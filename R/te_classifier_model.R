@@ -15,12 +15,12 @@ te_classifier<-R6::R6Class(
                         additional_data=NULL,
                         learner_name,
                         use_smote=TRUE,
-                        #smote_rep=1,
                         autotuning=FALSE,
+                        use_dim_reduction=FALSE,
+                        dim_red_n=60,
+                        dim_red_method="PCA",
                         smote_K=NULL,
-                        #smote_k_max=6,
                         smote_dup=NULL,
-                        #smote_dup_max=5,
                         normalize_input=FALSE,
                         normalize_output=FALSE,
                         n_performance_estimation=30,
@@ -107,12 +107,12 @@ te_classifier<-R6::R6Class(
         #print(smote_k_limit)
       #}
 
-        if(verbose==TRUE){
-          print(date())
-          print(smote_K)
-          print(date())
-          print(smote_k_limit)
-        }
+        #if(verbose==TRUE){
+        #  print(date())
+        #  print(smote_K)
+        #  print(date())
+        #  print(smote_k_limit)
+        #}
 
       #Create Learner----------------------------------------------------------
       learner<-get_configurated_learner(
@@ -130,6 +130,9 @@ te_classifier<-R6::R6Class(
       #Train Learner-----------------------------------------------------------
       trained_learner<-ai_train(
         text_embeddings=text_embeddings,
+        use_dim_reduction=use_dim_reduction,
+        dim_red_n=dim_red_n,
+        dim_red_method=dim_red_method,
         target_data=target_data,
         category_name = category_name,
         category_label=category_label,
@@ -160,8 +163,8 @@ te_classifier<-R6::R6Class(
         text_embeddings,
         additional_data=NULL,
         trained_learner=self$trained_learner,
-        na.rm=TRUE,
-        verbose=FALSE)
+        na.rm=na.rm,
+        verbose=verbose)
       return(predictions)
     },
     set_publication_info=function(autors,

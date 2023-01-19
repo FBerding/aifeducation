@@ -26,6 +26,9 @@
 #' @importFrom mlr3 TaskClassif
 #' @export
 ai_train<-function(text_embeddings,
+                   use_dim_reduction,
+                   dim_red_n,
+                   dim_red_method,
                    target_data,
                    category_name,
                    category_label=NULL,
@@ -61,7 +64,53 @@ ai_train<-function(text_embeddings,
   }
 
   ##Data Preparation-----------------------------------------------------------
-  data_analysis<-text_embeddings$embeddings
+  data_analysis_start<-text_embeddings$embeddings
+
+  if(is.null(additional_data)==FALSE){
+    data_analysis_start<-cbind(data_analysis_start,additional_data,target_data)
+  } else {
+    data_analysis_start<-cbind(data_analysis_start,target_data)
+  }
+  data_analysis_start<-as.data.frame(data_analysis_start)
+
+  #Removing cases with NA------------------------------------------------------
+  if(na.rm==TRUE){
+    if(verbose==TRUE){
+      print(paste(date(),"Removing Cases with NA"))
+    }
+    data_analysis_start<-stats::na.omit(data_analysis_start)
+    if(verbose==TRUE){
+      print(paste(date(),"Cases Reduced from",nrow(text_embeddings$embeddings),
+                  "to",nrow(data_analysis_start)))
+    }
+  }
+  data_analysis<-data_analysis_start[,1:(ncol(data_analysis_start)-1)]
+
+  ##Apply Dimensionreduction---------------------------------------------------
+  if(use_dim_reduction==TRUE){
+    if(verbose==TRUE){
+      print(paste(date(),"Reducing Dimensions with",dim_red_method,
+                  "from",ncol(data_analysis),
+                  "to",dim_red_n))
+    }
+    reduced_data<-dimRed::embed(
+      .data=data_analysis,
+      .method=dim_red_method,
+      "ndim"=dim_red_n,
+      .keep.org.data = TRUE)
+    reduced_data@org.data<-matrix()
+
+    data_analysis<-as.matrix(reduced_data@data@data)
+    data_analysis<-unname(data_analysis)
+    colnames(data_analysis)<-colnames(data_analysis,prefix = "rd_",do.NULL=FALSE)
+    data_analysis<-as.data.frame(data_analysis)
+
+    reduced_data@data<-dimRed::dimRedData()
+    reduced_data@has.inverse<-FALSE
+    reduced_data@inverse=function(){}
+  }
+
+  data_analysis$target_data<-data_analysis_start[,ncol(data_analysis_start)]
 
   #target_data<-basic_text_rep$dtm@docvars[,category_name]
 
@@ -69,17 +118,6 @@ ai_train<-function(text_embeddings,
   target_min=min(target_data,na.rm = TRUE)
   original_cat_labels<-names(table(target_data))
   #print(original_cat_labels)
-
-  if(is.null(additional_data)==FALSE){
-    data_analysis<-cbind(data_analysis,additional_data,target_data)
-  } else {
-    data_analysis<-cbind(data_analysis,target_data)
-  }
-  data_analysis<-as.data.frame(data_analysis)
-
-  if(na.rm==TRUE){
-    data_analysis<-stats::na.omit(data_analysis)
-  }
 
   datamatrix_non_normalized<-data_analysis
   if(normalize_input==TRUE)
@@ -149,6 +187,11 @@ ai_train<-function(text_embeddings,
   iota2_list<-NULL
   hyperparameter_all<-NULL
   hyperparameter_best<-NULL
+
+  if(verbose==TRUE){
+    print(paste(date(),"Starting Performance Estimation"))
+  }
+
   for(i in 1:n_performance_estimation)
   {
     #print(i)
@@ -229,7 +272,7 @@ ai_train<-function(text_embeddings,
     if(tune==TRUE){
       #hyperparameter_best[paste0("iter",i)]<-list(
       hyperparameter_best<-cbind(hyperparameter_best,
-        as.matrix(
+        matrix(
           c("iter"=i,
             results_performance[2,i],
             results_performance[3,i],
@@ -243,9 +286,13 @@ ai_train<-function(text_embeddings,
             results_performance[11,i],
             prediction$score(cr_optim),
             #unlist(x=tune_results$result_y),
-            unlist(x=tune_results$result_learner_param_vals))
+            unlist(x=as.character(tune_results$result_learner_param_vals)))
         )
       )
+      rownames(hyperparameter_best)<-c("iter",
+                                       rownames(results_performance)[2:11],
+                                       names(prediction$score(cr_optim)),
+                                       names(tune_results$result_learner_param_vals))
       hyperparameter_all<-rbind(
         hyperparameter_all,
         cbind(
@@ -299,8 +346,13 @@ ai_train<-function(text_embeddings,
     }
     for(i in 13:ncol(hyperparameter_best)){
       tmp_name=colnames(hyperparameter_best)[i]
-      #print(tmp_name)
-      if(varhandle::check.numeric(hyperparameter_best[1,i])==FALSE){
+      if(is.logical(hyperparameter_best[1,i])){
+        tmp_count<-table(hyperparameter_best[i])
+        index_max<-match(x=max(tmp_count),table=tmp_count)
+        tmp_value<-names(tmp_count)[index_max]
+        hyperparameter_final[tmp_name]<-list(tmp_value)
+
+      } else if(varhandle::check.numeric(hyperparameter_best[1,i])==FALSE){
         tmp_count<-table(hyperparameter_best[i])
         if(length(tmp_count)>0){
           index_max<-match(x=max(tmp_count),table=tmp_count)
@@ -355,7 +407,7 @@ ai_train<-function(text_embeddings,
   for (i in 1:n_features)
   {
     normalization_matrix[1,i]<-i
-    normalization_matrix[2,i]<-Liste_Features[i]
+    normalization_matrix[2,i]<-final_features[i]
     #Min-Werte for Normalisierung
     normalization_matrix[3,i]<-min(datamatrix_min_max[,i])
     #Max-Werte fuer Normalisierung
@@ -465,11 +517,21 @@ ai_train<-function(text_embeddings,
   res_transformation["n_input_variables"]=list(n_features)
   res_transformation["normalization_matrix"]=list(normalization_matrix)
 
+  #Summary of dimension_reduction
+  res_dim_reduction<-NULL
+  if(use_dim_reduction==TRUE){
+    res_dim_reduction["method"]<-list(dim_red_method)
+    res_dim_reduction["n_dim"]<-list(dim_red_n)
+    res_dim_reduction["applied"]<-list(use_dim_reduction)
+    res_dim_reduction["model"]<-list(reduced_data)
+  }
+
   #Summarizing the results
   trained_learner<-list(
     "category_summary"=category_summary,
     "learner"=finale_learner,
     "transformation"=res_transformation,
+    "dim_reduction"=res_dim_reduction,
     "reliability"=reliability,
     "filter_summary"=filter_summary,
     "hyperparameter_summary"=res_hyber_params,

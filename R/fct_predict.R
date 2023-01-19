@@ -7,22 +7,66 @@ ai_predict<-function(text_embeddings,
                      na.rm=TRUE,
                      verbose=FALSE){
 
-  if(text_embeddings$get_model_info()$model_name!=trained_learner$text_model$model_name |
-     text_embeddings$get_model_info()$model_date!=trained_learner$text_model$model_date |
-     text_embeddings$get_model_info()$model_method!=trained_learner$text_model$model_method |
-     text_embeddings$get_model_info()$param_seq_length!=trained_learner$text_model$param_seq_length |
-     text_embeddings$get_model_info()$param_chunks!=trained_learner$text_model$param_chunks |
-     text_embeddings$get_model_info()$param_overlap!=trained_learner$text_model$param_overlap |
-     text_embeddings$get_model_info()$param_aggregation!=trained_learner$text_model$param_aggregation
+  tmp_model_embedding=text_embeddings$get_model_info()
+  tmp_model_learner=trained_learner$text_model
+
+  for(i in 1:length(tmp_model_embedding)){
+    if(identical(tmp_model_embedding[[i]], integer(0))){
+      tmp_model_embedding[i]="missing"
+    }
+    if(is.null(tmp_model_embedding[[i]])==TRUE){
+      tmp_model_embedding[i]="missing"
+    } else {
+      if(is.na(tmp_model_embedding[[i]])==TRUE){
+        tmp_model_embedding[i]="missing"
+      }
+    }
+
+  }
+  for(i in 1:length(tmp_model_learner)){
+    if(identical(tmp_model_learner[[i]], integer(0))){
+      tmp_model_learner[i]="missing"
+    }
+    if(is.null(tmp_model_learner[[i]])==TRUE){
+      tmp_model_learner[i]="missing"
+    } else {
+      if(is.na(tmp_model_learner[[i]])==TRUE){
+        tmp_model_learner[i]="missing"
+      }
+    }
+
+  }
+
+    if(tmp_model_embedding$model_name!=tmp_model_learner$model_name |
+       tmp_model_embedding$model_date!=tmp_model_learner$model_date |
+       tmp_model_embedding$model_method!=tmp_model_learner$model_method |
+       tmp_model_embedding$param_seq_length!=tmp_model_learner$param_seq_length |
+       tmp_model_embedding$param_chunks!=tmp_model_learner$param_chunks |
+       tmp_model_embedding$param_overlap!=tmp_model_learner$param_overlap |
+       tmp_model_embedding$param_aggregation!=tmp_model_learner$param_aggregation
      ){
     stop("Text embedding model of the learner does not match with the text embedding model
          of the supplied text embedding.")
   }
 
+  data_embeddings<-text_embeddings$embeddings
+
+  if(trained_learner$dim_reduction$applied==TRUE){
+    if(verbose==TRUE){
+      print(paste(date(),"Applying Model for Dimension Reduction"))
+    }
+    data_embeddings<-as.matrix(trained_learner$dim_reduction$model@apply(data_embeddings)@data)
+    data_embeddings<-unname(data_embeddings)
+    colnames(data_embeddings)<-colnames(data_embeddings,
+                                        prefix = "rd_",
+                                        do.NULL=FALSE)
+    data_embeddings<-as.data.frame(data_embeddings)
+  }
+
   if(is.null(additional_data)==FALSE){
-    datamatrix_analysis<-cbind(text_embeddings$embeddings,additional_data)
+    datamatrix_analysis<-cbind(data_embeddings,additional_data)
   } else {
-    datamatrix_analysis<-text_embeddings$embeddings
+    datamatrix_analysis<-data_embeddings
   }
 
   datamatrix_analysis<-datamatrix_analysis[,trained_learner$transformation$normalization_matrix[2,]]

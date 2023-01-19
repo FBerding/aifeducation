@@ -72,6 +72,8 @@ multi_net<-function(input,
   hidden=vector(length = n_hidden)
   hidden[]=n_hidden_size
 
+  #hidden=c(20,10,8,7)
+
   #Training Net-----------------------------------------------------------------
   trained_wts<-multi_net_train(input = as.matrix(train_input),
                                output = as.character(train_target),

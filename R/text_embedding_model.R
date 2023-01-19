@@ -277,6 +277,108 @@ TextEmbeddingModel<-R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
+    fine_tune_bert_model=function(output_dir,
+                                  bert_model_dir_path,
+                                  model_name,
+                                  raw_texts,
+                                  p_mask=0.15,
+                                  n_epoch,
+                                  chunk_size,
+                                  n_workers=1,
+                                  multi_process=FALSE,
+                                  trace=TRUE){
+      transformer = reticulate::import('transformers')
+      tf = reticulate::import('tensorflow')
+      np=reticulate::import("numpy")
+
+      mlm_model=transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
+
+      print(paste(date(),"Tokenize Raw Texts"))
+      prepared_texts<-quanteda::tokens(
+        x = raw_texts,
+        what = "word",
+        remove_punct = FALSE,
+        remove_symbols = TRUE,
+        remove_numbers = FALSE,
+        remove_url = TRUE,
+        remove_separators = TRUE,
+        split_hyphens = FALSE,
+        split_tags = FALSE,
+        include_docvars = TRUE,
+        padding = FALSE,
+        verbose = trace)
+
+      print(paste(date(),"Creating Text Chunks"))
+      prepared_texts_chunks<-quanteda::tokens_chunk(
+        x=prepared_texts,
+        size=chunk_size,
+        overlap = 0,
+        use_docvars = FALSE)
+
+      prepared_text_chunks_strings<-lapply(prepared_texts_chunks,paste,collapse = " ")
+      prepared_text_chunks_strings<-as.character(prepared_text_chunks_strings)
+      print(paste(date(),length(prepared_text_chunks_strings),"Chunks Created"))
+
+      print(paste(date(),"Creating Input"))
+      tokenized_texts=self$bert_components$tokenizer(prepared_text_chunks_strings,
+                                                     truncation =TRUE,
+                                                     padding= TRUE,
+                                                     max_length=as.integer(chunk_size),
+                                                     return_tensors="np")
+
+      input_ids<-tokenized_texts["input_ids"]
+      token_type_ids<-tokenized_texts["token_type_ids"]
+      attention_mask<-tokenized_texts["attention_mask"]
+
+      print(paste(date(),"Creating Masked Data"))
+      masked_ids<-input_ids
+      for(i in 1:nrow(masked_ids)){
+        tmp_sample<-sample(2:(chunk_size-1),size = p_mask*chunk_size)
+        masked_ids[i,tmp_sample]<-tokenizer$mask_token_id
+      }
+
+      mode(input_ids) <- "integer"
+      mode(token_type_ids) <- "integer"
+      mode(attention_mask) <- "integer"
+      mode(masked_ids) <- "integer"
+
+      data_new<-reticulate::dict("input_ids"=masked_ids,
+                                 "token_type_ids"=token_type_ids,
+                                 "attention_mask"=attention_mask)
+
+      print(paste(date(),"Preparing Training of the Model"))
+      adam<-tf$keras$optimizers$Adam
+
+      print(paste(date(),"Compile Model"))
+      mlm_model$compile(optimizer=adam(3e-5))
+
+      print(paste(date(),"Start Fine Tuning"))
+      mlm_model$fit(x=data_new,
+                                     y=input_ids,
+                                     epochs=as.integer(n_epoch),
+                                     workers=as.integer(n_workers),
+                                     use_multiprocessing=multi_process
+      )
+
+      print(paste(date(),"Saving Bert Model"))
+      mlm_model$save_pretrained(
+        save_directory=output_dir)
+
+      print(paste(date(),"Saving Tokenizer"))
+      self$bert_components$tokenizer$save_pretrained(
+        output_dir)
+
+      print(paste(date(),"Setting new Model Name and Date"))
+      self$model_info$model_name<-model_name
+      self$model_info$model_date<-date()
+
+      print(paste(date(),"Reloading model"))
+      self$bert_components$model<-transformer$TFBertModel$from_pretrained(output_dir)
+
+      print(paste(date(),"Done"))
+
+    },
+    #-------------------------------------------------------------------------
     tokenize=function(raw_text, trace = FALSE){
       n_units<-length(raw_text)
 
@@ -487,6 +589,10 @@ TextEmbeddingModel<-R6::R6Class(
         }
         #text_embedding<-text_embedding/rowSums(self$bow_components$model[,-1])
         text_embedding<-text_embedding/rowSums(text_embedding)
+        #Replace NaN with 0 which indicate that the rowsum is 0 and division ist not
+        #possible
+        text_embedding[is.nan(text_embedding)]<-0
+
         colnames(text_embedding)<-colnames(text_embedding,
                                            do.NULL = FALSE,
                                            prefix = "lda_")

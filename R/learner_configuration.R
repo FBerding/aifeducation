@@ -21,9 +21,9 @@
      learner<-mlr3::lrn("classif.nnet",
                   predict_type = "response",
                   decay=0.2,
-                  size=3,
+                  size=100,
                   trace=FALSE,
-                  MaxNWts=1000000)
+                  MaxNWts=100000000)
 
      if(use_smote==TRUE){
        for(i in 1:smote_rep){
@@ -51,7 +51,7 @@
 
      if(autotuning==TRUE & use_smote==TRUE){
        learner$param_set$values$classif.nnet.trace=FALSE
-       learner$param_set$values$classif.nnet.size=paradox::to_tune(2,30)
+       learner$param_set$values$classif.nnet.size=paradox::to_tune(2,200)
       learner$param_set$values$classif.nnet.decay=paradox::to_tune(0.000001,1,logscale=TRUE)
       #learner$param_set$values$smote.dup_size=paradox::to_tune(1,smote_dup_max)
       #learner$param_set$values$smote.K=paradox::to_tune(1,smote_k_max)
@@ -64,7 +64,7 @@
      }
      if(autotuning==TRUE & use_smote==FALSE){
        learner$param_set$values$trace=FALSE
-       learner$param_set$values$size=paradox::to_tune(2,30)
+       learner$param_set$values$size=paradox::to_tune(2,200)
        learner$param_set$values$decay=paradox::to_tune(0.000001,1,logscale=TRUE)
      }
 
@@ -218,14 +218,14 @@
      #------------------------------------------------------------------------
      if(learner_name=="classif.keras_seq_net"){
        learner<-mlr3::lrn("classif.keras_seq_net",
-                    n_hidden=2,
-                    n_hidden_size=6,
+                    n_hidden=3,
+                    n_hidden_size=50,
                     #optimizer=keras::optimizer_rmsprop(),
                     act_fct="sigmoid",
                     act_fct_last="softmax",
                     err_fct="categorical_crossentropy",
                     epochs = 3000L,
-                    batch_size = 5L,
+                    batch_size = 1L,
                     rel_tolerance=1e-3,
                     view_metrics = FALSE,
                     validation_split = 0.0,
@@ -293,6 +293,7 @@
       #     tuner=mlr3tuning::tnr("random_search")
       #   )
       # }
+       return(learner)
      }
    #------------------------------------------------------------------------
    if(learner_name=="classif.keras_net_gru"){
@@ -393,9 +394,9 @@
      learner<-mlr3::lrn("classif.multinet",
                         predict_type = "response",
                         n_hidden=3,
-                        n_hidden_size=7,
-                        learning_rate = 0.01,
-                        act_fct="tanh",
+                        n_hidden_size=100,
+                        learning_rate = 0.001,
+                        act_fct="relu",
                         act_fct_last="softmax",
                         err_msr="iota2",
                         freq_recalc_iota2=10,
@@ -436,10 +437,10 @@
 
      if(autotuning==TRUE & use_smote==TRUE){
        learner$param_set$values$classif.multinet.trace=FALSE
-       learner$param_set$values$classif.multinet.n_hidden_size=paradox::to_tune(3,10)
+       learner$param_set$values$classif.multinet.n_hidden_size=paradox::to_tune(5,100)
        learner$param_set$values$classif.multinet.n_hidden=paradox::to_tune(2,5)
        learner$param_set$values$classif.multinet.learning_rate=paradox::to_tune(lower=0.001,
-                                                                                upper=0.100,
+                                                                                upper=0.800,
                                                                                 logscale=TRUE)
 
        #learner$param_set$values$smote.dup_size=paradox::to_tune(1,smote_dup_max)
@@ -453,11 +454,95 @@
      }
      if(autotuning==TRUE & use_smote==FALSE){
       learner$param_set$values$trace=FALSE
-      learner$param_set$values$n_hidden_size=paradox::to_tune(3,10)
+      learner$param_set$values$n_hidden_size=paradox::to_tune(5,100)
       learner$param_set$values$n_hidden=paradox::to_tune(2,5)
       learner$param_set$values$learning_rate=paradox::to_tune(lower=0.001,
-                                                              upper=0.100,
+                                                              upper=0.800,
                                                               logscale=TRUE)
+
+     }
+
+     #if(autotuning==TRUE){
+     #learner = mlr3tuning::AutoTuner$new(
+     #   learner=learner,
+     #   resampling = inner_sampling,
+     #   measure =  cr_optim,
+     #   terminator=mlr3tuning::trm("evals",n_evals=max_n_tuning),
+     #   tuner=mlr3tuning::tnr("random_search")
+     # )
+     # }
+     return(learner)
+   }
+
+   if(learner_name=="multinet_entropy"){
+     learner<-mlr3::lrn("classif.multinet",
+                        predict_type = "response",
+                        n_hidden=3,
+                        n_hidden_size=100,
+                        learning_rate = 0.001,
+                        act_fct="relu",
+                        act_fct_last="softmax",
+                        err_msr="cross_entropy",
+                        freq_recalc_iota2=10,
+                        max_iter = 1000,
+                        cr_rel_change = 1e-6,
+                        cr_abs_error=1e-4,
+                        validation_split=0.2,
+                        split_method="strata",
+                        monitor="val_loss",
+                        patience=5,
+                        return_best=TRUE,
+                        trace=FALSE
+     )
+
+     if(use_smote==TRUE){
+       for(i in 1:smote_rep){
+         if(i==1){
+           po_smote = mlr3pipelines::po("smote",
+                                        dup_size=smote_dup[i],
+                                        K=smote_K[i],
+                                        id=paste0("smote",i)
+           )
+         }
+         else{
+           po_smote=mlr3pipelines::concat_graphs(po_smote,
+                                                 mlr3pipelines::po("smote",
+                                                                   dup_size=smote_dup[i],
+                                                                   K=smote_K[i],
+                                                                   id=paste0("smote",i)),
+                                                 in_place=FALSE)
+         }
+       }
+       learner=mlr3pipelines::GraphLearner$new(mlr3pipelines::concat_graphs(
+         po_smote,
+         learner,
+         in_place=FALSE))
+     }
+
+     if(autotuning==TRUE & use_smote==TRUE){
+       learner$param_set$values$classif.multinet.trace=FALSE
+       learner$param_set$values$classif.multinet.n_hidden_size=paradox::to_tune(5,100)
+       learner$param_set$values$classif.multinet.n_hidden=paradox::to_tune(2,5)
+       learner$param_set$values$classif.multinet.learning_rate=paradox::to_tune(lower=0.001,
+                                                                                upper=0.800,
+                                                                                logscale=TRUE)
+
+       #learner$param_set$values$smote.dup_size=paradox::to_tune(1,smote_dup_max)
+       #learner$param_set$values$smote.K=paradox::to_tune(1,smote_k_max)
+       for(i in 1:smote_rep){
+         learner$param_set$values[[paste0("smote",i,".dup_size")]]=paradox::to_tune(1,smote_dup_max[i])
+         learner$param_set$values[[paste0("smote",i,".K")]]=paradox::to_tune(1,smote_k_max[i])
+       }
+
+
+     }
+     if(autotuning==TRUE & use_smote==FALSE){
+       learner$param_set$values$trace=FALSE
+       learner$param_set$values$n_hidden_size=paradox::to_tune(5,100)
+       learner$param_set$values$n_hidden=paradox::to_tune(2,5)
+       learner$param_set$values$learning_rate=paradox::to_tune(lower=0.001,
+                                                               upper=0.800,
+                                                               logscale=TRUE)
 
      }
 

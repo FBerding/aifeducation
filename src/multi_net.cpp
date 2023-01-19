@@ -207,6 +207,8 @@ double grad_iota2(double x,
   }
 
   grad=-x*tmp_error*tmp_error;
+  //grad=-x*tmp_error;
+  //grad=-x;
   return grad;
 
 }
@@ -288,6 +290,7 @@ double grad_tanh(double o_k,
 arma::vec act_softmax(arma::vec x){
   arma::vec nominator=arma::exp(x);
   double denominator=arma::accu(nominator);
+  //Rcout<<nominator.t()<<"\n";
   arma::vec result=nominator/denominator;
   return result;
   //return Rcpp::tanh(x);
@@ -675,6 +678,8 @@ Rcpp::List multi_net_train(arma::mat input,
     } else if(err_msr_last=="iota2"){
       error_output=atmp_vec_1-atmp_vec_2;
       test_error_sum=test_error_sum+err_fct_iota2(error_output, vec_true_c_test(r),iota2object_init_test)/n_cases_test;
+      //Rcpp::NumericVector iota2=iota2object_init_test(2);
+      //test_error_sum=1-Rcpp::sum(iota2)/iota2.length();
     }
   }
 
@@ -705,7 +710,11 @@ Rcpp::List multi_net_train(arma::mat input,
   double error_sum_old=0.0;
   double test_error_sum_old=0.0;
 
+  double init_rate=1*learningrate;
+
   while(((iter<=max_iter) & (monitor_rel_change>cr_rel_change)) & (monitor_loss > cr_abs_error)){
+    learningrate=init_rate*exp(-0.05*(iter-1));
+
     error_sum_old=error_sum;
     error_sum=0.0;
     test_error_sum_old=test_error_sum;
@@ -749,6 +758,10 @@ Rcpp::List multi_net_train(arma::mat input,
               error_sum=error_sum+arma::accu(err_fct_last(error_output))/n_cases;
             } else if (err_msr_last=="cross_entropy"){
               error_sum=error_sum+err_fct_last_vec(output_matrix.row(r).as_col(),res_list((n_layer-2)))/n_cases;
+              //error_sum=error_sum+err_fct_last_vec(res_list((n_layer-2)),output_matrix.row(r).as_col())/n_cases;
+              //if(r==10){
+              //Rcout<<res_list((n_layer-2))<<"\n";
+              //}
             } else if (err_msr_last=="iota2"){
               //Calculating the iota2object----------------------------------------
               //for every freq_recalc_iota2 object
@@ -777,8 +790,12 @@ Rcpp::List multi_net_train(arma::mat input,
                 iota2=iota2object_train(2);
                 recalc_counter=0;
               }
+              atmp_matrix_1=as<arma::mat>(iota2object_train(0));
+              atmp_vec_1=as<arma::vec>(iota2object_train(1));
+              error_list(i)=(1-atmp_vec_1(vec_true_c(r)))*atmp_matrix_1.row(vec_true_c(r)).as_col()%error_output;
               error_sum=error_sum+err_fct_iota2(error_output,vec_true_c(r),iota2object_train)/n_cases;
             }
+
             //Applying Gradient Error Function-------------------------------
             if(err_msr_last=="mse"){
               atmp_error_grad_vec=-2*error_output;
@@ -787,6 +804,8 @@ Rcpp::List multi_net_train(arma::mat input,
               atmp_vec_1=res_list((n_layer-2));
               atmp_error_grad_vec=(-1)*output_matrix.row(r).as_col()/atmp_vec_1;
               atmp_error_grad_mat=atmp_error_grad_vec*arma::rowvec(wts_list(i).n_cols, arma::fill::ones);
+              //atmp_error_grad_vec=(-1)*atmp_vec_1/output_matrix.row(r).as_col();
+              //atmp_error_grad_mat=atmp_error_grad_vec*arma::rowvec(wts_list(i).n_cols, arma::fill::ones);
             } else if(err_msr_last=="iota2"){
               atmp_vec_1=res_list(i);
               atmp_error_grad_vec.resize(wts_list(i).n_rows);
@@ -948,6 +967,8 @@ Rcpp::List multi_net_train(arma::mat input,
       } else if(err_msr_last=="iota2"){
         error_output=atmp_vec_1-atmp_vec_2;
         test_error_sum=test_error_sum+err_fct_iota2(error_output, vec_true_c_test(r),iota2object_test)/n_cases_test;
+        //Rcpp::NumericVector iota2=iota2object_test(2);
+        //test_error_sum=1-Rcpp::sum(iota2)/iota2.length();
       }
     }
     test_rel_change=(test_error_sum_old-test_error_sum)/test_error_sum_old;
@@ -980,17 +1001,19 @@ Rcpp::List multi_net_train(arma::mat input,
     if(iter>patience){
       for(r=0;r<patience;r++){
         index_history=iter-r-1;
-        patience_vec(r)=history(index_history,2);
+        if(monitor=="loss"){
+          patience_vec(r)=history(index_history,1);
+        } else if(monitor=="val_loss") {
+          patience_vec(r)=history(index_history,2);
+        }
       }
       index_patience_max=Rcpp::which_max(patience_vec);
-      //if(test_error_sum<0){
-        //if(patience_vec[index_patience_max]<0){
-        //  monitor_rel_change=(patience_vec[index_patience_max]-0)/patience_vec[index_patience_max]*(-1);
-        //} else {
-          //monitor_rel_change=(patience_vec[index_patience_max]-0)/patience_vec[index_patience_max];
-        //}
-      //} else {
+      if(monitor=="loss"){
+        monitor_rel_change=(patience_vec(index_patience_max)-error_sum)/patience_vec(index_patience_max);
+      } else if(monitor=="val_loss") {
         monitor_rel_change=(patience_vec(index_patience_max)-test_error_sum)/patience_vec(index_patience_max);
+      }
+
       //}
     } else {
       monitor_rel_change=10;
@@ -1019,7 +1042,8 @@ Rcpp::List multi_net_train(arma::mat input,
   }
 
   //Return model----------------------------------------------------------------
-  Rcpp::List final_model=Rcpp::List::create(Named("wts") = best_wts, Named("history")=history);
+  Rcpp::List final_model=Rcpp::List::create(Named("wts") = best_wts,
+                                            Named("history")=history);
   return final_model;
 }
 
