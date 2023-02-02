@@ -284,8 +284,12 @@ TextEmbeddingModel<-R6::R6Class(
                                   bert_model_dir_path,
                                   model_name,
                                   raw_texts,
+                                  vocab_draft,
+                                  aug_vocab_by=100,
                                   p_mask=0.15,
-                                  n_epoch,
+                                  test_size=0.1,
+                                  n_epoch=1,
+                                  batch_size=12,
                                   chunk_size,
                                   n_workers=1,
                                   multi_process=FALSE,
@@ -293,6 +297,7 @@ TextEmbeddingModel<-R6::R6Class(
       transformer = reticulate::import('transformers')
       tf = reticulate::import('tensorflow')
       np=reticulate::import("numpy")
+      datasets=reticulate::import("datasets")
 
       mlm_model=transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
 
@@ -310,6 +315,27 @@ TextEmbeddingModel<-R6::R6Class(
         include_docvars = TRUE,
         padding = FALSE,
         verbose = trace)
+
+      if(aug_vocab_by>0){
+        print(paste(date(),"Augmenting vocabulary"))
+
+        features_dfm<-quanteda::dfm(prepared_texts,tolower=FALSE)
+        top_features<-names(quanteda::topfeatures(
+          x=features_dfm,
+          n=ncol(features_dfm),
+          decreasing = TRUE))
+
+        top_features<-cbind(top_features,seq(from=1,to=length(top_features),by=1))
+
+        new_tokens<-subset(top_features,top_features[,1] %in% vocab_draft$vocab$token)
+
+        new_tokens<-setdiff(new_tokens[,1],names(self$bert_components$tokenizer$vocab))
+        new_tokens<-new_tokens[1:min(aug_vocab_by,length(new_tokens))]
+
+        print(paste(date(),"Adding",length(new_tokens),"New Tokens"))
+        invisible(self$bert_components$tokenizer$add_tokens(new_tokens = new_tokens))
+        invisible(mlm_model$resize_token_embeddings(length(self$bert_components$tokenizer)))
+      }
 
       print(paste(date(),"Creating Text Chunks"))
       prepared_texts_chunks<-quanteda::tokens_chunk(
@@ -345,9 +371,24 @@ TextEmbeddingModel<-R6::R6Class(
       mode(attention_mask) <- "integer"
       mode(masked_ids) <- "integer"
 
-      data_new<-reticulate::dict("input_ids"=masked_ids,
-                                 "token_type_ids"=token_type_ids,
-                                 "attention_mask"=attention_mask)
+      data_complete<-reticulate::dict("input_ids"=masked_ids,
+                                      "token_type_ids"=token_type_ids,
+                                      "attention_mask"=attention_mask,
+                                      "labels"=input_ids)
+
+      print(paste(date(),"Creating TensorFlow Dataset"))
+      data_complete<-datasets$Dataset$from_dict(data_complete)
+      data_complete<-data_complete$train_test_split(test_size=test_size)
+      data_train<-data_complete$train$to_tf_dataset(
+        columns = c("input_ids","token_type_ids","attention_mask"),
+        label_cols = "labels",
+        shuffle = TRUE,
+        batch_size = as.integer(batch_size))
+      data_test<-data_complete$test$to_tf_dataset(
+        columns = c("input_ids","token_type_ids","attention_mask"),
+        label_cols = "labels",
+        shuffle = TRUE,
+        batch_size = as.integer(batch_size))
 
       print(paste(date(),"Preparing Training of the Model"))
       adam<-tf$keras$optimizers$Adam
@@ -356,11 +397,11 @@ TextEmbeddingModel<-R6::R6Class(
       mlm_model$compile(optimizer=adam(3e-5))
 
       print(paste(date(),"Start Fine Tuning"))
-      mlm_model$fit(x=data_new,
-                                     y=input_ids,
-                                     epochs=as.integer(n_epoch),
-                                     workers=as.integer(n_workers),
-                                     use_multiprocessing=multi_process
+      mlm_model$fit(x=data_train,
+                    validation_data=data_test,
+                    epochs=as.integer(n_epoch),
+                    workers=as.integer(n_workers),
+                    use_multiprocessing=multi_process
       )
 
       print(paste(date(),"Saving Bert Model"))
