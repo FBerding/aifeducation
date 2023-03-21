@@ -37,14 +37,14 @@ ai_predict<-function(text_embeddings,
 
   }
 
-    if(tmp_model_embedding$model_name!=tmp_model_learner$model_name |
-       tmp_model_embedding$model_date!=tmp_model_learner$model_date |
-       tmp_model_embedding$model_method!=tmp_model_learner$model_method |
-       tmp_model_embedding$param_seq_length!=tmp_model_learner$param_seq_length |
-       tmp_model_embedding$param_chunks!=tmp_model_learner$param_chunks |
-       tmp_model_embedding$param_overlap!=tmp_model_learner$param_overlap |
-       tmp_model_embedding$param_aggregation!=tmp_model_learner$param_aggregation
-     ){
+  if(tmp_model_embedding$model_name!=tmp_model_learner$model_name |
+     tmp_model_embedding$model_date!=tmp_model_learner$model_date |
+     tmp_model_embedding$model_method!=tmp_model_learner$model_method |
+     tmp_model_embedding$param_seq_length!=tmp_model_learner$param_seq_length |
+     tmp_model_embedding$param_chunks!=tmp_model_learner$param_chunks |
+     tmp_model_embedding$param_overlap!=tmp_model_learner$param_overlap |
+     tmp_model_embedding$param_aggregation!=tmp_model_learner$param_aggregation
+  ){
     stop("Text embedding model of the learner does not match with the text embedding model
          of the supplied text embedding.")
   }
@@ -57,8 +57,8 @@ ai_predict<-function(text_embeddings,
     }
 
     data_embeddings<-scale(as.matrix(data_embeddings),
-                                     center=trained_learner$dim_reduction$model$columns_means,
-                                     scale=FALSE)%*%as.matrix(trained_learner$dim_reduction$model$loadings)
+                           center=trained_learner$dim_reduction$model$columns_means,
+                           scale=FALSE)%*%as.matrix(trained_learner$dim_reduction$model$loadings)
     data_embeddings<-as.matrix(data_embeddings)
     data_embeddings<-unname(data_embeddings)
     colnames(data_embeddings)<-colnames(data_embeddings,
@@ -90,13 +90,13 @@ ai_predict<-function(text_embeddings,
   # Normalisierung der Daten, falls im Training erfolgt
   if(trained_learner$transformation$normalization_input==TRUE){
     if(verbose==TRUE){
-    print(paste(date(),"Normalize Input Data"))
+      print(paste(date(),"Normalize Input Data"))
     }
     for(i in 1:n_cols){
-          datamatrix_analysis[i]<-lapply(X=datamatrix_analysis[i],
-                                      FUN=normalize_predict,
-                                      min_x=as.numeric(trained_learner$transformation$normalization_matrix[3,i]),
-                                      max_x=as.numeric(trained_learner$transformation$normalization_matrix[4,i]))
+      datamatrix_analysis[i]<-lapply(X=datamatrix_analysis[i],
+                                     FUN=normalize_predict,
+                                     min_x=as.numeric(trained_learner$transformation$normalization_matrix[3,i]),
+                                     max_x=as.numeric(trained_learner$transformation$normalization_matrix[4,i]))
     }
   }
 
@@ -109,13 +109,13 @@ ai_predict<-function(text_embeddings,
 
   if(trained_learner$transformation$normalization_output==TRUE){
     if(verbose==TRUE){
-    print(paste(date(),"Re-Normalizing Output Data"))
+      print(paste(date(),"Re-Normalizing Output Data"))
     }
-        responses<-lapply(X=responses,
-                        FUN=re_normalize_predict,
-                        min_x=trained_learner$transformation$target_min,
-                        max_x=trained_learner$transformation$target_max)
-        responses<-as.numeric(responses)
+    responses<-lapply(X=responses,
+                      FUN=re_normalize_predict,
+                      min_x=trained_learner$transformation$target_min,
+                      max_x=trained_learner$transformation$target_max)
+    responses<-as.numeric(responses)
   }
 
   responses<-as.data.frame(cbind(as.character(rownames(datamatrix_analysis)),
@@ -147,11 +147,11 @@ ai_ensemble_predict<-function(text_embeddings,ensemble_learner,verbose=FALSE){
   colnames(predictions)<-names(ensemble_learner)
   n_categories<-length(ensemble_learner[[1]]$category_summary$categories)
   probabilites_pattern<-matrix(data=NA,
-                      nrow=nrow(predictions),
-                      ncol=n_categories)
-  probabilites<-matrix(data=NA,
                                nrow=nrow(predictions),
                                ncol=n_categories)
+  probabilites<-matrix(data=NA,
+                       nrow=nrow(predictions),
+                       ncol=n_categories)
   for(i in 1:nrow(predictions)){
     for(j in 1:n_categories){
       tmp_prob<-1
@@ -180,4 +180,4 @@ ai_ensemble_predict<-function(text_embeddings,ensemble_learner,verbose=FALSE){
 
   results<-cbind(predictions,probabilites,expected_category)
   return(results)
-  }
+}

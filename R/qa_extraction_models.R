@@ -73,13 +73,24 @@ QAExtractModel<-R6::R6Class(
                                               model=self$model,
                                               tokenizer = self$tokenizer)
     },
-    answer_question=function(question,knowledge_base){
+    answer_question=function(question,
+                             knowledge_base,
+                             n_answers=1,
+                             doc_stride=128,
+                             max_answer_len=15,
+                             max_seq_len=384,
+                             max_question_len=64,
+                             handle_impossible_answer=FALSE,
+                             align_to_words=TRUE){
       knowledge_base["question"]<-list(question)
       knowledge_base<-unlist(knowledge_base,
                              use.names = TRUE)
       knowledge_base_corpus<-quanteda::corpus(knowledge_base)
-      knowledge_base_tokens<-tokens(knowledge_base_corpus)
-      knowledge_base_dfm<-dfm(knowledge_base_tokens)
+      knowledge_base_tokens<-quanteda::tokens(knowledge_base_corpus)
+      knowledge_base_dfm<-quanteda::dfm(knowledge_base_tokens)
+      knowledge_base_dfm<-quanteda::dfm_weight(
+        x=knowledge_base_dfm,
+        scheme = "prop")
       similarity_to_question<-quanteda.textstats::textstat_simil(
         x=knowledge_base_dfm[1:(nrow(knowledge_base_dfm)-1),],
         y=knowledge_base_dfm["question",],
@@ -91,7 +102,14 @@ QAExtractModel<-R6::R6Class(
       context = knowledge_base[index_max]
 
       answer<-self$qa_pipline(question=question,
-                              context=context)
+                              context=context,
+                              n_answers=as.integer(n_answers),
+                              doc_stride=as.integer(doc_stride),
+                              max_answer_len=as.integer(max_answer_len),
+                              max_seq_len=as.integer(max_seq_len),
+                              max_question_len=as.integer(max_question_len),
+                              handle_impossible_answer=FALSE,
+                              align_to_words=TRUE)
       return(answer$answer)
     }
   )

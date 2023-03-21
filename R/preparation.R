@@ -38,18 +38,18 @@ bow_pp_create_vocab_draft<-function(path_language_model,
     tmp_text<-stringr::str_remove_all(tmp_text,
                                       pattern = "-\\n")
     tmp_text<-stringr::str_remove_all(tmp_text,
-                                      pattern = "–")
+                                      pattern = "???")
     tmp_text<-stringr::str_remove_all(tmp_text,
                                       pattern = ":")
 
 
     ud_text_analysis<-udpipe::udpipe_annotate(ud_language_model,
-                                              #x=data$text[selected_documents],
                                               x=tmp_text,
                                               doc_id = data$doc_id[selected_documents],
                                               trace = FALSE,
-                                              tagger = "default",
-                                              parser = "none")
+                                              tagger="default",
+                                              parser="none")
+
     ud_text_analysis<-as.data.frame(ud_text_analysis)
     ud_text_analysis$ID<-udpipe::unique_identifier(
       ud_text_analysis,

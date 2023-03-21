@@ -7,6 +7,7 @@ TextEmbeddingModel<-R6::R6Class(
     model_info=list(
       model_license=NA,
       model_name=NA,
+      model_label=NA,
       model_date=NA,
       model_version=NA,
       model_language=NA
@@ -42,6 +43,7 @@ TextEmbeddingModel<-R6::R6Class(
       model=NULL,
       tokenizer=NULL,
       aggregation=NULL,
+      use_cls_token=NULL,
       chunks=NULL,
       overlap=NULL),
     bow_components=list(
@@ -64,6 +66,7 @@ TextEmbeddingModel<-R6::R6Class(
 
     #--------------------------------------------------------------------------
     initialize=function(model_name,
+                        model_label,
                         model_version,
                         model_language,
                         method,
@@ -71,6 +74,7 @@ TextEmbeddingModel<-R6::R6Class(
                         chunks=1,
                         overlap=0,
                         aggregation="last",
+                        use_cls_token=TRUE,
                         bert_model_dir_path,
                         bow_basic_text_rep,
                         bow_n_dim=NULL,
@@ -96,6 +100,7 @@ TextEmbeddingModel<-R6::R6Class(
         self$bert_components$chunks<-chunks
         self$bert_components$overlap<-overlap
         self$bert_components$aggregation<-aggregation
+        self$bert_components$use_cls_token<-use_cls_token
         #------------------------------------------------------------------------
       } else if(self$basic_components$method=="glove_cluster"){
         glove <- text2vec::GlobalVectors$new(rank = bow_n_dim,
@@ -251,12 +256,13 @@ TextEmbeddingModel<-R6::R6Class(
       }
 
       private$model_info$model_name<-model_name
+      private$model_info$model_label<-model_label
       private$model_info$model_version<-model_version
       private$model_info$model_language<-model_language
       private$model_info$model_date<-date()
     },
     #--------------------------------------------------------------------------
-    load_bert=function(bert_model_dir_path){
+    load_weights=function(bert_model_dir_path){
       if(self$basic_components$method=="bert"){
         transformer = reticulate::import('transformers')
         self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
@@ -287,6 +293,7 @@ TextEmbeddingModel<-R6::R6Class(
                                   vocab_draft,
                                   aug_vocab_by=100,
                                   p_mask=0.15,
+                                  whole_word=TRUE,
                                   test_size=0.1,
                                   n_epoch=1,
                                   batch_size=12,
@@ -344,6 +351,13 @@ TextEmbeddingModel<-R6::R6Class(
         overlap = 0,
         use_docvars = FALSE)
 
+      check_chunks_length=(quanteda::ntoken(prepared_texts_chunks)==chunk_size)
+
+      prepared_texts_chunks<-quanteda::tokens_subset(
+        x=prepared_texts_chunks,
+        subset = check_chunks_length
+      )
+
       prepared_text_chunks_strings<-lapply(prepared_texts_chunks,paste,collapse = " ")
       prepared_text_chunks_strings<-as.character(prepared_text_chunks_strings)
       print(paste(date(),length(prepared_text_chunks_strings),"Chunks Created"))
@@ -354,55 +368,122 @@ TextEmbeddingModel<-R6::R6Class(
                                                      padding= TRUE,
                                                      max_length=as.integer(chunk_size),
                                                      return_tensors="np")
+      print(paste(date(),"Creating TensorFlow Dataset"))
+      tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
 
-      input_ids<-tokenized_texts["input_ids"]
-      token_type_ids<-tokenized_texts["token_type_ids"]
-      attention_mask<-tokenized_texts["attention_mask"]
-
-      print(paste(date(),"Creating Masked Data"))
-      masked_ids<-input_ids
-      for(i in 1:nrow(masked_ids)){
-        tmp_sample<-sample(2:(chunk_size-1),size = p_mask*chunk_size)
-        masked_ids[i,tmp_sample]<-self$bert_components$tokenizer$mask_token_id
+      if(whole_word==TRUE){
+        print(paste(date(),"Using Whole Word Masking"))
+        word_ids=matrix(nrow = length(prepared_texts_chunks),
+                        ncol=(chunk_size-2))
+        for(i in 0:(nrow(word_ids)-1)){
+          word_ids[i,]<-as.vector(unlist(tokenized_texts$word_ids(as.integer(i))))
+        }
+        word_ids<-reticulate::dict("word_ids"=word_ids)
+        word_ids<-datasets$Dataset$from_dict(word_ids)
+        tokenized_dataset=tokenized_dataset$add_column(name="word_ids",column=word_ids)
+        data_collator=transformer$DataCollatorForWholeWordMask(
+          tokenizer = tokenizer,
+          mlm = TRUE,
+          mlm_probability = p_mask
+        )
+      } else {
+        print(paste(date(),"Using Token Masking"))
+        data_collator=transformer$DataCollatorForLanguageModeling(
+          tokenizer = tokenizer,
+          mlm = TRUE,
+          mlm_probability = p_mask
+        )
       }
 
-      mode(input_ids) <- "integer"
-      mode(token_type_ids) <- "integer"
-      mode(attention_mask) <- "integer"
-      mode(masked_ids) <- "integer"
+      tokenized_dataset=tokenized_dataset$train_test_split(test_size=test_size)
 
-      data_complete<-reticulate::dict("input_ids"=masked_ids,
-                                      "token_type_ids"=token_type_ids,
-                                      "attention_mask"=attention_mask,
-                                      "labels"=input_ids)
+      tf_train_dataset=mlm_model$prepare_tf_dataset(
+        dataset = tokenized_dataset$train,
+        batch_size = as.integer(batch_size),
+        collate_fn = data_collator,
+        shuffle = TRUE
+      )
+      tf_test_dataset=mlm_model$prepare_tf_dataset(
+        dataset = tokenized_dataset$test,
+        batch_size = as.integer(batch_size),
+        collate_fn = data_collator,
+        shuffle = TRUE
+      )
 
-      print(paste(date(),"Creating TensorFlow Dataset"))
-      data_complete<-datasets$Dataset$from_dict(data_complete)
-      data_complete<-data_complete$train_test_split(test_size=test_size)
-      data_train<-data_complete$train$to_tf_dataset(
-        columns = c("input_ids","token_type_ids","attention_mask"),
-        label_cols = "labels",
-        shuffle = TRUE,
-        batch_size = as.integer(batch_size))
-      data_test<-data_complete$test$to_tf_dataset(
-        columns = c("input_ids","token_type_ids","attention_mask"),
-        label_cols = "labels",
-        shuffle = TRUE,
-        batch_size = as.integer(batch_size))
+
+      #input_ids<-tokenized_texts["input_ids"]
+      #token_type_ids<-tokenized_texts["token_type_ids"]
+      #attention_mask<-tokenized_texts["attention_mask"]
+
+      #print(paste(date(),"Creating Masked Data"))
+      #masked_ids<-input_ids
+      #for(i in 1:nrow(masked_ids)){
+      #  tmp_sample<-sample(2:(chunk_size-1),size = p_mask*chunk_size)
+      #  masked_ids[i,tmp_sample]<-tokenizer$mask_token_id
+      #}
+
+      #mode(input_ids) <- "integer"
+      #mode(token_type_ids) <- "integer"
+      #mode(attention_mask) <- "integer"
+      #mode(masked_ids) <- "integer"
+
+      #data_complete<-reticulate::dict("input_ids"=masked_ids,
+      #                                "token_type_ids"=token_type_ids,
+      #                                "attention_mask"=attention_mask,
+      #                                "labels"=input_ids)
+
+      #print(paste(date(),"Creating TensorFlow Dataset"))
+      #data_complete<-datasets$Dataset$from_dict(data_complete)
+      #data_complete<-data_complete$train_test_split(test_size=test_size)
+      #data_train<-data_complete$train$to_tf_dataset(
+      #  columns = c("input_ids","token_type_ids","attention_mask"),
+      #  label_cols = "labels",
+      #  shuffle = TRUE,
+      #  batch_size = as.integer(batch_size))
+      #data_test<-data_complete$test$to_tf_dataset(
+      #  columns = c("input_ids","token_type_ids","attention_mask"),
+      #  label_cols = "labels",
+      #  shuffle = TRUE,
+      #  batch_size = as.integer(batch_size))
 
       print(paste(date(),"Preparing Training of the Model"))
       adam<-tf$keras$optimizers$Adam
+      #callback_1=tf$keras$callbacks$EarlyStopping(
+      #  monitor='val_loss',
+      #  restore_best_weights = TRUE,
+      #  min_delta=0,
+      #  patience=0,
+      #  mode="min",
+      #  verbose=1L
+      #)
+
+      if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
+        print(paste(date(),"Creating Checkpoint Directory"))
+        dir.create(paste0(output_dir,"/checkpoints"))
+      }
+      callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
+        filepath = paste0(output_dir,"/checkpoints/"),
+        monitor="val_loss",
+        verbose=1L,
+        mode="auto",
+        save_best_only=TRUE,
+        save_freq="epoch",
+        save_weights_only= TRUE
+      )
 
       print(paste(date(),"Compile Model"))
       mlm_model$compile(optimizer=adam(3e-5))
 
       print(paste(date(),"Start Fine Tuning"))
-      mlm_model$fit(x=data_train,
-                    validation_data=data_test,
+      mlm_model$fit(x=tf_train_dataset,
+                    validation_data=tf_test_dataset,
                     epochs=as.integer(n_epoch),
                     workers=as.integer(n_workers),
-                    use_multiprocessing=multi_process
-      )
+                    use_multiprocessing=multi_process,
+                    callbacks=list(callback_checkpoint))
+
+      print(paste(date(),"Load Weights From Best Checkpoint"))
+      mlm_model$load_weights(paste0(output_dir,"/checkpoints/"))
 
       print(paste(date(),"Saving Bert Model"))
       mlm_model$save_pretrained(
@@ -527,31 +608,76 @@ TextEmbeddingModel<-R6::R6Class(
             if(self$bert_components$aggregation=="last"){
               #The first token is always the CLS token
               tmp_embedding<-tmp_hidden_states[[1+n_layer]]
-              tmp_embedding<-tmp_embedding[[0]][[0]]
-              tmp_embedding<-reticulate::array_reshape(
-                tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
-              tmp_embedding<-reticulate::py_to_r(tmp_embedding)
+              if(self$bert_components$use_cls_token==TRUE){
+                tmp_embedding<-tmp_embedding[[0]][[0]]
+                tmp_embedding<-reticulate::array_reshape(
+                  tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
+                tmp_embedding<-reticulate::py_to_r(tmp_embedding)
+              } else {
+                tmp_n_tokens<-length(tmp_embedding)/self$bert_components$model$config$hidden_size
+                tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
+                tmp_vector[]=0
+                for(index in 1:(tmp_n_tokens-2)){
+                  tmp_vector<-tmp_vector+as.vector(tmp_embedding[[0]][[index]])
+                }
+                tmp_vector<-tmp_vector/(tmp_n_tokens-2)
+                tmp_embedding<-t(as.matrix(tmp_vector))
+              }
             } else if(self$bert_components$aggregation=="second_to_last"){
               tmp_embedding<-tmp_hidden_states[[1+n_layer-2]]
-              tmp_embedding<-tmp_embedding[[0]][[0]]
-              tmp_embedding<-reticulate::array_reshape(
-                tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
-              tmp_embedding<-reticulate::py_to_r(tmp_embedding)
+              if(self$bert_components$use_cls_token==TRUE){
+                tmp_embedding<-tmp_embedding[[0]][[0]]
+                tmp_embedding<-reticulate::array_reshape(
+                  tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
+                tmp_embedding<-reticulate::py_to_r(tmp_embedding)
+              } else {
+                tmp_n_tokens<-length(tmp_embedding)/self$bert_components$model$config$hidden_size
+                tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
+                tmp_vector[]=0
+                for(index in 1:(tmp_n_tokens-2)){
+                  tmp_vector<-tmp_vector+as.vector(tmp_embedding[[0]][[index]])
+                }
+                tmp_vector<-tmp_vector/(tmp_n_tokens-2)
+                tmp_embedding<-t(as.matrix(tmp_vector))
+              }
             } else if(self$bert_components$aggregation=="fourth_to_last"){
               tmp_embedding<-tmp_hidden_states[[1+n_layer-4]]
-              tmp_embedding<-tmp_embedding[[0]][[0]]
-              tmp_embedding<-reticulate::array_reshape(
-                tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
-              tmp_embedding<-reticulate::py_to_r(tmp_embedding)
+              if(self$bert_components$use_cls_token==TRUE){
+                tmp_embedding<-tmp_embedding[[0]][[0]]
+                tmp_embedding<-reticulate::array_reshape(
+                  tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
+                tmp_embedding<-reticulate::py_to_r(tmp_embedding)
+              } else {
+                tmp_n_tokens<-length(tmp_embedding)/self$bert_components$model$config$hidden_size
+                tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
+                tmp_vector[]=0
+                for(index in 1:(tmp_n_tokens-2)){
+                  tmp_vector<-tmp_vector+as.vector(tmp_embedding[[0]][[index]])
+                }
+                tmp_vector<-tmp_vector/(tmp_n_tokens-2)
+                tmp_embedding<-t(as.matrix(tmp_vector))
+              }
+
             } else if(self$bert_components$aggregation=="all"){
               tmp_embedding<-NULL
               tmp_embedding_sum<-NULL
               for(l in 2:(n_layer+1)){
                 tmp_embedding_sum<-tmp_hidden_states[[l]]
-                tmp_embedding_sum<-tmp_embedding_sum[[0]][[0]]
-                tmp_embedding_sum<-reticulate::array_reshape(
-                  tmp_embedding_sum,dim=c(1,self$bert_components$model$config$hidden_size))
-                tmp_embedding_sum<-reticulate::py_to_r(tmp_embedding_sum)
+                if(self$bert_components$use_cls_token==TRUE){
+                  tmp_embedding_sum<-tmp_embedding_sum[[0]][[0]]
+                  tmp_embedding_sum<-reticulate::array_reshape(
+                    tmp_embedding_sum,dim=c(1,self$bert_components$model$config$hidden_size))
+                  tmp_embedding_sum<-reticulate::py_to_r(tmp_embedding_sum)
+                } else {
+                  tmp_n_tokens<-length(tmp_embedding_sum)/self$bert_components$model$config$hidden_size
+                  tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
+                  tmp_vector[]=0
+                  for(index in 1:(tmp_n_tokens-2)){
+                    tmp_vector<-tmp_vector+as.vector(tmp_embedding_sum[[0]][[index]])
+                  }
+                  tmp_vector<-tmp_vector/(tmp_n_tokens-2)
+                  tmp_embedding_sum<-t(as.matrix(tmp_vector))
+                }
                 if(l==2){
                   tmp_embedding=tmp_embedding_sum
                 } else {
@@ -565,17 +691,33 @@ TextEmbeddingModel<-R6::R6Class(
               tmp_embedding_sum<-NULL
               for(l in (n_layer-3):(n_layer+1)){
                 tmp_embedding_sum<-tmp_hidden_states[[l]]
-                tmp_embedding_sum<-tmp_embedding_sum[[0]][[0]]
-                tmp_embedding_sum<-reticulate::array_reshape(
-                  tmp_embedding_sum,dim=c(1,self$bert_components$model$config$hidden_size))
-                tmp_embedding_sum<-reticulate::py_to_r(tmp_embedding_sum)
+                if(self$bert_components$use_cls_token==TRUE){
+                  tmp_embedding_sum<-tmp_embedding_sum[[0]][[0]]
+                  tmp_embedding_sum<-reticulate::array_reshape(
+                    tmp_embedding_sum,dim=c(1,self$bert_components$model$config$hidden_size))
+                  tmp_embedding_sum<-reticulate::py_to_r(tmp_embedding_sum)
+                } else {
+                  tmp_n_tokens<-length(tmp_embedding_sum)/self$bert_components$model$config$hidden_size
+                  tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
+                  tmp_vector[]=0
+                  for(index in 1:(tmp_n_tokens-2)){
+                    tmp_vector<-tmp_vector+as.vector(tmp_embedding_sum[[0]][[index]])
+                    #print(tmp_vector[1:5])
+                  }
+                  tmp_vector<-tmp_vector/(tmp_n_tokens-2)
+                  #print(tmp_vector[1:5])
+                  #print(tmp_n_tokens)
+                  tmp_embedding_sum<-t(as.matrix(tmp_vector))
+                }
                 if(l==(n_layer-3)){
                   tmp_embedding=tmp_embedding_sum
                 } else {
                   tmp_embedding=tmp_embedding+tmp_embedding_sum
                 }
               }
+              #print(tmp_embedding[1,1:10])
               tmp_embedding=tmp_embedding/4
+              #print(tmp_embedding[1,1:10])
             }
             text_embedding[i,(1:n_layer_size)+(j-1)*(1:n_layer_size)]<-tmp_embedding
             if(trace==TRUE){
@@ -609,6 +751,10 @@ TextEmbeddingModel<-R6::R6Class(
               text_embedding[i,self$bow_components$model$cluster[index]]
           }
         }
+
+        #text_embedding=text_embedding/rowSums(text_embedding)
+        #text_embedding[is.nan(text_embedding)]<-0
+
         colnames(text_embedding)<-colnames(text_embedding,
                                            do.NULL = FALSE,
                                            prefix = "cluster_")
@@ -782,6 +928,9 @@ EmbeddedText<-R6::R6Class(
                 param_overlap=private$param_overlap,
                 param_aggregation=private$param_aggregation)
       return(tmp)
+    },
+    get_model_label=function(){
+      return(private$model_label)
     }
   )
 )

@@ -94,7 +94,8 @@ ai_train<-function(text_embeddings,
                   "to",dim_red_n))
     }
     if(dim_red_method=="PCA"){
-      res_pca<-prcomp(x=data_analysis,center = TRUE)
+      #res_pca<-prcomp(x=data_analysis,center = TRUE)
+      res_pca<-Morpho::prcompfast(x=data_analysis,center = TRUE)
       pca_loadings<-res_pca$rotation
       columns_means<-colMeans(data_analysis)
       data_analysis=scale(as.matrix(data_analysis),
@@ -139,259 +140,289 @@ ai_train<-function(text_embeddings,
   data_analysis$target_data<-as.factor(data_analysis$target_data)
 
   #----------------------------------------------------------------------------
-  n_sampling<-nrow(data_analysis)
-  n_p_test<-floor(nrow(data_analysis)*(1-ratio_performance_estimation))
-  n_p_train<-n_sampling-n_p_test
-  n_iteration<-n_performance_estimation
+  if(n_performance_estimation>0){
+    n_sampling<-nrow(data_analysis)
+    n_p_test<-floor(nrow(data_analysis)*(1-ratio_performance_estimation))
+    n_p_train<-n_sampling-n_p_test
+    n_iteration<-n_performance_estimation
 
-  max_features=ncol(data_analysis)-1
-  n_features<-floor(filter_ratio*max_features)
-  filter=mlr3filters::flt(filter_method)
-  results_filtervalues<-matrix(data=NA,
-                               nrow=n_performance_estimation,
-                               ncol=(ncol(data_analysis)-1))
-  colnames(results_filtervalues)<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
-
-
-  task_training<-mlr3::TaskClassif$new(id="training",
-                                       backend = data_analysis,
-                                       target="target_data")
-  task_training$col_roles$stratum="target_data"
-
-  outer_sampling<-mlr3::rsmp("subsampling",
-                             ratio = ratio_performance_estimation,
-                             repeats = n_performance_estimation)
-  train_set_split<-outer_sampling$instantiate(task_training)
+    max_features=ncol(data_analysis)-1
+    n_features<-floor(filter_ratio*max_features)
+    filter=mlr3filters::flt(filter_method)
+    results_filtervalues<-matrix(data=NA,
+                                 nrow=n_performance_estimation,
+                                 ncol=(ncol(data_analysis)-1))
+    colnames(results_filtervalues)<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
 
 
-
-
-  ##Hyperparametertuning-----------------------------------------------------
-  results_performance<-matrix(data=NA,
-                              nrow = 10+1,
-                              ncol=n_performance_estimation)
-  rownames(results_performance)<-c(
-    "iteration",
-    "iota_index",
-    "iota_index_d4",
-    "iota_index_dyn2",
-    "kripp.alpha.nominal",
-    "kripp.alpha.ordinal",
-    "kendall_tau",
-    "cohen_kappa",
-    "fleiss_kappa",
-    "light_kappa",
-    "percentage_agreement"
-  )
-  iota2_list<-NULL
-  hyperparameter_all<-NULL
-  hyperparameter_best<-NULL
-
-  if(verbose==TRUE){
-    print(paste(date(),"Starting Performance Estimation"))
-  }
-
-  for(i in 1:n_performance_estimation)
-  {
-    #print(i)
-    train_set = train_set_split$train_set(i)
-    test_set = train_set_split$test_set(i)
-    #print(i)
-    if(filter_ratio<1){
-      task_filter<-mlr3::TaskClassif$new(id="filter_estimation",
-                                         backend = data_analysis[train_set,],
+    task_training<-mlr3::TaskClassif$new(id="training",
+                                         backend = data_analysis,
                                          target="target_data")
-      task_filter$col_roles$stratum="target_data"
-      #print(i)
-      filter$calculate(task_filter)
-      #abc<-filter
-      Liste_Features<-as.vector(rownames(as.matrix(filter$scores[1:floor(filter_ratio*max_features)])))
-      for (j in 1:(ncol(data_analysis)-1)){
-        results_filtervalues[i,names(filter$scores)[j]]<-filter$scores[names(filter$scores)[j]]
-      }
-    } else {
-      Liste_Features<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
-    }
+    task_training$col_roles$stratum="target_data"
 
-    #print(i)
-    task_performance<-mlr3::TaskClassif$new(id="performance_estimation",
-                                            backend = data_analysis[c(Liste_Features,"target_data")],
-                                            target="target_data")
-    task_performance$col_roles$stratum="target_data"
-    #print(i)
-    tmp_learner<-learner$clone(deep = TRUE)
-    if(tune==TRUE){
-      tune_results<-mlr3tuning::tune(
-        method = tuning_method,
-        task = task_performance,
-        learner = tmp_learner,
-        resampling = tune_inner_sampling,
-        measures = cr_optim,
-        term_evals = max_n_tuning
-      )
-      tmp_learner$param_set$values = tune_results$result_learner_param_vals
-    }
-    tmp_learner$train(task_performance,row_ids=train_set)
-    #invisible(tmp_learner$train(task_performance,row_ids=train_set))
-    prediction<-tmp_learner$predict(task_performance,row_ids = test_set)
+    outer_sampling<-mlr3::rsmp("subsampling",
+                               ratio = ratio_performance_estimation,
+                               repeats = n_performance_estimation)
+    train_set_split<-outer_sampling$instantiate(task_training)
 
-    tmp_iota2<-iotarelr::check_new_rater(
-      true_values = as.character(prediction$truth),
-      assigned_values = as.character(prediction$response),
-      con_trace = FALSE)
+    ##Hyperparametertuning-----------------------------------------------------
+    results_performance<-matrix(data=NA,
+                                nrow = 10+1,
+                                ncol=n_performance_estimation)
+    rownames(results_performance)<-c(
+      "iteration",
+      "iota_index",
+      "iota_index_d4",
+      "iota_index_dyn2",
+      "kripp.alpha.nominal",
+      "kripp.alpha.ordinal",
+      "kendall_tau",
+      "cohen_kappa",
+      "fleiss_kappa",
+      "light_kappa",
+      "percentage_agreement"
+    )
+    iota2_list<-NULL
+    iota2_free_list<-NULL
+    hyperparameter_all<-NULL
+    hyperparameter_best<-NULL
 
-    iota2_list[paste0("iter",i)]<-list(tmp_iota2)
-
-    results_performance[1,i]<-i
-    results_performance[2,i]<-iota2_list[[paste0("iter",i)]]$scale_level$iota_index
-    results_performance[3,i]<-iota2_list[[paste0("iter",i)]]$scale_level$iota_index_d4
-    results_performance[4,i]<-iota2_list[[paste0("iter",i)]]$scale_level$iota_index_dyn2
-    results_performance[5,i]<-irr::kripp.alpha(x=t(cbind(as.character(prediction$truth),
-                                                       as.character(prediction$response))),
-                                               method = "nominal")$value
-    results_performance[6,i]<-irr::kripp.alpha(x=t(cbind(as.character(prediction$truth),
-                                                         as.character(prediction$response))),
-                                               method = "ordinal")$value
-    results_performance[7,i]<-irr::kendall(ratings=cbind(as.character(prediction$truth),
-                                                         as.character(prediction$response)),
-                                            correct=TRUE)$value
-    results_performance[8,i]<-irr::kappa2(ratings=cbind(as.character(prediction$truth),
-                                                         as.character(prediction$response)),
-                                           weight = "unweighted",
-                                          sort.levels = FALSE)$value
-    results_performance[9,i]<-irr::kappam.fleiss(ratings=cbind(as.character(prediction$truth),
-                                                        as.character(prediction$response)),
-                                                exact = TRUE,
-                                                detail = FALSE)$value
-    results_performance[10,i]<-irr::kappam.light(ratings=cbind(as.character(prediction$truth),
-                                                               as.character(prediction$response)))$value
-    results_performance[11,i]<-irr::agree(ratings=cbind(as.character(prediction$truth),
-                                                              as.character(prediction$response)),
-                                         tolerance = 0)$value/100
-    if(tune==TRUE){
-      #hyperparameter_best[paste0("iter",i)]<-list(
-      hyperparameter_best<-cbind(hyperparameter_best,
-        matrix(
-          c("iter"=i,
-            results_performance[2,i],
-            results_performance[3,i],
-            results_performance[4,i],
-            results_performance[5,i],
-            results_performance[6,i],
-            results_performance[7,i],
-            results_performance[8,i],
-            results_performance[9,i],
-            results_performance[10,i],
-            results_performance[11,i],
-            prediction$score(cr_optim),
-            #unlist(x=tune_results$result_y),
-            unlist(x=as.character(tune_results$result_learner_param_vals)))
-        )
-      )
-      rownames(hyperparameter_best)<-c("iter",
-                                       rownames(results_performance)[2:11],
-                                       names(prediction$score(cr_optim)),
-                                       names(tune_results$result_learner_param_vals))
-      hyperparameter_all<-rbind(
-        hyperparameter_all,
-        cbind(
-          rep(i,
-              times=nrow(tune_results$archive$data)),
-          tune_results$archive$data)
-        )
-    }
-
-        if(verbose==TRUE){
-      print(paste(date(),"Performance estimation:",i,"of",n_performance_estimation,
-                  cr_optim$id,round(prediction$score(cr_optim),digits = 3)))
-    }
-  }
-
-  if(tune==TRUE){
-    hyperparameter_best<-t(as.matrix(hyperparameter_best))
-    hyperparameter_best<-as.data.frame(hyperparameter_best)
-    hyperparameter_all<-as.data.frame(hyperparameter_all)
-  }
-
-
-  #Training mit allen Daten----
-  #task_filter<-mlr3::TaskClassif$new(id="filter_estimation", backend = data_analysis, target="target_data")
-  #task_filter$col_roles$stratum="target_data"
-
-  #filter$calculate(task_filter)
-  #Liste_Features<-as.vector(rownames(as.matrix(filter$scores[1:floor(filter_ratio*max_features)])))
-
-  finale_learner<-learner$clone(deep = TRUE)
-
-  if(filter_ratio<1){
-    final_features<-colSums(results_filtervalues)
-    final_features<-final_features[names(final_features)[order(final_features,decreasing = TRUE)]]
-    final_features<-names(final_features)[1:floor(filter_ratio*max_features)]
-  }
-  else{
-    final_features<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
-  }
-
-  task_training_all<-mlr3::TaskClassif$new(id="training_complete",
-                                           backend = data_analysis[c(final_features,"target_data")],
-                                           target="target_data")
-  task_training_all$col_roles$stratum="target_data"
-
-  #Wenn Autotuning, Ermittlung der besten Werte fuer das finale Training
-  hyperparameter_final<-NULL
-  if(tune==TRUE){
     if(verbose==TRUE){
-      print(paste(date(),"Estimating best values of hyperparameters"))
+      print(paste(date(),"Starting Performance Estimation"))
     }
-    for(i in 13:ncol(hyperparameter_best)){
-      tmp_name=colnames(hyperparameter_best)[i]
-      if(is.logical(hyperparameter_best[1,i])){
-        tmp_count<-table(hyperparameter_best[i])
-        index_max<-match(x=max(tmp_count),table=tmp_count)
-        tmp_value<-names(tmp_count)[index_max]
-        hyperparameter_final[tmp_name]<-list(tmp_value)
 
-      } else if(varhandle::check.numeric(hyperparameter_best[1,i])==FALSE){
-        tmp_count<-table(hyperparameter_best[i])
-        if(length(tmp_count)>0){
-          index_max<-match(x=max(tmp_count),table=tmp_count)
-          tmp_value<-names(tmp_count)[index_max]
-          if(tmp_value=="FALSE"){
-            tmp_value<-FALSE
-          } else if(tmp_value=="TRUE") {
-            tmp_value<-TRUE
-          } else {
-            tmp_value<-tmp_value
-          }
-          hyperparameter_final[tmp_name]<-list(tmp_value)
+    for(i in 1:n_performance_estimation)
+    {
+      #print(i)
+      train_set = train_set_split$train_set(i)
+      test_set = train_set_split$test_set(i)
+      #print(i)
+      if(filter_ratio<1){
+        task_filter<-mlr3::TaskClassif$new(id="filter_estimation",
+                                           backend = data_analysis[train_set,],
+                                           target="target_data")
+        task_filter$col_roles$stratum="target_data"
+        #print(i)
+        filter$calculate(task_filter)
+        #abc<-filter
+        Liste_Features<-as.vector(rownames(as.matrix(filter$scores[1:floor(filter_ratio*max_features)])))
+        for (j in 1:(ncol(data_analysis)-1)){
+          results_filtervalues[i,names(filter$scores)[j]]<-filter$scores[names(filter$scores)[j]]
         }
       } else {
-        if(stats::sd(as.numeric(hyperparameter_best[,i]))>0){
-          hyperparameter_final[tmp_name]<-list(stats::quantile(x=as.numeric(hyperparameter_best[,i]),
-                                              probs=0.5))
-          if(learner$param_set$params[[tmp_name]]$class=="ParamInt"){
-            hyperparameter_final[tmp_name]<-list(as.integer(round(as.numeric(hyperparameter_final[tmp_name]),digits = 0)))
-          } else {
-            hyperparameter_final[tmp_name]<-list(as.numeric(hyperparameter_final[tmp_name]))
+        Liste_Features<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
+      }
+
+      #print(i)
+      task_performance<-mlr3::TaskClassif$new(id="performance_estimation",
+                                              backend = data_analysis[c(Liste_Features,"target_data")],
+                                              target="target_data")
+      task_performance$col_roles$stratum="target_data"
+      #print(i)
+      tmp_learner<-learner$clone(deep = TRUE)
+      if(tune==TRUE){
+        tune_results<-mlr3tuning::tune(
+          method = tuning_method,
+          task = task_performance,
+          learner = tmp_learner,
+          resampling = tune_inner_sampling,
+          measures = cr_optim,
+          term_evals = max_n_tuning
+        )
+        tmp_learner$param_set$values = tune_results$result_learner_param_vals
+      }
+      tmp_learner$train(task_performance,row_ids=train_set)
+      #invisible(tmp_learner$train(task_performance,row_ids=train_set))
+      prediction<-tmp_learner$predict(task_performance,row_ids = test_set)
+
+      tmp_iota2<-iotarelr::check_new_rater(
+        true_values = as.character(prediction$truth),
+        assigned_values = as.character(prediction$response),
+        con_trace = FALSE)
+      tmp_iota2_free<-iotarelr::check_new_rater(
+        true_values = as.character(prediction$truth),
+        assigned_values = as.character(prediction$response),
+        con_trace = FALSE,
+        free_aem = TRUE)
+
+      iota2_list[paste0("iter",i)]<-list(tmp_iota2)
+      iota2_free_list[paste0("iter",i)]<-list(tmp_iota2_free)
+
+      results_performance[1,i]<-i
+      results_performance[2,i]<-iota2_list[[paste0("iter",i)]]$scale_level$iota_index
+      results_performance[3,i]<-iota2_list[[paste0("iter",i)]]$scale_level$iota_index_d4
+      results_performance[4,i]<-iota2_list[[paste0("iter",i)]]$scale_level$iota_index_dyn2
+      results_performance[5,i]<-irr::kripp.alpha(x=t(cbind(as.character(prediction$truth),
+                                                         as.character(prediction$response))),
+                                                 method = "nominal")$value
+      results_performance[6,i]<-irr::kripp.alpha(x=t(cbind(as.character(prediction$truth),
+                                                           as.character(prediction$response))),
+                                                 method = "ordinal")$value
+      results_performance[7,i]<-irr::kendall(ratings=cbind(as.character(prediction$truth),
+                                                           as.character(prediction$response)),
+                                              correct=TRUE)$value
+      results_performance[8,i]<-irr::kappa2(ratings=cbind(as.character(prediction$truth),
+                                                           as.character(prediction$response)),
+                                             weight = "unweighted",
+                                            sort.levels = FALSE)$value
+      results_performance[9,i]<-irr::kappam.fleiss(ratings=cbind(as.character(prediction$truth),
+                                                          as.character(prediction$response)),
+                                                  exact = TRUE,
+                                                  detail = FALSE)$value
+      results_performance[10,i]<-irr::kappam.light(ratings=cbind(as.character(prediction$truth),
+                                                                 as.character(prediction$response)))$value
+      results_performance[11,i]<-irr::agree(ratings=cbind(as.character(prediction$truth),
+                                                                as.character(prediction$response)),
+                                           tolerance = 0)$value/100
+      if(tune==TRUE){
+        #hyperparameter_best[paste0("iter",i)]<-list(
+        hyperparameter_best<-cbind(hyperparameter_best,
+          matrix(
+            c("iter"=i,
+              results_performance[2,i],
+              results_performance[3,i],
+              results_performance[4,i],
+              results_performance[5,i],
+              results_performance[6,i],
+              results_performance[7,i],
+              results_performance[8,i],
+              results_performance[9,i],
+              results_performance[10,i],
+              results_performance[11,i],
+              prediction$score(cr_optim),
+              #unlist(x=tune_results$result_y),
+              unlist(x=as.character(tune_results$result_learner_param_vals)))
+          )
+        )
+        rownames(hyperparameter_best)<-c("iter",
+                                         rownames(results_performance)[2:11],
+                                         names(prediction$score(cr_optim)),
+                                         names(tune_results$result_learner_param_vals))
+        hyperparameter_all<-rbind(
+          hyperparameter_all,
+          cbind(
+            rep(i,
+                times=nrow(tune_results$archive$data)),
+            tune_results$archive$data)
+          )
+      }
+
+          if(verbose==TRUE){
+        print(paste(date(),"Performance estimation:",i,"of",n_performance_estimation,
+                    cr_optim$id,round(prediction$score(cr_optim),digits = 3)))
+      }
+    }
+
+    if(tune==TRUE){
+      hyperparameter_best<-t(as.matrix(hyperparameter_best))
+      hyperparameter_best<-as.data.frame(hyperparameter_best)
+      hyperparameter_all<-as.data.frame(hyperparameter_all)
+    }
+
+
+    #Training mit allen Daten----
+    #task_filter<-mlr3::TaskClassif$new(id="filter_estimation", backend = data_analysis, target="target_data")
+    #task_filter$col_roles$stratum="target_data"
+
+    #filter$calculate(task_filter)
+    #Liste_Features<-as.vector(rownames(as.matrix(filter$scores[1:floor(filter_ratio*max_features)])))
+
+    finale_learner<-learner$clone(deep = TRUE)
+
+    if(filter_ratio<1){
+      final_features<-colSums(results_filtervalues)
+      final_features<-final_features[names(final_features)[order(final_features,decreasing = TRUE)]]
+      final_features<-names(final_features)[1:floor(filter_ratio*max_features)]
+    }
+    else{
+      final_features<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
+    }
+
+    task_training_all<-mlr3::TaskClassif$new(id="training_complete",
+                                             backend = data_analysis[c(final_features,"target_data")],
+                                             target="target_data")
+    task_training_all$col_roles$stratum="target_data"
+
+    #Wenn Autotuning, Ermittlung der besten Werte fuer das finale Training
+    hyperparameter_final<-NULL
+    if(tune==TRUE){
+      if(verbose==TRUE){
+        print(paste(date(),"Estimating best values of hyperparameters"))
+      }
+      for(i in 13:ncol(hyperparameter_best)){
+        tmp_name=colnames(hyperparameter_best)[i]
+        if(is.logical(hyperparameter_best[1,i])){
+          tmp_count<-table(hyperparameter_best[i])
+          index_max<-match(x=max(tmp_count),table=tmp_count)
+          tmp_value<-names(tmp_count)[index_max]
+          hyperparameter_final[tmp_name]<-list(tmp_value)
+
+        } else if(varhandle::check.numeric(hyperparameter_best[1,i])==FALSE){
+          tmp_count<-table(hyperparameter_best[i])
+          if(length(tmp_count)>0){
+            index_max<-match(x=max(tmp_count),table=tmp_count)
+            tmp_value<-names(tmp_count)[index_max]
+            if(tmp_value=="FALSE"){
+              tmp_value<-FALSE
+            } else if(tmp_value=="TRUE") {
+              tmp_value<-TRUE
+            } else {
+              tmp_value<-tmp_value
+            }
+            hyperparameter_final[tmp_name]<-list(tmp_value)
           }
         } else {
-          hyperparameter_final[tmp_name]<-list(as.numeric(hyperparameter_best[1,i]))
+          if(stats::sd(as.numeric(hyperparameter_best[,i]))>0){
+            hyperparameter_final[tmp_name]<-list(stats::quantile(x=as.numeric(hyperparameter_best[,i]),
+                                                probs=0.5))
+            if(learner$param_set$params[[tmp_name]]$class=="ParamInt"){
+              hyperparameter_final[tmp_name]<-list(as.integer(round(as.numeric(hyperparameter_final[tmp_name]),digits = 0)))
+            } else {
+              hyperparameter_final[tmp_name]<-list(as.numeric(hyperparameter_final[tmp_name]))
+            }
+          } else {
+            hyperparameter_final[tmp_name]<-list(as.numeric(hyperparameter_best[1,i]))
+          }
         }
+        #print(i)
+        #print(hyperparameter_final)
       }
-      #print(i)
-      #print(hyperparameter_final)
+      #names(hyperparameter_final)=colnames(hyperparameter_best)[5:ncol(hyperparameter_best)]
+      #learner<-learner$base_learner()
+      if(verbose==TRUE){
+        print(paste(date(),"Setting best values of hyperparameters"))
+      }
+      #learner$param_set$add(learner$instance_args$learner$param_set)
+      finale_learner$param_set$values = mlr3misc::insert_named(finale_learner$param_set$values,
+                                                               as.list(hyperparameter_final))
+      #print(finale_learner$param_set$values)
+      #print(as.list(hyperparameter_final))
+      #finale_learner$param_set$params = as.list(hyperparameter_final)
     }
-    #names(hyperparameter_final)=colnames(hyperparameter_best)[5:ncol(hyperparameter_best)]
-    #learner<-learner$base_learner()
-    if(verbose==TRUE){
-      print(paste(date(),"Setting best values of hyperparameters"))
+  } else {
+    finale_learner=learner$clone(deep = TRUE)
+    max_features=ncol(data_analysis)-1
+    n_features<-floor(filter_ratio*max_features)
+    filter=mlr3filters::flt(filter_method)
+
+    task_filter<-mlr3::TaskClassif$new(id="filter_estimation",
+                                       backend = data_analysis,
+                                       target="target_data")
+    task_filter$col_roles$stratum="target_data"
+    filter$calculate(task_filter)
+    Liste_Features<-as.vector(rownames(as.matrix(filter$scores[1:floor(filter_ratio*max_features)])))
+
+    if(filter_ratio<1){
+      final_features<-Liste_Features[1:floor(filter_ratio*max_features)]
     }
-    #learner$param_set$add(learner$instance_args$learner$param_set)
-    finale_learner$param_set$values = mlr3misc::insert_named(finale_learner$param_set$values,
-                                                             as.list(hyperparameter_final))
-    #print(finale_learner$param_set$values)
-    #print(as.list(hyperparameter_final))
-    #finale_learner$param_set$params = as.list(hyperparameter_final)
+    else{
+      final_features<-colnames(data_analysis)[1:(ncol(data_analysis)-1)]
+    }
+
+    task_training_all<-mlr3::TaskClassif$new(id="training_complete",
+                                             backend = data_analysis[c(final_features,"target_data")],
+                                             target="target_data")
+    task_training_all$col_roles$stratum="target_data"
   }
 
   if(verbose==TRUE){
@@ -414,22 +445,30 @@ ai_train<-function(text_embeddings,
   }
 
   #Creating object of class iotarelr_iota2
-  mean_aem<-0
-  mean_categorical_sizes<-0
-  for(i in 1:length(iota2_list)){
-    mean_aem<-mean_aem+iota2_list[[paste0("iter",i)]]$categorical_level$raw_estimates$assignment_error_matrix
-  }
-  mean_aem<-mean_aem/n_performance_estimation
-  mean_categorical_sizes<-iota2_list[[paste0("iter",1)]]$information$est_true_cat_sizes
-  #mean_categorical_sizes<-mean_categorical_sizes/n_performance_estimation
+  if(n_performance_estimation>0){
+    mean_aem<-0
+    mean_aem_free<-0
+    mean_categorical_sizes<-0
+    for(i in 1:length(iota2_list)){
+      mean_aem<-mean_aem+iota2_list[[paste0("iter",i)]]$categorical_level$raw_estimates$assignment_error_matrix
+      mean_aem_free<-mean_aem_free+iota2_free_list[[paste0("iter",i)]]$categorical_level$raw_estimates$assignment_error_matrix
+    }
+    mean_aem<-mean_aem/n_performance_estimation
+    mean_aem_free<-mean_aem_free/n_performance_estimation
+    mean_categorical_sizes<-iota2_list[[paste0("iter",1)]]$information$est_true_cat_sizes
+    #mean_categorical_sizes<-mean_categorical_sizes/n_performance_estimation
 
-  colnames(mean_aem)<-original_cat_labels
-  rownames(mean_aem)<-original_cat_labels
-  names(mean_categorical_sizes) <- original_cat_labels
-  tmp_iota_2_measures <- iotarelr::get_iota2_measures(
-    aem = mean_aem,
-    categorical_sizes = mean_categorical_sizes,
-    categorical_levels = original_cat_labels)
+    colnames(mean_aem)<-original_cat_labels
+    rownames(mean_aem)<-original_cat_labels
+
+    colnames(mean_aem_free)<-original_cat_labels
+    rownames(mean_aem_free)<-original_cat_labels
+
+    names(mean_categorical_sizes) <- original_cat_labels
+    tmp_iota_2_measures <- iotarelr::get_iota2_measures(
+      aem = mean_aem,
+      categorical_sizes = mean_categorical_sizes,
+      categorical_levels = original_cat_labels)
 
   Esimtates_Information <- NULL
   Esimtates_Information["log_likelihood"] <- list(NA)
@@ -454,6 +493,7 @@ ai_train<-function(text_embeddings,
 
   reliability<-list(
     "Iota2_Object"=iota2_object,
+    "Iota2_free_aem"=mean_aem_free,
     "iota_index"=mean(results_performance[2,]),
     "static_iota_index"=mean(results_performance[3,]),
     "dynamic_iota_index"=mean(results_performance[4,]),
@@ -492,6 +532,31 @@ ai_train<-function(text_embeddings,
     "Inclusion_Percentage"=filter_ratio,
     "Scores"=filtervalues
   )
+  } else {
+    reliability<-list(
+      "Iota2_Object"=NULL,
+      "Iota2_free_aem"=NULL,
+      "iota_index"=NULL,
+      "static_iota_index"=NULL,
+      "dynamic_iota_index"=NULL,
+      "kripp_alpha_nominal"=NULL,
+      "kripp_alpha_ordinal"=NULL,
+      "kendall_tau"=NULL,
+      "cohen_kappa"=NULL,
+      "fleiss_kappa"=NULL,
+      "light_kappa"=NULL,
+      "percentage_agreement"=NULL,
+
+      "n_sample"=nrow(data_analysis),
+      "n_p_test"=NULL,
+      "n_p_train"=NULL,
+      "n_iteration"=0)
+
+    filter_summary<-list(
+      "Filter"=filter$id,
+      "Inclusion_Percentage"=filter_ratio,
+      "Scores"=NULL)
+  }
 
   #Summary of category related information
   category_summary<-NULL
@@ -523,6 +588,11 @@ ai_train<-function(text_embeddings,
     res_dim_reduction["n_dim"]<-list(dim_red_n)
     res_dim_reduction["applied"]<-list(use_dim_reduction)
     res_dim_reduction["model"]<-list(dim_red_model)
+  } else {
+    res_dim_reduction["method"]<-list(FALSE)
+    res_dim_reduction["n_dim"]<-list(FALSE)
+    res_dim_reduction["applied"]<-list(FALSE)
+    res_dim_reduction["model"]<-list(FALSE)
   }
 
   #Summarizing the results

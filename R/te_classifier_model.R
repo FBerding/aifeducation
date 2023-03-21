@@ -61,12 +61,12 @@ te_classifier<-R6::R6Class(
           smote_dup<-smote_dup[-1]
         }
 
-      freq_table<-table(target_data)
-      freq_table<-sort(freq_table)
-      minor_freq<-freq_table[1:(length(freq_table)-1)]
-      major_freq<-freq_table[length(freq_table)]
-      min_freq<-min(freq_table,na.rm=TRUE)
-    }
+        freq_table<-table(target_data)
+        freq_table<-sort(freq_table)
+        minor_freq<-freq_table[1:(length(freq_table)-1)]
+        major_freq<-freq_table[length(freq_table)]
+        min_freq<-min(freq_table,na.rm=TRUE)
+      }
 
       #Check Smote Configuration-----------------------------------------------
       #for subsampling
@@ -76,43 +76,43 @@ te_classifier<-R6::R6Class(
         #          applicable. Changing use_smote to FALSE.")
         #  use_smote=FALSE
         #} else {
-          test_freq<-floor((1-ratio_performance_estimation)*min_freq)
-          if(test_freq<1){
-            ratio_performance_estimation=1-1/min_freq
-            warning(paste("Ratio of parameter ratio_performance_estimation does not
+        test_freq<-floor((1-ratio_performance_estimation)*min_freq)
+        if(test_freq<1){
+          ratio_performance_estimation=1-1/min_freq
+          warning(paste("Ratio of parameter ratio_performance_estimation does not
                     ensure that at least one coding unit is part of the test
                     data. Changing parameter to",ratio_performance_estimation))
-          }
-          tmp_min_cat_size=floor(ratio_performance_estimation*(min_freq))-1
-          test_freq_inner<-(1-tune_inner_sampling$param_set$values$ratio)*tmp_min_cat_size
-          if(test_freq_inner<1){
-            tmp_new_ratio<-1-1/tmp_min_cat_size
-            tune_inner_sampling$param_set$values$ratio=tmp_new_ratio
-            warning(paste("Ratio of inner sampling does not
+        }
+        tmp_min_cat_size=floor(ratio_performance_estimation*(min_freq))-1
+        test_freq_inner<-(1-tune_inner_sampling$param_set$values$ratio)*tmp_min_cat_size
+        if(test_freq_inner<1){
+          tmp_new_ratio<-1-1/tmp_min_cat_size
+          tune_inner_sampling$param_set$values$ratio=tmp_new_ratio
+          warning(paste("Ratio of inner sampling does not
                     ensure that at least one coding unit is part of the test
                     data. Changing parameter to",tmp_new_ratio))
-          }
         }
-        smote_k_limit=floor(0.125*tune_inner_sampling$param_set$values$ratio*ratio_performance_estimation*minor_freq)
-        for(i in 1:length(smote_k_limit)){
-          if(smote_k_limit[i]<1){
-            smote_k_limit[i]=1
-          }
+      }
+      smote_k_limit=floor(0.125*tune_inner_sampling$param_set$values$ratio*ratio_performance_estimation*minor_freq)
+      for(i in 1:length(smote_k_limit)){
+        if(smote_k_limit[i]<1){
+          smote_k_limit[i]=1
         }
+      }
 
-        if(sum(smote_K>smote_k_limit)>0)
-        {
-          smote_K=smote_k_limit
-        }
-        #print(smote_k_limit)
+      if(sum(smote_K>smote_k_limit)>0)
+      {
+        smote_K=smote_k_limit
+      }
+      #print(smote_k_limit)
       #}
 
-        #if(verbose==TRUE){
-        #  print(date())
-        #  print(smote_K)
-        #  print(date())
-        #  print(smote_k_limit)
-        #}
+      #if(verbose==TRUE){
+      #  print(date())
+      #  print(smote_K)
+      #  print(date())
+      #  print(smote_k_limit)
+      #}
 
       #Create Learner----------------------------------------------------------
       learner<-get_configurated_learner(

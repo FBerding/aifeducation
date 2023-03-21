@@ -12,7 +12,7 @@ Text Embedding Model
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TextEmbeddingModel-new}{\code{TextEmbeddingModel$new()}}
-\item \href{#method-TextEmbeddingModel-load_bert}{\code{TextEmbeddingModel$load_bert()}}
+\item \href{#method-TextEmbeddingModel-load_weights}{\code{TextEmbeddingModel$load_weights()}}
 \item \href{#method-TextEmbeddingModel-save_bert_model}{\code{TextEmbeddingModel$save_bert_model()}}
 \item \href{#method-TextEmbeddingModel-fine_tune_bert_model}{\code{TextEmbeddingModel$fine_tune_bert_model()}}
 \item \href{#method-TextEmbeddingModel-tokenize}{\code{TextEmbeddingModel$tokenize()}}
@@ -41,6 +41,7 @@ Text Embedding Model
   chunks = 1,
   overlap = 0,
   aggregation = "last",
+  aggregate_cls = TRUE,
   bert_model_dir_path,
   bow_basic_text_rep,
   bow_n_dim = NULL,
@@ -55,11 +56,11 @@ Text Embedding Model
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-load_bert"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_bert}{}}}
-\subsection{Method \code{load_bert()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-load_weights"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_weights}{}}}
+\subsection{Method \code{load_weights()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_bert(bert_model_dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_weights(bert_model_dir_path)}\if{html}{\out{</div>}}
 }
 
 }
@@ -82,8 +83,13 @@ Text Embedding Model
   bert_model_dir_path,
   model_name,
   raw_texts,
+  vocab_draft,
+  aug_vocab_by = 100,
   p_mask = 0.15,
-  n_epoch,
+  whole_word = TRUE,
+  test_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
   chunk_size,
   n_workers = 1,
   multi_process = FALSE,

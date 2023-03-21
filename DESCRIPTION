@@ -1,35 +1,27 @@
-Type: Package
 Package: aifeducation
-Title: What the Package Does (Title Case)
-Version: 0.1.0.9000
+Type: Package
+Title: What the package does (short line)
+Version: 0.0.1.9000
+Date: 2023-03-10
 Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line) Use four
-    spaces when indenting paragraphs within the Description.
-License: GPL-3
-Depends: mlr3
-Imports: 
-    mlr3learners,
-    mlr3pipelines,
-    mlr3tuning,
-    mlr3filters,
-    mlr3misc,
-    paradox,
-    R6,
-    varhandle,
-    irr,
-    iotarelr,
-    lgr,
-    udpipe,
-    quanteda,
-    keras,
-    methods,
-    stringr,
-    reticulate,
-    Rcpp
-Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.2.1
-LinkingTo: 
-    Rcpp,
-    RcppArmadillo
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: Rcpp (>= 1.0.10),
+  stringr,
+  udpipe,
+  keras,
+  tensorflow,
+  iotarelr,
+  irr,
+  irrCAC,
+  bundle,
+  quanteda,
+  reticulate,
+  smotefamily
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.2.3
+Depends:
+  quanteda,
+  keras,
+  foreach
