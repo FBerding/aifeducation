@@ -339,6 +339,7 @@ bow_pp_create_basic_text_rep<-function(data,
     "configuration"=configuration
   )
 
+  class(results)<-"basic_text_rep"
   return(results)
 }
 

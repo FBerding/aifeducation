@@ -1,6 +1,6 @@
 #'@title Text Embedding Classifier with a Neural Net
 #'
-#'@description Abtract class for neural nets with keras and
+#'@description Abstract class for neural nets with keras and
 #'tensorflow
 #'
 #'@export
@@ -375,24 +375,85 @@ te_classifier_neuralnet<-R6::R6Class(
       self$date=date()
     },
     #-------------------------------------------------------------------------
+    #'@description Method for training a neural net with keras and
+    #'tensorflow.
+    #'@param data_embeddings Object of class \code{TextEmbeddingModel}.
+    #'@param data_targets \code{Factor} containing the labels for cases
+    #'stored in \code{data_embeddings}. Factor must be named and has to use the
+    #'same names used in \code{data_embeddings}.
+    #'@param data_n_valid_samples \code{int} determining the number of cross-fold
+    #'samples.
+    #'@param use_baseline \code{bool} \code{TRUE} if the calculation of a baseline
+    #'model is requested. This option is only relevant for \code{use_bsc=TRUE} or
+    #'\code{use_pbl=TRUE}. If both are \code{FALSE} a baseline model is calculated.
+    #'@param bsl_val_size \code{double} between 0 and 1 indicating the proportion of cases of each label
+    #'which should be used for the validation sample during the estimation of the baseline model.
+    #'The remaining cases are part of the training data.
+    #'@param use_bsc \code{bool} \code{TRUE} if the estimation should integrate
+    #'balanced synthetic cases. \code{FALSE} if not.
+    #'@param bsc_methods \code{vector} containing the methods for generating
+    #'synthetic cases via \link[smotefamily]{smotefamily}. Multiple methods can
+    #'be passed. Currently \code{bsc_methods=c("adas")}, \code{bsc_methods=c("smote")}
+    #'and \code{bsc_methods=c("dbsmote")} are possible.
+    #'@param bsc_max_k \code{int} determining the maximal number of k which is used
+    #'for creating synthetic units.
+    #'@param use_bpl \code{bool} \code{TRUE} if the estimation should integrate
+    #'balanced pseudo labeling. \code{FALSE} if not.
+    #'@param bpl_max_steps \code{int} determining the maximal number of steps for
+    #'every application of balanced pseudo labeling.
+    #'@param bpl_inc_ratio \code{double} ratio between 0 and 1 indicating the
+    #'proportion of new cases which should used for further training. See notes
+    #'for more details.
+    #'@param bpl_anchor \code{double} between 0 and 1 indicating the reference
+    #'point for sorting the new cases of every label. See notes for more details.
+    #'@param bpl_valid_size \code{double} ratio between 0 and 1 determining the proportion
+    #'of new cases for every label which should be added to the validation sample during training.
+    #'The remaining cases are added to the training sample.
+    #'@param opt_model_reset \code{bool} \code{TRUE} if the model should be
+    #'reseted before training.
+    #'@param epochs \code{int} Number of training epochs.
+    #'@param batch_size \code{int} Size of batches.
+    #'@param dir_checkpoint \code{string} Path to the directory where
+    #'the checkpoint during training should be saved. If the directory does not
+    #'exists it is created.
+    #'@param trace \code{bool} \code{TRUE} if information about the estimation
+    #'phase should be printed to the console.
+    #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
+    #'information about the training process from keras on the console.
+    #'\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
+    #'one line of information for every epoch.
+    #'@param n_cores \code{int} Number of cores used for creating synthetic units.
+    #'@details \itemize{
+    #'
+    #'\item{bsc_max_k: }{All values from 2 up to bsc_max_k are successively used. If
+    #'the number of bsc_max_k is to high the value is reduced to a number that
+    #'allows the calculating of synthetic units.}
+    #'
+    #'\item{bpl_inc_ratio: }{The ratio is applied to the label with the smallest number
+    #'of new cases. The resulting value is used for every label to ensure the balance
+    #'of all labels.}
+    #'
+    #'\item{bpl_anchor: }{With the help of this value the new cases are sorted. For
+    #'this aim the distance from the anchor is calculated and all cases are arranged
+    #'into an increasing order.
+    #'}
+    #'}
     train=function(data_embeddings,
                    data_targets,
                    data_n_valid_samples=10,
                    use_baseline=TRUE,
                    bsl_val_size=0.25,
                    use_bsc=TRUE,
-                   bsc_methods=c("smote","dbsmote","adas"),
+                   bsc_methods=c("dbsmote"),
                    bsc_max_k=10,
                    use_bpl=TRUE,
-                   bpl_max_steps=5,
-                   bpl_inc_ratio=0.5,
-                   bpl_anchor=0.66,
+                   bpl_max_steps=10,
+                   bpl_inc_ratio=0.25,
+                   bpl_anchor=0.75,
                    bpl_valid_size=0.33,
                    opt_model_reset=FALSE,
                    epochs=100,
                    batch_size=32,
-                   rel_tolerance=1e-4,
-                   #patience=4,
                    dir_checkpoint,
                    trace=TRUE,
                    view_metrics=FALSE,
@@ -594,6 +655,8 @@ te_classifier_neuralnet<-R6::R6Class(
                         "Iter:",iter,"from",folds$n_folds,
                         "Generating Synthetic Cases"))
           }
+          #save(embeddings_train_labeled,targets_train_labeled,bsc_methods,bsc_max_k,
+          #     file="debug.RData")
           syn_cases<-get_synthetic_cases(embedding=embeddings_train_labeled,
                                          target=targets_train_labeled,
                                          method=bsc_methods,
@@ -1340,6 +1403,11 @@ te_classifier_neuralnet<-R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
+    #'@descrition Method for prediciting new data with a trained neural net.
+    #'@param newdata Object of class \code{TextEmbeddingModel} or
+    #'\code{data.frame} for which predictions should be made.
+    #'@return Returns a \code{data.frame} containing the predictions and
+    #'the probabilities of the different labels for each case.
     predict=function(newdata){
       #Checking input data
       #if(methods::isClass(where=newdata,"data.frame")==FALSE){
@@ -1387,6 +1455,15 @@ te_classifier_neuralnet<-R6::R6Class(
       return(predictions_prob)
     },
     #General Information set and get--------------------------------------------
+    #'@description Method for setting publication information of the classifier
+    #'@param type \code{string} for choosing the type of information that should
+    #'be added. \code{type="developer"} for information about the developer of the
+    #'classifier and \code{type="trainer"} for information about persons who trained
+    #'the classifier. If you modify an already existing classifier please use
+    #'\code{type="modifier"}.
+    #'@param autors Person list of authors.
+    #'@param citation Free text citation.
+    #'@param url URL of a corresponding homepage.
     set_publication_info=function(type,
                                   autors,
                                   citation,
@@ -1406,17 +1483,31 @@ te_classifier_neuralnet<-R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
+    #'@description Method for requesting the publication information of the classifier.
+    #'@return \code{list} with all saved publication information.
     get_publication_info=function(){
       return(private$publication_info)
     },
     #--------------------------------------------------------------------------
+    #'@description Method for setting the license of the classifier.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
     set_license=function(license){
       private$model_info$model_license<-license
     },
+    #'@description Method for requesting the license of the classifier.
+    #'@return \code{string} License of the classifier.
     get_license=function(){
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
+    #'@description Method for setting a description of the classifier.
+    #'@param eng \code{string} A text describing the training of the learner,
+    #'its theoretical and empirical background, and the different output labels
+    #'in English.
+    #'@param native \code{string} A text describing the training of the learner,
+    #'its theoretical and empirical background, and the different output labels
+    #'in the native language of the classifier.
     set_model_description=function(eng=NULL,native=NULL){
       if(!is.null(description)){
         private$model_description$eng=description
@@ -1425,8 +1516,21 @@ te_classifier_neuralnet<-R6::R6Class(
         private$model_description$native=description
       }
     },
+    #'@description Method for requesting the model description.
+    #'@return \code{list} with the description of the classifier in English
+    #'and native language.
     get_model_description=function(){
       return(private$model_description)
+    },
+    #-------------------------------------------------------------------------
+    export_model=function(dir_path){
+      tmp_model=bundle::unbundle(self$bundeled_model)
+      tmp_model$save(dir_path)
+    },
+    import_model=function(dir_path){
+      tf=reticulate::import("tensorflow")
+      tmp_model<-tf$keras$models$load_model(dir_path)
+      self$bundeled_model=bundle::bundle(tmp_model)
     }
   ),
   private = list(

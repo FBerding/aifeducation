@@ -15,7 +15,7 @@ fine_tune_bert_model(
   test_size = 0.1,
   n_epoch = 1,
   batch_size = 12,
-  chunk_size,
+  chunk_size = 250,
   n_workers = 1,
   multi_process = FALSE,
   trace = TRUE

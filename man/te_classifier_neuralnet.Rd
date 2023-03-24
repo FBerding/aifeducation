@@ -4,7 +4,7 @@
 \alias{te_classifier_neuralnet}
 \title{Text Embedding Classifier with a Neural Net}
 \description{
-Abtract class for neural nets with keras and
+Abstract class for neural nets with keras and
 tensorflow
 }
 \section{Public fields}{
@@ -337,6 +337,8 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_license}{\code{te_classifier_neuralnet$get_license()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_model_description}{\code{te_classifier_neuralnet$set_model_description()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_model_description}{\code{te_classifier_neuralnet$get_model_description()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-export_model}{\code{te_classifier_neuralnet$export_model()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-import_model}{\code{te_classifier_neuralnet$import_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-clone}{\code{te_classifier_neuralnet$clone()}}
 }
 }
@@ -351,9 +353,9 @@ Creating a new instance of this class.
   label = NULL,
   text_embeddings = NULL,
   targets = NULL,
-  config = list(hidden = c(500, 250, 100), gru = c(500), dropout = 0.1, recurrent_dropout
-    = 0, l2_regularizer = 0.001, optimizer = keras::optimizer_adam(), act_fct = "gelu",
-    act_fct_last = "softmax", err_fct = "categorical_crossentropy")
+  config = list(hidden = c(128), gru = c(128), dropout = 0.2, recurrent_dropout = 0,
+    l2_regularizer = 0.001, optimizer = "adam", act_fct = "gelu", act_fct_last =
+    "softmax", err_fct = "categorical_crossentropy")
 )}\if{html}{\out{</div>}}
 }
 
@@ -403,29 +405,121 @@ recurrent dropout for each gru layer.}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-train"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-train}{}}}
 \subsection{Method \code{train()}}{
+Method for training a neural net with keras and
+tensorflow.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$train(
   data_embeddings,
   data_targets,
   data_n_valid_samples = 10,
   use_baseline = TRUE,
+  bsl_val_size = 0.25,
   use_bsc = TRUE,
-  bsc_methods = c("smote", "dbsmote", "adas"),
+  bsc_methods = c("dbsmote"),
   bsc_max_k = 10,
-  bsc_limit_factor = 3,
   use_bpl = TRUE,
-  bpl_max_steps = 5,
-  bpl_anchor = 0.66,
+  bpl_max_steps = 10,
+  bpl_inc_ratio = 0.25,
+  bpl_anchor = 0.75,
   bpl_valid_size = 0.33,
   opt_model_reset = FALSE,
   epochs = 100,
   batch_size = 32,
-  rel_tolerance = 1e-04,
   dir_checkpoint,
   trace = TRUE,
   view_metrics = FALSE,
+  keras_trace = 2,
   n_cores = 2
 )}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data_embeddings}}{Object of class \code{TextEmbeddingModel}.}
+
+\item{\code{data_targets}}{\code{Factor} containing the labels for cases
+stored in \code{data_embeddings}. Factor must be named and has to use the
+same names used in \code{data_embeddings}.}
+
+\item{\code{data_n_valid_samples}}{\code{int} determining the number of cross-fold
+samples.}
+
+\item{\code{use_baseline}}{\code{bool} \code{TRUE} if the calculation of a baseline
+model is requested. This option is only relevant for \code{use_bsc=TRUE} or
+\code{use_pbl=TRUE}. If both are \code{FALSE} a baseline model is calculated.}
+
+\item{\code{bsl_val_size}}{\code{double} between 0 and 1 indicating the proportion of cases of each label
+which should be used for the validation sample during the estimation of the baseline model.
+The remaining cases are part of the training data.}
+
+\item{\code{use_bsc}}{\code{bool} \code{TRUE} if the estimation should integrate
+balanced synthetic cases. \code{FALSE} if not.}
+
+\item{\code{bsc_methods}}{\code{vector} containing the methods for generating
+synthetic cases via \link[smotefamily]{smotefamily}. Multiple methods can
+be passed. Currently \code{bsc_methods=c("adas")}, \code{bsc_methods=c("smote")}
+and \code{bsc_methods=c("dbsmote")} are possible.}
+
+\item{\code{bsc_max_k}}{\code{int} determining the maximal number of k which is used
+for creating synthetic units.}
+
+\item{\code{use_bpl}}{\code{bool} \code{TRUE} if the estimation should integrate
+balanced pseudo labeling. \code{FALSE} if not.}
+
+\item{\code{bpl_max_steps}}{\code{int} determining the maximal number of steps for
+every application of balanced pseudo labeling.}
+
+\item{\code{bpl_inc_ratio}}{\code{double} ratio between 0 and 1 indicating the
+proportion of new cases which should used for further training. See notes
+for more details.}
+
+\item{\code{bpl_anchor}}{\code{double} between 0 and 1 indicating the reference
+point for sorting the new cases of every label. See notes for more details.}
+
+\item{\code{bpl_valid_size}}{\code{double} ratio between 0 and 1 determining the proportion
+of new cases for every label which should be added to the validation sample during training.
+The remaining cases are added to the training sample.}
+
+\item{\code{opt_model_reset}}{\code{bool} \code{TRUE} if the model should be
+reseted before training.}
+
+\item{\code{epochs}}{\code{int} Number of training epochs.}
+
+\item{\code{batch_size}}{\code{int} Size of batches.}
+
+\item{\code{dir_checkpoint}}{\code{string} Path to the directory where
+the checkpoint during training should be saved. If the directory does not
+exists it is created.}
+
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation
+phase should be printed to the console.}
+
+\item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not print any
+information about the training process from keras on the console.
+\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
+one line of information for every epoch.}
+
+\item{\code{n_cores}}{\code{int} Number of cores used for creating synthetic units.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\itemize{
+
+\item{bsc_max_k: }{All values from 2 up to bsc_max_k are successively used. If
+the number of bsc_max_k is to high the value is reduced to a number that
+allows the calculating of synthetic units.}
+
+\item{bpl_inc_ratio: }{The ratio is applied to the label with the smallest number
+of new cases. The resulting value is used for every label to ensure the balance
+of all labels.}
+
+\item{bpl_anchor: }{With the help of this value the new cases are sorted. For
+this aim the distance from the anchor is calculated and all cases are arranged
+into an increasing order.
+}
+}
 }
 
 }
@@ -437,11 +531,24 @@ recurrent dropout for each gru layer.}
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$predict(newdata)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{newdata}}{Object of class \code{TextEmbeddingModel} or
+\code{data.frame} for which predictions should be made.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{data.frame} containing the predictions and
+the probabilities of the different labels for each case.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_publication_info}{}}}
 \subsection{Method \code{set_publication_info()}}{
+Method for setting publication information of the classifier
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$set_publication_info(
   type,
@@ -451,49 +558,120 @@ recurrent dropout for each gru layer.}
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{\code{string} for choosing the type of information that should
+be added. \code{type="developer"} for information about the developer of the
+classifier and \code{type="trainer"} for information about persons who trained
+the classifier. If you modify an already existing classifier please use
+\code{type="modifier"}.}
+
+\item{\code{autors}}{Person list of authors.}
+
+\item{\code{citation}}{Free text citation.}
+
+\item{\code{url}}{URL of a corresponding homepage.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_publication_info}{}}}
 \subsection{Method \code{get_publication_info()}}{
+Method for requesting the publication information of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$get_publication_info()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{list} with all saved publication information.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_license"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_license}{}}}
 \subsection{Method \code{set_license()}}{
+Method for setting the license of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$set_license(license)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_license"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_license}{}}}
 \subsection{Method \code{get_license()}}{
+Method for requesting the license of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$get_license()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{string} License of the classifier.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_model_description"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_model_description}{}}}
 \subsection{Method \code{set_model_description()}}{
+Method for setting a description of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$set_model_description(eng = NULL, native = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{eng}}{\code{string} A text describing the training of the learner,
+its theoretical and empirical background, and the different output labels
+in English.}
+
+\item{\code{native}}{\code{string} A text describing the training of the learner,
+its theoretical and empirical background, and the different output labels
+in the native language of the classifier.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_model_description"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_model_description}{}}}
 \subsection{Method \code{get_model_description()}}{
+Method for requesting the model description.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$get_model_description()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{list} with the description of the classifier in English
+and native language.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-export_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-export_model}{}}}
+\subsection{Method \code{export_model()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$export_model(dir_path)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-import_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-import_model}{}}}
+\subsection{Method \code{import_model()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{te_classifier_neuralnet$import_model(dir_path)}\if{html}{\out{</div>}}
 }
 
 }

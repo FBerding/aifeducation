@@ -1,4 +1,7 @@
-#' @title Text Embedding Model
+#'@title Text Embedding Model
+#'@description This \link[R6]{R6} class stores a text embedding model which can be
+#'used to tokenize, encode, decode, and embed raw texts. The object provides a
+#'unique interface for different text processing methods.
 #'
 #'@export
 TextEmbeddingModel<-R6::R6Class(
@@ -35,36 +38,154 @@ TextEmbeddingModel<-R6::R6Class(
     )
   ),
   public = list(
+    #'@field basic_components ('list()')\cr
+    #'List storing information which can apply to all methods.
     basic_components=list(
+      #'@field basic_components$method ('string')\cr
+      #'Method underlying the text embedding model.
       method=NULL,
+      #'@field basic_components$method ('integer')\cr
+      #'Maximum number of tokens in sequence the model processes. In general
+      #'shorter sequences will be padded and longer sequences will be divided
+      #'into chunks and/or truncated.
       max_length=NULL
     ),
+
+    #'@field bert_components ('list()')\cr
+    #'List storing information which which do only apply to bert models.
     bert_components=list(
+      #'@field bert_components$model ('transformers.TFBertModel()')\cr
+      #'An Object of class transformers.TFBertModel for using with transformers library.
       model=NULL,
+      #'@field bert_components$tokenizer ('transformers.BertTokenizerFast()')\cr
+      #'An Object of class transformers.BertTokenizerFast for using with transformers library.
       tokenizer=NULL,
+      #'@field bert_components$aggregation ('string()')\cr
+      #'Aggregation method for the hidden states.
       aggregation=NULL,
+      #'@field bert_components$aggregation ('bool()')\cr
+      #'Whether to use the hidden state representing the [CLS] token or the mean
+      #'of the hidden states of the tokens with no special functions.
       use_cls_token=NULL,
+      #'@field bert_components$chunks ('integer()')\cr
+      #'Maximal number of chunks processed with the model.
       chunks=NULL,
+      #'@field bert_components$overlap ('integer()')\cr
+      #'Number of tokens which should be added at the beginng of the sequence
+      #'of the next chunk.
       overlap=NULL),
+
+    #'@field bow_components ('list()')\cr
+    #'List storing information which which do only apply for bow_models.
     bow_components=list(
+      #'@field bow_components$model ('data.frame()')\cr
+      #'data.frame describing the relationship between tokens and their corresponding
+      #'text embeddings.
       model=NULL,
+      #'@field bow_components$vocab ('data.frame()')\cr
+      #'data.frame saving tokens, lemmata and their corresponding integer index.
       vocab=NULL,
+      #'@field bow_components$configuration ('list()')\cr
+      #'List of the configuration parameters of the model.
       configuration=list(
+        #'@field bow_components$configuration$to_lower ('bool()')\cr
+        #'\code{TRUE} if tokens are transformed to lower case.
         to_lower = NA,
+        #'@field bow_components$configuration$use_lemmata ('bool()')\cr
+        #'\code{TRUE} if the corresponding lemma should be used instead of the token.
         use_lemmata = NA,
+        #'@field bow_components$configuration$bow_n_dim ('integer()')\cr
+        #'Number of dimensions for GlobalVectors and Topic Modeling
         bow_n_dim = NA,
+        #'@field bow_components$configuration$bow_n_cluster ('integer()')\cr
+        #'Number of clusters for grouping tokens based in their global vectors.
+        #'Does not apply for method lda.
         bow_n_cluster = NA,
+        #'@field bow_components$configuration$bow_max_iter ('integer()')\cr
+        #'Maximum number of iterations for calculation global vectors and topics.
         bow_max_iter = NA,
+        #'@field bow_components$configuration$bow_max_iter_cluster ('integer()')\cr
+        #'Maximum number of iterations for creating cluster. Applies only for method
+        #'glove.
         bow_max_iter_cluster = NA,
+        #'@field bow_components$configuration$bow_cr_criterion ('double()')\cr
+        #'Convergence criterion for calculating global vectors and topics.
         bow_cr_criterion = NA,
+        #'@field bow_components$configuration$bow_learning_rate ('double()')\cr
+        #'Initial learning rate for estimating global vectors.
         bow_learning_rate = NA
         ),
+      #'@field bow_components$aggregation ('string()')\cr
+      #'Does currently not apply to these methods.
       aggregation="none",
+      #'@field bow_components$overlap ('integer()')\cr
+      #'Does currently not apply to these methods.
       chunks="none",
+      #'@field bow_components$overlap ('integer()')\cr
+      #'Does currently not apply to these methods.
       overlap="none"
       ),
 
     #--------------------------------------------------------------------------
+    #'@description Method for creating a new text embedding model
+    #'@param model_name \code{string} containing the name of the new model.
+    #'@param model_label \code{string} containing the label/title of the new model.
+    #'@param model_version \code{string} version of the model.
+    #'@param model_language \code{string} containing the language which the model
+    #'represents (e.g., English).
+    #'@param method \code{string} determining the kind of embedding model. Currently
+    #'three type are supported. \code{method="bert"} for Bidirectional Encoder
+    #'Representations from Transformers (BERT), \code{method="glove"} for
+    #'GlobalVector Clusters, and \code{method="lda"} for topic modeling. See
+    #'details for more information.
+    #'@param max_length \code{int} determining the maximums length of token
+    #'sequences uses in bert models. Not relevant for the other methods.
+    #'@param chunks \code{int} Maximum number of chunks. Only relevant for
+    #'bert models.
+    #'@param overlap \code{int} determining the number of tokens which should be added
+    #'at the beginning of the next chunk. Only relevant for bert models.
+    #'@param aggregation \code{string} method for aggregating the text embeddings
+    #'created by bert models. See details for more information.
+    #'@param use_cls_token \code{bool} \code{TRUE} if the CLS token should be used
+    #'for aggregation and as text embedding. If \code{FALSE} the mean of all
+    #'corresponding tokens is used for aggregation and text embedding.
+    #'@param bert_model_dir_path \code{string} path to the directory where the
+    #'bert model is stored.
+    #'@param bow_basic_text_rep object of class \code{basic_text_rep} created via
+    #'the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove"}
+    #'and \code{method="lda"}.
+    #'@param bow_n_dim \code{int} Number of dimension of the GlobalVector or
+    #'number of topics for LDA.
+    #'@param bow_n_cluster \code{int} Number of clusters created on the basis
+    #'of GlobalVectors. Parameter is not relevant for \code{method="lda"} and
+    #'\code{method="bert"}
+    #'@param bow_max_iter \code{int} Maximum Number of iterations for fitting
+    #'GlobalVectors and Topic Models.
+    #'@param bow_max_iter_cluster \code{int} Maximum number of iterations for
+    #'fitting cluster if \code{method="glove"}.
+    #'@param bow_cr_criterion \code{double} convergence criterion for GlobalVectors.
+    #'@param bow_learning_rate \code{double} initial learning rate for GlobalVectors.
+    #'@param trace \code{bool} \code{TRUE} print information about the progress.
+    #'\code{FALSE} not.
+    #'@details \itemize{
+    #'\item{method: }{In the case of \code{method="bert"} a pretrained bert model
+    #'must be supplied via \code{bert_model_dir_path}. For \code{method="glove"}
+    #'and \code{method="lda"} a new model will be created based on the data provided
+    #'via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
+    #'only word embeddings, not text embeddings. To achieve text embeddings the words
+    #'are clusters based on their word embeddings with kmeans.}
+    #'
+    #'\item{aggregation: }{For creating a text embedding with a bert model server options
+    #'are possible:
+    #'\itemize{
+    #'\item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
+    #'\item{second_to_last: }{\code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
+    #'\item{fourth_to_last: }{\code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
+    #'\item{all: }{\code{aggregation="all"} uses mean of the hidden states of all hidden layers.}
+    #'\item{last_four: }{\code{aggregation="last_four"} uses mean of the hidden states of the last four layers.}
+    #'}}
+    #'
+    #'}
     initialize=function(model_name,
                         model_label,
                         model_version,
@@ -92,9 +213,7 @@ TextEmbeddingModel<-R6::R6Class(
           reticulate::py_install('transformers', pip = TRUE)
         }
         transformer = reticulate::import('transformers')
-        #self$bert_components$tokenizer<-transformer$AutoTokenizer$from_pretrained(bert_model)
         self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
-        #self$bert_components$model<-transformer$TFBertModel$from_pretrained(bert_model_dir_path)
         self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
 
         self$bert_components$chunks<-chunks
@@ -199,7 +318,6 @@ TextEmbeddingModel<-R6::R6Class(
         tmp_features<-colnames(corrected_dfm)
         for(i in 1:corrected_dfm@Dim[2]){
           tmp<-subset(lda,lda$term==tmp_features[i])
-          #tmp_index[i]<-tmp_features[i]
           term_topic_beta[i,]<-as.numeric(tmp$beta)
         }
 
@@ -262,17 +380,22 @@ TextEmbeddingModel<-R6::R6Class(
       private$model_info$model_date<-date()
     },
     #--------------------------------------------------------------------------
-    load_weights=function(bert_model_dir_path){
+    #'@description Method for loading a bert model into R.
+    #'@param bert_model_dir_path \code{string} containing the path to the relevant
+    #'bert model.
+    load_model=function(bert_model_dir_path){
       if(self$basic_components$method=="bert"){
         transformer = reticulate::import('transformers')
         self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
-        #self$bert_components$model<-transformer$TFBertModel$from_pretrained(bert_model_dir_path)
         self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
       } else {
         message("Method only relevant for bert models.")
       }
     },
     #--------------------------------------------------------------------------
+    #'@description Method for saving a bert model.
+    #'@param bert_model_dir_path \code{string} containing the path where the bert model
+    #'should be saved.
     save_bert_model=function(bert_model_dir_path){
       if(self$basic_components$method=="bert"){
         self$bert_components$model$save_pretrained(
@@ -286,229 +409,22 @@ TextEmbeddingModel<-R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    fine_tune_bert_model=function(output_dir,
-                                  bert_model_dir_path,
-                                  model_name,
-                                  raw_texts,
-                                  vocab_draft,
-                                  aug_vocab_by=100,
-                                  p_mask=0.15,
-                                  whole_word=TRUE,
-                                  test_size=0.1,
-                                  n_epoch=1,
-                                  batch_size=12,
-                                  chunk_size,
-                                  n_workers=1,
-                                  multi_process=FALSE,
-                                  trace=TRUE){
-      transformer = reticulate::import('transformers')
-      tf = reticulate::import('tensorflow')
-      np=reticulate::import("numpy")
-      datasets=reticulate::import("datasets")
-
-      mlm_model=transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
-
-      print(paste(date(),"Tokenize Raw Texts"))
-      prepared_texts<-quanteda::tokens(
-        x = raw_texts,
-        what = "word",
-        remove_punct = FALSE,
-        remove_symbols = TRUE,
-        remove_numbers = FALSE,
-        remove_url = TRUE,
-        remove_separators = TRUE,
-        split_hyphens = FALSE,
-        split_tags = FALSE,
-        include_docvars = TRUE,
-        padding = FALSE,
-        verbose = trace)
-
-      if(aug_vocab_by>0){
-        print(paste(date(),"Augmenting vocabulary"))
-
-        features_dfm<-quanteda::dfm(prepared_texts,tolower=FALSE)
-        top_features<-names(quanteda::topfeatures(
-          x=features_dfm,
-          n=ncol(features_dfm),
-          decreasing = TRUE))
-
-        top_features<-cbind(top_features,seq(from=1,to=length(top_features),by=1))
-
-        new_tokens<-subset(top_features,top_features[,1] %in% vocab_draft$vocab$token)
-
-        new_tokens<-setdiff(new_tokens[,1],names(self$bert_components$tokenizer$vocab))
-        new_tokens<-new_tokens[1:min(aug_vocab_by,length(new_tokens))]
-
-        print(paste(date(),"Adding",length(new_tokens),"New Tokens"))
-        invisible(self$bert_components$tokenizer$add_tokens(new_tokens = new_tokens))
-        invisible(mlm_model$resize_token_embeddings(length(self$bert_components$tokenizer)))
-      }
-
-      print(paste(date(),"Creating Text Chunks"))
-      prepared_texts_chunks<-quanteda::tokens_chunk(
-        x=prepared_texts,
-        size=chunk_size,
-        overlap = 0,
-        use_docvars = FALSE)
-
-      check_chunks_length=(quanteda::ntoken(prepared_texts_chunks)==chunk_size)
-
-      prepared_texts_chunks<-quanteda::tokens_subset(
-        x=prepared_texts_chunks,
-        subset = check_chunks_length
-      )
-
-      prepared_text_chunks_strings<-lapply(prepared_texts_chunks,paste,collapse = " ")
-      prepared_text_chunks_strings<-as.character(prepared_text_chunks_strings)
-      print(paste(date(),length(prepared_text_chunks_strings),"Chunks Created"))
-
-      print(paste(date(),"Creating Input"))
-      tokenized_texts= self$bert_components$tokenizer(prepared_text_chunks_strings,
-                                                     truncation =TRUE,
-                                                     padding= TRUE,
-                                                     max_length=as.integer(chunk_size),
-                                                     return_tensors="np")
-      print(paste(date(),"Creating TensorFlow Dataset"))
-      tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-
-      if(whole_word==TRUE){
-        print(paste(date(),"Using Whole Word Masking"))
-        word_ids=matrix(nrow = length(prepared_texts_chunks),
-                        ncol=(chunk_size-2))
-        for(i in 0:(nrow(word_ids)-1)){
-          word_ids[i,]<-as.vector(unlist(tokenized_texts$word_ids(as.integer(i))))
-        }
-        word_ids<-reticulate::dict("word_ids"=word_ids)
-        word_ids<-datasets$Dataset$from_dict(word_ids)
-        tokenized_dataset=tokenized_dataset$add_column(name="word_ids",column=word_ids)
-        data_collator=transformer$DataCollatorForWholeWordMask(
-          tokenizer = tokenizer,
-          mlm = TRUE,
-          mlm_probability = p_mask
-        )
-      } else {
-        print(paste(date(),"Using Token Masking"))
-        data_collator=transformer$DataCollatorForLanguageModeling(
-          tokenizer = tokenizer,
-          mlm = TRUE,
-          mlm_probability = p_mask
-        )
-      }
-
-      tokenized_dataset=tokenized_dataset$train_test_split(test_size=test_size)
-
-      tf_train_dataset=mlm_model$prepare_tf_dataset(
-        dataset = tokenized_dataset$train,
-        batch_size = as.integer(batch_size),
-        collate_fn = data_collator,
-        shuffle = TRUE
-      )
-      tf_test_dataset=mlm_model$prepare_tf_dataset(
-        dataset = tokenized_dataset$test,
-        batch_size = as.integer(batch_size),
-        collate_fn = data_collator,
-        shuffle = TRUE
-      )
-
-
-      #input_ids<-tokenized_texts["input_ids"]
-      #token_type_ids<-tokenized_texts["token_type_ids"]
-      #attention_mask<-tokenized_texts["attention_mask"]
-
-      #print(paste(date(),"Creating Masked Data"))
-      #masked_ids<-input_ids
-      #for(i in 1:nrow(masked_ids)){
-      #  tmp_sample<-sample(2:(chunk_size-1),size = p_mask*chunk_size)
-      #  masked_ids[i,tmp_sample]<-tokenizer$mask_token_id
-      #}
-
-      #mode(input_ids) <- "integer"
-      #mode(token_type_ids) <- "integer"
-      #mode(attention_mask) <- "integer"
-      #mode(masked_ids) <- "integer"
-
-      #data_complete<-reticulate::dict("input_ids"=masked_ids,
-      #                                "token_type_ids"=token_type_ids,
-      #                                "attention_mask"=attention_mask,
-      #                                "labels"=input_ids)
-
-      #print(paste(date(),"Creating TensorFlow Dataset"))
-      #data_complete<-datasets$Dataset$from_dict(data_complete)
-      #data_complete<-data_complete$train_test_split(test_size=test_size)
-      #data_train<-data_complete$train$to_tf_dataset(
-      #  columns = c("input_ids","token_type_ids","attention_mask"),
-      #  label_cols = "labels",
-      #  shuffle = TRUE,
-      #  batch_size = as.integer(batch_size))
-      #data_test<-data_complete$test$to_tf_dataset(
-      #  columns = c("input_ids","token_type_ids","attention_mask"),
-      #  label_cols = "labels",
-      #  shuffle = TRUE,
-      #  batch_size = as.integer(batch_size))
-
-      print(paste(date(),"Preparing Training of the Model"))
-      adam<-tf$keras$optimizers$Adam
-      #callback_1=tf$keras$callbacks$EarlyStopping(
-      #  monitor='val_loss',
-      #  restore_best_weights = TRUE,
-      #  min_delta=0,
-      #  patience=0,
-      #  mode="min",
-      #  verbose=1L
-      #)
-
-      if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
-        print(paste(date(),"Creating Checkpoint Directory"))
-        dir.create(paste0(output_dir,"/checkpoints"))
-      }
-      callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
-        filepath = paste0(output_dir,"/checkpoints/"),
-        monitor="val_loss",
-        verbose=1L,
-        mode="auto",
-        save_best_only=TRUE,
-        save_freq="epoch",
-        save_weights_only= TRUE
-      )
-
-      print(paste(date(),"Compile Model"))
-      mlm_model$compile(optimizer=adam(3e-5))
-
-      print(paste(date(),"Start Fine Tuning"))
-      mlm_model$fit(x=tf_train_dataset,
-                    validation_data=tf_test_dataset,
-                    epochs=as.integer(n_epoch),
-                    workers=as.integer(n_workers),
-                    use_multiprocessing=multi_process,
-                    callbacks=list(callback_checkpoint))
-
-      print(paste(date(),"Load Weights From Best Checkpoint"))
-      mlm_model$load_weights(paste0(output_dir,"/checkpoints/"))
-
-      print(paste(date(),"Saving Bert Model"))
-      mlm_model$save_pretrained(
-        save_directory=output_dir)
-
-      print(paste(date(),"Saving Tokenizer"))
-      self$bert_components$tokenizer$save_pretrained(
-        output_dir)
-
-      print(paste(date(),"Setting new Model Name and Date"))
-      private$model_info$model_name<-model_name
-      private$model_info$model_date<-date()
-
-      print(paste(date(),"Reloading model"))
-      self$bert_components$model<-transformer$TFBertModel$from_pretrained(output_dir)
-
-      print(paste(date(),"Done"))
-
-    },
-    #-------------------------------------------------------------------------
-    tokenize=function(raw_text, trace = FALSE){
+    #'@descprtion Method for encoding words of raw texts into integers.
+    #'@param raw_text \code{vector} containing the raw texts.
+    #'@param token_encodings_only \code{bool} If \code{TRUE} only the token
+    #'encodings are returned. If \code{FALSE} the complete encoding is returned
+    #'which is important for bert models.
+    #'@param trace \code{bool} If \code{TRUE} information of the progress
+    #'are printed. \code{FALSE} if not requested.
+    #'@return \code{list} containing the integer sequences of the raw texts with
+    #'special tokens.
+    encode=function(raw_text,
+                    token_encodings_only=FALSE,
+                    trace = FALSE){
       n_units<-length(raw_text)
 
       if(self$basic_components$method=="bert"){
-        tokens<-NULL
+        encodings<-NULL
         for(i in 1:n_units){
           preparation_tokens<-quanteda::tokens(raw_text[i])
           preparation_tokens<-quanteda::tokens_chunk(
@@ -532,9 +448,17 @@ TextEmbeddingModel<-R6::R6Class(
               print(paste(date(),i,"/",n_units,"block",j,"/",chunks))
             }
           }
-          tokens[i]<-list(tokens_unit)
+          encodings[i]<-list(tokens_unit)
         }
-        return(tokens)
+        if(token_encodings_only==FALSE){
+          return(encodings)
+        } else {
+          encodings_only=NULL
+          for(i in 1:length(encodings)){
+            encodings_only[i]=list(as.vector(encodings[[i]][[1]]["input_ids"]))
+          }
+          return(encodings_only)
+        }
       } else if(self$basic_components$method=="glove_cluster"|
                 self$basic_components$method=="lda"){
         textual_corpus <-quanteda::corpus(raw_text)
@@ -576,17 +500,81 @@ TextEmbeddingModel<-R6::R6Class(
                                             verbose=verbose)
           }
         }
-        integer_token<-NULL
+        encodings<-NULL
         for(i in 1:length(token)){
-          integer_token[i]<-list(as.integer(as.vector(token[[i]])))
+          encodings[i]<-list(as.integer(as.vector(token[[i]])))
         }
-        return(integer_token)
+        return(encodings)
+      }
+    },
+    #--------------------------------------------------------------------------
+    #'@description Method for decoding a sequence of integers into tokens
+    #'@param int_seqence \code{list} containing the integer sequences which
+    #'should be transformed to tokens or a single integer sequence as \code{vector}
+    #'@return \code{list} of token sequences
+    decode=function(int_seqence){
+
+      if(!is.list(int_seqence)){
+        tmp=NULL
+        tmp[1]=list(int_seqence)
+        int_seqence=tmp[1]
+      }
+
+      if(self$basic_components$method=="bert"){
+        tmp_token_list=NULL
+        for(i in 1:length(int_seqence)){
+          tmp_vector<-int_seqence[[i]]
+          mode(tmp_vector)="integer"
+          tmp_token_list[i]=list(self$bert_components$tokenizer$decode(tmp_vector))
+        }
+        return(tmp_token_list)
+      } else if(self$basic_components$method=="glove" |
+                self$basic_components$method=="lda"){
+        if(self$bow_components$configuration$to_lower==TRUE){
+          if(self$bow_components$configuration$use_lemmata==FALSE){
+            input_column="index_token_lower"
+            target_coumn="token_tolower"
+          } else {
+            input_column="index_lemma_lower"
+            target_coumn="lemma_tolower"
+          }
+        } else {
+          if(self$bow_components$configuration$use_lemmata==FALSE){
+            input_column="index_token"
+            target_coumn="token"
+          } else {
+            input_column="index_lemma"
+            target_coumn="lemma "
+          }
+        }
+
+        tmp_token_list=NULL
+        for(i in 1:length(int_seqence)){
+          tmp_int_seq=int_seqence[[i]]
+          tmp_token_seq=vector(length = length(tmp_int_seq))
+          for(j in 1:length(tmp_int_seq)){
+            index=match(x=tmp_int_seq[j],
+                        table=self$bow_components$vocab[,input_column])
+            tmp_token_seq[j]=self$bow_components$vocab[index,target_coumn]
+          }
+          tmp_token_list[i]=list(tmp_token_seq)
+        }
+        return(tmp_token_list)
       }
     },
     #Embedding------------------------------------------------------------------
+    #'@description Method for creating text embeddings from raw texts
+    #'@param raw_text \code{vector} containing the raw texts.
+    #'@param doc_id \code{vector} containing the corresponding ids for every text.
+    #'@param trace \code{bool} \code{TRUE} if information about the progression
+    #'should be printed on console.
+    #'@return Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
+    #'containg the embeddings as a \code{data.frame} and information about the
+    #'model creating the embeddings.
     embed=function(raw_text=NULL,doc_id=NULL, trace = FALSE){
-      tokens<-self$tokenize(raw_text = raw_text,
-                            trace = trace)
+      tokens<-self$encode(raw_text = raw_text,
+                          trace = trace,
+                          token_encodings_only=FALSE)
       n_units<-length(tokens)
       #bert---------------------------------------------------------------------
       if(self$basic_components$method=="bert"){
@@ -597,7 +585,6 @@ TextEmbeddingModel<-R6::R6Class(
           nrow=n_units,
           ncol=n_layer_size*self$bert_components$chunks,
           data=0)
-
 
         for(i in 1:n_units){
           for(j in 1:length(tokens[[i]])){
@@ -702,11 +689,8 @@ TextEmbeddingModel<-R6::R6Class(
                   tmp_vector[]=0
                   for(index in 1:(tmp_n_tokens-2)){
                     tmp_vector<-tmp_vector+as.vector(tmp_embedding_sum[[0]][[index]])
-                    #print(tmp_vector[1:5])
                   }
                   tmp_vector<-tmp_vector/(tmp_n_tokens-2)
-                  #print(tmp_vector[1:5])
-                  #print(tmp_n_tokens)
                   tmp_embedding_sum<-t(as.matrix(tmp_vector))
                 }
                 if(l==(n_layer-3)){
@@ -715,22 +699,13 @@ TextEmbeddingModel<-R6::R6Class(
                   tmp_embedding=tmp_embedding+tmp_embedding_sum
                 }
               }
-              #print(tmp_embedding[1,1:10])
               tmp_embedding=tmp_embedding/4
-              #print(tmp_embedding[1,1:10])
             }
             text_embedding[i,(1:n_layer_size)+(j-1)*(1:n_layer_size)]<-tmp_embedding
             if(trace==TRUE){
               print(paste(date(),i,"/",n_units,"block",j,"/",length(tokens[[i]])))
             }
           }
-          #text_embedding[i,]<-reticulate::py_to_r(
-          #  reticulate::array_reshape(
-          #    x=self$bert_components$model(
-          #      tokens[[i]])[[1]][[0]][[0]],
-          #    dim=c(1, n_layer_size)
-          #  )
-          #)
         }
         colnames(text_embedding)<-colnames(text_embedding,
                                            do.NULL = FALSE,
@@ -794,6 +769,7 @@ TextEmbeddingModel<-R6::R6Class(
       if(self$basic_components$method=="bert"){
         embeddings<-EmbeddedText$new(
           model_name = private$model_info$model_name,
+          model_label = private$model_info$model_label,
           model_date = private$model_info$model_date,
           model_method = self$basic_components$method,
           model_version = private$model_info$model_version,
@@ -822,6 +798,12 @@ TextEmbeddingModel<-R6::R6Class(
       return(embeddings)
     },
     #--------------------------------------------------------------------------
+    #'@description Method for setting the publication information of the model.
+    #'@param type \code{string} Type of information which should be changed/added.
+    #'\code{type="developer"},\code{type="trainer"}, and \code{type="modifier"} are possible.
+    #'@param autors List of persons.
+    #'@param \code{string} Citation in free text.
+    #'@param \code{string} Corresponding URL if applicable.
     set_publication_info=function(type,
                                   autors,
                                   citation,
@@ -841,17 +823,31 @@ TextEmbeddingModel<-R6::R6Class(
       }
      },
     #--------------------------------------------------------------------------
+    #'@description Method for getting publication information of the model.
+    #'@return \code{list} of publication information.
     get_publication_info=function(){
       return(private$publication_info)
     },
     #--------------------------------------------------------------------------
+    #'@description Method for setting the license of the model
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
     set_license=function(license){
       private$model_info$model_license<-license
     },
+    #'@description Method for requesting the license of the model
+    #'@return \code{string} License of the model
     get_license=function(){
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
+    #'@description Method for setting a description of the model
+    #'@param eng \code{string} A text describing the training of the learner,
+    #'its theoretical and empirical background, and the different output labels
+    #'in English.
+    #'@param native \code{string} A text describing the training of the learner,
+    #'its theoretical and empirical background, and the different output labels
+    #'in the native language of the model
     set_model_description=function(eng=NULL,native=NULL){
       if(!is.null(description)){
         private$model_description$eng=description
@@ -860,10 +856,15 @@ TextEmbeddingModel<-R6::R6Class(
         private$model_description$native=description
       }
     },
+    #'@description Method for requesting the model description.
+    #'@return \code{list} with the description of the model in English
+    #'and native language.
     get_model_description=function(){
       return(private$model_description)
     },
     #--------------------------------------------------------------------------
+    #'@description Method for requesting the model information
+    #'@return \code{list} of all relevant model information
     get_model_info=function(){
       return(list(
         model_license=private$model_info$model_license,
@@ -879,12 +880,15 @@ TextEmbeddingModel<-R6::R6Class(
 
 
 #'@title Embedded Text
-#'
+#'@description Object of class \link[R6]{R6} which stores the text embeddings
+#'generated by an object of class \link{TextEmbeddingModel} via the method
+#'\code{embed()}.
 #'@export
 EmbeddedText<-R6::R6Class(
   classname = "EmbeddedText",
   private = list(
     model_name=NA,
+    model_label=NA,
     model_date=NA,
     model_method=NA,
     model_version=NA,
@@ -895,8 +899,25 @@ EmbeddedText<-R6::R6Class(
     param_aggregation=NA
   ),
   public = list(
+    #'@field embeddings ('data.frame()')\cr
+    #'data.frame containing the text embeddings for all chunks. Documents are
+    #'in the rows. Embeddings dimensions are in the columns.
     embeddings=NA,
+
+    #'@decription Creates a new object representing text embeddings.
+    #'@param model_name \code{string} Name of the model that generates this embedding.
+    #'@param model_label \code{string} Label of the model that generates this embedding.
+    #'@param model_date \code{string} Date when the embedding generating model was created.
+    #'@param model_version \code{string} Version of the model that generated this embedding.
+    #'@param model_language \code{string} Language of the model that generated this embedding.
+    #'@param param_seq_length \code{int} Maximal number of tokens that processes the generating model for a chunk.
+    #'@param param_chunks \code{int} Maximal number of chunks which are supported by the generating model.
+    #'@param param_overlap \code{int} Number of tokens that were added at the beginning of the sequence for the next chunk
+    #'by this model.
+    #'@param param_aggregation \code{string} Aggregation method of the hidden states.
+    #'@param embeddings \code{data.frame} containing the text embeddings.
     initialize=function(model_name,
+                        model_label,
                         model_date,
                         model_method,
                         model_version,
@@ -917,8 +938,14 @@ EmbeddedText<-R6::R6Class(
       private$param_aggregation = param_aggregation
       self$embeddings=embeddings
     },
+    #--------------------------------------------------------------------------
+    #'@description Method for retrieving information about the model that
+    #'generated this embedding.
+    #'@return \code{list} contain all saved information about the underlying
+    #'text embedding model.
     get_model_info=function(){
       tmp<-list(model_name=private$model_name,
+                model_name=private$model_label,
                 model_date=private$model_date,
                 model_method=private$model_method,
                 model_version=private$model_version,
@@ -929,6 +956,10 @@ EmbeddedText<-R6::R6Class(
                 param_aggregation=private$param_aggregation)
       return(tmp)
     },
+    #--------------------------------------------------------------------------
+    #'@description Method for retrieving the label of the model that
+    #'generated this embedding.
+    #'@return \code{string} Lable of the corresponding text embedding model
     get_model_label=function(){
       return(private$model_label)
     }

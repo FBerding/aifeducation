@@ -4,18 +4,183 @@
 \alias{TextEmbeddingModel}
 \title{Text Embedding Model}
 \description{
-Text Embedding Model
+This \link[R6]{R6} class stores a text embedding model which can be
+used to tokenize, encode, decode, and embed raw texts. The object provides a
+unique interface for different text processing methods.
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{basic_components}}{('list()')\cr
+List storing information which can apply to all methods.}
 
-Text Embedding Model
+\item{\code{basic_components$method}}{('string')\cr
+Method underlying the text embedding model.}
+
+\item{\code{basic_components$method}}{('integer')\cr
+Maximum number of tokens in sequence the model processes. In general
+shorter sequences will be padded and longer sequences will be divided
+into chunks and/or truncated.}
+
+\item{\code{bert_components}}{('list()')\cr
+List storing information which which do only apply to bert models.}
+
+\item{\code{bert_components$model}}{('transformers.TFBertModel()')\cr
+An Object of class transformers.TFBertModel for using with transformers library.}
+
+\item{\code{bert_components$tokenizer}}{('transformers.BertTokenizerFast()')\cr
+An Object of class transformers.BertTokenizerFast for using with transformers library.}
+
+\item{\code{bert_components$aggregation}}{('string()')\cr
+Aggregation method for the hidden states.}
+
+\item{\code{bert_components$aggregation}}{('bool()')\cr
+Whether to use the hidden state representing the [CLS] token or the mean
+of the hidden states of the tokens with no special functions.}
+
+\item{\code{bert_components$chunks}}{('integer()')\cr
+Maximal number of chunks processed with the model.}
+
+\item{\code{bert_components$overlap}}{('integer()')\cr
+Number of tokens which should be added at the beginng of the sequence
+of the next chunk.}
+
+\item{\code{bow_components}}{('list()')\cr
+List storing information which which do only apply for bow_models.}
+
+\item{\code{bow_components$model}}{('data.frame()')\cr
+data.frame describing the relationship between tokens and their corresponding
+text embeddings.}
+
+\item{\code{bow_components$vocab}}{('data.frame()')\cr
+data.frame saving tokens, lemmata and their corresponding integer index.}
+
+\item{\code{bow_components$configuration}}{('list()')\cr
+List of the configuration parameters of the model.}
+
+\item{\code{bow_components$configuration$to_lower}}{('bool()')\cr
+\code{TRUE} if tokens are transformed to lower case.}
+
+\item{\code{bow_components$configuration$use_lemmata}}{('bool()')\cr
+\code{TRUE} if the corresponding lemma should be used instead of the token.}
+
+\item{\code{bow_components$configuration$bow_n_dim}}{('integer()')\cr
+Number of dimensions for GlobalVectors and Topic Modeling}
+
+\item{\code{bow_components$configuration$bow_n_cluster}}{('integer()')\cr
+Number of clusters for grouping tokens based in their global vectors.
+Does not apply for method lda.}
+
+\item{\code{bow_components$configuration$bow_max_iter}}{('integer()')\cr
+Maximum number of iterations for calculation global vectors and topics.}
+
+\item{\code{bow_components$configuration$bow_max_iter_cluster}}{('integer()')\cr
+Maximum number of iterations for creating cluster. Applies only for method
+glove.}
+
+\item{\code{bow_components$configuration$bow_cr_criterion}}{('double()')\cr
+Convergence criterion for calculating global vectors and topics.}
+
+\item{\code{bow_components$configuration$bow_learning_rate}}{('double()')\cr
+Initial learning rate for estimating global vectors.}
+
+\item{\code{bow_components$aggregation}}{('string()')\cr
+Does currently not apply to these methods.}
+
+\item{\code{bow_components$overlap}}{('integer()')\cr
+Does currently not apply to these methods.}
+
+\item{\code{bow_components$overlap}}{('integer()')\cr
+Does currently not apply to these methods.}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{basic_components$method}}{('string')\cr
+Method underlying the text embedding model.}
+
+\item{\code{basic_components$method}}{('integer')\cr
+Maximum number of tokens in sequence the model processes. In general
+shorter sequences will be padded and longer sequences will be divided
+into chunks and/or truncated.}
+
+\item{\code{bert_components$model}}{('transformers.TFBertModel()')\cr
+An Object of class transformers.TFBertModel for using with transformers library.}
+
+\item{\code{bert_components$tokenizer}}{('transformers.BertTokenizerFast()')\cr
+An Object of class transformers.BertTokenizerFast for using with transformers library.}
+
+\item{\code{bert_components$aggregation}}{('string()')\cr
+Aggregation method for the hidden states.}
+
+\item{\code{bert_components$aggregation}}{('bool()')\cr
+Whether to use the hidden state representing the [CLS] token or the mean
+of the hidden states of the tokens with no special functions.}
+
+\item{\code{bert_components$chunks}}{('integer()')\cr
+Maximal number of chunks processed with the model.}
+
+\item{\code{bert_components$overlap}}{('integer()')\cr
+Number of tokens which should be added at the beginng of the sequence
+of the next chunk.}
+
+\item{\code{bow_components$model}}{('data.frame()')\cr
+data.frame describing the relationship between tokens and their corresponding
+text embeddings.}
+
+\item{\code{bow_components$vocab}}{('data.frame()')\cr
+data.frame saving tokens, lemmata and their corresponding integer index.}
+
+\item{\code{bow_components$configuration}}{('list()')\cr
+List of the configuration parameters of the model.}
+
+\item{\code{bow_components$configuration$to_lower}}{('bool()')\cr
+\code{TRUE} if tokens are transformed to lower case.}
+
+\item{\code{bow_components$configuration$use_lemmata}}{('bool()')\cr
+\code{TRUE} if the corresponding lemma should be used instead of the token.}
+
+\item{\code{bow_components$configuration$bow_n_dim}}{('integer()')\cr
+Number of dimensions for GlobalVectors and Topic Modeling}
+
+\item{\code{bow_components$configuration$bow_n_cluster}}{('integer()')\cr
+Number of clusters for grouping tokens based in their global vectors.
+Does not apply for method lda.}
+
+\item{\code{bow_components$configuration$bow_max_iter}}{('integer()')\cr
+Maximum number of iterations for calculation global vectors and topics.}
+
+\item{\code{bow_components$configuration$bow_max_iter_cluster}}{('integer()')\cr
+Maximum number of iterations for creating cluster. Applies only for method
+glove.}
+
+\item{\code{bow_components$configuration$bow_cr_criterion}}{('double()')\cr
+Convergence criterion for calculating global vectors and topics.}
+
+\item{\code{bow_components$configuration$bow_learning_rate}}{('double()')\cr
+Initial learning rate for estimating global vectors.}
+
+\item{\code{bow_components$aggregation}}{('string()')\cr
+Does currently not apply to these methods.}
+
+\item{\code{bow_components$overlap}}{('integer()')\cr
+Does currently not apply to these methods.}
+
+\item{\code{bow_components$overlap}}{('integer()')\cr
+Does currently not apply to these methods.}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TextEmbeddingModel-new}{\code{TextEmbeddingModel$new()}}
-\item \href{#method-TextEmbeddingModel-load_weights}{\code{TextEmbeddingModel$load_weights()}}
+\item \href{#method-TextEmbeddingModel-load_model}{\code{TextEmbeddingModel$load_model()}}
 \item \href{#method-TextEmbeddingModel-save_bert_model}{\code{TextEmbeddingModel$save_bert_model()}}
-\item \href{#method-TextEmbeddingModel-fine_tune_bert_model}{\code{TextEmbeddingModel$fine_tune_bert_model()}}
-\item \href{#method-TextEmbeddingModel-tokenize}{\code{TextEmbeddingModel$tokenize()}}
+\item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
+\item \href{#method-TextEmbeddingModel-decode}{\code{TextEmbeddingModel$decode()}}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
 \item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
 \item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
@@ -31,9 +196,11 @@ Text Embedding Model
 \if{html}{\out{<a id="method-TextEmbeddingModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-new}{}}}
 \subsection{Method \code{new()}}{
+Method for creating a new text embedding model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$new(
   model_name,
+  model_label,
   model_version,
   model_language,
   method,
@@ -41,7 +208,7 @@ Text Embedding Model
   chunks = 1,
   overlap = 0,
   aggregation = "last",
-  aggregate_cls = TRUE,
+  use_cls_token = TRUE,
   bert_model_dir_path,
   bow_basic_text_rep,
   bow_n_dim = NULL,
@@ -54,130 +221,324 @@ Text Embedding Model
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_name}}{\code{string} containing the name of the new model.}
+
+\item{\code{model_label}}{\code{string} containing the label/title of the new model.}
+
+\item{\code{model_version}}{\code{string} version of the model.}
+
+\item{\code{model_language}}{\code{string} containing the language which the model
+represents (e.g., English).}
+
+\item{\code{method}}{\code{string} determining the kind of embedding model. Currently
+three type are supported. \code{method="bert"} for Bidirectional Encoder
+Representations from Transformers (BERT), \code{method="glove"} for
+GlobalVector Clusters, and \code{method="lda"} for topic modeling. See
+details for more information.}
+
+\item{\code{max_length}}{\code{int} determining the maximums length of token
+sequences uses in bert models. Not relevant for the other methods.}
+
+\item{\code{chunks}}{\code{int} Maximum number of chunks. Only relevant for
+bert models.}
+
+\item{\code{overlap}}{\code{int} determining the number of tokens which should be added
+at the beginning of the next chunk. Only relevant for bert models.}
+
+\item{\code{aggregation}}{\code{string} method for aggregating the text embeddings
+created by bert models. See details for more information.}
+
+\item{\code{use_cls_token}}{\code{bool} \code{TRUE} if the CLS token should be used
+for aggregation and as text embedding. If \code{FALSE} the mean of all
+corresponding tokens is used for aggregation and text embedding.}
+
+\item{\code{bert_model_dir_path}}{\code{string} path to the directory where the
+bert model is stored.}
+
+\item{\code{bow_basic_text_rep}}{object of class \code{basic_text_rep} created via
+the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove"}
+and \code{method="lda"}.}
+
+\item{\code{bow_n_dim}}{\code{int} Number of dimension of the GlobalVector or
+number of topics for LDA.}
+
+\item{\code{bow_n_cluster}}{\code{int} Number of clusters created on the basis
+of GlobalVectors. Parameter is not relevant for \code{method="lda"} and
+\code{method="bert"}}
+
+\item{\code{bow_max_iter}}{\code{int} Maximum Number of iterations for fitting
+GlobalVectors and Topic Models.}
+
+\item{\code{bow_max_iter_cluster}}{\code{int} Maximum number of iterations for
+fitting cluster if \code{method="glove"}.}
+
+\item{\code{bow_cr_criterion}}{\code{double} convergence criterion for GlobalVectors.}
+
+\item{\code{bow_learning_rate}}{\code{double} initial learning rate for GlobalVectors.}
+
+\item{\code{trace}}{\code{bool} \code{TRUE} print information about the progress.
+\code{FALSE} not.}
 }
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-load_weights"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_weights}{}}}
-\subsection{Method \code{load_weights()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_weights(bert_model_dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\itemize{
+\item{method: }{In the case of \code{method="bert"} a pretrained bert model
+must be supplied via \code{bert_model_dir_path}. For \code{method="glove"}
+and \code{method="lda"} a new model will be created based on the data provided
+via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
+only word embeddings, not text embeddings. To achieve text embeddings the words
+are clusters based on their word embeddings with kmeans.}
+
+\item{aggregation: }{For creating a text embedding with a bert model server options
+are possible:
+\itemize{
+\item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
+\item{second_to_last: }{\code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
+\item{fourth_to_last: }{\code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
+\item{all: }{\code{aggregation="all"} uses mean of the hidden states of all hidden layers.}
+\item{last_four: }{\code{aggregation="last_four"} uses mean of the hidden states of the last four layers.}
+}}
+
+}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-load_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_model}{}}}
+\subsection{Method \code{load_model()}}{
+Method for loading a bert model into R.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(bert_model_dir_path)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bert_model_dir_path}}{\code{string} containing the path to the relevant
+bert model.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-save_bert_model"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-save_bert_model}{}}}
 \subsection{Method \code{save_bert_model()}}{
+Method for saving a bert model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_bert_model(bert_model_dir_path)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bert_model_dir_path}}{\code{string} containing the path where the bert model
+should be saved.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-fine_tune_bert_model"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-fine_tune_bert_model}{}}}
-\subsection{Method \code{fine_tune_bert_model()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-encode"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-encode}{}}}
+\subsection{Method \code{encode()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$fine_tune_bert_model(
-  output_dir,
-  bert_model_dir_path,
-  model_name,
-  raw_texts,
-  vocab_draft,
-  aug_vocab_by = 100,
-  p_mask = 0.15,
-  whole_word = TRUE,
-  test_size = 0.1,
-  n_epoch = 1,
-  batch_size = 12,
-  chunk_size,
-  n_workers = 1,
-  multi_process = FALSE,
-  trace = TRUE
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$encode(
+  raw_text,
+  token_encodings_only = FALSE,
+  trace = FALSE
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{raw_text}}{\code{vector} containing the raw texts.}
+
+\item{\code{token_encodings_only}}{\code{bool} If \code{TRUE} only the token
+encodings are returned. If \code{FALSE} the complete encoding is returned
+which is important for bert models.}
+
+\item{\code{trace}}{\code{bool} If \code{TRUE} information of the progress
+are printed. \code{FALSE} if not requested.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{list} containing the integer sequences of the raw texts with
+special tokens.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-tokenize"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-tokenize}{}}}
-\subsection{Method \code{tokenize()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-decode"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-decode}{}}}
+\subsection{Method \code{decode()}}{
+Method for decoding a sequence of integers into tokens
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$tokenize(raw_text, trace = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$decode(int_seqence)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{int_seqence}}{\code{list} containing the integer sequences which
+should be transformed to tokens or a single integer sequence as \code{vector}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{list} of token sequences
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-embed"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-embed}{}}}
 \subsection{Method \code{embed()}}{
+Method for creating text embeddings from raw texts
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(raw_text = NULL, doc_id = NULL, trace = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{raw_text}}{\code{vector} containing the raw texts.}
+
+\item{\code{doc_id}}{\code{vector} containing the corresponding ids for every text.}
+
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the progression
+should be printed on console.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
+containg the embeddings as a \code{data.frame} and information about the
+model creating the embeddings.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-set_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_publication_info}{}}}
 \subsection{Method \code{set_publication_info()}}{
+Method for setting the publication information of the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_publication_info(type, autors, citation, url = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{\code{string} Type of information which should be changed/added.
+\code{type="developer"},\code{type="trainer"}, and \code{type="modifier"} are possible.}
+
+\item{\code{autors}}{List of persons.}
+
+\item{\code{\code{string}}}{Citation in free text.}
+
+\item{\code{\code{string}}}{Corresponding URL if applicable.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_publication_info}{}}}
 \subsection{Method \code{get_publication_info()}}{
+Method for getting publication information of the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_publication_info()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{list} of publication information.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-set_license"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_license}{}}}
 \subsection{Method \code{set_license()}}{
+Method for setting the license of the model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_license(license)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_license"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_license}{}}}
 \subsection{Method \code{get_license()}}{
+Method for requesting the license of the model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_license()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{string} License of the model
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-set_model_description"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_model_description}{}}}
 \subsection{Method \code{set_model_description()}}{
+Method for setting a description of the model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_model_description(eng = NULL, native = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{eng}}{\code{string} A text describing the training of the learner,
+its theoretical and empirical background, and the different output labels
+in English.}
+
+\item{\code{native}}{\code{string} A text describing the training of the learner,
+its theoretical and empirical background, and the different output labels
+in the native language of the model}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_model_description"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_model_description}{}}}
 \subsection{Method \code{get_model_description()}}{
+Method for requesting the model description.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_model_description()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{list} with the description of the model in English
+and native language.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_model_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_model_info}{}}}
 \subsection{Method \code{get_model_info()}}{
+Method for requesting the model information
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_model_info()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{list} of all relevant model information
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-clone"></a>}}
