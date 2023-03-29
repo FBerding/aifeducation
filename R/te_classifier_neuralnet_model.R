@@ -4,7 +4,7 @@
 #'tensorflow
 #'
 #'@export
-te_classifier_neuralnet<-R6::R6Class(
+TextEmbeddingClassifierNeuralNet<-R6::R6Class(
   classname = "TextEmbeddingClassifierNeuralNet",
   public = list(
     #'@field name ('character()')\cr
@@ -38,176 +38,135 @@ te_classifier_neuralnet<-R6::R6Class(
     #'@field model_config ('list()')\cr
     #'List for storing information about the configuration of the model. This
     #'information is used for predicting new data.
+    #'\itemize{
+    #'\item{\code{model_config$n_gru: }}{Number of gru layers.}
+    #'\item{\code{model_config$n_hidden: }}{Number of dense layers.}
+    #'\item{\code{model_config$target_levels: }}{Levels of the target variable. Do not change this manually.}
+    #'\item{\code{model_config$input_variables: }}{Order and name of the input variables. Do not change this manually.}
+    #'\item{\code{model_config$init_config: }}{List storing all parameters passed to method new().}
+    #'}
     model_config=list(
-      #'@field model_config$n_gru ('integer()')\cr
-      #'Number of gru layers.
       n_gru=NULL,
-      #'@field model_config$n_hidden ('integer()')\cr
-      #'Number of dense layers.
       n_hidden=NULL,
-      #'@field model_config$target_levels ('vector()')\cr
-      #'Levels of the target variable. Do not change this manually.
       target_levels=NULL,
-      #'@field model_config$input_variables ('vector()')\cr
-      #'Order and name of the input variables. Do not change this manually.
       input_variables=NULL,
-      #'@field model_config$init_config ('list()')\cr
-      #'List storing all parameters passed to method new().
       init_config=list()
     ),
 
-    #'@field config ('list()')\cr
+    #'@field last_training ('list()')\cr
     #'List for storing the history and the results of the last training. This
     #'information will be overwritten if a new training is started.
+    #'\itemize{
+    #'\item{\code{last_training$learning_time: }}{Duration of the training process.}
+    #'\item{\code{config$history: }}{History of the last training.}
+    #'\item{\code{config$data: }}{Object of class table storing the initial frequencies of the passed data.}
+    #'\item{\code{config$data_pb:l }}{Matrix storing the number of additional cases (test and training) added
+    #'during balanced pseudo labeling. The rows refer to folds and final training.
+    #'The columns refer to the steps during pseudo labeling.}
+    #'\item{\code{config$data_bsc_test: }}{Matrix storing the number of cases for each category used for testing
+    #'during the phase of balanced synthetic units. Please note that the
+    #'frequencies include original and synthetic cases. In terms that the number
+    #'of original and synthetic cases exceeds the limit for the majority classes
+    #'the frequency represents the number of cases created by cluster analysis.}
+    #'\item{\code{config$date: }}{Time when the last training finished.}
+    #'\item{\code{config$config: }}{List storing which kind of estimation was requested during last training.
+    #'\itemize{
+    #'\item{\code{config$config$use_bsc:  }}{\code{TRUE} if  balanced synthetic cases was requested. \code{FALSE}
+    #'if not.}
+    #'\item{\code{config$config$use_baseline: }}{\code{TRUE} if baseline estimation was requested. \code{FALSE}
+    #'if not.}
+    #'\item{\code{ config$config$use_bpl: }}{\code{TRUE} if  balanced pseudo labeling cases was requested. \code{FALSE}
+    #'if not.}
+    #'}}
+    #'}
     last_training=list(
-
       learning_time=NULL,
-
-      #'@field config$history ('keras_training_history')\cr
-      #'History of the last training.
       history=NULL,
-
-      #'@field config$data ('table()')\cr
-      #'Object of class table storing the initial frequencies of the passed data.
       data=NULL,
-
-      #'@field config$data_pbl ('matrix()')\cr
-      #'Matrix storing the number of additional cases (test and training) added
-      #'during balanced pseudo labeling. The rows refer to folds and final training.
-      #'The columns refer to the steps during pseudo labeling.
       data_pbl=NULL,
-
-      #'@field config$data_bsc_train ('matrix()')\cr
-      #'Matrix storing the number of cases for each category used for training
-      #'during the phase of balanced synthetic units. Please note that the
-      #'frequencies include original and synthetic cases. In terms that the number
-      #'of original and synthetic cases exceeds the limit for the majority classes
-      #'the frequency represents the number of cases created by cluster analysis.
       data_bsc_train=NULL,
-
-      #'@field config$data_bsc_test ('matrix()')\cr
-      #'Matrix storing the number of cases for each category used for testing
-      #'during the phase of balanced synthetic units. Please note that the
-      #'frequencies include original and synthetic cases. In terms that the number
-      #'of original and synthetic cases exceeds the limit for the majority classes
-      #'the frequency represents the number of cases created by cluster analysis.
       data_bsc_test=NULL,
-
-      #'@field config$date ('date()')\cr
-      #'Time when the last training finished.
       date=NULL,
-
-      #'@field config$date ('integer()')\cr
-      #'Number of folds in k-fold cross validation.
       n_samples=NULL,
-
-      #'@field config$config ('list()')\cr
-      #'List storing which kind of estimation was requested during last training.
       config=list(
-        #'@field config$config$use_bsc ('bool()')\cr
-        #'\code{TRUE} if  balanced synthetic cases was requested. \code{FALSE}
-        #'if not.
         use_bsc=NULL,
-
-        #'@field config$config$use_baseline ('bool()')\cr
-        #'\code{TRUE} if baseline estimation was requested. \code{FALSE}
-        #'if not.
         use_baseline=NULL,
-
-        #'@field config$config$use_bpl ('bool()')\cr
-        #'\code{TRUE} if  balanced pseudo labeling cases was requested. \code{FALSE}
-        #'if not.
         use_bpl=NULL
       )
     ),
 
     #'@field reliability ('list()')\cr
     #'List for storing central reliability measures of the last training.
+    #'\itemize{
+    #'\item{\code{reliability$val_metric: }}{Array containing the reliability measures for the validation data for
+    #'every fold, method, and step (in case of pseudo labeling).}
+    #'\item{\code{reliability$val_metric_mean: }}{Array containing the reliability measures for the validation data for
+    #'every method and step (in case of pseudo labeling). The values represent
+    #'the mean values for every fold.}
+    #'\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package \link[iotarelr]{iotarelr}
+    #'for every fold at the start and the end of the last training.
+    #'\itemize{
+    #'\item{\code{reliability$raw_iota_objects$iota_objects_start: }}{List of objects with class \code{iotarelr_iota2} containing the
+    #'estimated iota reliability of the second generation for the baseline model
+    #'for every fold.
+    #'If the estimation of the baseline model is not requested the list is
+    #'set to \code{NULL}.}
+    #'\item{\code{reliability$raw_iota_objects$iota_objects_end: }}{List of objects with class \code{iotarelr_iota2} containing the
+    #'estimated iota reliability of the second generation for the final model
+    #'for every fold. Depending of the requested training method these values
+    #'refer to the baseline model, a trained model on the basis of balanced
+    #'synthetic cases, balanced pseudo labeling or a combination of balanced
+    #'synthetic cases with pseudo labeling.}
+    #'\item{\code{reliability$raw_iota_objects$iota_objects_start_free: }}{List of objects with class \code{iotarelr_iota2} containing the
+    #'estimated iota reliability of the second generation for the baseline model
+    #'for every fold.
+    #'If the estimation of the baseline model is not requested the list is
+    #'set to \code{NULL}.Please note that the model is estimated without
+    #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+    #'\item{\code{reliability$raw_iota_objects$iota_objects_end_free: }}{List of objects with class \code{iotarelr_iota2} containing the
+    #'estimated iota reliability of the second generation for the final model
+    #'for every fold. Depending of the requested training method these values
+    #'refer to the baseline model, a trained model on the basis of balanced
+    #'synthetic cases, balanced pseudo labeling or a combination of balanced
+    #'synthetic cases with pseudo labeling.
+    #'Please note that the model is estimated without
+    #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+    #'}
+    #'}
+    #'\item{\code{reliability$iota_object_start: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+    #'for every fold. If the estimation of the baseline model is not requested the list is
+    #'set to \code{NULL}.}
+    #'\item{\code{ reliability$iota_object_start_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+    #'for every fold. If the estimation of the baseline model is not requested the list is
+    #'set to \code{NULL}.
+    #'Please note that the model is estimated without
+    #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+    #'\item{\code{reliability$iota_object_end: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+    #'for every fold.
+    #'Depending of the requested training method this object
+    #'refers to the baseline model, a trained model on the basis of balanced
+    #'synthetic cases, balanced pseudo labeling or a combination of balanced
+    #'synthetic cases with pseudo labeling.}
+    #'\item{\code{reliability$iota_object_end_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+    #'for every fold.
+    #'Depending of the requested training method this object
+    #'refers to the baseline model, a trained model on the basis of balanced
+    #'synthetic cases, balanced pseudo labeling or a combination of balanced
+    #'synthetic cases with pseudo labeling.
+    #'Please note that the model is estimated without
+    #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+    #'}
     reliability=list(
-      #'@field reliability$val_metric ('array()')\cr
-      #'Array containing the reliability measures for the validation data for
-      #'every fold, method, and step (in case of pseudo labeling).
       val_metric=NULL,
-
-      #'@field reliability$val_metric_mean ('array()')\cr
-      #'Array containing the reliability measures for the validation data for
-      #'every method and step (in case of pseudo labeling). The values represent
-      #'the mean values for every fold.
       val_metric_mean=NULL,
-
-      #'@field reliability$raw_iota_objects ('list()')\cr
-      #'List containing all iota_object generated with the package \link[iotarelr]{iotarelr}
-      #'for every fold at the start and the end of the last training.
       raw_iota_objects=list(
-        #'@field reliability$raw_iota_objects$iota_objects_start ('list()')\cr
-        #'List of objects with class \code{iotarelr_iota2} containing the
-        #'estimated iota reliability of the second generation for the baseline model
-        #'for every fold.
-        #'If the estimation of the baseline model is not requested the list is
-        #'set to \code{NULL}.
         iota_objects_start=NULL,
-
-        #'@field reliability$raw_iota_objects$iota_objects_end ('list()')\cr
-        #'List of objects with class \code{iotarelr_iota2} containing the
-        #'estimated iota reliability of the second generation for the final model
-        #'for every fold. Depending of the requested training method these values
-        #'refer to the baseline model, a trained model on the basis of balanced
-        #'synthetic cases, balanced pseudo labeling or a combination of balanced
-        #'synthetic cases with pseudo labeling.
         iota_objects_end=NULL,
-
-        #'@field reliability$raw_iota_objects$iota_objects_start_free ('list()')\cr
-        #'List of objects with class \code{iotarelr_iota2} containing the
-        #'estimated iota reliability of the second generation for the baseline model
-        #'for every fold.
-        #'If the estimation of the baseline model is not requested the list is
-        #'set to \code{NULL}.Please note that the model is estimated without
-        #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.
         iota_objects_start_free=NULL,
-
-        #'@field reliability$raw_iota_objects$iota_objects_end_free ('list()')\cr
-        #'List of objects with class \code{iotarelr_iota2} containing the
-        #'estimated iota reliability of the second generation for the final model
-        #'for every fold. Depending of the requested training method these values
-        #'refer to the baseline model, a trained model on the basis of balanced
-        #'synthetic cases, balanced pseudo labeling or a combination of balanced
-        #'synthetic cases with pseudo labeling.
-        #'Please note that the model is estimated without
-        #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.
         iota_objects_end_free=NULL),
-
-      #'@field reliability$iota_object_start ('iotarelr_iota2')\cr
-      #'Object of class \code{iotarelr_iota2} as a mean of the individual objects
-      #'for every fold. If the estimation of the baseline model is not requested the list is
-      #'set to \code{NULL}.
       iota_object_start=NULL,
-
-      #'@field reliability$iota_object_start_free ('iotarelr_iota2')\cr
-      #'Object of class \code{iotarelr_iota2} as a mean of the individual objects
-      #'for every fold. If the estimation of the baseline model is not requested the list is
-      #'set to \code{NULL}.
-      #'Please note that the model is estimated without
-      #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.
       iota_object_start_free=NULL,
-
-      #'@field reliability$iota_object_end ('iotarelr_iota2')\cr
-      #'Object of class \code{iotarelr_iota2} as a mean of the individual objects
-      #'for every fold.
-      #'Depending of the requested training method this object
-      #'refers to the baseline model, a trained model on the basis of balanced
-      #'synthetic cases, balanced pseudo labeling or a combination of balanced
-      #'synthetic cases with pseudo labeling.
       iota_object_end=NULL,
-
-      #'@field reliability$iota_object_end_free ('iotarelr_iota2')\cr
-      #'Object of class \code{iotarelr_iota2} as a mean of the individual objects
-      #'for every fold.
-      #'Depending of the requested training method this object
-      #'refers to the baseline model, a trained model on the basis of balanced
-      #'synthetic cases, balanced pseudo labeling or a combination of balanced
-      #'synthetic cases with pseudo labeling.
-      #'Please note that the model is estimated without
-      #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.
       iota_object_end_free=NULL
     ),
     #New-----------------------------------------------------------------------
@@ -422,6 +381,8 @@ te_classifier_neuralnet<-R6::R6Class(
     #'information about the training process from keras on the console.
     #'\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
     #'one line of information for every epoch.
+    #'@param view_metrics \code{bool} \code{TRUE} if metrics should be printed
+    #'in the RStudie IDE.
     #'@param n_cores \code{int} Number of cores used for creating synthetic units.
     #'@details \itemize{
     #'
@@ -529,7 +490,7 @@ te_classifier_neuralnet<-R6::R6Class(
       #Initalazing Objects for Saving Performance
       val_metric=array(dim=c(folds$n_folds,
                              bpl_max_steps+4,
-                             18),
+                             17),
                        dimnames = list(iterations=NULL,
                                        steps=c("Baseline",
                                                "BSC",
@@ -552,7 +513,6 @@ te_classifier_neuralnet<-R6::R6Class(
                                                  "kappa_fleiss",
                                                  "kappa_light",
                                                  "percentage_agreement",
-                                                 "intra_cat_agree",
                                                  "gwet_ac")))
       iota_objects_start=NULL
       iota_objects_end=NULL
@@ -1403,7 +1363,7 @@ te_classifier_neuralnet<-R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    #'@descrition Method for prediciting new data with a trained neural net.
+    #'@description Method for prediciting new data with a trained neural net.
     #'@param newdata Object of class \code{TextEmbeddingModel} or
     #'\code{data.frame} for which predictions should be made.
     #'@return Returns a \code{data.frame} containing the predictions and
@@ -1523,10 +1483,16 @@ te_classifier_neuralnet<-R6::R6Class(
       return(private$model_description)
     },
     #-------------------------------------------------------------------------
-    export_model=function(dir_path){
+    #'@description Method for exporting a model to tensorflow SavedModel format.
+    #'@param dir_path \code{string()} Path of the directory where the model should be
+    #'saved.
+     export_model=function(dir_path){
       tmp_model=bundle::unbundle(self$bundeled_model)
       tmp_model$save(dir_path)
     },
+    #'@description Method for importing a model from tensorflow SavedModel format.
+    #'@param dir_path \code{string()} Path of the directory where the model is
+    #'saved.
     import_model=function(dir_path){
       tf=reticulate::import("tensorflow")
       tmp_model<-tf$keras$models$load_model(dir_path)

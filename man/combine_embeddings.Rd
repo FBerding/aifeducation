@@ -6,6 +6,13 @@
 \usage{
 combine_embeddings(embeddings_list)
 }
+\arguments{
+\item{embeddings_list}{\code{list} of objects of class \link{EmbeddedText}.}
+}
+\value{
+Returns an object of class \link{EmbeddedText} which contains all
+unique cases of the input objects.
+}
 \description{
 Function for combining embedded texts of the same model
 }

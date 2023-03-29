@@ -15,6 +15,35 @@ create_synthetic_units(
   inc_major
 )
 }
+\arguments{
+\item{embedding}{Named \code{data.frame} containing the text embeddings.
+In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.}
+
+\item{target}{Named \code{factor} containing the labels/categories of the corresponding cases.}
+
+\item{k}{\code{int} The number of nearest neighbors during sampling process.}
+
+\item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
+
+\item{method}{\code{vector} containing strings of the requested methods for generating new cases.
+Currently "smote","dbsmote", and "adas" from package smotefamily are available.}
+
+\item{cat}{\code{string} The category for which new cases should be created.}
+
+\item{cat_freq}{Object of class \code{"table"} containing the absolute frequencies
+of every category/label.}
+
+\item{inc_major\code{bool}}{If \code{TRUE} the major category is considered for creating
+new synthetic units.}
+}
+\value{
+Returns a \code{list} which contains the text embeddings of the
+new synthetic cases as a named \code{data.frame} and their labels as a named
+\code{factor}.
+}
 \description{
-Creates Synthetic Units
+Function for creating synthetic cases in order to balance the data for
+training with \link{TextEmbeddingClassifierNeuralNet}. This is a helper
+function for use with \link{get_synthetic_cases} to allow parallel
+computations.
 }

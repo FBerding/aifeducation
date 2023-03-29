@@ -18,7 +18,8 @@ Imports: Rcpp (>= 1.0.10),
   bundle,
   quanteda,
   reticulate,
-  smotefamily
+  smotefamily,
+  quanteda.textstats
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.2.3
 Depends:

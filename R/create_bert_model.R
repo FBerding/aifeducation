@@ -1,6 +1,30 @@
 #'Function for creating a new transformer based on BERT
 #'
-#'Insert Description
+#'This function creates a transformer configuration based in the BERT base architecture
+#'and a vocabulary based on WordPiece by using
+#'the python libraries 'transformers' and 'tokenizers'.
+#'
+#'@param model_dir \code{string} Path to the directory where the model should be saved.
+#'@param vocab_raw_texts \code{vector} containing the raw texts for creating the
+#'vocabulary.
+#'@param vocab_size \code{int} Size of the vocabulary.
+#'@param vocab_do_lower_case \code{bool} \code{TRUE} if all words/tokens should be lower case.
+#'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
+#'also determines the maximum length of a sequence which can be processes with the model.
+#'@param hidden_size \code{int} Number of neurons in each layer. This parameter determines the
+#'dimensionality of the resulting text embedding.
+#'@param num_hidden_layer \code{int} Number of hidden layers.
+#'@param num_attention_heads \code{int} Number of attentions heads.
+#'@param intermediate_size \code{int} Number of neurons in the intermediate layer of
+#'the attention mechanism.
+#'@param hidden_act \code{string} name of the activation function.
+#'@param hidden_dropout_prob \code{double} Ratio of dropout
+#'@param trace \code{bool} \code{TRUE} if information about the progress should be
+#'printed to the console.
+#'@return This function does not return an object. Instead the configuration
+#'and the vocabulary of the new model are saved on disk.
+#'@note To train the model pass the directory of the model to the function
+#'\link{train_tune_bert_model}.
 #'
 #'@export
 create_bert_model<-function(
@@ -14,10 +38,10 @@ create_bert_model<-function(
     num_attention_heads=12,
     intermediate_size=3072,
     hidden_act="gelu",
-    hidden_dropput_prob=0.1,
+    hidden_dropout_prob=0.1,
     trace=TRUE){
 
-  transformer<-reticulate::import("transformers")
+  transformers<-reticulate::import("transformers")
   datasets<-reticulate::import("datasets")
   tok<-reticulate::import("tokenizers")
 
@@ -55,7 +79,7 @@ create_bert_model<-function(
     print(paste(date(),
                 "Creating Tokenizer"))
   }
-  tokenizer=transformer$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
+  tokenizer=transformer2$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
                                       do_lower_case=vocab_do_lower_case)
 
   if(trace==TRUE){
@@ -63,7 +87,7 @@ create_bert_model<-function(
                 "Creating Tokenizer - Done"))
   }
 
-  configuration=transformer$BertConfig(
+  configuration=transformers$BertConfig(
     vocab_size=as.integer(vocab_size),
     max_position_embeddings=as.integer(max_position_embeddings),
     hidden_size=as.integer(hidden_size),
@@ -71,10 +95,10 @@ create_bert_model<-function(
     num_attention_heads=as.integer(num_attention_heads),
     intermediate_size=as.integer(intermediate_size),
     hidden_act=hidden_act,
-    hidden_dropput_prob=hidden_dropput_prob
+    hidden_dropout_prob=hidden_dropout_prob
   )
 
-  bert_model=transformer$TFBertModel(configuration)
+  bert_model=transformers$TFBertModel(configuration)
 
   if(trace==TRUE){
     print(paste(date(),
@@ -91,5 +115,4 @@ create_bert_model<-function(
     print(paste(date(),
                 "Done"))
   }
-
 }

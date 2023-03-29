@@ -2,18 +2,34 @@
 % Please edit documentation in R/qa_extraction_models.R
 \name{QAExtractModel}
 \alias{QAExtractModel}
-\title{Question Extract Answer Models}
+\title{Question Answer Models of Type Extraction}
 \description{
-Question Extract Answer Models
+This \link[R6]{R6} class stores the information for modeling a
+question answer model. This kind of model extracts the answer from a given text.
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{model}}{('transformers.TFAutoModelForQuestionAnswering')\cr
+Object of class transformers.TFAutoModelForQuestionAnswering from transformers
+python library. Stores the qa model.}
 
-Question Extract Answer Models
+\item{\code{tokenizer}}{('transformers.AutoTokenizer')\cr
+Object of class transformers.AutoTokenizer from transformers python library.
+Stores the tokenizer.}
+
+\item{\code{qa_pipline}}{('transformers.QuestionAnsweringPipeline')\cr
+Object of class transformers.QuestionAnsweringPipeline from transformers
+python library.}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-QAExtractModel-new}{\code{QAExtractModel$new()}}
-\item \href{#method-QAExtractModel-save_qa_model}{\code{QAExtractModel$save_qa_model()}}
-\item \href{#method-QAExtractModel-load_weights}{\code{QAExtractModel$load_weights()}}
+\item \href{#method-QAExtractModel-save_model}{\code{QAExtractModel$save_model()}}
+\item \href{#method-QAExtractModel-load_model}{\code{QAExtractModel$load_model()}}
 \item \href{#method-QAExtractModel-answer_question}{\code{QAExtractModel$answer_question()}}
 \item \href{#method-QAExtractModel-clone}{\code{QAExtractModel$clone()}}
 }
@@ -22,6 +38,8 @@ Question Extract Answer Models
 \if{html}{\out{<a id="method-QAExtractModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-QAExtractModel-new}{}}}
 \subsection{Method \code{new()}}{
+Method for creating a new question answer model based on a pretrained
+model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$new(
   model_name,
@@ -32,29 +50,64 @@ Question Extract Answer Models
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_name}}{\code{Character} Name of the new model.}
+
+\item{\code{model_version}}{\code{Character} Version of the model.}
+
+\item{\code{model_language}}{\code{Character} Language the model does support.}
+
+\item{\code{model_license}}{\code{Character} License of the model.}
+
+\item{\code{model_dir_path}}{\code{string} Path to the directory where the model is
+stored.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-QAExtractModel-save_qa_model"></a>}}
-\if{latex}{\out{\hypertarget{method-QAExtractModel-save_qa_model}{}}}
-\subsection{Method \code{save_qa_model()}}{
+\if{html}{\out{<a id="method-QAExtractModel-save_model"></a>}}
+\if{latex}{\out{\hypertarget{method-QAExtractModel-save_model}{}}}
+\subsection{Method \code{save_model()}}{
+Method for saving a question answer model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$save_qa_model(model_dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$save_model(model_dir_path)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_dir_path}}{\code{string} Path to the directory where the model
+and the tokenizer should be stored.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-QAExtractModel-load_weights"></a>}}
-\if{latex}{\out{\hypertarget{method-QAExtractModel-load_weights}{}}}
-\subsection{Method \code{load_weights()}}{
+\if{html}{\out{<a id="method-QAExtractModel-load_model"></a>}}
+\if{latex}{\out{\hypertarget{method-QAExtractModel-load_model}{}}}
+\subsection{Method \code{load_model()}}{
+Method for loading a question answer model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$load_weights(model_dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$load_model(model_dir_path)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_dir_path}}{\code{string} Path to the directory where the model
+and the tokenizer are saved.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-QAExtractModel-answer_question"></a>}}
 \if{latex}{\out{\hypertarget{method-QAExtractModel-answer_question}{}}}
 \subsection{Method \code{answer_question()}}{
+Method for extracting answers from a given text.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$answer_question(
   question,
@@ -69,6 +122,37 @@ Question Extract Answer Models
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{question}}{\code{string} Question to be answered.}
+
+\item{\code{knowledge_base}}{\code{list} of raw texts where to search for the answer.}
+
+\item{\code{n_answers}}{\code{int} Number of possible answers generated from the texts.}
+
+\item{\code{doc_stride}}{\code{int} In the case the knowledge base is to long to
+for the model to process at once the text is divided into several overlapping
+chunks. This parameter determines the size of the overlap.}
+
+\item{\code{max_answer_len}}{\code{int} Maximum length in token for possible answers.
+Only answers which are shorter are considered for an answer.}
+
+\item{\code{max_seq_len}}{\code{int} Maximum length of question and knowledge base after
+tokenization. The context may be divided into several overlapping chunks.}
+
+\item{\code{max_question_len}}{\code{int} The maximum length of the question after tokenization.
+Longer sequences are truncated.}
+
+\item{\code{handle_impossible_answer}}{\code{bool} \code{TRUE} if impossible answers
+should be accepted.}
+
+\item{\code{align_to_words}}{\code{bool} If true \code{TRUE} the algorithm tries to align
+the answer to real words which increases the quality of the results for space
+separated languages.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-QAExtractModel-clone"></a>}}

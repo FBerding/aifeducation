@@ -30,6 +30,7 @@ in the rows. Embeddings dimensions are in the columns.}
 \if{html}{\out{<a id="method-EmbeddedText-new"></a>}}
 \if{latex}{\out{\hypertarget{method-EmbeddedText-new}{}}}
 \subsection{Method \code{new()}}{
+Creates a new object representing text embeddings.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EmbeddedText$new(
   model_name,
@@ -54,6 +55,8 @@ in the rows. Embeddings dimensions are in the columns.}
 \item{\code{model_label}}{\code{string} Label of the model that generates this embedding.}
 
 \item{\code{model_date}}{\code{string} Date when the embedding generating model was created.}
+
+\item{\code{model_method}}{\code{string} Method of the underlying embedding model.}
 
 \item{\code{model_version}}{\code{string} Version of the model that generated this embedding.}
 

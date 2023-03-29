@@ -1,5 +1,6 @@
-#' @title Question Extract Answer Models
-#'
+#'@title Question Answer Models of Type Extraction
+#'@description This \link[R6]{R6} class stores the information for modeling a
+#'question answer model. This kind of model extracts the answer from a given text.
 #'@export
 QAExtractModel<-R6::R6Class(
   classname = "QAExtractModel",
@@ -34,17 +35,32 @@ QAExtractModel<-R6::R6Class(
     )
   ),
   public = list(
+    #'@field model ('transformers.TFAutoModelForQuestionAnswering')\cr
+    #'Object of class transformers.TFAutoModelForQuestionAnswering from transformers
+    #'python library. Stores the qa model.
     model=NULL,
+    #'@field tokenizer ('transformers.AutoTokenizer')\cr
+    #'Object of class transformers.AutoTokenizer from transformers python library.
+    #'Stores the tokenizer.
     tokenizer=NULL,
+    #'@field qa_pipline ('transformers.QuestionAnsweringPipeline')\cr
+    #'Object of class transformers.QuestionAnsweringPipeline from transformers
+    #'python library.
     qa_pipline=NULL,
+    #--------------------------------------------------------------------------
+    #'@description Method for creating a new question answer model based on a pretrained
+    #'model.
+    #'@param model_name \code{Character} Name of the new model.
+    #'@param model_version \code{Character} Version of the model.
+    #'@param model_language \code{Character} Language the model does support.
+    #'@param model_license \code{Character} License of the model.
+    #'@param model_dir_path \code{string} Path to the directory where the model is
+    #'stored.
     initialize=function(model_name,
                         model_version,
                         model_language,
                         model_license,
                         model_dir_path){
-      if(reticulate::py_module_available("transformers")==FALSE){
-        reticulate::py_install('transformers', pip = TRUE)
-      }
       transformer = reticulate::import('transformers')
       self$model<-transformer$TFAutoModelForQuestionAnswering$from_pretrained(model_dir_path)
       self$tokenizer<-transformer$AutoTokenizer$from_pretrained(model_dir_path)
@@ -58,14 +74,22 @@ QAExtractModel<-R6::R6Class(
       private$model_info$model_date=date()
       private$model_info$model_license=model_license
     },
-    save_qa_model=function(model_dir_path){
+    #---------------------------------------------------------------------------
+    #'@description Method for saving a question answer model.
+    #'@param model_dir_path \code{string} Path to the directory where the model
+    #'and the tokenizer should be stored.
+    save_model=function(model_dir_path){
         self$model$save_pretrained(save_directory=model_dir_path)
         print(paste(date(),"QA Model Saved."))
 
         self$tokenizer$save_pretrained(model_dir_path)
         print(paste(date(),"Tokenizer saved."))
     },
-    load_weights=function(model_dir_path){
+    #---------------------------------------------------------------------------
+    #'@description Method for loading a question answer model.
+    #'@param model_dir_path \code{string} Path to the directory where the model
+    #'and the tokenizer are saved.
+    load_model=function(model_dir_path){
         transformer = reticulate::import('transformers')
         self$tokenizer<-transformer$AutoTokenizer$from_pretrained(model_dir_path)
         self$model<-transformer$TFAutoModelForQuestionAnswering$from_pretrained(model_dir_path)
@@ -73,6 +97,25 @@ QAExtractModel<-R6::R6Class(
                                               model=self$model,
                                               tokenizer = self$tokenizer)
     },
+    #---------------------------------------------------------------------------
+    #'@description Method for extracting answers from a given text.
+    #'@param question \code{string} Question to be answered.
+    #'@param knowledge_base \code{list} of raw texts where to search for the answer.
+    #'@param n_answers \code{int} Number of possible answers generated from the texts.
+    #'@param doc_stride \code{int} In the case the knowledge base is to long to
+    #'for the model to process at once the text is divided into several overlapping
+    #'chunks. This parameter determines the size of the overlap.
+    #'@param max_answer_len \code{int} Maximum length in token for possible answers.
+    #'Only answers which are shorter are considered for an answer.
+    #'@param max_seq_len \code{int} Maximum length of question and knowledge base after
+    #'tokenization. The context may be divided into several overlapping chunks.
+    #'@param  max_question_len \code{int} The maximum length of the question after tokenization.
+    #'Longer sequences are truncated.
+    #'@param handle_impossible_answer \code{bool} \code{TRUE} if impossible answers
+    #'should be accepted.
+    #'@param align_to_words \code{bool} If true \code{TRUE} the algorithm tries to align
+    #'the answer to real words which increases the quality of the results for space
+    #'separated languages.
     answer_question=function(question,
                              knowledge_base,
                              n_answers=1,

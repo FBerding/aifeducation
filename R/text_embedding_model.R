@@ -2,7 +2,6 @@
 #'@description This \link[R6]{R6} class stores a text embedding model which can be
 #'used to tokenize, encode, decode, and embed raw texts. The object provides a
 #'unique interface for different text processing methods.
-#'
 #'@export
 TextEmbeddingModel<-R6::R6Class(
   classname = "TextEmbeddingModel",
@@ -40,89 +39,75 @@ TextEmbeddingModel<-R6::R6Class(
   public = list(
     #'@field basic_components ('list()')\cr
     #'List storing information which can apply to all methods.
+    #'\itemize{
+    #'\item{\code{basic_components$method: }}{Method underlying the text embedding model.}
+    #'\item{\code{basic_components$max_length: }}{Maximum number of tokens in sequence the model processes. In general
+    #'shorter sequences will be padded and longer sequences will be divided
+    #'into chunks and/or truncated.}
+    #'}
     basic_components=list(
-      #'@field basic_components$method ('string')\cr
-      #'Method underlying the text embedding model.
       method=NULL,
-      #'@field basic_components$method ('integer')\cr
-      #'Maximum number of tokens in sequence the model processes. In general
-      #'shorter sequences will be padded and longer sequences will be divided
-      #'into chunks and/or truncated.
       max_length=NULL
     ),
 
     #'@field bert_components ('list()')\cr
     #'List storing information which which do only apply to bert models.
+    #'\itemize{
+    #'\item{\code{bert_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
+    #'\item{\code{bert_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
+    #'\item{\code{bert_components$aggregation: }}{Aggregation method for the hidden states.}
+    #'\item{\code{bert_components$use_cls_token: }}{Whether to use the hidden state representing the [CLS] token or the mean
+    #'of the hidden states of the tokens with no special functions.}
+    #'\item{\code{bert_components$chunks: }}{Maximal number of chunks processed with the model.}
+    #'\item{\code{ bert_components$overlap: }}{Number of tokens which should be added at the beginng of the sequence
+    #'of the next chunk.}
+    #'}
     bert_components=list(
-      #'@field bert_components$model ('transformers.TFBertModel()')\cr
-      #'An Object of class transformers.TFBertModel for using with transformers library.
       model=NULL,
-      #'@field bert_components$tokenizer ('transformers.BertTokenizerFast()')\cr
-      #'An Object of class transformers.BertTokenizerFast for using with transformers library.
       tokenizer=NULL,
-      #'@field bert_components$aggregation ('string()')\cr
-      #'Aggregation method for the hidden states.
       aggregation=NULL,
-      #'@field bert_components$aggregation ('bool()')\cr
-      #'Whether to use the hidden state representing the [CLS] token or the mean
-      #'of the hidden states of the tokens with no special functions.
       use_cls_token=NULL,
-      #'@field bert_components$chunks ('integer()')\cr
-      #'Maximal number of chunks processed with the model.
       chunks=NULL,
-      #'@field bert_components$overlap ('integer()')\cr
-      #'Number of tokens which should be added at the beginng of the sequence
-      #'of the next chunk.
       overlap=NULL),
 
     #'@field bow_components ('list()')\cr
     #'List storing information which which do only apply for bow_models.
+    #'\itemize{
+    #'\item{\code{bow_components$model: }}{data.frame describing the relationship between tokens and their corresponding
+    #'text embeddings.}
+    #'\item{\code{bow_components$vocab: }}{data.frame saving tokens, lemmata and their corresponding integer index.}
+    #'\item{\code{bow_components$configuration: }}{List of the configuration parameters of the model.
+    #'\itemize{
+    #'\item{\code{bow_components$configuration$to_lower }}{\code{TRUE} if tokens are transformed to lower case.}
+    #'\item{\code{bow_components$configuration$use_lemmata }}{\code{TRUE} if the corresponding lemma should be used instead of the token.}
+    #'\item{\code{bow_components$configuration$bow_n_dim }}{Number of dimensions for GlobalVectors and Topic Modeling.}
+    #'\item{\code{bow_components$configuration$bow_n_cluster }}{Number of clusters for grouping tokens based in their global vectors.
+    #'Does not apply for method lda.}
+    #'\item{\code{bow_components$configuration$bow_max_iter }}{Maximum number of iterations for calculation global vectors and topics.}
+    #'\item{\code{bow_components$configuration$bow_max_iter_cluster }}{Maximum number of iterations for creating cluster. Applies only for method
+    #'glove.}
+    #'\item{\code{bow_components$configuration$bow_cr_criterion }}{Convergence criterion for calculating global vectors and topics.}
+    #'\item{\code{bow_components$configuration$bow_learning_rate  }}{Initial learning rate for estimating global vectors.}}
+    #'}
+    #'\item{\code{bow_components$aggregation: }}{Does currently not apply to these methods.}
+    #'\item{\code{bow_components$chunks: }}{Does currently not apply to these methods.}
+    #'\item{\code{bow_components$overlap: }}{Does currently not apply to these methods.}
+    #'}
     bow_components=list(
-      #'@field bow_components$model ('data.frame()')\cr
-      #'data.frame describing the relationship between tokens and their corresponding
-      #'text embeddings.
       model=NULL,
-      #'@field bow_components$vocab ('data.frame()')\cr
-      #'data.frame saving tokens, lemmata and their corresponding integer index.
       vocab=NULL,
-      #'@field bow_components$configuration ('list()')\cr
-      #'List of the configuration parameters of the model.
       configuration=list(
-        #'@field bow_components$configuration$to_lower ('bool()')\cr
-        #'\code{TRUE} if tokens are transformed to lower case.
         to_lower = NA,
-        #'@field bow_components$configuration$use_lemmata ('bool()')\cr
-        #'\code{TRUE} if the corresponding lemma should be used instead of the token.
         use_lemmata = NA,
-        #'@field bow_components$configuration$bow_n_dim ('integer()')\cr
-        #'Number of dimensions for GlobalVectors and Topic Modeling
         bow_n_dim = NA,
-        #'@field bow_components$configuration$bow_n_cluster ('integer()')\cr
-        #'Number of clusters for grouping tokens based in their global vectors.
-        #'Does not apply for method lda.
         bow_n_cluster = NA,
-        #'@field bow_components$configuration$bow_max_iter ('integer()')\cr
-        #'Maximum number of iterations for calculation global vectors and topics.
         bow_max_iter = NA,
-        #'@field bow_components$configuration$bow_max_iter_cluster ('integer()')\cr
-        #'Maximum number of iterations for creating cluster. Applies only for method
-        #'glove.
         bow_max_iter_cluster = NA,
-        #'@field bow_components$configuration$bow_cr_criterion ('double()')\cr
-        #'Convergence criterion for calculating global vectors and topics.
         bow_cr_criterion = NA,
-        #'@field bow_components$configuration$bow_learning_rate ('double()')\cr
-        #'Initial learning rate for estimating global vectors.
         bow_learning_rate = NA
         ),
-      #'@field bow_components$aggregation ('string()')\cr
-      #'Does currently not apply to these methods.
       aggregation="none",
-      #'@field bow_components$overlap ('integer()')\cr
-      #'Does currently not apply to these methods.
       chunks="none",
-      #'@field bow_components$overlap ('integer()')\cr
-      #'Does currently not apply to these methods.
       overlap="none"
       ),
 
@@ -175,7 +160,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'only word embeddings, not text embeddings. To achieve text embeddings the words
     #'are clusters based on their word embeddings with kmeans.}
     #'
-    #'\item{aggregation: }{For creating a text embedding with a bert model server options
+    #'\item{aggregation: }{For creating a text embedding with a bert model serveral options
     #'are possible:
     #'\itemize{
     #'\item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
@@ -209,9 +194,6 @@ TextEmbeddingModel<-R6::R6Class(
       self$basic_components$max_length=as.integer(max_length)
       #------------------------------------------------------------------------
       if(self$basic_components$method=="bert"){
-        if(reticulate::py_module_available("transformers")==FALSE){
-          reticulate::py_install('transformers', pip = TRUE)
-        }
         transformer = reticulate::import('transformers')
         self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
         self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
@@ -409,7 +391,7 @@ TextEmbeddingModel<-R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    #'@descprtion Method for encoding words of raw texts into integers.
+    #'@description Method for encoding words of raw texts into integers.
     #'@param raw_text \code{vector} containing the raw texts.
     #'@param token_encodings_only \code{bool} If \code{TRUE} only the token
     #'encodings are returned. If \code{FALSE} the complete encoding is returned
@@ -569,7 +551,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param trace \code{bool} \code{TRUE} if information about the progression
     #'should be printed on console.
     #'@return Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
-    #'containg the embeddings as a \code{data.frame} and information about the
+    #'contain the embeddings as a \code{data.frame} and information about the
     #'model creating the embeddings.
     embed=function(raw_text=NULL,doc_id=NULL, trace = FALSE){
       tokens<-self$encode(raw_text = raw_text,
@@ -802,8 +784,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param type \code{string} Type of information which should be changed/added.
     #'\code{type="developer"},\code{type="trainer"}, and \code{type="modifier"} are possible.
     #'@param autors List of persons.
-    #'@param \code{string} Citation in free text.
-    #'@param \code{string} Corresponding URL if applicable.
+    #'@param citation \code{string} Citation in free text.
+    #'@param url \code{string} Corresponding URL if applicable.
     set_publication_info=function(type,
                                   autors,
                                   citation,
@@ -887,15 +869,45 @@ TextEmbeddingModel<-R6::R6Class(
 EmbeddedText<-R6::R6Class(
   classname = "EmbeddedText",
   private = list(
+
+    #model_name \code{string} Name of the model that generates this embedding.
     model_name=NA,
+
+
+    #Label of the model that generates this embedding.
     model_label=NA,
+
+
+    #Date when the embedding generating model was created.
     model_date=NA,
+
+
+    #Method of the underlying embedding model
     model_method=NA,
+
+
+    #Version of the model that generated this embedding.
     model_version=NA,
+
+
+    #Language of the model that generated this embedding.
     model_language=NA,
+
+
+    #Maximal number of tokens that processes the generating model for a chunk.
     param_seq_length=NA,
+
+
+    #Number of tokens that were added at the beginning of the sequence for the next chunk
+    #by this model.
     param_overlap=NA,
+
+
+    #Maximal number of chunks which are supported by the generating model.
     param_chunks=NA,
+
+
+    #Aggregation method of the hidden states.
     param_aggregation=NA
   ),
   public = list(
@@ -904,10 +916,11 @@ EmbeddedText<-R6::R6Class(
     #'in the rows. Embeddings dimensions are in the columns.
     embeddings=NA,
 
-    #'@decription Creates a new object representing text embeddings.
+    #'@description Creates a new object representing text embeddings.
     #'@param model_name \code{string} Name of the model that generates this embedding.
     #'@param model_label \code{string} Label of the model that generates this embedding.
     #'@param model_date \code{string} Date when the embedding generating model was created.
+    #'@param model_method \code{string} Method of the underlying embedding model.
     #'@param model_version \code{string} Version of the model that generated this embedding.
     #'@param model_language \code{string} Language of the model that generated this embedding.
     #'@param param_seq_length \code{int} Maximal number of tokens that processes the generating model for a chunk.
@@ -970,9 +983,13 @@ EmbeddedText<-R6::R6Class(
 #'
 #'Function for combining embedded texts of the same model
 #'
+#'@param embeddings_list \code{list} of objects of class \link{EmbeddedText}.
+#'@return Returns an object of class \link{EmbeddedText} which contains all
+#'unique cases of the input objects.
 #'@export
 combine_embeddings<-function(embeddings_list){
-#Check for the right class
+
+  #Check for the right class---------------------------------------------------
   for(i in 1:length(embeddings_list)){
     if(methods::isClass(where=embeddings_list[[i]],
                         Class="EmbeddedText")==TRUE){
@@ -980,7 +997,8 @@ combine_embeddings<-function(embeddings_list){
            EmbeddedText.")
     }
   }
-#Check for the right underlining embedding model
+
+  #Check for the right underlining embedding model-------------------------------
   for(i in 2:length(embeddings_list)){
     embedding_1<-embeddings_list[[i-1]]$get_model_info()
     embedding_2<-embeddings_list[[1]]$get_model_info()
@@ -992,7 +1010,27 @@ combine_embeddings<-function(embeddings_list){
       }
     }
   }
-#Combine embeddings
+
+  #Check for unique names------------------------------------------------------
+  tmp_names=NULL
+  tmp_cases=NULL
+  for(i in 1:length(embeddings_list)){
+    if(i==1){
+      tmp_names=rownames(embeddings_list[[i]]$embeddings)
+      tmp_cases=nrow(embeddings_list[[i]]$embeddings)
+    } else {
+      tmp_names=c(tmp_names,rownames(embeddings_list[[i]]$embeddings))
+      tmp_cases=tmp_cases+nrow(embeddings_list[[i]]$embeddings)
+    }
+  }
+  tmp_names=unique(tmp_names)
+  if(length(tmp_names)<tmp_cases){
+    stop("There are cases with duplicated names. Please check your data. Names
+         must be unique.")
+  }
+
+
+  #Combine embeddings-----------------------------------------------------------
 
   for(i in 1:length(embeddings_list)){
      if(i==1){

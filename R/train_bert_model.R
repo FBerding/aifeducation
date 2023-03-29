@@ -1,22 +1,52 @@
-#'Function for creating a fine tuned transformer
+#'Function for training and fine-tuning a bert model
 #'
-#'Insert Description
+#'This function can be used for training or fine-tuning a transformer
+#'based on Bert architecture with help of the python libraries 'transformers',
+#''datasets', and 'tokenizers'.
+#'
+#'@param output_dir \code{string} Path to the directory where the final model
+#'should be saved. If the directory does not exists it will be created.
+#'@param bert_model_dir_path \code{string} Path to the directory where the original
+#'model is stored.
+#'@param raw_texts \code{vector} containing the raw texts for training.
+#'@param aug_vocab_by \code{int} Number of entries for extending the current
+#'vocabulary. See notes for more details
+#'@param p_mask \code{double} Ratio determining the number of words/tokens for masking.
+#'@param whole_word \code{bool} \code{TRUE} if whole word masking should be applied.
+#'If \code{FALSE} token masking is used.
+#'@param val_size \code{double} Ratio determining the amount of token chunks used for
+#'validation.
+#'@param n_epoch \code{int} Number of epochs for training.
+#'@param batch_size \code{int} Size of batches.
+#'@param chunk_size \code{int} Size of every chunk for training.
+#'@param n_workers \code{int} Number of workers.
+#'@param multi_process \code{bool} \code{TRUE} if multiple process should be activated.
+#'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
+#'to the console.
+#'@return This function does not return an object. Instead the trained or fine-tuned
+#'model is saved to disk.
+#'@note if \code{aug_vocab_by > 0} the raw texts is used for training a WordPiece
+#'tokenizer. At the end of this process additional entries are added to the vocabulary
+#'that are not part of the original vocabulary.
+#'@note Pre-Trained models which can be fine-tuned with this function are available
+#'at \url{https://huggingface.co/}. New models can be created via the function
+#'\link{create_bert_model}.
 #'
 #'@export
-fine_tune_bert_model=function(output_dir,
+train_tune_bert_model=function(output_dir,
                               bert_model_dir_path,
                               raw_texts,
-                              vocab_draft,
                               aug_vocab_by=100,
                               p_mask=0.15,
                               whole_word=TRUE,
-                              test_size=0.1,
+                              val_size=0.1,
                               n_epoch=1,
                               batch_size=12,
                               chunk_size=250,
                               n_workers=1,
                               multi_process=FALSE,
                               trace=TRUE){
+
   transformer = reticulate::import('transformers')
   tf = reticulate::import('tensorflow')
   datasets=reticulate::import("datasets")
@@ -123,7 +153,7 @@ fine_tune_bert_model=function(output_dir,
     )
   }
 
-  tokenized_dataset=tokenized_dataset$train_test_split(test_size=test_size)
+  tokenized_dataset=tokenized_dataset$train_test_split(val_size=val_size)
 
   tf_train_dataset=mlm_model$prepare_tf_dataset(
     dataset = tokenized_dataset$train,

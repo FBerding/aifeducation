@@ -12,164 +12,50 @@ unique interface for different text processing methods.
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{basic_components}}{('list()')\cr
-List storing information which can apply to all methods.}
-
-\item{\code{basic_components$method}}{('string')\cr
-Method underlying the text embedding model.}
-
-\item{\code{basic_components$method}}{('integer')\cr
-Maximum number of tokens in sequence the model processes. In general
+List storing information which can apply to all methods.
+\itemize{
+\item{\code{basic_components$method: }}{Method underlying the text embedding model.}
+\item{\code{basic_components$max_length: }}{Maximum number of tokens in sequence the model processes. In general
 shorter sequences will be padded and longer sequences will be divided
 into chunks and/or truncated.}
+}}
 
 \item{\code{bert_components}}{('list()')\cr
-List storing information which which do only apply to bert models.}
-
-\item{\code{bert_components$model}}{('transformers.TFBertModel()')\cr
-An Object of class transformers.TFBertModel for using with transformers library.}
-
-\item{\code{bert_components$tokenizer}}{('transformers.BertTokenizerFast()')\cr
-An Object of class transformers.BertTokenizerFast for using with transformers library.}
-
-\item{\code{bert_components$aggregation}}{('string()')\cr
-Aggregation method for the hidden states.}
-
-\item{\code{bert_components$aggregation}}{('bool()')\cr
-Whether to use the hidden state representing the [CLS] token or the mean
+List storing information which which do only apply to bert models.
+\itemize{
+\item{\code{bert_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
+\item{\code{bert_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
+\item{\code{bert_components$aggregation: }}{Aggregation method for the hidden states.}
+\item{\code{bert_components$use_cls_token: }}{Whether to use the hidden state representing the [CLS] token or the mean
 of the hidden states of the tokens with no special functions.}
-
-\item{\code{bert_components$chunks}}{('integer()')\cr
-Maximal number of chunks processed with the model.}
-
-\item{\code{bert_components$overlap}}{('integer()')\cr
-Number of tokens which should be added at the beginng of the sequence
+\item{\code{bert_components$chunks: }}{Maximal number of chunks processed with the model.}
+\item{\code{ bert_components$overlap: }}{Number of tokens which should be added at the beginng of the sequence
 of the next chunk.}
+}}
 
 \item{\code{bow_components}}{('list()')\cr
-List storing information which which do only apply for bow_models.}
-
-\item{\code{bow_components$model}}{('data.frame()')\cr
-data.frame describing the relationship between tokens and their corresponding
+List storing information which which do only apply for bow_models.
+\itemize{
+\item{\code{bow_components$model: }}{data.frame describing the relationship between tokens and their corresponding
 text embeddings.}
-
-\item{\code{bow_components$vocab}}{('data.frame()')\cr
-data.frame saving tokens, lemmata and their corresponding integer index.}
-
-\item{\code{bow_components$configuration}}{('list()')\cr
-List of the configuration parameters of the model.}
-
-\item{\code{bow_components$configuration$to_lower}}{('bool()')\cr
-\code{TRUE} if tokens are transformed to lower case.}
-
-\item{\code{bow_components$configuration$use_lemmata}}{('bool()')\cr
-\code{TRUE} if the corresponding lemma should be used instead of the token.}
-
-\item{\code{bow_components$configuration$bow_n_dim}}{('integer()')\cr
-Number of dimensions for GlobalVectors and Topic Modeling}
-
-\item{\code{bow_components$configuration$bow_n_cluster}}{('integer()')\cr
-Number of clusters for grouping tokens based in their global vectors.
+\item{\code{bow_components$vocab: }}{data.frame saving tokens, lemmata and their corresponding integer index.}
+\item{\code{bow_components$configuration: }}{List of the configuration parameters of the model.
+\itemize{
+\item{\code{bow_components$configuration$to_lower }}{\code{TRUE} if tokens are transformed to lower case.}
+\item{\code{bow_components$configuration$use_lemmata }}{\code{TRUE} if the corresponding lemma should be used instead of the token.}
+\item{\code{bow_components$configuration$bow_n_dim }}{Number of dimensions for GlobalVectors and Topic Modeling.}
+\item{\code{bow_components$configuration$bow_n_cluster }}{Number of clusters for grouping tokens based in their global vectors.
 Does not apply for method lda.}
-
-\item{\code{bow_components$configuration$bow_max_iter}}{('integer()')\cr
-Maximum number of iterations for calculation global vectors and topics.}
-
-\item{\code{bow_components$configuration$bow_max_iter_cluster}}{('integer()')\cr
-Maximum number of iterations for creating cluster. Applies only for method
+\item{\code{bow_components$configuration$bow_max_iter }}{Maximum number of iterations for calculation global vectors and topics.}
+\item{\code{bow_components$configuration$bow_max_iter_cluster }}{Maximum number of iterations for creating cluster. Applies only for method
 glove.}
-
-\item{\code{bow_components$configuration$bow_cr_criterion}}{('double()')\cr
-Convergence criterion for calculating global vectors and topics.}
-
-\item{\code{bow_components$configuration$bow_learning_rate}}{('double()')\cr
-Initial learning rate for estimating global vectors.}
-
-\item{\code{bow_components$aggregation}}{('string()')\cr
-Does currently not apply to these methods.}
-
-\item{\code{bow_components$overlap}}{('integer()')\cr
-Does currently not apply to these methods.}
-
-\item{\code{bow_components$overlap}}{('integer()')\cr
-Does currently not apply to these methods.}
+\item{\code{bow_components$configuration$bow_cr_criterion }}{Convergence criterion for calculating global vectors and topics.}
+\item{\code{bow_components$configuration$bow_learning_rate  }}{Initial learning rate for estimating global vectors.}}
 }
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{basic_components$method}}{('string')\cr
-Method underlying the text embedding model.}
-
-\item{\code{basic_components$method}}{('integer')\cr
-Maximum number of tokens in sequence the model processes. In general
-shorter sequences will be padded and longer sequences will be divided
-into chunks and/or truncated.}
-
-\item{\code{bert_components$model}}{('transformers.TFBertModel()')\cr
-An Object of class transformers.TFBertModel for using with transformers library.}
-
-\item{\code{bert_components$tokenizer}}{('transformers.BertTokenizerFast()')\cr
-An Object of class transformers.BertTokenizerFast for using with transformers library.}
-
-\item{\code{bert_components$aggregation}}{('string()')\cr
-Aggregation method for the hidden states.}
-
-\item{\code{bert_components$aggregation}}{('bool()')\cr
-Whether to use the hidden state representing the [CLS] token or the mean
-of the hidden states of the tokens with no special functions.}
-
-\item{\code{bert_components$chunks}}{('integer()')\cr
-Maximal number of chunks processed with the model.}
-
-\item{\code{bert_components$overlap}}{('integer()')\cr
-Number of tokens which should be added at the beginng of the sequence
-of the next chunk.}
-
-\item{\code{bow_components$model}}{('data.frame()')\cr
-data.frame describing the relationship between tokens and their corresponding
-text embeddings.}
-
-\item{\code{bow_components$vocab}}{('data.frame()')\cr
-data.frame saving tokens, lemmata and their corresponding integer index.}
-
-\item{\code{bow_components$configuration}}{('list()')\cr
-List of the configuration parameters of the model.}
-
-\item{\code{bow_components$configuration$to_lower}}{('bool()')\cr
-\code{TRUE} if tokens are transformed to lower case.}
-
-\item{\code{bow_components$configuration$use_lemmata}}{('bool()')\cr
-\code{TRUE} if the corresponding lemma should be used instead of the token.}
-
-\item{\code{bow_components$configuration$bow_n_dim}}{('integer()')\cr
-Number of dimensions for GlobalVectors and Topic Modeling}
-
-\item{\code{bow_components$configuration$bow_n_cluster}}{('integer()')\cr
-Number of clusters for grouping tokens based in their global vectors.
-Does not apply for method lda.}
-
-\item{\code{bow_components$configuration$bow_max_iter}}{('integer()')\cr
-Maximum number of iterations for calculation global vectors and topics.}
-
-\item{\code{bow_components$configuration$bow_max_iter_cluster}}{('integer()')\cr
-Maximum number of iterations for creating cluster. Applies only for method
-glove.}
-
-\item{\code{bow_components$configuration$bow_cr_criterion}}{('double()')\cr
-Convergence criterion for calculating global vectors and topics.}
-
-\item{\code{bow_components$configuration$bow_learning_rate}}{('double()')\cr
-Initial learning rate for estimating global vectors.}
-
-\item{\code{bow_components$aggregation}}{('string()')\cr
-Does currently not apply to these methods.}
-
-\item{\code{bow_components$overlap}}{('integer()')\cr
-Does currently not apply to these methods.}
-
-\item{\code{bow_components$overlap}}{('integer()')\cr
-Does currently not apply to these methods.}
+\item{\code{bow_components$aggregation: }}{Does currently not apply to these methods.}
+\item{\code{bow_components$chunks: }}{Does currently not apply to these methods.}
+\item{\code{bow_components$overlap: }}{Does currently not apply to these methods.}
+}}
 }
 \if{html}{\out{</div>}}
 }
@@ -293,7 +179,7 @@ via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
 are clusters based on their word embeddings with kmeans.}
 
-\item{aggregation: }{For creating a text embedding with a bert model server options
+\item{aggregation: }{For creating a text embedding with a bert model serveral options
 are possible:
 \itemize{
 \item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
@@ -347,6 +233,7 @@ should be saved.}
 \if{html}{\out{<a id="method-TextEmbeddingModel-encode"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-encode}{}}}
 \subsection{Method \code{encode()}}{
+Method for encoding words of raw texts into integers.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$encode(
   raw_text,
@@ -418,7 +305,7 @@ should be printed on console.}
 }
 \subsection{Returns}{
 Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
-containg the embeddings as a \code{data.frame} and information about the
+contain the embeddings as a \code{data.frame} and information about the
 model creating the embeddings.
 }
 }
@@ -439,9 +326,9 @@ Method for setting the publication information of the model.
 
 \item{\code{autors}}{List of persons.}
 
-\item{\code{\code{string}}}{Citation in free text.}
+\item{\code{citation}}{\code{string} Citation in free text.}
 
-\item{\code{\code{string}}}{Corresponding URL if applicable.}
+\item{\code{url}}{\code{string} Corresponding URL if applicable.}
 }
 \if{html}{\out{</div>}}
 }

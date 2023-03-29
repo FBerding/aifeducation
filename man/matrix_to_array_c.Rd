@@ -6,6 +6,18 @@
 \usage{
 matrix_to_array_c(matrix, times, features)
 }
+\arguments{
+\item{matrix}{\code{matrix} containing the sequential data.}
+
+\item{times}{\code{uword} Number of sequences.}
+
+\item{features}{\code{uword} Number of features within each sequence.}
+}
+\value{
+Returns an array. The first dimension corresponds to the cases,
+the second to the times, and the third to the features.
+}
 \description{
-Reshape matrix to array
+Function written in C++ for reshaping a matrix containing sequential data into
+an array for use with keras.
 }

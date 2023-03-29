@@ -1,45 +1,14 @@
-normalize <- function(x) {
-  return (0.95*(x - min(x)) / (max(x) - min(x)))+0.01
-}
-
-normalize_predict<- function(x,min_x,max_x) {
-  return (0.95*(x - min_x) / (max_x - min_x))+0.01
-}
-
-re_normalize_predict<-function(x, min_x,max_x){
-  y=(x-0.01)*(max_x-min_x)/0.95+min_x
-  y=round(y)
-  return(y)
-}
-
-normalize_train <- function(x) {
-
-  return (0.95*(x - min(x)) / (max(x) - min(x)))+0.01
-}
-
-matrix_to_array<-function(matrix,
-                          times,
-                          features){
-
-    tmp_array<-array(
-      data = 0,
-      dim=c(nrow(matrix),
-            times,
-            features)
-      )
-
-  for(i in 1:nrow(matrix)){
-    tmp_sample<-matrix[i,]
-    for(j in 1:times){
-      tmp_time<-tmp_sample[(1:features)+(j-1)*(features)]
-      tmp_array[i,j,]=as.numeric(tmp_time)
-    }
-  }
-    return(tmp_array)
-}
-
+#'Check of compatible text embedding models
+#'
+#'This function checks if different objects are based on the same text
+#'embedding model. This is necessary in order to ensure that classifiers are used
+#'only with data generated with compatible embedding models.
+#'
+#'@param object_list \code{list} of object of class \link{EmbeddedText} or
+#'\link{TextEmbeddingClassifierNeuralNet}.
+#'@return Returns \code{TRUE} if all object refer to the same text embedding model.
+#'\code{FALSE} in all other cases.
 check_embedding_models<-function(object_list){
-
   #Check if all object are from the same class---------------------------------
   tmp_class<-NULL
   for(i in 1:length(object_list)){
@@ -90,7 +59,36 @@ return(TRUE)
 
 
 #------------------------------------------------------------------------------
-get_coder_metrics<-function(true_values,predicted_values){
+#'Calculates reliability measures based on content analysis
+#'
+#'This functions calculates different reliability measures which are based on the
+#'empirical research method of content analysis.
+#'
+#'@param true_values \code{factor} containing the true labels/categories.
+#'@param predicted_values \code{factor} containing the predicted labels/categories.
+#'@return Returns a \code{vector} with the following reliability measures:
+#'#'\itemize{
+#'\item{\strong{iota_index: }}{Iota Index from the Iota Reliability Concept Version 2.}
+#'\item{\strong{min_iota2: }}{Minimal Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{avg_iota2: }}{Average Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{max_iota2: }}{Maximum Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{min_alpha: }}{Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{avg_alpha: }}{Average Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{max_alpha: }}{Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{static_iota_index: }}{Static Iota Index from Iota Reliability Concept Version 2.}
+#'\item{\strong{dynamic_iota_index: }}{Dynamic Iota Index Iota Reliability Concept Version 2.}
+#'\item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
+#'\item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
+#'\item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
+#'\item{\strong{kappa2: }}{Cohen's Kappa with equal weights.}
+#'\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters with exact estimation.}
+#'\item{\strong{kappa_light: }}{Light's Kappa for multiple raters.}
+#'\item{\strong{percentage_agreement: }}{Percentage Agreement.}
+#'\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
+#'}
+#'@export
+get_coder_metrics<-function(true_values,
+                            predicted_values){
 val_res=iotarelr::check_new_rater(true_values = true_values,
                                   assigned_values = predicted_values,
                                   free_aem = TRUE)
@@ -101,7 +99,7 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
                  "max_iota2",
                  "min_alpha",
                  "avg_alpha",
-                 "avg_alpha",
+                 "max_alpha",
                  "static_iota_index",
                  "dynamic_iota_index",
                  "kalpha_nominal",
@@ -111,7 +109,6 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
                  "kappa_fleiss",
                  "kappa_light",
                  "percentage_agreement",
-                 "intra_cat_agree",
                  "gwet_ac")
   metric_values=vector(length = length(metric_names))
   names(metric_values)=metric_names
@@ -143,7 +140,7 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
   metric_values[12]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                 correct=TRUE)$value
   metric_values[13]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                               weight = "unweighted",
+                                               weight = "equal",
                                                sort.levels = FALSE)$value
   metric_values[14]=irr::kappam.fleiss(ratings=cbind(true_values,predicted_values),
                                                        exact = TRUE,
@@ -151,15 +148,35 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
   metric_values[15]=irr::kappam.light(ratings=cbind(true_values,predicted_values))$value
   metric_values[16]=irr::agree(ratings=cbind(true_values,predicted_values),
                                                tolerance = 0)$value/100
-  #metric_values[16]=sum(diag(table(cbind(true_values,factor(predicted_values)))))/sum(table(true_values))
-  #val_metric[17]=mean(diag(table(true_values,predicted_values))/table(true_values))
-  metric_values[18]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
+  metric_values[17]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
 
   return(metric_values)
 }
 
 #------------------------------------------------------------------------------
-get_train_test_split<-function(embedding,target,val_size){
+#'Function for splitting data into a train and validation sample
+#'
+#'This function creates a train and validation sample based on stratified random
+#'sampling. The relative frequencies of each category in the train and validation sample
+#'equal the relative frequencies of the initial data (proportional stratified sampling).
+#'
+#'@param embedding Object of class \link{EmbeddedText}.
+#'@param target Named \code{factor} containing the labels of every case.
+#'@param val_size \code{double} Ratio between 0 and 1 indicating the relative
+#'frequency of cases which should be used as validation sample.
+#'@return Returns a \code{list} with the following components.
+#'\itemize{
+#'\item{\code{target_train: }}{Named \code{factor} containing the labels of the training sample.}
+#'
+#'\item{\code{embeddings_train: }}{Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
+#'
+#'\item{\code{target_test: }}{Named \code{factor} containing the labels of the validation sample.}
+#'
+#'\item{\code{embeddings_test: }}{Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
+#'}
+get_train_test_split<-function(embedding,
+                               target,
+                               val_size){
   categories=names(table(target))
   val_sampe=NULL
   for(cat in categories){
@@ -184,27 +201,62 @@ get_train_test_split<-function(embedding,target,val_size){
                 embeddings_test=val_embeddings)
   return(results)
 }
+
+
 #-----------------------------------------------------------------------------
-get_folds<-function(target,k_folds){
+#'Creates Cross-Validation Samples
+#'
+#'Functions creates cross-validation samples and ensures that the relative
+#'frequency for every category/label within a fold equals the relative frequency of
+#'the category/label within the initial data.
+#'
+#'@param target Named \code{factor} containing the relevant labels/categories. Missing cases
+#'should be declared with \code{NA}.
+#'@param k_folds \code{int} number of folds.
+#'
+#'@return Return a \code{list} with the following components:
+#'\itemize{
+#'\item{\code{val_sample: }}{\code{vector} of \code{strings} containing the names of cases of the validation sample.}
+#'
+#'\item{\code{train_sample: }}{\code{vector} of \code{strings} containing the names of cases of the train sample.}
+#'
+#'\item{\code{n_folds: }}{\code{int} Number of realized folds.}
+#'
+#'\item{\code{unlabeled_cases: }}{\code{vector} of \code{strings} containing the names of the unlabeled cases.}
+#'}
+#'@note The parameter \code{target} allows cases with missing categories/labels.
+#'These should be declared with \code{NA}. All these cases are ignored for creating the
+#'different folds. Their names are saved within the component \code{unlabeled_cases}.
+#'These cases can be used for Pseudo Labeling.
+#'@note the functions checks the absolute frequencies of every category/label. If the
+#'absolute frequency is not sufficient to ensure at least four cases in every fold
+#'the number of folds is adjusted. In these cases a warning is printed to the console.
+#'At least four cases per fold are necessary to ensure that the training of
+#'\link{TextEmbeddingClassifierNeuralNet} works well with all options turned on.
+get_folds<-function(target,
+                    k_folds){
   sample_target=na.omit(target)
   freq_cat=table(sample_target)
   categories=names(freq_cat)
   min_freq=min(freq_cat)
 
-  if(k_folds>(min_freq/2)){
-    fin_k_folds=floor(min_freq/2)
-    warning(paste("Frequency of the smallest category is less the requested number of
-            folds. Adjusting number of folds from ",k_folds,"to",fin_k_folds,"."))
+  if(min_freq/k_folds<4){
+    fin_k_folds=floor(min_freq/4)
+    warning(paste("Frequency of the smallest category/label is not sufficent to ensure
+                  at least 4 cases per fold. Adjusting number of folds from ",k_folds,"to",fin_k_folds,"."))
+    if(fin_k_folds==0){
+      stop("Frequency of the smallest category/label is to low. Please check your data.
+           Consider to remove all categories/labels with a very low absolute frequency.")
+    }
   } else {
     fin_k_folds=k_folds
   }
 
   val_sample=NULL
-  sizes=ceiling(freq_cat/fin_k_folds)
   for(i in 1:fin_k_folds){
-
     for(cat in categories){
       all_names=names(subset(target,target==cat))
+      sizes=max(ceiling(freq_cat[cat]/fin_k_folds),1)
 
       if(is.null(val_sample)==TRUE){
         possible_names=all_names
@@ -214,11 +266,13 @@ get_folds<-function(target,k_folds){
       }
       selected_names=sample(x=possible_names,
                             size=min(length(possible_names),
-                                     sizes[cat]))
+                                     sizes))
       val_sample[i]=list(append(x=unlist(val_sample[i]),
                            values = selected_names))
     }
   }
+
+
   train_sample=NULL
   for(i in 1:fin_k_folds){
     train_sample[i]=list(setdiff(x=names(sample_target),y=val_sample[[i]]))
@@ -232,8 +286,30 @@ get_folds<-function(target,k_folds){
                 unlabeled_cases=unlabeled_cases)
   return(results)
 }
+
+
+
 #------------------------------------------------------------------------------
-split_labeled_unlabeled<-function(embedding,target){
+#'Splits data into labeled and unlabeled data
+#'
+#'This functions splits data into labeled and unlabeled data.
+#'
+#'@param embedding Object of class \link{EmbeddedText}.
+#'@param target Named \code{factor} containing all cases with labels and missing
+#'labels.
+#'@return Returns a \code{list} with the following components
+#'\itemize{
+#'\item{\code{embeddings_labeled: }}{Object of class \link{EmbeddedText} containing
+#'only the cases which have labels.}
+#'
+#'\item{\code{embeddings_unlabeled: }}{Object of class \link{EmbeddedText} containing
+#'only the cases which have no labels.}
+#'
+#'\item{\code{targets_labeled: }}{Named \code{factor} containing the labels of
+#'relevant cases.}
+#'}
+split_labeled_unlabeled<-function(embedding,
+                                  target){
   target_labeled=subset(target,is.na(target)==FALSE)
   embedding_labeled=embedding$embeddings[names(target_labeled),]
   embedding_unlabeled=embedding$embeddings[setdiff(names(target),names(target_labeled)),]
@@ -244,6 +320,20 @@ split_labeled_unlabeled<-function(embedding,target){
   return(result)
 }
 #------------------------------------------------------------------------------
+#'Creates in iota2 object
+#'
+#'Function creates an object of class \code{iotarelr_iota2} which can be used
+#'with the package iotarelr. This function is for internal use only.
+#'
+#'@param iota2_list \code{list} of objects of class \code{iotarelr_iota2}.
+#'@param free_aem \code{bool} \code{TRUE} if the iota2 objects are estimated
+#'without forcing the assumption of weak superiority.
+#'@param call \code{string} characterizing the source of estimation. That is, the
+#'function within the object was estimated.
+#'@param original_cat_labels \code{vector} containing the original labels of each
+#'category.
+#'@return Returns an object of class \code{iotarelr_iota2} which is the mean
+#'iota2 object.
 create_iota2_mean_object<-function(iota2_list,
                                    free_aem=FALSE,
                                    call="aifeducation::te_classifier_neuralnet",
@@ -304,7 +394,31 @@ create_iota2_mean_object<-function(iota2_list,
 }
 
 #-----------------------------------------------------------------------------
-#------------------------------------------------------------------------------
+#'Creates synthetic cases for balancing training data
+#'
+#'This function creates synthetic cases for balancing the training with an
+#'object of class \link{TextEmbeddingClassifierNeuralNet}.
+#'
+#'@param embedding Named \code{data.frame} containing the text embeddings.
+#'In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.
+#'@param target Named \code{factor} containing the labels of the corresponding embeddings.
+#'@param method \code{vector} containing strings of the requested methods for generating new cases.
+#'Currently "smote","dbsmote", and "adas" from package smotefamily are available.
+#'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
+#'@param inc_major\code{bool} If \code{TRUE} the major category is considered for creating
+#'new synthetic units.
+#'@return \code{list} with the following components.
+#'\itemize{
+#'\item{\code{syntetic_embeddings: }}{Named \code{data.frame} containing the text embeddings of
+#'the synthetic cases.}
+#'
+#'\item{\code{syntetic_targets}}{Named \code{factor} containing the labels of the corresponding
+#'synthetic cases.}
+#'
+#'\item{\code{n_syntetic_units}}{\code{table} showing the number of synthetic cases for every
+#'label/category.}
+#'}
+#'@export
 get_synthetic_cases<-function(embedding,
                               target,
                               method=c("smote"),
@@ -373,10 +487,31 @@ get_synthetic_cases<-function(embedding,
 
   return(results)
 }
-#---------------------------------------------
 
+
+#---------------------------------------------
 #'Creates Synthetic Units
 #'
+#'Function for creating synthetic cases in order to balance the data for
+#'training with \link{TextEmbeddingClassifierNeuralNet}. This is a helper
+#'function for use with \link{get_synthetic_cases} to allow parallel
+#'computations.
+#'
+#'@param embedding Named \code{data.frame} containing the text embeddings.
+#'In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.
+#'@param target Named \code{factor} containing the labels/categories of the corresponding cases.
+#'@param k \code{int} The number of nearest neighbors during sampling process.
+#'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
+#'@param method \code{vector} containing strings of the requested methods for generating new cases.
+#'Currently "smote","dbsmote", and "adas" from package smotefamily are available.
+#'@param cat \code{string} The category for which new cases should be created.
+#'@param cat_freq Object of class \code{"table"} containing the absolute frequencies
+#'of every category/label.
+#'@param inc_major\code{bool} If \code{TRUE} the major category is considered for creating
+#'new synthetic units.
+#'@returns Returns a \code{list} which contains the text embeddings of the
+#'new synthetic cases as a named \code{data.frame} and their labels as a named
+#'\code{factor}.
 #'@export
 create_synthetic_units<-function(embedding,
                                  target,
@@ -412,7 +547,6 @@ create_synthetic_units<-function(embedding,
 
       if(is.null(syn_data)==FALSE){
         tmp_data=syn_data$syn_data[,-ncol(syn_data$syn_data)]
-        #print(paste("m:",method,"cat:",cat,"k:",k,"row:",nrow(tmp_data)))
         rownames(tmp_data)<-paste0(method,"_",cat,"_",k,"_",
                                    seq(from=1,to=nrow(tmp_data),by=1))
         tmp_data<-as.data.frame(tmp_data)
@@ -431,13 +565,28 @@ create_synthetic_units<-function(embedding,
     }
   return(results)
 }
+
 #-------------------------------------------------------------------------------
+#'Creates a stratified random sample
+#'
+#'This function creates a stratified random sample.The difference to
+#'\link{get_train_test_split} is that this function does not require text
+#'embeddings and does not split the text embeddings into a train and validation
+#'sample.
+#'
+#'@param targets Named \code{vector} containing the labels/categories for each case.
+#'@param val_size \code{double} Value between 0 and 1 indicating how many cases of
+#'each label/category should be part of the validation sample.
+#'@return \code{list} which containing the names of cases belonging to the train
+#'sample and to the validation sample.
 get_stratified_train_test_split<-function(targets, val_size=0.25){
   test_sample=NULL
   categories=names(table(targets))
 
   for(cat in categories){
-    tmp=names(subset(targets,targets==cat))
+    condition=(targets==cat)
+    tmp=names(subset(x = targets,
+                     subset = condition))
     test_sample[cat]=list(
       sample(tmp,size=max(1,length(tmp)*val_size))
     )

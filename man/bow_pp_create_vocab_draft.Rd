@@ -14,6 +14,46 @@ bow_pp_create_vocab_draft(
   trace = TRUE
 )
 }
+\arguments{
+\item{path_language_model}{\code{string} Path to a udpipe language model that
+should be used for tagging and lemmatisation.}
+
+\item{data}{\code{vector} containing the raw texts.}
+
+\item{upos}{\code{vector} containing the universal part-of-speech tags which
+should be used to build the vocabulary.}
+
+\item{label_language_model}{\code{string} Label for the udpipe language model used.}
+
+\item{language}{\code{string} Name of the language (e.g., English, German)}
+
+\item{chunk_size}{\code{int} Number of raw texts which should be processed at one time.}
+
+\item{trace}{\code{bool} \code{TRUE} if information about the progress should be printed to console.}
+}
+\value{
+\code{list} with the following components.
+\itemize{
+\item{\code{vocab}}{\code{data.frame} containing the tokens, lemmas, tokens in lower case, and
+lemmas in lower case.}
+\item{\code{language_model}}{\code{}}
+\item{\code{ud_language_model}}{udpipe language model that is used for tagging.}
+\item{\code{label_language_model}}{Label of the udpipe language model.}
+\item{\code{language}}{Language of the raw texts.}
+\item{\code{upos}}{Used univerisal part-of-speech tags.}
+\item{\code{n_sentence}}{\code{int} Estimated number of sentence in the raw texts.}
+\item{\code{n_token}}{\code{int} Estimated number of tokens in the raw texts.}
+\item{\code{n_document_segments}}{\code{int} Estimated number of document segments/raw texts.}
+}
+}
 \description{
-Insert Description
+This function creates a list of tokens which refer to specific
+universal part-of-speech tags (UPOS) and provides the corresponding lemmas.
+}
+\note{
+A list of possible tags can be found
+here: \url{https://universaldependencies.org/u/pos/index.html}.
+
+A huge number of models can be found
+here: \url{https://ufal.mff.cuni.cz/udpipe/2/models}.
 }
