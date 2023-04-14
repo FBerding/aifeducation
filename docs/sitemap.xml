@@ -4,13 +4,19 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/aifeducation.html</loc>
+  </url>
+  <url>
+    <loc>/articles/classification_tasks.html</loc>
+  </url>
+  <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
     <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/aifeducation-package.html</loc>
   </url>
   <url>
     <loc>/reference/bow_pp_create_basic_text_rep.html</loc>
@@ -67,7 +73,13 @@
     <loc>/reference/QAExtractModel.html</loc>
   </url>
   <url>
-    <loc>/reference/rcpparma_hello_world.html</loc>
+    <loc>/reference/set_config_cpu_only.html</loc>
+  </url>
+  <url>
+    <loc>/reference/set_config_gpu_low_memory.html</loc>
+  </url>
+  <url>
+    <loc>/reference/set_config_tf_logger.html</loc>
   </url>
   <url>
     <loc>/reference/split_labeled_unlabeled.html</loc>
@@ -77,9 +89,6 @@
   </url>
   <url>
     <loc>/reference/TextEmbeddingModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/train_gpt2_model.html</loc>
   </url>
   <url>
     <loc>/reference/train_tune_bert_model.html</loc>

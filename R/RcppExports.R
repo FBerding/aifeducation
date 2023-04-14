@@ -3,10 +3,19 @@
 
 #'Reshape matrix to array
 #'
-#'@importFrom Rcpp
+#'Function written in C++ for reshaping a matrix containing sequential data into
+#'an array for use with keras.
+#'
+#'@param matrix \code{matrix} containing the sequential data.
+#'@param times \code{uword} Number of sequences.
+#'@param features \code{uword} Number of features within each sequence.
+#'@return Returns an array. The first dimension corresponds to the cases,
+#'the second to the times, and the third to the features.
+#'
+#'@import Rcpp
 #'@useDynLib aifeducation, .registration = TRUE
 #'@export
 matrix_to_array_c <- function(matrix, times, features) {
-    .Call('_aifeducation_matrix_to_array_c', PACKAGE = 'aifeducation', matrix, times, features)
+    .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)
 }
 

@@ -240,10 +240,10 @@ get_folds<-function(target,
   categories=names(freq_cat)
   min_freq=min(freq_cat)
 
-  if(min_freq/k_folds<4){
-    fin_k_folds=floor(min_freq/4)
+  if(min_freq/k_folds<1){
+    fin_k_folds=floor(min_freq/1)
     warning(paste("Frequency of the smallest category/label is not sufficent to ensure
-                  at least 4 cases per fold. Adjusting number of folds from ",k_folds,"to",fin_k_folds,"."))
+                  at least 1 cases per fold. Adjusting number of folds from ",k_folds,"to",fin_k_folds,"."))
     if(fin_k_folds==0){
       stop("Frequency of the smallest category/label is to low. Please check your data.
            Consider to remove all categories/labels with a very low absolute frequency.")
@@ -253,22 +253,24 @@ get_folds<-function(target,
   }
 
   val_sample=NULL
-  for(i in 1:fin_k_folds){
-    for(cat in categories){
-      all_names=names(subset(target,target==cat))
-      sizes=max(ceiling(freq_cat[cat]/fin_k_folds),1)
+  for(cat in categories){
+    all_names=names(subset(target,target==cat))
+    used_names=NULL
 
-      if(is.null(val_sample)==TRUE){
+    for(i in 1:fin_k_folds){
+      if(i==1){
         possible_names=all_names
       } else {
         possible_names=setdiff(x=all_names,
-                               y=unlist(val_sample))
+                               y=used_names)
       }
-      selected_names=sample(x=possible_names,
-                            size=min(length(possible_names),
-                                     sizes))
+      tmp_size=ceiling(length(possible_names)/(fin_k_folds-(i-1)))
+      selected_names<-sample(x=possible_names,
+                             size=tmp_size,
+                             replace=FALSE)
       val_sample[i]=list(append(x=unlist(val_sample[i]),
                            values = selected_names))
+      used_names=append(used_names,values = selected_names)
     }
   }
 

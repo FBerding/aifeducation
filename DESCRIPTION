@@ -1,18 +1,36 @@
 Package: aifeducation
 Type: Package
-Title: What the package does (short line)
-Version: 0.0.1.9000
+Title: Artifical Intelligence for Education
+Version: 0.1.0.9000
 Date: 2023-03-10
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: c(
+    person("Berding", "Florian", , "florian.berding@uni-hamburg.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3593-1695")),
+    person("Pargmann", "Julia", , "julia.pargmann@uni-hamburg.de", role = "ctb"),
+    person("Riebenbauer", "Elisabeth", , "elisabeth.riebenbauer@uni-graz.at", role = "ctb"),
+    person("Rebmann", "Karin", , "karin.rebmann@uni-oldenburg.de", role = "ctb"),
+    person("Slopinski", "Andreas", , "andreas.slopinski@uni-oldenburg.de", role = "ctb")
+  )
+Description: In social and educational settings using Artificial Intelligence is
+  a challenging tasks. Relevant data
+  is often available only in hand written forms or the use of data is restricted
+  by privacy policies leading to only small datasets. Futhermore, data in
+  educational and social science is often unbalanced in terms of their frequencies.
+  To support educators, eductional and social reserachers in using the potentials of
+  AI for their work this package provides a unified interface to neural nets in keras
+  and tensorflow in dealing with natural language problems. Tools integrate existing 
+  mathematical and statitical methods for dealing with
+  small data sets via pseudo labeling and imbalanced data via the creation of synthetic
+  cases. Performance evaluation of AI is connected to measures from content analysis
+  which educational and social researchers are generally more familiar with. Finally,
+  all objects created with this package allow to share trained AI with other persons.
+License: GPL-3
 Imports: Rcpp (>= 1.0.10),
   stringr,
   udpipe,
   keras,
   tensorflow,
-  iotarelr,
+  iotarelr(>= 0.1.4),
   irr,
   irrCAC,
   bundle,
@@ -22,7 +40,14 @@ Imports: Rcpp (>= 1.0.10),
   quanteda.textstats
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.2.3
+Encoding: UTF-8
 Depends:
   quanteda,
   keras,
   foreach
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr

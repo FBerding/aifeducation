@@ -159,7 +159,7 @@ Creating a new instance of this class.
   label = NULL,
   text_embeddings = NULL,
   targets = NULL,
-  config = list(hidden = c(128), gru = c(128), dropout = 0.2, recurrent_dropout = 0,
+  config = list(hidden = c(128), gru = c(128), dropout = 0.2, recurrent_dropout = 0.4,
     l2_regularizer = 0.001, optimizer = "adam", act_fct = "gelu", act_fct_last =
     "softmax", err_fct = "categorical_crossentropy")
 )}\if{html}{\out{</div>}}

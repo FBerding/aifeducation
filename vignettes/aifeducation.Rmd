@@ -1,0 +1,115 @@
+---
+title: "01 Get started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{01 Get started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# 1) Installation and Technical Requirements
+Several packages allow users to use machine learning directly in *R* such as
+[nnet](https://cran.r-project.org/package=nnet) for single layer neural nets,
+[rpart](https://CRAN.R-project.org/package=rpart) for decision tress, and 
+[ranger](https://CRAN.R-project.org/package=ranger) for random forest. Furthermore,
+with [mlr3verse](https://CRAN.R-project.org/package=mlr3verse) a series of 
+packages exist for managing different algorithms with a unified interface.
+
+These packages can be used with a 'normal' computer and provide an easy installation.
+In terms of natural language processing these approaches are currently limited.
+State-of-art approaches rely on neural nets with multiple layers and consist of a huge number
+of parameters making them computationally demanding. With specialized libraries
+such as keras and tensorflow graphical processing units (gpu) can help to speed up
+computations significantly. However, many of these specialized libraries for
+machine learning are written in python. 
+
+The R package *Artificial Intelligence for Education (aifeducation)* aims to provide
+educators, educational researchers, and social researchers an convince interface to 
+these state-of-art models for natural language processing and tries to address 
+the special needs and challenges of educational and social science. The package 
+currently supports the application of Artificial Intelligence (AI) for 
+tasks such as text embedding, classification, and question answering. 
+
+Since state-of-art approaches in natural language processing rely on large models
+compared to classical statistical methods (e.g., latent class analysis, structural
+equation modeling) and are based largely on python some additional installation steps are necessary.
+
+If you would like to train and to develop your own models and AIs a 
+compatible graphic card is necessary. Even a low performing graphic device can
+speed up computations significantly. If you
+would like to use pre-trained models this is **not** necessary. In this case
+a 'normal' office computer without a graphic device should be sufficient in most 
+cases.
+
+In order to use the package you must first install it. This can be done
+by:
+```{r, include = TRUE, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("FBerding/aifeducation")
+```
+With this command all necessary *R* packages are installed on your machine. Since
+natural language processing with neural nets is based on models which are
+computational intensive *keras* and *tensorflow* are used within this package together
+with some other specialized python libraries. To install them you must first
+install python on your machine. This may take some time.
+```{r, include = TRUE, eval=FALSE}
+reticulate::install_python()
+```
+You can check if everything is working by using the function
+`reticulate::py_available`. This should return `TRUE`.
+```{r, include = TRUE, eval=FALSE}
+reticulate::py_available(initialize = TRUE)
+```
+
+If everything is working you can now install the remaining
+python libraries. For convenience *aifeducation* comes with a helper function
+`install_py_modules` doing that for you. 
+```{r, include = TRUE, eval=FALSE}
+install_py_modules(envname="aifeducation")
+```
+This function installs the following python modules: os, transformers, tokenizers,
+datasets, torch, keras, tensorflow and its dependencies in the environment "aifeducation".
+If you would like to use *aifeducation* with other packages or with other environments
+please ensure that these python modules are available.
+
+With `check_aif_py_modules` you can check if all modules are successfully installed.
+```{r, include = TRUE, eval=TRUE}
+aifeducation::check_aif_py_modules()
+```
+
+Now everything is ready to use the package. When you start a new *R* session please
+note that you have to call `reticulate::use_condaenv(condaenv = "aifeducation")` on
+a machine with windows and `reticulate::use_virtualenv(condaenv = "aifeducation")`
+on mac and linux to make the python modules available for work. 
+
+# 2) Configuration
+In general, educators and educational researchers do neither have access to
+high performance computing nor do they own computers with a performing graphic card
+for their work. Thus, some additional configuration can be done to make computations
+on your machine working.
+
+If you do use a computer that does not own a graphic device you can disable the
+graphic device support of tensorflow with the function `set_config_cpu_only`.
+```{r, include = TRUE, eval=FALSE}
+aifeducation::set_config_cpu_only()
+```
+Now your machine uses only cpus for computations.
+
+If your machine has a graphic card but with limited memory it is recommended
+to change the configuration of the memory usage with `set_config_gpu_low_memory`
+```{r, include = TRUE, eval=FALSE}
+aifeducation::set_config_gpu_low_memory()
+```
+This enables your machine to compute even 'large' models with limited resources.
+For 'small' models this option is not relevant since it decreases the computational speed.
+
+Finally, in some cases you would like to disable tensorflow to print information
+on the console. You can change the behavior with the function 
+`set_config_tf_logger`. You can choose between five levels "FATAL", "ERROR",
+"WARN", "INFO", and "DEBUG" seting the minimal level for logging. 

@@ -18,14 +18,27 @@ tensorflow"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aifeducation</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/aifeducation.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/classification_tasks.html">02 Classification Tasks</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -203,7 +216,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  config <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>, gru <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>, dropout <span class="op">=</span> <span class="fl">0.2</span>, recurrent_dropout <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  config <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>, gru <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>, dropout <span class="op">=</span> <span class="fl">0.2</span>, recurrent_dropout <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>    l2_regularizer <span class="op">=</span> <span class="fl">0.001</span>, optimizer <span class="op">=</span> <span class="st">"adam"</span>, act_fct <span class="op">=</span> <span class="st">"gelu"</span>, act_fct_last <span class="op">=</span></span>
 <span>    <span class="st">"softmax"</span>, err_fct <span class="op">=</span> <span class="st">"categorical_crossentropy"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -640,7 +653,7 @@ saved.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Who to complain to.</p>
+  <p></p><p>Developed by Berding Florian.</p>
 </div>
 
 <div class="pkgdown">

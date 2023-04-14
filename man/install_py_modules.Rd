@@ -4,7 +4,7 @@
 \alias{install_py_modules}
 \title{Installing necessary python modules to an environment}
 \usage{
-install_py_modules(envname = NULL)
+install_py_modules(envname = "aifeducation")
 }
 \arguments{
 \item{envname}{\code{string} Name of the environment where the packages should

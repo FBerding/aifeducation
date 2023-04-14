@@ -4,7 +4,11 @@
 \alias{check_aif_py_modules}
 \title{Check if all necessary python modules are available}
 \usage{
-check_aif_py_modules()
+check_aif_py_modules(print = TRUE)
+}
+\arguments{
+\item{print}{\code{bool} \code{TRUE} if a list with all modules and their
+availability should be printed to the console.}
 }
 \value{
 The function prints a table with all relevant packages and shows
@@ -15,5 +19,5 @@ In all other cases \code{FALSE}
 }
 \description{
 This function checks if all necessary python modules are available for
-the package aifeducation to work
+the package aifeducation to work.
 }

@@ -201,7 +201,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                           hidden=c(128),
                           gru=c(128),
                           dropout=0.2,
-                          recurrent_dropout=0.0,
+                          recurrent_dropout=0.4,
                           l2_regularizer=0.001,
                           optimizer="adam",
                           act_fct="gelu",
@@ -412,7 +412,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    bpl_inc_ratio=0.25,
                    bpl_anchor=0.75,
                    bpl_valid_size=0.33,
-                   opt_model_reset=FALSE,
+                   opt_model_reset=TRUE,
                    epochs=100,
                    batch_size=32,
                    dir_checkpoint,
@@ -432,7 +432,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Checking Prerequisites
       if(trace==TRUE){
         print(paste(date(),
-                    "Start Training",
+                    "Start Training"))
+      }
+      if(trace==TRUE){
+        print(paste(date(),
                     "Matching Input and Target Data"))
       }
       data_embeddings=data_embeddings$clone(deep=TRUE)
@@ -459,7 +462,24 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                     "Unique Cases:",n_final_cases))
       }
 
-      #Split data into k folgs
+
+      if(trace==TRUE){
+        print(paste(date(),
+                    "Checking minimal frequencies."))
+      }
+      freq_check<-table(data_targets)
+      freq_check_eval<-freq_check<4
+      if(sum(freq_check_eval)>0){
+        cat<-subset(names(freq_check),
+                    subset = freq_check_eval)
+        stop(paste("Categories",cat,"have absolute frequencies below 4.",
+             "These categories are not suitable for training.
+             Please remove the corresponding categories/labels from the data
+             and create a new classifier with the reduced data set."))
+        }
+
+
+      #Split data into k folds
       folds=get_folds(target=data_targets,k_folds=data_n_valid_samples)
 
       #Create a Vector with names of categories
@@ -1550,9 +1570,21 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         data_embedding_test=embedding_test
       }
 
-      #Save names and order of input variables and train_target levels
-      variable_name_order<-colnames(data_embedding_train)
-      target_levels_order<-levels(target_train)
+      #load names and order of input variables and train_target levels
+      variable_name_order<-self$model_config$input_variables
+      target_levels_order<-self$model_config$target_levels
+
+      #Ensuring the same encoding
+      target_train<-factor(as.character(target_train),
+                           levels = target_levels_order)
+      target_test<-factor(as.character(target_test),
+                          levels = target_levels_order)
+
+      data_embedding_train<-data_embedding_train[,variable_name_order]
+      data_embedding_test<-data_embedding_test[,variable_name_order]
+
+      #variable_name_order<-colnames(data_embedding_train)
+      #target_levels_order<-levels(target_train)
 
       #Transforming train_target for the use in keras.
       #That is switching characters to numeric
@@ -1560,9 +1592,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       target_test_transformed<-as.numeric(target_test)-1
 
       #Estimating Class Weights
-      freq_categories=table(target_train)
-      freq_max=max(freq_categories)
-      weights_categories=as.list(freq_max/freq_categories)
+      #freq_categories=table(target_train)
+      #freq_max=max(freq_categories)
+      #weights_categories=as.list(freq_max/freq_categories)
 
       if(self$model_config$n_gru>0){
         #Convert Input data to sequential data
@@ -1628,8 +1660,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           mode = "auto",
           save_best_only = TRUE,
           save_weights_only = TRUE),
-        view_metrics=view_metrics,
-        class_weight=weights_categories
+        view_metrics=view_metrics
+        #class_weight=weights_categories
       )
 
       print(paste(date(),"Load Weights From Best Checkpoint"))

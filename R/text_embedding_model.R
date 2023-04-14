@@ -134,7 +134,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param use_cls_token \code{bool} \code{TRUE} if the CLS token should be used
     #'for aggregation and as text embedding. If \code{FALSE} the mean of all
     #'corresponding tokens is used for aggregation and text embedding.
-    #'@param bert_model_dir_path \code{string} path to the directory where the
+    #'@param model_dir \code{string} path to the directory where the
     #'bert model is stored.
     #'@param bow_basic_text_rep object of class \code{basic_text_rep} created via
     #'the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove"}
@@ -154,7 +154,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'\code{FALSE} not.
     #'@details \itemize{
     #'\item{method: }{In the case of \code{method="bert"} a pretrained bert model
-    #'must be supplied via \code{bert_model_dir_path}. For \code{method="glove"}
+    #'must be supplied via \code{model_dir}. For \code{method="glove"}
     #'and \code{method="lda"} a new model will be created based on the data provided
     #'via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
     #'only word embeddings, not text embeddings. To achieve text embeddings the words
@@ -181,7 +181,7 @@ TextEmbeddingModel<-R6::R6Class(
                         overlap=0,
                         aggregation="last",
                         use_cls_token=TRUE,
-                        bert_model_dir_path,
+                        model_dir,
                         bow_basic_text_rep,
                         bow_n_dim=NULL,
                         bow_n_cluster=NULL,
@@ -195,8 +195,8 @@ TextEmbeddingModel<-R6::R6Class(
       #------------------------------------------------------------------------
       if(self$basic_components$method=="bert"){
         transformer = reticulate::import('transformers')
-        self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
-        self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
+        self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
+        self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
 
         self$bert_components$chunks<-chunks
         self$bert_components$overlap<-overlap
@@ -362,29 +362,29 @@ TextEmbeddingModel<-R6::R6Class(
       private$model_info$model_date<-date()
     },
     #--------------------------------------------------------------------------
-    #'@description Method for loading a bert model into R.
-    #'@param bert_model_dir_path \code{string} containing the path to the relevant
-    #'bert model.
-    load_model=function(bert_model_dir_path){
+    #'@description Method for loading a transformer model into R.
+    #'@param model_dir \code{string} containing the path to the relevant
+    #'model.
+    load_model=function(model_dir){
       if(self$basic_components$method=="bert"){
         transformer = reticulate::import('transformers')
-        self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
-        self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
+        self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
+        self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
       } else {
-        message("Method only relevant for bert models.")
+        message("Method only relevant for transformer models.")
       }
     },
     #--------------------------------------------------------------------------
     #'@description Method for saving a bert model.
-    #'@param bert_model_dir_path \code{string} containing the path where the bert model
+    #'@param model_dir \code{string} containing the path where the bert model
     #'should be saved.
-    save_bert_model=function(bert_model_dir_path){
+    save_bert_model=function(model_dir){
       if(self$basic_components$method=="bert"){
         self$bert_components$model$save_pretrained(
-          save_directory=bert_model_dir_path)
+          save_directory=model_dir)
         print(paste(date(),"Bert model saved."))
         self$bert_components$tokenizer$save_pretrained(
-          bert_model_dir_path)
+          model_dir)
         print(paste(date(),"Tokenizer saved."))
       } else {
         message("Method only relevant for bert models.")

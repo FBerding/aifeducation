@@ -17,14 +17,27 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">aifeducation</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/aifeducation.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/classification_tasks.html">02 Classification Tasks</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -42,10 +55,6 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="aifeducation-package.html">aifeducation-package</a></code> <code><a href="aifeducation-package.html">aifeducation</a></code> </p>
-        </td>
-        <td><p>What the package does (short line)</p></td>
-      </tr><tr><td>
           <p><code><a href="bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep()</a></code> </p>
         </td>
         <td><p>Prepare texts for text embeddings with a bag of word approach.</p></td>
@@ -114,9 +123,17 @@
         </td>
         <td><p>Question Answer Models of Type Extraction</p></td>
       </tr><tr><td>
-          <p><code><a href="rcpparma_hello_world.html">rcpparma_hello_world()</a></code> <code><a href="rcpparma_hello_world.html">rcpparma_outerproduct()</a></code> <code><a href="rcpparma_hello_world.html">rcpparma_innerproduct()</a></code> <code><a href="rcpparma_hello_world.html">rcpparma_bothproducts()</a></code> </p>
+          <p><code><a href="set_config_cpu_only.html">set_config_cpu_only()</a></code> </p>
         </td>
-        <td><p>Set of functions in example RcppArmadillo package</p></td>
+        <td><p>Setting cpu only for tensorflow</p></td>
+      </tr><tr><td>
+          <p><code><a href="set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code> </p>
+        </td>
+        <td><p>Setting gpus' memory usage</p></td>
+      </tr><tr><td>
+          <p><code><a href="set_config_tf_logger.html">set_config_tf_logger()</a></code> </p>
+        </td>
+        <td><p>Sets the level for logging information in tensor flow.</p></td>
       </tr><tr><td>
           <p><code><a href="split_labeled_unlabeled.html">split_labeled_unlabeled()</a></code> </p>
         </td>
@@ -130,10 +147,6 @@
         </td>
         <td><p>Text Embedding Model</p></td>
       </tr><tr><td>
-          <p><code><a href="train_gpt2_model.html">train_gpt2_model()</a></code> </p>
-        </td>
-        <td><p>Function for training a gpt2 model</p></td>
-      </tr><tr><td>
           <p><code><a href="train_tune_bert_model.html">train_tune_bert_model()</a></code> </p>
         </td>
         <td><p>Function for training and fine-tuning a bert model</p></td>
@@ -146,7 +159,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Who to complain to.</p>
+  <p></p><p>Developed by Berding Florian.</p>
 </div>
 
 <div class="pkgdown">
