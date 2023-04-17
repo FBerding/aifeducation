@@ -27,7 +27,8 @@ State-of-art approaches rely on neural nets with multiple layers and consist of 
 of parameters making them computationally demanding. With specialized libraries
 such as keras and tensorflow graphical processing units (gpu) can help to speed up
 computations significantly. However, many of these specialized libraries for
-machine learning are written in python. 
+machine learning are written in python. An interface to pyhton is fourtunely 
+provided via the *R* package [reticulate](https://cran.r-project.org/package=reticulate).
 
 The R package *Artificial Intelligence for Education (aifeducation)* aims to provide
 educators, educational researchers, and social researchers an convince interface to 
@@ -38,10 +39,11 @@ tasks such as text embedding, classification, and question answering.
 
 Since state-of-art approaches in natural language processing rely on large models
 compared to classical statistical methods (e.g., latent class analysis, structural
-equation modeling) and are based largely on python some additional installation steps are necessary.
+equation modeling) and are based largely on python some additional installation 
+steps are necessary.
 
 If you would like to train and to develop your own models and AIs a 
-compatible graphic card is necessary. Even a low performing graphic device can
+compatible graphic device is necessary. Even a low performing graphic device can
 speed up computations significantly. If you
 would like to use pre-trained models this is **not** necessary. In this case
 a 'normal' office computer without a graphic device should be sufficient in most 
@@ -53,6 +55,7 @@ by:
 # install.packages("devtools")
 devtools::install_github("FBerding/aifeducation")
 ```
+
 With this command all necessary *R* packages are installed on your machine. Since
 natural language processing with neural nets is based on models which are
 computational intensive *keras* and *tensorflow* are used within this package together
@@ -61,26 +64,35 @@ install python on your machine. This may take some time.
 ```{r, include = TRUE, eval=FALSE}
 reticulate::install_python()
 ```
+
 You can check if everything is working by using the function
-`reticulate::py_available`. This should return `TRUE`.
+`reticulate::py_available()`. This should return `TRUE`.
 ```{r, include = TRUE, eval=FALSE}
 reticulate::py_available(initialize = TRUE)
 ```
 
 If everything is working you can now install the remaining
 python libraries. For convenience *aifeducation* comes with a helper function
-`install_py_modules` doing that for you. 
+`install_py_modules()` doing that for you. 
 ```{r, include = TRUE, eval=FALSE}
 install_py_modules(envname="aifeducation")
 ```
-This function installs the following python modules: os, transformers, tokenizers,
-datasets, torch, keras, tensorflow and its dependencies in the environment "aifeducation".
+This function installs the following python modules: 
+
+ - os, 
+ - transformers,
+ - tokenizers,
+ - datasets,
+ - torch,
+ - keras,
+ - tensorflow 
+and its dependencies in the environment "aifeducation".
 If you would like to use *aifeducation* with other packages or with other environments
 please ensure that these python modules are available.
 
-With `check_aif_py_modules` you can check if all modules are successfully installed.
-```{r, include = TRUE, eval=TRUE}
-aifeducation::check_aif_py_modules()
+With `check_aif_py_modules()` you can check if all modules are successfully installed.
+```{r, include = TRUE, eval=FALSE}
+aifeducation::check_aif_py_modules(print=TRUE)
 ```
 
 Now everything is ready to use the package. When you start a new *R* session please
@@ -90,19 +102,19 @@ on mac and linux to make the python modules available for work.
 
 # 2) Configuration
 In general, educators and educational researchers do neither have access to
-high performance computing nor do they own computers with a performing graphic card
+high performance computing nor do they own computers with a performing graphic device
 for their work. Thus, some additional configuration can be done to make computations
 on your machine working.
 
 If you do use a computer that does not own a graphic device you can disable the
-graphic device support of tensorflow with the function `set_config_cpu_only`.
+graphic device support of tensorflow with the function `set_config_cpu_only()`.
 ```{r, include = TRUE, eval=FALSE}
 aifeducation::set_config_cpu_only()
 ```
 Now your machine uses only cpus for computations.
 
 If your machine has a graphic card but with limited memory it is recommended
-to change the configuration of the memory usage with `set_config_gpu_low_memory`
+to change the configuration of the memory usage with `set_config_gpu_low_memory()`
 ```{r, include = TRUE, eval=FALSE}
 aifeducation::set_config_gpu_low_memory()
 ```
@@ -111,5 +123,5 @@ For 'small' models this option is not relevant since it decreases the computatio
 
 Finally, in some cases you would like to disable tensorflow to print information
 on the console. You can change the behavior with the function 
-`set_config_tf_logger`. You can choose between five levels "FATAL", "ERROR",
-"WARN", "INFO", and "DEBUG" seting the minimal level for logging. 
+`set_config_tf_logger()`. You can choose between five levels "FATAL", "ERROR",
+"WARN", "INFO", and "DEBUG" setting the minimal level for logging. 

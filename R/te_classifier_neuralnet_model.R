@@ -432,7 +432,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Checking Prerequisites
       if(trace==TRUE){
         print(paste(date(),
-                    "Start Training"))
+                    "Start"))
       }
       if(trace==TRUE){
         print(paste(date(),
@@ -465,7 +465,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(trace==TRUE){
         print(paste(date(),
-                    "Checking minimal frequencies."))
+                    "Checking Minimal Frequencies."))
       }
       freq_check<-table(data_targets)
       freq_check_eval<-freq_check<4
@@ -640,7 +640,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           syn_cases<-get_synthetic_cases(embedding=embeddings_train_labeled,
                                          target=targets_train_labeled,
                                          method=bsc_methods,
-                                         inc_major=TRUE,
                                          max_k=bsc_max_k)
           if(trace==TRUE){
             print(paste(date(),
@@ -652,7 +651,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           if(trace==TRUE){
             print(paste(date(),
                         "Iter:",iter,"from",folds$n_folds,
-                        "Addint Synthetic Cases to Sample"))
+                        "Selecting Synthetic Cases"))
           }
           #Checking frequencies of categories and adding syn_cases
           cat_freq=table(targets_train_labeled)
@@ -687,18 +686,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           targets_labeled_syn=c(targets_train_labeled,as.factor(syn_cases$syntetic_targets[syn_cases_selected]))
 
           #Ensuring that only unique cases are part of the data
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Reducing Data to Unique Cases"))
-          }
-          embeddings_labeled_syn=dplyr::distinct(embeddings_labeled_syn)
+          #if(trace==TRUE){
+          #  print(paste(date(),
+          #              "Iter:",iter,"from",folds$n_folds,
+          #              "Reducing Data to Unique Cases"))
+          #}
+          #embeddings_labeled_syn=dplyr::distinct(embeddings_labeled_syn)
           targets_labeled_syn=targets_labeled_syn[rownames(embeddings_labeled_syn)]
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Reducing Data to Unique Cases Done"))
-          }
+          #if(trace==TRUE){
+          #  print(paste(date(),
+          #              "Iter:",iter,"from",folds$n_folds,
+          #              "Reducing Data to Unique Cases Done"))
+          #}
 
           #Creating training and test sample
           bsc_train_test_split<-get_stratified_train_test_split(
@@ -1067,7 +1066,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         syn_cases<-get_synthetic_cases(embedding=embeddings_train_labeled,
                                        target=targets_train_labeled,
                                        method=bsc_methods,
-                                       inc_major=TRUE,
                                        max_k=bsc_max_k)
         if(trace==TRUE){
           print(paste(date(),"Generating Synthetic Cases Done"))
@@ -1076,8 +1074,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         #Combining original labeled data and synthetic data
         if(trace==TRUE){
           print(paste(date(),
-                      "Iter:",iter,"from",folds$n_folds,
-                      "Addint Synthetic Cases to Sample"))
+                      "Iter:","Final Training",
+                      "Selecting Synthetic Cases"))
         }
         #Checking frequencies of categories and adding syn_cases
         cat_freq=table(targets_train_labeled)
@@ -1104,7 +1102,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         #Combining original labeled data and synthetic data
         if(trace==TRUE){
           print(paste(date(),
-                      "Iter:",iter,"from",folds$n_folds,
+                      "Iter:","Final Training",
                       "Combining Original and Synthetic Data"))
         }
         embeddings_labeled_syn=rbind(embeddings_train_labeled,
@@ -1112,18 +1110,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         targets_labeled_syn=c(targets_train_labeled,as.factor(syn_cases$syntetic_targets[syn_cases_selected]))
 
         #Ensuring that only unique cases are part of the data
-        if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:",iter,"from",folds$n_folds,
-                      "Reducing Data to Unique Cases"))
-        }
-        embeddings_labeled_syn=dplyr::distinct(embeddings_labeled_syn)
+        #if(trace==TRUE){
+        #  print(paste(date(),
+        #              "Iter:",iter,"from",folds$n_folds,
+        #              "Reducing Data to Unique Cases"))
+        #}
+        #embeddings_labeled_syn=dplyr::distinct(embeddings_labeled_syn)
         targets_labeled_syn=targets_labeled_syn[rownames(embeddings_labeled_syn)]
-        if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:",iter,"from",folds$n_folds,
-                      "Reducing Data to Unique Cases Done"))
-        }
+        #if(trace==TRUE){
+        #  print(paste(date(),
+        #              "Iter:",iter,"from",folds$n_folds,
+        #              "Reducing Data to Unique Cases Done"))
+        #}
 
         #Creating training and test sample
         bsc_train_test_split<-get_stratified_train_test_split(

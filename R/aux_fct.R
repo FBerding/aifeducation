@@ -407,8 +407,6 @@ create_iota2_mean_object<-function(iota2_list,
 #'@param method \code{vector} containing strings of the requested methods for generating new cases.
 #'Currently "smote","dbsmote", and "adas" from package smotefamily are available.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
-#'@param inc_major\code{bool} If \code{TRUE} the major category is considered for creating
-#'new synthetic units.
 #'@return \code{list} with the following components.
 #'\itemize{
 #'\item{\code{syntetic_embeddings: }}{Named \code{data.frame} containing the text embeddings of
@@ -424,8 +422,10 @@ create_iota2_mean_object<-function(iota2_list,
 get_synthetic_cases<-function(embedding,
                               target,
                               method=c("smote"),
-                              inc_major=FALSE,
                               max_k=6){
+
+  min_k=max_k
+
   cat_freq=table(target)
   categories=names(cat_freq)
 
@@ -434,9 +434,16 @@ get_synthetic_cases<-function(embedding,
   for(cat in categories){
     for(m in 1:length(method)){
       if(method[m]!="dbsmote"){
-          for (k in 2:max_k){
+          for (k in min_k:max_k){
+
+            #If k exceeds the possible range reduce to a viable number
+            if(k>=cat_freq[cat]){
+              k_final=cat_freq[cat]-1
+            } else {
+              k_final=k
+            }
             input[[index]]<-list(cat=cat,
-                                 k=k,
+                                 k=k_final,
                                  method=method[m])
             index=index+1
           }
@@ -457,8 +464,7 @@ get_synthetic_cases<-function(embedding,
           max_k = max_k,
           method=input[[index]]$method,
           cat=input[[index]]$cat,
-          cat_freq=cat_freq,
-          inc_major=inc_major)
+          cat_freq=cat_freq)
       }
 
       syntetic_embeddings=data.frame()
@@ -509,8 +515,6 @@ get_synthetic_cases<-function(embedding,
 #'@param cat \code{string} The category for which new cases should be created.
 #'@param cat_freq Object of class \code{"table"} containing the absolute frequencies
 #'of every category/label.
-#'@param inc_major\code{bool} If \code{TRUE} the major category is considered for creating
-#'new synthetic units.
 #'@returns Returns a \code{list} which contains the text embeddings of the
 #'new synthetic cases as a named \code{data.frame} and their labels as a named
 #'\code{factor}.
@@ -521,20 +525,22 @@ create_synthetic_units<-function(embedding,
                                  max_k,
                                  method,
                                  cat,
-                                 cat_freq,
-                                 inc_major){
-  if((cat_freq[cat]!=max(cat_freq) | inc_major==TRUE) &
-     k<=min(max_k,cat_freq[cat]-1)){
+                                 cat_freq){
+
+  if((cat_freq[cat]!=max(cat_freq)) & (k<=min(max_k,cat_freq[cat]-1))){
 
     tmp_target=(target==cat)
-    tmp_ration_necessary_cases=sum(tmp_target)/(sum(!tmp_target))
+    n_minor=sum(tmp_target)
+    n_major=max(cat_freq)
+
+    tmp_ration_necessary_cases=n_minor/n_major
 
     syn_data=NULL
       if(method=="smote" & tmp_ration_necessary_cases<1){
         syn_data=smotefamily::SMOTE(X=embedding,
                                     target = tmp_target,
                                     K=k,
-                                    dup_size = 1)
+                                    dup_size = n_major/n_minor)
       } else if(method=="adas" & tmp_ration_necessary_cases<1){
         syn_data=smotefamily::ADAS(X=embedding,
                                    target = tmp_target,
@@ -542,7 +548,7 @@ create_synthetic_units<-function(embedding,
       } else if(method=="dbsmote" & tmp_ration_necessary_cases<1){
         syn_data=smotefamily::DBSMOTE(X=embedding,
                                       target = tmp_target,
-                                      dupSize = 1,
+                                      dupSize = 2*n_major/n_minor,
                                       MinPts = NULL,
                                       eps = NULL)
       }
