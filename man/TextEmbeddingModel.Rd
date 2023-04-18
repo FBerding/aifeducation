@@ -95,7 +95,7 @@ Method for creating a new text embedding model
   overlap = 0,
   aggregation = "last",
   use_cls_token = TRUE,
-  bert_model_dir_path,
+  model_dir,
   bow_basic_text_rep,
   bow_n_dim = NULL,
   bow_n_cluster = NULL,
@@ -141,7 +141,7 @@ created by bert models. See details for more information.}
 for aggregation and as text embedding. If \code{FALSE} the mean of all
 corresponding tokens is used for aggregation and text embedding.}
 
-\item{\code{bert_model_dir_path}}{\code{string} path to the directory where the
+\item{\code{model_dir}}{\code{string} path to the directory where the
 bert model is stored.}
 
 \item{\code{bow_basic_text_rep}}{object of class \code{basic_text_rep} created via
@@ -173,7 +173,7 @@ fitting cluster if \code{method="glove"}.}
 \subsection{Details}{
 \itemize{
 \item{method: }{In the case of \code{method="bert"} a pretrained bert model
-must be supplied via \code{bert_model_dir_path}. For \code{method="glove"}
+must be supplied via \code{model_dir}. For \code{method="glove"}
 and \code{method="lda"} a new model will be created based on the data provided
 via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
@@ -197,16 +197,16 @@ are possible:
 \if{html}{\out{<a id="method-TextEmbeddingModel-load_model"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_model}{}}}
 \subsection{Method \code{load_model()}}{
-Method for loading a bert model into R.
+Method for loading a transformer model into R.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(bert_model_dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(model_dir)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{bert_model_dir_path}}{\code{string} containing the path to the relevant
-bert model.}
+\item{\code{model_dir}}{\code{string} containing the path to the relevant
+model.}
 }
 \if{html}{\out{</div>}}
 }
@@ -217,13 +217,13 @@ bert model.}
 \subsection{Method \code{save_bert_model()}}{
 Method for saving a bert model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_bert_model(bert_model_dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_bert_model(model_dir)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{bert_model_dir_path}}{\code{string} containing the path where the bert model
+\item{\code{model_dir}}{\code{string} containing the path where the bert model
 should be saved.}
 }
 \if{html}{\out{</div>}}

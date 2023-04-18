@@ -176,7 +176,7 @@ TextEmbeddingModel<-R6::R6Class(
                         model_version,
                         model_language,
                         method,
-                        max_length,
+                        max_length=NULL,
                         chunks=1,
                         overlap=0,
                         aggregation="last",
@@ -257,8 +257,9 @@ TextEmbeddingModel<-R6::R6Class(
         cluster_structure<-stats::kmeans(x=embedding,
                                          centers = bow_n_cluster,
                                          iter.max = bow_max_iter_cluster,
-                                         nstart=25,
-                                         trace=trace)
+                                         nstart=5,
+                                         trace=trace,
+                                         algorithm="Lloyd")
         token_cluster_assignments<-stats::fitted(object=cluster_structure,
                                                 method="classes")
         model<-data.frame(index=names(token_cluster_assignments),
@@ -501,7 +502,7 @@ TextEmbeddingModel<-R6::R6Class(
         tmp[1]=list(int_seqence)
         int_seqence=tmp[1]
       }
-
+      #-------------------------------------------------------------------------
       if(self$basic_components$method=="bert"){
         tmp_token_list=NULL
         for(i in 1:length(int_seqence)){
@@ -510,7 +511,9 @@ TextEmbeddingModel<-R6::R6Class(
           tmp_token_list[i]=list(self$bert_components$tokenizer$decode(tmp_vector))
         }
         return(tmp_token_list)
-      } else if(self$basic_components$method=="glove" |
+
+      #-------------------------------------------------------------------------
+      } else if(self$basic_components$method=="glove_cluster" |
                 self$basic_components$method=="lda"){
         if(self$bow_components$configuration$to_lower==TRUE){
           if(self$bow_components$configuration$use_lemmata==FALSE){
@@ -537,7 +540,9 @@ TextEmbeddingModel<-R6::R6Class(
           for(j in 1:length(tmp_int_seq)){
             index=match(x=tmp_int_seq[j],
                         table=self$bow_components$vocab[,input_column])
+                        #table=global_vector_clusters_modeling$bow_components$vocab[,input_column])
             tmp_token_seq[j]=self$bow_components$vocab[index,target_coumn]
+            #tmp_token_seq[j]=global_vector_clusters_modeling$bow_components$vocab[index,target_coumn]
           }
           tmp_token_list[i]=list(tmp_token_seq)
         }

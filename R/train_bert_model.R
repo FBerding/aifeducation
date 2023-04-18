@@ -76,6 +76,7 @@ train_tune_bert_model=function(output_dir,
 
 
     #Creating a new Tokenizer for Computing Vocabulary
+    vocab_size_old=length(tokenizer$get_vocab())
     tok_new<-tok$Tokenizer(tok$models$WordPiece())
     tok_new$normalizer=tok$normalizers$BertNormalizer(lowercase= tokenizer$do_lower_case)
     tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
@@ -95,10 +96,9 @@ train_tune_bert_model=function(output_dir,
       print(paste(date(),
                   "Start Computing Vocabulary - Done"))
     }
-
-    print(paste(date(),"Adding",length(new_tokens),"New Tokens"))
     invisible(tokenizer$add_tokens(new_tokens = new_tokens))
     invisible(mlm_model$resize_token_embeddings(length(tokenizer)))
+    print(paste(date(),"Adding",length(tokenizer$get_vocab())-vocab_size_old,"New Tokens"))
   }
 
   print(paste(date(),"Creating Text Chunks"))
@@ -153,7 +153,7 @@ train_tune_bert_model=function(output_dir,
     )
   }
 
-  tokenized_dataset=tokenized_dataset$train_test_split(val_size=val_size)
+  tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
   tf_train_dataset=mlm_model$prepare_tf_dataset(
     dataset = tokenized_dataset$train,

@@ -182,7 +182,7 @@ when you install *aifeducation*.
 example_data<-data.frame(
   id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
-example_data$text<-as.data.frame(quanteda.textmodels::data_corpus_moviereviews)
+example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
 table(example_data$label)
 ```
@@ -190,7 +190,24 @@ We now have a data set with three columns. The first contains the id of the
 movie review, the second contains if the movie was rated positive or negative, and
 the third column contains the raw texts. As you can see the data is balanced.
 About 1000 reviews imply a positive rating of a movie and about 1000 imply a negative
-rating. We will now use this data to show you how to use the different objects
+rating. 
+
+For this tutorial we modify this data set by setting about the half of the 
+negative and positive reviews to `NA` indicating that these reviews are not
+labeled.
+
+```{r, include = TRUE, eval=TRUE}
+example_data$label[c(1:500,1001:1500)]=NA
+summary(example_data$label)
+```
+
+Furthermore, we will bring some imbalance by setting 250 positive reviews to `NA`.
+```{r, include = TRUE, eval=TRUE}
+example_data$label[1501:1750]=NA
+summary(example_data$label)
+```
+
+We will now use this data to show you how to use the different objects
 and functions in *aifeducation*.
 
 ## 2.2 Topic Modeling and GlobalVectorClusters
@@ -508,11 +525,11 @@ bert_modeling<-TextEmbeddingModel$new(
   model_language="english",
   method = "bert",
   max_length = 512,
-  chunks=15,
+  chunks=4,
   overlap=30,
   aggregation="last",
   use_cls_token=TRUE,
-  bert_model_dir_path="my_own_transformer_trained"
+  model_dir="my_own_transformer_trained"
   )
 ```
 
@@ -534,7 +551,7 @@ text embedding model would split a text consisting of 1024 tokens into 2 chunk w
 consisting of 512 tokens. For every chunk a text embedding is calculated. As a results you receive a sequence
 of embeddings. The first embeddings characterizes the first part of the text and
 the second embedding characterizes the second part of the text (and so on). 
-Thus, our example text embedding model is able to process texts with about 15*512=7680 tokens.
+Thus, our example text embedding model is able to process texts with about 4*512=2048 tokens.
 This approach is inspired by the work by Pappagari et al. (2019). 
 
 Since transformers are able to account for the context it may be useful to connect
@@ -721,7 +738,7 @@ names(example_targets)=example_data$id
 classifier$train(
    data_embeddings = bert_embeddings,
    data_targets = example_targets,
-   data_n_valid_samples=10,
+   data_n_valid_samples=5,
    use_baseline=TRUE,
    bsl_val_size=0.25,
    use_bsc=TRUE,

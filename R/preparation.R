@@ -42,7 +42,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
                                     trace=TRUE)
 {
   #Phase 1: Analyse der Texte mit udpipe
-  n_document_segments<-nrow(data)
+  n_document_segments<-length(data)
   n_sentence_init<-0
   n_token_init<-0
   n_iterations<-ceiling(n_document_segments/chunk_size)
@@ -58,21 +58,19 @@ bow_pp_create_vocab_draft<-function(path_language_model,
     if(trace==TRUE){
       print(paste(date(),"Processing chunk",i,"/",n_iterations))
     }
-    tmp_text<-data$text[selected_documents]
+    tmp_text<-data[selected_documents]
     tmp_text<-stringr::str_replace_all(tmp_text,
                                       pattern = "/",
                                       replacement = " ")
     tmp_text<-stringr::str_remove_all(tmp_text,
                                       pattern = "-\\n")
     tmp_text<-stringr::str_remove_all(tmp_text,
-                                      pattern = "???")
-    tmp_text<-stringr::str_remove_all(tmp_text,
                                       pattern = ":")
 
 
     ud_text_analysis<-udpipe::udpipe_annotate(ud_language_model,
                                               x=tmp_text,
-                                              doc_id = data$doc_id[selected_documents],
+                                              doc_id = selected_documents,
                                               trace = FALSE,
                                               tagger="default",
                                               parser="none")

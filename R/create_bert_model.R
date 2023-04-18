@@ -72,14 +72,14 @@ create_bert_model<-function(
     dir.create(model_dir)
   }
 
-  write(c(special_tokens,names(tok_new$get_vocab)),
+  write(c(special_tokens,names(tok_new$get_vocab())),
         file=paste0(model_dir,"/","vocab.txt"))
 
   if(trace==TRUE){
     print(paste(date(),
                 "Creating Tokenizer"))
   }
-  tokenizer=transformer2$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
+  tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
                                       do_lower_case=vocab_do_lower_case)
 
   if(trace==TRUE){

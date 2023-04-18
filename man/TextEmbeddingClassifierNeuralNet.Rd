@@ -228,7 +228,7 @@ tensorflow.
   bpl_inc_ratio = 0.25,
   bpl_anchor = 0.75,
   bpl_valid_size = 0.33,
-  opt_model_reset = FALSE,
+  opt_model_reset = TRUE,
   epochs = 100,
   batch_size = 32,
   dir_checkpoint,

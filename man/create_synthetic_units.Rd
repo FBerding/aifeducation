@@ -4,16 +4,7 @@
 \alias{create_synthetic_units}
 \title{Creates Synthetic Units}
 \usage{
-create_synthetic_units(
-  embedding,
-  target,
-  k,
-  max_k,
-  method,
-  cat,
-  cat_freq,
-  inc_major
-)
+create_synthetic_units(embedding, target, k, max_k, method, cat, cat_freq)
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
@@ -32,9 +23,6 @@ Currently "smote","dbsmote", and "adas" from package smotefamily are available.}
 
 \item{cat_freq}{Object of class \code{"table"} containing the absolute frequencies
 of every category/label.}
-
-\item{inc_major\code{bool}}{If \code{TRUE} the major category is considered for creating
-new synthetic units.}
 }
 \value{
 Returns a \code{list} which contains the text embeddings of the

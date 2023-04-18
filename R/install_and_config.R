@@ -24,14 +24,14 @@ install_py_modules<-function(envname="aifeducation"){
 #'
 #'This function checks if all necessary python modules are available for
 #'the package aifeducation to work.
-#'@param print \code{bool} \code{TRUE} if a list with all modules and their
+#'@param trace \code{bool} \code{TRUE} if a list with all modules and their
 #'availability should be printed to the console.
 #'@return The function prints a table with all relevant packages and shows
 #' which modules are available or not.
 #'@return If all relevant modules are available the functions returns \code{TRUE}.
 #'In all other cases \code{FALSE}
 #'@export
-check_aif_py_modules<-function(print=TRUE){
+check_aif_py_modules<-function(trace=TRUE){
   relevant_modules<-c("os",
                       "transformers",
                       "tokenizers",
@@ -48,7 +48,11 @@ check_aif_py_modules<-function(print=TRUE){
     matrix_overview[i,1]<-relevant_modules[i]
     matrix_overview[i,2]<-reticulate::py_module_available(relevant_modules[i])
   }
-  print(matrix_overview)
+
+  if(trace==TRUE){
+    print(matrix_overview)
+  }
+
   if(sum(matrix_overview[,2])==length(relevant_modules)){
     return(TRUE)
   } else {

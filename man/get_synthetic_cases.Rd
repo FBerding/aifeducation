@@ -4,13 +4,7 @@
 \alias{get_synthetic_cases}
 \title{Creates synthetic cases for balancing training data}
 \usage{
-get_synthetic_cases(
-  embedding,
-  target,
-  method = c("smote"),
-  inc_major = FALSE,
-  max_k = 6
-)
+get_synthetic_cases(embedding, target, method = c("smote"), max_k = 6)
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
@@ -22,9 +16,6 @@ In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embedd
 Currently "smote","dbsmote", and "adas" from package smotefamily are available.}
 
 \item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
-
-\item{inc_major\code{bool}}{If \code{TRUE} the major category is considered for creating
-new synthetic units.}
 }
 \value{
 \code{list} with the following components.

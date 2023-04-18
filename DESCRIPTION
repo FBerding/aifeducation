@@ -37,17 +37,22 @@ Imports: Rcpp (>= 1.0.10),
   quanteda,
   reticulate,
   smotefamily,
-  quanteda.textstats
+  quanteda.textstats,
+  topicmodels,
+  tidytext,
+  reshape2
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
-  quanteda,
-  keras,
-  foreach
+    quanteda,
+    keras,
+    foreach,
+    R (>= 2.10)
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+LazyData: true

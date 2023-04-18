@@ -3,3 +3,7 @@ Trial
 inst/doc
 materials
 test_model
+tmp
+checkpoints
+udpipe_models
+language_models
