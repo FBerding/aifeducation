@@ -78,7 +78,7 @@ an AI to classify a text accordingly based on supervised machine learning
 two kind of data are necessary as Figure 2
 illustrates. 
 
-![Figure 2: Basic Structure of Supervised Machine Learning](classif_gif_02.png){width=100%}
+![Figure 2: Basic Structure of Supervised Machine Learning](classif_fig_02.png){width=100%}
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data AI can learn
 which texts imply a specific class or category. In the example of exams AI can learn
@@ -90,7 +90,7 @@ for deriving recommendations about learning and teaching.
 To achieve this support by an artificial intelligence several steps are necessary.
 Figure 3 provides an overview integrating the functions and objects of *aifeducation*. 
 
-![Figure 3: Overview of the Steps to Perform a Classification](classif_gif_03.png){width=100%}
+![Figure 3: Overview of the Steps to Perform a Classification](classif_fig_03.png){width=100%}
 The first step is to transform raw texts into a form computers can use. That is,
 the raw texts must be transformed into numbers. In modern approaches this is done 
 by using word embeddings. Campesato (2021, p. 102) describes them as "the collective name for
@@ -171,6 +171,10 @@ but only the embedded texts to the classifier.
 In the next chapters we will guide you to the complete process. Starting with 
 the creation of the text embedding models.
 
+**Please not that the creation of a new text embedding model is only necessary
+if you can not rely on an existing model or if you can not rely on a pre-trained
+transformer.**
+
 # 2 Preparation Tasks
 ## 2.1 Example Data for this Vignette
 To illustrate the steps in this vignette we cannot use data from educational
@@ -180,7 +184,7 @@ to illustrate the usage of the package. This quanteda.textmodels is automaticall
 when you install *aifeducation*.
 ```{r, include = TRUE, eval=TRUE}
 example_data<-data.frame(
-  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
+  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
@@ -663,18 +667,15 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   name="movie_review_classifier",
   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings=bert_embeddings,
-  targets=example_target,
-  config=list(
-    hidden=c(128,64),
-    gru=c(128,128),
-    dropout=0.2,
-    recurrent_dropout=0.4,
-    l2_regularizer=0.001,
-    optimizer="adam",
-    act_fct="gelu",
-    act_fct_last="softmax",
-    err_fct="categorical_crossentropy")
-)
+  targets=example_targets,
+  hidden=c(128,64),
+  rec=c(128,128),
+  dropout=0.2,
+  recurrent_dropout=0.4,
+  l2_regularizer=0.001,
+  optimizer="adam",
+  act_fct="tanh",
+  rec_act_fct="tanh")
 ```
 
 Similar to the text embedding model you should provide a name (`name`) and a
@@ -694,7 +695,7 @@ the method cannot match text embeddings as input data to the target data.
 `config` represents a list where you decide about the structure of your classifier
 `hidden` takes a vector of integers determining the number of layers and the number
 of neurons. In our example this are two layers. The first with 128 and the 
-second with 64 neurons. `gru` also takes a vector of integers determining the number
+second with 64 neurons. `rec` also takes a vector of integers determining the number
 and size of the Gated Recurrent Unit. In this example we use two layers with 128 each.
 
 Since the classifiers in *aifeducation* use a standardized scheme for their 
@@ -800,7 +801,8 @@ social science some special training steps are integrated in this method.
  pseudo labels. 0 equals random guessing, 1 equals perfect certainty. It is recommended
  to include cases which have a high but not a perfect certainty to improve the
  quality of the classifier. Thus, we recommend to include only a small percentage
- (`bpl_inc_ratio`) in every step for the training of the next step.
+ (`bpl_inc_ratio`) in every step for the training of the next step. The added 
+ cases have an increased weight that increases with every step by 1.
  This technique requires `use_baseline = TRUE` or `use_bsc=TRUE`. 
  If both is set to true a classifier
  trained on the basis of balanced synthetic cases is used.
@@ -808,7 +810,7 @@ social science some special training steps are integrated in this method.
 Figure 4 illustrates the training loop for the cases that all three options
 are set to `TRUE`.
 
-![Figure 4: Overview of the Training Loop for all Options Activiated](classif_gif_04.png){width=100%}
+![Figure 4: Overview of the Training Loop for all Options Activiated](classif_fig_04.png){width=100%}
  
 Finally, `trace`, `view_metrics`, and `keras_trace` allow you to control how
 many information about the training progress are printed to the console. Please
@@ -843,13 +845,43 @@ reliability of every step within balanced pseudo labeling is reported.
 
 The central estimates for the reliabilites can be found via `reliability$val_metric_mean`.
 In our example this would be:
-```{r, include = TRUE, eval=FALSE}
+```{r, include = FALSE, eval=TRUE}
+classifier<-aifeducation::test_classifier
+```
+
+```{r, include = TRUE, eval=TRUE}
 classifier$reliability$val_metric_mean
 ```
-You know have a table with all relevant values. Evaluating the performance of
-a classifier is a complex task and behind the scope of this vignette. Here, we
+You know have a table with all relevant values. Of particular interest are the
+values for alpha from the Iota Concept since they represent a measure of reliability
+which is independent from the frequency distribution of the classes/categories.
+The alpha values describe the probability that a case of a specific class is
+recognized as the specific class. As you can see compared to the baseline model
+applying *Balanced Synthetic Cases increased* increases the minimal value of alpha
+reducing the risk to miss cases which belong to a seldom class (see row with "BSC"). On the opposite the
+alpha values for the major category decreases slightly losing its unjustified bonus
+from a high number of cases in the training set. Thus, this provides a more realistic
+performance estimation of the classifier. 
+
+Furthermore, you can see that the application of pseudo labeling increases the
+alpha values for the minor class further up to step 3. 
+
+Finally, you can plot a coding stream scheme showing how the cases of different classes
+are labeled. Her we use the package *iotarelr*.
+
+```{r, fig.height = 6, fig.width = 7.2, fig.align = "center", fig.cap = "Figure 5: Coding Stream of the Classifier",include = TRUE, eval=TRUE}
+library(iotarelr)
+iotarelr::plot_iota2_alluvial(aifeducation::test_classifier$reliability$iota_object_end_free)
+```
+Here you can see that a small number of the negative reviews is treated as a good
+review while a larger number of the positive reviews is treated as a bad review.
+Thus, the data for the major class (negative reviews) is more reliable and valid 
+as the the data for the minor class (positive reviews).
+
+Evaluating the performance of a classifier is a complex task and 
+and behind the scope of this vignette. Here, we
 would like to refer to the cited literature of content analysis and machine
-learning.
+learning if you would like to dive into the deep of this topic.
 
 ## 4.4 Saving and Loading a Classifier
 If you have created a classifier saving and loading is very easy due to the *R* package

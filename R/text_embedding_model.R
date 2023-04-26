@@ -171,25 +171,62 @@ TextEmbeddingModel<-R6::R6Class(
     #'}}
     #'
     #'}
-    initialize=function(model_name,
-                        model_label,
-                        model_version,
-                        model_language,
-                        method,
-                        max_length=NULL,
+    initialize=function(model_name=NULL,
+                        model_label=NULL,
+                        model_version=NULL,
+                        model_language=NULL,
+                        method=NULL,
+                        max_length=0,
                         chunks=1,
                         overlap=0,
                         aggregation="last",
                         use_cls_token=TRUE,
                         model_dir,
                         bow_basic_text_rep,
-                        bow_n_dim=NULL,
-                        bow_n_cluster=NULL,
+                        bow_n_dim=10,
+                        bow_n_cluster=100,
                         bow_max_iter=500,
-                        bow_max_iter_cluster=NULL,
+                        bow_max_iter_cluster=500,
                         bow_cr_criterion=1e-8,
-                        bow_learning_rate=NULL,
+                        bow_learning_rate=1e-8,
                         trace=FALSE){
+      #Parameter check---------------------------------------------------------
+      if(is.NULL(model_name)){
+        stop("model_name must be a character.")
+      }
+      if(is.NULL(model_label)){
+        stop("model_label must be a character.")
+      }
+      if(is.NULL(model_version)){
+        stop("model_version must be a character.")
+      }
+      if(is.NULL(model_language)){
+        stop("model_language must be a character.")
+      }
+      if(is.NULL(method)){
+        stop("method must be bert, glove_cluster or lda.")
+      }
+      if(is.integer(as.integer(max_length))){
+        stop("max_length must an integer.")
+      }
+      if(is.integer(as.integer(chunks))){
+        stop("chunks must an integer.")
+      }
+      if(is.integer(as.integer(overlap))){
+        stop("overlap must an integer.")
+      }
+      if((aggregation %in% c("last",
+                            "second_to_last",
+                            "fourth_to_last",
+                            "all",
+                            "last_four"))==FALSE){
+        stop("aggregation must be last, second_to_last, fourth_to_last, all or
+                            last_four.")
+
+      }
+      #------------------------------------------------------------------------
+
+      #basic_components-------------------------------------------------------
       self$basic_components$method=method
       self$basic_components$max_length=as.integer(max_length)
       #------------------------------------------------------------------------
@@ -772,6 +809,7 @@ TextEmbeddingModel<-R6::R6Class(
         embeddings<-EmbeddedText$new(
           model_name = private$model_info$model_name,
           model_date = private$model_info$model_date,
+          model_label = private$model_info$model_label,
           model_method = self$basic_components$method,
           model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
@@ -934,18 +972,19 @@ EmbeddedText<-R6::R6Class(
     #'by this model.
     #'@param param_aggregation \code{string} Aggregation method of the hidden states.
     #'@param embeddings \code{data.frame} containing the text embeddings.
-    initialize=function(model_name,
-                        model_label,
-                        model_date,
-                        model_method,
-                        model_version,
-                        model_language,
-                        param_seq_length,
+    initialize=function(model_name=NA,
+                        model_label=NA,
+                        model_date=NA,
+                        model_method=NA,
+                        model_version=NA,
+                        model_language=NA,
+                        param_seq_length=NA,
                         param_chunks=NULL,
                         param_overlap=NULL,
                         param_aggregation=NULL,
                         embeddings){
       private$model_name = model_name
+      private$model_label = model_label
       private$model_date = model_date
       private$model_method = model_method
       private$model_version = model_version
@@ -1004,17 +1043,14 @@ combine_embeddings<-function(embeddings_list){
   }
 
   #Check for the right underlining embedding model-------------------------------
-  for(i in 2:length(embeddings_list)){
-    embedding_1<-embeddings_list[[i-1]]$get_model_info()
-    embedding_2<-embeddings_list[[1]]$get_model_info()
-    for(j in 1:length(embedding_2)){
-      if(embedding_1[[j]]!=embedding_2[[j]]){
-        stop("The models which created the embeddings are not similar
-             accros all elements in embeddings_list. Please check
-             the elements.")
-      }
-    }
+  result<-check_embedding_models(object_list = embeddings_list,
+                                 same_class = FALSE)
+  if(result==FALSE){
+    stop("The models which created the embeddings are not similar
+           accros all elements in embeddings_list. Please check
+           the elements.")
   }
+
 
   #Check for unique names------------------------------------------------------
   tmp_names=NULL

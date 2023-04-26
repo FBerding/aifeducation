@@ -111,7 +111,7 @@ the *Basic Synthetic Minority Oversampling Technique* (Chawla et al. 2002),
 via the *R* package *smotefamiliy*.
 
 In order to address the problem of small data sets training loops of AI integrate
-*Pseudo Labeling*(e.g., Lee 2013). Pseudo Labeling is a technique which can be used for supervised 
+*Pseudo Labeling* (e.g., Lee 2013). Pseudo Labeling is a technique which can be used for supervised 
 learning. That is, educators and researchers rate a part of a data set and train
 AI with this part of data. The remaining part of data is not processed by humans.
 Instead, AI uses this part of data to learn on its own. Thus, educators and
@@ -144,10 +144,15 @@ every trained AI can be shared with other educators and researchers. The package
 supports an easy use of pre-trained AI within *R* but also provides the possibility
 to export trained AI to other environments.
 
+Using a pre-trained AI for classification requires only the classifier and 
+the corresponding text embedding model. Just load both to *R* and start predictions.
+vignette [02 clasification tasks](articles/classification_tasks.html) describes
+how to save and load the objects.
+
 ## Tutorial and Guides
-A guide how to install and configure the package can be found via [Get started](aifeducation.html).
+A guide how to install and configure the package can be found via [Get started](articles/aifeducation.html).
 A short introduction in using the package for classification tasks can be
-found in the vignette [02 clasification tasks](classification_tasks.html)
+found in the vignette [02 clasification tasks](articles/classification_tasks.html)
 
 ## References
 Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The Long-Document 

@@ -39,14 +39,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'List for storing information about the configuration of the model. This
     #'information is used for predicting new data.
     #'\itemize{
-    #'\item{\code{model_config$n_gru: }}{Number of gru layers.}
+    #'\item{\code{model_config$n_req: }}{Number of recurrent layers.}
     #'\item{\code{model_config$n_hidden: }}{Number of dense layers.}
     #'\item{\code{model_config$target_levels: }}{Levels of the target variable. Do not change this manually.}
     #'\item{\code{model_config$input_variables: }}{Order and name of the input variables. Do not change this manually.}
     #'\item{\code{model_config$init_config: }}{List storing all parameters passed to method new().}
     #'}
     model_config=list(
-      n_gru=NULL,
+      n_req=NULL,
       n_hidden=NULL,
       target_levels=NULL,
       input_variables=NULL,
@@ -177,37 +177,57 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'free text.
     #'@param text_embeddings An object of class\code{TextEmbeddingModel}.
     #'@param targets \code{factor} containing the target values of the classifier.
-    #'@param config \code{list} containing the configuration of the neural net.
-    #'@param config$hidden \code{vector} containing the number of neurons for each dense layer.
+    #'@param hidden \code{vector} containing the number of neurons for each dense layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer
     #'set this parameter to \code{NULL}.
-    #'@param config$gru \code{vector} containing the number of neurons for each gru layer.
+    #'@param rec \code{vector} containing the number of neurons for each recurrent layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer
     #'set this parameter to \code{NULL}.
-    #'@param config$dropout \code{double} ranging between 0 and lower 1 determining the
-    #'dropout for each gru layer.
-    #'@param config$recurrent_dropout \code{double} ranging between 0 and lower 1 determining the
-    #'recurrent dropout for each gru layer.
+    #'@param dropout \code{double} ranging between 0 and lower 1 determining the
+    #'dropout for each recurrent layer.
+    #'@param recurrent_dropout \code{double} ranging between 0 and lower 1 determining the
+    #'recurrent dropout for each recurrent layer.
     #'@param l2_regularizer \code{double} determining the l2 regularizer for every dense layer.
     #'@param optimizer Object of class \code{keras.optimizers}.
     #'@param act_fct \code{character} naming the activation function for all dense layers.
-    #'@param act_fct_last \code{character} naming the activation function for the last dense layers.
-    #'@param err_fct \code{character} naming the loss/error function for the neural net.
+    #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
     initialize=function(name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
                         targets=NULL,
-                        config=list(
-                          hidden=c(128),
-                          gru=c(128),
-                          dropout=0.2,
-                          recurrent_dropout=0.4,
-                          l2_regularizer=0.001,
-                          optimizer="adam",
-                          act_fct="gelu",
-                          act_fct_last="softmax",
-                          err_fct="categorical_crossentropy")
+                        hidden=c(128),
+                        rec=c(128),
+                        dropout=0.2,
+                        recurrent_dropout=0.4,
+                        l2_regularizer=0.001,
+                        optimizer="adam",
+                        act_fct="gelu",
+                        rec_act_fct="tanh"
     ){
+      #Checking of parameters--------------------------------------------------
+      if(is.null(name)){
+        stop("name is NULL but must be a character.")
+      }
+      if(is.null(label)){
+        stop("label is NULL but must be a character.")
+      }
+      if(!("EmbeddedText" %in% class(text_embeddings))){
+        stop("text_embeddings must be of class EmbeddedText.")
+      }
+      if(is.factor(targets)==FALSE){
+        stop("targets must be of class factor.")
+      }
+
+      if(!(is.numeric(hidden)==TRUE | is.null(hidden)==TRUE)){
+        stop("hidden must be a vector of integer or NULL.")
+      }
+      if(!(is.numeric(rec)==TRUE | is.null(rec)==TRUE)){
+        stop("rec must be a vector of integer or NULL.")
+      }
+
+
+      #------------------------------------------------------------------------
+
       #Setting Label and Name
       self$name=name
       self$label=label
@@ -224,12 +244,37 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       self$text_embedding_model["times"]=times
       self$text_embedding_model["features"]=features
 
+
+
+      #Saving Configuration
+      config=list(
+        hidden=hidden,
+        rec=rec,
+        dropout=dropout,
+        recurrent_dropout=recurrent_dropout,
+        l2_regularizer=l2_regularizer,
+        optimizer=optimizer,
+        act_fct=act_fct,
+        rec_act_fct=rec_act_fct)
+
+      if(length(target_levels_order)>2){
+        #Multi Class
+        config["act_fct_last"]="softmax"
+        config["err_fct"]="categorical_crossentropy"
+        config["metric"]="categorical_accuracy"
+      } else {
+        #Binary Classification
+        config["act_fct_last"]="sigmoid"
+        config["err_fct"]="binary_crossentropy"
+        config["metric"]="binary_accuracy"
+      }
+
       #Defining basic keras model
       layer_list=NULL
       #Adding Input Layer
-      n_gru=length(config$gru)
+      n_req=length(config$rec)
       n_hidden=length(config$hidden)
-      if(n_gru>0){
+      if(n_req>0){
         model_input<-keras::layer_input(shape=list(times,features),
                                         name="input_embeddings")
       } else {
@@ -239,22 +284,40 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       layer_list[1]<-list(model_input)
 
       #Adding a Mask-Layer
-      if(n_gru>0){
+      if(n_req>0){
         masking_layer<-keras::layer_masking(object=model_input,
                              mask_value = 0.0,
                              name="masking_layer",
                              input_shape=c(times,features),
-                             trainable=FALSE
-                             )
+                             trainable=FALSE)
         layer_list[length(layer_list)+1]<-list(masking_layer)
       }
 
       #Adding a Normalization Layer
-      if(n_gru>0){
-        #norm_layer<-keras::layer_layer_normalization(
-        #  object=layer_list[[length(layer_list)]],
-        #  name = "normalizaion_layer")
-        #layer_list[length(layer_list)+1]<-list(norm_layer)
+      if(n_req>0){
+        norm_layer<-keras::layer_layer_normalization(
+          object=layer_list[[length(layer_list)]],
+          name = "normalizaion_layer")
+        layer_list[length(layer_list)+1]<-list(norm_layer)
+
+        #attention_layer=keras::layer_multi_head_attention(
+        #  num_heads = 2L,
+        #  key_dim = as.integer(features),
+        #  name="self_attention")
+
+        #layer_list[length(layer_list)+1]<-list(
+        #  attention_layer(layer_list[[length(layer_list)]],
+        #                  layer_list[[length(layer_list)]],
+        #                  layer_list[[length(layer_list)]]))
+
+        #layer_list[length(layer_list)+1]<-list(
+        #  keras::layer_global_max_pooling_1d(object = layer_list[[length(layer_list)]],
+        #                                     name="flatten"))
+
+        #layer_list[length(layer_list)+1]<-list(
+        #  keras::layer_concatenate(c(layer_list[length(layer_list)],layer_list[length(layer_list)-1])))
+
+
       } else {
         norm_layer<-keras::layer_batch_normalization(
           object=layer_list[[length(layer_list)]],
@@ -263,32 +326,51 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
 
-      #Adding gru layer
-      if(n_gru>0){
-        for(i in 1:n_gru){
-          if(i<n_gru){
+      #Adding rec layer
+      if(n_req>0){
+        for(i in 1:n_req){
+          if(i<n_req){
             layer_list[length(layer_list)+1]<-list(
-              keras::bidirectional(object = layer_list[[length(layer_list)]],
-                                   layer=keras::layer_gru(
-                               units=config$gru[i],
-                               input_shape=list(times,features),
-                               return_sequences = TRUE,
-                               dropout = config$dropout,
-                               recurrent_dropout = config$recurrent_dropout,
-                               name=paste0("gru",i))))
+              keras::bidirectional(
+                object = layer_list[[length(layer_list)]],
+                layer=keras::layer_gru(
+                   units=config$rec[i],
+                   input_shape=list(times,features),
+                   return_sequences = TRUE,
+                   dropout = config$dropout,
+                   recurrent_dropout = config$recurrent_dropout,
+                   activation = config$rec_act_fct,
+                   name=paste0("gru_",i)),
+                name=paste0("bidirectional_",i)))
           } else {
             layer_list[length(layer_list)+1]<-list(
-              keras::bidirectional(object = layer_list[[length(layer_list)]],
-                                   layer=keras::layer_gru(
-                               units=config$gru[i],
-                               input_shape=list(times,features),
-                               return_sequences = FALSE,
-                               dropout = config$dropout,
-                               recurrent_dropout = config$recurrent_dropout,
-                               name=paste0("gru",i))))
+              keras::bidirectional(
+                object = layer_list[[length(layer_list)]],
+                layer=keras::layer_gru(
+                   units=config$rec[i],
+                   input_shape=list(times,features),
+                   return_sequences = FALSE,
+                   dropout = config$dropout,
+                   recurrent_dropout = config$recurrent_dropout,
+                   activation = config$rec_act_fct,
+                   name=paste0("gru",i)),
+                name=paste0("bidirectional_",i)))
           }
         }
       }
+
+
+
+      #layer_list[length(layer_list)+1]<-list(
+      #  keras::layer_attention(inputs = c(layer_list[[length(layer_list)]],layer_list[[length(layer_list)]]),
+      #                         name="attention",
+      #                         use_scale = FALSE))
+      #layer_list[length(layer_list)+1]<-list(
+      #  keras::layer_global_max_pooling_1d(object = layer_list[[length(layer_list)]],
+      #                         name="flatten"))
+      #layer_list[length(layer_list)+1]<-list(
+      #  keras::layer_average(inputs = c(layer_list[[length(layer_list)]],layer_list[[length(layer_list)-1]]),
+      #                         name="concatenate"))
 
       #Adding standard layer
       if(n_hidden>0){
@@ -303,11 +385,21 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Adding final Layer
-      layer_list[length(layer_list)+1]<-list(
-        keras::layer_dense(object = layer_list[[length(layer_list)]],
-                           units = length(levels(targets)),
-                           activation = config$act_fct_last,
-                           name="output_categories"))
+      if(length(target_levels_order)>2){
+        #Multi Class
+        layer_list[length(layer_list)+1]<-list(
+          keras::layer_dense(object = layer_list[[length(layer_list)]],
+                             units = length(levels(targets)),
+                             activation = config$act_fct_last,
+                             name="output_categories"))
+      } else {
+        #Multi Class
+        layer_list[length(layer_list)+1]<-list(
+          keras::layer_dense(object = layer_list[[length(layer_list)]],
+                             units = as.integer(1),
+                             activation = config$act_fct_last,
+                             name="output_categories"))
+      }
 
       #Creating Model
       model<-keras::keras_model(
@@ -321,12 +413,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         model %>% keras::compile(
           loss = config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
-          metric="categorical_accuracy")
+          metric=config$metric)
       }
 
       self$bundeled_model=bundle::bundle(model)
       private$init_weights=model$get_weights()
-      self$model_config$n_gru=length(config$gru)
+      self$model_config$n_req=length(config$rec)
       self$model_config$n_hidden=length(config$hidden)
       self$model_config$target_levels=target_levels_order
       self$model_config$input_variables=variable_name_order
@@ -365,6 +457,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'for more details.
     #'@param bpl_anchor \code{double} between 0 and 1 indicating the reference
     #'point for sorting the new cases of every label. See notes for more details.
+    #'@param bpl_min \code{double} between 0 and 1 setting the minimal level of
+    #'confidence for considerung a case for pseudo labeling.
     #'@param bpl_valid_size \code{double} ratio between 0 and 1 determining the proportion
     #'of new cases for every label which should be added to the validation sample during training.
     #'The remaining cases are added to the training sample.
@@ -411,6 +505,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    bpl_max_steps=10,
                    bpl_inc_ratio=0.25,
                    bpl_anchor=0.75,
+                   bpl_min=0.50,
                    bpl_valid_size=0.33,
                    opt_model_reset=TRUE,
                    epochs=100,
@@ -434,6 +529,31 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         print(paste(date(),
                     "Start"))
       }
+
+      if(!("EmbeddedText" %in% class(data_embeddings))){
+        stop("data_embeddings must be an object of class EmbeddedText")
+      }
+
+      embedding_model_config<-data_embeddings$get_model_info()
+      for(check in names(embedding_model_config)){
+        if(embedding_model_config[[check]]!=self$text_embedding_model$model[[check]]){
+          stop("The TextEmbeddingModel that generated the data_embeddings is not
+               the same as the TextEmbeddingModel when generating the classifier.")
+        }
+      }
+
+      if(is.factor(data_targets)==FALSE){
+        stop("data_targets must be a factor.")
+      }
+      if(is.null(names(data_targets))){
+        stop("data_targets must be a named factor.")
+      }
+
+      if(bpl_anchor<bpl_min){
+        stop("bpl_anchor must be at least bpl_min")
+      }
+
+      #------------------------------------------------------------------------
       if(trace==TRUE){
         print(paste(date(),
                     "Matching Input and Target Data"))
@@ -463,6 +583,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
 
+      #Checking Minimal Frequencies.
       if(trace==TRUE){
         print(paste(date(),
                     "Checking Minimal Frequencies."))
@@ -476,8 +597,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
              "These categories are not suitable for training.
              Please remove the corresponding categories/labels from the data
              and create a new classifier with the reduced data set."))
-        }
+      }
 
+      #Checking Number of categories.
+      if(length(freq_check)<2){
+        stop("After checking for uniquness data only consists of one category.
+             At least to categories are neceassry for training.")
+      }
 
       #Split data into k folds
       folds=get_folds(target=data_targets,k_folds=data_n_valid_samples)
@@ -494,9 +620,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Init Object for Saving pbl_labeling
       data_pbl=matrix(data=0,
-                      nrow=folds$n_folds,
+                      nrow=folds$n_folds+1,
                       ncol=bpl_max_steps)
-      dimnames(data_pbl)=list(folds=NULL,
+      dimnames(data_pbl)=list(folds=c(paste0("fold_",seq(from=1,to=folds$n_folds,by=1)),
+                              "final_train"),
                               bpl_steps=NULL)
 
       data_bsc_train=matrix(data = 0,
@@ -507,7 +634,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       data_bsc_test=data_bsc_train
 
-      #Initalazing Objects for Saving Performance
+      #Initializing Objects for Saving Performance
       val_metric=array(dim=c(folds$n_folds,
                              bpl_max_steps+4,
                              17),
@@ -584,9 +711,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               target_test=current_train_targets[baseline_sample$test_sample],
                               epochs=epochs,
                               batch_size=batch_size,
-                              rel_tolerance=rel_tolerance,
-                              patience=patience,
-                              trace=trace,
+                              trace=FALSE,
                               keras_trace=keras_trace,
                               view_metrics=view_metrics,
                               reset_model=TRUE,
@@ -750,9 +875,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               target_test=targets_train_test,
                               epochs=epochs,
                               batch_size=batch_size,
-                              rel_tolerance=rel_tolerance,
-                              patience=patience,
-                              trace=trace,
+                              trace=FALSE,
                               keras_trace=keras_trace,
                               view_metrics=view_metrics,
                               reset_model=opt_model_reset,
@@ -779,11 +902,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           if(use_bsc==TRUE){
             targets_augmented=targets_train_train
+            #original_targets=na.omit(targets_train_train)
+            weights_cases_list=NULL
+            weights_cases_list[1]=list(names(na.omit(targets_train_train)))
             current_test_embedding=embeddings_train_test
             current_test_targets=targets_train_test
           } else {
             targets_augmented=targets_train
-            current_test_embedding=embeddings_val
+            #original_targets=na.omit(targets_train)
+            weights_cases_list=NULL
+            weights_cases_list[1]=list(names(na.omit(targets_train)))
+            current_test_embedding=embeddings_val$clone(deep=TRUE)
             current_test_targets=targets_val
           }
 
@@ -814,6 +943,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               tmp_est_prob=est_remaining_data[i,1:(ncol(est_remaining_data)-1)]
               new_categories[i,1]=categories[which.max(tmp_est_prob)]
               new_categories[i,2]=max(tmp_est_prob)
+
             }
             new_categories<-as.data.frame(new_categories)
 
@@ -823,26 +953,37 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
 
             if(length(new_cat_freq)==length(categories)){
-              #Transforming the probabilities to a information index
-              new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/1/length(categories))/(1-1/length(categories)))
-              new_categories=as.data.frame(new_categories)
+                #Transforming the probabilities to a information index
+                new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/length(categories))/(1-1/length(categories)))
+                new_categories=as.data.frame(new_categories)
 
-              #Order cases with increasing distance from maximal information
-              final_new_categories=NULL
-              for(cat in categories){
-                condition=new_categories[,1]==cat
-                tmp=subset(x=new_categories,
-                           subset=condition)
-                tmp=tmp[order(tmp$prob,decreasing = FALSE),]
-                #Chose always the same number of new cases to ensure the balance
-                #of all categories
-                final_new_categories=append(x=final_new_categories,
-                                            values=rownames(tmp)[1:min_new_freq])
+                #Ensuring minimal certainty
+                tmp_condition=(new_categories[,2]>=bpl_min)
+                new_categories_selected=subset(x=new_categories,
+                                      subset=tmp_condition)
+                new_cat_freq=table(new_categories$cat)
+                min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
+
+                if(length(new_cat_freq)==length(categories)){
+                #Order cases with increasing distance from maximal information
+                final_new_categories=NULL
+                for(cat in categories){
+                  condition=new_categories[,1]==cat
+                  tmp=subset(x=new_categories,
+                             subset=condition)
+                  tmp=tmp[order(tmp$prob,decreasing = FALSE),]
+                  #Chose always the same number of new cases to ensure the balance
+                  #of all categories
+                  final_new_categories=append(x=final_new_categories,
+                                              values=rownames(tmp)[1:min_new_freq])
+                }
+
+                #select final categories
+                new_categories=new_categories[unique(final_new_categories),]
+              } else {
+                new_categories=data.frame()
               }
-
-              #select final categories
-              new_categories=new_categories[unique(final_new_categories),]
-            } else {
+            } else{
               new_categories=data.frame()
             }
 
@@ -888,15 +1029,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             added_cases_test=length(targets_augmented_test)
             data_pbl[iter,step]=added_cases_train+added_cases_test
             n_cases_total=length(subset(targets_augmented,is.na(targets_augmented)==FALSE))
-
-            if(trace==TRUE){
-              print(paste(date(),
-                          "Iter:",iter,"from",folds$n_folds,
-                          "Step:",step,"/",bpl_max_steps,
-                          "Added Cases Test:",added_cases_test,
-                          "Added Cases Train:",added_cases_train,
-                          "Cases Total Train:",n_cases_total))
-            }
+            n_cases_unlabaled=length(targets_augmented)-n_cases_total
 
             #Selecting the correct data for new training
             current_train_targets=na.omit(targets_augmented)
@@ -908,6 +1041,37 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             }
 
             if(added_cases_train>0){
+              #Calculating the weights for the cases
+              weights_cases_list[length(weights_cases_list)+1]=list(
+                setdiff(x=names(current_train_targets),
+                        y=unlist(weights_cases_list)))
+
+              tmp_weights=NULL
+              tmp_weights_names=NULL
+              for(i in 1:length(weights_cases_list)){
+                tmp_weights=append(x=tmp_weights,
+                                   values = rep.int(
+                                     x=i,
+                                     times = length(weights_cases_list[[i]])
+                                     )
+                                   )
+                tmp_weights_names=append(x=tmp_weights_names,
+                                         values = weights_cases_list[[i]])
+              }
+              names(tmp_weights)=tmp_weights_names
+
+              sample_weights=tmp_weights[names(current_train_targets)]
+
+              if(trace==TRUE){
+                print(paste(date(),
+                            "Iter:",iter,"from",folds$n_folds,
+                            "Step:",step,"/",bpl_max_steps,
+                            "Added Cases Test:",added_cases_test,
+                            "Added Cases Train:",added_cases_train,
+                            "Cases Total Train:",n_cases_total,
+                            "Cases Unlabaled:",n_cases_unlabaled,"/",n_unlabeled_data))
+              }
+
               #Train model
               private$basic_train(embedding_train=current_train_embedding,
                                   target_train=current_train_targets,
@@ -915,13 +1079,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                   target_test=current_test_targets,
                                   epochs=epochs,
                                   batch_size=batch_size,
-                                  rel_tolerance=rel_tolerance,
-                                  patience=patience,
-                                  trace=trace,
+                                  trace=FALSE,
                                   keras_trace=keras_trace,
                                   view_metrics=view_metrics,
-                                  reset_model=opt_model_reset,
-                                  dir_checkpoint=dir_checkpoint)
+                                  reset_model=TRUE,
+                                  dir_checkpoint=dir_checkpoint,
+                                  sample_weights=sample_weights)
 
               #Predict val targets
               val_predictions=self$predict(newdata=embeddings_val)
@@ -1000,8 +1163,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Final Training----------------------------------------------------------
-      if(use_bsc==FALSE & use_bpl==FALSE){
-        embeddings_train=data_embeddings
+      if((use_bsc==FALSE & use_bpl==FALSE) |
+         (use_baseline=TRUE) |
+        (use_bsc==FALSE & use_bpl==TRUE)){
+        embeddings_train=data_embeddings$clone(deep=TRUE)
         targets_train=data_targets
         if(trace==TRUE){
           print(paste(date(),
@@ -1011,7 +1176,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
         #omit cases with na
         current_train_targets=na.omit(targets_train)
-        current_train_embedding=embeddings_train$embeddings[names(current_train_targets),]
+        current_embedding=embeddings_train$embeddings[names(current_train_targets),]
 
         #Get Train and Test Sample
         baseline_sample<-get_stratified_train_test_split(
@@ -1019,21 +1184,24 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           val_size = bsl_val_size
         )
 
+        current_train_embedding=current_embedding[baseline_sample$train_sample,]
+        target_train=current_train_targets[baseline_sample$train_sample]
+
+        current_test_embedding=current_embedding[baseline_sample$test_sample,]
+        current_test_targets=current_train_targets[baseline_sample$test_sample]
+
         #Train model
-        private$basic_train(embedding_train=current_train_embedding[baseline_sample$train_sample,],
-                            target_train=current_train_targets[baseline_sample$train_sample],
-                            embedding_test=current_train_embedding[baseline_sample$test_sample,],
-                            target_test=current_train_targets[baseline_sample$test_sample],
+        private$basic_train(embedding_train=current_train_embedding,
+                            target_train=target_train,
+                            embedding_test=current_test_embedding,
+                            target_test=current_test_targets,
                             epochs=epochs,
                             batch_size=batch_size,
-                            rel_tolerance=rel_tolerance,
-                            patience=patience,
-                            trace=trace,
+                            trace=FALSE,
                             keras_trace=keras_trace,
                             view_metrics=view_metrics,
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
-
 
       }
 
@@ -1041,7 +1209,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(use_bsc==TRUE){
         #Setting embedding train to the complete data set
-        embeddings_train=data_embeddings
+        embeddings_train=data_embeddings$clone(deep=TRUE)
         targets_train=data_targets
 
         if(trace==TRUE){
@@ -1158,12 +1326,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             target_test=targets_train_test,
                             epochs=epochs,
                             batch_size=batch_size,
-                            rel_tolerance=rel_tolerance,
-                            patience=patience,
-                            trace=trace,
+                            trace=FALSE,
                             view_metrics=view_metrics,
                             keras_trace=keras_trace,
-                            reset_model=opt_model_reset,
+                            reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
       }
 
@@ -1184,10 +1350,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             targets_augmented=targets_train_train
             current_test_embedding=embeddings_train_test
             current_test_targets=targets_train_test
+            weights_cases_list=NULL
+            weights_cases_list[1]=list(names(na.omit(targets_train_train)))
           } else {
-            targets_augmented=data_targets
-            current_test_embedding=data_embeddings$embeddings
-            current_test_targets=targets_val
+            current_test_embedding=current_test_embedding
+            current_test_targets=current_test_targets
+
+            tmp_aug<-setdiff(x=as.vector(names(data_targets)),
+                             y=as.vector(names(current_test_targets)))
+            targets_augmented=data_targets[tmp_aug]
+
+            weights_cases_list=NULL
+            weights_cases_list[1]=list(names(na.omit(targets_augmented)))
           }
 
           while(step <=bpl_max_steps & added_cases_train>0){
@@ -1209,7 +1383,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             colnames(new_categories)=c("cat","prob")
 
             #Gather information for every case. That is the category with the
-            #highest probaiblits and save both
+            #highest probability and save both
             for(i in 1:nrow(est_remaining_data)){
               tmp_est_prob=est_remaining_data[i,1:(ncol(est_remaining_data)-1)]
               new_categories[i,1]=categories[which.max(tmp_est_prob)]
@@ -1224,24 +1398,34 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
             if(length(new_cat_freq)==length(categories)){
               #Transforming the probabilities to a information index
-              new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/1/length(categories))/(1-1/length(categories)))
+              new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/length(categories))/(1-1/length(categories)))
               new_categories=as.data.frame(new_categories)
 
-              #Order cases with increasing distance from maximal information
-              final_new_categories=NULL
-              for(cat in categories){
-                condition=new_categories[,1]==cat
-                tmp=subset(x=new_categories,
-                           subset=condition)
-                tmp=tmp[order(tmp$prob,decreasing = FALSE),]
-                #Chose always the same number of new cases to ensure the balance
-                #of all categories
-                final_new_categories=append(x=final_new_categories,
-                                            values=rownames(tmp)[1:min_new_freq])
-              }
+              #Ensuring a minimal certainty
+              tmp_condition=(new_categories[,2]>=bpl_min)
+              new_categories=subset(new_categories,tmp_condition)
+              new_cat_freq=table(new_categories$cat)
+              min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
 
-              #select final categories
-              new_categories=new_categories[unique(final_new_categories),]
+              if(length(new_cat_freq)==length(categories)){
+                #Order cases with increasing distance from maximal information
+                final_new_categories=NULL
+                for(cat in categories){
+                  condition=new_categories[,1]==cat
+                  tmp=subset(x=new_categories,
+                             subset=condition)
+                  tmp=tmp[order(tmp$prob,decreasing = FALSE),]
+                  #Chose always the same number of new cases to ensure the balance
+                  #of all categories
+                  final_new_categories=append(x=final_new_categories,
+                                              values=rownames(tmp)[1:min_new_freq])
+                }
+
+                #select final categories
+                new_categories=new_categories[unique(final_new_categories),]
+              } else {
+                new_categories=data.frame()
+              }
             } else {
               new_categories=data.frame()
             }
@@ -1274,10 +1458,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                 current_test_embedding,
                 embeddings_train$embeddings[targets_augmented_test,])
             } else {
-              current_test_embedding$embeddings=rbind(
-                current_test_embedding$embeddings,
+              current_test_embedding=rbind(
+                current_test_embedding,
                 embeddings_train$embeddings[targets_augmented_test,])
             }
+
             current_test_targets=c(current_test_targets,
                                    factor(as.character(new_categories[targets_augmented_test,1]),
                                           levels = categories))
@@ -1286,17 +1471,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             #Counting new cases
             added_cases_train=length(targets_augmented_train)
             added_cases_test=length(targets_augmented_test)
-            data_pbl[iter,step]=added_cases_train+added_cases_test
+            data_pbl[iter+1,step]=added_cases_train+added_cases_test
             n_cases_total=length(subset(targets_augmented,is.na(targets_augmented)==FALSE))
-
-            if(trace==TRUE){
-              print(paste(date(),
-                          "Iter:","Final Training",
-                          "Step:",step,"/",bpl_max_steps,
-                          "Added Cases Test:",added_cases_test,
-                          "Added Cases Train:",added_cases_train,
-                          "Cases Total Train:",n_cases_total))
-            }
+            n_cases_unlabaled=length(targets_augmented)-n_cases_total
 
             #Selecting the correct data for new training
             current_train_targets=na.omit(targets_augmented)
@@ -1307,6 +1484,38 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                 current_train_embedding=embeddings_train$embeddings[names(current_train_targets),]
               }
 
+              #Calculating the weights for the original labeled data
+              weights_cases_list[length(weights_cases_list)+1]=list(
+                setdiff(x=names(current_train_targets),
+                        y=unlist(weights_cases_list)))
+
+              tmp_weights=NULL
+              tmp_weights_names=NULL
+              for(i in 1:length(weights_cases_list)){
+                tmp_weights=append(x=tmp_weights,
+                                   values = rep.int(
+                                     x=i,
+                                     times = length(weights_cases_list[[i]])
+                                   )
+                )
+                tmp_weights_names=append(x=tmp_weights_names,
+                                         values = weights_cases_list[[i]])
+              }
+
+              names(tmp_weights)=tmp_weights_names
+
+              sample_weights=tmp_weights[names(current_train_targets)]
+
+              if(trace==TRUE){
+                print(paste(date(),
+                            "Iter:","Final Training",
+                            "Step:",step,"/",bpl_max_steps,
+                            "Added Cases Test:",added_cases_test,
+                            "Added Cases Train:",added_cases_train,
+                            "Cases Total Train:",n_cases_total,
+                            "Cases Unlabaled:", n_cases_unlabaled,"/",n_unlabeled_data))
+              }
+
               #Train model
               private$basic_train(embedding_train=current_train_embedding,
                                   target_train=current_train_targets,
@@ -1314,13 +1523,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                   target_test=current_test_targets,
                                   epochs=epochs,
                                   batch_size=batch_size,
-                                  rel_tolerance=rel_tolerance,
-                                  patience=patience,
-                                  trace=trace,
+                                  trace=FALSE,
                                   keras_trace=keras_trace,
                                   view_metrics=view_metrics,
                                   reset_model=opt_model_reset,
-                                  dir_checkpoint=dir_checkpoint)
+                                  dir_checkpoint=dir_checkpoint,
+                                  sample_weights = sample_weights)
             }
             #increase step
             step=step+1
@@ -1391,7 +1599,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #if(methods::isClass(where=newdata,"data.frame")==FALSE){
       #  stop("newdata mus be a data frame")
       #}
-      if("EmbeddedText" %in%class(newdata)){
+      if("EmbeddedText" %in% class(newdata)){
+        embedding_model_config<-newdata$get_model_info()
+        for(check in names(embedding_model_config)){
+          if(embedding_model_config[[check]]!=self$text_embedding_model$model[[check]]){
+            stop("The TextEmbeddingModel that generated the newdata is not
+               the same as the TextEmbeddingModel when generating the classifier.")
+          }
+        }
         real_newdata=newdata$embeddings
       } else {
         real_newdata=newdata
@@ -1400,7 +1615,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Ensuring the correct order of the variables for prediction
       real_newdata<-real_newdata[self$model_config$input_variables]
       current_row_names=rownames(real_newdata)
-      if(self$model_config$n_gru>0){
+      if(self$model_config$n_req>0){
         real_newdata<-matrix_to_array_c(
           matrix = as.matrix(real_newdata),
           times = self$text_embedding_model$times,
@@ -1409,10 +1624,34 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         real_newdata=as.matrix(real_newdata)
       }
 
-      #Predicting target variable
-      model<-bundle::unbundle(self$bundeled_model)
-      predictions_prob<-model %>% stats::predict(real_newdata)
-      predictions<-predictions_prob %>% keras::k_argmax()
+      if(length(self$model_config$target_levels)>2){
+        #Multi Class
+        #Predicting target variable
+        model<-bundle::unbundle(self$bundeled_model)
+        predictions_prob<-model %>% stats::predict(real_newdata)
+        predictions<-predictions_prob %>% keras::k_argmax()
+      } else {
+        model<-bundle::unbundle(self$bundeled_model)
+        predictions_prob<-model %>% stats::predict(real_newdata)
+
+        #Add Column for the second characteristic
+        predictions=vector(length = length(predictions_prob))
+        predictions_binary_prob<-matrix(ncol=2,
+                                        nrow=length(predictions_prob))
+
+        for(i in 1:length(predictions_prob)){
+          if(predictions_prob[i]>=0.5){
+            predictions_binary_prob[i,1]=1-predictions_prob[i]
+            predictions_binary_prob[i,2]=predictions_prob[i]
+            predictions[i]=1
+          } else {
+            predictions_binary_prob[i,1]=1-predictions_prob[i]
+            predictions_binary_prob[i,2]=predictions_prob[i]
+            predictions[i]=0
+          }
+        }
+        predictions_prob<-predictions_binary_prob
+      }
 
       #Transforming predictions to target levels
       predictions<-as.character(as.vector(predictions))
@@ -1431,6 +1670,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       rownames(predictions_prob)=current_row_names
 
       return(predictions_prob)
+
     },
     #General Information set and get--------------------------------------------
     #'@description Method for setting publication information of the classifier
@@ -1547,11 +1787,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                          target_train,
                          embedding_test,
                          target_test,
+                         sample_weights=NULL,
                          reset_model=FALSE,
                          epochs=100,
                          batch_size=32,
-                         rel_tolerance=1e-4,
-                         patience=3,
                          trace=TRUE,
                          view_metrics=FALSE,
                          keras_trace=2,
@@ -1589,12 +1828,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       target_train_transformed<-as.numeric(target_train)-1
       target_test_transformed<-as.numeric(target_test)-1
 
-      #Estimating Class Weights
-      #freq_categories=table(target_train)
-      #freq_max=max(freq_categories)
-      #weights_categories=as.list(freq_max/freq_categories)
-
-      if(self$model_config$n_gru>0){
+      if(self$model_config$n_req>0){
         #Convert Input data to sequential data
         input_embeddings_train<-matrix_to_array_c(
           matrix = as.matrix(data_embedding_train),
@@ -1611,10 +1845,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       n_categories=as.integer(length(levels(target_train)))
 
-      output_categories_train=keras::to_categorical(y=target_train_transformed,
-                                                    num_classes=n_categories)
-      output_categories_test=keras::to_categorical(y=target_test_transformed,
-                                                   num_classes=n_categories)
+      if(length(target_levels_order)>2){
+        #Multi Class
+        output_categories_train=keras::to_categorical(y=target_train_transformed,
+                                                      num_classes=n_categories)
+        output_categories_test=keras::to_categorical(y=target_test_transformed,
+                                                     num_classes=n_categories)
+      } else {
+        #Binary Classification
+        output_categories_train=target_train_transformed
+        output_categories_test=target_test_transformed
+      }
+
 
       model<-bundle::unbundle(self$bundeled_model)
 
@@ -1629,7 +1871,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         model %>% keras::compile(
           loss = self$model_config$init_config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
-          metric="categorical_accuracy")
+          metric=self$model_config$init_config$metric)
       }
 
       if(dir.exists(paste0(dir_checkpoint,"/checkpoints"))==FALSE){
@@ -1645,22 +1887,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                              y_val=output_categories_test),
         epochs = epochs,
         batch_size = batch_size,
-        #callback = keras::callback_early_stopping(monitor = "val_categorical_accuracy",
-        #                                          min_delta = rel_tolerance,
-        #                                          patience = patience,
-        #                                          restore_best_weights = TRUE,
-        #                                          verbose=as.integer(trace),
-        #                                          mode = "auto"),
         callback = keras::callback_model_checkpoint(
           filepath = paste0(dir_checkpoint,"/checkpoints"),
-          monitor = "val_categorical_accuracy",
+          monitor = paste0("val_",self$model_config$init_config$metric),
           verbose = as.integer(min(keras_trace,1)),
           mode = "auto",
           save_best_only = TRUE,
           save_weights_only = TRUE),
-        view_metrics=view_metrics
-        #class_weight=weights_categories
-      )
+        view_metrics=view_metrics,
+        sample_weight=sample_weights)
 
       print(paste(date(),"Load Weights From Best Checkpoint"))
       model$load_weights(paste0(dir_checkpoint,"/checkpoints"))

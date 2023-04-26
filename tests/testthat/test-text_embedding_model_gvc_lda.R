@@ -1,5 +1,5 @@
 example_data<-data.frame(
-  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
+  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
@@ -14,7 +14,7 @@ global_vector_clusters_modeling<-TextEmbeddingModel$new(
   bow_n_dim=25,
   bow_n_cluster=100,
   bow_max_iter=10,
-  bow_max_iter_cluster=200,
+  bow_max_iter_cluster=400,
   bow_cr_criterion=1e-8,
   trace=TRUE)
 
@@ -81,4 +81,104 @@ test_that("decoding_topic_modeling", {
 
   expect_length(decodings,10)
   expect_type(decodings,type="list")
+})
+#-------------------------------------------------------------------------------
+#test check_embedding for embeddings and models
+embeddings_topic<-topic_modeling$embed(raw_text = example_data$text[1:10],
+                                 doc_id = 1:10)
+embeddings_gvc<-global_vector_clusters_modeling$embed(raw_text = example_data$text[1:10],
+                                                  doc_id = 1:10)
+
+test_that("check_embeddings_models", {
+  expect_false(
+    check_embedding_models(
+      object_list = list(topic_modeling,global_vector_clusters_modeling),
+      same_class = FALSE))
+
+  expect_false(
+    check_embedding_models(
+      object_list = list(embeddings_topic,global_vector_clusters_modeling),
+      same_class = FALSE))
+
+  expect_false(
+    check_embedding_models(
+      object_list = list(embeddings_gvc,global_vector_clusters_modeling),
+      same_class = TRUE))
+
+  expect_false(
+    check_embedding_models(
+      object_list = list(embeddings_topic,topic_modeling),
+      same_class = TRUE))
+
+  expect_false(
+    check_embedding_models(
+      object_list = list(embeddings_topic,embeddings_gvc),
+      same_class = TRUE))
+
+  expect_false(
+    check_embedding_models(
+      object_list = list(embeddings_topic,embeddings_gvc),
+      same_class = FALSE))
+
+  expect_true(
+    check_embedding_models(
+      object_list = list(embeddings_topic,topic_modeling),
+      same_class = FALSE))
+
+  expect_true(
+    check_embedding_models(
+      object_list = list(embeddings_gvc,global_vector_clusters_modeling),
+      same_class = FALSE))
+
+  expect_true(
+    check_embedding_models(
+      object_list = list(embeddings_gvc,embeddings_gvc),
+      same_class = FALSE))
+
+  expect_true(
+    check_embedding_models(
+      object_list = list(embeddings_gvc,embeddings_gvc),
+      same_class = TRUE))
+
+  expect_true(
+    check_embedding_models(
+      object_list = list(embeddings_topic,embeddings_topic),
+      same_class = FALSE))
+
+  expect_true(
+    check_embedding_models(
+      object_list = list(embeddings_topic,embeddings_topic),
+      same_class = TRUE))
+})
+#------------------------------------------------------------------------------
+#check_combine_embedded_texts
+test_that("check_combine_embedded_texts",{
+  expect_error(
+    combine_embeddings(
+      embeddings_list = list(embeddings_topic,embeddings_gvc)))
+  expect_error(
+    combine_embeddings(
+      embeddings_list = list(embeddings_topic,embeddings_topic)))
+  expect_error(
+    combine_embeddings(
+      embeddings_list = list(embeddings_gvc,embeddings_gvc)))
+
+  tmp_embedding1<-embeddings_gvc$clone(deep = TRUE)
+  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:5,]
+  tmp_embedding2<-embeddings_gvc$clone(deep = TRUE)
+  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[6:10,]
+
+  expect_s3_class(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2)),
+                  class="EmbeddedText")
+  expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),10)
+
+  tmp_embedding1<-embeddings_topic$clone(deep = TRUE)
+  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:5,]
+  tmp_embedding2<-embeddings_topic$clone(deep = TRUE)
+  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[6:10,]
+
+  expect_s3_class(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2)),
+                  class="EmbeddedText")
+  expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),10)
+
 })

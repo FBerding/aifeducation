@@ -103,17 +103,29 @@ set_config_gpu_low_memory<-function(){
 #'@export
 set_config_tf_logger<-function(level="ERROR"){
   logger<-tf$get_logger()
-
-  if(level=="FATAL"){
-    level =as.integer(1)
-  } else if(level=="ERROR"){
-    level =as.integer(2)
-  }else if(level=="WARN"){
-    level =as.integer(3)
-  }else if(level=="INFO"){
-    level =as.integer(4)
-  }else if(level=="DEBUG"){
-    level =as.integer(5)
-  }
    logger$setLevel(level)
+}
+
+#'Sets the level for logging information in tensor flow.
+#'
+#'This function changes the level for logging information with tensorflow via
+#'the os environment. This function mus be called before importing tensorflow.
+#'
+#'@param \code{string} Minimal level that should be printed to console. Five
+#'levels are available: INFO, WARNING, ERROR and NONE.
+#'@return This function does not return anything. It is used for its
+#'side effects.
+#'@export
+set_config_os_environ_logger<-function(level="ERROR"){
+  if(level=="ERROR"){
+    level_int="2"
+  } else if (level=="WARNING"){
+  level_int="1"
+  } else if (level=="INFO"){
+    level_int="0"
+  } else if(level=="NONE"){
+    level_int="3"
+  }
+
+  os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL","2")
 }

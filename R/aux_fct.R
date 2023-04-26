@@ -6,51 +6,96 @@
 #'
 #'@param object_list \code{list} of object of class \link{EmbeddedText} or
 #'\link{TextEmbeddingClassifierNeuralNet}.
+#'@param same_class \code{bool} \code{TRUE} if all object must be from the same class.
 #'@return Returns \code{TRUE} if all object refer to the same text embedding model.
 #'\code{FALSE} in all other cases.
-check_embedding_models<-function(object_list){
-  #Check if all object are from the same class---------------------------------
-  tmp_class<-NULL
+check_embedding_models<-function(object_list,
+                                 same_class=FALSE){
+  #Check if the class of the object is TextEmbeddingModel, EmbeddedText or
+  #TextEmbeddingClassifierNeuralNet
   for(i in 1:length(object_list)){
-    tmp_class[i]<-list(class(object_list[[i]]))
-    if(i>1){
-      if(tmp_class[[i-1]][[1]]!=tmp_class[[i]][[1]]){
-        return(FALSE)
+    if(!(methods::is(object_list[[i]],"TextEmbeddingModel") |
+       methods::is(object_list[[i]],"EmbeddedText") |
+       methods::is(object_list[[i]],"TextEmbeddingClassifierNeuralNet"))){
+      stop("List contains obcects of the wrong class. Objects must be of class
+      TextEmbeddingModel, EmbeddedText or TextEmbeddingClassifierNeuralNet")
+    }
+  }
+
+  #Check if all object are from the same class---------------------------------
+  if(same_class==TRUE){
+    tmp_class<-NULL
+    for(i in 1:length(object_list)){
+      tmp_class[i]<-list(class(object_list[[i]]))
+      if(i>1){
+        if(tmp_class[[i-1]][[1]]!=tmp_class[[i]][[1]]){
+          return(FALSE)
+        }
       }
     }
   }
 
   #Check if all object have the same model configuration---------------------------------
+  #field to check
+  to_check<-c("model_name","model_date","model_method","model_version","model_language",
+              "param_seq_length","param_chunks","param_overlap","param_aggregation")
   tmp_model_config<-NULL
+  tmp_results<-NULL
   for(i in 1:length(object_list)){
     if(methods::is(object_list[[i]],"TextEmbeddingModel")){
-      tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
+      if(object_list[[i]]$basic_components$method=="bert"){
+        tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
+        tmp_model_config[[i]]["model_method"]=list(object_list[[i]]$basic_components$method)
+        tmp_model_config[[i]]["param_seq_length"]=object_list[[i]]$basic_components$max_length
+        tmp_model_config[[i]]["param_chunks"]=object_list[[i]]$bert_components$chunks
+        tmp_model_config[[i]]["param_overlap"]=object_list[[i]]$bert_components$overlap
+        tmp_model_config[[i]]["param_aggregation"]=object_list[[i]]$bert_components$aggregation
+      } else {
+        tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
+        tmp_model_config[[i]]["model_method"]=list(object_list[[i]]$basic_components$method)
+        tmp_model_config[[i]]["param_seq_length"]=object_list[[i]]$basic_components$max_length
+        tmp_model_config[[i]]["param_chunks"]=object_list[[i]]$bow_components$chunks
+        tmp_model_config[[i]]["param_overlap"]=object_list[[i]]$bow_components$overlap
+        tmp_model_config[[i]]["param_aggregation"]=object_list[[i]]$bow_components$aggregation
+      }
     } else if(methods::is(object_list[[i]],"EmbeddedText")){
       tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
-    } else if(methods::is(object_list[[i]],"TextEmbeddingClassifier")){
+    } else if(methods::is(object_list[[i]],"TextEmbeddingClassifierNeuralNet")){
       tmp_model_config[i]<-list(object_list[[i]]$trained_learner$text_model)
     }
+
     if(i>1){
-      for(j in 1:length(tmp_model_config[[i]])){
+      for(check in to_check){
         tmp_i_1<-tmp_model_config[[i-1]]
         tmp_i<-tmp_model_config[[i]]
         #print(tmp_i_1)
-        if(is.null(tmp_i_1[[j]])==TRUE){
-          tmp_i_1[[j]]<-"missing"
+        if(is.null(tmp_i_1[[check]])==TRUE){
+          tmp_i_1[[check]]<-"missing"
         }
-        if(is.null(tmp_i[[j]])==TRUE){
-          tmp_i[[j]]<-"missing"
+        if(is.null(tmp_i[[check]])==TRUE){
+          tmp_i[[check]]<-"missing"
         }
 
-        if(is.na(tmp_i_1[[j]])==TRUE){
-          tmp_i_1[[j]]<-"missing"
+        if(identical(tmp_i_1[[check]], integer(0))){
+          tmp_i_1[[check]]<-"missing"
         }
-        if(is.na(tmp_i[[j]])==TRUE){
-          tmp_i[[j]]<-"missing"
+        if(identical(tmp_i[[check]], integer(0))){
+          tmp_i[[check]]<-"missing"
         }
-        if(tmp_i_1[[j]]!=tmp_i[[j]]){
+
+        if(is.na(tmp_i_1[[check]])==TRUE){
+          tmp_i_1[[check]]<-"missing"
+        }
+        if(is.na(tmp_i[[check]])==TRUE){
+          tmp_i[[check]]<-"missing"
+        }
+        if(as.character(tmp_i_1[[check]])!=as.character(tmp_i[[check]])){
           return(FALSE)
+          #tmp_results[check]=FALSE
+        } else{
+          #tmp_results[check]=TRUE
         }
+
       }
     }
   }
@@ -137,6 +182,7 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
                                                     method = "nominal")$value
   metric_values[11]=irr::kripp.alpha(x=rbind(true_values,predicted_values),
                                                     method = "ordinal")$value
+
   metric_values[12]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                 correct=TRUE)$value
   metric_values[13]=irr::kappa2(ratings=cbind(true_values,predicted_values),

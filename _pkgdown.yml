@@ -1,0 +1,18 @@
+url: ~
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, tutorials, news]
+    right: [search, github]
+  components:
+    articles:
+      text: "Articles"
+      menu:
+      - text: "01 Get started"
+        href: "articles/aifeducation.html"
+      - text: "02 Classification taks"
+        href: "articles/classification_tasks.html"
+
+

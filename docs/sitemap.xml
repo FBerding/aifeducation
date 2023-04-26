@@ -19,6 +19,12 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/basic_text_rep_movie_reviews.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bert_embeddings.html</loc>
+  </url>
+  <url>
     <loc>/reference/bow_pp_create_basic_text_rep.html</loc>
   </url>
   <url>
@@ -92,5 +98,8 @@
   </url>
   <url>
     <loc>/reference/train_tune_bert_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/vocab_draft_movie_review.html</loc>
   </url>
 </urlset>

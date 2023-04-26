@@ -8,7 +8,7 @@ testthat::skip_if_not(condition=dir.exists(tmp_path),
 
 #-------------------------------------------------------------------------------
 example_data<-data.frame(
-  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
+  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
@@ -33,7 +33,7 @@ test_that("creation_bert", {
 
 test_that("embedding_bertg", {
   embeddings<-bert_modeling$embed(raw_text = example_data$text[1:10],
-                                        doc_id = 1:10)
+                                        doc_id = example_data$id[1:10])
   expect_s3_class(embeddings, class="EmbeddedText")
 })
 
