@@ -150,7 +150,9 @@ Using a pre-trained AI for classification requires only the classifier
 and the corresponding text embedding model. Just load both to *R* and
 start predictions. vignette [02 clasification
 tasks](articles/classification_tasks.html) describes how to save and
-load the objects.
+load the objects. In the vignette [03 Sharing and Using Trained
+AI/Models](articles/sharing_and_publishing.html) you find a detailed
+guide how to document and share your models.
 
 ## Tutorial and Guides
 

@@ -98,9 +98,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@field reliability ('list()')\cr
     #'List for storing central reliability measures of the last training.
     #'\itemize{
-    #'\item{\code{reliability$val_metric: }}{Array containing the reliability measures for the validation data for
+    #'\item{\code{reliability$test_metric: }}{Array containing the reliability measures for the validation data for
     #'every fold, method, and step (in case of pseudo labeling).}
-    #'\item{\code{reliability$val_metric_mean: }}{Array containing the reliability measures for the validation data for
+    #'\item{\code{reliability$test_metric_mean: }}{Array containing the reliability measures for the validation data for
     #'every method and step (in case of pseudo labeling). The values represent
     #'the mean values for every fold.}
     #'\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package \link[iotarelr]{iotarelr}
@@ -157,8 +157,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
     #'}
     reliability=list(
-      val_metric=NULL,
-      val_metric_mean=NULL,
+      test_metric=NULL,
+      test_metric_mean=NULL,
       raw_iota_objects=list(
         iota_objects_start=NULL,
         iota_objects_end=NULL,
@@ -183,6 +183,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param rec \code{vector} containing the number of neurons for each recurrent layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer
     #'set this parameter to \code{NULL}.
+    #'@param self_attention_heads \code{integer} determining the number of attention heads
+    #'for a self attention layer. If this value is greater 0 a self attention layer is added
+    #'between the recurrent and dense layers together with a normalization and a
+    #'recurrent layer. If set to 0 none of these layers is added.
     #'@param dropout \code{double} ranging between 0 and lower 1 determining the
     #'dropout for each recurrent layer.
     #'@param recurrent_dropout \code{double} ranging between 0 and lower 1 determining the
@@ -197,6 +201,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
+                        self_attention_heads=0,
                         dropout=0.2,
                         recurrent_dropout=0.4,
                         l2_regularizer=0.001,
@@ -223,6 +228,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
       if(!(is.numeric(rec)==TRUE | is.null(rec)==TRUE)){
         stop("rec must be a vector of integer or NULL.")
+      }
+      if(is.integer(as.integer(self_attention_heads))==FALSE){
+        stop("self_attention_heads must be an integer.")
       }
 
 
@@ -255,7 +263,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         l2_regularizer=l2_regularizer,
         optimizer=optimizer,
         act_fct=act_fct,
-        rec_act_fct=rec_act_fct)
+        rec_act_fct=rec_act_fct,
+        self_attention_heads=self_attention_heads)
 
       if(length(target_levels_order)>2){
         #Multi Class
@@ -299,32 +308,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           object=layer_list[[length(layer_list)]],
           name = "normalizaion_layer")
         layer_list[length(layer_list)+1]<-list(norm_layer)
-
-        #attention_layer=keras::layer_multi_head_attention(
-        #  num_heads = 2L,
-        #  key_dim = as.integer(features),
-        #  name="self_attention")
-
-        #layer_list[length(layer_list)+1]<-list(
-        #  attention_layer(layer_list[[length(layer_list)]],
-        #                  layer_list[[length(layer_list)]],
-        #                  layer_list[[length(layer_list)]]))
-
-        #layer_list[length(layer_list)+1]<-list(
-        #  keras::layer_global_max_pooling_1d(object = layer_list[[length(layer_list)]],
-        #                                     name="flatten"))
-
-        #layer_list[length(layer_list)+1]<-list(
-        #  keras::layer_concatenate(c(layer_list[length(layer_list)],layer_list[length(layer_list)-1])))
-
-
       } else {
         norm_layer<-keras::layer_batch_normalization(
           object=layer_list[[length(layer_list)]],
           name = "normalizaion_layer")
         layer_list[length(layer_list)+1]<-list(norm_layer)
       }
-
 
       #Adding rec layer
       if(n_req>0){
@@ -343,13 +332,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    name=paste0("gru_",i)),
                 name=paste0("bidirectional_",i)))
           } else {
+            if(config$self_attention_heads>0){
+              return_sequence=TRUE
+            } else {
+              return_sequence=FALSE
+            }
             layer_list[length(layer_list)+1]<-list(
               keras::bidirectional(
                 object = layer_list[[length(layer_list)]],
                 layer=keras::layer_gru(
                    units=config$rec[i],
                    input_shape=list(times,features),
-                   return_sequences = FALSE,
+                   return_sequences = return_sequence,
                    dropout = config$dropout,
                    recurrent_dropout = config$recurrent_dropout,
                    activation = config$rec_act_fct,
@@ -359,18 +353,35 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         }
       }
 
+      if(config$self_attention_heads>0){
+        self_attention_layer<-keras::layer_multi_head_attention(
+          num_heads = as.integer(self_attention_heads),
+          key_dim = config$rec[length(config$rec)],
+          name="self_attention")
 
+        layer_list[length(layer_list)+1]<-list(
+          self_attention_layer(layer_list[[length(layer_list)]],
+                               layer_list[[length(layer_list)]],
+                               layer_list[[length(layer_list)]]))
 
-      #layer_list[length(layer_list)+1]<-list(
-      #  keras::layer_attention(inputs = c(layer_list[[length(layer_list)]],layer_list[[length(layer_list)]]),
-      #                         name="attention",
-      #                         use_scale = FALSE))
-      #layer_list[length(layer_list)+1]<-list(
-      #  keras::layer_global_max_pooling_1d(object = layer_list[[length(layer_list)]],
-      #                         name="flatten"))
-      #layer_list[length(layer_list)+1]<-list(
-      #  keras::layer_average(inputs = c(layer_list[[length(layer_list)]],layer_list[[length(layer_list)-1]]),
-      #                         name="concatenate"))
+        norm_laye_attention<-keras::layer_layer_normalization(
+          object=layer_list[[length(layer_list)]],
+          name = "normalizaion_layer_attention")
+        layer_list[length(layer_list)+1]<-list(norm_laye_attention)
+
+        layer_list[length(layer_list)+1]<-list(
+          keras::bidirectional(
+            object = layer_list[[length(layer_list)]],
+            layer=keras::layer_gru(
+              units=config$rec[length(config$rec)],
+              input_shape=list(times,features),
+              return_sequences = FALSE,
+              dropout = config$dropout,
+              recurrent_dropout = config$recurrent_dropout,
+              activation = config$rec_act_fct,
+              name=paste0("gru",i+1)),
+            name=paste0("bidirectional_",i+1)))
+      }
 
       #Adding standard layer
       if(n_hidden>0){
@@ -462,7 +473,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param bpl_valid_size \code{double} ratio between 0 and 1 determining the proportion
     #'of new cases for every label which should be added to the validation sample during training.
     #'The remaining cases are added to the training sample.
-    #'@param opt_model_reset \code{bool} \code{TRUE} if the model should be
+    #'@param bpl_model_reset \code{bool} \code{TRUE} if the model should be
     #'reseted before training.
     #'@param epochs \code{int} Number of training epochs.
     #'@param batch_size \code{int} Size of batches.
@@ -507,7 +518,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    bpl_anchor=0.75,
                    bpl_min=0.50,
                    bpl_valid_size=0.33,
-                   opt_model_reset=TRUE,
+                   bpl_model_reset=FALSE,
                    epochs=100,
                    batch_size=32,
                    dir_checkpoint,
@@ -595,7 +606,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                     subset = freq_check_eval)
         stop(paste("Categories",cat,"have absolute frequencies below 4.",
              "These categories are not suitable for training.
-             Please remove the corresponding categories/labels from the data
+             Please remove the corresponding categories/classes from the data
              and create a new classifier with the reduced data set."))
       }
 
@@ -635,7 +646,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       data_bsc_test=data_bsc_train
 
       #Initializing Objects for Saving Performance
-      val_metric=array(dim=c(folds$n_folds,
+      test_metric=array(dim=c(folds$n_folds,
                              bpl_max_steps+4,
                              17),
                        dimnames = list(iterations=NULL,
@@ -726,7 +737,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           val_res=get_coder_metrics(true_values = targets_val,
                                     predicted_values = val_predictions$expected_category)
           #Save results for baseline model
-          val_metric[iter,1,]<-val_res
+          test_metric[iter,1,]<-val_res
 
           if(use_bsc==TRUE | use_bpl==TRUE){
 
@@ -878,7 +889,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               trace=FALSE,
                               keras_trace=keras_trace,
                               view_metrics=view_metrics,
-                              reset_model=opt_model_reset,
+                              reset_model=bpl_model_reset,
                               dir_checkpoint=dir_checkpoint)
           #Predict val targets
           val_predictions=self$predict(newdata=embeddings_val)
@@ -886,7 +897,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           val_res=get_coder_metrics(true_values = targets_val,
                                     predicted_values = val_predictions$expected_category)
           #Save results for baseline model
-          val_metric[iter,2,]<-val_res
+          test_metric[iter,2,]<-val_res
         }
 
         #Applying Pseudo Labeling-----------------------------------------------
@@ -1093,15 +1104,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               val_res=get_coder_metrics(true_values = targets_val,
                                         predicted_values = val_predictions$expected_category)
               #Save results for baseline model
-              val_metric[iter,2+step,]<-val_res
+              test_metric[iter,2+step,]<-val_res
             }
 
             #increase step
             step=step+1
           }
-          val_metric[iter,"BPL",]<-val_res
+          test_metric[iter,"BPL",]<-val_res
         }
-        val_metric[iter,"Final",]<-val_res
+        test_metric[iter,"Final",]<-val_res
 
         iota_objects_end[iter]=list(iotarelr::check_new_rater(true_values = targets_val,
                                                                 assigned_values = val_predictions$expected_category,
@@ -1116,7 +1127,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Insert Final Training here and Savings here
-      self$reliability$val_metric=val_metric
+      self$reliability$test_metric=test_metric
       self$reliability$raw_iota_objects$iota_objects_start=iota_objects_start
       self$reliability$raw_iota_objects$iota_objects_end=iota_objects_end
       self$reliability$raw_iota_objects$iota_objects_start_free=iota_objects_start_free
@@ -1526,7 +1537,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                   trace=FALSE,
                                   keras_trace=keras_trace,
                                   view_metrics=view_metrics,
-                                  reset_model=opt_model_reset,
+                                  reset_model=bpl_model_reset,
                                   dir_checkpoint=dir_checkpoint,
                                   sample_weights = sample_weights)
             }
@@ -1551,29 +1562,29 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         self$last_training$data_pbl=NULL
       }
 
-      val_metric_mean=matrix(data=0,
-                             nrow = nrow(val_metric[1,,]),
-                             ncol = ncol(val_metric[1,,]))
-      rownames(val_metric_mean)=rownames(val_metric[1,,])
-      colnames(val_metric_mean)=colnames(val_metric[1,,])
+      test_metric_mean=matrix(data=0,
+                             nrow = nrow(test_metric[1,,]),
+                             ncol = ncol(test_metric[1,,]))
+      rownames(test_metric_mean)=rownames(test_metric[1,,])
+      colnames(test_metric_mean)=colnames(test_metric[1,,])
 
-      n_mean=vector(length = nrow(val_metric[1,,]))
+      n_mean=vector(length = nrow(test_metric[1,,]))
       n_mean[]=folds$n_folds
 
       for(i in 1:folds$n_folds){
-          tmp_val_metric=val_metric[i,,]
+          tmp_val_metric=test_metric[i,,]
           for(j in 1:nrow(tmp_val_metric)){
             if(sum(is.na(tmp_val_metric[j,]))!=length(tmp_val_metric[j,])){
-              val_metric_mean[j,]=val_metric_mean[j,]+tmp_val_metric[j,]
+              test_metric_mean[j,]=test_metric_mean[j,]+tmp_val_metric[j,]
             } else {
               n_mean[j]=n_mean[j]-1
             }
           }
         }
 
-      val_metric_mean=val_metric_mean/n_mean
-      val_metric_mean[is.nan(val_metric_mean)]=NA
-      self$reliability$val_metric_mean=val_metric_mean
+      test_metric_mean=test_metric_mean/n_mean
+      test_metric_mean[is.nan(test_metric_mean)]=NA
+      self$reliability$test_metric_mean=test_metric_mean
 
       self$last_training$learning_time=as.numeric(difftime(Sys.time(),start_time,
                                                            units="mins"))

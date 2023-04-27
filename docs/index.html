@@ -69,7 +69,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="articles/aifeducation.html">01 Get started</a>
-    <a class="dropdown-item" href="articles/classification_tasks.html">02 Classification taks</a>
+    <a class="dropdown-item" href="articles/classification_tasks.html">02 Classification tasks</a>
+    <a class="dropdown-item" href="articles/sharing_and_publishing.html">03 03 Sharing and Using Trained AI/Models</a>
   </div>
 </li>
       </ul>
@@ -127,7 +128,7 @@
 </h3>
 <p>For the second step within a classification task <em>aifeducation</em> integrates some important statistical and mathematical methods for dealing with the main challenges in educational and social sciences for applying AI.</p>
 <p>In order to deal with the problem of imbalanced data sets package integrates <em>Synthetic Minority Oversampling Technique</em> into the learning process. Currently the <em>Basic Synthetic Minority Oversampling Technique</em> (Chawla et al. 2002), <em>Density-Bases Synthetic Minority Oversampling Technique</em> (Bunkhumpornpat, Sinapiromsaran &amp; Lursinsap, 2012), and <em>Adaptive Synthetic Sampling Approach for Imbalanced Learning</em> (Hem Garcia &amp; Li 2008) are implemented via the <em>R</em> package <em>smotefamiliy</em>.</p>
-<p>In order to address the problem of small data sets training loops of AI integrate <em>Pseudo Labeling</em>(e.g., Lee 2013). Pseudo Labeling is a technique which can be used for supervised learning. That is, educators and researchers rate a part of a data set and train AI with this part of data. The remaining part of data is not processed by humans. Instead, AI uses this part of data to learn on its own. Thus, educators and researchers do only have to provide additional data for learning without working on it. This offers the possibility to add more data to the training and to reduce personal costs.</p>
+<p>In order to address the problem of small data sets training loops of AI integrate <em>Pseudo Labeling</em> (e.g., Lee 2013). Pseudo Labeling is a technique which can be used for supervised learning. That is, educators and researchers rate a part of a data set and train AI with this part of data. The remaining part of data is not processed by humans. Instead, AI uses this part of data to learn on its own. Thus, educators and researchers do only have to provide additional data for learning without working on it. This offers the possibility to add more data to the training and to reduce personal costs.</p>
 </div>
 <div class="section level3">
 <h3 id="evaluating-performance">Evaluating Performance<a class="anchor" aria-label="anchor" href="#evaluating-performance"></a>
@@ -150,11 +151,12 @@ with performance measures they are more familiar with every AI trained with this
 <h2 id="sharing-trained-ai">Sharing Trained AI<a class="anchor" aria-label="anchor" href="#sharing-trained-ai"></a>
 </h2>
 <p>Since the package is based on keras, tensorflow, and the transformer libraries every trained AI can be shared with other educators and researchers. The package supports an easy use of pre-trained AI within <em>R</em> but also provides the possibility to export trained AI to other environments.</p>
+<p>Using a pre-trained AI for classification requires only the classifier and the corresponding text embedding model. Just load both to <em>R</em> and start predictions. vignette <a href="articles/classification_tasks.html">02 clasification tasks</a> describes how to save and load the objects. In the vignette <a href="articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a> you find a detailed guide how to document and share your models.</p>
 </div>
 <div class="section level2">
 <h2 id="tutorial-and-guides">Tutorial and Guides<a class="anchor" aria-label="anchor" href="#tutorial-and-guides"></a>
 </h2>
-<p>A guide how to install and configure the package can be found via <a href="aifeducation.html">Get started</a>. A short introduction in using the package for classification tasks can be found in the vignette <a href="classification_tasks.html">02 clasification tasks</a></p>
+<p>A guide how to install and configure the package can be found via <a href="articles/aifeducation.html">Get started</a>. A short introduction in using the package for classification tasks can be found in the vignette <a href="articles/classification_tasks.html">02 clasification tasks</a></p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

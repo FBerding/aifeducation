@@ -13,6 +13,9 @@
     <loc>/articles/index.html</loc>
   </url>
   <url>
+    <loc>/articles/sharing_and_publishing.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -85,10 +88,16 @@
     <loc>/reference/set_config_gpu_low_memory.html</loc>
   </url>
   <url>
+    <loc>/reference/set_config_os_environ_logger.html</loc>
+  </url>
+  <url>
     <loc>/reference/set_config_tf_logger.html</loc>
   </url>
   <url>
     <loc>/reference/split_labeled_unlabeled.html</loc>
+  </url>
+  <url>
+    <loc>/reference/test_classifier.html</loc>
   </url>
   <url>
     <loc>/reference/TextEmbeddingClassifierNeuralNet.html</loc>

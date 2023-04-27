@@ -64,7 +64,6 @@ glove.}
 \itemize{
 \item \href{#method-TextEmbeddingModel-new}{\code{TextEmbeddingModel$new()}}
 \item \href{#method-TextEmbeddingModel-load_model}{\code{TextEmbeddingModel$load_model()}}
-\item \href{#method-TextEmbeddingModel-save_bert_model}{\code{TextEmbeddingModel$save_bert_model()}}
 \item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
 \item \href{#method-TextEmbeddingModel-decode}{\code{TextEmbeddingModel$decode()}}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
@@ -85,24 +84,24 @@ glove.}
 Method for creating a new text embedding model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$new(
-  model_name,
-  model_label,
-  model_version,
-  model_language,
-  method,
-  max_length,
+  model_name = NULL,
+  model_label = NULL,
+  model_version = NULL,
+  model_language = NULL,
+  method = NULL,
+  max_length = 0,
   chunks = 1,
   overlap = 0,
   aggregation = "last",
   use_cls_token = TRUE,
   model_dir,
   bow_basic_text_rep,
-  bow_n_dim = NULL,
-  bow_n_cluster = NULL,
+  bow_n_dim = 10,
+  bow_n_cluster = 100,
   bow_max_iter = 500,
-  bow_max_iter_cluster = NULL,
+  bow_max_iter_cluster = 500,
   bow_cr_criterion = 1e-08,
-  bow_learning_rate = NULL,
+  bow_learning_rate = 1e-08,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -207,24 +206,6 @@ Method for loading a transformer model into R.
 \describe{
 \item{\code{model_dir}}{\code{string} containing the path to the relevant
 model.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-save_bert_model"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-save_bert_model}{}}}
-\subsection{Method \code{save_bert_model()}}{
-Method for saving a bert model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_bert_model(model_dir)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{model_dir}}{\code{string} containing the path where the bert model
-should be saved.}
 }
 \if{html}{\out{</div>}}
 }

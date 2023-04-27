@@ -4,6 +4,8 @@ Trial
 ^README\.Rmd$
 materials
 test_model
+tests/testthat/tmp
+tests/testthat/language_models
 tmp
 checkpoints
 udpipe_models

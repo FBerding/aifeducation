@@ -4,11 +4,13 @@
 \alias{check_embedding_models}
 \title{Check of compatible text embedding models}
 \usage{
-check_embedding_models(object_list)
+check_embedding_models(object_list, same_class = FALSE)
 }
 \arguments{
 \item{object_list}{\code{list} of object of class \link{EmbeddedText} or
 \link{TextEmbeddingClassifierNeuralNet}.}
+
+\item{same_class}{\code{bool} \code{TRUE} if all object must be from the same class.}
 }
 \value{
 Returns \code{TRUE} if all object refer to the same text embedding model.

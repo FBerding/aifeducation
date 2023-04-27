@@ -4,10 +4,10 @@
 \alias{check_aif_py_modules}
 \title{Check if all necessary python modules are available}
 \usage{
-check_aif_py_modules(print = TRUE)
+check_aif_py_modules(trace = TRUE)
 }
 \arguments{
-\item{print}{\code{bool} \code{TRUE} if a list with all modules and their
+\item{trace}{\code{bool} \code{TRUE} if a list with all modules and their
 availability should be printed to the console.}
 }
 \value{

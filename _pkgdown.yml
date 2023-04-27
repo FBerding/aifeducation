@@ -12,7 +12,9 @@ navbar:
       menu:
       - text: "01 Get started"
         href: "articles/aifeducation.html"
-      - text: "02 Classification taks"
+      - text: "02 Classification tasks"
         href: "articles/classification_tasks.html"
+      - text: "03 Sharing and Using Trained AI/Models"
+        href: "articles/sharing_and_publishing.html"
 
 

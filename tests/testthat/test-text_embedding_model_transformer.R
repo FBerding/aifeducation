@@ -31,7 +31,7 @@ test_that("creation_bert", {
                   class="TextEmbeddingModel")
 })
 
-test_that("embedding_bertg", {
+test_that("embedding_bert", {
   embeddings<-bert_modeling$embed(raw_text = example_data$text[1:10],
                                         doc_id = example_data$id[1:10])
   expect_s3_class(embeddings, class="EmbeddedText")

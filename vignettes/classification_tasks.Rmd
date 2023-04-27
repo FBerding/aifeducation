@@ -598,6 +598,7 @@ bert_embeddings<-bert_modeling$embed(
 The method `embed`creates an object of class `EmbeddedText`. This is just
 a data.frame consisting the embedding of every text. Depending on the method
 the data.frame has a different meaning:
+
  - **Topic Modeling:** In the case of Topic Modeling the rows represent the texts 
  and the columns represent the percentage of every topic within a text.
  - **GlobalVectorClusters:** In this case the rows represent the texts and the columns
@@ -670,6 +671,7 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   targets=example_targets,
   hidden=c(128,64),
   rec=c(128,128),
+  self_attention_heads = 0,
   dropout=0.2,
   recurrent_dropout=0.4,
   l2_regularizer=0.001,
@@ -692,7 +694,11 @@ that you name your factor. That is, the entries of the factor mus have names
 that correspond to the ids of the corresponding texts. Without these names
 the method cannot match text embeddings as input data to the target data. 
 
-`config` represents a list where you decide about the structure of your classifier
+With the other parameters  you decide about the structure of your classifier. Figure
+4 illustrates this.
+
+![Figure 4: Overview of Possible Structure iof a Classifier](classif_fig_04.png){width=100%}
+
 `hidden` takes a vector of integers determining the number of layers and the number
 of neurons. In our example this are two layers. The first with 128 and the 
 second with 64 neurons. `rec` also takes a vector of integers determining the number
@@ -703,8 +709,14 @@ creation, dense layers are used after the gru layers. If you want to omit gru la
 or dense layers set the corresponding argument to `NULL`. 
 
 If you use a text embedding model that processes more than 1 chunk we would like
-to recommend to use gru layers since they are able to use the sequential structure 
+to recommend to use recurrent layers since they are able to use the sequential structure 
 of your data. In all other cases you can rely on dense layers only.
+
+If you use text embeddings it is a good idea to try self attention layer in order to
+take the context of all chunks into account. To add a self attention layer you must
+provide an integer greater 0 to `self_attention_heads`. This will add a self 
+attention layer. Additionally a normalization layer and a recurrent layer are also added
+behind self attention to process the contextualized sequences. 
 
 Masking, normalization, and the creation of the input layer as well as the output
 layer is done automatically.
@@ -746,12 +758,13 @@ classifier$train(
    bsc_methods=c("dbsmote"),
    bsc_max_k=10,
    use_bpl=TRUE,
-   bpl_max_steps=10,
-   bpl_inc_ratio=0.25,
-   bpl_anchor=0.75,
+   bpl_max_steps=4,
+   bpl_inc_ratio=0.75, 
+   bpl_anchor=0.90,
+   bpl_min=0.75,
    bpl_valid_size=0.33,
-   opt_model_reset=TRUE,
-   epochs=100,
+   bpl_model_reset=FALSE,
+   epochs=50,
    batch_size=32,
    dir_checkpoint="tmp/checkpoints_classifier",
    trace=TRUE,
@@ -807,10 +820,10 @@ social science some special training steps are integrated in this method.
  If both is set to true a classifier
  trained on the basis of balanced synthetic cases is used.
  
-Figure 4 illustrates the training loop for the cases that all three options
+Figure 5 illustrates the training loop for the cases that all three options
 are set to `TRUE`.
 
-![Figure 4: Overview of the Training Loop for all Options Activiated](classif_fig_04.png){width=100%}
+![Figure 5: Overview of the Steps to Perform a Classification](classif_fig_05.png){width=100%}
  
 Finally, `trace`, `view_metrics`, and `keras_trace` allow you to control how
 many information about the training progress are printed to the console. Please
@@ -843,14 +856,14 @@ stores all relevant information. In this list you will find the reliability valu
 for every fold and for every requested training configuration. In addition, the
 reliability of every step within balanced pseudo labeling is reported.
 
-The central estimates for the reliabilites can be found via `reliability$val_metric_mean`.
+The central estimates for the reliabilites can be found via `reliability$test_metric_mean`.
 In our example this would be:
 ```{r, include = FALSE, eval=TRUE}
 classifier<-aifeducation::test_classifier
 ```
 
 ```{r, include = TRUE, eval=TRUE}
-classifier$reliability$val_metric_mean
+classifier$reliability$test_metric_mean
 ```
 You know have a table with all relevant values. Of particular interest are the
 values for alpha from the Iota Concept since they represent a measure of reliability
@@ -869,7 +882,7 @@ alpha values for the minor class further up to step 3.
 Finally, you can plot a coding stream scheme showing how the cases of different classes
 are labeled. Her we use the package *iotarelr*.
 
-```{r, fig.height = 6, fig.width = 7.2, fig.align = "center", fig.cap = "Figure 5: Coding Stream of the Classifier",include = TRUE, eval=TRUE}
+```{r, fig.height = 6, fig.width = 7.2, fig.align = "center", fig.cap = "Figure 6: Coding Stream of the Classifier",include = TRUE, eval=TRUE}
 library(iotarelr)
 iotarelr::plot_iota2_alluvial(aifeducation::test_classifier$reliability$iota_object_end_free)
 ```

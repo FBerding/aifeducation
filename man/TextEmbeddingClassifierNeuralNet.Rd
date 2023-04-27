@@ -33,7 +33,7 @@ object with help of the package \link[bundle]{bundle} for serialization.}
 List for storing information about the configuration of the model. This
 information is used for predicting new data.
 \itemize{
-\item{\code{model_config$n_gru: }}{Number of gru layers.}
+\item{\code{model_config$n_req: }}{Number of recurrent layers.}
 \item{\code{model_config$n_hidden: }}{Number of dense layers.}
 \item{\code{model_config$target_levels: }}{Levels of the target variable. Do not change this manually.}
 \item{\code{model_config$input_variables: }}{Order and name of the input variables. Do not change this manually.}
@@ -70,9 +70,9 @@ if not.}
 \item{\code{reliability}}{('list()')\cr
 List for storing central reliability measures of the last training.
 \itemize{
-\item{\code{reliability$val_metric: }}{Array containing the reliability measures for the validation data for
+\item{\code{reliability$test_metric: }}{Array containing the reliability measures for the validation data for
 every fold, method, and step (in case of pseudo labeling).}
-\item{\code{reliability$val_metric_mean: }}{Array containing the reliability measures for the validation data for
+\item{\code{reliability$test_metric_mean: }}{Array containing the reliability measures for the validation data for
 every method and step (in case of pseudo labeling). The values represent
 the mean values for every fold.}
 \item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package \link[iotarelr]{iotarelr}
@@ -159,9 +159,15 @@ Creating a new instance of this class.
   label = NULL,
   text_embeddings = NULL,
   targets = NULL,
-  config = list(hidden = c(128), gru = c(128), dropout = 0.2, recurrent_dropout = 0.4,
-    l2_regularizer = 0.001, optimizer = "adam", act_fct = "gelu", act_fct_last =
-    "softmax", err_fct = "categorical_crossentropy")
+  hidden = c(128),
+  rec = c(128),
+  self_attention_heads = 0,
+  dropout = 0.2,
+  recurrent_dropout = 0.4,
+  l2_regularizer = 0.001,
+  optimizer = "adam",
+  act_fct = "gelu",
+  rec_act_fct = "tanh"
 )}\if{html}{\out{</div>}}
 }
 
@@ -178,21 +184,24 @@ free text.}
 
 \item{\code{targets}}{\code{factor} containing the target values of the classifier.}
 
-\item{\code{config}}{\code{list} containing the configuration of the neural net.}
-
-\item{\code{config$hidden}}{\code{vector} containing the number of neurons for each dense layer.
+\item{\code{hidden}}{\code{vector} containing the number of neurons for each dense layer.
 The length of the vector determines the number of dense layers. If you want no dense layer
 set this parameter to \code{NULL}.}
 
-\item{\code{config$gru}}{\code{vector} containing the number of neurons for each gru layer.
+\item{\code{rec}}{\code{vector} containing the number of neurons for each recurrent layer.
 The length of the vector determines the number of dense layers. If you want no dense layer
 set this parameter to \code{NULL}.}
 
-\item{\code{config$dropout}}{\code{double} ranging between 0 and lower 1 determining the
-dropout for each gru layer.}
+\item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads
+for a self attention layer. If this value is greater 0 a self attention layer is added
+between the recurrent and dense layers together with a normalization and a
+recurrent layer. If set to 0 none of these layers is added.}
 
-\item{\code{config$recurrent_dropout}}{\code{double} ranging between 0 and lower 1 determining the
-recurrent dropout for each gru layer.}
+\item{\code{dropout}}{\code{double} ranging between 0 and lower 1 determining the
+dropout for each recurrent layer.}
+
+\item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1 determining the
+recurrent dropout for each recurrent layer.}
 
 \item{\code{l2_regularizer}}{\code{double} determining the l2 regularizer for every dense layer.}
 
@@ -200,9 +209,7 @@ recurrent dropout for each gru layer.}
 
 \item{\code{act_fct}}{\code{character} naming the activation function for all dense layers.}
 
-\item{\code{act_fct_last}}{\code{character} naming the activation function for the last dense layers.}
-
-\item{\code{err_fct}}{\code{character} naming the loss/error function for the neural net.}
+\item{\code{rec_act_fct}}{\code{character} naming the activation function for all recurrent layers.}
 }
 \if{html}{\out{</div>}}
 }
@@ -227,8 +234,9 @@ tensorflow.
   bpl_max_steps = 10,
   bpl_inc_ratio = 0.25,
   bpl_anchor = 0.75,
+  bpl_min = 0.5,
   bpl_valid_size = 0.33,
-  opt_model_reset = TRUE,
+  bpl_model_reset = FALSE,
   epochs = 100,
   batch_size = 32,
   dir_checkpoint,
@@ -283,11 +291,14 @@ for more details.}
 \item{\code{bpl_anchor}}{\code{double} between 0 and 1 indicating the reference
 point for sorting the new cases of every label. See notes for more details.}
 
+\item{\code{bpl_min}}{\code{double} between 0 and 1 setting the minimal level of
+confidence for considerung a case for pseudo labeling.}
+
 \item{\code{bpl_valid_size}}{\code{double} ratio between 0 and 1 determining the proportion
 of new cases for every label which should be added to the validation sample during training.
 The remaining cases are added to the training sample.}
 
-\item{\code{opt_model_reset}}{\code{bool} \code{TRUE} if the model should be
+\item{\code{bpl_model_reset}}{\code{bool} \code{TRUE} if the model should be
 reseted before training.}
 
 \item{\code{epochs}}{\code{int} Number of training epochs.}

@@ -191,19 +191,19 @@ TextEmbeddingModel<-R6::R6Class(
                         bow_learning_rate=1e-8,
                         trace=FALSE){
       #Parameter check---------------------------------------------------------
-      if(is.NULL(model_name)){
+      if(is.null(model_name)){
         stop("model_name must be a character.")
       }
-      if(is.NULL(model_label)){
+      if(is.null(model_label)){
         stop("model_label must be a character.")
       }
-      if(is.NULL(model_version)){
+      if(is.null(model_version)){
         stop("model_version must be a character.")
       }
-      if(is.NULL(model_language)){
+      if(is.null(model_language)){
         stop("model_language must be a character.")
       }
-      if(is.NULL(method)){
+      if(is.null(method)){
         stop("method must be bert, glove_cluster or lda.")
       }
       if(is.integer(as.integer(max_length))){
@@ -410,22 +410,6 @@ TextEmbeddingModel<-R6::R6Class(
         self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
       } else {
         message("Method only relevant for transformer models.")
-      }
-    },
-    #--------------------------------------------------------------------------
-    #'@description Method for saving a bert model.
-    #'@param model_dir \code{string} containing the path where the bert model
-    #'should be saved.
-    save_bert_model=function(model_dir){
-      if(self$basic_components$method=="bert"){
-        self$bert_components$model$save_pretrained(
-          save_directory=model_dir)
-        print(paste(date(),"Bert model saved."))
-        self$bert_components$tokenizer$save_pretrained(
-          model_dir)
-        print(paste(date(),"Tokenizer saved."))
-      } else {
-        message("Method only relevant for bert models.")
       }
     },
     #-------------------------------------------------------------------------

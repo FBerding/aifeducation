@@ -33,13 +33,13 @@ in the rows. Embeddings dimensions are in the columns.}
 Creates a new object representing text embeddings.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EmbeddedText$new(
-  model_name,
-  model_label,
-  model_date,
-  model_method,
-  model_version,
-  model_language,
-  param_seq_length,
+  model_name = NA,
+  model_label = NA,
+  model_date = NA,
+  model_method = NA,
+  model_version = NA,
+  model_language = NA,
+  param_seq_length = NA,
   param_chunks = NULL,
   param_overlap = NULL,
   param_aggregation = NULL,

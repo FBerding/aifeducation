@@ -1,6 +1,5 @@
-testthat::skip()
 testthat::skip_if_not(condition=check_aif_py_modules(),
-                      message = "Necessary python modules not available")
+                      message  = "Necessary python modules not available")
 
 #-------------------------------------------------------------------------------
 example_data<-data.frame(
@@ -20,7 +19,7 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   text_embeddings=current_embeddings,
   targets=example_targets,
   hidden=NULL,
-  gru=c(28,28),
+  rec=c(28,28),
   dropout=0.2,
   recurrent_dropout=0.4,
   l2_regularizer=0.001,
@@ -49,14 +48,14 @@ test_that("training_baseline_only", {
       bpl_inc_ratio=0.25,
       bpl_anchor=0.75,
       bpl_valid_size=0.33,
-      opt_model_reset=TRUE,
-      epochs=30,
+      bpl_model_reset=FALSE,
+      epochs=9,
       batch_size=32,
       dir_checkpoint="tmp/checkpoints_classifier",
       trace=FALSE,
       view_metrics=FALSE,
       keras_trace=0,
-      n_cores=2)
+      n_cores=1)
   )
 })
 
@@ -76,14 +75,14 @@ test_that("training_bsc_only", {
       bpl_inc_ratio=0.25,
       bpl_anchor=0.75,
       bpl_valid_size=0.33,
-      opt_model_reset=TRUE,
-      epochs=30,
+      bpl_model_reset=FALSE,
+      epochs=9,
       batch_size=32,
       dir_checkpoint="tmp/checkpoints_classifier",
       trace=FALSE,
       view_metrics=FALSE,
       keras_trace=0,
-      n_cores=2)
+      n_cores=1)
   )
 })
 
@@ -103,7 +102,7 @@ test_that("training_pbl_only", {
       bpl_inc_ratio=0.25,
       bpl_anchor=0.75,
       bpl_valid_size=0.33,
-      opt_model_reset=TRUE,
+      bpl_model_reset=FALSE,
       epochs=30,
       batch_size=32,
       dir_checkpoint="tmp/checkpoints_classifier",
