@@ -46,7 +46,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a>
     <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
-    <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 03 Sharing and Using Trained AI/Models</a>
+    <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
 </li>
       </ul>
@@ -119,6 +119,13 @@ work</strong>. Furthermore, your description should include:</p>
 <li>Which steps were performed and which method was used.</li>
 <li>For which kind of tasks or materials can the model be used.</li>
 </ul>
+<p>With <code>abstract_eng</code> and <code>abstract_native</code> you
+can provide a summary of your description. This is very important if you
+would like to share your work on a repository. With
+<code>keywords_eng</code> and <code>keywords_native</code> you can set a
+vector of keywords which helps to find your work with searching engines.
+We would like to recommend that use provide information at least in
+English.</p>
 <p>You can access a model’s description by using the method
 <code>get_model_description</code></p>
 <p>Besides a description of your work it is necessary to provide
@@ -203,12 +210,17 @@ directory that stores you transformer model.</p>
 <div class="section level3">
 <h3 id="adding-model-descriptions-1">3.1 Adding Model Descriptions<a class="anchor" aria-label="anchor" href="#adding-model-descriptions-1"></a>
 </h3>
-<p>Adding the model description of a classifier is similar to the
+<p>Adding the model description of a classifier is similar to
 <code>TextEmbeddingModel</code>s. With the methods
 <code>set_model_description</code> and
 <code>get_model_description</code> you can provide a detailed
-description of your classifier in English and the native language of
-your classifier processes.</p>
+description (parameter <code>eng</code> and <code>native</code>) of your
+classifier in English and the native language of your classifier
+processes. With <code>abstract_eng</code> and
+<code>abstract_native</code> you can provide the corresponding abstract
+of your descriptions while <code>keywords_eng</code> and
+<code>keywords_native</code> take a vector with the corresponding
+keywords.</p>
 <p>In the case of a classifier the description should include:</p>
 <ul>
 <li>A short reference to the theoretical models that guided the

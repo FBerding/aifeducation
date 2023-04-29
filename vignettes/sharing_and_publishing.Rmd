@@ -41,10 +41,14 @@ important information for potential users of your model.
 
 First every models needs a clear description how it was developed, modified and how
 it can be use. You can add a description via the method `set_model_description`.
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_model$set_model_description(
   eng=NULL,
-  native=NULL)
+  native=NULL,
+  abstract_eng=NULL,
+  abstract_native=NULL,
+  keywords_eng=NULL,
+  keywords_native=NULL)
 ```
 This methods allow you to provide a description in English and in the native language 
 of the model to make the distribution of your model more easy. You can write
@@ -60,15 +64,21 @@ include:
 - Which steps were performed and which method was used.
 - For which kind of tasks or materials can the model be used.
 
+With `abstract_eng` and `abstract_native` you can provide a summary of your
+description. This is very important if you would like to share your work
+on a repository. With `keywords_eng` and `keywords_native` you can set a vector 
+of keywords which helps to find your work with searching engines. We would like
+to recommend that use provide information at least in English.
+
 You can access a model's description by using the method `get_model_description`
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_model$get_model_description()
 ```
 
 Besides a description of your work it is necessary to provide information
 about the persons who are involved in creating a model. This can be done with
 the method `set_publication_info`.
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_model$set_publication_info(
   type,
   autors,
@@ -99,13 +109,13 @@ text how to cite the work of the different persons. With `url` you can provide
 a link to relevant sites of the model.
 
 You can access the information by using `get_publication_info`.
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_model$get_publication_info()
 ```
 
 Finally  you must provide a license describing for using your model. This can be 
 done with `set_license` and `get_license`.
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_model$set_licens("GPL-3")
 ```
 
@@ -158,14 +168,20 @@ files of the directory that stores you transformer model.
 
 ## 3 Classifiers
 ## 3.1 Adding Model Descriptions
-Adding the model description of a classifier is similar to the `TextEmbeddingModel`s.
+Adding the model description of a classifier is similar to `TextEmbeddingModel`s.
 With the methods `set_model_description` and `get_model_description` you can provide
-a detailed description of your classifier in English and the native language of your
-classifier processes. 
-```{r, include = FALSE, eval=FALSE}
+a detailed description (parameter `eng` and `native`) of your classifier in English and the native language of your
+classifier processes. With `abstract_eng` and `abstract_native` you can provide the
+corresponding abstract of your descriptions while `keywords_eng` and `keywords_native`
+take a vector with the corresponding keywords.
+```{r, include = TRUE, eval=FALSE}
 example_classifier$set_model_description(
   eng=NULL,
-  native=NULL)
+  native=NULL,
+  abstract_eng=NULL,
+  abstract_native=NULL,
+  keywords_eng=NULL,
+  keywords_native=NULL)
 ```
 In the case of a classifier the description should include:
 
@@ -186,7 +202,7 @@ These can be accessed directly via `example_classifier$reliability$test_metric_m
 
 With the methods `set_publication_info` and `get_publication_info` you can provide
 the publication information of your classifier. 
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_classifier$set_publication_info(
   type,
   autors,
@@ -198,7 +214,7 @@ Please use "developer" and "trainer" if you are the first person who trained the
 
 Finally you can manage the license for using your classifier via `set_license` and
 `get_license`.
-```{r, include = FALSE, eval=FALSE}
+```{r, include = TRUE, eval=FALSE}
 example_classifier$set_licens("GPL-3")
 ```
 

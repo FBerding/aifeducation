@@ -31,7 +31,7 @@ tensorflow"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a>
     <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
-    <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 03 Sharing and Using Trained AI/Models</a>
+    <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -311,6 +311,7 @@ tensorflow.</p><div class="section">
 <span>  bpl_inc_ratio <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  bpl_anchor <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  bpl_min <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  bpl_weight_inc <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bpl_valid_size <span class="op">=</span> <span class="fl">0.33</span>,</span>
 <span>  bpl_model_reset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  epochs <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -392,7 +393,13 @@ point for sorting the new cases of every label. See notes for more details.</p><
 
 <dt><code>bpl_min</code></dt>
 <dd><p><code>double</code> between 0 and 1 setting the minimal level of
-confidence for considerung a case for pseudo labeling.</p></dd>
+confidence for considering a case for pseudo labeling.</p></dd>
+
+
+<dt><code>bpl_weight_inc</code></dt>
+<dd><p><code>double</code> value how much the sample weights
+should be increased or decreased compared to the previous step. If the
+cases of all steps should be weighted equally set this value to 0.</p></dd>
 
 
 <dt><code>bpl_valid_size</code></dt>
@@ -427,7 +434,7 @@ phase should be printed to the console.</p></dd>
 
 <dt><code>view_metrics</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if metrics should be printed
-in the RStudie IDE.</p></dd>
+in the RStudio IDE.</p></dd>
 
 
 <dt><code>keras_trace</code></dt>
@@ -564,7 +571,11 @@ the license text.</p></dd>
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
 <span>  eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  native <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  native <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  abstract_eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  abstract_native <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keywords_eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keywords_native <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -580,6 +591,24 @@ in English.</p></dd>
 <dd><p><code>string</code> A text describing the training of the learner,
 its theoretical and empirical background, and the different output labels
 in the native language of the classifier.</p></dd>
+
+
+<dt><code>abstract_eng</code></dt>
+<dd><p><code>string</code> A text providing a summary of the description
+in English.</p></dd>
+
+
+<dt><code>abstract_native</code></dt>
+<dd><p><code>string</code> A text providing a summary of the description
+in the native language of the classifier.</p></dd>
+
+
+<dt><code>keywords_eng</code></dt>
+<dd><p><code>vector</code> of keyword in English.</p></dd>
+
+
+<dt><code>keywords_native</code></dt>
+<dd><p><code>vector</code> of keyword in the native language of the classifier.</p></dd>
 
 
 </dl><p></p></div>

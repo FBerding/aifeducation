@@ -235,6 +235,7 @@ tensorflow.
   bpl_inc_ratio = 0.25,
   bpl_anchor = 0.75,
   bpl_min = 0.5,
+  bpl_weight_inc = 1,
   bpl_valid_size = 0.33,
   bpl_model_reset = FALSE,
   epochs = 100,
@@ -292,7 +293,11 @@ for more details.}
 point for sorting the new cases of every label. See notes for more details.}
 
 \item{\code{bpl_min}}{\code{double} between 0 and 1 setting the minimal level of
-confidence for considerung a case for pseudo labeling.}
+confidence for considering a case for pseudo labeling.}
+
+\item{\code{bpl_weight_inc}}{\code{double} value how much the sample weights
+should be increased or decreased compared to the previous step. If the
+cases of all steps should be weighted equally set this value to 0.}
 
 \item{\code{bpl_valid_size}}{\code{double} ratio between 0 and 1 determining the proportion
 of new cases for every label which should be added to the validation sample during training.
@@ -313,7 +318,7 @@ exists it is created.}
 phase should be printed to the console.}
 
 \item{\code{view_metrics}}{\code{bool} \code{TRUE} if metrics should be printed
-in the RStudie IDE.}
+in the RStudio IDE.}
 
 \item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not print any
 information about the training process from keras on the console.
@@ -449,7 +454,11 @@ Method for setting a description of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_model_description(
   eng = NULL,
-  native = NULL
+  native = NULL,
+  abstract_eng = NULL,
+  abstract_native = NULL,
+  keywords_eng = NULL,
+  keywords_native = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -463,6 +472,16 @@ in English.}
 \item{\code{native}}{\code{string} A text describing the training of the learner,
 its theoretical and empirical background, and the different output labels
 in the native language of the classifier.}
+
+\item{\code{abstract_eng}}{\code{string} A text providing a summary of the description
+in English.}
+
+\item{\code{abstract_native}}{\code{string} A text providing a summary of the description
+in the native language of the classifier.}
+
+\item{\code{keywords_eng}}{\code{vector} of keyword in English.}
+
+\item{\code{keywords_native}}{\code{vector} of keyword in the native language of the classifier.}
 }
 \if{html}{\out{</div>}}
 }

@@ -33,7 +33,11 @@ TextEmbeddingModel<-R6::R6Class(
     ),
     model_description=list(
       eng=NULL,
-      native=NULL
+      native=NULL,
+      abstract_eng=NULL,
+      abstract_native=NULL,
+      keywords_eng=NULL,
+      keywords_native=NULL
     )
   ),
   public = list(
@@ -206,13 +210,13 @@ TextEmbeddingModel<-R6::R6Class(
       if(is.null(method)){
         stop("method must be bert, glove_cluster or lda.")
       }
-      if(is.integer(as.integer(max_length))){
+      if(!is.integer(as.integer(max_length))){
         stop("max_length must an integer.")
       }
-      if(is.integer(as.integer(chunks))){
+      if(!is.integer(as.integer(chunks))){
         stop("chunks must an integer.")
       }
-      if(is.integer(as.integer(overlap))){
+      if(!is.integer(as.integer(overlap))){
         stop("overlap must an integer.")
       }
       if((aggregation %in% c("last",
@@ -595,6 +599,9 @@ TextEmbeddingModel<-R6::R6Class(
           data=0)
 
         for(i in 1:n_units){
+          #Clear session to ensure enough memory
+          tf$keras$backend$clear_session()
+
           for(j in 1:length(tokens[[i]])){
             tmp_hidden_states<-self$bert_components$model(
               tokens[[i]][[j]],
@@ -851,19 +858,47 @@ TextEmbeddingModel<-R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #'@description Method for setting a description of the model
-    #'@param eng \code{string} A text describing the training of the learner,
+    #'@param eng \code{string} A text describing the training of the classifier,
     #'its theoretical and empirical background, and the different output labels
     #'in English.
-    #'@param native \code{string} A text describing the training of the learner,
+    #'@param native \code{string} A text describing the training of the classifier,
     #'its theoretical and empirical background, and the different output labels
-    #'in the native language of the model
-    set_model_description=function(eng=NULL,native=NULL){
+    #'in the native language of the model.
+    #'@param abstract_eng \code{string} A text providing a summary of the description
+    #'in English.
+    #'@param abstract_native \code{string} A text providing a summary of the description
+    #'in the native language of the classifier.
+    #'@param keywords_eng \code{vector} of keyword in English.
+    #'@param keywords_native \code{vector} of keyword in the native language of the classifier.
+    set_model_description=function(eng=NULL,
+                                   native=NULL,
+                                   abstract_eng=NULL,
+                                   abstract_native=NULL,
+                                   keywords_eng=NULL,
+                                   keywords_native=NULL){
       if(!is.null(description)){
         private$model_description$eng=description
       }
       if(!is.null(description_native)){
         private$model_description$native=description
       }
+
+      if(!is.null(abstract_eng)){
+        private$model_description$abstract_eng=abstract_eng
+      }
+      if(!is.null(abstract_native)){
+        private$model_description$abstract_native=abstract_native
+      }
+
+      if(!is.null(keywords_eng)){
+        private$model_description$keywords_eng=keywords_eng
+      }
+      if(!is.null(keywords_native)){
+        private$model_description$keywords_native=keywords_native
+      }
+
+
+
     },
     #'@description Method for requesting the model description.
     #'@return \code{list} with the description of the model in English

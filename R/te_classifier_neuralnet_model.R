@@ -469,7 +469,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param bpl_anchor \code{double} between 0 and 1 indicating the reference
     #'point for sorting the new cases of every label. See notes for more details.
     #'@param bpl_min \code{double} between 0 and 1 setting the minimal level of
-    #'confidence for considerung a case for pseudo labeling.
+    #'confidence for considering a case for pseudo labeling.
+    #'@param bpl_weight_inc \code{double} value how much the sample weights
+    #'should be increased or decreased compared to the previous step. If the
+    #'cases of all steps should be weighted equally set this value to 0.
     #'@param bpl_valid_size \code{double} ratio between 0 and 1 determining the proportion
     #'of new cases for every label which should be added to the validation sample during training.
     #'The remaining cases are added to the training sample.
@@ -487,7 +490,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
     #'one line of information for every epoch.
     #'@param view_metrics \code{bool} \code{TRUE} if metrics should be printed
-    #'in the RStudie IDE.
+    #'in the RStudio IDE.
     #'@param n_cores \code{int} Number of cores used for creating synthetic units.
     #'@details \itemize{
     #'
@@ -517,6 +520,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    bpl_inc_ratio=0.25,
                    bpl_anchor=0.75,
                    bpl_min=0.50,
+                   bpl_weight_inc=1,
                    bpl_valid_size=0.33,
                    bpl_model_reset=FALSE,
                    epochs=100,
@@ -1052,7 +1056,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             }
 
             if(added_cases_train>0){
-              #Calculating the weights for the cases
+              #Calculating the weights for the new cases
               weights_cases_list[length(weights_cases_list)+1]=list(
                 setdiff(x=names(current_train_targets),
                         y=unlist(weights_cases_list)))
@@ -1062,7 +1066,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               for(i in 1:length(weights_cases_list)){
                 tmp_weights=append(x=tmp_weights,
                                    values = rep.int(
-                                     x=i,
+                                     x=(1+(i-1)*bpl_weight_inc),
                                      times = length(weights_cases_list[[i]])
                                      )
                                    )
@@ -1495,7 +1499,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                 current_train_embedding=embeddings_train$embeddings[names(current_train_targets),]
               }
 
-              #Calculating the weights for the original labeled data
+              #Calculating the weights for the new data
               weights_cases_list[length(weights_cases_list)+1]=list(
                 setdiff(x=names(current_train_targets),
                         y=unlist(weights_cases_list)))
@@ -1505,7 +1509,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               for(i in 1:length(weights_cases_list)){
                 tmp_weights=append(x=tmp_weights,
                                    values = rep.int(
-                                     x=i,
+                                     x=(1+(i-1)*bpl_weight_inc),
                                      times = length(weights_cases_list[[i]])
                                    )
                 )
@@ -1737,13 +1741,39 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param native \code{string} A text describing the training of the learner,
     #'its theoretical and empirical background, and the different output labels
     #'in the native language of the classifier.
-    set_model_description=function(eng=NULL,native=NULL){
+    #'@param abstract_eng \code{string} A text providing a summary of the description
+    #'in English.
+    #'@param abstract_native \code{string} A text providing a summary of the description
+    #'in the native language of the classifier.
+    #'@param keywords_eng \code{vector} of keyword in English.
+    #'@param keywords_native \code{vector} of keyword in the native language of the classifier.
+    set_model_description=function(eng=NULL,
+                                   native=NULL,
+                                   abstract_eng=NULL,
+                                   abstract_native=NULL,
+                                   keywords_eng=NULL,
+                                   keywords_native=NULL){
       if(!is.null(description)){
         private$model_description$eng=description
       }
       if(!is.null(description_native)){
         private$model_description$native=description
       }
+
+      if(!is.null(abstract_eng)){
+        private$model_description$abstract_eng=abstract_eng
+      }
+      if(!is.null(abstract_native)){
+        private$model_description$abstract_native=abstract_native
+      }
+
+      if(!is.null(keywords_eng)){
+        private$model_description$keywords_eng=keywords_eng
+      }
+      if(!is.null(keywords_native)){
+        private$model_description$keywords_native=keywords_native
+      }
+
     },
     #'@description Method for requesting the model description.
     #'@return \code{list} with the description of the classifier in English
@@ -1789,7 +1819,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     ),
     model_description=list(
       eng=NULL,
-      native=NULL
+      native=NULL,
+      abstract_eng=NULL,
+      abstract_native=NULL,
+      keywords_eng=NULL,
+      keywords_native=NULL
     ),
     #Training Process----------------------------------------------------------
     init_weights=NULL,
@@ -1817,6 +1851,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       } else {
         data_embedding_test=embedding_test
       }
+
+      #Clear session to provide enough resources for computations
+      tf$keras$backend$clear_session()
 
       #load names and order of input variables and train_target levels
       variable_name_order<-self$model_config$input_variables

@@ -364,19 +364,36 @@ Method for requesting the license of the model
 \subsection{Method \code{set_model_description()}}{
 Method for setting a description of the model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_model_description(eng = NULL, native = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_model_description(
+  eng = NULL,
+  native = NULL,
+  abstract_eng = NULL,
+  abstract_native = NULL,
+  keywords_eng = NULL,
+  keywords_native = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{eng}}{\code{string} A text describing the training of the learner,
+\item{\code{eng}}{\code{string} A text describing the training of the classifier,
 its theoretical and empirical background, and the different output labels
 in English.}
 
-\item{\code{native}}{\code{string} A text describing the training of the learner,
+\item{\code{native}}{\code{string} A text describing the training of the classifier,
 its theoretical and empirical background, and the different output labels
-in the native language of the model}
+in the native language of the model.}
+
+\item{\code{abstract_eng}}{\code{string} A text providing a summary of the description
+in English.}
+
+\item{\code{abstract_native}}{\code{string} A text providing a summary of the description
+in the native language of the classifier.}
+
+\item{\code{keywords_eng}}{\code{vector} of keyword in English.}
+
+\item{\code{keywords_native}}{\code{vector} of keyword in the native language of the classifier.}
 }
 \if{html}{\out{</div>}}
 }
