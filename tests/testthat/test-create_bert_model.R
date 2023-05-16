@@ -1,6 +1,8 @@
 testthat::skip_on_cran()
-testthat::skip_if_not(condition=check_aif_py_modules(),
+testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                   message = "Necessary python modules not available")
+aifeducation::set_config_gpu_low_memory()
+
 test_that("create_bert_model", {
   example_data<-data.frame(
     id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,

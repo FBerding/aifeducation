@@ -73,8 +73,6 @@ train_tune_bert_model=function(output_dir,
   if(aug_vocab_by>0){
     print(paste(date(),"Augmenting vocabulary"))
 
-
-
     #Creating a new Tokenizer for Computing Vocabulary
     vocab_size_old=length(tokenizer$get_vocab())
     tok_new<-tok$Tokenizer(tok$models$WordPiece())
@@ -187,6 +185,9 @@ train_tune_bert_model=function(output_dir,
 
   print(paste(date(),"Compile Model"))
   mlm_model$compile(optimizer=adam(3e-5))
+
+  #Clear session to provide enough resources for computations
+  tf$keras$backend$clear_session()
 
   print(paste(date(),"Start Fine Tuning"))
   mlm_model$fit(x=tf_train_dataset,

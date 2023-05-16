@@ -1,4 +1,11 @@
 
+path="test_data/vocab_draft_movie_review.rda"
+testthat::skip_if_not(condition=file.exists(path),
+                      message  = "Necessary dataset not available")
+#------------------------------------------------------------------------------
+load(path)
+
+#------------------------------------------------------------------------------
 test_that("bow_pp_create_vocab_draft", {
 
   example_data<-data.frame(

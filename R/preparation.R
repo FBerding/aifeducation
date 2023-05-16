@@ -31,7 +31,7 @@
 #'here: \url{https://ufal.mff.cuni.cz/udpipe/2/models}.
 #'@importFrom udpipe udpipe_load_model udpipe_annotate unique_identifier
 #'@importFrom stats na.omit
-#'@importFrom stringr str_length
+#'@importFrom stringr str_length str_replace_all str_remove_all
 #'@export
 bow_pp_create_vocab_draft<-function(path_language_model,
                                     data,
@@ -143,7 +143,8 @@ bow_pp_create_vocab_draft<-function(path_language_model,
 #'@param split_tags \code{bool} \code{TRUE} if tags should be splitted.
 #'@param use_lemmata \code{bool} \code{TRUE} lemmas instead of original tokens should be used.
 #'@param to_lower \code{bool} \code{TRUE} if token or lemmas should be used with lower cases.
-#'
+#'@param language_stopwords \code{string} Abbreviation for the language for which stopword shoud be
+#'removed.
 #'@param min_termfreq \code{int} Minimum frequency of a token to be part of the vocabulary.
 #'@param min_docfreq \code{int} Minimum appearance of a token in documents to be part of the vocabulary.
 #'@param max_docfreq \code{int} Maximum appearance of a token in documents to be part of the vocabulary.

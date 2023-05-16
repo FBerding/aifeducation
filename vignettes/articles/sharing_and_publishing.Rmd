@@ -1,0 +1,248 @@
+---
+title: "03 Sharing and Using Trained AI/Models"
+author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sharing and Using Trained AI/Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include = FALSE}
+library(aifeducation)
+```
+
+# 1 Introduction
+In educational and social science it is a common practice to share research
+instruments such as questionnaires or tests. For example, the 
+[Open Test Archive](https://www.testarchiv.eu/en) provides researchers and practitioners
+access to a large number of open access instruments. *aifeducation* is based on the
+assumption that AI based classifiers should be shareable similar to research instruments
+to empower educational and social science research and to support the application
+of AI for educational purposes. Thus, *aifeducation* aims to make the sharing process
+as easy as possible.
+
+For this aim every object generated with *aifeducation* can be prepared for
+publication in a few basic steps. In this vignette we would like to show you
+how the make your AI ready for publication and how to use models from other persons.
+
+We will start with text embeddings models.
+
+# 2 Text Embedding Models
+## 2.1 Adding Model Descriptions
+Every object of class `TextEmbeddingModel` comes with several methods allowing you to provide
+important information for potential users of your model.
+
+First every models needs a clear description how it was developed, modified and how
+it can be use. You can add a description via the method `set_model_description`.
+```{r, include = TRUE, eval=FALSE}
+example_model$set_model_description(
+  eng=NULL,
+  native=NULL,
+  abstract_eng=NULL,
+  abstract_native=NULL,
+  keywords_eng=NULL,
+  keywords_native=NULL)
+```
+This methods allow you to provide a description in English and in the native language 
+of the model to make the distribution of your model more easy. You can write
+your description in HTML which allows you to add links to other sources or
+publications, to add tables or to highlight important aspects of your model.
+
+**We would like to recommend that you write a description at least in English
+to allow a wide community to recognize sour work**. Furthermore, your description should 
+include:
+
+- Which kind of data was used for creating the model.
+- Haw many data was used for creating the model.
+- Which steps were performed and which method was used.
+- For which kind of tasks or materials can the model be used.
+
+With `abstract_eng` and `abstract_native` you can provide a summary of your
+description. This is very important if you would like to share your work
+on a repository. With `keywords_eng` and `keywords_native` you can set a vector 
+of keywords which helps to find your work with searching engines. We would like
+to recommend that use provide information at least in English.
+
+You can access a model's description by using the method `get_model_description`
+```{r, include = TRUE, eval=FALSE}
+example_model$get_model_description()
+```
+
+Besides a description of your work it is necessary to provide information
+about the persons who are involved in creating a model. This can be done with
+the method `set_publication_info`.
+```{r, include = TRUE, eval=FALSE}
+example_model$set_publication_info(
+  type,
+  autors,
+  citation,
+  url=NULL)
+```
+First of all you have to decide the type of information you would like to add.
+You have three choices "developer", "trainer", and "modifier" which you set with 
+`type`.
+
+`type="developer"` stores all information about the persons and the process of
+developing the model. If you use a transformer model from [Huggingface](https://huggingface.co/)
+the persons and their description of the model should be entered as developers. In 
+all other cases you can use this type for providing a description of how you developed the model.
+
+Sometimes the personas who developed a model and the persons who trained a model differ.
+In these cases you can pay credit for the persons who trained a model via setting
+`type="trainer"`.
+
+In some cases you wish to modify a model. This is particular the case if you use
+a transformer model and you adept the model to a specific domain or task. In this
+case you rely on the work of other people and modifier their work. In these cases
+you can describe your modifications by setting `type=modifier`.
+
+For every type you can add the relevant persons via `autors`. Please use a
+*R*'s function `personList()` for this. With `citation`you can provide a free 
+text how to cite the work of the different persons. With `url` you can provide 
+a link to relevant sites of the model.
+
+You can access the information by using `get_publication_info`.
+```{r, include = TRUE, eval=FALSE}
+example_model$get_publication_info()
+```
+
+Finally  you must provide a license describing for using your model. This can be 
+done with `set_license` and `get_license`.
+```{r, include = TRUE, eval=FALSE}
+example_model$set_licens("GPL-3")
+```
+
+Now you are able to share your work. Please remember to save you now described object
+as described in section 2.2.
+
+## 2.2 Saving and Loading
+Saving a created text embedding model is very easy. However, the saving
+and loading process is different for models based on Topic Modeling and 
+GlobalVectorClusters on the hand and models based on transformers on the other hand.
+
+For models using Topic Modeling or GlobalVectorClusters you can call `save()` to
+write your model to disk.
+```{r, include = TRUE, eval=FALSE}
+save(example_model, 
+     file="models/embedding_model_topic.RData")
+save(example_model, 
+     file="models/embedding_model_gvc.RData")
+```
+If you want to load your model just call `load()` and you can continue using
+your model.
+```{r, include = TRUE, eval=FALSE}
+load(file="models/embedding_model_topic.RData")
+load(file="models/embedding_model_gvc.RData")
+```
+
+If your text embedding model is based on a transformer saving and loading 
+requires some other steps. In this case your text embedding models serves as
+an interface to *R*. The original model is saved in a model directory. Thus,
+you have to save your interface to that model directory.
+```{r, include = TRUE, eval=FALSE}
+save(example_model,
+     file="my_own_transformer_trained/r_interface.RData")
+```
+Loading your model requires two steps. First, load the interface.
+```{r, include = TRUE, eval=FALSE}
+load(file="my_own_transformer_trained/r_interface.RData")
+```
+Now the text embedding model is available in *R.*. Next you must
+re-initialize the transformer by calling the corresponding method `load_model` 
+of your model.
+```{r, include = TRUE, eval=FALSE}
+example_model$load_model(model_dir="my_own_transformer_trained")
+```
+
+Now you are ready to share your work. Just provide the .RData file for 
+GlobalVectorClusters and Topic Models to other persons. In the case of
+transformer models you must provide the `r_interface.RData` along with the other
+files of the directory that stores you transformer model. 
+
+## 3 Classifiers
+## 3.1 Adding Model Descriptions
+Adding the model description of a classifier is similar to `TextEmbeddingModel`s.
+With the methods `set_model_description` and `get_model_description` you can provide
+a detailed description (parameter `eng` and `native`) of your classifier in English and the native language of your
+classifier processes. With `abstract_eng` and `abstract_native` you can provide the
+corresponding abstract of your descriptions while `keywords_eng` and `keywords_native`
+take a vector with the corresponding keywords.
+```{r, include = TRUE, eval=FALSE}
+example_classifier$set_model_description(
+  eng=NULL,
+  native=NULL,
+  abstract_eng=NULL,
+  abstract_native=NULL,
+  keywords_eng=NULL,
+  keywords_native=NULL)
+```
+In the case of a classifier the description should include:
+
+- A short reference to the theoretical models that guided the development.
+- A clear and detailed description of every single category/class and its development.
+- A short statement where the classifier can be used.
+- A description of the kind and quantity of data used for training.
+- If possible information about the inter-coder-reliability of the coding
+process providing the data.
+- If possible provide a link to the corresponding text embedding model.
+
+Again you can provide your description in HTML to include tables (e.g. for
+reporting the reliability of the initial coding process) or links to other
+sources and publication.
+
+**Please do not report the performance values of your classifier in the description.**
+These can be accessed directly via `example_classifier$reliability$test_metric_mean`.
+
+With the methods `set_publication_info` and `get_publication_info` you can provide
+the publication information of your classifier. 
+```{r, include = TRUE, eval=FALSE}
+example_classifier$set_publication_info(
+  type,
+  autors,
+  citation,
+  url=NULL)
+```
+Please use "developer" and "trainer" if you are the first person who trained the classifier. 
+`type="modifier"` will be needed only rarely.
+
+Finally you can manage the license for using your classifier via `set_license` and
+`get_license`.
+```{r, include = TRUE, eval=FALSE}
+example_classifier$set_licens("GPL-3")
+```
+
+Now you are ready for sharing your classifier. Please remember to save your changes
+as described in section 3.2.
+
+## 3.2 Saving and Loading
+If you have created a classifier saving and loading is very easy due to the *R* package
+*bundle*. You can just use `save()` and `load()`. In our example this could be
+
+```{r, include = TRUE, eval=FALSE}
+save(classifier,
+     file="classifiers/movie_review.RData")
+
+load(file="classifiers/movie_review.RData")
+```
+
+Please note that you need the `TextEmbeddingModel` that was used for training in
+order to predict new data with the classifier. You can request the name, label, and
+configuration of that model with `example_classifier$text_embedding_model`. Thus,
+if you would like to share your classifier ensure that you also share the corresponding
+text embedding model.
+
+If you would like to apply your classifier to new data, two steps are necessary.
+First, you must transform the raw text into a numerical expression by using
+*exactly* the same text embedding model that was used for training your classifier.
+The resulting object can be passed to the method `predict` and you will get
+the predictions together with an estimate of certainty for each class/category. 
+
+More information can be found in the vignette [02 clasification tasks](articles/classification_tasks.html).

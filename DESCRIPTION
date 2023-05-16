@@ -28,19 +28,19 @@ License: GPL-3
 Imports: Rcpp (>= 1.0.10),
   stringr,
   udpipe,
-  keras,
-  tensorflow,
   iotarelr(>= 0.1.4),
   irr,
   irrCAC,
   bundle,
-  quanteda,
   reticulate,
   smotefamily,
   quanteda.textstats,
   topicmodels,
   tidytext,
-  reshape2
+  text2vec,
+  methods,
+  reshape2,
+  doParallel
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.2.3
 Encoding: UTF-8
@@ -48,11 +48,12 @@ Depends:
     quanteda,
     keras,
     foreach,
-    R (>= 2.10)
+    R (>= 3.5.0)
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    quanteda.textmodels,
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 LazyData: true

@@ -103,7 +103,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\item{\code{reliability$test_metric_mean: }}{Array containing the reliability measures for the validation data for
     #'every method and step (in case of pseudo labeling). The values represent
     #'the mean values for every fold.}
-    #'\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package \link[iotarelr]{iotarelr}
+    #'\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package [iotarelr]{iotarelr}
     #'for every fold at the start and the end of the last training.
     #'\itemize{
     #'\item{\code{reliability$raw_iota_objects$iota_objects_start: }}{List of objects with class \code{iotarelr_iota2} containing the
@@ -195,6 +195,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param optimizer Object of class \code{keras.optimizers}.
     #'@param act_fct \code{character} naming the activation function for all dense layers.
     #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
+    #'@import bundle
+    #'@import keras
     initialize=function(name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -202,9 +204,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         hidden=c(128),
                         rec=c(128),
                         self_attention_heads=0,
-                        dropout=0.2,
+                        dropout=0.4,
                         recurrent_dropout=0.4,
-                        l2_regularizer=0.001,
+                        l2_regularizer=0.01,
                         optimizer="adam",
                         act_fct="gelu",
                         rec_act_fct="tanh"
@@ -392,6 +394,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                activation = config$act_fct,
                                kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
                                name=paste0("dense",i)))
+
+          if(i==(n_hidden-1) & n_hidden>=2){
+            #Add Dropout_Layer
+            layer_list[length(layer_list)+1]<-list(
+              keras::layer_dropout(object = layer_list[[length(layer_list)]],
+                                   rate = config$dropout,
+                                   name="dropout"))
+          }
         }
       }
 
@@ -404,7 +414,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                              activation = config$act_fct_last,
                              name="output_categories"))
       } else {
-        #Multi Class
+        #Binary Class
         layer_list[length(layer_list)+1]<-list(
           keras::layer_dense(object = layer_list[[length(layer_list)]],
                              units = as.integer(1),
@@ -443,12 +453,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param data_targets \code{Factor} containing the labels for cases
     #'stored in \code{data_embeddings}. Factor must be named and has to use the
     #'same names used in \code{data_embeddings}.
-    #'@param data_n_valid_samples \code{int} determining the number of cross-fold
+    #'@param data_n_test_samples \code{int} determining the number of cross-fold
     #'samples.
     #'@param use_baseline \code{bool} \code{TRUE} if the calculation of a baseline
     #'model is requested. This option is only relevant for \code{use_bsc=TRUE} or
     #'\code{use_pbl=TRUE}. If both are \code{FALSE} a baseline model is calculated.
-    #'@param bsl_val_size \code{double} between 0 and 1 indicating the proportion of cases of each label
+    #'@param bsl_val_size \code{double} between 0 and 1 indicating the proportion of cases of each class
     #'which should be used for the validation sample during the estimation of the baseline model.
     #'The remaining cases are part of the training data.
     #'@param use_bsc \code{bool} \code{TRUE} if the estimation should integrate
@@ -459,25 +469,31 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'and \code{bsc_methods=c("dbsmote")} are possible.
     #'@param bsc_max_k \code{int} determining the maximal number of k which is used
     #'for creating synthetic units.
+    #'@param bsc_val_size \code{double} between 0 and 1 indicating the proportion of cases of each class
+    #'which should be used for the validation sample during the estimation with synthetic cases.
     #'@param use_bpl \code{bool} \code{TRUE} if the estimation should integrate
     #'balanced pseudo labeling. \code{FALSE} if not.
-    #'@param bpl_max_steps \code{int} determining the maximal number of steps for
-    #'every application of balanced pseudo labeling.
-    #'@param bpl_inc_ratio \code{double} ratio between 0 and 1 indicating the
-    #'proportion of new cases which should used for further training. See notes
-    #'for more details.
+    #'@param bpl_max_steps \code{int} determining the maximal number of steps during
+    #'pseudo labeling.
+    #'@param bpl_epochs_per_step \code{int} Number of training epochs within every step.
+    #'@param bpl_model_reset \code{bool} If \code{TRUE} model is re-initialized every
+    #'step.
+    #'@param bpl_dynamic_inc \code{bool} If \code{TRUE} the only a specific percentage
+    #'of cases are included during each step. The percentage is determined by
+    #'\eqn{step/bpl_max_steps}. If \code{FALSE} all cases are used.
+    #'@param bpl_balance \code{bool} If \code{TRUE} the same number of cases for
+    #'every category/class of the pseudo labeled data are used with training. That
+    #'is, the number of cases is determined by the minor class/category.
     #'@param bpl_anchor \code{double} between 0 and 1 indicating the reference
     #'point for sorting the new cases of every label. See notes for more details.
+    #'@param bpl_max \code{double} between 0 and 1 setting the maximal level of
+    #'confidence for considering a case for pseudo labeling.
     #'@param bpl_min \code{double} between 0 and 1 setting the minimal level of
     #'confidence for considering a case for pseudo labeling.
     #'@param bpl_weight_inc \code{double} value how much the sample weights
-    #'should be increased or decreased compared to the previous step. If the
-    #'cases of all steps should be weighted equally set this value to 0.
-    #'@param bpl_valid_size \code{double} ratio between 0 and 1 determining the proportion
-    #'of new cases for every label which should be added to the validation sample during training.
-    #'The remaining cases are added to the training sample.
-    #'@param bpl_model_reset \code{bool} \code{TRUE} if the model should be
-    #'reseted before training.
+    #'should be increased for the cases with pseudo labels in very step.
+    #'@param bpl_weight_start \code{dobule} Start value for the weights of the
+    #'unlabeled cases.
     #'@param epochs \code{int} Number of training epochs.
     #'@param batch_size \code{int} Size of batches.
     #'@param dir_checkpoint \code{string} Path to the directory where
@@ -498,32 +514,34 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'the number of bsc_max_k is to high the value is reduced to a number that
     #'allows the calculating of synthetic units.}
     #'
-    #'\item{bpl_inc_ratio: }{The ratio is applied to the label with the smallest number
-    #'of new cases. The resulting value is used for every label to ensure the balance
-    #'of all labels.}
-    #'
     #'\item{bpl_anchor: }{With the help of this value the new cases are sorted. For
     #'this aim the distance from the anchor is calculated and all cases are arranged
     #'into an increasing order.
     #'}
     #'}
+    #'@import bundle
+    #'@import keras
     train=function(data_embeddings,
                    data_targets,
-                   data_n_valid_samples=10,
+                   data_n_test_samples=5,
                    use_baseline=TRUE,
                    bsl_val_size=0.25,
                    use_bsc=TRUE,
                    bsc_methods=c("dbsmote"),
                    bsc_max_k=10,
+                   bsc_val_size=0.25,
                    use_bpl=TRUE,
-                   bpl_max_steps=10,
-                   bpl_inc_ratio=0.25,
-                   bpl_anchor=0.75,
-                   bpl_min=0.50,
-                   bpl_weight_inc=1,
-                   bpl_valid_size=0.33,
+                   bpl_max_steps=3,
+                   bpl_epochs_per_step=1,
+                   bpl_dynamic_inc=FALSE,
+                   bpl_balance=TRUE,
+                   bpl_max=1.00,
+                   bpl_anchor=1.00,
+                   bpl_min=0.00,
+                   bpl_weight_inc=0.02,
+                   bpl_weight_start=0.00,
                    bpl_model_reset=FALSE,
-                   epochs=100,
+                   epochs=40,
                    batch_size=32,
                    dir_checkpoint,
                    trace=TRUE,
@@ -541,8 +559,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Checking Prerequisites
       if(trace==TRUE){
-        print(paste(date(),
-                    "Start"))
+        cat(paste(date(),
+                    "Start","\n"))
       }
 
       if(!("EmbeddedText" %in% class(data_embeddings))){
@@ -567,11 +585,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       if(bpl_anchor<bpl_min){
         stop("bpl_anchor must be at least bpl_min")
       }
+      if(bpl_anchor>bpl_max){
+        stop("bpl_anchor must be lower or equal to bpl_max")
+      }
 
       #------------------------------------------------------------------------
       if(trace==TRUE){
-        print(paste(date(),
-                    "Matching Input and Target Data"))
+        cat(paste(date(),
+                    "Matching Input and Target Data","\n"))
       }
       data_embeddings=data_embeddings$clone(deep=TRUE)
       viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
@@ -581,8 +602,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Reducing to unique cases
       if(trace==TRUE){
-        print(paste(date(),
-                    "Checking Uniqueness of Data"))
+        cat(paste(date(),
+                    "Checking Uniqueness of Data","\n"))
       }
       n_init_cases=nrow(data_embeddings$embeddings)
       data_embeddings$embeddings=unique(data_embeddings$embeddings)
@@ -592,16 +613,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,]
       data_targets=data_targets[viable_cases]
       if(trace==TRUE){
-        print(paste(date(),
+        cat(paste(date(),
                     "Total Cases:",n_init_cases,
-                    "Unique Cases:",n_final_cases))
+                    "Unique Cases:",n_final_cases,"\n"))
       }
 
 
       #Checking Minimal Frequencies.
       if(trace==TRUE){
-        print(paste(date(),
-                    "Checking Minimal Frequencies."))
+        cat(paste(date(),
+                    "Checking Minimal Frequencies.","\n"))
       }
       freq_check<-table(data_targets)
       freq_check_eval<-freq_check<4
@@ -621,7 +642,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Split data into k folds
-      folds=get_folds(target=data_targets,k_folds=data_n_valid_samples)
+      folds=get_folds(target=data_targets,k_folds=data_n_test_samples)
 
       #Create a Vector with names of categories
       categories<-names(table(data_targets))
@@ -641,6 +662,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               "final_train"),
                               bpl_steps=NULL)
 
+      #Init Object for Saving syntehtic xases
       data_bsc_train=matrix(data = 0,
                       nrow = folds$n_folds+1,
                       ncol = length(categories))
@@ -651,12 +673,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Initializing Objects for Saving Performance
       test_metric=array(dim=c(folds$n_folds,
-                             bpl_max_steps+4,
+                             4,
                              17),
                        dimnames = list(iterations=NULL,
                                        steps=c("Baseline",
                                                "BSC",
-                                               paste0("BPL_Step",seq(from=1,to=bpl_max_steps,by=1)),
                                                "BPL",
                                                "Final"),
                                        metrics=c("iota_index",
@@ -681,49 +702,201 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       iota_objects_start_free=NULL
       iota_objects_end_free=NULL
 
+      #Initializing core objects
+      embeddings_all=data_embeddings$embeddings
+      targets_labeleld_all=na.omit(data_targets)
+
+      names_unlabeled=names(subset(data_targets,is.na(data_targets)==TRUE))
 
       for(iter in 1:folds$n_folds){
         #---------------------------------------------
-
-
         #Create a Train and Validation Sample
-        targets_val=data_targets[folds$val_sample[[iter]]]
-        targets_train=data_targets[c(folds$train_sample[[iter]],
-                                     folds$unlabeled_cases)]
+        names_targets_labaled_test=folds$val_sample[[iter]]
+        names_targets_labeled_train=folds$train_sample[[iter]]
 
-        embeddings_val=data_embeddings$clone(deep=TRUE)
-        embeddings_val$embeddings=embeddings_val$embeddings[folds$val_sample[[iter]],]
-        embeddings_val$embeddings=na.omit(embeddings_val$embeddings)
-
-        embeddings_train=data_embeddings$clone(deep=TRUE)
-        embeddings_train$embeddings=embeddings_train$embeddings[names(targets_train),]
-        #embeddings_train$embeddings=na.omit(embeddings_train$embeddings)
+        targets_labeleld_train=targets_labeleld_all[names_targets_labeled_train]
+        targets_labeled_test=targets_labeleld_all[names_targets_labaled_test]
 
         #Train baseline model or normal training--------------------------------
         if(use_baseline==TRUE |
            (use_bsc==FALSE & use_bpl==FALSE) |
            (use_bsc==FALSE & use_bpl==TRUE)){
           if(trace==TRUE){
-            print(paste(date(),
+            cat(paste(date(),
                         "Iter:",iter,"from",folds$n_folds,
-                        "Training Baseline Model"))
+                        "Training Baseline Model","\n"))
           }
-
-          #omit cases with na
-          current_train_targets=na.omit(targets_train)
-          current_train_embedding=embeddings_train$embeddings[names(current_train_targets),]
 
           #Get Train and Test Sample
           baseline_sample<-get_stratified_train_test_split(
-            targets = current_train_targets,
-            val_size = bsl_val_size
-          )
+            targets = targets_labeleld_all[names_targets_labeled_train],
+            val_size = bsl_val_size)
+
+          names_targets_labeled_train_train=baseline_sample$train_sample
+          names_targets_labeled_train_test=baseline_sample$test_sample
+
+          targets_labeled_train_train=targets_labeleld_all[names_targets_labeled_train_train]
+          targets_labeled_val=targets_labeleld_all[names_targets_labeled_train_test]
 
           #Train model
-          private$basic_train(embedding_train=current_train_embedding[baseline_sample$train_sample,],
-                              target_train=current_train_targets[baseline_sample$train_sample],
-                              embedding_test=current_train_embedding[baseline_sample$test_sample,],
-                              target_test=current_train_targets[baseline_sample$test_sample],
+          private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,],
+                              target_train=targets_labeled_train_train,
+                              embedding_test=embeddings_all[names_targets_labeled_train_test,],
+                              target_test=targets_labeled_val,
+                              epochs=epochs,
+                              batch_size=batch_size,
+                              trace=FALSE,
+                              keras_trace=keras_trace,
+                              view_metrics=view_metrics,
+                              reset_model=TRUE,
+                              dir_checkpoint=dir_checkpoint)
+
+          #Predict val targets
+          test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,],
+                                        verbose = keras_trace,
+                                        batch_size =batch_size)
+          test_pred_cat=test_predictions$expected_category
+          names(test_pred_cat)=rownames(test_predictions)
+          test_pred_cat<-test_pred_cat[names(targets_labeled_test)]
+          test_res=get_coder_metrics(true_values = targets_labeled_test,
+                                     predicted_values = test_pred_cat)
+
+          #Save results for baseline model
+          test_metric[iter,1,]<-test_res
+          #print(paste("Baseline:",test_res["avg_alpha"]))
+
+          if(use_bsc==TRUE | use_bpl==TRUE){
+          iota_objects_start[iter]=list(iotarelr::check_new_rater(true_values = targets_labeled_test,
+                                                                  assigned_values = test_pred_cat,
+                                                                  free_aem = FALSE))
+          iota_objects_start_free[iter]=list(iotarelr::check_new_rater(true_values = targets_labeled_test,
+                                                                       assigned_values = test_pred_cat,
+                                                                       free_aem = TRUE))
+          }
+          #print(paste("Train",length(targets_labeled_train_train),
+          #          "Validation",length(targets_labeled_val),
+          #          "Test",length(targets_labeled_test)))
+        }
+
+        #Create and Train with synthetic cases----------------------------------
+        if(use_bsc==TRUE){
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Applying Augmention with Balanced Synthetic Cases","\n"))
+          }
+
+          #Generating Data For Training
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Generating Synthetic Cases","\n"))
+          }
+          #save(embeddings_train_labeled,targets_train_labeled,bsc_methods,bsc_max_k,
+          #     file="debug.RData")
+          syn_cases<-get_synthetic_cases(embedding=embeddings_all[names_targets_labeled_train,],
+                                         target=targets_labeleld_train,
+                                         method=bsc_methods,
+                                         max_k=bsc_max_k,
+                                         times = self$text_embedding_model$times,
+                                         features = self$text_embedding_model$features)
+          targets_synthetic_all=factor(syn_cases$syntetic_targets,
+                                       levels = categories)
+          embeddings_syntehtic_all=syn_cases$syntetic_embeddings
+
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Generating Synthetic Cases Done","\n"))
+          }
+
+          #Combining original labeled data and synthetic data
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Selecting Synthetic Cases","\n"))
+          }
+          #Checking frequencies of categories and adding syn_cases
+          cat_freq=table(targets_labeleld_train)
+          cat_max=max(cat_freq)
+          cat_delta=cat_max-cat_freq
+
+          cat_freq_syn=table(targets_synthetic_all)
+
+          names_syntethic_targets_selected=NULL
+          for(cat in categories){
+            if(cat_delta[cat]>0){
+              condition=(targets_synthetic_all==cat)
+              tmp_subset=subset(x = targets_synthetic_all,
+                                subset = condition)
+              names_syntethic_targets_selected[cat]=list(
+                sample(x=names(tmp_subset),
+                       size = min(cat_delta[cat],length(tmp_subset)),
+                       replace = FALSE)
+              )
+            }
+          }
+          names_syntethic_targets_selected=(unlist(names_syntethic_targets_selected,
+                                                   use.names = FALSE))
+
+          #Combining original labeled data and synthetic data
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Combining Original and Synthetic Data","\n"))
+          }
+
+          #embeddings_labeled_syn=rbind(embeddings,
+          #                             syn_cases$syntetic_embeddings[syn_cases_selected,])
+          #targets_labeled_syn=c(targets_train_labeled,as.factor(syn_cases$syntetic_targets[syn_cases_selected]))
+          #targets_labeled_syn=targets_labeled_syn[rownames(embeddings_labeled_syn)]
+
+          #Creating training and test sample
+          bsc_train_test_split<-get_stratified_train_test_split(
+            targets = c(targets_labeleld_train,targets_synthetic_all[names_syntethic_targets_selected]),
+            val_size=bsc_val_size)
+
+          #Including names of synthetic cases
+          names_targets_labeled_train_train=bsc_train_test_split$train_sample
+          names_targets_labeled_train_test=bsc_train_test_split$test_sample
+
+          #Creating the final dataset for training. Please note that units
+          #with NA in target are included for pseudo labeling if requested
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Creating Train Dataset","\n"))
+          }
+
+          embeddings_all_and_synthetic=rbind(
+            embeddings_all,
+            embeddings_syntehtic_all)
+
+          targets_all_and_synthetic=c(
+            targets_labeleld_all,
+            targets_synthetic_all)
+
+          #Creating the final test dataset for training
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Creating Test Dataset","\n"))
+          }
+
+          #Save freq of every labeled original and synthetic case
+          data_bsc_train[iter,]<-table(targets_all_and_synthetic[names_targets_labeled_train_train])
+          data_bsc_test[iter,]<-table(targets_all_and_synthetic[names_targets_labeled_train_test])
+
+          #Train model
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Iter:",iter,"from",folds$n_folds,
+                        "Start Training","\n"))
+          }
+          private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,],
+                              target_train=targets_all_and_synthetic[names_targets_labeled_train_train],
+                              embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,],
+                              target_test=targets_all_and_synthetic[names_targets_labeled_train_test],
                               epochs=epochs,
                               batch_size=batch_size,
                               trace=FALSE,
@@ -732,219 +905,73 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               reset_model=TRUE,
                               dir_checkpoint=dir_checkpoint)
           #Predict val targets
-          val_predictions=self$predict(newdata=embeddings_val)
-          #compare prediction and true values
-          #print(targets_val)
-          #print(val_predictions$expected_category)
-          #print(cbind(targets_val,val_predictions$expected_category))
-
-          val_res=get_coder_metrics(true_values = targets_val,
-                                    predicted_values = val_predictions$expected_category)
+          test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,],
+                                        verbose = keras_trace,
+                                        batch_size =batch_size)
+          test_pred_cat=test_predictions$expected_category
+          names(test_pred_cat)=rownames(test_predictions)
+          test_pred_cat=test_pred_cat[names(targets_labeled_test)]
+          test_res=get_coder_metrics(true_values = targets_labeled_test,
+                                     predicted_values = test_pred_cat)
           #Save results for baseline model
-          test_metric[iter,1,]<-val_res
+          test_metric[iter,2,]<-test_res
+          #print(paste("BSC",test_res["avg_alpha"]))
 
-          if(use_bsc==TRUE | use_bpl==TRUE){
+          #print(paste("Train",length(names_targets_labeled_train_train),
+          #            "Validation",length(names_targets_labeled_train_test),
+          #            "Test",length(targets_labeled_test)))
 
-          iota_objects_start[iter]=list(iotarelr::check_new_rater(true_values = targets_val,
-                                                                  assigned_values = val_predictions$expected_category,
-                                                                  free_aem = FALSE))
-          iota_objects_start_free[iter]=list(iotarelr::check_new_rater(true_values = targets_val,
-                                                                       assigned_values = val_predictions$expected_category,
-                                                                       free_aem = TRUE))
-          }
-        }
-
-        #Create and Train with synthetic cases----------------------------------
-        if(use_bsc==TRUE){
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Applying Augmention with Balanced Synthetic Cases"))
-          }
-          #Split data in labeled and unlabeled cases
-          train_data_labeled_unlabeled=split_labeled_unlabeled(embedding = embeddings_train,
-                                                               target = targets_train)
-
-          embeddings_train_unlabeled=train_data_labeled_unlabeled$embeddings_unlabeled
-          embeddings_train_labeled=train_data_labeled_unlabeled$embeddings_labeled
-          targets_train_labeled=train_data_labeled_unlabeled$targets_labeled
-
-          #Generating Data For Training
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Generating Synthetic Cases"))
-          }
-          #save(embeddings_train_labeled,targets_train_labeled,bsc_methods,bsc_max_k,
-          #     file="debug.RData")
-          syn_cases<-get_synthetic_cases(embedding=embeddings_train_labeled,
-                                         target=targets_train_labeled,
-                                         method=bsc_methods,
-                                         max_k=bsc_max_k)
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Generating Synthetic Cases Done"))
-          }
-
-          #Combining original labeled data and synthetic data
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Selecting Synthetic Cases"))
-          }
-          #Checking frequencies of categories and adding syn_cases
-          cat_freq=table(targets_train_labeled)
-          cat_max=max(cat_freq)
-          cat_delta=cat_max-cat_freq
-
-          cat_freq_syn=table(syn_cases$syntetic_targets)
-
-          syn_cases_selected=NULL
-          for(cat in categories){
-            if(cat_delta[cat]>0){
-              condition=(syn_cases$syntetic_targets==cat)
-              tmp_subset=subset(x = syn_cases$syntetic_targets,
-                                subset = condition)
-              syn_cases_selected[cat]=list(
-                sample(x=names(tmp_subset),
-                       size = min(cat_delta[cat],length(tmp_subset)),
-                       replace = FALSE)
-              )
-            }
-          }
-          syn_cases_selected=unlist(syn_cases_selected)
-
-          #Combining original labeled data and synthetic data
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Combining Original and Synthetic Data"))
-          }
-          embeddings_labeled_syn=rbind(embeddings_train_labeled,
-                                       syn_cases$syntetic_embeddings[syn_cases_selected,])
-          targets_labeled_syn=c(targets_train_labeled,as.factor(syn_cases$syntetic_targets[syn_cases_selected]))
-
-          #Ensuring that only unique cases are part of the data
-          #if(trace==TRUE){
-          #  print(paste(date(),
-          #              "Iter:",iter,"from",folds$n_folds,
-          #              "Reducing Data to Unique Cases"))
-          #}
-          #embeddings_labeled_syn=dplyr::distinct(embeddings_labeled_syn)
-          targets_labeled_syn=targets_labeled_syn[rownames(embeddings_labeled_syn)]
-          #if(trace==TRUE){
-          #  print(paste(date(),
-          #              "Iter:",iter,"from",folds$n_folds,
-          #              "Reducing Data to Unique Cases Done"))
-          #}
-
-          #Creating training and test sample
-          bsc_train_test_split<-get_stratified_train_test_split(
-            targets = targets_labeled_syn,
-            val_size=0.25)
-          val_sampel_bsc=bsc_train_test_split$test_sample
-          train_sample_bsc=bsc_train_test_split$train_sample
-
-          #Creating the final dataset for training. Please note that units
-          #with NA in target are included for pseudo labeling if requested
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Creating Train Dataset"))
-          }
-          embeddings_train_train=rbind(
-            embeddings_labeled_syn[train_sample_bsc,],
-            embeddings_train_unlabeled)
-          targets_train_train=c(
-            targets_labeled_syn[train_sample_bsc],
-            targets_train[rownames(embeddings_train_unlabeled)]
-          )
-
-          #Creating the final test dataset for training
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Creating Test Dataset"))
-          }
-          embeddings_train_test=embeddings_labeled_syn[val_sampel_bsc,]
-          targets_train_test=as.factor(targets_labeled_syn[val_sampel_bsc])
-
-          #omit cases with na
-          current_train_targets=na.omit(targets_train_train)
-          current_train_embedding=embeddings_train_train[names(current_train_targets),]
-
-          #Save freq of every labeled original and synthetic case
-          data_bsc_train[iter,]<-table(current_train_targets)
-          data_bsc_test[iter,]<-table(targets_train_test)
-
-          #Train model
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:",iter,"from",folds$n_folds,
-                        "Start Training"))
-          }
-          private$basic_train(embedding_train=current_train_embedding,
-                              target_train=current_train_targets,
-                              embedding_test=embeddings_train_test,
-                              target_test=targets_train_test,
-                              epochs=epochs,
-                              batch_size=batch_size,
-                              trace=FALSE,
-                              keras_trace=keras_trace,
-                              view_metrics=view_metrics,
-                              reset_model=bpl_model_reset,
-                              dir_checkpoint=dir_checkpoint)
-          #Predict val targets
-          val_predictions=self$predict(newdata=embeddings_val)
-          #compare prediction and true values
-          val_res=get_coder_metrics(true_values = targets_val,
-                                    predicted_values = val_predictions$expected_category)
-          #Save results for baseline model
-          test_metric[iter,2,]<-val_res
         }
 
         #Applying Pseudo Labeling-----------------------------------------------
         if(use_bpl==TRUE){
           categories<-names(table(data_targets))
           if(trace==TRUE){
-            print(paste(date(),
+            cat(paste(date(),
                         "Iter:",iter,"from",folds$n_folds,
-                        "Applying Balanced Pseudo Labeling"))
+                        "Applying Pseudo Labeling","\n"))
           }
-          added_cases_train=100
+
+          #Defining the basic parameter for while
           step=1
+          val_avg_alpha=0
 
           if(use_bsc==TRUE){
-            targets_augmented=targets_train_train
-            #original_targets=na.omit(targets_train_train)
-            weights_cases_list=NULL
-            weights_cases_list[1]=list(names(na.omit(targets_train_train)))
-            current_test_embedding=embeddings_train_test
-            current_test_targets=targets_train_test
+            pseudo_label_embeddings_all=embeddings_all_and_synthetic
+            pseudo_label_targets_labeled_train=targets_all_and_synthetic[names_targets_labeled_train_train]
+            pseudo_label_targets_labeled_test=targets_labeled_test
+            pseudo_label_targets_labeled_val=targets_all_and_synthetic[names_targets_labeled_train_test]
           } else {
-            targets_augmented=targets_train
-            #original_targets=na.omit(targets_train)
-            weights_cases_list=NULL
-            weights_cases_list[1]=list(names(na.omit(targets_train)))
-            current_test_embedding=embeddings_val$clone(deep=TRUE)
-            current_test_targets=targets_val
+            pseudo_label_embeddings_all=embeddings_all
+            pseudo_label_targets_labeled_train=targets_labeled_train_train
+            pseudo_label_targets_labeled_val=targets_labeled_val
+            pseudo_label_targets_labeled_test=targets_labeled_test
           }
+          weights_cases_list=NULL
+          weights_cases_list[1]=list(names_targets_labeled_train_train)
 
+          added_cases_train=100
+
+
+          #Start of While-------------------------------------------------------
           while(step <=bpl_max_steps & added_cases_train>0){
-            #Augmenting Data
 
-            #Select targets with no label
-            condition=is.na(targets_augmented)
-            remaining_targets=subset(targets_augmented,
-                                     subset=condition)
+            if(bpl_dynamic_inc==TRUE){
+              bpl_inc_ratio=step/bpl_max_steps
+            } else {
+              bpl_inc_ratio=1
+            }
 
-            #Select the corresponding embeddings
-            remaining_embeddings<-embeddings_train$clone(deep=TRUE)
-            remaining_embeddings$embeddings<-remaining_embeddings$embeddings[names(remaining_targets),]
+            #print(paste("Train",length(pseudo_label_targets_labeled_train),
+            #            "Validation",length(pseudo_label_targets_labeled_val),
+            #            "Test",length(pseudo_label_targets_labeled_test),
+            #            "Unlabeled",length(names_unlabeled)))
+
 
             #Estimate the labels for the remaining data
-            est_remaining_data=self$predict(newdata=remaining_embeddings)
+            est_remaining_data=self$predict(newdata=embeddings_all[names_unlabeled,],
+                                            verbose = keras_trace,
+                                            batch_size =batch_size)
 
             #Create Matrix for saving the results
             new_categories<-matrix(nrow= nrow(est_remaining_data),
@@ -953,179 +980,170 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             colnames(new_categories)=c("cat","prob")
 
             #Gather information for every case. That is the category with the
-            #highest probaiblits and save both
+            #highest probability and save both
             for(i in 1:nrow(est_remaining_data)){
               tmp_est_prob=est_remaining_data[i,1:(ncol(est_remaining_data)-1)]
               new_categories[i,1]=categories[which.max(tmp_est_prob)]
               new_categories[i,2]=max(tmp_est_prob)
-
             }
             new_categories<-as.data.frame(new_categories)
 
-            #check if all possible categories are part of the estimates.
-            #if not stop process here since it would influence the balance
+            #Transforming the probabilities to a information index
+            new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/length(categories))/(1-1/length(categories)))
+            new_categories=as.data.frame(new_categories)
+
+            #Reducing the new categories to the desired range
+            condition=(new_categories[,2]>=bpl_min & new_categories[,2]<=bpl_max)
+            new_categories=subset(new_categories,
+                                  condition)
+
+            #calculate the minimal freq of the available categories
             new_cat_freq=table(new_categories$cat)
             min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
+            new_categories_names=names(new_cat_freq)
 
-            if(length(new_cat_freq)==length(categories)){
-                #Transforming the probabilities to a information index
-                new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/length(categories))/(1-1/length(categories)))
-                new_categories=as.data.frame(new_categories)
-
-                #Ensuring minimal certainty
-                tmp_condition=(new_categories[,2]>=bpl_min)
-                new_categories_selected=subset(x=new_categories,
-                                      subset=tmp_condition)
-                new_cat_freq=table(new_categories$cat)
-                min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
-
-                if(length(new_cat_freq)==length(categories)){
-                #Order cases with increasing distance from maximal information
-                final_new_categories=NULL
-                for(cat in categories){
-                  condition=new_categories[,1]==cat
-                  tmp=subset(x=new_categories,
-                             subset=condition)
-                  tmp=tmp[order(tmp$prob,decreasing = FALSE),]
-                  #Chose always the same number of new cases to ensure the balance
-                  #of all categories
-                  final_new_categories=append(x=final_new_categories,
-                                              values=rownames(tmp)[1:min_new_freq])
-                }
-
-                #select final categories
-                new_categories=new_categories[unique(final_new_categories),]
+            #Order cases with increasing distance from maximal information
+            names_final_new_categories=NULL
+            for(cat in new_categories_names){
+              condition=(new_categories[,1]==cat)
+              tmp=subset(x=new_categories,
+                         subset=condition)
+              tmp=tmp[order(tmp$prob,decreasing = FALSE),]
+              if(bpl_balance==TRUE){
+                #Chose always the same number of new cases to ensure the balance
+                #of all categories
+                names_final_new_categories=append(x=names_final_new_categories,
+                                            values=rownames(tmp)[1:min_new_freq])
               } else {
-                new_categories=data.frame()
+                n_inc=max(floor(nrow(tmp)*bpl_inc_ratio),1)
+                names_final_new_categories=append(x=names_final_new_categories,
+                                            values=rownames(tmp)[1:n_inc])
               }
-            } else{
-              new_categories=data.frame()
             }
 
-            #Splitting augmented data into train and test set
-            if(min_new_freq>=2 & nrow(new_categories)>0){
-              tmp_targets=factor(new_categories[,1],
-                                 levels = categories)
-              names(tmp_targets)=rownames(new_categories)
-              bpl_train_test_split<-get_stratified_train_test_split(
-                targets = tmp_targets,
-                val_size = max(1/min_new_freq,bpl_valid_size))
-              targets_augmented_train=bpl_train_test_split$train_sample
-              targets_augmented_test=bpl_train_test_split$test_sample
+            new_categories<-new_categories[names_final_new_categories,]
+
+            targets_pseudo_labeled<-new_categories[names_final_new_categories,1]
+            targets_pseudo_labeled<-factor(targets_pseudo_labeled,
+                                         levels=categories)
+            names(targets_pseudo_labeled)<-names_final_new_categories
+
+            targets_labeled_and_pseudo<-c(
+              pseudo_label_targets_labeled_train,
+              targets_pseudo_labeled)
+
+          #Counting new cases
+          added_cases_train=length(targets_pseudo_labeled)
+          data_pbl[iter,step]=added_cases_train
+
+          #Calculating the weights for the new cases
+          weights_cases_list[2]=list(names(targets_pseudo_labeled))
+          tmp_weights=NULL
+          tmp_weights_names=NULL
+          for(i in 1:length(weights_cases_list)){
+            if(i==1){
+              w=1
             } else {
-              targets_augmented_train=rownames(new_categories)
-              targets_augmented_test=NULL
+              w=bpl_weight_start+ bpl_weight_inc*step
             }
+            tmp_weights=append(x=tmp_weights,
+                                 values = rep(
+                                   x=w,
+                                   times = length(weights_cases_list[[i]]))
+                               )
+            tmp_weights_names=append(x=tmp_weights_names,
+                                     values = weights_cases_list[[i]])
+            }
+            names(tmp_weights)=tmp_weights_names
+            sample_weights=tmp_weights[names(targets_labeled_and_pseudo)]
 
-            #Augmenting Train Data with new cases
-            targets_augmented[targets_augmented_train]=as.character(new_categories[targets_augmented_train,1])
-            #Removing cases that are assigned to test data
-            targets_augmented=targets_augmented[!names(targets_augmented)%in%targets_augmented_test]
-            #Creating a factor
-            targets_augmented=as.factor(targets_augmented)
-
-            #Augmenting Test Data
-            if(use_bsc==TRUE){
-              current_test_embedding=rbind(
-                current_test_embedding,
-                embeddings_train$embeddings[targets_augmented_test,])
+           #Train model
+            if(bpl_epochs_per_step>1){
+              use_callback=TRUE
             } else {
-              current_test_embedding$embeddings=rbind(
-                current_test_embedding$embeddings,
-                embeddings_train$embeddings[targets_augmented_test,])
+              use_callback=FALSE
             }
-            current_test_targets=c(current_test_targets,
-                                   factor(as.character(new_categories[targets_augmented_test,1]),
-                                          levels = categories))
-            current_test_targets=as.factor(current_test_targets)
+                private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),],
+                                    target_train=targets_labeled_and_pseudo,
+                                    embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+                                    target_test=pseudo_label_targets_labeled_val,
+                                    epochs = bpl_epochs_per_step,
+                                    use_callback=use_callback,
+                                    batch_size=batch_size,
+                                    trace=FALSE,
+                                    keras_trace=keras_trace,
+                                    view_metrics=view_metrics,
+                                    reset_model=bpl_model_reset,
+                                    dir_checkpoint=dir_checkpoint,
+                                    sample_weights=sample_weights)
 
-            #Counting new cases
-            added_cases_train=length(targets_augmented_train)
-            added_cases_test=length(targets_augmented_test)
-            data_pbl[iter,step]=added_cases_train+added_cases_test
-            n_cases_total=length(subset(targets_augmented,is.na(targets_augmented)==FALSE))
-            n_cases_unlabaled=length(targets_augmented)-n_cases_total
+              #predict val targets
+              val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+                                            verbose = keras_trace,
+                                            batch_size =batch_size)
+              val_pred_cat=val_predictions$expected_category
+              names(val_pred_cat)=rownames(val_predictions)
+              val_pred_cat=val_pred_cat[names(pseudo_label_targets_labeled_val)]
+              val_res=get_coder_metrics(true_values = pseudo_label_targets_labeled_val,
+                                        predicted_values = val_pred_cat)
 
-            #Selecting the correct data for new training
-            current_train_targets=na.omit(targets_augmented)
+              #print(table(data.frame(pred=val_predictions$expected_category,
+              #              true=pseudo_label_targets_labeled_val)))
 
-            if(use_bsc==TRUE){
-              current_train_embedding=embeddings_train_train[names(current_train_targets),]
-            } else {
-              current_train_embedding=embeddings_train$embeddings[names(current_train_targets),]
-            }
+              #Predict test targets
+              test_predictions=self$predict(newdata = embeddings_all[names(pseudo_label_targets_labeled_test),],
+                                            verbose = keras_trace,
+                                            batch_size =batch_size)
+              test_pred_cat=test_predictions$expected_category
+              names(test_pred_cat)=rownames(test_predictions)
+              test_pred_cat<-test_pred_cat[names(pseudo_label_targets_labeled_test)]
+              test_res=get_coder_metrics(true_values = pseudo_label_targets_labeled_test,
+                                         predicted_values = test_pred_cat)
 
-            if(added_cases_train>0){
-              #Calculating the weights for the new cases
-              weights_cases_list[length(weights_cases_list)+1]=list(
-                setdiff(x=names(current_train_targets),
-                        y=unlist(weights_cases_list)))
-
-              tmp_weights=NULL
-              tmp_weights_names=NULL
-              for(i in 1:length(weights_cases_list)){
-                tmp_weights=append(x=tmp_weights,
-                                   values = rep.int(
-                                     x=(1+(i-1)*bpl_weight_inc),
-                                     times = length(weights_cases_list[[i]])
-                                     )
-                                   )
-                tmp_weights_names=append(x=tmp_weights_names,
-                                         values = weights_cases_list[[i]])
+              if(val_avg_alpha<val_res["avg_alpha"]){
+                val_avg_alpha=val_res["avg_alpha"]
+                new_best_model=self$bundeled_model
+                best_val_metric=val_res
+                best_test_metric=test_res
               }
-              names(tmp_weights)=tmp_weights_names
+              #print(paste("Validation:",val_res["avg_alpha"]))
+              #print(paste("Test:",test_res["avg_alpha"]))
 
-              sample_weights=tmp_weights[names(current_train_targets)]
+              #print(paste("Train",length(targets_labeled_and_pseudo),
+              #            "Validation",length(pseudo_label_targets_labeled_val),
+              #            "Test",length(pseudo_label_targets_labeled_test),
+              #            "Unlabeled",length(targets_pseudo_labeled)))
 
               if(trace==TRUE){
-                print(paste(date(),
-                            "Iter:",iter,"from",folds$n_folds,
-                            "Step:",step,"/",bpl_max_steps,
-                            "Added Cases Test:",added_cases_test,
-                            "Added Cases Train:",added_cases_train,
-                            "Cases Total Train:",n_cases_total,
-                            "Cases Unlabaled:",n_cases_unlabaled,"/",n_unlabeled_data))
+                cat(paste(date(),
+                            "Epoch",step,"Done","\n"))
               }
-
-              #Train model
-              private$basic_train(embedding_train=current_train_embedding,
-                                  target_train=current_train_targets,
-                                  embedding_test=current_test_embedding,
-                                  target_test=current_test_targets,
-                                  epochs=epochs,
-                                  batch_size=batch_size,
-                                  trace=FALSE,
-                                  keras_trace=keras_trace,
-                                  view_metrics=view_metrics,
-                                  reset_model=TRUE,
-                                  dir_checkpoint=dir_checkpoint,
-                                  sample_weights=sample_weights)
-
-              #Predict val targets
-              val_predictions=self$predict(newdata=embeddings_val)
-
-              #compare prediction and true values
-              val_res=get_coder_metrics(true_values = targets_val,
-                                        predicted_values = val_predictions$expected_category)
-              #Save results for baseline model
-              test_metric[iter,2+step,]<-val_res
-            }
 
             #increase step
             step=step+1
           }
-          test_metric[iter,"BPL",]<-val_res
+
+          self$bundeled_model=new_best_model
+          test_metric[iter,"BPL",]<-best_test_metric
+          test_res<-best_test_metric
         }
-        test_metric[iter,"Final",]<-val_res
+        test_metric[iter,"Final",]<-test_res
 
-        iota_objects_end[iter]=list(iotarelr::check_new_rater(true_values = targets_val,
-                                                                assigned_values = val_predictions$expected_category,
+
+        test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,],
+                                      verbose = keras_trace,
+                                      batch_size =batch_size)
+        test_pred_cat=test_predictions$expected_category
+        names(test_pred_cat)=rownames(test_predictions)
+        test_pred_cat<-test_pred_cat[names(targets_labeled_test)]
+        test_res=get_coder_metrics(true_values = targets_labeled_test,
+                                   predicted_values = test_pred_cat)
+        iota_objects_end[iter]=list(iotarelr::check_new_rater(true_values = targets_labeled_test,
+                                                                assigned_values = test_pred_cat,
                                                                 free_aem = FALSE))
-        iota_objects_end_free[iter]=list(iotarelr::check_new_rater(true_values = targets_val,
-                                                                     assigned_values = val_predictions$expected_category,
+        iota_objects_end_free[iter]=list(iotarelr::check_new_rater(true_values = targets_labeled_test,
+                                                                     assigned_values = test_pred_cat,
                                                                      free_aem = TRUE))
-
-
 
         #----------------------------------------------
       }
@@ -1179,37 +1197,30 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Final Training----------------------------------------------------------
       if((use_bsc==FALSE & use_bpl==FALSE) |
-         (use_baseline=TRUE) |
+         #(use_baseline=TRUE) |
         (use_bsc==FALSE & use_bpl==TRUE)){
         embeddings_train=data_embeddings$clone(deep=TRUE)
         targets_train=data_targets
         if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:","Final Training",
-                      "Final Training of Baseline Model"))
+          cat(paste(date(),
+                      "Final Training of Baseline Model","\n"))
         }
-
-        #omit cases with na
-        current_train_targets=na.omit(targets_train)
-        current_embedding=embeddings_train$embeddings[names(current_train_targets),]
-
         #Get Train and Test Sample
         baseline_sample<-get_stratified_train_test_split(
-          targets = current_train_targets,
-          val_size = bsl_val_size
-        )
+          targets = targets_labeleld_all,
+          val_size = bsl_val_size)
 
-        current_train_embedding=current_embedding[baseline_sample$train_sample,]
-        target_train=current_train_targets[baseline_sample$train_sample]
+        names_targets_labeled_train_train=baseline_sample$train_sample
+        names_targets_labeled_train_test=baseline_sample$test_sample
 
-        current_test_embedding=current_embedding[baseline_sample$test_sample,]
-        current_test_targets=current_train_targets[baseline_sample$test_sample]
+        targets_labeled_train_train=targets_labeleld_all[names_targets_labeled_train_train]
+        targets_labeled_val=targets_labeleld_all[names_targets_labeled_train_test]
 
         #Train model
-        private$basic_train(embedding_train=current_train_embedding,
-                            target_train=target_train,
-                            embedding_test=current_test_embedding,
-                            target_test=current_test_targets,
+        private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,],
+                            target_train=targets_labeled_train_train,
+                            embedding_test=embeddings_all[names_targets_labeled_train_test,],
+                            target_test=targets_labeled_val,
                             epochs=epochs,
                             batch_size=batch_size,
                             trace=FALSE,
@@ -1217,338 +1228,320 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             view_metrics=view_metrics,
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
+
+        #print(paste("Train",length(names_targets_labeled_train_train),
+        #            "Validation",length(names_targets_labeled_train_test)))
 
       }
 
       #Final Training with BSC--------------------------------------------------
 
       if(use_bsc==TRUE){
-        #Setting embedding train to the complete data set
-        embeddings_train=data_embeddings$clone(deep=TRUE)
-        targets_train=data_targets
-
         if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:","Final Training",
-                      "Applying Augmention with Balanced Synthetic Cases for Final Training"))
+          cat(paste(date(),
+                      "Final Training",
+                      "Applying Augmention with Balanced Synthetic Casesng"),"\n")
         }
-        #Split data in labeled and unlabeled cases
-        train_data_labeled_unlabeled=split_labeled_unlabeled(embedding = embeddings_train,
-                                                             target = targets_train)
-
-        embeddings_train_unlabeled=train_data_labeled_unlabeled$embeddings_unlabeled
-        embeddings_train_labeled=train_data_labeled_unlabeled$embeddings_labeled
-        targets_train_labeled=train_data_labeled_unlabeled$targets_labeled
-
         #Generating Data For Training
         if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:","Final Training",
-                      "Generating Synthetic Cases"))
+          cat(paste(date(),
+                      "Final Training",
+                      "Generating Synthetic Cases"),"\n")
         }
-        syn_cases<-get_synthetic_cases(embedding=embeddings_train_labeled,
-                                       target=targets_train_labeled,
+        #save(embeddings_train_labeled,targets_train_labeled,bsc_methods,bsc_max_k,
+        #     file="debug.RData")
+        syn_cases<-get_synthetic_cases(embedding=embeddings_all[names(targets_labeleld_all),],
+                                       target=targets_labeleld_all,
                                        method=bsc_methods,
-                                       max_k=bsc_max_k)
+                                       max_k=bsc_max_k,
+                                       times = self$text_embedding_model$times,
+                                       features = self$text_embedding_model$features)
+        targets_synthetic_all=factor(syn_cases$syntetic_targets,
+                                     levels = categories)
+        embeddings_syntehtic_all=syn_cases$syntetic_embeddings
+
         if(trace==TRUE){
-          print(paste(date(),"Generating Synthetic Cases Done"))
+          cat(paste(date(),
+                      "Final Training",
+                      "Generating Synthetic Cases Done"),"\n")
         }
 
         #Combining original labeled data and synthetic data
         if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:","Final Training",
-                      "Selecting Synthetic Cases"))
+          cat(paste(date(),
+                      "Final Training",
+                      "Selecting Synthetic Cases"),"\n")
         }
         #Checking frequencies of categories and adding syn_cases
-        cat_freq=table(targets_train_labeled)
+        cat_freq=table(targets_labeleld_all)
         cat_max=max(cat_freq)
         cat_delta=cat_max-cat_freq
 
-        cat_freq_syn=table(syn_cases$syntetic_targets)
+        cat_freq_syn=table(targets_synthetic_all)
 
-        syn_cases_selected=NULL
+        names_syntethic_targets_selected=NULL
         for(cat in categories){
           if(cat_delta[cat]>0){
-            condition=(syn_cases$syntetic_targets==cat)
-            tmp_subset=subset(x = syn_cases$syntetic_targets,
+            condition=(targets_synthetic_all==cat)
+            tmp_subset=subset(x = targets_synthetic_all,
                               subset = condition)
-            syn_cases_selected[cat]=list(
+            names_syntethic_targets_selected[cat]=list(
               sample(x=names(tmp_subset),
                      size = min(cat_delta[cat],length(tmp_subset)),
                      replace = FALSE)
             )
           }
         }
-        syn_cases_selected=unlist(syn_cases_selected)
+        names_syntethic_targets_selected=(unlist(names_syntethic_targets_selected,
+                                                 use.names = FALSE))
 
         #Combining original labeled data and synthetic data
         if(trace==TRUE){
-          print(paste(date(),
-                      "Iter:","Final Training",
-                      "Combining Original and Synthetic Data"))
+          cat(paste(date(),
+                      "Final Training",
+                      "Combining Original and Synthetic Data"),"\n")
         }
-        embeddings_labeled_syn=rbind(embeddings_train_labeled,
-                                     syn_cases$syntetic_embeddings[syn_cases_selected,])
-        targets_labeled_syn=c(targets_train_labeled,as.factor(syn_cases$syntetic_targets[syn_cases_selected]))
-
-        #Ensuring that only unique cases are part of the data
-        #if(trace==TRUE){
-        #  print(paste(date(),
-        #              "Iter:",iter,"from",folds$n_folds,
-        #              "Reducing Data to Unique Cases"))
-        #}
-        #embeddings_labeled_syn=dplyr::distinct(embeddings_labeled_syn)
-        targets_labeled_syn=targets_labeled_syn[rownames(embeddings_labeled_syn)]
-        #if(trace==TRUE){
-        #  print(paste(date(),
-        #              "Iter:",iter,"from",folds$n_folds,
-        #              "Reducing Data to Unique Cases Done"))
-        #}
 
         #Creating training and test sample
         bsc_train_test_split<-get_stratified_train_test_split(
-          targets = targets_labeled_syn,
-          val_size=0.25)
-        val_sampel_bsc=bsc_train_test_split$test_sample
-        train_sample_bsc=bsc_train_test_split$train_sample
+          targets = c(targets_labeleld_all,targets_synthetic_all[names_syntethic_targets_selected]),
+          val_size=bsc_val_size)
+
+        #Including names of synthetic cases
+        names_targets_labeled_train_train=bsc_train_test_split$train_sample
+        names_targets_labeled_train_test=bsc_train_test_split$test_sample
 
         #Creating the final dataset for training. Please note that units
         #with NA in target are included for pseudo labeling if requested
-        embeddings_train_train=rbind(
-          embeddings_labeled_syn[train_sample_bsc,],
-          embeddings_train_unlabeled)
-        targets_train_train=c(
-          targets_labeled_syn[train_sample_bsc],
-          targets_train[rownames(embeddings_train_unlabeled)]
-        )
+        if(trace==TRUE){
+          cat(paste(date(),
+                      "Final Training",
+                      "Creating Train Dataset","\n"))
+        }
+
+        embeddings_all_and_synthetic=rbind(
+          embeddings_all,
+          embeddings_syntehtic_all)
+
+        targets_all_and_synthetic=c(
+          targets_labeleld_all,
+          targets_synthetic_all)
 
         #Creating the final test dataset for training
-        embeddings_train_test=embeddings_labeled_syn[val_sampel_bsc,]
-        targets_train_test=as.factor(targets_labeled_syn[val_sampel_bsc])
+        if(trace==TRUE){
+          cat(paste(date(),
+                      "Final Training",
+                      "Creating Test Dataset","\n"))
+        }
 
-        #omit cases with na
-        current_train_targets=na.omit(targets_train_train)
-        current_train_embedding=embeddings_train_train[names(current_train_targets),]
-
-        data_bsc_train[folds$n_folds+1,]<-table(current_train_targets)
-        data_bsc_test[folds$n_folds+1,]<-table(targets_train_test)
+        #Save freq of every labeled original and synthetic case
+        data_bsc_train["final",]<-table(targets_all_and_synthetic[names_targets_labeled_train_train])
+        data_bsc_test["final",]<-table(targets_all_and_synthetic[names_targets_labeled_train_test])
 
         #Train model
-        private$basic_train(embedding_train=current_train_embedding,
-                            target_train=current_train_targets,
-                            embedding_test=embeddings_train_test,
-                            target_test=targets_train_test,
+        if(trace==TRUE){
+          cat(paste(date(),
+                      "Final Training",
+                      "Start Training","\n"))
+        }
+        private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,],
+                            target_train=targets_all_and_synthetic[names_targets_labeled_train_train],
+                            embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,],
+                            target_test=targets_all_and_synthetic[names_targets_labeled_train_test],
                             epochs=epochs,
                             batch_size=batch_size,
                             trace=FALSE,
-                            view_metrics=view_metrics,
                             keras_trace=keras_trace,
+                            view_metrics=view_metrics,
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
+        #print(paste("Train",length(names_targets_labeled_train_train),
+        #            "Validation",length(names_targets_labeled_train_test)))
       }
 
-      if(use_bpl==TRUE){
         #Applying Pseudo Labeling-----------------------------------------------
-        if(use_bpl==TRUE){
-          categories<-names(table(data_targets))
-          if(trace==TRUE){
-            print(paste(date(),
-                        "Iter:","Final Training",
-                        "Applying Balanced Pseudo Labeling for Final Training"))
-          }
-
-          added_cases_train=100
-          step=1
-
-          if(use_bsc==TRUE){
-            targets_augmented=targets_train_train
-            current_test_embedding=embeddings_train_test
-            current_test_targets=targets_train_test
-            weights_cases_list=NULL
-            weights_cases_list[1]=list(names(na.omit(targets_train_train)))
-          } else {
-            current_test_embedding=current_test_embedding
-            current_test_targets=current_test_targets
-
-            tmp_aug<-setdiff(x=as.vector(names(data_targets)),
-                             y=as.vector(names(current_test_targets)))
-            targets_augmented=data_targets[tmp_aug]
-
-            weights_cases_list=NULL
-            weights_cases_list[1]=list(names(na.omit(targets_augmented)))
-          }
-
-          while(step <=bpl_max_steps & added_cases_train>0){
-            #Augmenting Data
-
-            #Select targets with no label
-            remaining_targets=subset(targets_augmented,is.na(targets_augmented)==TRUE)
-
-            #Select the corresponding embeddings
-            remaining_embeddings<-embeddings_train$clone(deep=TRUE)
-            remaining_embeddings$embeddings<-remaining_embeddings$embeddings[names(remaining_targets),]
-
-            #Estimate the labels for the remaining data
-            est_remaining_data=self$predict(newdata=remaining_embeddings)
-            #Create Matrix for saving the results
-            new_categories<-matrix(nrow= nrow(est_remaining_data),
-                                   ncol=2)
-            rownames(new_categories)=rownames(est_remaining_data)
-            colnames(new_categories)=c("cat","prob")
-
-            #Gather information for every case. That is the category with the
-            #highest probability and save both
-            for(i in 1:nrow(est_remaining_data)){
-              tmp_est_prob=est_remaining_data[i,1:(ncol(est_remaining_data)-1)]
-              new_categories[i,1]=categories[which.max(tmp_est_prob)]
-              new_categories[i,2]=max(tmp_est_prob)
-            }
-            new_categories<-as.data.frame(new_categories)
-
-            #check if all possible categories are part of the estimates.
-            #if not stop process here since it would influence the balance
-            new_cat_freq=table(new_categories$cat)
-            min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
-
-            if(length(new_cat_freq)==length(categories)){
-              #Transforming the probabilities to a information index
-              new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/length(categories))/(1-1/length(categories)))
-              new_categories=as.data.frame(new_categories)
-
-              #Ensuring a minimal certainty
-              tmp_condition=(new_categories[,2]>=bpl_min)
-              new_categories=subset(new_categories,tmp_condition)
-              new_cat_freq=table(new_categories$cat)
-              min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
-
-              if(length(new_cat_freq)==length(categories)){
-                #Order cases with increasing distance from maximal information
-                final_new_categories=NULL
-                for(cat in categories){
-                  condition=new_categories[,1]==cat
-                  tmp=subset(x=new_categories,
-                             subset=condition)
-                  tmp=tmp[order(tmp$prob,decreasing = FALSE),]
-                  #Chose always the same number of new cases to ensure the balance
-                  #of all categories
-                  final_new_categories=append(x=final_new_categories,
-                                              values=rownames(tmp)[1:min_new_freq])
-                }
-
-                #select final categories
-                new_categories=new_categories[unique(final_new_categories),]
-              } else {
-                new_categories=data.frame()
-              }
-            } else {
-              new_categories=data.frame()
-            }
-
-            #Splitting augmented data into train and test set
-            if(min_new_freq>=2 & nrow(new_categories)>0){
-              tmp_targets=factor(new_categories[,1],
-                                 levels = categories)
-              names(tmp_targets)=rownames(new_categories)
-              bpl_train_test_split<-get_stratified_train_test_split(
-                targets = tmp_targets,
-                val_size = max(1/min_new_freq,bpl_valid_size))
-              targets_augmented_train=bpl_train_test_split$train_sample
-              targets_augmented_test=bpl_train_test_split$test_sample
-            } else {
-              targets_augmented_train=rownames(new_categories)
-              targets_augmented_test=NULL
-            }
-
-            #Augmenting Train Data with new cases
-            targets_augmented[targets_augmented_train]=as.character(new_categories[targets_augmented_train,1])
-            #Removing cases that are assigned to test data
-            targets_augmented=targets_augmented[!names(targets_augmented)%in%targets_augmented_test]
-            #Creating a factor
-            targets_augmented=as.factor(targets_augmented)
-
-            #Augmenting Test Data
-            if(use_bsc==TRUE){
-              current_test_embedding=rbind(
-                current_test_embedding,
-                embeddings_train$embeddings[targets_augmented_test,])
-            } else {
-              current_test_embedding=rbind(
-                current_test_embedding,
-                embeddings_train$embeddings[targets_augmented_test,])
-            }
-
-            current_test_targets=c(current_test_targets,
-                                   factor(as.character(new_categories[targets_augmented_test,1]),
-                                          levels = categories))
-            current_test_targets=as.factor(current_test_targets)
-
-            #Counting new cases
-            added_cases_train=length(targets_augmented_train)
-            added_cases_test=length(targets_augmented_test)
-            data_pbl[iter+1,step]=added_cases_train+added_cases_test
-            n_cases_total=length(subset(targets_augmented,is.na(targets_augmented)==FALSE))
-            n_cases_unlabaled=length(targets_augmented)-n_cases_total
-
-            #Selecting the correct data for new training
-            current_train_targets=na.omit(targets_augmented)
-            if(added_cases_train>0){
-              if(use_bsc==TRUE){
-                current_train_embedding=embeddings_train_train[names(current_train_targets),]
-              } else {
-                current_train_embedding=embeddings_train$embeddings[names(current_train_targets),]
-              }
-
-              #Calculating the weights for the new data
-              weights_cases_list[length(weights_cases_list)+1]=list(
-                setdiff(x=names(current_train_targets),
-                        y=unlist(weights_cases_list)))
-
-              tmp_weights=NULL
-              tmp_weights_names=NULL
-              for(i in 1:length(weights_cases_list)){
-                tmp_weights=append(x=tmp_weights,
-                                   values = rep.int(
-                                     x=(1+(i-1)*bpl_weight_inc),
-                                     times = length(weights_cases_list[[i]])
-                                   )
-                )
-                tmp_weights_names=append(x=tmp_weights_names,
-                                         values = weights_cases_list[[i]])
-              }
-
-              names(tmp_weights)=tmp_weights_names
-
-              sample_weights=tmp_weights[names(current_train_targets)]
-
-              if(trace==TRUE){
-                print(paste(date(),
-                            "Iter:","Final Training",
-                            "Step:",step,"/",bpl_max_steps,
-                            "Added Cases Test:",added_cases_test,
-                            "Added Cases Train:",added_cases_train,
-                            "Cases Total Train:",n_cases_total,
-                            "Cases Unlabaled:", n_cases_unlabaled,"/",n_unlabeled_data))
-              }
-
-              #Train model
-              private$basic_train(embedding_train=current_train_embedding,
-                                  target_train=current_train_targets,
-                                  embedding_test=current_test_embedding,
-                                  target_test=current_test_targets,
-                                  epochs=epochs,
-                                  batch_size=batch_size,
-                                  trace=FALSE,
-                                  keras_trace=keras_trace,
-                                  view_metrics=view_metrics,
-                                  reset_model=bpl_model_reset,
-                                  dir_checkpoint=dir_checkpoint,
-                                  sample_weights = sample_weights)
-            }
-            #increase step
-            step=step+1
-          }
+      if(use_bpl==TRUE){
+        categories<-names(table(data_targets))
+        if(trace==TRUE){
+          cat(paste(date(),
+                      "Final Training",
+                      "Applying Pseudo Labeling","\n"))
         }
+
+        #Defining the basic parameter for while
+        step=1
+        val_avg_alpha=0
+
+        if(use_bsc==TRUE){
+          pseudo_label_embeddings_all=embeddings_all_and_synthetic
+          pseudo_label_targets_labeled_train=targets_all_and_synthetic[names_targets_labeled_train_train]
+          pseudo_label_targets_labeled_test=targets_labeled_test
+          pseudo_label_targets_labeled_val=targets_all_and_synthetic[names_targets_labeled_train_test]
+        } else {
+          pseudo_label_embeddings_all=embeddings_all
+          pseudo_label_targets_labeled_train=targets_labeled_train_train
+          pseudo_label_targets_labeled_val=targets_labeled_val
+          pseudo_label_targets_labeled_test=targets_labeled_test
+        }
+        weights_cases_list=NULL
+        weights_cases_list[1]=list(names_targets_labeled_train_train)
+
+        added_cases_train=100
+
+
+        #Start of While-------------------------------------------------------
+        while(step <=bpl_max_steps & added_cases_train>0){
+
+          #print(paste("Train",length(pseudo_label_targets_labeled_train),
+          #            "Validation",length(pseudo_label_targets_labeled_val),
+          #            "Unlabeled",length(names_unlabeled)))
+
+          if(bpl_dynamic_inc==TRUE){
+            bpl_inc_ratio=step/bpl_max_steps
+          } else {
+            bpl_inc_ratio=1
+          }
+
+          #Estimate the labels for the remaining data
+          est_remaining_data=self$predict(newdata=embeddings_all[names_unlabeled,],
+                                          verbose = keras_trace,
+                                          batch_size =batch_size)
+
+          #Create Matrix for saving the results
+          new_categories<-matrix(nrow= nrow(est_remaining_data),
+                                 ncol=2)
+          rownames(new_categories)=rownames(est_remaining_data)
+          colnames(new_categories)=c("cat","prob")
+
+          #Gather information for every case. That is the category with the
+          #highest probability and save both
+          for(i in 1:nrow(est_remaining_data)){
+            tmp_est_prob=est_remaining_data[i,1:(ncol(est_remaining_data)-1)]
+            new_categories[i,1]=categories[which.max(tmp_est_prob)]
+            new_categories[i,2]=max(tmp_est_prob)
+          }
+          new_categories<-as.data.frame(new_categories)
+
+          #Transforming the probabilities to a information index
+          new_categories[,2]=abs(bpl_anchor-(as.numeric(new_categories[,2])-1/length(categories))/(1-1/length(categories)))
+          new_categories=as.data.frame(new_categories)
+
+          #Reducing the new categories to the desired range
+          condition=(new_categories[,2]>=bpl_min & new_categories[,2]<=bpl_max)
+          new_categories=subset(new_categories,
+                                condition)
+
+          #calculate the minimal freq of the available categories
+          new_cat_freq=table(new_categories$cat)
+          min_new_freq=max(floor(min(new_cat_freq)*bpl_inc_ratio),1)
+          new_categories_names=names(new_cat_freq)
+
+          #Order cases with increasing distance from maximal information
+          names_final_new_categories=NULL
+          for(cat in new_categories_names){
+            condition=(new_categories[,1]==cat)
+            tmp=subset(x=new_categories,
+                       subset=condition)
+            tmp=tmp[order(tmp$prob,decreasing = FALSE),]
+            if(bpl_balance==TRUE){
+              #Chose always the same number of new cases to ensure the balance
+              #of all categories
+              names_final_new_categories=append(x=names_final_new_categories,
+                                                values=rownames(tmp)[1:min_new_freq])
+            } else {
+              n_inc=max(floor(nrow(tmp)*bpl_inc_ratio),1)
+              names_final_new_categories=append(x=names_final_new_categories,
+                                                values=rownames(tmp)[1:n_inc])
+            }
+          }
+
+          new_categories<-new_categories[names_final_new_categories,]
+
+
+          targets_pseudo_labeled<-new_categories[names_final_new_categories,1]
+          targets_pseudo_labeled<-factor(targets_pseudo_labeled,
+                                         levels=categories)
+          names(targets_pseudo_labeled)<-names_final_new_categories
+
+          targets_labeled_and_pseudo<-c(
+            pseudo_label_targets_labeled_train,
+            targets_pseudo_labeled)
+
+          #Counting new cases
+          added_cases_train=length(targets_pseudo_labeled)
+          data_pbl[iter,step]=added_cases_train
+
+          #Calculating the weights for the new cases
+          weights_cases_list[2]=list(names(targets_pseudo_labeled))
+          tmp_weights=NULL
+          tmp_weights_names=NULL
+          for(i in 1:length(weights_cases_list)){
+            if(i==1){
+              w=1
+            } else {
+              bpl_weight_start+ bpl_weight_inc*step
+            }
+            tmp_weights=append(x=tmp_weights,
+                               values = rep(
+                                 x=w,
+                                 times = length(weights_cases_list[[i]]))
+            )
+            tmp_weights_names=append(x=tmp_weights_names,
+                                     values = weights_cases_list[[i]])
+          }
+          names(tmp_weights)=tmp_weights_names
+          sample_weights=tmp_weights[names(targets_labeled_and_pseudo)]
+
+          #Train model
+          if(bpl_epochs_per_step>1){
+            use_callback=TRUE
+          } else {
+            use_callback=FALSE
+          }
+          private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),],
+                              target_train=targets_labeled_and_pseudo,
+                              embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+                              target_test=pseudo_label_targets_labeled_val,
+                              epochs = bpl_epochs_per_step,
+                              use_callback=use_callback,
+                              batch_size=batch_size,
+                              trace=FALSE,
+                              keras_trace=keras_trace,
+                              view_metrics=view_metrics,
+                              reset_model=bpl_model_reset,
+                              dir_checkpoint=dir_checkpoint,
+                              sample_weights=sample_weights)
+          #print(paste("Train",length(targets_labeled_and_pseudo),
+          #            "Validation",length(pseudo_label_targets_labeled_val),
+          #            "Unlabeled",length(targets_pseudo_labeled)))
+
+          #predict val targets
+          val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+                                       verbose = keras_trace,
+                                       batch_size =batch_size)
+          val_pred_cat=val_predictions$expected_category
+          names(val_pred_cat)=rownames(val_predictions)
+          val_pred_cat=val_pred_cat[names(pseudo_label_targets_labeled_val)]
+          val_res=get_coder_metrics(true_values = pseudo_label_targets_labeled_val,
+                                    predicted_values = val_pred_cat)
+
+          if(val_avg_alpha<val_res["avg_alpha"]){
+            val_avg_alpha=val_res["avg_alpha"]
+            new_best_model=self$bundeled_model
+            best_val_metric=val_res
+          }
+          #print(paste("Validation:",val_res["avg_alpha"]))
+
+          if(trace==TRUE){
+            cat(paste(date(),
+                        "Epoch",step,"Done","\n"))
+          }
+
+          #increase step
+          step=step+1
+        }
+
+        self$bundeled_model=new_best_model
       }
       #Save Final Information
       self$last_training$date=date()
@@ -1599,17 +1592,24 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       if(trace==TRUE){
-        print(paste(date(),
-                    "Training Complete"))
+        cat(paste(date(),
+                    "Training Complete","\n"))
       }
     },
     #-------------------------------------------------------------------------
-    #'@description Method for prediciting new data with a trained neural net.
+    #'@description Method for predicting new data with a trained neural net.
     #'@param newdata Object of class \code{TextEmbeddingModel} or
     #'\code{data.frame} for which predictions should be made.
+    #'@param verbose \code{int} \code{verbose=0} does not print any
+    #'information about the training process from keras on the console.
+    #'\code{verbose=1} print a progress bar. \code{verbose=2} prints
+    #'one line of information for every epoch.
+    #'@param batch_size \code{int} Size of batches.
     #'@return Returns a \code{data.frame} containing the predictions and
     #'the probabilities of the different labels for each case.
-    predict=function(newdata){
+    predict=function(newdata,
+                     batch_size=32,
+                     verbose=1){
       #Checking input data
       #if(methods::isClass(where=newdata,"data.frame")==FALSE){
       #  stop("newdata mus be a data frame")
@@ -1643,11 +1643,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         #Multi Class
         #Predicting target variable
         model<-bundle::unbundle(self$bundeled_model)
-        predictions_prob<-model %>% stats::predict(real_newdata)
+        predictions_prob<-predict(object = model,
+                                  x = real_newdata,
+                                  batch_size = as.integer(batch_size),
+                                  verbose=as.integer(verbose))
         predictions<-predictions_prob %>% keras::k_argmax()
       } else {
         model<-bundle::unbundle(self$bundeled_model)
-        predictions_prob<-model %>% stats::predict(real_newdata)
+        predictions_prob<-predict(object = model,
+                                  x = real_newdata,
+                                  batch_size = as.integer(batch_size),
+                                  verbose=as.integer(verbose))
 
         #Add Column for the second characteristic
         predictions=vector(length = length(predictions_prob))
@@ -1834,6 +1840,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                          target_test,
                          sample_weights=NULL,
                          reset_model=FALSE,
+                         use_callback=TRUE,
                          epochs=100,
                          batch_size=32,
                          trace=TRUE,
@@ -1910,7 +1917,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(reset_model==TRUE){
         model$set_weights(private$init_weights)
-        print("Model reseted")
+        #print("Model reseted")
       }
 
       tf<-reticulate::import("tensorflow")
@@ -1927,6 +1934,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         dir.create(paste0(dir_checkpoint,"/checkpoints"))
       }
 
+      if(use_callback==TRUE){
+        callback=keras::callback_model_checkpoint(
+          filepath = paste0(dir_checkpoint,"/checkpoints"),
+          monitor = paste0("val_",self$model_config$init_config$metric),
+          verbose = as.integer(min(keras_trace,1)),
+          mode = "auto",
+          save_best_only = TRUE,
+          save_weights_only = TRUE)
+      } else {
+        callback=NULL
+      }
+
       train_results<- model %>% keras::fit(
         verbose=as.integer(keras_trace),
         x=input_embeddings_train,
@@ -1935,18 +1954,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                              y_val=output_categories_test),
         epochs = epochs,
         batch_size = batch_size,
-        callback = keras::callback_model_checkpoint(
-          filepath = paste0(dir_checkpoint,"/checkpoints"),
-          monitor = paste0("val_",self$model_config$init_config$metric),
-          verbose = as.integer(min(keras_trace,1)),
-          mode = "auto",
-          save_best_only = TRUE,
-          save_weights_only = TRUE),
+        callback = callback,
         view_metrics=view_metrics,
         sample_weight=sample_weights)
 
-      print(paste(date(),"Load Weights From Best Checkpoint"))
-      model$load_weights(paste0(dir_checkpoint,"/checkpoints"))
+      if(use_callback==TRUE){
+        #print(paste(date(),"Load Weights From Best Checkpoint"))
+        model$load_weights(paste0(dir_checkpoint,"/checkpoints"))
+      }
 
       self$bundeled_model=bundle::bundle(model)
       self$model_config$input_variables<-variable_name_order

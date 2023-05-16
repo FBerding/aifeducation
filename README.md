@@ -61,6 +61,10 @@ for diagnosing characteristics of learners from written materials or for
 estimating the properties of learning and teaching materials. In the
 future more tasks will be implemented.
 
+*aifeducation* is in an early stage. We appreciate every feedback, bug
+report or contributions to our project. Please remind that we are a very
+small team managing this package.
+
 ## Installation
 
 You can install the development version of aifeducation from

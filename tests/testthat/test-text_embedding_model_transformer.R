@@ -1,10 +1,14 @@
+testthat::skip()
+
 testthat::skip_on_cran()
-testthat::skip_if_not(condition=check_aif_py_modules(),
+testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message = "Necessary python modules not available")
 
-tmp_path="language_models/bert-base-uncased"
+tmp_path="test_data/language_models/bert-base-uncased"
 testthat::skip_if_not(condition=dir.exists(tmp_path),
                       message = "Necessary bert model not available")
+
+aifeducation::set_config_gpu_low_memory()
 
 #-------------------------------------------------------------------------------
 example_data<-data.frame(

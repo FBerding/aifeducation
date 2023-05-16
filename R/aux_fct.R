@@ -165,36 +165,36 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
                                          assigned_values = predicted_values,
                                          free_aem = TRUE)
 
-  metric_values[1]=val_res$scale_level$iota_index
+  metric_values["iota_index"]=val_res$scale_level$iota_index
 
-  metric_values[2]=min(val_res_free$categorical_level$raw_estimates$iota)
-  metric_values[3]=mean(val_res_free$categorical_level$raw_estimates$iota)
-  metric_values[4]=max(val_res_free$categorical_level$raw_estimates$iota)
+  metric_values["min_iota2"]=min(val_res_free$categorical_level$raw_estimates$iota)
+  metric_values["avg_iota2"]=mean(val_res_free$categorical_level$raw_estimates$iota)
+  metric_values["max_iota2"]=max(val_res_free$categorical_level$raw_estimates$iota)
 
-  metric_values[5]=min(val_res_free$categorical_level$raw_estimates$alpha_reliability)
-  metric_values[6]=mean(val_res_free$categorical_level$raw_estimates$alpha_reliability)
-  metric_values[7]=max(val_res_free$categorical_level$raw_estimates$alpha_reliability)
+  metric_values["min_alpha"]=min(val_res_free$categorical_level$raw_estimates$alpha_reliability)
+  metric_values["avg_alpha"]=mean(val_res_free$categorical_level$raw_estimates$alpha_reliability)
+  metric_values["max_alpha"]=max(val_res_free$categorical_level$raw_estimates$alpha_reliability)
 
-  metric_values[8]=val_res$scale_level$iota_index_d4
-  metric_values[9]=val_res$scale_level$iota_index_dyn2
+  metric_values["static_iota_index"]=val_res$scale_level$iota_index_d4
+  metric_values["dynamic_iota_index"]=val_res$scale_level$iota_index_dyn2
 
-  metric_values[10]=irr::kripp.alpha(x=rbind(true_values,predicted_values),
+  metric_values["kalpha_nominal"]=irr::kripp.alpha(x=rbind(true_values,predicted_values),
                                                     method = "nominal")$value
-  metric_values[11]=irr::kripp.alpha(x=rbind(true_values,predicted_values),
+  metric_values["kalpha_ordinal"]=irr::kripp.alpha(x=rbind(true_values,predicted_values),
                                                     method = "ordinal")$value
 
-  metric_values[12]=irr::kendall(ratings=cbind(true_values,predicted_values),
+  metric_values["kendall"]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                 correct=TRUE)$value
-  metric_values[13]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+  metric_values["kappa2"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
                                                weight = "equal",
                                                sort.levels = FALSE)$value
-  metric_values[14]=irr::kappam.fleiss(ratings=cbind(true_values,predicted_values),
+  metric_values["kappa_fleiss"]=irr::kappam.fleiss(ratings=cbind(true_values,predicted_values),
                                                        exact = TRUE,
                                                        detail = FALSE)$value
-  metric_values[15]=irr::kappam.light(ratings=cbind(true_values,predicted_values))$value
-  metric_values[16]=irr::agree(ratings=cbind(true_values,predicted_values),
+  metric_values["kappa_light"]=irr::kappam.light(ratings=cbind(true_values,predicted_values))$value
+  metric_values["percentage_agreement"]=irr::agree(ratings=cbind(true_values,predicted_values),
                                                tolerance = 0)$value/100
-  metric_values[17]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
+  metric_values["gwet_ac"]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
 
   return(metric_values)
 }
@@ -448,8 +448,10 @@ create_iota2_mean_object<-function(iota2_list,
 #'object of class \link{TextEmbeddingClassifierNeuralNet}.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
 #'@param target Named \code{factor} containing the labels of the corresponding embeddings.
+#'@param times \code{int} for the number of sequences/times.
+#'@param features \code{int} for the number of features within each sequence.
 #'@param method \code{vector} containing strings of the requested methods for generating new cases.
 #'Currently "smote","dbsmote", and "adas" from package smotefamily are available.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
@@ -465,18 +467,33 @@ create_iota2_mean_object<-function(iota2_list,
 #'label/category.}
 #'}
 #'@export
+#'@import foreach
+#'@import doParallel
 get_synthetic_cases<-function(embedding,
+                              times,
+                              features,
                               target,
                               method=c("smote"),
                               max_k=6){
 
   min_k=max_k
 
-  cat_freq=table(target)
-  categories=names(cat_freq)
+  #Calculate the number of chunks for every cases
+  n_chunks<-get_n_chunks(text_embeddings = embedding,
+                         times = times,
+                         features = features)
+  #get the kind of chunks
+  chunk_kind=as.numeric(names(table(n_chunks)))
 
   index=1
   input=NULL
+for(ckind in chunk_kind){
+  condition=(n_chunks==ckind)
+  current_selection<-subset(n_chunks,
+                            condition)
+  cat_freq=table(target[names(current_selection)])
+  categories=names(cat_freq)
+
   for(cat in categories){
     for(m in 1:length(method)){
       if(method[m]!="dbsmote"){
@@ -490,47 +507,69 @@ get_synthetic_cases<-function(embedding,
             }
             input[[index]]<-list(cat=cat,
                                  k=k_final,
-                                 method=method[m])
+                                 method=method[m],
+                                 selected_cases=names(current_selection),
+                                 chunks=ckind)
             index=index+1
           }
         } else {
             input[[index]]<-list(cat=cat,
                                  k=0,
-                                 method=method[m])
+                                 method=method[m],
+                                 selected_cases=names(current_selection),
+                                 chunks=ckind)
             index=index+1
         }
       }
-    }
+  }
+}
 
-      result_list<-foreach(index=1:length(input),.export="create_synthetic_units")%dopar%{
+      result_list<-foreach::foreach(index=1:length(input),.export="create_synthetic_units")%dopar%{
         create_synthetic_units(
-          embedding=embedding,
-          target=target,
+          embedding=embedding[input[[index]]$selected_cases,
+                              c(1:(input[[index]]$chunks*features))],
+          target=target[input[[index]]$selected_cases],
           k=input[[index]]$k,
           max_k = max_k,
           method=input[[index]]$method,
           cat=input[[index]]$cat,
-          cat_freq=cat_freq)
+          cat_freq=table(target[input[[index]]$selected_cases]))
       }
 
-      syntetic_embeddings=data.frame()
+  #get number of synthetic cases
+      n_syn_cases=0
+      for(i in 1:length(result_list)){
+        if(is.null(result_list[[i]]$syntetic_embeddings)==FALSE){
+          n_syn_cases=n_syn_cases+nrow(result_list[[i]]$syntetic_embeddings)
+        }
+      }
+
+      syntetic_embeddings<-matrix(data = 0,
+                                  nrow = n_syn_cases,
+                                  ncol = ncol(embedding))
+      colnames(syntetic_embeddings)=colnames(embedding)
+      syntetic_embeddings=as.data.frame(syntetic_embeddings)
       syntetic_targets=NULL
 
+      n_row=0
+      names_vector=NULL
   for(i in 1:length(result_list)){
     if(is.null(result_list[[i]]$syntetic_embeddings)==FALSE){
-      if(nrow(syntetic_embeddings)>0){
-        n_row=nrow(syntetic_embeddings)
-        syntetic_embeddings[(n_row+1):(n_row+nrow(result_list[[i]]$syntetic_embeddings)),]<-result_list[[i]]$syntetic_embeddings
+      #if(nrow(syntetic_embeddings)>0){
+        #n_row=nrow(syntetic_embeddings)
+        syntetic_embeddings[(n_row+1):(n_row+nrow(result_list[[i]]$syntetic_embeddings)),
+                            c(1:ncol(result_list[[i]]$syntetic_embeddings))]<-result_list[[i]]$syntetic_embeddings[,c(1:ncol(result_list[[i]]$syntetic_embeddings))]
         syntetic_targets=append(syntetic_targets,values = result_list[[i]]$syntetic_targets)
-      } else {
-      syntetic_embeddings=result_list[[i]]$syntetic_embeddings
-      syntetic_targets=result_list[[i]]$syntetic_targets
-    }
+        n_row=n_row+nrow(result_list[[i]]$syntetic_embeddings)
+        names_vector=append(x=names_vector,
+                            values = rownames(result_list[[i]]$syntetic_embeddings))
+      #} else {
+      #syntetic_embeddings=result_list[[i]]$syntetic_embeddings
+      #syntetic_targets=result_list[[i]]$syntetic_targets
+    #}
     }
   }
-
-  #syntetic_embeddings=unique(syntetic_embeddings)
-  #syntetic_targets=syntetic_targets[rownames(syntetic_embeddings)]
+  rownames(syntetic_embeddings)=names_vector
 
   n_syntetic_units=table(syntetic_targets)
 
@@ -552,7 +591,7 @@ get_synthetic_cases<-function(embedding,
 #'computations.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
 #'@param target Named \code{factor} containing the labels/categories of the corresponding cases.
 #'@param k \code{int} The number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
@@ -578,6 +617,7 @@ create_synthetic_units<-function(embedding,
     tmp_target=(target==cat)
     n_minor=sum(tmp_target)
     n_major=max(cat_freq)
+    n_cols_embedding=ncol(embedding)
 
     tmp_ration_necessary_cases=n_minor/n_major
 
@@ -601,7 +641,7 @@ create_synthetic_units<-function(embedding,
 
       if(is.null(syn_data)==FALSE){
         tmp_data=syn_data$syn_data[,-ncol(syn_data$syn_data)]
-        rownames(tmp_data)<-paste0(method,"_",cat,"_",k,"_",
+        rownames(tmp_data)<-paste0(method,"_",cat,"_",k,"_",n_cols_embedding,"_",
                                    seq(from=1,to=nrow(tmp_data),by=1))
         tmp_data<-as.data.frame(tmp_data)
         tmp_target=rep(cat,times=nrow(tmp_data))
@@ -653,3 +693,26 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
   return(results)
 }
 
+#------------------------------------------------------------------------------
+#'Get the Number of Chunks/Sequences for each case
+#'
+#'Function for calculating the number of chunks/sequences for every case
+#'
+#'@param text_embeddings \code{data.frame} containing the text embeddings.
+#'@param features \code{int} Number of features within each sequence.
+#'@param times \code{int} Number of sequences
+#'@return Named\code{vector} of integers representing the number of chunks/sequences
+#'for every case.
+#'@export
+get_n_chunks<-function(text_embeddings,features,times){
+  n_chunks<-vector(length = nrow(text_embeddings))
+  n_chunks[]<-0
+  for(i in 1:times){
+    window<-c(1:features)+(i-1)*features
+    sub_matrix<-text_embeddings[,window]
+    tmp_sums<-rowSums(sub_matrix)
+    n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
+  }
+  names(n_chunks)<-rownames(text_embeddings)
+  return(n_chunks)
+}

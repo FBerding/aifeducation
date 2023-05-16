@@ -116,6 +116,7 @@ QAExtractModel<-R6::R6Class(
     #'@param align_to_words \code{bool} If true \code{TRUE} the algorithm tries to align
     #'the answer to real words which increases the quality of the results for space
     #'separated languages.
+    #'@importFrom quanteda.textstats textstat_simil
     answer_question=function(question,
                              knowledge_base,
                              n_answers=1,

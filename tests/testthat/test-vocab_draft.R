@@ -1,6 +1,7 @@
+
 testthat::skip_on_cran()
 
-tmp_path="language_models/udpipe_models/english-ewt-ud-2.5-191206.udpipe"
+tmp_path="test_data/language_models/udpipe_models/english-ewt-ud-2.5-191206.udpipe"
 tmp_condition=file.exists(tmp_path)
 testthat::skip_if_not(condition=tmp_condition,
                   message = "udpipe language model not available")
@@ -18,7 +19,7 @@ test_that("bow_pp_create_vocab_draft", {
     label_language_model="english-ewt-ud-2.5-191206",
     language="english",
     chunk_size=50,
-    trace=TRUE)
+    trace=FALSE)
 
 expect_type(res,type="list")
 })

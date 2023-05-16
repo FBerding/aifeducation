@@ -175,6 +175,13 @@ TextEmbeddingModel<-R6::R6Class(
     #'}}
     #'
     #'}
+    #'@import tidytext
+    #'@importFrom topicmodels LDA
+    #'@import quanteda
+    #'@importFrom text2vec GlobalVectors
+    #'@import reticulate
+    #'@import stats
+    #'@import reshape2
     initialize=function(model_name=NULL,
                         model_label=NULL,
                         model_version=NULL,
@@ -1050,6 +1057,7 @@ EmbeddedText<-R6::R6Class(
 #'@return Returns an object of class \link{EmbeddedText} which contains all
 #'unique cases of the input objects.
 #'@export
+#'@importFrom methods isClass
 combine_embeddings<-function(embeddings_list){
 
   #Check for the right class---------------------------------------------------

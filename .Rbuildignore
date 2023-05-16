@@ -12,3 +12,7 @@ udpipe_models
 language_models
 .git
 .gitignore
+_pkgdown.yml
+docs
+test.rda
+^vignettes/articles$

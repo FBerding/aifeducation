@@ -1,8 +1,17 @@
+testthat::skip()
+
+path="test_data/basic_text_rep_movie_reviews.rda"
+testthat::skip_if_not(condition=file.exists(path),
+                      message  = "Necessary dataset not available")
+
+#------------------------------------------------------------------------------
+load(path)
+
 example_data<-data.frame(
   id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
-
+#------------------------------------------------------------------------------
 
 global_vector_clusters_modeling<-TextEmbeddingModel$new(
   model_name="global_vector_clusters_embedding",
@@ -16,7 +25,7 @@ global_vector_clusters_modeling<-TextEmbeddingModel$new(
   bow_max_iter=10,
   bow_max_iter_cluster=400,
   bow_cr_criterion=1e-8,
-  trace=TRUE)
+  trace=FALSE)
 
 test_that("creation_GlobalVectorCluster", {
   expect_s3_class(global_vector_clusters_modeling,

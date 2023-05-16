@@ -96,7 +96,7 @@ set_config_gpu_low_memory<-function(){
 #'
 #'This function changes the level for logging information with tensorflow.
 #'
-#'@param \code{string} Minimal level that should be printed to console. Five
+#'@param level \code{string} Minimal level that should be printed to console. Five
 #'levels are available: FATAL, ERROR, WARN, INFO, and DEBUG.
 #'@return This function does not return anything. It is used for its
 #'side effects.
@@ -111,7 +111,7 @@ set_config_tf_logger<-function(level="ERROR"){
 #'This function changes the level for logging information with tensorflow via
 #'the os environment. This function mus be called before importing tensorflow.
 #'
-#'@param \code{string} Minimal level that should be printed to console. Five
+#'@param level \code{string} Minimal level that should be printed to console. Five
 #'levels are available: INFO, WARNING, ERROR and NONE.
 #'@return This function does not return anything. It is used for its
 #'side effects.
