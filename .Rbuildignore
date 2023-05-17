@@ -4,15 +4,9 @@ Trial
 ^README\.Rmd$
 materials
 test_model
-tests/testthat/tmp
-tests/testthat/language_models
-tmp
-checkpoints
-udpipe_models
-language_models
+tests/testthat/test_data
 .git
 .gitignore
 _pkgdown.yml
 docs
-test.rda
 ^vignettes/articles$

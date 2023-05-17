@@ -1,11 +1,9 @@
-testthat::skip()
-
 path="test_data/basic_text_rep_movie_reviews.rda"
 testthat::skip_if_not(condition=file.exists(path),
                       message  = "Necessary dataset not available")
 
 #------------------------------------------------------------------------------
-load(path)
+load(testthat::test_path(path))
 
 example_data<-data.frame(
   id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,

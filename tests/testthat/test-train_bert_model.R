@@ -1,7 +1,8 @@
-testthat::skip()
 testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace=FALSE),
                   message = "Necessary python modules not available")
+testthat::skip_if_not(condition = dir.exists(testthat::test_path("test_data/language_models/bert-base-uncased")),
+                      message = "Necessary bert model not available")
 aifeducation::set_config_gpu_low_memory()
 
 test_that("train_tune_bert_model", {
@@ -11,8 +12,8 @@ test_that("train_tune_bert_model", {
   example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
   expect_no_error(
-    train_tune_bert_model(output_dir="test_data/tmp",
-                          bert_model_dir_path="test_data/language_models/bert-base-uncased",
+    train_tune_bert_model(output_dir=testthat::test_path("test_data/tmp"),
+                          bert_model_dir_path=testthat::test_path("test_data/language_models/bert-base-uncased"),
                           raw_texts= example_data$text[1:25],
                           aug_vocab_by=0,
                           p_mask=0.30,
@@ -25,8 +26,8 @@ test_that("train_tune_bert_model", {
                           multi_process=FALSE,
                           trace=FALSE))
   expect_no_error(
-    train_tune_bert_model(output_dir="test_data/tmp",
-                          bert_model_dir_path="test_data/language_models/bert-base-uncased",
+    train_tune_bert_model(output_dir=testthat::test_path("test_data/tmp"),
+                          bert_model_dir_path=testthat::test_path("test_data/language_models/bert-base-uncased"),
                           raw_texts= example_data$text[1:25],
                           aug_vocab_by=100,
                           p_mask=0.30,
@@ -40,8 +41,8 @@ test_that("train_tune_bert_model", {
                           trace=FALSE))
 
   expect_no_error(
-    train_tune_bert_model(output_dir="test_data/tmp",
-                          bert_model_dir_path="test_data/language_models/bert-base-uncased",
+    train_tune_bert_model(output_dir=testthat::test_path("test_data/tmp"),
+                          bert_model_dir_path=testthat::test_path("test_data/language_models/bert-base-uncased"),
                           raw_texts= example_data$text[1:25],
                           aug_vocab_by=0,
                           p_mask=0.30,

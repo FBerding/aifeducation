@@ -11,7 +11,7 @@ test_that("create_bert_model", {
 
   expect_no_error(
     create_bert_model(
-    model_dir="tmp",
+    model_dir=testthat::test_path("test_data"),
     vocab_raw_texts=example_data$text,
     vocab_size=30522,
     vocab_do_lower_case=FALSE,
@@ -26,7 +26,7 @@ test_that("create_bert_model", {
 
   expect_no_error(
     create_bert_model(
-      model_dir="tmp",
+      model_dir=testthat::test_path("test_data"),
       vocab_raw_texts=example_data$text,
       vocab_size=30522,
       vocab_do_lower_case=TRUE,

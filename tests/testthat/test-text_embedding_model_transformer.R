@@ -1,11 +1,10 @@
-testthat::skip()
 
 testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message = "Necessary python modules not available")
 
 tmp_path="test_data/language_models/bert-base-uncased"
-testthat::skip_if_not(condition=dir.exists(tmp_path),
+testthat::skip_if_not(condition=dir.exists(testthat::test_path(tmp_path)),
                       message = "Necessary bert model not available")
 
 aifeducation::set_config_gpu_low_memory()
@@ -28,7 +27,7 @@ bert_modeling<-TextEmbeddingModel$new(
   overlap=4,
   aggregation="last",
   use_cls_token=TRUE,
-  model_dir=tmp_path)
+  model_dir=testthat::test_path(tmp_path))
 
 test_that("creation_bert", {
   expect_s3_class(bert_modeling,

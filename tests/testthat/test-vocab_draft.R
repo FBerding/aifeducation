@@ -1,8 +1,8 @@
-
 testthat::skip_on_cran()
 
 tmp_path="test_data/language_models/udpipe_models/english-ewt-ud-2.5-191206.udpipe"
-tmp_condition=file.exists(tmp_path)
+print(testthat::test_path(tmp_path))
+tmp_condition=file.exists(testthat::test_path(tmp_path))
 testthat::skip_if_not(condition=tmp_condition,
                   message = "udpipe language model not available")
 
@@ -13,7 +13,7 @@ test_that("bow_pp_create_vocab_draft", {
   example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
   res<-bow_pp_create_vocab_draft(
-    path_language_model=tmp_path,
+    path_language_model=testthat::test_path(tmp_path),
     data=example_data$text[1:150],
     upos=c("NOUN", "ADJ","VERB"),
     label_language_model="english-ewt-ud-2.5-191206",

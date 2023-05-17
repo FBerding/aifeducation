@@ -2,7 +2,7 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
 path="test_data/bert_embeddings.rda"
-testthat::skip_if_not(condition=file.exists(path),
+testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
 #-------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ test_that("training_baseline_only", {
       bpl_model_reset=FALSE,
       epochs=9,
       batch_size=32,
-      dir_checkpoint="test_data/tmp",
+      dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
       view_metrics=FALSE,
       keras_trace=0,
@@ -97,7 +97,7 @@ test_that("training_bsc_only", {
       bpl_model_reset=FALSE,
       epochs=40,
       batch_size=32,
-      dir_checkpoint="test_data/tmp",
+      dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
       view_metrics=FALSE,
       keras_trace=0,
@@ -130,7 +130,7 @@ test_that("training_pbl_baseline", {
       bpl_model_reset=FALSE,
       epochs=40,
       batch_size=32,
-      dir_checkpoint="test_data/tmp",
+      dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
       view_metrics=FALSE,
       keras_trace=0,
@@ -163,7 +163,7 @@ test_that("training_pbl_bsc", {
       bpl_model_reset=FALSE,
       epochs=40,
       batch_size=32,
-      dir_checkpoint="test_data/tmp",
+      dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
       view_metrics=FALSE,
       keras_trace=0,

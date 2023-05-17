@@ -1,9 +1,9 @@
 
 path="test_data/vocab_draft_movie_review.rda"
-testthat::skip_if_not(condition=file.exists(path),
+testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 #------------------------------------------------------------------------------
-load(path)
+load(testthat::test_path(path))
 
 #------------------------------------------------------------------------------
 test_that("bow_pp_create_vocab_draft", {

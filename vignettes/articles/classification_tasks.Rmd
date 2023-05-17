@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 load("data/test_classifier.rda")
 load("data/bert_embeddings.rda")
 
-
 classifier<-test_classifier
 ```
 
@@ -713,13 +712,13 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   text_embeddings=bert_embeddings,
   targets=example_targets,
   hidden=NULL,
-  rec=c(128,128),
-  self_attention_heads = 0,
-  dropout=0.3,
+  rec=c(256),
+  self_attention_heads = 2,
+  dropout=0.4,
   recurrent_dropout=0.4,
-  l2_regularizer=0.001,
+  l2_regularizer=0.01,
   optimizer="adam",
-  act_fct="tanh",
+  act_fct="gelu",
   rec_act_fct="tanh")
 ```
 
@@ -745,7 +744,7 @@ With the other parameters  you decide about the structure of your classifier. Fi
 `hidden` takes a vector of integers determining the number of layers and the number
 of neurons. In our example this are no dense layers. `rec` also takes a vector of
 integers determining the number
-and size of the Gated Recurrent Unit. In this example we use two layers with 128 each.
+and size of the Gated Recurrent Unit. In this example we use one layers with 256 neurons.
 
 Since the classifiers in *aifeducation* use a standardized scheme for their 
 creation, dense layers are used after the gru layers. If you want to omit gru layers
@@ -770,13 +769,13 @@ After you have created a new classifier you can begin training.
 For starting the training of your classifier you have to call the `train` method.
 Similar for the creation of the classifier you must provide the text embedding to
 `data_embeddings` and the categories/classes as target data to `data_targets`.
-Please remember that `data_targets` expects a named factor where the names 
+Please remember that `data_targets` expects a **named** factor where the names 
 corresponds to the ids of the corresponding text embeddings. Text embeddings
-and target data that cannot be matched are ommited from training. 
+and target data that cannot be matched are omitted from training. 
 
 For training a classifier it is necessary that you provide a path to
 `dir_checkpoint`. This directory stores the best set of weights during each
-training step. After training these weights are automatically used as final weights
+training epoch. After training these weights are automatically used as final weights
 for the classifier. 
 
 For performance estimation training splits the data into several chunky based on
@@ -796,24 +795,24 @@ classifier$train(
    data_targets = example_targets,
    data_n_test_samples=5,
    use_baseline=TRUE,
-   bsl_val_size=0.25,
+   bsl_val_size=0.33,
    use_bsc=TRUE,
    bsc_methods=c("dbsmote"),
    bsc_max_k=10,
    bsc_val_size=0.25,
    use_bpl=TRUE,
-   bpl_max_steps=30,
-   bpl_epochs_per_step=1,
-   bpl_dynamic_inc=FALSE,
-   bpl_balance=TRUE,
+   bpl_max_steps=5,
+   bpl_epochs_per_step=30,
+   bpl_dynamic_inc=TRUE,
+   bpl_balance=FALSE,
    bpl_max=1.00,
    bpl_anchor=1.00,
    bpl_min=0.00,
-   bpl_weight_inc=0.02,
-   bpl_weight_start=0.00,
-   bpl_model_reset=FALSE,
-   epochs=40,
-   batch_size=32,
+   bpl_weight_inc=0.00,
+   bpl_weight_start=1.00,
+   bpl_model_reset=TRUE,
+   epochs=30,
+   batch_size=8,
    trace=TRUE,
    view_metrics=FALSE,
    keras_trace=0,
@@ -845,46 +844,62 @@ social science some special training steps are integrated in this method.
  random sample is drawn. If the technique allows to set the number of neighbors
  during generation `k = bsc_max_k` is used.
  - **Balanced Pseudo Labeling:** This technique is relevant if you have a labeled
- target data and a large number of unlabeled target data. This option activates
- an implementation of pseudo labeling. That is, the classifier is trained with
- the cases for which labeled data is available. After training the classifier
- predicts the classes/categories for the unlabeled cases. The classifier is trained with the
- extended data and after each epoch it predicts the classes/categories of the
- unlabeled data again. This process is iterated as long `bpl_step_max` is reached. Please note
- that the number of cases added within each step is determined for *all* classes/categories
- by the category with the *lowest absolute frequency* in the case of
- `bpl_balance=TRUE`. If more cases are available the cases are sorted
- by their distance to `bpl_anchor`. This is a value describing the certainty of the 
- pseudo labels. 0 equals random guessing, 1 equals perfect certainty. It is recommended
- to include cases which have a high but not a perfect certainty to improve the
- quality of the classifier. Cases with a very high certainty provide only 
- little new information for the training while cases with a low certainty are
- may provide to much noise to the training. You can set the minimal and maximal 
- limits for considering cases with `bpl_min` and `bpl_max` for both 
- `bpl_balance=TRUE` and `bpl_balance=FALSE`. The value for increasing the weights
- for every step is determined with `bpl_weight_inc`.
- This technique requires `use_baseline = TRUE` or `use_bsc=TRUE`. 
- If both is set to true a classifier
- trained on the basis of balanced synthetic cases is used.
+ target data and a large number of unlabeled target data. With the different parameter starting with
+ "bpl_" you can request different implementation of pseudo labeling for example
+ based on the work by Lee (2013) or by Cascante-Bonilla et al. (2020). To turn
+ pseudo labeling on you have to set `use_bpl=TRUE`. 
  
-Figure 5 illustrates the training loop for the cases that all three options
+ To request pseudo labeling based on Cascante-Bonilla et al. (2020) the following parameters have to be set:
+  
+  - `bpl_max_steps = 5` (splits the unlabeled data into five chunks)
+  - `bpl_dynamic_inc = TRUE` (ensures that the number of used chunks increases every step)
+  - `bpl_model_reset = TRUE` (re-initializes the model for every step)
+  - `bpl_epochs_per_step=30` (number of training epochs within each step)
+  - `bpl_balance=FALSE` (ensures that the cases with the highest certainty are added to 
+    the training regardless of the absolute frequencies of the classes)
+  - `bpl_weight_inc=0.00` and `bpl_weight_start=1.00` (ensures that labeled and 
+    unlabeled data have the same weight during training)
+  - `bpl_max=1.00`, `bpl_anchor=1.00`, and `bpl_min=0.00` (ensures that all unlabeled
+    data is considered for training and that cases with the highest certainty are use
+    for training.)
+  
+  To request the original  pseudo labeling proposed by Lee (2013) you have to set the following parameters:
+
+  - `bpl_max_steps=30` (steps must be treated as epochs)
+  - `bpl_dynamic_inc=FALSE` (ensures that all pseudo labeled cases are used)
+  - `bpl_model_reset=FALSE` (the model is not allowed to be re-initialized)
+  - `bpl_epochs_per_step=1` (steps are treated as epochs so this must be one)
+  - `bpl_balance=FALSE` (ensures that all cases are added to regardless of the absolute frequencies of the classes)
+  - `bpl_weight_inc=0.02` and `bpl_weight_start=0.00` (gives the pseudo labeled data
+    an increasing weight with every step)
+  - `bpl_max=1.00`, `bpl_anchor=1.00`, and `bpl_min=0.00` (ensures that all 
+    pseudo labeled cases are used for training. `bpl_anchor` does not effect the calculations)
+
+ Please note that while Lee (2013) suggests to recalculate the pseudo labels of 
+ the unlabeled data after every weight actualization in *aifeducation* the pseudo 
+ labels are recalculated after every epoch. 
+ 
+ `bpl_max=1.00`, `bpl_anchor=1.00`, and `bpl_min=0.00` are used for describing the
+ certainty of a prediction. 0 refers to random guessing while 1 refers to perfect
+ certainty. `bpl_anchor` is used as a reference value. That is, for every
+ case the distance to `bpl_anchor` is calculated and the cases are sorted
+ with an increasing distance from `bpl_anchor`. The resulting order of cases
+ is relevant if you set `bpl_dynamic_inc=TRUE` or `bpl_balance=TRUE`.
+ 
+ Figure 5 illustrates the training loop for the cases that all three options
 are set to `TRUE`.
 
 ![Figure 5: Overview of the Steps to Perform a Classification](classif_fig_05.png){width=100%}
 
-The example above applies the algorithm proposed by Lee (2013). That is, after
-training the classifier on the labeled data the unlabeled data is introduced
-into the training with an increasing weight in every step. While Lee (2013)
-suggests to recalculate the pseudo labels of the unlabeled data after every
-weight actualization in *aifeducation* the pseudo labels are recalculated after
-every epoch. The model is never re-initialized during this training. Thus, to achieve
-a training that is near to the work of Lee (2013) `steps` must be treated as epochs,
-`epochs_per_steps` must be set to 1 and model re-initialization has to be turned off
-(`bpl_model_reset = FALSE`). The second change to Lee`s (2013) algorithm is that in our example
-`bpl_balance = TRUE`. Thus, not all unlabeled data is used. That is, for
-every class/category the same number of pseudo labels is used and at the same time
-the cases which have the highest classification certainty.
- 
+The example above applies the algorithm proposed by Cascante-Bonilla et al. (2020).
+That is, after training the classifier on the labeled data the unlabeled data is introduced
+into the training. The classifier predicts the potential labels of the unlabeled data 
+and adds 20% of the cases with the highest certainty for their pseudo labels to the training. The
+classifier is re-initialized and trained again. After training the classifier predicts the
+potential labels of *all* originally unlabeled and adds 40% of the pseudo labeled data 
+to the training data. The model is again re-initialized and trained again until all
+unlabeled data is used for training.
+
 Finally, `trace`, `view_metrics`, and `keras_trace` allow you to control how
 many information about the training progress are printed to the console. Please
 note that training the classifier can take some time. 
@@ -984,6 +999,9 @@ Berding, F., Riebenbauer, E., Stütz, S., Jahncke, H., Slopinski, A., & Rebmann,
 Performance and Configuration of Artificial Intelligence in Educational Settings.: 
 Introducing a New Reliability Concept Based on Content Analysis. 
 Frontiers in Education, 1–21. https://doi.org/10.3389/feduc.2022.818365
+
+Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum Labeling: 
+Revisiting Pseudo-Labeling for Semi-Supervised Learning. https://doi.org/10.48550/arXiv.2001.06001
 
 Campesato, O. (2021). Natural Language Processing Fundamentals for Developers. 
 Mercury Learning & Information. https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713 
