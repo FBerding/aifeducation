@@ -1,13 +1,13 @@
 #'Check of compatible text embedding models
 #'
 #'This function checks if different objects are based on the same text
-#'embedding model. This is necessary in order to ensure that classifiers are used
-#'only with data generated with compatible embedding models.
+#'embedding model. This is necessary to ensure that classifiers are used
+#'only with data generated through compatible embedding models.
 #'
 #'@param object_list \code{list} of object of class \link{EmbeddedText} or
 #'\link{TextEmbeddingClassifierNeuralNet}.
 #'@param same_class \code{bool} \code{TRUE} if all object must be from the same class.
-#'@return Returns \code{TRUE} if all object refer to the same text embedding model.
+#'@return Returns \code{TRUE} if all objects refer to the same text embedding model.
 #'\code{FALSE} in all other cases.
 check_embedding_models<-function(object_list,
                                  same_class=FALSE){
@@ -37,7 +37,9 @@ check_embedding_models<-function(object_list,
 
   #Check if all object have the same model configuration---------------------------------
   #field to check
-  to_check<-c("model_name","model_date","model_method","model_version","model_language",
+  #to_check<-c("model_name","model_date","model_method","model_version","model_language",
+  #            "param_seq_length","param_chunks","param_overlap","param_aggregation")
+  to_check<-c("model_name","model_method","model_version","model_language",
               "param_seq_length","param_chunks","param_overlap","param_aggregation")
   tmp_model_config<-NULL
   tmp_results<-NULL
@@ -68,7 +70,8 @@ check_embedding_models<-function(object_list,
       for(check in to_check){
         tmp_i_1<-tmp_model_config[[i-1]]
         tmp_i<-tmp_model_config[[i]]
-        #print(tmp_i_1)
+
+        #--------------------------------------------------------------------
         if(is.null(tmp_i_1[[check]])==TRUE){
           tmp_i_1[[check]]<-"missing"
         }
@@ -89,13 +92,15 @@ check_embedding_models<-function(object_list,
         if(is.na(tmp_i[[check]])==TRUE){
           tmp_i[[check]]<-"missing"
         }
+
+
+        #----------------------------------------------------------------------
         if(as.character(tmp_i_1[[check]])!=as.character(tmp_i[[check]])){
           return(FALSE)
-          #tmp_results[check]=FALSE
         } else{
-          #tmp_results[check]=TRUE
-        }
 
+        }
+        #----------------------------------------------------------------------
       }
     }
   }
@@ -104,9 +109,9 @@ return(TRUE)
 
 
 #------------------------------------------------------------------------------
-#'Calculates reliability measures based on content analysis
+#'Calculate reliability measures based on content analysis
 #'
-#'This functions calculates different reliability measures which are based on the
+#'This function calculates different reliability measures which are based on the
 #'empirical research method of content analysis.
 #'
 #'@param true_values \code{factor} containing the true labels/categories.
@@ -250,9 +255,9 @@ get_train_test_split<-function(embedding,
 
 
 #-----------------------------------------------------------------------------
-#'Creates Cross-Validation Samples
+#'Create Cross-Validation Samples
 #'
-#'Functions creates cross-validation samples and ensures that the relative
+#'Function creates cross-validation samples and ensures that the relative
 #'frequency for every category/label within a fold equals the relative frequency of
 #'the category/label within the initial data.
 #'
@@ -274,9 +279,9 @@ get_train_test_split<-function(embedding,
 #'These should be declared with \code{NA}. All these cases are ignored for creating the
 #'different folds. Their names are saved within the component \code{unlabeled_cases}.
 #'These cases can be used for Pseudo Labeling.
-#'@note the functions checks the absolute frequencies of every category/label. If the
-#'absolute frequency is not sufficient to ensure at least four cases in every fold
-#'the number of folds is adjusted. In these cases a warning is printed to the console.
+#'@note the function checks the absolute frequencies of every category/label. If the
+#'absolute frequency is not sufficient to ensure at least four cases in every fold,
+#'the number of folds is adjusted. In these cases, a warning is printed to the console.
 #'At least four cases per fold are necessary to ensure that the training of
 #'\link{TextEmbeddingClassifierNeuralNet} works well with all options turned on.
 get_folds<-function(target,
@@ -338,7 +343,7 @@ get_folds<-function(target,
 
 
 #------------------------------------------------------------------------------
-#'Splits data into labeled and unlabeled data
+#'Split data into labeled and unlabeled data
 #'
 #'This functions splits data into labeled and unlabeled data.
 #'
@@ -368,7 +373,7 @@ split_labeled_unlabeled<-function(embedding,
   return(result)
 }
 #------------------------------------------------------------------------------
-#'Creates in iota2 object
+#'Create a iota2 object
 #'
 #'Function creates an object of class \code{iotarelr_iota2} which can be used
 #'with the package iotarelr. This function is for internal use only.
@@ -442,18 +447,18 @@ create_iota2_mean_object<-function(iota2_list,
 }
 
 #-----------------------------------------------------------------------------
-#'Creates synthetic cases for balancing training data
+#'Create synthetic cases for balancing training data
 #'
 #'This function creates synthetic cases for balancing the training with an
-#'object of class \link{TextEmbeddingClassifierNeuralNet}.
+#'object of the class \link{TextEmbeddingClassifierNeuralNet}.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases, this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
 #'@param target Named \code{factor} containing the labels of the corresponding embeddings.
 #'@param times \code{int} for the number of sequences/times.
 #'@param features \code{int} for the number of features within each sequence.
 #'@param method \code{vector} containing strings of the requested methods for generating new cases.
-#'Currently "smote","dbsmote", and "adas" from package smotefamily are available.
+#'Currently "smote","dbsmote", and "adas" from the package smotefamily are available.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
 #'@return \code{list} with the following components.
 #'\itemize{
@@ -583,10 +588,10 @@ for(ckind in chunk_kind){
 
 
 #---------------------------------------------
-#'Creates Synthetic Units
+#'Create Synthetic Units
 #'
 #'Function for creating synthetic cases in order to balance the data for
-#'training with \link{TextEmbeddingClassifierNeuralNet}. This is a helper
+#'training with \link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary
 #'function for use with \link{get_synthetic_cases} to allow parallel
 #'computations.
 #'
@@ -596,7 +601,7 @@ for(ckind in chunk_kind){
 #'@param k \code{int} The number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
 #'@param method \code{vector} containing strings of the requested methods for generating new cases.
-#'Currently "smote","dbsmote", and "adas" from package smotefamily are available.
+#'Currently "smote","dbsmote", and "adas" from the package smotefamily are available.
 #'@param cat \code{string} The category for which new cases should be created.
 #'@param cat_freq Object of class \code{"table"} containing the absolute frequencies
 #'of every category/label.
@@ -612,13 +617,21 @@ create_synthetic_units<-function(embedding,
                                  cat,
                                  cat_freq){
 
-  if((cat_freq[cat]!=max(cat_freq)) & (k<=min(max_k,cat_freq[cat]-1))){
+  tmp_target=(target==cat)
+  n_minor=sum(tmp_target)
+  n_major=max(cat_freq)
+  print(cat_freq)
+  print(table(tmp_target))
 
-    tmp_target=(target==cat)
-    n_minor=sum(tmp_target)
-    n_major=max(cat_freq)
+  condition=(
+    #(cat_freq[cat]!=max(cat_freq)) &
+    (k<=min(max_k,n_minor-1)) &
+    (n_minor>=4)
+  )
+
+  if(condition==TRUE){
+
     n_cols_embedding=ncol(embedding)
-
     tmp_ration_necessary_cases=n_minor/n_major
 
     syn_data=NULL
@@ -661,7 +674,7 @@ create_synthetic_units<-function(embedding,
 }
 
 #-------------------------------------------------------------------------------
-#'Creates a stratified random sample
+#'Create a stratified random sample
 #'
 #'This function creates a stratified random sample.The difference to
 #'\link{get_train_test_split} is that this function does not require text
@@ -671,7 +684,7 @@ create_synthetic_units<-function(embedding,
 #'@param targets Named \code{vector} containing the labels/categories for each case.
 #'@param val_size \code{double} Value between 0 and 1 indicating how many cases of
 #'each label/category should be part of the validation sample.
-#'@return \code{list} which containing the names of cases belonging to the train
+#'@return \code{list} which contains the names of the cases belonging to the train
 #'sample and to the validation sample.
 get_stratified_train_test_split<-function(targets, val_size=0.25){
   test_sample=NULL

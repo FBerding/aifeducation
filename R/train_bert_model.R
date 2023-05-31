@@ -1,11 +1,11 @@
-#'Function for training and fine-tuning a bert model
+#'Function for training and fine-tuning a BERT model
 #'
-#'This function can be used for training or fine-tuning a transformer
-#'based on Bert architecture with help of the python libraries 'transformers',
+#'This function can be used to train or fine-tune a transformer
+#'based on BERT architecture with the help of the python libraries 'transformers',
 #''datasets', and 'tokenizers'.
 #'
 #'@param output_dir \code{string} Path to the directory where the final model
-#'should be saved. If the directory does not exists it will be created.
+#'should be saved. If the directory does not exist, it will be created.
 #'@param bert_model_dir_path \code{string} Path to the directory where the original
 #'model is stored.
 #'@param raw_texts \code{vector} containing the raw texts for training.
@@ -20,13 +20,13 @@
 #'@param batch_size \code{int} Size of batches.
 #'@param chunk_size \code{int} Size of every chunk for training.
 #'@param n_workers \code{int} Number of workers.
-#'@param multi_process \code{bool} \code{TRUE} if multiple process should be activated.
+#'@param multi_process \code{bool} \code{TRUE} if multiple processes should be activated.
 #'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
 #'to the console.
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
-#'@note if \code{aug_vocab_by > 0} the raw texts is used for training a WordPiece
-#'tokenizer. At the end of this process additional entries are added to the vocabulary
+#'@note if \code{aug_vocab_by > 0} the raw text is used for training a WordPiece
+#'tokenizer. At the end of this process, additional entries are added to the vocabulary
 #'that are not part of the original vocabulary.
 #'@note Pre-Trained models which can be fine-tuned with this function are available
 #'at \url{https://huggingface.co/}. New models can be created via the function

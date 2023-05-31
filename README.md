@@ -13,57 +13,52 @@ Artificial Intelligence (AI) for Natural Language Processing tasks such
 as text embedding, classification, and question answering under the
 special conditions of educational and social sciences. These are:
 
-- **digital data availability:** In educational and social science data
-  is often available only in a hand written form. For example, students
-  and pupils often solve tasks in schools or universities by creating
-  hand written documents. Thus, educators and researchers have first to
-  transform textual data into a digital form involving human actions.
-  This makes data generation financial expensive and time consuming
+- **digital data availability:** In educational and social science, data
+  is often only available in handwritten form. For example in schools or
+  universities, students and pupils often solve tasks by creating
+  handwritten documents. Thus, educators and researchers first have to
+  transform analogue data into a digital form, involving human actions.
+  This makes data generation financially expensive and time consuming
   leading to *small data sets*.
-- **high privacy policies standards:** Furthermore, in educational and
-  social science data often refers to humans and/or human actions. These
-  kind of data is protected by privacy policies in many countries
-  limiting the access and the usage of data which in turn results in
-  *small data sets*.  
-- **long research tradition:** Educational and social science have a
-  long research tradition generating insights into social phenomenon as
-  well as learning and teaching. These insights have to be incorporated
-  into applications of AI (e.g., Luan et al. 2020; Wong et al. 2019).
-  This makes supervised machine learning a very important technique
-  since it provides a link between educational and social theories and
-  models on the one hand and machine learning on the other hand (Berding
-  et al. 2022). However, this kind of machine learning requires humans
-  for generating a valid data set for training AI leading to *small data
-  sets*.
-- **complex constructs:** Compared to classification tasks where an AI
-  has to differentiate between a ‘good’ or ‘bad’ movie review constructs
-  in educational and social science are more complex. For example, some
-  research instruments in motivation psychology require to infer
-  personal motives from written essays (e.g., Gruber & Kreuzpointner
+- **high privacy policy standards:** Furthermore, in educational and
+  social science, data often refers to humans and/or their actions.
+  These kinds of data are protected by privacy policies in many
+  countries, limiting access to and the usage of data, which also
+  results in *small data sets*.
+- **long research tradition:** Educational and social sciences have a
+  long research tradition in generating insights into social phenomenons
+  as well as learning and teaching. These insights have to be
+  incorporated into applications of AI (e.g., Luan et al. 2020; Wong et
+  al. 2019). This makes supervised machine learning a very important
+  technology since it provides a link between educational and social
+  theories and models on the one hand and machine learning on the other
+  hand (Berding et al. 2022). However, this kind of machine learning
+  requires humans to generate a valid data set for the training process,
+  leading to *small data sets*.
+- **complex constructs:** Compared to classification tasks where AI has
+  to differentiate between a ‘good’ or ‘bad’ movie review, constructs in
+  the educational and social sciences are more complex. For example,
+  some research instruments in motivational psychology require to infer
+  personal motifs from written essays (e.g., Gruber & Kreuzpointner
   2013). A reliable and valid interpretation of this kind of information
-  requires well qualified human raters making data generation expensive.
-  This also *limits the size of a data set*.
-- **imbalanced data:** Finally, data in educational and social science
-  often occurs in an imbalanced pattern as several empirical studies
-  show (Bloemen 2011, Stütz et al. 2022). Imbalanced means that some
-  categories or characteristics of a data set have a very high absolute
-  frequencies compared to other categories and characteristics.
-  Imbalance during training AI guides algorithms to focus and to
-  prioritize the categories and characteristics with high absolute
-  frequencies increasing the risk to miss categories/characteristics
-  with low frequencies (Haixiang et al. 2017). This can lead AI to
-  prefer special groups of persons/materials, to imply false
-  recommendations and conclusions, and to miss rare categories or
-  characteristics.
+  requires well qualified human raters, making data generation
+  expensive. This also *limits the size of a data set*.
+- **imbalanced data:** Finally, data in the educational and social
+  sciences often occurs in an imbalanced pattern as several empirical
+  studies show (Bloemen 2011, Stütz et al. 2022). Imbalanced means that
+  some categories or characteristics of a data set have very high
+  absolute frequencies compared to other categories and characteristics.
+  Imbalance during AI training guides algorithms to focus and prioritize
+  the categories and characteristics with high absolute frequencies,
+  increasing the risk to miss categories/characteristics with low
+  frequencies (Haixiang et al. 2017). This can lead AI to prefer special
+  groups of people/materials, imply false recommendations and
+  conclusions, or to miss rare categories or characteristics.
 
-Currently the package focuses on classification tasks which can be used
-for diagnosing characteristics of learners from written materials or for
-estimating the properties of learning and teaching materials. In the
-future more tasks will be implemented.
-
-*aifeducation* is in an early stage. We appreciate every feedback, bug
-report or contributions to our project. Please remind that we are a very
-small team managing this package.
+Currently, the package focuses on classification tasks which can either
+be used to diagnose characteristics of learners from written materials
+or to estimate the properties of learning and teaching materials. In the
+future, more tasks will be implemented.
 
 ## Installation
 
@@ -80,30 +75,30 @@ devtools::install_github("FBerding/aifeducation")
 ### Transforming Texts into Numbers
 
 Classification tasks require the transformation of raw texts into a
-representation with numbers. For this step in a classification task
-*aifeducation* supports newer approaches such as BERT (Devlin et
-al. 2019) and older approaches such as GlobalVectors (Pennington, Socher
-& Manning 2014) or Latent Dirichlet Allocation/Topic Modeling. Other
-newer approaches such as ROBERTA (Liu et al. 2019) or Longformer
-(Beltagy, Peters & Cohan 2020) are planned for the future.
+representation with numbers. For this step, *aifeducation* supports both
+newer approaches such as BERT (Devlin et al. 2019) and older approaches
+such as GlobalVectors (Pennington, Socher & Manning 2014) or Latent
+Dirichlet Allocation/Topic Modeling in classification tasks. Other newer
+approaches such as ROBERTA (Liu et al. 2019) or Longformer (Beltagy,
+Peters & Cohan 2020) are planned for the future.
 
 *aifeducation* supports the usage of pre-trained transformer models
 provided by [Huggingface](https://huggingface.co/) and the creation of
-new transformers allowing educators and researchers to development
+new transformers allowing educators and researchers to develop
 specialized and domain-specific models.
 
-Package supports analysis of long texts. Depending on the method long
-texts are transformed into vectors at once or by splitting long texts
-into several chunks which result in a sequence of vectors.
+The package supports analysis of long texts. Depending on the method,
+long texts are transformed into vectors at once or, if too long, are
+split into several chunks which result in a sequence of vectors.
 
 ### Training AI under Challenging Conditions
 
-For the second step within a classification task *aifeducation*
+For the second step within a classification task, *aifeducation*
 integrates some important statistical and mathematical methods for
 dealing with the main challenges in educational and social sciences for
 applying AI.
 
-In order to deal with the problem of imbalanced data sets package
+In order to deal with the problem of imbalanced data sets, the package
 integrates *Synthetic Minority Oversampling Technique* into the learning
 process. Currently the *Basic Synthetic Minority Oversampling Technique*
 (Chawla et al. 2002), *Density-Bases Synthetic Minority Oversampling
@@ -111,27 +106,26 @@ Technique* (Bunkhumpornpat, Sinapiromsaran & Lursinsap, 2012), and
 *Adaptive Synthetic Sampling Approach for Imbalanced Learning* (Hem
 Garcia & Li 2008) are implemented via the *R* package *smotefamiliy*.
 
-In order to address the problem of small data sets training loops of AI
-integrate *Pseudo Labeling* (e.g., Lee 2013). Pseudo Labeling is a
+In order to address the problem of small data sets, training loops of AI
+integrate *pseudo-labeling* (e.g., Lee 2013). Pseudo-labeling is a
 technique which can be used for supervised learning. That is, educators
-and researchers rate a part of a data set and train AI with this part of
-data. The remaining part of data is not processed by humans. Instead, AI
+and researchers rate a part of a data set and train AI with this very
+part. The remainder of the data is not processed by humans. Instead, AI
 uses this part of data to learn on its own. Thus, educators and
-researchers do only have to provide additional data for learning without
-working on it. This offers the possibility to add more data to the
-training and to reduce personal costs.
+researchers only have to provide additional data for the AI’s learning
+process without coding it themselves. This offers the possibility to add
+more data to the training process and to reduce labor costs.
 
 ### Evaluating Performance
 
 Classification tasks in machine learning are comparable to the empirical
 method of *content analysis* from social science. This method looks back
-to a long research tradition and a long discussion about how to evaluate
-the reliability and validity of generated data. In order to provide a
-link to this research tradition and in order to provide educators as
+to a long research tradition and an ongoing discussion on how to
+evaluate the reliability and validity of generated data. In order to
+provide a link to this research tradition and to provide educators as
 well as educational and social researchers  
-with performance measures they are more familiar with every AI trained
-with this packages is evaluated with the following measures and
-concepts:
+with performance measures they are more familiar with, every AI trained
+with this package is evaluated with the following measures and concepts:
 
 - Iota Concept of the Second Generation (Berding & Pargmann 2022)
 - Krippendorff’s Alpha (Krippendorff 2019)
@@ -145,25 +139,25 @@ concepts:
 ## Sharing Trained AI
 
 Since the package is based on keras, tensorflow, and the transformer
-libraries every trained AI can be shared with other educators and
+libraries, every trained AI can be shared with other educators and
 researchers. The package supports an easy use of pre-trained AI within
 *R* but also provides the possibility to export trained AI to other
 environments.
 
-Using a pre-trained AI for classification requires only the classifier
+Using a pre-trained AI for classification only requires the classifier
 and the corresponding text embedding model. Just load both to *R* and
-start predictions. vignette [02 clasification
+start predictions. Vignette [02 classification
 tasks](articles/classification_tasks.html) describes how to save and
-load the objects. In the vignette [03 Sharing and Using Trained
-AI/Models](articles/sharing_and_publishing.html) you find a detailed
-guide how to document and share your models.
+load the objects. In vignette [03 Sharing and Using Trained
+AI/Models](articles/sharing_and_publishing.html) you can find a detailed
+guide on how to document and share your models.
 
 ## Tutorial and Guides
 
-A guide how to install and configure the package can be found via [Get
-started](articles/aifeducation.html). A short introduction in using the
-package for classification tasks can be found in the vignette [02
-clasification tasks](articles/classification_tasks.html)
+A guide on how to install and configure this package can be found via
+[Get started](articles/aifeducation.html). A short introduction into the
+package with examples for classification tasks can be found in vignette
+[02 classification tasks](articles/classification_tasks.html).
 
 ## References
 

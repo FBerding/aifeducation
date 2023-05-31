@@ -1,6 +1,6 @@
 #'Function for creating a new transformer based on BERT
 #'
-#'This function creates a transformer configuration based in the BERT base architecture
+#'This function creates a transformer configuration based on the BERT base architecture
 #'and a vocabulary based on WordPiece by using
 #'the python libraries 'transformers' and 'tokenizers'.
 #'
@@ -10,11 +10,11 @@
 #'@param vocab_size \code{int} Size of the vocabulary.
 #'@param vocab_do_lower_case \code{bool} \code{TRUE} if all words/tokens should be lower case.
 #'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
-#'also determines the maximum length of a sequence which can be processes with the model.
+#'also determines the maximum length of a sequence which can be processed with the model.
 #'@param hidden_size \code{int} Number of neurons in each layer. This parameter determines the
 #'dimensionality of the resulting text embedding.
 #'@param num_hidden_layer \code{int} Number of hidden layers.
-#'@param num_attention_heads \code{int} Number of attentions heads.
+#'@param num_attention_heads \code{int} Number of attention heads.
 #'@param intermediate_size \code{int} Number of neurons in the intermediate layer of
 #'the attention mechanism.
 #'@param hidden_act \code{string} name of the activation function.
@@ -23,7 +23,7 @@
 #'printed to the console.
 #'@return This function does not return an object. Instead the configuration
 #'and the vocabulary of the new model are saved on disk.
-#'@note To train the model pass the directory of the model to the function
+#'@note To train the model, pass the directory of the model to the function
 #'\link{train_tune_bert_model}.
 #'
 #'@export

@@ -22,14 +22,14 @@ install_py_modules<-function(envname="aifeducation"){
 
 #'Check if all necessary python modules are available
 #'
-#'This function checks if all necessary python modules are available for
-#'the package aifeducation to work.
+#'This function checks if all  python modules necessary for the package 
+#'aifeducation to work are available.
 #'@param trace \code{bool} \code{TRUE} if a list with all modules and their
 #'availability should be printed to the console.
 #'@return The function prints a table with all relevant packages and shows
-#' which modules are available or not.
-#'@return If all relevant modules are available the functions returns \code{TRUE}.
-#'In all other cases \code{FALSE}
+#' which modules are available or unavailable.
+#'@return If all relevant modules are available, the functions returns \code{TRUE}.
+#'In all other cases it returns \code{FALSE}
 #'@export
 check_aif_py_modules<-function(trace=TRUE){
   relevant_modules<-c("os",
@@ -75,7 +75,7 @@ set_config_cpu_only<-function(){
 #'Setting gpus' memory usage
 #'
 #'This function changes the memory usage of the gpus to allow computations
-#'on machine with small memory. With this function some computations of large
+#'on machines with small memory. With this function, some computations of large
 #'models may be possible but the speed of computation decreases.
 #'#'@return This function does not return anything. It is used for its
 #'side effects.
@@ -109,7 +109,7 @@ set_config_tf_logger<-function(level="ERROR"){
 #'Sets the level for logging information in tensor flow.
 #'
 #'This function changes the level for logging information with tensorflow via
-#'the os environment. This function mus be called before importing tensorflow.
+#'the os environment. This function must be called before importing tensorflow.
 #'
 #'@param level \code{string} Minimal level that should be printed to console. Five
 #'levels are available: INFO, WARNING, ERROR and NONE.

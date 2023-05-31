@@ -1,6 +1,6 @@
-#'@title Question Answer Models of Type Extraction
+#'@title Question-Answer-Models of Type Extraction
 #'@description This \link[R6]{R6} class stores the information for modeling a
-#'question answer model. This kind of model extracts the answer from a given text.
+#'question-answer-model. This kind of model extracts the answer from a given text.
 #'@export
 QAExtractModel<-R6::R6Class(
   classname = "QAExtractModel",
@@ -48,11 +48,11 @@ QAExtractModel<-R6::R6Class(
     #'python library.
     qa_pipline=NULL,
     #--------------------------------------------------------------------------
-    #'@description Method for creating a new question answer model based on a pretrained
+    #'@description Method for creating a new question-answer-model based on a pretrained
     #'model.
     #'@param model_name \code{Character} Name of the new model.
     #'@param model_version \code{Character} Version of the model.
-    #'@param model_language \code{Character} Language the model does support.
+    #'@param model_language \code{Character} Language the model supports.
     #'@param model_license \code{Character} License of the model.
     #'@param model_dir_path \code{string} Path to the directory where the model is
     #'stored.
@@ -75,7 +75,7 @@ QAExtractModel<-R6::R6Class(
       private$model_info$model_license=model_license
     },
     #---------------------------------------------------------------------------
-    #'@description Method for saving a question answer model.
+    #'@description Method for saving a question-answer-model.
     #'@param model_dir_path \code{string} Path to the directory where the model
     #'and the tokenizer should be stored.
     save_model=function(model_dir_path){
@@ -86,7 +86,7 @@ QAExtractModel<-R6::R6Class(
         print(paste(date(),"Tokenizer saved."))
     },
     #---------------------------------------------------------------------------
-    #'@description Method for loading a question answer model.
+    #'@description Method for loading a question-answer-model.
     #'@param model_dir_path \code{string} Path to the directory where the model
     #'and the tokenizer are saved.
     load_model=function(model_dir_path){
@@ -102,12 +102,12 @@ QAExtractModel<-R6::R6Class(
     #'@param question \code{string} Question to be answered.
     #'@param knowledge_base \code{list} of raw texts where to search for the answer.
     #'@param n_answers \code{int} Number of possible answers generated from the texts.
-    #'@param doc_stride \code{int} In the case the knowledge base is to long to
-    #'for the model to process at once the text is divided into several overlapping
+    #'@param doc_stride \code{int} In case the knowledge base is too long
+    #'for the model to process at once, the text is divided into several overlapping
     #'chunks. This parameter determines the size of the overlap.
-    #'@param max_answer_len \code{int} Maximum length in token for possible answers.
+    #'@param max_answer_len \code{int} Maximum length in tokens for possible answers.
     #'Only answers which are shorter are considered for an answer.
-    #'@param max_seq_len \code{int} Maximum length of question and knowledge base after
+    #'@param max_seq_len \code{int} Maximum length of a question and knowledge base after
     #'tokenization. The context may be divided into several overlapping chunks.
     #'@param  max_question_len \code{int} The maximum length of the question after tokenization.
     #'Longer sequences are truncated.

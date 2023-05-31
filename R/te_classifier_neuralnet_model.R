@@ -31,13 +31,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     ),
 
     #'@field bundeled_model ('bundle object')\cr
-    #'Object for storing the keras model of the neural net. Saved as bundled
+    #'Object for storing the keras model of the neural net. Saved as a bundled
     #'object with help of the package \link[bundle]{bundle} for serialization.
     bundeled_model=NULL,
 
     #'@field model_config ('list()')\cr
     #'List for storing information about the configuration of the model. This
-    #'information is used for predicting new data.
+    #'information is used to predict new data.
     #'\itemize{
     #'\item{\code{model_config$n_req: }}{Number of recurrent layers.}
     #'\item{\code{model_config$n_hidden: }}{Number of dense layers.}
@@ -61,21 +61,21 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\item{\code{config$history: }}{History of the last training.}
     #'\item{\code{config$data: }}{Object of class table storing the initial frequencies of the passed data.}
     #'\item{\code{config$data_pb:l }}{Matrix storing the number of additional cases (test and training) added
-    #'during balanced pseudo labeling. The rows refer to folds and final training.
-    #'The columns refer to the steps during pseudo labeling.}
+    #'during balanced pseudo-labeling. The rows refer to folds and final training.
+    #'The columns refer to the steps during pseudo-labeling.}
     #'\item{\code{config$data_bsc_test: }}{Matrix storing the number of cases for each category used for testing
     #'during the phase of balanced synthetic units. Please note that the
-    #'frequencies include original and synthetic cases. In terms that the number
-    #'of original and synthetic cases exceeds the limit for the majority classes
+    #'frequencies include original and synthetic cases. In case the number
+    #'of original and synthetic cases exceeds the limit for the majority classes,
     #'the frequency represents the number of cases created by cluster analysis.}
     #'\item{\code{config$date: }}{Time when the last training finished.}
-    #'\item{\code{config$config: }}{List storing which kind of estimation was requested during last training.
+    #'\item{\code{config$config: }}{List storing which kind of estimation was requested during the last training.
     #'\itemize{
-    #'\item{\code{config$config$use_bsc:  }}{\code{TRUE} if  balanced synthetic cases was requested. \code{FALSE}
+    #'\item{\code{config$config$use_bsc:  }}{\code{TRUE} if  balanced synthetic cases were requested. \code{FALSE}
     #'if not.}
-    #'\item{\code{config$config$use_baseline: }}{\code{TRUE} if baseline estimation was requested. \code{FALSE}
+    #'\item{\code{config$config$use_baseline: }}{\code{TRUE} if baseline estimation were requested. \code{FALSE}
     #'if not.}
-    #'\item{\code{ config$config$use_bpl: }}{\code{TRUE} if  balanced pseudo labeling cases was requested. \code{FALSE}
+    #'\item{\code{ config$config$use_bpl: }}{\code{TRUE} if  balanced, pseudo-labeling cases were requested. \code{FALSE}
     #'if not.}
     #'}}
     #'}
@@ -99,9 +99,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'List for storing central reliability measures of the last training.
     #'\itemize{
     #'\item{\code{reliability$test_metric: }}{Array containing the reliability measures for the validation data for
-    #'every fold, method, and step (in case of pseudo labeling).}
+    #'every fold, method, and step (in case of pseudo-labeling).}
     #'\item{\code{reliability$test_metric_mean: }}{Array containing the reliability measures for the validation data for
-    #'every method and step (in case of pseudo labeling). The values represent
+    #'every method and step (in case of pseudo-labeling). The values represent
     #'the mean values for every fold.}
     #'\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package [iotarelr]{iotarelr}
     #'for every fold at the start and the end of the last training.
@@ -109,7 +109,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\item{\code{reliability$raw_iota_objects$iota_objects_start: }}{List of objects with class \code{iotarelr_iota2} containing the
     #'estimated iota reliability of the second generation for the baseline model
     #'for every fold.
-    #'If the estimation of the baseline model is not requested the list is
+    #'If the estimation of the baseline model is not requested, the list is
     #'set to \code{NULL}.}
     #'\item{\code{reliability$raw_iota_objects$iota_objects_end: }}{List of objects with class \code{iotarelr_iota2} containing the
     #'estimated iota reliability of the second generation for the final model
@@ -120,39 +120,39 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\item{\code{reliability$raw_iota_objects$iota_objects_start_free: }}{List of objects with class \code{iotarelr_iota2} containing the
     #'estimated iota reliability of the second generation for the baseline model
     #'for every fold.
-    #'If the estimation of the baseline model is not requested the list is
+    #'If the estimation of the baseline model is not requested, the list is
     #'set to \code{NULL}.Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
     #'\item{\code{reliability$raw_iota_objects$iota_objects_end_free: }}{List of objects with class \code{iotarelr_iota2} containing the
     #'estimated iota reliability of the second generation for the final model
-    #'for every fold. Depending of the requested training method these values
+    #'for every fold. Depending of the requested training method, these values
     #'refer to the baseline model, a trained model on the basis of balanced
-    #'synthetic cases, balanced pseudo labeling or a combination of balanced
-    #'synthetic cases with pseudo labeling.
+    #'synthetic cases, balanced pseudo-labeling or a combination of balanced
+    #'synthetic cases and pseudo-labeling.
     #'Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
     #'}
     #'}
     #'\item{\code{reliability$iota_object_start: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
-    #'for every fold. If the estimation of the baseline model is not requested the list is
+    #'for every fold. If the estimation of the baseline model is not requested, the list is
     #'set to \code{NULL}.}
     #'\item{\code{ reliability$iota_object_start_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
-    #'for every fold. If the estimation of the baseline model is not requested the list is
+    #'for every fold. If the estimation of the baseline model is not requested, the list is
     #'set to \code{NULL}.
     #'Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
     #'\item{\code{reliability$iota_object_end: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
     #'for every fold.
-    #'Depending of the requested training method this object
+    #'Depending on the requested training method, this object
     #'refers to the baseline model, a trained model on the basis of balanced
-    #'synthetic cases, balanced pseudo labeling or a combination of balanced
-    #'synthetic cases with pseudo labeling.}
+    #'synthetic cases, balanced pseudo-labeling or a combination of balanced
+    #'synthetic cases and pseudo-labeling.}
     #'\item{\code{reliability$iota_object_end_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
     #'for every fold.
-    #'Depending of the requested training method this object
+    #'Depending on the requested training method, this object
     #'refers to the baseline model, a trained model on the basis of balanced
-    #'synthetic cases, balanced pseudo labeling or a combination of balanced
-    #'synthetic cases with pseudo labeling.
+    #'synthetic cases, balanced pseudo-labeling or a combination of balanced
+    #'synthetic cases and pseudo-labeling.
     #'Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
     #'}
@@ -169,6 +169,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       iota_object_end=NULL,
       iota_object_end_free=NULL
     ),
+
     #New-----------------------------------------------------------------------
     #'@description Creating a new instance of this class.
     #'@param name \code{Character} Name of the new classifier. Please refer to
@@ -178,18 +179,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param text_embeddings An object of class\code{TextEmbeddingModel}.
     #'@param targets \code{factor} containing the target values of the classifier.
     #'@param hidden \code{vector} containing the number of neurons for each dense layer.
-    #'The length of the vector determines the number of dense layers. If you want no dense layer
+    #'The length of the vector determines the number of dense layers. If you want no dense layer,
     #'set this parameter to \code{NULL}.
     #'@param rec \code{vector} containing the number of neurons for each recurrent layer.
-    #'The length of the vector determines the number of dense layers. If you want no dense layer
+    #'The length of the vector determines the number of dense layers. If you want no dense layer,
     #'set this parameter to \code{NULL}.
     #'@param self_attention_heads \code{integer} determining the number of attention heads
-    #'for a self attention layer. If this value is greater 0 a self attention layer is added
+    #'for a self-attention layer. If this value is greater 0, a self-attention layer is added
     #'between the recurrent and dense layers together with a normalization and a
-    #'recurrent layer. If set to 0 none of these layers is added.
-    #'@param dropout \code{double} ranging between 0 and lower 1 determining the
+    #'recurrent layer. If set to 0, none of these layers are added.
+    #'@param dropout \code{double} ranging between 0 and lower 1, determining the
     #'dropout for each recurrent layer.
-    #'@param recurrent_dropout \code{double} ranging between 0 and lower 1 determining the
+    #'@param recurrent_dropout \code{double} ranging between 0 and lower 1, determining the
     #'recurrent dropout for each recurrent layer.
     #'@param l2_regularizer \code{double} determining the l2 regularizer for every dense layer.
     #'@param optimizer Object of class \code{keras.optimizers}.
@@ -233,6 +234,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
       if(is.integer(as.integer(self_attention_heads))==FALSE){
         stop("self_attention_heads must be an integer.")
+      }
+
+      if(optimizer %in% c("adam","rmsprop")==FALSE){
+        stop("Optimzier must be 'adam' oder 'rmspro'.")
       }
 
 
@@ -366,10 +371,41 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                layer_list[[length(layer_list)]],
                                layer_list[[length(layer_list)]]))
 
-        norm_laye_attention<-keras::layer_layer_normalization(
+        addition_layer_attention<-keras::layer_add(
+          inputs=list(layer_list[[length(layer_list)]],
+                      layer_list[[length(layer_list)-1]]))
+        layer_list[length(layer_list)+1]<-list(addition_layer_attention)
+
+        norm_layer_attention<-keras::layer_layer_normalization(
           object=layer_list[[length(layer_list)]],
           name = "normalizaion_layer_attention")
-        layer_list[length(layer_list)+1]<-list(norm_laye_attention)
+        layer_list[length(layer_list)+1]<-list(norm_layer_attention)
+
+        proj_dense_1<-keras::layer_dense(
+          object=layer_list[[length(layer_list)]],
+          units = as.integer(self_attention_heads*2*config$rec[length(config$rec)]),
+          activation = config$act_fct,
+          kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
+          name="dense_projection_1")
+        layer_list[length(layer_list)+1]<-list(proj_dense_1)
+
+        proj_dense_2<-keras::layer_dense(
+          object=layer_list[[length(layer_list)]],
+          units = as.integer(2*config$rec[length(config$rec)]),
+          activation = config$act_fct,
+          kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
+          name="dense_projection_2")
+        layer_list[length(layer_list)+1]<-list(proj_dense_2)
+
+        addition_layer_projection<-keras::layer_add(
+          inputs=list(layer_list[[length(layer_list)]],
+                      layer_list[[length(layer_list)-2]]))
+        layer_list[length(layer_list)+1]<-list(addition_layer_projection)
+
+        norm_layer_projection<-keras::layer_layer_normalization(
+          object=layer_list[[length(layer_list)]],
+          name = "normalizaion_layer_projection")
+        layer_list[length(layer_list)+1]<-list(norm_layer_projection)
 
         layer_list[length(layer_list)+1]<-list(
           keras::bidirectional(
@@ -435,6 +471,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           loss = config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
           metric=config$metric)
+      } else if (config$optimizer=="rmsprop"){
+          model %>% keras::compile(
+            loss = self$model_config$init_config$err_fct,
+            optimizer=tf$keras$optimizers$legacy$RMSprop(),
+            metric=self$model_config$init_config$metric)
       }
 
       self$bundeled_model=bundle::bundle(model)
@@ -446,6 +487,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       self$model_config$init_config=config
       self$date=date()
     },
+
     #-------------------------------------------------------------------------
     #'@description Method for training a neural net with keras and
     #'tensorflow.
@@ -457,8 +499,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'samples.
     #'@param use_baseline \code{bool} \code{TRUE} if the calculation of a baseline
     #'model is requested. This option is only relevant for \code{use_bsc=TRUE} or
-    #'\code{use_pbl=TRUE}. If both are \code{FALSE} a baseline model is calculated.
-    #'@param bsl_val_size \code{double} between 0 and 1 indicating the proportion of cases of each class
+    #'\code{use_pbl=TRUE}. If both are \code{FALSE}, a baseline model is calculated.
+    #'@param bsl_val_size \code{double} between 0 and 1, indicating the proportion of cases of each class
     #'which should be used for the validation sample during the estimation of the baseline model.
     #'The remaining cases are part of the training data.
     #'@param use_bsc \code{bool} \code{TRUE} if the estimation should integrate
@@ -469,54 +511,57 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'and \code{bsc_methods=c("dbsmote")} are possible.
     #'@param bsc_max_k \code{int} determining the maximal number of k which is used
     #'for creating synthetic units.
-    #'@param bsc_val_size \code{double} between 0 and 1 indicating the proportion of cases of each class
+    #'@param bsc_val_size \code{double} between 0 and 1, indicating the proportion of cases of each class
     #'which should be used for the validation sample during the estimation with synthetic cases.
+    #'@param bsc_add_all \code{bool} If \code{FALSE} only synthetic cases necessary to fill
+    #'the gab between the class and the major class are added to the data. If \code{TRUE} all
+    #'generated synthetic cases are added to the data.
     #'@param use_bpl \code{bool} \code{TRUE} if the estimation should integrate
-    #'balanced pseudo labeling. \code{FALSE} if not.
-    #'@param bpl_max_steps \code{int} determining the maximal number of steps during
-    #'pseudo labeling.
+    #'balanced pseudo-labeling. \code{FALSE} if not.
+    #'@param bpl_max_steps \code{int} determining the maximum number of steps during
+    #'pseudo-labeling.
     #'@param bpl_epochs_per_step \code{int} Number of training epochs within every step.
-    #'@param bpl_model_reset \code{bool} If \code{TRUE} model is re-initialized every
+    #'@param bpl_model_reset \code{bool} If \code{TRUE}, model is re-initialized at every
     #'step.
-    #'@param bpl_dynamic_inc \code{bool} If \code{TRUE} the only a specific percentage
-    #'of cases are included during each step. The percentage is determined by
-    #'\eqn{step/bpl_max_steps}. If \code{FALSE} all cases are used.
-    #'@param bpl_balance \code{bool} If \code{TRUE} the same number of cases for
-    #'every category/class of the pseudo labeled data are used with training. That
+    #'@param bpl_dynamic_inc \code{bool} If \code{TRUE}, only a specific percentage
+    #'of cases is included during each step. The percentage is determined by
+    #'\eqn{step/bpl_max_steps}. If \code{FALSE}, all cases are used.
+    #'@param bpl_balance \code{bool} If \code{TRUE}, the same number of cases for
+    #'every category/class of the pseudo-labeled data are used with training. That
     #'is, the number of cases is determined by the minor class/category.
     #'@param bpl_anchor \code{double} between 0 and 1 indicating the reference
     #'point for sorting the new cases of every label. See notes for more details.
-    #'@param bpl_max \code{double} between 0 and 1 setting the maximal level of
-    #'confidence for considering a case for pseudo labeling.
-    #'@param bpl_min \code{double} between 0 and 1 setting the minimal level of
-    #'confidence for considering a case for pseudo labeling.
+    #'@param bpl_max \code{double} between 0 and 1, setting the maximal level of
+    #'confidence for considering a case for pseudo-labeling.
+    #'@param bpl_min \code{double} between 0 and 1, setting the minimal level of
+    #'confidence for considering a case for pseudo-labeling.
     #'@param bpl_weight_inc \code{double} value how much the sample weights
-    #'should be increased for the cases with pseudo labels in very step.
-    #'@param bpl_weight_start \code{dobule} Start value for the weights of the
+    #'should be increased for the cases with pseudo-labels in every step.
+    #'@param bpl_weight_start \code{dobule} Starting value for the weights of the
     #'unlabeled cases.
     #'@param epochs \code{int} Number of training epochs.
     #'@param batch_size \code{int} Size of batches.
     #'@param dir_checkpoint \code{string} Path to the directory where
     #'the checkpoint during training should be saved. If the directory does not
-    #'exists it is created.
-    #'@param trace \code{bool} \code{TRUE} if information about the estimation
+    #'exist, it is created.
+    #'@param trace \code{bool} \code{TRUE}, if information about the estimation
     #'phase should be printed to the console.
     #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
     #'information about the training process from keras on the console.
     #'\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
     #'one line of information for every epoch.
-    #'@param view_metrics \code{bool} \code{TRUE} if metrics should be printed
+    #'@param view_metrics \code{bool} \code{TRUE}, if metrics should be printed
     #'in the RStudio IDE.
     #'@param n_cores \code{int} Number of cores used for creating synthetic units.
     #'@details \itemize{
     #'
     #'\item{bsc_max_k: }{All values from 2 up to bsc_max_k are successively used. If
-    #'the number of bsc_max_k is to high the value is reduced to a number that
+    #'the number of bsc_max_k is too high, the value is reduced to a number that
     #'allows the calculating of synthetic units.}
     #'
-    #'\item{bpl_anchor: }{With the help of this value the new cases are sorted. For
-    #'this aim the distance from the anchor is calculated and all cases are arranged
-    #'into an increasing order.
+    #'\item{bpl_anchor: }{With the help of this value, the new cases are sorted. For
+    #'this aim, the distance from the anchor is calculated and all cases are arranged
+    #'into an ascending order.
     #'}
     #'}
     #'@import bundle
@@ -530,6 +575,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    bsc_methods=c("dbsmote"),
                    bsc_max_k=10,
                    bsc_val_size=0.25,
+                   bsc_add_all=FALSE,
                    use_bpl=TRUE,
                    bpl_max_steps=3,
                    bpl_epochs_per_step=1,
@@ -583,10 +629,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       if(bpl_anchor<bpl_min){
-        stop("bpl_anchor must be at least bpl_min")
+        stop("bpl_anchor must be at least bpl_min.")
       }
       if(bpl_anchor>bpl_max){
-        stop("bpl_anchor must be lower or equal to bpl_max")
+        stop("bpl_anchor must be lower or equal to bpl_max.")
+      }
+
+      if(data_n_test_samples<2){
+        stop("data_n_test_samples must be at least 2.")
       }
 
       #------------------------------------------------------------------------
@@ -820,6 +870,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           cat_freq=table(targets_labeleld_train)
           cat_max=max(cat_freq)
           cat_delta=cat_max-cat_freq
+
+          if(bsc_add_all==TRUE){
+            cat_delta[]=Inf
+          }
 
           cat_freq_syn=table(targets_synthetic_all)
 
@@ -1277,6 +1331,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         cat_max=max(cat_freq)
         cat_delta=cat_max-cat_freq
 
+        if(bsc_add_all==TRUE){
+          cat_delta[]=Inf
+        }
+
         cat_freq_syn=table(targets_synthetic_all)
 
         names_syntethic_targets_selected=NULL
@@ -1596,13 +1654,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                     "Training Complete","\n"))
       }
     },
+
     #-------------------------------------------------------------------------
     #'@description Method for predicting new data with a trained neural net.
     #'@param newdata Object of class \code{TextEmbeddingModel} or
     #'\code{data.frame} for which predictions should be made.
     #'@param verbose \code{int} \code{verbose=0} does not print any
     #'information about the training process from keras on the console.
-    #'\code{verbose=1} print a progress bar. \code{verbose=2} prints
+    #'\code{verbose=1} prints a progress bar. \code{verbose=2} prints
     #'one line of information for every epoch.
     #'@param batch_size \code{int} Size of batches.
     #'@return Returns a \code{data.frame} containing the predictions and
@@ -1693,37 +1752,38 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       return(predictions_prob)
 
     },
+
     #General Information set and get--------------------------------------------
     #'@description Method for setting publication information of the classifier
     #'@param type \code{string} for choosing the type of information that should
     #'be added. \code{type="developer"} for information about the developer of the
-    #'classifier and \code{type="trainer"} for information about persons who trained
-    #'the classifier. If you modify an already existing classifier please use
+    #'classifier and \code{type="trainer"} for information about people who trained
+    #'the classifier. If you modify an already existing classifier, please use
     #'\code{type="modifier"}.
-    #'@param autors Person list of authors.
+    #'@param authors List of authors.
     #'@param citation Free text citation.
     #'@param url URL of a corresponding homepage.
     set_publication_info=function(type,
-                                  autors,
+                                  authors ,
                                   citation,
                                   url=NULL){
       if(type=="developer"){
-        private$publication_info$developed_by$authors<-autors
+        private$publication_info$developed_by$authors<-authors
         private$publication_info$developed_by$citation<-citation
         private$publication_info$developed_by$url<-url
       } else if(type=="trainer"){
-        private$publication_info$trained_by$authors<-autors
+        private$publication_info$trained_by$authors<-authors
         private$publication_info$trained_by$citation<-citation
         private$publication_info$trained_by$url<-url
       } else if(type=="modifier"){
-        private$publication_info$modifided_by$authors<-autors
+        private$publication_info$modifided_by$authors<-authors
         private$publication_info$modifided_by$citation<-citation
         private$publication_info$modifided_by$url<-url
       }
     },
     #--------------------------------------------------------------------------
-    #'@description Method for requesting the publication information of the classifier.
-    #'@return \code{list} with all saved publication information.
+    #'@description Method for requesting the bibliographic information of the classifier.
+    #'@return \code{list} with all saved bibliographic information.
     get_publication_info=function(){
       return(private$publication_info)
     },
@@ -1734,8 +1794,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     set_license=function(license){
       private$model_info$model_license<-license
     },
-    #'@description Method for requesting the license of the classifier.
-    #'@return \code{string} License of the classifier.
+    #'@description Method for setting the license of the classifier.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
     get_license=function(){
       return(private$model_info$model_license)
     },
@@ -1783,7 +1844,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     },
     #'@description Method for requesting the model description.
     #'@return \code{list} with the description of the classifier in English
-    #'and native language.
+    #'and the native language.
     get_model_description=function(){
       return(private$model_description)
     },
@@ -1808,17 +1869,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #General Information-------------------------------------------------------
     publication_info=list(
       developed_by=list(
-        autors=NULL,
+        authors =NULL,
         citation=NULL,
         url=NULL
       ),
       trained_by=list(
-        autors=NULL,
+        authors =NULL,
         citation=NULL,
         url=NULL
       ),
       modifided_by=list(
-        autors=NULL,
+        authors =NULL,
         citation=NULL,
         url=NULL
       )
@@ -1926,6 +1987,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         model %>% keras::compile(
           loss = self$model_config$init_config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
+          metric=self$model_config$init_config$metric)
+      } else if (self$model_config$init_config$optimizer=="rmsprop"){
+        model %>% keras::compile(
+          loss = self$model_config$init_config$err_fct,
+          optimizer=tf$keras$optimizers$legacy$RMSprop(),
           metric=self$model_config$init_config$metric)
       }
 

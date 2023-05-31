@@ -1,16 +1,15 @@
 #'Function for creating a first draft of a vocabulary
-#'
 #'This function creates a list of tokens which refer to specific
 #'universal part-of-speech tags (UPOS) and provides the corresponding lemmas.
 #'
 #'@param path_language_model \code{string} Path to a udpipe language model that
-#'should be used for tagging and lemmatisation.
+#'should be used for tagging and lemmatization.
 #'@param data \code{vector} containing the raw texts.
 #'@param upos \code{vector} containing the universal part-of-speech tags which
 #'should be used to build the vocabulary.
 #'@param label_language_model \code{string} Label for the udpipe language model used.
 #'@param language \code{string} Name of the language (e.g., English, German)
-#'@param chunk_size \code{int} Number of raw texts which should be processed at one time.
+#'@param chunk_size \code{int} Number of raw texts which should be processed at once.
 #'@param trace \code{bool} \code{TRUE} if information about the progress should be printed to console.
 #'@return \code{list} with the following components.
 #'\itemize{
@@ -21,7 +20,7 @@
 #'\item{\code{label_language_model}}{Label of the udpipe language model.}
 #'\item{\code{language}}{Language of the raw texts.}
 #'\item{\code{upos}}{Used univerisal part-of-speech tags.}
-#'\item{\code{n_sentence}}{\code{int} Estimated number of sentence in the raw texts.}
+#'\item{\code{n_sentence}}{\code{int} Estimated number of sentences in the raw texts.}
 #'\item{\code{n_token}}{\code{int} Estimated number of tokens in the raw texts.}
 #'\item{\code{n_document_segments}}{\code{int} Estimated number of document segments/raw texts.}
 #'}
@@ -41,7 +40,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
                                     chunk_size=100,
                                     trace=TRUE)
 {
-  #Phase 1: Analyse der Texte mit udpipe
+  #Phase 1: Analyze Texts with udpipe
   n_document_segments<-length(data)
   n_sentence_init<-0
   n_token_init<-0
@@ -139,18 +138,18 @@ bow_pp_create_vocab_draft<-function(path_language_model,
 #'@param remove_numbers \code{bool} \code{TRUE} if numbers should be removed.
 #'@param remove_url \code{bool} \code{TRUE} if urls should be removed.
 #'@param remove_separators \code{bool} \code{TRUE} if separators should be removed.
-#'@param split_hyphens \code{bool} \code{TRUE} if hyphens should be splitted into several tokens.
-#'@param split_tags \code{bool} \code{TRUE} if tags should be splitted.
+#'@param split_hyphens \code{bool} \code{TRUE} if hyphens should be split into several tokens.
+#'@param split_tags \code{bool} \code{TRUE} if tags should be split.
 #'@param use_lemmata \code{bool} \code{TRUE} lemmas instead of original tokens should be used.
-#'@param to_lower \code{bool} \code{TRUE} if token or lemmas should be used with lower cases.
-#'@param language_stopwords \code{string} Abbreviation for the language for which stopword shoud be
+#'@param to_lower \code{bool} \code{TRUE} if tokens or lemmas should be used with lower cases.
+#'@param language_stopwords \code{string} Abbreviation for the language for which stopwords should be
 #'removed.
 #'@param min_termfreq \code{int} Minimum frequency of a token to be part of the vocabulary.
 #'@param min_docfreq \code{int} Minimum appearance of a token in documents to be part of the vocabulary.
 #'@param max_docfreq \code{int} Maximum appearance of a token in documents to be part of the vocabulary.
-#'@param window \code{int} size of the window for creating the feature co-occurance matrix.
-#'@param weights \code{vector} weights for the corresponding window. The vector length must be equal to window's size.
-#'@param trace \code{bool} \code{TRUE} if information about the progress should
+#'@param window \code{int} size of the window for creating the feature-co-occurance matrix.
+#'@param weights \code{vector} weights for the corresponding window. The vector length must be equal to the window size.
+#'@param trace \code{bool} \code{TRUE} if information about the progress should be
 #'printed to console.
 #'@return Returns a \code{list} of class \code{basic_text_rep} with the following components.
 #'\itemize{
@@ -161,7 +160,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
 #'
 #'\item{\code{information: }}{\code{list} containing information about the used vocabulary. These are:
 #'  \itemize{
-#'  \item{\code{n_sentence: }} {Number of sentence}
+#'  \item{\code{n_sentence: }} {Number of sentences}
 #'  \item{\code{n_document_segments: }} {Number of document segments/raw texts}
 #'  \item{\code{n_token_init: }} {Number of initial tokens}
 #'  \item{\code{n_token_final: }} {Number of final tokens}
