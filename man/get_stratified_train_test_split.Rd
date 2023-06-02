@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{get_stratified_train_test_split}
 \alias{get_stratified_train_test_split}
-\title{Creates a stratified random sample}
+\title{Create a stratified random sample}
 \usage{
 get_stratified_train_test_split(targets, val_size = 0.25)
 }
@@ -13,7 +13,7 @@ get_stratified_train_test_split(targets, val_size = 0.25)
 each label/category should be part of the validation sample.}
 }
 \value{
-\code{list} which containing the names of cases belonging to the train
+\code{list} which contains the names of the cases belonging to the train
 sample and to the validation sample.
 }
 \description{

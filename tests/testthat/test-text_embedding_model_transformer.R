@@ -23,8 +23,8 @@ bert_modeling<-TextEmbeddingModel$new(
   model_language="english",
   method = "bert",
   max_length = 512,
-  chunks=15,
-  overlap=4,
+  chunks=4,
+  overlap=40,
   aggregation="last",
   use_cls_token=TRUE,
   model_dir=testthat::test_path(tmp_path))

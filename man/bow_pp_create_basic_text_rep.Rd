@@ -40,13 +40,16 @@ bow_pp_create_basic_text_rep(
 
 \item{remove_separators}{\code{bool} \code{TRUE} if separators should be removed.}
 
-\item{split_hyphens}{\code{bool} \code{TRUE} if hyphens should be splitted into several tokens.}
+\item{split_hyphens}{\code{bool} \code{TRUE} if hyphens should be split into several tokens.}
 
-\item{split_tags}{\code{bool} \code{TRUE} if tags should be splitted.}
+\item{split_tags}{\code{bool} \code{TRUE} if tags should be split.}
+
+\item{language_stopwords}{\code{string} Abbreviation for the language for which stopwords should be
+removed.}
 
 \item{use_lemmata}{\code{bool} \code{TRUE} lemmas instead of original tokens should be used.}
 
-\item{to_lower}{\code{bool} \code{TRUE} if token or lemmas should be used with lower cases.}
+\item{to_lower}{\code{bool} \code{TRUE} if tokens or lemmas should be used with lower cases.}
 
 \item{min_termfreq}{\code{int} Minimum frequency of a token to be part of the vocabulary.}
 
@@ -54,11 +57,11 @@ bow_pp_create_basic_text_rep(
 
 \item{max_docfreq}{\code{int} Maximum appearance of a token in documents to be part of the vocabulary.}
 
-\item{window}{\code{int} size of the window for creating the feature co-occurance matrix.}
+\item{window}{\code{int} size of the window for creating the feature-co-occurance matrix.}
 
-\item{weights}{\code{vector} weights for the corresponding window. The vector length must be equal to window's size.}
+\item{weights}{\code{vector} weights for the corresponding window. The vector length must be equal to the window size.}
 
-\item{trace}{\code{bool} \code{TRUE} if information about the progress should
+\item{trace}{\code{bool} \code{TRUE} if information about the progress should be
 printed to console.}
 }
 \value{
@@ -71,7 +74,7 @@ the number of tokens in the document.}
 
 \item{\code{information: }}{\code{list} containing information about the used vocabulary. These are:
  \itemize{
- \item{\code{n_sentence: }} {Number of sentence}
+ \item{\code{n_sentence: }} {Number of sentences}
  \item{\code{n_document_segments: }} {Number of document segments/raw texts}
  \item{\code{n_token_init: }} {Number of initial tokens}
  \item{\code{n_token_final: }} {Number of final tokens}

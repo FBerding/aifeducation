@@ -54,23 +54,20 @@ TextEmbeddingModel<-R6::R6Class(
       max_length=NULL
     ),
 
-    #'@field bert_components ('list()')\cr
+    #'@field transformer_components ('list()')\cr
     #'List storing information which only apply to BERT models.
     #'\itemize{
-    #'\item{\code{bert_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
-    #'\item{\code{bert_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
-    #'\item{\code{bert_components$aggregation: }}{Aggregation method for the hidden states.}
-    #'\item{\code{bert_components$use_cls_token: }}{Whether to use the hidden state representing the [CLS] token or the mean
-    #'of the hidden states of the tokens with no special functions.}
-    #'\item{\code{bert_components$chunks: }}{Maximal number of chunks processed with the model.}
-    #'\item{\code{ bert_components$overlap: }}{Number of tokens which should be added at the beginning of the sequence
+    #'\item{\code{transformer_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
+    #'\item{\code{transformer_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
+    #'\item{\code{transformer_components$aggregation: }}{Aggregation method for the hidden states.}
+    #'\item{\code{transformer_components$chunks: }}{Maximal number of chunks processed with the model.}
+    #'\item{\code{ transformer_components$overlap: }}{Number of tokens which should be added at the beginning of the sequence
     #'of the next chunk.}
     #'}
-    bert_components=list(
+    transformer_components=list(
       model=NULL,
       tokenizer=NULL,
       aggregation=NULL,
-      use_cls_token=NULL,
       chunks=NULL,
       overlap=NULL),
 
@@ -135,9 +132,6 @@ TextEmbeddingModel<-R6::R6Class(
     #'at the beginning of the next chunk. Only relevant for BERT models.
     #'@param aggregation \code{string} method for aggregating the text embeddings
     #'created by BERT models. See details for more information.
-    #'@param use_cls_token \code{bool} \code{TRUE} if the CLS token should be used
-    #'for aggregation and as text embedding. If \code{FALSE} the mean of all
-    #'corresponding tokens is used for aggregation and text embedding.
     #'@param model_dir \code{string} path to the directory where the
     #'BERT model is stored.
     #'@param bow_basic_text_rep object of class \code{basic_text_rep} created via
@@ -191,7 +185,6 @@ TextEmbeddingModel<-R6::R6Class(
                         chunks=1,
                         overlap=0,
                         aggregation="last",
-                        use_cls_token=TRUE,
                         model_dir,
                         bow_basic_text_rep,
                         bow_n_dim=10,
@@ -243,13 +236,12 @@ TextEmbeddingModel<-R6::R6Class(
       #------------------------------------------------------------------------
       if(self$basic_components$method=="bert"){
         transformer = reticulate::import('transformers')
-        self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
-        self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
+        self$transformer_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
+        self$transformer_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
 
-        self$bert_components$chunks<-chunks
-        self$bert_components$overlap<-overlap
-        self$bert_components$aggregation<-aggregation
-        self$bert_components$use_cls_token<-use_cls_token
+        self$transformer_components$chunks<-chunks
+        self$transformer_components$overlap<-overlap
+        self$transformer_components$aggregation<-aggregation
         #------------------------------------------------------------------------
       } else if(self$basic_components$method=="glove_cluster"){
         glove <- text2vec::GlobalVectors$new(rank = bow_n_dim,
@@ -322,8 +314,8 @@ TextEmbeddingModel<-R6::R6Class(
         self$bow_components$configuration$bow_max_iter_cluster=bow_max_iter_cluster
         self$bow_components$configuration$bow_cr_criterion=bow_cr_criterion
         self$bow_components$configuration$bow_learning_rate=bow_learning_rate
-        self$bow_components$chunks=chunks
-        self$bow_components$overlap=overlap
+        self$bow_components$chunks=1
+        self$bow_components$overlap=0
 
         #Topic Modeling--------------------------------------------------------
       } else if(self$basic_components$method=="lda"){
@@ -400,8 +392,8 @@ TextEmbeddingModel<-R6::R6Class(
       self$bow_components$configuration$bow_max_iter_cluster=bow_max_iter_cluster
       self$bow_components$configuration$bow_cr_criterion=bow_cr_criterion
       self$bow_components$configuration$bow_learning_rate=bow_learning_rate
-      self$bow_components$chunks=chunks
-      self$bow_components$overlap=overlap
+      self$bow_components$chunks=1
+      self$bow_components$overlap=0
       }
 
       private$model_info$model_name<-model_name
@@ -417,8 +409,8 @@ TextEmbeddingModel<-R6::R6Class(
     load_model=function(model_dir){
       if(self$basic_components$method=="bert"){
         transformer = reticulate::import('transformers')
-        self$bert_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
-        self$bert_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
+        self$transformer_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
+        self$transformer_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
       } else {
         message("Method only relevant for transformer models.")
       }
@@ -439,40 +431,72 @@ TextEmbeddingModel<-R6::R6Class(
       n_units<-length(raw_text)
 
       if(self$basic_components$method=="bert"){
+        chunk_list<-vector(length = n_units)
         encodings<-NULL
-        for(i in 1:n_units){
-          preparation_tokens<-quanteda::tokens(raw_text[i])
-          preparation_tokens<-quanteda::tokens_chunk(
-            x=preparation_tokens,
-            size=self$basic_components$max_length,
-            overlap = self$bert_components$overlap,
-            use_docvars = FALSE)
+        #---------------------------------------------------------------------
+        if(token_encodings_only==TRUE){
+          for(i in 1:n_units){
+            preparation_tokens<-quanteda::tokens(raw_text[i])
+            preparation_tokens<-quanteda::tokens_chunk(
+              x=preparation_tokens,
+              size=self$basic_components$max_length,
+              overlap = self$transformer_components$overlap,
+              use_docvars = FALSE)
 
-          chunks=min(length(preparation_tokens),self$bert_components$chunks)
-          tokens_unit<-NULL
-          for(j in 1:chunks){
-            tokens_unit[j]<-list(
-              self$bert_components$tokenizer(
-                paste(preparation_tokens[j],collapse = " "),
-                padding=TRUE,
-                truncation=TRUE,
-                max_length=as.integer(self$basic_components$max_length),
-                return_tensors="tf")
-            )
-            if(trace==TRUE){
-              print(paste(date(),i,"/",n_units,"block",j,"/",chunks))
+            chunks=min(length(preparation_tokens),self$transformer_components$chunks)
+            tokens_unit<-NULL
+            for(j in 1:chunks){
+              tokens_unit[j]<-list(
+                self$transformer_components$tokenizer(
+                  paste(preparation_tokens[j],collapse = " "),
+                  padding=TRUE,
+                  truncation=TRUE,
+                  max_length=as.integer(self$basic_components$max_length),
+                  return_tensors="tf")
+              )
+              if(trace==TRUE){
+                print(paste(date(),i,"/",n_units,"block",j,"/",chunks))
+              }
             }
+            encodings[i]<-list(tokens_unit)
           }
-          encodings[i]<-list(tokens_unit)
-        }
-        if(token_encodings_only==FALSE){
-          return(encodings)
-        } else {
           encodings_only=NULL
           for(i in 1:length(encodings)){
             encodings_only[i]=list(as.vector(encodings[[i]][[1]]["input_ids"]))
           }
           return(encodings_only)
+          #--------------------------------------------------------------------
+        } else {
+          text_chunks<-NULL
+          for(i in 1:n_units){
+            preparation_tokens<-quanteda::tokens(raw_text[i])
+            preparation_tokens<-quanteda::tokens_chunk(
+              x=preparation_tokens,
+              size=self$basic_components$max_length,
+              overlap = self$transformer_components$overlap,
+              use_docvars = FALSE)
+            preparation_tokens=as.list(preparation_tokens)
+            preparation_tokens=lapply(X=preparation_tokens,FUN=paste,collapse=" ")
+
+            chunk_list[i]=min(length(preparation_tokens),self$transformer_components$chunks)
+            preparation_tokens<-preparation_tokens[1:chunk_list[i]]
+
+            index_min=length(text_chunks)+1
+            index_max=length(text_chunks)+length(preparation_tokens)
+            #print(index_min)
+            text_chunks=append(x=text_chunks,values = unname(preparation_tokens))
+            #text_chunks[index_min:index_max]<-list(preparation_tokens)
+          }
+
+          encodings=self$transformer_components$tokenizer(
+            text_chunks,
+            padding=TRUE,
+            truncation=TRUE,
+            max_length=as.integer(self$basic_components$max_length),
+            return_tensors="tf")
+
+          return(encodings_list=list(encodings=encodings,
+                                     chunks=chunk_list))
         }
       } else if(self$basic_components$method=="glove_cluster"|
                 self$basic_components$method=="lda"){
@@ -540,7 +564,7 @@ TextEmbeddingModel<-R6::R6Class(
         for(i in 1:length(int_seqence)){
           tmp_vector<-int_seqence[[i]]
           mode(tmp_vector)="integer"
-          tmp_token_list[i]=list(self$bert_components$tokenizer$decode(tmp_vector))
+          tmp_token_list[i]=list(self$transformer_components$tokenizer$decode(tmp_vector))
         }
         return(tmp_token_list)
 
@@ -585,182 +609,143 @@ TextEmbeddingModel<-R6::R6Class(
     #'@description Method for creating text embeddings from raw texts
     #'@param raw_text \code{vector} containing the raw texts.
     #'@param doc_id \code{vector} containing the corresponding IDs for every text.
+    #'@param batch_size \code{int} determining the maximal size of every batch.
     #'@param trace \code{bool} \code{TRUE}, if information about the progression
     #'should be printed on console.
     #'@return Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
     #'contains the embeddings as a \code{data.frame} and information about the
     #'model creating the embeddings.
-    embed=function(raw_text=NULL,doc_id=NULL, trace = FALSE){
-      tokens<-self$encode(raw_text = raw_text,
-                          trace = trace,
-                          token_encodings_only=FALSE)
-      n_units<-length(tokens)
+    embed=function(raw_text=NULL,doc_id=NULL,batch_size=8, trace = FALSE){
+
       #bert---------------------------------------------------------------------
       if(self$basic_components$method=="bert"){
-        n_layer<-self$bert_components$model$config$num_hidden_layers
-        n_layer_size<-self$bert_components$model$config$hidden_size
 
-        text_embedding<-matrix(
-          nrow=n_units,
-          ncol=n_layer_size*self$bert_components$chunks,
-          data=0)
+        n_units<-length(raw_text)
+        n_layer<-self$transformer_components$model$config$num_hidden_layers
+        n_layer_size<-self$transformer_components$model$config$hidden_size
 
-        for(i in 1:n_units){
+        #Batch refers to the number of cases
+        n_batches=ceiling(n_units/batch_size)
+        batch_results<-NULL
+        for (b in 1:n_batches){
+          tokens<-self$encode(raw_text = raw_text,
+                              trace = trace,
+                              token_encodings_only=FALSE)
+
+          index_min=1+(b-1)*batch_size
+          index_max=min(b*batch_size,n_units)
+          batch=index_min:index_max
+          #print(batch)
+
+          tokens<-self$encode(raw_text = raw_text[batch],
+                              trace = trace,
+                              token_encodings_only=FALSE)
+
+          text_embedding<-array(
+            data = 0,
+            dim = c(length(batch),
+                    self$transformer_components$chunks,
+                    n_layer_size))
+
           #Clear session to ensure enough memory
           tf$keras$backend$clear_session()
 
-          for(j in 1:length(tokens[[i]])){
-            tmp_hidden_states<-self$bert_components$model(
-              tokens[[i]][[j]],
-              output_hidden_states=TRUE)$hidden_states
+          #Calculate tensors
+          tensor_embeddings<-self$transformer_components$model(
+            tokens$encodings,
+            output_hidden_states=TRUE)$hidden_states
 
-            if(self$bert_components$aggregation=="last"){
-              #The first token is always the CLS token
-              tmp_embedding<-tmp_hidden_states[[1+n_layer]]
-              if(self$bert_components$use_cls_token==TRUE){
-                tmp_embedding<-tmp_embedding[[0]][[0]]
-                tmp_embedding<-reticulate::array_reshape(
-                  tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
-                tmp_embedding<-reticulate::py_to_r(tmp_embedding)
-              } else {
-                tmp_n_tokens<-length(tmp_embedding)/self$bert_components$model$config$hidden_size
-                tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
-                tmp_vector[]=0
-                for(index in 1:(tmp_n_tokens-2)){
-                  tmp_vector<-tmp_vector+as.vector(tmp_embedding[[0]][[index]])
-                }
-                tmp_vector<-tmp_vector/(tmp_n_tokens-2)
-                tmp_embedding<-t(as.matrix(tmp_vector))
-              }
-            } else if(self$bert_components$aggregation=="second_to_last"){
-              tmp_embedding<-tmp_hidden_states[[1+n_layer-2]]
-              if(self$bert_components$use_cls_token==TRUE){
-                tmp_embedding<-tmp_embedding[[0]][[0]]
-                tmp_embedding<-reticulate::array_reshape(
-                  tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
-                tmp_embedding<-reticulate::py_to_r(tmp_embedding)
-              } else {
-                tmp_n_tokens<-length(tmp_embedding)/self$bert_components$model$config$hidden_size
-                tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
-                tmp_vector[]=0
-                for(index in 1:(tmp_n_tokens-2)){
-                  tmp_vector<-tmp_vector+as.vector(tmp_embedding[[0]][[index]])
-                }
-                tmp_vector<-tmp_vector/(tmp_n_tokens-2)
-                tmp_embedding<-t(as.matrix(tmp_vector))
-              }
-            } else if(self$bert_components$aggregation=="fourth_to_last"){
-              tmp_embedding<-tmp_hidden_states[[1+n_layer-4]]
-              if(self$bert_components$use_cls_token==TRUE){
-                tmp_embedding<-tmp_embedding[[0]][[0]]
-                tmp_embedding<-reticulate::array_reshape(
-                  tmp_embedding,dim=c(1,self$bert_components$model$config$hidden_size))
-                tmp_embedding<-reticulate::py_to_r(tmp_embedding)
-              } else {
-                tmp_n_tokens<-length(tmp_embedding)/self$bert_components$model$config$hidden_size
-                tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
-                tmp_vector[]=0
-                for(index in 1:(tmp_n_tokens-2)){
-                  tmp_vector<-tmp_vector+as.vector(tmp_embedding[[0]][[index]])
-                }
-                tmp_vector<-tmp_vector/(tmp_n_tokens-2)
-                tmp_embedding<-t(as.matrix(tmp_vector))
-              }
+          #Selecting the relevant layers
+          if(self$transformer_components$aggregation=="last"){
+            selected_layer=self$transformer_components$model$config$num_hidden_layers
+          } else if (self$transformer_components$aggregation=="second_to_last") {
+            selected_layer=self$transformer_components$model$config$num_hidden_layers-2
+          } else if (self$transformer_components$aggregation=="fourth_to_last") {
+            selected_layer=self$transformer_components$model$config$num_hidden_layers-4
+          } else if (self$transformer_components$aggregation=="all") {
+            selected_layer=1:self$transformer_components$model$config$num_hidden_layers
+          } else if (self$transformer_components$aggregation=="last_four") {
+            selected_layer=(self$transformer_components$model$config$num_hidden_layers-4):self$transformer_components$model$config$num_hidden_layers
+          }
 
-            } else if(self$bert_components$aggregation=="all"){
-              tmp_embedding<-NULL
-              tmp_embedding_sum<-NULL
-              for(l in 2:(n_layer+1)){
-                tmp_embedding_sum<-tmp_hidden_states[[l]]
-                if(self$bert_components$use_cls_token==TRUE){
-                  tmp_embedding_sum<-tmp_embedding_sum[[0]][[0]]
-                  tmp_embedding_sum<-reticulate::array_reshape(
-                    tmp_embedding_sum,dim=c(1,self$bert_components$model$config$hidden_size))
-                  tmp_embedding_sum<-reticulate::py_to_r(tmp_embedding_sum)
-                } else {
-                  tmp_n_tokens<-length(tmp_embedding_sum)/self$bert_components$model$config$hidden_size
-                  tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
-                  tmp_vector[]=0
-                  for(index in 1:(tmp_n_tokens-2)){
-                    tmp_vector<-tmp_vector+as.vector(tmp_embedding_sum[[0]][[index]])
-                  }
-                  tmp_vector<-tmp_vector/(tmp_n_tokens-2)
-                  tmp_embedding_sum<-t(as.matrix(tmp_vector))
-                }
-                if(l==2){
-                  tmp_embedding=tmp_embedding_sum
-                } else {
-                  tmp_embedding=tmp_embedding+tmp_embedding_sum
-                }
+          #Sorting the hidden states to the corresponding cases and times
+          #If more than one layer is selected the mean is calculated
+          #CLS Token is always the first token
+          index=0
+          tmp_selected_layer=1+selected_layer
+          for(i in 1:length(batch)){
+            for(j in 1:tokens$chunks[i]){
+              for(layer in tmp_selected_layer){
+                text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(tensor_embeddings[[layer]][[index]][[0]])
               }
-              tmp_embedding=tmp_embedding/n_layer
-
-            } else if(self$bert_components$aggregation=="last_four"){
-              tmp_embedding<-NULL
-              tmp_embedding_sum<-NULL
-              for(l in (n_layer-3):(n_layer+1)){
-                tmp_embedding_sum<-tmp_hidden_states[[l]]
-                if(self$bert_components$use_cls_token==TRUE){
-                  tmp_embedding_sum<-tmp_embedding_sum[[0]][[0]]
-                  tmp_embedding_sum<-reticulate::array_reshape(
-                    tmp_embedding_sum,dim=c(1,self$bert_components$model$config$hidden_size))
-                  tmp_embedding_sum<-reticulate::py_to_r(tmp_embedding_sum)
-                } else {
-                  tmp_n_tokens<-length(tmp_embedding_sum)/self$bert_components$model$config$hidden_size
-                  tmp_vector=vector(length = self$bert_components$model$config$hidden_size)
-                  tmp_vector[]=0
-                  for(index in 1:(tmp_n_tokens-2)){
-                    tmp_vector<-tmp_vector+as.vector(tmp_embedding_sum[[0]][[index]])
-                  }
-                  tmp_vector<-tmp_vector/(tmp_n_tokens-2)
-                  tmp_embedding_sum<-t(as.matrix(tmp_vector))
-                }
-                if(l==(n_layer-3)){
-                  tmp_embedding=tmp_embedding_sum
-                } else {
-                  tmp_embedding=tmp_embedding+tmp_embedding_sum
-                }
-              }
-              tmp_embedding=tmp_embedding/4
-            }
-            text_embedding[i,(1:n_layer_size)+(j-1)*(1:n_layer_size)]<-tmp_embedding
-            if(trace==TRUE){
-              print(paste(date(),i,"/",n_units,"block",j,"/",length(tokens[[i]])))
+              text_embedding[i,j,]<-text_embedding[i,j,]/length(tmp_selected_layer)
+              index=index+1
             }
           }
-        }
-        colnames(text_embedding)<-colnames(text_embedding,
-                                           do.NULL = FALSE,
-                                           prefix = "bert_")
-        text_embedding<-as.data.frame(text_embedding)
+          dimnames(text_embedding)[[3]]<-colnames(text_embedding[,1,],
+                                                  do.NULL = FALSE,
+                                                  prefix = "bert_")
+            #Add ID of every case
+            dimnames(text_embedding)[[1]]<-doc_id[batch]
+            batch_results[b]=list(text_embedding)
+            if(trace==TRUE){
+            print(paste(date(),
+                        "Batch",b,"/",n_batches,"Done"))
+            }
+          }
+
+      #Summarizing the results over all batchtes
+      text_embedding=abind::abind(batch_results,along = 1)
         #Glove Cluster----------------------------------------------------------
       } else if(self$basic_components$method=="glove_cluster"){
-        text_embedding<-matrix(nrow = length(tokens),
-                               ncol =  self$bow_components$configuration$bow_n_cluster,
-                               data = 0)
+        tokens<-self$encode(raw_text = raw_text,
+                            trace = trace,
+                            token_encodings_only=FALSE)
+
+
+        text_embedding<-array(
+          data = 0,
+          dim = c(length(tokens),
+                  1,
+                  self$bow_components$configuration$bow_n_cluster))
+        #text_embedding<-matrix(nrow = length(tokens),
+        #                       ncol =  self$bow_components$configuration$bow_n_cluster,
+        #                       data = 0)
         for(i in 1:length(tokens)){
           token_freq<-table(tokens[[i]])
           tmp_tokens<-names(token_freq)
           for(j in 1:length(token_freq)){
             index<-match(x=as.integer(tmp_tokens[j]),
                   table = self$bow_components$model$index)
-            text_embedding[i,self$bow_components$model$cluster[index]]<-token_freq[j]+
-              text_embedding[i,self$bow_components$model$cluster[index]]
+            text_embedding[i,1,self$bow_components$model$cluster[index]]<-token_freq[j]+
+              text_embedding[i,1,self$bow_components$model$cluster[index]]
           }
         }
 
         #text_embedding=text_embedding/rowSums(text_embedding)
         #text_embedding[is.nan(text_embedding)]<-0
 
-        colnames(text_embedding)<-colnames(text_embedding,
-                                           do.NULL = FALSE,
-                                           prefix = "cluster_")
-        text_embedding<-as.data.frame(text_embedding)
+        dimnames(text_embedding)[[3]]<-colnames(text_embedding[,1,],
+                                                do.NULL = FALSE,
+                                                prefix = "cluster_")
+        #Add ID of every case
+        dimnames(text_embedding)[[1]]<-doc_id
+
+        #text_embedding<-as.data.frame(text_embedding)
         #Topic Modeling---------------------------------------------------------
       } else if(self$basic_components$method=="lda"){
-        text_embedding<-matrix(nrow = length(tokens),
-                               ncol =  self$bow_components$configuration$bow_n_dim,
-                               data = 0)
+        tokens<-self$encode(raw_text = raw_text[batch],
+                            trace = trace,
+                            token_encodings_only=FALSE)
+
+        text_embedding<-array(
+          data = 0,
+          dim = c(length(tokens),
+                  1,
+                  self$bow_components$configuration$bow_n_dim))
+        #text_embedding<-matrix(nrow = length(tokens),
+        #                       ncol =  self$bow_components$configuration$bow_n_dim,
+        #                       data = 0)
         for(i in 1:length(tokens)){
           token_freq<-table(tokens[[i]])
           tmp_tokens<-names(token_freq)
@@ -769,7 +754,7 @@ TextEmbeddingModel<-R6::R6Class(
               index<-match(x=as.integer(tmp_tokens[j]),
                            table = self$bow_components$model$index)
               if(is.na(index)==FALSE){
-                text_embedding[i,]<-text_embedding[i,]+token_freq[j]*as.matrix(self$bow_components$model[index,-1])
+                text_embedding[i,1,]<-text_embedding[i,1,]+token_freq[j]*as.matrix(self$bow_components$model[index,-1])
               }
             }
           }
@@ -780,13 +765,15 @@ TextEmbeddingModel<-R6::R6Class(
         #possible
         text_embedding[is.nan(text_embedding)]<-0
 
-        colnames(text_embedding)<-colnames(text_embedding,
-                                           do.NULL = FALSE,
-                                           prefix = "lda_")
-        text_embedding<-as.data.frame(text_embedding)
-      }
+        dimnames(text_embedding)[[3]]<-colnames(text_embedding[,1,],
+                                                do.NULL = FALSE,
+                                                prefix = "lda_")
+        #Add ID of every case
+        dimnames(text_embedding)[[1]]<-doc_id
 
-      rownames(text_embedding)<-doc_id
+        #text_embedding<-as.data.frame(text_embedding)
+      }
+      #------------------------------------------------------------------------
 
       if(self$basic_components$method=="bert"){
         embeddings<-EmbeddedText$new(
@@ -797,9 +784,9 @@ TextEmbeddingModel<-R6::R6Class(
           model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
           param_seq_length =self$basic_components$max_length,
-          param_chunks = self$bert_components$chunks,
-          param_overlap = self$bert_components$overlap,
-          param_aggregation = self$bert_components$aggregation,
+          param_chunks = self$transformer_components$chunks,
+          param_overlap = self$transformer_components$overlap,
+          param_aggregation = self$transformer_components$aggregation,
           embeddings = text_embedding
         )
       } else if(self$basic_components$method=="glove_cluster" |
@@ -1058,6 +1045,7 @@ EmbeddedText<-R6::R6Class(
 #'unique cases of the input objects.
 #'@export
 #'@importFrom methods isClass
+#'@importFrom abind abind
 combine_embeddings<-function(embeddings_list){
 
   #Check for the right class---------------------------------------------------
@@ -1104,7 +1092,8 @@ combine_embeddings<-function(embeddings_list){
      if(i==1){
       combined_embeddings<-embeddings_list[[i]]$embeddings
     } else {
-      combined_embeddings<-rbind(combined_embeddings,embeddings_list[[i]]$embeddings)
+      combined_embeddings<-abind::abind(combined_embeddings,embeddings_list[[i]]$embeddings,
+                                        along = 1)
     }
   }
 

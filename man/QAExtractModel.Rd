@@ -2,10 +2,10 @@
 % Please edit documentation in R/qa_extraction_models.R
 \name{QAExtractModel}
 \alias{QAExtractModel}
-\title{Question Answer Models of Type Extraction}
+\title{Question-Answer-Models of Type Extraction}
 \description{
 This \link[R6]{R6} class stores the information for modeling a
-question answer model. This kind of model extracts the answer from a given text.
+question-answer-model. This kind of model extracts the answer from a given text.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -38,7 +38,7 @@ python library.}
 \if{html}{\out{<a id="method-QAExtractModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-QAExtractModel-new}{}}}
 \subsection{Method \code{new()}}{
-Method for creating a new question answer model based on a pretrained
+Method for creating a new question-answer-model based on a pretrained
 model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$new(
@@ -57,7 +57,7 @@ model.
 
 \item{\code{model_version}}{\code{Character} Version of the model.}
 
-\item{\code{model_language}}{\code{Character} Language the model does support.}
+\item{\code{model_language}}{\code{Character} Language the model supports.}
 
 \item{\code{model_license}}{\code{Character} License of the model.}
 
@@ -71,7 +71,7 @@ stored.}
 \if{html}{\out{<a id="method-QAExtractModel-save_model"></a>}}
 \if{latex}{\out{\hypertarget{method-QAExtractModel-save_model}{}}}
 \subsection{Method \code{save_model()}}{
-Method for saving a question answer model.
+Method for saving a question-answer-model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$save_model(model_dir_path)}\if{html}{\out{</div>}}
 }
@@ -89,7 +89,7 @@ and the tokenizer should be stored.}
 \if{html}{\out{<a id="method-QAExtractModel-load_model"></a>}}
 \if{latex}{\out{\hypertarget{method-QAExtractModel-load_model}{}}}
 \subsection{Method \code{load_model()}}{
-Method for loading a question answer model.
+Method for loading a question-answer-model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{QAExtractModel$load_model(model_dir_path)}\if{html}{\out{</div>}}
 }
@@ -131,14 +131,14 @@ Method for extracting answers from a given text.
 
 \item{\code{n_answers}}{\code{int} Number of possible answers generated from the texts.}
 
-\item{\code{doc_stride}}{\code{int} In the case the knowledge base is to long to
-for the model to process at once the text is divided into several overlapping
+\item{\code{doc_stride}}{\code{int} In case the knowledge base is too long
+for the model to process at once, the text is divided into several overlapping
 chunks. This parameter determines the size of the overlap.}
 
-\item{\code{max_answer_len}}{\code{int} Maximum length in token for possible answers.
+\item{\code{max_answer_len}}{\code{int} Maximum length in tokens for possible answers.
 Only answers which are shorter are considered for an answer.}
 
-\item{\code{max_seq_len}}{\code{int} Maximum length of question and knowledge base after
+\item{\code{max_seq_len}}{\code{int} Maximum length of a question and knowledge base after
 tokenization. The context may be divided into several overlapping chunks.}
 
 \item{\code{max_question_len}}{\code{int} The maximum length of the question after tokenization.

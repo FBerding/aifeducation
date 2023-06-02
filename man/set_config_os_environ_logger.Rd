@@ -7,7 +7,7 @@
 set_config_os_environ_logger(level = "ERROR")
 }
 \arguments{
-\item{\code{string}}{Minimal level that should be printed to console. Five
+\item{level}{\code{string} Minimal level that should be printed to console. Five
 levels are available: INFO, WARNING, ERROR and NONE.}
 }
 \value{
@@ -16,5 +16,5 @@ side effects.
 }
 \description{
 This function changes the level for logging information with tensorflow via
-the os environment. This function mus be called before importing tensorflow.
+the os environment. This function must be called before importing tensorflow.
 }

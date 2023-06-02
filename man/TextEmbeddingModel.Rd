@@ -15,39 +15,37 @@ unique interface for different text processing methods.
 List storing information which can apply to all methods.
 \itemize{
 \item{\code{basic_components$method: }}{Method underlying the text embedding model.}
-\item{\code{basic_components$max_length: }}{Maximum number of tokens in sequence the model processes. In general
+\item{\code{basic_components$max_length: }}{Maximum number of tokens in the sequence the model processes. In general,
 shorter sequences will be padded and longer sequences will be divided
 into chunks and/or truncated.}
 }}
 
-\item{\code{bert_components}}{('list()')\cr
-List storing information which which do only apply to bert models.
+\item{\code{transformer_components}}{('list()')\cr
+List storing information which only apply to BERT models.
 \itemize{
-\item{\code{bert_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
-\item{\code{bert_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
-\item{\code{bert_components$aggregation: }}{Aggregation method for the hidden states.}
-\item{\code{bert_components$use_cls_token: }}{Whether to use the hidden state representing the [CLS] token or the mean
-of the hidden states of the tokens with no special functions.}
-\item{\code{bert_components$chunks: }}{Maximal number of chunks processed with the model.}
-\item{\code{ bert_components$overlap: }}{Number of tokens which should be added at the beginng of the sequence
+\item{\code{transformer_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
+\item{\code{transformer_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
+\item{\code{transformer_components$aggregation: }}{Aggregation method for the hidden states.}
+\item{\code{transformer_components$chunks: }}{Maximal number of chunks processed with the model.}
+\item{\code{ transformer_components$overlap: }}{Number of tokens which should be added at the beginning of the sequence
 of the next chunk.}
 }}
 
 \item{\code{bow_components}}{('list()')\cr
-List storing information which which do only apply for bow_models.
+List storing information which only apply to bow_models.
 \itemize{
 \item{\code{bow_components$model: }}{data.frame describing the relationship between tokens and their corresponding
 text embeddings.}
-\item{\code{bow_components$vocab: }}{data.frame saving tokens, lemmata and their corresponding integer index.}
+\item{\code{bow_components$vocab: }}{data.frame saving tokens, lemmas and their corresponding integer index.}
 \item{\code{bow_components$configuration: }}{List of the configuration parameters of the model.
 \itemize{
 \item{\code{bow_components$configuration$to_lower }}{\code{TRUE} if tokens are transformed to lower case.}
 \item{\code{bow_components$configuration$use_lemmata }}{\code{TRUE} if the corresponding lemma should be used instead of the token.}
 \item{\code{bow_components$configuration$bow_n_dim }}{Number of dimensions for GlobalVectors and Topic Modeling.}
 \item{\code{bow_components$configuration$bow_n_cluster }}{Number of clusters for grouping tokens based in their global vectors.
-Does not apply for method lda.}
-\item{\code{bow_components$configuration$bow_max_iter }}{Maximum number of iterations for calculation global vectors and topics.}
-\item{\code{bow_components$configuration$bow_max_iter_cluster }}{Maximum number of iterations for creating cluster. Applies only for method
+Does not apply to method lda.}
+\item{\code{bow_components$configuration$bow_max_iter }}{Maximum number of iterations to calculate global vectors and topics.}
+\item{\code{bow_components$configuration$bow_max_iter_cluster }}{Maximum number of iterations for creating clusters. Applies only to method
 glove.}
 \item{\code{bow_components$configuration$bow_cr_criterion }}{Convergence criterion for calculating global vectors and topics.}
 \item{\code{bow_components$configuration$bow_learning_rate  }}{Initial learning rate for estimating global vectors.}}
@@ -93,7 +91,6 @@ Method for creating a new text embedding model
   chunks = 1,
   overlap = 0,
   aggregation = "last",
-  use_cls_token = TRUE,
   model_dir,
   bow_basic_text_rep,
   bow_n_dim = 10,
@@ -119,42 +116,38 @@ Method for creating a new text embedding model
 represents (e.g., English).}
 
 \item{\code{method}}{\code{string} determining the kind of embedding model. Currently
-three type are supported. \code{method="bert"} for Bidirectional Encoder
+three types are supported. \code{method="bert"} for Bidirectional Encoder
 Representations from Transformers (BERT), \code{method="glove"} for
 GlobalVector Clusters, and \code{method="lda"} for topic modeling. See
 details for more information.}
 
-\item{\code{max_length}}{\code{int} determining the maximums length of token
-sequences uses in bert models. Not relevant for the other methods.}
+\item{\code{max_length}}{\code{int} determining the maximum length of token
+sequences uses in BERT models. Not relevant for the other methods.}
 
 \item{\code{chunks}}{\code{int} Maximum number of chunks. Only relevant for
-bert models.}
+BERT models.}
 
 \item{\code{overlap}}{\code{int} determining the number of tokens which should be added
-at the beginning of the next chunk. Only relevant for bert models.}
+at the beginning of the next chunk. Only relevant for BERT models.}
 
 \item{\code{aggregation}}{\code{string} method for aggregating the text embeddings
-created by bert models. See details for more information.}
-
-\item{\code{use_cls_token}}{\code{bool} \code{TRUE} if the CLS token should be used
-for aggregation and as text embedding. If \code{FALSE} the mean of all
-corresponding tokens is used for aggregation and text embedding.}
+created by BERT models. See details for more information.}
 
 \item{\code{model_dir}}{\code{string} path to the directory where the
-bert model is stored.}
+BERT model is stored.}
 
 \item{\code{bow_basic_text_rep}}{object of class \code{basic_text_rep} created via
 the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove"}
 and \code{method="lda"}.}
 
-\item{\code{bow_n_dim}}{\code{int} Number of dimension of the GlobalVector or
+\item{\code{bow_n_dim}}{\code{int} Number of dimensions of the GlobalVector or
 number of topics for LDA.}
 
 \item{\code{bow_n_cluster}}{\code{int} Number of clusters created on the basis
 of GlobalVectors. Parameter is not relevant for \code{method="lda"} and
 \code{method="bert"}}
 
-\item{\code{bow_max_iter}}{\code{int} Maximum Number of iterations for fitting
+\item{\code{bow_max_iter}}{\code{int} Maximum number of iterations for fitting
 GlobalVectors and Topic Models.}
 
 \item{\code{bow_max_iter_cluster}}{\code{int} Maximum number of iterations for
@@ -164,28 +157,28 @@ fitting cluster if \code{method="glove"}.}
 
 \item{\code{bow_learning_rate}}{\code{double} initial learning rate for GlobalVectors.}
 
-\item{\code{trace}}{\code{bool} \code{TRUE} print information about the progress.
-\code{FALSE} not.}
+\item{\code{trace}}{\code{bool} \code{TRUE} prints information about the progress.
+\code{FALSE} does not.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 \itemize{
-\item{method: }{In the case of \code{method="bert"} a pretrained bert model
+\item{method: }{In the case of \code{method="bert"}, a pretrained BERT model
 must be supplied via \code{model_dir}. For \code{method="glove"}
 and \code{method="lda"} a new model will be created based on the data provided
 via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
-are clusters based on their word embeddings with kmeans.}
+are clustered based on their word embeddings with kmeans.}
 
-\item{aggregation: }{For creating a text embedding with a bert model serveral options
+\item{aggregation: }{For creating a text embedding with a BERT model, several options
 are possible:
 \itemize{
 \item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
 \item{second_to_last: }{\code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
 \item{fourth_to_last: }{\code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
-\item{all: }{\code{aggregation="all"} uses mean of the hidden states of all hidden layers.}
-\item{last_four: }{\code{aggregation="last_four"} uses mean of the hidden states of the last four layers.}
+\item{all: }{\code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
+\item{last_four: }{\code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
 }}
 
 }
@@ -228,12 +221,12 @@ Method for encoding words of raw texts into integers.
 \describe{
 \item{\code{raw_text}}{\code{vector} containing the raw texts.}
 
-\item{\code{token_encodings_only}}{\code{bool} If \code{TRUE} only the token
-encodings are returned. If \code{FALSE} the complete encoding is returned
-which is important for bert models.}
+\item{\code{token_encodings_only}}{\code{bool} If \code{TRUE}, only the token
+encodings are returned. If \code{FALSE}, the complete encoding is returned
+which is important for BERT models.}
 
-\item{\code{trace}}{\code{bool} If \code{TRUE} information of the progress
-are printed. \code{FALSE} if not requested.}
+\item{\code{trace}}{\code{bool} If \code{TRUE}, information of the progress
+is printed. \code{FALSE} if not requested.}
 }
 \if{html}{\out{</div>}}
 }
@@ -269,7 +262,12 @@ should be transformed to tokens or a single integer sequence as \code{vector}}
 \subsection{Method \code{embed()}}{
 Method for creating text embeddings from raw texts
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(raw_text = NULL, doc_id = NULL, trace = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(
+  raw_text = NULL,
+  doc_id = NULL,
+  batch_size = 8,
+  trace = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -277,16 +275,18 @@ Method for creating text embeddings from raw texts
 \describe{
 \item{\code{raw_text}}{\code{vector} containing the raw texts.}
 
-\item{\code{doc_id}}{\code{vector} containing the corresponding ids for every text.}
+\item{\code{doc_id}}{\code{vector} containing the corresponding IDs for every text.}
 
-\item{\code{trace}}{\code{bool} \code{TRUE} if information about the progression
+\item{\code{batch_size}}{\code{int} determining the maximal size of every batch.}
+
+\item{\code{trace}}{\code{bool} \code{TRUE}, if information about the progression
 should be printed on console.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
-contain the embeddings as a \code{data.frame} and information about the
+contains the embeddings as a \code{data.frame} and information about the
 model creating the embeddings.
 }
 }
@@ -294,9 +294,9 @@ model creating the embeddings.
 \if{html}{\out{<a id="method-TextEmbeddingModel-set_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_publication_info}{}}}
 \subsection{Method \code{set_publication_info()}}{
-Method for setting the publication information of the model.
+Method for setting the bibliographic information of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_publication_info(type, autors, citation, url = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_publication_info(type, authors, citation, url = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -305,7 +305,7 @@ Method for setting the publication information of the model.
 \item{\code{type}}{\code{string} Type of information which should be changed/added.
 \code{type="developer"},\code{type="trainer"}, and \code{type="modifier"} are possible.}
 
-\item{\code{autors}}{List of persons.}
+\item{\code{authors}}{List of people.}
 
 \item{\code{citation}}{\code{string} Citation in free text.}
 
@@ -318,13 +318,13 @@ Method for setting the publication information of the model.
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_publication_info}{}}}
 \subsection{Method \code{get_publication_info()}}{
-Method for getting publication information of the model.
+Method for getting the bibliographic information of the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_publication_info()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-\code{list} of publication information.
+\code{list} of bibliographic information.
 }
 }
 \if{html}{\out{<hr>}}
@@ -391,9 +391,9 @@ in English.}
 \item{\code{abstract_native}}{\code{string} A text providing a summary of the description
 in the native language of the classifier.}
 
-\item{\code{keywords_eng}}{\code{vector} of keyword in English.}
+\item{\code{keywords_eng}}{\code{vector} of keywords in English.}
 
-\item{\code{keywords_native}}{\code{vector} of keyword in the native language of the classifier.}
+\item{\code{keywords_native}}{\code{vector} of keywords in the native language of the classifier.}
 }
 \if{html}{\out{</div>}}
 }
@@ -409,7 +409,7 @@ Method for requesting the model description.
 
 \subsection{Returns}{
 \code{list} with the description of the model in English
-and native language.
+and the native language.
 }
 }
 \if{html}{\out{<hr>}}

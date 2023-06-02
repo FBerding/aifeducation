@@ -70,7 +70,7 @@ add links to other sources or publications, to add tables or to
 highlight important aspects of your model.
 
 **We would like to recommend that you write at least an English
-description to allow a wider community to recognize xour work**.
+description to allow a wider community to recognize your work**.
 Furthermore, your description should include:
 
 -   Which kind of data was used to create the model.
@@ -110,7 +110,7 @@ which you set with `type`.
 
 `type="developer"` stores all information about the people involved and
 the process of developing the model. If you use a transformer model from
-[Huggingface](https://huggingface.co/), the people and their description
+[Hugging Face](https://huggingface.co/), the people and their description
 of the model should be entered as developers. In all other cases you can
 use this type for providing a description of how you developed the
 model.

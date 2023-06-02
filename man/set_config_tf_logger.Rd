@@ -7,7 +7,7 @@
 set_config_tf_logger(level = "ERROR")
 }
 \arguments{
-\item{\code{string}}{Minimal level that should be printed to console. Five
+\item{level}{\code{string} Minimal level that should be printed to console. Five
 levels are available: FATAL, ERROR, WARN, INFO, and DEBUG.}
 }
 \value{

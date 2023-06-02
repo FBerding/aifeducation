@@ -67,6 +67,9 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>03 Sharing and Using Trained AI/Models</h1>
+                        <h4 data-toc-skip class="author">Florian
+Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
+Rebmann</h4>
             
       
       
@@ -78,20 +81,22 @@
 <div class="section level2">
 <h2 id="introduction">1 Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>In educational and social science it is a common practice to share
-research instruments such as questionnaires or tests. For example, the
-<a href="https://www.testarchiv.eu/en" class="external-link">Open Test Archive</a> provides
-researchers and practitioners access to a large number of open access
-instruments. <em>aifeducation</em> is based on the assumption that AI
-based classifiers should be shareable similar to research instruments to
-empower educational and social science research and to support the
-application of AI for educational purposes. Thus, <em>aifeducation</em>
-aims to make the sharing process as easy as possible.</p>
-<p>For this aim every object generated with <em>aifeducation</em> can be
-prepared for publication in a few basic steps. In this vignette we would
-like to show you how the make your AI ready for publication and how to
-use models from other persons.</p>
-<p>We will start with text embeddings models.</p>
+<p>In the educational and social sciences, it is a common practice to
+share research instruments such as questionnaires or tests. For example,
+the <a href="https://www.testarchiv.eu/en" class="external-link">Open Test Archive</a>
+provides researchers and practitioners access to a large number of open
+access instruments. <em>aifeducation</em> is based on the assumption
+that AI-based classifiers should be shareable, similarly to research
+instruments, to empower educational and social science researchers and
+to support the application of AI for educational purposes. Thus,
+<em>aifeducation</em> aims to make the sharing process as easy as
+possible.</p>
+<p>For this aim, every object generated with <em>aifeducation</em> can
+be prepared for publication in a few basic steps. In this vignette, we
+would like to show you how to make your AI ready for publication and how
+to use models from other persons.</p>
+<p>Now we will start with a guide on preparing text embedding
+models.</p>
 </div>
 <div class="section level2">
 <h2 id="text-embedding-models">2 Text Embedding Models<a class="anchor" aria-label="anchor" href="#text-embedding-models"></a>
@@ -102,103 +107,123 @@ use models from other persons.</p>
 <p>Every object of class <code>TextEmbeddingModel</code> comes with
 several methods allowing you to provide important information for
 potential users of your model.</p>
-<p>First every models needs a clear description how it was developed,
-modified and how it can be use. You can add a description via the method
-<code>set_model_description</code>.</p>
-<p>This methods allow you to provide a description in English and in the
-native language of the model to make the distribution of your model more
-easy. You can write your description in HTML which allows you to add
-links to other sources or publications, to add tables or to highlight
-important aspects of your model.</p>
-<p><strong>We would like to recommend that you write a description at
-least in English to allow a wide community to recognize sour
-work</strong>. Furthermore, your description should include:</p>
+<p>First, every model needs a clear description how it was developed,
+modified and how it can be used. You can add a description via the
+method <code>set_model_description</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
+<span>  eng<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  native<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  abstract_eng<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  abstract_native<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  keywords_eng<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  keywords_native<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<p>This method allows you to provide a description in English and in the
+native language of your model to make the distribution of your model
+more easy. You can write your description in HTML which allows you to
+add links to other sources or publications, to add tables or to
+highlight important aspects of your model.</p>
+<p><strong>We would like to recommend that you write at least an English
+description to allow a wider community to recognize your work</strong>.
+Furthermore, your description should include:</p>
 <ul>
-<li>Which kind of data was used for creating the model.</li>
-<li>Haw many data was used for creating the model.</li>
+<li>Which kind of data was used to create the model.</li>
+<li>How much data was used to create the model.</li>
 <li>Which steps were performed and which method was used.</li>
-<li>For which kind of tasks or materials can the model be used.</li>
+<li>For which kinds of tasks or materials the model can be used.</li>
 </ul>
 <p>With <code>abstract_eng</code> and <code>abstract_native</code> you
 can provide a summary of your description. This is very important if you
 would like to share your work on a repository. With
 <code>keywords_eng</code> and <code>keywords_native</code> you can set a
-vector of keywords which helps to find your work with searching engines.
-We would like to recommend that use provide information at least in
+vector of keywords which help to find your work with search engines. We
+would like to recommend that you at least provide this information in
 English.</p>
 <p>You can access a model’s description by using the method
 <code>get_model_description</code></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">get_model_description</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Besides a description of your work it is necessary to provide
-information about the persons who are involved in creating a model. This
-can be done with the method <code>set_publication_info</code>.</p>
+information about other people who were involved in creating a model.
+This can be done with the method <code>set_publication_info</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
+<span>  <span class="va">type</span>,</span>
+<span>  <span class="va">authors</span>,</span>
+<span>  <span class="va">citation</span>,</span>
+<span>  url<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <p>First of all you have to decide the type of information you would
-like to add. You have three choices “developer”, “trainer”, and
-“modifier” which you set with <code>type</code>.</p>
-<p><code>type="developer"</code> stores all information about the
-persons and the process of developing the model. If you use a
-transformer model from <a href="https://huggingface.co/" class="external-link">Huggingface</a>
-the persons and their description of the model should be entered as
-developers. In all other cases you can use this type for providing a
-description of how you developed the model.</p>
-<p>Sometimes the personas who developed a model and the persons who
-trained a model differ. In these cases you can pay credit for the
-persons who trained a model via setting <code>type="trainer"</code>.</p>
-<p>In some cases you wish to modify a model. This is particular the case
-if you use a transformer model and you adept the model to a specific
-domain or task. In this case you rely on the work of other people and
-modifier their work. In these cases you can describe your modifications
-by setting <code>type=modifier</code>.</p>
-<p>For every type you can add the relevant persons via
-<code>autors</code>. Please use a <em>R</em>’s function
+like to add. You have three choices: “developer”, “trainer”, and
+“modifier”, which you set with <code>type</code>.</p>
+<p><code>type="developer"</code> stores all information about the people
+involved and the process of developing the model. If you use a
+transformer model from <a href="https://huggingface.co/" class="external-link">Hugging
+Face</a>, the people and their description of the model should be
+entered as developers. In all other cases you can use this type for
+providing a description of how you developed the model.</p>
+<p>Sometimes the personas who developed a model and the people who
+trained a model differ. In these cases you can pay credit to the
+individuals who trained a model via setting
+<code>type="trainer"</code>.</p>
+<p>In some cases you might wish to modify an existing model. This might
+be the case if you use a transformer model and you adapt the model to a
+specific domain or task. In this case you rely on the work of other
+people and modify their work. In these cases you can describe your
+modifications by setting <code>type=modifier</code>.</p>
+<p>For every type of person you can add the relevant individuals via
+<code>authors</code>. Please use the <em>R</em>’s function
 <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">personList()</a></code> for this. With <code>citation</code>you can
 provide a free text how to cite the work of the different persons. With
 <code>url</code> you can provide a link to relevant sites of the
 model.</p>
 <p>You can access the information by using
 <code>get_publication_info</code>.</p>
-<p>Finally you must provide a license describing for using your model.
-This can be done with <code>set_license</code> and
-<code>get_license</code>.</p>
-<p>Now you are able to share your work. Please remember to save you now
-described object as described in section 2.2.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">get_publication_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Finally, you must provide a license for using your model. This can be
+done with <code>set_license</code> and <code>get_license</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_licens</span><span class="op">(</span><span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div>
+<p>Now you are able to share your work. Please remember to save your now
+fully described object as described in the following section 2.2.</p>
 </div>
 <div class="section level3">
 <h3 id="saving-and-loading">2.2 Saving and Loading<a class="anchor" aria-label="anchor" href="#saving-and-loading"></a>
 </h3>
 <p>Saving a created text embedding model is very easy. However, the
 saving and loading process is different for models based on Topic
-Modeling and GlobalVectorClusters on the hand and models based on
-transformers on the other hand.</p>
+Modeling and GlobalVectorClusters on the one hand and transformer based
+models on the other hand.</p>
 <p>For models using Topic Modeling or GlobalVectorClusters you can call
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> to write your model to disk.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> to write your model to the disk.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">example_model</span>, </span>
 <span>     file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">example_model</span>, </span>
 <span>     file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If you want to load your model just call <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> and you
+<p>If you want to load your model, just call <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> and you
 can continue using your model.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If your text embedding model is based on a transformer saving and
-loading requires some other steps. In this case your text embedding
+<p>If your text embedding model is based on a transformer, saving and
+loading requires some other steps. In this case, your text embedding
 models serves as an interface to <em>R</em>. The original model is saved
 in a model directory. Thus, you have to save your interface to that
 model directory.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">example_model</span>,</span>
 <span>     file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
 <p>Loading your model requires two steps. First, load the interface.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>Now the text embedding model is available in <em>R.</em>. Next you
+<p>Now the text embedding model is available in <em>R.</em>. Second, you
 must re-initialize the transformer by calling the corresponding method
 <code>load_model</code> of your model.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span>model_dir<span class="op">=</span><span class="st">"my_own_transformer_trained"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you are ready to share your work. Just provide the .RData file
-for GlobalVectorClusters and Topic Models to other persons. In the case
+for GlobalVectorClusters and Topic Models to other people. In the case
 of transformer models you must provide the
 <code>r_interface.RData</code> along with the other files of the
 directory that stores you transformer model.</p>
@@ -221,7 +246,71 @@ processes. With <code>abstract_eng</code> and
 of your descriptions while <code>keywords_eng</code> and
 <code>keywords_native</code> take a vector with the corresponding
 keywords.</p>
-<p>In the case of a classifier the description should include:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_classifier</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
+<span>eng<span class="op">=</span><span class="st">"This classifier targets the realization of the need for competence from </span></span>
+<span><span class="st">  the self-determination theory of motivation by Deci and Ryan in lesson plans </span></span>
+<span><span class="st">  and materials. It describes a learner’s need to perceive themselves as capable. </span></span>
+<span><span class="st">  In this classifier, the need for competence can take on the values 0 to 2. </span></span>
+<span><span class="st">  A value of 0 indicates that the learners have no space in the lesson plan to </span></span>
+<span><span class="st">  perceive their own learning progress and that there is no possibility for </span></span>
+<span><span class="st">  self-comparison. At level 1, competence growth is made visible implicitly, </span></span>
+<span><span class="st">  e.g. by demonstrating the ability to carry out complex exercises or peer </span></span>
+<span><span class="st">  control. At level 2, the increase in competence is made explicit by giving </span></span>
+<span><span class="st">  each learner insights into their progress towards the competence goal. For </span></span>
+<span><span class="st">  example, a comparison between the target vs. actual development towards the </span></span>
+<span><span class="st">  learning objectives of the lesson can be made, or the learners receive </span></span>
+<span><span class="st">  explicit feedback on their competence growth from the teacher. Self-assessment </span></span>
+<span><span class="st">  is also possible. The classifier was trained using 790 lesson plans, 298 </span></span>
+<span><span class="st">  materials and up to 1,400 textbook tasks. Two people who received coding </span></span>
+<span><span class="st">  training were involved in the coding and the inter-coder reliability for the </span></span>
+<span><span class="st">  need for competence increased from a dynamic iota value of 0.615 to 0.646 over </span></span>
+<span><span class="st">  two rounds of training. The Krippendorffs alpha value, on the other hand, </span></span>
+<span><span class="st">  decreased from 0.516 to 0.484. The classifier is suitable for use in all </span></span>
+<span><span class="st">  settings in which lesson plans and materials are to be reviewed with regard </span></span>
+<span><span class="st">  to their implementation of the need for competence."</span>,</span>
+<span>native<span class="op">=</span><span class="st">"Dieser Classifier bewertet Unterrichtsentwürfe und Lernmaterial danach, </span></span>
+<span><span class="st">  ob sie das Bedürfnis nach Kompetenzerleben aus der Selbstbestimmungstheorie </span></span>
+<span><span class="st">  der Motivation nach Deci und Ryan unterstützen. Das Kompetenzerleben stellt </span></span>
+<span><span class="st">  das Bedürfnis dar, sich als wirksam zu erleben. Der Classifer unterteilt es </span></span>
+<span><span class="st">  in drei Stufen, wobei 0 bedeutet, dass die Lernenden im Unterrichtsentwurf </span></span>
+<span><span class="st">  bzw. Material keinen Raum haben, ihren eigenen Lernfortschritt wahrzunehmen </span></span>
+<span><span class="st">  und auch keine Möglichkeit zum Selbstvergleich besteht. Bei einer Ausprägung </span></span>
+<span><span class="st">  von 1 wird der Kompetenzzuwachs implizit, also z.B. durch die Durchführung </span></span>
+<span><span class="st">  komplexer Übungen oder einer Peer-Kontrolle ermöglicht. Auf Stufe 2 wird der </span></span>
+<span><span class="st">  Kompetenzzuwachs explizit aufgezeigt, indem jede:r Lernende einen objektiven </span></span>
+<span><span class="st">  Einblick erhält. So kann hier bspw. ein Soll-Ist-Vergleich mit den Lernzielen </span></span>
+<span><span class="st">  der Stunde erfolgen oder die Lernenden erhalten dezidiertes Feedback zu ihrem </span></span>
+<span><span class="st">  Kompetenzzuwachs durch die Lehrkraft. Auch eine Selbstbewertung ist möglich.</span></span>
+<span><span class="st">  Der Classifier wurde anhand von 790 Unterrichtsentwürfen, 298 Materialien und </span></span>
+<span><span class="st">  bis zu 1400 Schulbuchaufgaben traniert. Es waren an der Kodierung zwei Personen </span></span>
+<span><span class="st">  beteiligt, die eine Kodierschulung erhalten haben und die </span></span>
+<span><span class="st">  Inter-Coder-Reliabilität für das Kompetenzerleben würde über zwei </span></span>
+<span><span class="st">  Trainingsrunden von einem dynamischen Iota-Wert von 0,615 auf 0,646 gesteigert. </span></span>
+<span><span class="st">  Der Krippendorffs Alpha-Wert sank hingegen von 0,516 auf 0,484. Er eignet sich </span></span>
+<span><span class="st">  zum Einsatz in allen Settings, in denen Unterrichtsentwürfe und Lernmaterial </span></span>
+<span><span class="st">  hinsichtlich ihrer Umsetzung des Kompetenzerlebens überprüft werden sollen."</span>,</span>
+<span>abstract_eng<span class="op">=</span><span class="st">"This classifier targets the realization of the need for </span></span>
+<span><span class="st">  competence from Deci and Ryan’s self-determination theory of motivation in l</span></span>
+<span><span class="st">  esson plans and materials. It describes a learner’s need to perceive themselves </span></span>
+<span><span class="st">  as capable. The variable need for competence is assessed by a scale of 0-2. </span></span>
+<span><span class="st">  The classifier was developed using 790 lesson plans, 298 materials and up to </span></span>
+<span><span class="st">  1,400 textbook tasks. A coding training was conducted and the inter-coder </span></span>
+<span><span class="st">  reliabilities of different measures </span></span>
+<span><span class="st">  (i.e. Krippendorff’s Alpha and Dynamic Iota Index) of the individual categories </span></span>
+<span><span class="st">  were calculated at different points in time."</span>,</span>
+<span>abstract_native<span class="op">=</span><span class="st">"Dieser Classifier bewertet Unterrichtsentwürfe und </span></span>
+<span><span class="st">  Lernmaterial danach, ob sie das Bedürfnis nach Kompetenzerleben aus der </span></span>
+<span><span class="st">  Selbstbestimmungstheorie der Motivation nach Deci &amp; Ryan unterstützen. Das </span></span>
+<span><span class="st">  Kompetenzerleben stellt das Bedürfnis dar, sich als wirksam zu erleben. Der </span></span>
+<span><span class="st">  Classifer unterteilt es in drei Stufen und wurde anhand von 790 </span></span>
+<span><span class="st">  Unterrichtsentwürfen, 298 Materialien und bis zu 1400 Schulbuchaufgaben </span></span>
+<span><span class="st">  entwickelt. Es wurden stets Kodierschulungen durchgeführt und die </span></span>
+<span><span class="st">  Inter-Coder-Reliabilitäten der einzelnen Kategorien zu verschiedenen </span></span>
+<span><span class="st">  Zeitpunkten berechnet."</span>,</span>
+<span>keywords_eng<span class="op">=</span><span class="st">"Self-determination theory, motivation, lesson planning, business didactics"</span>,</span>
+<span>keywords_native<span class="op">=</span><span class="st">"Selbstbestimmungstheorie, Motivation, Unterrichtsplanung, Wirtschaftsdidaktik"</span><span class="op">)</span></span></code></pre></div>
+<p>In the case of a classifier, the description should include:</p>
 <ul>
 <li>A short reference to the theoretical models that guided the
 development.</li>
@@ -230,36 +319,44 @@ its development.</li>
 <li>A short statement where the classifier can be used.</li>
 <li>A description of the kind and quantity of data used for
 training.</li>
-<li>If possible information about the inter-coder-reliability of the
+<li>If possible, information about the inter-coder-reliability of the
 coding process providing the data.</li>
-<li>If possible provide a link to the corresponding text embedding
+<li>If possible, provide a link to the corresponding text embedding
 model.</li>
 </ul>
-<p>Again you can provide your description in HTML to include tables
-(e.g. for reporting the reliability of the initial coding process) or
-links to other sources and publication.</p>
+<p>Again, you can provide your description in HTML to include tables
+(e.g. for reporting the reliability of the initial coding process) or
+links to other sources and publications.</p>
 <p><strong>Please do not report the performance values of your
 classifier in the description.</strong> These can be accessed directly
 via <code>example_classifier$reliability$test_metric_mean</code>.</p>
 <p>With the methods <code>set_publication_info</code> and
-<code>get_publication_info</code> you can provide the publication
+<code>get_publication_info</code> you can provide the bibliographic
 information of your classifier.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_classifier</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
+<span>  <span class="va">type</span>,</span>
+<span>  <span class="va">authors</span>,</span>
+<span>  <span class="va">citation</span>,</span>
+<span>  url<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <p>Please use “developer” and “trainer” if you are the first person who
-trained the classifier. <code>type="modifier"</code> will be needed only
-rarely.</p>
-<p>Finally you can manage the license for using your classifier via
+trained the classifier. <code>type="modifier"</code> will be rarely
+needed.</p>
+<p>Finally, you can manage the license for using your classifier via
 <code>set_license</code> and <code>get_license</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_classifier</span><span class="op">$</span><span class="fu">set_licens</span><span class="op">(</span><span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you are ready for sharing your classifier. Please remember to
-save your changes as described in section 3.2.</p>
+save your changes as described in the following section 3.2.</p>
 </div>
 <div class="section level3">
 <h3 id="saving-and-loading-1">3.2 Saving and Loading<a class="anchor" aria-label="anchor" href="#saving-and-loading-1"></a>
 </h3>
-<p>If you have created a classifier saving and loading is very easy due
+<p>If you have created a classifier, saving and loading is very easy due
 to the <em>R</em> package <em>bundle</em>. You can just use
 <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> and <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>. In our example this could
 be</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">classifier</span>,</span>
 <span>     file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span>
 <span></span>
@@ -268,16 +365,15 @@ be</p>
 was used for training in order to predict new data with the classifier.
 You can request the name, label, and configuration of that model with
 <code>example_classifier$text_embedding_model</code>. Thus, if you would
-like to share your classifier ensure that you also share the
+like to share your classifier, ensure that you also share the
 corresponding text embedding model.</p>
 <p>If you would like to apply your classifier to new data, two steps are
 necessary. First, you must transform the raw text into a numerical
 expression by using <em>exactly</em> the same text embedding model that
-was used for training your classifier. The resulting object can be
-passed to the method <code>predict</code> and you will get the
-predictions together with an estimate of certainty for each
-class/category.</p>
-<p>More information can be found in the vignette <a href="articles/classification_tasks.html">02 clasification
+was used to train your classifier. The resulting object can be passed to
+the method <code>predict</code> and you will receive the predictions
+together with an estimate of certainty for each class/category.</p>
+<p>More information can be found in the vignette <a href="articles/classification_tasks.html">02 classification
 tasks</a>.</p>
 </div>
 </div>

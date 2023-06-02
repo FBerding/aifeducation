@@ -2,13 +2,13 @@
 % Please edit documentation in R/aux_fct.R
 \name{create_synthetic_units}
 \alias{create_synthetic_units}
-\title{Creates Synthetic Units}
+\title{Create Synthetic Units}
 \usage{
 create_synthetic_units(embedding, target, k, max_k, method, cat, cat_freq)
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.}
 
 \item{target}{Named \code{factor} containing the labels/categories of the corresponding cases.}
 
@@ -17,7 +17,7 @@ In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embedd
 \item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
 
 \item{method}{\code{vector} containing strings of the requested methods for generating new cases.
-Currently "smote","dbsmote", and "adas" from package smotefamily are available.}
+Currently "smote","dbsmote", and "adas" from the package smotefamily are available.}
 
 \item{cat}{\code{string} The category for which new cases should be created.}
 
@@ -31,7 +31,7 @@ new synthetic cases as a named \code{data.frame} and their labels as a named
 }
 \description{
 Function for creating synthetic cases in order to balance the data for
-training with \link{TextEmbeddingClassifierNeuralNet}. This is a helper
+training with \link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary
 function for use with \link{get_synthetic_cases} to allow parallel
 computations.
 }

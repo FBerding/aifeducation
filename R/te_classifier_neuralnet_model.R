@@ -248,12 +248,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       self$label=label
 
       #Basic Information of Input and Target Data
-      variable_name_order<-colnames(text_embeddings$embeddings)
+      variable_name_order<-dimnames(text_embeddings$embeddings)[[3]]
       target_levels_order<-levels(targets)
 
       model_info=text_embeddings$get_model_info()
       times=model_info$param_chunks
-      features=ncol(text_embeddings$embeddings)/times
+      features=dim(text_embeddings$embeddings)[3]
 
       self$text_embedding_model["model"]=list(model_info)
       self$text_embedding_model["times"]=times
@@ -294,7 +294,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         model_input<-keras::layer_input(shape=list(times,features),
                                         name="input_embeddings")
       } else {
-        model_input<-keras::layer_input(shape=ncol(text_embeddings$embeddings),
+        model_input<-keras::layer_input(shape=times*features,
                                         name="input_embeddings")
       }
       layer_list[1]<-list(model_input)
@@ -566,6 +566,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'}
     #'@import bundle
     #'@import keras
+    #'@importFrom abind abind
     train=function(data_embeddings,
                    data_targets,
                    data_n_test_samples=5,
@@ -647,7 +648,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       data_embeddings=data_embeddings$clone(deep=TRUE)
       viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
                                    names(data_targets))
-      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,]
+      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,]
       data_targets=data_targets[viable_cases]
 
       #Reducing to unique cases
@@ -660,7 +661,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       n_final_cases=nrow(data_embeddings$embeddings)
       viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
                                    names(data_targets))
-      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,]
+      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,]
       data_targets=data_targets[viable_cases]
       if(trace==TRUE){
         cat(paste(date(),
@@ -789,9 +790,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           targets_labeled_val=targets_labeleld_all[names_targets_labeled_train_test]
 
           #Train model
-          private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,],
+          private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,,],
                               target_train=targets_labeled_train_train,
-                              embedding_test=embeddings_all[names_targets_labeled_train_test,],
+                              embedding_test=embeddings_all[names_targets_labeled_train_test,,],
                               target_test=targets_labeled_val,
                               epochs=epochs,
                               batch_size=batch_size,
@@ -802,7 +803,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               dir_checkpoint=dir_checkpoint)
 
           #Predict val targets
-          test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,],
+          test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,,],
                                         verbose = keras_trace,
                                         batch_size =batch_size)
           test_pred_cat=test_predictions$expected_category
@@ -844,7 +845,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           }
           #save(embeddings_train_labeled,targets_train_labeled,bsc_methods,bsc_max_k,
           #     file="debug.RData")
-          syn_cases<-get_synthetic_cases(embedding=embeddings_all[names_targets_labeled_train,],
+
+          syn_cases<-get_synthetic_cases(embedding=embeddings_all[names_targets_labeled_train,,],
                                          target=targets_labeleld_train,
                                          method=bsc_methods,
                                          max_k=bsc_max_k,
@@ -922,9 +924,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         "Creating Train Dataset","\n"))
           }
 
-          embeddings_all_and_synthetic=rbind(
+          embeddings_all_and_synthetic=abind::abind(
             embeddings_all,
-            embeddings_syntehtic_all)
+            embeddings_syntehtic_all,
+            along = 1)
 
           targets_all_and_synthetic=c(
             targets_labeleld_all,
@@ -947,9 +950,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         "Iter:",iter,"from",folds$n_folds,
                         "Start Training","\n"))
           }
-          private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,],
+          private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,,],
                               target_train=targets_all_and_synthetic[names_targets_labeled_train_train],
-                              embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,],
+                              embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,,],
                               target_test=targets_all_and_synthetic[names_targets_labeled_train_test],
                               epochs=epochs,
                               batch_size=batch_size,
@@ -959,7 +962,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               reset_model=TRUE,
                               dir_checkpoint=dir_checkpoint)
           #Predict val targets
-          test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,],
+          test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,,],
                                         verbose = keras_trace,
                                         batch_size =batch_size)
           test_pred_cat=test_predictions$expected_category
@@ -1023,7 +1026,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
 
             #Estimate the labels for the remaining data
-            est_remaining_data=self$predict(newdata=embeddings_all[names_unlabeled,],
+            est_remaining_data=self$predict(newdata=embeddings_all[names_unlabeled,,],
                                             verbose = keras_trace,
                                             batch_size =batch_size)
 
@@ -1117,9 +1120,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             } else {
               use_callback=FALSE
             }
-                private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),],
+                private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),,],
                                     target_train=targets_labeled_and_pseudo,
-                                    embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+                                    embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
                                     target_test=pseudo_label_targets_labeled_val,
                                     epochs = bpl_epochs_per_step,
                                     use_callback=use_callback,
@@ -1132,7 +1135,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                     sample_weights=sample_weights)
 
               #predict val targets
-              val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+              val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
                                             verbose = keras_trace,
                                             batch_size =batch_size)
               val_pred_cat=val_predictions$expected_category
@@ -1145,7 +1148,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               #              true=pseudo_label_targets_labeled_val)))
 
               #Predict test targets
-              test_predictions=self$predict(newdata = embeddings_all[names(pseudo_label_targets_labeled_test),],
+              test_predictions=self$predict(newdata = embeddings_all[names(pseudo_label_targets_labeled_test),,],
                                             verbose = keras_trace,
                                             batch_size =batch_size)
               test_pred_cat=test_predictions$expected_category
@@ -1184,7 +1187,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         test_metric[iter,"Final",]<-test_res
 
 
-        test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,],
+        test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,,],
                                       verbose = keras_trace,
                                       batch_size =batch_size)
         test_pred_cat=test_predictions$expected_category
@@ -1271,9 +1274,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         targets_labeled_val=targets_labeleld_all[names_targets_labeled_train_test]
 
         #Train model
-        private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,],
+        private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,,],
                             target_train=targets_labeled_train_train,
-                            embedding_test=embeddings_all[names_targets_labeled_train_test,],
+                            embedding_test=embeddings_all[names_targets_labeled_train_test,,],
                             target_test=targets_labeled_val,
                             epochs=epochs,
                             batch_size=batch_size,
@@ -1294,7 +1297,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         if(trace==TRUE){
           cat(paste(date(),
                       "Final Training",
-                      "Applying Augmention with Balanced Synthetic Casesng"),"\n")
+                      "Applying Augmention with Balanced Synthetic Cases"),"\n")
         }
         #Generating Data For Training
         if(trace==TRUE){
@@ -1304,7 +1307,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         }
         #save(embeddings_train_labeled,targets_train_labeled,bsc_methods,bsc_max_k,
         #     file="debug.RData")
-        syn_cases<-get_synthetic_cases(embedding=embeddings_all[names(targets_labeleld_all),],
+        syn_cases<-get_synthetic_cases(embedding=embeddings_all[names(targets_labeleld_all),,],
                                        target=targets_labeleld_all,
                                        method=bsc_methods,
                                        max_k=bsc_max_k,
@@ -1377,9 +1380,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                       "Creating Train Dataset","\n"))
         }
 
-        embeddings_all_and_synthetic=rbind(
+        embeddings_all_and_synthetic=abind::abind(
           embeddings_all,
-          embeddings_syntehtic_all)
+          embeddings_syntehtic_all,
+          along = 1)
 
         targets_all_and_synthetic=c(
           targets_labeleld_all,
@@ -1402,9 +1406,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                       "Final Training",
                       "Start Training","\n"))
         }
-        private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,],
+        private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,,],
                             target_train=targets_all_and_synthetic[names_targets_labeled_train_train],
-                            embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,],
+                            embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,,],
                             target_test=targets_all_and_synthetic[names_targets_labeled_train_test],
                             epochs=epochs,
                             batch_size=batch_size,
@@ -1461,7 +1465,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           }
 
           #Estimate the labels for the remaining data
-          est_remaining_data=self$predict(newdata=embeddings_all[names_unlabeled,],
+          est_remaining_data=self$predict(newdata=embeddings_all[names_unlabeled,,],
                                           verbose = keras_trace,
                                           batch_size =batch_size)
 
@@ -1527,7 +1531,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           #Counting new cases
           added_cases_train=length(targets_pseudo_labeled)
-          data_pbl[iter,step]=added_cases_train
+          data_pbl["final_train",step]=added_cases_train
 
           #Calculating the weights for the new cases
           weights_cases_list[2]=list(names(targets_pseudo_labeled))
@@ -1556,9 +1560,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           } else {
             use_callback=FALSE
           }
-          private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),],
+          private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),,],
                               target_train=targets_labeled_and_pseudo,
-                              embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+                              embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
                               target_test=pseudo_label_targets_labeled_val,
                               epochs = bpl_epochs_per_step,
                               use_callback=use_callback,
@@ -1574,7 +1578,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           #            "Unlabeled",length(targets_pseudo_labeled)))
 
           #predict val targets
-          val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),],
+          val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
                                        verbose = keras_trace,
                                        batch_size =batch_size)
           val_pred_cat=val_predictions$expected_category
@@ -1687,15 +1691,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Ensuring the correct order of the variables for prediction
-      real_newdata<-real_newdata[self$model_config$input_variables]
+      real_newdata<-real_newdata[,,self$model_config$input_variables]
       current_row_names=rownames(real_newdata)
-      if(self$model_config$n_req>0){
-        real_newdata<-matrix_to_array_c(
-          matrix = as.matrix(real_newdata),
-          times = self$text_embedding_model$times,
-          features = self$text_embedding_model$features)
-      } else {
-        real_newdata=as.matrix(real_newdata)
+      if(self$model_config$n_req==0){
+        real_newdata=array_to_matrix(real_newdata)
       }
 
       if(length(self$model_config$target_levels)>2){
@@ -1933,8 +1932,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       target_test<-factor(as.character(target_test),
                           levels = target_levels_order)
 
-      data_embedding_train<-data_embedding_train[,variable_name_order]
-      data_embedding_test<-data_embedding_test[,variable_name_order]
+      data_embedding_train<-data_embedding_train[,,variable_name_order]
+      data_embedding_test<-data_embedding_test[,,variable_name_order]
 
       #variable_name_order<-colnames(data_embedding_train)
       #target_levels_order<-levels(target_train)
@@ -1944,19 +1943,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       target_train_transformed<-as.numeric(target_train)-1
       target_test_transformed<-as.numeric(target_test)-1
 
-      if(self$model_config$n_req>0){
-        #Convert Input data to sequential data
-        input_embeddings_train<-matrix_to_array_c(
-          matrix = as.matrix(data_embedding_train),
-          times = self$text_embedding_model$times,
-          features = self$text_embedding_model$features)
-        input_embeddings_test<-matrix_to_array_c(
-          matrix = as.matrix(data_embedding_test),
-          times = self$text_embedding_model$times,
-          features = self$text_embedding_model$features)
+      #Convert Input data if the network cannot process sequential data
+      if(self$model_config$n_req==0){
+        input_embeddings_train= array_to_matrix(data_embedding_train)
+        input_embeddings_test=array_to_matrix(data_embedding_test)
       } else {
-        input_embeddings_train= as.matrix(data_embedding_train)
-        input_embeddings_test=as.matrix(data_embedding_test)
+        input_embeddings_train=data_embedding_train
+        input_embeddings_test=data_embedding_test
       }
 
       n_categories=as.integer(length(levels(target_train)))
@@ -1972,7 +1965,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         output_categories_train=target_train_transformed
         output_categories_test=target_test_transformed
       }
-
 
       model<-bundle::unbundle(self$bundeled_model)
 

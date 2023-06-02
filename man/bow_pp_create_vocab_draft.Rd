@@ -2,7 +2,9 @@
 % Please edit documentation in R/preparation.R
 \name{bow_pp_create_vocab_draft}
 \alias{bow_pp_create_vocab_draft}
-\title{Function for creating a first draft of a vocabulary}
+\title{Function for creating a first draft of a vocabulary
+This function creates a list of tokens which refer to specific
+universal part-of-speech tags (UPOS) and provides the corresponding lemmas.}
 \usage{
 bow_pp_create_vocab_draft(
   path_language_model,
@@ -16,7 +18,7 @@ bow_pp_create_vocab_draft(
 }
 \arguments{
 \item{path_language_model}{\code{string} Path to a udpipe language model that
-should be used for tagging and lemmatisation.}
+should be used for tagging and lemmatization.}
 
 \item{data}{\code{vector} containing the raw texts.}
 
@@ -27,7 +29,7 @@ should be used to build the vocabulary.}
 
 \item{language}{\code{string} Name of the language (e.g., English, German)}
 
-\item{chunk_size}{\code{int} Number of raw texts which should be processed at one time.}
+\item{chunk_size}{\code{int} Number of raw texts which should be processed at once.}
 
 \item{trace}{\code{bool} \code{TRUE} if information about the progress should be printed to console.}
 }
@@ -41,12 +43,13 @@ lemmas in lower case.}
 \item{\code{label_language_model}}{Label of the udpipe language model.}
 \item{\code{language}}{Language of the raw texts.}
 \item{\code{upos}}{Used univerisal part-of-speech tags.}
-\item{\code{n_sentence}}{\code{int} Estimated number of sentence in the raw texts.}
+\item{\code{n_sentence}}{\code{int} Estimated number of sentences in the raw texts.}
 \item{\code{n_token}}{\code{int} Estimated number of tokens in the raw texts.}
 \item{\code{n_document_segments}}{\code{int} Estimated number of document segments/raw texts.}
 }
 }
 \description{
+Function for creating a first draft of a vocabulary
 This function creates a list of tokens which refer to specific
 universal part-of-speech tags (UPOS) and provides the corresponding lemmas.
 }

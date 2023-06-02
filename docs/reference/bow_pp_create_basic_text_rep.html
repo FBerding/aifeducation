@@ -106,11 +106,16 @@
 
 
 <dt>split_hyphens</dt>
-<dd><p><code>bool</code> <code>TRUE</code> if hyphens should be splitted into several tokens.</p></dd>
+<dd><p><code>bool</code> <code>TRUE</code> if hyphens should be split into several tokens.</p></dd>
 
 
 <dt>split_tags</dt>
-<dd><p><code>bool</code> <code>TRUE</code> if tags should be splitted.</p></dd>
+<dd><p><code>bool</code> <code>TRUE</code> if tags should be split.</p></dd>
+
+
+<dt>language_stopwords</dt>
+<dd><p><code>string</code> Abbreviation for the language for which stopwords should be
+removed.</p></dd>
 
 
 <dt>use_lemmata</dt>
@@ -118,7 +123,7 @@
 
 
 <dt>to_lower</dt>
-<dd><p><code>bool</code> <code>TRUE</code> if token or lemmas should be used with lower cases.</p></dd>
+<dd><p><code>bool</code> <code>TRUE</code> if tokens or lemmas should be used with lower cases.</p></dd>
 
 
 <dt>min_termfreq</dt>
@@ -134,15 +139,15 @@
 
 
 <dt>window</dt>
-<dd><p><code>int</code> size of the window for creating the feature co-occurance matrix.</p></dd>
+<dd><p><code>int</code> size of the window for creating the feature-co-occurance matrix.</p></dd>
 
 
 <dt>weights</dt>
-<dd><p><code>vector</code> weights for the corresponding window. The vector length must be equal to window's size.</p></dd>
+<dd><p><code>vector</code> weights for the corresponding window. The vector length must be equal to the window size.</p></dd>
 
 
 <dt>trace</dt>
-<dd><p><code>bool</code> <code>TRUE</code> if information about the progress should
+<dd><p><code>bool</code> <code>TRUE</code> if information about the progress should be
 printed to console.</p></dd>
 
 </dl></div>
@@ -154,7 +159,7 @@ printed to console.</p></dd>
 the number of tokens in the document.</p></li>
 <li><p><code>fcm: </code>Feature-Co-Occurance-Matrix.</p></li>
 <li><p><code>information: </code><code>list</code> containing information about the used vocabulary. These are:
- </p><ul><li><p><code>n_sentence: </code> Number of sentence</p></li>
+ </p><ul><li><p><code>n_sentence: </code> Number of sentences</p></li>
 <li><p><code>n_document_segments: </code> Number of document segments/raw texts</p></li>
 <li><p><code>n_token_init: </code> Number of initial tokens</p></li>
 <li><p><code>n_token_final: </code> Number of final tokens</p></li>

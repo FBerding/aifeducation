@@ -662,7 +662,6 @@ bert_modeling<-TextEmbeddingModel$new(
   chunks=4,
   overlap=30,
   aggregation="last",
-  use_cls_token=TRUE,
   model_dir="my_own_transformer_trained"
   )
 ```
@@ -699,11 +698,8 @@ to interconnect every chunk to bring context into the calculations. This
 can be done with `overlap` to determine how many tokens of the end of a
 prior chunk should be added to the next.
 
-Finally, you have to decide if you would like the embedding of the
-classification token [CLS] as text embedding or the mean of all token
-embeddings as text embedding (`use_cls_token`). You can further decide
-from which hidden layer or layers the embeddings should be drawn
-(`aggregation="last"`). In their initial work, Devlin et al. (2019) used
+Finally, you have to decide from which hidden layer or layers the embeddings 
+should be drawn (`aggregation="last"`). In their initial work, Devlin et al. (2019) used
 the hidden states of different layers for classification.
 
 After deciding about the configuration, you can use your model.

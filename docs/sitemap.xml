@@ -22,10 +22,7 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/basic_text_rep_movie_reviews.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bert_embeddings.html</loc>
+    <loc>/reference/array_to_matrix.html</loc>
   </url>
   <url>
     <loc>/reference/bow_pp_create_basic_text_rep.html</loc>
@@ -59,6 +56,9 @@
   </url>
   <url>
     <loc>/reference/get_folds.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_n_chunks.html</loc>
   </url>
   <url>
     <loc>/reference/get_stratified_train_test_split.html</loc>
@@ -97,9 +97,6 @@
     <loc>/reference/split_labeled_unlabeled.html</loc>
   </url>
   <url>
-    <loc>/reference/test_classifier.html</loc>
-  </url>
-  <url>
     <loc>/reference/TextEmbeddingClassifierNeuralNet.html</loc>
   </url>
   <url>
@@ -107,8 +104,5 @@
   </url>
   <url>
     <loc>/reference/train_tune_bert_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/vocab_draft_movie_review.html</loc>
   </url>
 </urlset>

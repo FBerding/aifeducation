@@ -67,6 +67,9 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>02 Classification Tasks</h1>
+                        <h4 data-toc-skip class="author">Florian
+Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
+Rebmann</h4>
             
       
       
@@ -78,111 +81,119 @@
 <div class="section level2">
 <h2 id="introduction-and-overview">1 Introduction and Overview<a class="anchor" aria-label="anchor" href="#introduction-and-overview"></a>
 </h2>
-<p>In educational and social science assigning an observation to
-scientific concepts is an important task allowing to understand an
-observation, to generate new insights, and to derive recommendations for
-research and practice.</p>
-<p>In educational science several areas deal with this kind of task. For
-example, diagnosing students characteristics is an important aspect of
-teachers’ profession for understanding and promoting learning. Another
-example is learning analytics where data about students is used to
-provide learning environments adapted to their individual needs. On an
-other level institutions such as schools and universities can use this
-information for a data driven decision about their performance
-(Laurusson &amp; White 2014) and where and how to improve it. In any
-case a real world observations is aligned into scientific models in
-order to use scientific knowledge as a technology for improving learning
-and instruction.</p>
-<p>Supervised machine learning is one concept allowing to link real
-world observations on the one hand and existing scientific models and
-theories on the other hand (Berding et al. 2022). For educational
-sciences this is a great advantage because it allows to use the existing
-knowledge and insights for applications of AI. The drawback of this
+<p>In the educational and social sciences, the assignment of an
+observation to scientific concepts is an important task that allows
+researchers to understand an observation, to generate new insights, and
+to derive recommendations for research and practice.</p>
+<p>In educational science, several areas deal with this kind of task.
+For example, diagnosing students characteristics is an important aspect
+of a teachers’ profession and necessary to understand and promote
+learning. Another example is the use of learning analytics, where data
+about students is used to provide learning environments adapted to their
+individual needs. On another level, educational institutions such as
+schools and universities can use this information for data-driven
+performance decisions (Laurusson &amp; White 2014) as well as where and
+how to improve it. In any case, a real-world observation is aligned to
+scientific models to use scientific knowledge as a technology for
+improved learning and instruction.</p>
+<p>Supervised machine learning is one concept that allows a link between
+real-world observations and existing scientific models and theories
+(Berding et al. 2022). For educational sciences this is a great
+advantage because it allows researchers to use the existing knowledge
+and insights for use case applications of AI. The drawback of this
 approach is that the training of AI requires both information about the
-real world observation on the one hand and information on the
-corresponding alignment in scientific models and theories on the other
-hand.</p>
-<p>A valuable source of data in educational science are texts since
-textual data can be found everywhere in learning and teaching (Berding
-et al. 2022). For example, teachers often demand students to solve a
-task which they provide in a written form. Students have to create a
-solution for the tasks which they often document with a short written
-essay or a presentation. These data can be used for analyzing learning
-and teaching. Teachers’ written tasks for their students may provide
-insights into the quality of instruction. Students’ solutions may
-provide insights into their learning outcomes and prerequisites.</p>
+real world observations and information on the corresponding alignment
+with scientific models and theories.</p>
+<p>A valuable source of data in educational science are written texts,
+since textual data can be found almost everywhere in the realm of
+learning and teaching (Berding et al. 2022). For example, teachers often
+require students to solve a task which they provide in a written form.
+Students have to create a solution for the tasks which they often
+document with a short written essay or a presentation. This data can be
+used to analyze learning and teaching. Teachers’ written tasks for their
+students may provide insights into the quality of instruction while
+students’ solutions may provide insights into their learning outcomes
+and prerequisites.</p>
 <p>AI can be a helpful assistant in analyzing textual data since the
-analysis of textual data is a challenging and time consuming task for
-humans because they have to conduct a content analysis. In this vignette
-we would like to show you how to create an AI that can help you in such
-tasks by using the package <em>aifedcuation</em>.</p>
-<p><strong>Please note that an introduction in content analysis, natural
-language processing or machine learning is behind the scope of this
-vignette. If you would like to go into details please refer to the cited
+analysis of textual data is a challenging and time-consuming task for
+humans because they have to conduct a content analysis. In this
+vignette, we would like to show you how to create an AI that can help
+you with such tasks by using the package <em>aifedcuation</em>.</p>
+<p><strong>Please note that an introduction to content analysis, natural
+language processing or machine learning is beyond the scope of this
+vignette. If you would like to learn more, please refer to the cited
 literature.</strong></p>
-<p>Before we start we have to introduce a definition of our
-understanding of basic concepts since applying AI to educational
+<p>Before we start it is necessary to introduce a definition of our
+understanding of some basic concepts since applying AI to educational
 contexts means to combine the knowledge of different scientific
 disciplines using different, sometimes overlapping concepts. Even within
-a research area concepts are not unified used. Figure 1 illustrates
+a research area, concepts are not unified. Figure 1 illustrates this
 package’s understanding.</p>
-<p><img src="classif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"> Since
-<em>aifeducation</em> looks at the application of AI for classification
-tasks from the perspective of the empirical method of content analysis
-there is some overlapping between concepts of content analysis and
-machine learning. In content analysis phenomenon like performance and
-colors can be described as a scale/dimension which is made up by several
-categories (e.g. Schreier 2012 pp. 59). In our example an exam’s
-performance (scale/dimension) could be “good”, “average” or “poor”. In
-terms of colors (scale/dimension) categories could be “blue”, “green”
-etc. Machine learning literature uses other words to describe this kind
-of data. In machine learning “scale” and “dimension” corresponds to the
-term “label” and “categories” refer to the term “classes” (Chollet,
-Kalinowski &amp; Allaire 2022, p. 114).</p>
-<p>With these clarifications classification means that a text is
+<div class="figure">
+<img src="classif_fig_01.png" style="width:100.0%" alt=""><p class="caption">Figure 1: Understanding of Central Concepts</p>
+</div>
+<p>Since <em>aifeducation</em> looks at the application of AI for
+classification tasks from the perspective of the empirical method of
+content analysis, there is some overlapping between the concepts of
+content analysis and machine learning. In content analysis, a phenomenon
+like performance and colors can be described as a scale/dimension which
+is made up by several categories (e.g. Schreier 2012 pp. 59). In our
+example, an exam’s performance (scale/dimension) could be “good”,
+“average” or “poor”. In terms of colors (scale/dimension) categories
+could be “blue”, “green” etc. Machine learning literature uses other
+words to describe this kind of data. In machine learning, “scale” and
+“dimension” correspond to the term “label” while “categories” refer to
+the term “classes” (Chollet, Kalinowski &amp; Allaire 2022, p. 114).</p>
+<p>With these clarifications, classification means that a text is
 assigned to the correct category of a scale or that the text is labeled
-with the correct class. To train an AI to classify a text accordingly
-based on supervised machine learning two kind of data are necessary as
-Figure 2 illustrates.</p>
-<p><img src="classif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"> By
-providing AI with both the textual data as input data and the
-corresponding information about the class as target data AI can learn
-which texts imply a specific class or category. In the example of exams
-AI can learn which texts imply a “good”, “average” or “poor” judgment.
-After training AI can be applied to new texts and predicts the most
-likely class of every new text. The generated class can be used for
-further statistical analysis or for deriving recommendations about
-learning and teaching.</p>
-<p>To achieve this support by an artificial intelligence several steps
+with the correct class. As Figure 2 illustrates, two kinds of data are
+necessary to train an AI to classify text in line with supervised
+machine learning principles.</p>
+<div class="figure">
+<img src="classif_fig_02.png" style="width:100.0%" alt=""><p class="caption">Figure 2: Basic Structure of Supervised Machine
+Learning</p>
+</div>
+<p>By providing AI with both the textual data as input data and the
+corresponding information about the class as target data, AI can learn
+which texts imply a specific class or category. In the above exam
+example, AI can learn which texts imply a “good”, an “average” or a
+“poor” judgment. After training, AI can be applied to new texts and
+predict the most likely class of every new text. The generated class can
+be used for further statistical analysis or to derive recommendations
+about learning and teaching.</p>
+<p>To achieve this support by an artificial intelligence, several steps
 are necessary. Figure 3 provides an overview integrating the functions
 and objects of <em>aifeducation</em>.</p>
-<p><img src="classif_fig_03.png" style="width:100.0%" alt="Figure 3: Overview of the Steps to Perform a Classification"> The
-first step is to transform raw texts into a form computers can use. That
-is, the raw texts must be transformed into numbers. In modern approaches
-this is done by using word embeddings. Campesato (2021, p. 102)
-describes them as “the collective name for a set of language modeling
-and feature learning techniques (…) where words or phrases from the
-vocabulary are mapped to vectors of real numbers.” Similar is the
-definition of word vector: „Word vectors represent the semantic meaning
-of words as vectors in the context of the training corpus.“ (Lane,
-Howard &amp; Hapke 2019, p. 191)</p>
+<div class="figure">
+<img src="classif_fig_03.png" style="width:100.0%" alt=""><p class="caption">Figure 3: Overview of the Steps to Perform a
+Classification</p>
+</div>
+<p>The first step is to transform raw texts into a form computers can
+use. That is, the raw texts must be transformed into numbers. In modern
+approaches, this is usually done through word embeddings. Campesato
+(2021, p. 102) describes them as “the collective name for a set of
+language modeling and feature learning techniques (…) where words or
+phrases from the vocabulary are mapped to vectors of real numbers.” The
+definition of a word vector is similar: „Word vectors represent the
+semantic meaning of words as vectors in the context of the training
+corpus.” (Lane, Howard &amp; Hapke 2019, p. 191)</p>
 <p>Campesato (2021, pp. 112) clusters approaches for creating word
-embeddings into three groups reflecting their ability to provide context
-sensitive numerical representations. Approaches of group one do not
-account for any context. Typical methods rely on bag-of-words
+embeddings into three groups, reflecting their ability to provide
+context-sensitive numerical representations. Approaches in group one do
+not account for any context. Typical methods rely on bag-of-words
 assumptions. Thus, they are normally not able to provide a word
 embedding for single words. Group two consists of approaches such as
-word2vec, GloVe (Pennington, Socher % Manning 2014) or fastText which
-are able to provide one embedding for each word regardless of its
-context. Thus, they do account only for one context. The last group
+word2vec, GloVe (Pennington, Socher &amp; Manning 2014) or fastText,
+which are able to provide one embedding for each word regardless of its
+context. Thus, they only account for one context. The last group
 consists of approaches such as BERT (Devlin et al. 2019), which are able
 to produce multiple word embeddings depending on the context of the
 words.</p>
-<p>From these different groups <em>aifedcuation</em> implements several
+<p>From these different groups, <em>aifedcuation</em> implements several
 methods.</p>
 <ul>
 <li>
-<strong>Topic Modeling:</strong> Topic Modeling is an approach that
+<strong>Topic Modeling:</strong> Topic modeling is an approach that
 uses frequencies of tokens within a text. The frequencies of the tokens
 are models as the observable variables of one more latent topics
 (Campesato 2021, p. 113). The estimation of a topic model is often based
@@ -190,32 +201,32 @@ on a Latent Dirichlet Analysis (LDA) which describes each text by a
 distribution of topics. The topics themselves are described by a
 distribution of words/tokens (Campesato 2021, p. 114). This relationship
 between texts, words, and topics can be used to create a text embedding
-by computing the relative amount of every topic in a text on the basis
-of every token in a text.</li>
+by computing the relative amount of every topic in a text based on every
+token in a text.</li>
 <li>
 <strong>GlobalVectorClusters:</strong> GlobalVectors is a newer
 approach which utilizes the co-occurrence of words/tokens to compute
 GlobalVectors (Campesato 2021, p. 110). These vectors are generated in a
-way that tokens/words with a similar meaning are located near to each
+way that tokens/words with a similar meaning are located close to each
 other (Pennington, Socher &amp; Manning 2014). In order to create a
 <em>text</em> embedding from <em>word</em> embeddings,
 <em>aifeducation</em> groups tokens into clusters based on their
 vectors. Thus, tokens with a similar meaning are members of the same
-cluster. For the <em>text</em> embedding the tokens of a text are
+cluster. For the <em>text</em> embedding, the tokens of a text are
 counted for every cluster and the frequencies of every cluster for that
 text are used as a numerical representation of that text.</li>
 <li>
 <strong>Transformers:</strong> Transformers are the current
-state-of-art approach for many natural language tasks (Tunstall, von
-Werra &amp; Wolf 2022, p. xv). With help of the self attention mechanism
-(Vaswani et al. 2017) they are able to produce context sensitive
-<em>word</em> embeddings (Chollet, Kalinowski &amp; Allaire, 2022
-pp.366). In <em>aifeducation</em> only architecture of BERT are
-implemented as foundation for classification tasks.</li>
+state-of-the-art approach for many natural language tasks (Tunstall, von
+Werra &amp; Wolf 2022, p. xv). With the help of the self-attention
+mechanism (Vaswani et al. 2017), they are able to produce
+context-sensitive <em>word</em> embeddings (Chollet, Kalinowski &amp;
+Allaire, 2022 pp.366). In <em>aifeducation</em>, only the architecture
+of BERT is implemented as the foundation for classification tasks.</li>
 </ul>
 <p>All the approaches are managed and used with a unified interface
 provided by the object <code>TextEmbeddingModel</code>. With this object
-you can easily convert raw texts into a numerical representation which
+you can easily convert raw texts into a numerical representation, which
 you can use for different classification tasks at the same time. This
 makes it possible to reduce computational time. The created text
 embedding is stored in an object of class <code>EmbeddedText</code>.
@@ -223,53 +234,83 @@ This object additionally contains information about the text embedding
 model that created this object.</p>
 <p>In the very best case you can apply an existing text embedding model
 by using a transformer from <a href="https://huggingface.co/" class="external-link">Huggingface</a> or by using a model from
-colleagues. If not <em>aifeducation</em> provides several functions
+colleagues. If not, <em>aifeducation</em> provides several functions
 allowing you to create your own models. Depending on the approach you
-would like to use different steps are necessary. In the case of Topic
+would like to use, different steps are necessary. In the case of Topic
 Modeling or GlobalVectorClusters you must first create a draft of a
 vocabulary with the two functions
 <code><a href="../reference/bow_pp_create_vocab_draft.html">bow_pp_create_vocab_draft()</a></code> and
 <code><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep()</a></code>. When calling these
-functions you determine central properties of the resulting model. In
-the case of transformers you first have to configure and to train a
+functions, you determine central properties of the resulting model. In
+the case of transformers, you first have to configure and to train a
 vocabulary with <code>create_xxx_model()</code> and in a next step you
 can train your model with <code>train_tune_xxx_model()</code>. Every
 step will be explained in the next chapters. Please note that
 <code>xxx</code> stands for different architectures of transformers that
 are supported with <em>aifedcuation</em>.</p>
 <p>With an object of class <code>TextEmbeddingModel</code> you can
-create the input data for the supervised machine learning. Additionally
-you need the target data which must be a named factor containing the
-classes/categories of each text.</p>
-<p>With both kind of data you are able to create a new object of class
+create the input data for the supervised machine learning process.
+Additionally, you need the target data which must be a named factor
+containing the classes/categories of each text.</p>
+<p>With both kinds of data you are able to create a new object of class
 <code>TextEmbeddingClassifierNeuralNet</code> which is the classifier.
-For training of the classifier you have several options which we will
-cover in detail in chapter 3. After training the classifier you can
-share it with other researchers and apply it on new texts. Please note
-that the application to new texts requires that the text is transformed
-into numbers with <em>exactly the same text embedding model</em> before
-passing the text to the classifier. That is, please do not pass the raw
-texts but only the embedded texts to the classifier.</p>
-<p>In the next chapters we will guide you to the complete process.
-Starting with the creation of the text embedding models.</p>
-<p><strong>Please not that the creation of a new text embedding model is
-only necessary if you can not rely on an existing model or if you can
-not rely on a pre-trained transformer.</strong></p>
+To train the classifier you have several options which we will cover in
+detail in chapter 3. After training the classifier you can share it with
+other researchers and apply it to new texts. Please note that the
+application to new texts requires the text to be transformed into
+numbers with <em>exactly the same text embedding model</em> before
+passing the text to the classifier. Please note: Do not pass the raw
+texts to the classifier, only embedded texts work!</p>
+<p>In the next chapters, we will guide you through the complete process,
+starting with the creation of the text embedding models.</p>
+<p><strong>Please note that the creation of a new text embedding model
+is only necessary if you cannot rely on an existing model or if you
+cannot rely on a pre-trained transformer.</strong></p>
 </div>
 <div class="section level2">
-<h2 id="preparation-tasks">2 Preparation Tasks<a class="anchor" aria-label="anchor" href="#preparation-tasks"></a>
+<h2 id="starting-a-new-session">2 Starting a New Session<a class="anchor" aria-label="anchor" href="#starting-a-new-session"></a>
+</h2>
+<p>Before you can work with <em>aifeducation</em> you must set up a new
+<em>R</em> session. First, it is necessary that you load the library.
+Second, you must set up python via reticulate. In case you installed
+python as suggested in vignette <a href="articles/aifeducation.html">01
+Get started</a> you may start a new session like this:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">aifeducation</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#if you use a machine with windows</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span>condaenv <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#if you use a machine with mac or linux</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span>virtualenv<span class="op">=</span> <span class="st">"aifedcuation"</span><span class="op">)</span></span></code></pre></div>
+<p>Now is a good time to configure tensorflow, since some configurations
+can only be done <strong>before</strong> tensorflow is used the first
+time.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#if you would like to use only cpus</span></span>
+<span><span class="fu"><a href="../reference/set_config_cpu_only.html">set_config_cpu_only</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#if you have a graphic device with low memory</span></span>
+<span><span class="fu"><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#if you would like to reduce the tensorflow output to errors</span></span>
+<span><span class="fu"><a href="../reference/set_config_os_environ_logger.html">set_config_os_environ_logger</a></span><span class="op">(</span>level <span class="op">=</span> <span class="st">"ERROR"</span><span class="op">)</span></span></code></pre></div>
+<p>Now everything is ready to start the preparation tasks.</p>
+</div>
+<div class="section level2">
+<h2 id="preparation-tasks">3 Preparation Tasks<a class="anchor" aria-label="anchor" href="#preparation-tasks"></a>
 </h2>
 <div class="section level3">
-<h3 id="example-data-for-this-vignette">2.1 Example Data for this Vignette<a class="anchor" aria-label="anchor" href="#example-data-for-this-vignette"></a>
+<h3 id="example-data-for-this-vignette">3.1 Example Data for this Vignette<a class="anchor" aria-label="anchor" href="#example-data-for-this-vignette"></a>
 </h3>
-<p>To illustrate the steps in this vignette we cannot use data from
-educational settings since these data is in general protected by privacy
+<p>To illustrate the steps in this vignette, we cannot use data from
+educational settings since these data is generally protected by privacy
 policies. Therefore, we use the data set
 <code>data_corpus_moviereviews</code> from the package
-quanteda.textmodels to illustrate the usage of the package. This
+quanteda.textmodels to illustrate the usage of this package. This
 quanteda.textmodels is automatically installed when you install
 <em>aifeducation</em>.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  id<span class="op">=</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="fu">quanteda.textmodels</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/quanteda.textmodels/man/data_corpus_moviereviews.html" class="external-link">data_corpus_moviereviews</a></span><span class="op">)</span><span class="op">$</span><span class="va">id2</span>,</span>
 <span>  label<span class="op">=</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="fu">quanteda.textmodels</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/quanteda.textmodels/man/data_corpus_moviereviews.html" class="external-link">data_corpus_moviereviews</a></span><span class="op">)</span><span class="op">$</span><span class="va">sentiment</span><span class="op">)</span></span>
@@ -279,22 +320,22 @@ quanteda.textmodels is automatically installed when you install
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  neg  pos </span></span>
 <span><span class="co">#&gt; 1000 1000</span></span></code></pre></div>
-<p>We now have a data set with three columns. The first contains the id
-of the movie review, the second contains if the movie was rated positive
-or negative, and the third column contains the raw texts. As you can see
-the data is balanced. About 1000 reviews imply a positive rating of a
-movie and about 1000 imply a negative rating.</p>
-<p>For this tutorial we modify this data set by setting about the half
-of the negative and positive reviews to <code>NA</code> indicating that
+<p>We now have a data set with three columns. The first contains the ID
+of the movie review, the second contains the rating of the movie
+(positive or negative), and the third column contains the raw texts. As
+you can see, the data is balanced. About 1,000 reviews imply a positive
+rating of a movie and about 1,000 imply a negative rating.</p>
+<p>For this tutorial, we modify this data set by setting about half of
+the negative and positive reviews to <code>NA</code>, indicating that
 these reviews are not labeled.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span>,<span class="fl">1001</span><span class="op">:</span><span class="fl">1500</span><span class="op">)</span><span class="op">]</span><span class="op">=</span><span class="cn">NA</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  neg  pos NA's </span></span>
 <span><span class="co">#&gt;  500  500 1000</span></span></code></pre></div>
 <p>Furthermore, we will bring some imbalance by setting 250 positive
 reviews to <code>NA</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fl">1501</span><span class="op">:</span><span class="fl">1750</span><span class="op">]</span><span class="op">=</span><span class="cn">NA</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  neg  pos NA's </span></span>
@@ -303,10 +344,10 @@ reviews to <code>NA</code>.</p>
 objects and functions in <em>aifeducation</em>.</p>
 </div>
 <div class="section level3">
-<h3 id="topic-modeling-and-globalvectorclusters">2.2 Topic Modeling and GlobalVectorClusters<a class="anchor" aria-label="anchor" href="#topic-modeling-and-globalvectorclusters"></a>
+<h3 id="topic-modeling-and-globalvectorclusters">3.2 Topic Modeling and GlobalVectorClusters<a class="anchor" aria-label="anchor" href="#topic-modeling-and-globalvectorclusters"></a>
 </h3>
 <p>If you would like to create a new text embedding model with Topic
-Modeling or GlobalVectorClusters you first have to create a draft of a
+Modeling or GlobalVectorClusters, you first have to create a draft of a
 vocabulary. You can do this by calling the function
 <code><a href="../reference/bow_pp_create_vocab_draft.html">bow_pp_create_vocab_draft()</a></code>. The main input of this
 function is a vector of texts. The function’s aims are</p>
@@ -315,12 +356,13 @@ function is a vector of texts. The function’s aims are</p>
 <li>to reduce the tokens to tokens that carry semantic meaning,</li>
 <li>to provide the lemma of every token.</li>
 </ul>
-<p>Since Topic Modeling depends on a bag-of-word approach the reason for
-this preprocess step is to reduce the tokens to tokens that really carry
-semantic meaning. In general these are tokens of words that are either
-nouns, verbs or adjectives (Papilloud &amp; Hinneburg 2018, p. 32). With
-our example data an application of that function could be:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>Since Topic Modeling depends on a bag-of-word approach, the reason
+for this pre-process step is to reduce the tokens to tokens that really
+carry semantic meaning. In general, these are tokens of words that are
+either nouns, verbs or adjectives (Papilloud &amp; Hinneburg 2018,
+p. 32). With our example data, an application of that function could
+be:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vocab_draft</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/bow_pp_create_vocab_draft.html">bow_pp_create_vocab_draft</a></span><span class="op">(</span></span>
 <span>  path_language_model<span class="op">=</span><span class="st">"language_model/english-gum-ud-2.5-191206.udpipe"</span>,</span>
 <span>  data<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
@@ -328,7 +370,7 @@ our example data an application of that function could be:</p>
 <span>  label_language_model<span class="op">=</span><span class="st">"english-gum-ud-2.5-191206"</span>,</span>
 <span>  language<span class="op">=</span><span class="st">"english"</span>,</span>
 <span>  trace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>As you can see there is an additional parameter
+<p>As you can see, there is an additional parameter:
 <code>path_language_model</code>. Here you must insert the path to an
 udpipe pre-trained language model since this function uses the
 <em>udpipe</em> package for part-of-speech tagging and lemmataziation. A
@@ -337,15 +379,15 @@ here [<a href="https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3131" 
 Just download the relevant model to your machine and provide the path to
 the model.</p>
 <p>With the parameter <code>upos</code> you can select which tokens
-should be selected. In this example only tokens that represent a noun,
+should be selected. In this example, only tokens that represent a noun,
 an adjective or a verb will remain after the analysis. A list of
 possible tags can be found here: [<a href="https://universaldependencies.org/u/pos/index.html" class="external-link uri">https://universaldependencies.org/u/pos/index.html</a>].</p>
 <p>Please do not forget do provide a label for the udpipe model you use
-and please also provide the language your are analyzing. This
-information is important since this will be transferred to the text
-embedding model. Other researchers/users will need this information in
-order to estimate if this model could help for their own work.</p>
-<p>In the next step we can use our draft of a vocabulary to create a
+and please also provide the language you are analyzing. This information
+is important since this will be transferred to the text embedding model.
+Other researchers/users will need this information to decide if this
+model could help with their own work.</p>
+<p>In the next step, we can use our draft of a vocabulary to create a
 basic text representation with the function
 <code><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep()</a></code>. This function takes raw
 texts and the draft of a vocabulary as main input. The function aims</p>
@@ -354,13 +396,13 @@ texts and the draft of a vocabulary as main input. The function aims</p>
 <li>to clean the data (e.g., removing punctuation, numbers),</li>
 <li>to lower case all tokens if requested,</li>
 <li>to remove tokens with a specific minimal frequency,</li>
-<li>to remove tokens that occur in to few or to many documents</li>
+<li>to remove tokens that occur in too few or too many documents</li>
 <li>to create a document-feature-matrix (dfm),</li>
-<li>to create a feature co-occurrence matrix (fcm).</li>
+<li>to create a feature-co-occurrence-matrix (fcm).</li>
 </ul>
-<p>Applied to the example the call of the function could look like
+<p>Applied to the example, the call of the function could look like
 this:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">basic_text_rep</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
 <span>  vocab_draft <span class="op">=</span> <span class="va">vocab_draft</span>,</span>
@@ -383,99 +425,102 @@ this:</p>
 <p><code>data</code> takes the raw texts while <code>vocab_draft</code>
 takes the draft of a vocabulary we created in the first step.</p>
 <p>The main goal is to create a document-feature-matrix(dfm) and a
-feature co-occurrence matrix (fcm). The dfm is a matrix that reports the
-texts in the rows and the number of tokens in the columns. This matrix
-is later used to create a text embedding model based on Topic Modeling.
-The dfm is reduced to tokens that correspond to the part-of-speech tags
-of the vocabulary draft. Punctuation, symbols, numbers etc. are removed
-from this matrix if you set the corresponding parameter to
-<code>TRUE</code>. If you set <code>use_lemmata = TRUE</code> you can
-reduce the dimensionality of this matrix further by using the lemmata
-instead of the tokens (Papilloud &amp; Hinneburg 2018, p.33). If you set
-<code>to_lower = TRUE</code> all tokens are transformed to lower case.
-At the end you get an matrix that tries to represent the semantic
-meaning of the text with a minimum of tokens possible.</p>
-<p>The same applies for the fcm. Here the tokens/features are reduced in
-the same way. However, before the features are reduced the tokens
+feature-co- occurrence-matrix (fcm). The dfm is a matrix that reports
+the texts in the rows and the number of tokens in the columns. This
+matrix is later used to create a text embedding model based on topic
+modeling. The dfm is reduced to tokens that correspond to the
+part-of-speech tags of the vocabulary draft. Punctuation, symbols,
+numbers etc. are removed from this matrix if you set the corresponding
+parameter to <code>TRUE</code>. If you set
+<code>use_lemmata = TRUE</code> you can reduce the dimensionality of
+this matrix further by using the lemmas instead of the tokens (Papilloud
+&amp; Hinneburg 2018, p.33). If you set <code>to_lower = TRUE</code> all
+tokens are transformed to lower case. At the end you get a matrix that
+tries to represent the semantic meaning of the text with the smallest
+possible number of tokens.</p>
+<p>The same applies for the fcm. Here, the tokens/features are reduced
+in the same way. However, before the features are reduced, the token’s
 co-occurrence is calculated. For this aim a window is used and shifted
-across the text counting the tokens left and right from a token under
+across the text, counting the tokens left and right from the token under
 investigation. The size of this window can be determined with
 <code>window</code>. With <code>weights</code> you can provide weights
-for counting. For example that tokens which are far away from the token
-under investigation count less as tokens that are near to the token
-under investigation. The fcm is later used for creating a text embedding
+for counting. For example, the tokens which are far away from the token
+under investigation count less than tokens that are closer to the token
+under investigation. The fcm is later used to create a text embedding
 model based on GlobalVectorClusters.</p>
-<p>As you may notices the dfm counts only the words in a text. Thus,
+<p>As you may notice, the dfm only counts the words in a text. Thus,
 their position in the text or within a sentence does not matter. If you
-further lower case tokens or use lemmata more syntactic information is
+further lower case tokens or use lemmas, more syntactic information is
 lost for the advantage that the dfm has a lower dimensionality while
-losing only few semantic meaning. In contrast, the fcm is a matrix that
-describes how often different tokens occur together. Thus, fcm recovers
-part of the position of words in a sentence and in a text.</p>
+losing only little semantic meaning. In contrast, the fcm is a matrix
+that describes how often different tokens occur together. Thus, an fcm
+recovers part of the position of words in a sentence and in a text.</p>
 <p>Now everything is ready to create a new text embedding model based on
 Topic Modeling or GlobalVectorClusters. Before we show you how to create
-the new model we will have a look on the preparation of a new
+the new model, we will have a look on the preparation of a new
 transformer.</p>
 </div>
 <div class="section level3">
-<h3 id="creating-a-new-transformer">2.3 Creating a New Transformer<a class="anchor" aria-label="anchor" href="#creating-a-new-transformer"></a>
+<h3 id="creating-a-new-transformer">3.3 Creating a New Transformer<a class="anchor" aria-label="anchor" href="#creating-a-new-transformer"></a>
 </h3>
-<p>In general it is recommended to use a pre-trained model since the
-creation of a new transformers requires a large data set of texts and is
-computational intensive. In this vignette we will illustrated the
-process with a BERT model. However, for many other transformers the
+<p>In general, it is recommended to use a pre-trained model since the
+creation of a new transformer requires a large data set of texts and is
+computationally intensive. In this vignette we will illustrate the
+process with a BERT model. However, for many other transformers, the
 process is the same.</p>
 <p>The creation of a new transformer requires at least two steps. First
 you must decide about the architecture of your transformer. This
-includes to create a vocabulary. In <em>aifedcuation</em> you can do
-this by calling the function <code><a href="../reference/create_bert_model.html">create_bert_model()</a></code>. For our
-example this could look like this:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p>For this function to work you must provide a path to a directory
+includes the creation of a set of vocabulary. In <em>aifedcuation</em>
+you can do this by calling the function
+<code><a href="../reference/create_bert_model.html">create_bert_model()</a></code>. For our example this could look like
+this:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved. Furthermore, you must
 provide raw texts. These texts are <strong>not</strong> used for
 training the transformer but for training the vocabulary. The maximum
 size of the vocabulary is determined by <code>vocab_size</code>. Please
-do not provide a size about 50000 to 60000 since this kind of vocabulary
-works different to the approachs described in section 2.2. Modern
-tokenizer such as <em>WordPiece</em> (Wu et al. 2016) use algorithms
-that splits tokens into smaller elements allowing them to build a huge
-number of words with a small number of elements. Thus, even with only
-small number of about 30000 tokens they are able to represent a very
-large number of words. As a consequence, these kind of vocabulary are
-many times smaller as the vocabularies built in section 2.2.</p>
+do not provide a size above 50,000 to 60,000 since this kind of
+vocabulary works differently than the approaches described in section
+2.2. Modern tokenizers such as <em>WordPiece</em> (Wu et al. 2016) use
+algorithms that splits tokens into smaller elements, allowing them to
+build a huge number of words with a small number of elements. Thus, even
+with only small number of about 30,000 tokens, they are able to
+represent a very large number of words. As a consequence, these kinds of
+vocabularies are many times smaller than the vocabularies built in
+section 2.2.</p>
 <p>The other parameters allow you to customize your BERT model. For
 example, you could increase the number of hidden layers from 12 to 24 or
-reduce the hidden size from 768 to 256 allowing you to built and to test
-larger or smaller transformers.</p>
+reduce the hidden size from 768 to 256, allowing you to built and to
+test larger or smaller transformers.</p>
 <p>Please note that with <code>max_position_embeddings</code> you
 determine how many tokens your transformer can process. If your text has
-more tokens <em>after</em> tokenaization these tokens are ignored.
-However, if you would like to analyze long documents please avoid to
-increase this number significantly because the computational times does
-not increase linear but quadratic (Beltagy, Peters &amp; Cohan 2020).
-For long documents you can use another architecture of BERT
+more tokens <em>after</em> tokenization, these tokens are ignored.
+However, if you would like to analyze long documents, please avoid to
+increase this number too significantly because the computational time
+does not increase in a linear way but quadratic (Beltagy, Peters &amp;
+Cohan 2020). For long documents you can use another architecture of BERT
 (e.g. Longformer from Beltagy, Peters &amp; Cohan 2020) or split a long
-document into several chunks which are seuential used for classification
-(e.g., Pappagari et al. 2019). Using chunks is supported with
-<em>aifedcuation</em>.</p>
-<p>After calling the function you will find your new model in your model
-directory. The next step is to train your model by calling
+document into several chunks which are used sequentially for
+classification (e.g., Pappagari et al. 2019). Using chunks is supported
+by <em>aifedcuation</em>.</p>
+<p>After calling the function, you will find your new model in your
+model directory. The next step is to train your model by calling
 <code><a href="../reference/train_tune_bert_model.html">train_tune_bert_model()</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/train_tune_bert_model.html">train_tune_bert_model</a></span><span class="op">(</span></span>
 <span>  output_dir <span class="op">=</span> <span class="st">"my_own_transformer_trained"</span>,</span>
 <span>  bert_model_dir_path <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
@@ -490,67 +535,66 @@ directory. The next step is to train your model by calling
 <span>  n_workers<span class="op">=</span><span class="fl">1</span>,</span>
 <span>  multi_process<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>  trace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>Here, it is important that you provide the path to the directory
-where your new transformer is stored. Furthermore, it is important that
-you provide <em>another</em> directory where your trained transformer
-should be saved to avoid reading and writing collisions.</p>
-<p>Now the provides raw data is used for training your model by using
-Masked Language Modeling. First, you can set the length of token
-sequences with <code>chunk_size</code>. With <code>whole_word</code> you
-can chose between masking single tokens or masking complete words
-(Please remember that modern tokenizers split words into several tokens.
-Thus, tokens and word are not forced to match each other directly). With
+<p>Here it is important that you provide the path to the directory where
+your new transformer is stored. Furthermore, it is important that you
+provide <em>another</em> directory where your trained transformer should
+be saved to avoid reading and writing collisions.</p>
+<p>Now the provided raw data is used to train your model by using Masked
+Language Modeling. First, you can set the length of token sequences with
+<code>chunk_size</code>. With <code>whole_word</code> you can choose
+between masking single tokens or masking complete words (Please remember
+that modern tokenizers split words into several tokens. Thus, tokens and
+words are not forced to match each other directly). With
 <code>p_mask</code> you can determine how many tokens should be masked.
-Finally, with <code>val_size</code> you set how many chunks should be
+Finally, with <code>val_size</code>, you set how many chunks should be
 used for the validation sample.</p>
-<p>If you work on a machine and your graphic device has only a small
-memory please reduce the batch size significantly. We also recommend to
+<p>If you work on a machine and your graphic device only has small
+memory, please reduce the batch size significantly. We also recommend to
 change the usage of memory with
 <code><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code>.</p>
-<p>After the training finishes you can find the transformer ready to use
-in your output_directory. Now you are able to create a text embedding
-model.</p>
+<p>After the training finishes, you can find the transformer ready to
+use in your output_directory. Now you are able to create a text
+embedding model.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="text-embedding">3 Text Embedding<a class="anchor" aria-label="anchor" href="#text-embedding"></a>
+<h2 id="text-embedding">4 Text Embedding<a class="anchor" aria-label="anchor" href="#text-embedding"></a>
 </h2>
 <div class="section level3">
-<h3 id="introduction">3.1 Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h3 id="introduction">4.1 Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h3>
-<p>In <em>aifedcuation</em> a text embedding model is stored as an
-object of class <code>TextEmbeddingModel</code>. This object contains
-all relevant information for transforming raw texts into a numeric
-representation that can be used for machine learning.</p>
-<p>In <em>aifedcuation</em> the transformation of raw texts into numbers
-is a separate step from downstream task such as classification. The
-reason is to reduce computational time on machines with low performance.
-By separating text embedding from other tasks the text embedding has to
+<p>In <em>aifedcuation</em>, a text embedding model is stored as an
+object of the class <code>TextEmbeddingModel</code>. This object
+contains all relevant information for transforming raw texts into a
+numeric representation that can be used for machine learning.</p>
+<p>In <em>aifedcuation</em>, the transformation of raw texts into
+numbers is a separate step from downstream tasks such as classification.
+This is to reduce computational time on machines with low performance.
+By separating text embedding from other tasks, the text embedding has to
 be calculated only once and can be used for different tasks at the same
 time. Another advantage is that the training of the downstream tasks
 involves only the downstream tasks an not the parameters of the
-embedding model making training less time consuming and decreases the
-computational insensitivity. Finally, this approach allows the analysis
-of long documents by applying the same algorithm on different parts of a
-long text.</p>
-<p>The text embedding model provides a unified interface. That is, after
-creating the model with different methods the handling of the model is
-always the same.</p>
+embedding model, making training less time-consuming, thus decreasing
+computational intensity. Finally, this approach allows the analysis of
+long documents by applying the same algorithm to different parts.</p>
+<p>The text embedding model provides a unified interface: After creating
+the model with different methods, the handling of the model is always
+the same.</p>
 <p>In the following we will show you how to use this object. We start
 with Topic Modeling.</p>
 </div>
 <div class="section level3">
-<h3 id="creating-text-embedding-models">3.2 Creating Text Embedding Models<a class="anchor" aria-label="anchor" href="#creating-text-embedding-models"></a>
+<h3 id="creating-text-embedding-models">4.2 Creating Text Embedding Models<a class="anchor" aria-label="anchor" href="#creating-text-embedding-models"></a>
 </h3>
 <div class="section level4">
-<h4 id="topic-modeling">3.2.1 Topic Modeling<a class="anchor" aria-label="anchor" href="#topic-modeling"></a>
+<h4 id="topic-modeling">4.2.1 Topic Modeling<a class="anchor" aria-label="anchor" href="#topic-modeling"></a>
 </h4>
-<p>For creating a new text embedding model based on Topic Modeling you
+<p>For creating a new text embedding model based on Topic Modeling, you
 only need a basic text representation generated with the function
 <code><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep()</a></code> (see section 2.2). Now you
 can create a new instance of a text embedding model by calling
 <code>TextEmbeddingModel$new()</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">topic_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  model_name<span class="op">=</span><span class="st">"topic_model_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via Topic Modeling"</span>,</span>
@@ -567,29 +611,29 @@ can create a new instance of a text embedding model by calling
 (<code>model_name</code>). This should be a unique but short name
 without any spaces. With <code>model_label</code> you can provide a
 label for your model with more freedom. It is important that you provide
-a version for your model for the case that you will create an improved
-version in the future. With <code>model_language</code> you provide
-users the information for which language your model is designed. This is
-very important if you plan to share your model to a wider community.</p>
+a version for your model in case you want to create an improved version
+in the future. With <code>model_language</code> you provide users the
+information for which language your model is designed. This is very
+important if you plan to share your model to a wider community.</p>
 <p>With <code>method</code> you determine which approach should be used
-for your model. If you would like to use Topic Modeling you have to set
+for your model. If you would like to use Topic Modeling, you have to set
 <code>method = "lda"</code>. the number of topics is set via
 <code>bow_n_dim</code>. In this example we would like to create a topic
-model with 12 topics. The number of topics also determines the
-dimensionality for our text embedding. That is, every text will be
-characterized by these 12 topics.</p>
+model with twelve topics. The number of topics also determines the
+dimensionality for our text embedding. Consequently, every text will be
+characterized by these twelve topics.</p>
 <p>Please do not forget to pass your basic text representation to
 <code>bow_basic_text_rep</code>.</p>
-<p>After the model is estimated it is stored as
+<p>After the model is estimated, it is stored as
 <code>topic_modeling</code> in our example.</p>
 </div>
 <div class="section level4">
-<h4 id="globealvectorclusters">3.2.2 GlobealVectorClusters<a class="anchor" aria-label="anchor" href="#globealvectorclusters"></a>
+<h4 id="globealvectorclusters">4.2.2 GlobealVectorClusters<a class="anchor" aria-label="anchor" href="#globealvectorclusters"></a>
 </h4>
 <p>The creation of a text embedding model based on GlobalVectorClusters
 is very similar to a model based on Topic Modeling. There are only two
 differences.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">global_vector_clusters_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  model_name<span class="op">=</span><span class="st">"global_vector_clusters_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via Clusters of GlobalVectors"</span>,</span>
@@ -606,27 +650,27 @@ differences.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>First, you request a model based on GlobalVectorCluster by setting
 <code>method="glove_cluster"</code>. Second, you have to determine the
-dimensionalty of the global vectors with <code>bow_n_dim</code> and the
+dimensionality of the global vectors with <code>bow_n_dim</code> and the
 number of clusters by <code>bow_n_cluster</code>. When creating a new
-text embedding model the global vector of each token is calculated based
-on the feature-co-occurrence matrix (fcm) you provide with
-<code>basic_text_rep</code>. That is, for very token a vector is
-calculated with the length of <code>bow_n_dim</code>. Since these
-vectors are <strong>word</strong> embeddings and not
-<strong>text</strong> embeddings an additional step is necessary to
-create text embedding. In <em>aifedcuation</em> the word embeddings are
-used to group the word into clusters. The number of cluster is set with
-<code>bow_n_cluster</code>. Now, the text embedding results by counting
-the tokens of every cluster for every text.</p>
+text embedding model, the global vector of each token is calculated
+based on the feature-co-occurrence-matrix (fcm) you provide with
+<code>basic_text_rep</code>. For very token, a vector is calculated with
+the length of <code>bow_n_dim</code>. Since these vectors are
+<strong>word</strong> embeddings and not <strong>text</strong>
+embeddings, an additional step is necessary to create text embeddings.
+In <em>aifedcuation</em> the word embeddings are used to group the words
+into clusters. The number of clusters is set with
+<code>bow_n_cluster</code>. Now, the text embedding is produced by
+counting the tokens of every cluster for every text.</p>
 <p>The final model is stored as
 <code>global_vector_clusters_modeling</code>.</p>
 </div>
 <div class="section level4">
-<h4 id="transformers">3.2.3 Transformers<a class="anchor" aria-label="anchor" href="#transformers"></a>
+<h4 id="transformers">4.2.3 Transformers<a class="anchor" aria-label="anchor" href="#transformers"></a>
 </h4>
 <p>Using a transformer for creating a text embedding model is similar to
-the other both approaches.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+the other two approaches.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  model_name<span class="op">=</span><span class="st">"bert_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via BERT"</span>,</span>
@@ -637,59 +681,57 @@ the other both approaches.</p>
 <span>  chunks<span class="op">=</span><span class="fl">4</span>,</span>
 <span>  overlap<span class="op">=</span><span class="fl">30</span>,</span>
 <span>  aggregation<span class="op">=</span><span class="st">"last"</span>,</span>
-<span>  use_cls_token<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"my_own_transformer_trained"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p>To request a model based on a transformer you must set
 <code>method</code> accordingly. Since we use a BERT model in our
-example we have to set <code>method = "bert"</code>. Next, you have to
+example, we have to set <code>method = "bert"</code>. Next, you have to
 provide the directory where your model is stored. In this example this
 would be <code>bert_model_dir_path="my_own_transformer_trained</code>.
-Of course you cane use any other pre-trained model from Huggingface
-which addresses your needs.</p>
-<p>Using a BERT model for text embedding is no problem since your text
-do not provide more tokens as the transformer can process. This maximal
-value is set in the config of the transformer (see section 2.3). If the
-text produces more tokens the last tokens are ignored. In some cases you
-may want to analyze long texts. In these situations reducing the text to
-the first tokens (e.g. only the first 512 tokens) could result in a
-problematic lose of information. To deal with these situations you can
-config a text embedding model in <em>aifecuation</em> to split long
-texts into several chunks which are processed by the transformer. The
-maximal number of chunks is set with <code>chunks</code>. In our example
-above, the text embedding model would split a text consisting of 1024
-tokens into 2 chunk with every chunk consisting of 512 tokens. For every
-chunk a text embedding is calculated. As a results you receive a
-sequence of embeddings. The first embeddings characterizes the first
-part of the text and the second embedding characterizes the second part
-of the text (and so on). Thus, our example text embedding model is able
-to process texts with about 4*512=2048 tokens. This approach is inspired
-by the work by Pappagari et al. (2019).</p>
-<p>Since transformers are able to account for the context it may be
-useful to connect every chunk in order to bring the context into the
-calculations. This can be done with <code>overlap</code> determining how
-many tokens of the end of a prior chunk should be added to the next
-chunk.</p>
-<p>Finally, you have to decide if you would like the embedding of the
-classification token [CLS] as text embedding or the mean of all token
-embeddings as text embedding (<code>use_cls_token</code>). You can
-further decide from which hidden layer or layers the embeddings should
-be drawn (<code>aggregation="last"</code>). In their initial work Devlin
-et al. (2019) used the hidden states of different layers for
-classification.</p>
-<p>After deciding about the configuration you can use your model.</p>
+Of course you can use any other pre-trained model from Huggingface which
+addresses your needs.</p>
+<p>Using a BERT model for text embedding is not a problem since your
+text does not provide more tokens than the transformer can process. This
+maximal value is set in the configuration of the transformer (see
+section 2.3). If the text produces more tokens the last tokens are
+ignored. In some instances you might want to analyze long texts. In
+these situations, reducing the text to the first tokens (e.g. only the
+first 512 tokens) could result in a problematic loss of information. To
+deal with these situations you can configure a text embedding model in
+<em>aifecuation</em> to split long texts into several chunks which are
+processed by the transformer. The maximal number of chunks is set with
+<code>chunks</code>. In our example above, the text embedding model
+would split a text consisting of 1024 tokens into two chunks with every
+chunk consisting of 512 tokens. For every chunk a text embedding is
+calculated. As a result, you receive a sequence of embeddings. The first
+embeddings characterizes the first part of the text and the second
+embedding characterizes the second part of the text (and so on). Thus,
+our example text embedding model is able to process texts with about
+4*512=2048 tokens. This approach is inspired by the work by Pappagari et
+al. (2019).</p>
+<p>Since transformers are able to account for the context, it may be
+useful to interconnect every chunk to bring context into the
+calculations. This can be done with <code>overlap</code> to determine
+how many tokens of the end of a prior chunk should be added to the
+next.</p>
+<p>Finally, you have to decide from which hidden layer or layers the
+embeddings should be drawn (<code>aggregation="last"</code>). In their
+initial work, Devlin et al. (2019) used the hidden states of different
+layers for classification.</p>
+<p>After deciding about the configuration, you can use your model.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="transforming-raw-texts-into-embedded-texts">3.3 Transforming Raw Texts into Embedded Texts<a class="anchor" aria-label="anchor" href="#transforming-raw-texts-into-embedded-texts"></a>
+<h3 id="transforming-raw-texts-into-embedded-texts">4.3 Transforming Raw Texts into Embedded Texts<a class="anchor" aria-label="anchor" href="#transforming-raw-texts-into-embedded-texts"></a>
 </h3>
-<p>Although the mechanics within a text embedding model are different
+<p>Although the mechanics within a text embedding model are different,
 the usage is always the same. To transform raw text into a numeric
-representation you only have to use the embed method of your model.
-Therefore, you must provide the raw texts to <code>raw_text</code>. In
-addition, it is necessary that you provide a character vector containing
-the id of every text. The ids must be unique.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+representation you only have to use the <code>embed</code> method of
+your model. To do this, you must provide the raw texts to
+<code>raw_text</code>. In addition, it is necessary that you provide a
+character vector containing the ID of every text. The IDs must be
+unique.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">topic_embeddings</span><span class="op">&lt;-</span><span class="va">topic_modeling</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
 <span>  raw_text<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
 <span>  doc_id<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span>, </span>
@@ -706,81 +748,80 @@ the id of every text. The ids must be unique.</p>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>The method <code>embed</code>creates an object of class
 <code>EmbeddedText</code>. This is just a data.frame consisting the
-embedding of every text. Depending on the method the data.frame has a
+embedding of every text. Depending on the method, the data.frame has a
 different meaning:</p>
 <ul>
 <li>
-<strong>Topic Modeling:</strong> In the case of Topic Modeling the
-rows represent the texts and the columns represent the percentage of
-every topic within a text.</li>
+<strong>Topic Modeling:</strong> Regarding Topic Modeling, the rows
+represent the texts and the columns represent the percentage of every
+topic within a text.</li>
 <li>
-<strong>GlobalVectorClusters:</strong> In this case the rows
-represent the texts and the columns represent the absolute frequencies
-of tokens belonging to a semantic cluster.</li>
+<strong>GlobalVectorClusters:</strong> Here, the rows represent the
+texts and the columns represent the absolute frequencies of tokens
+belonging to a semantic cluster.</li>
 <li>
-<strong>Transformer - Bert:</strong> In the case of BERT the rows
-represent the texts and the columns represents the contextualized text
-embedding. That is, Bert’s understanding of the relevant text
-chunk.</li>
+<strong>Transformer - Bert:</strong> With BERT, the rows represent
+the texts and the columns represents the contextualized text embedding
+or BERT’s understanding of the relevant text chunk.</li>
 </ul>
-<p>Please not that in the case of Bert models the embeddings of every
-chunks are concatenated.</p>
+<p>Please note that in the case of BERT models, the embeddings of every
+chunks are interlinked.</p>
 <p>With the embedded texts you now have the input to train a new
 classifier or to apply a pre-trained classifier for predicting
 categories/classes. In the next chapter we will show you how to use
-these classifiers. But before we start we will show you how to save and
+these classifiers. But before we start, we will show you how to save and
 load your model.</p>
 </div>
 <div class="section level3">
-<h3 id="saving-and-loading-text-embedding-models">3.4 Saving and Loading Text Embedding Models<a class="anchor" aria-label="anchor" href="#saving-and-loading-text-embedding-models"></a>
+<h3 id="saving-and-loading-text-embedding-models">4.4 Saving and Loading Text Embedding Models<a class="anchor" aria-label="anchor" href="#saving-and-loading-text-embedding-models"></a>
 </h3>
 <p>Saving a created text embedding model is very easy. However, the
 saving and loading process is different for models based on Topic
-Modeling and GlobalVectorClusters on the hand and models based on
+Modeling and GlobalVectorClusters on the one hand and models based on
 transformers on the other hand.</p>
-<p>For models using Topic Modeling or GlobalVectorClusters you can call
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> to write your model to disk.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>For models using Topic Modeling or GlobalVectorClusters, you can call
+<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> to write your model to the disk.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">topic_modeling</span>, </span>
 <span>     file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">global_vector_clusters_modeling</span>, </span>
 <span>     file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If you want to load your model just call <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> and you
+<p>If you want to load your model, just call <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> and you
 can continue using your model.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If your text embedding model is based on a transformer saving and
-loading requires some other steps. In this case your text embedding
-models serves as an interface to <em>R</em>. The original model is saved
-in a model directory. Thus, you have to save your interface to that
+<p>If your text embedding model is based on a transformer, saving and
+loading requires some other steps. In this case, your text embedding
+models serve as an interface to <em>R</em>. The original model is saved
+to a model directory. Thus, you have to save your interface to that very
 model directory.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">bert_modeling</span>,</span>
 <span>     file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
 <p>Loading your model requires two steps. First, load the interface.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
 <p>Now the text embedding model is available in <em>R.</em>. Next you
 must re-initialize the transformer by calling the corresponding method
 <code>load_model</code> of your model.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span>model_dir<span class="op">=</span><span class="st">"my_own_transformer_trained"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you can use your text embedding model.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="using-ai-for-classification">4 Using AI for Classification<a class="anchor" aria-label="anchor" href="#using-ai-for-classification"></a>
+<h2 id="using-ai-for-classification">5 Using AI for Classification<a class="anchor" aria-label="anchor" href="#using-ai-for-classification"></a>
 </h2>
 <div class="section level3">
-<h3 id="creating-a-new-classifier">4.1 Creating a New Classifier<a class="anchor" aria-label="anchor" href="#creating-a-new-classifier"></a>
+<h3 id="creating-a-new-classifier">5.1 Creating a New Classifier<a class="anchor" aria-label="anchor" href="#creating-a-new-classifier"></a>
 </h3>
-<p>In <em>aifedcuation</em> classifiers are based on neural nets and
-stored in objects of class
+<p>In <em>aifedcuation</em>, classifiers are based on neural nets and
+stored in objects of the class
 <code>TextEmbeddingClassifierNeuralNet</code>. You can create a new
 classifier by calling
 <code>TextEmbeddingClassifierNeuralNet$new()</code>.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_targets</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
@@ -789,14 +830,14 @@ classifier by calling
 <span>  label<span class="op">=</span><span class="st">"Classifier for Estimating a Postive or Negative Rating of Movie Reviews"</span>,</span>
 <span>  text_embeddings<span class="op">=</span><span class="va">bert_embeddings</span>,</span>
 <span>  targets<span class="op">=</span><span class="va">example_targets</span>,</span>
-<span>  hidden<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span>,<span class="fl">64</span><span class="op">)</span>,</span>
-<span>  rec<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span>,<span class="fl">128</span><span class="op">)</span>,</span>
-<span>  self_attention_heads <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  dropout<span class="op">=</span><span class="fl">0.2</span>,</span>
+<span>  hidden<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  rec<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">256</span><span class="op">)</span>,</span>
+<span>  self_attention_heads <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  dropout<span class="op">=</span><span class="fl">0.4</span>,</span>
 <span>  recurrent_dropout<span class="op">=</span><span class="fl">0.4</span>,</span>
-<span>  l2_regularizer<span class="op">=</span><span class="fl">0.001</span>,</span>
+<span>  l2_regularizer<span class="op">=</span><span class="fl">0.01</span>,</span>
 <span>  optimizer<span class="op">=</span><span class="st">"adam"</span>,</span>
-<span>  act_fct<span class="op">=</span><span class="st">"tanh"</span>,</span>
+<span>  act_fct<span class="op">=</span><span class="st">"gelu"</span>,</span>
 <span>  rec_act_fct<span class="op">=</span><span class="st">"tanh"</span><span class="op">)</span></span></code></pre></div>
 <p>Similar to the text embedding model you should provide a name
 (<code>name</code>) and a label (<code>label</code>) for your new
@@ -807,174 +848,237 @@ embedding produced by our BERT model.</p>
 <p><code>targets</code> takes the target data for the supervised
 learning. Please do not omit cases which have no category/class since
 they can be used with a special training technique we will show you
-later. It is very important that you provide the target data as factor.
+later. It is very important that you provide the target data as factors.
 Otherwise an error will occur. It is also important that you name your
 factor. That is, the entries of the factor mus have names that
-correspond to the ids of the corresponding texts. Without these names
-the method cannot match text embeddings as input data to the target
+correspond to the IDs of the corresponding texts. Without these names
+the method cannot match the input data (text embeddings) to the target
 data.</p>
 <p>With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.</p>
 <div class="figure">
-<img src="classif_fig_04.png" style="width:100.0%" alt=""><p class="caption">Figure 4: Overview of Possible Structure iof a
+<img src="classif_fig_04.png" style="width:100.0%" alt=""><p class="caption">Figure 4: Overview of Possible Structure of a
 Classifier</p>
 </div>
-<p><code>hidden</code> takes a vector of integers determining the number
-of layers and the number of neurons. In our example this are two layers.
-The first with 128 and the second with 64 neurons. <code>rec</code> also
-takes a vector of integers determining the number and size of the Gated
-Recurrent Unit. In this example we use two layers with 128 each.</p>
+<p><code>hidden</code> takes a vector of integers, determining the
+number of layers and the number of neurons. In our example, there are no
+dense layers. <code>rec</code> also takes a vector of integers
+determining the number and size of the Gated Recurrent Unit (gru). In
+this example, we use one layer with 256 neurons.</p>
 <p>Since the classifiers in <em>aifeducation</em> use a standardized
 scheme for their creation, dense layers are used after the gru layers.
-If you want to omit gru layers or dense layers set the corresponding
+If you want to omit gru layers or dense layers, set the corresponding
 argument to <code>NULL</code>.</p>
-<p>If you use a text embedding model that processes more than 1 chunk we
-would like to recommend to use recurrent layers since they are able to
-use the sequential structure of your data. In all other cases you can
+<p>If you use a text embedding model that processes more than one chunk
+we would like to recommend to use recurrent layers since they are able
+to use the sequential structure of your data. In all other cases you can
 rely on dense layers only.</p>
-<p>If you use text embeddings it is a good idea to try self attention
-layer in order to take the context of all chunks into account. To add a
-self attention layer you must provide an integer greater 0 to
-<code>self_attention_heads</code>. This will add a self attention layer.
-Additionally a normalization layer and a recurrent layer are also added
-behind self attention to process the contextualized sequences.</p>
+<p>If you use text embeddings with more than one chunk, it is a good
+idea to try self-attention layering in order to take the context of all
+chunks into account. To add a self-attention layer you must provide an
+integer greater 0 to <code>self_attention_heads</code>. This will not
+only add a self-attention layer but a transformer encoder as described
+by Chollet, Kalinowski, and Allaire (2022, pp. 373).</p>
 <p>Masking, normalization, and the creation of the input layer as well
-as the output layer is done automatically.</p>
-<p>After you have created a new classifier you can begin training.</p>
+as the output layer are done automatically.</p>
+<p>After you have created a new classifier, you can begin training.</p>
 </div>
 <div class="section level3">
-<h3 id="training-a-classifier">4.2 Training a Classifier<a class="anchor" aria-label="anchor" href="#training-a-classifier"></a>
+<h3 id="training-a-classifier">5.2 Training a Classifier<a class="anchor" aria-label="anchor" href="#training-a-classifier"></a>
 </h3>
-<p>For starting the training of your classifier you have to call the
-<code>train</code> method. Similar for the creation of the classifier
-you must provide the text embedding to <code>data_embeddings</code> and
-the categories/classes as target data to <code>data_targets</code>.
-Please remember that <code>data_targets</code> expects a named factor
-where the names corresponds to the ids of the corresponding text
-embeddings. Text embeddings and target data that cannot be matched are
-ommited from training.</p>
-<p>For training a classifier it is necessary that you provide a path to
+<p>To start the training of your classifier, you have to call the
+<code>train</code> method. Similarly, for the creation of the
+classifier, you must provide the text embedding to
+<code>data_embeddings</code> and the categories/classes as target data
+to <code>data_targets</code>. Please remember that
+<code>data_targets</code> expects a <strong>named</strong> factor where
+the names correspond to the IDs of the corresponding text embeddings.
+Text embeddings and target data that cannot be matched are omitted from
+training.</p>
+<p>To train a classifier, it is necessary that you provide a path to
 <code>dir_checkpoint</code>. This directory stores the best set of
-weights during each training step. After training these weights are
+weights during each training epoch. After training, these weights are
 automatically used as final weights for the classifier.</p>
-<p>For performance estimation training splits the data into several
-chunky based on cross fold validation. The number of folds is set with
-<code>data_n_valid_samples</code>. In every case one fold is not used
-for training and serves as <em>test</em> sample. The remaining data is
-used for creating a <em>training</em> and a <em>validation</em> sample.
-All performance values saved in the trained classifier refer to the test
-sample. That is, this data has never been used during training and
-provides a more realistic estimation of classifier`s performance.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p>For performance estimation, training splits the data into several
+chunks based on cross-fold validation. The number of folds is set with
+<code>data_n_test_samples</code>. In every case, one fold is not used
+for training and serves as a <em>test</em> sample. The remaining data is
+used to create a <em>training</em> and a <em>validation</em> sample. All
+performance values saved in the trained classifier refer to the test
+sample. This data has never been used during training and provides a
+more realistic estimation of a classifier`s performance.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_targets</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
 <span><span class="va">classifier</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>   data_embeddings <span class="op">=</span> <span class="va">bert_embeddings</span>,</span>
 <span>   data_targets <span class="op">=</span> <span class="va">example_targets</span>,</span>
-<span>   data_n_valid_samples<span class="op">=</span><span class="fl">5</span>,</span>
+<span>   data_n_test_samples<span class="op">=</span><span class="fl">5</span>,</span>
 <span>   use_baseline<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>   bsl_val_size<span class="op">=</span><span class="fl">0.25</span>,</span>
+<span>   bsl_val_size<span class="op">=</span><span class="fl">0.33</span>,</span>
 <span>   use_bsc<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>   bsc_methods<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dbsmote"</span><span class="op">)</span>,</span>
 <span>   bsc_max_k<span class="op">=</span><span class="fl">10</span>,</span>
+<span>   bsc_val_size<span class="op">=</span><span class="fl">0.25</span>,</span>
 <span>   use_bpl<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>   bpl_max_steps<span class="op">=</span><span class="fl">4</span>,</span>
-<span>   bpl_inc_ratio<span class="op">=</span><span class="fl">0.75</span>, </span>
-<span>   bpl_anchor<span class="op">=</span><span class="fl">0.90</span>,</span>
-<span>   bpl_min<span class="op">=</span><span class="fl">0.75</span>,</span>
-<span>   bpl_valid_size<span class="op">=</span><span class="fl">0.33</span>,</span>
-<span>   bpl_model_reset<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>   epochs<span class="op">=</span><span class="fl">50</span>,</span>
-<span>   batch_size<span class="op">=</span><span class="fl">32</span>,</span>
-<span>   dir_checkpoint<span class="op">=</span><span class="st">"tmp/checkpoints_classifier"</span>,</span>
+<span>   bpl_max_steps<span class="op">=</span><span class="fl">5</span>,</span>
+<span>   bpl_epochs_per_step<span class="op">=</span><span class="fl">30</span>,</span>
+<span>   bpl_dynamic_inc<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>   bpl_balance<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>   bpl_max<span class="op">=</span><span class="fl">1.00</span>,</span>
+<span>   bpl_anchor<span class="op">=</span><span class="fl">1.00</span>,</span>
+<span>   bpl_min<span class="op">=</span><span class="fl">0.00</span>,</span>
+<span>   bpl_weight_inc<span class="op">=</span><span class="fl">0.00</span>,</span>
+<span>   bpl_weight_start<span class="op">=</span><span class="fl">1.00</span>,</span>
+<span>   bpl_model_reset<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>   epochs<span class="op">=</span><span class="fl">30</span>,</span>
+<span>   batch_size<span class="op">=</span><span class="fl">8</span>,</span>
 <span>   trace<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>   view_metrics<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>   keras_trace<span class="op">=</span><span class="fl">2</span>,</span>
-<span>   n_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<span>   keras_trace<span class="op">=</span><span class="fl">0</span>,</span>
+<span>   n_cores<span class="op">=</span><span class="fl">2</span>,</span>
+<span>   dir_checkpoint<span class="op">=</span><span class="st">"training/classifier"</span><span class="op">)</span></span></code></pre></div>
 <p>Since <em>aifedcuation</em> tries to address the special needs in
-educational and social science some special training steps are
-integrated in this method.</p>
+educational and social science, some special training steps are
+integrated into this method.</p>
 <ul>
 <li>
 <strong>Baseline:</strong> If you are interested in training your
-classifier without applying any additional statistical techniques you
-should set <code>use_baseline = TRUE</code>. In this case the classifier
-is trained with the provided data as it is. Cases with missing values in
-target data are omitted. Even if you would like to apply further
-statistical adjustments it makes sense to compute a baseline model for
-comparing the effect of the modified training process with an unmodified
-training. By using <code>bsl_val_size</code> you can determine how many
-data should be used as training data and how many data should be used as
-validation data.</li>
+classifier without applying any additional statistical techniques, you
+should set <code>use_baseline = TRUE</code>. In this case, the
+classifier is trained with the provided data as it is. Cases with
+missing values in target data are omitted. Even if you would like to
+apply further statistical adjustments, it makes sense to compute a
+baseline model for comparing the effect of the modified training process
+with unmodified training. By using <code>bsl_val_size</code> you can
+determine how much data should be used as training data and how much
+should be used as validation data.</li>
 <li>
 <strong>Balanced Synthetic Cases:</strong> In case of imbalanced
-data it is recommended to set <code>use_bsc=TRUE</code>. Now, before
-training a number of synthetic units is created via different
+data, it is recommended to set <code>use_bsc=TRUE</code>. Before
+training, a number of synthetic units is created via different
 techniques. Currently you can request <em>Basic Synthetic Minority
 Oversampling Technique</em>, <em>Density-Bases Synthetic Minority
 Oversampling Technique</em>, and <em>Adaptive Synthetic Sampling
 Approach for Imbalanced Learning</em>. The aim is to create new cases
-that fill the gap to the majority class. Multiclass problems are reduced
-to a two class problem (class under investigation vs. each other) for
-generating these units. You can even request several techniques at once.
-If the number of synthetic units and original minority units exceed the
-number of cases of the majority class a random sample is drawn. If the
-technique allows to set the number of neighbors during generation
-<code>k = bsc_max_k</code> is used.</li>
+that fill the gap to the majority class. Multi-class problems are
+reduced to a two class problem (class under investigation vs. each
+other) for generating these units. You can even request several
+techniques at once. If the number of synthetic units and original
+minority units exceeds the number of cases of the majority class, a
+random sample is drawn. If the technique allows to set the number of
+neighbors during generation, <code>k = bsc_max_k</code> is used.</li>
 <li>
-<strong>Balanced Pseudo Labeling:</strong> This technique is
-relevant if you have a labeled target data and a large number of
-unlabeled target data. This option activates an implementation of pseudo
-labeling. That is, the classifier is trained with the cases for which
-labeled data is available. After training the classifier predicts the
-classes/categories for the unlabeled cases. A percentage of cases
-determined with <code>bpl_inc_ratio</code> is selected and added to the
-training and test sample according to <code>bpl_valid_size</code>. The
-classifier is trained with the extended data and after training it
-predicts the classes/categories of the remaining unlabeled data. This
-process is iterated as long as the pseudo-labeled data contains cases
-for every class/category. The process stops if the number of maximum
-steps is reached (<code>bpl_max_steps</code>) or all unlabeled data is
-used for training. Please note that the number of cases added within
-each step is determined for <em>all</em> classes/categories by the
-category with the lowest absolute frequency weighted with
-<code>bpl_inc_ratio</code> to ensure the balance of new cases. If more
-cases are available the cases are sorted by their distance to
-<code>bpl_anchor</code>. This is a value describing the certainty of the
-pseudo labels. 0 equals random guessing, 1 equals perfect certainty. It
-is recommended to include cases which have a high but not a perfect
-certainty to improve the quality of the classifier. Thus, we recommend
-to include only a small percentage (<code>bpl_inc_ratio</code>) in every
-step for the training of the next step. The added cases have an
-increased weight that increases with every step by 1. This technique
-requires <code>use_baseline = TRUE</code> or <code>use_bsc=TRUE</code>.
-If both is set to true a classifier trained on the basis of balanced
-synthetic cases is used.</li>
+<strong>Balanced Pseudo-Labeling:</strong> This technique is
+relevant if you have labeled target data and a large number of unlabeled
+target data. With the different parameter starting with “bpl_”, you can
+request different implementations of pseudo-labeling, for example based
+on the work by Lee (2013) or by Cascante-Bonilla et al. (2020). To turn
+on pseudo-labeling, you have to set <code>use_bpl=TRUE</code>.</li>
 </ul>
+<p>To request pseudo-labeling based on Cascante-Bonilla et al. (2020),
+the following parameters have to be set:</p>
+<ul>
+<li>
+<code>bpl_max_steps = 5</code> (splits the unlabeled data into five
+chunks)</li>
+<li>
+<code>bpl_dynamic_inc = TRUE</code> (ensures that the number of used
+chunks increases at every step)</li>
+<li>
+<code>bpl_model_reset = TRUE</code> (re-initializes the model for
+every step)</li>
+<li>
+<code>bpl_epochs_per_step=30</code> (number of training epochs
+within each step)</li>
+<li>
+<code>bpl_balance=FALSE</code> (ensures that the cases with the
+highest certainty are added to training regardless of the absolute
+frequencies of the classes)</li>
+<li>
+<code>bpl_weight_inc=0.00</code> and
+<code>bpl_weight_start=1.00</code> (ensures that labeled and unlabeled
+data have the same weight during training)</li>
+<li>
+<code>bpl_max=1.00</code>, <code>bpl_anchor=1.00</code>, and
+<code>bpl_min=0.00</code> (ensures that all unlabeled data is considered
+for training and that cases with the highest certainty are used for
+training.)</li>
+</ul>
+<p>To request the original pseudo-labeling proposed by Lee (2013), you
+have to set the following parameters:</p>
+<ul>
+<li>
+<code>bpl_max_steps=30</code> (steps must be treated as epochs)</li>
+<li>
+<code>bpl_dynamic_inc=FALSE</code> (ensures that all pseudo-labeled
+cases are used)</li>
+<li>
+<code>bpl_model_reset=FALSE</code> (the model is not allowed to be
+re-initialized)</li>
+<li>
+<code>bpl_epochs_per_step=1</code> (steps are treated as epochs so
+this must be one)</li>
+<li>
+<code>bpl_balance=FALSE</code> (ensures that all cases are added
+regardless of the absolute frequencies of the classes)</li>
+<li>
+<code>bpl_weight_inc=0.02</code> and
+<code>bpl_weight_start=0.00</code> (gives the pseudo labeled data an
+increasing weight with every step)</li>
+<li>
+<code>bpl_max=1.00</code>, <code>bpl_anchor=1.00</code>, and
+<code>bpl_min=0.00</code> (ensures that all pseudo labeled cases are
+used for training. <code>bpl_anchor</code> does not effect the
+calculations)</li>
+</ul>
+<p>Please note that while Lee (2013) suggests to recalculate the
+pseudo-labels of the unlabeled data after every weight actualization, in
+<em>aifeducation</em>, the pseudo-labels are recalculated after every
+epoch.</p>
+<p><code>bpl_max=1.00</code>, <code>bpl_anchor=1.00</code>, and
+<code>bpl_min=0.00</code> are used to describe the certainty of a
+prediction. 0 refers to random guessing while 1 refers to perfect
+certainty. <code>bpl_anchor</code> is used as a reference value. The
+distance to <code>bpl_anchor</code> is calculated for every case. Then
+they are sorted with an increasing distance from
+<code>bpl_anchor</code>. The resulting order of cases is relevant if you
+set <code>bpl_dynamic_inc=TRUE</code> or
+<code>bpl_balance=TRUE</code>.</p>
 <p>Figure 5 illustrates the training loop for the cases that all three
 options are set to <code>TRUE</code>.</p>
 <div class="figure">
 <img src="classif_fig_05.png" style="width:100.0%" alt=""><p class="caption">Figure 5: Overview of the Steps to Perform a
 Classification</p>
 </div>
+<p>The example above applies the algorithm proposed by Cascante-Bonilla
+et al. (2020). After training the classifier on the labeled data, the
+unlabeled data is introduced into the training. The classifier predicts
+the potential labels of the unlabeled data and adds 20% of the cases
+with the highest certainty for their pseudo-labels to the training. The
+classifier is re-initialized and trained again. After training, the
+classifier predicts the potential labels of <em>all</em> originally
+unlabeled data and adds 40% of the pseudo-labeled data to the training
+data. The model is again re-initialized and trained again until all
+unlabeled data is used for training.</p>
 <p>Finally, <code>trace</code>, <code>view_metrics</code>, and
-<code>keras_trace</code> allow you to control how many information about
-the training progress are printed to the console. Please note that
+<code>keras_trace</code> allow you to control how much information about
+the training progress is printed to the console. Please note that
 training the classifier can take some time.</p>
-<p>Please note that after performance estimation the final training of
+<p>Please note that after performance estimation, the final training of
 the classifier makes use of all data available. That is, the test sample
 is left empty.</p>
 </div>
 <div class="section level3">
-<h3 id="evaluating-classifiers-performance">4.3 Evaluating Classifier’s Performance<a class="anchor" aria-label="anchor" href="#evaluating-classifiers-performance"></a>
+<h3 id="evaluating-classifiers-performance">5.3 Evaluating Classifier’s Performance<a class="anchor" aria-label="anchor" href="#evaluating-classifiers-performance"></a>
 </h3>
-<p>After finishing training you can evaluate the performance of the
-classifier. For every fold the classifier is applied to the test sample
-and the results are compared with the true categories/class. Since the
-test sample is never be part of the training all performance measures
-provide a more realistic idea of classifier`s performance.</p>
-<p>To support researchers in judging the quality of the predictions
+<p>After finishing training, you can evaluate the performance of the
+classifier. For every fold, the classifier is applied to the test sample
+and the results are compared to the true categories/classes. Since the
+test sample is never part of the training, all performance measures
+provide a more realistic idea of the classifier`s performance.</p>
+<p>To support researchers in judging the quality of the predictions,
 <em>aifeducation</em> utilizes several measures and concepts from
 content analysis. These are</p>
 <ul>
@@ -992,105 +1096,90 @@ content analysis. These are</p>
 <code>reliability</code> which stores all relevant information. In this
 list you will find the reliability values for every fold and for every
 requested training configuration. In addition, the reliability of every
-step within balanced pseudo labeling is reported.</p>
-<p>The central estimates for the reliabilites can be found via
+step within balanced pseudo-labeling is reported.</p>
+<p>The central estimates for the reliability values can be found via
 <code>reliability$test_metric_mean</code>. In our example this would
 be:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
-<span><span class="co">#&gt;           iota_index min_iota2 avg_iota2 max_iota2 min_alpha avg_alpha</span></span>
-<span><span class="co">#&gt; Baseline   0.5760000 0.4508632 0.5886911 0.7265191     0.560     0.723</span></span>
-<span><span class="co">#&gt; BSC        0.5866667 0.4812027 0.6076034 0.7340041     0.600     0.740</span></span>
-<span><span class="co">#&gt; BPL_Step1  0.6026667 0.5409676 0.6412843 0.7416010     0.700     0.776</span></span>
-<span><span class="co">#&gt; BPL_Step2  0.5973333 0.5462234 0.6406740 0.7351245     0.722     0.781</span></span>
-<span><span class="co">#&gt; BPL_Step3  0.5946667 0.5383125 0.6368101 0.7353076     0.708     0.775</span></span>
-<span><span class="co">#&gt; BPL_Step4  0.6000000 0.5460703 0.6422004 0.7383306     0.716     0.779</span></span>
-<span><span class="co">#&gt; BPL        0.6000000 0.5460703 0.6422004 0.7383306     0.716     0.779</span></span>
-<span><span class="co">#&gt; Final      0.6000000 0.5460703 0.6422004 0.7383306     0.716     0.779</span></span>
-<span><span class="co">#&gt;           max_alpha static_iota_index dynamic_iota_index kalpha_nominal</span></span>
-<span><span class="co">#&gt; Baseline      0.886         0.2629795          0.4800333      0.4605342</span></span>
-<span><span class="co">#&gt; BSC           0.880         0.2514907          0.4898910      0.4933361</span></span>
-<span><span class="co">#&gt; BPL_Step1     0.852         0.1802080          0.5031194      0.5531187</span></span>
-<span><span class="co">#&gt; BPL_Step2     0.840         0.1609082          0.4984116      0.5529949</span></span>
-<span><span class="co">#&gt; BPL_Step3     0.842         0.1660659          0.4959886      0.5471260</span></span>
-<span><span class="co">#&gt; BPL_Step4     0.842         0.1711764          0.5019280      0.5543067</span></span>
-<span><span class="co">#&gt; BPL           0.842         0.1711764          0.5019280      0.5543067</span></span>
-<span><span class="co">#&gt; Final         0.842         0.1711764          0.5019280      0.5543067</span></span>
-<span><span class="co">#&gt;           kalpha_ordinal   kendall    kappa2 kappa_fleiss kappa_light</span></span>
-<span><span class="co">#&gt; Baseline       0.4605342 0.7392154 0.4669364    0.4669364   0.4669364</span></span>
-<span><span class="co">#&gt; BSC            0.4933361 0.7529911 0.4971530    0.4971530   0.4971530</span></span>
-<span><span class="co">#&gt; BPL_Step1      0.5531187 0.7761880 0.5518732    0.5518732   0.5518732</span></span>
-<span><span class="co">#&gt; BPL_Step2      0.5529949 0.7769813 0.5520843    0.5520843   0.5520843</span></span>
-<span><span class="co">#&gt; BPL_Step3      0.5471260 0.7735351 0.5459945    0.5459945   0.5459945</span></span>
-<span><span class="co">#&gt; BPL_Step4      0.5543067 0.7769331 0.5530967    0.5530967   0.5530967</span></span>
-<span><span class="co">#&gt; BPL            0.5543067 0.7769331 0.5530967    0.5530967   0.5530967</span></span>
-<span><span class="co">#&gt; Final          0.5543067 0.7769331 0.5530967    0.5530967   0.5530967</span></span>
-<span><span class="co">#&gt;           percentage_agreement  gwet_ac</span></span>
-<span><span class="co">#&gt; Baseline             0.7773333 0.619410</span></span>
-<span><span class="co">#&gt; BSC                  0.7866667 0.630340</span></span>
-<span><span class="co">#&gt; BPL_Step1            0.8013333 0.643130</span></span>
-<span><span class="co">#&gt; BPL_Step2            0.7986667 0.634408</span></span>
-<span><span class="co">#&gt; BPL_Step3            0.7973333 0.633960</span></span>
-<span><span class="co">#&gt; BPL_Step4            0.8000000 0.638044</span></span>
-<span><span class="co">#&gt; BPL                  0.8000000 0.638044</span></span>
-<span><span class="co">#&gt; Final                0.8000000 0.638044</span></span></code></pre></div>
-<p>You know have a table with all relevant values. Of particular
-interest are the values for alpha from the Iota Concept since they
-represent a measure of reliability which is independent from the
-frequency distribution of the classes/categories. The alpha values
-describe the probability that a case of a specific class is recognized
-as the specific class. As you can see compared to the baseline model
-applying <em>Balanced Synthetic Cases increased</em> increases the
-minimal value of alpha reducing the risk to miss cases which belong to a
-seldom class (see row with “BSC”). On the opposite the alpha values for
-the major category decreases slightly losing its unjustified bonus from
-a high number of cases in the training set. Thus, this provides a more
-realistic performance estimation of the classifier.</p>
-<p>Furthermore, you can see that the application of pseudo labeling
-increases the alpha values for the minor class further up to step 3.</p>
+<span><span class="co">#&gt;          iota_index min_iota2 avg_iota2 max_iota2 min_alpha avg_alpha max_alpha</span></span>
+<span><span class="co">#&gt; Baseline  0.5546667 0.4359583 0.5742172 0.7124761     0.544     0.714     0.884</span></span>
+<span><span class="co">#&gt; BSC       0.5493333 0.4857597 0.5966513 0.7075429     0.630     0.742     0.854</span></span>
+<span><span class="co">#&gt; BPL       0.6213333 0.5620768 0.6560003 0.7499238     0.710     0.790     0.870</span></span>
+<span><span class="co">#&gt; Final     0.6213333 0.5620768 0.6560003 0.7499238     0.710     0.790     0.870</span></span>
+<span><span class="co">#&gt;          static_iota_index dynamic_iota_index kalpha_nominal kalpha_ordinal</span></span>
+<span><span class="co">#&gt; Baseline         0.2700657          0.4633180      0.4380976      0.4380976</span></span>
+<span><span class="co">#&gt; BSC              0.1967275          0.4601609      0.4803104      0.4803104</span></span>
+<span><span class="co">#&gt; BPL              0.2073401          0.5187046      0.5762644      0.5762644</span></span>
+<span><span class="co">#&gt; Final            0.2073401          0.5187046      0.5762644      0.5762644</span></span>
+<span><span class="co">#&gt;            kendall    kappa2 kappa_fleiss kappa_light percentage_agreement</span></span>
+<span><span class="co">#&gt; Baseline 0.7313550 0.4464147    0.4464147   0.4464147            0.7666667</span></span>
+<span><span class="co">#&gt; BSC      0.7476550 0.4851209    0.4851209   0.4851209            0.7720000</span></span>
+<span><span class="co">#&gt; BPL      0.7900515 0.5764172    0.5764172   0.5764172            0.8106667</span></span>
+<span><span class="co">#&gt; Final    0.7900515 0.5764172    0.5764172   0.5764172            0.8106667</span></span>
+<span><span class="co">#&gt;           gwet_ac</span></span>
+<span><span class="co">#&gt; Baseline 0.598012</span></span>
+<span><span class="co">#&gt; BSC      0.591286</span></span>
+<span><span class="co">#&gt; BPL      0.657888</span></span>
+<span><span class="co">#&gt; Final    0.657888</span></span></code></pre></div>
+<p>You now have a table with all relevant values. Of particular interest
+are the values for alpha from the Iota Concept since they represent a
+measure of reliability which is independent from the frequency
+distribution of the classes/categories. The alpha values describe the
+probability that a case of a specific class is recognized as that
+specific class. As you can see, compared to the baseline model, applying
+<em>Balanced Synthetic Cases increased</em> increases the minimal value
+of alpha, reducing the risk to miss cases which belong to a rare class
+(see row with “BSC”). On the contrary, the alpha values for the major
+category decrease slightly, thus losing its unjustified bonus from a
+high number of cases in the training set. This provides a more realistic
+performance estimation of the classifier.</p>
+<p>Furthermore, you can see that the application of pseudo-labeling
+increases the alpha values for the minor class further, up to step
+3.</p>
 <p>Finally, you can plot a coding stream scheme showing how the cases of
-different classes are labeled. Her we use the package
+different classes are labeled. Here we use the package
 <em>iotarelr</em>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/iotarelr/" class="external-link">iotarelr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: ggalluvial</span></span>
-<span><span class="fu">iotarelr</span><span class="fu">::</span><span class="fu"><a href="https://fberding.github.io/iotarelr/reference/plot_iota2_alluvial.html" class="external-link">plot_iota2_alluvial</a></span><span class="op">(</span><span class="fu">aifeducation</span><span class="fu">::</span><span class="va"><a href="../reference/test_classifier.html">test_classifier</a></span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">iota_object_end_free</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">iotarelr</span><span class="fu">::</span><span class="fu"><a href="https://fberding.github.io/iotarelr/reference/plot_iota2_alluvial.html" class="external-link">plot_iota2_alluvial</a></span><span class="op">(</span><span class="va">test_classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">iota_object_end_free</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="classification_tasks_files/figure-html/unnamed-chunk-22-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
+<img src="classification_tasks_files/figure-html/unnamed-chunk-23-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
 Figure 6: Coding Stream of the Classifier
 </p>
 </div>
-<p>Here you can see that a small number of the negative reviews is
-treated as a good review while a larger number of the positive reviews
-is treated as a bad review. Thus, the data for the major class (negative
-reviews) is more reliable and valid as the the data for the minor class
-(positive reviews).</p>
+<p>Here you can see that a small number of negative reviews is treated
+as a good review while a larger number of positive reviews is treated as
+a bad review. Thus, the data for the major class (negative reviews) is
+more reliable and valid as the the data for the minor class (positive
+reviews).</p>
 <p>Evaluating the performance of a classifier is a complex task and and
-behind the scope of this vignette. Here, we would like to refer to the
-cited literature of content analysis and machine learning if you would
-like to dive into the deep of this topic.</p>
+beyond the scope of this vignette. Instead, we would like to refer to
+the cited literature of content analysis and machine learning if you
+would like to dive deeper into this topic.</p>
 </div>
 <div class="section level3">
-<h3 id="saving-and-loading-a-classifier">4.4 Saving and Loading a Classifier<a class="anchor" aria-label="anchor" href="#saving-and-loading-a-classifier"></a>
+<h3 id="saving-and-loading-a-classifier">5.4 Saving and Loading a Classifier<a class="anchor" aria-label="anchor" href="#saving-and-loading-a-classifier"></a>
 </h3>
-<p>If you have created a classifier saving and loading is very easy due
+<p>If you have created a classifier, saving and loading is very easy due
 to the <em>R</em> package <em>bundle</em>. You can just use
 <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> and <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>. In our example this could
 be</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">classifier</span>,</span>
 <span>     file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="predicting-new-data">4.5 Predicting New Data<a class="anchor" aria-label="anchor" href="#predicting-new-data"></a>
+<h3 id="predicting-new-data">5.5 Predicting New Data<a class="anchor" aria-label="anchor" href="#predicting-new-data"></a>
 </h3>
 <p>If you would like to apply your classifier to new data, two steps are
-necessary. First, you must transform the raw text into a numerical
+necessary. You must first transform the raw text into a numerical
 expression by using <em>exactly</em> the same text embedding model that
-was used for training your classifier. The resulting object can be
+was used for training your classifier. The resulting object can then be
 passed to the method <code>predict</code> and you will get the
 predictions together with an estimate of certainty for each
 class/category.</p>
@@ -1107,10 +1196,13 @@ the Second Generation. Logos Verlag Berlin. <a href="https://doi.org/10.30819/55
 &amp; Rebmann, K. (2022). Performance and Configuration of Artificial
 Intelligence in Educational Settings.: Introducing a New Reliability
 Concept Based on Content Analysis. Frontiers in Education, 1–21. <a href="https://doi.org/10.3389/feduc.2022.818365" class="external-link uri">https://doi.org/10.3389/feduc.2022.818365</a></p>
+<p>Cascante-Bonilla, P., Tan, F., Qi, Y. &amp; Ordonez, V. (2020).
+Curriculum Labeling: Revisiting Pseudo-Labeling for Semi-Supervised
+Learning. <a href="https://doi.org/10.48550/arXiv.2001.06001" class="external-link uri">https://doi.org/10.48550/arXiv.2001.06001</a></p>
 <p>Campesato, O. (2021). Natural Language Processing Fundamentals for
 Developers. Mercury Learning &amp; Information. <a href="https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713" class="external-link uri">https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713</a></p>
 <p>Chollet, F., Kalinowski, T., &amp; Allaire, J. J. (2022). Deep
-learning with R (Second edition). Manning Publications Co.  <a href="https://learning.oreilly.com/library/view/-/9781633439849/?ar" class="external-link uri">https://learning.oreilly.com/library/view/-/9781633439849/?ar</a></p>
+learning with R (Second edition). Manning Publications Co. <a href="https://learning.oreilly.com/library/view/-/9781633439849/?ar" class="external-link uri">https://learning.oreilly.com/library/view/-/9781633439849/?ar</a></p>
 <p>Devlin, J., Chang, M.‑W., Lee, K., &amp; Toutanova, K. (2019). BERT:
 Pre-training of Deep Bidirectional Transformers for Language
 Understanding. In J. Burstein, C. Doran, &amp; T. Solorio (Eds.),
@@ -1126,6 +1218,9 @@ processing in action: Understanding, analyzing, and generating text with
 Python. Manning.</p>
 <p>Larusson, J. A., &amp; White, B. (Eds.). (2014). Learning Analytics:
 From Research to Practice. Springer New York. <a href="https://doi.org/10.1007/978-1-4614-3305-7" class="external-link uri">https://doi.org/10.1007/978-1-4614-3305-7</a></p>
+<p>Lee, D.‑H. (2013). Pseudo-Label : The Simple and Efficient
+Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
+Workshop : Challenges in RepresentationLearning. <a href="https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks" class="external-link uri">https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks</a></p>
 <p>Papilloud, C., &amp; Hinneburg, A. (2018). Qualitative Textanalyse
 mit Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Springer.
 <a href="https://doi.org/10.1007/978-3-658-21980-2" class="external-link uri">https://doi.org/10.1007/978-3-658-21980-2</a></p>

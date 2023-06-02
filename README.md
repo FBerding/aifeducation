@@ -83,7 +83,7 @@ approaches such as ROBERTA (Liu et al. 2019) or Longformer (Beltagy,
 Peters & Cohan 2020) are planned for the future.
 
 *aifeducation* supports the usage of pre-trained transformer models
-provided by [Huggingface](https://huggingface.co/) and the creation of
+provided by [Hugging Face](https://huggingface.co/) and the creation of
 new transformers allowing educators and researchers to develop
 specialized and domain-specific models.
 

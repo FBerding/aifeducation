@@ -1,3 +1,36 @@
+#'Array to Matrix
+#'
+#'Function transforming an array to a matrix.
+#'
+#'@param text_embedding \code{array} containing the text embedding. The array
+#'should be created via an object of class \link{TextEmbeddingModel}.
+#'@return Returns a matrix which contains the cases in the rows and the columns
+#'represent the features of all sequences. The sequences are concatenated.
+#'
+#'@export
+array_to_matrix<-function(text_embedding){
+  features=dim(text_embedding)[3]
+  times=dim(text_embedding)[2]
+  cases=dim(text_embedding)[1]
+
+  embedding_matrix<-matrix(data = 0,
+                           nrow=nrow(text_embedding),
+                           ncol=times*features)
+  for(i in 1:cases){
+    for(j in 1:times){
+      tmp_interval<-(1:features)+(j-1)*features
+      embedding_matrix[i,tmp_interval]<-text_embedding[i,j,]
+    }
+  }
+  rownames(embedding_matrix)=rownames(text_embedding)
+  colnames(embedding_matrix)=colnames(embedding_matrix,
+                                      do.NULL = FALSE,
+                                      prefix="feat_")
+  return(embedding_matrix)
+}
+
+
+
 #'Check of compatible text embedding models
 #'
 #'This function checks if different objects are based on the same text
@@ -292,7 +325,7 @@ get_folds<-function(target,
   min_freq=min(freq_cat)
 
   if(min_freq/k_folds<1){
-    fin_k_folds=floor(min_freq/1)
+    fin_k_folds=min_freq
     warning(paste("Frequency of the smallest category/label is not sufficent to ensure
                   at least 1 cases per fold. Adjusting number of folds from ",k_folds,"to",fin_k_folds,"."))
     if(fin_k_folds==0){
@@ -307,6 +340,7 @@ get_folds<-function(target,
   for(cat in categories){
     all_names=names(subset(target,target==cat))
     used_names=NULL
+    tmp_regular_size=ceiling(length(all_names)/fin_k_folds)
 
     for(i in 1:fin_k_folds){
       if(i==1){
@@ -315,7 +349,7 @@ get_folds<-function(target,
         possible_names=setdiff(x=all_names,
                                y=used_names)
       }
-      tmp_size=ceiling(length(possible_names)/(fin_k_folds-(i-1)))
+      tmp_size=min(length(possible_names),tmp_regular_size)
       selected_names<-sample(x=possible_names,
                              size=tmp_size,
                              replace=FALSE)
@@ -483,6 +517,11 @@ get_synthetic_cases<-function(embedding,
 
   min_k=max_k
 
+  #transform array to matrix
+  feature_names=dimnames(embedding)[3]
+  save(embedding,file="test_array.rda")
+  embedding=array_to_matrix(embedding)
+  save(embedding,file="test_matrix.rda")
   #Calculate the number of chunks for every cases
   n_chunks<-get_n_chunks(text_embeddings = embedding,
                          times = times,
@@ -574,7 +613,14 @@ for(ckind in chunk_kind){
     #}
     }
   }
+
+  #Transform matrix back to array
+  syntetic_embeddings<-matrix_to_array_c(
+    matrix=as.matrix(syntetic_embeddings),
+    times = times,
+    features = features)
   rownames(syntetic_embeddings)=names_vector
+  dimnames(syntetic_embeddings)[3]<-feature_names
 
   n_syntetic_units=table(syntetic_targets)
 
@@ -620,8 +666,8 @@ create_synthetic_units<-function(embedding,
   tmp_target=(target==cat)
   n_minor=sum(tmp_target)
   n_major=max(cat_freq)
-  print(cat_freq)
-  print(table(tmp_target))
+  #print(cat_freq)
+  #print(table(tmp_target))
 
   condition=(
     #(cat_freq[cat]!=max(cat_freq)) &
@@ -636,18 +682,18 @@ create_synthetic_units<-function(embedding,
 
     syn_data=NULL
       if(method=="smote" & tmp_ration_necessary_cases<1){
-        syn_data=smotefamily::SMOTE(X=embedding,
+        syn_data=smotefamily::SMOTE(X=as.data.frame(embedding),
                                     target = tmp_target,
                                     K=k,
                                     dup_size = n_major/n_minor)
       } else if(method=="adas" & tmp_ration_necessary_cases<1){
-        syn_data=smotefamily::ADAS(X=embedding,
+        syn_data=smotefamily::ADAS(X=as.data.frame(embedding),
                                    target = tmp_target,
                                    K=k)
       } else if(method=="dbsmote" & tmp_ration_necessary_cases<1){
-        syn_data=smotefamily::DBSMOTE(X=embedding,
+        syn_data=smotefamily::DBSMOTE(X=as.data.frame(embedding),
                                       target = tmp_target,
-                                      dupSize = 2*n_major/n_minor,
+                                      dupSize = n_major/n_minor,
                                       MinPts = NULL,
                                       eps = NULL)
       }
@@ -723,7 +769,7 @@ get_n_chunks<-function(text_embeddings,features,times){
   for(i in 1:times){
     window<-c(1:features)+(i-1)*features
     sub_matrix<-text_embeddings[,window]
-    tmp_sums<-rowSums(sub_matrix)
+    tmp_sums<-rowSums(abs(sub_matrix))
     n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
   }
   names(n_chunks)<-rownames(text_embeddings)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{get_coder_metrics}
 \alias{get_coder_metrics}
-\title{Calculates reliability measures based on content analysis}
+\title{Calculate reliability measures based on content analysis}
 \usage{
 get_coder_metrics(true_values, predicted_values)
 }
@@ -34,6 +34,6 @@ Returns a \code{vector} with the following reliability measures:
 }
 }
 \description{
-This functions calculates different reliability measures which are based on the
+This function calculates different reliability measures which are based on the
 empirical research method of content analysis.
 }

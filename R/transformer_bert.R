@@ -1,3 +1,134 @@
+#'Function for creating a new transformer based on BERT
+#'
+#'This function creates a transformer configuration based on the BERT base architecture
+#'and a vocabulary based on WordPiece by using
+#'the python libraries 'transformers' and 'tokenizers'.
+#'
+#'@param model_dir \code{string} Path to the directory where the model should be saved.
+#'@param vocab_raw_texts \code{vector} containing the raw texts for creating the
+#'vocabulary.
+#'@param vocab_size \code{int} Size of the vocabulary.
+#'@param vocab_do_lower_case \code{bool} \code{TRUE} if all words/tokens should be lower case.
+#'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
+#'also determines the maximum length of a sequence which can be processed with the model.
+#'@param hidden_size \code{int} Number of neurons in each layer. This parameter determines the
+#'dimensionality of the resulting text embedding.
+#'@param num_hidden_layer \code{int} Number of hidden layers.
+#'@param num_attention_heads \code{int} Number of attention heads.
+#'@param intermediate_size \code{int} Number of neurons in the intermediate layer of
+#'the attention mechanism.
+#'@param hidden_act \code{string} name of the activation function.
+#'@param hidden_dropout_prob \code{double} Ratio of dropout
+#'@param trace \code{bool} \code{TRUE} if information about the progress should be
+#'printed to the console.
+#'@return This function does not return an object. Instead the configuration
+#'and the vocabulary of the new model are saved on disk.
+#'@note To train the model, pass the directory of the model to the function
+#'\link{train_tune_bert_model}.
+#'@references
+#'Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
+#'Pre-training of Deep Bidirectional Transformers for Language
+#'Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
+#'Proceedings of the 2019 Conference of the North (pp. 4171--4186).
+#'Association for Computational Linguistics.
+#'\url{https://doi.org/10.18653/v1/N19-1423}
+#'
+#'@references Hugging Face documentation
+#'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
+#'
+#'@export
+create_bert_model<-function(
+    model_dir,
+    vocab_raw_texts=NULL,
+    vocab_size=30522,
+    vocab_do_lower_case=FALSE,
+    max_position_embeddings=512,
+    hidden_size=768,
+    num_hidden_layer=12,
+    num_attention_heads=12,
+    intermediate_size=3072,
+    hidden_act="gelu",
+    hidden_dropout_prob=0.1,
+    trace=TRUE){
+
+  transformers<-reticulate::import("transformers")
+  datasets<-reticulate::import("datasets")
+  tok<-reticulate::import("tokenizers")
+
+  #Creating a new Tokenizer for Computing Vocabulary
+  tok_new<-tok$Tokenizer(tok$models$WordPiece())
+  tok_new$normalizer=tok$normalizers$BertNormalizer(lowercase=vocab_do_lower_case)
+  tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
+  tok_new$decode=tok$decoders$WordPiece()
+  trainer<-tok$trainers$WordPieceTrainer(
+    vocab_size=as.integer(vocab_size),
+    show_progress=trace)
+
+  #Calculating Vocabulary
+  if(trace==TRUE){
+    print(paste(date(),
+                "Start Computing Vocabulary"))
+  }
+  tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
+  if(trace==TRUE){
+    print(paste(date(),
+                "Start Computing Vocabulary - Done"))
+  }
+
+  special_tokens=c("[PAD]","[CLS]","[SEP]","[UNK]","[MASK]")
+
+  if(dir.exists(model_dir)==FALSE){
+    print(paste(date(),"Creating Checkpoint Directory"))
+    dir.create(model_dir)
+  }
+
+  write(c(special_tokens,names(tok_new$get_vocab())),
+        file=paste0(model_dir,"/","vocab.txt"))
+
+  if(trace==TRUE){
+    print(paste(date(),
+                "Creating Tokenizer"))
+  }
+  tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
+                                           do_lower_case=vocab_do_lower_case)
+
+  if(trace==TRUE){
+    print(paste(date(),
+                "Creating Tokenizer - Done"))
+  }
+
+  configuration=transformers$BertConfig(
+    vocab_size=as.integer(vocab_size),
+    max_position_embeddings=as.integer(max_position_embeddings),
+    hidden_size=as.integer(hidden_size),
+    num_hidden_layer=as.integer(num_hidden_layer),
+    num_attention_heads=as.integer(num_attention_heads),
+    intermediate_size=as.integer(intermediate_size),
+    hidden_act=hidden_act,
+    hidden_dropout_prob=hidden_dropout_prob
+  )
+
+  bert_model=transformers$TFBertModel(configuration)
+
+  if(trace==TRUE){
+    print(paste(date(),
+                "Saving Bert Model"))
+  }
+  bert_model$save_pretrained(model_dir)
+
+  if(trace==TRUE){
+    print(paste(date(),
+                "Saving Tokenizer Model"))
+  }
+  tokenizer$save_pretrained(model_dir)
+  if(trace==TRUE){
+    print(paste(date(),
+                "Done"))
+  }
+}
+
+
+
 #'Function for training and fine-tuning a BERT model
 #'
 #'This function can be used to train or fine-tune a transformer
@@ -19,6 +150,7 @@
 #'@param n_epoch \code{int} Number of epochs for training.
 #'@param batch_size \code{int} Size of batches.
 #'@param chunk_size \code{int} Size of every chunk for training.
+#'@param learning_rate \code{double} Learning rate for adam optimizer.
 #'@param n_workers \code{int} Number of workers.
 #'@param multi_process \code{bool} \code{TRUE} if multiple processes should be activated.
 #'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
@@ -27,25 +159,38 @@
 #'model is saved to disk.
 #'@note if \code{aug_vocab_by > 0} the raw text is used for training a WordPiece
 #'tokenizer. At the end of this process, additional entries are added to the vocabulary
-#'that are not part of the original vocabulary.
+#'that are not part of the original vocabulary. This is in an experimental state.
 #'@note Pre-Trained models which can be fine-tuned with this function are available
-#'at \url{https://huggingface.co/}. New models can be created via the function
-#'\link{create_bert_model}.
+#'at \url{https://huggingface.co/}.
+#'@note New models can be created via the function \link{create_bert_model}.
+#'@note Training of the model makes use of dynamic masking in contrast to the
+#'original paper where static masking was used.
+#'@references
+#'Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
+#'Pre-training of Deep Bidirectional Transformers for Language
+#'Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
+#'Proceedings of the 2019 Conference of the North (pp. 4171--4186).
+#'Association for Computational Linguistics.
+#'\url{https://doi.org/10.18653/v1/N19-1423}
+#'
+#'@references Hugging Face documentation
+#'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
 #'
 #'@export
 train_tune_bert_model=function(output_dir,
-                              bert_model_dir_path,
-                              raw_texts,
-                              aug_vocab_by=100,
-                              p_mask=0.15,
-                              whole_word=TRUE,
-                              val_size=0.1,
-                              n_epoch=1,
-                              batch_size=12,
-                              chunk_size=250,
-                              n_workers=1,
-                              multi_process=FALSE,
-                              trace=TRUE){
+                               bert_model_dir_path,
+                               raw_texts,
+                               aug_vocab_by=100,
+                               p_mask=0.15,
+                               whole_word=TRUE,
+                               val_size=0.1,
+                               n_epoch=1,
+                               batch_size=12,
+                               chunk_size=250,
+                               learning_rate=3e-3,
+                               n_workers=1,
+                               multi_process=FALSE,
+                               trace=TRUE){
 
   transformer = reticulate::import('transformers')
   tf = reticulate::import('tensorflow')
@@ -119,10 +264,10 @@ train_tune_bert_model=function(output_dir,
 
   print(paste(date(),"Creating Input"))
   tokenized_texts= tokenizer(prepared_text_chunks_strings,
-                                                  truncation =TRUE,
-                                                  padding= TRUE,
-                                                  max_length=as.integer(chunk_size),
-                                                  return_tensors="np")
+                             truncation =TRUE,
+                             padding= TRUE,
+                             max_length=as.integer(chunk_size),
+                             return_tensors="np")
 
 
   print(paste(date(),"Creating TensorFlow Dataset"))
@@ -184,7 +329,7 @@ train_tune_bert_model=function(output_dir,
   )
 
   print(paste(date(),"Compile Model"))
-  mlm_model$compile(optimizer=adam(3e-5))
+  mlm_model$compile(optimizer=adam(learning_rate))
 
   #Clear session to provide enough resources for computations
   tf$keras$backend$clear_session()
@@ -209,3 +354,4 @@ train_tune_bert_model=function(output_dir,
   print(paste(date(),"Done"))
 
 }
+

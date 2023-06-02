@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{get_folds}
 \alias{get_folds}
-\title{Creates Cross-Validation Samples}
+\title{Create Cross-Validation Samples}
 \usage{
 get_folds(target, k_folds)
 }
@@ -25,7 +25,7 @@ Return a \code{list} with the following components:
 }
 }
 \description{
-Functions creates cross-validation samples and ensures that the relative
+Function creates cross-validation samples and ensures that the relative
 frequency for every category/label within a fold equals the relative frequency of
 the category/label within the initial data.
 }
@@ -35,9 +35,9 @@ These should be declared with \code{NA}. All these cases are ignored for creatin
 different folds. Their names are saved within the component \code{unlabeled_cases}.
 These cases can be used for Pseudo Labeling.
 
-the functions checks the absolute frequencies of every category/label. If the
-absolute frequency is not sufficient to ensure at least four cases in every fold
-the number of folds is adjusted. In these cases a warning is printed to the console.
+the function checks the absolute frequencies of every category/label. If the
+absolute frequency is not sufficient to ensure at least four cases in every fold,
+the number of folds is adjusted. In these cases, a warning is printed to the console.
 At least four cases per fold are necessary to ensure that the training of
 \link{TextEmbeddingClassifierNeuralNet} works well with all options turned on.
 }

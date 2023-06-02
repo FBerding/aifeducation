@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{split_labeled_unlabeled}
 \alias{split_labeled_unlabeled}
-\title{Splits data into labeled and unlabeled data}
+\title{Split data into labeled and unlabeled data}
 \usage{
 split_labeled_unlabeled(embedding, target)
 }

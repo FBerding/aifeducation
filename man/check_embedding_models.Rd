@@ -13,11 +13,11 @@ check_embedding_models(object_list, same_class = FALSE)
 \item{same_class}{\code{bool} \code{TRUE} if all object must be from the same class.}
 }
 \value{
-Returns \code{TRUE} if all object refer to the same text embedding model.
+Returns \code{TRUE} if all objects refer to the same text embedding model.
 \code{FALSE} in all other cases.
 }
 \description{
 This function checks if different objects are based on the same text
-embedding model. This is necessary in order to ensure that classifiers are used
-only with data generated with compatible embedding models.
+embedding model. This is necessary to ensure that classifiers are used
+only with data generated through compatible embedding models.
 }

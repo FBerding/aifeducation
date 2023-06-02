@@ -82,14 +82,14 @@ embeddings.</p></dd>
 
 <dt><code>bundeled_model</code></dt>
 <dd><p>('bundle object')<br>
-Object for storing the keras model of the neural net. Saved as bundled
+Object for storing the keras model of the neural net. Saved as a bundled
 object with help of the package <a href="https://rstudio.github.io/bundle/reference/bundle.html" class="external-link">bundle</a> for serialization.</p></dd>
 
 
 <dt><code>model_config</code></dt>
 <dd><p>('list()')<br>
 List for storing information about the configuration of the model. This
-information is used for predicting new data.</p><ul><li><p><code>model_config$n_req: </code>Number of recurrent layers.</p></li>
+information is used to predict new data.</p><ul><li><p><code>model_config$n_req: </code>Number of recurrent layers.</p></li>
 <li><p><code>model_config$n_hidden: </code>Number of dense layers.</p></li>
 <li><p><code>model_config$target_levels: </code>Levels of the target variable. Do not change this manually.</p></li>
 <li><p><code>model_config$input_variables: </code>Order and name of the input variables. Do not change this manually.</p></li>
@@ -104,20 +104,20 @@ information will be overwritten if a new training is started.</p><ul><li><p><cod
 <li><p><code>config$history: </code>History of the last training.</p></li>
 <li><p><code>config$data: </code>Object of class table storing the initial frequencies of the passed data.</p></li>
 <li><p><code>config$data_pb:l </code>Matrix storing the number of additional cases (test and training) added
-during balanced pseudo labeling. The rows refer to folds and final training.
-The columns refer to the steps during pseudo labeling.</p></li>
+during balanced pseudo-labeling. The rows refer to folds and final training.
+The columns refer to the steps during pseudo-labeling.</p></li>
 <li><p><code>config$data_bsc_test: </code>Matrix storing the number of cases for each category used for testing
 during the phase of balanced synthetic units. Please note that the
-frequencies include original and synthetic cases. In terms that the number
-of original and synthetic cases exceeds the limit for the majority classes
+frequencies include original and synthetic cases. In case the number
+of original and synthetic cases exceeds the limit for the majority classes,
 the frequency represents the number of cases created by cluster analysis.</p></li>
 <li><p><code>config$date: </code>Time when the last training finished.</p></li>
-<li><p><code>config$config: </code>List storing which kind of estimation was requested during last training.
-</p><ul><li><p><code>config$config$use_bsc:  </code><code>TRUE</code> if  balanced synthetic cases was requested. <code>FALSE</code>
+<li><p><code>config$config: </code>List storing which kind of estimation was requested during the last training.
+</p><ul><li><p><code>config$config$use_bsc:  </code><code>TRUE</code> if  balanced synthetic cases were requested. <code>FALSE</code>
 if not.</p></li>
-<li><p><code>config$config$use_baseline: </code><code>TRUE</code> if baseline estimation was requested. <code>FALSE</code>
+<li><p><code>config$config$use_baseline: </code><code>TRUE</code> if baseline estimation were requested. <code>FALSE</code>
 if not.</p></li>
-<li><p><code> config$config$use_bpl: </code><code>TRUE</code> if  balanced pseudo labeling cases was requested. <code>FALSE</code>
+<li><p><code> config$config$use_bpl: </code><code>TRUE</code> if  balanced, pseudo-labeling cases were requested. <code>FALSE</code>
 if not.</p></li>
 </ul></li>
 </ul></dd>
@@ -126,16 +126,16 @@ if not.</p></li>
 <dt><code>reliability</code></dt>
 <dd><p>('list()')<br>
 List for storing central reliability measures of the last training.</p><ul><li><p><code>reliability$test_metric: </code>Array containing the reliability measures for the validation data for
-every fold, method, and step (in case of pseudo labeling).</p></li>
+every fold, method, and step (in case of pseudo-labeling).</p></li>
 <li><p><code>reliability$test_metric_mean: </code>Array containing the reliability measures for the validation data for
-every method and step (in case of pseudo labeling). The values represent
+every method and step (in case of pseudo-labeling). The values represent
 the mean values for every fold.</p></li>
-<li><p><code>reliability$raw_iota_objects: </code>List containing all iota_object generated with the package iotarelr
+<li><p><code>reliability$raw_iota_objects: </code>List containing all iota_object generated with the package [iotarelr]iotarelr
 for every fold at the start and the end of the last training.
 </p><ul><li><p><code>reliability$raw_iota_objects$iota_objects_start: </code>List of objects with class <code>iotarelr_iota2</code> containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
-If the estimation of the baseline model is not requested the list is
+If the estimation of the baseline model is not requested, the list is
 set to <code>NULL</code>.</p></li>
 <li><p><code>reliability$raw_iota_objects$iota_objects_end: </code>List of objects with class <code>iotarelr_iota2</code> containing the
 estimated iota reliability of the second generation for the final model
@@ -146,38 +146,38 @@ synthetic cases with pseudo labeling.</p></li>
 <li><p><code>reliability$raw_iota_objects$iota_objects_start_free: </code>List of objects with class <code>iotarelr_iota2</code> containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
-If the estimation of the baseline model is not requested the list is
+If the estimation of the baseline model is not requested, the list is
 set to <code>NULL</code>.Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.</p></li>
 <li><p><code>reliability$raw_iota_objects$iota_objects_end_free: </code>List of objects with class <code>iotarelr_iota2</code> containing the
 estimated iota reliability of the second generation for the final model
-for every fold. Depending of the requested training method these values
+for every fold. Depending of the requested training method, these values
 refer to the baseline model, a trained model on the basis of balanced
-synthetic cases, balanced pseudo labeling or a combination of balanced
-synthetic cases with pseudo labeling.
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.</p></li>
 </ul></li>
 <li><p><code>reliability$iota_object_start: </code>Object of class <code>iotarelr_iota2</code> as a mean of the individual objects
-for every fold. If the estimation of the baseline model is not requested the list is
+for every fold. If the estimation of the baseline model is not requested, the list is
 set to <code>NULL</code>.</p></li>
 <li><p><code> reliability$iota_object_start_free: </code>Object of class <code>iotarelr_iota2</code> as a mean of the individual objects
-for every fold. If the estimation of the baseline model is not requested the list is
+for every fold. If the estimation of the baseline model is not requested, the list is
 set to <code>NULL</code>.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.</p></li>
 <li><p><code>reliability$iota_object_end: </code>Object of class <code>iotarelr_iota2</code> as a mean of the individual objects
 for every fold.
-Depending of the requested training method this object
+Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
-synthetic cases, balanced pseudo labeling or a combination of balanced
-synthetic cases with pseudo labeling.</p></li>
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.</p></li>
 <li><p><code>reliability$iota_object_end_free: </code>Object of class <code>iotarelr_iota2</code> as a mean of the individual objects
 for every fold.
-Depending of the requested training method this object
+Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
-synthetic cases, balanced pseudo labeling or a combination of balanced
-synthetic cases with pseudo labeling.
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.</p></li>
 </ul></dd>
@@ -215,9 +215,9 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 <span>  hidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>,</span>
 <span>  rec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>,</span>
 <span>  self_attention_heads <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  dropout <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  dropout <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  recurrent_dropout <span class="op">=</span> <span class="fl">0.4</span>,</span>
-<span>  l2_regularizer <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  l2_regularizer <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"adam"</span>,</span>
 <span>  act_fct <span class="op">=</span> <span class="st">"gelu"</span>,</span>
 <span>  rec_act_fct <span class="op">=</span> <span class="st">"tanh"</span></span>
@@ -246,30 +246,30 @@ free text.</p></dd>
 
 <dt><code>hidden</code></dt>
 <dd><p><code>vector</code> containing the number of neurons for each dense layer.
-The length of the vector determines the number of dense layers. If you want no dense layer
+The length of the vector determines the number of dense layers. If you want no dense layer,
 set this parameter to <code>NULL</code>.</p></dd>
 
 
 <dt><code>rec</code></dt>
 <dd><p><code>vector</code> containing the number of neurons for each recurrent layer.
-The length of the vector determines the number of dense layers. If you want no dense layer
+The length of the vector determines the number of dense layers. If you want no dense layer,
 set this parameter to <code>NULL</code>.</p></dd>
 
 
 <dt><code>self_attention_heads</code></dt>
 <dd><p><code>integer</code> determining the number of attention heads
-for a self attention layer. If this value is greater 0 a self attention layer is added
+for a self-attention layer. If this value is greater 0, a self-attention layer is added
 between the recurrent and dense layers together with a normalization and a
-recurrent layer. If set to 0 none of these layers is added.</p></dd>
+recurrent layer. If set to 0, none of these layers are added.</p></dd>
 
 
 <dt><code>dropout</code></dt>
-<dd><p><code>double</code> ranging between 0 and lower 1 determining the
+<dd><p><code>double</code> ranging between 0 and lower 1, determining the
 dropout for each recurrent layer.</p></dd>
 
 
 <dt><code>recurrent_dropout</code></dt>
-<dd><p><code>double</code> ranging between 0 and lower 1 determining the
+<dd><p><code>double</code> ranging between 0 and lower 1, determining the
 recurrent dropout for each recurrent layer.</p></dd>
 
 
@@ -300,21 +300,26 @@ tensorflow.</p><div class="section">
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>  <span class="va">data_embeddings</span>,</span>
 <span>  <span class="va">data_targets</span>,</span>
-<span>  data_n_valid_samples <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  data_n_test_samples <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  use_baseline <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  bsl_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  use_bsc <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  bsc_methods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dbsmote"</span><span class="op">)</span>,</span>
 <span>  bsc_max_k <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  bsc_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  bsc_add_all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  use_bpl <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  bpl_max_steps <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  bpl_inc_ratio <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  bpl_anchor <span class="op">=</span> <span class="fl">0.75</span>,</span>
-<span>  bpl_min <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  bpl_weight_inc <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  bpl_valid_size <span class="op">=</span> <span class="fl">0.33</span>,</span>
+<span>  bpl_max_steps <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  bpl_epochs_per_step <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  bpl_dynamic_inc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  bpl_balance <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bpl_max <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  bpl_anchor <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  bpl_min <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  bpl_weight_inc <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  bpl_weight_start <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  bpl_model_reset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  epochs <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
 <span>  <span class="va">dir_checkpoint</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -336,7 +341,7 @@ stored in <code>data_embeddings</code>. Factor must be named and has to use the
 same names used in <code>data_embeddings</code>.</p></dd>
 
 
-<dt><code>data_n_valid_samples</code></dt>
+<dt><code>data_n_test_samples</code></dt>
 <dd><p><code>int</code> determining the number of cross-fold
 samples.</p></dd>
 
@@ -344,11 +349,11 @@ samples.</p></dd>
 <dt><code>use_baseline</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if the calculation of a baseline
 model is requested. This option is only relevant for <code>use_bsc=TRUE</code> or
-<code>use_pbl=TRUE</code>. If both are <code>FALSE</code> a baseline model is calculated.</p></dd>
+<code>use_pbl=TRUE</code>. If both are <code>FALSE</code>, a baseline model is calculated.</p></dd>
 
 
 <dt><code>bsl_val_size</code></dt>
-<dd><p><code>double</code> between 0 and 1 indicating the proportion of cases of each label
+<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases of each class
 which should be used for the validation sample during the estimation of the baseline model.
 The remaining cases are part of the training data.</p></dd>
 
@@ -370,20 +375,46 @@ and <code>bsc_methods=c("dbsmote")</code> are possible.</p></dd>
 for creating synthetic units.</p></dd>
 
 
+<dt><code>bsc_val_size</code></dt>
+<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases of each class
+which should be used for the validation sample during the estimation with synthetic cases.</p></dd>
+
+
+<dt><code>bsc_add_all</code></dt>
+<dd><p><code>bool</code> If <code>FALSE</code> only synthetic cases necessary to fill
+the gab between the class and the major class are added to the data. If <code>TRUE</code> all
+generated synthetic cases are added to the data.</p></dd>
+
+
 <dt><code>use_bpl</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if the estimation should integrate
-balanced pseudo labeling. <code>FALSE</code> if not.</p></dd>
+balanced pseudo-labeling. <code>FALSE</code> if not.</p></dd>
 
 
 <dt><code>bpl_max_steps</code></dt>
-<dd><p><code>int</code> determining the maximal number of steps for
-every application of balanced pseudo labeling.</p></dd>
+<dd><p><code>int</code> determining the maximum number of steps during
+pseudo-labeling.</p></dd>
 
 
-<dt><code>bpl_inc_ratio</code></dt>
-<dd><p><code>double</code> ratio between 0 and 1 indicating the
-proportion of new cases which should used for further training. See notes
-for more details.</p></dd>
+<dt><code>bpl_epochs_per_step</code></dt>
+<dd><p><code>int</code> Number of training epochs within every step.</p></dd>
+
+
+<dt><code>bpl_dynamic_inc</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code>, only a specific percentage
+of cases is included during each step. The percentage is determined by
+\(step/bpl_max_steps\). If <code>FALSE</code>, all cases are used.</p></dd>
+
+
+<dt><code>bpl_balance</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code>, the same number of cases for
+every category/class of the pseudo-labeled data are used with training. That
+is, the number of cases is determined by the minor class/category.</p></dd>
+
+
+<dt><code>bpl_max</code></dt>
+<dd><p><code>double</code> between 0 and 1, setting the maximal level of
+confidence for considering a case for pseudo-labeling.</p></dd>
 
 
 <dt><code>bpl_anchor</code></dt>
@@ -392,25 +423,23 @@ point for sorting the new cases of every label. See notes for more details.</p><
 
 
 <dt><code>bpl_min</code></dt>
-<dd><p><code>double</code> between 0 and 1 setting the minimal level of
-confidence for considering a case for pseudo labeling.</p></dd>
+<dd><p><code>double</code> between 0 and 1, setting the minimal level of
+confidence for considering a case for pseudo-labeling.</p></dd>
 
 
 <dt><code>bpl_weight_inc</code></dt>
 <dd><p><code>double</code> value how much the sample weights
-should be increased or decreased compared to the previous step. If the
-cases of all steps should be weighted equally set this value to 0.</p></dd>
+should be increased for the cases with pseudo-labels in every step.</p></dd>
 
 
-<dt><code>bpl_valid_size</code></dt>
-<dd><p><code>double</code> ratio between 0 and 1 determining the proportion
-of new cases for every label which should be added to the validation sample during training.
-The remaining cases are added to the training sample.</p></dd>
+<dt><code>bpl_weight_start</code></dt>
+<dd><p><code>dobule</code> Starting value for the weights of the
+unlabeled cases.</p></dd>
 
 
 <dt><code>bpl_model_reset</code></dt>
-<dd><p><code>bool</code> <code>TRUE</code> if the model should be
-reseted before training.</p></dd>
+<dd><p><code>bool</code> If <code>TRUE</code>, model is re-initialized at every
+step.</p></dd>
 
 
 <dt><code>epochs</code></dt>
@@ -424,16 +453,16 @@ reseted before training.</p></dd>
 <dt><code>dir_checkpoint</code></dt>
 <dd><p><code>string</code> Path to the directory where
 the checkpoint during training should be saved. If the directory does not
-exists it is created.</p></dd>
+exist, it is created.</p></dd>
 
 
 <dt><code>trace</code></dt>
-<dd><p><code>bool</code> <code>TRUE</code> if information about the estimation
+<dd><p><code>bool</code> <code>TRUE</code>, if information about the estimation
 phase should be printed to the console.</p></dd>
 
 
 <dt><code>view_metrics</code></dt>
-<dd><p><code>bool</code> <code>TRUE</code> if metrics should be printed
+<dd><p><code>bool</code> <code>TRUE</code>, if metrics should be printed
 in the RStudio IDE.</p></dd>
 
 
@@ -454,22 +483,19 @@ one line of information for every epoch.</p></dd>
 <h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
 
 <ul><li><p>bsc_max_k: All values from 2 up to bsc_max_k are successively used. If
-the number of bsc_max_k is to high the value is reduced to a number that
+the number of bsc_max_k is too high, the value is reduced to a number that
 allows the calculating of synthetic units.</p></li>
-<li><p>bpl_inc_ratio: The ratio is applied to the label with the smallest number
-of new cases. The resulting value is used for every label to ensure the balance
-of all labels.</p></li>
-<li><p>bpl_anchor: With the help of this value the new cases are sorted. For
-this aim the distance from the anchor is calculated and all cases are arranged
-into an increasing order.</p></li>
+<li><p>bpl_anchor: With the help of this value, the new cases are sorted. For
+this aim, the distance from the anchor is calculated and all cases are arranged
+into an ascending order.</p></li>
 </ul></div>
 
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-predict"></a><div class="section">
 <h3 id="method-predict-">Method <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code><a class="anchor" aria-label="anchor" href="#method-predict-"></a></h3>
-<p>Method for prediciting new data with a trained neural net.</p><div class="section">
+<p>Method for predicting new data with a trained neural net.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">predict</span><span class="op">(</span><span class="va">newdata</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">predict</span><span class="op">(</span><span class="va">newdata</span>, batch_size <span class="op">=</span> <span class="fl">32</span>, verbose <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -477,6 +503,17 @@ into an increasing order.</p></li>
 <p></p><div class="arguments"><dl><dt><code>newdata</code></dt>
 <dd><p>Object of class <code>TextEmbeddingModel</code> or
 <code>data.frame</code> for which predictions should be made.</p></dd>
+
+
+<dt><code>batch_size</code></dt>
+<dd><p><code>int</code> Size of batches.</p></dd>
+
+
+<dt><code>verbose</code></dt>
+<dd><p><code>int</code> <code>verbose=0</code> does not print any
+information about the training process from keras on the console.
+<code>verbose=1</code> prints a progress bar. <code>verbose=2</code> prints
+one line of information for every epoch.</p></dd>
 
 
 </dl><p></p></div>
@@ -493,7 +530,7 @@ the probabilities of the different labels for each case.</p>
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
 <span>  <span class="va">type</span>,</span>
-<span>  <span class="va">autors</span>,</span>
+<span>  <span class="va">authors</span>,</span>
 <span>  <span class="va">citation</span>,</span>
 <span>  url <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -504,13 +541,13 @@ the probabilities of the different labels for each case.</p>
 <p></p><div class="arguments"><dl><dt><code>type</code></dt>
 <dd><p><code>string</code> for choosing the type of information that should
 be added. <code>type="developer"</code> for information about the developer of the
-classifier and <code>type="trainer"</code> for information about persons who trained
-the classifier. If you modify an already existing classifier please use
+classifier and <code>type="trainer"</code> for information about people who trained
+the classifier. If you modify an already existing classifier, please use
 <code>type="modifier"</code>.</p></dd>
 
 
-<dt><code>autors</code></dt>
-<dd><p>Person list of authors.</p></dd>
+<dt><code>authors</code></dt>
+<dd><p>List of authors.</p></dd>
 
 
 <dt><code>citation</code></dt>
@@ -526,14 +563,14 @@ the classifier. If you modify an already existing classifier please use
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_publication_info"></a><div class="section">
 <h3 id="method-get-publication-info-">Method <code>get_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-get-publication-info-"></a></h3>
-<p>Method for requesting the publication information of the classifier.</p><div class="section">
+<p>Method for requesting the bibliographic information of the classifier.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_publication_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
-<p><code>list</code> with all saved publication information.</p>
+<p><code>list</code> with all saved bibliographic information.</p>
 </div>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-set_license"></a><div class="section">
@@ -555,14 +592,19 @@ the license text.</p></dd>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_license"></a><div class="section">
 <h3 id="method-get-license-">Method <code>get_license()</code><a class="anchor" aria-label="anchor" href="#method-get-license-"></a></h3>
-<p>Method for requesting the license of the classifier.</p><div class="section">
+<p>Method for setting the license of the classifier.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
-<p><code>string</code> License of the classifier.</p>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>license</code></dt>
+<dd><p><code>string</code> containing the abbreviation of the license or
+the license text.</p></dd>
+
+
+</dl><p></p></div>
 </div>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-set_model_description"></a><div class="section">
@@ -580,7 +622,7 @@ the license text.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>eng</code></dt>
 <dd><p><code>string</code> A text describing the training of the learner,
 its theoretical and empirical background, and the different output labels
@@ -622,9 +664,9 @@ in the native language of the classifier.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p><code>list</code> with the description of the classifier in English
-and native language.</p>
+and the native language.</p>
 </div>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-export_model"></a><div class="section">
@@ -635,7 +677,7 @@ and native language.</p>
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir_path</code></dt>
 <dd><p><code>string()</code> Path of the directory where the model should be
 saved.</p></dd>
@@ -652,7 +694,7 @@ saved.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir_path</code></dt>
 <dd><p><code>string()</code> Path of the directory where the model is
 saved.</p></dd>
@@ -669,7 +711,7 @@ saved.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

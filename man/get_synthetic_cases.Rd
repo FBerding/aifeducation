@@ -2,18 +2,29 @@
 % Please edit documentation in R/aux_fct.R
 \name{get_synthetic_cases}
 \alias{get_synthetic_cases}
-\title{Creates synthetic cases for balancing training data}
+\title{Create synthetic cases for balancing training data}
 \usage{
-get_synthetic_cases(embedding, target, method = c("smote"), max_k = 6)
+get_synthetic_cases(
+  embedding,
+  times,
+  features,
+  target,
+  method = c("smote"),
+  max_k = 6
+)
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases this object is taken from \link[=EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases, this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.}
+
+\item{times}{\code{int} for the number of sequences/times.}
+
+\item{features}{\code{int} for the number of features within each sequence.}
 
 \item{target}{Named \code{factor} containing the labels of the corresponding embeddings.}
 
 \item{method}{\code{vector} containing strings of the requested methods for generating new cases.
-Currently "smote","dbsmote", and "adas" from package smotefamily are available.}
+Currently "smote","dbsmote", and "adas" from the package smotefamily are available.}
 
 \item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
 }
@@ -32,5 +43,5 @@ label/category.}
 }
 \description{
 This function creates synthetic cases for balancing the training with an
-object of class \link{TextEmbeddingClassifierNeuralNet}.
+object of the class \link{TextEmbeddingClassifierNeuralNet}.
 }

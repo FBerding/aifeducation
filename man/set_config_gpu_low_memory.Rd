@@ -8,7 +8,7 @@ set_config_gpu_low_memory()
 }
 \description{
 This function changes the memory usage of the gpus to allow computations
-on machine with small memory. With this function some computations of large
+on machines with small memory. With this function, some computations of large
 models may be possible but the speed of computation decreases.
 #'@return This function does not return anything. It is used for its
 side effects.

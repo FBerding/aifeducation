@@ -26,12 +26,12 @@ the correct text embedding model and ensures the correct handling of the
 embeddings.}
 
 \item{\code{bundeled_model}}{('bundle object')\cr
-Object for storing the keras model of the neural net. Saved as bundled
+Object for storing the keras model of the neural net. Saved as a bundled
 object with help of the package \link[bundle]{bundle} for serialization.}
 
 \item{\code{model_config}}{('list()')\cr
 List for storing information about the configuration of the model. This
-information is used for predicting new data.
+information is used to predict new data.
 \itemize{
 \item{\code{model_config$n_req: }}{Number of recurrent layers.}
 \item{\code{model_config$n_hidden: }}{Number of dense layers.}
@@ -48,21 +48,21 @@ information will be overwritten if a new training is started.
 \item{\code{config$history: }}{History of the last training.}
 \item{\code{config$data: }}{Object of class table storing the initial frequencies of the passed data.}
 \item{\code{config$data_pb:l }}{Matrix storing the number of additional cases (test and training) added
-during balanced pseudo labeling. The rows refer to folds and final training.
-The columns refer to the steps during pseudo labeling.}
+during balanced pseudo-labeling. The rows refer to folds and final training.
+The columns refer to the steps during pseudo-labeling.}
 \item{\code{config$data_bsc_test: }}{Matrix storing the number of cases for each category used for testing
 during the phase of balanced synthetic units. Please note that the
-frequencies include original and synthetic cases. In terms that the number
-of original and synthetic cases exceeds the limit for the majority classes
+frequencies include original and synthetic cases. In case the number
+of original and synthetic cases exceeds the limit for the majority classes,
 the frequency represents the number of cases created by cluster analysis.}
 \item{\code{config$date: }}{Time when the last training finished.}
-\item{\code{config$config: }}{List storing which kind of estimation was requested during last training.
+\item{\code{config$config: }}{List storing which kind of estimation was requested during the last training.
 \itemize{
-\item{\code{config$config$use_bsc:  }}{\code{TRUE} if  balanced synthetic cases was requested. \code{FALSE}
+\item{\code{config$config$use_bsc:  }}{\code{TRUE} if  balanced synthetic cases were requested. \code{FALSE}
 if not.}
-\item{\code{config$config$use_baseline: }}{\code{TRUE} if baseline estimation was requested. \code{FALSE}
+\item{\code{config$config$use_baseline: }}{\code{TRUE} if baseline estimation were requested. \code{FALSE}
 if not.}
-\item{\code{ config$config$use_bpl: }}{\code{TRUE} if  balanced pseudo labeling cases was requested. \code{FALSE}
+\item{\code{ config$config$use_bpl: }}{\code{TRUE} if  balanced, pseudo-labeling cases were requested. \code{FALSE}
 if not.}
 }}
 }}
@@ -71,17 +71,17 @@ if not.}
 List for storing central reliability measures of the last training.
 \itemize{
 \item{\code{reliability$test_metric: }}{Array containing the reliability measures for the validation data for
-every fold, method, and step (in case of pseudo labeling).}
+every fold, method, and step (in case of pseudo-labeling).}
 \item{\code{reliability$test_metric_mean: }}{Array containing the reliability measures for the validation data for
-every method and step (in case of pseudo labeling). The values represent
+every method and step (in case of pseudo-labeling). The values represent
 the mean values for every fold.}
-\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package \link[iotarelr]{iotarelr}
+\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package [iotarelr]{iotarelr}
 for every fold at the start and the end of the last training.
 \itemize{
 \item{\code{reliability$raw_iota_objects$iota_objects_start: }}{List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
-If the estimation of the baseline model is not requested the list is
+If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.}
 \item{\code{reliability$raw_iota_objects$iota_objects_end: }}{List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the final model
@@ -92,39 +92,39 @@ synthetic cases with pseudo labeling.}
 \item{\code{reliability$raw_iota_objects$iota_objects_start_free: }}{List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
-If the estimation of the baseline model is not requested the list is
+If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
 \item{\code{reliability$raw_iota_objects$iota_objects_end_free: }}{List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the final model
-for every fold. Depending of the requested training method these values
+for every fold. Depending of the requested training method, these values
 refer to the baseline model, a trained model on the basis of balanced
-synthetic cases, balanced pseudo labeling or a combination of balanced
-synthetic cases with pseudo labeling.
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
 }
 }
 \item{\code{reliability$iota_object_start: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
-for every fold. If the estimation of the baseline model is not requested the list is
+for every fold. If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.}
 \item{\code{ reliability$iota_object_start_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
-for every fold. If the estimation of the baseline model is not requested the list is
+for every fold. If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
 \item{\code{reliability$iota_object_end: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold.
-Depending of the requested training method this object
+Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
-synthetic cases, balanced pseudo labeling or a combination of balanced
-synthetic cases with pseudo labeling.}
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.}
 \item{\code{reliability$iota_object_end_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold.
-Depending of the requested training method this object
+Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
-synthetic cases, balanced pseudo labeling or a combination of balanced
-synthetic cases with pseudo labeling.
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
 }}
@@ -162,9 +162,9 @@ Creating a new instance of this class.
   hidden = c(128),
   rec = c(128),
   self_attention_heads = 0,
-  dropout = 0.2,
+  dropout = 0.4,
   recurrent_dropout = 0.4,
-  l2_regularizer = 0.001,
+  l2_regularizer = 0.01,
   optimizer = "adam",
   act_fct = "gelu",
   rec_act_fct = "tanh"
@@ -185,22 +185,22 @@ free text.}
 \item{\code{targets}}{\code{factor} containing the target values of the classifier.}
 
 \item{\code{hidden}}{\code{vector} containing the number of neurons for each dense layer.
-The length of the vector determines the number of dense layers. If you want no dense layer
+The length of the vector determines the number of dense layers. If you want no dense layer,
 set this parameter to \code{NULL}.}
 
 \item{\code{rec}}{\code{vector} containing the number of neurons for each recurrent layer.
-The length of the vector determines the number of dense layers. If you want no dense layer
+The length of the vector determines the number of dense layers. If you want no dense layer,
 set this parameter to \code{NULL}.}
 
 \item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads
-for a self attention layer. If this value is greater 0 a self attention layer is added
+for a self-attention layer. If this value is greater 0, a self-attention layer is added
 between the recurrent and dense layers together with a normalization and a
-recurrent layer. If set to 0 none of these layers is added.}
+recurrent layer. If set to 0, none of these layers are added.}
 
-\item{\code{dropout}}{\code{double} ranging between 0 and lower 1 determining the
+\item{\code{dropout}}{\code{double} ranging between 0 and lower 1, determining the
 dropout for each recurrent layer.}
 
-\item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1 determining the
+\item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1, determining the
 recurrent dropout for each recurrent layer.}
 
 \item{\code{l2_regularizer}}{\code{double} determining the l2 regularizer for every dense layer.}
@@ -224,21 +224,26 @@ tensorflow.
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$train(
   data_embeddings,
   data_targets,
-  data_n_valid_samples = 10,
+  data_n_test_samples = 5,
   use_baseline = TRUE,
   bsl_val_size = 0.25,
   use_bsc = TRUE,
   bsc_methods = c("dbsmote"),
   bsc_max_k = 10,
+  bsc_val_size = 0.25,
+  bsc_add_all = FALSE,
   use_bpl = TRUE,
-  bpl_max_steps = 10,
-  bpl_inc_ratio = 0.25,
-  bpl_anchor = 0.75,
-  bpl_min = 0.5,
-  bpl_weight_inc = 1,
-  bpl_valid_size = 0.33,
+  bpl_max_steps = 3,
+  bpl_epochs_per_step = 1,
+  bpl_dynamic_inc = FALSE,
+  bpl_balance = TRUE,
+  bpl_max = 1,
+  bpl_anchor = 1,
+  bpl_min = 0,
+  bpl_weight_inc = 0.02,
+  bpl_weight_start = 0,
   bpl_model_reset = FALSE,
-  epochs = 100,
+  epochs = 40,
   batch_size = 32,
   dir_checkpoint,
   trace = TRUE,
@@ -257,14 +262,14 @@ tensorflow.
 stored in \code{data_embeddings}. Factor must be named and has to use the
 same names used in \code{data_embeddings}.}
 
-\item{\code{data_n_valid_samples}}{\code{int} determining the number of cross-fold
+\item{\code{data_n_test_samples}}{\code{int} determining the number of cross-fold
 samples.}
 
 \item{\code{use_baseline}}{\code{bool} \code{TRUE} if the calculation of a baseline
 model is requested. This option is only relevant for \code{use_bsc=TRUE} or
-\code{use_pbl=TRUE}. If both are \code{FALSE} a baseline model is calculated.}
+\code{use_pbl=TRUE}. If both are \code{FALSE}, a baseline model is calculated.}
 
-\item{\code{bsl_val_size}}{\code{double} between 0 and 1 indicating the proportion of cases of each label
+\item{\code{bsl_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases of each class
 which should be used for the validation sample during the estimation of the baseline model.
 The remaining cases are part of the training data.}
 
@@ -279,32 +284,46 @@ and \code{bsc_methods=c("dbsmote")} are possible.}
 \item{\code{bsc_max_k}}{\code{int} determining the maximal number of k which is used
 for creating synthetic units.}
 
+\item{\code{bsc_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases of each class
+which should be used for the validation sample during the estimation with synthetic cases.}
+
+\item{\code{bsc_add_all}}{\code{bool} If \code{FALSE} only synthetic cases necessary to fill
+the gab between the class and the major class are added to the data. If \code{TRUE} all
+generated synthetic cases are added to the data.}
+
 \item{\code{use_bpl}}{\code{bool} \code{TRUE} if the estimation should integrate
-balanced pseudo labeling. \code{FALSE} if not.}
+balanced pseudo-labeling. \code{FALSE} if not.}
 
-\item{\code{bpl_max_steps}}{\code{int} determining the maximal number of steps for
-every application of balanced pseudo labeling.}
+\item{\code{bpl_max_steps}}{\code{int} determining the maximum number of steps during
+pseudo-labeling.}
 
-\item{\code{bpl_inc_ratio}}{\code{double} ratio between 0 and 1 indicating the
-proportion of new cases which should used for further training. See notes
-for more details.}
+\item{\code{bpl_epochs_per_step}}{\code{int} Number of training epochs within every step.}
+
+\item{\code{bpl_dynamic_inc}}{\code{bool} If \code{TRUE}, only a specific percentage
+of cases is included during each step. The percentage is determined by
+\eqn{step/bpl_max_steps}. If \code{FALSE}, all cases are used.}
+
+\item{\code{bpl_balance}}{\code{bool} If \code{TRUE}, the same number of cases for
+every category/class of the pseudo-labeled data are used with training. That
+is, the number of cases is determined by the minor class/category.}
+
+\item{\code{bpl_max}}{\code{double} between 0 and 1, setting the maximal level of
+confidence for considering a case for pseudo-labeling.}
 
 \item{\code{bpl_anchor}}{\code{double} between 0 and 1 indicating the reference
 point for sorting the new cases of every label. See notes for more details.}
 
-\item{\code{bpl_min}}{\code{double} between 0 and 1 setting the minimal level of
-confidence for considering a case for pseudo labeling.}
+\item{\code{bpl_min}}{\code{double} between 0 and 1, setting the minimal level of
+confidence for considering a case for pseudo-labeling.}
 
 \item{\code{bpl_weight_inc}}{\code{double} value how much the sample weights
-should be increased or decreased compared to the previous step. If the
-cases of all steps should be weighted equally set this value to 0.}
+should be increased for the cases with pseudo-labels in every step.}
 
-\item{\code{bpl_valid_size}}{\code{double} ratio between 0 and 1 determining the proportion
-of new cases for every label which should be added to the validation sample during training.
-The remaining cases are added to the training sample.}
+\item{\code{bpl_weight_start}}{\code{dobule} Starting value for the weights of the
+unlabeled cases.}
 
-\item{\code{bpl_model_reset}}{\code{bool} \code{TRUE} if the model should be
-reseted before training.}
+\item{\code{bpl_model_reset}}{\code{bool} If \code{TRUE}, model is re-initialized at every
+step.}
 
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 
@@ -312,12 +331,12 @@ reseted before training.}
 
 \item{\code{dir_checkpoint}}{\code{string} Path to the directory where
 the checkpoint during training should be saved. If the directory does not
-exists it is created.}
+exist, it is created.}
 
-\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation
+\item{\code{trace}}{\code{bool} \code{TRUE}, if information about the estimation
 phase should be printed to the console.}
 
-\item{\code{view_metrics}}{\code{bool} \code{TRUE} if metrics should be printed
+\item{\code{view_metrics}}{\code{bool} \code{TRUE}, if metrics should be printed
 in the RStudio IDE.}
 
 \item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not print any
@@ -333,16 +352,12 @@ one line of information for every epoch.}
 \itemize{
 
 \item{bsc_max_k: }{All values from 2 up to bsc_max_k are successively used. If
-the number of bsc_max_k is to high the value is reduced to a number that
+the number of bsc_max_k is too high, the value is reduced to a number that
 allows the calculating of synthetic units.}
 
-\item{bpl_inc_ratio: }{The ratio is applied to the label with the smallest number
-of new cases. The resulting value is used for every label to ensure the balance
-of all labels.}
-
-\item{bpl_anchor: }{With the help of this value the new cases are sorted. For
-this aim the distance from the anchor is calculated and all cases are arranged
-into an increasing order.
+\item{bpl_anchor: }{With the help of this value, the new cases are sorted. For
+this aim, the distance from the anchor is calculated and all cases are arranged
+into an ascending order.
 }
 }
 }
@@ -352,9 +367,9 @@ into an increasing order.
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-predict"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-predict}{}}}
 \subsection{Method \code{predict()}}{
-Method for prediciting new data with a trained neural net.
+Method for predicting new data with a trained neural net.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$predict(newdata)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$predict(newdata, batch_size = 32, verbose = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -362,6 +377,13 @@ Method for prediciting new data with a trained neural net.
 \describe{
 \item{\code{newdata}}{Object of class \code{TextEmbeddingModel} or
 \code{data.frame} for which predictions should be made.}
+
+\item{\code{batch_size}}{\code{int} Size of batches.}
+
+\item{\code{verbose}}{\code{int} \code{verbose=0} does not print any
+information about the training process from keras on the console.
+\code{verbose=1} prints a progress bar. \code{verbose=2} prints
+one line of information for every epoch.}
 }
 \if{html}{\out{</div>}}
 }
@@ -378,7 +400,7 @@ Method for setting publication information of the classifier
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_publication_info(
   type,
-  autors,
+  authors,
   citation,
   url = NULL
 )}\if{html}{\out{</div>}}
@@ -389,11 +411,11 @@ Method for setting publication information of the classifier
 \describe{
 \item{\code{type}}{\code{string} for choosing the type of information that should
 be added. \code{type="developer"} for information about the developer of the
-classifier and \code{type="trainer"} for information about persons who trained
-the classifier. If you modify an already existing classifier please use
+classifier and \code{type="trainer"} for information about people who trained
+the classifier. If you modify an already existing classifier, please use
 \code{type="modifier"}.}
 
-\item{\code{autors}}{Person list of authors.}
+\item{\code{authors}}{List of authors.}
 
 \item{\code{citation}}{Free text citation.}
 
@@ -406,13 +428,13 @@ the classifier. If you modify an already existing classifier please use
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_publication_info}{}}}
 \subsection{Method \code{get_publication_info()}}{
-Method for requesting the publication information of the classifier.
+Method for requesting the bibliographic information of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_publication_info()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-\code{list} with all saved publication information.
+\code{list} with all saved bibliographic information.
 }
 }
 \if{html}{\out{<hr>}}
@@ -437,13 +459,18 @@ the license text.}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_license"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_license}{}}}
 \subsection{Method \code{get_license()}}{
-Method for requesting the license of the classifier.
+Method for setting the license of the classifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_license()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-\code{string} License of the classifier.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -497,7 +524,7 @@ Method for requesting the model description.
 
 \subsection{Returns}{
 \code{list} with the description of the classifier in English
-and native language.
+and the native language.
 }
 }
 \if{html}{\out{<hr>}}

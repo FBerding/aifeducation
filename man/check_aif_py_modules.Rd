@@ -12,12 +12,12 @@ availability should be printed to the console.}
 }
 \value{
 The function prints a table with all relevant packages and shows
-which modules are available or not.
+which modules are available or unavailable.
 
-If all relevant modules are available the functions returns \code{TRUE}.
-In all other cases \code{FALSE}
+If all relevant modules are available, the functions returns \code{TRUE}.
+In all other cases it returns \code{FALSE}
 }
 \description{
-This function checks if all necessary python modules are available for
-the package aifeducation to work.
+This function checks if all  python modules necessary for the package 
+aifeducation to work are available.
 }

@@ -28,6 +28,8 @@ arma::cube matrix_to_array_c(arma::mat matrix,
                              arma::uword features){
   arma::uword i=0;
   arma::uword j=0;
+  arma::uword f=0;
+  arma::uword index=0;
 
   //cube(n_rows, n_cols, n_slices)
   arma::cube output_array(matrix.n_rows,
@@ -36,10 +38,14 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 
   for(i=0;i<matrix.n_rows;i++){
     for(j=0;j<times;j++){
-      output_array.tube(i,j,i,j)=matrix.submat(i,
-                      0+j*(features-1),
-                      i,
-                      (features-1)+j*(features-1));
+      index=j*features;
+      for(f=0;f<features;f++){
+        output_array(i,j,f)=matrix(i,f+index);
+      }
+      //output_array.tube(i,j,i,j)=matrix.submat(i,
+      //                0+j*(features-1),
+      //                i,
+      //                (features-1)+j*(features-1));
     }
   }
   return output_array;
