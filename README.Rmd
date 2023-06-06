@@ -94,11 +94,10 @@ devtools::install_github("FBerding/aifeducation")
 
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports both
-newer approaches such as BERT (Devlin et al. 2019) and older approaches
+newer approaches such as BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), 
+and Longformer Beltagy, Peters & Cohan 2020) and older approaches
 such as GlobalVectors (Pennington, Socher & Manning 2014) or Latent
-Dirichlet Allocation/Topic Modeling in classification tasks. Other newer
-approaches such as ROBERTA (Liu et al. 2019) or Longformer (Beltagy,
-Peters & Cohan 2020) are planned for the future.
+Dirichlet Allocation/Topic Modeling in classification tasks.
 
 *aifeducation* supports the usage of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of

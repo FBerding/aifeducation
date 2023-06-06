@@ -189,7 +189,7 @@ are possible:
 \if{html}{\out{<a id="method-TextEmbeddingModel-load_model"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_model}{}}}
 \subsection{Method \code{load_model()}}{
-Method for loading a transformer model into R.
+Method for loading a transformers model into R.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(model_dir)}\if{html}{\out{</div>}}
 }

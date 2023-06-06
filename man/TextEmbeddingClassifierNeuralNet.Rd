@@ -339,9 +339,9 @@ phase should be printed to the console.}
 \item{\code{view_metrics}}{\code{bool} \code{TRUE}, if metrics should be printed
 in the RStudio IDE.}
 
-\item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not print any
+\item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not cat any
 information about the training process from keras on the console.
-\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
+\code{keras_trace=1} cat a progress bar. \code{keras_trace=2} prints
 one line of information for every epoch.}
 
 \item{\code{n_cores}}{\code{int} Number of cores used for creating synthetic units.}
@@ -380,7 +380,7 @@ Method for predicting new data with a trained neural net.
 
 \item{\code{batch_size}}{\code{int} Size of batches.}
 
-\item{\code{verbose}}{\code{int} \code{verbose=0} does not print any
+\item{\code{verbose}}{\code{int} \code{verbose=0} does not cat any
 information about the training process from keras on the console.
 \code{verbose=1} prints a progress bar. \code{verbose=2} prints
 one line of information for every epoch.}

@@ -26,7 +26,6 @@ bert_modeling<-TextEmbeddingModel$new(
   chunks=4,
   overlap=40,
   aggregation="last",
-  use_cls_token=TRUE,
   model_dir=testthat::test_path(tmp_path))
 
 test_that("creation_bert", {

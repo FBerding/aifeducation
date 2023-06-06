@@ -171,18 +171,18 @@ test_that("check_combine_embedded_texts",{
       embeddings_list = list(embeddings_gvc,embeddings_gvc)))
 
   tmp_embedding1<-embeddings_gvc$clone(deep = TRUE)
-  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:5,]
+  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:5,,,drop=FALSE]
   tmp_embedding2<-embeddings_gvc$clone(deep = TRUE)
-  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[6:10,]
+  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[6:10,,,drop=FALSE]
 
   expect_s3_class(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2)),
                   class="EmbeddedText")
   expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),10)
 
   tmp_embedding1<-embeddings_topic$clone(deep = TRUE)
-  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:5,]
+  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:5,,,drop=FALSE]
   tmp_embedding2<-embeddings_topic$clone(deep = TRUE)
-  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[6:10,]
+  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[6:10,,,drop=FALSE]
 
   expect_s3_class(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2)),
                   class="EmbeddedText")

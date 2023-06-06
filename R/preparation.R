@@ -55,7 +55,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
       to=min(n_document_segments,chunk_size+(i-1)*chunk_size))
 
     if(trace==TRUE){
-      print(paste(date(),"Processing chunk",i,"/",n_iterations))
+      cat(paste(date(),"Processing chunk",i,"/",n_iterations))
     }
     tmp_text<-data[selected_documents]
     tmp_text<-stringr::str_replace_all(tmp_text,
@@ -111,7 +111,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
   final_vocab_draft$lemma_tolower<-tolower(final_vocab_draft$lemma)
 
   if(trace==TRUE){
-    print(paste(date(),"Done"))
+    cat(paste(date(),"Done"))
   }
 
   results<-NULL

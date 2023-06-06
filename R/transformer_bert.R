@@ -51,9 +51,18 @@ create_bert_model<-function(
     hidden_dropout_prob=0.1,
     trace=TRUE){
 
-  transformers<-reticulate::import("transformers")
-  datasets<-reticulate::import("datasets")
-  tok<-reticulate::import("tokenizers")
+  #argument checking-----------------------------------------------------------
+  if(max_position_embeddings>512){
+    warning("Due to a quadratic increase in memory requirments it is not
+            recommended to set max_position_embeddings above 512.
+            If you want to analyse long documents please split your document
+            into several chunks with an object of class TextEmbedding Model or
+            use another transformer (e.g. longformer).")
+  }
+
+  if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
+    stop("hidden_act must be gelu, relu, silu or gelu_new")
+  }
 
   #Creating a new Tokenizer for Computing Vocabulary
   tok_new<-tok$Tokenizer(tok$models$WordPiece())
@@ -66,19 +75,19 @@ create_bert_model<-function(
 
   #Calculating Vocabulary
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Start Computing Vocabulary"))
   }
   tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Start Computing Vocabulary - Done"))
   }
 
   special_tokens=c("[PAD]","[CLS]","[SEP]","[UNK]","[MASK]")
 
   if(dir.exists(model_dir)==FALSE){
-    print(paste(date(),"Creating Checkpoint Directory"))
+    cat(paste(date(),"Creating Checkpoint Directory"))
     dir.create(model_dir)
   }
 
@@ -86,14 +95,14 @@ create_bert_model<-function(
         file=paste0(model_dir,"/","vocab.txt"))
 
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Creating Tokenizer"))
   }
   tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
                                            do_lower_case=vocab_do_lower_case)
 
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Creating Tokenizer - Done"))
   }
 
@@ -111,18 +120,18 @@ create_bert_model<-function(
   bert_model=transformers$TFBertModel(configuration)
 
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Saving Bert Model"))
   }
   bert_model$save_pretrained(model_dir)
 
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Saving Tokenizer Model"))
   }
   tokenizer$save_pretrained(model_dir)
   if(trace==TRUE){
-    print(paste(date(),
+    cat(paste(date(),
                 "Done"))
   }
 }
@@ -200,7 +209,7 @@ train_tune_bert_model=function(output_dir,
   mlm_model=transformer$TFBertForMaskedLM$from_pretrained(bert_model_dir_path)
   tokenizer<-transformer$BertTokenizerFast$from_pretrained(bert_model_dir_path)
 
-  print(paste(date(),"Tokenize Raw Texts"))
+  cat(paste(date(),"Tokenize Raw Texts"))
   prepared_texts<-quanteda::tokens(
     x = raw_texts,
     what = "word",
@@ -216,7 +225,7 @@ train_tune_bert_model=function(output_dir,
     verbose = trace)
 
   if(aug_vocab_by>0){
-    print(paste(date(),"Augmenting vocabulary"))
+    cat(paste(date(),"Augmenting vocabulary"))
 
     #Creating a new Tokenizer for Computing Vocabulary
     vocab_size_old=length(tokenizer$get_vocab())
@@ -230,21 +239,21 @@ train_tune_bert_model=function(output_dir,
 
     #Calculating Vocabulary
     if(trace==TRUE){
-      print(paste(date(),
+      cat(paste(date(),
                   "Start Computing Vocabulary"))
     }
     tok_new$train_from_iterator(raw_texts,trainer=trainer)
     new_tokens=names(tok_new$get_vocab())
     if(trace==TRUE){
-      print(paste(date(),
+      cat(paste(date(),
                   "Start Computing Vocabulary - Done"))
     }
     invisible(tokenizer$add_tokens(new_tokens = new_tokens))
     invisible(mlm_model$resize_token_embeddings(length(tokenizer)))
-    print(paste(date(),"Adding",length(tokenizer$get_vocab())-vocab_size_old,"New Tokens"))
+    cat(paste(date(),"Adding",length(tokenizer$get_vocab())-vocab_size_old,"New Tokens"))
   }
 
-  print(paste(date(),"Creating Text Chunks"))
+  cat(paste(date(),"Creating Text Chunks"))
   prepared_texts_chunks<-quanteda::tokens_chunk(
     x=prepared_texts,
     size=chunk_size,
@@ -260,9 +269,9 @@ train_tune_bert_model=function(output_dir,
 
   prepared_text_chunks_strings<-lapply(prepared_texts_chunks,paste,collapse = " ")
   prepared_text_chunks_strings<-as.character(prepared_text_chunks_strings)
-  print(paste(date(),length(prepared_text_chunks_strings),"Chunks Created"))
+  cat(paste(date(),length(prepared_text_chunks_strings),"Chunks Created"))
 
-  print(paste(date(),"Creating Input"))
+  cat(paste(date(),"Creating Input"))
   tokenized_texts= tokenizer(prepared_text_chunks_strings,
                              truncation =TRUE,
                              padding= TRUE,
@@ -270,11 +279,11 @@ train_tune_bert_model=function(output_dir,
                              return_tensors="np")
 
 
-  print(paste(date(),"Creating TensorFlow Dataset"))
+  cat(paste(date(),"Creating TensorFlow Dataset"))
   tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
 
   if(whole_word==TRUE){
-    print(paste(date(),"Using Whole Word Masking"))
+    cat(paste(date(),"Using Whole Word Masking"))
     word_ids=matrix(nrow = length(prepared_texts_chunks),
                     ncol=(chunk_size-2))
     for(i in 0:(nrow(word_ids)-1)){
@@ -288,7 +297,7 @@ train_tune_bert_model=function(output_dir,
       mlm = TRUE,
       mlm_probability = p_mask)
   } else {
-    print(paste(date(),"Using Token Masking"))
+    cat(paste(date(),"Using Token Masking"))
     data_collator=transformer$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
       mlm = TRUE,
@@ -311,11 +320,11 @@ train_tune_bert_model=function(output_dir,
     shuffle = TRUE
   )
 
-  print(paste(date(),"Preparing Training of the Model"))
+  cat(paste(date(),"Preparing Training of the Model"))
   adam<-tf$keras$optimizers$Adam
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
-    print(paste(date(),"Creating Checkpoint Directory"))
+    cat(paste(date(),"Creating Checkpoint Directory"))
     dir.create(paste0(output_dir,"/checkpoints"))
   }
   callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
@@ -328,13 +337,13 @@ train_tune_bert_model=function(output_dir,
     save_weights_only= TRUE
   )
 
-  print(paste(date(),"Compile Model"))
+  cat(paste(date(),"Compile Model"))
   mlm_model$compile(optimizer=adam(learning_rate))
 
   #Clear session to provide enough resources for computations
   tf$keras$backend$clear_session()
 
-  print(paste(date(),"Start Fine Tuning"))
+  cat(paste(date(),"Start Fine Tuning"))
   mlm_model$fit(x=tf_train_dataset,
                 validation_data=tf_test_dataset,
                 epochs=as.integer(n_epoch),
@@ -342,16 +351,16 @@ train_tune_bert_model=function(output_dir,
                 use_multiprocessing=multi_process,
                 callbacks=list(callback_checkpoint))
 
-  print(paste(date(),"Load Weights From Best Checkpoint"))
+  cat(paste(date(),"Load Weights From Best Checkpoint"))
   mlm_model$load_weights(paste0(output_dir,"/checkpoints/"))
 
-  print(paste(date(),"Saving Bert Model"))
+  cat(paste(date(),"Saving Bert Model"))
   mlm_model$save_pretrained(save_directory=output_dir)
 
-  print(paste(date(),"Saving Tokenizer"))
+  cat(paste(date(),"Saving Tokenizer"))
   tokenizer$save_pretrained(output_dir)
 
-  print(paste(date(),"Done"))
+  cat(paste(date(),"Done"))
 
 }
 

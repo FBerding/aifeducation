@@ -18,6 +18,6 @@ If all relevant modules are available, the functions returns \code{TRUE}.
 In all other cases it returns \code{FALSE}
 }
 \description{
-This function checks if all  python modules necessary for the package 
+This function checks if all  python modules necessary for the package
 aifeducation to work are available.
 }

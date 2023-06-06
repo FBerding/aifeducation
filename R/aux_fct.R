@@ -666,8 +666,8 @@ create_synthetic_units<-function(embedding,
   tmp_target=(target==cat)
   n_minor=sum(tmp_target)
   n_major=max(cat_freq)
-  #print(cat_freq)
-  #print(table(tmp_target))
+  #cat(cat_freq)
+  #cat(table(tmp_target))
 
   condition=(
     #(cat_freq[cat]!=max(cat_freq)) &

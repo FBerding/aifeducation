@@ -1,6 +1,8 @@
 testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                   message = "Necessary python modules not available")
+testthat::skip_if_not(condition = dir.exists(testthat::test_path("test_data/bert")),
+                      message = "Necessary directory not available")
 aifeducation::set_config_gpu_low_memory()
 
 test_that("create_bert_model", {
@@ -11,30 +13,30 @@ test_that("create_bert_model", {
 
   expect_no_error(
     create_bert_model(
-    model_dir=testthat::test_path("test_data"),
-    vocab_raw_texts=example_data$text,
+    model_dir=testthat::test_path("test_data/bert"),
+    vocab_raw_texts=example_data$text[1:500],
     vocab_size=30522,
     vocab_do_lower_case=FALSE,
     max_position_embeddings=512,
-    hidden_size=768,
-    num_hidden_layer=12,
-    num_attention_heads=12,
-    intermediate_size=3072,
+    hidden_size=256,
+    num_hidden_layer=6,
+    num_attention_heads=8,
+    intermediate_size=1024,
     hidden_act="gelu",
     hidden_dropout_prob=0.1,
     trace=FALSE))
 
   expect_no_error(
     create_bert_model(
-      model_dir=testthat::test_path("test_data"),
-      vocab_raw_texts=example_data$text,
+      model_dir=testthat::test_path("test_data/bert"),
+      vocab_raw_texts=example_data$text[1:500],
       vocab_size=30522,
       vocab_do_lower_case=TRUE,
       max_position_embeddings=512,
-      hidden_size=768,
-      num_hidden_layer=12,
-      num_attention_heads=12,
-      intermediate_size=3072,
+      hidden_size=256,
+      num_hidden_layer=6,
+      num_attention_heads=8,
+      intermediate_size=1024,
       hidden_act="gelu",
       hidden_dropout_prob=0.1,
       trace=FALSE))

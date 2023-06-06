@@ -22,7 +22,7 @@ install_py_modules<-function(envname="aifeducation"){
 
 #'Check if all necessary python modules are available
 #'
-#'This function checks if all  python modules necessary for the package 
+#'This function checks if all  python modules necessary for the package
 #'aifeducation to work are available.
 #'@param trace \code{bool} \code{TRUE} if a list with all modules and their
 #'availability should be printed to the console.
@@ -50,7 +50,7 @@ check_aif_py_modules<-function(trace=TRUE){
   }
 
   if(trace==TRUE){
-    print(matrix_overview)
+    cat(matrix_overview)
   }
 
   if(sum(matrix_overview[,2])==length(relevant_modules)){

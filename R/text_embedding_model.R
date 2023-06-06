@@ -234,10 +234,28 @@ TextEmbeddingModel<-R6::R6Class(
       self$basic_components$method=method
       self$basic_components$max_length=as.integer(max_length)
       #------------------------------------------------------------------------
-      if(self$basic_components$method=="bert"){
-        transformer = reticulate::import('transformers')
-        self$transformer_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
-        self$transformer_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
+      if(self$basic_components$method=="bert" |
+         self$basic_components$method=="roberta" |
+         self$basic_components$method=="longformer"){
+
+        if(self$basic_components$method=="bert"){
+          self$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
+          self$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
+        } else if(self$basic_components$method=="roberta"){
+          self$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
+          self$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
+        } else if(self$basic_components$method=="longformer"){
+          self$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
+          self$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
+        }
+
+        if(self$basic_components$method=="longformer" |
+           self$basic_components$method=="roberta"){
+          if(max_length>(self$transformer_components$model$config$max_position_embeddings-2)){
+            stop(paste("max_length is",max_length,". This value is not allowed to exceed",
+                       self$transformer_components$model$config$max_position_embeddings-2))
+          }
+        }
 
         self$transformer_components$chunks<-chunks
         self$transformer_components$overlap<-overlap
@@ -403,16 +421,26 @@ TextEmbeddingModel<-R6::R6Class(
       private$model_info$model_date<-date()
     },
     #--------------------------------------------------------------------------
-    #'@description Method for loading a transformer model into R.
+    #'@description Method for loading a transformers model into R.
     #'@param model_dir \code{string} containing the path to the relevant
     #'model.
     load_model=function(model_dir){
-      if(self$basic_components$method=="bert"){
-        transformer = reticulate::import('transformers')
-        self$transformer_components$tokenizer<-transformer$BertTokenizerFast$from_pretrained(model_dir)
-        self$transformer_components$model<-transformer$TFBertForMaskedLM$from_pretrained(model_dir)
+        if(self$basic_components$method=="bert" |
+           self$basic_components$method=="roberta" |
+           self$basic_components$method=="longformer"){
+
+          if(self$basic_components$method=="bert"){
+            self$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
+            self$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
+          } else if(self$basic_components$method=="roberta"){
+            self$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
+            self$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
+          } else if(self$basic_components$method=="longformer"){
+            self$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
+            self$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
+          }
       } else {
-        message("Method only relevant for transformer models.")
+        message("Method only relevant for transformers models.")
       }
     },
     #-------------------------------------------------------------------------
@@ -430,7 +458,9 @@ TextEmbeddingModel<-R6::R6Class(
                     trace = FALSE){
       n_units<-length(raw_text)
 
-      if(self$basic_components$method=="bert"){
+      if(self$basic_components$method=="bert" |
+         self$basic_components$method=="roberta" |
+         self$basic_components$method=="longformer"){
         chunk_list<-vector(length = n_units)
         encodings<-NULL
         #---------------------------------------------------------------------
@@ -455,7 +485,7 @@ TextEmbeddingModel<-R6::R6Class(
                   return_tensors="tf")
               )
               if(trace==TRUE){
-                print(paste(date(),i,"/",n_units,"block",j,"/",chunks))
+                cat(paste(date(),i,"/",n_units,"block",j,"/",chunks))
               }
             }
             encodings[i]<-list(tokens_unit)
@@ -483,7 +513,7 @@ TextEmbeddingModel<-R6::R6Class(
 
             index_min=length(text_chunks)+1
             index_max=length(text_chunks)+length(preparation_tokens)
-            #print(index_min)
+            #cat(index_min)
             text_chunks=append(x=text_chunks,values = unname(preparation_tokens))
             #text_chunks[index_min:index_max]<-list(preparation_tokens)
           }
@@ -559,7 +589,9 @@ TextEmbeddingModel<-R6::R6Class(
         int_seqence=tmp[1]
       }
       #-------------------------------------------------------------------------
-      if(self$basic_components$method=="bert"){
+      if(self$basic_components$method=="bert" |
+         self$basic_components$method=="roberta" |
+         self$basic_components$method=="longformer"){
         tmp_token_list=NULL
         for(i in 1:length(int_seqence)){
           tmp_vector<-int_seqence[[i]]
@@ -618,7 +650,9 @@ TextEmbeddingModel<-R6::R6Class(
     embed=function(raw_text=NULL,doc_id=NULL,batch_size=8, trace = FALSE){
 
       #bert---------------------------------------------------------------------
-      if(self$basic_components$method=="bert"){
+      if(self$basic_components$method=="bert" |
+         self$basic_components$method=="roberta" |
+         self$basic_components$method=="longformer"){
 
         n_units<-length(raw_text)
         n_layer<-self$transformer_components$model$config$num_hidden_layers
@@ -635,7 +669,7 @@ TextEmbeddingModel<-R6::R6Class(
           index_min=1+(b-1)*batch_size
           index_max=min(b*batch_size,n_units)
           batch=index_min:index_max
-          #print(batch)
+          #cat(batch)
 
           tokens<-self$encode(raw_text = raw_text[batch],
                               trace = trace,
@@ -663,7 +697,7 @@ TextEmbeddingModel<-R6::R6Class(
           } else if (self$transformer_components$aggregation=="fourth_to_last") {
             selected_layer=self$transformer_components$model$config$num_hidden_layers-4
           } else if (self$transformer_components$aggregation=="all") {
-            selected_layer=1:self$transformer_components$model$config$num_hidden_layers
+            selected_layer=2:self$transformer_components$model$config$num_hidden_layers
           } else if (self$transformer_components$aggregation=="last_four") {
             selected_layer=(self$transformer_components$model$config$num_hidden_layers-4):self$transformer_components$model$config$num_hidden_layers
           }
@@ -689,7 +723,7 @@ TextEmbeddingModel<-R6::R6Class(
             dimnames(text_embedding)[[1]]<-doc_id[batch]
             batch_results[b]=list(text_embedding)
             if(trace==TRUE){
-            print(paste(date(),
+            cat(paste(date(),
                         "Batch",b,"/",n_batches,"Done"))
             }
           }
@@ -734,7 +768,7 @@ TextEmbeddingModel<-R6::R6Class(
         #text_embedding<-as.data.frame(text_embedding)
         #Topic Modeling---------------------------------------------------------
       } else if(self$basic_components$method=="lda"){
-        tokens<-self$encode(raw_text = raw_text[batch],
+        tokens<-self$encode(raw_text = raw_text,
                             trace = trace,
                             token_encodings_only=FALSE)
 
@@ -775,7 +809,9 @@ TextEmbeddingModel<-R6::R6Class(
       }
       #------------------------------------------------------------------------
 
-      if(self$basic_components$method=="bert"){
+      if(self$basic_components$method=="bert" |
+         self$basic_components$method=="roberta" |
+         self$basic_components$method=="longformer" ){
         embeddings<-EmbeddedText$new(
           model_name = private$model_info$model_name,
           model_label = private$model_info$model_label,

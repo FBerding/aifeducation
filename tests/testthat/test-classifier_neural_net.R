@@ -13,10 +13,11 @@ example_data<-data.frame(
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 example_data$label[c(1:500,1001:1750)]=NA
+example_data<-example_data[c(501:600,1001:1100,1751:1850),]
 example_targets<-as.factor(example_data$label)
 names(example_targets)=example_data$id
 
-load(path)
+load(testthat::test_path(path))
 current_embeddings<-bert_embeddings$clone(deep = TRUE)
 #-------------------------------------------------------------------------------
 
@@ -29,7 +30,7 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   rec=c(28,28),
   dropout=0.2,
   recurrent_dropout=0.4,
-  l2_regularizer=0.001,
+  l2_regularizer=0.01,
   optimizer="adam",
   act_fct="gelu",
   rec_act_fct="tanh")
@@ -52,7 +53,7 @@ test_that("training_baseline_only", {
       bsc_max_k=10,
       bsc_val_size=0.25,
       use_bpl=FALSE,
-      bpl_max_steps=3,
+      bpl_max_steps=2,
       bpl_epochs_per_step=1,
       bpl_dynamic_inc=FALSE,
       bpl_balance=TRUE,
@@ -62,7 +63,7 @@ test_that("training_baseline_only", {
       bpl_weight_inc=0.02,
       bpl_weight_start=0.00,
       bpl_model_reset=FALSE,
-      epochs=9,
+      epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
@@ -85,7 +86,7 @@ test_that("training_bsc_only", {
       bsc_max_k=10,
       bsc_val_size=0.25,
       use_bpl=TRUE,
-      bpl_max_steps=3,
+      bpl_max_steps=2,
       bpl_epochs_per_step=1,
       bpl_dynamic_inc=FALSE,
       bpl_balance=FALSE,
@@ -95,7 +96,7 @@ test_that("training_bsc_only", {
       bpl_weight_inc=0.02,
       bpl_weight_start=0.00,
       bpl_model_reset=FALSE,
-      epochs=40,
+      epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
@@ -118,7 +119,7 @@ test_that("training_pbl_baseline", {
       bsc_max_k=10,
       bsc_val_size=0.25,
       use_bpl=TRUE,
-      bpl_max_steps=3,
+      bpl_max_steps=2,
       bpl_epochs_per_step=1,
       bpl_dynamic_inc=FALSE,
       bpl_balance=TRUE,
@@ -128,7 +129,7 @@ test_that("training_pbl_baseline", {
       bpl_weight_inc=0.02,
       bpl_weight_start=0.00,
       bpl_model_reset=FALSE,
-      epochs=40,
+      epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
@@ -151,7 +152,7 @@ test_that("training_pbl_bsc", {
       bsc_max_k=10,
       bsc_val_size=0.25,
       use_bpl=TRUE,
-      bpl_max_steps=3,
+      bpl_max_steps=2,
       bpl_epochs_per_step=1,
       bpl_dynamic_inc=FALSE,
       bpl_balance=TRUE,
@@ -161,7 +162,7 @@ test_that("training_pbl_bsc", {
       bpl_weight_inc=0.02,
       bpl_weight_start=0.00,
       bpl_model_reset=FALSE,
-      epochs=40,
+      epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,

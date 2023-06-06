@@ -546,9 +546,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'exist, it is created.
     #'@param trace \code{bool} \code{TRUE}, if information about the estimation
     #'phase should be printed to the console.
-    #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
+    #'@param keras_trace \code{int} \code{keras_trace=0} does not cat any
     #'information about the training process from keras on the console.
-    #'\code{keras_trace=1} print a progress bar. \code{keras_trace=2} prints
+    #'\code{keras_trace=1} cat a progress bar. \code{keras_trace=2} prints
     #'one line of information for every epoch.
     #'@param view_metrics \code{bool} \code{TRUE}, if metrics should be printed
     #'in the RStudio IDE.
@@ -814,7 +814,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           #Save results for baseline model
           test_metric[iter,1,]<-test_res
-          #print(paste("Baseline:",test_res["avg_alpha"]))
+          #cat(paste("Baseline:",test_res["avg_alpha"]))
 
           if(use_bsc==TRUE | use_bpl==TRUE){
           iota_objects_start[iter]=list(iotarelr::check_new_rater(true_values = targets_labeled_test,
@@ -824,7 +824,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                                                        assigned_values = test_pred_cat,
                                                                        free_aem = TRUE))
           }
-          #print(paste("Train",length(targets_labeled_train_train),
+          #cat(paste("Train",length(targets_labeled_train_train),
           #          "Validation",length(targets_labeled_val),
           #          "Test",length(targets_labeled_test)))
         }
@@ -972,9 +972,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                      predicted_values = test_pred_cat)
           #Save results for baseline model
           test_metric[iter,2,]<-test_res
-          #print(paste("BSC",test_res["avg_alpha"]))
+          #cat(paste("BSC",test_res["avg_alpha"]))
 
-          #print(paste("Train",length(names_targets_labeled_train_train),
+          #cat(paste("Train",length(names_targets_labeled_train_train),
           #            "Validation",length(names_targets_labeled_train_test),
           #            "Test",length(targets_labeled_test)))
 
@@ -1019,7 +1019,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               bpl_inc_ratio=1
             }
 
-            #print(paste("Train",length(pseudo_label_targets_labeled_train),
+            #cat(paste("Train",length(pseudo_label_targets_labeled_train),
             #            "Validation",length(pseudo_label_targets_labeled_val),
             #            "Test",length(pseudo_label_targets_labeled_test),
             #            "Unlabeled",length(names_unlabeled)))
@@ -1144,7 +1144,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               val_res=get_coder_metrics(true_values = pseudo_label_targets_labeled_val,
                                         predicted_values = val_pred_cat)
 
-              #print(table(data.frame(pred=val_predictions$expected_category,
+              #cat(table(data.frame(pred=val_predictions$expected_category,
               #              true=pseudo_label_targets_labeled_val)))
 
               #Predict test targets
@@ -1163,10 +1163,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                 best_val_metric=val_res
                 best_test_metric=test_res
               }
-              #print(paste("Validation:",val_res["avg_alpha"]))
-              #print(paste("Test:",test_res["avg_alpha"]))
+              #cat(paste("Validation:",val_res["avg_alpha"]))
+              #cat(paste("Test:",test_res["avg_alpha"]))
 
-              #print(paste("Train",length(targets_labeled_and_pseudo),
+              #cat(paste("Train",length(targets_labeled_and_pseudo),
               #            "Validation",length(pseudo_label_targets_labeled_val),
               #            "Test",length(pseudo_label_targets_labeled_test),
               #            "Unlabeled",length(targets_pseudo_labeled)))
@@ -1286,7 +1286,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
 
-        #print(paste("Train",length(names_targets_labeled_train_train),
+        #cat(paste("Train",length(names_targets_labeled_train_train),
         #            "Validation",length(names_targets_labeled_train_test)))
 
       }
@@ -1417,7 +1417,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             view_metrics=view_metrics,
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
-        #print(paste("Train",length(names_targets_labeled_train_train),
+        #cat(paste("Train",length(names_targets_labeled_train_train),
         #            "Validation",length(names_targets_labeled_train_test)))
       }
 
@@ -1454,7 +1454,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         #Start of While-------------------------------------------------------
         while(step <=bpl_max_steps & added_cases_train>0){
 
-          #print(paste("Train",length(pseudo_label_targets_labeled_train),
+          #cat(paste("Train",length(pseudo_label_targets_labeled_train),
           #            "Validation",length(pseudo_label_targets_labeled_val),
           #            "Unlabeled",length(names_unlabeled)))
 
@@ -1573,7 +1573,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               reset_model=bpl_model_reset,
                               dir_checkpoint=dir_checkpoint,
                               sample_weights=sample_weights)
-          #print(paste("Train",length(targets_labeled_and_pseudo),
+          #cat(paste("Train",length(targets_labeled_and_pseudo),
           #            "Validation",length(pseudo_label_targets_labeled_val),
           #            "Unlabeled",length(targets_pseudo_labeled)))
 
@@ -1592,7 +1592,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             new_best_model=self$bundeled_model
             best_val_metric=val_res
           }
-          #print(paste("Validation:",val_res["avg_alpha"]))
+          #cat(paste("Validation:",val_res["avg_alpha"]))
 
           if(trace==TRUE){
             cat(paste(date(),
@@ -1663,7 +1663,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@description Method for predicting new data with a trained neural net.
     #'@param newdata Object of class \code{TextEmbeddingModel} or
     #'\code{data.frame} for which predictions should be made.
-    #'@param verbose \code{int} \code{verbose=0} does not print any
+    #'@param verbose \code{int} \code{verbose=0} does not cat any
     #'information about the training process from keras on the console.
     #'\code{verbose=1} prints a progress bar. \code{verbose=2} prints
     #'one line of information for every epoch.
@@ -1970,7 +1970,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(reset_model==TRUE){
         model$set_weights(private$init_weights)
-        #print("Model reseted")
+        #cat("Model reseted")
       }
 
       tf<-reticulate::import("tensorflow")
@@ -1988,7 +1988,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       if(dir.exists(paste0(dir_checkpoint,"/checkpoints"))==FALSE){
-        print(paste(date(),"Creating Checkpoint Directory"))
+        cat(paste(date(),"Creating Checkpoint Directory"))
         dir.create(paste0(dir_checkpoint,"/checkpoints"))
       }
 
@@ -2017,7 +2017,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         sample_weight=sample_weights)
 
       if(use_callback==TRUE){
-        #print(paste(date(),"Load Weights From Best Checkpoint"))
+        #cat(paste(date(),"Load Weights From Best Checkpoint"))
         model$load_weights(paste0(dir_checkpoint,"/checkpoints"))
       }
 
