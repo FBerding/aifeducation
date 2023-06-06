@@ -142,7 +142,7 @@ create_roberta_model<-function(
 
 
 
-#'Function for training and fine-tuning a Roberta model
+#'Function for training and fine-tuning a RoBERTa model
 #'
 #'This function can be used to train or fine-tune a transformer
 #'based on BERT architecture with the help of the python libraries 'transformers',

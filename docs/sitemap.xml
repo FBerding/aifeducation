@@ -46,6 +46,12 @@
     <loc>/reference/create_iota2_mean_object.html</loc>
   </url>
   <url>
+    <loc>/reference/create_longformer_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_roberta_model.html</loc>
+  </url>
+  <url>
     <loc>/reference/create_synthetic_units.html</loc>
   </url>
   <url>
@@ -104,5 +110,11 @@
   </url>
   <url>
     <loc>/reference/train_tune_bert_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/train_tune_longformer_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/train_tune_roberta_model.html</loc>
   </url>
 </urlset>

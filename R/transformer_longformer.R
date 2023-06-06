@@ -140,7 +140,7 @@ create_longformer_model<-function(
 
 
 
-#'Function for training and fine-tuning a Roberta model
+#'Function for training and fine-tuning a Longformer model
 #'
 #'This function can be used to train or fine-tune a transformer
 #'based on BERT architecture with the help of the python libraries 'transformers',
