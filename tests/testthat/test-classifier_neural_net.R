@@ -1,7 +1,7 @@
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
-path="test_data/bert_embeddings.rda"
+path="test_data/classifier/bert_embeddings.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 

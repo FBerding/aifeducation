@@ -4,7 +4,8 @@ Trial
 ^README\.Rmd$
 materials
 test_model
-tests/testthat/test_data
+tests/testthat/test_data/language_models
+test/testthat/test_data/tmp
 .git
 .gitignore
 _pkgdown.yml

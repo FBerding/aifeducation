@@ -1,4 +1,4 @@
-path="test_data/basic_text_rep_movie_reviews.rda"
+path="test_data/gvc_lda/basic_text_rep_movie_reviews.rda"
 testthat::skip_if_not(condition=file.exists(path),
                       message  = "Necessary dataset not available")
 

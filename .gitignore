@@ -9,3 +9,5 @@ udpipe_models
 language_models
 .Rhistory
 *.h5
+tests/testthat/test_data/language_models
+test/testthat/test_data/tmp

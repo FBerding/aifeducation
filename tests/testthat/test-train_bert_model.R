@@ -26,7 +26,7 @@ test_that("train_tune_bert_model", {
                           multi_process=FALSE,
                           trace=FALSE))
   expect_no_error(
-    train_tune_bert_model(output_dir=testthat::test_path("test_data/tmp"),
+    train_tune_bert_model(output_dir=testthat::test_path("test_data/bert"),
                           bert_model_dir_path=testthat::test_path("test_data/bert"),
                           raw_texts= example_data$text[1:5],
                           aug_vocab_by=100,
@@ -41,7 +41,7 @@ test_that("train_tune_bert_model", {
                           trace=FALSE))
 
   expect_no_error(
-    train_tune_bert_model(output_dir=testthat::test_path("test_data/tmp"),
+    train_tune_bert_model(output_dir=testthat::test_path("test_data/bert"),
                           bert_model_dir_path=testthat::test_path("test_data/bert"),
                           raw_texts= example_data$text[1:5],
                           aug_vocab_by=0,

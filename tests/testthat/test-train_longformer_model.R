@@ -2,7 +2,7 @@ testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace=FALSE),
                   message = "Necessary python modules not available")
 testthat::skip_if_not(condition = dir.exists(testthat::test_path("test_data/longformer")),
-                      message = "Necessary bert model not available")
+                      message = "Necessary longformer model not available")
 aifeducation::set_config_gpu_low_memory()
 
 test_that("train_tune_longformer_model", {
