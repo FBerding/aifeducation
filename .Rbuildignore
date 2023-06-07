@@ -10,3 +10,4 @@ tests/testthat/test_data
 _pkgdown.yml
 docs
 ^vignettes/articles$
+^\.github$

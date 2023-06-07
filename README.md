@@ -4,6 +4,8 @@
 # aifeducation
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is

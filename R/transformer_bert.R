@@ -173,7 +173,7 @@ create_bert_model<-function(
 #'at \url{https://huggingface.co/}.
 #'@note New models can be created via the function \link{create_bert_model}.
 #'@note Training of the model makes use of dynamic masking in contrast to the
-#'original paper where static masking was used.
+#'original paper where static masking was applied.
 #'@references
 #'Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
 #'Pre-training of Deep Bidirectional Transformers for Language

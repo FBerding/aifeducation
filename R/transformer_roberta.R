@@ -171,7 +171,7 @@ create_roberta_model<-function(
 #'\link{create_roberta_model}.
 #'@note Training of this model makes use of dynamic masking.
 #'
-#'#'@references
+#'@references
 #'Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 #'Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
 #'Optimized BERT Pretraining Approach.
