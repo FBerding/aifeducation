@@ -519,9 +519,7 @@ get_synthetic_cases<-function(embedding,
 
   #transform array to matrix
   feature_names=dimnames(embedding)[3]
-  save(embedding,file="test_array.rda")
   embedding=array_to_matrix(embedding)
-  save(embedding,file="test_matrix.rda")
   #Calculate the number of chunks for every cases
   n_chunks<-get_n_chunks(text_embeddings = embedding,
                          times = times,

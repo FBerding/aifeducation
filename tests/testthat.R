@@ -8,5 +8,6 @@
 
 library(testthat)
 library(aifeducation)
+library(quanteda.textmodels)
 
 test_check("aifeducation")

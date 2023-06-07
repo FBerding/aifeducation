@@ -76,7 +76,7 @@ at \url{https://huggingface.co/}.
 New models can be created via the function \link{create_bert_model}.
 
 Training of the model makes use of dynamic masking in contrast to the
-original paper where static masking was used.
+original paper where static masking was applied.
 }
 \references{
 Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:

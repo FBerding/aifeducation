@@ -7,6 +7,5 @@ tmp
 checkpoints
 udpipe_models
 language_models
-man
 .Rhistory
 *.h5
