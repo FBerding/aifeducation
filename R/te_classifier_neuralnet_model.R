@@ -11,6 +11,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'Name of the classifier.
     name=NULL,
 
+    #'@field name_root ('character()')\cr
+    #'Root part of the name of the classifier.
+    name_root=NULL,
+
     #'@field label ('character()')\cr
     #'Label of the classifier used as the individual title.
     label=NULL,
@@ -244,7 +248,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #------------------------------------------------------------------------
 
       #Setting Label and Name
-      self$name=name
+      self$name_root=name
+      self$name=paste0(self$name_root,"_id_",generate_id(16))
       self$label=label
 
       #Basic Information of Input and Target Data
@@ -758,6 +763,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       targets_labeleld_all=na.omit(data_targets)
 
       names_unlabeled=names(subset(data_targets,is.na(data_targets)==TRUE))
+
+      #Setting a new ID for the classifier
+      self$name=paste0(self$name_root,"_id_",generate_id(16))
 
       for(iter in 1:folds$n_folds){
         #---------------------------------------------
@@ -1790,7 +1798,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@description Method for setting the license of the classifier.
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
-    set_license=function(license){
+    set_license=function(license="CC BY-NC-SA"){
       private$model_info$model_license<-license
     },
     #'@description Method for setting the license of the classifier.

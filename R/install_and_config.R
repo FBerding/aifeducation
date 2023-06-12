@@ -6,8 +6,7 @@
 #'be installed.
 #'@export
 install_py_modules<-function(envname="aifeducation"){
-  relevant_modules<-c("os",
-                      "transformers",
+  relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
                       "torch",
@@ -103,7 +102,7 @@ set_config_gpu_low_memory<-function(){
 #'@export
 set_config_tf_logger<-function(level="ERROR"){
   logger<-tf$get_logger()
-   logger$setLevel(level)
+  logger$setLevel(level)
 }
 
 #'Sets the level for logging information in tensor flow.

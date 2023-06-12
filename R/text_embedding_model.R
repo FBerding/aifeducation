@@ -943,6 +943,7 @@ TextEmbeddingModel<-R6::R6Class(
       return(list(
         model_license=private$model_info$model_license,
         model_name=private$model_info$model_name,
+        model_label=private$model_info$model_label,
         model_date=private$model_info$model_date,
         model_version=private$model_info$model_version,
         model_language=private$model_info$model_language

@@ -61,10 +61,14 @@ jobs:
                       "tensorflow")
 
           library(reticulate)
-          virtualenv_create("r-reticulate", Sys.which("python"))
-          virtualenv_install("r-reticulate", python_packages)
+          #virtualenv_create("r-reticulate", Sys.which("python"))
+          #virtualenv_install("r-reticulate", python_packages)
 
-          path_to_python <- virtualenv_python("r-reticulate")
+          conda_create("r-reticulate", Sys.which("python"))
+          conda_install("r-reticulate", python_packages)
+
+          #path_to_python <- virtualenv_python("r-reticulate")
+          path_to_python <- conda_python("r-reticulate")
           writeLines(sprintf("RETICULATE_PYTHON=%s", path_to_python),
                      Sys.getenv("GITHUB_ENV"))
 

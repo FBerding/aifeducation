@@ -13,6 +13,9 @@ tensorflow
 \item{\code{name}}{('character()')\cr
 Name of the classifier.}
 
+\item{\code{name_root}}{('character()')\cr
+Root part of the name of the classifier.}
+
 \item{\code{label}}{('character()')\cr
 Label of the classifier used as the individual title.}
 
@@ -443,7 +446,7 @@ Method for requesting the bibliographic information of the classifier.
 \subsection{Method \code{set_license()}}{
 Method for setting the license of the classifier.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_license(license)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_license(license = "CC BY-NC-SA")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

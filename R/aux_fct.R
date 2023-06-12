@@ -336,29 +336,45 @@ get_folds<-function(target,
     fin_k_folds=k_folds
   }
 
-  val_sample=NULL
+  final_assignments=NULL
   for(cat in categories){
-    all_names=names(subset(target,target==cat))
-    used_names=NULL
-    tmp_regular_size=ceiling(length(all_names)/fin_k_folds)
+    condition=(sample_target==cat)
+    focused_targets=subset(x = sample_target,
+                           subset = condition)
+    n_cases=length(focused_targets)
 
-    for(i in 1:fin_k_folds){
-      if(i==1){
-        possible_names=all_names
-      } else {
-        possible_names=setdiff(x=all_names,
-                               y=used_names)
-      }
-      tmp_size=min(length(possible_names),tmp_regular_size)
-      selected_names<-sample(x=possible_names,
-                             size=tmp_size,
-                             replace=FALSE)
-      val_sample[i]=list(append(x=unlist(val_sample[i]),
-                           values = selected_names))
-      used_names=append(used_names,values = selected_names)
+    cases_per_fold=vector(length = fin_k_folds)
+    cases_per_fold[]=ceiling(n_cases/fin_k_folds)
+
+    delta=sum(cases_per_fold)-n_cases
+    for(i in 1:delta){
+      cases_per_fold[1+(i-1)%%fin_k_folds]=cases_per_fold[1+(i-1)%%fin_k_folds]-1
     }
+
+    possible_assignments=NULL
+    for(i in 1:length(cases_per_fold))
+      possible_assignments=append(
+        x=possible_assignments,
+        values=rep.int(x=i,
+                       times = cases_per_fold[i])
+      )
+
+    assignments<-sample(
+      x=possible_assignments,
+      size=length(possible_assignments),
+      replace = FALSE
+    )
+    names(assignments)=names(focused_targets)
+    final_assignments=append(x=final_assignments,
+                             values=assignments)
   }
 
+  val_sample=NULL
+  for(i in 1:fin_k_folds){
+    condition=(final_assignments==i)
+    val_sample[i]=list(names(subset(x=final_assignments,
+                               subset=condition)))
+  }
 
   train_sample=NULL
   for(i in 1:fin_k_folds){
@@ -772,4 +788,53 @@ get_n_chunks<-function(text_embeddings,features,times){
   }
   names(n_chunks)<-rownames(text_embeddings)
   return(n_chunks)
+}
+
+#------------------------------------------------------------------------------
+#'Generate ID Suffix for Objects.
+#'
+#'Function for generating an ID suffix for objects of class
+#'\link{TextEmbeddingModel} and \link{TextEmbeddingClassifierNeuralNet}.
+#'
+#'@param length \code{int} determining the length of the id suffix.
+#'@return Returns a \code{string} of the requested length
+generate_id<-function(length=16){
+  id_suffix=NULL
+  sample_values=c(
+    "a","A",
+    "b","B",
+    "c","C",
+    "d","D",
+    "e","E",
+    "f","F",
+    "g","G",
+    "h","H",
+    "i","I",
+    "j","J",
+    "k","K",
+    "l","L",
+    "m","M",
+    "n","N",
+    "o","O",
+    "p","P",
+    "q","Q",
+    "r","R",
+    "s","S",
+    "t","T",
+    "u","U",
+    "v","V",
+    "w","W",
+    "x","X",
+    "y","Y",
+    "z","Z",
+    seq(from=0,to=9,by=1)
+  )
+
+
+    id_suffix=sample(
+      x=sample_values,
+      size = length,
+      replace = TRUE)
+    id_suffix=paste(id_suffix,collapse = "")
+    return(id_suffix)
 }
