@@ -347,8 +347,10 @@ get_folds<-function(target,
     cases_per_fold[]=ceiling(n_cases/fin_k_folds)
 
     delta=sum(cases_per_fold)-n_cases
-    for(i in 1:delta){
-      cases_per_fold[1+(i-1)%%fin_k_folds]=cases_per_fold[1+(i-1)%%fin_k_folds]-1
+    if(delta>0){
+      for(i in 1:delta){
+        cases_per_fold[1+(i-1)%%fin_k_folds]=cases_per_fold[1+(i-1)%%fin_k_folds]-1
+      }
     }
 
     possible_assignments=NULL

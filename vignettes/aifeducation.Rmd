@@ -85,6 +85,16 @@ You can check if everything is working by using the function
 reticulate::py_available(initialize = TRUE)
 ```
 
+The next step is to install miniconda since *aifeducation* uses conda 
+environments for managing the different modules.
+```{r, include = TRUE, eval=FALSE}
+reticulate::install_miniconda()
+```
+
+If you would like to use a graphic card for computations you need to install
+some further software. A list with links to downloads can be found here:
+https://www.tensorflow.org/install/pip#linux
+
 If everything is working, you can now install the remaining python
 libraries. For convenience, *aifeducation* comes with an auxiliary
 function `install_py_modules()` doing that for you.
@@ -95,16 +105,16 @@ install_py_modules(envname="aifeducation")
 
 This function installs the following python modules:
 
--   os,
 -   transformers,
 -   tokenizers,
 -   datasets,
 -   torch,
 -   keras,
 -   tensorflow and its dependencies in the environment "aifeducation".
-    If you would like to use *aifeducation* with other packages or with
-    other environments, please ensure that these python modules are
-    available.
+    
+If you would like to use *aifeducation* with other packages or with
+other environments, please ensure that these python modules are
+available.
 
 With `check_aif_py_modules()` you can check if all modules are
 successfully installed.

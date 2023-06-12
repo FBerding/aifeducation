@@ -4,6 +4,8 @@
 #'
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
+#'@importFrom reticulate conda_create
+#'#'@importFrom reticulate py_install
 #'@export
 install_py_modules<-function(envname="aifeducation"){
   relevant_modules<-c("transformers",
@@ -12,11 +14,17 @@ install_py_modules<-function(envname="aifeducation"){
                       "torch",
                       "keras",
                       "tensorflow")
+
+  reticulate::conda_create(
+    envname = envname,
+    channel=c("conda-forge")
+  )
   reticulate::py_install(
-    envname=envname,
+    packages = relevant_modules,
+    envname = envname,
     method = "auto",
-    pip=TRUE,
-    packages=relevant_modules)
+    pip = TRUE
+  )
 }
 
 #'Check if all necessary python modules are available
@@ -49,7 +57,7 @@ check_aif_py_modules<-function(trace=TRUE){
   }
 
   if(trace==TRUE){
-    cat(matrix_overview)
+    print(matrix_overview)
   }
 
   if(sum(matrix_overview[,2])==length(relevant_modules)){
