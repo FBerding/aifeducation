@@ -44,8 +44,11 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - uses: actions/setup-python@v4
+      - uses: conda-incubator/setup-miniconda@v2
         with:
+          auto-activate-base: true
+          activate-environment: ""
+          auto-update-conda: true
           python-version: "3.x"
 
       - name: setup r-reticulate venv
