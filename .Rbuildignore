@@ -5,7 +5,10 @@ Trial
 materials
 test_model
 tests/testthat/test_data/language_models
-test/testthat/test_data/tmp/checkpoints
+test/testthat/test_data/tmp
+test/testthat/test_data/bert/checkpoints
+test/testthat/test_data/longformer/checkpoints
+test/testthat/test_data/roberta/checkpoints
 .h5
 .git
 .gitignore
@@ -13,3 +16,6 @@ _pkgdown.yml
 docs
 ^vignettes/articles$
 ^\.github$
+checkpoints
+.txt
+.json

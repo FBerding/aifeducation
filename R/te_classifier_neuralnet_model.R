@@ -1762,31 +1762,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
     #General Information set and get--------------------------------------------
     #'@description Method for setting publication information of the classifier
-    #'@param type \code{string} for choosing the type of information that should
-    #'be added. \code{type="developer"} for information about the developer of the
-    #'classifier and \code{type="trainer"} for information about people who trained
-    #'the classifier. If you modify an already existing classifier, please use
-    #'\code{type="modifier"}.
     #'@param authors List of authors.
     #'@param citation Free text citation.
     #'@param url URL of a corresponding homepage.
-    set_publication_info=function(type,
-                                  authors ,
+    set_publication_info=function(authors ,
                                   citation,
                                   url=NULL){
-      if(type=="developer"){
-        private$publication_info$developed_by$authors<-authors
-        private$publication_info$developed_by$citation<-citation
-        private$publication_info$developed_by$url<-url
-      } else if(type=="trainer"){
-        private$publication_info$trained_by$authors<-authors
-        private$publication_info$trained_by$citation<-citation
-        private$publication_info$trained_by$url<-url
-      } else if(type=="modifier"){
-        private$publication_info$modifided_by$authors<-authors
-        private$publication_info$modifided_by$citation<-citation
-        private$publication_info$modifided_by$url<-url
-      }
+
+      private$publication_info$developed_by$authors<-authors
+      private$publication_info$developed_by$citation<-citation
+      private$publication_info$developed_by$url<-url
+
     },
     #--------------------------------------------------------------------------
     #'@description Method for requesting the bibliographic information of the classifier.
@@ -1876,16 +1862,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #General Information-------------------------------------------------------
     publication_info=list(
       developed_by=list(
-        authors =NULL,
-        citation=NULL,
-        url=NULL
-      ),
-      trained_by=list(
-        authors =NULL,
-        citation=NULL,
-        url=NULL
-      ),
-      modifided_by=list(
         authors =NULL,
         citation=NULL,
         url=NULL

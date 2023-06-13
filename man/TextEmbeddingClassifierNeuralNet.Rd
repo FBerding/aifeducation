@@ -402,7 +402,6 @@ the probabilities of the different labels for each case.
 Method for setting publication information of the classifier
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_publication_info(
-  type,
   authors,
   citation,
   url = NULL
@@ -412,12 +411,6 @@ Method for setting publication information of the classifier
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{type}}{\code{string} for choosing the type of information that should
-be added. \code{type="developer"} for information about the developer of the
-classifier and \code{type="trainer"} for information about people who trained
-the classifier. If you modify an already existing classifier, please use
-\code{type="modifier"}.}
-
 \item{\code{authors}}{List of authors.}
 
 \item{\code{citation}}{Free text citation.}

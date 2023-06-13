@@ -105,7 +105,7 @@ example_model$set_publication_info(
 ```
 
 First of all you have to decide the type of information you would like
-to add. You have three choices: "developer", "trainer", and "modifier",
+to add. You have three choices: "developer", and "modifier",
 which you set with `type`.
 
 `type="developer"` stores all information about the people involved and
@@ -114,10 +114,6 @@ the process of developing the model. If you use a transformer model from
 of the model should be entered as developers. In all other cases you can
 use this type for providing a description of how you developed the
 model.
-
-Sometimes the personas who developed a model and the people who trained
-a model differ. In these cases you can pay credit to the individuals who
-trained a model via setting `type="trainer"`.
 
 In some cases you might wish to modify an existing model. This might be
 the case if you use a transformer model and you adapt the model to a
@@ -307,20 +303,19 @@ can provide the bibliographic information of your classifier.
 
 ```{r, include = TRUE, eval=FALSE}
 example_classifier$set_publication_info(
-  type,
   authors,
   citation,
   url=NULL)
 ```
 
-Please use "developer" and "trainer" if you are the first person who
-trained the classifier. `type="modifier"` will be rarely needed.
+In contrast to \link{TextEmbeddingModels} there are not different types of
+author groups.
 
 Finally, you can manage the license for using your classifier via
 `set_license` and `get_license`.
 
 ```{r, include = TRUE, eval=FALSE}
-example_classifier$set_licens("GPL-3")
+example_classifier$set_licens("CC BY-NC-SA")
 ```
 
 Now you are ready for sharing your classifier. Please remember to save

@@ -303,7 +303,7 @@ Method for setting the bibliographic information of the model.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{type}}{\code{string} Type of information which should be changed/added.
-\code{type="developer"},\code{type="trainer"}, and \code{type="modifier"} are possible.}
+\code{type="developer"}, and \code{type="modifier"} are possible.}
 
 \item{\code{authors}}{List of people.}
 

@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 ```
 
 # 1) Installation and Technical Requirements
-
+## Introduction
 Several packages allow users to use machine learning directly in *R*
 such as [nnet](https://cran.r-project.org/package=nnet) for single layer
 neural nets, [rpart](https://CRAN.R-project.org/package=rpart) for
@@ -59,16 +59,23 @@ pre-trained models however, this is **not** necessary. In this case, a
 'normal' office computer without a graphic device should be sufficient
 in most cases.
 
+## Step 1 - Install the R Package
+
 In order to use the package, you first need to install it. This can be
 done by:
 
 ```{r, include = TRUE, eval=FALSE}
 # install.packages("devtools")
-devtools::install_github("FBerding/aifeducation")
+devtools::install_github("FBerding/aifeducation",
+                         dependencies = TRUE)
 ```
 
 With this command, all necessary *R* packages are installed on your
-machine. Since natural language processing with neural nets is based on
+machine. 
+
+## Step 2 - Install Python
+
+Since natural language processing with neural nets is based on
 models which are computationally intensive, *keras* and *tensorflow* are
 used within this package together with some other specialized python
 libraries. To install them, you need to install python on your machine
@@ -85,15 +92,27 @@ You can check if everything is working by using the function
 reticulate::py_available(initialize = TRUE)
 ```
 
+## Step 3 - Install Miniconda
+
 The next step is to install miniconda since *aifeducation* uses conda 
 environments for managing the different modules.
 ```{r, include = TRUE, eval=FALSE}
 reticulate::install_miniconda()
 ```
 
+## Step 4 - Install Support for Graphic Devices
+
 If you would like to use a graphic card for computations you need to install
 some further software. A list with links to downloads can be found here:
 https://www.tensorflow.org/install/pip#linux
+
+In general you need
+
+- NVIDIA GPU Drivers
+- CUDA Toolkit
+- cuDNN SDK
+
+## Step 5 - Install Specialized Python Libraries
 
 If everything is working, you can now install the remaining python
 libraries. For convenience, *aifeducation* comes with an auxiliary
@@ -110,7 +129,9 @@ This function installs the following python modules:
 -   datasets,
 -   torch,
 -   keras,
--   tensorflow and its dependencies in the environment "aifeducation".
+-   tensorflow 
+
+and its dependencies in the environment "aifeducation".
     
 If you would like to use *aifeducation* with other packages or with
 other environments, please ensure that these python modules are
@@ -123,11 +144,12 @@ successfully installed.
 aifeducation::check_aif_py_modules(print=TRUE)
 ```
 
-Now everything is ready to use the package. When you start a new *R*
+Now everything is ready to use the package. 
+
+**When you start a new *R*
 session, please note that you have to call
-`reticulate::use_condaenv(condaenv = "aifeducation")` on a machine with
-windows and `reticulate::use_virtualenv(condaenv = "aifeducation")` on
-mac and linux to make the python modules available for work.
+`reticulate::use_condaenv(condaenv = "aifeducation")` 
+to make the python modules available for work.**
 
 # 2) Configuration
 
@@ -160,6 +182,10 @@ decreases the computational speed.
 
 Finally, in some cases you might want to disable tensorflow to print
 information on the console. You can change the behavior with the
-function `set_config_tf_logger()`. You can choose between five levels
+function `set_config_tf_logger()`. 
+```{r, include = TRUE, eval=FALSE}
+aifeducation::set_config_tf_logger()
+```
+You can choose between five levels
 "FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
 for logging.

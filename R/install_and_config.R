@@ -5,7 +5,7 @@
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
 #'@importFrom reticulate conda_create
-#'#'@importFrom reticulate py_install
+#'@importFrom reticulate py_install
 #'@export
 install_py_modules<-function(envname="aifeducation"){
   relevant_modules<-c("transformers",

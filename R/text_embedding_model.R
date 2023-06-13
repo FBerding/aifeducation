@@ -20,11 +20,6 @@ TextEmbeddingModel<-R6::R6Class(
         citation=NULL,
         url=NULL
       ),
-      trained_by=list(
-        authors=NULL,
-        citation=NULL,
-        url=NULL
-      ),
       modifided_by=list(
         authors=NULL,
         citation=NULL,
@@ -846,7 +841,7 @@ TextEmbeddingModel<-R6::R6Class(
     #--------------------------------------------------------------------------
     #'@description Method for setting the bibliographic information of the model.
     #'@param type \code{string} Type of information which should be changed/added.
-    #'\code{type="developer"},\code{type="trainer"}, and \code{type="modifier"} are possible.
+    #'\code{type="developer"}, and \code{type="modifier"} are possible.
     #'@param authors List of people.
     #'@param citation \code{string} Citation in free text.
     #'@param url \code{string} Corresponding URL if applicable.
@@ -858,10 +853,6 @@ TextEmbeddingModel<-R6::R6Class(
         private$publication_info$developed_by$authors<-authors
         private$publication_info$developed_by$citation<-citation
         private$publication_info$developed_by$url<-url
-      } else if(type=="trainer"){
-        private$publication_info$trained_by$authors<-authors
-        private$publication_info$trained_by$citation<-citation
-        private$publication_info$trained_by$url<-url
       } else if(type=="modifier"){
         private$publication_info$modifided_by$authors<-authors
         private$publication_info$modifided_by$citation<-citation

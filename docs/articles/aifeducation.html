@@ -78,6 +78,9 @@
 <div class="section level2">
 <h2 id="installation-and-technical-requirements">1) Installation and Technical Requirements<a class="anchor" aria-label="anchor" href="#installation-and-technical-requirements"></a>
 </h2>
+<div class="section level3">
+<h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h3>
 <p>Several packages allow users to use machine learning directly in
 <em>R</em> such as <a href="https://cran.r-project.org/package=nnet" class="external-link">nnet</a> for single layer
 neural nets, <a href="https://CRAN.R-project.org/package=rpart" class="external-link">rpart</a> for decision
@@ -113,14 +116,24 @@ device can speed up computations significantly. If you prefer using
 pre-trained models however, this is <strong>not</strong> necessary. In
 this case, a ‘normal’ office computer without a graphic device should be
 sufficient in most cases.</p>
+</div>
+<div class="section level3">
+<h3 id="step-1---install-the-r-package">Step 1 - Install the R Package<a class="anchor" aria-label="anchor" href="#step-1---install-the-r-package"></a>
+</h3>
 <p>In order to use the package, you first need to install it. This can
 be done by:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FBerding/aifeducation"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FBerding/aifeducation"</span>,</span>
+<span>                         dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>With this command, all necessary <em>R</em> packages are installed on
-your machine. Since natural language processing with neural nets is
-based on models which are computationally intensive, <em>keras</em> and
+your machine.</p>
+</div>
+<div class="section level3">
+<h3 id="step-2---install-python">Step 2 - Install Python<a class="anchor" aria-label="anchor" href="#step-2---install-python"></a>
+</h3>
+<p>Since natural language processing with neural nets is based on models
+which are computationally intensive, <em>keras</em> and
 <em>tensorflow</em> are used within this package together with some
 other specialized python libraries. To install them, you need to install
 python on your machine first. This may take some time.</p>
@@ -131,35 +144,60 @@ python on your machine first. This may take some time.</p>
 <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_available.html" class="external-link">py_available</a></span><span class="op">(</span>initialize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="step-3---install-miniconda">Step 3 - Install Miniconda<a class="anchor" aria-label="anchor" href="#step-3---install-miniconda"></a>
+</h3>
+<p>The next step is to install miniconda since <em>aifeducation</em>
+uses conda environments for managing the different modules.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/install_miniconda.html" class="external-link">install_miniconda</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="step-4---install-support-for-graphic-devices">Step 4 - Install Support for Graphic Devices<a class="anchor" aria-label="anchor" href="#step-4---install-support-for-graphic-devices"></a>
+</h3>
+<p>If you would like to use a graphic card for computations you need to
+install some further software. A list with links to downloads can be
+found here: <a href="https://www.tensorflow.org/install/pip#linux" class="external-link uri">https://www.tensorflow.org/install/pip#linux</a></p>
+<p>In general you need</p>
+<ul>
+<li>NVIDIA GPU Drivers</li>
+<li>CUDA Toolkit</li>
+<li>cuDNN SDK</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="step-5---install-specialized-python-libraries">Step 5 - Install Specialized Python Libraries<a class="anchor" aria-label="anchor" href="#step-5---install-specialized-python-libraries"></a>
+</h3>
 <p>If everything is working, you can now install the remaining python
 libraries. For convenience, <em>aifeducation</em> comes with an
 auxiliary function <code><a href="../reference/install_py_modules.html">install_py_modules()</a></code> doing that for
 you.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/install_py_modules.html">install_py_modules</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
 <p>This function installs the following python modules:</p>
 <ul>
-<li>os,</li>
 <li>transformers,</li>
 <li>tokenizers,</li>
 <li>datasets,</li>
 <li>torch,</li>
 <li>keras,</li>
-<li>tensorflow and its dependencies in the environment “aifeducation”.
-If you would like to use <em>aifeducation</em> with other packages or
-with other environments, please ensure that these python modules are
-available.</li>
+<li>tensorflow</li>
 </ul>
+<p>and its dependencies in the environment “aifeducation”.</p>
+<p>If you would like to use <em>aifeducation</em> with other packages or
+with other environments, please ensure that these python modules are
+available.</p>
 <p>With <code><a href="../reference/check_aif_py_modules.html">check_aif_py_modules()</a></code> you can check if all modules
 are successfully installed.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>Now everything is ready to use the package. When you start a new
-<em>R</em> session, please note that you have to call
-<code>reticulate::use_condaenv(condaenv = "aifeducation")</code> on a
-machine with windows and
-<code>reticulate::use_virtualenv(condaenv = "aifeducation")</code> on
-mac and linux to make the python modules available for work.</p>
+<p>Now everything is ready to use the package.</p>
+<p><strong>When you start a new <em>R</em> session, please note that you
+have to call
+<code>reticulate::use_condaenv(condaenv = "aifeducation")</code> to make
+the python modules available for work.</strong></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="configuration">2) Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
@@ -172,22 +210,24 @@ machine.</p>
 <p>If you do use a computer that does not own a graphic device, you can
 disable the graphic device support of tensorflow with the function
 <code><a href="../reference/set_config_cpu_only.html">set_config_cpu_only()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_cpu_only.html">set_config_cpu_only</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Now your machine only uses cpus for computations.</p>
 <p>If your machine has a graphic card with limited memory, it is
 recommended to change the configuration of the memory usage with
 <code><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>This enables your machine to compute ‘large’ models with limited
 resources. For ‘small’ models, this option is not relevant since it
 decreases the computational speed.</p>
 <p>Finally, in some cases you might want to disable tensorflow to print
 information on the console. You can change the behavior with the
-function <code><a href="../reference/set_config_tf_logger.html">set_config_tf_logger()</a></code>. You can choose between
-five levels “FATAL”, “ERROR”, “WARN”, “INFO”, and “DEBUG”, setting the
-minimal level for logging.</p>
+function <code><a href="../reference/set_config_tf_logger.html">set_config_tf_logger()</a></code>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_tf_logger.html">set_config_tf_logger</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>You can choose between five levels “FATAL”, “ERROR”, “WARN”, “INFO”,
+and “DEBUG”, setting the minimal level for logging.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
