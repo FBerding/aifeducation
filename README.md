@@ -10,7 +10,10 @@
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
 designed for the special needs of educators, educational researchers,
-and social researchers. The package supports the application of
+and social researchers. The target audience of this package are
+educators and researchers who would like to develop their own models as
+well as persons who would like to use models created by other
+researchers/educators. The package supports the application of
 Artificial Intelligence (AI) for Natural Language Processing tasks such
 as text embedding, classification, and question answering under the
 special conditions of educational and social sciences. These are:
@@ -69,7 +72,8 @@ You can install the development version of aifeducation from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("FBerding/aifeducation")
+devtools::install_github("FBerding/aifeducation",
+                          dependencies = TRUE)
 ```
 
 ## Classification Tasks

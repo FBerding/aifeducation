@@ -189,3 +189,27 @@ test_that("check_combine_embedded_texts",{
   expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),10)
 
 })
+
+
+#------------------------------------------------------------------------------
+#check_combine_embedded_texts_with_only_1_case
+test_that("check_single_case",{
+  tmp_embedding1<-embeddings_gvc$clone(deep = TRUE)
+  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:1,,,drop=FALSE]
+  tmp_embedding2<-embeddings_gvc$clone(deep = TRUE)
+  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[2:2,,,drop=FALSE]
+
+  expect_s3_class(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2)),
+                  class="EmbeddedText")
+  expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),2)
+
+  tmp_embedding1<-embeddings_topic$clone(deep = TRUE)
+  tmp_embedding1$embeddings<-tmp_embedding1$embeddings[1:1,,,drop=FALSE]
+  tmp_embedding2<-embeddings_topic$clone(deep = TRUE)
+  tmp_embedding2$embeddings<-tmp_embedding2$embeddings[2:2,,,drop=FALSE]
+
+  expect_s3_class(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2)),
+                  class="EmbeddedText")
+  expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),2)
+
+})

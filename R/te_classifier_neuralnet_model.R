@@ -241,9 +241,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       if(optimizer %in% c("adam","rmsprop")==FALSE){
-        stop("Optimzier must be 'adam' oder 'rmspro'.")
+        stop("Optimzier must be 'adam' oder 'rmsprop'.")
       }
-
 
       #------------------------------------------------------------------------
 
@@ -263,6 +262,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       self$text_embedding_model["model"]=list(model_info)
       self$text_embedding_model["times"]=times
       self$text_embedding_model["features"]=features
+
+      if(is.null(rec) & self_attention_heads>0){
+        if(features %% 2 !=0){
+          stop("The number of features of the TextEmbeddingmodel is
+               not a multiple of 2.")
+
+        }
+      }
 
 
 
@@ -295,7 +302,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Adding Input Layer
       n_req=length(config$rec)
       n_hidden=length(config$hidden)
-      if(n_req>0){
+      if(n_req>0 |
+         self_attention_heads>0){
         model_input<-keras::layer_input(shape=list(times,features),
                                         name="input_embeddings")
       } else {
@@ -305,7 +313,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       layer_list[1]<-list(model_input)
 
       #Adding a Mask-Layer
-      if(n_req>0){
+      if(n_req>0 |
+         self_attention_heads>0){
         masking_layer<-keras::layer_masking(object=model_input,
                              mask_value = 0.0,
                              name="masking_layer",
@@ -315,7 +324,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Adding a Normalization Layer
-      if(n_req>0){
+      if(n_req>0|
+         self_attention_heads>0){
         norm_layer<-keras::layer_layer_normalization(
           object=layer_list[[length(layer_list)]],
           name = "normalizaion_layer")
@@ -365,10 +375,22 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         }
       }
 
+      if(n_req>0){
+        i=i
+      } else {
+        i=0
+      }
+
       if(config$self_attention_heads>0){
+        if(length(config$rec)>0){
+          self_attention_units=config$rec[length(config$rec)]
+        } else {
+          self_attention_units=features/2
+        }
+
         self_attention_layer<-keras::layer_multi_head_attention(
           num_heads = as.integer(self_attention_heads),
-          key_dim = config$rec[length(config$rec)],
+          key_dim = as.integer(self_attention_units),
           name="self_attention")
 
         layer_list[length(layer_list)+1]<-list(
@@ -388,7 +410,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
         proj_dense_1<-keras::layer_dense(
           object=layer_list[[length(layer_list)]],
-          units = as.integer(self_attention_heads*2*config$rec[length(config$rec)]),
+          units = as.integer(self_attention_heads*2*self_attention_units),
           activation = config$act_fct,
           kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
           name="dense_projection_1")
@@ -396,7 +418,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
         proj_dense_2<-keras::layer_dense(
           object=layer_list[[length(layer_list)]],
-          units = as.integer(2*config$rec[length(config$rec)]),
+          units = as.integer(2*self_attention_units),
           activation = config$act_fct,
           kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
           name="dense_projection_2")
@@ -416,7 +438,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           keras::bidirectional(
             object = layer_list[[length(layer_list)]],
             layer=keras::layer_gru(
-              units=config$rec[length(config$rec)],
+              units=self_attention_units,
               input_shape=list(times,features),
               return_sequences = FALSE,
               dropout = config$dropout,
@@ -1699,7 +1721,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Ensuring the correct order of the variables for prediction
-      real_newdata<-real_newdata[,,self$model_config$input_variables]
+      real_newdata<-real_newdata[,,self$model_config$input_variables,drop=FALSE]
       current_row_names=rownames(real_newdata)
       if(self$model_config$n_req==0){
         real_newdata=array_to_matrix(real_newdata)

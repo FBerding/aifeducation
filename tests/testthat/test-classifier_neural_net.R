@@ -21,6 +21,98 @@ load(testthat::test_path(path))
 current_embeddings<-bert_embeddings$clone(deep = TRUE)
 #-------------------------------------------------------------------------------
 
+test_that("creation_classifier_neural_net", {
+  classifier<-NULL
+  classifier<-TextEmbeddingClassifierNeuralNet$new(
+    name="movie_review_classifier",
+    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+    text_embeddings=current_embeddings,
+    targets=example_targets,
+    hidden=NULL,
+    rec=c(28,28),
+    dropout=0.2,
+    recurrent_dropout=0.4,
+    l2_regularizer=0.01,
+    optimizer="adam",
+    act_fct="gelu",
+    rec_act_fct="tanh")
+  expect_s3_class(classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+
+  classifier<-NULL
+  classifier<-TextEmbeddingClassifierNeuralNet$new(
+    name="movie_review_classifier",
+    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+    text_embeddings=current_embeddings,
+    targets=example_targets,
+    hidden=c(28,28),
+    rec=NULL,
+    dropout=0.2,
+    recurrent_dropout=0.4,
+    l2_regularizer=0.01,
+    optimizer="adam",
+    act_fct="gelu",
+    rec_act_fct="tanh")
+  expect_s3_class(classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+
+  classifier<-NULL
+  classifier<-TextEmbeddingClassifierNeuralNet$new(
+    name="movie_review_classifier",
+    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+    text_embeddings=current_embeddings,
+    targets=example_targets,
+    hidden=c(28,28),
+    rec=c(28,28),
+    self_attention_heads=2,
+    dropout=0.2,
+    recurrent_dropout=0.4,
+    l2_regularizer=0.01,
+    optimizer="adam",
+    act_fct="gelu",
+    rec_act_fct="tanh")
+  expect_s3_class(classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+
+  classifier<-NULL
+  classifier<-TextEmbeddingClassifierNeuralNet$new(
+    name="movie_review_classifier",
+    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+    text_embeddings=current_embeddings,
+    targets=example_targets,
+    hidden=c(28,28),
+    rec=NULL,
+    self_attention_heads=2,
+    dropout=0.2,
+    recurrent_dropout=0.4,
+    l2_regularizer=0.01,
+    optimizer="adam",
+    act_fct="gelu",
+    rec_act_fct="tanh")
+  expect_s3_class(classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+
+  classifier<-NULL
+  classifier<-TextEmbeddingClassifierNeuralNet$new(
+    name="movie_review_classifier",
+    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+    text_embeddings=current_embeddings,
+    targets=example_targets,
+    hidden=NULL,
+    rec=NULL,
+    self_attention_heads=2,
+    dropout=0.2,
+    recurrent_dropout=0.4,
+    l2_regularizer=0.01,
+    optimizer="adam",
+    act_fct="gelu",
+    rec_act_fct="tanh")
+  expect_s3_class(classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+})
+
+
+#-------------------------------------------------------------------------------
 classifier<-TextEmbeddingClassifierNeuralNet$new(
   name="movie_review_classifier",
   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
@@ -34,11 +126,6 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   optimizer="adam",
   act_fct="gelu",
   rec_act_fct="tanh")
-
-test_that("creation_classifier_neural_net", {
-  expect_s3_class(classifier,
-                  class="TextEmbeddingClassifierNeuralNet")
-})
 
 test_that("training_baseline_only", {
   expect_no_error(
@@ -172,6 +259,23 @@ test_that("training_pbl_bsc", {
   )
 })
 
+test_that("prediction", {
+  prediction<-classifier$predict(newdata = current_embeddings,
+                                 batch_size = 2,
+                                 verbose = 0)
+  expect_equal(object=nrow(prediction),
+               expected = dim(current_embeddings$embeddings)[[1]])
 
+})
+
+test_that("prediction_single_case", {
+  single_embedding<-current_embeddings$clone(deep = TRUE)
+  single_embedding$embeddings<-single_embedding$embeddings[1,,,drop=FALSE]
+  prediction<-classifier$predict(newdata = single_embedding,
+                                 batch_size = 2,
+                                 verbose = 0)
+  expect_equal(object=nrow(prediction),
+               expected = 1)
+})
 
 
