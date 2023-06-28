@@ -278,4 +278,73 @@ test_that("prediction_single_case", {
                expected = 1)
 })
 
+test_that("descriptions", {
+  classifier$set_model_description(
+    eng = "Description",
+    native = "Beschreibung",
+    abstract_eng = "Abstract",
+    abstract_native = "Zusammenfassung",
+    keywords_eng = c("Test","Neural Net"),
+    keywords_native = c("Test","Neuronales Netz")
+  )
+  desc<-classifier$get_model_description()
+  expect_equal(
+    object=desc$eng,
+    expected="Description"
+  )
+  expect_equal(
+    object=desc$native,
+    expected="Beschreibung"
+  )
+  expect_equal(
+    object=desc$abstract_eng,
+    expected="Abstract"
+  )
+  expect_equal(
+    object=desc$abstract_native,
+    expected="Zusammenfassung"
+  )
+  expect_equal(
+    object=desc$keywords_eng,
+    expected=c("Test","Neural Net")
+  )
+  expect_equal(
+    object=desc$keywords_native,
+    expected=c("Test","Neuronales Netz")
+  )
+})
 
+test_that("license", {
+  classifier$set_license("test_license")
+  expect_equal(
+    object=classifier$get_license(),
+    expected=c("test_license")
+  )
+})
+
+test_that("publication_info",{
+  classifier$set_publication_info(
+    authors = personList(
+      person(given="Max",family="Mustermann")
+    ),
+    citation="Test Classifier",
+    url="https://Test.html"
+  )
+  pub_info=classifier$get_publication_info()
+  expect_equal(
+    object=pub_info$developed_by$authors,
+    expected=personList(
+      person(given="Max",family="Mustermann")
+    )
+  )
+
+  expect_equal(
+    object=pub_info$developed_by$citation,
+    expected="Test Classifier"
+  )
+
+  expect_equal(
+    object=pub_info$developed_by$url,
+    expected="https://Test.html"
+  )
+})

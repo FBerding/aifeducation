@@ -194,10 +194,16 @@ train_tune_longformer_model=function(output_dir,
   tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir_path)
 
   #argument checking------------------------------------------------------------
-  if(chunk_size>(mlm_model$config$max_position_embeddings-2)){
+  if(chunk_size>(mlm_model$config$max_position_embeddings)){
     stop(paste("Chunk size is",chunk_size,". This value is not allowed to exceed",
-               mlm_model$config$max_position_embeddings-2))
+               mlm_model$config$max_position_embeddings))
   }
+  if(chunk_size<3){
+    stop("Chunk size must be at least 3.")
+  }
+
+  #adjust chunk size. To elements are needed for begin and end of sequence
+  chunk_size=chunk_size-2
 
   cat(paste(date(),"Tokenize Raw Texts"))
   prepared_texts<-quanteda::tokens(

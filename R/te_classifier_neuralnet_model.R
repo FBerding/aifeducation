@@ -726,7 +726,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       categories<-names(table(data_targets))
 
       #Saving Training Information
-      n_unlabeled_data=length(data_targets)-length(na.omit(data_targets))
+      if(use_bpl==TRUE){
+        n_unlabeled_data=length(data_targets)-length(na.omit(data_targets))
+      } else {
+        n_unlabeled_data=0
+      }
       names(n_unlabeled_data)="unlabeled"
       n_labeled_data=as.vector(table(data_targets))
       names(n_labeled_data)=names(table(data_targets))
@@ -1807,13 +1811,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
     set_license=function(license="CC BY-NC-SA"){
-      private$model_info$model_license<-license
+      private$model_license<-license
     },
     #'@description Method for setting the license of the classifier.
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
     get_license=function(){
-      return(private$model_info$model_license)
+      return(private$model_license)
     },
     #--------------------------------------------------------------------------
     #'@description Method for setting a description of the classifier.
@@ -1835,11 +1839,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                    abstract_native=NULL,
                                    keywords_eng=NULL,
                                    keywords_native=NULL){
-      if(!is.null(description)){
-        private$model_description$eng=description
+      if(!is.null(eng)){
+        private$model_description$eng=eng
       }
-      if(!is.null(description_native)){
-        private$model_description$native=description
+      if(!is.null(native)){
+        private$model_description$native=native
       }
 
       if(!is.null(abstract_eng)){
@@ -1897,6 +1901,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       keywords_eng=NULL,
       keywords_native=NULL
     ),
+    model_license=NULL,
     #Training Process----------------------------------------------------------
     init_weights=NULL,
     #--------------------------------------------------------------------------

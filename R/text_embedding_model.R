@@ -20,7 +20,7 @@ TextEmbeddingModel<-R6::R6Class(
         citation=NULL,
         url=NULL
       ),
-      modifided_by=list(
+      modified_by=list(
         authors=NULL,
         citation=NULL,
         url=NULL
@@ -246,9 +246,9 @@ TextEmbeddingModel<-R6::R6Class(
 
         if(self$basic_components$method=="longformer" |
            self$basic_components$method=="roberta"){
-          if(max_length>(self$transformer_components$model$config$max_position_embeddings-2)){
+          if(max_length>(self$transformer_components$model$config$max_position_embeddings)){
             stop(paste("max_length is",max_length,". This value is not allowed to exceed",
-                       self$transformer_components$model$config$max_position_embeddings-2))
+                       self$transformer_components$model$config$max_position_embeddings))
           }
         }
 
@@ -854,9 +854,9 @@ TextEmbeddingModel<-R6::R6Class(
         private$publication_info$developed_by$citation<-citation
         private$publication_info$developed_by$url<-url
       } else if(type=="modifier"){
-        private$publication_info$modifided_by$authors<-authors
-        private$publication_info$modifided_by$citation<-citation
-        private$publication_info$modifided_by$url<-url
+        private$publication_info$modified_by$authors<-authors
+        private$publication_info$modified_by$citation<-citation
+        private$publication_info$modified_by$url<-url
       }
      },
     #--------------------------------------------------------------------------
@@ -897,11 +897,11 @@ TextEmbeddingModel<-R6::R6Class(
                                    abstract_native=NULL,
                                    keywords_eng=NULL,
                                    keywords_native=NULL){
-      if(!is.null(description)){
-        private$model_description$eng=description
+      if(!is.null(eng)){
+        private$model_description$eng=eng
       }
-      if(!is.null(description_native)){
-        private$model_description$native=description
+      if(!is.null(native)){
+        private$model_description$native=native
       }
 
       if(!is.null(abstract_eng)){

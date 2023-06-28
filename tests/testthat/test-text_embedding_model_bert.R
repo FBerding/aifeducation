@@ -54,3 +54,99 @@ test_that("decoding_bert", {
   expect_type(decodings,type="list")
 })
 
+test_that("descriptions", {
+  bert_modeling$set_model_description(
+    eng = "Description",
+    native = "Beschreibung",
+    abstract_eng = "Abstract",
+    abstract_native = "Zusammenfassung",
+    keywords_eng = c("Test","Neural Net"),
+    keywords_native = c("Test","Neuronales Netz")
+  )
+  desc<-bert_modeling$get_model_description()
+  expect_equal(
+    object=desc$eng,
+    expected="Description"
+  )
+  expect_equal(
+    object=desc$native,
+    expected="Beschreibung"
+  )
+  expect_equal(
+    object=desc$abstract_eng,
+    expected="Abstract"
+  )
+  expect_equal(
+    object=desc$abstract_native,
+    expected="Zusammenfassung"
+  )
+  expect_equal(
+    object=desc$keywords_eng,
+    expected=c("Test","Neural Net")
+  )
+  expect_equal(
+    object=desc$keywords_native,
+    expected=c("Test","Neuronales Netz")
+  )
+})
+
+test_that("license", {
+  bert_modeling$set_license("test_license")
+  expect_equal(
+    object=bert_modeling$get_license(),
+    expected=c("test_license")
+  )
+})
+
+test_that("publication_info",{
+  bert_modeling$set_publication_info(
+    type="developer",
+    authors = personList(
+      person(given="Max",family="Mustermann")
+    ),
+    citation="Test Classifier",
+    url="https://Test.html"
+  )
+
+  bert_modeling$set_publication_info(
+    type="modifier",
+    authors = personList(
+      person(given="Nico",family="Meyer")
+    ),
+    citation="Test Classifier Revisited",
+    url="https://Test_revisited.html"
+  )
+
+
+  pub_info=bert_modeling$get_publication_info()
+
+  expect_equal(
+    object=pub_info$developed_by$authors,
+    expected=personList(
+      person(given="Max",family="Mustermann")
+    )
+  )
+  expect_equal(
+    object=pub_info$developed_by$citation,
+    expected="Test Classifier"
+  )
+  expect_equal(
+    object=pub_info$developed_by$url,
+    expected="https://Test.html"
+  )
+
+  expect_equal(
+    object=pub_info$modified_by$authors,
+    expected=personList(
+      person(given="Nico",family="Meyer")
+    )
+  )
+  expect_equal(
+    object=pub_info$modified_by$citation,
+    expected="Test Classifier Revisited"
+  )
+  expect_equal(
+    object=pub_info$modified_by$url,
+    expected="https://Test_revisited.html"
+  )
+})
