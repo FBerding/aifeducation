@@ -206,7 +206,7 @@ Adding the model description of a classifier is similar to
 `TextEmbeddingModel`s. With the methods `set_model_description` and
 `get_model_description` you can provide a detailed description
 (parameter `eng` and `native`) of your classifier in English and the
-native language of your classifier processes. With `abstract_eng` and
+native language of your classifier. With `abstract_eng` and
 `abstract_native` you can provide the corresponding abstract of your
 descriptions while `keywords_eng` and `keywords_native` take a vector
 with the corresponding keywords.
@@ -273,8 +273,8 @@ abstract_native="Dieser Classifier bewertet Unterrichtsentwürfe und
   entwickelt. Es wurden stets Kodierschulungen durchgeführt und die 
   Inter-Coder-Reliabilitäten der einzelnen Kategorien zu verschiedenen 
   Zeitpunkten berechnet.",
-keywords_eng="Self-determination theory, motivation, lesson planning, business didactics",
-keywords_native="Selbstbestimmungstheorie, Motivation, Unterrichtsplanung, Wirtschaftsdidaktik")
+keywords_eng=c("Self-determination theory", "motivation", "lesson planning", "business didactics"),
+keywords_native=c("Selbstbestimmungstheorie", "Motivation", "Unterrichtsplanung", "Wirtschaftsdidaktik")
 ```
 
 In the case of a classifier, the description should include:
@@ -308,7 +308,7 @@ example_classifier$set_publication_info(
   url=NULL)
 ```
 
-In contrast to \link{TextEmbeddingModels} there are not different types of
+In contrast to TextEmbeddingModels there are not different types of
 author groups.
 
 Finally, you can manage the license for using your classifier via

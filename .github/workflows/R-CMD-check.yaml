@@ -19,9 +19,9 @@ jobs:
       matrix:
         config:
           - {os: macos-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: macos-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,10 @@ jobs:
 
           #conda_create(envname="r-reticulate",
           #              conda=Sys.which("python"))
-          conda_install("r-reticulate", python_packages,pip=TRUE)
+
+
+          #conda_install("r-reticulate", python_packages,pip=TRUE)
+          aifeducation::install_py_modules("r-reticulate")
 
           #path_to_python <- virtualenv_python("r-reticulate")
           path_to_python <- conda_python("r-reticulate")

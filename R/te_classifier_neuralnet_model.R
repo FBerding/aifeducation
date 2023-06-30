@@ -267,11 +267,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         if(features %% 2 !=0){
           stop("The number of features of the TextEmbeddingmodel is
                not a multiple of 2.")
-
         }
       }
-
-
 
       #Saving Configuration
       config=list(
@@ -509,6 +506,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       private$init_weights=model$get_weights()
       self$model_config$n_req=length(config$rec)
       self$model_config$n_hidden=length(config$hidden)
+      self$model_config$n_self_attention_heads=config$self_attention_heads
       self$model_config$target_levels=target_levels_order
       self$model_config$input_variables=variable_name_order
       self$model_config$init_config=config
@@ -1727,7 +1725,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Ensuring the correct order of the variables for prediction
       real_newdata<-real_newdata[,,self$model_config$input_variables,drop=FALSE]
       current_row_names=rownames(real_newdata)
-      if(self$model_config$n_req==0){
+      if(self$model_config$n_req==0 &
+         self$model_config$n_self_attention_heads==0){
         real_newdata=array_to_matrix(real_newdata)
       }
 
@@ -1955,7 +1954,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       target_test_transformed<-as.numeric(target_test)-1
 
       #Convert Input data if the network cannot process sequential data
-      if(self$model_config$n_req==0){
+      if(self$model_config$n_req==0 &
+         self$model_config$n_self_attention_heads==0){
         input_embeddings_train= array_to_matrix(data_embedding_train)
         input_embeddings_test=array_to_matrix(data_embedding_test)
       } else {
