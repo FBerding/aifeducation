@@ -494,7 +494,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           loss = config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
           metric=config$metric)
-      } else if (config$optimizer=="rmsprop"){
+      } else if(config$optimizer=="rmsprop"){
          model<-keras::compile(
             object = model,
             loss = self$model_config$init_config$err_fct,
