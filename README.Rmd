@@ -194,7 +194,7 @@ Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
 Berding, F., Riebenbauer, E., Stütz, S., Jahncke, H., Slopinski, A., &
 Rebmann, K. (2022). Performance and Configuration of Artificial
 Intelligence in Educational Settings.: Introducing a New Reliability
-Concept Based on Content Analysis. Frontiers in Education, 1--21.
+Concept Based on Content Analysis. Frontiers in Education, 1-21.
 <https://doi.org/10.3389/feduc.2022.818365>
 
 Bloemen, A. (2011). Lernaufgaben in Schulbüchern der Wirtschaftslehre:
