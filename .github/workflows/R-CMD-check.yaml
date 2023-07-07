@@ -83,8 +83,8 @@ jobs:
           #virtualenv_create("r-reticulate", Sys.which("python"))
           #virtualenv_install("r-reticulate", python_packages)
 
-          conda_create(envname="r-reticulate",
-                        conda=Sys.which("python"))
+          #conda_create(envname="r-reticulate",
+          #              conda=Sys.which("python"))
 
 
           conda_install("r-reticulate",

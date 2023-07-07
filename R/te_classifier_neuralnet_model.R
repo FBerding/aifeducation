@@ -488,15 +488,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         outputs = layer_list[length(layer_list)],
         name = name)
 
-      tf<-reticulate::import("tensorflow")
-
       if(config$optimizer=="adam"){
-        model %>% keras::compile(
+        model<-keras::compile(
+          object = model,
           loss = config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
           metric=config$metric)
       } else if (config$optimizer=="rmsprop"){
-          model %>% keras::compile(
+         model<-keras::compile(
+            object = model,
             loss = self$model_config$init_config$err_fct,
             optimizer=tf$keras$optimizers$legacy$RMSprop(),
             metric=self$model_config$init_config$metric)
