@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,12 +85,11 @@ Rebmann</h4>
 share research instruments such as questionnaires or tests. For example,
 the <a href="https://www.testarchiv.eu/en" class="external-link">Open Test Archive</a>
 provides researchers and practitioners access to a large number of open
-access instruments. <em>aifeducation</em> is based on the assumption
-that AI-based classifiers should be shareable, similarly to research
-instruments, to empower educational and social science researchers and
-to support the application of AI for educational purposes. Thus,
-<em>aifeducation</em> aims to make the sharing process as easy as
-possible.</p>
+access instruments. <em>aifeducation</em> assumes AI-based classifiers
+should be shareable, similarly to research instruments, to empower
+educational and social science researchers and to support the
+application of AI for educational purposes. Thus, <em>aifeducation</em>
+aims to make the sharing process as easy as possible.</p>
 <p>For this aim, every object generated with <em>aifeducation</em> can
 be prepared for publication in a few basic steps. In this vignette, we
 would like to show you how to make your AI ready for publication and how
@@ -120,9 +119,9 @@ method <code>set_model_description</code>.</p>
 <span>  keywords_native<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <p>This method allows you to provide a description in English and in the
 native language of your model to make the distribution of your model
-more easy. You can write your description in HTML which allows you to
-add links to other sources or publications, to add tables or to
-highlight important aspects of your model.</p>
+easier. You can write your description in HTML which allows you to add
+links to other sources or publications, to add tables or to highlight
+important aspects of your model.</p>
 <p><strong>We would like to recommend that you write at least an English
 description to allow a wider community to recognize your work</strong>.
 Furthermore, your description should include:</p>
@@ -153,7 +152,7 @@ This can be done with the method <code>set_publication_info</code>.</p>
 <span>  <span class="va">citation</span>,</span>
 <span>  url<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <p>First of all you have to decide the type of information you would
-like to add. You have three choices: “developer”, and “modifier”, which
+like to add. You have two choices: “developer”, and “modifier”, which
 you set with <code>type</code>.</p>
 <p><code>type="developer"</code> stores all information about the people
 involved and the process of developing the model. If you use a

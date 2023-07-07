@@ -55,7 +55,7 @@ python, some additional installation steps are necessary.
 If you would like to train and to develop your own models and AIs, a
 compatible graphic device is necessary. Even a low performing graphic
 device can speed up computations significantly. If you prefer using
-pre-trained models however, this is **not** necessary. In this case, a
+pre-trained models however, this is **not** necessary. In this case a
 'normal' office computer without a graphic device should be sufficient
 in most cases.
 
@@ -133,11 +133,11 @@ This function installs the following python modules:
 
 and its dependencies in the environment "aifeducation".
     
-If you would like to use *aifeducation* with other packages or with
+If you would like to use *aifeducation* with other packages or within
 other environments, please ensure that these python modules are
 available.
 
-With `check_aif_py_modules()` you can check if all modules are
+With `check_aif_py_modules()` you can check, if all modules are
 successfully installed.
 
 ```{r, include = TRUE, eval=FALSE}

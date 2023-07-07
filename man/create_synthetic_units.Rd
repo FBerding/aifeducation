@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{create_synthetic_units}
 \alias{create_synthetic_units}
-\title{Create Synthetic Units}
+\title{Create synthetic units}
 \usage{
 create_synthetic_units(embedding, target, k, max_k, method, cat, cat_freq)
 }

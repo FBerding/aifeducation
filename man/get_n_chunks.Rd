@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{get_n_chunks}
 \alias{get_n_chunks}
-\title{Get the Number of Chunks/Sequences for each case}
+\title{Get the number of chunks/sequences for each case}
 \usage{
 get_n_chunks(text_embeddings, features, times)
 }

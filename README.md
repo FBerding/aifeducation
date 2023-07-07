@@ -6,6 +6,9 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-project.org/package=aifeducation)
+[![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/aifeducation)](https://cran.r-project.org/package=aifeducation)
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
@@ -19,11 +22,11 @@ as text embedding, classification, and question answering under the
 special conditions of educational and social sciences. These are:
 
 - **digital data availability:** In educational and social science, data
-  is often only available in handwritten form. For example in schools or
-  universities, students and pupils often solve tasks by creating
+  is often only available in handwritten form. For example, in schools
+  or universities, students and pupils often solve tasks by creating
   handwritten documents. Thus, educators and researchers first have to
   transform analogue data into a digital form, involving human actions.
-  This makes data generation financially expensive and time consuming
+  This makes data generation financially expensive and time-consuming,
   leading to *small data sets*.
 - **high privacy policy standards:** Furthermore, in educational and
   social science, data often refers to humans and/or their actions.
@@ -31,7 +34,7 @@ special conditions of educational and social sciences. These are:
   countries, limiting access to and the usage of data, which also
   results in *small data sets*.
 - **long research tradition:** Educational and social sciences have a
-  long research tradition in generating insights into social phenomenons
+  long research tradition in generating insights into social phenomena
   as well as learning and teaching. These insights have to be
   incorporated into applications of AI (e.g., Luan et al. 2020; Wong et
   al. 2019). This makes supervised machine learning a very important
@@ -40,17 +43,17 @@ special conditions of educational and social sciences. These are:
   hand (Berding et al. 2022). However, this kind of machine learning
   requires humans to generate a valid data set for the training process,
   leading to *small data sets*.
-- **complex constructs:** Compared to classification tasks where AI has
-  to differentiate between a ‘good’ or ‘bad’ movie review, constructs in
-  the educational and social sciences are more complex. For example,
-  some research instruments in motivational psychology require to infer
-  personal motifs from written essays (e.g., Gruber & Kreuzpointner
-  2013). A reliable and valid interpretation of this kind of information
-  requires well qualified human raters, making data generation
-  expensive. This also *limits the size of a data set*.
+- **complex constructs:** Compared to classification tasks where, for
+  instance, AI has to differentiate between a ‘good’ or ‘bad’ movie
+  review, constructs in the educational and social sciences are more
+  complex. For example, some research instruments in motivational
+  psychology require to infer personal motifs from written essays (e.g.,
+  Gruber & Kreuzpointner 2013). A reliable and valid interpretation of
+  this kind of information requires well qualified human raters, making
+  data generation expensive. This also *limits the size of a data set*.
 - **imbalanced data:** Finally, data in the educational and social
   sciences often occurs in an imbalanced pattern as several empirical
-  studies show (Bloemen 2011, Stütz et al. 2022). Imbalanced means that
+  studies show (Bloemen 2011; Stütz et al. 2022). Imbalanced means that
   some categories or characteristics of a data set have very high
   absolute frequencies compared to other categories and characteristics.
   Imbalance during AI training guides algorithms to focus and prioritize
@@ -83,7 +86,7 @@ devtools::install_github("FBerding/aifeducation",
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports both
 newer approaches such as BERT (Devlin et al. 2019), RoBERTa (Liu et
-al. 2019), and Longformer Beltagy, Peters & Cohan 2020) and older
+al. 2019), and Longformer (Beltagy, Peters & Cohan 2020) and older
 approaches such as GlobalVectors (Pennington, Socher & Manning 2014) or
 Latent Dirichlet Allocation/Topic Modeling in classification tasks.
 
@@ -107,7 +110,7 @@ In order to deal with the problem of imbalanced data sets, the package
 integrates *Synthetic Minority Oversampling Technique* into the learning
 process. Currently the *Basic Synthetic Minority Oversampling Technique*
 (Chawla et al. 2002), *Density-Bases Synthetic Minority Oversampling
-Technique* (Bunkhumpornpat, Sinapiromsaran & Lursinsap, 2012), and
+Technique* (Bunkhumpornpat, Sinapiromsaran & Lursinsap 2012), and
 *Adaptive Synthetic Sampling Approach for Imbalanced Learning* (Hem
 Garcia & Li 2008) are implemented via the *R* package *smotefamiliy*.
 
@@ -170,7 +173,7 @@ Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
 Long-Document Transformer. <https://doi.org/10.48550/arXiv.2004.05150>
 
 Berding, F., & Pargmann, J. (2022). Iota Reliability Concept of the
-Second Generation. Logos Verlag Berlin. <https://doi.org/10.30819/5581>
+Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
 
 Berding, F., Riebenbauer, E., Stütz, S., Jahncke, H., Slopinski, A., &
 Rebmann, K. (2022). Performance and Configuration of Artificial
@@ -204,7 +207,7 @@ picture story exercises like the TAT. PloS One, 8(11), e79450.
 
 Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive
 guide to measuring the extent of agreement among raters (Fourth
-edition). Advances Analytics LLC.
+edition). STATAXIS.
 
 Haixiang, G., Yijing, L., Shang, J., Mingyun, G., Yuanyue, H., & Bing,
 G. (2017). Learning from class-imbalanced data: Review of methods and
@@ -220,9 +223,9 @@ on Computational Intelligence) (pp. 1322–1328). IEEE.
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th Ed.). SAGE.
 
-Lee, D.‑H. (2013). Pseudo-Label : The Simple and Efficient
+Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
-Workshop : Challenges in RepresentationLearning.
+Workshop: Challenges in RepresentationLearning.
 <https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks>
 
 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
@@ -250,5 +253,5 @@ Wong, J., Baars, M., Koning, B. B. de, van der Zee, T., Davis, D.,
 Khalil, M., Houben, G.‑J., & Paas, F. (2019). Educational Theories and
 Learning Analytics: From Data to Knowledge. In D. Ifenthaler, D.-K. Mah,
 & J. Y.-K. Yau (Eds.), Utilizing Learning Analytics to Support Study
-Success (pp. 3–25). Springer International Publishing.
+Success (pp. 3–25). Springer.
 <https://doi.org/10.1007/978-3-319-64792-0_1>

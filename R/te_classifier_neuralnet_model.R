@@ -1,4 +1,4 @@
-#'@title Text Embedding Classifier with a Neural Net
+#'@title Text embedding classifier with a neural net
 #'
 #'@description Abstract class for neural nets with keras and
 #'tensorflow

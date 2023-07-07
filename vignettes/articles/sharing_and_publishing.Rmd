@@ -28,7 +28,7 @@ In the educational and social sciences, it is a common practice to share
 research instruments such as questionnaires or tests. For example, the
 [Open Test Archive](https://www.testarchiv.eu/en) provides researchers
 and practitioners access to a large number of open access instruments.
-*aifeducation* is based on the assumption that AI-based classifiers
+*aifeducation* assumes AI-based classifiers
 should be shareable, similarly to research instruments, to empower
 educational and social science researchers and to support the
 application of AI for educational purposes. Thus, *aifeducation* aims to
@@ -65,7 +65,7 @@ example_model$set_model_description(
 
 This method allows you to provide a description in English and in the
 native language of your model to make the distribution of your model
-more easy. You can write your description in HTML which allows you to
+easier. You can write your description in HTML which allows you to
 add links to other sources or publications, to add tables or to
 highlight important aspects of your model.
 
@@ -105,7 +105,7 @@ example_model$set_publication_info(
 ```
 
 First of all you have to decide the type of information you would like
-to add. You have three choices: "developer", and "modifier",
+to add. You have two choices: "developer", and "modifier",
 which you set with `type`.
 
 `type="developer"` stores all information about the people involved and

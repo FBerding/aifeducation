@@ -8,7 +8,8 @@
 #'@importFrom reticulate py_install
 #'@export
 install_py_modules<-function(envname="aifeducation"){
-  relevant_modules<-c("transformers",
+  relevant_modules<-c("numpy",
+                      "transformers",
                       "tokenizers",
                       "datasets",
                       "torch",
@@ -17,12 +18,13 @@ install_py_modules<-function(envname="aifeducation"){
 
   reticulate::conda_create(
     envname = envname,
-    channel=c("conda-forge")
+    channel=c("conda-forge"),
+    conda=Sys.which("python")
   )
-  reticulate::py_install(
+  reticulate::conda_install(
     packages = relevant_modules,
     envname = envname,
-    method = "auto",
+    conda = "auto",
     pip = TRUE
   )
 }

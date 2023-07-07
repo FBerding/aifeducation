@@ -31,7 +31,7 @@ understand an observation, to generate new insights, and to derive
 recommendations for research and practice.
 
 In educational science, several areas deal with this kind of task. For
-example, diagnosing students characteristics is an important aspect of a
+example, diagnosing students' characteristics is an important aspect of a
 teachers' profession and necessary to understand and promote learning.
 Another example is the use of learning analytics, where data about
 students is used to provide learning environments adapted to their
@@ -46,7 +46,7 @@ Supervised machine learning is one concept that allows a link between
 real-world observations and existing scientific models and theories
 (Berding et al. 2022). For educational sciences this is a great
 advantage because it allows researchers to use the existing knowledge
-and insights for use case applications of AI. The drawback of this
+and insights for applications of AI. The drawback of this
 approach is that the training of AI requires both information about the
 real world observations and information on the corresponding alignment
 with scientific models and theories.
@@ -56,7 +56,7 @@ since textual data can be found almost everywhere in the realm of
 learning and teaching (Berding et al. 2022). For example, teachers often
 require students to solve a task which they provide in a written form.
 Students have to create a solution for the tasks which they often
-document with a short written essay or a presentation. This data can be
+document with a short-written essay or a presentation. This data can be
 used to analyze learning and teaching. Teachers' written tasks for their
 students may provide insights into the quality of instruction while
 students' solutions may provide insights into their learning outcomes
@@ -64,8 +64,8 @@ and prerequisites.
 
 AI can be a helpful assistant in analyzing textual data since the
 analysis of textual data is a challenging and time-consuming task for
-humans because they have to conduct a content analysis. In this
-vignette, we would like to show you how to create an AI that can help
+humans. In this
+vignette, we would like to show how to create an AI that can help
 you with such tasks by using the package *aifedcuation*.
 
 **Please note that an introduction to content analysis, natural language
@@ -89,7 +89,7 @@ machine learning. In content analysis, a phenomenon like performance and
 colors can be described as a scale/dimension which is made up by several
 categories (e.g. Schreier 2012 pp. 59). In our example, an exam's
 performance (scale/dimension) could be "good", "average" or "poor". In
-terms of colors (scale/dimension) categories could be "blue", "green"
+terms of colors (scale/dimension) categories could be "blue", "green",
 etc. Machine learning literature uses other words to describe this kind
 of data. In machine learning, "scale" and "dimension" correspond to the
 term "label" while "categories" refer to the term "classes" (Chollet,
@@ -147,7 +147,7 @@ From these different groups, *aifedcuation* implements several methods.
 
 -   **Topic Modeling:** Topic modeling is an approach that uses
     frequencies of tokens within a text. The frequencies of the tokens
-    are models as the observable variables of one more latent topics
+    are models as the observable variables of one more latent topic
     (Campesato 2021, p. 113). The estimation of a topic model is often
     based on a Latent Dirichlet Analysis (LDA) which describes each text
     by a distribution of topics. The topics themselves are described by
@@ -186,7 +186,7 @@ using a transformer from [Huggingface](https://huggingface.co/) or by
 using a model from colleagues. If not, *aifeducation* provides several
 functions allowing you to create your own models. Depending on the
 approach you would like to use, different steps are necessary. In the
-case of Topic Modeling or GlobalVectorClusters you must first create a
+case of Topic Modeling or GlobalVectorClusters, you must first create a
 draft of a vocabulary with the two functions
 `bow_pp_create_vocab_draft()` and `bow_pp_create_basic_text_rep()`. When
 calling these functions, you determine central properties of the
@@ -202,7 +202,7 @@ data for the supervised machine learning process. Additionally, you need
 the target data which must be a named factor containing the
 classes/categories of each text.
 
-With both kinds of data you are able to create a new object of class
+With both kinds of data, you are able to create a new object of class
 `TextEmbeddingClassifierNeuralNet` which is the classifier. To train the
 classifier you have several options which we will cover in detail in
 chapter 3. After training the classifier you can share it with other
@@ -415,13 +415,13 @@ GlobalVectorClusters.
 
 As you may notice, the dfm only counts the words in a text. Thus, their
 position in the text or within a sentence does not matter. If you
-further lower case tokens or use lemmas, more syntactic information is
+further lower-case tokens or use lemmas, more syntactic information is
 lost for the advantage that the dfm has a lower dimensionality while
 losing only little semantic meaning. In contrast, the fcm is a matrix
 that describes how often different tokens occur together. Thus, an fcm
 recovers part of the position of words in a sentence and in a text.
 
-Now everything is ready to create a new text embedding model based on
+Now, everything is ready to create a new text embedding model based on
 Topic Modeling or GlobalVectorClusters. Before we show you how to create
 the new model, we will have a look on the preparation of a new
 transformer.
@@ -434,7 +434,7 @@ computationally intensive. In this vignette we will illustrate the
 process with a BERT model. However, for many other transformers, the
 process is the same.
 
-The creation of a new transformer requires at least two steps. First you
+The creation of a new transformer requires at least two steps. First, you
 must decide about the architecture of your transformer. This includes
 the creation of a set of vocabulary. In *aifedcuation* you can do this
 by calling the function `create_bert_model()`. For our example this
@@ -469,11 +469,11 @@ smaller elements, allowing them to build a huge number of words with a
 small number of elements. Thus, even with only small number of about
 30,000 tokens, they are able to represent a very large number of words.
 As a consequence, these kinds of vocabularies are many times smaller
-than the vocabularies built in section 2.2.
+than the vocabularies build in section 2.2.
 
 The other parameters allow you to customize your BERT model. For
 example, you could increase the number of hidden layers from 12 to 24 or
-reduce the hidden size from 768 to 256, allowing you to built and to
+reduce the hidden size from 768 to 256, allowing you to build and to
 test larger or smaller transformers.
 
 Please note that with `max_position_embeddings` you determine how many
@@ -513,7 +513,7 @@ your new transformer is stored. Furthermore, it is important that you
 provide *another* directory where your trained transformer should be
 saved to avoid reading and writing collisions.
 
-Now the provided raw data is used to train your model by using Masked
+Now, the provided raw data is used to train your model by using Masked
 Language Modeling. First, you can set the length of token sequences with
 `chunk_size`. With `whole_word` you can choose between masking single
 tokens or masking complete words (Please remember that modern tokenizers
@@ -732,7 +732,7 @@ The method `embed`creates an object of class `EmbeddedText`. This is
 just a data.frame consisting the embedding of every text. Depending on
 the method, the data.frame has a different meaning:
 
--   **Topic Modeling:** Regarding Topic Modeling, the rows represent the
+-   **Topic Modeling:** Regarding topic modeling, the rows represent the
     texts and the columns represent the percentage of every topic within
     a text.
 -   **GlobalVectorClusters:** Here, the rows represent the texts and the
@@ -792,7 +792,7 @@ Loading your model requires two steps. First, load the interface.
 load(file="my_own_transformer_trained/r_interface.RData")
 ```
 
-Now the text embedding model is available in *R.*. Next you must
+Now, the text embedding model is available in *R.*. Next you must
 re-initialize the transformer by calling the corresponding method
 `load_model` of your model.
 
@@ -1006,7 +1006,7 @@ to set the following parameters:
     labeled data an increasing weight with every step)
 -   `bpl_max=1.00`, `bpl_anchor=1.00`, and `bpl_min=0.00` (ensures that
     all pseudo labeled cases are used for training. `bpl_anchor` does
-    not effect the calculations)
+    not affect the calculations)
 
 Please note that while Lee (2013) suggests to recalculate the
 pseudo-labels of the unlabeled data after every weight actualization, in
@@ -1015,7 +1015,7 @@ pseudo-labels of the unlabeled data after every weight actualization, in
 `bpl_max=1.00`, `bpl_anchor=1.00`, and `bpl_min=0.00` are used to
 describe the certainty of a prediction. 0 refers to random guessing
 while 1 refers to perfect certainty. `bpl_anchor` is used as a reference
-value. The distance to `bpl_anchor` is calculated for every case. Then
+value. The distance to `bpl_anchor` is calculated for every case. Then,
 they are sorted with an increasing distance from `bpl_anchor`. The
 resulting order of cases is relevant if you set `bpl_dynamic_inc=TRUE`
 or `bpl_balance=TRUE`.
@@ -1142,7 +1142,7 @@ Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
 Long-Document Transformer. <https://doi.org/10.48550/arXiv.2004.05150>
 
 Berding, F., & Pargmann, J. (2022). Iota Reliability Concept of the
-Second Generation. Logos Verlag Berlin. <https://doi.org/10.30819/5581>
+Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
 
 Berding, F., Riebenbauer, E., Stütz, S., Jahncke, H., Slopinski, A., &
 Rebmann, K. (2022). Performance and Configuration of Artificial
@@ -1171,17 +1171,17 @@ Association for Computational Linguistics.
 
 Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive
 guide to measuring the extent of agreement among raters (Fourth
-edition). Advances Analytics LLC.
+edition). Gaithersburg: STATAXIS.
 
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
-Methodology (4th Ed.). SAGE.
+Methodology (4th ed.). Los Angeles: SAGE.
 
 Lane, H., Howard, C., & Hapke, H. M. (2019). Natural language processing
 in action: Understanding, analyzing, and generating text with Python.
-Manning.
+Shelter Island: Manning.
 
 Larusson, J. A., & White, B. (Eds.). (2014). Learning Analytics: From
-Research to Practice. Springer New York.
+Research to Practice. New York: Springer.
 <https://doi.org/10.1007/978-1-4614-3305-7>
 
 Lee, D.‑H. (2013). Pseudo-Label : The Simple and Efficient
@@ -1190,7 +1190,7 @@ Workshop : Challenges in RepresentationLearning.
 <https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks>
 
 Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
-Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Springer.
+Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden: Springer.
 <https://doi.org/10.1007/978-3-658-21980-2>
 
 Pappagari, R., Zelasko, P., Villalba, J., Carmiel, Y., & Dehak, N.
@@ -1203,11 +1203,11 @@ Vectors for Word Representation. Proceedings of the 2014 Conference on
 Empirical Methods in Natural Language Processing.
 <https://aclanthology.org/D14-1162.pdf>
 
-Schreier, M. (2012). Qualitative Content Analysis in Practice. SAGE.
+Schreier, M. (2012). Qualitative Content Analysis in Practice. Los Angeles: SAGE.
 
 Tunstall, L., Werra, L. von, Wolf, T., & Géron, A. (2022). Natural
 language processing with transformers: Building language applications
-with hugging face (Revised edition). O'Reilly.
+with hugging face (Revised edition). Heidelberg: O'Reilly.
 
 Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez,
 A. N., Kaiser, L., & Polosukhin, I. (2017). Attention Is All You Need.

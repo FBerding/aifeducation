@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,7 @@ observation to scientific concepts is an important task that allows
 researchers to understand an observation, to generate new insights, and
 to derive recommendations for research and practice.</p>
 <p>In educational science, several areas deal with this kind of task.
-For example, diagnosing students characteristics is an important aspect
+For example, diagnosing students’ characteristics is an important aspect
 of a teachers’ profession and necessary to understand and promote
 learning. Another example is the use of learning analytics, where data
 about students is used to provide learning environments adapted to their
@@ -100,25 +100,25 @@ improved learning and instruction.</p>
 real-world observations and existing scientific models and theories
 (Berding et al. 2022). For educational sciences this is a great
 advantage because it allows researchers to use the existing knowledge
-and insights for use case applications of AI. The drawback of this
-approach is that the training of AI requires both information about the
-real world observations and information on the corresponding alignment
-with scientific models and theories.</p>
+and insights for applications of AI. The drawback of this approach is
+that the training of AI requires both information about the real world
+observations and information on the corresponding alignment with
+scientific models and theories.</p>
 <p>A valuable source of data in educational science are written texts,
 since textual data can be found almost everywhere in the realm of
 learning and teaching (Berding et al. 2022). For example, teachers often
 require students to solve a task which they provide in a written form.
 Students have to create a solution for the tasks which they often
-document with a short written essay or a presentation. This data can be
+document with a short-written essay or a presentation. This data can be
 used to analyze learning and teaching. Teachers’ written tasks for their
 students may provide insights into the quality of instruction while
 students’ solutions may provide insights into their learning outcomes
 and prerequisites.</p>
 <p>AI can be a helpful assistant in analyzing textual data since the
 analysis of textual data is a challenging and time-consuming task for
-humans because they have to conduct a content analysis. In this
-vignette, we would like to show you how to create an AI that can help
-you with such tasks by using the package <em>aifedcuation</em>.</p>
+humans. In this vignette, we would like to show how to create an AI that
+can help you with such tasks by using the package
+<em>aifedcuation</em>.</p>
 <p><strong>Please note that an introduction to content analysis, natural
 language processing or machine learning is beyond the scope of this
 vignette. If you would like to learn more, please refer to the cited
@@ -140,7 +140,7 @@ like performance and colors can be described as a scale/dimension which
 is made up by several categories (e.g. Schreier 2012 pp. 59). In our
 example, an exam’s performance (scale/dimension) could be “good”,
 “average” or “poor”. In terms of colors (scale/dimension) categories
-could be “blue”, “green” etc. Machine learning literature uses other
+could be “blue”, “green”, etc. Machine learning literature uses other
 words to describe this kind of data. In machine learning, “scale” and
 “dimension” correspond to the term “label” while “categories” refer to
 the term “classes” (Chollet, Kalinowski &amp; Allaire 2022, p. 114).</p>
@@ -195,7 +195,7 @@ methods.</p>
 <li>
 <strong>Topic Modeling:</strong> Topic modeling is an approach that
 uses frequencies of tokens within a text. The frequencies of the tokens
-are models as the observable variables of one more latent topics
+are models as the observable variables of one more latent topic
 (Campesato 2021, p. 113). The estimation of a topic model is often based
 on a Latent Dirichlet Analysis (LDA) which describes each text by a
 distribution of topics. The topics themselves are described by a
@@ -236,7 +236,7 @@ by using a transformer from <a href="https://huggingface.co/" class="external-li
 colleagues. If not, <em>aifeducation</em> provides several functions
 allowing you to create your own models. Depending on the approach you
 would like to use, different steps are necessary. In the case of Topic
-Modeling or GlobalVectorClusters you must first create a draft of a
+Modeling or GlobalVectorClusters, you must first create a draft of a
 vocabulary with the two functions
 <code><a href="../reference/bow_pp_create_vocab_draft.html">bow_pp_create_vocab_draft()</a></code> and
 <code><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep()</a></code>. When calling these
@@ -251,7 +251,7 @@ are supported with <em>aifedcuation</em>.</p>
 create the input data for the supervised machine learning process.
 Additionally, you need the target data which must be a named factor
 containing the classes/categories of each text.</p>
-<p>With both kinds of data you are able to create a new object of class
+<p>With both kinds of data, you are able to create a new object of class
 <code>TextEmbeddingClassifierNeuralNet</code> which is the classifier.
 To train the classifier you have several options which we will cover in
 detail in chapter 3. After training the classifier you can share it with
@@ -449,14 +449,14 @@ under investigation. The fcm is later used to create a text embedding
 model based on GlobalVectorClusters.</p>
 <p>As you may notice, the dfm only counts the words in a text. Thus,
 their position in the text or within a sentence does not matter. If you
-further lower case tokens or use lemmas, more syntactic information is
+further lower-case tokens or use lemmas, more syntactic information is
 lost for the advantage that the dfm has a lower dimensionality while
 losing only little semantic meaning. In contrast, the fcm is a matrix
 that describes how often different tokens occur together. Thus, an fcm
 recovers part of the position of words in a sentence and in a text.</p>
-<p>Now everything is ready to create a new text embedding model based on
-Topic Modeling or GlobalVectorClusters. Before we show you how to create
-the new model, we will have a look on the preparation of a new
+<p>Now, everything is ready to create a new text embedding model based
+on Topic Modeling or GlobalVectorClusters. Before we show you how to
+create the new model, we will have a look on the preparation of a new
 transformer.</p>
 </div>
 <div class="section level3">
@@ -467,7 +467,7 @@ creation of a new transformer requires a large data set of texts and is
 computationally intensive. In this vignette we will illustrate the
 process with a BERT model. However, for many other transformers, the
 process is the same.</p>
-<p>The creation of a new transformer requires at least two steps. First
+<p>The creation of a new transformer requires at least two steps. First,
 you must decide about the architecture of your transformer. This
 includes the creation of a set of vocabulary. In <em>aifedcuation</em>
 you can do this by calling the function
@@ -499,11 +499,11 @@ algorithms that splits tokens into smaller elements, allowing them to
 build a huge number of words with a small number of elements. Thus, even
 with only small number of about 30,000 tokens, they are able to
 represent a very large number of words. As a consequence, these kinds of
-vocabularies are many times smaller than the vocabularies built in
+vocabularies are many times smaller than the vocabularies build in
 section 2.2.</p>
 <p>The other parameters allow you to customize your BERT model. For
 example, you could increase the number of hidden layers from 12 to 24 or
-reduce the hidden size from 768 to 256, allowing you to built and to
+reduce the hidden size from 768 to 256, allowing you to build and to
 test larger or smaller transformers.</p>
 <p>Please note that with <code>max_position_embeddings</code> you
 determine how many tokens your transformer can process. If your text has
@@ -538,15 +538,15 @@ model directory. The next step is to train your model by calling
 your new transformer is stored. Furthermore, it is important that you
 provide <em>another</em> directory where your trained transformer should
 be saved to avoid reading and writing collisions.</p>
-<p>Now the provided raw data is used to train your model by using Masked
-Language Modeling. First, you can set the length of token sequences with
-<code>chunk_size</code>. With <code>whole_word</code> you can choose
-between masking single tokens or masking complete words (Please remember
-that modern tokenizers split words into several tokens. Thus, tokens and
-words are not forced to match each other directly). With
-<code>p_mask</code> you can determine how many tokens should be masked.
-Finally, with <code>val_size</code>, you set how many chunks should be
-used for the validation sample.</p>
+<p>Now, the provided raw data is used to train your model by using
+Masked Language Modeling. First, you can set the length of token
+sequences with <code>chunk_size</code>. With <code>whole_word</code> you
+can choose between masking single tokens or masking complete words
+(Please remember that modern tokenizers split words into several tokens.
+Thus, tokens and words are not forced to match each other directly).
+With <code>p_mask</code> you can determine how many tokens should be
+masked. Finally, with <code>val_size</code>, you set how many chunks
+should be used for the validation sample.</p>
 <p>If you work on a machine and your graphic device only has small
 memory, please reduce the batch size significantly. We also recommend to
 change the usage of memory with
@@ -751,7 +751,7 @@ embedding of every text. Depending on the method, the data.frame has a
 different meaning:</p>
 <ul>
 <li>
-<strong>Topic Modeling:</strong> Regarding Topic Modeling, the rows
+<strong>Topic Modeling:</strong> Regarding topic modeling, the rows
 represent the texts and the columns represent the percentage of every
 topic within a text.</li>
 <li>
@@ -801,7 +801,7 @@ model directory.</p>
 <p>Loading your model requires two steps. First, load the interface.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>Now the text embedding model is available in <em>R.</em>. Next you
+<p>Now, the text embedding model is available in <em>R.</em>. Next you
 must re-initialize the transformer by calling the corresponding method
 <code>load_model</code> of your model.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -1029,7 +1029,7 @@ increasing weight with every step)</li>
 <li>
 <code>bpl_max=1.00</code>, <code>bpl_anchor=1.00</code>, and
 <code>bpl_min=0.00</code> (ensures that all pseudo labeled cases are
-used for training. <code>bpl_anchor</code> does not effect the
+used for training. <code>bpl_anchor</code> does not affect the
 calculations)</li>
 </ul>
 <p>Please note that while Lee (2013) suggests to recalculate the
@@ -1040,7 +1040,7 @@ epoch.</p>
 <code>bpl_min=0.00</code> are used to describe the certainty of a
 prediction. 0 refers to random guessing while 1 refers to perfect
 certainty. <code>bpl_anchor</code> is used as a reference value. The
-distance to <code>bpl_anchor</code> is calculated for every case. Then
+distance to <code>bpl_anchor</code> is calculated for every case. Then,
 they are sorted with an increasing distance from
 <code>bpl_anchor</code>. The resulting order of cases is relevant if you
 set <code>bpl_dynamic_inc=TRUE</code> or
@@ -1190,7 +1190,7 @@ class/category.</p>
 <p>Beltagy, I., Peters, M. E., &amp; Cohan, A. (2020). Longformer: The
 Long-Document Transformer. <a href="https://doi.org/10.48550/arXiv.2004.05150" class="external-link uri">https://doi.org/10.48550/arXiv.2004.05150</a></p>
 <p>Berding, F., &amp; Pargmann, J. (2022). Iota Reliability Concept of
-the Second Generation. Logos Verlag Berlin. <a href="https://doi.org/10.30819/5581" class="external-link uri">https://doi.org/10.30819/5581</a></p>
+the Second Generation. Berlin: Logos. <a href="https://doi.org/10.30819/5581" class="external-link uri">https://doi.org/10.30819/5581</a></p>
 <p>Berding, F., Riebenbauer, E., Stütz, S., Jahncke, H., Slopinski, A.,
 &amp; Rebmann, K. (2022). Performance and Configuration of Artificial
 Intelligence in Educational Settings.: Introducing a New Reliability
@@ -1209,20 +1209,20 @@ Proceedings of the 2019 Conference of the North (pp. 4171–4186).
 Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/N19-1423" class="external-link uri">https://doi.org/10.18653/v1/N19-1423</a></p>
 <p>Gwet, K. L. (2014). Handbook of inter-rater reliability: The
 definitive guide to measuring the extent of agreement among raters
-(Fourth edition). Advances Analytics LLC.</p>
+(Fourth edition). Gaithersburg: STATAXIS.</p>
 <p>Krippendorff, K. (2019). Content Analysis: An Introduction to Its
-Methodology (4th Ed.). SAGE.</p>
+Methodology (4th ed.). Los Angeles: SAGE.</p>
 <p>Lane, H., Howard, C., &amp; Hapke, H. M. (2019). Natural language
 processing in action: Understanding, analyzing, and generating text with
-Python. Manning.</p>
+Python. Shelter Island: Manning.</p>
 <p>Larusson, J. A., &amp; White, B. (Eds.). (2014). Learning Analytics:
-From Research to Practice. Springer New York. <a href="https://doi.org/10.1007/978-1-4614-3305-7" class="external-link uri">https://doi.org/10.1007/978-1-4614-3305-7</a></p>
+From Research to Practice. New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-3305-7" class="external-link uri">https://doi.org/10.1007/978-1-4614-3305-7</a></p>
 <p>Lee, D.‑H. (2013). Pseudo-Label : The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
 Workshop : Challenges in RepresentationLearning. <a href="https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks" class="external-link uri">https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks</a></p>
 <p>Papilloud, C., &amp; Hinneburg, A. (2018). Qualitative Textanalyse
-mit Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Springer.
-<a href="https://doi.org/10.1007/978-3-658-21980-2" class="external-link uri">https://doi.org/10.1007/978-3-658-21980-2</a></p>
+mit Topic-Modellen: Eine Einführung für Sozialwissenschaftler.
+Wiesbaden: Springer. <a href="https://doi.org/10.1007/978-3-658-21980-2" class="external-link uri">https://doi.org/10.1007/978-3-658-21980-2</a></p>
 <p>Pappagari, R., Zelasko, P., Villalba, J., Carmiel, Y., &amp; Dehak,
 N. (2019). Hierarchical Transformers for Long Document Classification.
 In 2019 IEEE Automatic Speech Recognition and Understanding Workshop
@@ -1230,11 +1230,12 @@ In 2019 IEEE Automatic Speech Recognition and Understanding Workshop
 <p>Pennington, J., Socher, R., &amp; Manning, C. D. (2014). GloVe:
 Global Vectors for Word Representation. Proceedings of the 2014
 Conference on Empirical Methods in Natural Language Processing. <a href="https://aclanthology.org/D14-1162.pdf" class="external-link uri">https://aclanthology.org/D14-1162.pdf</a></p>
-<p>Schreier, M. (2012). Qualitative Content Analysis in Practice.
-SAGE.</p>
+<p>Schreier, M. (2012). Qualitative Content Analysis in Practice. Los
+Angeles: SAGE.</p>
 <p>Tunstall, L., Werra, L. von, Wolf, T., &amp; Géron, A. (2022).
 Natural language processing with transformers: Building language
-applications with hugging face (Revised edition). O’Reilly.</p>
+applications with hugging face (Revised edition). Heidelberg:
+O’Reilly.</p>
 <p>Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L.,
 Gomez, A. N., Kaiser, L., &amp; Polosukhin, I. (2017). Attention Is All
 You Need. <a href="https://doi.org/10.48550/arXiv.1706.03762" class="external-link uri">https://doi.org/10.48550/arXiv.1706.03762</a></p>

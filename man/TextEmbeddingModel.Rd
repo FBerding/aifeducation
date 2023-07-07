@@ -2,7 +2,7 @@
 % Please edit documentation in R/text_embedding_model.R
 \name{TextEmbeddingModel}
 \alias{TextEmbeddingModel}
-\title{Text Embedding Model}
+\title{Text embedding model}
 \description{
 This \link[R6]{R6} class stores a text embedding model which can be
 used to tokenize, encode, decode, and embed raw texts. The object provides a

@@ -1,4 +1,4 @@
-#'Array to Matrix
+#'Array to matrix
 #'
 #'Function transforming an array to a matrix.
 #'
@@ -288,7 +288,7 @@ get_train_test_split<-function(embedding,
 
 
 #-----------------------------------------------------------------------------
-#'Create Cross-Validation Samples
+#'Create cross-validation samples
 #'
 #'Function creates cross-validation samples and ensures that the relative
 #'frequency for every category/label within a fold equals the relative frequency of
@@ -425,7 +425,7 @@ split_labeled_unlabeled<-function(embedding,
   return(result)
 }
 #------------------------------------------------------------------------------
-#'Create a iota2 object
+#'Create an iota2 object
 #'
 #'Function creates an object of class \code{iotarelr_iota2} which can be used
 #'with the package iotarelr. This function is for internal use only.
@@ -650,7 +650,7 @@ for(ckind in chunk_kind){
 
 
 #---------------------------------------------
-#'Create Synthetic Units
+#'Create synthetic units
 #'
 #'Function for creating synthetic cases in order to balance the data for
 #'training with \link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary
@@ -769,7 +769,7 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
 }
 
 #------------------------------------------------------------------------------
-#'Get the Number of Chunks/Sequences for each case
+#'Get the number of chunks/sequences for each case
 #'
 #'Function for calculating the number of chunks/sequences for every case
 #'
@@ -793,7 +793,7 @@ get_n_chunks<-function(text_embeddings,features,times){
 }
 
 #------------------------------------------------------------------------------
-#'Generate ID Suffix for Objects.
+#'Generate ID suffix for objects
 #'
 #'Function for generating an ID suffix for objects of class
 #'\link{TextEmbeddingModel} and \link{TextEmbeddingClassifierNeuralNet}.

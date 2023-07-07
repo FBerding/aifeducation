@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{create_iota2_mean_object}
 \alias{create_iota2_mean_object}
-\title{Create a iota2 object}
+\title{Create an iota2 object}
 \usage{
 create_iota2_mean_object(
   iota2_list,

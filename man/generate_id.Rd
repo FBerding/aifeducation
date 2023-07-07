@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{generate_id}
 \alias{generate_id}
-\title{Generate ID Suffix for Objects.}
+\title{Generate ID suffix for objects}
 \usage{
 generate_id(length = 16)
 }

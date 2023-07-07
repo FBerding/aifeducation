@@ -2,7 +2,7 @@
 % Please edit documentation in R/text_embedding_model.R
 \name{combine_embeddings}
 \alias{combine_embeddings}
-\title{Combine Embedded Texts}
+\title{Combine embedded texts}
 \usage{
 combine_embeddings(embeddings_list)
 }

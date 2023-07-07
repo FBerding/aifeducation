@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{get_folds}
 \alias{get_folds}
-\title{Create Cross-Validation Samples}
+\title{Create cross-validation samples}
 \usage{
 get_folds(target, k_folds)
 }

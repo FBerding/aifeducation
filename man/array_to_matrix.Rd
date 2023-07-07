@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_fct.R
 \name{array_to_matrix}
 \alias{array_to_matrix}
-\title{Array to Matrix}
+\title{Array to matrix}
 \usage{
 array_to_matrix(text_embedding)
 }
