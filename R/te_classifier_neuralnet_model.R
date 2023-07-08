@@ -2008,7 +2008,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(use_callback==TRUE){
         callback=tf$keras$callbacks$ModelCheckpoint(
-          filepath = paste0(dir_checkpoint,"/checkpoints/"),
+          filepath = paste0(dir_checkpoint,"/checkpoints/best_weights.ckpt"),
           monitor = paste0("val_",self$model_config$init_config$metric),
           verbose = as.integer(min(keras_trace,1)),
           mode = "auto",
@@ -2041,7 +2041,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(use_callback==TRUE){
         #cat(paste(date(),"Load Weights From Best Checkpoint"))
-        model$load_weights(paste0(dir_checkpoint,"/checkpoints/"))
+        model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.ckpt"))
       }
 
       self$bundeled_model=bundle::bundle(model)
