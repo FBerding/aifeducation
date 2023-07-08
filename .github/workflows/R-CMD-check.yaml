@@ -78,7 +78,7 @@ jobs:
           )
 
           conda_install(
-            packages = relevant_modules,
+            packages = python_packages,
             envname = envname,
             conda = "auto",
             pip = TRUE
