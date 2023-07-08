@@ -2041,7 +2041,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(use_callback==TRUE){
         #cat(paste(date(),"Load Weights From Best Checkpoint"))
-        model$load_weights(paste0(dir_checkpoint,"/checkpoints"))
+        model$load_weights(paste0(dir_checkpoint,"/checkpoints/"))
       }
 
       self$bundeled_model=bundle::bundle(model)
