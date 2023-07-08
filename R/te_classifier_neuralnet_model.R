@@ -2020,6 +2020,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(!is.null(sample_weights)){
         sample_weights=np$array(sample_weights)
+      } else {
+        sample_weights=reticulate::py_none()
       }
 
         train_results<-model$fit(

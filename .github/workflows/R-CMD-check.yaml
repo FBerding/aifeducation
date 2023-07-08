@@ -63,7 +63,7 @@ jobs:
                              "tokenizers",
                              "datasets",
                              "torch")
-          #envname<-"r-reticulate"
+          envname<-"r-reticulate"
 
           #conda_create(
           #  envname = envname,
