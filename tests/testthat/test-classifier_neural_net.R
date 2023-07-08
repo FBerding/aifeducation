@@ -174,7 +174,7 @@ test_that("training_bsc_only", {
       bsc_methods=c("dbsmote"),
       bsc_max_k=10,
       bsc_val_size=0.25,
-      use_bpl=TRUE,
+      use_bpl=FALSE,
       bpl_max_steps=2,
       bpl_epochs_per_step=1,
       bpl_dynamic_inc=FALSE,

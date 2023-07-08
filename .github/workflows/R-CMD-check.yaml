@@ -62,21 +62,27 @@ jobs:
                              "transformers",
                              "tokenizers",
                              "datasets",
-                             "torch",
-                             "keras",
-                             "tensorflow")
+                             "torch")
           #envname<-"r-reticulate"
 
           #conda_create(
           #  envname = envname,
           #  conda=Sys.which("python")
           #)
-          #conda_install(
-          #  packages = relevant_modules,
-          #  envname = envname,
-          #  conda = "auto",
-          #  pip = TRUE
-          #)
+
+          conda_install(
+            packages = "tensorflow<2.11",
+            envname = envname,
+            conda = "auto",
+            pip = TRUE
+          )
+
+          conda_install(
+            packages = relevant_modules,
+            envname = envname,
+            conda = "auto",
+            pip = TRUE
+          )
 
 
           #virtualenv_create("r-reticulate", Sys.which("python"))
@@ -86,9 +92,9 @@ jobs:
           #              conda=Sys.which("python"))
 
 
-          conda_install("r-reticulate",
-                        python_packages,
-                        pip=TRUE)
+          #conda_install("r-reticulate",
+          #              python_packages,
+          #              pip=TRUE)
 
           #aifeducation::install_py_modules("r-reticulate")
 

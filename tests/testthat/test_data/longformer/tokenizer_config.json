@@ -8,6 +8,7 @@
     "rstrip": false,
     "single_word": false
   },
+  "clean_up_tokenization_spaces": true,
   "cls_token": {
     "__type": "AddedToken",
     "content": "<s>",

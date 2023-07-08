@@ -131,7 +131,9 @@ This function installs the following python modules:
 -   keras,
 -   tensorflow 
 
-and its dependencies in the environment "aifeducation".
+and its dependencies in the environment "aifeducation". Please note that
+*aifeducation* supports only tensorflow<2.11. Newer versions will be
+supported in the future.
     
 If you would like to use *aifeducation* with other packages or within
 other environments, please ensure that these python modules are

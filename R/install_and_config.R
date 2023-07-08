@@ -12,15 +12,20 @@ install_py_modules<-function(envname="aifeducation"){
                       "transformers",
                       "tokenizers",
                       "datasets",
-                      "torch",
-                      "keras",
-                      "tensorflow")
+                      "torch")
 
   reticulate::conda_create(
     envname = envname,
-    channel=c("conda-forge"),
-    conda=Sys.which("python")
+    channel=c("conda-forge")
   )
+
+  reticulate::conda_install(
+    packages = c("tensorflow<2.11"),
+    envname = envname,
+    conda = "auto",
+    pip = TRUE
+  )
+
   reticulate::conda_install(
     packages = relevant_modules,
     envname = envname,

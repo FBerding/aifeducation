@@ -301,7 +301,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       n_hidden=length(config$hidden)
       if(n_req>0 |
          self_attention_heads>0){
-        model_input<-keras::layer_input(shape=list(times,features),
+        model_input<-keras::layer_input(shape=list(as.integer(times),as.integer(features)),
                                         name="input_embeddings")
       } else {
         model_input<-keras::layer_input(shape=times*features,
@@ -489,14 +489,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         name = name)
 
       if(config$optimizer=="adam"){
-        model<-keras::compile(
-          object = model,
+        model$compile(
           loss = config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
-          metric=config$metric)
+          metrics=config$metric)
+
       } else if(config$optimizer=="rmsprop"){
-         model<-keras::compile(
-            object = model,
+         model$compile(
             loss = self$model_config$init_config$err_fct,
             optimizer=tf$keras$optimizers$legacy$RMSprop(),
             metric=self$model_config$init_config$metric)
@@ -1734,15 +1733,19 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         #Multi Class
         #Predicting target variable
         model<-bundle::unbundle(self$bundeled_model)
-        predictions_prob<-predict(object = model,
-                                  x = real_newdata,
+        #predictions_prob<-predict(object = model,
+        #                          x = real_newdata,
+        #                          batch_size = as.integer(batch_size),
+        #                          verbose=as.integer(verbose))
+        predictions_prob<-model$predict(
+                                  x = np$array(real_newdata),
                                   batch_size = as.integer(batch_size),
                                   verbose=as.integer(verbose))
         predictions<-predictions_prob %>% keras::k_argmax()
       } else {
         model<-bundle::unbundle(self$bundeled_model)
-        predictions_prob<-predict(object = model,
-                                  x = real_newdata,
+        predictions_prob<-model$predict(
+                                  x = np$array(real_newdata),
                                   batch_size = as.integer(batch_size),
                                   verbose=as.integer(verbose))
 
@@ -1987,15 +1990,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       tf<-reticulate::import("tensorflow")
 
       if(self$model_config$init_config$optimizer=="adam"){
-        model %>% keras::compile(
+        model$compile(
           loss = self$model_config$init_config$err_fct,
           optimizer=tf$keras$optimizers$legacy$Adam(),
-          metric=self$model_config$init_config$metric)
+          metrics=self$model_config$init_config$metric)
       } else if (self$model_config$init_config$optimizer=="rmsprop"){
-        model %>% keras::compile(
+        model$compile(
           loss = self$model_config$init_config$err_fct,
           optimizer=tf$keras$optimizers$legacy$RMSprop(),
-          metric=self$model_config$init_config$metric)
+          metrics=self$model_config$init_config$metric)
       }
 
       if(dir.exists(paste0(dir_checkpoint,"/checkpoints"))==FALSE){
@@ -2004,28 +2007,35 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       if(use_callback==TRUE){
-        callback=keras::callback_model_checkpoint(
-          filepath = paste0(dir_checkpoint,"/checkpoints"),
+        callback=tf$keras$callbacks$ModelCheckpoint(
+          filepath = paste0(dir_checkpoint,"/checkpoints/"),
           monitor = paste0("val_",self$model_config$init_config$metric),
           verbose = as.integer(min(keras_trace,1)),
           mode = "auto",
           save_best_only = TRUE,
           save_weights_only = TRUE)
       } else {
-        callback=NULL
+        callback=reticulate::py_none()
       }
 
-      train_results<- model %>% keras::fit(
-        verbose=as.integer(keras_trace),
-        x=input_embeddings_train,
-        y=output_categories_train,
-        validation_data=list(x_val=input_embeddings_test,
-                             y_val=output_categories_test),
-        epochs = epochs,
-        batch_size = batch_size,
-        callback = callback,
-        view_metrics=view_metrics,
-        sample_weight=sample_weights)
+      if(!is.null(sample_weights)){
+        sample_weights=np$array(sample_weights)
+      }
+
+        train_results<-model$fit(
+          verbose=as.integer(keras_trace),
+          x=np$array(input_embeddings_train),
+          y=np$array(output_categories_train),
+          #validation_data=list(x_val=input_embeddings_test,
+          #                     y_val=output_categories_test),
+          validation_data=reticulate::tuple(list(x_val=np$array(input_embeddings_test),
+                               y_val=np$array(output_categories_test))),
+          epochs = as.integer(epochs),
+          batch_size = as.integer(batch_size),
+          callbacks = callback,
+          #view_metrics=view_metrics,
+          sample_weight=sample_weights)
+
 
       if(use_callback==TRUE){
         #cat(paste(date(),"Load Weights From Best Checkpoint"))

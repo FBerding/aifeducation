@@ -1,4 +1,5 @@
 {
+  "clean_up_tokenization_spaces": true,
   "cls_token": "[CLS]",
   "do_basic_tokenize": true,
   "do_lower_case": true,
