@@ -154,7 +154,7 @@ test_that("training_baseline_only", {
       bpl_model_reset=FALSE,
       epochs=2,
       batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/tmp"),
+      dir_checkpoint=testthat::test_path("test_data/classifier"),
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
@@ -186,7 +186,7 @@ test_that("training_bsc_only", {
       bpl_model_reset=FALSE,
       epochs=2,
       batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/tmp"),
+      dir_checkpoint=testthat::test_path("test_data/classifier"),
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
@@ -218,7 +218,7 @@ test_that("training_pbl_baseline", {
       bpl_model_reset=FALSE,
       epochs=2,
       batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/tmp"),
+      dir_checkpoint=testthat::test_path("test_data/classifier"),
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
@@ -250,7 +250,7 @@ test_that("training_pbl_bsc", {
       bpl_model_reset=FALSE,
       epochs=2,
       batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/tmp"),
+      dir_checkpoint=testthat::test_path("test_data/classifier"),
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
