@@ -281,7 +281,7 @@ train_tune_roberta_model=function(output_dir,
   }
 
   callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
-    filepath = paste0(output_dir,"/checkpoints/best_weights.cpkt"),
+    filepath = paste0(output_dir,"/checkpoints/best_weights.h5t"),
     monitor="val_loss",
     verbose=1L,
     mode="auto",
@@ -304,7 +304,7 @@ train_tune_roberta_model=function(output_dir,
                 callbacks=list(callback_checkpoint))
 
   print(paste(date(),"Load Weights From Best Checkpoint"))
-  mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.cpkt"))
+  mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
 
   print(paste(date(),"Saving RoBERTa Model"))
   mlm_model$save_pretrained(save_directory=output_dir)

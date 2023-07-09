@@ -250,7 +250,6 @@ tensorflow.
   batch_size = 32,
   dir_checkpoint,
   trace = TRUE,
-  view_metrics = FALSE,
   keras_trace = 2,
   n_cores = 2
 )}\if{html}{\out{</div>}}
@@ -338,9 +337,6 @@ exist, it is created.}
 
 \item{\code{trace}}{\code{bool} \code{TRUE}, if information about the estimation
 phase should be printed to the console.}
-
-\item{\code{view_metrics}}{\code{bool} \code{TRUE}, if metrics should be printed
-in the RStudio IDE.}
 
 \item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not cat any
 information about the training process from keras on the console.

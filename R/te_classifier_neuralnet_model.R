@@ -201,7 +201,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param act_fct \code{character} naming the activation function for all dense layers.
     #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
     #'@import bundle
-    #'@import keras
     initialize=function(name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -301,10 +300,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       n_hidden=length(config$hidden)
       if(n_req>0 |
          self_attention_heads>0){
-        model_input<-keras::layer_input(shape=list(as.integer(times),as.integer(features)),
+        model_input<-tf$keras$layers$Input(shape=list(as.integer(times),as.integer(features)),
                                         name="input_embeddings")
       } else {
-        model_input<-keras::layer_input(shape=times*features,
+        model_input<-tf$keras$layers$Input(shape=as.integer(times*features),
                                         name="input_embeddings")
       }
       layer_list[1]<-list(model_input)
@@ -312,25 +311,23 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Adding a Mask-Layer
       if(n_req>0 |
          self_attention_heads>0){
-        masking_layer<-keras::layer_masking(object=model_input,
+        masking_layer<-tf$keras$layers$Masking(
                              mask_value = 0.0,
                              name="masking_layer",
                              input_shape=c(times,features),
-                             trainable=FALSE)
+                             trainable=FALSE)(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(masking_layer)
       }
 
       #Adding a Normalization Layer
       if(n_req>0|
          self_attention_heads>0){
-        norm_layer<-keras::layer_layer_normalization(
-          object=layer_list[[length(layer_list)]],
-          name = "normalizaion_layer")
+        norm_layer<-tf$keras$layers$LayerNormalization(
+          name = "normalizaion_layer")(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(norm_layer)
       } else {
-        norm_layer<-keras::layer_batch_normalization(
-          object=layer_list[[length(layer_list)]],
-          name = "normalizaion_layer")
+        norm_layer<-tf$keras$layers$BatchNormalization(
+          name = "normalizaion_layer")(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(norm_layer)
       }
 
@@ -339,17 +336,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         for(i in 1:n_req){
           if(i<n_req){
             layer_list[length(layer_list)+1]<-list(
-              keras::bidirectional(
-                object = layer_list[[length(layer_list)]],
-                layer=keras::layer_gru(
-                   units=config$rec[i],
+              tf$keras$layers$Bidirectional(
+                layer=tf$keras$layers$GRU(
+                   units=as.integer(config$rec[i]),
                    input_shape=list(times,features),
                    return_sequences = TRUE,
                    dropout = config$dropout,
                    recurrent_dropout = config$recurrent_dropout,
                    activation = config$rec_act_fct,
                    name=paste0("gru_",i)),
-                name=paste0("bidirectional_",i)))
+                name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]])
+              )
           } else {
             if(config$self_attention_heads>0){
               return_sequence=TRUE
@@ -357,17 +354,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               return_sequence=FALSE
             }
             layer_list[length(layer_list)+1]<-list(
-              keras::bidirectional(
-                object = layer_list[[length(layer_list)]],
-                layer=keras::layer_gru(
-                   units=config$rec[i],
+              tf$keras$layers$Bidirectional(
+                layer=tf$keras$layers$GRU(
+                   units=as.integer(config$rec[i]),
                    input_shape=list(times,features),
                    return_sequences = return_sequence,
                    dropout = config$dropout,
                    recurrent_dropout = config$recurrent_dropout,
                    activation = config$rec_act_fct,
                    name=paste0("gru",i)),
-                name=paste0("bidirectional_",i)))
+                name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]])
+              )
           }
         }
       }
@@ -385,7 +382,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           self_attention_units=features/2
         }
 
-        self_attention_layer<-keras::layer_multi_head_attention(
+        self_attention_layer<-tf$keras$layers$MultiHeadAttention(
           num_heads = as.integer(self_attention_heads),
           key_dim = as.integer(self_attention_units),
           name="self_attention")
@@ -395,72 +392,70 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                layer_list[[length(layer_list)]],
                                layer_list[[length(layer_list)]]))
 
-        addition_layer_attention<-keras::layer_add(
+        addition_layer_attention<-tf$keras$layers$add(
           inputs=list(layer_list[[length(layer_list)]],
                       layer_list[[length(layer_list)-1]]))
         layer_list[length(layer_list)+1]<-list(addition_layer_attention)
 
-        norm_layer_attention<-keras::layer_layer_normalization(
-          object=layer_list[[length(layer_list)]],
-          name = "normalizaion_layer_attention")
+        norm_layer_attention<-tf$keras$layers$LayerNormalization(
+          name = "normalizaion_layer_attention")(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(norm_layer_attention)
 
-        proj_dense_1<-keras::layer_dense(
-          object=layer_list[[length(layer_list)]],
+        proj_dense_1<-tf$keras$layers$Dense(
           units = as.integer(self_attention_heads*2*self_attention_units),
           activation = config$act_fct,
-          kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
-          name="dense_projection_1")
+          kernel_regularizer = tf$keras$regularizers$l2(config$l2_regularizer),
+          name="dense_projection_1")(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(proj_dense_1)
 
-        proj_dense_2<-keras::layer_dense(
-          object=layer_list[[length(layer_list)]],
+        proj_dense_2<-tf$keras$layers$Dense(
           units = as.integer(2*self_attention_units),
           activation = config$act_fct,
-          kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
-          name="dense_projection_2")
+          kernel_regularizer = tf$keras$regularizers$l2(config$l2_regularizer),
+          name="dense_projection_2")(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(proj_dense_2)
 
-        addition_layer_projection<-keras::layer_add(
+        addition_layer_projection<-tf$keras$layers$add(
           inputs=list(layer_list[[length(layer_list)]],
                       layer_list[[length(layer_list)-2]]))
         layer_list[length(layer_list)+1]<-list(addition_layer_projection)
 
-        norm_layer_projection<-keras::layer_layer_normalization(
-          object=layer_list[[length(layer_list)]],
-          name = "normalizaion_layer_projection")
+        norm_layer_projection<-tf$keras$layers$LayerNormalization(
+          name = "normalizaion_layer_projection")(layer_list[[length(layer_list)]])
         layer_list[length(layer_list)+1]<-list(norm_layer_projection)
 
         layer_list[length(layer_list)+1]<-list(
-          keras::bidirectional(
-            object = layer_list[[length(layer_list)]],
-            layer=keras::layer_gru(
-              units=self_attention_units,
+          tf$keras$layers$Bidirectional(
+            layer=tf$keras$layers$GRU(
+              units=as.integer(self_attention_units),
               input_shape=list(times,features),
               return_sequences = FALSE,
               dropout = config$dropout,
               recurrent_dropout = config$recurrent_dropout,
               activation = config$rec_act_fct,
               name=paste0("gru",i+1)),
-            name=paste0("bidirectional_",i+1)))
+            name=paste0("bidirectional_",i+1))(layer_list[[length(layer_list)]])
+          )
       }
 
       #Adding standard layer
       if(n_hidden>0){
         for(i in 1:n_hidden){
           layer_list[length(layer_list)+1]<-list(
-            keras::layer_dense(object= layer_list[[length(layer_list)]],
-                               units = as.integer(config$hidden[i]),
-                               activation = config$act_fct,
-                               kernel_regularizer = keras::regularizer_l2(l=config$l2_regularizer),
-                               name=paste0("dense",i)))
+            tf$keras$layers$Dense(
+              units = as.integer(config$hidden[i]),
+              activation = config$act_fct,
+              kernel_regularizer = tf$keras$regularizers$l2(config$l2_regularizer),
+              name=paste0("dense",i))(layer_list[[length(layer_list)]])
+            )
 
           if(i==(n_hidden-1) & n_hidden>=2){
             #Add Dropout_Layer
             layer_list[length(layer_list)+1]<-list(
-              keras::layer_dropout(object = layer_list[[length(layer_list)]],
-                                   rate = config$dropout,
-                                   name="dropout"))
+              tf$keras$layers$Dropout(
+                rate = config$dropout,
+                name="dropout")(layer_list[[length(layer_list)]])
+              )
           }
         }
       }
@@ -469,21 +464,23 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       if(length(target_levels_order)>2){
         #Multi Class
         layer_list[length(layer_list)+1]<-list(
-          keras::layer_dense(object = layer_list[[length(layer_list)]],
-                             units = length(levels(targets)),
-                             activation = config$act_fct_last,
-                             name="output_categories"))
+          tf$keras$layers$Dense(
+            units = as.integer(length(levels(targets))),
+            activation = config$act_fct_last,
+            name="output_categories")(layer_list[[length(layer_list)]])
+          )
       } else {
         #Binary Class
         layer_list[length(layer_list)+1]<-list(
-          keras::layer_dense(object = layer_list[[length(layer_list)]],
-                             units = as.integer(1),
-                             activation = config$act_fct_last,
-                             name="output_categories"))
+          tf$keras$layers$Dense(
+            units = as.integer(1),
+            activation = config$act_fct_last,
+            name="output_categories")(layer_list[[length(layer_list)]])
+          )
       }
 
       #Creating Model
-      model<-keras::keras_model(
+      model<-tf$keras$Model(
         inputs = model_input,
         outputs = layer_list[length(layer_list)],
         name = name)
@@ -574,8 +571,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'information about the training process from keras on the console.
     #'\code{keras_trace=1} cat a progress bar. \code{keras_trace=2} prints
     #'one line of information for every epoch.
-    #'@param view_metrics \code{bool} \code{TRUE}, if metrics should be printed
-    #'in the RStudio IDE.
     #'@param n_cores \code{int} Number of cores used for creating synthetic units.
     #'@details \itemize{
     #'
@@ -589,7 +584,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'}
     #'}
     #'@import bundle
-    #'@import keras
     #'@importFrom abind abind
     train=function(data_embeddings,
                    data_targets,
@@ -616,7 +610,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    batch_size=32,
                    dir_checkpoint,
                    trace=TRUE,
-                   view_metrics=FALSE,
                    keras_trace=2,
                    n_cores=2){
 
@@ -829,7 +822,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               batch_size=batch_size,
                               trace=FALSE,
                               keras_trace=keras_trace,
-                              view_metrics=view_metrics,
                               reset_model=TRUE,
                               dir_checkpoint=dir_checkpoint)
 
@@ -989,7 +981,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               batch_size=batch_size,
                               trace=FALSE,
                               keras_trace=keras_trace,
-                              view_metrics=view_metrics,
                               reset_model=TRUE,
                               dir_checkpoint=dir_checkpoint)
           #Predict val targets
@@ -1160,7 +1151,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                     batch_size=batch_size,
                                     trace=FALSE,
                                     keras_trace=keras_trace,
-                                    view_metrics=view_metrics,
                                     reset_model=bpl_model_reset,
                                     dir_checkpoint=dir_checkpoint,
                                     sample_weights=sample_weights)
@@ -1313,7 +1303,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             batch_size=batch_size,
                             trace=FALSE,
                             keras_trace=keras_trace,
-                            view_metrics=view_metrics,
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
 
@@ -1445,7 +1434,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             batch_size=batch_size,
                             trace=FALSE,
                             keras_trace=keras_trace,
-                            view_metrics=view_metrics,
                             reset_model=TRUE,
                             dir_checkpoint=dir_checkpoint)
         #cat(paste("Train",length(names_targets_labeled_train_train),
@@ -1600,7 +1588,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               batch_size=batch_size,
                               trace=FALSE,
                               keras_trace=keras_trace,
-                              view_metrics=view_metrics,
                               reset_model=bpl_model_reset,
                               dir_checkpoint=dir_checkpoint,
                               sample_weights=sample_weights)
@@ -1741,7 +1728,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                   x = np$array(real_newdata),
                                   batch_size = as.integer(batch_size),
                                   verbose=as.integer(verbose))
-        predictions<-predictions_prob %>% keras::k_argmax()
+        predictions<-tf$keras$backend$argmax(predictions_prob)
+        #predictions<-predictions_prob %>% keras::k_argmax()
       } else {
         model<-bundle::unbundle(self$bundeled_model)
         predictions_prob<-model$predict(
@@ -1917,7 +1905,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                          epochs=100,
                          batch_size=32,
                          trace=TRUE,
-                         view_metrics=FALSE,
                          keras_trace=2,
                          dir_checkpoint){
 
@@ -1970,10 +1957,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(length(target_levels_order)>2){
         #Multi Class
-        output_categories_train=keras::to_categorical(y=target_train_transformed,
-                                                      num_classes=n_categories)
-        output_categories_test=keras::to_categorical(y=target_test_transformed,
-                                                     num_classes=n_categories)
+        output_categories_train=tf$keras$utils$to_categorical(y=target_train_transformed,
+                                                              num_classes=n_categories)
+        output_categories_test=tf$keras$utils$to_categorical(y=target_test_transformed,
+                                                            num_classes=n_categories)
       } else {
         #Binary Classification
         output_categories_train=target_train_transformed
@@ -2008,7 +1995,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(use_callback==TRUE){
         callback=tf$keras$callbacks$ModelCheckpoint(
-          filepath = paste0(dir_checkpoint,"/checkpoints/best_weights.ckpt"),
+          filepath = paste0(dir_checkpoint,"/checkpoints/best_weights.h5"),
           monitor = paste0("val_",self$model_config$init_config$metric),
           verbose = as.integer(min(keras_trace,1)),
           mode = "auto",
@@ -2041,7 +2028,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(use_callback==TRUE){
         #cat(paste(date(),"Load Weights From Best Checkpoint"))
-        model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.ckpt"))
+        model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.h5"))
       }
 
       self$bundeled_model=bundle::bundle(model)

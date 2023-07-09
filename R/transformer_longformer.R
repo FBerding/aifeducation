@@ -276,7 +276,7 @@ train_tune_longformer_model=function(output_dir,
   }
 
   callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
-    filepath = paste0(output_dir,"/checkpoints/best_weights.cpkt"),
+    filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
     monitor="val_loss",
     verbose=1L,
     mode="auto",
@@ -299,7 +299,7 @@ train_tune_longformer_model=function(output_dir,
                 callbacks=list(callback_checkpoint))
 
   cat(paste(date(),"Load Weights From Best Checkpoint"))
-  mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.cpkt"))
+  mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
 
   cat(paste(date(),"Saving Longformer Model"))
   mlm_model$save_pretrained(save_directory=output_dir)

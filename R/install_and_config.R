@@ -20,7 +20,7 @@ install_py_modules<-function(envname="aifeducation"){
   )
 
   reticulate::conda_install(
-    packages = c("tensorflow<2.11"),
+    packages = c("tensorflow"),
     envname = envname,
     conda = "auto",
     pip = TRUE

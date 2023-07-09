@@ -1,7 +1,6 @@
 {
-  "_name_or_path": "test_data/longformer",
   "architectures": [
-    "LongformerForMaskedLM"
+    "LongformerModel"
   ],
   "attention_probs_dropout_prob": 0.1,
   "attention_window": [

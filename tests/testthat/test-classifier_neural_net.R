@@ -156,7 +156,6 @@ test_that("training_baseline_only", {
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
-      view_metrics=FALSE,
       keras_trace=0,
       n_cores=1)
   )
@@ -189,7 +188,6 @@ test_that("training_bsc_only", {
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
-      view_metrics=FALSE,
       keras_trace=0,
       n_cores=1)
   )
@@ -222,7 +220,6 @@ test_that("training_pbl_baseline", {
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
-      view_metrics=FALSE,
       keras_trace=0,
       n_cores=1)
   )
@@ -255,7 +252,6 @@ test_that("training_pbl_bsc", {
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/tmp"),
       trace=FALSE,
-      view_metrics=FALSE,
       keras_trace=0,
       n_cores=1)
   )

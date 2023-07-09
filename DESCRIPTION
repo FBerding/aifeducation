@@ -47,7 +47,6 @@ RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
     quanteda,
-    keras,
     foreach,
     R (>= 2.10)
 Suggests: 
