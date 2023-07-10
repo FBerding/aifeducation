@@ -487,7 +487,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
           encodings_only=NULL
           for(i in 1:length(encodings)){
-            encodings_only[i]=list(as.vector(encodings[[i]][[1]]["input_ids"]))
+            encodings_only[i]=list(as.vector(encodings[[i]][[1]][["input_ids"]]))
           }
           return(encodings_only)
           #--------------------------------------------------------------------

@@ -281,7 +281,7 @@ train_tune_roberta_model=function(output_dir,
   }
 
   callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
-    filepath = paste0(output_dir,"/checkpoints/best_weights.h5t"),
+    filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
     monitor="val_loss",
     verbose=1L,
     mode="auto",

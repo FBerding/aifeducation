@@ -70,7 +70,7 @@ jobs:
           #)
 
           conda_install(
-            packages = "tensorflow",
+            packages = "tensorflow<2.11",
             envname = envname,
             conda = "auto",
             pip = TRUE
