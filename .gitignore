@@ -11,3 +11,6 @@ language_models
 *.h5
 tests/testthat/test_data/language_models
 test/testthat/test_data/tmp
+test/testthat/test_data/bert
+test/testthat/test_data/roberta
+test/testthat/test_data/longformer
