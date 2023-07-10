@@ -8,8 +8,7 @@
 #'@importFrom reticulate py_install
 #'@export
 install_py_modules<-function(envname="aifeducation"){
-  relevant_modules<-c("numpy",
-                      "transformers",
+  relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
                       "torch")

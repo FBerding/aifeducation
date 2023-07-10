@@ -1,7 +1,6 @@
 testthat::skip_on_cran()
 
 tmp_path="test_data/language_models/udpipe_models/english-ewt-ud-2.5-191206.udpipe"
-print(testthat::test_path(tmp_path))
 tmp_condition=file.exists(testthat::test_path(tmp_path))
 testthat::skip_if_not(condition=tmp_condition,
                   message = "udpipe language model not available")
