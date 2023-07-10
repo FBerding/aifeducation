@@ -487,7 +487,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
           encodings_only=NULL
           for(i in 1:length(encodings)){
-            encodings_only[i]=list(as.vector(encodings[[as.integer(i)]][[as.integer(1)]][["input_ids"]]))
+            encodings_only[i]=list(as.vector(reticulate::py_to_r(encodings[[as.integer(i)]][[as.integer(1)]][["input_ids"]])$numpy()))
           }
           return(encodings_only)
           #--------------------------------------------------------------------
@@ -705,7 +705,9 @@ TextEmbeddingModel<-R6::R6Class(
           for(i in 1:length(batch)){
             for(j in 1:tokens$chunks[i]){
               for(layer in tmp_selected_layer){
-                text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]])
+                text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                  reticulate$py_to_r(tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy())
+                  )
               }
               text_embedding[i,j,]<-text_embedding[i,j,]/length(tmp_selected_layer)
               index=index+1
