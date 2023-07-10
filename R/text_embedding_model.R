@@ -706,7 +706,7 @@ TextEmbeddingModel<-R6::R6Class(
             for(j in 1:tokens$chunks[i]){
               for(layer in tmp_selected_layer){
                 text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
-                  reticulate$py_to_r(tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy())
+                  tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy()
                   )
               }
               text_embedding[i,j,]<-text_embedding[i,j,]/length(tmp_selected_layer)
