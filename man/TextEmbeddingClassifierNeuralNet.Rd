@@ -148,6 +148,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_model_description}{\code{TextEmbeddingClassifierNeuralNet$get_model_description()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-export_model}{\code{TextEmbeddingClassifierNeuralNet$export_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-import_model}{\code{TextEmbeddingClassifierNeuralNet$import_model()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_package_versions}{\code{TextEmbeddingClassifierNeuralNet$get_package_versions()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-clone}{\code{TextEmbeddingClassifierNeuralNet$clone()}}
 }
 }
@@ -553,6 +554,21 @@ Method for importing a model from tensorflow SavedModel format.
 saved.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_package_versions"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_package_versions}{}}}
+\subsection{Method \code{get_package_versions()}}{
+Method for requesting a summary of the R and python packages'
+versions used for creating the classifier.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_package_versions()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list} containing the versions of the relevant
+R and python packages.
 }
 }
 \if{html}{\out{<hr>}}

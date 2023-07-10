@@ -200,6 +200,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param optimizer Object of class \code{keras.optimizers}.
     #'@param act_fct \code{character} naming the activation function for all dense layers.
     #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
+    #'@import keras
     #'@import bundle
     initialize=function(name=NULL,
                         label=NULL,
@@ -507,6 +508,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       self$model_config$input_variables=variable_name_order
       self$model_config$init_config=config
       self$date=date()
+
+      private$r_package_versions$aifeducation<-packageVersion("aifeducation")
+      private$r_package_versions$keras<-packageVersion("keras")
+      private$r_package_versions$smotefamily<-packageVersion("smotefamily")
+      private$r_package_versions$bundle<-packageVersion("bundle")
+
+      private$py_package_versions$tensorflow<-tf$version$VERSION
+      private$py_package_versions$numpy<-np$version$short_version
     },
 
     #-------------------------------------------------------------------------
@@ -583,6 +592,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'into an ascending order.
     #'}
     #'}
+    #'@import keras
     #'@import bundle
     #'@importFrom abind abind
     train=function(data_embeddings,
@@ -1872,6 +1882,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       tf=reticulate::import("tensorflow")
       tmp_model<-tf$keras$models$load_model(dir_path)
       self$bundeled_model=bundle::bundle(tmp_model)
+    },
+    #'@description Method for requesting a summary of the R and python packages'
+    #'versions used for creating the classifier.
+    #'@return Returns a \code{list} containing the versions of the relevant
+    #'R and python packages.
+    get_package_versions=function(){
+      return(
+        list(private$r_package_versions,
+             private$py_package_versions)
+      )
     }
   ),
   private = list(
@@ -1892,6 +1912,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       keywords_native=NULL
     ),
     model_license=NULL,
+    r_package_versions=list(
+      aifeducation=NA,
+      smotefamily=NA,
+      bundle=NA,
+      keras=NA
+    ),
+    py_package_versions=list(
+      tensorflow=NA,
+      numpy=NA
+    ),
     #Training Process----------------------------------------------------------
     init_weights=NULL,
     #--------------------------------------------------------------------------
