@@ -32,7 +32,8 @@ TextEmbeddingModel<-R6::R6Class(
       abstract_eng=NULL,
       abstract_native=NULL,
       keywords_eng=NULL,
-      keywords_native=NULL
+      keywords_native=NULL,
+      license=NA
     )
   ),
   public = list(
@@ -871,12 +872,12 @@ TextEmbeddingModel<-R6::R6Class(
     #'@description Method for setting the license of the model
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
-    set_license=function(license){
+    set_software_license=function(license="GPL-3"){
       private$model_info$model_license<-license
     },
     #'@description Method for requesting the license of the model
     #'@return \code{string} License of the model
-    get_license=function(){
+    get_software_license=function(){
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
@@ -919,15 +920,25 @@ TextEmbeddingModel<-R6::R6Class(
       if(!is.null(keywords_native)){
         private$model_description$keywords_native=keywords_native
       }
-
-
-
     },
     #'@description Method for requesting the model description.
     #'@return \code{list} with the description of the model in English
     #'and the native language.
     get_model_description=function(){
       return(private$model_description)
+    },
+    #--------------------------------------------------------------------------
+    #'@description Method for setting the license of models' documentation.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
+    set_documentation_license=function(license="CC BY-SA"){
+      private$model_description$license<-license
+    },
+    #'@description Method for getting the license of the models' documentation.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
+    get_documentation_license=function(){
+      return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
     #'@description Method for requesting the model information

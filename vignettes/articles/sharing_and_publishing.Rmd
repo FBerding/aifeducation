@@ -134,10 +134,23 @@ example_model$get_publication_info()
 ```
 
 Finally, you must provide a license for using your model. This can be
-done with `set_license` and `get_license`.
+done with `set_software_license` and `get_software_license`.
 
 ```{r, include = TRUE, eval=FALSE}
-example_model$set_licens("GPL-3")
+example_model$set_software_license("GPL-3")
+```
+
+Please note, that in most cases the license for your model must be "GPL-3" since
+some of the software used to create your model are licensed under "GPL-3". Thus,
+derivative work must also be licensed under "GPL-3".
+
+The documentation of your work is not part of the software. Here you can set
+further licenses such as Creative Common (CC) or Free Documentation License (FDL).
+You can set the license for your documentation by using the method 
+'set_documentation_license'.
+
+```{r, include = TRUE, eval=FALSE}
+example_model$set_documentation_license("CC BY-SA")
 ```
 
 Now you are able to share your work. Please remember to save your now
@@ -198,7 +211,7 @@ GlobalVectorClusters and Topic Models to other people. In the case of
 transformer models you must provide the `r_interface.RData` along with
 the other files of the directory that stores you transformer model.
 
-## 3 Classifiers
+# 3 Classifiers
 
 ## 3.1 Adding Model Descriptions
 
@@ -281,10 +294,10 @@ In the case of a classifier, the description should include:
 
 -   A short reference to the theoretical models that guided the
     development.
--   A clear and detailed description of every single category/class and
-    its development.
+-   A clear and detailed description of every single category/class.
 -   A short statement where the classifier can be used.
 -   A description of the kind and quantity of data used for training.
+-   Information on potential bias in the data.
 -   If possible, information about the inter-coder-reliability of the
     coding process providing the data.
 -   If possible, provide a link to the corresponding text embedding
@@ -312,10 +325,20 @@ In contrast to TextEmbeddingModels there are not different types of
 author groups.
 
 Finally, you can manage the license for using your classifier via
-`set_license` and `get_license`.
+`set_software_license` and `get_software_license`.
 
 ```{r, include = TRUE, eval=FALSE}
-example_classifier$set_licens("CC BY-NC-SA")
+example_classifier$set_software_license("GPL-3")
+```
+
+Similar to TextEmbeddingModels your classifier has to be licensed via "GPL-3" since
+some of the software used for creating a classifier applies this license. For the
+documentation you can choose between further license since the documentation is 
+not part of the software. For setting and receivinf the license you can call
+the methods 'set_documentation_license' and 'get_documentation_license'
+
+```{r, include = TRUE, eval=FALSE}
+example_classifier$set_documentation_license("CC BY-SA")
 ```
 
 Now you are ready for sharing your classifier. Please remember to save

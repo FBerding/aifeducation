@@ -155,17 +155,20 @@ environments.
 Using a pre-trained AI for classification only requires the classifier
 and the corresponding text embedding model. Just load both to *R* and
 start predictions. Vignette [02 classification
-tasks](articles/classification_tasks.html) describes how to save and
-load the objects. In vignette [03 Sharing and Using Trained
-AI/Models](articles/sharing_and_publishing.html) you can find a detailed
-guide on how to document and share your models.
+tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
+describes how to save and load the objects. In vignette [03 Sharing and
+Using Trained
+AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
+you can find a detailed guide on how to document and share your models.
 
 ## Tutorial and Guides
 
 A guide on how to install and configure this package can be found via
-[Get started](articles/aifeducation.html). A short introduction into the
-package with examples for classification tasks can be found in vignette
-[02 classification tasks](articles/classification_tasks.html).
+[Get
+started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
+A short introduction into the package with examples for classification
+tasks can be found in vignette [02 classification
+tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 
 ## References
 

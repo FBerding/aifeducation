@@ -14,3 +14,4 @@ test/testthat/test_data/tmp
 test/testthat/test_data/bert
 test/testthat/test_data/roberta
 test/testthat/test_data/longformer
+cran-comments.md

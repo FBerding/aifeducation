@@ -312,10 +312,18 @@ test_that("descriptions", {
   )
 })
 
-test_that("license", {
-  classifier$set_license("test_license")
+test_that("software_license", {
+  classifier$set_software_license("test_license")
   expect_equal(
-    object=classifier$get_license(),
+    object=classifier$get_software_license(),
+    expected=c("test_license")
+  )
+})
+
+test_that("documentation_license", {
+  classifier$set_documentation_license("test_license")
+  expect_equal(
+    object=classifier$get_documentation_license(),
     expected=c("test_license")
   )
 })

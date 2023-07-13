@@ -66,7 +66,7 @@ Training of this model makes use of dynamic masking.
 }
 \references{
 Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
-Long-Document Transformer. \url{https://doi.org/10.48550/arXiv.2004.05150}
+Long-Document Transformer. \url{doi.org/10.48550/arXiv.2004.05150}
 
 Hugging Face Documentation
 \url{https://huggingface.co/docs/transformers/model_doc/longformer#transformers.LongformerConfig}

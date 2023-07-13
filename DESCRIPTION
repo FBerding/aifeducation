@@ -1,8 +1,7 @@
-Package: aifeducation
 Type: Package
-Title: Artifical Intelligence for Education
+Package: aifeducation
+Title: Artificial Intelligence for Education
 Version: 0.1.0
-Date: 2023-03-10
 Authors@R: c(
     person("Berding", "Florian", , "florian.berding@uni-hamburg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3593-1695")),
@@ -11,50 +10,56 @@ Authors@R: c(
     person("Rebmann", "Karin", , "karin.rebmann@uni-oldenburg.de", role = "ctb"),
     person("Slopinski", "Andreas", , "andreas.slopinski@uni-oldenburg.de", role = "ctb")
   )
-Description: In social and educational settings, the use of Artificial Intelligence (AI) is
-  a challenging task. Relevant data
-  is often only available in handwritten forms or the use of data is restricted
-  by privacy policies, often leading to small data sets. Futhermore, data in the
-  educational and social sciences is often unbalanced in terms of frequencies.
-  To support educators as well as eductional and social reserachers in using the potentials of
-  AI for their work, this package provides a unified interface for neural nets in keras
-  and tensorflow to deal with natural language problems. The tools integrate existing 
-  mathematical and statitical methods for dealing with
-  small data sets via pseudo-labeling and imbalanced data via the creation of synthetic
-  cases. Performance evaluation of AI is connected to measures from content analysis
-  which educational and social researchers are generally more familiar with. Finally,
-  all objects created with this package allow to share trained AI with other people.
+Description: In social and educational settings, the use of Artificial
+    Intelligence (AI) is a challenging task. Relevant data is often only
+    available in handwritten forms or the use of data is restricted by
+    privacy policies, often leading to small data sets. Furthermore, data
+    in the educational and social sciences is often unbalanced in terms of
+    frequencies.  To support educators as well as educational and social
+    researchers in using the potentials of AI for their work, this package
+    provides a unified interface for neural nets in keras and tensorflow
+    to deal with natural language problems. The tools integrate existing
+    mathematical and statistical methods for dealing with small data sets
+    via pseudo-labeling and imbalanced data via the creation of synthetic
+    cases. Performance evaluation of AI is connected to measures from
+    content analysis which educational and social researchers are
+    generally more familiar with. Finally, all objects created with this
+    package allow to share trained AI with other people.
 License: GPL-3
-Imports: Rcpp (>= 1.0.10),
-  stringr,
-  udpipe,
-  iotarelr(>= 0.1.4),
-  irr,
-  irrCAC,
-  bundle,
-  keras,
-  reticulate,
-  smotefamily,
-  quanteda.textstats,
-  topicmodels,
-  tidytext,
-  reshape2,
-  abind,
-  text2vec,
-  doParallel,
-  methods
-LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.2.3
-Encoding: UTF-8
 Depends:
-    quanteda,
     foreach,
+    quanteda,
     R (>= 3.5.0)
+Imports: 
+    abind,
+    bundle,
+    doParallel,
+    iotarelr(>= 0.1.4),
+    irr,
+    irrCAC,
+    keras,
+    methods,
+    quanteda.textstats,
+    Rcpp (>= 1.0.10),
+    reshape2,
+    reticulate,
+    smotefamily,
+    stringr,
+    text2vec,
+    tidytext,
+    topicmodels,
+    udpipe
 Suggests: 
     knitr,
+    quanteda.textmodels,
     rmarkdown,
-    testthat (>= 3.0.0),
-    quanteda.textmodels
+    testthat (>= 3.0.0)
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.2.3

@@ -13,7 +13,7 @@ author=c(person(given="Florian",family="Berding"),
 
 year="2023",
 
-url="ttps://fberding.github.io/aifeducation/index.html",
+url="https://fberding.github.io/aifeducation/index.html",
 
 textVersion="Florian Berding, Julia Pargmann, Elisabeth Riebenbauer,
   Karin Rebmann, and Andreas Slopinski (2023). AI for Education (aifeducation).

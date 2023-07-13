@@ -142,8 +142,10 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-predict}{\code{TextEmbeddingClassifierNeuralNet$predict()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_publication_info}{\code{TextEmbeddingClassifierNeuralNet$set_publication_info()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_publication_info}{\code{TextEmbeddingClassifierNeuralNet$get_publication_info()}}
-\item \href{#method-TextEmbeddingClassifierNeuralNet-set_license}{\code{TextEmbeddingClassifierNeuralNet$set_license()}}
-\item \href{#method-TextEmbeddingClassifierNeuralNet-get_license}{\code{TextEmbeddingClassifierNeuralNet$get_license()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-set_software_license}{\code{TextEmbeddingClassifierNeuralNet$set_software_license()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_software_license}{\code{TextEmbeddingClassifierNeuralNet$get_software_license()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-set_documentation_license}{\code{TextEmbeddingClassifierNeuralNet$set_documentation_license()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_documentation_license}{\code{TextEmbeddingClassifierNeuralNet$get_documentation_license()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_model_description}{\code{TextEmbeddingClassifierNeuralNet$set_model_description()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_model_description}{\code{TextEmbeddingClassifierNeuralNet$get_model_description()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-export_model}{\code{TextEmbeddingClassifierNeuralNet$export_model()}}
@@ -431,12 +433,12 @@ Method for requesting the bibliographic information of the classifier.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_license}{}}}
-\subsection{Method \code{set_license()}}{
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_software_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_software_license}{}}}
+\subsection{Method \code{set_software_license()}}{
 Method for setting the license of the classifier.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_license(license = "CC BY-NC-SA")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_software_license(license = "GPL-3")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -449,12 +451,50 @@ the license text.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_license}{}}}
-\subsection{Method \code{get_license()}}{
-Method for setting the license of the classifier.
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_software_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_software_license}{}}}
+\subsection{Method \code{get_software_license()}}{
+Method for getting the license of the classifier.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_license()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_software_license()}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_documentation_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_documentation_license}{}}}
+\subsection{Method \code{set_documentation_license()}}{
+Method for setting the license of the classifier's documentation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$set_documentation_license(
+  license = "CC BY-SA"
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_documentation_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_documentation_license}{}}}
+\subsection{Method \code{get_documentation_license()}}{
+Method for getting the license of the classifier's documentation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_documentation_license()}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

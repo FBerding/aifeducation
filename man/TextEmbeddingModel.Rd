@@ -67,10 +67,12 @@ glove.}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
 \item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
 \item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
-\item \href{#method-TextEmbeddingModel-set_license}{\code{TextEmbeddingModel$set_license()}}
-\item \href{#method-TextEmbeddingModel-get_license}{\code{TextEmbeddingModel$get_license()}}
+\item \href{#method-TextEmbeddingModel-set_software_license}{\code{TextEmbeddingModel$set_software_license()}}
+\item \href{#method-TextEmbeddingModel-get_software_license}{\code{TextEmbeddingModel$get_software_license()}}
 \item \href{#method-TextEmbeddingModel-set_model_description}{\code{TextEmbeddingModel$set_model_description()}}
 \item \href{#method-TextEmbeddingModel-get_model_description}{\code{TextEmbeddingModel$get_model_description()}}
+\item \href{#method-TextEmbeddingModel-set_documentation_license}{\code{TextEmbeddingModel$set_documentation_license()}}
+\item \href{#method-TextEmbeddingModel-get_documentation_license}{\code{TextEmbeddingModel$get_documentation_license()}}
 \item \href{#method-TextEmbeddingModel-get_model_info}{\code{TextEmbeddingModel$get_model_info()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
@@ -328,12 +330,12 @@ Method for getting the bibliographic information of the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-set_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_license}{}}}
-\subsection{Method \code{set_license()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-set_software_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_software_license}{}}}
+\subsection{Method \code{set_software_license()}}{
 Method for setting the license of the model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_license(license)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_software_license(license = "GPL-3")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -346,12 +348,12 @@ the license text.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_license}{}}}
-\subsection{Method \code{get_license()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_software_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_software_license}{}}}
+\subsection{Method \code{get_software_license()}}{
 Method for requesting the license of the model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_license()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_software_license()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -410,6 +412,42 @@ Method for requesting the model description.
 \subsection{Returns}{
 \code{list} with the description of the model in English
 and the native language.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-set_documentation_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_documentation_license}{}}}
+\subsection{Method \code{set_documentation_license()}}{
+Method for setting the license of models' documentation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_documentation_license(license = "CC BY-SA")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_documentation_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_documentation_license}{}}}
+\subsection{Method \code{get_documentation_license()}}{
+Method for getting the license of the models' documentation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_documentation_license()}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

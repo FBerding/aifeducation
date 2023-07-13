@@ -1810,14 +1810,27 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@description Method for setting the license of the classifier.
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
-    set_license=function(license="CC BY-NC-SA"){
+    set_software_license=function(license="GPL-3"){
       private$model_license<-license
     },
-    #'@description Method for setting the license of the classifier.
+    #'@description Method for getting the license of the classifier.
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
-    get_license=function(){
+    get_software_license=function(){
       return(private$model_license)
+    },
+    #--------------------------------------------------------------------------
+    #'@description Method for setting the license of the classifier's documentation.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
+    set_documentation_license=function(license="CC BY-SA"){
+      private$model_description$license<-license
+    },
+    #'@description Method for getting the license of the classifier's documentation.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
+    get_documentation_license=function(){
+      return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
     #'@description Method for setting a description of the classifier.
@@ -1909,7 +1922,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       abstract_eng=NULL,
       abstract_native=NULL,
       keywords_eng=NULL,
-      keywords_native=NULL
+      keywords_native=NULL,
+      license=NA
     ),
     model_license=NULL,
     r_package_versions=list(
