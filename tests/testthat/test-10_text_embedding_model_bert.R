@@ -93,7 +93,7 @@ test_that("descriptions", {
 test_that("software_license", {
   bert_modeling$set_software_license("test_license")
   expect_equal(
-    object=classifier$get_software_license(),
+    object=bert_modeling$get_software_license(),
     expected=c("test_license")
   )
 })
@@ -101,7 +101,7 @@ test_that("software_license", {
 test_that("documentation_license", {
   bert_modeling$set_documentation_license("test_license")
   expect_equal(
-    object=classifier$get_documentation_license(),
+    object=bert_modeling$get_documentation_license(),
     expected=c("test_license")
   )
 })

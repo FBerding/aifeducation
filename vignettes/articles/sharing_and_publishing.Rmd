@@ -372,4 +372,4 @@ method `predict` and you will receive the predictions together with an
 estimate of certainty for each class/category.
 
 More information can be found in the vignette [02 classification
-tasks](articles/classification_tasks.html).
+tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).

@@ -129,8 +129,9 @@ contexts means to combine the knowledge of different scientific
 disciplines using different, sometimes overlapping concepts. Even within
 a research area, concepts are not unified. Figure 1 illustrates this
 package’s understanding.</p>
-<div class="figure">
-<img src="classif_fig_01.png" style="width:100.0%" alt=""><p class="caption">Figure 1: Understanding of Central Concepts</p>
+<div class="float">
+<img src="classif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
+Concepts</div>
 </div>
 <p>Since <em>aifeducation</em> looks at the application of AI for
 classification tasks from the perspective of the empirical method of
@@ -149,9 +150,9 @@ assigned to the correct category of a scale or that the text is labeled
 with the correct class. As Figure 2 illustrates, two kinds of data are
 necessary to train an AI to classify text in line with supervised
 machine learning principles.</p>
-<div class="figure">
-<img src="classif_fig_02.png" style="width:100.0%" alt=""><p class="caption">Figure 2: Basic Structure of Supervised Machine
-Learning</p>
+<div class="float">
+<img src="classif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
+Learning</div>
 </div>
 <p>By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -164,9 +165,9 @@ about learning and teaching.</p>
 <p>To achieve this support by an artificial intelligence, several steps
 are necessary. Figure 3 provides an overview integrating the functions
 and objects of <em>aifeducation</em>.</p>
-<div class="figure">
-<img src="classif_fig_03.png" style="width:100.0%" alt=""><p class="caption">Figure 3: Overview of the Steps to Perform a
-Classification</p>
+<div class="float">
+<img src="classif_fig_03.png" style="width:100.0%" alt="Figure 3: Overview of the Steps to Perform a Classification"><div class="figcaption">Figure 3: Overview of the Steps to Perform a
+Classification</div>
 </div>
 <p>The first step is to transform raw texts into a form computers can
 use. That is, the raw texts must be transformed into numbers. In modern
@@ -473,20 +474,20 @@ includes the creation of a set of vocabulary. In <em>aifedcuation</em>
 you can do this by calling the function
 <code><a href="../reference/create_bert_model.html">create_bert_model()</a></code>. For our example this could look like
 this:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved. Furthermore, you must
 provide raw texts. These texts are <strong>not</strong> used for
@@ -855,9 +856,9 @@ the method cannot match the input data (text embeddings) to the target
 data.</p>
 <p>With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.</p>
-<div class="figure">
-<img src="classif_fig_04.png" style="width:100.0%" alt=""><p class="caption">Figure 4: Overview of Possible Structure of a
-Classifier</p>
+<div class="float">
+<img src="classif_fig_04.png" style="width:100.0%" alt="Figure 4: Overview of Possible Structure of a Classifier"><div class="figcaption">Figure 4: Overview of Possible Structure of a
+Classifier</div>
 </div>
 <p><code>hidden</code> takes a vector of integers, determining the
 number of layers and the number of neurons. In our example, there are no
@@ -1047,9 +1048,9 @@ set <code>bpl_dynamic_inc=TRUE</code> or
 <code>bpl_balance=TRUE</code>.</p>
 <p>Figure 5 illustrates the training loop for the cases that all three
 options are set to <code>TRUE</code>.</p>
-<div class="figure">
-<img src="classif_fig_05.png" style="width:100.0%" alt=""><p class="caption">Figure 5: Overview of the Steps to Perform a
-Classification</p>
+<div class="float">
+<img src="classif_fig_05.png" style="width:100.0%" alt="Figure 5: Overview of the Steps to Perform a Classification"><div class="figcaption">Figure 5: Overview of the Steps to Perform a
+Classification</div>
 </div>
 <p>The example above applies the algorithm proposed by Cascante-Bonilla
 et al. (2020). After training the classifier on the labeled data, the

@@ -118,10 +118,12 @@ glove.</p></li>
 <li><p><a href="#method-TextEmbeddingModel-embed"><code>TextEmbeddingModel$embed()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-set_publication_info"><code>TextEmbeddingModel$set_publication_info()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-get_publication_info"><code>TextEmbeddingModel$get_publication_info()</code></a></p></li>
-<li><p><a href="#method-TextEmbeddingModel-set_license"><code>TextEmbeddingModel$set_license()</code></a></p></li>
-<li><p><a href="#method-TextEmbeddingModel-get_license"><code>TextEmbeddingModel$get_license()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-set_software_license"><code>TextEmbeddingModel$set_software_license()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_software_license"><code>TextEmbeddingModel$get_software_license()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-set_model_description"><code>TextEmbeddingModel$set_model_description()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-get_model_description"><code>TextEmbeddingModel$get_model_description()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-set_documentation_license"><code>TextEmbeddingModel$set_documentation_license()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_documentation_license"><code>TextEmbeddingModel$get_documentation_license()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-get_model_info"><code>TextEmbeddingModel$get_model_info()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-clone"><code>TextEmbeddingModel$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-TextEmbeddingModel-new"></a><div class="section">
@@ -419,11 +421,11 @@ model creating the embeddings.</p>
 <p><code>list</code> of bibliographic information.</p>
 </div>
 
-</div><p></p><hr><a id="method-TextEmbeddingModel-set_license"></a><div class="section">
-<h3 id="method-set-license-">Method <code>set_license()</code><a class="anchor" aria-label="anchor" href="#method-set-license-"></a></h3>
+</div><p></p><hr><a id="method-TextEmbeddingModel-set_software_license"></a><div class="section">
+<h3 id="method-set-software-license-">Method <code>set_software_license()</code><a class="anchor" aria-label="anchor" href="#method-set-software-license-"></a></h3>
 <p>Method for setting the license of the model</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_license</span><span class="op">(</span><span class="va">license</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_software_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -436,11 +438,11 @@ the license text.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-TextEmbeddingModel-get_license"></a><div class="section">
-<h3 id="method-get-license-">Method <code>get_license()</code><a class="anchor" aria-label="anchor" href="#method-get-license-"></a></h3>
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_software_license"></a><div class="section">
+<h3 id="method-get-software-license-">Method <code>get_software_license()</code><a class="anchor" aria-label="anchor" href="#method-get-software-license-"></a></h3>
 <p>Method for requesting the license of the model</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_software_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -510,10 +512,44 @@ in the native language of the classifier.</p></dd>
 and the native language.</p>
 </div>
 
+</div><p></p><hr><a id="method-TextEmbeddingModel-set_documentation_license"></a><div class="section">
+<h3 id="method-set-documentation-license-">Method <code>set_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-set-documentation-license-"></a></h3>
+<p>Method for setting the license of models' documentation.</p><div class="section">
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"CC BY-SA"</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>license</code></dt>
+<dd><p><code>string</code> containing the abbreviation of the license or
+the license text.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_documentation_license"></a><div class="section">
+<h3 id="method-get-documentation-license-">Method <code>get_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-get-documentation-license-"></a></h3>
+<p>Method for getting the license of the models' documentation.</p><div class="section">
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_documentation_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>license</code></dt>
+<dd><p><code>string</code> containing the abbreviation of the license or
+the license text.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
 </div><p></p><hr><a id="method-TextEmbeddingModel-get_model_info"></a><div class="section">
 <h3 id="method-get-model-info-">Method <code>get_model_info()</code><a class="anchor" aria-label="anchor" href="#method-get-model-info-"></a></h3>
 <p>Method for requesting the model information</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_model_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -525,12 +561,12 @@ and the native language.</p>
 </div><p></p><hr><a id="method-TextEmbeddingModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
