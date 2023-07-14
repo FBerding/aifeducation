@@ -255,10 +255,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       variable_name_order<-dimnames(text_embeddings$embeddings)[[3]]
       target_levels_order<-levels(targets)
 
+      model_info=text_embeddings$get_model_info()
       times=model_info$param_chunks
       features=dim(text_embeddings$embeddings)[3]
 
-      self$text_embedding_model["model"]=list(text_embeddings$get_model_info())
+      self$text_embedding_model["model"]=list(model_info)
       self$text_embedding_model["times"]=times
       self$text_embedding_model["features"]=features
 
