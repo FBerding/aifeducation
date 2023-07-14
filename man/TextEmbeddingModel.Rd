@@ -263,6 +263,10 @@ should be transformed to tokens or a single integer sequence as \code{vector}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-embed}{}}}
 \subsection{Method \code{embed()}}{
 Method for creating text embeddings from raw texts
+
+
+In the case of using a GPU and running out of memory reduce the
+batch size or restart R and switch to use cpu only via \link{set_config_cpu_only}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(
   raw_text = NULL,

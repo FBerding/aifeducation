@@ -67,7 +67,7 @@ create_longformer_model<-function(
   #Calculating Vocabulary
   if(trace==TRUE){
     cat(paste(date(),
-                "Start Computing Vocabulary"))
+                "Start Computing Vocabulary","\n"))
   }
   tok_new$train_from_iterator(
     iterator = vocab_raw_texts,
@@ -75,11 +75,11 @@ create_longformer_model<-function(
     special_tokens=c("<s>","<pad>","</s>","<unk>","<mask>"))
   if(trace==TRUE){
     cat(paste(date(),
-                "Start Computing Vocabulary - Done"))
+                "Start Computing Vocabulary - Done","\n"))
   }
 
   if(dir.exists(model_dir)==FALSE){
-    cat(paste(date(),"Creating Model Directory"))
+    cat(paste(date(),"Creating Model Directory","\n"))
     dir.create(model_dir)
   }
 
@@ -88,7 +88,7 @@ create_longformer_model<-function(
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Creating Tokenizer"))
+                "Creating Tokenizer","\n"))
   }
   tokenizer=transformers$LongformerTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.json"),
                                               merges_file = paste0(model_dir,"/","merges.txt"),
@@ -103,7 +103,7 @@ create_longformer_model<-function(
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Creating Tokenizer - Done"))
+                "Creating Tokenizer - Done","\n"))
   }
 
   configuration=transformers$LongformerConfig(
@@ -123,18 +123,18 @@ create_longformer_model<-function(
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Saving Longformer Model"))
+                "Saving Longformer Model","\n"))
   }
   roberta_model$save_pretrained(model_dir)
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Saving Tokenizer Model"))
+                "Saving Tokenizer Model","\n"))
   }
   tokenizer$save_pretrained(model_dir)
   if(trace==TRUE){
     cat(paste(date(),
-                "Done"))
+                "Done","\n"))
   }
 }
 
@@ -205,7 +205,7 @@ train_tune_longformer_model=function(output_dir,
   #adjust chunk size. To elements are needed for begin and end of sequence
   chunk_size=chunk_size-2
 
-  cat(paste(date(),"Tokenize Raw Texts"))
+  cat(paste(date(),"Tokenize Raw Texts","\n"))
   prepared_texts<-quanteda::tokens(
     x = raw_texts,
     what = "word",
@@ -220,7 +220,7 @@ train_tune_longformer_model=function(output_dir,
     padding = FALSE,
     verbose = trace)
 
-  cat(paste(date(),"Creating Text Chunks"))
+  cat(paste(date(),"Creating Text Chunks","\n"))
   prepared_texts_chunks<-quanteda::tokens_chunk(
     x=prepared_texts,
     size=chunk_size,
@@ -235,9 +235,9 @@ train_tune_longformer_model=function(output_dir,
 
   prepared_text_chunks_strings<-lapply(prepared_texts_chunks,paste,collapse = " ")
   prepared_text_chunks_strings<-as.character(prepared_text_chunks_strings)
-  cat(paste(date(),length(prepared_text_chunks_strings),"Chunks Created"))
+  cat(paste(date(),length(prepared_text_chunks_strings),"Chunks Created","\n"))
 
-  cat(paste(date(),"Creating Input"))
+  cat(paste(date(),"Creating Input","\n"))
   tokenized_texts= tokenizer(prepared_text_chunks_strings,
                              truncation =TRUE,
                              padding= TRUE,
@@ -245,10 +245,10 @@ train_tune_longformer_model=function(output_dir,
                              return_tensors="np")
 
 
-  cat(paste(date(),"Creating TensorFlow Dataset"))
+  cat(paste(date(),"Creating TensorFlow Dataset","\n"))
   tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
 
-  cat(paste(date(),"Using Token Masking"))
+  cat(paste(date(),"Using Token Masking","\n"))
   data_collator=transformers$DataCollatorForLanguageModeling(
     tokenizer = tokenizer,
     mlm = TRUE,
@@ -267,11 +267,11 @@ train_tune_longformer_model=function(output_dir,
     collate_fn = data_collator,
     shuffle = TRUE)
 
-  cat(paste(date(),"Preparing Training of the Model"))
+  cat(paste(date(),"Preparing Training of the Model","\n"))
   adam<-tf$keras$optimizers$Adam
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
-    cat(paste(date(),"Creating Checkpoint Directory"))
+    cat(paste(date(),"Creating Checkpoint Directory","\n"))
     dir.create(paste0(output_dir,"/checkpoints"))
   }
 
@@ -284,13 +284,13 @@ train_tune_longformer_model=function(output_dir,
     save_freq="epoch",
     save_weights_only= TRUE)
 
-  cat(paste(date(),"Compile Model"))
+  cat(paste(date(),"Compile Model","\n"))
   mlm_model$compile(optimizer=adam(learning_rate))
 
   #Clear session to provide enough resources for computations
   tf$keras$backend$clear_session()
 
-  cat(paste(date(),"Start Fine Tuning"))
+  cat(paste(date(),"Start Fine Tuning","\n"))
   mlm_model$fit(x=tf_train_dataset,
                 validation_data=tf_test_dataset,
                 epochs=as.integer(n_epoch),
@@ -298,16 +298,16 @@ train_tune_longformer_model=function(output_dir,
                 use_multiprocessing=multi_process,
                 callbacks=list(callback_checkpoint))
 
-  cat(paste(date(),"Load Weights From Best Checkpoint"))
+  cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
   mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
 
-  cat(paste(date(),"Saving Longformer Model"))
+  cat(paste(date(),"Saving Longformer Model","\n"))
   mlm_model$save_pretrained(save_directory=output_dir)
 
-  cat(paste(date(),"Saving Tokenizer"))
+  cat(paste(date(),"Saving Tokenizer","\n"))
   tokenizer$save_pretrained(output_dir)
 
-  cat(paste(date(),"Done"))
+  cat(paste(date(),"Done","\n"))
 
 }
 

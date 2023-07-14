@@ -481,7 +481,7 @@ TextEmbeddingModel<-R6::R6Class(
                   return_tensors="tf")
               )
               if(trace==TRUE){
-                cat(paste(date(),i,"/",n_units,"block",j,"/",chunks))
+                cat(paste(date(),i,"/",n_units,"block",j,"/",chunks,"\n"))
               }
             }
             encodings[i]<-list(tokens_unit)
@@ -643,6 +643,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'@return Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
     #'contains the embeddings as a \code{data.frame} and information about the
     #'model creating the embeddings.
+    #'@description In the case of using a GPU and running out of memory reduce the
+    #'batch size or restart R and switch to use cpu only via \link{set_config_cpu_only}.
     embed=function(raw_text=NULL,doc_id=NULL,batch_size=8, trace = FALSE){
 
       #bert---------------------------------------------------------------------
@@ -722,7 +724,7 @@ TextEmbeddingModel<-R6::R6Class(
             batch_results[b]=list(text_embedding)
             if(trace==TRUE){
             cat(paste(date(),
-                        "Batch",b,"/",n_batches,"Done"))
+                        "Batch",b,"/",n_batches,"Done","\n"))
             }
           }
 

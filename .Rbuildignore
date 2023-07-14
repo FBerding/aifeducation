@@ -19,3 +19,5 @@ docs
 checkpoints
 .txt
 .json
+cran-comments.md
+^CRAN-SUBMISSION$
