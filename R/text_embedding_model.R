@@ -1058,7 +1058,7 @@ EmbeddedText<-R6::R6Class(
     #'text embedding model.
     get_model_info=function(){
       tmp<-list(model_name=private$model_name,
-                model_name=private$model_label,
+                model_label=private$model_label,
                 model_date=private$model_date,
                 model_method=private$model_method,
                 model_version=private$model_version,
@@ -1143,6 +1143,7 @@ combine_embeddings<-function(embeddings_list){
   new_embedding<-EmbeddedText$new(
     embeddings = combined_embeddings,
     model_name = embeddings_list[[1]]$get_model_info()$model_name,
+    model_label = embeddings_list[[1]]$get_model_info()$model_label,
     model_date =embeddings_list[[1]]$get_model_info()$model_date,
     model_method=embeddings_list[[1]]$get_model_info()$model_method,
     model_version=embeddings_list[[1]]$get_model_info()$model_version,

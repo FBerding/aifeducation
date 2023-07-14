@@ -145,7 +145,7 @@ some of the software used to create your model are licensed under "GPL-3". Thus,
 derivative work must also be licensed under "GPL-3".
 
 The documentation of your work is not part of the software. Here you can set
-further licenses such as Creative Common (CC) or Free Documentation License (FDL).
+other licenses such as Creative Common (CC) or Free Documentation License (FDL).
 You can set the license for your documentation by using the method 
 'set_documentation_license'.
 
