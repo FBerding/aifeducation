@@ -39,7 +39,6 @@ Imports:
     irrCAC,
     keras,
     methods,
-    quanteda.textstats,
     Rcpp (>= 1.0.10),
     reshape2,
     reticulate,
