@@ -18,3 +18,12 @@ side effects.
 This function changes the level for logging information with tensorflow via
 the os environment. This function must be called before importing tensorflow.
 }
+\seealso{
+Other Installation and Configuration: 
+\code{\link{check_aif_py_modules}()},
+\code{\link{install_py_modules}()},
+\code{\link{set_config_cpu_only}()},
+\code{\link{set_config_gpu_low_memory}()},
+\code{\link{set_config_tf_logger}()}
+}
+\concept{Installation and Configuration}

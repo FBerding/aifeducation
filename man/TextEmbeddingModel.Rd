@@ -8,6 +8,12 @@ This \link[R6]{R6} class stores a text embedding model which can be
 used to tokenize, encode, decode, and embed raw texts. The object provides a
 unique interface for different text processing methods.
 }
+\seealso{
+Other Text Embedding: 
+\code{\link{EmbeddedText}},
+\code{\link{combine_embeddings}()}
+}
+\concept{Text Embedding}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{

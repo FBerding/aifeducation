@@ -17,3 +17,19 @@ represent the features of all sequences. The sequences are concatenated.
 \description{
 Function transforming an array to a matrix.
 }
+\seealso{
+Other Auxiliary Functions: 
+\code{\link{check_embedding_models}()},
+\code{\link{create_iota2_mean_object}()},
+\code{\link{create_synthetic_units}()},
+\code{\link{generate_id}()},
+\code{\link{get_coder_metrics}()},
+\code{\link{get_folds}()},
+\code{\link{get_n_chunks}()},
+\code{\link{get_stratified_train_test_split}()},
+\code{\link{get_synthetic_cases}()},
+\code{\link{get_train_test_split}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{split_labeled_unlabeled}()}
+}
+\concept{Auxiliary Functions}

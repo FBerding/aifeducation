@@ -31,6 +31,7 @@
 #'@importFrom udpipe udpipe_load_model udpipe_annotate unique_identifier
 #'@importFrom stats na.omit
 #'@importFrom stringr str_length str_replace_all str_remove_all
+#'@family Preparation
 #'@export
 bow_pp_create_vocab_draft<-function(path_language_model,
                                     data,
@@ -185,6 +186,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
 #'@importFrom quanteda corpus tokens tokens_replace tokens_remove tokens_tolower
 #'@importFrom quanteda dfm dfm_trim fcm dfm_keep fcm_select
 #'@importFrom stats na.omit
+#'@family Preparation
 #'@export
 bow_pp_create_basic_text_rep<-function(data,
                                       vocab_draft,

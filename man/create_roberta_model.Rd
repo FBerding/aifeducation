@@ -67,8 +67,17 @@ To train the model, pass the directory of the model to the function
 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
 Optimized BERT Pretraining Approach.
-\url{doi.org/10.48550/arXiv.1907.11692}
+\doi{10.48550/arXiv.1907.11692}
 
 Hugging Face Documentation
 \url{https://huggingface.co/docs/transformers/model_doc/roberta#transformers.RobertaConfig}
 }
+\seealso{
+Other Transformer: 
+\code{\link{create_bert_model}()},
+\code{\link{create_longformer_model}()},
+\code{\link{train_tune_bert_model}()},
+\code{\link{train_tune_longformer_model}()},
+\code{\link{train_tune_roberta_model}()}
+}
+\concept{Transformer}

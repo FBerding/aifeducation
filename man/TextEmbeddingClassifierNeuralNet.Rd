@@ -7,6 +7,7 @@
 Abstract class for neural nets with keras and
 tensorflow
 }
+\concept{Classification}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{

@@ -84,8 +84,17 @@ Pre-training of Deep Bidirectional Transformers for Language
 Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
 Proceedings of the 2019 Conference of the North (pp. 4171--4186).
 Association for Computational Linguistics.
-\url{doi.org/10.18653/v1/N19-1423}
+\doi{10.18653/v1/N19-1423}
 
 Hugging Face documentation
 \url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
 }
+\seealso{
+Other Transformer: 
+\code{\link{create_bert_model}()},
+\code{\link{create_longformer_model}()},
+\code{\link{create_roberta_model}()},
+\code{\link{train_tune_longformer_model}()},
+\code{\link{train_tune_roberta_model}()}
+}
+\concept{Transformer}

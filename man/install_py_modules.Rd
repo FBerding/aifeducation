@@ -13,3 +13,12 @@ be installed.}
 \description{
 Function for installing the necessary python modules
 }
+\seealso{
+Other Installation and Configuration: 
+\code{\link{check_aif_py_modules}()},
+\code{\link{set_config_cpu_only}()},
+\code{\link{set_config_gpu_low_memory}()},
+\code{\link{set_config_os_environ_logger}()},
+\code{\link{set_config_tf_logger}()}
+}
+\concept{Installation and Configuration}

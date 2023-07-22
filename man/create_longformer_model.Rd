@@ -73,8 +73,17 @@ To train the model, pass the directory of the model to the function
 }
 \references{
 Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
-Long-Document Transformer. \url{doi.org/10.48550/arXiv.2004.05150}
+Long-Document Transformer. \doi{10.48550/arXiv.2004.05150}
 
 Hugging Face Documentation
 \url{https://huggingface.co/docs/transformers/model_doc/longformer#transformers.LongformerConfig}
 }
+\seealso{
+Other Transformer: 
+\code{\link{create_bert_model}()},
+\code{\link{create_roberta_model}()},
+\code{\link{train_tune_bert_model}()},
+\code{\link{train_tune_longformer_model}()},
+\code{\link{train_tune_roberta_model}()}
+}
+\concept{Transformer}

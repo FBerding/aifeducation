@@ -99,3 +99,8 @@ language model. These are:
 \description{
 This function prepares raw texts for use with \link{TextEmbeddingModel}.
 }
+\seealso{
+Other Preparation: 
+\code{\link{bow_pp_create_vocab_draft}()}
+}
+\concept{Preparation}

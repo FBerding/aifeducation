@@ -14,7 +14,7 @@ test_that("bow_pp_create_vocab_draft", {
   example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
   res<-bow_pp_create_basic_text_rep(
-     data=example_data$text,
+     data=example_data$text[1:100],
      vocab_draft=vocab_draft_movie_review,
      remove_punct = TRUE,
      remove_symbols = TRUE,

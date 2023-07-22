@@ -21,3 +21,12 @@ In all other cases it returns \code{FALSE}
 This function checks if all  python modules necessary for the package
 aifeducation to work are available.
 }
+\seealso{
+Other Installation and Configuration: 
+\code{\link{install_py_modules}()},
+\code{\link{set_config_cpu_only}()},
+\code{\link{set_config_gpu_low_memory}()},
+\code{\link{set_config_os_environ_logger}()},
+\code{\link{set_config_tf_logger}()}
+}
+\concept{Installation and Configuration}

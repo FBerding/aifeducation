@@ -17,4 +17,28 @@ navbar:
       - text: "03 Sharing and Using Trained AI/Models"
         href: "articles/sharing_and_publishing.html"
 
+reference:
+- title: Installation and Configuration
+- contents:
+  - has_concept("Installation and Configuration")
+
+- title: Preparation
+- contents:
+  - has_concept("Preparation")
+
+- title: Transformer
+- contents:
+  - has_concept("Transformer")
+
+- title: Text Embedding
+- contents:
+  - has_concept("Text Embedding")
+
+- title: Classification
+- contents:
+  - has_concept("Classification")
+
+- title: Auxiliary Functions
+- contents:
+  - has_concept("Auxiliary Functions")
 

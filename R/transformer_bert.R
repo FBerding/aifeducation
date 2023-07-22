@@ -31,11 +31,12 @@
 #'Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
 #'Proceedings of the 2019 Conference of the North (pp. 4171--4186).
 #'Association for Computational Linguistics.
-#'\url{doi.org/10.18653/v1/N19-1423}
+#'\doi{10.18653/v1/N19-1423}
 #'
 #'@references Hugging Face documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
 #'
+#'@family Transformer
 #'@export
 create_bert_model<-function(
     model_dir,
@@ -180,10 +181,12 @@ create_bert_model<-function(
 #'Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
 #'Proceedings of the 2019 Conference of the North (pp. 4171--4186).
 #'Association for Computational Linguistics.
-#'\url{doi.org/10.18653/v1/N19-1423}
+#'\doi{10.18653/v1/N19-1423}
 #'
 #'@references Hugging Face documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
+#'
+#'@family Transformer
 #'
 #'@export
 train_tune_bert_model=function(output_dir,

@@ -35,3 +35,19 @@ training with \link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary
 function for use with \link{get_synthetic_cases} to allow parallel
 computations.
 }
+\seealso{
+Other Auxiliary Functions: 
+\code{\link{array_to_matrix}()},
+\code{\link{check_embedding_models}()},
+\code{\link{create_iota2_mean_object}()},
+\code{\link{generate_id}()},
+\code{\link{get_coder_metrics}()},
+\code{\link{get_folds}()},
+\code{\link{get_n_chunks}()},
+\code{\link{get_stratified_train_test_split}()},
+\code{\link{get_synthetic_cases}()},
+\code{\link{get_train_test_split}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{split_labeled_unlabeled}()}
+}
+\concept{Auxiliary Functions}

@@ -14,6 +14,7 @@
 #'
 #'@import Rcpp
 #'@useDynLib aifeducation, .registration = TRUE
+#'@family Auxiliary Functions
 #'@export
 matrix_to_array_c <- function(matrix, times, features) {
     .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)

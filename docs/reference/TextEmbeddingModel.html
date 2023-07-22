@@ -59,6 +59,12 @@ unique interface for different text processing methods.</p>
 
 
     <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other Text Embedding: 
+<code><a href="EmbeddedText.html">EmbeddedText</a></code>,
+<code><a href="combine_embeddings.html">combine_embeddings</a>()</code></p></div>
+    </div>
+    <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
     <p></p><div class="r6-fields"><dl><dt><code>basic_components</code></dt>
 <dd><p>('list()')<br>
@@ -342,7 +348,10 @@ should be transformed to tokens or a single integer sequence as <code>vector</co
 
 </div><p></p><hr><a id="method-TextEmbeddingModel-embed"></a><div class="section">
 <h3 id="method-embed-">Method <code><a href="https://rdrr.io/r/stats/embed.html" class="external-link">embed()</a></code><a class="anchor" aria-label="anchor" href="#method-embed-"></a></h3>
-<p>Method for creating text embeddings from raw texts</p><div class="section">
+<p>Method for creating text embeddings from raw texts</p>
+
+<p>In the case of using a GPU and running out of memory reduce the
+batch size or restart R and switch to use cpu only via <a href="set_config_cpu_only.html">set_config_cpu_only</a>.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
 <span>  raw_text <span class="op">=</span> <span class="cn">NULL</span>,</span>

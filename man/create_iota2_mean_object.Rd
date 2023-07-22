@@ -31,3 +31,20 @@ iota2 object.
 Function creates an object of class \code{iotarelr_iota2} which can be used
 with the package iotarelr. This function is for internal use only.
 }
+\seealso{
+Other Auxiliary Functions: 
+\code{\link{array_to_matrix}()},
+\code{\link{check_embedding_models}()},
+\code{\link{create_synthetic_units}()},
+\code{\link{generate_id}()},
+\code{\link{get_coder_metrics}()},
+\code{\link{get_folds}()},
+\code{\link{get_n_chunks}()},
+\code{\link{get_stratified_train_test_split}()},
+\code{\link{get_synthetic_cases}()},
+\code{\link{get_train_test_split}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{split_labeled_unlabeled}()}
+}
+\concept{Auxiliary Functions}
+\keyword{internal}

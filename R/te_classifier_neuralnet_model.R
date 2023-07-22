@@ -3,6 +3,7 @@
 #'@description Abstract class for neural nets with keras and
 #'tensorflow
 #'
+#'@family Classification
 #'@export
 TextEmbeddingClassifierNeuralNet<-R6::R6Class(
   classname = "TextEmbeddingClassifierNeuralNet",

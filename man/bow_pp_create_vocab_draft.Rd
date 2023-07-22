@@ -60,3 +60,8 @@ here: \url{https://universaldependencies.org/u/pos/index.html}.
 A huge number of models can be found
 here: \url{https://ufal.mff.cuni.cz/udpipe/2/models}.
 }
+\seealso{
+Other Preparation: 
+\code{\link{bow_pp_create_basic_text_rep}()}
+}
+\concept{Preparation}

@@ -6,6 +6,7 @@
 #'be installed.
 #'@importFrom reticulate conda_create
 #'@importFrom reticulate py_install
+#'@family Installation and Configuration
 #'@export
 install_py_modules<-function(envname="aifeducation"){
   relevant_modules<-c("transformers",
@@ -43,6 +44,7 @@ install_py_modules<-function(envname="aifeducation"){
 #' which modules are available or unavailable.
 #'@return If all relevant modules are available, the functions returns \code{TRUE}.
 #'In all other cases it returns \code{FALSE}
+#'@family Installation and Configuration
 #'@export
 check_aif_py_modules<-function(trace=TRUE){
   relevant_modules<-c("os",
@@ -80,6 +82,7 @@ check_aif_py_modules<-function(trace=TRUE){
 #'@return This function does not return anything. It is used for its
 #'side effects.
 #'@note os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")
+#'@family Installation and Configuration
 #'@export
 set_config_cpu_only<-function(){
   os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")
@@ -94,6 +97,7 @@ set_config_cpu_only<-function(){
 #'side effects.
 #'@note This function sets TF_GPU_ALLOCATOR to \code{"cuda_malloc_async"} and
 #'sets memory growth to \code{TRUE}.
+#'@family Installation and Configuration
 #'@export
 set_config_gpu_low_memory<-function(){
   os$environ$setdefault("TF_GPU_ALLOCATOR","cuda_malloc_async")
@@ -113,6 +117,7 @@ set_config_gpu_low_memory<-function(){
 #'levels are available: FATAL, ERROR, WARN, INFO, and DEBUG.
 #'@return This function does not return anything. It is used for its
 #'side effects.
+#'@family Installation and Configuration
 #'@export
 set_config_tf_logger<-function(level="ERROR"){
   logger<-tf$get_logger()
@@ -128,6 +133,7 @@ set_config_tf_logger<-function(level="ERROR"){
 #'levels are available: INFO, WARNING, ERROR and NONE.
 #'@return This function does not return anything. It is used for its
 #'side effects.
+#'@family Installation and Configuration
 #'@export
 set_config_os_environ_logger<-function(level="ERROR"){
   if(level=="ERROR"){

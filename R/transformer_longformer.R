@@ -33,10 +33,12 @@
 #'
 #'@references
 #'Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
-#'Long-Document Transformer. \url{doi.org/10.48550/arXiv.2004.05150}
+#'Long-Document Transformer. \doi{10.48550/arXiv.2004.05150}
 #'
 #'@references Hugging Face Documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/longformer#transformers.LongformerConfig}
+#'
+#'@family Transformer
 #'
 #'@export
 create_longformer_model<-function(
@@ -171,10 +173,12 @@ create_longformer_model<-function(
 #'
 #'@references
 #'Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
-#'Long-Document Transformer. \url{doi.org/10.48550/arXiv.2004.05150}
+#'Long-Document Transformer. \doi{10.48550/arXiv.2004.05150}
 #'
 #'@references Hugging Face Documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/longformer#transformers.LongformerConfig}
+#'
+#'@family Transformer
 #'
 #'@export
 train_tune_longformer_model=function(output_dir,

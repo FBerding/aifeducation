@@ -7,6 +7,8 @@
 #'@return Returns a matrix which contains the cases in the rows and the columns
 #'represent the features of all sequences. The sequences are concatenated.
 #'
+#'@family Auxiliary Functions
+#'
 #'@export
 array_to_matrix<-function(text_embedding){
   features=dim(text_embedding)[3]
@@ -42,6 +44,8 @@ array_to_matrix<-function(text_embedding){
 #'@param same_class \code{bool} \code{TRUE} if all object must be from the same class.
 #'@return Returns \code{TRUE} if all objects refer to the same text embedding model.
 #'\code{FALSE} in all other cases.
+#'@family Auxiliary Functions
+#'@keywords internal
 check_embedding_models<-function(object_list,
                                  same_class=FALSE){
   #Check if the class of the object is TextEmbeddingModel, EmbeddedText or
@@ -169,6 +173,9 @@ return(TRUE)
 #'\item{\strong{percentage_agreement: }}{Percentage Agreement.}
 #'\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
 #'}
+#'
+#'@family Auxiliary Functions
+#'
 #'@export
 get_coder_metrics<-function(true_values,
                             predicted_values){
@@ -258,6 +265,8 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
 #'
 #'\item{\code{embeddings_test: }}{Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
 #'}
+#'@family Auxiliary Functions
+#'@keywords internal
 get_train_test_split<-function(embedding,
                                target,
                                val_size){
@@ -317,6 +326,8 @@ get_train_test_split<-function(embedding,
 #'the number of folds is adjusted. In these cases, a warning is printed to the console.
 #'At least four cases per fold are necessary to ensure that the training of
 #'\link{TextEmbeddingClassifierNeuralNet} works well with all options turned on.
+#'@family Auxiliary Functions
+#'@keywords internal
 get_folds<-function(target,
                     k_folds){
   sample_target=na.omit(target)
@@ -413,6 +424,8 @@ get_folds<-function(target,
 #'\item{\code{targets_labeled: }}{Named \code{factor} containing the labels of
 #'relevant cases.}
 #'}
+#'@family Auxiliary Functions
+#'@keywords internal
 split_labeled_unlabeled<-function(embedding,
                                   target){
   target_labeled=subset(target,is.na(target)==FALSE)
@@ -439,6 +452,8 @@ split_labeled_unlabeled<-function(embedding,
 #'category.
 #'@return Returns an object of class \code{iotarelr_iota2} which is the mean
 #'iota2 object.
+#'@family Auxiliary Functions
+#'@keywords internal
 create_iota2_mean_object<-function(iota2_list,
                                    free_aem=FALSE,
                                    call="aifeducation::te_classifier_neuralnet",
@@ -523,6 +538,9 @@ create_iota2_mean_object<-function(iota2_list,
 #'\item{\code{n_syntetic_units}}{\code{table} showing the number of synthetic cases for every
 #'label/category.}
 #'}
+#'
+#'@family Auxiliary Functions
+#'
 #'@export
 #'@import foreach
 #'@import doParallel
@@ -670,6 +688,9 @@ for(ckind in chunk_kind){
 #'@returns Returns a \code{list} which contains the text embeddings of the
 #'new synthetic cases as a named \code{data.frame} and their labels as a named
 #'\code{factor}.
+#'
+#'@family Auxiliary Functions
+#'
 #'@export
 create_synthetic_units<-function(embedding,
                                  target,
@@ -748,6 +769,8 @@ create_synthetic_units<-function(embedding,
 #'each label/category should be part of the validation sample.
 #'@return \code{list} which contains the names of the cases belonging to the train
 #'sample and to the validation sample.
+#'@family Auxiliary Functions
+#'@keywords internal
 get_stratified_train_test_split<-function(targets, val_size=0.25){
   test_sample=NULL
   categories=names(table(targets))
@@ -778,6 +801,9 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
 #'@param times \code{int} Number of sequences
 #'@return Named\code{vector} of integers representing the number of chunks/sequences
 #'for every case.
+#'
+#'@family Auxiliary Functions
+#'
 #'@export
 get_n_chunks<-function(text_embeddings,features,times){
   n_chunks<-vector(length = nrow(text_embeddings))
@@ -800,6 +826,8 @@ get_n_chunks<-function(text_embeddings,features,times){
 #'
 #'@param length \code{int} determining the length of the id suffix.
 #'@return Returns a \code{string} of the requested length
+#'@family Auxiliary Functions
+#'@keywords internal
 generate_id<-function(length=16){
   id_suffix=NULL
   sample_values=c(

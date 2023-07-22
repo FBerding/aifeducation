@@ -31,10 +31,12 @@
 #'Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 #'Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
 #'Optimized BERT Pretraining Approach.
-#'\url{doi.org/10.48550/arXiv.1907.11692}
+#'\doi{10.48550/arXiv.1907.11692}
 #'
 #'@references Hugging Face Documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/roberta#transformers.RobertaConfig}
+#'
+#'@family Transformer
 #'
 #'@export
 create_roberta_model<-function(
@@ -175,11 +177,12 @@ create_roberta_model<-function(
 #'Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 #'Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
 #'Optimized BERT Pretraining Approach.
-#'\url{doi.org/10.48550/arXiv.1907.11692}
+#'\doi{10.48550/arXiv.1907.11692}
 #'
 #'@references Hugging Face Documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/roberta#transformers.RobertaConfig}
 #'
+#'@family Transformer
 #'
 #'@export
 train_tune_roberta_model=function(output_dir,

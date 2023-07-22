@@ -21,6 +21,7 @@
 //'
 //'@import Rcpp
 //'@useDynLib aifeducation, .registration = TRUE
+//'@family Auxiliary Functions
 //'@export
 // [[Rcpp::export]]
 arma::cube matrix_to_array_c(arma::mat matrix,

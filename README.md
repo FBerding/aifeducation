@@ -189,7 +189,7 @@ Analyse, Konstruktion und Evaluation von Lernaufgaben für die Lernfelder
 industrieller Geschäftsprozesse. Hampp.
 
 Bunkhumpornpat, C., Sinapiromsaran, K., & Lursinsap, C. (2012). DBSMOTE:
-Density-Based Synthetic Minority Over-sampling TEchnique. Applied
+Density-Based Synthetic Minority Over-sampling Technique. Applied
 Intelligence, 36(3), 664–684.
 <https://doi.org/10.1007/s10489-011-0287-y>
 
