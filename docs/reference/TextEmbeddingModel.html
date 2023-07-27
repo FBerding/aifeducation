@@ -14,7 +14,7 @@ unique interface for different text processing methods."><!-- mathjax --><script
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,6 +119,7 @@ glove.</p></li>
 
 <ul><li><p><a href="#method-TextEmbeddingModel-new"><code>TextEmbeddingModel$new()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-load_model"><code>TextEmbeddingModel$load_model()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-save_model"><code>TextEmbeddingModel$save_model()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-encode"><code>TextEmbeddingModel$encode()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-decode"><code>TextEmbeddingModel$decode()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-embed"><code>TextEmbeddingModel$embed()</code></a></p></li>
@@ -283,7 +284,25 @@ are possible:
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>model_dir</code></dt>
 <dd><p><code>string</code> containing the path to the relevant
-model.</p></dd>
+model directory.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingModel-save_model"></a><div class="section">
+<h3 id="method-save-model-">Method <code>save_model()</code><a class="anchor" aria-label="anchor" href="#method-save-model-"></a></h3>
+<p>Method for saving a transformer model on disk.Relevant
+only for transformer models.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">save_model</span><span class="op">(</span><span class="va">model_dir</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>model_dir</code></dt>
+<dd><p><code>string</code> containing the path to the relevant
+model directory.</p></dd>
 
 
 </dl><p></p></div>
@@ -292,7 +311,7 @@ model.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingModel-encode"></a><div class="section">
 <h3 id="method-encode-">Method <code>encode()</code><a class="anchor" aria-label="anchor" href="#method-encode-"></a></h3>
 <p>Method for encoding words of raw texts into integers.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span></span>
 <span>  <span class="va">raw_text</span>,</span>
 <span>  token_encodings_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -301,7 +320,7 @@ model.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>raw_text</code></dt>
 <dd><p><code>vector</code> containing the raw texts.</p></dd>
 
@@ -328,12 +347,12 @@ special tokens.</p>
 </div><p></p><hr><a id="method-TextEmbeddingModel-decode"></a><div class="section">
 <h3 id="method-decode-">Method <code>decode()</code><a class="anchor" aria-label="anchor" href="#method-decode-"></a></h3>
 <p>Method for decoding a sequence of integers into tokens</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">decode</span><span class="op">(</span><span class="va">int_seqence</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>int_seqence</code></dt>
 <dd><p><code>list</code> containing the integer sequences which
 should be transformed to tokens or a single integer sequence as <code>vector</code></p></dd>
@@ -352,7 +371,7 @@ should be transformed to tokens or a single integer sequence as <code>vector</co
 
 <p>In the case of using a GPU and running out of memory reduce the
 batch size or restart R and switch to use cpu only via <a href="set_config_cpu_only.html">set_config_cpu_only</a>.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
 <span>  raw_text <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  doc_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -362,7 +381,7 @@ batch size or restart R and switch to use cpu only via <a href="set_config_cpu_o
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>raw_text</code></dt>
 <dd><p><code>vector</code> containing the raw texts.</p></dd>
 
@@ -392,12 +411,12 @@ model creating the embeddings.</p>
 </div><p></p><hr><a id="method-TextEmbeddingModel-set_publication_info"></a><div class="section">
 <h3 id="method-set-publication-info-">Method <code>set_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-set-publication-info-"></a></h3>
 <p>Method for setting the bibliographic information of the model.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span><span class="va">type</span>, <span class="va">authors</span>, <span class="va">citation</span>, url <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>type</code></dt>
 <dd><p><code>string</code> Type of information which should be changed/added.
 <code>type="developer"</code>, and <code>type="modifier"</code> are possible.</p></dd>
@@ -421,7 +440,7 @@ model creating the embeddings.</p>
 </div><p></p><hr><a id="method-TextEmbeddingModel-get_publication_info"></a><div class="section">
 <h3 id="method-get-publication-info-">Method <code>get_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-get-publication-info-"></a></h3>
 <p>Method for getting the bibliographic information of the model.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_publication_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -433,12 +452,12 @@ model creating the embeddings.</p>
 </div><p></p><hr><a id="method-TextEmbeddingModel-set_software_license"></a><div class="section">
 <h3 id="method-set-software-license-">Method <code>set_software_license()</code><a class="anchor" aria-label="anchor" href="#method-set-software-license-"></a></h3>
 <p>Method for setting the license of the model</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_software_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>license</code></dt>
 <dd><p><code>string</code> containing the abbreviation of the license or
 the license text.</p></dd>
@@ -450,7 +469,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingModel-get_software_license"></a><div class="section">
 <h3 id="method-get-software-license-">Method <code>get_software_license()</code><a class="anchor" aria-label="anchor" href="#method-get-software-license-"></a></h3>
 <p>Method for requesting the license of the model</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_software_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -462,7 +481,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingModel-set_model_description"></a><div class="section">
 <h3 id="method-set-model-description-">Method <code>set_model_description()</code><a class="anchor" aria-label="anchor" href="#method-set-model-description-"></a></h3>
 <p>Method for setting a description of the model</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
 <span>  eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  native <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -474,7 +493,7 @@ the license text.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>eng</code></dt>
 <dd><p><code>string</code> A text describing the training of the classifier,
 its theoretical and empirical background, and the different output labels
@@ -511,7 +530,7 @@ in the native language of the classifier.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingModel-get_model_description"></a><div class="section">
 <h3 id="method-get-model-description-">Method <code>get_model_description()</code><a class="anchor" aria-label="anchor" href="#method-get-model-description-"></a></h3>
 <p>Method for requesting the model description.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_model_description</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -524,25 +543,8 @@ and the native language.</p>
 </div><p></p><hr><a id="method-TextEmbeddingModel-set_documentation_license"></a><div class="section">
 <h3 id="method-set-documentation-license-">Method <code>set_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-set-documentation-license-"></a></h3>
 <p>Method for setting the license of models' documentation.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"CC BY-SA"</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>license</code></dt>
-<dd><p><code>string</code> containing the abbreviation of the license or
-the license text.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-TextEmbeddingModel-get_documentation_license"></a><div class="section">
-<h3 id="method-get-documentation-license-">Method <code>get_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-get-documentation-license-"></a></h3>
-<p>Method for getting the license of the models' documentation.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_documentation_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"CC BY-SA"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -555,10 +557,27 @@ the license text.</p></dd>
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_documentation_license"></a><div class="section">
+<h3 id="method-get-documentation-license-">Method <code>get_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-get-documentation-license-"></a></h3>
+<p>Method for getting the license of the models' documentation.</p><div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_documentation_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>license</code></dt>
+<dd><p><code>string</code> containing the abbreviation of the license or
+the license text.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
 </div><p></p><hr><a id="method-TextEmbeddingModel-get_model_info"></a><div class="section">
 <h3 id="method-get-model-info-">Method <code>get_model_info()</code><a class="anchor" aria-label="anchor" href="#method-get-model-info-"></a></h3>
 <p>Method for requesting the model information</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_model_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -570,12 +589,12 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -196,43 +196,58 @@ fully described object as described in the following section 2.2.</p>
 <div class="section level3">
 <h3 id="saving-and-loading">2.2 Saving and Loading<a class="anchor" aria-label="anchor" href="#saving-and-loading"></a>
 </h3>
-<p>Saving a created text embedding model is very easy. However, the
-saving and loading process is different for models based on Topic
-Modeling and GlobalVectorClusters on the one hand and transformer based
-models on the other hand.</p>
-<p>For models using Topic Modeling or GlobalVectorClusters you can call
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> to write your model to the disk.</p>
+<p>Saving a created text embedding model is very easy by using the
+function <code>save_ai_model</code>. This function provides a unique
+interface for all text embedding models. For saving your work you can
+pass your model to <code>model</code> and the directory where to save
+the model to <code>model_dir</code>. Please do only pass the path of a
+directory and not the path of a file to this function. Internally the
+function creates a new folder in the directory where all files belonging
+to a model are stored.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">example_model</span>, </span>
-<span>     file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">example_model</span>, </span>
-<span>     file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If you want to load your model, just call <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> and you
-can continue using your model.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">topic_modeling</span>, </span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">global_vector_clusters_modeling</span>, </span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">bert_modeling</span>, </span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span></code></pre></div>
+<p>As you can see all three text embedding models are saved within the
+same directory named “text_embedding_models”. Within this directory the
+function creates a unique folder for every model. The name of the folder
+is created by using the models’ names. Since the files are stored with a
+special structure please do <strong>not</strong> edit the files
+manually.</p>
+<p>If you want to load your model, just call the function
+<code>load_ai_model</code> and you can continue using your model.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If your text embedding model is based on a transformer, saving and
-loading requires some other steps. In this case, your text embedding
-models serves as an interface to <em>R</em>. The original model is saved
-in a model directory. Thus, you have to save your interface to that
-model directory.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">example_model</span>,</span>
-<span>     file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>Loading your model requires two steps. First, load the interface.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>Now the text embedding model is available in <em>R.</em>. Second, you
-must re-initialize the transformer by calling the corresponding method
-<code>load_model</code> of your model.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span>model_dir<span class="op">=</span><span class="st">"my_own_transformer_trained"</span><span class="op">)</span></span></code></pre></div>
-<p>Now you are ready to share your work. Just provide the .RData file
-for GlobalVectorClusters and Topic Models to other people. In the case
-of transformer models you must provide the
-<code>r_interface.RData</code> along with the other files of the
-directory that stores you transformer model.</p>
+<code class="sourceCode R"><span><span class="va">topic_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/topic_model_embedding_ID_DfO25E1Guuaqw7tM"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">global_vector_clusters_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Please note that you have to add the name of the model to the
+directory path.</strong> In our example we have stored three models in
+the directory “text_embedding_models”. Each model is saved within its
+own folder. The folder’s name is created automatically with the help of
+the name of the model. Thus, for loading a model you must specify which
+model you want to load by adding the model’s name to the directory path
+as shown above.</p>
+<p>At this point you may wonder why there is an ID in model’s name
+although you did not enter an ID on model’s creation. The ID is added
+automatically to ensure that every model has a unique name. This is
+important if you would like to share your work with other persons.</p>
+<p>Now you are ready to share your work. Just provide all files within
+your model folder. For the bert model in the example above this would be
+the folder
+<code>"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</code>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -251,69 +266,69 @@ classifier in English and the native language of your classifier. With
 provide the corresponding abstract of your descriptions while
 <code>keywords_eng</code> and <code>keywords_native</code> take a vector
 with the corresponding keywords.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>example_classifier<span class="sc">$</span><span class="fu">set_model_description</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="at">eng=</span><span class="st">"This classifier targets the realization of the need for competence from </span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="st">  the self-determination theory of motivation by Deci and Ryan in lesson plans </span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="st">  and materials. It describes a learner’s need to perceive themselves as capable. </span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="st">  In this classifier, the need for competence can take on the values 0 to 2. </span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="st">  A value of 0 indicates that the learners have no space in the lesson plan to </span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="st">  perceive their own learning progress and that there is no possibility for </span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="st">  self-comparison. At level 1, competence growth is made visible implicitly, </span></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="st">  e.g. by demonstrating the ability to carry out complex exercises or peer </span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="st">  control. At level 2, the increase in competence is made explicit by giving </span></span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="st">  each learner insights into their progress towards the competence goal. For </span></span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="st">  example, a comparison between the target vs. actual development towards the </span></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="st">  learning objectives of the lesson can be made, or the learners receive </span></span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="st">  explicit feedback on their competence growth from the teacher. Self-assessment </span></span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="st">  is also possible. The classifier was trained using 790 lesson plans, 298 </span></span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="st">  materials and up to 1,400 textbook tasks. Two people who received coding </span></span>
-<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="st">  training were involved in the coding and the inter-coder reliability for the </span></span>
-<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="st">  need for competence increased from a dynamic iota value of 0.615 to 0.646 over </span></span>
-<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="st">  two rounds of training. The Krippendorffs alpha value, on the other hand, </span></span>
-<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="st">  decreased from 0.516 to 0.484. The classifier is suitable for use in all </span></span>
-<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="st">  settings in which lesson plans and materials are to be reviewed with regard </span></span>
-<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="st">  to their implementation of the need for competence."</span>,</span>
-<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="at">native=</span><span class="st">"Dieser Classifier bewertet Unterrichtsentwürfe und Lernmaterial danach, </span></span>
-<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="st">  ob sie das Bedürfnis nach Kompetenzerleben aus der Selbstbestimmungstheorie </span></span>
-<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="st">  der Motivation nach Deci und Ryan unterstützen. Das Kompetenzerleben stellt </span></span>
-<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="st">  das Bedürfnis dar, sich als wirksam zu erleben. Der Classifer unterteilt es </span></span>
-<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="st">  in drei Stufen, wobei 0 bedeutet, dass die Lernenden im Unterrichtsentwurf </span></span>
-<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a><span class="st">  bzw. Material keinen Raum haben, ihren eigenen Lernfortschritt wahrzunehmen </span></span>
-<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a><span class="st">  und auch keine Möglichkeit zum Selbstvergleich besteht. Bei einer Ausprägung </span></span>
-<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="st">  von 1 wird der Kompetenzzuwachs implizit, also z.B. durch die Durchführung </span></span>
-<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a><span class="st">  komplexer Übungen oder einer Peer-Kontrolle ermöglicht. Auf Stufe 2 wird der </span></span>
-<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a><span class="st">  Kompetenzzuwachs explizit aufgezeigt, indem jede:r Lernende einen objektiven </span></span>
-<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a><span class="st">  Einblick erhält. So kann hier bspw. ein Soll-Ist-Vergleich mit den Lernzielen </span></span>
-<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a><span class="st">  der Stunde erfolgen oder die Lernenden erhalten dezidiertes Feedback zu ihrem </span></span>
-<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a><span class="st">  Kompetenzzuwachs durch die Lehrkraft. Auch eine Selbstbewertung ist möglich.</span></span>
-<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a><span class="st">  Der Classifier wurde anhand von 790 Unterrichtsentwürfen, 298 Materialien und </span></span>
-<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a><span class="st">  bis zu 1400 Schulbuchaufgaben traniert. Es waren an der Kodierung zwei Personen </span></span>
-<span id="cb12-38"><a href="#cb12-38" tabindex="-1"></a><span class="st">  beteiligt, die eine Kodierschulung erhalten haben und die </span></span>
-<span id="cb12-39"><a href="#cb12-39" tabindex="-1"></a><span class="st">  Inter-Coder-Reliabilität für das Kompetenzerleben würde über zwei </span></span>
-<span id="cb12-40"><a href="#cb12-40" tabindex="-1"></a><span class="st">  Trainingsrunden von einem dynamischen Iota-Wert von 0,615 auf 0,646 gesteigert. </span></span>
-<span id="cb12-41"><a href="#cb12-41" tabindex="-1"></a><span class="st">  Der Krippendorffs Alpha-Wert sank hingegen von 0,516 auf 0,484. Er eignet sich </span></span>
-<span id="cb12-42"><a href="#cb12-42" tabindex="-1"></a><span class="st">  zum Einsatz in allen Settings, in denen Unterrichtsentwürfe und Lernmaterial </span></span>
-<span id="cb12-43"><a href="#cb12-43" tabindex="-1"></a><span class="st">  hinsichtlich ihrer Umsetzung des Kompetenzerlebens überprüft werden sollen."</span>,</span>
-<span id="cb12-44"><a href="#cb12-44" tabindex="-1"></a><span class="at">abstract_eng=</span><span class="st">"This classifier targets the realization of the need for </span></span>
-<span id="cb12-45"><a href="#cb12-45" tabindex="-1"></a><span class="st">  competence from Deci and Ryan’s self-determination theory of motivation in l</span></span>
-<span id="cb12-46"><a href="#cb12-46" tabindex="-1"></a><span class="st">  esson plans and materials. It describes a learner’s need to perceive themselves </span></span>
-<span id="cb12-47"><a href="#cb12-47" tabindex="-1"></a><span class="st">  as capable. The variable need for competence is assessed by a scale of 0-2. </span></span>
-<span id="cb12-48"><a href="#cb12-48" tabindex="-1"></a><span class="st">  The classifier was developed using 790 lesson plans, 298 materials and up to </span></span>
-<span id="cb12-49"><a href="#cb12-49" tabindex="-1"></a><span class="st">  1,400 textbook tasks. A coding training was conducted and the inter-coder </span></span>
-<span id="cb12-50"><a href="#cb12-50" tabindex="-1"></a><span class="st">  reliabilities of different measures </span></span>
-<span id="cb12-51"><a href="#cb12-51" tabindex="-1"></a><span class="st">  (i.e. Krippendorff’s Alpha and Dynamic Iota Index) of the individual categories </span></span>
-<span id="cb12-52"><a href="#cb12-52" tabindex="-1"></a><span class="st">  were calculated at different points in time."</span>,</span>
-<span id="cb12-53"><a href="#cb12-53" tabindex="-1"></a><span class="at">abstract_native=</span><span class="st">"Dieser Classifier bewertet Unterrichtsentwürfe und </span></span>
-<span id="cb12-54"><a href="#cb12-54" tabindex="-1"></a><span class="st">  Lernmaterial danach, ob sie das Bedürfnis nach Kompetenzerleben aus der </span></span>
-<span id="cb12-55"><a href="#cb12-55" tabindex="-1"></a><span class="st">  Selbstbestimmungstheorie der Motivation nach Deci &amp; Ryan unterstützen. Das </span></span>
-<span id="cb12-56"><a href="#cb12-56" tabindex="-1"></a><span class="st">  Kompetenzerleben stellt das Bedürfnis dar, sich als wirksam zu erleben. Der </span></span>
-<span id="cb12-57"><a href="#cb12-57" tabindex="-1"></a><span class="st">  Classifer unterteilt es in drei Stufen und wurde anhand von 790 </span></span>
-<span id="cb12-58"><a href="#cb12-58" tabindex="-1"></a><span class="st">  Unterrichtsentwürfen, 298 Materialien und bis zu 1400 Schulbuchaufgaben </span></span>
-<span id="cb12-59"><a href="#cb12-59" tabindex="-1"></a><span class="st">  entwickelt. Es wurden stets Kodierschulungen durchgeführt und die </span></span>
-<span id="cb12-60"><a href="#cb12-60" tabindex="-1"></a><span class="st">  Inter-Coder-Reliabilitäten der einzelnen Kategorien zu verschiedenen </span></span>
-<span id="cb12-61"><a href="#cb12-61" tabindex="-1"></a><span class="st">  Zeitpunkten berechnet."</span>,</span>
-<span id="cb12-62"><a href="#cb12-62" tabindex="-1"></a><span class="at">keywords_eng=</span><span class="fu">c</span>(<span class="st">"Self-determination theory"</span>, <span class="st">"motivation"</span>, <span class="st">"lesson planning"</span>, <span class="st">"business didactics"</span>),</span>
-<span id="cb12-63"><a href="#cb12-63" tabindex="-1"></a><span class="at">keywords_native=</span><span class="fu">c</span>(<span class="st">"Selbstbestimmungstheorie"</span>, <span class="st">"Motivation"</span>, <span class="st">"Unterrichtsplanung"</span>, <span class="st">"Wirtschaftsdidaktik"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>example_classifier<span class="sc">$</span><span class="fu">set_model_description</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="at">eng=</span><span class="st">"This classifier targets the realization of the need for competence from </span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="st">  the self-determination theory of motivation by Deci and Ryan in lesson plans </span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="st">  and materials. It describes a learner’s need to perceive themselves as capable. </span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="st">  In this classifier, the need for competence can take on the values 0 to 2. </span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="st">  A value of 0 indicates that the learners have no space in the lesson plan to </span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="st">  perceive their own learning progress and that there is no possibility for </span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="st">  self-comparison. At level 1, competence growth is made visible implicitly, </span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="st">  e.g. by demonstrating the ability to carry out complex exercises or peer </span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="st">  control. At level 2, the increase in competence is made explicit by giving </span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="st">  each learner insights into their progress towards the competence goal. For </span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="st">  example, a comparison between the target vs. actual development towards the </span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="st">  learning objectives of the lesson can be made, or the learners receive </span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="st">  explicit feedback on their competence growth from the teacher. Self-assessment </span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="st">  is also possible. The classifier was trained using 790 lesson plans, 298 </span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="st">  materials and up to 1,400 textbook tasks. Two people who received coding </span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="st">  training were involved in the coding and the inter-coder reliability for the </span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="st">  need for competence increased from a dynamic iota value of 0.615 to 0.646 over </span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="st">  two rounds of training. The Krippendorffs alpha value, on the other hand, </span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="st">  decreased from 0.516 to 0.484. The classifier is suitable for use in all </span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a><span class="st">  settings in which lesson plans and materials are to be reviewed with regard </span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="st">  to their implementation of the need for competence."</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="at">native=</span><span class="st">"Dieser Classifier bewertet Unterrichtsentwürfe und Lernmaterial danach, </span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="st">  ob sie das Bedürfnis nach Kompetenzerleben aus der Selbstbestimmungstheorie </span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a><span class="st">  der Motivation nach Deci und Ryan unterstützen. Das Kompetenzerleben stellt </span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="st">  das Bedürfnis dar, sich als wirksam zu erleben. Der Classifer unterteilt es </span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="st">  in drei Stufen, wobei 0 bedeutet, dass die Lernenden im Unterrichtsentwurf </span></span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="st">  bzw. Material keinen Raum haben, ihren eigenen Lernfortschritt wahrzunehmen </span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="st">  und auch keine Möglichkeit zum Selbstvergleich besteht. Bei einer Ausprägung </span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a><span class="st">  von 1 wird der Kompetenzzuwachs implizit, also z.B. durch die Durchführung </span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a><span class="st">  komplexer Übungen oder einer Peer-Kontrolle ermöglicht. Auf Stufe 2 wird der </span></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="st">  Kompetenzzuwachs explizit aufgezeigt, indem jede:r Lernende einen objektiven </span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a><span class="st">  Einblick erhält. So kann hier bspw. ein Soll-Ist-Vergleich mit den Lernzielen </span></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a><span class="st">  der Stunde erfolgen oder die Lernenden erhalten dezidiertes Feedback zu ihrem </span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a><span class="st">  Kompetenzzuwachs durch die Lehrkraft. Auch eine Selbstbewertung ist möglich.</span></span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a><span class="st">  Der Classifier wurde anhand von 790 Unterrichtsentwürfen, 298 Materialien und </span></span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a><span class="st">  bis zu 1400 Schulbuchaufgaben traniert. Es waren an der Kodierung zwei Personen </span></span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a><span class="st">  beteiligt, die eine Kodierschulung erhalten haben und die </span></span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a><span class="st">  Inter-Coder-Reliabilität für das Kompetenzerleben würde über zwei </span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a><span class="st">  Trainingsrunden von einem dynamischen Iota-Wert von 0,615 auf 0,646 gesteigert. </span></span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a><span class="st">  Der Krippendorffs Alpha-Wert sank hingegen von 0,516 auf 0,484. Er eignet sich </span></span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a><span class="st">  zum Einsatz in allen Settings, in denen Unterrichtsentwürfe und Lernmaterial </span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a><span class="st">  hinsichtlich ihrer Umsetzung des Kompetenzerlebens überprüft werden sollen."</span>,</span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a><span class="at">abstract_eng=</span><span class="st">"This classifier targets the realization of the need for </span></span>
+<span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a><span class="st">  competence from Deci and Ryan’s self-determination theory of motivation in l</span></span>
+<span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a><span class="st">  esson plans and materials. It describes a learner’s need to perceive themselves </span></span>
+<span id="cb9-47"><a href="#cb9-47" tabindex="-1"></a><span class="st">  as capable. The variable need for competence is assessed by a scale of 0-2. </span></span>
+<span id="cb9-48"><a href="#cb9-48" tabindex="-1"></a><span class="st">  The classifier was developed using 790 lesson plans, 298 materials and up to </span></span>
+<span id="cb9-49"><a href="#cb9-49" tabindex="-1"></a><span class="st">  1,400 textbook tasks. A coding training was conducted and the inter-coder </span></span>
+<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a><span class="st">  reliabilities of different measures </span></span>
+<span id="cb9-51"><a href="#cb9-51" tabindex="-1"></a><span class="st">  (i.e. Krippendorff’s Alpha and Dynamic Iota Index) of the individual categories </span></span>
+<span id="cb9-52"><a href="#cb9-52" tabindex="-1"></a><span class="st">  were calculated at different points in time."</span>,</span>
+<span id="cb9-53"><a href="#cb9-53" tabindex="-1"></a><span class="at">abstract_native=</span><span class="st">"Dieser Classifier bewertet Unterrichtsentwürfe und </span></span>
+<span id="cb9-54"><a href="#cb9-54" tabindex="-1"></a><span class="st">  Lernmaterial danach, ob sie das Bedürfnis nach Kompetenzerleben aus der </span></span>
+<span id="cb9-55"><a href="#cb9-55" tabindex="-1"></a><span class="st">  Selbstbestimmungstheorie der Motivation nach Deci &amp; Ryan unterstützen. Das </span></span>
+<span id="cb9-56"><a href="#cb9-56" tabindex="-1"></a><span class="st">  Kompetenzerleben stellt das Bedürfnis dar, sich als wirksam zu erleben. Der </span></span>
+<span id="cb9-57"><a href="#cb9-57" tabindex="-1"></a><span class="st">  Classifer unterteilt es in drei Stufen und wurde anhand von 790 </span></span>
+<span id="cb9-58"><a href="#cb9-58" tabindex="-1"></a><span class="st">  Unterrichtsentwürfen, 298 Materialien und bis zu 1400 Schulbuchaufgaben </span></span>
+<span id="cb9-59"><a href="#cb9-59" tabindex="-1"></a><span class="st">  entwickelt. Es wurden stets Kodierschulungen durchgeführt und die </span></span>
+<span id="cb9-60"><a href="#cb9-60" tabindex="-1"></a><span class="st">  Inter-Coder-Reliabilitäten der einzelnen Kategorien zu verschiedenen </span></span>
+<span id="cb9-61"><a href="#cb9-61" tabindex="-1"></a><span class="st">  Zeitpunkten berechnet."</span>,</span>
+<span id="cb9-62"><a href="#cb9-62" tabindex="-1"></a><span class="at">keywords_eng=</span><span class="fu">c</span>(<span class="st">"Self-determination theory"</span>, <span class="st">"motivation"</span>, <span class="st">"lesson planning"</span>, <span class="st">"business didactics"</span>),</span>
+<span id="cb9-63"><a href="#cb9-63" tabindex="-1"></a><span class="at">keywords_native=</span><span class="fu">c</span>(<span class="st">"Selbstbestimmungstheorie"</span>, <span class="st">"Motivation"</span>, <span class="st">"Unterrichtsplanung"</span>, <span class="st">"Wirtschaftsdidaktik"</span>)</span></code></pre></div>
 <p>In the case of a classifier, the description should include:</p>
 <ul>
 <li>A short reference to the theoretical models that guided the
@@ -338,7 +353,7 @@ via <code>example_classifier$reliability$test_metric_mean</code>.</p>
 <p>With the methods <code>set_publication_info</code> and
 <code>get_publication_info</code> you can provide the bibliographic
 information of your classifier.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_classifier</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
 <span>  <span class="va">authors</span>,</span>
 <span>  <span class="va">citation</span>,</span>
@@ -348,7 +363,7 @@ author groups.</p>
 <p>Finally, you can manage the license for using your classifier via
 <code>set_software_license</code> and
 <code>get_software_license</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_classifier</span><span class="op">$</span><span class="fu">set_software_license</span><span class="op">(</span><span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div>
 <p>Similar to TextEmbeddingModels your classifier has to be licensed via
 “GPL-3” since some of the software used for creating a classifier
@@ -356,7 +371,7 @@ applies this license. For the documentation you can choose between
 further license since the documentation is not part of the software. For
 setting and receivinf the license you can call the methods
 ‘set_documentation_license’ and ‘get_documentation_license’</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_classifier</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span><span class="st">"CC BY-SA"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you are ready for sharing your classifier. Please remember to
 save your changes as described in the following section 3.2.</p>
@@ -365,20 +380,40 @@ save your changes as described in the following section 3.2.</p>
 <h3 id="saving-and-loading-1">3.2 Saving and Loading<a class="anchor" aria-label="anchor" href="#saving-and-loading-1"></a>
 </h3>
 <p>If you have created a classifier, saving and loading is very easy due
-to the <em>R</em> package <em>bundle</em>. You can just use
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> and <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>. In our example this could
-be</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">classifier</span>,</span>
-<span>     file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span></code></pre></div>
+to the functions <code>save_ai_model</code> and
+<code>load_ai_model</code>. The process for saving a model is similar to
+the process for text embedding models. You only have to pass the model
+and a directory path to the function <code>save_ai_model</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">classifier</span>,</span>
+<span>  model_dir<span class="op">=</span><span class="st">"classifiers"</span>,</span>
+<span>  save_format <span class="op">=</span> <span class="st">"tf"</span><span class="op">)</span></span></code></pre></div>
+<p>In contrast to text embedding models you can specify the additional
+argument <code>save_format</code> allowing you to choose between
+<code>save_format = "tf"</code> and <code>save_format = "h5"</code>. We
+recommend to chose <code>save_format = "tf"</code> since this is the
+recommended format by tensorflow.</p>
+<p>If you would like to load a model you can call the function
+<code>load_ai_model</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"</span><span class="op">)</span></span></code></pre></div>
+<p>Similar to text embedding models an ID is added to the name during
+the creation of the classifier ensuring a unique name for your model.
+Thus, you have to specify the correct folder for loading a
+classifier.</p>
+<p>If you would like to share your classifier with other persons you
+have to provide all files within the folder
+<code>"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"</code>.
+Since all files are stored with a specific structure do
+<strong>not</strong> change or edit the files manually.</p>
 <p>Please note that you need the <code>TextEmbeddingModel</code> that
 was used for training in order to predict new data with the classifier.
 You can request the name, label, and configuration of that model with
-<code>example_classifier$text_embedding_model</code>. Thus, if you would
-like to share your classifier, ensure that you also share the
-corresponding text embedding model.</p>
+<code>example_classifier$get_text_embedding_model()$model</code>. Thus,
+if you would like to share your classifier, ensure that you also share
+the corresponding text embedding model.</p>
 <p>If you would like to apply your classifier to new data, two steps are
 necessary. First, you must transform the raw text into a numerical
 expression by using <em>exactly</em> the same text embedding model that

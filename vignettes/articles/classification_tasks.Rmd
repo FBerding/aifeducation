@@ -605,7 +605,7 @@ Please do not forget to pass your basic text representation to
 After the model is estimated, it is stored as `topic_modeling` in our
 example.
 
-### 4.2.2 GlobealVectorClusters
+### 4.2.2 GlobalVectorClusters
 
 The creation of a text embedding model based on GlobalVectorClusters is
 very similar to a model based on Topic Modeling. There are only two
@@ -752,53 +752,59 @@ before we start, we will show you how to save and load your model.
 
 ## 4.4 Saving and Loading Text Embedding Models
 
-Saving a created text embedding model is very easy. However, the saving
-and loading process is different for models based on Topic Modeling and
-GlobalVectorClusters on the one hand and models based on transformers on
-the other hand.
-
-For models using Topic Modeling or GlobalVectorClusters, you can call
-`save()` to write your model to the disk.
+Saving a created text embedding model is very easy in aifeducation by using the
+function `save_ai_model`. This function provides a unique interface for all
+text embedding models. For saving your work you can pass your model to `model` and
+the directory where to save the model to `model_dir`. Please do only pass 
+the path of a directory and not the path of a file to this function. Internally
+the function creates a new folder in the directory where all files belonging
+to a model are stored.
 
 ```{r, include = TRUE, eval=FALSE}
-save(topic_modeling, 
-     file="models/embedding_model_topic.RData")
-save(global_vector_clusters_modeling, 
-     file="models/embedding_model_gvc.RData")
+save_ai_model(
+  model=topic_modeling, 
+  model_dir="text_embedding_models")
+
+save_ai_model(
+  model=global_vector_clusters_modeling, 
+  model_dir="text_embedding_models")
+
+save_ai_model(
+  model=bert_modeling, 
+  model_dir="text_embedding_models")
 ```
 
-If you want to load your model, just call `load()` and you can continue
+As you can see all three text embedding models are saved within the same
+directory named "text_embedding_models". Within this directory the function
+creates a unique folder for every model. The name of the folder is created 
+by using the models' names. Since the files are stored with
+a special structure please do **not** change the files manually. 
+
+If you want to load your model, just call the function `load_ai_model` and you can continue
 using your model.
 
 ```{r, include = TRUE, eval=FALSE}
-load(file="models/embedding_model_topic.RData")
-load(file="models/embedding_model_gvc.RData")
+topic_modeling<-load_ai_model(
+  model_dir="text_embedding_models/topic_model_embedding_ID_DfO25E1Guuaqw7tM")
+
+global_vector_clusters_modeling<-load_ai_model(
+  model_dir="text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l")
+
+bert_modeling<-load_ai_model(
+  model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
 ```
 
-If your text embedding model is based on a transformer, saving and
-loading requires some other steps. In this case, your text embedding
-models serve as an interface to *R*. The original model is saved to a
-model directory. Thus, you have to save your interface to that very
-model directory.
+**Please note that you have to add the name of the model to the directory path.**
+In our example we have stored three models in the directory "text_embedding_models". Each
+model is saved within its own folder. The folder's name is created automatically
+with the help of the name of the model. Thus, for loading a model you must specify
+which model you want to load by adding the model's name to the directory path as
+shown above. 
 
-```{r, include = TRUE, eval=FALSE}
-save(bert_modeling,
-     file="my_own_transformer_trained/r_interface.RData")
-```
-
-Loading your model requires two steps. First, load the interface.
-
-```{r, include = TRUE, eval=FALSE}
-load(file="my_own_transformer_trained/r_interface.RData")
-```
-
-Now, the text embedding model is available in *R.*. Next you must
-re-initialize the transformer by calling the corresponding method
-`load_model` of your model.
-
-```{r, include = TRUE, eval=FALSE}
-bert_modeling$load_model(model_dir="my_own_transformer_trained")
-```
+At this point you may wonder why there is an ID in model's name although you
+did not enter an ID on model's creation. The ID is added automatically to ensure
+that every model has a unique name. This is important if you would like to share your 
+work with other persons. 
 
 Now you can use your text embedding model.
 
@@ -1116,16 +1122,30 @@ like to dive deeper into this topic.
 
 ## 5.4 Saving and Loading a Classifier
 
-If you have created a classifier, saving and loading is very easy due to
-the *R* package *bundle*. You can just use `save()` and `load()`. In our
-example this could be
+If you have created a classifier, saving and loading is very easy. The process
+for saving a model is similar to the process for text embedding models. You only have 
+to pass the model and a directory path to the function `save_ai_model`.
 
 ```{r, include = TRUE, eval=FALSE}
-save(classifier,
-     file="classifiers/movie_review.RData")
-
-load(file="classifiers/movie_review.RData")
+save_ai_model(
+  model=classifier,
+  model_dir="classifiers",
+  save_format = "tf")
 ```
+
+In contrast to text embedding models you can specify the additional argument `save_format`
+allowing you to choose between `save_format = "tf"` and  `save_format = "h5"`.
+We recommend to chose `save_format = "tf"` since this is the recommended format
+by tensorflow.
+
+If you would like to load a model you can call the function `load_ai_model`.
+```{r, include = TRUE, eval=FALSE}
+classifier<-load_ai_model(
+  model_dir="classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB")
+```
+Similar to text embedding models an ID is added to the name during the creation
+of the classifier ensuring a unique name for your model. Thus, you have to specify
+the correct folder for loading a classifier.
 
 ## 5.5 Predicting New Data
 

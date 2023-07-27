@@ -14,7 +14,7 @@ save_ai_model(model, model_dir, save_format = "tf")
 
 \item{save_format}{Format for saving the model. \code{"tf"} for SavedModel
 or \code{"h5"} for HDF5. Only relevant if the model is of class \link{TextEmbeddingClassifierNeuralNet}.
-It is recommended to use \code{"tf}.}
+It is recommended to use \code{"tf"}.}
 }
 \description{
 Function for saving models created with aifeducation.

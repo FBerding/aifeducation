@@ -16,14 +16,14 @@ load_ai_model<-function(model_dir){
 
     loaded_model<-get(x=name_interface)
 
-    if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
+    if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
       loaded_model$load_model(model_dir)
-    } else if (methods::is(model,"TextEmbeddingModel")){
-      loaded_model$load_model(model_dir)
+    } else if (methods::is(loaded_model,"TextEmbeddingModel")){
+      if(loaded_model$basic_components$method%in%c("glove_cluster","lda")==FALSE){
+        loaded_model$load_model(model_dir)
+      }
     }
-
     return(loaded_model)
-
   } else {
     stop("There is no file r_interface.rda in the selected directory")
   }
@@ -37,7 +37,7 @@ load_ai_model<-function(model_dir){
 #'@param model_dir Path to the directory where the should model is stored.
 #'@param save_format Format for saving the model. \code{"tf"} for SavedModel
 #'or \code{"h5"} for HDF5. Only relevant if the model is of class \link{TextEmbeddingClassifierNeuralNet}.
-#'It is recommended to use \code{"tf}.
+#'It is recommended to use \code{"tf"}.
 #'
 #'@family Saving and Loading
 #'
@@ -57,16 +57,12 @@ save_ai_model<-function(model,model_dir,save_format="tf"){
     if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
       model$save_model(dir_path = final_model_dir_path,save_format=save_format)
     } else {
-      model$save_model(model_dir = final_model_dir_path)
+      if(model$basic_components$method%in%c("glove_cluster","lda")==FALSE){
+        model$save_model(model_dir = final_model_dir_path)
+      }
     }
-
-
-
   } else {
     stop("Function supports only objects of class TextEmbeddingClassifierNeuralNet or
          TextEmbeddingModel")
   }
-
-  methods::is(model,"TextEmbeddingModel")
-
 }

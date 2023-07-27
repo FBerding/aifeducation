@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -628,7 +628,7 @@ characterized by these twelve topics.</p>
 <code>topic_modeling</code> in our example.</p>
 </div>
 <div class="section level4">
-<h4 id="globealvectorclusters">4.2.2 GlobealVectorClusters<a class="anchor" aria-label="anchor" href="#globealvectorclusters"></a>
+<h4 id="globalvectorclusters">4.2.2 GlobalVectorClusters<a class="anchor" aria-label="anchor" href="#globalvectorclusters"></a>
 </h4>
 <p>The creation of a text embedding model based on GlobalVectorClusters
 is very similar to a model based on Topic Modeling. There are only two
@@ -775,38 +775,54 @@ load your model.</p>
 <div class="section level3">
 <h3 id="saving-and-loading-text-embedding-models">4.4 Saving and Loading Text Embedding Models<a class="anchor" aria-label="anchor" href="#saving-and-loading-text-embedding-models"></a>
 </h3>
-<p>Saving a created text embedding model is very easy. However, the
-saving and loading process is different for models based on Topic
-Modeling and GlobalVectorClusters on the one hand and models based on
-transformers on the other hand.</p>
-<p>For models using Topic Modeling or GlobalVectorClusters, you can call
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> to write your model to the disk.</p>
+<p>Saving a created text embedding model is very easy in aifeducation by
+using the function <code>save_ai_model</code>. This function provides a
+unique interface for all text embedding models. For saving your work you
+can pass your model to <code>model</code> and the directory where to
+save the model to <code>model_dir</code>. Please do only pass the path
+of a directory and not the path of a file to this function. Internally
+the function creates a new folder in the directory where all files
+belonging to a model are stored.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">topic_modeling</span>, </span>
-<span>     file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">global_vector_clusters_modeling</span>, </span>
-<span>     file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If you want to load your model, just call <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> and you
-can continue using your model.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">topic_modeling</span>, </span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">global_vector_clusters_modeling</span>, </span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">bert_modeling</span>, </span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span></code></pre></div>
+<p>As you can see all three text embedding models are saved within the
+same directory named “text_embedding_models”. Within this directory the
+function creates a unique folder for every model. The name of the folder
+is created by using the models’ names. Since the files are stored with a
+special structure please do <strong>not</strong> change the files
+manually.</p>
+<p>If you want to load your model, just call the function
+<code>load_ai_model</code> and you can continue using your model.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_topic.RData"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"models/embedding_model_gvc.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>If your text embedding model is based on a transformer, saving and
-loading requires some other steps. In this case, your text embedding
-models serve as an interface to <em>R</em>. The original model is saved
-to a model directory. Thus, you have to save your interface to that very
-model directory.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">bert_modeling</span>,</span>
-<span>     file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>Loading your model requires two steps. First, load the interface.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"my_own_transformer_trained/r_interface.RData"</span><span class="op">)</span></span></code></pre></div>
-<p>Now, the text embedding model is available in <em>R.</em>. Next you
-must re-initialize the transformer by calling the corresponding method
-<code>load_model</code> of your model.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span>model_dir<span class="op">=</span><span class="st">"my_own_transformer_trained"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">topic_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/topic_model_embedding_ID_DfO25E1Guuaqw7tM"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">global_vector_clusters_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Please note that you have to add the name of the model to the
+directory path.</strong> In our example we have stored three models in
+the directory “text_embedding_models”. Each model is saved within its
+own folder. The folder’s name is created automatically with the help of
+the name of the model. Thus, for loading a model you must specify which
+model you want to load by adding the model’s name to the directory path
+as shown above.</p>
+<p>At this point you may wonder why there is an ID in model’s name
+although you did not enter an ID on model’s creation. The ID is added
+automatically to ensure that every model has a unique name. This is
+important if you would like to share your work with other persons.</p>
 <p>Now you can use your text embedding model.</p>
 </div>
 </div>
@@ -821,7 +837,7 @@ stored in objects of the class
 <code>TextEmbeddingClassifierNeuralNet</code>. You can create a new
 classifier by calling
 <code>TextEmbeddingClassifierNeuralNet$new()</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_targets</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
@@ -907,7 +923,7 @@ used to create a <em>training</em> and a <em>validation</em> sample. All
 performance values saved in the trained classifier refer to the test
 sample. This data has never been used during training and provides a
 more realistic estimation of a classifier`s performance.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_targets</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
@@ -1100,7 +1116,7 @@ step within balanced pseudo-labeling is reported.</p>
 <p>The central estimates for the reliability values can be found via
 <code>reliability$test_metric_mean</code>. In our example this would
 be:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;          iota_index min_iota2 avg_iota2 max_iota2 min_alpha avg_alpha max_alpha</span></span>
 <span><span class="co">#&gt; Baseline  0.5546667 0.4359583 0.5742172 0.7124761     0.544     0.714     0.884</span></span>
@@ -1140,13 +1156,13 @@ increases the alpha values for the minor class further, up to step
 <p>Finally, you can plot a coding stream scheme showing how the cases of
 different classes are labeled. Here we use the package
 <em>iotarelr</em>.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/iotarelr/" class="external-link">iotarelr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: ggalluvial</span></span>
 <span><span class="fu">iotarelr</span><span class="fu">::</span><span class="fu"><a href="https://fberding.github.io/iotarelr/reference/plot_iota2_alluvial.html" class="external-link">plot_iota2_alluvial</a></span><span class="op">(</span><span class="va">test_classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">iota_object_end_free</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="classification_tasks_files/figure-html/unnamed-chunk-23-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
+<img src="classification_tasks_files/figure-html/unnamed-chunk-20-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
 Figure 6: Coding Stream of the Classifier
 </p>
 </div>
@@ -1163,15 +1179,29 @@ would like to dive deeper into this topic.</p>
 <div class="section level3">
 <h3 id="saving-and-loading-a-classifier">5.4 Saving and Loading a Classifier<a class="anchor" aria-label="anchor" href="#saving-and-loading-a-classifier"></a>
 </h3>
-<p>If you have created a classifier, saving and loading is very easy due
-to the <em>R</em> package <em>bundle</em>. You can just use
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> and <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code>. In our example this could
-be</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">classifier</span>,</span>
-<span>     file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"classifiers/movie_review.RData"</span><span class="op">)</span></span></code></pre></div>
+<p>If you have created a classifier, saving and loading is very easy.
+The process for saving a model is similar to the process for text
+embedding models. You only have to pass the model and a directory path
+to the function <code>save_ai_model</code>.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
+<span>  model<span class="op">=</span><span class="va">classifier</span>,</span>
+<span>  model_dir<span class="op">=</span><span class="st">"classifiers"</span>,</span>
+<span>  save_format <span class="op">=</span> <span class="st">"tf"</span><span class="op">)</span></span></code></pre></div>
+<p>In contrast to text embedding models you can specify the additional
+argument <code>save_format</code> allowing you to choose between
+<code>save_format = "tf"</code> and <code>save_format = "h5"</code>. We
+recommend to chose <code>save_format = "tf"</code> since this is the
+recommended format by tensorflow.</p>
+<p>If you would like to load a model you can call the function
+<code>load_ai_model</code>.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"</span><span class="op">)</span></span></code></pre></div>
+<p>Similar to text embedding models an ID is added to the name during
+the creation of the classifier ensuring a unique name for your model.
+Thus, you have to specify the correct folder for loading a
+classifier.</p>
 </div>
 <div class="section level3">
 <h3 id="predicting-new-data">5.5 Predicting New Data<a class="anchor" aria-label="anchor" href="#predicting-new-data"></a>

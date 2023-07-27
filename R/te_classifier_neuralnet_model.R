@@ -483,9 +483,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       private$model_info$model_date=date()
 
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
-      private$r_package_versions$keras<-packageVersion("keras")
+      #private$r_package_versions$keras<-packageVersion("keras")
       private$r_package_versions$smotefamily<-packageVersion("smotefamily")
-      private$r_package_versions$bundle<-packageVersion("bundle")
+      #private$r_package_versions$bundle<-packageVersion("bundle")
 
       private$py_package_versions$tensorflow<-tf$version$VERSION
       private$py_package_versions$numpy<-np$version$short_version

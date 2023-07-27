@@ -12,7 +12,7 @@ tensorflow"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,38 +57,9 @@ tensorflow</p>
 
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>name</code></dt>
-<dd><p>('character()')<br>
-Name of the classifier.</p></dd>
-
-
-<dt><code>name_root</code></dt>
-<dd><p>('character()')<br>
-Root part of the name of the classifier.</p></dd>
-
-
-<dt><code>label</code></dt>
-<dd><p>('character()')<br>
-Label of the classifier used as the individual title.</p></dd>
-
-
-<dt><code>date</code></dt>
-<dd><p>('date()')<br>
-Date of the first creation of the classifier.</p></dd>
-
-
-<dt><code>text_embedding_model</code></dt>
-<dd><p>('list()')<br>
-List for storing information about the underlying text embedding model.
-This information ensures that a classifier is only used with data from
-the correct text embedding model and ensures the correct handling of the
-embeddings.</p></dd>
-
-
-<dt><code>bundeled_model</code></dt>
-<dd><p>('bundle object')<br>
-Object for storing the keras model of the neural net. Saved as a bundled
-object with help of the package <a href="https://rstudio.github.io/bundle/reference/bundle.html" class="external-link">bundle</a> for serialization.</p></dd>
+    <p></p><div class="r6-fields"><dl><dt><code>model</code></dt>
+<dd><p>('tensorflow_model()')<br>
+Field for storing the tensorflow model after loading.</p></dd>
 
 
 <dt><code>model_config</code></dt>
@@ -199,6 +170,8 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 <ul><li><p><a href="#method-TextEmbeddingClassifierNeuralNet-new"><code>TextEmbeddingClassifierNeuralNet$new()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-train"><code>TextEmbeddingClassifierNeuralNet$train()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-predict"><code>TextEmbeddingClassifierNeuralNet$predict()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_model_info"><code>TextEmbeddingClassifierNeuralNet$get_model_info()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_text_embedding_model"><code>TextEmbeddingClassifierNeuralNet$get_text_embedding_model()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-set_publication_info"><code>TextEmbeddingClassifierNeuralNet$set_publication_info()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_publication_info"><code>TextEmbeddingClassifierNeuralNet$get_publication_info()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-set_software_license"><code>TextEmbeddingClassifierNeuralNet$set_software_license()</code></a></p></li>
@@ -207,8 +180,8 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_documentation_license"><code>TextEmbeddingClassifierNeuralNet$get_documentation_license()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-set_model_description"><code>TextEmbeddingClassifierNeuralNet$set_model_description()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_model_description"><code>TextEmbeddingClassifierNeuralNet$get_model_description()</code></a></p></li>
-<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-export_model"><code>TextEmbeddingClassifierNeuralNet$export_model()</code></a></p></li>
-<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-import_model"><code>TextEmbeddingClassifierNeuralNet$import_model()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-save_model"><code>TextEmbeddingClassifierNeuralNet$save_model()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-load_model"><code>TextEmbeddingClassifierNeuralNet$load_model()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_package_versions"><code>TextEmbeddingClassifierNeuralNet$get_package_versions()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-clone"><code>TextEmbeddingClassifierNeuralNet$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-new"></a><div class="section">
@@ -526,10 +499,35 @@ one line of information for every epoch.</p></dd>
 the probabilities of the different labels for each case.</p>
 </div>
 
+</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_model_info"></a><div class="section">
+<h3 id="method-get-model-info-">Method <code>get_model_info()</code><a class="anchor" aria-label="anchor" href="#method-get-model-info-"></a></h3>
+<p>Method for requesting the model information</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_model_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p><code>list</code> of all relevant model information</p>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_text_embedding_model"></a><div class="section">
+<h3 id="method-get-text-embedding-model-">Method <code>get_text_embedding_model()</code><a class="anchor" aria-label="anchor" href="#method-get-text-embedding-model-"></a></h3>
+<p>Method for requesting the text embedding model information</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_text_embedding_model</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<p><code>list</code> of all relevant model information on the text embedding model
+underlying the classifier</p>
+</div>
+
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-set_publication_info"></a><div class="section">
 <h3 id="method-set-publication-info-">Method <code>set_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-set-publication-info-"></a></h3>
 <p>Method for setting publication information of the classifier</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
 <span>  <span class="va">authors</span>,</span>
 <span>  <span class="va">citation</span>,</span>
@@ -557,19 +555,19 @@ the probabilities of the different labels for each case.</p>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_publication_info"></a><div class="section">
 <h3 id="method-get-publication-info-">Method <code>get_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-get-publication-info-"></a></h3>
 <p>Method for requesting the bibliographic information of the classifier.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_publication_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p><code>list</code> with all saved bibliographic information.</p>
 </div>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-set_software_license"></a><div class="section">
 <h3 id="method-set-software-license-">Method <code>set_software_license()</code><a class="anchor" aria-label="anchor" href="#method-set-software-license-"></a></h3>
 <p>Method for setting the license of the classifier.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">set_software_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -586,7 +584,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_software_license"></a><div class="section">
 <h3 id="method-get-software-license-">Method <code>get_software_license()</code><a class="anchor" aria-label="anchor" href="#method-get-software-license-"></a></h3>
 <p>Method for getting the license of the classifier.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_software_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -603,7 +601,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-set_documentation_license"></a><div class="section">
 <h3 id="method-set-documentation-license-">Method <code>set_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-set-documentation-license-"></a></h3>
 <p>Method for setting the license of the classifier's documentation.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span></span>
 <span>  license <span class="op">=</span> <span class="st">"CC BY-SA"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -622,7 +620,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_documentation_license"></a><div class="section">
 <h3 id="method-get-documentation-license-">Method <code>get_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-get-documentation-license-"></a></h3>
 <p>Method for getting the license of the classifier's documentation.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_documentation_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -639,7 +637,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-set_model_description"></a><div class="section">
 <h3 id="method-set-model-description-">Method <code>set_model_description()</code><a class="anchor" aria-label="anchor" href="#method-set-model-description-"></a></h3>
 <p>Method for setting a description of the classifier.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
 <span>  eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  native <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -688,21 +686,22 @@ in the native language of the classifier.</p></dd>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_model_description"></a><div class="section">
 <h3 id="method-get-model-description-">Method <code>get_model_description()</code><a class="anchor" aria-label="anchor" href="#method-get-model-description-"></a></h3>
 <p>Method for requesting the model description.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_model_description</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p><code>list</code> with the description of the classifier in English
 and the native language.</p>
 </div>
 
-</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-export_model"></a><div class="section">
-<h3 id="method-export-model-">Method <code>export_model()</code><a class="anchor" aria-label="anchor" href="#method-export-model-"></a></h3>
-<p>Method for exporting a model to tensorflow SavedModel format.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">export_model</span><span class="op">(</span><span class="va">dir_path</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-save_model"></a><div class="section">
+<h3 id="method-save-model-">Method <code>save_model()</code><a class="anchor" aria-label="anchor" href="#method-save-model-"></a></h3>
+<p>Method for saving a model to tensorflow SavedModel format
+or h5 format.</p><div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">save_model</span><span class="op">(</span><span class="va">dir_path</span>, save_format <span class="op">=</span> <span class="st">"tf"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -712,14 +711,20 @@ and the native language.</p>
 saved.</p></dd>
 
 
+<dt><code>save_format</code></dt>
+<dd><p>Format for saving the model. <code>"tf"</code> for SavedModel
+or <code>"h5"</code> for HDF5.</p></dd>
+
+
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-import_model"></a><div class="section">
-<h3 id="method-import-model-">Method <code>import_model()</code><a class="anchor" aria-label="anchor" href="#method-import-model-"></a></h3>
-<p>Method for importing a model from tensorflow SavedModel format.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">import_model</span><span class="op">(</span><span class="va">dir_path</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-load_model"></a><div class="section">
+<h3 id="method-load-model-">Method <code>load_model()</code><a class="anchor" aria-label="anchor" href="#method-load-model-"></a></h3>
+<p>Method for importing a model from in tensorflow SavedModel format
+or h5 format.</p><div class="section">
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span><span class="va">dir_path</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -736,12 +741,12 @@ saved.</p></dd>
 <h3 id="method-get-package-versions-">Method <code>get_package_versions()</code><a class="anchor" aria-label="anchor" href="#method-get-package-versions-"></a></h3>
 <p>Method for requesting a summary of the R and python packages'
 versions used for creating the classifier.</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_package_versions</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
 <p>Returns a <code>list</code> containing the versions of the relevant
 R and python packages.</p>
 </div>
@@ -749,7 +754,7 @@ R and python packages.</p>
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

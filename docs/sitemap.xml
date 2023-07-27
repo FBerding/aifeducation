@@ -85,10 +85,16 @@
     <loc>/reference/install_py_modules.html</loc>
   </url>
   <url>
+    <loc>/reference/load_ai_model.html</loc>
+  </url>
+  <url>
     <loc>/reference/matrix_to_array_c.html</loc>
   </url>
   <url>
     <loc>/reference/QAExtractModel.html</loc>
+  </url>
+  <url>
+    <loc>/reference/save_ai_model.html</loc>
   </url>
   <url>
     <loc>/reference/set_config_cpu_only.html</loc>

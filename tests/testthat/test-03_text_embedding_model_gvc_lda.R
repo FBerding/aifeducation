@@ -1,5 +1,5 @@
 path="test_data/gvc_lda/basic_text_rep_movie_reviews.rda"
-testthat::skip_if_not(condition=file.exists(path),
+testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
 #------------------------------------------------------------------------------
@@ -29,6 +29,43 @@ test_that("creation_GlobalVectorCluster", {
   expect_s3_class(global_vector_clusters_modeling,
                   class="TextEmbeddingModel")
 })
+
+model_name=global_vector_clusters_modeling$get_model_info()$model_name
+
+test_that("GlobalVectorClusters Save Total Model H5", {
+  expect_no_error(
+    save_ai_model(model=global_vector_clusters_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "H5")
+  )
+})
+
+test_that("GlobalVectorClusters Load Total Model H5", {
+  global_vector_clusters_modeling<-NULL
+  global_vector_clusters_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+  )
+  expect_s3_class(global_vector_clusters_modeling,
+                  class="TextEmbeddingModel")
+})
+
+test_that("GlobalVectorClusters Save Total Model TF", {
+  expect_no_error(
+    save_ai_model(model=global_vector_clusters_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "tf")
+  )
+})
+
+test_that("GlobalVectorClusters Load Total Model TF", {
+  global_vector_clusters_modeling<-NULL
+  global_vector_clusters_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+  )
+  expect_s3_class(global_vector_clusters_modeling,
+                  class="TextEmbeddingModel")
+})
+
 
 test_that("embedding_GlobalVectorCluster", {
   embeddings<-global_vector_clusters_modeling$embed(raw_text = example_data$text[1:10],
@@ -75,6 +112,43 @@ test_that("creation_topic_modeling", {
                   class="TextEmbeddingModel")
 })
 
+model_name=topic_modeling$get_model_info()$model_name
+
+test_that("TopicModeling Save Total Model H5", {
+  expect_no_error(
+    save_ai_model(model=topic_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "H5")
+  )
+})
+
+test_that("TopicModeling Load Total Model H5", {
+  topic_modeling<-NULL
+  topic_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+  )
+  expect_s3_class(topic_modeling,
+                  class="TextEmbeddingModel")
+})
+
+test_that("TopicModeling Save Total Model TF", {
+  expect_no_error(
+    save_ai_model(model=topic_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "tf")
+  )
+})
+
+test_that("TopicModeling Load Total Model TF", {
+  topic_modeling<-NULL
+  topic_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+  )
+  expect_s3_class(topic_modeling,
+                  class="TextEmbeddingModel")
+})
+
+
 test_that("embedding_topic_modeling", {
   embeddings<-topic_modeling$embed(raw_text = example_data$text[1:10],
                                    doc_id = 1:10)
@@ -101,6 +175,9 @@ test_that("decoding_topic_modeling", {
   expect_length(decodings,10)
   expect_type(decodings,type="list")
 })
+
+
+
 #-------------------------------------------------------------------------------
 #test check_embedding for embeddings and models
 embeddings_topic<-topic_modeling$embed(raw_text = example_data$text[1:10],
