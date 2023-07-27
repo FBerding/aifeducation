@@ -420,8 +420,10 @@ TextEmbeddingModel<-R6::R6Class(
     #--------------------------------------------------------------------------
     #'@description Method for loading a transformers model into R.
     #'@param model_dir \code{string} containing the path to the relevant
-    #'model.
+    #'model directory.
     load_model=function(model_dir){
+        model_dir<-paste0(model_dir,"/",private$model_info$model_name)
+
         if(self$basic_components$method=="bert" |
            self$basic_components$method=="roberta" |
            self$basic_components$method=="longformer"){
@@ -437,7 +439,29 @@ TextEmbeddingModel<-R6::R6Class(
             self$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
           }
       } else {
-        message("Method only relevant for transformers models.")
+        message("Method only relevant for transformer models.")
+      }
+    },
+    #'@description Method for saving a transformer model on disk.Relevant
+    #'only for transformer models.
+    #'@param model_dir \code{string} containing the path to the relevant
+    #'model directory.
+    save_model=function(model_dir){
+      if(self$basic_components$method=="bert" |
+         self$basic_components$method=="roberta" |
+         self$basic_components$method=="longformer"){
+
+      model_dir<-paste0(model_dir,"/",private$model_info$model_name)
+
+      if(dir.exists(model_dir)==FALSE){
+        dir.create(model_dir)
+        cat("Creating Directory\n")
+      }
+
+      self$transformer_components$model$save_pretrained(save_directory=model_dir)
+      self$transformer_components$tokenizer$save_pretrained(model_dir)
+      } else {
+        message("Method only relevant for transformer models.")
       }
     },
     #-------------------------------------------------------------------------
@@ -717,9 +741,8 @@ TextEmbeddingModel<-R6::R6Class(
               index=index+1
             }
           }
-          dimnames(text_embedding)[[3]]<-colnames(text_embedding[,1,],
-                                                  do.NULL = FALSE,
-                                                  prefix = "bert_")
+          dimnames(text_embedding)[[3]]<-paste0(self$basic_components$method,"_",seq(from=1,to=n_layer_size,by=1))
+
             #Add ID of every case
             dimnames(text_embedding)[[1]]<-doc_id[batch]
             batch_results[b]=list(text_embedding)
@@ -760,9 +783,7 @@ TextEmbeddingModel<-R6::R6Class(
         #text_embedding=text_embedding/rowSums(text_embedding)
         #text_embedding[is.nan(text_embedding)]<-0
 
-        dimnames(text_embedding)[[3]]<-colnames(text_embedding[,1,],
-                                                do.NULL = FALSE,
-                                                prefix = "cluster_")
+        dimnames(text_embedding)[[3]]<-paste0(self$basic_components$method,"_",seq(from=1,to=self$bow_components$configuration$bow_n_cluster,by=1))
         #Add ID of every case
         dimnames(text_embedding)[[1]]<-doc_id
 
@@ -800,9 +821,7 @@ TextEmbeddingModel<-R6::R6Class(
         #possible
         text_embedding[is.nan(text_embedding)]<-0
 
-        dimnames(text_embedding)[[3]]<-colnames(text_embedding[,1,],
-                                                do.NULL = FALSE,
-                                                prefix = "lda_")
+        dimnames(text_embedding)[[3]]<-paste0(self$basic_components$method,"_",seq(from=1,to=self$bow_components$configuration$bow_n_dim,by=1))
         #Add ID of every case
         dimnames(text_embedding)[[1]]<-doc_id
 

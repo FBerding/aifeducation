@@ -257,6 +257,34 @@ test_that("training_pbl_bsc", {
   )
 })
 
+test_that("Saving Classifier H5",{
+  expect_no_error(classifier$save_model(
+    testthat::test_path("tmp"),
+    save_format = "h5")
+  )
+})
+
+test_that("Loading Classifier H5",{
+  expect_no_error(
+    classifier$load_model(
+      testthat::test_path("tmp"))
+  )
+})
+
+test_that("Saving Classifier TF",{
+  expect_no_error(classifier$save_model(
+    testthat::test_path("tmp"),
+    save_format = "tf")
+  )
+})
+
+test_that("Loading Classifier TF",{
+  expect_no_error(
+    classifier$load_model(
+      testthat::test_path("tmp"))
+  )
+})
+
 test_that("prediction", {
   prediction<-classifier$predict(newdata = current_embeddings,
                                  batch_size = 2,
@@ -353,4 +381,65 @@ test_that("publication_info",{
     object=pub_info$developed_by$url,
     expected="https://Test.html"
   )
+})
+
+test_that("Classifier Save Total Model H5", {
+  expect_no_error(
+    save_ai_model(model=classifier,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "H5")
+  )
+})
+
+test_that("Classifier Load Total Model H5", {
+  new_classifier<-NULL
+  new_classifier<-load_ai_model(
+    model_dir = testthat::test_path("tmp_full_models/",classifier$get_model_info()$model_name)
+  )
+  expect_s3_class(new_classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+})
+
+test_that("Classifier Save Total Model TF", {
+  expect_no_error(
+    save_ai_model(model=classifier,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "tf")
+  )
+})
+
+test_that("Classifier Load Total Model TF", {
+  new_classifier<-NULL
+  new_classifier<-load_ai_model(
+    model_dir = testthat::test_path("tmp_full_models/",classifier$get_model_info()$model_name)
+  )
+  expect_s3_class(new_classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+})
+
+test_that("Classifier Predict", {
+  pred<-NULL
+  pred<-classifier$predict(
+    newdata = current_embeddings,
+    batch_size = 2,
+    verbose = 0
+  )
+  expect_equal(nrow(pred),nrow(current_embeddings$embeddings))
+
+  pred<-NULL
+  pred<-classifier$predict(
+    newdata = current_embeddings$embeddings,
+    batch_size = 2,
+    verbose = 0
+  )
+  expect_equal(nrow(pred),nrow(current_embeddings$embeddings))
+
+  pred<-NULL
+  pred<-classifier$predict(
+    newdata = current_embeddings$embeddings[1,,,drop=FALSE],
+    batch_size = 2,
+    verbose = 0
+  )
+  expect_equal(nrow(pred),1)
+
 })

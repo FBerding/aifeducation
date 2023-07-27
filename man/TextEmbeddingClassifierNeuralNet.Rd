@@ -11,27 +11,8 @@ tensorflow
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{name}}{('character()')\cr
-Name of the classifier.}
-
-\item{\code{name_root}}{('character()')\cr
-Root part of the name of the classifier.}
-
-\item{\code{label}}{('character()')\cr
-Label of the classifier used as the individual title.}
-
-\item{\code{date}}{('date()')\cr
-Date of the first creation of the classifier.}
-
-\item{\code{text_embedding_model}}{('list()')\cr
-List for storing information about the underlying text embedding model.
-This information ensures that a classifier is only used with data from
-the correct text embedding model and ensures the correct handling of the
-embeddings.}
-
-\item{\code{bundeled_model}}{('bundle object')\cr
-Object for storing the keras model of the neural net. Saved as a bundled
-object with help of the package \link[bundle]{bundle} for serialization.}
+\item{\code{model}}{('tensorflow_model()')\cr
+Field for storing the tensorflow model after loading.}
 
 \item{\code{model_config}}{('list()')\cr
 List for storing information about the configuration of the model. This
@@ -141,6 +122,8 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-new}{\code{TextEmbeddingClassifierNeuralNet$new()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-train}{\code{TextEmbeddingClassifierNeuralNet$train()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-predict}{\code{TextEmbeddingClassifierNeuralNet$predict()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_model_info}{\code{TextEmbeddingClassifierNeuralNet$get_model_info()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_text_embedding_model}{\code{TextEmbeddingClassifierNeuralNet$get_text_embedding_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_publication_info}{\code{TextEmbeddingClassifierNeuralNet$set_publication_info()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_publication_info}{\code{TextEmbeddingClassifierNeuralNet$get_publication_info()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_software_license}{\code{TextEmbeddingClassifierNeuralNet$set_software_license()}}
@@ -149,8 +132,8 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_documentation_license}{\code{TextEmbeddingClassifierNeuralNet$get_documentation_license()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_model_description}{\code{TextEmbeddingClassifierNeuralNet$set_model_description()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_model_description}{\code{TextEmbeddingClassifierNeuralNet$get_model_description()}}
-\item \href{#method-TextEmbeddingClassifierNeuralNet-export_model}{\code{TextEmbeddingClassifierNeuralNet$export_model()}}
-\item \href{#method-TextEmbeddingClassifierNeuralNet-import_model}{\code{TextEmbeddingClassifierNeuralNet$import_model()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-save_model}{\code{TextEmbeddingClassifierNeuralNet$save_model()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-load_model}{\code{TextEmbeddingClassifierNeuralNet$load_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_package_versions}{\code{TextEmbeddingClassifierNeuralNet$get_package_versions()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-clone}{\code{TextEmbeddingClassifierNeuralNet$clone()}}
 }
@@ -396,6 +379,33 @@ the probabilities of the different labels for each case.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_model_info"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_model_info}{}}}
+\subsection{Method \code{get_model_info()}}{
+Method for requesting the model information
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_model_info()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{list} of all relevant model information
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_text_embedding_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_text_embedding_model}{}}}
+\subsection{Method \code{get_text_embedding_model()}}{
+Method for requesting the text embedding model information
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_text_embedding_model()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{list} of all relevant model information on the text embedding model
+underlying the classifier
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_publication_info"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-set_publication_info}{}}}
 \subsection{Method \code{set_publication_info()}}{
@@ -562,12 +572,13 @@ and the native language.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-export_model"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-export_model}{}}}
-\subsection{Method \code{export_model()}}{
-Method for exporting a model to tensorflow SavedModel format.
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-save_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-save_model}{}}}
+\subsection{Method \code{save_model()}}{
+Method for saving a model to tensorflow SavedModel format
+or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$export_model(dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$save_model(dir_path, save_format = "tf")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -575,17 +586,21 @@ Method for exporting a model to tensorflow SavedModel format.
 \describe{
 \item{\code{dir_path}}{\code{string()} Path of the directory where the model should be
 saved.}
+
+\item{\code{save_format}}{Format for saving the model. \code{"tf"} for SavedModel
+or \code{"h5"} for HDF5.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-import_model"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-import_model}{}}}
-\subsection{Method \code{import_model()}}{
-Method for importing a model from tensorflow SavedModel format.
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-load_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-load_model}{}}}
+\subsection{Method \code{load_model()}}{
+Method for importing a model from in tensorflow SavedModel format
+or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$import_model(dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(dir_path)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

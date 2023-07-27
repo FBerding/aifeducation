@@ -68,6 +68,7 @@ glove.}
 \itemize{
 \item \href{#method-TextEmbeddingModel-new}{\code{TextEmbeddingModel$new()}}
 \item \href{#method-TextEmbeddingModel-load_model}{\code{TextEmbeddingModel$load_model()}}
+\item \href{#method-TextEmbeddingModel-save_model}{\code{TextEmbeddingModel$save_model()}}
 \item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
 \item \href{#method-TextEmbeddingModel-decode}{\code{TextEmbeddingModel$decode()}}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
@@ -206,7 +207,26 @@ Method for loading a transformers model into R.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{model_dir}}{\code{string} containing the path to the relevant
-model.}
+model directory.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-save_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-save_model}{}}}
+\subsection{Method \code{save_model()}}{
+Method for saving a transformer model on disk.Relevant
+only for transformer models.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_model(model_dir)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_dir}}{\code{string} containing the path to the relevant
+model directory.}
 }
 \if{html}{\out{</div>}}
 }

@@ -7,6 +7,10 @@ tmp_path="test_data/bert"
 testthat::skip_if_not(condition=dir.exists(testthat::test_path(tmp_path)),
                       message = "Necessary bert model not available")
 
+if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
+  dir.create(testthat::test_path("tmp_full_models"))
+}
+
 aifeducation::set_config_gpu_low_memory()
 
 #-------------------------------------------------------------------------------
@@ -28,15 +32,35 @@ bert_modeling<-TextEmbeddingModel$new(
   aggregation="last",
   model_dir=testthat::test_path(tmp_path))
 
+model_name=bert_modeling$get_model_info()$model_name
+
 test_that("creation_bert", {
   expect_s3_class(bert_modeling,
                   class="TextEmbeddingModel")
+})
+
+test_that("Saving Model Bert", {
+  expect_no_error(
+    bert_modeling$save_model(testthat::test_path("tmp"))
+  )
+})
+
+test_that("Loading Model Bert", {
+  expect_no_error(
+    bert_modeling$load_model(testthat::test_path("tmp"))
+  )
 })
 
 test_that("embedding_bert", {
   embeddings<-bert_modeling$embed(raw_text = example_data$text[1:10],
                                         doc_id = example_data$id[1:10])
   expect_s3_class(embeddings, class="EmbeddedText")
+
+  embeddings<-NULL
+  embeddings<-bert_modeling$embed(raw_text = example_data$text[1:1],
+                                  doc_id = example_data$id[1:1])
+  expect_s3_class(embeddings, class="EmbeddedText")
+
 })
 
 test_that("encoding_bert", {
@@ -157,4 +181,39 @@ test_that("publication_info",{
     object=pub_info$modified_by$url,
     expected="https://Test_revisited.html"
   )
+})
+
+
+test_that("BERT Save Total Model H5", {
+  expect_no_error(
+    save_ai_model(model=bert_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "H5")
+  )
+})
+
+test_that("BERT Load Total Model H5", {
+  bert_modeling<-NULL
+  bert_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+  )
+  expect_s3_class(bert_modeling,
+                  class="TextEmbeddingModel")
+})
+
+test_that("BERT Save Total Model TF", {
+  expect_no_error(
+    save_ai_model(model=bert_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "tf")
+  )
+})
+
+test_that("BERT Load Total Model TF", {
+  bert_modeling<-NULL
+  bert_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+  )
+  expect_s3_class(bert_modeling,
+                  class="TextEmbeddingModel")
 })

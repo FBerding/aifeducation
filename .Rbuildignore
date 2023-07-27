@@ -6,6 +6,8 @@ materials
 test_model
 tests/testthat/test_data/language_models
 test/testthat/test_data/tmp
+test/testthat/tmp
+test/testthat/tmp_full_models
 test/testthat/test_data/bert/checkpoints
 test/testthat/test_data/longformer/checkpoints
 test/testthat/test_data/roberta/checkpoints

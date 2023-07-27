@@ -9,9 +9,11 @@ udpipe_models
 language_models
 .Rhistory
 *.h5
-tests/testthat/test_data/language_models
-test/testthat/test_data/tmp
-test/testthat/test_data/bert
-test/testthat/test_data/roberta
-test/testthat/test_data/longformer
+tests/testthat/test_data/language_models/
+test/testthat/test_data/tmp/
+test/testthat/tmp/
+test/testthat/tmp_full_models/
+test/testthat/test_data/bert/
+test/testthat/test_data/roberta/
+test/testthat/test_data/longformer/
 cran-comments.md

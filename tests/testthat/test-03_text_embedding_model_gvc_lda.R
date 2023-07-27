@@ -34,6 +34,12 @@ test_that("embedding_GlobalVectorCluster", {
   embeddings<-global_vector_clusters_modeling$embed(raw_text = example_data$text[1:10],
                                         doc_id = 1:10)
   expect_s3_class(embeddings, class="EmbeddedText")
+
+  embeddings<-NULL
+  embeddings<-global_vector_clusters_modeling$embed(raw_text = example_data$text[1:1],
+                                                    doc_id = 1:1)
+  expect_s3_class(embeddings, class="EmbeddedText")
+
 })
 
 test_that("encoding_GlobalVectorCluster", {
@@ -73,6 +79,12 @@ test_that("embedding_topic_modeling", {
   embeddings<-topic_modeling$embed(raw_text = example_data$text[1:10],
                                    doc_id = 1:10)
   expect_s3_class(embeddings, class="EmbeddedText")
+
+  embeddings<-NULL
+  embeddings<-topic_modeling$embed(raw_text = example_data$text[1:1],
+                                   doc_id = 1:1)
+  expect_s3_class(embeddings, class="EmbeddedText")
+
 })
 
 test_that("encoding_topic_modeling", {

@@ -54,7 +54,7 @@ check_embedding_models<-function(object_list,
     if(!(methods::is(object_list[[i]],"TextEmbeddingModel") |
        methods::is(object_list[[i]],"EmbeddedText") |
        methods::is(object_list[[i]],"TextEmbeddingClassifierNeuralNet"))){
-      stop("List contains obcects of the wrong class. Objects must be of class
+      stop("List contains objects of the wrong class. Objects must be of class
       TextEmbeddingModel, EmbeddedText or TextEmbeddingClassifierNeuralNet")
     }
   }
@@ -100,7 +100,7 @@ check_embedding_models<-function(object_list,
     } else if(methods::is(object_list[[i]],"EmbeddedText")){
       tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
     } else if(methods::is(object_list[[i]],"TextEmbeddingClassifierNeuralNet")){
-      tmp_model_config[i]<-list(object_list[[i]]$trained_learner$text_model)
+      tmp_model_config[i]<-list(object_list[[i]]$trained_learner$get_text_embedding_model()$model)
     }
 
     if(i>1){

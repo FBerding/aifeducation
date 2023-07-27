@@ -324,6 +324,8 @@ train_tune_bert_model=function(output_dir,
   )
 
   cat(paste(date(),"Preparing Training of the Model","\n"))
+
+
   adam<-tf$keras$optimizers$Adam
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){

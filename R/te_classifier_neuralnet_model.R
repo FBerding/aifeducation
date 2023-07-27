@@ -8,37 +8,9 @@
 TextEmbeddingClassifierNeuralNet<-R6::R6Class(
   classname = "TextEmbeddingClassifierNeuralNet",
   public = list(
-    #'@field name ('character()')\cr
-    #'Name of the classifier.
-    name=NULL,
-
-    #'@field name_root ('character()')\cr
-    #'Root part of the name of the classifier.
-    name_root=NULL,
-
-    #'@field label ('character()')\cr
-    #'Label of the classifier used as the individual title.
-    label=NULL,
-
-    #'@field date ('date()')\cr
-    #'Date of the first creation of the classifier.
-    date=NULL,
-
-    #'@field text_embedding_model ('list()')\cr
-    #'List for storing information about the underlying text embedding model.
-    #'This information ensures that a classifier is only used with data from
-    #'the correct text embedding model and ensures the correct handling of the
-    #'embeddings.
-    text_embedding_model=list(
-      model=list(),
-      times=NA,
-      features=NA
-    ),
-
-    #'@field bundeled_model ('bundle object')\cr
-    #'Object for storing the keras model of the neural net. Saved as a bundled
-    #'object with help of the package \link[bundle]{bundle} for serialization.
-    bundeled_model=NULL,
+    #'@field model ('tensorflow_model()')\cr
+    #'Field for storing the tensorflow model after loading.
+    model=NULL,
 
     #'@field model_config ('list()')\cr
     #'List for storing information about the configuration of the model. This
@@ -201,8 +173,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param optimizer Object of class \code{keras.optimizers}.
     #'@param act_fct \code{character} naming the activation function for all dense layers.
     #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
-    #'@import keras
-    #'@import bundle
     initialize=function(name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -248,9 +218,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #------------------------------------------------------------------------
 
       #Setting Label and Name
-      self$name_root=name
-      self$name=paste0(self$name_root,"_id_",generate_id(16))
-      self$label=label
+      private$model_info$model_name_root=name
+      private$model_info$model_name=paste0(private$model_info$model_name_root,"_id_",generate_id(16))
+      private$model_info$model_label=label
 
       #Basic Information of Input and Target Data
       variable_name_order<-dimnames(text_embeddings$embeddings)[[3]]
@@ -260,9 +230,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       times=model_info$param_chunks
       features=dim(text_embeddings$embeddings)[3]
 
-      self$text_embedding_model["model"]=list(model_info)
-      self$text_embedding_model["times"]=times
-      self$text_embedding_model["features"]=features
+      private$text_embedding_model["model"]=list(model_info)
+      private$text_embedding_model["times"]=times
+      private$text_embedding_model["features"]=features
 
       if(is.null(rec) & self_attention_heads>0){
         if(features %% 2 !=0){
@@ -487,28 +457,30 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         outputs = layer_list[length(layer_list)],
         name = name)
 
-      if(config$optimizer=="adam"){
-        model$compile(
-          loss = config$err_fct,
-          optimizer=tf$keras$optimizers$legacy$Adam(),
-          metrics=config$metric)
+        #if(config$optimizer=="adam"){
+        #  model$compile(
+        #    loss = config$err_fct,
+        #    optimizer=tf$keras$optimizers$Adam(),
+        #    metrics=config$metric)
 
-      } else if(config$optimizer=="rmsprop"){
-         model$compile(
-            loss = self$model_config$init_config$err_fct,
-            optimizer=tf$keras$optimizers$legacy$RMSprop(),
-            metric=self$model_config$init_config$metric)
-      }
+        #} else if(config$optimizer=="rmsprop"){
+        #  model$compile(
+        #    loss = self$model_config$init_config$err_fct,
+        #    optimizer=tf$keras$optimizers$RMSprop(),
+        #    metric=self$model_config$init_config$metric)
+        #}
 
-      self$bundeled_model=bundle::bundle(model)
+
+      self$model=model
       private$init_weights=model$get_weights()
+
       self$model_config$n_req=length(config$rec)
       self$model_config$n_hidden=length(config$hidden)
       self$model_config$n_self_attention_heads=config$self_attention_heads
       self$model_config$target_levels=target_levels_order
       self$model_config$input_variables=variable_name_order
       self$model_config$init_config=config
-      self$date=date()
+      private$model_info$model_date=date()
 
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
       private$r_package_versions$keras<-packageVersion("keras")
@@ -593,8 +565,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'into an ascending order.
     #'}
     #'}
-    #'@import keras
-    #'@import bundle
     #'@importFrom abind abind
     train=function(data_embeddings,
                    data_targets,
@@ -644,7 +614,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       embedding_model_config<-data_embeddings$get_model_info()
       for(check in names(embedding_model_config)){
-        if(embedding_model_config[[check]]!=self$text_embedding_model$model[[check]]){
+        if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
           stop("The TextEmbeddingModel that generated the data_embeddings is not
                the same as the TextEmbeddingModel when generating the classifier.")
         }
@@ -792,7 +762,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       names_unlabeled=names(subset(data_targets,is.na(data_targets)==TRUE))
 
       #Setting a new ID for the classifier
-      self$name=paste0(self$name_root,"_id_",generate_id(16))
+      private$model_info$model_name=paste0(private$model_info$model_name_root,"_id_",generate_id(16))
 
       for(iter in 1:folds$n_folds){
         #---------------------------------------------
@@ -884,8 +854,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                          target=targets_labeleld_train,
                                          method=bsc_methods,
                                          max_k=bsc_max_k,
-                                         times = self$text_embedding_model$times,
-                                         features = self$text_embedding_model$features)
+                                         times = private$text_embedding_model$times,
+                                         features = private$text_embedding_model$features)
           targets_synthetic_all=factor(syn_cases$syntetic_targets,
                                        levels = categories)
           embeddings_syntehtic_all=syn_cases$syntetic_embeddings
@@ -1191,7 +1161,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
               if(val_avg_alpha<val_res["avg_alpha"]){
                 val_avg_alpha=val_res["avg_alpha"]
-                new_best_model=self$bundeled_model
+                new_best_model=tf$keras$models$clone_model(self$model)
                 best_val_metric=val_res
                 best_test_metric=test_res
               }
@@ -1212,7 +1182,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             step=step+1
           }
 
-          self$bundeled_model=new_best_model
+          self$model=tf$keras$models$clone_model(new_best_model)
           test_metric[iter,"BPL",]<-best_test_metric
           test_res<-best_test_metric
         }
@@ -1342,8 +1312,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                        target=targets_labeleld_all,
                                        method=bsc_methods,
                                        max_k=bsc_max_k,
-                                       times = self$text_embedding_model$times,
-                                       features = self$text_embedding_model$features)
+                                       times = private$text_embedding_model$times,
+                                       features = private$text_embedding_model$features)
         targets_synthetic_all=factor(syn_cases$syntetic_targets,
                                      levels = categories)
         embeddings_syntehtic_all=syn_cases$syntetic_embeddings
@@ -1618,7 +1588,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           if(val_avg_alpha<val_res["avg_alpha"]){
             val_avg_alpha=val_res["avg_alpha"]
-            new_best_model=self$bundeled_model
+            new_best_model=tf$keras$models$clone_model(self$model)
             best_val_metric=val_res
           }
           #cat(paste("Validation:",val_res["avg_alpha"]))
@@ -1632,7 +1602,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           step=step+1
         }
 
-        self$bundeled_model=new_best_model
+        self$model=tf$keras$models$clone_model(new_best_model)
       }
       #Save Final Information
       self$last_training$date=date()
@@ -1709,7 +1679,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       if("EmbeddedText" %in% class(newdata)){
         embedding_model_config<-newdata$get_model_info()
         for(check in names(embedding_model_config)){
-          if(embedding_model_config[[check]]!=self$text_embedding_model$model[[check]]){
+          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
             stop("The TextEmbeddingModel that generated the newdata is not
                the same as the TextEmbeddingModel when generating the classifier.")
           }
@@ -1727,10 +1697,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         real_newdata=array_to_matrix(real_newdata)
       }
 
+      model<-self$model
+
       if(length(self$model_config$target_levels)>2){
         #Multi Class
         #Predicting target variable
-        model<-bundle::unbundle(self$bundeled_model)
+        #model<-bundle::unbundle(self$bundeled_model)
         #predictions_prob<-predict(object = model,
         #                          x = real_newdata,
         #                          batch_size = as.integer(batch_size),
@@ -1742,7 +1714,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         predictions<-tf$keras$backend$argmax(predictions_prob)
         #predictions<-predictions_prob %>% keras::k_argmax()
       } else {
-        model<-bundle::unbundle(self$bundeled_model)
         predictions_prob<-model$predict(
                                   x = np$array(real_newdata),
                                   batch_size = as.integer(batch_size),
@@ -1788,6 +1759,25 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     },
 
     #General Information set and get--------------------------------------------
+    #'@description Method for requesting the model information
+    #'@return \code{list} of all relevant model information
+    get_model_info=function(){
+      return(list(
+        model_license=private$model_info$model_license,
+        model_name=private$model_info$model_name,
+        model_name_root=private$model_info$model_name_root,
+        model_label=private$model_info$model_label,
+        model_date=private$model_info$model_date
+      )
+      )
+    },
+    #'@description Method for requesting the text embedding model information
+    #'@return \code{list} of all relevant model information on the text embedding model
+    #'underlying the classifier
+    get_text_embedding_model=function(){
+      return(private$text_embedding_model)
+    },
+    #---------------------------------------------------------------------------
     #'@description Method for setting publication information of the classifier
     #'@param authors List of authors.
     #'@param citation Free text citation.
@@ -1812,13 +1802,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
     set_software_license=function(license="GPL-3"){
-      private$model_license<-license
+      private$model_info$model_license<-license
     },
     #'@description Method for getting the license of the classifier.
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
     get_software_license=function(){
-      return(private$model_license)
+      return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
     #'@description Method for setting the license of the classifier's documentation.
@@ -1882,20 +1872,44 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       return(private$model_description)
     },
     #-------------------------------------------------------------------------
-    #'@description Method for exporting a model to tensorflow SavedModel format.
+    #'@description Method for saving a model to tensorflow SavedModel format
+    #'or h5 format.
     #'@param dir_path \code{string()} Path of the directory where the model should be
     #'saved.
-     export_model=function(dir_path){
-      tmp_model=bundle::unbundle(self$bundeled_model)
-      tmp_model$save(dir_path)
+    #'@param save_format Format for saving the model. \code{"tf"} for SavedModel
+    #'or \code{"h5"} for HDF5.
+     save_model=function(dir_path,save_format="tf"){
+       if(save_format=="tf"){
+         extension=".tf"
+       } else {
+         extension=".h5"
+       }
+
+       file_path=paste0(dir_path,"/",private$model_info$model_name,extension)
+
+       if(dir.exists(dir_path)==FALSE){
+         dir.create(dir_path)
+         cat("Creating Directory\n")
+       }
+
+       self$model$save(file_path)
     },
-    #'@description Method for importing a model from tensorflow SavedModel format.
+    #'@description Method for importing a model from in tensorflow SavedModel format
+    #'or h5 format.
     #'@param dir_path \code{string()} Path of the directory where the model is
     #'saved.
-    import_model=function(dir_path){
+    load_model=function(dir_path){
       tf=reticulate::import("tensorflow")
-      tmp_model<-tf$keras$models$load_model(dir_path)
-      self$bundeled_model=bundle::bundle(tmp_model)
+
+      path=paste0(dir_path,"/",private$model_info$model_name,".tf")
+
+      if(dir.exists(paths = path)==TRUE){
+        self$model<-tf$keras$models$load_model(path)
+      } else {
+        self$model<-tf$keras$models$load_model(paste0(dir_path,"/",private$model_info$model_name,".h5"))
+      }
+
+
     },
     #'@description Method for requesting a summary of the R and python packages'
     #'versions used for creating the classifier.
@@ -1910,6 +1924,21 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
   ),
   private = list(
     #General Information-------------------------------------------------------
+    model_info=list(
+      model_license=NA,
+      model_name=NA,
+      name_root=NA,
+      model_label=NA,
+      model_date=NA
+    ),
+
+    text_embedding_model=list(
+      model=list(),
+      times=NA,
+      features=NA
+    ),
+
+
     publication_info=list(
       developed_by=list(
         authors =NULL,
@@ -1926,7 +1955,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       keywords_native=NULL,
       license=NA
     ),
-    model_license=NULL,
+
     r_package_versions=list(
       aifeducation=NA,
       smotefamily=NA,
@@ -1966,6 +1995,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Clear session to provide enough resources for computations
       tf$keras$backend$clear_session()
+
+      model<-self$model
 
       #load names and order of input variables and train_target levels
       variable_name_order<-self$model_config$input_variables
@@ -2012,26 +2043,22 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         output_categories_test=target_test_transformed
       }
 
-      model<-bundle::unbundle(self$bundeled_model)
-
       if(reset_model==TRUE){
         model$set_weights(private$init_weights)
         #cat("Model reseted")
       }
 
-      tf<-reticulate::import("tensorflow")
-
-      if(self$model_config$init_config$optimizer=="adam"){
-        model$compile(
-          loss = self$model_config$init_config$err_fct,
-          optimizer=tf$keras$optimizers$legacy$Adam(),
-          metrics=self$model_config$init_config$metric)
-      } else if (self$model_config$init_config$optimizer=="rmsprop"){
-        model$compile(
-          loss = self$model_config$init_config$err_fct,
-          optimizer=tf$keras$optimizers$legacy$RMSprop(),
-          metrics=self$model_config$init_config$metric)
-      }
+        if(self$model_config$init_config$optimizer=="adam"){
+          model$compile(
+            loss = self$model_config$init_config$err_fct,
+            optimizer=tf$keras$optimizers$Adam(),
+            metrics=self$model_config$init_config$metric)
+        } else if (self$model_config$init_config$optimizer=="rmsprop"){
+          model$compile(
+            loss = self$model_config$init_config$err_fct,
+            optimizer=tf$keras$optimizers$RMSprop(),
+            metrics=self$model_config$init_config$metric)
+        }
 
       if(dir.exists(paste0(dir_checkpoint,"/checkpoints"))==FALSE){
         cat(paste(date(),"Creating Checkpoint Directory"))
@@ -2076,7 +2103,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.h5"))
       }
 
-      self$bundeled_model=bundle::bundle(model)
+      self$model=model
       self$model_config$input_variables<-variable_name_order
       self$model_config$target_levels<-target_levels_order
       self$last_training$history<-train_results
