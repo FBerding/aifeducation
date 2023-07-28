@@ -7,8 +7,41 @@
 TextEmbeddingModel<-R6::R6Class(
   classname = "TextEmbeddingModel",
   private = list(
+
+    basic_components=list(
+      method=NULL,
+      max_length=NULL
+    ),
+
+    transformer_components=list(
+      model=NULL,
+      tokenizer=NULL,
+      aggregation=NULL,
+      chunks=NULL,
+      overlap=NULL),
+
+    bow_components=list(
+      model=NULL,
+      vocab=NULL,
+      configuration=list(
+        to_lower = NA,
+        use_lemmata = NA,
+        bow_n_dim = NA,
+        bow_n_cluster = NA,
+        bow_max_iter = NA,
+        bow_max_iter_cluster = NA,
+        bow_cr_criterion = NA,
+        bow_learning_rate = NA
+      ),
+      aggregation="none",
+      chunks="none",
+      overlap="none"
+    ),
+
+
     model_info=list(
       model_license=NA,
+      model_name_root=NA,
       model_name=NA,
       model_label=NA,
       model_date=NA,
@@ -38,77 +71,6 @@ TextEmbeddingModel<-R6::R6Class(
     )
   ),
   public = list(
-    #'@field basic_components ('list()')\cr
-    #'List storing information which can apply to all methods.
-    #'\itemize{
-    #'\item{\code{basic_components$method: }}{Method underlying the text embedding model.}
-    #'\item{\code{basic_components$max_length: }}{Maximum number of tokens in the sequence the model processes. In general,
-    #'shorter sequences will be padded and longer sequences will be divided
-    #'into chunks and/or truncated.}
-    #'}
-    basic_components=list(
-      method=NULL,
-      max_length=NULL
-    ),
-
-    #'@field transformer_components ('list()')\cr
-    #'List storing information which only apply to BERT models.
-    #'\itemize{
-    #'\item{\code{transformer_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
-    #'\item{\code{transformer_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
-    #'\item{\code{transformer_components$aggregation: }}{Aggregation method for the hidden states.}
-    #'\item{\code{transformer_components$chunks: }}{Maximal number of chunks processed with the model.}
-    #'\item{\code{ transformer_components$overlap: }}{Number of tokens which should be added at the beginning of the sequence
-    #'of the next chunk.}
-    #'}
-    transformer_components=list(
-      model=NULL,
-      tokenizer=NULL,
-      aggregation=NULL,
-      chunks=NULL,
-      overlap=NULL),
-
-    #'@field bow_components ('list()')\cr
-    #'List storing information which only apply to bow_models.
-    #'\itemize{
-    #'\item{\code{bow_components$model: }}{data.frame describing the relationship between tokens and their corresponding
-    #'text embeddings.}
-    #'\item{\code{bow_components$vocab: }}{data.frame saving tokens, lemmas and their corresponding integer index.}
-    #'\item{\code{bow_components$configuration: }}{List of the configuration parameters of the model.
-    #'\itemize{
-    #'\item{\code{bow_components$configuration$to_lower }}{\code{TRUE} if tokens are transformed to lower case.}
-    #'\item{\code{bow_components$configuration$use_lemmata }}{\code{TRUE} if the corresponding lemma should be used instead of the token.}
-    #'\item{\code{bow_components$configuration$bow_n_dim }}{Number of dimensions for GlobalVectors and Topic Modeling.}
-    #'\item{\code{bow_components$configuration$bow_n_cluster }}{Number of clusters for grouping tokens based in their global vectors.
-    #'Does not apply to method lda.}
-    #'\item{\code{bow_components$configuration$bow_max_iter }}{Maximum number of iterations to calculate global vectors and topics.}
-    #'\item{\code{bow_components$configuration$bow_max_iter_cluster }}{Maximum number of iterations for creating clusters. Applies only to method
-    #'glove.}
-    #'\item{\code{bow_components$configuration$bow_cr_criterion }}{Convergence criterion for calculating global vectors and topics.}
-    #'\item{\code{bow_components$configuration$bow_learning_rate  }}{Initial learning rate for estimating global vectors.}}
-    #'}
-    #'\item{\code{bow_components$aggregation: }}{Does currently not apply to these methods.}
-    #'\item{\code{bow_components$chunks: }}{Does currently not apply to these methods.}
-    #'\item{\code{bow_components$overlap: }}{Does currently not apply to these methods.}
-    #'}
-    bow_components=list(
-      model=NULL,
-      vocab=NULL,
-      configuration=list(
-        to_lower = NA,
-        use_lemmata = NA,
-        bow_n_dim = NA,
-        bow_n_cluster = NA,
-        bow_max_iter = NA,
-        bow_max_iter_cluster = NA,
-        bow_cr_criterion = NA,
-        bow_learning_rate = NA
-        ),
-      aggregation="none",
-      chunks="none",
-      overlap="none"
-      ),
-
     #--------------------------------------------------------------------------
     #'@description Method for creating a new text embedding model
     #'@param model_name \code{string} containing the name of the new model.
@@ -228,37 +190,37 @@ TextEmbeddingModel<-R6::R6Class(
       #------------------------------------------------------------------------
 
       #basic_components-------------------------------------------------------
-      self$basic_components$method=method
-      self$basic_components$max_length=as.integer(max_length)
+      private$basic_components$method=method
+      private$basic_components$max_length=as.integer(max_length)
       #------------------------------------------------------------------------
-      if(self$basic_components$method=="bert" |
-         self$basic_components$method=="roberta" |
-         self$basic_components$method=="longformer"){
+      if(private$basic_components$method=="bert" |
+         private$basic_components$method=="roberta" |
+         private$basic_components$method=="longformer"){
 
-        if(self$basic_components$method=="bert"){
-          self$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
-          self$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
-        } else if(self$basic_components$method=="roberta"){
-          self$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
-          self$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
-        } else if(self$basic_components$method=="longformer"){
-          self$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
-          self$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
+        if(private$basic_components$method=="bert"){
+          private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
+          private$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
+        } else if(private$basic_components$method=="roberta"){
+          private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
+          private$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
+        } else if(private$basic_components$method=="longformer"){
+          private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
+          private$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
         }
 
-        if(self$basic_components$method=="longformer" |
-           self$basic_components$method=="roberta"){
-          if(max_length>(self$transformer_components$model$config$max_position_embeddings)){
+        if(private$basic_components$method=="longformer" |
+           private$basic_components$method=="roberta"){
+          if(max_length>(private$transformer_components$model$config$max_position_embeddings)){
             stop(paste("max_length is",max_length,". This value is not allowed to exceed",
-                       self$transformer_components$model$config$max_position_embeddings))
+                       private$transformer_components$model$config$max_position_embeddings))
           }
         }
 
-        self$transformer_components$chunks<-chunks
-        self$transformer_components$overlap<-overlap
-        self$transformer_components$aggregation<-aggregation
+        private$transformer_components$chunks<-chunks
+        private$transformer_components$overlap<-overlap
+        private$transformer_components$aggregation<-aggregation
         #------------------------------------------------------------------------
-      } else if(self$basic_components$method=="glove_cluster"){
+      } else if(private$basic_components$method=="glove_cluster"){
         glove <- text2vec::GlobalVectors$new(rank = bow_n_dim,
                                              x_max = 10
         )
@@ -319,21 +281,21 @@ TextEmbeddingModel<-R6::R6Class(
                                                 method="classes")
         model<-data.frame(index=names(token_cluster_assignments),
                           cluster=token_cluster_assignments)
-        self$bow_components$model=model
-        self$bow_components$vocab=bow_basic_text_rep$language_model$vocab
-        self$bow_components$configuration$to_lower=bow_basic_text_rep$configuration$to_lower
-        self$bow_components$configuration$use_lemmata=bow_basic_text_rep$configuration$use_lemmata
-        self$bow_components$configuration$bow_n_dim=bow_n_dim
-        self$bow_components$configuration$bow_n_cluster=bow_n_cluster
-        self$bow_components$configuration$bow_max_iter=bow_max_iter
-        self$bow_components$configuration$bow_max_iter_cluster=bow_max_iter_cluster
-        self$bow_components$configuration$bow_cr_criterion=bow_cr_criterion
-        self$bow_components$configuration$bow_learning_rate=bow_learning_rate
-        self$bow_components$chunks=1
-        self$bow_components$overlap=0
+        private$bow_components$model=model
+        private$bow_components$vocab=bow_basic_text_rep$language_model$vocab
+        private$bow_components$configuration$to_lower=bow_basic_text_rep$configuration$to_lower
+        private$bow_components$configuration$use_lemmata=bow_basic_text_rep$configuration$use_lemmata
+        private$bow_components$configuration$bow_n_dim=bow_n_dim
+        private$bow_components$configuration$bow_n_cluster=bow_n_cluster
+        private$bow_components$configuration$bow_max_iter=bow_max_iter
+        private$bow_components$configuration$bow_max_iter_cluster=bow_max_iter_cluster
+        private$bow_components$configuration$bow_cr_criterion=bow_cr_criterion
+        private$bow_components$configuration$bow_learning_rate=bow_learning_rate
+        private$bow_components$chunks=1
+        private$bow_components$overlap=0
 
         #Topic Modeling--------------------------------------------------------
-      } else if(self$basic_components$method=="lda"){
+      } else if(private$basic_components$method=="lda"){
         selection<-(rowSums(as.matrix(bow_basic_text_rep$dfm))>0)
         corrected_dfm<-quanteda::dfm_subset(x=bow_basic_text_rep$dfm,
                                             selection)
@@ -397,21 +359,22 @@ TextEmbeddingModel<-R6::R6Class(
       model<-model[order(model$index),]
       rownames(model)<-model$index
 
-      self$bow_components$model=model
-      self$bow_components$vocab=bow_basic_text_rep$language_model$vocab
-      self$bow_components$configuration$to_lower=bow_basic_text_rep$configuration$to_lower
-      self$bow_components$configuration$use_lemmata=bow_basic_text_rep$configuration$use_lemmata
-      self$bow_components$configuration$bow_n_dim=bow_n_dim
-      self$bow_components$configuration$bow_n_cluster=bow_n_cluster
-      self$bow_components$configuration$bow_max_iter=bow_max_iter
-      self$bow_components$configuration$bow_max_iter_cluster=bow_max_iter_cluster
-      self$bow_components$configuration$bow_cr_criterion=bow_cr_criterion
-      self$bow_components$configuration$bow_learning_rate=bow_learning_rate
-      self$bow_components$chunks=1
-      self$bow_components$overlap=0
+      private$bow_components$model=model
+      private$bow_components$vocab=bow_basic_text_rep$language_model$vocab
+      private$bow_components$configuration$to_lower=bow_basic_text_rep$configuration$to_lower
+      private$bow_components$configuration$use_lemmata=bow_basic_text_rep$configuration$use_lemmata
+      private$bow_components$configuration$bow_n_dim=bow_n_dim
+      private$bow_components$configuration$bow_n_cluster=bow_n_cluster
+      private$bow_components$configuration$bow_max_iter=bow_max_iter
+      private$bow_components$configuration$bow_max_iter_cluster=bow_max_iter_cluster
+      private$bow_components$configuration$bow_cr_criterion=bow_cr_criterion
+      private$bow_components$configuration$bow_learning_rate=bow_learning_rate
+      private$bow_components$chunks=1
+      private$bow_components$overlap=0
       }
 
-      private$model_info$model_name<-model_name
+      private$model_info$model_name_root<-model_name
+      private$model_info$model_name<-paste0(model_name,"_Id_",generate_id(16))
       private$model_info$model_label<-model_label
       private$model_info$model_version<-model_version
       private$model_info$model_language<-model_language
@@ -424,19 +387,19 @@ TextEmbeddingModel<-R6::R6Class(
     load_model=function(model_dir){
         model_dir<-paste0(model_dir,"/",private$model_info$model_name)
 
-        if(self$basic_components$method=="bert" |
-           self$basic_components$method=="roberta" |
-           self$basic_components$method=="longformer"){
+        if(private$basic_components$method=="bert" |
+           private$basic_components$method=="roberta" |
+           private$basic_components$method=="longformer"){
 
-          if(self$basic_components$method=="bert"){
-            self$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
-            self$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
-          } else if(self$basic_components$method=="roberta"){
-            self$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
-            self$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
-          } else if(self$basic_components$method=="longformer"){
-            self$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
-            self$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
+          if(private$basic_components$method=="bert"){
+            private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
+            private$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
+          } else if(private$basic_components$method=="roberta"){
+            private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
+            private$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
+          } else if(private$basic_components$method=="longformer"){
+            private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
+            private$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
           }
       } else {
         message("Method only relevant for transformer models.")
@@ -447,9 +410,9 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
     save_model=function(model_dir){
-      if(self$basic_components$method=="bert" |
-         self$basic_components$method=="roberta" |
-         self$basic_components$method=="longformer"){
+      if(private$basic_components$method=="bert" |
+         private$basic_components$method=="roberta" |
+         private$basic_components$method=="longformer"){
 
       model_dir<-paste0(model_dir,"/",private$model_info$model_name)
 
@@ -458,8 +421,8 @@ TextEmbeddingModel<-R6::R6Class(
         cat("Creating Directory\n")
       }
 
-      self$transformer_components$model$save_pretrained(save_directory=model_dir)
-      self$transformer_components$tokenizer$save_pretrained(model_dir)
+      private$transformer_components$model$save_pretrained(save_directory=model_dir)
+      private$transformer_components$tokenizer$save_pretrained(model_dir)
       } else {
         message("Method only relevant for transformer models.")
       }
@@ -479,9 +442,9 @@ TextEmbeddingModel<-R6::R6Class(
                     trace = FALSE){
       n_units<-length(raw_text)
 
-      if(self$basic_components$method=="bert" |
-         self$basic_components$method=="roberta" |
-         self$basic_components$method=="longformer"){
+      if(private$basic_components$method=="bert" |
+         private$basic_components$method=="roberta" |
+         private$basic_components$method=="longformer"){
         chunk_list<-vector(length = n_units)
         encodings<-NULL
         #---------------------------------------------------------------------
@@ -490,19 +453,19 @@ TextEmbeddingModel<-R6::R6Class(
             preparation_tokens<-quanteda::tokens(raw_text[i])
             preparation_tokens<-quanteda::tokens_chunk(
               x=preparation_tokens,
-              size=self$basic_components$max_length,
-              overlap = self$transformer_components$overlap,
+              size=private$basic_components$max_length,
+              overlap = private$transformer_components$overlap,
               use_docvars = FALSE)
 
-            chunks=min(length(preparation_tokens),self$transformer_components$chunks)
+            chunks=min(length(preparation_tokens),private$transformer_components$chunks)
             tokens_unit<-NULL
             for(j in 1:chunks){
               tokens_unit[j]<-list(
-                self$transformer_components$tokenizer(
+                private$transformer_components$tokenizer(
                   paste(preparation_tokens[j],collapse = " "),
                   padding=TRUE,
                   truncation=TRUE,
-                  max_length=as.integer(self$basic_components$max_length),
+                  max_length=as.integer(private$basic_components$max_length),
                   return_tensors="tf")
               )
               if(trace==TRUE){
@@ -523,13 +486,13 @@ TextEmbeddingModel<-R6::R6Class(
             preparation_tokens<-quanteda::tokens(raw_text[i])
             preparation_tokens<-quanteda::tokens_chunk(
               x=preparation_tokens,
-              size=self$basic_components$max_length,
-              overlap = self$transformer_components$overlap,
+              size=private$basic_components$max_length,
+              overlap = private$transformer_components$overlap,
               use_docvars = FALSE)
             preparation_tokens=as.list(preparation_tokens)
             preparation_tokens=lapply(X=preparation_tokens,FUN=paste,collapse=" ")
 
-            chunk_list[i]=min(length(preparation_tokens),self$transformer_components$chunks)
+            chunk_list[i]=min(length(preparation_tokens),private$transformer_components$chunks)
             preparation_tokens<-preparation_tokens[1:chunk_list[i]]
 
             index_min=length(text_chunks)+1
@@ -539,53 +502,53 @@ TextEmbeddingModel<-R6::R6Class(
             #text_chunks[index_min:index_max]<-list(preparation_tokens)
           }
 
-          encodings=self$transformer_components$tokenizer(
+          encodings=private$transformer_components$tokenizer(
             text_chunks,
             padding=TRUE,
             truncation=TRUE,
-            max_length=as.integer(self$basic_components$max_length),
+            max_length=as.integer(private$basic_components$max_length),
             return_tensors="tf")
 
           return(encodings_list=list(encodings=encodings,
                                      chunks=chunk_list))
         }
-      } else if(self$basic_components$method=="glove_cluster"|
-                self$basic_components$method=="lda"){
+      } else if(private$basic_components$method=="glove_cluster"|
+                private$basic_components$method=="lda"){
         textual_corpus <-quanteda::corpus(raw_text)
         token<-quanteda::tokens(textual_corpus)
-        if(self$bow_components$configuration$use_lemmata==TRUE){
-          if(self$bow_components$configuration$to_lower==TRUE){
+        if(private$bow_components$configuration$use_lemmata==TRUE){
+          if(private$bow_components$configuration$to_lower==TRUE){
             token<-quanteda::tokens_keep(x=token,
-                                         pattern = self$bow_components$vocab$token)
+                                         pattern = private$bow_components$vocab$token)
             token<-quanteda::tokens_replace(x=token,
-                                            pattern = self$bow_components$vocab$token,
-                                            replacement = as.character(self$bow_components$vocab$index_lemma_lower),
+                                            pattern = private$bow_components$vocab$token,
+                                            replacement = as.character(private$bow_components$vocab$index_lemma_lower),
                                             valuetype = "fixed",
                                             verbose=verbose)
           } else {
             token<-quanteda::tokens_keep(x=token,
-                                         pattern = self$bow_components$vocab$token)
+                                         pattern = private$bow_components$vocab$token)
             token<-quanteda::tokens_replace(x=token,
-                                            pattern = self$bow_components$vocab$token,
-                                            replacement = as.character(self$bow_components$vocab$index_lemma),
+                                            pattern = private$bow_components$vocab$token,
+                                            replacement = as.character(private$bow_components$vocab$index_lemma),
                                             valuetype = "fixed",
                                             verbose=verbose)
           }
         } else {
-          if(self$bow_components$configuration$to_lower==TRUE){
+          if(private$bow_components$configuration$to_lower==TRUE){
             token<-quanteda::tokens_keep(x=token,
-                                         pattern = self$bow_components$vocab$token)
+                                         pattern = private$bow_components$vocab$token)
             token<-quanteda::tokens_replace(x=token,
-                                            pattern = self$bow_components$vocab$token,
-                                            replacement = as.character(self$bow_components$vocab$index_token_lower),
+                                            pattern = private$bow_components$vocab$token,
+                                            replacement = as.character(private$bow_components$vocab$index_token_lower),
                                             valuetype = "fixed",
                                             verbose=verbose)
           } else {
             token<-quanteda::tokens_keep(x=token,
-                                         pattern = self$bow_components$vocab$token)
+                                         pattern = private$bow_components$vocab$token)
             token<-quanteda::tokens_replace(x=token,
-                                            pattern = self$bow_components$vocab$token,
-                                            replacement = as.character(self$bow_components$vocab$index_token),
+                                            pattern = private$bow_components$vocab$token,
+                                            replacement = as.character(private$bow_components$vocab$index_token),
                                             valuetype = "fixed",
                                             verbose=verbose)
           }
@@ -610,22 +573,22 @@ TextEmbeddingModel<-R6::R6Class(
         int_seqence=tmp[1]
       }
       #-------------------------------------------------------------------------
-      if(self$basic_components$method=="bert" |
-         self$basic_components$method=="roberta" |
-         self$basic_components$method=="longformer"){
+      if(private$basic_components$method=="bert" |
+         private$basic_components$method=="roberta" |
+         private$basic_components$method=="longformer"){
         tmp_token_list=NULL
         for(i in 1:length(int_seqence)){
           tmp_vector<-int_seqence[[i]]
           mode(tmp_vector)="integer"
-          tmp_token_list[i]=list(self$transformer_components$tokenizer$decode(tmp_vector))
+          tmp_token_list[i]=list(private$transformer_components$tokenizer$decode(tmp_vector))
         }
         return(tmp_token_list)
 
       #-------------------------------------------------------------------------
-      } else if(self$basic_components$method=="glove_cluster" |
-                self$basic_components$method=="lda"){
-        if(self$bow_components$configuration$to_lower==TRUE){
-          if(self$bow_components$configuration$use_lemmata==FALSE){
+      } else if(private$basic_components$method=="glove_cluster" |
+                private$basic_components$method=="lda"){
+        if(private$bow_components$configuration$to_lower==TRUE){
+          if(private$bow_components$configuration$use_lemmata==FALSE){
             input_column="index_token_lower"
             target_coumn="token_tolower"
           } else {
@@ -633,7 +596,7 @@ TextEmbeddingModel<-R6::R6Class(
             target_coumn="lemma_tolower"
           }
         } else {
-          if(self$bow_components$configuration$use_lemmata==FALSE){
+          if(private$bow_components$configuration$use_lemmata==FALSE){
             input_column="index_token"
             target_coumn="token"
           } else {
@@ -648,9 +611,9 @@ TextEmbeddingModel<-R6::R6Class(
           tmp_token_seq=vector(length = length(tmp_int_seq))
           for(j in 1:length(tmp_int_seq)){
             index=match(x=tmp_int_seq[j],
-                        table=self$bow_components$vocab[,input_column])
+                        table=private$bow_components$vocab[,input_column])
                         #table=global_vector_clusters_modeling$bow_components$vocab[,input_column])
-            tmp_token_seq[j]=self$bow_components$vocab[index,target_coumn]
+            tmp_token_seq[j]=private$bow_components$vocab[index,target_coumn]
             #tmp_token_seq[j]=global_vector_clusters_modeling$bow_components$vocab[index,target_coumn]
           }
           tmp_token_list[i]=list(tmp_token_seq)
@@ -673,13 +636,13 @@ TextEmbeddingModel<-R6::R6Class(
     embed=function(raw_text=NULL,doc_id=NULL,batch_size=8, trace = FALSE){
 
       #bert---------------------------------------------------------------------
-      if(self$basic_components$method=="bert" |
-         self$basic_components$method=="roberta" |
-         self$basic_components$method=="longformer"){
+      if(private$basic_components$method=="bert" |
+         private$basic_components$method=="roberta" |
+         private$basic_components$method=="longformer"){
 
         n_units<-length(raw_text)
-        n_layer<-self$transformer_components$model$config$num_hidden_layers
-        n_layer_size<-self$transformer_components$model$config$hidden_size
+        n_layer<-private$transformer_components$model$config$num_hidden_layers
+        n_layer_size<-private$transformer_components$model$config$hidden_size
 
         #Batch refers to the number of cases
         n_batches=ceiling(n_units/batch_size)
@@ -701,28 +664,28 @@ TextEmbeddingModel<-R6::R6Class(
           text_embedding<-array(
             data = 0,
             dim = c(length(batch),
-                    self$transformer_components$chunks,
+                    private$transformer_components$chunks,
                     n_layer_size))
 
           #Clear session to ensure enough memory
           tf$keras$backend$clear_session()
 
           #Calculate tensors
-          tensor_embeddings<-self$transformer_components$model(
+          tensor_embeddings<-private$transformer_components$model(
             tokens$encodings,
             output_hidden_states=TRUE)$hidden_states
 
           #Selecting the relevant layers
-          if(self$transformer_components$aggregation=="last"){
-            selected_layer=self$transformer_components$model$config$num_hidden_layers
-          } else if (self$transformer_components$aggregation=="second_to_last") {
-            selected_layer=self$transformer_components$model$config$num_hidden_layers-2
-          } else if (self$transformer_components$aggregation=="fourth_to_last") {
-            selected_layer=self$transformer_components$model$config$num_hidden_layers-4
-          } else if (self$transformer_components$aggregation=="all") {
-            selected_layer=2:self$transformer_components$model$config$num_hidden_layers
-          } else if (self$transformer_components$aggregation=="last_four") {
-            selected_layer=(self$transformer_components$model$config$num_hidden_layers-4):self$transformer_components$model$config$num_hidden_layers
+          if(private$transformer_components$aggregation=="last"){
+            selected_layer=private$transformer_components$model$config$num_hidden_layers
+          } else if (private$transformer_components$aggregation=="second_to_last") {
+            selected_layer=private$transformer_components$model$config$num_hidden_layers-2
+          } else if (private$transformer_components$aggregation=="fourth_to_last") {
+            selected_layer=private$transformer_components$model$config$num_hidden_layers-4
+          } else if (private$transformer_components$aggregation=="all") {
+            selected_layer=2:private$transformer_components$model$config$num_hidden_layers
+          } else if (private$transformer_components$aggregation=="last_four") {
+            selected_layer=(private$transformer_components$model$config$num_hidden_layers-4):private$transformer_components$model$config$num_hidden_layers
           }
 
           #Sorting the hidden states to the corresponding cases and times
@@ -741,7 +704,7 @@ TextEmbeddingModel<-R6::R6Class(
               index=index+1
             }
           }
-          dimnames(text_embedding)[[3]]<-paste0(self$basic_components$method,"_",seq(from=1,to=n_layer_size,by=1))
+          dimnames(text_embedding)[[3]]<-paste0(private$basic_components$method,"_",seq(from=1,to=n_layer_size,by=1))
 
             #Add ID of every case
             dimnames(text_embedding)[[1]]<-doc_id[batch]
@@ -755,7 +718,7 @@ TextEmbeddingModel<-R6::R6Class(
       #Summarizing the results over all batchtes
       text_embedding=abind::abind(batch_results,along = 1)
         #Glove Cluster----------------------------------------------------------
-      } else if(self$basic_components$method=="glove_cluster"){
+      } else if(private$basic_components$method=="glove_cluster"){
         tokens<-self$encode(raw_text = raw_text,
                             trace = trace,
                             token_encodings_only=FALSE)
@@ -765,31 +728,31 @@ TextEmbeddingModel<-R6::R6Class(
           data = 0,
           dim = c(length(tokens),
                   1,
-                  self$bow_components$configuration$bow_n_cluster))
+                  private$bow_components$configuration$bow_n_cluster))
         #text_embedding<-matrix(nrow = length(tokens),
-        #                       ncol =  self$bow_components$configuration$bow_n_cluster,
+        #                       ncol =  private$bow_components$configuration$bow_n_cluster,
         #                       data = 0)
         for(i in 1:length(tokens)){
           token_freq<-table(tokens[[i]])
           tmp_tokens<-names(token_freq)
           for(j in 1:length(token_freq)){
             index<-match(x=as.integer(tmp_tokens[j]),
-                  table = self$bow_components$model$index)
-            text_embedding[i,1,self$bow_components$model$cluster[index]]<-token_freq[j]+
-              text_embedding[i,1,self$bow_components$model$cluster[index]]
+                  table = private$bow_components$model$index)
+            text_embedding[i,1,private$bow_components$model$cluster[index]]<-token_freq[j]+
+              text_embedding[i,1,private$bow_components$model$cluster[index]]
           }
         }
 
         #text_embedding=text_embedding/rowSums(text_embedding)
         #text_embedding[is.nan(text_embedding)]<-0
 
-        dimnames(text_embedding)[[3]]<-paste0(self$basic_components$method,"_",seq(from=1,to=self$bow_components$configuration$bow_n_cluster,by=1))
+        dimnames(text_embedding)[[3]]<-paste0(private$basic_components$method,"_",seq(from=1,to=private$bow_components$configuration$bow_n_cluster,by=1))
         #Add ID of every case
         dimnames(text_embedding)[[1]]<-doc_id
 
         #text_embedding<-as.data.frame(text_embedding)
         #Topic Modeling---------------------------------------------------------
-      } else if(self$basic_components$method=="lda"){
+      } else if(private$basic_components$method=="lda"){
         tokens<-self$encode(raw_text = raw_text,
                             trace = trace,
                             token_encodings_only=FALSE)
@@ -798,9 +761,9 @@ TextEmbeddingModel<-R6::R6Class(
           data = 0,
           dim = c(length(tokens),
                   1,
-                  self$bow_components$configuration$bow_n_dim))
+                  private$bow_components$configuration$bow_n_dim))
         #text_embedding<-matrix(nrow = length(tokens),
-        #                       ncol =  self$bow_components$configuration$bow_n_dim,
+        #                       ncol =  private$bow_components$configuration$bow_n_dim,
         #                       data = 0)
         for(i in 1:length(tokens)){
           token_freq<-table(tokens[[i]])
@@ -808,20 +771,20 @@ TextEmbeddingModel<-R6::R6Class(
           if(length(tmp_tokens)>0){
             for(j in 1:length(token_freq)){
               index<-match(x=as.integer(tmp_tokens[j]),
-                           table = self$bow_components$model$index)
+                           table = private$bow_components$model$index)
               if(is.na(index)==FALSE){
-                text_embedding[i,1,]<-text_embedding[i,1,]+token_freq[j]*as.matrix(self$bow_components$model[index,-1])
+                text_embedding[i,1,]<-text_embedding[i,1,]+token_freq[j]*as.matrix(private$bow_components$model[index,-1])
               }
             }
           }
         }
-        #text_embedding<-text_embedding/rowSums(self$bow_components$model[,-1])
+        #text_embedding<-text_embedding/rowSums(private$bow_components$model[,-1])
         text_embedding<-text_embedding/rowSums(text_embedding)
         #Replace NaN with 0 which indicate that the rowsum is 0 and division ist not
         #possible
         text_embedding[is.nan(text_embedding)]<-0
 
-        dimnames(text_embedding)[[3]]<-paste0(self$basic_components$method,"_",seq(from=1,to=self$bow_components$configuration$bow_n_dim,by=1))
+        dimnames(text_embedding)[[3]]<-paste0(private$basic_components$method,"_",seq(from=1,to=private$bow_components$configuration$bow_n_dim,by=1))
         #Add ID of every case
         dimnames(text_embedding)[[1]]<-doc_id
 
@@ -829,35 +792,35 @@ TextEmbeddingModel<-R6::R6Class(
       }
       #------------------------------------------------------------------------
 
-      if(self$basic_components$method=="bert" |
-         self$basic_components$method=="roberta" |
-         self$basic_components$method=="longformer" ){
+      if(private$basic_components$method=="bert" |
+         private$basic_components$method=="roberta" |
+         private$basic_components$method=="longformer" ){
         embeddings<-EmbeddedText$new(
           model_name = private$model_info$model_name,
           model_label = private$model_info$model_label,
           model_date = private$model_info$model_date,
-          model_method = self$basic_components$method,
+          model_method = private$basic_components$method,
           model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
-          param_seq_length =self$basic_components$max_length,
-          param_chunks = self$transformer_components$chunks,
-          param_overlap = self$transformer_components$overlap,
-          param_aggregation = self$transformer_components$aggregation,
+          param_seq_length =private$basic_components$max_length,
+          param_chunks = private$transformer_components$chunks,
+          param_overlap = private$transformer_components$overlap,
+          param_aggregation = private$transformer_components$aggregation,
           embeddings = text_embedding
         )
-      } else if(self$basic_components$method=="glove_cluster" |
-                self$basic_components$method=="lda"){
+      } else if(private$basic_components$method=="glove_cluster" |
+                private$basic_components$method=="lda"){
         embeddings<-EmbeddedText$new(
           model_name = private$model_info$model_name,
           model_date = private$model_info$model_date,
           model_label = private$model_info$model_label,
-          model_method = self$basic_components$method,
+          model_method = private$basic_components$method,
           model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
-          param_seq_length =self$basic_components$max_length,
-          param_chunks = self$bow_components$chunks,
-          param_overlap = self$bow_components$overlap,
-          param_aggregation = self$bow_components$aggregation,
+          param_seq_length =private$basic_components$max_length,
+          param_chunks = private$bow_components$chunks,
+          param_overlap = private$bow_components$overlap,
+          param_aggregation = private$bow_components$aggregation,
           embeddings = text_embedding
         )
       }
@@ -968,11 +931,14 @@ TextEmbeddingModel<-R6::R6Class(
     get_model_info=function(){
       return(list(
         model_license=private$model_info$model_license,
+        model_name_root=private$model_info$model_name_root,
         model_name=private$model_info$model_name,
         model_label=private$model_info$model_label,
         model_date=private$model_info$model_date,
         model_version=private$model_info$model_version,
-        model_language=private$model_info$model_language
+        model_language=private$model_info$model_language,
+        model_method=private$basic_components$method,
+        model_max_size=private$basic_components$max_length
         )
         )
     }

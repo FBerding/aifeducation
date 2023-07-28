@@ -19,7 +19,7 @@ load_ai_model<-function(model_dir){
     if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
       loaded_model$load_model(model_dir)
     } else if (methods::is(loaded_model,"TextEmbeddingModel")){
-      if(loaded_model$basic_components$method%in%c("glove_cluster","lda")==FALSE){
+      if(loaded_model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
         loaded_model$load_model(model_dir)
       }
     }
@@ -57,7 +57,7 @@ save_ai_model<-function(model,model_dir,save_format="tf"){
     if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
       model$save_model(dir_path = final_model_dir_path,save_format=save_format)
     } else {
-      if(model$basic_components$method%in%c("glove_cluster","lda")==FALSE){
+      if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
         model$save_model(model_dir = final_model_dir_path)
       }
     }

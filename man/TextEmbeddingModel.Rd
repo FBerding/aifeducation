@@ -14,55 +14,6 @@ Other Text Embedding:
 \code{\link{combine_embeddings}()}
 }
 \concept{Text Embedding}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{basic_components}}{('list()')\cr
-List storing information which can apply to all methods.
-\itemize{
-\item{\code{basic_components$method: }}{Method underlying the text embedding model.}
-\item{\code{basic_components$max_length: }}{Maximum number of tokens in the sequence the model processes. In general,
-shorter sequences will be padded and longer sequences will be divided
-into chunks and/or truncated.}
-}}
-
-\item{\code{transformer_components}}{('list()')\cr
-List storing information which only apply to BERT models.
-\itemize{
-\item{\code{transformer_components$model: }}{An object of class transformers.TFBertModel for using with transformers library.}
-\item{\code{transformer_components$tokenizer: }}{An object of class transformers.BertTokenizerFast for using with transformers library.}
-\item{\code{transformer_components$aggregation: }}{Aggregation method for the hidden states.}
-\item{\code{transformer_components$chunks: }}{Maximal number of chunks processed with the model.}
-\item{\code{ transformer_components$overlap: }}{Number of tokens which should be added at the beginning of the sequence
-of the next chunk.}
-}}
-
-\item{\code{bow_components}}{('list()')\cr
-List storing information which only apply to bow_models.
-\itemize{
-\item{\code{bow_components$model: }}{data.frame describing the relationship between tokens and their corresponding
-text embeddings.}
-\item{\code{bow_components$vocab: }}{data.frame saving tokens, lemmas and their corresponding integer index.}
-\item{\code{bow_components$configuration: }}{List of the configuration parameters of the model.
-\itemize{
-\item{\code{bow_components$configuration$to_lower }}{\code{TRUE} if tokens are transformed to lower case.}
-\item{\code{bow_components$configuration$use_lemmata }}{\code{TRUE} if the corresponding lemma should be used instead of the token.}
-\item{\code{bow_components$configuration$bow_n_dim }}{Number of dimensions for GlobalVectors and Topic Modeling.}
-\item{\code{bow_components$configuration$bow_n_cluster }}{Number of clusters for grouping tokens based in their global vectors.
-Does not apply to method lda.}
-\item{\code{bow_components$configuration$bow_max_iter }}{Maximum number of iterations to calculate global vectors and topics.}
-\item{\code{bow_components$configuration$bow_max_iter_cluster }}{Maximum number of iterations for creating clusters. Applies only to method
-glove.}
-\item{\code{bow_components$configuration$bow_cr_criterion }}{Convergence criterion for calculating global vectors and topics.}
-\item{\code{bow_components$configuration$bow_learning_rate  }}{Initial learning rate for estimating global vectors.}}
-}
-\item{\code{bow_components$aggregation: }}{Does currently not apply to these methods.}
-\item{\code{bow_components$chunks: }}{Does currently not apply to these methods.}
-\item{\code{bow_components$overlap: }}{Does currently not apply to these methods.}
-}}
-}
-\if{html}{\out{</div>}}
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

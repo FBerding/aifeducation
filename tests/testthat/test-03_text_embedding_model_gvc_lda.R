@@ -2,6 +2,10 @@ path="test_data/gvc_lda/basic_text_rep_movie_reviews.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
+if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
+  dir.create(testthat::test_path("tmp_full_models"))
+}
+
 #------------------------------------------------------------------------------
 load(testthat::test_path(path))
 
