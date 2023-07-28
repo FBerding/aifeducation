@@ -82,32 +82,35 @@ check_embedding_models<-function(object_list,
   tmp_results<-NULL
   for(i in 1:length(object_list)){
     if(methods::is(object_list[[i]],"TextEmbeddingModel")){
-      if(object_list[[i]]$basic_components$method=="bert"){
+      if(object_list[[i]]$get_model_info()$model_method=="bert"|
+         object_list[[i]]$get_model_info()$model_method=="roberta"|
+         object_list[[i]]$get_model_info()$model_method=="longformer"){
         tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
-        tmp_model_config[[i]]["model_method"]=list(object_list[[i]]$basic_components$method)
-        tmp_model_config[[i]]["param_seq_length"]=object_list[[i]]$basic_components$max_length
-        tmp_model_config[[i]]["param_chunks"]=object_list[[i]]$bert_components$chunks
-        tmp_model_config[[i]]["param_overlap"]=object_list[[i]]$bert_components$overlap
-        tmp_model_config[[i]]["param_aggregation"]=object_list[[i]]$bert_components$aggregation
+        tmp_model_config[[i]]["model_method"]=list(object_list[[i]]$get_basic_components()$method)
+        tmp_model_config[[i]]["param_seq_length"]=object_list[[i]]$get_basic_components()$max_length
+        tmp_model_config[[i]]["param_chunks"]=object_list[[i]]$get_transformer_components()$chunks
+        tmp_model_config[[i]]["param_overlap"]=object_list[[i]]$get_transformer_components()$overlap
+        tmp_model_config[[i]]["param_aggregation"]=object_list[[i]]$get_transformer_components()$aggregation
       } else {
         tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
-        tmp_model_config[[i]]["model_method"]=list(object_list[[i]]$basic_components$method)
-        tmp_model_config[[i]]["param_seq_length"]=object_list[[i]]$basic_components$max_length
-        tmp_model_config[[i]]["param_chunks"]=object_list[[i]]$bow_components$chunks
-        tmp_model_config[[i]]["param_overlap"]=object_list[[i]]$bow_components$overlap
-        tmp_model_config[[i]]["param_aggregation"]=object_list[[i]]$bow_components$aggregation
+        tmp_model_config[[i]]["model_method"]=list(object_list[[i]]$get_basic_components()$method)
+        tmp_model_config[[i]]["param_seq_length"]=object_list[[i]]$get_basic_components()$max_length
+        tmp_model_config[[i]]["param_chunks"]=object_list[[i]]$get_bow_components()$chunks
+        tmp_model_config[[i]]["param_overlap"]=object_list[[i]]$get_bow_components()$overlap
+        tmp_model_config[[i]]["param_aggregation"]=object_list[[i]]$get_bow_components()$aggregation
       }
     } else if(methods::is(object_list[[i]],"EmbeddedText")){
       tmp_model_config[i]<-list(object_list[[i]]$get_model_info())
     } else if(methods::is(object_list[[i]],"TextEmbeddingClassifierNeuralNet")){
       tmp_model_config[i]<-list(object_list[[i]]$trained_learner$get_text_embedding_model()$model)
     }
+  }
 
+  for(i in 1:length(object_list)){
     if(i>1){
+      tmp_i_1<-tmp_model_config[[i-1]]
+      tmp_i<-tmp_model_config[[i]]
       for(check in to_check){
-        tmp_i_1<-tmp_model_config[[i-1]]
-        tmp_i<-tmp_model_config[[i]]
-
         #--------------------------------------------------------------------
         if(is.null(tmp_i_1[[check]])==TRUE){
           tmp_i_1[[check]]<-"missing"

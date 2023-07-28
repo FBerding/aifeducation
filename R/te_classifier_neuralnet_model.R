@@ -483,9 +483,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       private$model_info$model_date=date()
 
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
-      #private$r_package_versions$keras<-packageVersion("keras")
+      private$r_package_versions$reticulate<-packageVersion("reticulate")
       private$r_package_versions$smotefamily<-packageVersion("smotefamily")
-      #private$r_package_versions$bundle<-packageVersion("bundle")
 
       private$py_package_versions$tensorflow<-tf$version$VERSION
       private$py_package_versions$numpy<-np$version$short_version
@@ -1885,7 +1884,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
          extension=".h5"
        }
 
-       file_path=paste0(dir_path,"/",private$model_info$model_name,extension)
+       file_path=paste0(dir_path,"/","model_data",extension)
 
        if(dir.exists(dir_path)==FALSE){
          dir.create(dir_path)
@@ -1901,7 +1900,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     load_model=function(dir_path){
       tf=reticulate::import("tensorflow")
 
-      path=paste0(dir_path,"/",private$model_info$model_name,".tf")
+      path=paste0(dir_path,"/","model_data",".tf")
 
       if(dir.exists(paths = path)==TRUE){
         self$model<-tf$keras$models$load_model(path)
@@ -1959,8 +1958,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     r_package_versions=list(
       aifeducation=NA,
       smotefamily=NA,
-      bundle=NA,
-      keras=NA
+      reticulate=NA
     ),
     py_package_versions=list(
       tensorflow=NA,

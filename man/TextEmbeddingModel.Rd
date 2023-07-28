@@ -32,6 +32,10 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-set_documentation_license}{\code{TextEmbeddingModel$set_documentation_license()}}
 \item \href{#method-TextEmbeddingModel-get_documentation_license}{\code{TextEmbeddingModel$get_documentation_license()}}
 \item \href{#method-TextEmbeddingModel-get_model_info}{\code{TextEmbeddingModel$get_model_info()}}
+\item \href{#method-TextEmbeddingModel-get_package_versions}{\code{TextEmbeddingModel$get_package_versions()}}
+\item \href{#method-TextEmbeddingModel-get_basic_components}{\code{TextEmbeddingModel$get_basic_components()}}
+\item \href{#method-TextEmbeddingModel-get_bow_components}{\code{TextEmbeddingModel$get_bow_components()}}
+\item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
@@ -442,6 +446,63 @@ Method for requesting the model information
 
 \subsection{Returns}{
 \code{list} of all relevant model information
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_package_versions"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_package_versions}{}}}
+\subsection{Method \code{get_package_versions()}}{
+Method for requesting a summary of the R and python packages'
+versions used for creating the classifier.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_package_versions()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list} containing the versions of the relevant
+R and python packages.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_basic_components"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_basic_components}{}}}
+\subsection{Method \code{get_basic_components()}}{
+Method for requesting the part of interface's configuration that is
+necessary for all models.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_basic_components()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_bow_components"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_bow_components}{}}}
+\subsection{Method \code{get_bow_components()}}{
+Method for requesting the part of interface's configuration that is
+necessary bag-of-words models.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_bow_components()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_transformer_components"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_transformer_components}{}}}
+\subsection{Method \code{get_transformer_components()}}{
+Method for requesting the part of interface's configuration that is
+necessary for transformer models.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_transformer_components()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list}.
 }
 }
 \if{html}{\out{<hr>}}

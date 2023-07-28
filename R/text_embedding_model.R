@@ -7,6 +7,10 @@
 TextEmbeddingModel<-R6::R6Class(
   classname = "TextEmbeddingModel",
   private = list(
+    r_package_versions=list(
+      aifeducation=NA,
+      reticulate=NA
+    ),
 
     basic_components=list(
       method=NULL,
@@ -188,6 +192,9 @@ TextEmbeddingModel<-R6::R6Class(
 
       }
       #------------------------------------------------------------------------
+      private$r_package_versions$aifeducation<-packageVersion("aifeducation")
+      private$r_package_versions$reticulate<-packageVersion("reticulate")
+
 
       #basic_components-------------------------------------------------------
       private$basic_components$method=method
@@ -385,7 +392,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
     load_model=function(model_dir){
-        model_dir<-paste0(model_dir,"/",private$model_info$model_name)
+        model_dir<-paste0(model_dir,"/","model_data")
 
         if(private$basic_components$method=="bert" |
            private$basic_components$method=="roberta" |
@@ -414,15 +421,15 @@ TextEmbeddingModel<-R6::R6Class(
          private$basic_components$method=="roberta" |
          private$basic_components$method=="longformer"){
 
-      model_dir<-paste0(model_dir,"/",private$model_info$model_name)
+      model_dir_data_path<-paste0(model_dir,"/","model_data")
 
       if(dir.exists(model_dir)==FALSE){
         dir.create(model_dir)
         cat("Creating Directory\n")
       }
 
-      private$transformer_components$model$save_pretrained(save_directory=model_dir)
-      private$transformer_components$tokenizer$save_pretrained(model_dir)
+      private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path)
+      private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
       } else {
         message("Method only relevant for transformer models.")
       }
@@ -941,6 +948,44 @@ TextEmbeddingModel<-R6::R6Class(
         model_max_size=private$basic_components$max_length
         )
         )
+    },
+    #---------------------------------------------------------------------------
+    #'@description Method for requesting a summary of the R and python packages'
+    #'versions used for creating the classifier.
+    #'@return Returns a \code{list} containing the versions of the relevant
+    #'R and python packages.
+    get_package_versions=function(){
+      return(
+        private$r_package_versions
+      )
+    },
+    #'@description Method for requesting the part of interface's configuration that is
+    #'necessary for all models.
+    #'@return Returns a \code{list}.
+    get_basic_components=function(){
+      return(
+        private$basic_components
+      )
+    },
+    #'@description Method for requesting the part of interface's configuration that is
+    #'necessary bag-of-words models.
+    #'@return Returns a \code{list}.
+    get_bow_components=function(){
+      return(
+        private$bow_components
+      )
+    },
+    #'@description Method for requesting the part of interface's configuration that is
+    #'necessary for transformer models.
+    #'@return Returns a \code{list}.
+    get_transformer_components=function(){
+      return(
+        list(
+          private$transformer_components$aggregation,
+          private$transformer_components$chunks,
+          private$transformer_components$overlap,
+        )
+      )
     }
   )
 )
