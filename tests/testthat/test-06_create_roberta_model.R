@@ -1,8 +1,11 @@
 testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                   message = "Necessary python modules not available")
-#testthat::skip_if_not(condition = dir.exists(testthat::test_path("test_data/roberta")),
-#                      message = "Necessary directory not available")
+
+if(dir.exists(testthat::test_path("test_data/roberta"))==FALSE){
+  dir.create(testthat::test_path("test_data/roberta"))
+}
+
 aifeducation::set_config_gpu_low_memory()
 
 test_that("create_roberta_model", {

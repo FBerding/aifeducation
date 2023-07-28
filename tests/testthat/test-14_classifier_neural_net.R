@@ -5,6 +5,10 @@ path="test_data/classifier/bert_embeddings.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
+if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
+  dir.create(testthat::test_path("tmp_full_models"))
+}
+
 #-------------------------------------------------------------------------------
 aifeducation::set_config_gpu_low_memory()
 
