@@ -10,4 +10,7 @@ library(testthat)
 library(aifeducation)
 library(quanteda.textmodels)
 
-test_check("aifeducation")
+test_check("aifeducation",
+           stop_on_failure=TRUE,
+           reporter = LocationReporter(),
+           stop_on_failure = TRUE)
