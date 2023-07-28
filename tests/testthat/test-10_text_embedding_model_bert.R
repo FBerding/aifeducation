@@ -41,13 +41,13 @@ test_that("creation_bert", {
 
 test_that("Saving Model Bert", {
   expect_no_error(
-    bert_modeling$save_model(testthat::test_path("tmp"))
+    bert_modeling$save_model(testthat::test_path("tmp/bert"))
   )
 })
 
 test_that("Loading Model Bert", {
   expect_no_error(
-    bert_modeling$load_model(testthat::test_path("tmp"))
+    bert_modeling$load_model(testthat::test_path("tmp/bert"))
   )
 })
 

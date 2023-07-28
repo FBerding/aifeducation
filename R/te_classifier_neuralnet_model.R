@@ -1905,7 +1905,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       if(dir.exists(paths = path)==TRUE){
         self$model<-tf$keras$models$load_model(path)
       } else {
-        self$model<-tf$keras$models$load_model(paste0(dir_path,"/",private$model_info$model_name,".h5"))
+        self$model<-tf$keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
       }
 
 

@@ -41,13 +41,13 @@ test_that("creation_longformer", {
 
 test_that("Saving Model Longformer", {
   expect_no_error(
-    bert_modeling$save_model(testthat::test_path("tmp"))
+    bert_modeling$save_model(testthat::test_path("tmp/longformer"))
   )
 })
 
 test_that("Loading Model Longformer", {
   expect_no_error(
-    bert_modeling$load_model(testthat::test_path("tmp"))
+    bert_modeling$load_model(testthat::test_path("tmp/longformer"))
   )
 })
 
@@ -91,7 +91,7 @@ test_that("Longformer Load Total Model H5", {
   bert_modeling<-load_ai_model(
     model_dir = testthat::test_path("tmp_full_models/",model_name)
   )
-  expect_s3_class(new_classifier,
+  expect_s3_class(bert_modeling,
                   class="TextEmbeddingModel")
 })
 

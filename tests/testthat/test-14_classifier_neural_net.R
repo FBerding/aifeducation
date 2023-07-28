@@ -398,7 +398,7 @@ test_that("Classifier Save Total Model H5", {
 test_that("Classifier Load Total Model H5", {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
-    model_dir = testthat::test_path("tmp_full_models/",classifier$get_model_info()$model_name)
+    model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")
@@ -415,7 +415,7 @@ test_that("Classifier Save Total Model TF", {
 test_that("Classifier Load Total Model TF", {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
-    model_dir = testthat::test_path("tmp_full_models/",classifier$get_model_info()$model_name)
+    model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")
