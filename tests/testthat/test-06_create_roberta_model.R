@@ -27,6 +27,10 @@ test_that("create_roberta_model", {
     intermediate_size=1024,
     hidden_act="gelu",
     hidden_dropout_prob=0.1,
+    sustain_track=TRUE,
+    sustain_iso_code = "DEU",
+    sustain_region = NULL,
+    sustain_interval = 15,
     trace=FALSE))
 
   expect_no_error(

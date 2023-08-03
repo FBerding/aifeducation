@@ -34,6 +34,7 @@ Other Auxiliary Functions:
 \code{\link{get_stratified_train_test_split}()},
 \code{\link{get_synthetic_cases}()},
 \code{\link{get_train_test_split}()},
-\code{\link{split_labeled_unlabeled}()}
+\code{\link{split_labeled_unlabeled}()},
+\code{\link{summarize_tracked_sustainability}()}
 }
 \concept{Auxiliary Functions}

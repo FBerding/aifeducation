@@ -14,7 +14,7 @@ the python libraries 'transformers' and 'tokenizers'."><!-- mathjax --><script s
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +71,10 @@ the python libraries 'transformers' and 'tokenizers'.</p>
 <span>  intermediate_size <span class="op">=</span> <span class="fl">3072</span>,</span>
 <span>  hidden_act <span class="op">=</span> <span class="st">"gelu"</span>,</span>
 <span>  hidden_dropout_prob <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -123,7 +127,29 @@ the attention mechanism.</p></dd>
 
 
 <dt>hidden_dropout_prob</dt>
-<dd><p><code>double</code> Ratio of dropout</p></dd>
+<dd><p><code>double</code> Ratio of dropout.</p></dd>
+
+
+<dt>sustain_track</dt>
+<dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked
+during training via the python library codecarbon.</p></dd>
+
+
+<dt>sustain_iso_code</dt>
+<dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable
+must be set if sustainability should be tracked. A list can be found on
+Wikipedia: <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>.</p></dd>
+
+
+<dt>sustain_region</dt>
+<dd><p>Region within a country. Only available for USA and
+Canada See the documentation of codecarbon for more information.
+<a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a></p></dd>
+
+
+<dt>sustain_interval</dt>
+<dd><p><code>integer</code> Interval in seconds for measuring power
+usage.</p></dd>
 
 
 <dt>trace</dt>

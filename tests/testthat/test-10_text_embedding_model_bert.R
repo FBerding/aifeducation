@@ -33,6 +33,7 @@ bert_modeling<-TextEmbeddingModel$new(
   model_dir=testthat::test_path(tmp_path))
 
 model_name=bert_modeling$get_model_info()$model_name
+model_name_root=bert_modeling$get_model_info()$model_name_root
 
 test_that("creation_bert", {
   expect_s3_class(bert_modeling,
@@ -201,7 +202,7 @@ test_that("BERT Load Total Model H5", {
                   class="TextEmbeddingModel")
 })
 
-test_that("BERT Save Total Model TF", {
+test_that("BERT Save Total Model TF with ID", {
   expect_no_error(
     save_ai_model(model=bert_modeling,
                   model_dir = testthat::test_path("tmp_full_models"),
@@ -209,11 +210,38 @@ test_that("BERT Save Total Model TF", {
   )
 })
 
-test_that("BERT Load Total Model TF", {
+test_that("BERT Load Total Model TF with ID", {
   bert_modeling<-NULL
   bert_modeling<-load_ai_model(
     model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
   )
   expect_s3_class(bert_modeling,
                   class="TextEmbeddingModel")
+})
+
+test_that("BERT Save Total Model TF without ID", {
+  expect_no_error(
+    save_ai_model(model=bert_modeling,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "tf",
+                  append_ID = FALSE)
+  )
+})
+
+test_that("BERT Load Total Model TF without ID", {
+  bert_modeling<-NULL
+  bert_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name_root))
+  )
+  expect_s3_class(bert_modeling,
+                  class="TextEmbeddingModel")
+})
+
+test_that("Sustainability Data Loaded", {
+  bert_modeling<-NULL
+  bert_modeling<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name_root))
+  )
+  sustain_data<-bert_modeling$get_sustainability_data()
+  expect_equal(nrow(sustain_data),2)
 })

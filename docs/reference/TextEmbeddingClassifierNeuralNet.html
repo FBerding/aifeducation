@@ -12,7 +12,7 @@ tensorflow"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -183,6 +183,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-save_model"><code>TextEmbeddingClassifierNeuralNet$save_model()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-load_model"><code>TextEmbeddingClassifierNeuralNet$load_model()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_package_versions"><code>TextEmbeddingClassifierNeuralNet$get_package_versions()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingClassifierNeuralNet-get_sustainability_data"><code>TextEmbeddingClassifierNeuralNet$get_sustainability_data()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingClassifierNeuralNet-clone"><code>TextEmbeddingClassifierNeuralNet$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -300,6 +301,10 @@ tensorflow.</p><div class="section">
 <span>  bpl_weight_inc <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  bpl_weight_start <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  bpl_model_reset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
 <span>  <span class="va">dir_checkpoint</span>,</span>
@@ -422,6 +427,28 @@ unlabeled cases.</p></dd>
 step.</p></dd>
 
 
+<dt><code>sustain_track</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked
+during training via the python library codecarbon.</p></dd>
+
+
+<dt><code>sustain_iso_code</code></dt>
+<dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable
+must be set if sustainability should be tracked. A list can be found on
+Wikipedia: <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>.</p></dd>
+
+
+<dt><code>sustain_region</code></dt>
+<dd><p>Region within a country. Only available for USA and
+Canada See the documentation of codecarbon for more information.
+<a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a></p></dd>
+
+
+<dt><code>sustain_interval</code></dt>
+<dd><p><code>integer</code> Interval in seconds for measuring power
+usage.</p></dd>
+
+
 <dt><code>epochs</code></dt>
 <dd><p><code>int</code> Number of training epochs.</p></dd>
 
@@ -442,9 +469,9 @@ phase should be printed to the console.</p></dd>
 
 
 <dt><code>keras_trace</code></dt>
-<dd><p><code>int</code> <code>keras_trace=0</code> does not cat any
+<dd><p><code>int</code> <code>keras_trace=0</code> does not print any
 information about the training process from keras on the console.
-<code>keras_trace=1</code> cat a progress bar. <code>keras_trace=2</code> prints
+<code>keras_trace=1</code> prints a progress bar. <code>keras_trace=2</code> prints
 one line of information for every epoch.</p></dd>
 
 
@@ -713,7 +740,8 @@ saved.</p></dd>
 
 <dt><code>save_format</code></dt>
 <dd><p>Format for saving the model. <code>"tf"</code> for SavedModel
-or <code>"h5"</code> for HDF5.</p></dd>
+or <code>"h5"</code> for HDF5.
+#'</p></dd>
 
 
 </dl><p></p></div>
@@ -751,10 +779,25 @@ versions used for creating the classifier.</p><div class="section">
 R and python packages.</p>
 </div>
 
+</div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-get_sustainability_data"></a><div class="section">
+<h3 id="method-get-sustainability-data-">Method <code>get_sustainability_data()</code><a class="anchor" aria-label="anchor" href="#method-get-sustainability-data-"></a></h3>
+<p>Method for requesting a summary of tracked energy consumption
+during training and an estimate of the resulting CO2 equivalents in kg.</p><div class="section">
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
+<p>Returns a <code>list</code> containing the tracked energy consumption,
+CO2 equivalents in kg, information on the tracker used, and technical
+information on the training infrastructure.</p>
+</div>
+
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

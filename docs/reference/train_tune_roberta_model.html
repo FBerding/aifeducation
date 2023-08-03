@@ -14,7 +14,7 @@ based on BERT architecture with the help of the python libraries 'transformers',
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,12 @@ based on BERT architecture with the help of the python libraries 'transformers',
 <span>  learning_rate <span class="op">=</span> <span class="fl">0.03</span>,</span>
 <span>  n_workers <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  multi_process <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  keras_trace <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -124,9 +129,38 @@ validation.</p></dd>
 <dd><p><code>bool</code> <code>TRUE</code> if multiple processes should be activated.</p></dd>
 
 
+<dt>sustain_track</dt>
+<dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked
+during training via the python library codecarbon.</p></dd>
+
+
+<dt>sustain_iso_code</dt>
+<dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable
+must be set if sustainability should be tracked. A list can be found on
+Wikipedia: <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>.</p></dd>
+
+
+<dt>sustain_region</dt>
+<dd><p>Region within a country. Only available for USA and
+Canada See the documentation of codecarbon for more information.
+<a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a></p></dd>
+
+
+<dt>sustain_interval</dt>
+<dd><p><code>integer</code> Interval in seconds for measuring power
+usage.</p></dd>
+
+
 <dt>trace</dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information on the progress should be printed
 to the console.</p></dd>
+
+
+<dt>keras_trace</dt>
+<dd><p><code>int</code> <code>keras_trace=0</code> does not print any
+information about the training process from keras on the console.
+<code>keras_trace=1</code> prints a progress bar. <code>keras_trace=2</code> prints
+one line of information for every epoch.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -12,7 +12,8 @@ install_py_modules<-function(envname="aifeducation"){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
-                      "torch")
+                      "torch",
+                      "codecarbon")
 
   reticulate::conda_create(
     envname = envname,
@@ -53,7 +54,8 @@ check_aif_py_modules<-function(trace=TRUE){
                       "datasets",
                       "torch",
                       "keras",
-                      "tensorflow")
+                      "tensorflow",
+                      "codecarbon")
   matrix_overview=matrix(data=NA,
                          nrow = length(relevant_modules),
                          ncol= 2)

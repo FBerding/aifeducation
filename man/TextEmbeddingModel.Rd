@@ -36,6 +36,7 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-get_basic_components}{\code{TextEmbeddingModel$get_basic_components()}}
 \item \href{#method-TextEmbeddingModel-get_bow_components}{\code{TextEmbeddingModel$get_bow_components()}}
 \item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
+\item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
@@ -503,6 +504,22 @@ necessary for transformer models.
 
 \subsection{Returns}{
 Returns a \code{list}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_sustainability_data"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_sustainability_data}{}}}
+\subsection{Method \code{get_sustainability_data()}}{
+Method for requesting a log of tracked energy consumption
+during training and an estimate of the resulting CO2 equivalents in kg.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_sustainability_data()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{matrix} containing the tracked energy consumption,
+CO2 equivalents in kg, information on the tracker used, and technical
+information on the training infrastructure for every training run.
 }
 }
 \if{html}{\out{<hr>}}

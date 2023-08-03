@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -487,7 +487,11 @@ this:</p>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">sustain_track=</span><span class="cn">TRUE</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>    <span class="at">sustain_iso_code=</span><span class="st">"DEU"</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>    <span class="at">sustain_region=</span><span class="cn">NULL</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>    <span class="at">sustain_interval=</span><span class="dv">15</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved. Furthermore, you must
 provide raw texts. These texts are <strong>not</strong> used for
@@ -517,6 +521,18 @@ Cohan 2020). For long documents you can use another architecture of BERT
 document into several chunks which are used sequentially for
 classification (e.g., Pappagari et al. 2019). Using chunks is supported
 by <em>aifedcuation</em>.</p>
+<p>Since creating a transformer model is energy consuming
+<em>aifeducation</em> allows you to estimate its ecological impact with
+help of the python library <code>codecarbon</code>. Thus,
+<code>sustain_track</code> is set to <code>TRUE</code> by default. If
+you use the sustainability tracker you must provide the alpha-3 code for
+the country where your computer is located (e.g., “CAN”=“Canada”,
+“Deu”=“Germany”). A list with the codes can be found on <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3" class="external-link">wikipedia</a>.
+The reason is that different countries use different sources and
+techniques for generating their energy resulting in a specific impact on
+CO2 emissions. For USA and Canada you can additionally specify a region
+by setting <code>sustain_region</code>. Please refer to the
+documentation of codecarbon for more information.</p>
 <p>After calling the function, you will find your new model in your
 model directory. The next step is to train your model by calling
 <code><a href="../reference/train_tune_bert_model.html">train_tune_bert_model()</a></code>.</p>
@@ -534,6 +550,10 @@ model directory. The next step is to train your model by calling
 <span>  chunk_size<span class="op">=</span><span class="fl">250</span>,</span>
 <span>  n_workers<span class="op">=</span><span class="fl">1</span>,</span>
 <span>  multi_process<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>  sustain_track<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>  sustain_iso_code<span class="op">=</span><span class="st">"DEU"</span>,</span>
+<span>  sustain_region<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>  sustain_interval<span class="op">=</span><span class="fl">15</span>,</span>
 <span>  trace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Here it is important that you provide the path to the directory where
 your new transformer is stored. Furthermore, it is important that you
@@ -548,6 +568,9 @@ Thus, tokens and words are not forced to match each other directly).
 With <code>p_mask</code> you can determine how many tokens should be
 masked. Finally, with <code>val_size</code>, you set how many chunks
 should be used for the validation sample.</p>
+<p>Please remember to set the correct alpha-3 code for tracking the
+ecological impact of training your model
+(<code>sustain_iso_code</code>).</p>
 <p>If you work on a machine and your graphic device only has small
 memory, please reduce the batch size significantly. We also recommend to
 change the usage of memory with
@@ -950,6 +973,10 @@ more realistic estimation of a classifier`s performance.</p>
 <span>   bpl_model_reset<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>   epochs<span class="op">=</span><span class="fl">30</span>,</span>
 <span>   batch_size<span class="op">=</span><span class="fl">8</span>,</span>
+<span>   sustain_track<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>   sustain_iso_code<span class="op">=</span><span class="st">"DEU"</span>,</span>
+<span>   sustain_region<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>   sustain_interval<span class="op">=</span><span class="fl">15</span>,</span>
 <span>   trace<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>   view_metrics<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>   keras_trace<span class="op">=</span><span class="fl">0</span>,</span>
@@ -1078,6 +1105,18 @@ classifier predicts the potential labels of <em>all</em> originally
 unlabeled data and adds 40% of the pseudo-labeled data to the training
 data. The model is again re-initialized and trained again until all
 unlabeled data is used for training.</p>
+<p>Since training a neural net is energy consuming <em>aifeducation</em>
+allows you to estimate its ecological impact with help of the python
+library <code>codecarbon</code>. Thus, <code>sustain_track</code> is set
+to <code>TRUE</code> by default. If you use the sustainability tracker
+you must provide the alpha-3 code for the country where your computer is
+located (e.g., “CAN”=“Canada”, “Deu”=“Germany”). A list with the codes
+can be found on <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3" class="external-link">wikipedia</a>.
+The reason is that different countries use different sources and
+techniques for generating their energy resulting in a specific impact on
+CO2 emissions. For USA and Canada you can additionally specify a region
+by setting <code>sustain_region</code>. Please refer to the
+documentation of codecarbon for more information.</p>
 <p>Finally, <code>trace</code>, <code>view_metrics</code>, and
 <code>keras_trace</code> allow you to control how much information about
 the training progress is printed to the console. Please note that

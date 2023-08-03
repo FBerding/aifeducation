@@ -4,6 +4,7 @@ transformers<-NULL
 datasets<-NULL
 tok<-NULL
 np<-NULL
+codecarbon<-NULL
 
 .onLoad<-function(libname, pkgname){
   # use superassignment to update the global reference
@@ -13,6 +14,7 @@ np<-NULL
   np<<-reticulate::import("numpy", delay_load = TRUE)
   tf<<-reticulate::import("tensorflow", delay_load = TRUE)
   os<<-reticulate::import("os", delay_load = TRUE)
+  codecarbon<<-reticulate::import("codecarbon", delay_load = TRUE)
 }
 
 

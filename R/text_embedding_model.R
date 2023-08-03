@@ -52,6 +52,12 @@ TextEmbeddingModel<-R6::R6Class(
       model_version=NA,
       model_language=NA
     ),
+
+    sustainability=list(
+      sustainability_tracked=FALSE,
+      track_log=NA
+    ),
+
     publication_info=list(
       developed_by=list(
         authors=NULL,
@@ -226,6 +232,17 @@ TextEmbeddingModel<-R6::R6Class(
         private$transformer_components$chunks<-chunks
         private$transformer_components$overlap<-overlap
         private$transformer_components$aggregation<-aggregation
+
+        sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
+        if(file.exists(sustainability_datalog_path)){
+          tmp_sustainability_data<-read.csv(sustainability_datalog_path)
+          private$sustainability$sustainability_tracked=TRUE
+          private$sustainability$track_log=tmp_sustainability_data
+        } else {
+          private$sustainability$sustainability_tracked=FALSE
+          private$sustainability$track_log=NA
+        }
+
         #------------------------------------------------------------------------
       } else if(private$basic_components$method=="glove_cluster"){
         glove <- text2vec::GlobalVectors$new(rank = bow_n_dim,
@@ -391,23 +408,35 @@ TextEmbeddingModel<-R6::R6Class(
     #'@description Method for loading a transformers model into R.
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
+    #'
+    #'@importFrom utils read.csv
     load_model=function(model_dir){
-        model_dir<-paste0(model_dir,"/","model_data")
-
+        model_dir_main<-paste0(model_dir,"/","model_data")
         if(private$basic_components$method=="bert" |
            private$basic_components$method=="roberta" |
            private$basic_components$method=="longformer"){
 
           if(private$basic_components$method=="bert"){
-            private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
-            private$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir)
+            private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir_main)
+            private$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir_main)
           } else if(private$basic_components$method=="roberta"){
-            private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
-            private$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir)
+            private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir_main)
+            private$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_main)
           } else if(private$basic_components$method=="longformer"){
-            private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
-            private$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir)
+            private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir_main)
+            private$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir_main)
           }
+
+          sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
+          if(file.exists(sustainability_datalog_path)){
+            tmp_sustainability_data<-read.csv(sustainability_datalog_path)
+            private$sustainability$sustainability_tracked=TRUE
+            private$sustainability$track_log=tmp_sustainability_data
+          } else {
+            private$sustainability$sustainability_tracked=FALSE
+            private$sustainability$track_log=NA
+          }
+
       } else {
         message("Method only relevant for transformer models.")
       }
@@ -416,6 +445,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'only for transformer models.
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
+    #'
+    #'@importFrom utils write.csv
     save_model=function(model_dir){
       if(private$basic_components$method=="bert" |
          private$basic_components$method=="roberta" |
@@ -430,6 +461,15 @@ TextEmbeddingModel<-R6::R6Class(
 
       private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path)
       private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+
+      #Saving Sustainability Data
+      sustain_matrix=private$sustainability$track_log
+      write.csv(
+        x=sustain_matrix,
+        file=paste0(model_dir,"/","sustainability.csv"),
+        row.names = FALSE
+      )
+
       } else {
         message("Method only relevant for transformer models.")
       }
@@ -986,6 +1026,14 @@ TextEmbeddingModel<-R6::R6Class(
           private$transformer_components$overlap,
         )
       )
+    },
+    #'@description Method for requesting a log of tracked energy consumption
+    #'during training and an estimate of the resulting CO2 equivalents in kg.
+    #'@return Returns a \code{matrix} containing the tracked energy consumption,
+    #'CO2 equivalents in kg, information on the tracker used, and technical
+    #'information on the training infrastructure for every training run.
+    get_sustainability_data=function(){
+      return(private$sustainability$track_log)
     }
   )
 )
@@ -1104,7 +1152,7 @@ EmbeddedText<-R6::R6Class(
     #--------------------------------------------------------------------------
     #'@description Method for retrieving the label of the model that
     #'generated this embedding.
-    #'@return \code{string} Lable of the corresponding text embedding model
+    #'@return \code{string} Label of the corresponding text embedding model
     get_model_label=function(){
       return(private$model_label)
     }

@@ -219,7 +219,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       #Setting Label and Name
       private$model_info$model_name_root=name
-      private$model_info$model_name=paste0(private$model_info$model_name_root,"_id_",generate_id(16))
+      private$model_info$model_name=paste0(private$model_info$model_name_root,"_ID_",generate_id(16))
       private$model_info$model_label=label
 
       #Basic Information of Input and Target Data
@@ -541,6 +541,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'should be increased for the cases with pseudo-labels in every step.
     #'@param bpl_weight_start \code{dobule} Starting value for the weights of the
     #'unlabeled cases.
+    #'@param sustain_track \code{bool} If \code{TRUE} energy consumption is tracked
+    #'during training via the python library codecarbon.
+    #'@param sustain_iso_code \code{string} ISO code (Alpha-3-Code) for the country. This variable
+    #'must be set if sustainability should be tracked. A list can be found on
+    #'Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.
+    #'@param sustain_region Region within a country. Only available for USA and
+    #'Canada See the documentation of codecarbon for more information.
+    #'\url{https://mlco2.github.io/codecarbon/parameters.html}
+    #'@param sustain_interval \code{integer} Interval in seconds for measuring power
+    #'usage.
     #'@param epochs \code{int} Number of training epochs.
     #'@param batch_size \code{int} Size of batches.
     #'@param dir_checkpoint \code{string} Path to the directory where
@@ -548,9 +558,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'exist, it is created.
     #'@param trace \code{bool} \code{TRUE}, if information about the estimation
     #'phase should be printed to the console.
-    #'@param keras_trace \code{int} \code{keras_trace=0} does not cat any
+    #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
     #'information about the training process from keras on the console.
-    #'\code{keras_trace=1} cat a progress bar. \code{keras_trace=2} prints
+    #'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
     #'one line of information for every epoch.
     #'@param n_cores \code{int} Number of cores used for creating synthetic units.
     #'@details \itemize{
@@ -586,6 +596,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    bpl_weight_inc=0.02,
                    bpl_weight_start=0.00,
                    bpl_model_reset=FALSE,
+                   sustain_track=TRUE,
+                   sustain_iso_code=NULL,
+                   sustain_region=NULL,
+                   sustain_interval=15,
                    epochs=40,
                    batch_size=32,
                    dir_checkpoint,
@@ -594,6 +608,24 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    n_cores=2){
 
       start_time=Sys.time()
+
+      #Start Sustainability Tracking
+      if(sustain_track==TRUE){
+        if(is.null(sustain_iso_code)==TRUE){
+          stop("Sustainability tracking is activated but iso code for the
+               country is missing. Add iso code or deactivate tracking.")
+        }
+        sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
+          country_iso_code=sustain_iso_code,
+          region=sustain_region,
+          tracking_mode="machine",
+          log_level="warning",
+          measure_power_secs=sustain_interval,
+          save_to_file=FALSE,
+          save_to_api=FALSE
+        )
+        sustainability_tracker$start()
+      }
 
       #Set Up Parallel Execution
       if(use_bsc==TRUE){
@@ -1651,6 +1683,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         parallel::stopCluster(cl)
       }
 
+      if(sustain_track==TRUE){
+        sustainability_tracker$stop()
+        private$sustainability<-summarize_tracked_sustainability(sustainability_tracker)
+      }
+
       if(trace==TRUE){
         cat(paste(date(),
                     "Training Complete","\n"))
@@ -1877,6 +1914,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'saved.
     #'@param save_format Format for saving the model. \code{"tf"} for SavedModel
     #'or \code{"h5"} for HDF5.
+    #'#'
+    #'@importFrom utils write.csv
      save_model=function(dir_path,save_format="tf"){
        if(save_format=="tf"){
          extension=".tf"
@@ -1892,6 +1931,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
        }
 
        self$model$save(file_path)
+
+       #Saving Sustainability Data
+       sustain_matrix=t(as.matrix(unlist(private$sustainability)))
+       write.csv(
+         x=sustain_matrix,
+         file=paste0(file_path,"/","sustainability.csv"),
+         row.names = FALSE
+       )
     },
     #'@description Method for importing a model from in tensorflow SavedModel format
     #'or h5 format.
@@ -1907,9 +1954,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       } else {
         self$model<-tf$keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
       }
-
-
     },
+    #---------------------------------------------------------------------------
     #'@description Method for requesting a summary of the R and python packages'
     #'versions used for creating the classifier.
     #'@return Returns a \code{list} containing the versions of the relevant
@@ -1919,6 +1965,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         list(private$r_package_versions,
              private$py_package_versions)
       )
+    },
+    #---------------------------------------------------------------------------
+    #'@description Method for requesting a summary of tracked energy consumption
+    #'during training and an estimate of the resulting CO2 equivalents in kg.
+    #'@return Returns a \code{list} containing the tracked energy consumption,
+    #'CO2 equivalents in kg, information on the tracker used, and technical
+    #'information on the training infrastructure.
+    get_sustainability_data=function(){
+      return(private$sustainability)
     }
   ),
   private = list(
@@ -1960,10 +2015,42 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       smotefamily=NA,
       reticulate=NA
     ),
+
     py_package_versions=list(
       tensorflow=NA,
       numpy=NA
     ),
+
+    sustainability=list(
+      sustainability_tracked=FALSE,
+      date=NA,
+      sustainability_data=list(
+        duration_sec=NA,
+        co2eq_kg=NA,
+        cpu_energy_kwh=NA,
+        gpu_energy_kwh=NA,
+        ram_energy_kwh=NA,
+        total_energy_kwh=NA
+      ),
+      technical=list(
+        tracker=NA,
+        py_package_version=NA,
+
+        cpu_count=NA,
+        cpu_model=NA,
+
+        gpu_count=NA,
+        gpu_model=NA,
+
+        ram_total_size=NA
+      ),
+      region=list(
+        country_name=NA,
+        country_iso_code=NA,
+        region=NA
+      )
+    ),
+
     #Training Process----------------------------------------------------------
     init_weights=NULL,
     #--------------------------------------------------------------------------
@@ -2105,6 +2192,40 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       self$model_config$input_variables<-variable_name_order
       self$model_config$target_levels<-target_levels_order
       self$last_training$history<-train_results
+    },
+    #--------------------------------------------------------------------------
+    #Method for summarizing sustainability data for this classifier
+    #List for results must correspond to the private fields of the classifier
+    summarize_tracked_sustainability=function(sustainability_tracker){
+
+      results<-list(
+        sustainability_tracked=TRUE,
+        sustainability_data=list(
+          co2eq_kg=sustainability_tracker$final_emissions_data$emissions,
+          cpu_energy_kwh=sustainability_tracker$final_emissions_data$cpu_energy,
+          gpu_energy_kwh=sustainability_tracker$final_emissions_data$gpu_energy,
+          ram_energy_kwh=sustainability_tracker$final_emissions_data$ram_energy,
+          total_energy_kwh=sustainability_tracker$final_emissions_data$energy_consumed
+        ),
+        technical=list(
+          tracker="codecarbon",
+          py_package_version=codecarbon$"__version__",
+
+          cpu_count=sustainability_tracker$final_emissions_data$cpu_count,
+          cpu_model=sustainability_tracker$final_emissions_data$cpu_model,
+
+          gpu_count=sustainability_tracker$final_emissions_data$gpu_count,
+          gpu_model=sustainability_tracker$final_emissions_data$gpu_model,
+
+          ram_total_size=sustainability_tracker$final_emissions_data$ram_total_size
+        ),
+        region=list(
+          country_name=sustainability_tracker$final_emissions_data$country_name,
+          country_iso_code=sustainability_tracker$final_emissions_data$country_iso_code,
+          region=sustainability_tracker$final_emissions_data$region
+        )
+      )
+      return(results)
     }
   )
 )

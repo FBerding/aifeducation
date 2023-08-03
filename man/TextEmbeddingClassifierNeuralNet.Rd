@@ -135,6 +135,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-save_model}{\code{TextEmbeddingClassifierNeuralNet$save_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-load_model}{\code{TextEmbeddingClassifierNeuralNet$load_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_package_versions}{\code{TextEmbeddingClassifierNeuralNet$get_package_versions()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_sustainability_data}{\code{TextEmbeddingClassifierNeuralNet$get_sustainability_data()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-clone}{\code{TextEmbeddingClassifierNeuralNet$clone()}}
 }
 }
@@ -233,6 +234,10 @@ tensorflow.
   bpl_weight_inc = 0.02,
   bpl_weight_start = 0,
   bpl_model_reset = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
   epochs = 40,
   batch_size = 32,
   dir_checkpoint,
@@ -314,6 +319,20 @@ unlabeled cases.}
 \item{\code{bpl_model_reset}}{\code{bool} If \code{TRUE}, model is re-initialized at every
 step.}
 
+\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked
+during training via the python library codecarbon.}
+
+\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable
+must be set if sustainability should be tracked. A list can be found on
+Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+
+\item{\code{sustain_region}}{Region within a country. Only available for USA and
+Canada See the documentation of codecarbon for more information.
+\url{https://mlco2.github.io/codecarbon/parameters.html}}
+
+\item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power
+usage.}
+
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 
 \item{\code{batch_size}}{\code{int} Size of batches.}
@@ -325,9 +344,9 @@ exist, it is created.}
 \item{\code{trace}}{\code{bool} \code{TRUE}, if information about the estimation
 phase should be printed to the console.}
 
-\item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not cat any
+\item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not print any
 information about the training process from keras on the console.
-\code{keras_trace=1} cat a progress bar. \code{keras_trace=2} prints
+\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
 one line of information for every epoch.}
 
 \item{\code{n_cores}}{\code{int} Number of cores used for creating synthetic units.}
@@ -588,7 +607,8 @@ or h5 format.
 saved.}
 
 \item{\code{save_format}}{Format for saving the model. \code{"tf"} for SavedModel
-or \code{"h5"} for HDF5.}
+or \code{"h5"} for HDF5.
+#'}
 }
 \if{html}{\out{</div>}}
 }
@@ -625,6 +645,22 @@ versions used for creating the classifier.
 \subsection{Returns}{
 Returns a \code{list} containing the versions of the relevant
 R and python packages.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_sustainability_data"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_sustainability_data}{}}}
+\subsection{Method \code{get_sustainability_data()}}{
+Method for requesting a summary of tracked energy consumption
+during training and an estimate of the resulting CO2 equivalents in kg.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_sustainability_data()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list} containing the tracked energy consumption,
+CO2 equivalents in kg, information on the tracker used, and technical
+information on the training infrastructure.
 }
 }
 \if{html}{\out{<hr>}}

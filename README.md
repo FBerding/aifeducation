@@ -18,8 +18,8 @@ educators and researchers who would like to develop their own models as
 well as persons who would like to use models created by other
 researchers/educators. The package supports the application of
 Artificial Intelligence (AI) for Natural Language Processing tasks such
-as text embedding, classification, and question answering under the
-special conditions of educational and social sciences. These are:
+as text embedding, and classification under the special conditions of
+educational and social sciences. These are:
 
 - **digital data availability:** In educational and social science, data
   is often only available in handwritten form. For example, in schools
@@ -67,6 +67,16 @@ Currently, the package focuses on classification tasks which can either
 be used to diagnose characteristics of learners from written materials
 or to estimate the properties of learning and teaching materials. In the
 future, more tasks will be implemented.
+
+## Sustainability
+
+Training AI models can be time and energy consuming. To help researchers
+in estimating the ecological impact of their work a sustainability
+tracker is implemented based on the python library codecarbon by Courty
+et al. (2023). This tracker allows to estimate the energy consumption
+for CPUs, GPUs, and RAM during training and derives a value for the CO2
+emission. This value is based on the country’s energy mix where the
+computer is located.
 
 ## Installation
 
@@ -196,6 +206,10 @@ Intelligence, 36(3), 664–684.
 Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002).
 SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial
 Intelligence Research, 16, 321–357. <https://doi.org/10.1613/jair.953>
+
+Courty, B., Schmidt, V., Goyal-Kamal, Coutarel, M., Feld, B., Lecourt,
+J., & … (2023). mlco2/codecarbon: v2.2.7.
+<https://doi.org/10.5281/zenodo.8181237>
 
 Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
 Pre-training of Deep Bidirectional Transformers for Language

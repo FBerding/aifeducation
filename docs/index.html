@@ -54,7 +54,7 @@
     
     <a class="navbar-brand me-2" href="index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The R package <em>Artificial Intelligence for Education (aifeducation)</em> is designed for the special needs of educators, educational researchers, and social researchers. The target audience of this package are educators and researchers who would like to develop their own models as well as persons who would like to use models created by other researchers/educators. The package supports the application of Artificial Intelligence (AI) for Natural Language Processing tasks such as text embedding, classification, and question answering under the special conditions of educational and social sciences. These are:</p>
+<p>The R package <em>Artificial Intelligence for Education (aifeducation)</em> is designed for the special needs of educators, educational researchers, and social researchers. The target audience of this package are educators and researchers who would like to develop their own models as well as persons who would like to use models created by other researchers/educators. The package supports the application of Artificial Intelligence (AI) for Natural Language Processing tasks such as text embedding, and classification under the special conditions of educational and social sciences. These are:</p>
 <ul>
 <li>
 <strong>digital data availability:</strong> In educational and social science, data is often only available in handwritten form. For example, in schools or universities, students and pupils often solve tasks by creating handwritten documents. Thus, educators and researchers first have to transform analogue data into a digital form, involving human actions. This makes data generation financially expensive and time-consuming, leading to <em>small data sets</em>.</li>
@@ -108,6 +108,11 @@
 <strong>imbalanced data:</strong> Finally, data in the educational and social sciences often occurs in an imbalanced pattern as several empirical studies show (Bloemen 2011; Stütz et al. 2022). Imbalanced means that some categories or characteristics of a data set have very high absolute frequencies compared to other categories and characteristics. Imbalance during AI training guides algorithms to focus and prioritize the categories and characteristics with high absolute frequencies, increasing the risk to miss categories/characteristics with low frequencies (Haixiang et al. 2017). This can lead AI to prefer special groups of people/materials, imply false recommendations and conclusions, or to miss rare categories or characteristics.</li>
 </ul>
 <p>Currently, the package focuses on classification tasks which can either be used to diagnose characteristics of learners from written materials or to estimate the properties of learning and teaching materials. In the future, more tasks will be implemented.</p>
+<div class="section level2">
+<h2 id="sustainability">Sustainability<a class="anchor" aria-label="anchor" href="#sustainability"></a>
+</h2>
+<p>Training AI models can be time and energy consuming. To help researchers in estimating the ecological impact of their work a sustainability tracker is implemented based on the python library codecarbon by Benoit et al. (2023). This tracker allows to estimate the energy consumption for CPUs, GPUs, and RAM during training and derives a value for the CO2 emission based on the country’s energy mix where the computer is located.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -171,6 +176,7 @@ with performance measures they are more familiar with, every AI trained with thi
 <p>Bloemen, A. (2011). Lernaufgaben in Schulbüchern der Wirtschaftslehre: Analyse, Konstruktion und Evaluation von Lernaufgaben für die Lernfelder industrieller Geschäftsprozesse. Hampp.</p>
 <p>Bunkhumpornpat, C., Sinapiromsaran, K., &amp; Lursinsap, C. (2012). DBSMOTE: Density-Based Synthetic Minority Over-sampling Technique. Applied Intelligence, 36(3), 664–684. <a href="https://doi.org/10.1007/s10489-011-0287-y" class="external-link uri">https://doi.org/10.1007/s10489-011-0287-y</a></p>
 <p>Chawla, N. V., Bowyer, K. W., Hall, L. O., &amp; Kegelmeyer, W. P. (2002). SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial Intelligence Research, 16, 321–357. <a href="https://doi.org/10.1613/jair.953" class="external-link uri">https://doi.org/10.1613/jair.953</a></p>
+<p>Courty, B., Schmidt, V., Goyal-Kamal, Coutarel, M., Feld, B., Lecourt, J., &amp; … (2023). mlco2/codecarbon: v2.2.7. <a href="https://doi.org/10.5281/zenodo.8181237" class="external-link uri">https://doi.org/10.5281/zenodo.8181237</a></p>
 <p>Devlin, J., Chang, M.‑W., Lee, K., &amp; Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. Doran, &amp; T. Solorio (Eds.), Proceedings of the 2019 Conference of the North (pp. 4171–4186). Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/N19-1423" class="external-link uri">https://doi.org/10.18653/v1/N19-1423</a></p>
 <p>Gruber, N., &amp; Kreuzpointner, L. (2013). Measuring the reliability of picture story exercises like the TAT. PloS One, 8(11), e79450. <a href="https://doi.org/10.1371/journal.pone.0079450" class="external-link uri">https://doi.org/10.1371/journal.pone.0079450</a></p>
 <p>Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive guide to measuring the extent of agreement among raters (Fourth edition). STATAXIS.</p>

@@ -19,7 +19,19 @@
 #'@param intermediate_size \code{int} Number of neurons in the intermediate layer of
 #'the attention mechanism.
 #'@param hidden_act \code{string} name of the activation function.
-#'@param hidden_dropout_prob \code{double} Ratio of dropout
+#'@param hidden_dropout_prob \code{double} Ratio of dropout.
+#'
+#'@param sustain_track \code{bool} If \code{TRUE} energy consumption is tracked
+#'during training via the python library codecarbon.
+#'@param sustain_iso_code \code{string} ISO code (Alpha-3-Code) for the country. This variable
+#'must be set if sustainability should be tracked. A list can be found on
+#'Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.
+#'@param sustain_region Region within a country. Only available for USA and
+#'Canada See the documentation of codecarbon for more information.
+#'\url{https://mlco2.github.io/codecarbon/parameters.html}
+#'@param sustain_interval \code{integer} Interval in seconds for measuring power
+#'usage.
+#'
 #'@param trace \code{bool} \code{TRUE} if information about the progress should be
 #'printed to the console.
 #'@return This function does not return an object. Instead the configuration
@@ -51,6 +63,10 @@ create_roberta_model<-function(
     intermediate_size=3072,
     hidden_act="gelu",
     hidden_dropout_prob=0.1,
+    sustain_track=TRUE,
+    sustain_iso_code=NULL,
+    sustain_region=NULL,
+    sustain_interval=15,
     trace=TRUE){
 
   #argument checking-----------------------------------------------------------
@@ -64,6 +80,24 @@ create_roberta_model<-function(
 
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
     stop("hidden_act must be gelu, relu, silu or gelu_new")
+  }
+
+  #Start Sustainability Tracking
+  if(sustain_track==TRUE){
+    if(is.null(sustain_iso_code)==TRUE){
+      stop("Sustainability tracking is activated but iso code for the
+               country is missing. Add iso code or deactivate tracking.")
+    }
+    sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
+      country_iso_code=sustain_iso_code,
+      region=sustain_region,
+      tracking_mode="machine",
+      log_level="warning",
+      measure_power_secs=sustain_interval,
+      save_to_file=FALSE,
+      save_to_api=FALSE
+    )
+    sustainability_tracker$start()
   }
 
   #Creating a new Tokenizer for Computing Vocabulary
@@ -85,7 +119,9 @@ create_roberta_model<-function(
   }
 
   if(dir.exists(model_dir)==FALSE){
-    cat(paste(date(),"Creating Model Directory","\n"))
+    if(trace==TRUE){
+      cat(paste(date(),"Creating Model Directory","\n"))
+    }
     dir.create(model_dir)
   }
 
@@ -136,6 +172,24 @@ create_roberta_model<-function(
                 "Saving Tokenizer Model","\n"))
   }
   tokenizer$save_pretrained(model_dir)
+
+  #Stop Sustainability Tracking if requested
+  if(sustain_track==TRUE){
+    sustainability_tracker$stop()
+    sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
+    sustain_matrix=t(as.matrix(unlist(sustainability_data)))
+
+    if(trace==TRUE){
+      cat(paste(date(),
+                "Saving Sustainability Data","\n"))
+    }
+
+    write.csv(
+      x=sustain_matrix,
+      file=paste0(model_dir,"/sustainability.csv"),
+      row.names = FALSE)
+  }
+
   if(trace==TRUE){
     cat(paste(date(),
                 "Done","\n"))
@@ -164,8 +218,24 @@ create_roberta_model<-function(
 #'@param learning_rate \code{bool} Learning rate for adam optimizer.
 #'@param n_workers \code{int} Number of workers.
 #'@param multi_process \code{bool} \code{TRUE} if multiple processes should be activated.
+#'
+#'@param sustain_track \code{bool} If \code{TRUE} energy consumption is tracked
+#'during training via the python library codecarbon.
+#'@param sustain_iso_code \code{string} ISO code (Alpha-3-Code) for the country. This variable
+#'must be set if sustainability should be tracked. A list can be found on
+#'Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.
+#'@param sustain_region Region within a country. Only available for USA and
+#'Canada See the documentation of codecarbon for more information.
+#'\url{https://mlco2.github.io/codecarbon/parameters.html}
+#'@param sustain_interval \code{integer} Interval in seconds for measuring power
+#'usage.
+#'
 #'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
 #'to the console.
+#'@param keras_trace \code{int} \code{keras_trace=0} does not print any
+#'information about the training process from keras on the console.
+#'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
+#'one line of information for every epoch.
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
 #'@note Pre-Trained models which can be fine-tuned with this function are available
@@ -184,6 +254,9 @@ create_roberta_model<-function(
 #'
 #'@family Transformer
 #'
+#'@importFrom utils write.csv
+#'@importFrom utils read.csv
+#'
 #'@export
 train_tune_roberta_model=function(output_dir,
                                model_dir_path,
@@ -196,7 +269,30 @@ train_tune_roberta_model=function(output_dir,
                                learning_rate=3e-2,
                                n_workers=1,
                                multi_process=FALSE,
-                               trace=TRUE){
+                               sustain_track=TRUE,
+                               sustain_iso_code=NULL,
+                               sustain_region=NULL,
+                               sustain_interval=15,
+                               trace=TRUE,
+                               keras_trace=1){
+
+  #Start Sustainability Tracking
+  if(sustain_track==TRUE){
+    if(is.null(sustain_iso_code)==TRUE){
+      stop("Sustainability tracking is activated but iso code for the
+               country is missing. Add iso code or deactivate tracking.")
+    }
+    sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
+      country_iso_code=sustain_iso_code,
+      region=sustain_region,
+      tracking_mode="machine",
+      log_level="warning",
+      measure_power_secs=sustain_interval,
+      save_to_file=FALSE,
+      save_to_api=FALSE
+    )
+    sustainability_tracker$start()
+  }
 
   mlm_model=transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_path)
   tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir_path)
@@ -279,14 +375,16 @@ train_tune_roberta_model=function(output_dir,
   adam<-tf$keras$optimizers$Adam
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
-    cat(paste(date(),"Creating Checkpoint Directory","\n"))
+    if(trace==TRUE){
+      cat(paste(date(),"Creating Checkpoint Directory","\n"))
+    }
     dir.create(paste0(output_dir,"/checkpoints"))
   }
 
   callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
     filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
     monitor="val_loss",
-    verbose=1L,
+    verbose = as.integer(min(keras_trace,1)),
     mode="auto",
     save_best_only=TRUE,
     save_freq="epoch",
@@ -304,7 +402,8 @@ train_tune_roberta_model=function(output_dir,
                 epochs=as.integer(n_epoch),
                 workers=as.integer(n_workers),
                 use_multiprocessing=multi_process,
-                callbacks=list(callback_checkpoint))
+                callbacks=list(callback_checkpoint),
+                verbose=as.integer(keras_trace))
 
   cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
   mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
@@ -314,6 +413,40 @@ train_tune_roberta_model=function(output_dir,
 
   cat(paste(date(),"Saving Tokenizer","\n"))
   tokenizer$save_pretrained(output_dir)
+
+  #Stop Sustainability Tracking if requested
+  if(sustain_track==TRUE){
+    sustainability_tracker$stop()
+    sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
+    sustain_matrix=t(as.matrix(unlist(sustainability_data)))
+
+    if(trace==TRUE){
+      cat(paste(date(),
+                "Saving Sustainability Data","\n"))
+    }
+
+    sustainability_data_file_path_input=paste0(model_dir_path,"/sustainability.csv")
+    sustainability_data_file_path=paste0(output_dir,"/sustainability.csv")
+
+    if(file.exists(sustainability_data_file_path_input)){
+      sustainability_data_chronic<-as.matrix(read.csv(sustainability_data_file_path_input))
+      sustainability_data_chronic<-rbind(
+        sustainability_data_chronic,
+        sustain_matrix
+      )
+
+      write.csv(
+        x=sustainability_data_chronic,
+        file=sustainability_data_file_path,
+        row.names = FALSE)
+
+    } else {
+      write.csv(
+        x=sustain_matrix,
+        file=sustainability_data_file_path,
+        row.names = FALSE)
+    }
+  }
 
   cat(paste(date(),"Done","\n"))
 

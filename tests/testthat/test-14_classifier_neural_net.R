@@ -156,6 +156,8 @@ test_that("training_baseline_only", {
       bpl_weight_inc=0.02,
       bpl_weight_start=0.00,
       bpl_model_reset=FALSE,
+      sustain_track=TRUE,
+      sustain_iso_code = "DEU",
       epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/classifier"),
@@ -404,7 +406,7 @@ test_that("Classifier Load Total Model H5", {
                   class="TextEmbeddingClassifierNeuralNet")
 })
 
-test_that("Classifier Save Total Model TF", {
+test_that("Classifier Save Total Model TF with ID", {
   expect_no_error(
     save_ai_model(model=classifier,
                   model_dir = testthat::test_path("tmp_full_models"),
@@ -412,10 +414,28 @@ test_that("Classifier Save Total Model TF", {
   )
 })
 
-test_that("Classifier Load Total Model TF", {
+test_that("Classifier Load Total Model TF with ID", {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
     model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name))
+  )
+  expect_s3_class(new_classifier,
+                  class="TextEmbeddingClassifierNeuralNet")
+})
+
+test_that("Classifier Save Total Model TF without ID", {
+  expect_no_error(
+    save_ai_model(model=classifier,
+                  model_dir = testthat::test_path("tmp_full_models"),
+                  save_format = "tf",
+                  append_ID=FALSE)
+  )
+})
+
+test_that("Classifier Load Total Model TF without ID", {
+  new_classifier<-NULL
+  new_classifier<-load_ai_model(
+    model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name_root))
   )
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")

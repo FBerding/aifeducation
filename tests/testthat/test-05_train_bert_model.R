@@ -13,7 +13,7 @@ test_that("train_tune_bert_model", {
 
   expect_no_error(
     train_tune_bert_model(output_dir=testthat::test_path("test_data/bert"),
-                          bert_model_dir_path=testthat::test_path("test_data/bert"),
+                          model_dir_path=testthat::test_path("test_data/bert"),
                           raw_texts= example_data$text[1:5],
                           aug_vocab_by=0,
                           p_mask=0.30,
@@ -24,10 +24,15 @@ test_that("train_tune_bert_model", {
                           chunk_size=100,
                           n_workers=1,
                           multi_process=FALSE,
-                          trace=FALSE))
+                          sustain_track=TRUE,
+                          sustain_iso_code = "DEU",
+                          sustain_region = NULL,
+                          sustain_interval = 15,
+                          trace=FALSE,
+                          keras_trace = 0))
   expect_no_error(
     train_tune_bert_model(output_dir=testthat::test_path("test_data/bert"),
-                          bert_model_dir_path=testthat::test_path("test_data/bert"),
+                          model_dir_path=testthat::test_path("test_data/bert"),
                           raw_texts= example_data$text[1:5],
                           aug_vocab_by=100,
                           p_mask=0.30,
@@ -38,11 +43,16 @@ test_that("train_tune_bert_model", {
                           chunk_size=100,
                           n_workers=1,
                           multi_process=FALSE,
-                          trace=FALSE))
+                          sustain_track=TRUE,
+                          sustain_iso_code = "DEU",
+                          sustain_region = NULL,
+                          sustain_interval = 15,
+                          trace=FALSE,
+                          keras_trace = 0))
 
   expect_no_error(
     train_tune_bert_model(output_dir=testthat::test_path("test_data/bert"),
-                          bert_model_dir_path=testthat::test_path("test_data/bert"),
+                          model_dir_path=testthat::test_path("test_data/bert"),
                           raw_texts= example_data$text[1:5],
                           aug_vocab_by=0,
                           p_mask=0.30,
@@ -53,7 +63,12 @@ test_that("train_tune_bert_model", {
                           chunk_size=100,
                           n_workers=1,
                           multi_process=FALSE,
-                          trace=FALSE))
+                          sustain_track=TRUE,
+                          sustain_iso_code = "DEU",
+                          sustain_region = NULL,
+                          sustain_interval = 15,
+                          trace=FALSE,
+                          keras_trace = 0))
 })
 
 

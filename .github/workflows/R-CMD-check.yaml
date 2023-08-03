@@ -61,7 +61,8 @@ jobs:
           python_packages<-c("transformers",
                              "tokenizers",
                              "datasets",
-                             "torch")
+                             "torch",
+                             "codecarbon")
           envname<-"r-reticulate"
 
           #conda_create(

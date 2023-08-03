@@ -22,6 +22,11 @@ test_that("train_tune_longformer_model", {
                           chunk_size=100,
                           n_workers=1,
                           multi_process=FALSE,
+                          sustain_track=TRUE,
+                          sustain_iso_code = "DEU",
+                          sustain_region = NULL,
+                          sustain_interval = 15,
+                          keras_trace = 0,
                           trace=FALSE))
 })
 

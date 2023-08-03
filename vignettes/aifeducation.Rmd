@@ -130,6 +130,7 @@ This function installs the following python modules:
 -   torch,
 -   keras,
 -   tensorflow 
+-   codecarbon
 
 and its dependencies in the environment "aifeducation". 
     

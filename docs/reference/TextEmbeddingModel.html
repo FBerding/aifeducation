@@ -14,7 +14,7 @@ unique interface for different text processing methods."><!-- mathjax --><script
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,53 +65,6 @@ unique interface for different text processing methods.</p>
 <code><a href="combine_embeddings.html">combine_embeddings</a>()</code></p></div>
     </div>
     <div class="section level2">
-    <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>basic_components</code></dt>
-<dd><p>('list()')<br>
-List storing information which can apply to all methods.</p><ul><li><p><code>basic_components$method: </code>Method underlying the text embedding model.</p></li>
-<li><p><code>basic_components$max_length: </code>Maximum number of tokens in the sequence the model processes. In general,
-shorter sequences will be padded and longer sequences will be divided
-into chunks and/or truncated.</p></li>
-</ul></dd>
-
-
-<dt><code>transformer_components</code></dt>
-<dd><p>('list()')<br>
-List storing information which only apply to BERT models.</p><ul><li><p><code>transformer_components$model: </code>An object of class transformers.TFBertModel for using with transformers library.</p></li>
-<li><p><code>transformer_components$tokenizer: </code>An object of class transformers.BertTokenizerFast for using with transformers library.</p></li>
-<li><p><code>transformer_components$aggregation: </code>Aggregation method for the hidden states.</p></li>
-<li><p><code>transformer_components$chunks: </code>Maximal number of chunks processed with the model.</p></li>
-<li><p><code> transformer_components$overlap: </code>Number of tokens which should be added at the beginning of the sequence
-of the next chunk.</p></li>
-</ul></dd>
-
-
-<dt><code>bow_components</code></dt>
-<dd><p>('list()')<br>
-List storing information which only apply to bow_models.</p><ul><li><p><code>bow_components$model: </code>data.frame describing the relationship between tokens and their corresponding
-text embeddings.</p></li>
-<li><p><code>bow_components$vocab: </code>data.frame saving tokens, lemmas and their corresponding integer index.</p></li>
-<li><p><code>bow_components$configuration: </code>List of the configuration parameters of the model.
-</p><ul><li><p><code>bow_components$configuration$to_lower </code><code>TRUE</code> if tokens are transformed to lower case.</p></li>
-<li><p><code>bow_components$configuration$use_lemmata </code><code>TRUE</code> if the corresponding lemma should be used instead of the token.</p></li>
-<li><p><code>bow_components$configuration$bow_n_dim </code>Number of dimensions for GlobalVectors and Topic Modeling.</p></li>
-<li><p><code>bow_components$configuration$bow_n_cluster </code>Number of clusters for grouping tokens based in their global vectors.
-Does not apply to method lda.</p></li>
-<li><p><code>bow_components$configuration$bow_max_iter </code>Maximum number of iterations to calculate global vectors and topics.</p></li>
-<li><p><code>bow_components$configuration$bow_max_iter_cluster </code>Maximum number of iterations for creating clusters. Applies only to method
-glove.</p></li>
-<li><p><code>bow_components$configuration$bow_cr_criterion </code>Convergence criterion for calculating global vectors and topics.</p></li>
-<li><p><code>bow_components$configuration$bow_learning_rate  </code>Initial learning rate for estimating global vectors.</p></li>
-</ul></li>
-<li><p><code>bow_components$aggregation: </code>Does currently not apply to these methods.</p></li>
-<li><p><code>bow_components$chunks: </code>Does currently not apply to these methods.</p></li>
-<li><p><code>bow_components$overlap: </code>Does currently not apply to these methods.</p></li>
-</ul></dd>
-
-
-</dl><p></p></div>
-    </div>
-    <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
     
 <div class="section">
@@ -132,6 +85,11 @@ glove.</p></li>
 <li><p><a href="#method-TextEmbeddingModel-set_documentation_license"><code>TextEmbeddingModel$set_documentation_license()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-get_documentation_license"><code>TextEmbeddingModel$get_documentation_license()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-get_model_info"><code>TextEmbeddingModel$get_model_info()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_package_versions"><code>TextEmbeddingModel$get_package_versions()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_basic_components"><code>TextEmbeddingModel$get_basic_components()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_bow_components"><code>TextEmbeddingModel$get_bow_components()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_transformer_components"><code>TextEmbeddingModel$get_transformer_components()</code></a></p></li>
+<li><p><a href="#method-TextEmbeddingModel-get_sustainability_data"><code>TextEmbeddingModel$get_sustainability_data()</code></a></p></li>
 <li><p><a href="#method-TextEmbeddingModel-clone"><code>TextEmbeddingModel$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-TextEmbeddingModel-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -586,10 +544,78 @@ the license text.</p></dd>
 <p><code>list</code> of all relevant model information</p>
 </div>
 
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_package_versions"></a><div class="section">
+<h3 id="method-get-package-versions-">Method <code>get_package_versions()</code><a class="anchor" aria-label="anchor" href="#method-get-package-versions-"></a></h3>
+<p>Method for requesting a summary of the R and python packages'
+versions used for creating the classifier.</p><div class="section">
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_package_versions</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
+<p>Returns a <code>list</code> containing the versions of the relevant
+R and python packages.</p>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_basic_components"></a><div class="section">
+<h3 id="method-get-basic-components-">Method <code>get_basic_components()</code><a class="anchor" aria-label="anchor" href="#method-get-basic-components-"></a></h3>
+<p>Method for requesting the part of interface's configuration that is
+necessary for all models.</p><div class="section">
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_basic_components</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
+<p>Returns a <code>list</code>.</p>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_bow_components"></a><div class="section">
+<h3 id="method-get-bow-components-">Method <code>get_bow_components()</code><a class="anchor" aria-label="anchor" href="#method-get-bow-components-"></a></h3>
+<p>Method for requesting the part of interface's configuration that is
+necessary bag-of-words models.</p><div class="section">
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_bow_components</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
+<p>Returns a <code>list</code>.</p>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_transformer_components"></a><div class="section">
+<h3 id="method-get-transformer-components-">Method <code>get_transformer_components()</code><a class="anchor" aria-label="anchor" href="#method-get-transformer-components-"></a></h3>
+<p>Method for requesting the part of interface's configuration that is
+necessary for transformer models.</p><div class="section">
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_transformer_components</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-10">Returns<a class="anchor" aria-label="anchor" href="#returns-10"></a></h4>
+<p>Returns a <code>list</code>.</p>
+</div>
+
+</div><p></p><hr><a id="method-TextEmbeddingModel-get_sustainability_data"></a><div class="section">
+<h3 id="method-get-sustainability-data-">Method <code>get_sustainability_data()</code><a class="anchor" aria-label="anchor" href="#method-get-sustainability-data-"></a></h3>
+<p>Method for requesting a log of tracked energy consumption
+during training and an estimate of the resulting CO2 equivalents in kg.</p><div class="section">
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
+<p>Returns a <code>matrix</code> containing the tracked energy consumption,
+CO2 equivalents in kg, information on the tracker used, and technical
+information on the training infrastructure for every training run.</p>
+</div>
+
 </div><p></p><hr><a id="method-TextEmbeddingModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

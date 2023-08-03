@@ -4,7 +4,7 @@
 \alias{save_ai_model}
 \title{Saving models created with aifeducation}
 \usage{
-save_ai_model(model, model_dir, save_format = "tf")
+save_ai_model(model, model_dir, save_format = "tf", append_ID = TRUE)
 }
 \arguments{
 \item{model}{Object of class \link{TextEmbeddingClassifierNeuralNet} or
@@ -15,6 +15,9 @@ save_ai_model(model, model_dir, save_format = "tf")
 \item{save_format}{Format for saving the model. \code{"tf"} for SavedModel
 or \code{"h5"} for HDF5. Only relevant if the model is of class \link{TextEmbeddingClassifierNeuralNet}.
 It is recommended to use \code{"tf"}.}
+
+\item{append_ID}{\code{bool} \code{TRUE} if the ID should be appended to
+the model directory for saving purposes. \code{FALSE} if not.}
 }
 \description{
 Function for saving models created with aifeducation.

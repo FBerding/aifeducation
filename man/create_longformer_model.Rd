@@ -18,6 +18,10 @@ create_longformer_model(
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1,
   attention_window = 512,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
   trace = TRUE
 )
 }
@@ -54,6 +58,20 @@ probabilities.}
 
 \item{attention_window}{\code{int} Size of the window around each token for
 attention mechanism in every layer.}
+
+\item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked
+during training via the python library codecarbon.}
+
+\item{sustain_iso_code}{\code{string} ISO code (Alpha-3-Code) for the country. This variable
+must be set if sustainability should be tracked. A list can be found on
+Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+
+\item{sustain_region}{Region within a country. Only available for USA and
+Canada See the documentation of codecarbon for more information.
+\url{https://mlco2.github.io/codecarbon/parameters.html}}
+
+\item{sustain_interval}{\code{integer} Interval in seconds for measuring power
+usage.}
 
 \item{trace}{\code{bool} \code{TRUE} if information about the progress should be
 printed to the console.}

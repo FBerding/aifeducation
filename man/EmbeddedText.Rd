@@ -108,7 +108,7 @@ generated this embedding.
 }
 
 \subsection{Returns}{
-\code{string} Lable of the corresponding text embedding model
+\code{string} Label of the corresponding text embedding model
 }
 }
 \if{html}{\out{<hr>}}

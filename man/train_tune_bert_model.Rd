@@ -6,7 +6,7 @@
 \usage{
 train_tune_bert_model(
   output_dir,
-  bert_model_dir_path,
+  model_dir_path,
   raw_texts,
   aug_vocab_by = 100,
   p_mask = 0.15,
@@ -18,14 +18,19 @@ train_tune_bert_model(
   learning_rate = 0.003,
   n_workers = 1,
   multi_process = FALSE,
-  trace = TRUE
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1
 )
 }
 \arguments{
 \item{output_dir}{\code{string} Path to the directory where the final model
 should be saved. If the directory does not exist, it will be created.}
 
-\item{bert_model_dir_path}{\code{string} Path to the directory where the original
+\item{model_dir_path}{\code{string} Path to the directory where the original
 model is stored.}
 
 \item{raw_texts}{\code{vector} containing the raw texts for training.}
@@ -53,8 +58,27 @@ validation.}
 
 \item{multi_process}{\code{bool} \code{TRUE} if multiple processes should be activated.}
 
+\item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked
+during training via the python library codecarbon.}
+
+\item{sustain_iso_code}{\code{string} ISO code (Alpha-3-Code) for the country. This variable
+must be set if sustainability should be tracked. A list can be found on
+Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+
+\item{sustain_region}{Region within a country. Only available for USA and
+Canada See the documentation of codecarbon for more information.
+\url{https://mlco2.github.io/codecarbon/parameters.html}}
+
+\item{sustain_interval}{\code{integer} Interval in seconds for measuring power
+usage.}
+
 \item{trace}{\code{bool} \code{TRUE} if information on the progress should be printed
 to the console.}
+
+\item{keras_trace}{\code{int} \code{keras_trace=0} does not print any
+information about the training process from keras on the console.
+\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
+one line of information for every epoch.}
 }
 \value{
 This function does not return an object. Instead the trained or fine-tuned
