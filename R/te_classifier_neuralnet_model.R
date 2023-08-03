@@ -1936,7 +1936,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
        sustain_matrix=t(as.matrix(unlist(private$sustainability)))
        write.csv(
          x=sustain_matrix,
-         file=paste0(file_path,"/","sustainability.csv"),
+         file=paste0(dir_path,"/","sustainability.csv"),
          row.names = FALSE
        )
     },

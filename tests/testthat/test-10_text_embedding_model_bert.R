@@ -11,6 +11,10 @@ if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
   dir.create(testthat::test_path("tmp_full_models"))
 }
 
+if(dir.exists(testthat::test_path("tmp"))==FALSE){
+  dir.create(testthat::test_path("tmp"))
+}
+
 aifeducation::set_config_gpu_low_memory()
 
 #-------------------------------------------------------------------------------

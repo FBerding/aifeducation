@@ -193,6 +193,10 @@ test_that("training_bsc_only", {
       epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/classifier"),
+      sustain_track=FALSE,
+      sustain_iso_code = "DEU",
+      sustain_region = NULL,
+      sustain_interval = 15,
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
@@ -225,6 +229,10 @@ test_that("training_pbl_baseline", {
       epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/classifier"),
+      sustain_track=FALSE,
+      sustain_iso_code = "DEU",
+      sustain_region = NULL,
+      sustain_interval = 15,
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
@@ -257,6 +265,10 @@ test_that("training_pbl_bsc", {
       epochs=2,
       batch_size=32,
       dir_checkpoint=testthat::test_path("test_data/classifier"),
+      sustain_track=FALSE,
+      sustain_iso_code = "DEU",
+      sustain_region = NULL,
+      sustain_interval = 15,
       trace=FALSE,
       keras_trace=0,
       n_cores=1)
