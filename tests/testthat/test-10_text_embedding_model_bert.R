@@ -247,5 +247,5 @@ test_that("Sustainability Data Loaded", {
     model_dir = testthat::test_path(paste0("tmp_full_models/",model_name_root))
   )
   sustain_data<-bert_modeling$get_sustainability_data()
-  expect_equal(nrow(sustain_data),2)
+  expect_equal(nrow(sustain_data),4)
 })
