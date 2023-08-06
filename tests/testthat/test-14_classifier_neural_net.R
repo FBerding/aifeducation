@@ -12,21 +12,122 @@ if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
 #-------------------------------------------------------------------------------
 aifeducation::set_config_gpu_low_memory()
 
-example_data<-data.frame(
-  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
-  label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
-example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
-example_data$label[c(1:500,1001:1750)]=NA
-example_data<-example_data[c(501:600,1001:1100,1751:1850),]
-example_targets<-as.factor(example_data$label)
-names(example_targets)=example_data$id
-
 load(testthat::test_path(path))
 current_embeddings<-bert_embeddings$clone(deep = TRUE)
-#-------------------------------------------------------------------------------
+for (n_classes in 2:3){
+  example_data<-data.frame(
+    id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
+    label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
+  example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
+  example_data$label<-as.character(example_data$label)
 
-test_that("creation_classifier_neural_net", {
-  classifier<-NULL
+  rownames(example_data)<-example_data$id
+  example_data<-example_data[intersect(
+    rownames(example_data),rownames(current_embeddings$embeddings)),]
+
+  example_data$label[c(201:300)]=NA
+  if(n_classes>2){
+    example_data$label[c(201:250)]<-"medium"
+  }
+  example_targets<-as.factor(example_data$label)
+  names(example_targets)=example_data$id
+
+
+  #-------------------------------------------------------------------------------
+
+  test_that(paste("creation_classifier_neural_net","n_classes",n_classes), {
+    classifier<-NULL
+    classifier<-TextEmbeddingClassifierNeuralNet$new(
+      name="movie_review_classifier",
+      label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+      text_embeddings=current_embeddings,
+      targets=example_targets,
+      hidden=NULL,
+      rec=c(28,28),
+      self_attention_heads = 0,
+      dropout=0.2,
+      recurrent_dropout=0.4,
+      l2_regularizer=0.01,
+      optimizer="adam",
+      act_fct="gelu",
+      rec_act_fct="tanh")
+    expect_s3_class(classifier,
+                    class="TextEmbeddingClassifierNeuralNet")
+
+    classifier<-NULL
+    classifier<-TextEmbeddingClassifierNeuralNet$new(
+      name="movie_review_classifier",
+      label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+      text_embeddings=current_embeddings,
+      targets=example_targets,
+      hidden=c(28,28),
+      rec=NULL,
+      dropout=0.2,
+      recurrent_dropout=0.4,
+      l2_regularizer=0.01,
+      optimizer="adam",
+      act_fct="gelu",
+      rec_act_fct="tanh")
+    expect_s3_class(classifier,
+                    class="TextEmbeddingClassifierNeuralNet")
+
+    classifier<-NULL
+    classifier<-TextEmbeddingClassifierNeuralNet$new(
+      name="movie_review_classifier",
+      label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+      text_embeddings=current_embeddings,
+      targets=example_targets,
+      hidden=c(28,28),
+      rec=c(28,28),
+      self_attention_heads=2,
+      dropout=0.2,
+      recurrent_dropout=0.4,
+      l2_regularizer=0.01,
+      optimizer="adam",
+      act_fct="gelu",
+      rec_act_fct="tanh")
+    expect_s3_class(classifier,
+                    class="TextEmbeddingClassifierNeuralNet")
+
+    classifier<-NULL
+    classifier<-TextEmbeddingClassifierNeuralNet$new(
+      name="movie_review_classifier",
+      label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+      text_embeddings=current_embeddings,
+      targets=example_targets,
+      hidden=c(28,28),
+      rec=NULL,
+      self_attention_heads=2,
+      dropout=0.2,
+      recurrent_dropout=0.4,
+      l2_regularizer=0.01,
+      optimizer="adam",
+      act_fct="gelu",
+      rec_act_fct="tanh")
+    expect_s3_class(classifier,
+                    class="TextEmbeddingClassifierNeuralNet")
+
+    classifier<-NULL
+    classifier<-TextEmbeddingClassifierNeuralNet$new(
+      name="movie_review_classifier",
+      label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+      text_embeddings=current_embeddings,
+      targets=example_targets,
+      hidden=NULL,
+      rec=NULL,
+      self_attention_heads=2,
+      dropout=0.2,
+      recurrent_dropout=0.4,
+      l2_regularizer=0.01,
+      optimizer="adam",
+      act_fct="gelu",
+      rec_act_fct="tanh")
+    expect_s3_class(classifier,
+                    class="TextEmbeddingClassifierNeuralNet")
+  })
+
+
+  #-------------------------------------------------------------------------------
   classifier<-TextEmbeddingClassifierNeuralNet$new(
     name="movie_review_classifier",
     label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
@@ -41,239 +142,149 @@ test_that("creation_classifier_neural_net", {
     optimizer="adam",
     act_fct="gelu",
     rec_act_fct="tanh")
-  expect_s3_class(classifier,
-                  class="TextEmbeddingClassifierNeuralNet")
 
-  classifier<-NULL
-  classifier<-TextEmbeddingClassifierNeuralNet$new(
-    name="movie_review_classifier",
-    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-    text_embeddings=current_embeddings,
-    targets=example_targets,
-    hidden=c(28,28),
-    rec=NULL,
-    dropout=0.2,
-    recurrent_dropout=0.4,
-    l2_regularizer=0.01,
-    optimizer="adam",
-    act_fct="gelu",
-    rec_act_fct="tanh")
-  expect_s3_class(classifier,
-                  class="TextEmbeddingClassifierNeuralNet")
+  test_that(paste("training_baseline_only","n_classes",n_classes), {
+    expect_no_error(
+      classifier$train(
+        data_embeddings = current_embeddings,
+        data_targets = example_targets,
+        data_n_test_samples=2,
+        use_baseline=TRUE,
+        bsl_val_size=0.25,
+        use_bsc=FALSE,
+        bsc_methods=c("dbsmote"),
+        bsc_max_k=10,
+        bsc_val_size=0.25,
+        use_bpl=FALSE,
+        bpl_max_steps=2,
+        bpl_epochs_per_step=1,
+        bpl_dynamic_inc=FALSE,
+        bpl_balance=TRUE,
+        bpl_max=1.00,
+        bpl_anchor=1.00,
+        bpl_min=0.00,
+        bpl_weight_inc=0.02,
+        bpl_weight_start=0.00,
+        bpl_model_reset=FALSE,
+        sustain_track=TRUE,
+        sustain_iso_code = "DEU",
+        epochs=2,
+        batch_size=32,
+        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        trace=FALSE,
+        keras_trace=0,
+        n_cores=1)
+    )
+  })
 
-  classifier<-NULL
-  classifier<-TextEmbeddingClassifierNeuralNet$new(
-    name="movie_review_classifier",
-    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-    text_embeddings=current_embeddings,
-    targets=example_targets,
-    hidden=c(28,28),
-    rec=c(28,28),
-    self_attention_heads=2,
-    dropout=0.2,
-    recurrent_dropout=0.4,
-    l2_regularizer=0.01,
-    optimizer="adam",
-    act_fct="gelu",
-    rec_act_fct="tanh")
-  expect_s3_class(classifier,
-                  class="TextEmbeddingClassifierNeuralNet")
+  test_that(paste("training_bsc_only","n_classes",n_classes), {
+    expect_no_error(
+      classifier$train(
+        data_embeddings = current_embeddings,
+        data_targets = example_targets,
+        data_n_test_samples=2,
+        use_baseline=FALSE,
+        bsl_val_size=0.25,
+        use_bsc=TRUE,
+        bsc_methods=c("dbsmote"),
+        bsc_max_k=10,
+        bsc_val_size=0.25,
+        use_bpl=FALSE,
+        bpl_max_steps=2,
+        bpl_epochs_per_step=1,
+        bpl_dynamic_inc=FALSE,
+        bpl_balance=FALSE,
+        bpl_max=1.00,
+        bpl_anchor=1.00,
+        bpl_min=0.00,
+        bpl_weight_inc=0.02,
+        bpl_weight_start=0.00,
+        bpl_model_reset=FALSE,
+        epochs=2,
+        batch_size=32,
+        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        sustain_track=FALSE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace=FALSE,
+        keras_trace=0,
+        n_cores=1)
+    )
+  })
 
-  classifier<-NULL
-  classifier<-TextEmbeddingClassifierNeuralNet$new(
-    name="movie_review_classifier",
-    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-    text_embeddings=current_embeddings,
-    targets=example_targets,
-    hidden=c(28,28),
-    rec=NULL,
-    self_attention_heads=2,
-    dropout=0.2,
-    recurrent_dropout=0.4,
-    l2_regularizer=0.01,
-    optimizer="adam",
-    act_fct="gelu",
-    rec_act_fct="tanh")
-  expect_s3_class(classifier,
-                  class="TextEmbeddingClassifierNeuralNet")
+  test_that(paste("training_pbl_baseline","n_classes",n_classes), {
+    expect_no_error(
+      classifier$train(
+        data_embeddings = current_embeddings,
+        data_targets = example_targets,
+        data_n_test_samples=2,
+        use_baseline=TRUE,
+        bsl_val_size=0.25,
+        use_bsc=FALSE,
+        bsc_methods=c("dbsmote"),
+        bsc_max_k=10,
+        bsc_val_size=0.25,
+        use_bpl=TRUE,
+        bpl_max_steps=2,
+        bpl_epochs_per_step=1,
+        bpl_dynamic_inc=FALSE,
+        bpl_balance=TRUE,
+        bpl_max=1.00,
+        bpl_anchor=1.00,
+        bpl_min=0.00,
+        bpl_weight_inc=0.02,
+        bpl_weight_start=0.00,
+        bpl_model_reset=FALSE,
+        epochs=2,
+        batch_size=32,
+        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        sustain_track=FALSE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace=FALSE,
+        keras_trace=0,
+        n_cores=1)
+    )
+  })
 
-  classifier<-NULL
-  classifier<-TextEmbeddingClassifierNeuralNet$new(
-    name="movie_review_classifier",
-    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-    text_embeddings=current_embeddings,
-    targets=example_targets,
-    hidden=NULL,
-    rec=NULL,
-    self_attention_heads=2,
-    dropout=0.2,
-    recurrent_dropout=0.4,
-    l2_regularizer=0.01,
-    optimizer="adam",
-    act_fct="gelu",
-    rec_act_fct="tanh")
-  expect_s3_class(classifier,
-                  class="TextEmbeddingClassifierNeuralNet")
-})
-
-
-#-------------------------------------------------------------------------------
-classifier<-TextEmbeddingClassifierNeuralNet$new(
-  name="movie_review_classifier",
-  label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-  text_embeddings=current_embeddings,
-  targets=example_targets,
-  hidden=NULL,
-  rec=c(28,28),
-  self_attention_heads = 0,
-  dropout=0.2,
-  recurrent_dropout=0.4,
-  l2_regularizer=0.01,
-  optimizer="adam",
-  act_fct="gelu",
-  rec_act_fct="tanh")
-
-test_that("training_baseline_only", {
-  expect_no_error(
-    classifier$train(
-      data_embeddings = current_embeddings,
-      data_targets = example_targets,
-      data_n_test_samples=2,
-      use_baseline=TRUE,
-      bsl_val_size=0.25,
-      use_bsc=FALSE,
-      bsc_methods=c("dbsmote"),
-      bsc_max_k=10,
-      bsc_val_size=0.25,
-      use_bpl=FALSE,
-      bpl_max_steps=2,
-      bpl_epochs_per_step=1,
-      bpl_dynamic_inc=FALSE,
-      bpl_balance=TRUE,
-      bpl_max=1.00,
-      bpl_anchor=1.00,
-      bpl_min=0.00,
-      bpl_weight_inc=0.02,
-      bpl_weight_start=0.00,
-      bpl_model_reset=FALSE,
-      sustain_track=TRUE,
-      sustain_iso_code = "DEU",
-      epochs=2,
-      batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/classifier"),
-      trace=FALSE,
-      keras_trace=0,
-      n_cores=1)
-  )
-})
-
-test_that("training_bsc_only", {
-  expect_no_error(
-    classifier$train(
-      data_embeddings = current_embeddings,
-      data_targets = example_targets,
-      data_n_test_samples=2,
-      use_baseline=FALSE,
-      bsl_val_size=0.25,
-      use_bsc=TRUE,
-      bsc_methods=c("dbsmote"),
-      bsc_max_k=10,
-      bsc_val_size=0.25,
-      use_bpl=FALSE,
-      bpl_max_steps=2,
-      bpl_epochs_per_step=1,
-      bpl_dynamic_inc=FALSE,
-      bpl_balance=FALSE,
-      bpl_max=1.00,
-      bpl_anchor=1.00,
-      bpl_min=0.00,
-      bpl_weight_inc=0.02,
-      bpl_weight_start=0.00,
-      bpl_model_reset=FALSE,
-      epochs=2,
-      batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/classifier"),
-      sustain_track=FALSE,
-      sustain_iso_code = "DEU",
-      sustain_region = NULL,
-      sustain_interval = 15,
-      trace=FALSE,
-      keras_trace=0,
-      n_cores=1)
-  )
-})
-
-test_that("training_pbl_baseline", {
-  expect_no_error(
-    classifier$train(
-      data_embeddings = current_embeddings,
-      data_targets = example_targets,
-      data_n_test_samples=2,
-      use_baseline=TRUE,
-      bsl_val_size=0.25,
-      use_bsc=FALSE,
-      bsc_methods=c("dbsmote"),
-      bsc_max_k=10,
-      bsc_val_size=0.25,
-      use_bpl=TRUE,
-      bpl_max_steps=2,
-      bpl_epochs_per_step=1,
-      bpl_dynamic_inc=FALSE,
-      bpl_balance=TRUE,
-      bpl_max=1.00,
-      bpl_anchor=1.00,
-      bpl_min=0.00,
-      bpl_weight_inc=0.02,
-      bpl_weight_start=0.00,
-      bpl_model_reset=FALSE,
-      epochs=2,
-      batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/classifier"),
-      sustain_track=FALSE,
-      sustain_iso_code = "DEU",
-      sustain_region = NULL,
-      sustain_interval = 15,
-      trace=FALSE,
-      keras_trace=0,
-      n_cores=1)
-  )
-})
-
-test_that("training_pbl_bsc", {
-  expect_no_error(
-    classifier$train(
-      data_embeddings = current_embeddings,
-      data_targets = example_targets,
-      data_n_test_samples=2,
-      use_baseline=FALSE,
-      bsl_val_size=0.25,
-      use_bsc=TRUE,
-      bsc_methods=c("dbsmote"),
-      bsc_max_k=10,
-      bsc_val_size=0.25,
-      use_bpl=TRUE,
-      bpl_max_steps=2,
-      bpl_epochs_per_step=1,
-      bpl_dynamic_inc=FALSE,
-      bpl_balance=TRUE,
-      bpl_max=1.00,
-      bpl_anchor=1.00,
-      bpl_min=0.00,
-      bpl_weight_inc=0.02,
-      bpl_weight_start=0.00,
-      bpl_model_reset=FALSE,
-      epochs=2,
-      batch_size=32,
-      dir_checkpoint=testthat::test_path("test_data/classifier"),
-      sustain_track=FALSE,
-      sustain_iso_code = "DEU",
-      sustain_region = NULL,
-      sustain_interval = 15,
-      trace=FALSE,
-      keras_trace=0,
-      n_cores=1)
-  )
-})
+  test_that(paste("training_pbl_bsc","n_classes",n_classes), {
+    expect_no_error(
+      classifier$train(
+        data_embeddings = current_embeddings,
+        data_targets = example_targets,
+        data_n_test_samples=2,
+        use_baseline=FALSE,
+        bsl_val_size=0.25,
+        use_bsc=TRUE,
+        bsc_methods=c("dbsmote"),
+        bsc_max_k=10,
+        bsc_val_size=0.25,
+        use_bpl=TRUE,
+        bpl_max_steps=2,
+        bpl_epochs_per_step=1,
+        bpl_dynamic_inc=FALSE,
+        bpl_balance=TRUE,
+        bpl_max=1.00,
+        bpl_anchor=1.00,
+        bpl_min=0.00,
+        bpl_weight_inc=0.02,
+        bpl_weight_start=0.00,
+        bpl_model_reset=FALSE,
+        epochs=2,
+        batch_size=32,
+        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        sustain_track=FALSE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace=FALSE,
+        keras_trace=0,
+        n_cores=1)
+    )
+  })
+}
 
 test_that("Saving Classifier H5",{
   expect_no_error(classifier$save_model(

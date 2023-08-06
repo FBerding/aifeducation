@@ -677,7 +677,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       data_embeddings=data_embeddings$clone(deep=TRUE)
       viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
                                    names(data_targets))
-      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,]
+      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,,drop=FALSE]
       data_targets=data_targets[viable_cases]
 
       #Reducing to unique cases
@@ -690,12 +690,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       n_final_cases=nrow(data_embeddings$embeddings)
       viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
                                    names(data_targets))
-      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,]
+      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,,drop=FALSE]
       data_targets=data_targets[viable_cases]
       if(trace==TRUE){
         cat(paste(date(),
                     "Total Cases:",n_init_cases,
-                    "Unique Cases:",n_final_cases,"\n"))
+                    "Unique Cases:",n_final_cases,
+                    "Labeled Cases:",length(na.omit(data_targets)),"\n"))
       }
 
 
@@ -704,6 +705,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         cat(paste(date(),
                     "Checking Minimal Frequencies.","\n"))
       }
+
       freq_check<-table(data_targets)
       freq_check_eval<-freq_check<4
       if(sum(freq_check_eval)>0){
@@ -1747,8 +1749,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                   x = np$array(real_newdata),
                                   batch_size = as.integer(batch_size),
                                   verbose=as.integer(verbose))
-        predictions<-tf$keras$backend$argmax(predictions_prob)
-        #predictions<-predictions_prob %>% keras::k_argmax()
+
+        #Select index of column with maximum value and convert to zero based indices
+        predictions<-max.col(predictions_prob)-1
       } else {
         predictions_prob<-model$predict(
                                   x = np$array(real_newdata),
