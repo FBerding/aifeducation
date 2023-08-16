@@ -1,11 +1,11 @@
 #'Summarizing tracked sustainability data
 #'
 #'Function for summarizing the tracked sustainability data with a tracker
-#'of the python library codecarbon.
+#'of the python library 'codecarbon'.
 #'
 #'@param sustainability_tracker Object of class \code{codecarbon.emissions_tracker.OfflineEmissionsTracker}
 #'of the python library codecarbon.
-#'@return Returns a list which contains the tracked sustainability data.
+#'@return Returns a \code{list} which contains the tracked sustainability data.
 #'
 #'@family Auxiliary Functions
 #'

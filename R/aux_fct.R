@@ -688,7 +688,7 @@ for(ckind in chunk_kind){
 #'@param cat \code{string} The category for which new cases should be created.
 #'@param cat_freq Object of class \code{"table"} containing the absolute frequencies
 #'of every category/label.
-#'@returns Returns a \code{list} which contains the text embeddings of the
+#'@return Returns a \code{list} which contains the text embeddings of the
 #'new synthetic cases as a named \code{data.frame} and their labels as a named
 #'\code{factor}.
 #'

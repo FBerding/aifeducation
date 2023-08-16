@@ -11,11 +11,11 @@ summarize_tracked_sustainability(sustainability_tracker)
 of the python library codecarbon.}
 }
 \value{
-Returns a list which contains the tracked sustainability data.
+Returns a \code{list} which contains the tracked sustainability data.
 }
 \description{
 Function for summarizing the tracked sustainability data with a tracker
-of the python library codecarbon.
+of the python library 'codecarbon'.
 }
 \seealso{
 Other Auxiliary Functions: 

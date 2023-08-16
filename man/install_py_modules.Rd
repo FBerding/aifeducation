@@ -10,6 +10,10 @@ install_py_modules(envname = "aifeducation")
 \item{envname}{\code{string} Name of the environment where the packages should
 be installed.}
 }
+\value{
+Returns no values or objects. Function is used for installing the
+necessary python libraries in a conda environment.
+}
 \description{
 Function for installing the necessary python modules
 }

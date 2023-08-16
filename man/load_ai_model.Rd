@@ -2,15 +2,19 @@
 % Please edit documentation in R/saving_and_loading.R
 \name{load_ai_model}
 \alias{load_ai_model}
-\title{Loading models created with aifeducation}
+\title{Loading models created with 'aifeducation'}
 \usage{
 load_ai_model(model_dir)
 }
 \arguments{
 \item{model_dir}{Path to the directory where the model is stored.}
 }
+\value{
+Returns an object of class \link{TextEmbeddingClassifierNeuralNet} or
+\link{TextEmbeddingModel}.
+}
 \description{
-Function for loading models created with aifeducation.
+Function for loading models created with 'aifeducation'.
 }
 \seealso{
 Other Saving and Loading: 

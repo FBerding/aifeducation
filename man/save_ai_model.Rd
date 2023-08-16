@@ -2,7 +2,7 @@
 % Please edit documentation in R/saving_and_loading.R
 \name{save_ai_model}
 \alias{save_ai_model}
-\title{Saving models created with aifeducation}
+\title{Saving models created with 'aifeducation'}
 \usage{
 save_ai_model(model, model_dir, save_format = "tf", append_ID = TRUE)
 }
@@ -19,8 +19,11 @@ It is recommended to use \code{"tf"}.}
 \item{append_ID}{\code{bool} \code{TRUE} if the ID should be appended to
 the model directory for saving purposes. \code{FALSE} if not.}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
-Function for saving models created with aifeducation.
+Function for saving models created with 'aifeducation'.
 }
 \seealso{
 Other Saving and Loading: 

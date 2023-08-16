@@ -3,6 +3,12 @@
 \name{TextEmbeddingModel}
 \alias{TextEmbeddingModel}
 \title{Text embedding model}
+\value{
+Objects of class \code{TextEmbeddingModel} transform raw texts into numerical
+representations which can be used for downstream tasks. For this aim objects of this class
+allow to tokenize raw texts, to encode tokens to sequences of integers, and to decode sequences
+of integers back to tokens.
+}
 \description{
 This \link[R6]{R6} class stores a text embedding model which can be
 used to tokenize, encode, decode, and embed raw texts. The object provides a
@@ -27,10 +33,10 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
 \item \href{#method-TextEmbeddingModel-set_software_license}{\code{TextEmbeddingModel$set_software_license()}}
 \item \href{#method-TextEmbeddingModel-get_software_license}{\code{TextEmbeddingModel$get_software_license()}}
-\item \href{#method-TextEmbeddingModel-set_model_description}{\code{TextEmbeddingModel$set_model_description()}}
-\item \href{#method-TextEmbeddingModel-get_model_description}{\code{TextEmbeddingModel$get_model_description()}}
 \item \href{#method-TextEmbeddingModel-set_documentation_license}{\code{TextEmbeddingModel$set_documentation_license()}}
 \item \href{#method-TextEmbeddingModel-get_documentation_license}{\code{TextEmbeddingModel$get_documentation_license()}}
+\item \href{#method-TextEmbeddingModel-set_model_description}{\code{TextEmbeddingModel$set_model_description()}}
+\item \href{#method-TextEmbeddingModel-get_model_description}{\code{TextEmbeddingModel$get_model_description()}}
 \item \href{#method-TextEmbeddingModel-get_model_info}{\code{TextEmbeddingModel$get_model_info()}}
 \item \href{#method-TextEmbeddingModel-get_package_versions}{\code{TextEmbeddingModel$get_package_versions()}}
 \item \href{#method-TextEmbeddingModel-get_basic_components}{\code{TextEmbeddingModel$get_basic_components()}}
@@ -81,22 +87,26 @@ Method for creating a new text embedding model
 represents (e.g., English).}
 
 \item{\code{method}}{\code{string} determining the kind of embedding model. Currently
-three types are supported. \code{method="bert"} for Bidirectional Encoder
-Representations from Transformers (BERT), \code{method="glove"} for
-GlobalVector Clusters, and \code{method="lda"} for topic modeling. See
+the following models are supported:
+\code{method="bert"} for Bidirectional Encoder Representations from Transformers (BERT),
+\code{method="roberta"} for A Robustly Optimized BERT Pretraining Approach (RoBERTa),
+\code{method="longformer"} for Long-Document Transformer,
+\code{method="glove"} for
+GlobalVector Clusters, and
+\code{method="lda"} for topic modeling. See
 details for more information.}
 
 \item{\code{max_length}}{\code{int} determining the maximum length of token
-sequences uses in BERT models. Not relevant for the other methods.}
+sequences used in transformer models. Not relevant for the other methods.}
 
 \item{\code{chunks}}{\code{int} Maximum number of chunks. Only relevant for
-BERT models.}
+transformer models.}
 
 \item{\code{overlap}}{\code{int} determining the number of tokens which should be added
 at the beginning of the next chunk. Only relevant for BERT models.}
 
 \item{\code{aggregation}}{\code{string} method for aggregating the text embeddings
-created by BERT models. See details for more information.}
+created by transformer models. See details for more information.}
 
 \item{\code{model_dir}}{\code{string} path to the directory where the
 BERT model is stored.}
@@ -129,14 +139,15 @@ fitting cluster if \code{method="glove"}.}
 }
 \subsection{Details}{
 \itemize{
-\item{method: }{In the case of \code{method="bert"}, a pretrained BERT model
+\item{method: }{In the case of \code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"},
+a pretrained transformer model
 must be supplied via \code{model_dir}. For \code{method="glove"}
 and \code{method="lda"} a new model will be created based on the data provided
 via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
 are clustered based on their word embeddings with kmeans.}
 
-\item{aggregation: }{For creating a text embedding with a BERT model, several options
+\item{aggregation: }{For creating a text embedding with a transformer model, several options
 are possible:
 \itemize{
 \item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
@@ -149,6 +160,9 @@ are possible:
 }
 }
 
+\subsection{Returns}{
+Returns an object of class \link{TextEmbeddingModel}.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-load_model"></a>}}
@@ -166,6 +180,10 @@ Method for loading a transformers model into R.
 model directory.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Function does not return a value. It is used for loading a saved
+transformer model into the R interface.
 }
 }
 \if{html}{\out{<hr>}}
@@ -185,6 +203,10 @@ only for transformer models.
 model directory.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Function does not return a value. It is used for saving a transformer model
+to disk.
 }
 }
 \if{html}{\out{<hr>}}
@@ -301,6 +323,10 @@ Method for setting the bibliographic information of the model.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Function does not return a value. It is used to set the private
+members for publication information of the model.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_publication_info"></a>}}
@@ -332,6 +358,10 @@ the license text.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Function does not return a value. It is used for setting the private
+member for the software license of the model.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_software_license"></a>}}
@@ -344,6 +374,46 @@ Method for requesting the license of the model
 
 \subsection{Returns}{
 \code{string} License of the model
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-set_documentation_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_documentation_license}{}}}
+\subsection{Method \code{set_documentation_license()}}{
+Method for setting the license of models' documentation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_documentation_license(license = "CC BY-SA")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Function does not return a value. It is used to set the private member for the
+documentation license of the model.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_documentation_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_documentation_license}{}}}
+\subsection{Method \code{get_documentation_license()}}{
+Method for getting the license of the models' documentation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_documentation_license()}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{license}}{\code{string} containing the abbreviation of the license or
+the license text.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -385,6 +455,10 @@ in the native language of the classifier.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Function does not return a value. It is used to set the private members for the
+description of the model.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-get_model_description"></a>}}
@@ -398,42 +472,6 @@ Method for requesting the model description.
 \subsection{Returns}{
 \code{list} with the description of the model in English
 and the native language.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-set_documentation_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_documentation_license}{}}}
-\subsection{Method \code{set_documentation_license()}}{
-Method for setting the license of models' documentation.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_documentation_license(license = "CC BY-SA")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{license}}{\code{string} containing the abbreviation of the license or
-the license text.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_documentation_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_documentation_license}{}}}
-\subsection{Method \code{get_documentation_license()}}{
-Method for getting the license of the models' documentation.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_documentation_license()}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{license}}{\code{string} containing the abbreviation of the license or
-the license text.}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

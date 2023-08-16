@@ -15,8 +15,8 @@ This function does not return anything. It is used for its
 side effects.
 }
 \description{
-This function changes the level for logging information with tensorflow via
-the os environment. This function must be called before importing tensorflow.
+This function changes the level for logging information with 'tensorflow' via
+the os environment. This function must be called before importing 'tensorflow'.
 }
 \seealso{
 Other Installation and Configuration: 

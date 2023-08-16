@@ -19,7 +19,7 @@ the second to the times, and the third to the features.
 }
 \description{
 Function written in C++ for reshaping a matrix containing sequential data into
-an array for use with keras.
+an array for use with 'keras'.
 }
 \seealso{
 Other Auxiliary Functions: 

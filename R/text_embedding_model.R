@@ -2,6 +2,10 @@
 #'@description This \link[R6]{R6} class stores a text embedding model which can be
 #'used to tokenize, encode, decode, and embed raw texts. The object provides a
 #'unique interface for different text processing methods.
+#'@return Objects of class \code{TextEmbeddingModel} transform raw texts into numerical
+#'representations which can be used for downstream tasks. For this aim objects of this class
+#'allow to tokenize raw texts, to encode tokens to sequences of integers, and to decode sequences
+#'of integers back to tokens.
 #'@family Text Embedding
 #'@export
 TextEmbeddingModel<-R6::R6Class(
@@ -89,18 +93,22 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param model_language \code{string} containing the language which the model
     #'represents (e.g., English).
     #'@param method \code{string} determining the kind of embedding model. Currently
-    #'three types are supported. \code{method="bert"} for Bidirectional Encoder
-    #'Representations from Transformers (BERT), \code{method="glove"} for
-    #'GlobalVector Clusters, and \code{method="lda"} for topic modeling. See
+    #'the following models are supported:
+    #'\code{method="bert"} for Bidirectional Encoder Representations from Transformers (BERT),
+    #'\code{method="roberta"} for A Robustly Optimized BERT Pretraining Approach (RoBERTa),
+    #'\code{method="longformer"} for Long-Document Transformer,
+    #'\code{method="glove"} for
+    #'GlobalVector Clusters, and
+    #'\code{method="lda"} for topic modeling. See
     #'details for more information.
     #'@param max_length \code{int} determining the maximum length of token
-    #'sequences uses in BERT models. Not relevant for the other methods.
+    #'sequences used in transformer models. Not relevant for the other methods.
     #'@param chunks \code{int} Maximum number of chunks. Only relevant for
-    #'BERT models.
+    #'transformer models.
     #'@param overlap \code{int} determining the number of tokens which should be added
     #'at the beginning of the next chunk. Only relevant for BERT models.
     #'@param aggregation \code{string} method for aggregating the text embeddings
-    #'created by BERT models. See details for more information.
+    #'created by transformer models. See details for more information.
     #'@param model_dir \code{string} path to the directory where the
     #'BERT model is stored.
     #'@param bow_basic_text_rep object of class \code{basic_text_rep} created via
@@ -119,15 +127,17 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param bow_learning_rate \code{double} initial learning rate for GlobalVectors.
     #'@param trace \code{bool} \code{TRUE} prints information about the progress.
     #'\code{FALSE} does not.
+    #'@return Returns an object of class \link{TextEmbeddingModel}.
     #'@details \itemize{
-    #'\item{method: }{In the case of \code{method="bert"}, a pretrained BERT model
+    #'\item{method: }{In the case of \code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"},
+    #'a pretrained transformer model
     #'must be supplied via \code{model_dir}. For \code{method="glove"}
     #'and \code{method="lda"} a new model will be created based on the data provided
     #'via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
     #'only word embeddings, not text embeddings. To achieve text embeddings the words
     #'are clustered based on their word embeddings with kmeans.}
     #'
-    #'\item{aggregation: }{For creating a text embedding with a BERT model, several options
+    #'\item{aggregation: }{For creating a text embedding with a transformer model, several options
     #'are possible:
     #'\itemize{
     #'\item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
@@ -248,7 +258,6 @@ TextEmbeddingModel<-R6::R6Class(
         glove <- text2vec::GlobalVectors$new(rank = bow_n_dim,
                                              x_max = 10
         )
-        set.seed(0)
         wv_main <- glove$fit_transform(bow_basic_text_rep$fcm,
                                        n_iter = bow_max_iter,
                                        convergence_tol = bow_cr_criterion,
@@ -408,6 +417,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'@description Method for loading a transformers model into R.
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
+    #'@return Function does not return a value. It is used for loading a saved
+    #'transformer model into the R interface.
     #'
     #'@importFrom utils read.csv
     load_model=function(model_dir){
@@ -445,6 +456,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'only for transformer models.
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
+    #'@return Function does not return a value. It is used for saving a transformer model
+    #'to disk.
     #'
     #'@importFrom utils write.csv
     save_model=function(model_dir){
@@ -880,6 +893,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param authors List of people.
     #'@param citation \code{string} Citation in free text.
     #'@param url \code{string} Corresponding URL if applicable.
+    #'@return Function does not return a value. It is used to set the private
+    #'members for publication information of the model.
     set_publication_info=function(type,
                                   authors,
                                   citation,
@@ -904,6 +919,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'@description Method for setting the license of the model
     #'@param license \code{string} containing the abbreviation of the license or
     #'the license text.
+    #'@return Function does not return a value. It is used for setting the private
+    #'member for the software license of the model.
     set_software_license=function(license="GPL-3"){
       private$model_info$model_license<-license
     },
@@ -911,6 +928,21 @@ TextEmbeddingModel<-R6::R6Class(
     #'@return \code{string} License of the model
     get_software_license=function(){
       return(private$model_info$model_license)
+    },
+    #--------------------------------------------------------------------------
+    #'@description Method for setting the license of models' documentation.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
+    #'@return Function does not return a value. It is used to set the private member for the
+    #'documentation license of the model.
+    set_documentation_license=function(license="CC BY-SA"){
+      private$model_description$license<-license
+    },
+    #'@description Method for getting the license of the models' documentation.
+    #'@param license \code{string} containing the abbreviation of the license or
+    #'the license text.
+    get_documentation_license=function(){
+      return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
     #'@description Method for setting a description of the model
@@ -926,6 +958,8 @@ TextEmbeddingModel<-R6::R6Class(
     #'in the native language of the classifier.
     #'@param keywords_eng \code{vector} of keywords in English.
     #'@param keywords_native \code{vector} of keywords in the native language of the classifier.
+    #'@return Function does not return a value. It is used to set the private members for the
+    #'description of the model.
     set_model_description=function(eng=NULL,
                                    native=NULL,
                                    abstract_eng=NULL,
@@ -958,19 +992,6 @@ TextEmbeddingModel<-R6::R6Class(
     #'and the native language.
     get_model_description=function(){
       return(private$model_description)
-    },
-    #--------------------------------------------------------------------------
-    #'@description Method for setting the license of models' documentation.
-    #'@param license \code{string} containing the abbreviation of the license or
-    #'the license text.
-    set_documentation_license=function(license="CC BY-SA"){
-      private$model_description$license<-license
-    },
-    #'@description Method for getting the license of the models' documentation.
-    #'@param license \code{string} containing the abbreviation of the license or
-    #'the license text.
-    get_documentation_license=function(){
-      return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
     #'@description Method for requesting the model information
@@ -1043,6 +1064,15 @@ TextEmbeddingModel<-R6::R6Class(
 #'@description Object of class \link[R6]{R6} which stores the text embeddings
 #'generated by an object of class \link{TextEmbeddingModel} via the method
 #'\code{embed()}.
+#'@return Returns an object of class \code{EmbeddedText}. These objects are used
+#'for storing and managing the text embeddings created with objects of class \link{TextEmbeddingModel}.
+#'Objects of class \code{EmbeddedText} serve as input for classifiers of class
+#'\link{TextEmbeddingClassifierNeuralNet}. The main aim of this class is to provide a structured link between
+#'embedding models and classifiers. Since objects of this class save information on
+#'the text embedding model that created the text embedding it ensures that only
+#'embedding generated with same embedding model are combined. Furthermore, the stored information allows
+#'classifiers to check if embeddings of the correct text embedding model are used for
+#'training and predicting.
 #'@family Text Embedding
 #'@export
 EmbeddedText<-R6::R6Class(
@@ -1108,6 +1138,9 @@ EmbeddedText<-R6::R6Class(
     #'by this model.
     #'@param param_aggregation \code{string} Aggregation method of the hidden states.
     #'@param embeddings \code{data.frame} containing the text embeddings.
+    #'@return Returns an object of class \link{EmbeddedText} which stores the
+    #'text embeddings produced by an objects of class \link{TextEmbeddingModel}.
+    #'The object serves as input for objects of class \link{TextEmbeddingClassifierNeuralNet}.
     initialize=function(model_name=NA,
                         model_label=NA,
                         model_date=NA,
@@ -1134,7 +1167,7 @@ EmbeddedText<-R6::R6Class(
     #--------------------------------------------------------------------------
     #'@description Method for retrieving information about the model that
     #'generated this embedding.
-    #'@return \code{list} contain all saved information about the underlying
+    #'@return \code{list} contains all saved information about the underlying
     #'text embedding model.
     get_model_info=function(){
       tmp<-list(model_name=private$model_name,

@@ -6,12 +6,14 @@
 \usage{
 set_config_gpu_low_memory()
 }
+\value{
+This function does not return anything. It is used for its
+side effects.
+}
 \description{
 This function changes the memory usage of the gpus to allow computations
 on machines with small memory. With this function, some computations of large
 models may be possible but the speed of computation decreases.
-#'@return This function does not return anything. It is used for its
-side effects.
 }
 \note{
 This function sets TF_GPU_ALLOCATOR to \code{"cuda_malloc_async"} and

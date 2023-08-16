@@ -4,6 +4,8 @@
 #'
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
+#'@return Returns no values or objects. Function is used for installing the
+#'necessary python libraries in a conda environment.
 #'@importFrom reticulate conda_create
 #'@importFrom reticulate py_install
 #'@family Installation and Configuration
@@ -78,9 +80,9 @@ check_aif_py_modules<-function(trace=TRUE){
 }
 
 
-#'Setting cpu only for tensorflow
+#'Setting cpu only for 'tensorflow'
 #'
-#'This functions configurates tensorflow to use only cpus.
+#'This functions configurates 'tensorflow' to use only cpus.
 #'@return This function does not return anything. It is used for its
 #'side effects.
 #'@note os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")
@@ -95,7 +97,7 @@ set_config_cpu_only<-function(){
 #'This function changes the memory usage of the gpus to allow computations
 #'on machines with small memory. With this function, some computations of large
 #'models may be possible but the speed of computation decreases.
-#'#'@return This function does not return anything. It is used for its
+#'@return This function does not return anything. It is used for its
 #'side effects.
 #'@note This function sets TF_GPU_ALLOCATOR to \code{"cuda_malloc_async"} and
 #'sets memory growth to \code{TRUE}.
@@ -113,7 +115,7 @@ set_config_gpu_low_memory<-function(){
 
 #'Sets the level for logging information in tensor flow.
 #'
-#'This function changes the level for logging information with tensorflow.
+#'This function changes the level for logging information with 'tensorflow'.
 #'
 #'@param level \code{string} Minimal level that should be printed to console. Five
 #'levels are available: FATAL, ERROR, WARN, INFO, and DEBUG.
@@ -128,8 +130,8 @@ set_config_tf_logger<-function(level="ERROR"){
 
 #'Sets the level for logging information in tensor flow.
 #'
-#'This function changes the level for logging information with tensorflow via
-#'the os environment. This function must be called before importing tensorflow.
+#'This function changes the level for logging information with 'tensorflow' via
+#'the os environment. This function must be called before importing 'tensorflow'.
 #'
 #'@param level \code{string} Minimal level that should be printed to console. Five
 #'levels are available: INFO, WARNING, ERROR and NONE.

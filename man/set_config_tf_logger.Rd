@@ -15,7 +15,7 @@ This function does not return anything. It is used for its
 side effects.
 }
 \description{
-This function changes the level for logging information with tensorflow.
+This function changes the level for logging information with 'tensorflow'.
 }
 \seealso{
 Other Installation and Configuration: 

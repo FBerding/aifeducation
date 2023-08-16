@@ -10,16 +10,24 @@
     available in handwritten forms or the use of data is restricted by
     privacy policies, often leading to small data sets. Furthermore, data
     in the educational and social sciences is often unbalanced in terms of
-    frequencies.  To support educators as well as educational and social
+    frequencies. To support educators as well as educational and social
     researchers in using the potentials of AI for their work, this package
-    provides a unified interface for neural nets in keras and tensorflow
-    to deal with natural language problems. The tools integrate existing
-    mathematical and statistical methods for dealing with small data sets
-    via pseudo-labeling and imbalanced data via the creation of synthetic
-    cases. Performance evaluation of AI is connected to measures from
-    content analysis which educational and social researchers are
-    generally more familiar with. Finally, all objects created with this
-    package allow to share trained AI with other people.">
+    provides a unified interface for neural nets in keras and
+    tensorflow to deal with natural language problems. The tools
+    integrate existing mathematical and statistical methods for dealing
+    with small data sets via pseudo-labeling (e.g. Lee (2013)
+    &lt;https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks&gt;,
+    Cascante-Bonilla et al. (2020) &lt;doi:10.48550/arXiv.2001.06001&gt;) and
+    imbalanced data via the creation of synthetic cases (e.g.
+    Bunkhumpornpat et al. (2012) &lt;doi:10.1007/s10489-011-0287-y&gt;).
+    Performance evaluation of AI is connected to measures from content
+    analysis which educational and social researchers are generally more
+    familiar with (e.g. Berding &amp; Pargmann (2022) &lt;doi:10.30819/5581&gt;,
+    Gwet (2014) &lt;ISBN:978-0-9708062-8-4&gt;, Krippendorff (2019)
+    &lt;doi:10.4135/9781071878781&gt;). Estimation of energy consumption and CO2
+    emissions during training models is done with the python library
+    codecarbon.  Finally, all objects created with this package allow to
+    share trained AI with other people.">
 <title>Artificial Intelligence for Education • aifeducation</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
@@ -31,16 +39,24 @@
     available in handwritten forms or the use of data is restricted by
     privacy policies, often leading to small data sets. Furthermore, data
     in the educational and social sciences is often unbalanced in terms of
-    frequencies.  To support educators as well as educational and social
+    frequencies. To support educators as well as educational and social
     researchers in using the potentials of AI for their work, this package
-    provides a unified interface for neural nets in keras and tensorflow
-    to deal with natural language problems. The tools integrate existing
-    mathematical and statistical methods for dealing with small data sets
-    via pseudo-labeling and imbalanced data via the creation of synthetic
-    cases. Performance evaluation of AI is connected to measures from
-    content analysis which educational and social researchers are
-    generally more familiar with. Finally, all objects created with this
-    package allow to share trained AI with other people.">
+    provides a unified interface for neural nets in keras and
+    tensorflow to deal with natural language problems. The tools
+    integrate existing mathematical and statistical methods for dealing
+    with small data sets via pseudo-labeling (e.g. Lee (2013)
+    &lt;https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks&gt;,
+    Cascante-Bonilla et al. (2020) &lt;doi:10.48550/arXiv.2001.06001&gt;) and
+    imbalanced data via the creation of synthetic cases (e.g.
+    Bunkhumpornpat et al. (2012) &lt;doi:10.1007/s10489-011-0287-y&gt;).
+    Performance evaluation of AI is connected to measures from content
+    analysis which educational and social researchers are generally more
+    familiar with (e.g. Berding &amp; Pargmann (2022) &lt;doi:10.30819/5581&gt;,
+    Gwet (2014) &lt;ISBN:978-0-9708062-8-4&gt;, Krippendorff (2019)
+    &lt;doi:10.4135/9781071878781&gt;). Estimation of energy consumption and CO2
+    emissions during training models is done with the python library
+    codecarbon.  Finally, all objects created with this package allow to
+    share trained AI with other people.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -54,7 +70,7 @@
     
     <a class="navbar-brand me-2" href="index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +98,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -111,13 +134,16 @@
 <div class="section level2">
 <h2 id="sustainability">Sustainability<a class="anchor" aria-label="anchor" href="#sustainability"></a>
 </h2>
-<p>Training AI models can be time and energy consuming. To help researchers in estimating the ecological impact of their work a sustainability tracker is implemented based on the python library codecarbon by Benoit et al. (2023). This tracker allows to estimate the energy consumption for CPUs, GPUs, and RAM during training and derives a value for the CO2 emission based on the country’s energy mix where the computer is located.</p>
+<p>Training AI models can be time and energy consuming. To help researchers in estimating the ecological impact of their work a sustainability tracker is implemented based on the python library codecarbon by Courty et al. (2023). This tracker allows to estimate the energy consumption for CPUs, GPUs, and RAM during training and derives a value for the CO2 emission. This value is based on the country’s energy mix where the computer is located.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of aifeducation from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the package from CRAN with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
+<p>You can install the development version of aifeducation from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FBerding/aifeducation"</span>,</span>
 <span>                          dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -183,7 +209,7 @@ with performance measures they are more familiar with, every AI trained with thi
 <p>Haixiang, G., Yijing, L., Shang, J., Mingyun, G., Yuanyue, H., &amp; Bing, G. (2017). Learning from class-imbalanced data: Review of methods and applications. Expert Systems with Applications, 73, 220–239. <a href="https://doi.org/10.1016/j.eswa.2016.12.035" class="external-link uri">https://doi.org/10.1016/j.eswa.2016.12.035</a></p>
 <p>He, H., Bai, Y., Garcia, E. A., &amp; Li, S. (2008). ADASYN: Adaptive synthetic sampling approach for imbalanced learning. In 2008 IEEE International Joint Conference on Neural Networks (IEEE World Congress on Computational Intelligence) (pp. 1322–1328). IEEE. <a href="https://doi.org/10.1109/IJCNN.2008.4633969" class="external-link uri">https://doi.org/10.1109/IJCNN.2008.4633969</a></p>
 <p>Krippendorff, K. (2019). Content Analysis: An Introduction to Its Methodology (4th Ed.). SAGE.</p>
-<p>Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient Semi-Supervised Learning Method for Deep Neural Networks. CML 2013 Workshop: Challenges in RepresentationLearning.</p>
+<p>Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient Semi-Supervised Learning Method for Deep Neural Networks. CML 2013 Workshop: Challenges in Representation Learning.</p>
 <p>Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &amp; Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. <a href="https://doi.org/10.48550/arXiv.1907.11692" class="external-link uri">https://doi.org/10.48550/arXiv.1907.11692</a></p>
 <p>Luan, H., Geczy, P., Lai, H., Gobert, J., Yang, S. J. H., Ogata, H., Baltes, J., Guerra, R., Li, P., &amp; Tsai, C.‑C. (2020). Challenges and Future Directions of Big Data and Artificial Intelligence in Education. Frontiers in Psychology, 11, 1–11. <a href="https://doi.org/10.3389/fpsyg.2020.580820" class="external-link uri">https://doi.org/10.3389/fpsyg.2020.580820</a></p>
 <p>Pennington, J., Socher, R., &amp; Manning, C. D. (2014). GloVe: Global Vectors for Word Representation. Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing. <a href="https://aclanthology.org/D14-1162.pdf" class="external-link uri">https://aclanthology.org/D14-1162.pdf</a></p>
@@ -191,7 +217,16 @@ with performance measures they are more familiar with, every AI trained with thi
 <p>Wong, J., Baars, M., Koning, B. B. de, van der Zee, T., Davis, D., Khalil, M., Houben, G.‑J., &amp; Paas, F. (2019). Educational Theories and Learning Analytics: From Data to Knowledge. In D. Ifenthaler, D.-K. Mah, &amp; J. Y.-K. Yau (Eds.), Utilizing Learning Analytics to Support Study Success (pp. 3–25). Springer. <a href="https://doi.org/10.1007/978-3-319-64792-0_1" class="external-link uri">https://doi.org/10.1007/978-3-319-64792-0_1</a></p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=aifeducation" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/cran/aifeducation/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/cran/aifeducation/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>

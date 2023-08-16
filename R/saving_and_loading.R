@@ -1,8 +1,10 @@
-#'Loading models created with aifeducation
+#'Loading models created with 'aifeducation'
 #'
-#'Function for loading models created with aifeducation.
+#'Function for loading models created with 'aifeducation'.
 #'
 #'@param model_dir Path to the directory where the model is stored.
+#'@return Returns an object of class \link{TextEmbeddingClassifierNeuralNet} or
+#'\link{TextEmbeddingModel}.
 #'
 #'@family Saving and Loading
 #'
@@ -29,9 +31,9 @@ load_ai_model<-function(model_dir){
   }
 }
 
-#'Saving models created with aifeducation
+#'Saving models created with 'aifeducation'
 #'
-#'Function for saving models created with aifeducation.
+#'Function for saving models created with 'aifeducation'.
 #'
 #'@param model Object of class \link{TextEmbeddingClassifierNeuralNet} or
 #'\link{TextEmbeddingModel} which should be saved.
@@ -41,6 +43,7 @@ load_ai_model<-function(model_dir){
 #'It is recommended to use \code{"tf"}.
 #'@param append_ID \code{bool} \code{TRUE} if the ID should be appended to
 #'the model directory for saving purposes. \code{FALSE} if not.
+#'@return No return value, called for side effects.
 #'
 #'@family Saving and Loading
 #'

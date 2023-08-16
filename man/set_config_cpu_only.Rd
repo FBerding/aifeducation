@@ -2,7 +2,7 @@
 % Please edit documentation in R/install_and_config.R
 \name{set_config_cpu_only}
 \alias{set_config_cpu_only}
-\title{Setting cpu only for tensorflow}
+\title{Setting cpu only for 'tensorflow'}
 \usage{
 set_config_cpu_only()
 }
@@ -11,7 +11,7 @@ This function does not return anything. It is used for its
 side effects.
 }
 \description{
-This functions configurates tensorflow to use only cpus.
+This functions configurates 'tensorflow' to use only cpus.
 }
 \note{
 os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")

@@ -96,6 +96,11 @@ is located.
 
 ## Installation
 
+You can install the package from CRAN with:
+``` r
+install.packages("aifeducation")
+```
+
 You can install the development version of aifeducation from
 [GitHub](https://github.com/) with:
 
@@ -253,7 +258,7 @@ Methodology (4th Ed.). SAGE.
 
 Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
-Workshop: Challenges in RepresentationLearning.
+Workshop: Challenges in Representation Learning.
 
 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly

@@ -41,7 +41,7 @@ bow_pp_create_vocab_draft<-function(path_language_model,
                                     chunk_size=100,
                                     trace=TRUE)
 {
-  #Phase 1: Analyze Texts with udpipe
+  #Phase 1: Analyze Texts with 'udpipe'
   n_document_segments<-length(data)
   n_sentence_init<-0
   n_token_init<-0

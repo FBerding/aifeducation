@@ -4,7 +4,7 @@
 #'Reshape matrix to array
 #'
 #'Function written in C++ for reshaping a matrix containing sequential data into
-#'an array for use with keras.
+#'an array for use with 'keras'.
 #'
 #'@param matrix \code{matrix} containing the sequential data.
 #'@param times \code{uword} Number of sequences.
