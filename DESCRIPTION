@@ -1,7 +1,7 @@
 Type: Package
 Package: aifeducation
 Title: Artificial Intelligence for Education
-Version: 0.2.0
+Version: 0.2.1.9000
 Authors@R: c(
     person("Berding", "Florian", , "florian.berding@uni-hamburg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3593-1695")),
@@ -17,8 +17,8 @@ Description: In social and educational settings, the use of Artificial
     in the educational and social sciences is often unbalanced in terms of
     frequencies. To support educators as well as educational and social
     researchers in using the potentials of AI for their work, this package
-    provides a unified interface for neural nets in 'keras' and
-    'tensorflow' to deal with natural language problems. The tools
+    provides a unified interface for neural nets in 'keras',
+    'tensorflow', and 'pytorch' to deal with natural language problems. The tools
     integrate existing mathematical and statistical methods for dealing
     with small data sets via pseudo-labeling (e.g. Lee (2013)
     <https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks>,
@@ -38,10 +38,10 @@ URL:https://fberding.github.io/aifeducation/
 BugReports: https://github.com/cran/aifeducation/issues
 Depends:
     foreach,
-    quanteda,
     R (>= 3.5.0)
 Imports: 
     abind,
+    quanteda,
     doParallel,
     iotarelr(>= 0.1.4),
     irr,

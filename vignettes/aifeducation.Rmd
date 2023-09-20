@@ -103,8 +103,12 @@ reticulate::install_miniconda()
 ## Step 4 - Install Support for Graphic Devices
 
 If you would like to use a graphic card for computations you need to install
-some further software. A list with links to downloads can be found here:
+some further software. A list with links to downloads can be found here if you would
+like to use tensorflow as machine learning framework:
 https://www.tensorflow.org/install/pip#linux
+
+If you would like to use PyTorch as framework you can find furhter
+information here: https://pytorch.org/get-started/locally/
 
 In general you need
 
@@ -159,6 +163,8 @@ high performance computing nor do they own computers with a performing
 graphic device for their work. Thus, some additional configuration can
 be done to get computations working on your machine.
 
+## 2.1) Tensorflow
+
 If you do use a computer that does not own a graphic device, you can
 disable the graphic device support of tensorflow with the function
 `set_config_cpu_only()`.
@@ -190,3 +196,12 @@ aifeducation::set_config_tf_logger()
 You can choose between five levels
 "FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
 for logging.
+
+# 3) Tutorial and Guides
+
+A short introduction into the
+package with examples for classification tasks can be found in vignette
+[02 classification tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+
+Documenting and sharing your work is described in vignette
+[03 sharing and using trained AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)

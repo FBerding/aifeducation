@@ -5,6 +5,7 @@
 \title{Function for training and fine-tuning a Longformer model}
 \usage{
 train_tune_longformer_model(
+  ml_framework = "tensorflow",
   output_dir,
   model_dir_path,
   raw_texts,
@@ -13,6 +14,8 @@ train_tune_longformer_model(
   n_epoch = 1,
   batch_size = 12,
   chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
   learning_rate = 0.03,
   n_workers = 1,
   multi_process = FALSE,
@@ -25,6 +28,10 @@ train_tune_longformer_model(
 )
 }
 \arguments{
+\item{ml_framework}{\code{string} Framework to use for training and inference.
+\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
+for 'pytorch'.}
+
 \item{output_dir}{\code{string} Path to the directory where the final model
 should be saved. If the directory does not exist, it will be created.}
 
@@ -44,11 +51,18 @@ validation.}
 
 \item{chunk_size}{\code{int} Size of every chunk for training.}
 
+\item{full_sequences_only}{\code{bool} \code{TRUE} for using only chunks
+with a sequence length equal to \code{chunk_size}.}
+
+\item{min_seq_len}{\code{int} Only relevant if \code{full_sequences_only=FALSE}.
+Value determines the minimal sequence length for inclusion in training process.}
+
 \item{learning_rate}{\code{bool} Learning rate for adam optimizer.}
 
-\item{n_workers}{\code{int} Number of workers.}
+\item{n_workers}{\code{int} Number of workers. Only relevant if \code{ml_framework="tensorflow"}.}
 
-\item{multi_process}{\code{bool} \code{TRUE} if multiple processes should be activated.}
+\item{multi_process}{\code{bool} \code{TRUE} if multiple processes should be activated.
+Only relevant if \code{ml_framework="tensorflow"}.}
 
 \item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked
 during training via the python library codecarbon.}
@@ -70,7 +84,8 @@ to the console.}
 \item{keras_trace}{\code{int} \code{keras_trace=0} does not print any
 information about the training process from keras on the console.
 \code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
-one line of information for every epoch.}
+one line of information for every epoch.
+Only relevant if \code{ml_framework="tensorflow"}.}
 }
 \value{
 This function does not return an object. Instead the trained or fine-tuned
@@ -78,7 +93,7 @@ model is saved to disk.
 }
 \description{
 This function can be used to train or fine-tune a transformer
-based on BERT architecture with the help of the python libraries 'transformers',
+based on Longformer architecture with the help of the python libraries 'transformers',
 'datasets', and 'tokenizers'.
 }
 \note{
@@ -98,9 +113,13 @@ Hugging Face Documentation
 \seealso{
 Other Transformer: 
 \code{\link{create_bert_model}()},
+\code{\link{create_deberta_v2_model}()},
+\code{\link{create_funnel_model}()},
 \code{\link{create_longformer_model}()},
 \code{\link{create_roberta_model}()},
 \code{\link{train_tune_bert_model}()},
+\code{\link{train_tune_deberta_v2_model}()},
+\code{\link{train_tune_funnel_model}()},
 \code{\link{train_tune_roberta_model}()}
 }
 \concept{Transformer}

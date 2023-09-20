@@ -5,10 +5,12 @@
 \title{Function for creating a new transformer based on RoBERTa}
 \usage{
 create_roberta_model(
+  ml_framework = "tensorflow",
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 30522,
   add_prefix_space = FALSE,
+  trim_offsets = TRUE,
   max_position_embeddings = 512,
   hidden_size = 768,
   num_hidden_layer = 12,
@@ -16,6 +18,7 @@ create_roberta_model(
   intermediate_size = 3072,
   hidden_act = "gelu",
   hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
   sustain_track = TRUE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
@@ -24,6 +27,10 @@ create_roberta_model(
 )
 }
 \arguments{
+\item{ml_framework}{\code{string} Framework to use for training and inference.
+\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
+for 'pytorch'.}
+
 \item{model_dir}{\code{string} Path to the directory where the model should be saved.}
 
 \item{vocab_raw_texts}{\code{vector} containing the raw texts for creating the
@@ -33,6 +40,9 @@ vocabulary.}
 
 \item{add_prefix_space}{\code{bool} \code{TRUE} if an additional space should be insert
 to the leading words.}
+
+\item{trim_offsets}{\code{bool} If \code{TRUE} post processing trims offsets
+to avoid including whitespaces.}
 
 \item{max_position_embeddings}{\code{int} Number of maximal position embeddings. This parameter
 also determines the maximum length of a sequence which can be processed with the model.}
@@ -50,6 +60,9 @@ the attention mechanism.}
 \item{hidden_act}{\code{string} name of the activation function.}
 
 \item{hidden_dropout_prob}{\code{double} Ratio of dropout.}
+
+\item{attention_probs_dropout_prob}{\code{double} Ratio of dropout for attention
+probabilities.}
 
 \item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked
 during training via the python library codecarbon.}
@@ -93,8 +106,12 @@ Hugging Face Documentation
 \seealso{
 Other Transformer: 
 \code{\link{create_bert_model}()},
+\code{\link{create_deberta_v2_model}()},
+\code{\link{create_funnel_model}()},
 \code{\link{create_longformer_model}()},
 \code{\link{train_tune_bert_model}()},
+\code{\link{train_tune_deberta_v2_model}()},
+\code{\link{train_tune_funnel_model}()},
 \code{\link{train_tune_longformer_model}()},
 \code{\link{train_tune_roberta_model}()}
 }

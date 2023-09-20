@@ -5,9 +5,23 @@ path="test_data/classifier/bert_embeddings.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
-if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
-  dir.create(testthat::test_path("tmp_full_models"))
+if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts"))
 }
+
+if(dir.exists(testthat::test_path("test_artefacts/tmp_full_models"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts/tmp_full_models"))
+}
+
+if(dir.exists(testthat::test_path("test_artefacts/classifier"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts/classifier"))
+}
+
+if(dir.exists(testthat::test_path("test_artefacts/tmp"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts/tmp"))
+}
+
+
 
 #-------------------------------------------------------------------------------
 aifeducation::set_config_gpu_low_memory()
@@ -170,7 +184,7 @@ for (n_classes in 2:3){
         sustain_iso_code = "DEU",
         epochs=2,
         batch_size=32,
-        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
         trace=FALSE,
         keras_trace=0,
         n_cores=1)
@@ -202,7 +216,7 @@ for (n_classes in 2:3){
         bpl_model_reset=FALSE,
         epochs=2,
         batch_size=32,
-        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
         sustain_track=FALSE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
@@ -238,7 +252,7 @@ for (n_classes in 2:3){
         bpl_model_reset=FALSE,
         epochs=2,
         batch_size=32,
-        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
         sustain_track=FALSE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
@@ -274,7 +288,7 @@ for (n_classes in 2:3){
         bpl_model_reset=FALSE,
         epochs=2,
         batch_size=32,
-        dir_checkpoint=testthat::test_path("test_data/classifier"),
+        dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
         sustain_track=FALSE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
@@ -288,7 +302,7 @@ for (n_classes in 2:3){
 
 test_that("Saving Classifier H5",{
   expect_no_error(classifier$save_model(
-    testthat::test_path("tmp"),
+    testthat::test_path("test_artefacts/tmp"),
     save_format = "h5")
   )
 })
@@ -296,13 +310,13 @@ test_that("Saving Classifier H5",{
 test_that("Loading Classifier H5",{
   expect_no_error(
     classifier$load_model(
-      testthat::test_path("tmp"))
+      testthat::test_path("test_artefacts/tmp"))
   )
 })
 
 test_that("Saving Classifier TF",{
   expect_no_error(classifier$save_model(
-    testthat::test_path("tmp"),
+    testthat::test_path("test_artefacts/tmp"),
     save_format = "tf")
   )
 })
@@ -310,7 +324,7 @@ test_that("Saving Classifier TF",{
 test_that("Loading Classifier TF",{
   expect_no_error(
     classifier$load_model(
-      testthat::test_path("tmp"))
+      testthat::test_path("test_artefacts/tmp"))
   )
 })
 
@@ -415,7 +429,7 @@ test_that("publication_info",{
 test_that("Classifier Save Total Model H5", {
   expect_no_error(
     save_ai_model(model=classifier,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "H5")
   )
 })
@@ -423,7 +437,7 @@ test_that("Classifier Save Total Model H5", {
 test_that("Classifier Load Total Model H5", {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")
@@ -432,7 +446,7 @@ test_that("Classifier Load Total Model H5", {
 test_that("Classifier Save Total Model TF with ID", {
   expect_no_error(
     save_ai_model(model=classifier,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "tf")
   )
 })
@@ -440,7 +454,7 @@ test_that("Classifier Save Total Model TF with ID", {
 test_that("Classifier Load Total Model TF with ID", {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")
@@ -449,7 +463,7 @@ test_that("Classifier Load Total Model TF with ID", {
 test_that("Classifier Save Total Model TF without ID", {
   expect_no_error(
     save_ai_model(model=classifier,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "tf",
                   append_ID=FALSE)
   )
@@ -458,7 +472,7 @@ test_that("Classifier Save Total Model TF without ID", {
 test_that("Classifier Load Total Model TF without ID", {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",classifier$get_model_info()$model_name_root))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name_root))
   )
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")

@@ -2,8 +2,12 @@ path="test_data/gvc_lda/basic_text_rep_movie_reviews.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
-if(dir.exists(testthat::test_path("tmp_full_models"))==FALSE){
-  dir.create(testthat::test_path("tmp_full_models"))
+if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts"))
+}
+
+if(dir.exists(testthat::test_path("test_artefacts/tmp_full_models"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts/tmp_full_models"))
 }
 
 #------------------------------------------------------------------------------
@@ -39,7 +43,7 @@ model_name=global_vector_clusters_modeling$get_model_info()$model_name
 test_that("GlobalVectorClusters Save Total Model H5", {
   expect_no_error(
     save_ai_model(model=global_vector_clusters_modeling,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "H5")
   )
 })
@@ -47,7 +51,7 @@ test_that("GlobalVectorClusters Save Total Model H5", {
 test_that("GlobalVectorClusters Load Total Model H5", {
   global_vector_clusters_modeling<-NULL
   global_vector_clusters_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
   )
   expect_s3_class(global_vector_clusters_modeling,
                   class="TextEmbeddingModel")
@@ -56,7 +60,7 @@ test_that("GlobalVectorClusters Load Total Model H5", {
 test_that("GlobalVectorClusters Save Total Model TF", {
   expect_no_error(
     save_ai_model(model=global_vector_clusters_modeling,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "tf")
   )
 })
@@ -64,7 +68,7 @@ test_that("GlobalVectorClusters Save Total Model TF", {
 test_that("GlobalVectorClusters Load Total Model TF", {
   global_vector_clusters_modeling<-NULL
   global_vector_clusters_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
   )
   expect_s3_class(global_vector_clusters_modeling,
                   class="TextEmbeddingModel")
@@ -121,7 +125,7 @@ model_name=topic_modeling$get_model_info()$model_name
 test_that("TopicModeling Save Total Model H5", {
   expect_no_error(
     save_ai_model(model=topic_modeling,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "H5")
   )
 })
@@ -129,7 +133,7 @@ test_that("TopicModeling Save Total Model H5", {
 test_that("TopicModeling Load Total Model H5", {
   topic_modeling<-NULL
   topic_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
   )
   expect_s3_class(topic_modeling,
                   class="TextEmbeddingModel")
@@ -138,7 +142,7 @@ test_that("TopicModeling Load Total Model H5", {
 test_that("TopicModeling Save Total Model TF", {
   expect_no_error(
     save_ai_model(model=topic_modeling,
-                  model_dir = testthat::test_path("tmp_full_models"),
+                  model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
                   save_format = "tf")
   )
 })
@@ -146,7 +150,7 @@ test_that("TopicModeling Save Total Model TF", {
 test_that("TopicModeling Load Total Model TF", {
   topic_modeling<-NULL
   topic_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
   )
   expect_s3_class(topic_modeling,
                   class="TextEmbeddingModel")
@@ -306,3 +310,4 @@ test_that("check_single_case",{
   expect_equal(nrow(combine_embeddings(embeddings_list = list(tmp_embedding1,tmp_embedding2))$embeddings),2)
 
 })
+

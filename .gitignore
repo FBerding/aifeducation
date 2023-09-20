@@ -14,6 +14,7 @@ tests/testthat/test_data/tmp/
 tests/testthat/tmp/
 tests/testthat/tmp_full_models/
 tests/testthat/test_data/bert/
+tests/testthat/test_data/test_artefacts/
 tests/testthat/test_data/roberta/
 tests/testthat/test_data/longformer/
 cran-comments.md

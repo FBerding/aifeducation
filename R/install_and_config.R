@@ -15,7 +15,9 @@ install_py_modules<-function(envname="aifeducation"){
                       "tokenizers",
                       "datasets",
                       "torch",
-                      "codecarbon")
+                      "keras",
+                      "codecarbon",
+                      "accelerate")
 
   reticulate::conda_create(
     envname = envname,

@@ -230,11 +230,7 @@ may start a new session like this:
 ```{r, include = TRUE, eval=FALSE}
 library(aifeducation)
 
-#if you use a machine with windows
 reticulate::use_condaenv(condaenv = "aifeducation")
-
-#if you use a machine with mac or linux
-reticulate::use_virtualenv(virtualenv= "aifedcuation")
 ```
 
 Now is a good time to configure tensorflow, since some configurations
@@ -250,6 +246,8 @@ set_config_gpu_low_memory()
 #if you would like to reduce the tensorflow output to errors
 set_config_os_environ_logger(level = "ERROR")
 ```
+
+If you would like to use PyTorch you can skip this stept.
 
 Now everything is ready to start the preparation tasks.
 
@@ -444,6 +442,7 @@ could look like this:
 basic_text_rep<-bow_pp_create_basic_text_rep(
 create_bert_model(
     model_dir = "my_own_transformer",
+    ml_framework="pytorch",
     vocab_raw_texts=example_data$text,
     vocab_size=30522,
     vocab_do_lower_case=FALSE,
@@ -460,6 +459,10 @@ create_bert_model(
     sustain_interval=15,
     trace=TRUE)
 ```
+
+With `ml_framework="tensorflow"` you can decide which machine learning framework
+should be used. You can choose between `ml_framework="tensorflow"` and 
+`ml_framework="pytorch"`. Please note, that you can change the framework at any point.
 
 For this function to work, you must provide a path to a directory where
 your new transformer should be saved. Furthermore, you must provide raw
@@ -509,6 +512,7 @@ directory. The next step is to train your model by calling
 
 ```{r, include = TRUE, eval=FALSE}
 train_tune_bert_model(
+  ml_framework="pytorch",
   output_dir = "my_own_transformer_trained",
   bert_model_dir_path = "my_own_transformer",
   raw_texts = example_data$text,
@@ -814,8 +818,14 @@ global_vector_clusters_modeling<-load_ai_model(
   model_dir="text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l")
 
 bert_modeling<-load_ai_model(
+  ml_framework="auto",
   model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
 ```
+
+In the case of transformers you can decide which machine learning framework should
+be used for applying the model by specifying `ml_framework`. You can choose between
+PyTorch(`ml_framework="pytorch"`) and tensorflow(`ml_framework="tensorflow"`). If you set
+`ml_framework="auto"` the framework is used that was active when the model was saved.
 
 **Please note that you have to add the name of the model to the directory path.**
 In our example we have stored three models in the directory "text_embedding_models". Each

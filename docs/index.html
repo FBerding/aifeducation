@@ -12,8 +12,8 @@
     in the educational and social sciences is often unbalanced in terms of
     frequencies. To support educators as well as educational and social
     researchers in using the potentials of AI for their work, this package
-    provides a unified interface for neural nets in keras and
-    tensorflow to deal with natural language problems. The tools
+    provides a unified interface for neural nets in keras,
+    tensorflow, and pytorch to deal with natural language problems. The tools
     integrate existing mathematical and statistical methods for dealing
     with small data sets via pseudo-labeling (e.g. Lee (2013)
     &lt;https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks&gt;,
@@ -41,8 +41,8 @@
     in the educational and social sciences is often unbalanced in terms of
     frequencies. To support educators as well as educational and social
     researchers in using the potentials of AI for their work, this package
-    provides a unified interface for neural nets in keras and
-    tensorflow to deal with natural language problems. The tools
+    provides a unified interface for neural nets in keras,
+    tensorflow, and pytorch to deal with natural language problems. The tools
     integrate existing mathematical and statistical methods for dealing
     with small data sets via pseudo-labeling (e.g. Lee (2013)
     &lt;https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks&gt;,
@@ -70,7 +70,7 @@
     
     <a class="navbar-brand me-2" href="index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,24 +117,20 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The R package <em>Artificial Intelligence for Education (aifeducation)</em> is designed for the special needs of educators, educational researchers, and social researchers. The target audience of this package are educators and researchers who would like to develop their own models as well as persons who would like to use models created by other researchers/educators. The package supports the application of Artificial Intelligence (AI) for Natural Language Processing tasks such as text embedding, and classification under the special conditions of educational and social sciences. These are:</p>
+<p>The R package <em>Artificial Intelligence for Education (aifeducation)</em> is designed for the special needs of educators, educational researchers, and social researchers. The target audience of this package are educators and researchers who would like to develop their own models as well as persons who would like to use models created by other researchers/educators. The package supports the application of Artificial Intelligence (AI) for Natural Language Processing tasks such as text embedding, and classification under the special conditions of educational and social sciences.</p>
+<div class="section level2">
+<h2 id="features-overview">Features Overview<a class="anchor" aria-label="anchor" href="#features-overview"></a>
+</h2>
 <ul>
-<li>
-<strong>digital data availability:</strong> In educational and social science, data is often only available in handwritten form. For example, in schools or universities, students and pupils often solve tasks by creating handwritten documents. Thus, educators and researchers first have to transform analogue data into a digital form, involving human actions. This makes data generation financially expensive and time-consuming, leading to <em>small data sets</em>.</li>
-<li>
-<strong>high privacy policy standards:</strong> Furthermore, in educational and social science, data often refers to humans and/or their actions. These kinds of data are protected by privacy policies in many countries, limiting access to and the usage of data, which also results in <em>small data sets</em>.</li>
-<li>
-<strong>long research tradition:</strong> Educational and social sciences have a long research tradition in generating insights into social phenomena as well as learning and teaching. These insights have to be incorporated into applications of AI (e.g., Luan et al. 2020; Wong et al. 2019). This makes supervised machine learning a very important technology since it provides a link between educational and social theories and models on the one hand and machine learning on the other hand (Berding et al. 2022). However, this kind of machine learning requires humans to generate a valid data set for the training process, leading to <em>small data sets</em>.</li>
-<li>
-<strong>complex constructs:</strong> Compared to classification tasks where, for instance, AI has to differentiate between a ‘good’ or ‘bad’ movie review, constructs in the educational and social sciences are more complex. For example, some research instruments in motivational psychology require to infer personal motifs from written essays (e.g., Gruber &amp; Kreuzpointner 2013). A reliable and valid interpretation of this kind of information requires well qualified human raters, making data generation expensive. This also <em>limits the size of a data set</em>.</li>
-<li>
-<strong>imbalanced data:</strong> Finally, data in the educational and social sciences often occurs in an imbalanced pattern as several empirical studies show (Bloemen 2011; Stütz et al. 2022). Imbalanced means that some categories or characteristics of a data set have very high absolute frequencies compared to other categories and characteristics. Imbalance during AI training guides algorithms to focus and prioritize the categories and characteristics with high absolute frequencies, increasing the risk to miss categories/characteristics with low frequencies (Haixiang et al. 2017). This can lead AI to prefer special groups of people/materials, imply false recommendations and conclusions, or to miss rare categories or characteristics.</li>
+<li>Simple usage of artificial intelligence by providing routines for the most important tasks for educators and researchers from the social and educational sciences.</li>
+<li>Supporting both ‘PyTorch’ and ‘Tensorflow’ as machine learning frameworks.</li>
+<li>Supporting pre-trained language models from Hugging Face.</li>
+<li>Supporting the usage of trained models on both frameworks providing a high level of flexibility (supported models are BERT, RoBERTa, DeBERTa, Longformer, and Funnel Transformer).</li>
+<li>Making sharing pre-trained models very easy.</li>
+<li>Integrating sustainability tracking.</li>
+<li>Integrating special statistical techniques for dealing with data structures common in the social and educational sciences.</li>
 </ul>
 <p>Currently, the package focuses on classification tasks which can either be used to diagnose characteristics of learners from written materials or to estimate the properties of learning and teaching materials. In the future, more tasks will be implemented.</p>
-<div class="section level2">
-<h2 id="sustainability">Sustainability<a class="anchor" aria-label="anchor" href="#sustainability"></a>
-</h2>
-<p>Training AI models can be time and energy consuming. To help researchers in estimating the ecological impact of their work a sustainability tracker is implemented based on the python library codecarbon by Courty et al. (2023). This tracker allows to estimate the energy consumption for CPUs, GPUs, and RAM during training and derives a value for the CO2 emission. This value is based on the country’s energy mix where the computer is located.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -149,19 +145,42 @@
 <span>                          dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="sustainability">Sustainability<a class="anchor" aria-label="anchor" href="#sustainability"></a>
+</h2>
+<p>Training AI models can be time and energy consuming. To help researchers in estimating the ecological impact of their work a sustainability tracker is implemented based on the python library codecarbon by Courty et al. (2023). This tracker allows to estimate the energy consumption for CPUs, GPUs, and RAM during training and derives a value for the CO2 emission. This value is based on the country’s energy mix where the computer is located.</p>
+</div>
+<div class="section level2">
+<h2 id="pytorch-and-tensorflow-compatiblity">PyTorch and Tensorflow Compatiblity<a class="anchor" aria-label="anchor" href="#pytorch-and-tensorflow-compatiblity"></a>
+</h2>
+<p>The packages allows to use all supported models either with ‘PyTorch’ or with ‘tensorflow’ providing a high level of flexibility. Even pre-trained models can be used with both frameworks. In general, users only have to decide which framework they would like to use when loading a model.</p>
+<p>At the moment the classifier requires ‘tensorflow’. This will be changed when keras3 is released.</p>
+</div>
+<div class="section level2">
 <h2 id="classification-tasks">Classification Tasks<a class="anchor" aria-label="anchor" href="#classification-tasks"></a>
 </h2>
 <div class="section level3">
 <h3 id="transforming-texts-into-numbers">Transforming Texts into Numbers<a class="anchor" aria-label="anchor" href="#transforming-texts-into-numbers"></a>
 </h3>
-<p>Classification tasks require the transformation of raw texts into a representation with numbers. For this step, <em>aifeducation</em> supports both newer approaches such as BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), and Longformer (Beltagy, Peters &amp; Cohan 2020) and older approaches such as GlobalVectors (Pennington, Socher &amp; Manning 2014) or Latent Dirichlet Allocation/Topic Modeling in classification tasks.</p>
+<p>Classification tasks require the transformation of raw texts into a representation with numbers. For this step, <em>aifeducation</em> supports both newer approaches such as BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &amp; Cohan 2020) and older approaches such as GlobalVectors (Pennington, Socher &amp; Manning 2014) or Latent Dirichlet Allocation/Topic Modeling in classification tasks.</p>
 <p><em>aifeducation</em> supports the usage of pre-trained transformer models provided by <a href="https://huggingface.co/" class="external-link">Hugging Face</a> and the creation of new transformers allowing educators and researchers to develop specialized and domain-specific models.</p>
 <p>The package supports analysis of long texts. Depending on the method, long texts are transformed into vectors at once or, if too long, are split into several chunks which result in a sequence of vectors.</p>
 </div>
 <div class="section level3">
 <h3 id="training-ai-under-challenging-conditions">Training AI under Challenging Conditions<a class="anchor" aria-label="anchor" href="#training-ai-under-challenging-conditions"></a>
 </h3>
-<p>For the second step within a classification task, <em>aifeducation</em> integrates some important statistical and mathematical methods for dealing with the main challenges in educational and social sciences for applying AI.</p>
+<p>For the second step within a classification task, <em>aifeducation</em> integrates some important statistical and mathematical methods for dealing with the main challenges in educational and social sciences for applying AI. These are:</p>
+<ul>
+<li>
+<strong>digital data availability:</strong> In educational and social science, data is often only available in handwritten form. For example, in schools or universities, students and pupils often solve tasks by creating handwritten documents. Thus, educators and researchers first have to transform analogue data into a digital form, involving human actions. This makes data generation financially expensive and time-consuming, leading to <em>small data sets</em>.</li>
+<li>
+<strong>high privacy policy standards:</strong> Furthermore, in educational and social science, data often refers to humans and/or their actions. These kinds of data are protected by privacy policies in many countries, limiting access to and the usage of data, which also results in <em>small data sets</em>.</li>
+<li>
+<strong>long research tradition:</strong> Educational and social sciences have a long research tradition in generating insights into social phenomena as well as learning and teaching. These insights have to be incorporated into applications of AI (e.g., Luan et al. 2020; Wong et al. 2019). This makes supervised machine learning a very important technology since it provides a link between educational and social theories and models on the one hand and machine learning on the other hand (Berding et al. 2022). However, this kind of machine learning requires humans to generate a valid data set for the training process, leading to <em>small data sets</em>.</li>
+<li>
+<strong>complex constructs:</strong> Compared to classification tasks where, for instance, AI has to differentiate between a ‘good’ or ‘bad’ movie review, constructs in the educational and social sciences are more complex. For example, some research instruments in motivational psychology require to infer personal motifs from written essays (e.g., Gruber &amp; Kreuzpointner 2013). A reliable and valid interpretation of this kind of information requires well qualified human raters, making data generation expensive. This also <em>limits the size of a data set</em>.</li>
+<li>
+<strong>imbalanced data:</strong> Finally, data in the educational and social sciences often occurs in an imbalanced pattern as several empirical studies show (Bloemen 2011; Stütz et al. 2022). Imbalanced means that some categories or characteristics of a data set have very high absolute frequencies compared to other categories and characteristics. Imbalance during AI training guides algorithms to focus and prioritize the categories and characteristics with high absolute frequencies, increasing the risk to miss categories/characteristics with low frequencies (Haixiang et al. 2017). This can lead AI to prefer special groups of people/materials, imply false recommendations and conclusions, or to miss rare categories or characteristics.</li>
+</ul>
 <p>In order to deal with the problem of imbalanced data sets, the package integrates <em>Synthetic Minority Oversampling Technique</em> into the learning process. Currently the <em>Basic Synthetic Minority Oversampling Technique</em> (Chawla et al. 2002), <em>Density-Bases Synthetic Minority Oversampling Technique</em> (Bunkhumpornpat, Sinapiromsaran &amp; Lursinsap 2012), and <em>Adaptive Synthetic Sampling Approach for Imbalanced Learning</em> (Hem Garcia &amp; Li 2008) are implemented via the <em>R</em> package <em>smotefamiliy</em>.</p>
 <p>In order to address the problem of small data sets, training loops of AI integrate <em>pseudo-labeling</em> (e.g., Lee 2013). Pseudo-labeling is a technique which can be used for supervised learning. That is, educators and researchers rate a part of a data set and train AI with this very part. The remainder of the data is not processed by humans. Instead, AI uses this part of data to learn on its own. Thus, educators and researchers only have to provide additional data for the AI’s learning process without coding it themselves. This offers the possibility to add more data to the training process and to reduce labor costs.</p>
 </div>
@@ -203,11 +222,13 @@ with performance measures they are more familiar with, every AI trained with thi
 <p>Bunkhumpornpat, C., Sinapiromsaran, K., &amp; Lursinsap, C. (2012). DBSMOTE: Density-Based Synthetic Minority Over-sampling Technique. Applied Intelligence, 36(3), 664–684. <a href="https://doi.org/10.1007/s10489-011-0287-y" class="external-link uri">https://doi.org/10.1007/s10489-011-0287-y</a></p>
 <p>Chawla, N. V., Bowyer, K. W., Hall, L. O., &amp; Kegelmeyer, W. P. (2002). SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial Intelligence Research, 16, 321–357. <a href="https://doi.org/10.1613/jair.953" class="external-link uri">https://doi.org/10.1613/jair.953</a></p>
 <p>Courty, B., Schmidt, V., Goyal-Kamal, Coutarel, M., Feld, B., Lecourt, J., &amp; … (2023). mlco2/codecarbon: v2.2.7. <a href="https://doi.org/10.5281/zenodo.8181237" class="external-link uri">https://doi.org/10.5281/zenodo.8181237</a></p>
+<p>Dai, Z., Lai, G., Yang, Y. &amp; Le, Q. V. (2020). Funnel-Transformer: Filtering out Sequential Redundancy for Efficient Language Processing. <a href="https://doi.org/10.48550/arXiv.2006.03236" class="external-link uri">https://doi.org/10.48550/arXiv.2006.03236</a></p>
 <p>Devlin, J., Chang, M.‑W., Lee, K., &amp; Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. Doran, &amp; T. Solorio (Eds.), Proceedings of the 2019 Conference of the North (pp. 4171–4186). Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/N19-1423" class="external-link uri">https://doi.org/10.18653/v1/N19-1423</a></p>
 <p>Gruber, N., &amp; Kreuzpointner, L. (2013). Measuring the reliability of picture story exercises like the TAT. PloS One, 8(11), e79450. <a href="https://doi.org/10.1371/journal.pone.0079450" class="external-link uri">https://doi.org/10.1371/journal.pone.0079450</a></p>
 <p>Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive guide to measuring the extent of agreement among raters (Fourth edition). STATAXIS.</p>
 <p>Haixiang, G., Yijing, L., Shang, J., Mingyun, G., Yuanyue, H., &amp; Bing, G. (2017). Learning from class-imbalanced data: Review of methods and applications. Expert Systems with Applications, 73, 220–239. <a href="https://doi.org/10.1016/j.eswa.2016.12.035" class="external-link uri">https://doi.org/10.1016/j.eswa.2016.12.035</a></p>
 <p>He, H., Bai, Y., Garcia, E. A., &amp; Li, S. (2008). ADASYN: Adaptive synthetic sampling approach for imbalanced learning. In 2008 IEEE International Joint Conference on Neural Networks (IEEE World Congress on Computational Intelligence) (pp. 1322–1328). IEEE. <a href="https://doi.org/10.1109/IJCNN.2008.4633969" class="external-link uri">https://doi.org/10.1109/IJCNN.2008.4633969</a></p>
+<p>He, P., Liu, X., Gao, J. &amp; Chen, W. (2020). DeBERTa: Decoding-enhanced BERT with Disentangled Attention. <a href="https://doi.org/10.48550/arXiv.2006.03654" class="external-link uri">https://doi.org/10.48550/arXiv.2006.03654</a></p>
 <p>Krippendorff, K. (2019). Content Analysis: An Introduction to Its Methodology (4th Ed.). SAGE.</p>
 <p>Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient Semi-Supervised Learning Method for Deep Neural Networks. CML 2013 Workshop: Challenges in Representation Learning.</p>
 <p>Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &amp; Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. <a href="https://doi.org/10.48550/arXiv.1907.11692" class="external-link uri">https://doi.org/10.48550/arXiv.1907.11692</a></p>

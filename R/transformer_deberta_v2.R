@@ -1,7 +1,7 @@
-#'Function for creating a new transformer based on BERT
+#'Function for creating a new transformer based on DeBERTa-V2
 #'
-#'This function creates a transformer configuration based on the BERT base architecture
-#'and a vocabulary based on WordPiece by using
+#'This function creates a transformer configuration based on the DeBERTa-V2 base architecture
+#'and a vocabulary based on SentencePiece tokenizer by using
 #'the python libraries 'transformers' and 'tokenizers'.
 #'
 #'@param ml_framework \code{string} Framework to use for training and inference.
@@ -11,7 +11,11 @@
 #'@param vocab_raw_texts \code{vector} containing the raw texts for creating the
 #'vocabulary.
 #'@param vocab_size \code{int} Size of the vocabulary.
-#'@param vocab_do_lower_case \code{bool} \code{TRUE} if all words/tokens should be lower case.
+#'@param add_prefix_space \code{bool} \code{TRUE} if an additional space should be insert
+#'to the leading words.
+#'@param trim_offsets \code{bool} If \code{TRUE} post processing trims offsets
+#'to avoid including whitespaces.
+#'@param do_lower_case \code{bool} If \code{TRUE} all characters are transformed to lower case.
 #'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
 #'also determines the maximum length of a sequence which can be processed with the model.
 #'@param hidden_size \code{int} Number of neurons in each layer. This parameter determines the
@@ -41,31 +45,34 @@
 #'@return This function does not return an object. Instead the configuration
 #'and the vocabulary of the new model are saved on disk.
 #'@note To train the model, pass the directory of the model to the function
-#'\link{train_tune_bert_model}.
-#'@references
-#'Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
-#'Pre-training of Deep Bidirectional Transformers for Language
-#'Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
-#'Proceedings of the 2019 Conference of the North (pp. 4171--4186).
-#'Association for Computational Linguistics.
-#'\doi{10.18653/v1/N19-1423}
+#'\link{train_tune_deberta_v2_model}.
+#'@note For this model a SentencePiece tokenizer is created which does not rely
+#'on the corresponding python library sentencepiece. Instead an implementation
+#'of the tokenizer library.
 #'
-#'@references Hugging Face documentation
-#'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
+#'@references
+#'He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT
+#'with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
+#'
+#'@references Hugging Face Documentation
+#'\url{https://huggingface.co/docs/transformers/model_doc/deberta-v2#debertav2}
 #'
 #'@family Transformer
+#'
 #'@export
-create_bert_model<-function(
+create_deberta_v2_model<-function(
     ml_framework="tensorflow",
     model_dir,
     vocab_raw_texts=NULL,
-    vocab_size=30522,
-    vocab_do_lower_case=FALSE,
+    vocab_size=128100,
+    add_prefix_space=FALSE,
+    trim_offsets=TRUE,
+    do_lower_case=FALSE,
     max_position_embeddings=512,
-    hidden_size=768,
-    num_hidden_layer=12,
-    num_attention_heads=12,
-    intermediate_size=3072,
+    hidden_size=1536,
+    num_hidden_layer=24,
+    num_attention_heads=24,
+    intermediate_size=6144,
     hidden_act="gelu",
     hidden_dropout_prob=0.1,
     attention_probs_dropout_prob=0.1,
@@ -76,20 +83,20 @@ create_bert_model<-function(
     trace=TRUE){
 
   #argument checking-----------------------------------------------------------
-  if(max_position_embeddings>512){
-    warning("Due to a quadratic increase in memory requirments it is not
-            recommended to set max_position_embeddings above 512.
-            If you want to analyse long documents please split your document
-            into several chunks with an object of class TextEmbedding Model or
-            use another transformer (e.g. longformer).")
+  #if(max_position_embeddings>512){
+  #  warning("Due to a quadratic increase in memory requirments it is not
+  #          recommended to set max_position_embeddings above 512.
+  #          If you want to analyse long documents please split your document
+  #          into several chunks with an object of class TextEmbedding Model or
+  #          use another transformer (e.g. longformer).")
+  #}
+
+  if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
+    stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
 
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
     stop("hidden_act must be gelu, relu, silu or gelu_new")
-  }
-
-  if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
-    stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
 
   #Start Sustainability Tracking
@@ -111,61 +118,68 @@ create_bert_model<-function(
   }
 
   #Creating a new Tokenizer for Computing Vocabulary
-  special_tokens=c("[PAD]","[CLS]","[SEP]","[UNK]","[MASK]")
-  tok_new<-tok$Tokenizer(tok$models$WordPiece())
-  tok_new$normalizer=tok$normalizers$BertNormalizer(
-    lowercase=vocab_do_lower_case,
+  tok_new<-tok$SentencePieceUnigramTokenizer()
+  tok_new$normalizer<-tok$normalizers$BertNormalizer(
     clean_text = TRUE,
     handle_chinese_chars = TRUE,
-    strip_accents = vocab_do_lower_case)
-  tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
-  tok_new$decode=tok$decoders$WordPiece()
-  trainer<-tok$trainers$WordPieceTrainer(
-    vocab_size=as.integer(vocab_size),
-    special_tokens = special_tokens,
-    show_progress=trace)
+    strip_accents = do_lower_case,
+    lowercase = do_lower_case
+  )
+  tok_new$post_processor<-tok$processors$RobertaProcessing(
+    sep=reticulate::tuple(list("[SEP]",as.integer(1))),
+    cls=reticulate::tuple(list("[CLS]",as.integer(0))),
+    trim_offsets=trim_offsets,
+    add_prefix_space = add_prefix_space
+  )
+  tok_new$enable_truncation(max_length = as.integer(max_position_embeddings))
+  tok_new$enable_padding(pad_token = "[PAD]")
 
   #Calculating Vocabulary
   if(trace==TRUE){
     cat(paste(date(),
               "Start Computing Vocabulary","\n"))
   }
-  tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
+  tok_new$train_from_iterator(
+    iterator = vocab_raw_texts,
+    vocab_size = as.integer(vocab_size),
+    special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"))
   if(trace==TRUE){
     cat(paste(date(),
               "Start Computing Vocabulary - Done","\n"))
   }
 
   if(dir.exists(model_dir)==FALSE){
-    cat(paste(date(),"Creating Directory","\n"))
+    if(trace==TRUE){
+      cat(paste(date(),"Creating Model Directory","\n"))
+    }
     dir.create(model_dir)
   }
 
-  write(c(special_tokens,names(tok_new$get_vocab())),
-        file=paste0(model_dir,"/","vocab.txt"))
+  #Saving files
+  tok_new$save_model(model_dir)
 
   if(trace==TRUE){
     cat(paste(date(),
               "Creating Tokenizer","\n"))
   }
-  tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
-                                           do_lower_case=vocab_do_lower_case,
-                                           clean_text=TRUE,
-                                           tokenize_chinese_chars=TRUE,
-                                           strip_accents=vocab_do_lower_case,
-                                           wordpieces_prefix="##",
-                                           unk_token="[UNK]",
-                                           sep_token="[SEP]",
-                                           pad_token="[PAD]",
-                                           cls_token="[CLS]",
-                                           mask_token="[MASK]")
+  tokenizer=transformers$PreTrainedTokenizerFast(
+    tokenizer_object=tok_new,
+    bos_token = "[CLS]",
+    eos_token = "[SEP]",
+    sep_token = "[SEP]",
+    cls_token = "[CLS]",
+    unk_token = "[UNK]",
+    pad_token = "[PAD]",
+    mask_token = "[MASK]",
+    add_prefix_space = add_prefix_space,
+    trim_offsets=trim_offsets)
 
   if(trace==TRUE){
     cat(paste(date(),
               "Creating Tokenizer - Done","\n"))
   }
 
-  configuration=transformers$BertConfig(
+  configuration=transformers$DebertaV2Config(
     vocab_size=as.integer(vocab_size),
     max_position_embeddings=as.integer(max_position_embeddings),
     hidden_size=as.integer(hidden_size),
@@ -174,27 +188,28 @@ create_bert_model<-function(
     intermediate_size=as.integer(intermediate_size),
     hidden_act=hidden_act,
     hidden_dropout_prob=hidden_dropout_prob,
-    attention_probs_dropout_prob=attention_probs_dropout_prob,
-    pad_token_id = tokenizer$pad_token_id,
-    type_vocab_size =as.integer(2),
+    attention_probs_dropout_prob =attention_probs_dropout_prob,
+    type_vocab_size =as.integer(0),
     initializer_range=0.02,
     layer_norm_eps=1e-12,
-    position_embedding_type="absolute",
-    is_decoder=FALSE,
-    use_cache=TRUE
-    )
+    relative_attention=TRUE,
+    max_relative_positions=as.integer(max_position_embeddings),
+    pad_token_id=tokenizer$pad_token_id,
+    position_biased_input=FALSE,
+    pos_att_type =c("p2c", "c2p")
+  )
 
   if(ml_framework=="tensorflow"){
-    bert_model=transformers$TFBertModel(configuration)
+    model=transformers$TFDebertaV2ForMaskedLM(configuration)
   } else {
-    bert_model=transformers$BertModel(configuration)
+    model=transformers$DebertaV2ForMaskedLM(configuration)
   }
 
   if(trace==TRUE){
     cat(paste(date(),
-              "Saving Bert Model","\n"))
+              "Saving DeBERTa V2 Model","\n"))
   }
-  bert_model$save_pretrained(save_directory=model_dir)
+  model$save_pretrained(model_dir)
 
   if(trace==TRUE){
     cat(paste(date(),
@@ -223,15 +238,14 @@ create_bert_model<-function(
     cat(paste(date(),
               "Done","\n"))
   }
-
 }
 
 
 
-#'Function for training and fine-tuning a BERT model
+#'Function for training and fine-tuning a DeBERTa-V2 model
 #'
 #'This function can be used to train or fine-tune a transformer
-#'based on BERT architecture with the help of the python libraries 'transformers',
+#'based on DeBERTa-V2 architecture with the help of the python libraries 'transformers',
 #''datasets', and 'tokenizers'.
 #'
 #'@param ml_framework \code{string} Framework to use for training and inference.
@@ -243,8 +257,6 @@ create_bert_model<-function(
 #'model is stored.
 #'@param raw_texts \code{vector} containing the raw texts for training.
 #'@param p_mask \code{double} Ratio determining the number of words/tokens for masking.
-#'@param whole_word \code{bool} \code{TRUE} if whole word masking should be applied.
-#'If \code{FALSE} token masking is used.
 #'@param val_size \code{double} Ratio determining the amount of token chunks used for
 #'validation.
 #'@param n_epoch \code{int} Number of epochs for training.
@@ -254,7 +266,7 @@ create_bert_model<-function(
 #'with a sequence length equal to \code{chunk_size}.
 #'@param min_seq_len \code{int} Only relevant if \code{full_sequences_only=FALSE}.
 #'Value determines the minimal sequence length for inclusion in training process.
-#'@param learning_rate \code{double} Learning rate for adam optimizer.
+#'@param learning_rate \code{bool} Learning rate for adam optimizer.
 #'@param n_workers \code{int} Number of workers. Only relevant if \code{ml_framework="tensorflow"}.
 #'@param multi_process \code{bool} \code{TRUE} if multiple processes should be activated.
 #'Only relevant if \code{ml_framework="tensorflow"}.
@@ -279,24 +291,17 @@ create_bert_model<-function(
 #'
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
-#'@note if \code{aug_vocab_by > 0} the raw text is used for training a WordPiece
-#'tokenizer. At the end of this process, additional entries are added to the vocabulary
-#'that are not part of the original vocabulary. This is in an experimental state.
 #'@note Pre-Trained models which can be fine-tuned with this function are available
-#'at \url{https://huggingface.co/}.
-#'@note New models can be created via the function \link{create_bert_model}.
-#'@note Training of the model makes use of dynamic masking in contrast to the
-#'original paper where static masking was applied.
-#'@references
-#'Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
-#'Pre-training of Deep Bidirectional Transformers for Language
-#'Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
-#'Proceedings of the 2019 Conference of the North (pp. 4171--4186).
-#'Association for Computational Linguistics.
-#'\doi{10.18653/v1/N19-1423}
+#'at \url{https://huggingface.co/}. New models can be created via the function
+#'\link{create_deberta_v2_model}.
+#'@note Training of this model makes use of dynamic masking.
 #'
-#'@references Hugging Face documentation
-#'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
+#'@references
+#'He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT
+#'with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
+#'
+#'@references Hugging Face Documentation
+#'\url{https://huggingface.co/docs/transformers/model_doc/deberta-v2#debertav2}
 #'
 #'@family Transformer
 #'
@@ -304,19 +309,18 @@ create_bert_model<-function(
 #'@importFrom utils read.csv
 #'
 #'@export
-train_tune_bert_model=function(ml_framework="tensorflow",
-                               output_dir,
+train_tune_deberta_v2_model=function(ml_framework="tensorflow",
+                                  output_dir,
                                model_dir_path,
                                raw_texts,
                                p_mask=0.15,
-                               whole_word=TRUE,
                                val_size=0.1,
                                n_epoch=1,
                                batch_size=12,
                                chunk_size=250,
                                full_sequences_only=FALSE,
                                min_seq_len=50,
-                               learning_rate=3e-3,
+                               learning_rate=3e-2,
                                n_workers=1,
                                multi_process=FALSE,
                                sustain_track=TRUE,
@@ -348,7 +352,6 @@ train_tune_bert_model=function(ml_framework="tensorflow",
     sustainability_tracker$start()
   }
 
-
   if(ml_framework=="tensorflow"){
     if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
       from_pt=FALSE
@@ -368,16 +371,24 @@ train_tune_bert_model=function(ml_framework="tensorflow",
   }
 
   if(ml_framework=="tensorflow"){
-    mlm_model=transformers$TFBertForMaskedLM$from_pretrained(model_dir_path,from_pt=from_pt)
+    mlm_model=transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_path, from_pt=from_pt)
   } else {
-    mlm_model=transformers$BertForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
+    mlm_model=transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
   }
 
-  tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir_path)
+  tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_path)
 
-  if(trace==TRUE){
-    cat(paste(date(),"Tokenize Raw Texts","\n"))
+  #argument checking------------------------------------------------------------
+  if(chunk_size>(mlm_model$config$max_position_embeddings)){
+    stop(paste("Chunk size is",chunk_size,". This value is not allowed to exceed",
+               mlm_model$config$max_position_embeddings))
   }
+  if(chunk_size<3){
+    stop("Chunk size must be at least 3.")
+  }
+
+  #adjust chunk size. To elements are needed for begin and end of sequence
+  chunk_size=chunk_size-2
 
   if(trace==TRUE){
     cat(paste(date(),"Creating Sequence Chunks For Training","\n"))
@@ -449,65 +460,35 @@ train_tune_bert_model=function(ml_framework="tensorflow",
 
   if(ml_framework=="tensorflow"){
 
-    if(whole_word==TRUE){
-      if(trace==TRUE){
-        cat(paste(date(),"Using Whole Word Masking","\n"))
-      }
-      word_ids=matrix(nrow = n_chunks,
-                      ncol= chunk_size)
-
-      if(trace==TRUE){
-        cat(paste(date(),"Adding Word Ids","\n"))
-      }
-
-      for(i in 0:(n_chunks-1)){
-        tmp=as.vector(unlist(tokenized_texts$word_ids(as.integer(i))))
-        word_ids[i+1,2:(length(tmp)+1)]=tmp
-      }
-
-      word_ids<-reticulate::dict("word_ids"=word_ids)
-      word_ids<-datasets$Dataset$from_dict(word_ids)
-      tokenized_dataset=tokenized_dataset$add_column(name="word_ids",column=word_ids)
-      data_collator=transformers$DataCollatorForWholeWordMask(
-        tokenizer = tokenizer,
-        mlm = TRUE,
-        mlm_probability = p_mask,
-        return_tensors = "tf")
-    } else {
-      if(trace==TRUE){
-        cat(paste(date(),"Using Token Masking","\n"))
-      }
-      data_collator=transformers$DataCollatorForLanguageModeling(
-        tokenizer = tokenizer,
-        mlm = TRUE,
-        mlm_probability = p_mask,
-        return_tensors = "tf"
-      )
+    if(trace==TRUE){
+      cat(paste(date(),"Using Token Masking","\n"))
     }
+    data_collator=transformers$DataCollatorForLanguageModeling(
+      tokenizer = tokenizer,
+      mlm = TRUE,
+      mlm_probability = p_mask,
+      return_tensors = "tf")
 
     tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
 
-  tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
+    tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     tf_train_dataset=mlm_model$prepare_tf_dataset(
       dataset = tokenized_dataset$train,
       batch_size = as.integer(batch_size),
       collate_fn = data_collator,
-      shuffle = TRUE
-    )
+      shuffle = TRUE)
     tf_test_dataset=mlm_model$prepare_tf_dataset(
       dataset = tokenized_dataset$test,
       batch_size = as.integer(batch_size),
       collate_fn = data_collator,
-      shuffle = TRUE
-    )
+      shuffle = TRUE)
 
     if(trace==TRUE){
       cat(paste(date(),"Preparing Training of the Model","\n"))
     }
     adam<-tf$keras$optimizers$Adam
-
 
     callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
       filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
@@ -516,8 +497,7 @@ train_tune_bert_model=function(ml_framework="tensorflow",
       mode="auto",
       save_best_only=TRUE,
       save_freq="epoch",
-      save_weights_only= TRUE
-    )
+      save_weights_only= TRUE)
 
     if(trace==TRUE){
       cat(paste(date(),"Compile Model","\n"))
@@ -545,41 +525,14 @@ train_tune_bert_model=function(ml_framework="tensorflow",
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
 
-    if(whole_word==TRUE){
-      if(trace==TRUE){
-        cat(paste(date(),"Using Whole Word Masking","\n"))
-      }
-      word_ids=matrix(nrow = n_chunks,
-                      ncol= chunk_size)
-
-      if(trace==TRUE){
-        cat(paste(date(),"Adding Word Ids","\n"))
-      }
-
-      for(i in 0:(n_chunks-1)){
-        tmp=as.vector(unlist(tokenized_texts$word_ids(as.integer(i))))
-        word_ids[i+1,2:(length(tmp)+1)]=tmp
-      }
-
-      word_ids<-reticulate::dict("word_ids"=word_ids)
-      word_ids<-datasets$Dataset$from_dict(word_ids)
-      tokenized_dataset=tokenized_dataset$add_column(name="word_ids",column=word_ids)
-      data_collator=transformers$DataCollatorForWholeWordMask(
-        tokenizer = tokenizer,
-        mlm = TRUE,
-        mlm_probability = p_mask,
-        return_tensors = "pt")
-    } else {
-      if(trace==TRUE){
-        cat(paste(date(),"Using Token Masking","\n"))
-      }
-      data_collator=transformers$DataCollatorForLanguageModeling(
-        tokenizer = tokenizer,
-        mlm = TRUE,
-        mlm_probability = p_mask,
-        return_tensors = "pt"
-      )
+    if(trace==TRUE){
+      cat(paste(date(),"Using Token Masking","\n"))
     }
+    data_collator=transformers$DataCollatorForLanguageModeling(
+      tokenizer = tokenizer,
+      mlm = TRUE,
+      mlm_probability = p_mask,
+      return_tensors = "pt")
 
     tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="torch")
@@ -601,9 +554,7 @@ train_tune_bert_model=function(ml_framework="tensorflow",
       per_device_eval_batch_size = as.integer(batch_size),
       save_safetensors=TRUE,
       auto_find_batch_size=FALSE,
-      report_to="none",
-      log_level="error",
-      disable_tqdm=!trace
+      report_to="none"
     )
 
     trainer=transformers$Trainer(
@@ -617,10 +568,11 @@ train_tune_bert_model=function(ml_framework="tensorflow",
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
 
     trainer$train()
+
   }
 
   if(trace==TRUE){
-    cat(paste(date(),"Saving Bert Model","\n"))
+    cat(paste(date(),"Saving DeBERTa V2 Model","\n"))
   }
   mlm_model$save_pretrained(save_directory=output_dir)
 
@@ -647,8 +599,7 @@ train_tune_bert_model=function(ml_framework="tensorflow",
       sustainability_data_chronic<-as.matrix(read.csv(sustainability_data_file_path_input))
       sustainability_data_chronic<-rbind(
         sustainability_data_chronic,
-        sustain_matrix
-      )
+        sustain_matrix)
 
       write.csv(
         x=sustainability_data_chronic,
@@ -666,5 +617,6 @@ train_tune_bert_model=function(ml_framework="tensorflow",
   if(trace==TRUE){
     cat(paste(date(),"Done","\n"))
   }
+
 }
 

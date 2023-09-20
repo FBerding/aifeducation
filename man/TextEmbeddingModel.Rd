@@ -58,6 +58,7 @@ Method for creating a new text embedding model
   model_version = NULL,
   model_language = NULL,
   method = NULL,
+  ml_framework = "tensorflow",
   max_length = 0,
   chunks = 1,
   overlap = 0,
@@ -91,10 +92,16 @@ the following models are supported:
 \code{method="bert"} for Bidirectional Encoder Representations from Transformers (BERT),
 \code{method="roberta"} for A Robustly Optimized BERT Pretraining Approach (RoBERTa),
 \code{method="longformer"} for Long-Document Transformer,
+\code{method="funnel"} for Funnel-Transformer,
+\code{method="deberta_v2"} for Decoding-enhanced BERT with Disentangled Attention (DeBERTa V2),
 \code{method="glove"} for
 GlobalVector Clusters, and
 \code{method="lda"} for topic modeling. See
 details for more information.}
+
+\item{\code{ml_framework}}{\code{string} Framework to use for the model.
+\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
+for 'pytorch'. Only relevant for transformer models.}
 
 \item{\code{max_length}}{\code{int} determining the maximum length of token
 sequences used in transformer models. Not relevant for the other methods.}
@@ -170,7 +177,7 @@ Returns an object of class \link{TextEmbeddingModel}.
 \subsection{Method \code{load_model()}}{
 Method for loading a transformers model into R.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(model_dir)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(model_dir, ml_framework = "auto")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -178,6 +185,10 @@ Method for loading a transformers model into R.
 \describe{
 \item{\code{model_dir}}{\code{string} containing the path to the relevant
 model directory.}
+
+\item{\code{ml_framework}}{\code{string} Determines the machine learning framework
+for using the model. Possible are \code{ml_framework="pytorch"} for 'pytorch',
+\code{ml_framework="tensorflow"} for 'tensorflow', and \code{ml_framework="auto"}.}
 }
 \if{html}{\out{</div>}}
 }

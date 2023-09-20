@@ -4,12 +4,17 @@
 #'and a vocabulary based on Byte-Pair Encoding (BPE) tokenizer by using
 #'the python libraries 'transformers' and 'tokenizers'.
 #'
+#'@param ml_framework \code{string} Framework to use for training and inference.
+#'\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
+#'for 'pytorch'.
 #'@param model_dir \code{string} Path to the directory where the model should be saved.
 #'@param vocab_raw_texts \code{vector} containing the raw texts for creating the
 #'vocabulary.
 #'@param vocab_size \code{int} Size of the vocabulary.
 #'@param add_prefix_space \code{bool} \code{TRUE} if an additional space should be insert
 #'to the leading words.
+#'@param trim_offsets \code{bool} If \code{TRUE} post processing trims offsets
+#'to avoid including whitespaces.
 #'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
 #'also determines the maximum length of a sequence which can be processed with the model.
 #'@param hidden_size \code{int} Number of neurons in each layer. This parameter determines the
@@ -20,6 +25,8 @@
 #'the attention mechanism.
 #'@param hidden_act \code{string} name of the activation function.
 #'@param hidden_dropout_prob \code{double} Ratio of dropout.
+#'@param attention_probs_dropout_prob \code{double} Ratio of dropout for attention
+#'probabilities.
 #'
 #'@param sustain_track \code{bool} If \code{TRUE} energy consumption is tracked
 #'during training via the python library codecarbon.
@@ -52,10 +59,12 @@
 #'
 #'@export
 create_roberta_model<-function(
+    ml_framework="tensorflow",
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=30522,
     add_prefix_space=FALSE,
+    trim_offsets=TRUE,
     max_position_embeddings=512,
     hidden_size=768,
     num_hidden_layer=12,
@@ -63,6 +72,7 @@ create_roberta_model<-function(
     intermediate_size=3072,
     hidden_act="gelu",
     hidden_dropout_prob=0.1,
+    attention_probs_dropout_prob=0.1,
     sustain_track=TRUE,
     sustain_iso_code=NULL,
     sustain_region=NULL,
@@ -76,6 +86,10 @@ create_roberta_model<-function(
             If you want to analyse long documents please split your document
             into several chunks with an object of class TextEmbedding Model or
             use another transformer (e.g. longformer).")
+  }
+
+  if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
+    stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
 
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
@@ -101,13 +115,17 @@ create_roberta_model<-function(
   }
 
   #Creating a new Tokenizer for Computing Vocabulary
-  tok_new<-tok$ByteLevelBPETokenizer()
+  tok_new<-tok$ByteLevelBPETokenizer(
+    add_prefix_space = add_prefix_space,
+    unicode_normalizer = "nfc",
+    trim_offsets = trim_offsets,
+    lowercase = FALSE)
   tok_new$enable_truncation(max_length = as.integer(max_position_embeddings))
   tok_new$enable_padding(pad_token = "<pad>")
   #Calculating Vocabulary
   if(trace==TRUE){
     cat(paste(date(),
-                "Start Computing Vocabulary","\n"))
+              "Start Computing Vocabulary","\n"))
   }
   tok_new$train_from_iterator(
     iterator = vocab_raw_texts,
@@ -115,7 +133,7 @@ create_roberta_model<-function(
     special_tokens=c("<s>","<pad>","</s>","<unk>","<mask>"))
   if(trace==TRUE){
     cat(paste(date(),
-                "Start Computing Vocabulary - Done","\n"))
+              "Start Computing Vocabulary - Done","\n"))
   }
 
   if(dir.exists(model_dir)==FALSE){
@@ -130,7 +148,7 @@ create_roberta_model<-function(
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Creating Tokenizer","\n"))
+              "Creating Tokenizer","\n"))
   }
   tokenizer=transformers$RobertaTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.json"),
                                               merges_file = paste0(model_dir,"/","merges.txt"),
@@ -141,11 +159,12 @@ create_roberta_model<-function(
                                               unk_token = "<unk>",
                                               pad_token = "<pad>",
                                               mask_token = "<mask>",
-                                              add_prefix_space = add_prefix_space)
+                                              add_prefix_space = add_prefix_space,
+                                              trim_offsets=trim_offsets)
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Creating Tokenizer - Done","\n"))
+              "Creating Tokenizer - Done","\n"))
   }
 
   configuration=transformers$RobertaConfig(
@@ -156,20 +175,31 @@ create_roberta_model<-function(
     num_attention_heads=as.integer(num_attention_heads),
     intermediate_size=as.integer(intermediate_size),
     hidden_act=hidden_act,
-    hidden_dropout_prob=hidden_dropout_prob
+    hidden_dropout_prob=hidden_dropout_prob,
+    attention_probs_dropout_prob =attention_probs_dropout_prob,
+    type_vocab_size =as.integer(2),
+    initializer_range=0.02,
+    layer_norm_eps=1e-12,
+    position_embedding_type="absolute",
+    is_decoder=FALSE,
+    use_cache=TRUE
   )
 
-  roberta_model=transformers$TFRobertaModel(configuration)
+  if(ml_framework=="tensorflow"){
+    roberta_model=transformers$TFRobertaModel(configuration)
+  } else {
+    roberta_model=transformers$RobertaModel(configuration)
+  }
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Saving Roberta Model","\n"))
+              "Saving Roberta Model","\n"))
   }
   roberta_model$save_pretrained(model_dir)
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Saving Tokenizer Model","\n"))
+              "Saving Tokenizer Model","\n"))
   }
   tokenizer$save_pretrained(model_dir)
 
@@ -192,7 +222,7 @@ create_roberta_model<-function(
 
   if(trace==TRUE){
     cat(paste(date(),
-                "Done","\n"))
+              "Done","\n"))
   }
 }
 
@@ -201,9 +231,12 @@ create_roberta_model<-function(
 #'Function for training and fine-tuning a RoBERTa model
 #'
 #'This function can be used to train or fine-tune a transformer
-#'based on BERT architecture with the help of the python libraries 'transformers',
+#'based on RoBERTa architecture with the help of the python libraries 'transformers',
 #''datasets', and 'tokenizers'.
 #'
+#'@param ml_framework \code{string} Framework to use for training and inference.
+#'\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
+#'for 'pytorch'.
 #'@param output_dir \code{string} Path to the directory where the final model
 #'should be saved. If the directory does not exist, it will be created.
 #'@param model_dir_path \code{string} Path to the directory where the original
@@ -215,9 +248,14 @@ create_roberta_model<-function(
 #'@param n_epoch \code{int} Number of epochs for training.
 #'@param batch_size \code{int} Size of batches.
 #'@param chunk_size \code{int} Size of every chunk for training.
+#'@param full_sequences_only \code{bool} \code{TRUE} for using only chunks
+#'with a sequence length equal to \code{chunk_size}.
+#'@param min_seq_len \code{int} Only relevant if \code{full_sequences_only=FALSE}.
+#'Value determines the minimal sequence length for inclusion in training process.
 #'@param learning_rate \code{bool} Learning rate for adam optimizer.
-#'@param n_workers \code{int} Number of workers.
+#'@param n_workers \code{int} Number of workers. Only relevant if \code{ml_framework="tensorflow"}.
 #'@param multi_process \code{bool} \code{TRUE} if multiple processes should be activated.
+#'Only relevant if \code{ml_framework="tensorflow"}.
 #'
 #'@param sustain_track \code{bool} If \code{TRUE} energy consumption is tracked
 #'during training via the python library codecarbon.
@@ -235,7 +273,8 @@ create_roberta_model<-function(
 #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
 #'information about the training process from keras on the console.
 #'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
-#'one line of information for every epoch.
+#'one line of information for every epoch. Only relevant if \code{ml_framework="tensorflow"}.
+#'
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
 #'@note Pre-Trained models which can be fine-tuned with this function are available
@@ -258,7 +297,8 @@ create_roberta_model<-function(
 #'@importFrom utils read.csv
 #'
 #'@export
-train_tune_roberta_model=function(output_dir,
+train_tune_roberta_model=function(ml_framework="tensorflow",
+                                  output_dir,
                                model_dir_path,
                                raw_texts,
                                p_mask=0.15,
@@ -266,6 +306,8 @@ train_tune_roberta_model=function(output_dir,
                                n_epoch=1,
                                batch_size=12,
                                chunk_size=250,
+                               full_sequences_only=FALSE,
+                               min_seq_len=50,
                                learning_rate=3e-2,
                                n_workers=1,
                                multi_process=FALSE,
@@ -275,6 +317,10 @@ train_tune_roberta_model=function(output_dir,
                                sustain_interval=15,
                                trace=TRUE,
                                keras_trace=1){
+
+  if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
+    stop("ml_framework must be 'tensorflow' or 'pytorch'.")
+  }
 
   #Start Sustainability Tracking
   if(sustain_track==TRUE){
@@ -294,7 +340,30 @@ train_tune_roberta_model=function(output_dir,
     sustainability_tracker$start()
   }
 
-  mlm_model=transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_path)
+  if(ml_framework=="tensorflow"){
+    if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
+      from_pt=FALSE
+    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
+      from_pt=TRUE
+    } else {
+      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+    }
+  } else {
+    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
+      from_tf=FALSE
+    } else if (file.exists(paste0(model_dir_path,"/tf_model.h5"))){
+      from_tf=TRUE
+    } else {
+      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+    }
+  }
+
+  if(ml_framework=="tensorflow"){
+    mlm_model=transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_path, from_pt=from_pt)
+  } else {
+    mlm_model=transformers$RobertaForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
+  }
+
   tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir_path)
 
   #argument checking------------------------------------------------------------
@@ -309,70 +378,66 @@ train_tune_roberta_model=function(output_dir,
   #adjust chunk size. To elements are needed for begin and end of sequence
   chunk_size=chunk_size-2
 
-  cat(paste(date(),"Tokenize Raw Texts","\n"))
-  prepared_texts<-quanteda::tokens(
-    x = raw_texts,
-    what = "word",
-    remove_punct = FALSE,
-    remove_symbols = TRUE,
-    remove_numbers = FALSE,
-    remove_url = TRUE,
-    remove_separators = TRUE,
-    split_hyphens = FALSE,
-    split_tags = FALSE,
-    include_docvars = TRUE,
-    padding = FALSE,
-    verbose = trace)
+  if(trace==TRUE){
+    cat(paste(date(),"Creating Sequence Chunks For Training","\n"))
+  }
 
-  cat(paste(date(),"Creating Text Chunks","\n"))
-  prepared_texts_chunks<-quanteda::tokens_chunk(
-    x=prepared_texts,
-    size=chunk_size,
-    overlap = 0,
-    use_docvars = FALSE)
-
-  check_chunks_length=(quanteda::ntoken(prepared_texts_chunks)==chunk_size)
-
-  prepared_texts_chunks<-quanteda::tokens_subset(
-    x=prepared_texts_chunks,
-    subset = check_chunks_length)
-
-  prepared_text_chunks_strings<-lapply(prepared_texts_chunks,paste,collapse = " ")
-  prepared_text_chunks_strings<-as.character(prepared_text_chunks_strings)
-  cat(paste(date(),length(prepared_text_chunks_strings),"Chunks Created","\n"))
-
-  cat(paste(date(),"Creating Input","\n"))
-  tokenized_texts= tokenizer(prepared_text_chunks_strings,
-                             truncation =TRUE,
-                             padding= TRUE,
-                             max_length=as.integer(chunk_size),
-                             return_tensors="np")
+  if(full_sequences_only==FALSE){
+    tokenized_texts=tokenizer(raw_texts,
+                              truncation =TRUE,
+                              padding= FALSE,
+                              max_length=as.integer(chunk_size),
+                              return_overflowing_tokens = TRUE,
+                              return_length = TRUE,
+                              return_special_tokens_mask=TRUE,
+                              return_offsets_mapping = FALSE,
+                              return_attention_mask = TRUE,
+                              return_tensors="np")
+    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
+    relevant_indices=which(tokenized_dataset["length"]<=chunk_size & tokenized_dataset["length"]>=min_seq_len)
 
 
-  cat(paste(date(),"Creating TensorFlow Dataset","\n"))
-  tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
+    tokenized_texts=tokenizer(raw_texts,
+                              truncation =TRUE,
+                              padding= TRUE,
+                              max_length=as.integer(chunk_size),
+                              return_overflowing_tokens = TRUE,
+                              return_length = TRUE,
+                              return_special_tokens_mask=TRUE,
+                              return_offsets_mapping = FALSE,
+                              return_attention_mask = TRUE,
+                              return_tensors="np")
+    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
+    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
 
-  cat(paste(date(),"Using Token Masking","\n"))
-  data_collator=transformers$DataCollatorForLanguageModeling(
-    tokenizer = tokenizer,
-    mlm = TRUE,
-    mlm_probability = p_mask)
+  } else {
+    tokenized_texts=tokenizer(raw_texts,
+                              truncation =TRUE,
+                              padding= FALSE,
+                              max_length=as.integer(chunk_size),
+                              return_overflowing_tokens = TRUE,
+                              return_length = TRUE,
+                              return_special_tokens_mask=TRUE,
+                              return_offsets_mapping = FALSE,
+                              return_attention_mask = TRUE,
+                              return_tensors="np")
+    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
+    relevant_indices=which(tokenized_dataset["length"]==chunk_size)
+    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
+  }
 
-  tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
+  n_chunks=tokenized_dataset$num_rows
 
-  tf_train_dataset=mlm_model$prepare_tf_dataset(
-    dataset = tokenized_dataset$train,
-    batch_size = as.integer(batch_size),
-    collate_fn = data_collator,
-    shuffle = TRUE)
-  tf_test_dataset=mlm_model$prepare_tf_dataset(
-    dataset = tokenized_dataset$test,
-    batch_size = as.integer(batch_size),
-    collate_fn = data_collator,
-    shuffle = TRUE)
+  if(trace==TRUE){
+    cat(paste(date(),n_chunks,"Chunks Created","\n"))
+  }
 
-  cat(paste(date(),"Preparing Training of the Model","\n"))
-  adam<-tf$keras$optimizers$Adam
+  if(dir.exists(paste0(output_dir))==FALSE){
+    if(trace==TRUE){
+      cat(paste(date(),"Creating Output Directory","\n"))
+    }
+    dir.create(paste0(output_dir))
+  }
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
     if(trace==TRUE){
@@ -381,37 +446,127 @@ train_tune_roberta_model=function(output_dir,
     dir.create(paste0(output_dir,"/checkpoints"))
   }
 
-  callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
-    filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
-    monitor="val_loss",
-    verbose = as.integer(min(keras_trace,1)),
-    mode="auto",
-    save_best_only=TRUE,
-    save_freq="epoch",
-    save_weights_only= TRUE)
+  if(ml_framework=="tensorflow"){
 
-  cat(paste(date(),"Compile Model","\n"))
-  mlm_model$compile(optimizer=adam(learning_rate))
+    if(trace==TRUE){
+      cat(paste(date(),"Using Token Masking","\n"))
+    }
+    data_collator=transformers$DataCollatorForLanguageModeling(
+      tokenizer = tokenizer,
+      mlm = TRUE,
+      mlm_probability = p_mask,
+      return_tensors = "tf")
 
-  #Clear session to provide enough resources for computations
-  tf$keras$backend$clear_session()
+    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
+    tokenized_dataset$set_format(type="tensorflow")
 
-  cat(paste(date(),"Start Fine Tuning","\n"))
-  mlm_model$fit(x=tf_train_dataset,
-                validation_data=tf_test_dataset,
-                epochs=as.integer(n_epoch),
-                workers=as.integer(n_workers),
-                use_multiprocessing=multi_process,
-                callbacks=list(callback_checkpoint),
-                verbose=as.integer(keras_trace))
+    tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
-  cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
-  mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
+    tf_train_dataset=mlm_model$prepare_tf_dataset(
+      dataset = tokenized_dataset$train,
+      batch_size = as.integer(batch_size),
+      collate_fn = data_collator,
+      shuffle = TRUE)
+    tf_test_dataset=mlm_model$prepare_tf_dataset(
+      dataset = tokenized_dataset$test,
+      batch_size = as.integer(batch_size),
+      collate_fn = data_collator,
+      shuffle = TRUE)
 
-  cat(paste(date(),"Saving RoBERTa Model","\n"))
+    if(trace==TRUE){
+      cat(paste(date(),"Preparing Training of the Model","\n"))
+    }
+    adam<-tf$keras$optimizers$Adam
+
+    callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
+      filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
+      monitor="val_loss",
+      verbose = as.integer(min(keras_trace,1)),
+      mode="auto",
+      save_best_only=TRUE,
+      save_freq="epoch",
+      save_weights_only= TRUE)
+
+    if(trace==TRUE){
+      cat(paste(date(),"Compile Model","\n"))
+    }
+    mlm_model$compile(optimizer=adam(learning_rate),
+                      loss="auto")
+
+    #Clear session to provide enough resources for computations
+    tf$keras$backend$clear_session()
+
+    if(trace==TRUE){
+      cat(paste(date(),"Start Fine Tuning","\n"))
+    }
+    mlm_model$fit(x=tf_train_dataset,
+                  validation_data=tf_test_dataset,
+                  epochs=as.integer(n_epoch),
+                  workers=as.integer(n_workers),
+                  use_multiprocessing=multi_process,
+                  callbacks=list(callback_checkpoint),
+                  verbose=as.integer(keras_trace))
+
+    if(trace==TRUE){
+      cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
+    }
+    mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
+  } else {
+
+    if(trace==TRUE){
+      cat(paste(date(),"Using Token Masking","\n"))
+    }
+    data_collator=transformers$DataCollatorForLanguageModeling(
+      tokenizer = tokenizer,
+      mlm = TRUE,
+      mlm_probability = p_mask,
+      return_tensors = "pt")
+
+    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
+    tokenized_dataset$set_format(type="torch")
+
+    tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
+
+    training_args=transformers$TrainingArguments(
+      output_dir = paste0(output_dir,"/checkpoints"),
+      overwrite_output_dir=TRUE,
+      evaluation_strategy = "epoch",
+      num_train_epochs = as.integer(n_epoch),
+      logging_strategy="epoch",
+      save_strategy ="epoch",
+      save_total_limit=as.integer(1),
+      load_best_model_at_end=TRUE,
+      optim = "adamw_torch",
+      learning_rate = learning_rate,
+      per_device_train_batch_size = as.integer(batch_size),
+      per_device_eval_batch_size = as.integer(batch_size),
+      save_safetensors=TRUE,
+      auto_find_batch_size=FALSE,
+      report_to="none"
+    )
+
+    trainer=transformers$Trainer(
+      model=mlm_model,
+      train_dataset = tokenized_dataset$train,
+      eval_dataset = tokenized_dataset$test,
+      args = training_args,
+      data_collator = data_collator,
+      tokenizer = tokenizer
+    )
+    trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
+
+    trainer$train()
+
+  }
+
+  if(trace==TRUE){
+    cat(paste(date(),"Saving RoBERTa Model","\n"))
+  }
   mlm_model$save_pretrained(save_directory=output_dir)
 
-  cat(paste(date(),"Saving Tokenizer","\n"))
+  if(trace==TRUE){
+    cat(paste(date(),"Saving Tokenizer","\n"))
+  }
   tokenizer$save_pretrained(output_dir)
 
   #Stop Sustainability Tracking if requested
@@ -432,8 +587,7 @@ train_tune_roberta_model=function(output_dir,
       sustainability_data_chronic<-as.matrix(read.csv(sustainability_data_file_path_input))
       sustainability_data_chronic<-rbind(
         sustainability_data_chronic,
-        sustain_matrix
-      )
+        sustain_matrix)
 
       write.csv(
         x=sustainability_data_chronic,
@@ -448,7 +602,9 @@ train_tune_roberta_model=function(output_dir,
     }
   }
 
-  cat(paste(date(),"Done","\n"))
+  if(trace==TRUE){
+    cat(paste(date(),"Done","\n"))
+  }
 
 }
 

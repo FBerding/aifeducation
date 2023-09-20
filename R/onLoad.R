@@ -5,6 +5,7 @@ datasets<-NULL
 tok<-NULL
 np<-NULL
 codecarbon<-NULL
+torch<-NULL
 
 .onLoad<-function(libname, pkgname){
   # use superassignment to update the global reference
@@ -13,6 +14,7 @@ codecarbon<-NULL
   tok<<-reticulate::import("tokenizers", delay_load = TRUE)
   np<<-reticulate::import("numpy", delay_load = TRUE)
   tf<<-reticulate::import("tensorflow", delay_load = TRUE)
+  torch<<-reticulate::import("torch", delay_load = TRUE)
   os<<-reticulate::import("os", delay_load = TRUE)
   codecarbon<<-reticulate::import("codecarbon", delay_load = TRUE)
 }

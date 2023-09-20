@@ -497,6 +497,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       private$r_package_versions$smotefamily<-packageVersion("smotefamily")
 
       private$py_package_versions$tensorflow<-tf$version$VERSION
+      #private$py_package_versions$torch<-toch$"__version__"
+      #private$py_package_versions$keras<-tf$keras$"__version__"
       private$py_package_versions$numpy<-np$version$short_version
     },
 
@@ -2044,6 +2046,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
     py_package_versions=list(
       tensorflow=NA,
+      torch=NA,
+      keras=NA,
       numpy=NA
     ),
 
