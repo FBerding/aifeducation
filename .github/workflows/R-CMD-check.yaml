@@ -92,6 +92,7 @@ jobs:
                 conda = "auto",
                 pip = TRUE
               )
+            }
 
           path_to_python <- conda_python("r-reticulate")
 
