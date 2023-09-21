@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,9 @@
     <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
     <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -165,7 +168,10 @@ uses conda environments for managing the different modules.</p>
 </h3>
 <p>If you would like to use a graphic card for computations you need to
 install some further software. A list with links to downloads can be
-found here: <a href="https://www.tensorflow.org/install/pip#linux" class="external-link uri">https://www.tensorflow.org/install/pip#linux</a></p>
+found here if you would like to use tensorflow as machine learning
+framework: <a href="https://www.tensorflow.org/install/pip#linux" class="external-link uri">https://www.tensorflow.org/install/pip#linux</a></p>
+<p>If you would like to use PyTorch as framework you can find furhter
+information here: <a href="https://pytorch.org/get-started/locally/" class="external-link uri">https://pytorch.org/get-started/locally/</a></p>
 <p>In general you need</p>
 <ul>
 <li>NVIDIA GPU Drivers</li>
@@ -215,6 +221,9 @@ to high performance computing nor do they own computers with a
 performing graphic device for their work. Thus, some additional
 configuration can be done to get computations working on your
 machine.</p>
+<div class="section level3">
+<h3 id="tensorflow">2.1) Tensorflow<a class="anchor" aria-label="anchor" href="#tensorflow"></a>
+</h3>
 <p>If you do use a computer that does not own a graphic device, you can
 disable the graphic device support of tensorflow with the function
 <code><a href="../reference/set_config_cpu_only.html">set_config_cpu_only()</a></code>.</p>
@@ -236,6 +245,16 @@ function <code><a href="../reference/set_config_tf_logger.html">set_config_tf_lo
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_tf_logger.html">set_config_tf_logger</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>You can choose between five levels “FATAL”, “ERROR”, “WARN”, “INFO”,
 and “DEBUG”, setting the minimal level for logging.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="tutorial-and-guides">3) Tutorial and Guides<a class="anchor" aria-label="anchor" href="#tutorial-and-guides"></a>
+</h2>
+<p>A short introduction into the package with examples for
+classification tasks can be found in vignette <a href="https://fberding.github.io/aifeducation/articles/classification_tasks.html" class="external-link">02
+classification tasks</a>.</p>
+<p>Documenting and sharing your work is described in vignette <a href="https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html" class="external-link">03
+sharing and using trained AI/models</a></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

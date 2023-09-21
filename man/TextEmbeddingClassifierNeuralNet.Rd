@@ -156,6 +156,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$new(
+  ml_framework = "tensorflow",
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -175,6 +176,10 @@ Creating a new instance of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{ml_framework}}{\code{string} #'@param ml_framework \code{string} Framework to use for training and inference.
+\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
+for 'pytorch'}
+
 \item{\code{name}}{\code{Character} Name of the new classifier. Please refer to
 common name conventions. Free text can be used with parameter \code{label}.}
 
@@ -223,8 +228,7 @@ training.
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-train"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-train}{}}}
 \subsection{Method \code{train()}}{
-Method for training a neural net with keras and
-tensorflow.
+Method for training a neural net.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$train(
   data_embeddings,
@@ -631,10 +635,10 @@ and the native language.
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-save_model"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-save_model}{}}}
 \subsection{Method \code{save_model()}}{
-Method for saving a model to 'tensorflow' SavedModel format
-or h5 format.
+Method for saving a model to 'Keras v3 format',
+'tensorflow' SavedModel format or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$save_model(dir_path, save_format = "tf")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$save_model(dir_path, save_format = "keras")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -643,8 +647,8 @@ or h5 format.
 \item{\code{dir_path}}{\code{string()} Path of the directory where the model should be
 saved.}
 
-\item{\code{save_format}}{Format for saving the model. \code{"tf"} for SavedModel
-or \code{"h5"} for HDF5.}
+\item{\code{save_format}}{Format for saving the model. \code{"keras"} for 'Keras v3 format',
+\code{"tf"} for SavedModel or \code{"h5"} for HDF5.}
 }
 \if{html}{\out{</div>}}
 }
@@ -656,10 +660,10 @@ Function does not return a value. It saves the model to disk.
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-load_model"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-load_model}{}}}
 \subsection{Method \code{load_model()}}{
-Method for importing a model from 'tensorflow' SavedModel format
-or h5 format.
+Method for importing a model from 'Keras v3 format',
+'tensorflow' SavedModel format or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(dir_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(dir_path, ml_framework = "auto")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -667,6 +671,10 @@ or h5 format.
 \describe{
 \item{\code{dir_path}}{\code{string()} Path of the directory where the model is
 saved.}
+
+\item{\code{ml_framework}}{\code{string} Determines the machine learning framework
+for using the model. Possible are \code{ml_framework="pytorch"} for 'pytorch',
+\code{ml_framework="tensorflow"} for 'tensorflow', and \code{ml_framework="auto"}.}
 }
 \if{html}{\out{</div>}}
 }

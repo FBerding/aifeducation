@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,9 @@
     <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
     <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -285,11 +288,7 @@ Get started</a> you may start a new session like this:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/aifeducation/" class="external-link">aifeducation</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#if you use a machine with windows</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span>condaenv <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#if you use a machine with mac or linux</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span>virtualenv<span class="op">=</span> <span class="st">"aifedcuation"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span>condaenv <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
 <p>Now is a good time to configure tensorflow, since some configurations
 can only be done <strong>before</strong> tensorflow is used the first
 time.</p>
@@ -302,6 +301,7 @@ time.</p>
 <span></span>
 <span><span class="co">#if you would like to reduce the tensorflow output to errors</span></span>
 <span><span class="fu"><a href="../reference/set_config_os_environ_logger.html">set_config_os_environ_logger</a></span><span class="op">(</span>level <span class="op">=</span> <span class="st">"ERROR"</span><span class="op">)</span></span></code></pre></div>
+<p>If you would like to use PyTorch you can skip this stept.</p>
 <p>Now everything is ready to start the preparation tasks.</p>
 </div>
 <div class="section level2">
@@ -484,21 +484,27 @@ this:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">sustain_track=</span><span class="cn">TRUE</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>    <span class="at">sustain_iso_code=</span><span class="st">"DEU"</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>    <span class="at">sustain_region=</span><span class="cn">NULL</span>,</span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>    <span class="at">sustain_interval=</span><span class="dv">15</span>,</span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    <span class="at">ml_framework=</span><span class="st">"pytorch"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>    <span class="at">sustain_track=</span><span class="cn">TRUE</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>    <span class="at">sustain_iso_code=</span><span class="st">"DEU"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>    <span class="at">sustain_region=</span><span class="cn">NULL</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    <span class="at">sustain_interval=</span><span class="dv">15</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>With <code>ml_framework="tensorflow"</code> you can decide which
+machine learning framework should be used. You can choose between
+<code>ml_framework="tensorflow"</code> and
+<code>ml_framework="pytorch"</code>. Please note, that you can change
+the framework at any point.</p>
 <p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved. Furthermore, you must
 provide raw texts. These texts are <strong>not</strong> used for
@@ -545,6 +551,7 @@ model directory. The next step is to train your model by calling
 <code><a href="../reference/train_tune_bert_model.html">train_tune_bert_model()</a></code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/train_tune_bert_model.html">train_tune_bert_model</a></span><span class="op">(</span></span>
+<span>  ml_framework<span class="op">=</span><span class="st">"pytorch"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"my_own_transformer_trained"</span>,</span>
 <span>  bert_model_dir_path <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
 <span>  raw_texts <span class="op">=</span> <span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
@@ -841,7 +848,15 @@ manually.</p>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  ml_framework<span class="op">=</span><span class="st">"auto"</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</span><span class="op">)</span></span></code></pre></div>
+<p>In the case of transformers you can decide which machine learning
+framework should be used for applying the model by specifying
+<code>ml_framework</code>. You can choose between
+PyTorch(<code>ml_framework="pytorch"</code>) and
+tensorflow(<code>ml_framework="tensorflow"</code>). If you set
+<code>ml_framework="auto"</code> the framework is used that was active
+when the model was saved.</p>
 <p><strong>Please note that you have to add the name of the model to the
 directory path.</strong> In our example we have stored three models in
 the directory “text_embedding_models”. Each model is saved within its

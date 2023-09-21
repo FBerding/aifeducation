@@ -38,10 +38,10 @@ URL:https://fberding.github.io/aifeducation/
 BugReports: https://github.com/cran/aifeducation/issues
 Depends:
     foreach,
+    quanteda,
     R (>= 3.5.0)
 Imports: 
     abind,
-    quanteda,
     doParallel,
     iotarelr(>= 0.1.4),
     irr,

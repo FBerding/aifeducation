@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,9 @@
     <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
     <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -239,7 +242,15 @@ manually.</p>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  ml_framework <span class="op">=</span> <span class="st">"pytorch"</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</span><span class="op">)</span></span></code></pre></div>
+<p>In the case of transformers you can decide which machine learning
+framework should be used for applying the model by specifying
+<code>ml_framework</code>. You can choose between
+PyTorch(<code>ml_framework="pytorch"</code>) and
+tensorflow(<code>ml_framework="tensorflow"</code>). If you set
+<code>ml_framework="auto"</code> the framework is used that was active
+when the model was saved.</p>
 <p><strong>Please note that you have to add the name of the model to the
 directory path.</strong> In our example we have stored three models in
 the directory “text_embedding_models”. Each model is saved within its

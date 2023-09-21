@@ -14,8 +14,6 @@ install_py_modules<-function(envname="aifeducation"){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
-                      "torch",
-                      "keras",
                       "codecarbon",
                       "accelerate")
 
@@ -25,7 +23,10 @@ install_py_modules<-function(envname="aifeducation"){
   )
 
   reticulate::conda_install(
-    packages = c("tensorflow"),
+    packages = c(
+      "tensorflow",
+      "torch",
+      "keras"),
     envname = envname,
     conda = "auto",
     pip = TRUE
@@ -37,6 +38,19 @@ install_py_modules<-function(envname="aifeducation"){
     conda = "auto",
     pip = TRUE
   )
+
+  py_packages_list<-reticulate::py_list_packages(
+    envname = envname
+  )
+  keras_version<-py_package_list[which(py_package_list$package=="keras"),"version"]
+  if(keras_version<"3.0.0"){
+    reticulate::conda_install(
+      packages = "keras-core",
+      envname = envname,
+      conda = "auto",
+      pip = TRUE
+    )
+  }
 }
 
 #'Check if all necessary python modules are available
@@ -153,4 +167,37 @@ set_config_os_environ_logger<-function(level="ERROR"){
   }
 
   os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL","2")
+}
+
+#'Loading library 'aifeducation' and sets the desired backend for 'keras'.
+#'
+#'Function for loading the library 'aifeducation' and sets the backend for 'keras'.
+#'
+#'@param backend \code{string} Determines the machine learning framework
+#'for using with 'keras'. Possible are \code{keras_framework="pytorch"} for 'pytorch',
+#'\code{keras_framework="tensorflow"} for 'tensorflow'.
+#'@return The function does nothing return. It is used for its sideeffects.
+#'@note The 'keras' backend must be chosen before importing 'keras' for the first time.
+#'Thus, we recommend to call this function directly after loading the library 'aifeducation'.
+#'If you would like to change the backend you must restart R.
+#'@note Please note that you can only choose the backend for 'keras' if your system
+#' uses 'keras' version 3. If you use on older version 'tensorflow' is the backend
+#' for all keras models.
+#'
+#'@family Installation and Configuration
+#'
+#'@export
+set_global_keras_backend<-function(backend="tensorflow"){
+
+  py_package_list<-reticulate::py_list_packages()
+  keras_version<-py_package_list[which(py_package_list$package=="keras"),"version"]
+
+  if(keras_version<"3.0.0" & reticulate::py_module_available("keras-core")){
+    #os$environ["KERAS_BACKEND"] = keras_framework
+    os$environ$setdefault("KERAS_BACKEND",backend)
+    cat("Using",backend,"for all keras models.\n")
+  } else {
+    os$environ$setdefault("KERAS_BACKEND","tensorflow")
+    cat("Using","tensorflow","for all keras models.\n")
+  }
 }

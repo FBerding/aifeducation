@@ -61,17 +61,14 @@ jobs:
           python_packages<-c("transformers",
                              "tokenizers",
                              "datasets",
-                             "torch",
                              "codecarbon")
           envname<-"r-reticulate"
 
-          #conda_create(
-          #  envname = envname,
-          #  conda=Sys.which("python")
-          #)
-
           conda_install(
-            packages = "tensorflow",
+            packages = c(
+            "tensorflow",
+            "torch",
+            "keras"),
             envname = envname,
             conda = "auto",
             pip = TRUE
@@ -84,21 +81,17 @@ jobs:
             pip = TRUE
           )
 
-
-          #virtualenv_create("r-reticulate", Sys.which("python"))
-          #virtualenv_install("r-reticulate", python_packages)
-
-          #conda_create(envname="r-reticulate",
-          #              conda=Sys.which("python"))
-
-
-          #conda_install("r-reticulate",
-          #              python_packages,
-          #              pip=TRUE)
-
-          #aifeducation::install_py_modules("r-reticulate")
-
-          #path_to_python <- virtualenv_python("r-reticulate")
+            py_packages_list<-reticulate::py_list_packages(
+              envname = envname
+            )
+            keras_version<-py_package_list[which(py_package_list$package=="keras"),"version"]
+            if(keras_version<"3.0.0"){
+              reticulate::conda_install(
+                packages = "keras-core",
+                envname = envname,
+                conda = "auto",
+                pip = TRUE
+              )
 
           path_to_python <- conda_python("r-reticulate")
 

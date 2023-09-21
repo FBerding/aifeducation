@@ -197,8 +197,14 @@ global_vector_clusters_modeling<-load_ai_model(
   model_dir="text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l")
 
 bert_modeling<-load_ai_model(
+  ml_framework = "pytorch",
   model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
 ```
+
+In the case of transformers you can decide which machine learning framework should
+be used for applying the model by specifying `ml_framework`. You can choose between
+PyTorch(`ml_framework="pytorch"`) and tensorflow(`ml_framework="tensorflow"`). If you set
+`ml_framework="auto"` the framework is used that was active when the model was saved.
 
 **Please note that you have to add the name of the model to the directory path.**
 In our example we have stored three models in the directory "text_embedding_models". Each

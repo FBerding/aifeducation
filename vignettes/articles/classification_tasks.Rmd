@@ -790,15 +790,18 @@ to a model are stored.
 ```{r, include = TRUE, eval=FALSE}
 save_ai_model(
   model=topic_modeling, 
-  model_dir="text_embedding_models")
+  model_dir="text_embedding_models",
+  append_ID=FALSE)
 
 save_ai_model(
   model=global_vector_clusters_modeling, 
-  model_dir="text_embedding_models")
+  model_dir="text_embedding_models",
+  append_ID=FALSE)
 
 save_ai_model(
   model=bert_modeling, 
-  model_dir="text_embedding_models")
+  model_dir="text_embedding_models",
+  append_ID=FALSE)
 ```
 
 As you can see all three text embedding models are saved within the same
@@ -812,14 +815,14 @@ using your model.
 
 ```{r, include = TRUE, eval=FALSE}
 topic_modeling<-load_ai_model(
-  model_dir="text_embedding_models/topic_model_embedding_ID_DfO25E1Guuaqw7tM")
+  model_dir="text_embedding_models/topic_model_embedding")
 
 global_vector_clusters_modeling<-load_ai_model(
-  model_dir="text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l")
+  model_dir="text_embedding_models/global_vector_clusters_embedding")
 
 bert_modeling<-load_ai_model(
   ml_framework="auto",
-  model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
+  model_dir="text_embedding_models/bert_embedding")
 ```
 
 In the case of transformers you can decide which machine learning framework should
@@ -834,8 +837,8 @@ with the help of the name of the model. Thus, for loading a model you must speci
 which model you want to load by adding the model's name to the directory path as
 shown above. 
 
-At this point you may wonder why there is an ID in model's name although you
-did not enter an ID on model's creation. The ID is added automatically to ensure
+If you change the argument `append_ID` to `append_ID=TRUE` the unique ID of the model
+is added to the directory. The ID is added automatically to ensure
 that every model has a unique name. This is important if you would like to share your 
 work with other persons. 
 
@@ -854,6 +857,7 @@ example_targets<-as.factor(example_data$label)
 names(example_targets)=example_data$id
 
 classifier<-TextEmbeddingClassifierNeuralNet$new(
+  ml_framework="pytorch",
   name="movie_review_classifier",
   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings=bert_embeddings,
@@ -868,6 +872,11 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   act_fct="gelu",
   rec_act_fct="tanh")
 ```
+
+With `ml_framework` you can choose which machine learning framework you would like
+to use. Since the classifier is written with 'keras' using a classifier with
+'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
+with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 
 Similar to the text embedding model you should provide a name (`name`)
 and a label (`label`) for your new classifier. With `text_embeddings`
@@ -1179,22 +1188,26 @@ to pass the model and a directory path to the function `save_ai_model`.
 save_ai_model(
   model=classifier,
   model_dir="classifiers",
-  save_format = "tf")
+  save_format = "keras",
+  append_ID=FALSE)
 ```
 
 In contrast to text embedding models you can specify the additional argument `save_format`
-allowing you to choose between `save_format = "tf"` and  `save_format = "h5"`.
-We recommend to chose `save_format = "tf"` since this is the recommended format
-by tensorflow.
+allowing you to choose between `save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
+We recommend to chose `save_format = "keras"` since this is allows to use the classifier
+with both 'PyTorch' and 'tensorflow'.
 
 If you would like to load a model you can call the function `load_ai_model`.
 ```{r, include = TRUE, eval=FALSE}
 classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB")
+  model_dir="classifiers/movie_review_classifier",
+  ml_framework="pytorch")
 ```
-Similar to text embedding models an ID is added to the name during the creation
-of the classifier ensuring a unique name for your model. Thus, you have to specify
-the correct folder for loading a classifier.
+
+With `ml_framework` you can choose which machine learning framework you would like
+to use. Since the classifier is written with 'keras' using a classifier with
+'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
+with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 
 ## 5.5 Predicting New Data
 

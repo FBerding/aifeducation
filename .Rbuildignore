@@ -11,6 +11,7 @@ tests/testthat/tmp_full_models
 tests/testthat/test_data/bert/checkpoints
 tests/testthat/test_data/longformer/checkpoints
 tests/testthat/test_data/roberta/checkpoints
+tests/testthat/test_artefacts
 .h5
 .git
 .gitignore

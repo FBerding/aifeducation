@@ -22,6 +22,9 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/news/index.html</loc>
+  </url>
+  <url>
     <loc>/reference/array_to_matrix.html</loc>
   </url>
   <url>
@@ -41,6 +44,12 @@
   </url>
   <url>
     <loc>/reference/create_bert_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_deberta_v2_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_funnel_model.html</loc>
   </url>
   <url>
     <loc>/reference/create_iota2_mean_object.html</loc>
@@ -122,6 +131,12 @@
   </url>
   <url>
     <loc>/reference/train_tune_bert_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/train_tune_deberta_v2_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/train_tune_funnel_model.html</loc>
   </url>
   <url>
     <loc>/reference/train_tune_longformer_model.html</loc>

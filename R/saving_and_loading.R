@@ -46,7 +46,9 @@ load_ai_model<-function(model_dir,ml_framework="auto"){
     } else {
       #For aifeducation 0.2.1 and higher-----------------------------------------
       if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
-        loaded_model$load_model(model_dir)
+        loaded_model$load_model(
+          model_dir,
+          ml_framework=ml_framework)
       } else if (methods::is(loaded_model,"TextEmbeddingModel")){
         if(loaded_model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
           loaded_model$load_model(

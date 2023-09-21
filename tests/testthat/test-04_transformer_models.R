@@ -2,6 +2,8 @@ testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                   message = "Necessary python modules not available")
 
+aifeducation::set_global_keras_backend("tensorflow")
+
 aifeducation::set_config_gpu_low_memory()
 transformers$utils$logging$set_verbosity_error()
 
@@ -635,6 +637,11 @@ for(ai_method in ai_methods){
         )
       })
 
+      test_that(paste0(ai_method,"get_methods",framework), {
+        expect_no_error(bert_modeling$get_transformer_components())
+        expect_no_error(bert_modeling$get_basic_components())
+        expect_no_error(bert_modeling$get_bow_components())
+        })
 
       test_that(paste0(ai_method,"Save Total Model H5",framework), {
         expect_no_error(
