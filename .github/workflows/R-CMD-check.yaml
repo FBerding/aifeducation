@@ -66,9 +66,10 @@ jobs:
 
           conda_install(
             packages = c(
-            "tensorflow",
+            "tensorflow-cpu",
             "torch",
-            "keras"),
+            "keras",
+            "accelerate"),
             envname = envname,
             conda = "auto",
             pip = TRUE

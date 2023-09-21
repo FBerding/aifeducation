@@ -39,7 +39,7 @@ install_py_modules<-function(envname="aifeducation"){
     pip = TRUE
   )
 
-  py_packages_list<-reticulate::py_list_packages(
+  py_package_list<-reticulate::py_list_packages(
     envname = envname
   )
   keras_version<-py_package_list[which(py_package_list$package=="keras"),"version"]
