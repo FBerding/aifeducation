@@ -84,7 +84,7 @@ jobs:
             py_packages_list<-reticulate::py_list_packages(
               envname = envname
             )
-            keras_version<-py_package_list[which(py_packages_list$package=="keras"),"version"]
+            keras_version<-py_packages_list[which(py_packages_list$package=="keras"),"version"]
             if(keras_version<"3.0.0"){
               reticulate::conda_install(
                 packages = "keras-core",
