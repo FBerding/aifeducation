@@ -14,4 +14,4 @@ test_results<-test_check("aifeducation")
            #reporter = LocationReporter(),
            #stop_on_failure = TRUE)
 
-print(test_results)
+#print(test_results)
