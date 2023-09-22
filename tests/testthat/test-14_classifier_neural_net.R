@@ -1,6 +1,10 @@
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
+aifeducation::set_config_gpu_low_memory()
+set_config_tf_logger("ERROR")
+set_config_os_environ_logger("ERROR")
+
 path="test_data/classifier/bert_embeddings.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")

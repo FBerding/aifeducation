@@ -131,7 +131,7 @@ create_deberta_v2_model<-function(
     trim_offsets=trim_offsets,
     add_prefix_space = add_prefix_space
   )
-  tok_new$enable_truncation(max_length = as.integer(max_position_embeddings))
+  #tok_new$enable_truncation(max_length = as.integer(max_position_embeddings))
   tok_new$enable_padding(pad_token = "[PAD]")
 
   #Calculating Vocabulary
