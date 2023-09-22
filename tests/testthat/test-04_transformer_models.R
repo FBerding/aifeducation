@@ -19,7 +19,8 @@ if(dir.exists(testthat::test_path("test_artefacts/tmp"))==FALSE){
   dir.create(testthat::test_path("test_artefacts/tmp"))
 }
 
-ml_frameworks<-c("tensorflow","pytorch")
+ml_frameworks<-c("tensorflow",
+                 "pytorch")
 
 ai_methods=c("bert",
              "roberta",
@@ -54,6 +55,8 @@ example_data<-data.frame(
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
+for(framework in ml_frameworks){
+
 for(ai_method in ai_methods){
 
   path_01=paste0("test_artefacts/",ai_method)
@@ -77,8 +80,6 @@ for(ai_method in ai_methods){
   if(dir.exists(testthat::test_path(paste0(path_03,"/pytorch")))==FALSE){
     dir.create(testthat::test_path(paste0(path_03,"/pytorch")))
   }
-
-  for(framework in ml_frameworks){
 
     if(ai_framework_matrix[ai_method,framework]==1){
 
@@ -115,7 +116,7 @@ for(ai_method in ai_methods){
             vocab_size=10000,
             vocab_do_lower_case=TRUE,
             max_position_embeddings=512,
-            hidden_size=16,
+            hidden_size=32,
             num_hidden_layer=2,
             num_attention_heads=2,
             intermediate_size=128,
@@ -156,7 +157,7 @@ for(ai_method in ai_methods){
               vocab_size=10000,
               add_prefix_space=TRUE,
               max_position_embeddings=512,
-              hidden_size=16,
+              hidden_size=32,
               num_hidden_layer=2,
               num_attention_heads=2,
               intermediate_size=128,
@@ -177,7 +178,7 @@ for(ai_method in ai_methods){
               vocab_size=10000,
               add_prefix_space=FALSE,
               max_position_embeddings=512,
-              hidden_size=16,
+              hidden_size=32,
               num_hidden_layer=2,
               num_attention_heads=2,
               intermediate_size=128,
@@ -198,7 +199,7 @@ for(ai_method in ai_methods){
               vocab_size=10000,
               add_prefix_space=TRUE,
               max_position_embeddings=512,
-              hidden_size=16,
+              hidden_size=32,
               num_hidden_layer=2,
               num_attention_heads=2,
               intermediate_size=128,
@@ -218,7 +219,7 @@ for(ai_method in ai_methods){
             vocab_raw_texts=example_data$text,
             vocab_size=10000,
             max_position_embeddings=512,
-            hidden_size=16,
+            hidden_size=32,
             block_sizes = c(2,2,2),
             num_decoder_layers = 1,
             num_attention_heads=2,
@@ -238,7 +239,7 @@ for(ai_method in ai_methods){
             vocab_raw_texts=example_data$text,
             vocab_size=10000,
             max_position_embeddings=512,
-            hidden_size=16,
+            hidden_size=32,
             block_sizes = c(2,2,2),
             num_attention_heads=2,
             intermediate_size=128,
@@ -259,7 +260,7 @@ for(ai_method in ai_methods){
             vocab_size=10000,
             add_prefix_space=FALSE,
             max_position_embeddings=512,
-            hidden_size=16,
+            hidden_size=32,
             num_hidden_layer=2,
             num_attention_heads=2,
             intermediate_size=128,
@@ -279,7 +280,7 @@ for(ai_method in ai_methods){
             vocab_size=10000,
             add_prefix_space=TRUE,
             max_position_embeddings=512,
-            hidden_size=16,
+            hidden_size=32,
             num_hidden_layer=2,
             num_attention_heads=2,
             intermediate_size=128,
