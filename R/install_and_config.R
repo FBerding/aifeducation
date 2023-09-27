@@ -169,35 +169,82 @@ set_config_os_environ_logger<-function(level="ERROR"){
   os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL","2")
 }
 
-#'Loading library 'aifeducation' and sets the desired backend for 'keras'.
+#'R6 class for settting the global machine learning framework.
 #'
-#'Function for loading the library 'aifeducation' and sets the backend for 'keras'.
+#'R6 class for setting the global machine learning framework to 'PyTorch' or
+#''tensorflow' depending of the available version of 'keras'.
 #'
 #'@param backend \code{string} Determines the machine learning framework
 #'for using with 'keras'. Possible are \code{keras_framework="pytorch"} for 'pytorch',
 #'\code{keras_framework="tensorflow"} for 'tensorflow'.
-#'@return The function does nothing return. It is used for its sideeffects.
-#'@note The 'keras' backend must be chosen before importing 'keras' for the first time.
-#'Thus, we recommend to call this function directly after loading the library 'aifeducation'.
-#'If you would like to change the backend you must restart R.
-#'@note Please note that you can only choose the backend for 'keras' if your system
-#' uses 'keras' version 3. If you use on older version 'tensorflow' is the backend
-#' for all keras models.
+#'@return The function does nothing return. It is used for its side effects.
+#'@note This function must be called directly after loading 'aifeducation' to take effect.
+#'@note Please note that using classifier objects with 'PyTorch' requires keras of
+#'at least version 3. If you have an older version 'tensorflow' is used.
 #'
 #'@family Installation and Configuration
+#'@keywords internal
 #'
-#'@export
-set_global_keras_backend<-function(backend="tensorflow"){
+AifeducationConfiguration<-R6::R6Class(
+  classname = "aifeducationConfiguration",
+  private = list(
+    TextEmbeddingFramework="not_specified",
+    ClassifierFramework="not_specified"
+  ),
+  public = list(
+    #'@description Method for requesting the used machine learning framework.
+    #'@return Returns a \code{list} containing the used machine learning framework
+    #'for \link{TextEmbeddingModel}s as well as for \link{TextEmbeddingClassifierNeuralNet}.
+    get_framework=function(){
+      return(
+        list(private$TextEmbeddingFramework,
+             private$ClassifierFramework))
+    },
+    #'@description Method for setting machine learning framework.
+    #'@param backend \code{string} Framework to use for training and inference.
+    #'\code{backend="tensorflow"} for 'tensorflow' and \code{backend="pytorch"}
+    #'for 'PyTorch'.
+    #'@return This method does nothing return. It is used for setting the global
+    #'configuration of 'aifeducation'.
+    set_global_ml_backend=function(backend){
 
-  py_package_list<-reticulate::py_list_packages()
-  keras_version<-py_package_list[which(py_package_list$package=="keras"),"version"]
+      if((backend %in% c("tensorflow","pytorch"))==FALSE) {
+        stop("backend must be 'tensorflow' or 'pytorch'.")
+      }
 
-  if(keras_version<"3.0.0" & reticulate::py_module_available("keras-core")){
-    #os$environ["KERAS_BACKEND"] = keras_framework
-    os$environ$setdefault("KERAS_BACKEND",backend)
-    cat("Using",backend,"for all keras models.\n")
-  } else {
-    os$environ$setdefault("KERAS_BACKEND","tensorflow")
-    cat("Using","tensorflow","for all keras models.\n")
-  }
-}
+      if(private$TextEmbeddingFramework=="not_specified"){
+        if(keras["__version__"]>="2.4.0" & keras["__version__"]<"3.0.0"){
+          private$TextEmbeddingFramework=backend
+          private$ClassifierFramework="tensorflow"
+          os$environ$setdefault("KERAS_BACKEND","tensorflow")
+
+          cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
+          cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
+
+        } else if(keras["__version__"]>="3.0.0"){
+          private$TextEmbeddingFramework=backend
+          private$ClassifierFramework=backend
+          os$environ$setdefault("KERAS_BACKEND",backend)
+
+          cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
+          cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
+
+        } else if(keras["__version__"]<"2.4.0" & reticulate::py_module_available("keras-core")){
+          private$TextEmbeddingFramework=backend
+          private$ClassifierFramework=backend
+          os$environ$setdefault("KERAS_BACKEND",backend)
+
+          cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
+          cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
+
+        } else {
+          stop("No compatible version of keras found.")
+        }
+      } else {
+        warning("The global machine learning framework has already been set.
+            If you would like to change the framework please restart the
+            session and set framework to the desired backend.")
+      }
+    }
+  )
+)

@@ -7,6 +7,9 @@ codecarbon<-NULL
 torch<-NULL
 os<-NULL
 keras<-NULL
+aifeducation_config<-NULL
+
+
 
 .onLoad<-function(libname, pkgname){
   # use superassignment to update the global reference
@@ -18,9 +21,9 @@ keras<-NULL
   tf<<-reticulate::import("tensorflow", delay_load = TRUE)
   torch<<-reticulate::import("torch", delay_load = TRUE)
   codecarbon<<-reticulate::import("codecarbon", delay_load = TRUE)
+  keras<<-reticulate::import("keras", delay_load = TRUE)
 
-    keras<<-reticulate::import("keras", delay_load = TRUE)
-
+  aifeducation_config<<-AifeducationConfiguration$new()
 
 }
 

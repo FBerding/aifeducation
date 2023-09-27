@@ -18,11 +18,11 @@ os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")
 }
 \seealso{
 Other Installation and Configuration: 
+\code{\link{AifeducationConfiguration}},
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_py_modules}()},
 \code{\link{set_config_gpu_low_memory}()},
 \code{\link{set_config_os_environ_logger}()},
-\code{\link{set_config_tf_logger}()},
-\code{\link{set_global_keras_backend}()}
+\code{\link{set_config_tf_logger}()}
 }
 \concept{Installation and Configuration}
