@@ -2,8 +2,6 @@ testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                   message = "Necessary python modules not available")
 
-aifeducation::set_global_keras_backend("tensorflow")
-
 aifeducation::set_config_gpu_low_memory()
 #transformers$utils$logging$set_verbosity_warning()
 transformers$utils$logging$set_verbosity_error()

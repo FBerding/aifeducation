@@ -33,8 +33,6 @@ if(dir.exists(testthat::test_path("test_artefacts/tmp_keras"))==FALSE){
   dir.create(testthat::test_path("test_artefacts/tmp_keras"))
 }
 
-aifeducation::set_global_keras_backend("tensorflow")
-
 #-------------------------------------------------------------------------------
 aifeducation::set_config_gpu_low_memory()
 
