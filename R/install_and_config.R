@@ -197,8 +197,8 @@ AifeducationConfiguration<-R6::R6Class(
     #'for \link{TextEmbeddingModel}s as well as for \link{TextEmbeddingClassifierNeuralNet}.
     get_framework=function(){
       return(
-        list(private$TextEmbeddingFramework,
-             private$ClassifierFramework))
+        list(TextEmbeddingFramework=private$TextEmbeddingFramework,
+             ClassifierFramework=private$ClassifierFramework))
     },
     #'@description Method for setting machine learning framework.
     #'@param backend \code{string} Framework to use for training and inference.
@@ -206,6 +206,7 @@ AifeducationConfiguration<-R6::R6Class(
     #'for 'PyTorch'.
     #'@return This method does nothing return. It is used for setting the global
     #'configuration of 'aifeducation'.
+    #'@importFrom utils compareVersion
     set_global_ml_backend=function(backend){
 
       if((backend %in% c("tensorflow","pytorch"))==FALSE) {
@@ -213,7 +214,8 @@ AifeducationConfiguration<-R6::R6Class(
       }
 
       if(private$TextEmbeddingFramework=="not_specified"){
-        if(keras["__version__"]>="2.4.0" & keras["__version__"]<"3.0.0"){
+        if(utils::compareVersion(keras["__version__"],"2.4.0")>=0 &
+           utils::compareVersion(keras["__version__"],"3.0.0")<0){
           private$TextEmbeddingFramework=backend
           private$ClassifierFramework="tensorflow"
           os$environ$setdefault("KERAS_BACKEND","tensorflow")
@@ -221,7 +223,7 @@ AifeducationConfiguration<-R6::R6Class(
           cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
           cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
 
-        } else if(keras["__version__"]>="3.0.0"){
+        } else if(utils::compareVersion(keras["__version__"],"3.0.0")>=0){
           private$TextEmbeddingFramework=backend
           private$ClassifierFramework=backend
           os$environ$setdefault("KERAS_BACKEND",backend)
@@ -229,7 +231,8 @@ AifeducationConfiguration<-R6::R6Class(
           cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
           cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
 
-        } else if(keras["__version__"]<"2.4.0" & reticulate::py_module_available("keras-core")){
+        } else if(utils::compareVersion(keras["__version__"],"2.4.0")<0 &
+                  reticulate::py_module_available("keras-core")){
           private$TextEmbeddingFramework=backend
           private$ClassifierFramework=backend
           os$environ$setdefault("KERAS_BACKEND",backend)

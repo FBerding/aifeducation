@@ -157,7 +157,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
     #New-----------------------------------------------------------------------
     #'@description Creating a new instance of this class.
-    #'@param ml_framework \code{string} #'@param ml_framework \code{string} Framework to use for training and inference.
+    #'@param ml_framework \code{string} Framework to use for training and inference.
     #'\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
     #'for 'pytorch'
     #'@param name \code{Character} Name of the new classifier. Please refer to
@@ -186,7 +186,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
     #'@return Returns an object of class \link{TextEmbeddingClassifierNeuralNet} which is ready for
     #'training.
-    initialize=function(ml_framework="tensorflow",
+    initialize=function(ml_framework=aifeducation_config$get_framework()$ClassifierFramework,
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -1992,16 +1992,29 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\code{ml_framework="tensorflow"} for 'tensorflow', and \code{ml_framework="auto"}.
     #'@return Function does not return a value. It is used to load the weights
     #'of a model.
-    load_model=function(dir_path,ml_framework="auto"){
+    #'@importFrom utils compareVersion
+    load_model=function(dir_path,
+                        ml_framework=aifeducation_config$get_framework()$ClassifierFramework){
 
       # Set the correct ml framework
-      if(keras["__version__"]<"3.0.0" & ml_framework=="auto"){
+
+      if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
+        stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
+      }
+
+      if(ml_framework=="not_specified"){
+        stop("The global machine learning framework is not set. Please use
+             aifeducation_config$set_global_ml_backend() directly after loading
+             the library to set the global framework. ")
+      }
+
+      if(utils::compareVersion(keras["__version__"],"3.0.0")>=0 & ml_framework=="auto"){
         private$ml_framework="tensorflow"
-      } else if (keras["__version__"]<"3.0.0" & ml_framework!="pytorch"){
+      } else if (utils::compareVersion(keras["__version__"],"3.0.0")<0 & ml_framework=="pytorch"){
         private$ml_framework="tensorflow"
         warning("Using a classifier object with PyTorch requires at least Keras Version 3.
                 ml_framework is set to tensorflow.")
-      } else if (keras["__version__"]>="3.0.0" & ml_framework!="auto"){
+      } else if (utils::compareVersion(keras["__version__"],"3.0.0")>=0 & ml_framework!="auto"){
         private$ml_framework=ml_framework
       } else {
         private$ml_framework="tensorflow"

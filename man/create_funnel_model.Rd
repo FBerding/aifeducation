@@ -5,7 +5,7 @@
 \title{Function for creating a new transformer based on Funnel Transformer}
 \usage{
 create_funnel_model(
-  ml_framework = "tensorflow",
+  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 30522,

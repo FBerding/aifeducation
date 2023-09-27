@@ -497,10 +497,17 @@ TextEmbeddingModel<-R6::R6Class(
     #'transformer model into the R interface.
     #'
     #'@importFrom utils read.csv
-    load_model=function(model_dir,ml_framework="auto"){
+    load_model=function(model_dir,
+                        ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework){
 
-      if((ml_framework %in% c("tensorflow","pytorch","auto"))==FALSE) {
+      if((ml_framework %in% c("tensorflow","pytorch","auto","not_specified"))==FALSE) {
         stop("ml_framework must be 'auto', 'tensorflow' or 'pytorch'.")
+      }
+
+      if(ml_framework=="not_specified"){
+        stop("The global machine learning framework is not set. Please use
+             aifeducation_config$set_global_ml_backend() directly after loading
+             the library to set the global framework. ")
       }
 
       model_dir_main<-paste0(model_dir,"/","model_data")

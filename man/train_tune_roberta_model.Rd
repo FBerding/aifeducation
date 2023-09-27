@@ -5,7 +5,7 @@
 \title{Function for training and fine-tuning a RoBERTa model}
 \usage{
 train_tune_roberta_model(
-  ml_framework = "tensorflow",
+  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
   output_dir,
   model_dir_path,
   raw_texts,

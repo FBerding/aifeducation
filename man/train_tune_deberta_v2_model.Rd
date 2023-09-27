@@ -5,7 +5,7 @@
 \title{Function for training and fine-tuning a DeBERTa-V2 model}
 \usage{
 train_tune_deberta_v2_model(
-  ml_framework = "tensorflow",
+  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
   output_dir,
   model_dir_path,
   raw_texts,

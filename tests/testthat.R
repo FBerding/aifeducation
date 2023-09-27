@@ -10,6 +10,8 @@ library(testthat)
 library(aifeducation)
 library(quanteda.textmodels)
 
+aifeducation_config$set_global_ml_backend("tensorflow")
+
 test_results<-test_check("aifeducation")
            #reporter = LocationReporter(),
            #stop_on_failure = TRUE)

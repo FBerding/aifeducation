@@ -506,7 +506,9 @@ for(ai_method in ai_methods){
 
       test_that(paste0(ai_method,"Loading Model",framework), {
         expect_no_error(
-          bert_modeling$load_model(testthat::test_path(paste0(path_02,"/",framework)))
+          bert_modeling$load_model(
+            model_dir=testthat::test_path(paste0(path_02,"/",framework)),
+            ml_framework=framework)
         )
       })
 
@@ -659,6 +661,7 @@ for(ai_method in ai_methods){
       test_that(paste0(ai_method,"Load Total Model H5",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
+          ml_framework = framework,
           model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
         )
         expect_s3_class(bert_modeling,
@@ -676,6 +679,7 @@ for(ai_method in ai_methods){
       test_that(paste0(ai_method,"Load Total Model TF with ID",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
+          ml_framework = framework,
           model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
         )
         expect_s3_class(bert_modeling,
@@ -694,6 +698,7 @@ for(ai_method in ai_methods){
       test_that(paste0("Load Total Model TF without ID",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
+          ml_framework = framework,
           model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name_root))
         )
         expect_s3_class(bert_modeling,
@@ -703,6 +708,7 @@ for(ai_method in ai_methods){
       test_that(paste0(ai_method,"Sustainability Data Loaded",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
+          ml_framework = framework,
           model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name_root))
         )
         sustain_data<-bert_modeling$get_sustainability_data()

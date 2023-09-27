@@ -5,7 +5,7 @@
 \title{Function for training and fine-tuning a Longformer model}
 \usage{
 train_tune_longformer_model(
-  ml_framework = "tensorflow",
+  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
   output_dir,
   model_dir_path,
   raw_texts,

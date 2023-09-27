@@ -177,7 +177,10 @@ Returns an object of class \link{TextEmbeddingModel}.
 \subsection{Method \code{load_model()}}{
 Method for loading a transformers model into R.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(model_dir, ml_framework = "auto")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_model(
+  model_dir,
+  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

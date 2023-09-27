@@ -156,7 +156,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$new(
-  ml_framework = "tensorflow",
+  ml_framework = aifeducation_config$get_framework()$ClassifierFramework,
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -176,7 +176,7 @@ Creating a new instance of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} #'@param ml_framework \code{string} Framework to use for training and inference.
+\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
 \code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
 for 'pytorch'}
 
@@ -663,7 +663,10 @@ Function does not return a value. It saves the model to disk.
 Method for importing a model from 'Keras v3 format',
 'tensorflow' SavedModel format or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(dir_path, ml_framework = "auto")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(
+  dir_path,
+  ml_framework = aifeducation_config$get_framework()$ClassifierFramework
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

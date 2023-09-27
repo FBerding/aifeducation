@@ -12,11 +12,19 @@
 #'
 #'@family Saving and Loading
 #'
+#'@importFrom utils compareVersion
+#'
 #'@export
 load_ai_model<-function(model_dir,ml_framework="auto"){
 
-  if((ml_framework %in% c("tensorflow","pytorch","auto"))==FALSE) {
-    stop("ml_framework must be 'auto', 'tensorflow' or 'pytorch'.")
+  if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
+    stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
+  }
+
+  if(ml_framework=="not_specified"){
+    stop("The global machine learning framework is not set. Please use
+             aifeducation_config$set_global_ml_backend() directly after loading
+             the library to set the global framework. ")
   }
 
   #Load the Interface to R
@@ -34,7 +42,7 @@ load_ai_model<-function(model_dir,ml_framework="auto"){
     }
 
     #For aifeducation 0.2.0 and lower-----------------------------------------
-    if(aifeducation_version<="0.2.0"){
+    if(utils::compareVersion(as.character(aifeducation_version),"0.2.0")<=0){
       if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
         loaded_model$load_model(model_dir)
       } else if (methods::is(loaded_model,"TextEmbeddingModel")){

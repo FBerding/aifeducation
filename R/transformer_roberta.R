@@ -59,7 +59,7 @@
 #'
 #'@export
 create_roberta_model<-function(
-    ml_framework="tensorflow",
+    ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=30522,
@@ -88,8 +88,14 @@ create_roberta_model<-function(
             use another transformer (e.g. longformer).")
   }
 
-  if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
+  if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
+  }
+
+  if(ml_framework=="not_specified"){
+    stop("The global machine learning framework is not set. Please use
+             aifeducation_config$set_global_ml_backend() directly after loading
+             the library to set the global framework. ")
   }
 
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
@@ -297,7 +303,7 @@ create_roberta_model<-function(
 #'@importFrom utils read.csv
 #'
 #'@export
-train_tune_roberta_model=function(ml_framework="tensorflow",
+train_tune_roberta_model=function(ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
                                   output_dir,
                                model_dir_path,
                                raw_texts,
@@ -318,8 +324,14 @@ train_tune_roberta_model=function(ml_framework="tensorflow",
                                trace=TRUE,
                                keras_trace=1){
 
-  if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
+  if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
+  }
+
+  if(ml_framework=="not_specified"){
+    stop("The global machine learning framework is not set. Please use
+             aifeducation_config$set_global_ml_backend() directly after loading
+             the library to set the global framework. ")
   }
 
   #Start Sustainability Tracking
