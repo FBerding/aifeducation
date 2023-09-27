@@ -327,7 +327,8 @@ test_that(paste(ml_framework,"Saving Classifier Keras_V3"),{
 test_that(paste(ml_framework,"Loading Classifier Keras_V3"),{
   expect_no_error(
     classifier$load_model(
-      testthat::test_path("test_artefacts/tmp_keras"))
+      ml_framework="tensorflow",
+      dir_path=testthat::test_path("test_artefacts/tmp_keras"))
   )
 })
 
@@ -341,7 +342,8 @@ test_that(paste(ml_framework,"Saving Classifier H5"),{
 test_that(paste(ml_framework,"Loading Classifier H5"),{
   expect_no_error(
     classifier$load_model(
-      testthat::test_path("test_artefacts/tmp"))
+      ml_framework="tensorflow",
+      dir_path=testthat::test_path("test_artefacts/tmp"))
   )
 })
 
@@ -355,7 +357,8 @@ test_that(paste(ml_framework,"Saving Classifier TF"),{
 test_that(paste(ml_framework,"Loading Classifier TF"),{
   expect_no_error(
     classifier$load_model(
-      testthat::test_path("test_artefacts/tmp"))
+      ml_framework="tensorflow",
+      dir_path=testthat::test_path("test_artefacts/tmp"))
   )
 })
 
@@ -470,6 +473,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model keras_V3 without ID"),
 test_that(paste(ml_framework,"Classifier Load Total Model keras_V3 without ID"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
+    ml_framework="tensorflow",
     model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models_keras/",classifier$get_model_info()$model_name_root))
   )
   expect_s3_class(new_classifier,
@@ -487,6 +491,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model keras_V3"), {
 test_that(paste(ml_framework,"Classifier Load Total Model keras_V3 with ID"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
+    ml_framework="tensorflow",
     model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models_keras/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
@@ -506,6 +511,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model H5"), {
 test_that(paste(ml_framework,"Classifier Load Total Model H5"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
+    ml_framework="tensorflow",
     model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
@@ -523,6 +529,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model TF with ID"), {
 test_that(paste(ml_framework,"Classifier Load Total Model TF with ID"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
+    ml_framework="tensorflow",
     model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name))
   )
   expect_s3_class(new_classifier,
@@ -541,6 +548,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model TF without ID"), {
 test_that(paste(ml_framework,"Classifier Load Total Model TF without ID"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
+    ml_framework="tensorflow",
     model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name_root))
   )
   expect_s3_class(new_classifier,
