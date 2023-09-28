@@ -4,18 +4,27 @@
 #'
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
+#'@param tf_version \code{string} determining the desired version of 'tensorflow'.
 #'@return Returns no values or objects. Function is used for installing the
 #'necessary python libraries in a conda environment.
 #'@importFrom reticulate conda_create
 #'@importFrom reticulate py_install
+#'@importFrom utils compareVersion
 #'@family Installation and Configuration
 #'@export
-install_py_modules<-function(envname="aifeducation"){
+install_py_modules<-function(envname="aifeducation",
+                             tf_version="<=2.14"){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
                       "codecarbon",
                       "accelerate")
+
+  conda_environments<-reticulate::conda_list()
+
+  if((envname %in% conda_environments$name)==TRUE){
+    reticulate::conda_remove(envname = envname)
+  }
 
   reticulate::conda_create(
     envname = envname,
@@ -24,7 +33,7 @@ install_py_modules<-function(envname="aifeducation"){
 
   reticulate::conda_install(
     packages = c(
-      "tensorflow",
+      paste0("tensorflow",tf_version),
       "torch",
       "keras"),
     envname = envname,
@@ -39,18 +48,6 @@ install_py_modules<-function(envname="aifeducation"){
     pip = TRUE
   )
 
-  py_package_list<-reticulate::py_list_packages(
-    envname = envname
-  )
-  keras_version<-py_package_list[which(py_package_list$package=="keras"),"version"]
-  if(keras_version<"3.0.0"){
-    reticulate::conda_install(
-      packages = "keras-core",
-      envname = envname,
-      conda = "auto",
-      pip = TRUE
-    )
-  }
 }
 
 #'Check if all necessary python modules are available
@@ -220,6 +217,7 @@ AifeducationConfiguration<-R6::R6Class(
           private$ClassifierFramework="tensorflow"
           os$environ$setdefault("KERAS_BACKEND","tensorflow")
 
+          cat("keras Version:",keras["__version__"],"\n")
           cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
           cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
 
@@ -228,15 +226,7 @@ AifeducationConfiguration<-R6::R6Class(
           private$ClassifierFramework=backend
           os$environ$setdefault("KERAS_BACKEND",backend)
 
-          cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
-          cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
-
-        } else if(utils::compareVersion(keras["__version__"],"2.4.0")<0 &
-                  reticulate::py_module_available("keras-core")){
-          private$TextEmbeddingFramework=backend
-          private$ClassifierFramework=backend
-          os$environ$setdefault("KERAS_BACKEND",backend)
-
+          cat("keras Version:",keras["__version__"],"\n")
           cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
           cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
 

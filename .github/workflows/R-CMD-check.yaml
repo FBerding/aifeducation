@@ -82,19 +82,6 @@ jobs:
             pip = TRUE
           )
 
-            py_packages_list<-reticulate::py_list_packages(
-              envname = envname
-            )
-            keras_version<-py_packages_list[which(py_packages_list$package=="keras"),"version"]
-            if(keras_version<"3.0.0"){
-              reticulate::conda_install(
-                packages = "keras-core",
-                envname = envname,
-                conda = "auto",
-                pip = TRUE
-              )
-            }
-
           path_to_python <- conda_python("r-reticulate")
 
           writeLines(sprintf("RETICULATE_PYTHON=%s", path_to_python),
@@ -102,4 +89,4 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          upload-snapshots: true
+          upload-snapshots: false
