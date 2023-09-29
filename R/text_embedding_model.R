@@ -162,10 +162,6 @@ TextEmbeddingModel<-R6::R6Class(
     #'}}
     #'
     #'}
-    #'@import tidytext
-    #'@importFrom topicmodels LDA
-    #'@import quanteda
-    #'@importFrom text2vec GlobalVectors
     #'@import reticulate
     #'@import stats
     #'@import reshape2

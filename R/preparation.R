@@ -28,7 +28,6 @@
 #'here: \url{https://universaldependencies.org/u/pos/index.html}.
 #'@note A huge number of models can be found
 #'here: \url{https://ufal.mff.cuni.cz/udpipe/2/models}.
-#'@importFrom udpipe udpipe_load_model udpipe_annotate unique_identifier
 #'@importFrom stats na.omit
 #'@importFrom stringr str_length str_replace_all str_remove_all
 #'@family Preparation
@@ -186,8 +185,6 @@ bow_pp_create_vocab_draft<-function(path_language_model,
 #'
 #'}
 #'
-#'@importFrom quanteda corpus tokens tokens_replace tokens_remove tokens_tolower
-#'@importFrom quanteda dfm dfm_trim fcm dfm_keep fcm_select
 #'@importFrom stats na.omit
 #'@family Preparation
 #'@export
