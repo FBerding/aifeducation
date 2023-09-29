@@ -4,11 +4,13 @@
 \alias{install_py_modules}
 \title{Installing necessary python modules to an environment}
 \usage{
-install_py_modules(envname = "aifeducation")
+install_py_modules(envname = "aifeducation", tf_version = "<=2.14")
 }
 \arguments{
 \item{envname}{\code{string} Name of the environment where the packages should
 be installed.}
+
+\item{tf_version}{\code{string} determining the desired version of 'tensorflow'.}
 }
 \value{
 Returns no values or objects. Function is used for installing the

@@ -328,6 +328,8 @@ TextEmbeddingModel<-R6::R6Class(
 
         #------------------------------------------------------------------------
       } else if(private$basic_components$method=="glove_cluster"){
+        requireNamespace(package="text2vec")
+
         glove <- text2vec::GlobalVectors$new(rank = bow_n_dim,
                                              x_max = 10
         )
@@ -402,6 +404,10 @@ TextEmbeddingModel<-R6::R6Class(
 
         #Topic Modeling--------------------------------------------------------
       } else if(private$basic_components$method=="lda"){
+        requireNamespace(package="quanteda")
+        requireNamespace(package="topicmodels")
+        requireNamespace(package="tidytext")
+
         selection<-(rowSums(as.matrix(bow_basic_text_rep$dfm))>0)
         corrected_dfm<-quanteda::dfm_subset(x=bow_basic_text_rep$dfm,
                                             selection)
@@ -657,13 +663,6 @@ TextEmbeddingModel<-R6::R6Class(
         if(token_encodings_only==TRUE){
           encodings_only=NULL
           for(i in 1:n_units){
-            #preparation_tokens<-quanteda::tokens(raw_text[i])
-            #preparation_tokens<-quanteda::tokens_chunk(
-            #  x=preparation_tokens,
-            #  size=private$basic_components$max_length,
-            #  overlap = private$transformer_components$overlap,
-            #  use_docvars = FALSE)
-
 
             tokens_unit<-NULL
 
@@ -697,24 +696,6 @@ TextEmbeddingModel<-R6::R6Class(
           #text_chunks<-NULL
           encodings<-NULL
           for(i in 1:n_units){
-            #preparation_tokens<-quanteda::tokens(raw_text[i])
-            #preparation_tokens<-quanteda::tokens_chunk(
-            #  x=preparation_tokens,
-             # size=private$basic_components$max_length,
-             # overlap = private$transformer_components$overlap,
-            #  use_docvars = FALSE)
-            #preparation_tokens=as.list(preparation_tokens)
-            #preparation_tokens=lapply(X=preparation_tokens,FUN=paste,collapse=" ")
-
-            #chunk_list[i]=min(length(preparation_tokens),private$transformer_components$chunks)
-            #preparation_tokens<-preparation_tokens[1:chunk_list[i]]
-
-            #index_min=length(text_chunks)+1
-            #index_max=length(text_chunks)+length(preparation_tokens)
-            #cat(index_min)
-            #text_chunks=append(x=text_chunks,values = unname(preparation_tokens))
-            #text_chunks[index_min:index_max]<-list(preparation_tokens)
-
 
           if(private$transformer_components$ml_framework=="tensorflow"){
             tokens=private$transformer_components$tokenizer(
@@ -758,6 +739,9 @@ TextEmbeddingModel<-R6::R6Class(
         }
       } else if(private$basic_components$method=="glove_cluster"|
                 private$basic_components$method=="lda"){
+
+        requireNamespace(package="quanteda")
+
         textual_corpus <-quanteda::corpus(raw_text)
         token<-quanteda::tokens(textual_corpus)
         if(private$bow_components$configuration$use_lemmata==TRUE){

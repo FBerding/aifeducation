@@ -41,6 +41,9 @@ bow_pp_create_vocab_draft<-function(path_language_model,
                                     chunk_size=100,
                                     trace=TRUE)
 {
+  requireNamespace(package="udpipe")
+  requireNamespace(package="quanteda")
+
   #Phase 1: Analyze Texts with 'udpipe'
   n_document_segments<-length(data)
   n_sentence_init<-0
@@ -207,6 +210,8 @@ bow_pp_create_basic_text_rep<-function(data,
                                       weights = 1 / (1:5),
                                       trace=TRUE)
 {
+  requireNamespace(package="quanteda")
+
   textual_corpus <-quanteda::corpus(data)
   token<-quanteda::tokens(textual_corpus,
                           remove_punct = remove_punct,

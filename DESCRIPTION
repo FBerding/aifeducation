@@ -38,7 +38,6 @@ URL:https://fberding.github.io/aifeducation/
 BugReports: https://github.com/cran/aifeducation/issues
 Depends:
     foreach,
-    quanteda,
     R (>= 3.5.0)
 Imports: 
     abind,
@@ -52,14 +51,15 @@ Imports:
     reticulate,
     smotefamily,
     stringr,
+    utils
+Suggests: 
     text2vec,
     tidytext,
     topicmodels,
     udpipe,
-    utils
-Suggests: 
-    knitr,
+    quanteda,
     quanteda.textmodels,
+    knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 LinkingTo: 
