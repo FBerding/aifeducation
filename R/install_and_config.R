@@ -238,6 +238,16 @@ AifeducationConfiguration<-R6::R6Class(
             If you would like to change the framework please restart the
             session and set framework to the desired backend.")
       }
+    },
+    #'@description Method for checking if the global ml framework is set.
+    #'@return Return \code{TRUE} if the global machine learning framework ist set.
+    #'Otherwiese \code{FALSE}.
+    global_framework_set=function(){
+      if(private$TextEmbeddingFramework=="not_specified"){
+        return(FALSE)
+      } else {
+        return(TRUE)
+      }
     }
   )
 )

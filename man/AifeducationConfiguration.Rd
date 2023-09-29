@@ -37,6 +37,7 @@ Other Installation and Configuration:
 \itemize{
 \item \href{#method-aifeducationConfiguration-get_framework}{\code{AifeducationConfiguration$get_framework()}}
 \item \href{#method-aifeducationConfiguration-set_global_ml_backend}{\code{AifeducationConfiguration$set_global_ml_backend()}}
+\item \href{#method-aifeducationConfiguration-global_framework_set}{\code{AifeducationConfiguration$global_framework_set()}}
 \item \href{#method-aifeducationConfiguration-clone}{\code{AifeducationConfiguration$clone()}}
 }
 }
@@ -75,6 +76,20 @@ for 'PyTorch'.}
 \subsection{Returns}{
 This method does nothing return. It is used for setting the global
 configuration of 'aifeducation'.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-aifeducationConfiguration-global_framework_set"></a>}}
+\if{latex}{\out{\hypertarget{method-aifeducationConfiguration-global_framework_set}{}}}
+\subsection{Method \code{global_framework_set()}}{
+Method for checking if the global ml framework is set.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{AifeducationConfiguration$global_framework_set()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Return \code{TRUE} if the global machine learning framework ist set.
+Otherwiese \code{FALSE}.
 }
 }
 \if{html}{\out{<hr>}}

@@ -65,7 +65,14 @@ In order to use the package, you first need to install it. This can be
 done by:
 
 ```{r, include = TRUE, eval=FALSE}
-# install.packages("devtools")
+install.packages("aifeducation")
+```
+
+You can install the development version of aifeducation from
+[GitHub](https://github.com/) with:
+
+```{r, include = TRUE, eval=FALSE}
+install.packages("devtools")
 devtools::install_github("FBerding/aifeducation",
                          dependencies = TRUE)
 ```

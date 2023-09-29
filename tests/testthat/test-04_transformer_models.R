@@ -2,7 +2,9 @@ testthat::skip_on_cran()
 testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                   message = "Necessary python modules not available")
 
-aifeducation_config$set_global_ml_backend("tensorflow")
+if(aifeducation_config$global_framework_set()==FALSE){
+  aifeducation_config$set_global_ml_backend("tensorflow")
+}
 
 aifeducation::set_config_gpu_low_memory()
 #transformers$utils$logging$set_verbosity_warning()
@@ -92,7 +94,7 @@ for(ai_method in ai_methods){
           create_bert_model(
           ml_framework = framework,
           model_dir=testthat::test_path(paste0(path_01,"/",framework)),
-          vocab_raw_texts=example_data$text[1:500],
+          vocab_raw_texts=example_data$text,
           vocab_size=50000,
           vocab_do_lower_case=FALSE,
           max_position_embeddings=512,
@@ -112,7 +114,7 @@ for(ai_method in ai_methods){
           create_bert_model(
             ml_framework = framework,
             model_dir=testthat::test_path(paste0(path_01,"/",framework)),
-            vocab_raw_texts=example_data$text[1:500],
+            vocab_raw_texts=example_data$text,
             vocab_size=50000,
             vocab_do_lower_case=TRUE,
             max_position_embeddings=512,
