@@ -1717,6 +1717,19 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       if(sustain_track==TRUE){
         sustainability_tracker$stop()
         private$sustainability<-summarize_tracked_sustainability(sustainability_tracker)
+      } else {
+        private$sustainability=list(
+          sustainability_tracked=FALSE,
+          date=NA,
+          sustainability_data=list(
+            duration_sec=NA,
+            co2eq_kg=NA,
+            cpu_energy_kwh=NA,
+            gpu_energy_kwh=NA,
+            ram_energy_kwh=NA,
+            total_energy_kwh=NA
+          )
+        )
       }
 
       if(trace==TRUE){

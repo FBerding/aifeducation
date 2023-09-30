@@ -126,7 +126,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param model_dir \code{string} path to the directory where the
     #'BERT model is stored.
     #'@param bow_basic_text_rep object of class \code{basic_text_rep} created via
-    #'the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove"}
+    #'the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove_cluster"}
     #'and \code{method="lda"}.
     #'@param bow_n_dim \code{int} Number of dimensions of the GlobalVector or
     #'number of topics for LDA.
@@ -170,7 +170,7 @@ TextEmbeddingModel<-R6::R6Class(
                         model_version=NULL,
                         model_language=NULL,
                         method=NULL,
-                        ml_framework="tensorflow",
+                        ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
                         max_length=0,
                         chunks=1,
                         overlap=0,
@@ -229,6 +229,18 @@ TextEmbeddingModel<-R6::R6Class(
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
       private$r_package_versions$reticulate<-packageVersion("reticulate")
 
+      #Load Sustainability Data-----------------------------------------------
+      if(!(method %in% c("lda","glove_cluster"))==TRUE){
+        sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
+        if(file.exists(sustainability_datalog_path)){
+          tmp_sustainability_data<-read.csv(sustainability_datalog_path)
+          private$sustainability$sustainability_tracked=TRUE
+          private$sustainability$track_log=tmp_sustainability_data
+        } else {
+          private$sustainability$sustainability_tracked=FALSE
+          private$sustainability$track_log=NA
+        }
+      }
 
       #basic_components-------------------------------------------------------
       private$basic_components$method=method

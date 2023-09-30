@@ -58,7 +58,7 @@ Method for creating a new text embedding model
   model_version = NULL,
   model_language = NULL,
   method = NULL,
-  ml_framework = "tensorflow",
+  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
   max_length = 0,
   chunks = 1,
   overlap = 0,
@@ -119,7 +119,7 @@ created by transformer models. See details for more information.}
 BERT model is stored.}
 
 \item{\code{bow_basic_text_rep}}{object of class \code{basic_text_rep} created via
-the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove"}
+the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove_cluster"}
 and \code{method="lda"}.}
 
 \item{\code{bow_n_dim}}{\code{int} Number of dimensions of the GlobalVector or

@@ -29,14 +29,16 @@ educational and social sciences.
   educational sciences.
 - Supporting both ‘PyTorch’ and ‘Tensorflow’ as machine learning
   frameworks.
-- Supporting pre-trained language models from Hugging Face.
 - Supporting the usage of trained models on both frameworks providing a
-  high level of flexibility (supported models are BERT, RoBERTa,
-  DeBERTa, Longformer, and Funnel Transformer).
+  high level of flexibility
+- Supporting pre-trained language models from Hugging Face.
+- Supporting BERT, RoBERTa, DeBERTa, Longformer, and Funnel Transformer
+  for creating context sensitive text embedding.
 - Making sharing pre-trained models very easy.
 - Integrating sustainability tracking.
 - Integrating special statistical techniques for dealing with data
   structures common in the social and educational sciences.
+- Supporting the classification of long textual documents.
 
 Currently, the package focuses on classification tasks which can either
 be used to diagnose characteristics of learners from written material or
@@ -55,10 +57,18 @@ You can install the development version of aifeducation from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("FBerding/aifeducation",
-                          dependencies = TRUE)
+install.packages("devtools")
+devtools::install_github(repo="FBerding/aifeducation",
+                         ref="master",
+                         dependencies = TRUE)
 ```
+
+> **Note:** There is currently a bug in reticulate 1.32.0 which does not
+> allow to load python packages such as tensorflow, keras or torch. The
+> error has been fixed in the developer version of reticulate. You can
+> install this version with `install.packages("pak")` and
+> `pak::pak("rstudio/reticulate")`. With the release of reticulate
+> 1.33.0 you can ignore this note.
 
 ## Sustainability
 
@@ -75,7 +85,8 @@ computer is located.
 This package allows all supported models based either on ‘PyTorch’ or
 ‘tensorflow’, providing a high level of flexibility. Even pre-trained
 models can be used with both frameworks. In general, users only have to
-decide which framework they would like to use when loading a model.
+decide which framework they would like to use when starting a new
+session.
 
 At the moment, using ‘PyTorch’ for classifier objects requires
 ‘keras-core’ or ‘keras3’. If your system does not support these python
@@ -210,12 +221,13 @@ you can find a detailed guide on how to document and share your models.
 
 ## Tutorial and Guides
 
-A guide on how to install and configure this package can be found via
-[Get
-started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
-A short introduction into the package with examples for classification
-tasks can be found in vignette [02 classification
-tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+- Installation and configuration of the package: [01 get
+  started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
+- A short introduction into the package with examples for classification
+  tasks:[02 classification
+  tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+- A description for sharing models: [03 sharing and using trained
+  AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
 
 ## References
 

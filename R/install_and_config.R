@@ -5,6 +5,9 @@
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
 #'@param tf_version \code{string} determining the desired version of 'tensorflow'.
+#'@param remove_first \code{bool} If \code{TRUE} removes the environment completely before
+#'recreating the environment and installing the packages. If \code{FALSE} the packages
+#'are installed in the existing environment without any prior changes.
 #'@return Returns no values or objects. Function is used for installing the
 #'necessary python libraries in a conda environment.
 #'@importFrom reticulate conda_create
@@ -13,23 +16,25 @@
 #'@family Installation and Configuration
 #'@export
 install_py_modules<-function(envname="aifeducation",
-                             tf_version="<=2.14"){
+                             tf_version="<=2.14",
+                             remove_first=FALSE){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
                       "codecarbon",
                       "accelerate")
 
-  conda_environments<-reticulate::conda_list()
+  if(remove_first==TRUE){
+    conda_environments<-reticulate::conda_list()
+      if((envname %in% conda_environments$name)==TRUE){
+      reticulate::conda_remove(envname = envname)
+    }
 
-  if((envname %in% conda_environments$name)==TRUE){
-    reticulate::conda_remove(envname = envname)
+    reticulate::conda_create(
+      envname = envname,
+      channel=c("conda-forge")
+    )
   }
-
-  reticulate::conda_create(
-    envname = envname,
-    channel=c("conda-forge")
-  )
 
   reticulate::conda_install(
     packages = c(
@@ -180,8 +185,6 @@ set_config_os_environ_logger<-function(level="ERROR"){
 #'at least version 3. If you have an older version 'tensorflow' is used.
 #'
 #'@family Installation and Configuration
-#'@keywords internal
-#'
 AifeducationConfiguration<-R6::R6Class(
   classname = "aifeducationConfiguration",
   private = list(
@@ -210,23 +213,27 @@ AifeducationConfiguration<-R6::R6Class(
         stop("backend must be 'tensorflow' or 'pytorch'.")
       }
 
+
+      py_package_list<-reticulate::py_list_packages()
+      keras_version<-as.character(py_package_list[which(py_package_list$package=="keras"),"version"])
+
       if(private$TextEmbeddingFramework=="not_specified"){
-        if(utils::compareVersion(keras["__version__"],"2.4.0")>=0 &
-           utils::compareVersion(keras["__version__"],"3.0.0")<0){
+        if(utils::compareVersion(keras_version,"2.4.0")>=0 &
+           utils::compareVersion(keras_version,"3.0.0")<0){
           private$TextEmbeddingFramework=backend
           private$ClassifierFramework="tensorflow"
           os$environ$setdefault("KERAS_BACKEND","tensorflow")
 
-          cat("keras Version:",keras["__version__"],"\n")
+          cat("keras Version:",keras_version,"\n")
           cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
           cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
 
-        } else if(utils::compareVersion(keras["__version__"],"3.0.0")>=0){
+        } else if(utils::compareVersion(keras_version,"3.0.0")>=0){
           private$TextEmbeddingFramework=backend
           private$ClassifierFramework=backend
           os$environ$setdefault("KERAS_BACKEND",backend)
 
-          cat("keras Version:",keras["__version__"],"\n")
+          cat("keras Version:",keras_version,"\n")
           cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
           cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
 
@@ -251,3 +258,11 @@ AifeducationConfiguration<-R6::R6Class(
     }
   )
 )
+
+#' R6 object of class AifeducationConfiguration
+#'
+#' Object for managing setting the machine learning framework of a session.
+#'
+#'@family Installation and Configuration
+#'@export
+aifeducation_config<-NULL

@@ -25,6 +25,12 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/AifeducationConfiguration.html</loc>
+  </url>
+  <url>
+    <loc>/reference/aifeducation_config.html</loc>
+  </url>
+  <url>
     <loc>/reference/array_to_matrix.html</loc>
   </url>
   <url>
@@ -98,9 +104,6 @@
   </url>
   <url>
     <loc>/reference/matrix_to_array_c.html</loc>
-  </url>
-  <url>
-    <loc>/reference/QAExtractModel.html</loc>
   </url>
   <url>
     <loc>/reference/save_ai_model.html</loc>

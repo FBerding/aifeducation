@@ -219,8 +219,8 @@ starting with the creation of the text embedding models.
 necessary if you cannot rely on an existing model or if you cannot rely
 on a pre-trained transformer.**
 
-# 2 Starting a New Session
-
+# 2 Start Working
+# 2.1 Starting a New Session
 Before you can work with *aifeducation* you must set up a new *R*
 session. First, it is necessary that you load the library. Second, you
 must set up python via reticulate. In case you installed python as
@@ -229,11 +229,22 @@ may start a new session like this:
 
 ```{r, include = TRUE, eval=FALSE}
 library(aifeducation)
-
 reticulate::use_condaenv(condaenv = "aifeducation")
 ```
 
-Now is a good time to configure tensorflow, since some configurations
+Next you have to choose the machine learning framework you would like to use.
+You can set the framework for complete the session with
+
+```{r, include = TRUE, eval=FALSE}
+#For tensorflow
+aifeducation_config$set_global_ml_backend("tensorflow")
+
+#For PyTorch
+aifeducation_config$set_global_ml_backend("pytorch")
+```
+
+In the case that you would like to use tensorflow now is a good time to 
+configure that backend, since some configurations
 can only be done **before** tensorflow is used the first time.
 
 ```{r, include = TRUE, eval=FALSE}
@@ -247,7 +258,56 @@ set_config_gpu_low_memory()
 set_config_os_environ_logger(level = "ERROR")
 ```
 
-If you would like to use PyTorch you can skip this stept.
+> **Note:** Please remember: Every time you start a new session in *R* you have to
+load the library, to set the correct conda environment after loading *aifeducation*, and
+to chose your machine learning framework.
+
+# 2.2  Reading Texts into *R*
+
+For most applications of  *aifeducation* it's necessary to read the text you would like to use into
+*R*. For this task, several packages are available on CRAN. Our experience has been good
+with the package [readtext](https://cran.r-project.org/package=readtext)
+since it allows you to process different kind of sources for textual data.
+Please refer to readtext's documentation for more details. If you have not installed
+this package on your machine, you can request it by
+```{r, include = TRUE, eval=FALSE}
+install.packages("readtext")
+```
+
+For example, if you have stored your texts in an excel sheet with two columns
+(*texts* for the texts and *id* for the texts' id) you can read the data by
+```{r, include = TRUE, eval=FALSE}
+#for excel files
+textual_data<-readtext::readtext(
+  file="text_data.xlsx",
+  text_field = "texts",
+  docid_field = "id"
+)
+```
+Here it is crucial that you pass the file path to `file` and the name of
+the column for the texts to `text_field` and the name of the column for the id
+to `docid_field`.
+
+In other cases you may have stored each text in a separate file (e.g., .txt or .pdf).
+For these cases you can pass the directory of the files and read the data. In the following 
+example the files are stored in the directory "data".
+```{r, include = TRUE, eval=FALSE}
+#read all files with the extension .txt in the directory data
+textual_data<-readtext::readtext(
+  file="data/*.txt"
+)
+
+#read all files with the extension .pdf in the directory data
+textual_data<-readtext::readtext(
+  file="data/*.pdf"
+)
+```
+If you read texts for sever files you do not need to specify the arguments
+`docid_field` and `text_field`. The id of the texts is automatically set to
+the file names. 
+
+Please refer to the documentation of the function readtext within the readtext
+library for more information.
 
 Now everything is ready to start the preparation tasks.
 
@@ -442,7 +502,6 @@ could look like this:
 basic_text_rep<-bow_pp_create_basic_text_rep(
 create_bert_model(
     model_dir = "my_own_transformer",
-    ml_framework="pytorch",
     vocab_raw_texts=example_data$text,
     vocab_size=30522,
     vocab_do_lower_case=FALSE,
@@ -459,10 +518,6 @@ create_bert_model(
     sustain_interval=15,
     trace=TRUE)
 ```
-
-With `ml_framework="tensorflow"` you can decide which machine learning framework
-should be used. You can choose between `ml_framework="tensorflow"` and 
-`ml_framework="pytorch"`. Please note, that you can change the framework at any point.
 
 For this function to work, you must provide a path to a directory where
 your new transformer should be saved. Furthermore, you must provide raw
@@ -512,11 +567,9 @@ directory. The next step is to train your model by calling
 
 ```{r, include = TRUE, eval=FALSE}
 train_tune_bert_model(
-  ml_framework="pytorch",
   output_dir = "my_own_transformer_trained",
   bert_model_dir_path = "my_own_transformer",
   raw_texts = example_data$text,
-  aug_vocab_by=0,
   p_mask=0.15,
   whole_word=TRUE,
   val_size=0.1,
@@ -551,11 +604,15 @@ of training your model (`sustain_iso_code`).
 
 If you work on a machine and your graphic device only has small memory,
 please reduce the batch size significantly. We also recommend to change
-the usage of memory with `set_config_gpu_low_memory()`.
+the usage of memory with `set_config_gpu_low_memory()` at the beginning of the session.
 
 After the training finishes, you can find the transformer ready to use
 in your output_directory. Now you are able to create a text embedding
 model.
+
+> **Note:** In the documentation of the functions you find an argument `ml_framework`.
+Please do *not* change the argument manually since this argument is controlled 
+by the global configuration you have set at the beginning of a session (see section 2).
 
 # 4 Text Embedding
 
@@ -715,13 +772,17 @@ calculated. As a result, you receive a sequence of embeddings. The first
 embeddings characterizes the first part of the text and the second
 embedding characterizes the second part of the text (and so on). Thus,
 our example text embedding model is able to process texts with about
-4\*512=2048 tokens. This approach is inspired by the work by Pappagari
+4*512=2048 tokens. This approach is inspired by the work by Pappagari
 et al. (2019).
 
 Since transformers are able to account for the context, it may be useful
 to interconnect every chunk to bring context into the calculations. This
 can be done with `overlap` to determine how many tokens of the end of a
-prior chunk should be added to the next.
+prior chunk should be added to the next.In our example the last 30 tokens of the prior 
+chunks are added at the beginning of the following chunk. This can help to
+add the correct context of the text sections into the analysis. Altogether,
+this example model can analyse a maximum of 512+(4-1)*(512-30)=1958 tokens of a 
+text.
 
 Finally, you have to decide from which hidden layer or layers the embeddings 
 should be drawn (`aggregation="last"`). In their initial work, Devlin et al. (2019) used
@@ -769,7 +830,7 @@ the method, the data.frame has a different meaning:
     the columns represents the contextualized text embedding or BERT's
     understanding of the relevant text chunk.
 
-Please note that in the case of BERT models, the embeddings of every
+Please note that in the case of transformer models, the embeddings of every
 chunks are interlinked.
 
 With the embedded texts you now have the input to train a new classifier
@@ -810,6 +871,11 @@ creates a unique folder for every model. The name of the folder is created
 by using the models' names. Since the files are stored with
 a special structure please do **not** change the files manually. 
 
+If you change the argument `append_ID` to `append_ID=TRUE` the unique ID of the model
+is added to the directory. The ID is added automatically to ensure
+that every model has a unique name. This is important if you would like to share your 
+work with other persons. 
+
 If you want to load your model, just call the function `load_ai_model` and you can continue
 using your model.
 
@@ -821,14 +887,12 @@ global_vector_clusters_modeling<-load_ai_model(
   model_dir="text_embedding_models/global_vector_clusters_embedding")
 
 bert_modeling<-load_ai_model(
-  ml_framework="auto",
   model_dir="text_embedding_models/bert_embedding")
 ```
 
-In the case of transformers you can decide which machine learning framework should
-be used for applying the model by specifying `ml_framework`. You can choose between
-PyTorch(`ml_framework="pytorch"`) and tensorflow(`ml_framework="tensorflow"`). If you set
-`ml_framework="auto"` the framework is used that was active when the model was saved.
+> **Note:** In the documentation of the function you find an argument `ml_framework`.
+Please do *not* change the argument manually since this argument is controlled 
+by the global configuration you have set at the beginning of a session (see section 2).
 
 **Please note that you have to add the name of the model to the directory path.**
 In our example we have stored three models in the directory "text_embedding_models". Each
@@ -836,11 +900,6 @@ model is saved within its own folder. The folder's name is created automatically
 with the help of the name of the model. Thus, for loading a model you must specify
 which model you want to load by adding the model's name to the directory path as
 shown above. 
-
-If you change the argument `append_ID` to `append_ID=TRUE` the unique ID of the model
-is added to the directory. The ID is added automatically to ensure
-that every model has a unique name. This is important if you would like to share your 
-work with other persons. 
 
 Now you can use your text embedding model.
 
@@ -857,7 +916,6 @@ example_targets<-as.factor(example_data$label)
 names(example_targets)=example_data$id
 
 classifier<-TextEmbeddingClassifierNeuralNet$new(
-  ml_framework="pytorch",
   name="movie_review_classifier",
   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings=bert_embeddings,
@@ -872,11 +930,6 @@ classifier<-TextEmbeddingClassifierNeuralNet$new(
   act_fct="gelu",
   rec_act_fct="tanh")
 ```
-
-With `ml_framework` you can choose which machine learning framework you would like
-to use. Since the classifier is written with 'keras' using a classifier with
-'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
-with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 
 Similar to the text embedding model you should provide a name (`name`)
 and a label (`label`) for your new classifier. With `text_embeddings`
@@ -926,6 +979,14 @@ Masking, normalization, and the creation of the input layer as well as
 the output layer are done automatically.
 
 After you have created a new classifier, you can begin training.
+
+> **Note:** In the documentation of the function you find an argument `ml_framework`.
+Please do *not* change the argument manually since this argument is controlled 
+by the global configuration you have set at the beginning of a session (see section 2).
+
+> **Note:** Since the classifier is written with 'keras' using a classifier with
+'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
+with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 
 ## 5.2 Training a Classifier
 
@@ -1200,12 +1261,14 @@ with both 'PyTorch' and 'tensorflow'.
 If you would like to load a model you can call the function `load_ai_model`.
 ```{r, include = TRUE, eval=FALSE}
 classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier",
-  ml_framework="pytorch")
+  model_dir="classifiers/movie_review_classifier")
 ```
 
-With `ml_framework` you can choose which machine learning framework you would like
-to use. Since the classifier is written with 'keras' using a classifier with
+> **Note:** In the documentation of the function you find an argument `ml_framework`.
+Please do *not* change the argument manually since this argument is controlled 
+by the global configuration you have set at the beginning of a session (see section 2).
+
+> **Note:** Since the classifier is written with 'keras' using a classifier with
 'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
 with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 
@@ -1214,9 +1277,66 @@ with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 If you would like to apply your classifier to new data, two steps are
 necessary. You must first transform the raw text into a numerical
 expression by using *exactly* the same text embedding model that was
-used for training your classifier. The resulting object can then be passed to
-the method `predict` and you will get the predictions together with an
+used for training your classifier. In the case of our example classifier we
+use our BERT model.
+
+```{r, include = TRUE, eval=FALSE}
+# If our mode is not loaded
+bert_modeling<-load_ai_model(
+  model_dir="text_embedding_models/bert_embedding")
+
+# Create a numerical representation of the text
+text_embeddings<-bert_modeling$embed(
+  raw_text = textual_data$texts,
+  doc_id = textual_data$doc_id,
+  batch_size=8,
+  trace=TRUE)
+```
+
+To transform raw texts into a numeric representation 
+Just pass the raw texts and the IDs of every text to the method `embed` of the loaded model.
+This is very easy if you used the package [readtext](https://cran.r-project.org/package=readtext)
+to read raw text from disk, since the object resulting from `readtext` always 
+stores the texts in the column "texts" and the IDs in the column "doc_id".
+
+Depending on your machine, embedding raw texts may take some time. In case
+you use a machine with a graphic device, it is possible that an "out of memory"
+error occurs. In this case reduce the batch size. If the error still occurs,
+restart the *R* session, switch to cpu-only mode *directly* after
+loading the libraries with `aifeducation::set_config_cpu_only()` and request the 
+embedding again.
+
+In the example above, the text embeddings are stored in `text_embedding`. Since
+embedding texts may take some time, it is a good idea to save the embeddings 
+for future analysis (use the `save` function of *R*). This allows you to load
+the embedding without the need to apply the text embedding model on the same 
+raw texts again.
+
+The resulting object can then be passed to
+the method `predict` of our classifier and you will get the predictions together with an
 estimate of certainty for each class/category.
+
+```{r, include = TRUE, eval=FALSE}
+# If your classifier is not loaded
+classifier<-load_ai_model(
+  model_dir="classifiers/movie_review_classifier")
+
+# Predict the classes of new texts
+predicted_categories<-classifier$predict(
+  newdata = text_embeddings,
+  batch_size=8,
+  verbose=0)
+```
+
+After the classifier finishes the prediction, the estimated categories/classes
+are stored as `predicted_categories`. This object is a `data.frame` containing
+texts' IDs in the rows and the probabilities of the different categories/classes
+in the columns. The last column with the name `expected_category` represents the 
+category which is assigned to a text due the highest probability.
+
+The estimates can be used in further analysis with common methods of the educational
+and social sciences such as correlation analysis, regression analysis, structural 
+equation modeling, latent class analysis or analysis of variance.
 
 # References
 

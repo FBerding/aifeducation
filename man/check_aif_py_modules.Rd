@@ -24,6 +24,7 @@ aifeducation to work are available.
 \seealso{
 Other Installation and Configuration: 
 \code{\link{AifeducationConfiguration}},
+\code{\link{aifeducation_config}},
 \code{\link{install_py_modules}()},
 \code{\link{set_config_cpu_only}()},
 \code{\link{set_config_gpu_low_memory}()},

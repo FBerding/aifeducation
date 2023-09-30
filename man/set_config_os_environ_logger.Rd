@@ -21,6 +21,7 @@ the os environment. This function must be called before importing 'tensorflow'.
 \seealso{
 Other Installation and Configuration: 
 \code{\link{AifeducationConfiguration}},
+\code{\link{aifeducation_config}},
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_py_modules}()},
 \code{\link{set_config_cpu_only}()},

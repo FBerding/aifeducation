@@ -169,15 +169,18 @@ to a model are stored.
 ```{r, include = TRUE, eval=FALSE}
 save_ai_model(
   model=topic_modeling, 
-  model_dir="text_embedding_models")
+  model_dir="text_embedding_models",
+  append_ID=TRUE)
 
 save_ai_model(
   model=global_vector_clusters_modeling, 
-  model_dir="text_embedding_models")
+  model_dir="text_embedding_models",
+  append_ID=TRUE)
 
 save_ai_model(
   model=bert_modeling, 
-  model_dir="text_embedding_models")
+  model_dir="text_embedding_models",
+  append_ID=TRUE)
 ```
 
 As you can see all three text embedding models are saved within the same
@@ -197,14 +200,13 @@ global_vector_clusters_modeling<-load_ai_model(
   model_dir="text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l")
 
 bert_modeling<-load_ai_model(
-  ml_framework = "pytorch",
   model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
 ```
 
-In the case of transformers you can decide which machine learning framework should
-be used for applying the model by specifying `ml_framework`. You can choose between
-PyTorch(`ml_framework="pytorch"`) and tensorflow(`ml_framework="tensorflow"`). If you set
-`ml_framework="auto"` the framework is used that was active when the model was saved.
+> **Note:** In the case of transformers you can decide which machine learning framework should
+be used for applying the model by specifying `ml_framework`. Please do *not* edit
+the argument manually. It is recommend that you set your machine learning framework
+at the start of a session with `aifeducation_config$set_global_ml_backend()`.
 
 **Please note that you have to add the name of the model to the directory path.**
 In our example we have stored three models in the directory "text_embedding_models". Each
@@ -216,10 +218,11 @@ shown above.
 At this point you may wonder why there is an ID in model's name although you
 did not enter an ID on model's creation. The ID is added automatically to ensure
 that every model has a unique name. This is important if you would like to share your 
-work with other persons. 
+work with other persons. During saving the ID is appended automatically by 
+setting `append_ID=TRUE`.
 
 Now you are ready to share your work. Just provide all files within your model
-folder. For the bert model in the example above this would be the folder 
+folder. For the BERT model in the example above this would be the folder 
 `"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"`.
 
 # 3 Classifiers
@@ -366,19 +369,30 @@ to pass the model and a directory path to the function `save_ai_model`.
 save_ai_model(
   model=classifier,
   model_dir="classifiers",
-  save_format = "tf")
+  save_format = "keras",
+  append_ID = TRUE)
 ```
 
 In contrast to text embedding models you can specify the additional argument `save_format`
-allowing you to choose between `save_format = "tf"` and  `save_format = "h5"`.
-We recommend to chose `save_format = "tf"` since this is the recommended format
-by tensorflow.
+allowing you to choose between `save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
+We recommend to chose `save_format = "keras"` since this is allows to use the classifier
+with both 'PyTorch' and 'tensorflow'.
 
 If you would like to load a model you can call the function `load_ai_model`.
 ```{r, include = TRUE, eval=FALSE}
 classifier<-load_ai_model(
   model_dir="classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB")
 ```
+
+> **Note:** In the documentation of the function you find an argument `ml_framework`.
+Please do *not* change the argument manually since this argument is controlled 
+by the global configuration you have set at the beginning of a session with
+`aifeducation_config$set_global_ml_backend()`.
+
+> **Note:** Since the classifier is written with 'keras' using a classifier with
+'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
+with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
+
 Similar to text embedding models an ID is added to the name during the creation
 of the classifier ensuring a unique name for your model. Thus, you have to specify
 the correct folder for loading a classifier.

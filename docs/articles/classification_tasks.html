@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -278,7 +278,11 @@ is only necessary if you cannot rely on an existing model or if you
 cannot rely on a pre-trained transformer.</strong></p>
 </div>
 <div class="section level2">
-<h2 id="starting-a-new-session">2 Starting a New Session<a class="anchor" aria-label="anchor" href="#starting-a-new-session"></a>
+<h2 id="start-working">2 Start Working<a class="anchor" aria-label="anchor" href="#start-working"></a>
+</h2>
+</div>
+<div class="section level2">
+<h2 id="starting-a-new-session">2.1 Starting a New Session<a class="anchor" aria-label="anchor" href="#starting-a-new-session"></a>
 </h2>
 <p>Before you can work with <em>aifeducation</em> you must set up a new
 <em>R</em> session. First, it is necessary that you load the library.
@@ -287,12 +291,19 @@ python as suggested in vignette <a href="articles/aifeducation.html">01
 Get started</a> you may start a new session like this:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/aifeducation/" class="external-link">aifeducation</a></span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span>condaenv <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
-<p>Now is a good time to configure tensorflow, since some configurations
-can only be done <strong>before</strong> tensorflow is used the first
-time.</p>
+<p>Next you have to choose the machine learning framework you would like
+to use. You can set the framework for complete the session with</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#For tensorflow</span></span>
+<span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"tensorflow"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#For PyTorch</span></span>
+<span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"pytorch"</span><span class="op">)</span></span></code></pre></div>
+<p>In the case that you would like to use tensorflow now is a good time
+to configure that backend, since some configurations can only be done
+<strong>before</strong> tensorflow is used the first time.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#if you would like to use only cpus</span></span>
 <span><span class="fu"><a href="../reference/set_config_cpu_only.html">set_config_cpu_only</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -301,7 +312,57 @@ time.</p>
 <span></span>
 <span><span class="co">#if you would like to reduce the tensorflow output to errors</span></span>
 <span><span class="fu"><a href="../reference/set_config_os_environ_logger.html">set_config_os_environ_logger</a></span><span class="op">(</span>level <span class="op">=</span> <span class="st">"ERROR"</span><span class="op">)</span></span></code></pre></div>
-<p>If you would like to use PyTorch you can skip this stept.</p>
+<blockquote>
+<p><strong>Note:</strong> Please remember: Every time you start a new
+session in <em>R</em> you have to load the library, to set the correct
+conda environment after loading <em>aifeducation</em>, and to chose your
+machine learning framework.</p>
+</blockquote>
+</div>
+<div class="section level2">
+<h2 id="reading-texts-into-r">2.2 Reading Texts into <em>R</em><a class="anchor" aria-label="anchor" href="#reading-texts-into-r"></a>
+</h2>
+<p>For most applications of <em>aifeducation</em> it’s necessary to read
+the text you would like to use into <em>R</em>. For this task, several
+packages are available on CRAN. Our experience has been good with the
+package <a href="https://cran.r-project.org/package=readtext" class="external-link">readtext</a> since it
+allows you to process different kind of sources for textual data. Please
+refer to readtext’s documentation for more details. If you have not
+installed this package on your machine, you can request it by</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"readtext"</span><span class="op">)</span></span></code></pre></div>
+<p>For example, if you have stored your texts in an excel sheet with two
+columns (<em>texts</em> for the texts and <em>id</em> for the texts’ id)
+you can read the data by</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#for excel files</span></span>
+<span><span class="va">textual_data</span><span class="op">&lt;-</span><span class="fu">readtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readtext/man/readtext.html" class="external-link">readtext</a></span><span class="op">(</span></span>
+<span>  file<span class="op">=</span><span class="st">"text_data.xlsx"</span>,</span>
+<span>  text_field <span class="op">=</span> <span class="st">"texts"</span>,</span>
+<span>  docid_field <span class="op">=</span> <span class="st">"id"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Here it is crucial that you pass the file path to <code>file</code>
+and the name of the column for the texts to <code>text_field</code> and
+the name of the column for the id to <code>docid_field</code>.</p>
+<p>In other cases you may have stored each text in a separate file
+(e.g., .txt or .pdf). For these cases you can pass the directory of the
+files and read the data. In the following example the files are stored
+in the directory “data”.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#read all files with the extension .txt in the directory data</span></span>
+<span><span class="va">textual_data</span><span class="op">&lt;-</span><span class="fu">readtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readtext/man/readtext.html" class="external-link">readtext</a></span><span class="op">(</span></span>
+<span>  file<span class="op">=</span><span class="st">"data/*.txt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#read all files with the extension .pdf in the directory data</span></span>
+<span><span class="va">textual_data</span><span class="op">&lt;-</span><span class="fu">readtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readtext/man/readtext.html" class="external-link">readtext</a></span><span class="op">(</span></span>
+<span>  file<span class="op">=</span><span class="st">"data/*.pdf"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>If you read texts for sever files you do not need to specify the
+arguments <code>docid_field</code> and <code>text_field</code>. The id
+of the texts is automatically set to the file names.</p>
+<p>Please refer to the documentation of the function readtext within the
+readtext library for more information.</p>
 <p>Now everything is ready to start the preparation tasks.</p>
 </div>
 <div class="section level2">
@@ -317,7 +378,7 @@ policies. Therefore, we use the data set
 quanteda.textmodels to illustrate the usage of this package. This
 quanteda.textmodels is automatically installed when you install
 <em>aifeducation</em>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  id<span class="op">=</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="fu">quanteda.textmodels</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/quanteda.textmodels/man/data_corpus_moviereviews.html" class="external-link">data_corpus_moviereviews</a></span><span class="op">)</span><span class="op">$</span><span class="va">id2</span>,</span>
 <span>  label<span class="op">=</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="fu">quanteda.textmodels</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/quanteda.textmodels/man/data_corpus_moviereviews.html" class="external-link">data_corpus_moviereviews</a></span><span class="op">)</span><span class="op">$</span><span class="va">sentiment</span><span class="op">)</span></span>
@@ -335,14 +396,14 @@ rating of a movie and about 1,000 imply a negative rating.</p>
 <p>For this tutorial, we modify this data set by setting about half of
 the negative and positive reviews to <code>NA</code>, indicating that
 these reviews are not labeled.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span>,<span class="fl">1001</span><span class="op">:</span><span class="fl">1500</span><span class="op">)</span><span class="op">]</span><span class="op">=</span><span class="cn">NA</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  neg  pos NA's </span></span>
 <span><span class="co">#&gt;  500  500 1000</span></span></code></pre></div>
 <p>Furthermore, we will bring some imbalance by setting 250 positive
 reviews to <code>NA</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fl">1501</span><span class="op">:</span><span class="fl">1750</span><span class="op">]</span><span class="op">=</span><span class="cn">NA</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  neg  pos NA's </span></span>
@@ -369,7 +430,7 @@ carry semantic meaning. In general, these are tokens of words that are
 either nouns, verbs or adjectives (Papilloud &amp; Hinneburg 2018,
 p. 32). With our example data, an application of that function could
 be:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vocab_draft</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/bow_pp_create_vocab_draft.html">bow_pp_create_vocab_draft</a></span><span class="op">(</span></span>
 <span>  path_language_model<span class="op">=</span><span class="st">"language_model/english-gum-ud-2.5-191206.udpipe"</span>,</span>
 <span>  data<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
@@ -409,7 +470,7 @@ texts and the draft of a vocabulary as main input. The function aims</p>
 </ul>
 <p>Applied to the example, the call of the function could look like
 this:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">basic_text_rep</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
 <span>  vocab_draft <span class="op">=</span> <span class="va">vocab_draft</span>,</span>
@@ -481,30 +542,24 @@ includes the creation of a set of vocabulary. In <em>aifedcuation</em>
 you can do this by calling the function
 <code><a href="../reference/create_bert_model.html">create_bert_model()</a></code>. For our example this could look like
 this:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    <span class="at">ml_framework=</span><span class="st">"pytorch"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>    <span class="at">sustain_track=</span><span class="cn">TRUE</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>    <span class="at">sustain_iso_code=</span><span class="st">"DEU"</span>,</span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>    <span class="at">sustain_region=</span><span class="cn">NULL</span>,</span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    <span class="at">sustain_interval=</span><span class="dv">15</span>,</span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p>With <code>ml_framework="tensorflow"</code> you can decide which
-machine learning framework should be used. You can choose between
-<code>ml_framework="tensorflow"</code> and
-<code>ml_framework="pytorch"</code>. Please note, that you can change
-the framework at any point.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>    <span class="at">sustain_track=</span><span class="cn">TRUE</span>,</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>    <span class="at">sustain_iso_code=</span><span class="st">"DEU"</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>    <span class="at">sustain_region=</span><span class="cn">NULL</span>,</span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>    <span class="at">sustain_interval=</span><span class="dv">15</span>,</span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved. Furthermore, you must
 provide raw texts. These texts are <strong>not</strong> used for
@@ -549,13 +604,11 @@ documentation of codecarbon for more information.</p>
 <p>After calling the function, you will find your new model in your
 model directory. The next step is to train your model by calling
 <code><a href="../reference/train_tune_bert_model.html">train_tune_bert_model()</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/train_tune_bert_model.html">train_tune_bert_model</a></span><span class="op">(</span></span>
-<span>  ml_framework<span class="op">=</span><span class="st">"pytorch"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"my_own_transformer_trained"</span>,</span>
 <span>  bert_model_dir_path <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
 <span>  raw_texts <span class="op">=</span> <span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
-<span>  aug_vocab_by<span class="op">=</span><span class="fl">0</span>,</span>
 <span>  p_mask<span class="op">=</span><span class="fl">0.15</span>,</span>
 <span>  whole_word<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>  val_size<span class="op">=</span><span class="fl">0.1</span>,</span>
@@ -587,11 +640,18 @@ ecological impact of training your model
 (<code>sustain_iso_code</code>).</p>
 <p>If you work on a machine and your graphic device only has small
 memory, please reduce the batch size significantly. We also recommend to
-change the usage of memory with
-<code><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code>.</p>
+change the usage of memory with <code><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code>
+at the beginning of the session.</p>
 <p>After the training finishes, you can find the transformer ready to
 use in your output_directory. Now you are able to create a text
 embedding model.</p>
+<blockquote>
+<p><strong>Note:</strong> In the documentation of the functions you find
+an argument <code>ml_framework</code>. Please do <em>not</em> change the
+argument manually since this argument is controlled by the global
+configuration you have set at the beginning of a session (see section
+2).</p>
+</blockquote>
 </div>
 </div>
 <div class="section level2">
@@ -631,7 +691,7 @@ only need a basic text representation generated with the function
 <code><a href="../reference/bow_pp_create_basic_text_rep.html">bow_pp_create_basic_text_rep()</a></code> (see section 2.2). Now you
 can create a new instance of a text embedding model by calling
 <code>TextEmbeddingModel$new()</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">topic_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  model_name<span class="op">=</span><span class="st">"topic_model_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via Topic Modeling"</span>,</span>
@@ -670,7 +730,7 @@ characterized by these twelve topics.</p>
 <p>The creation of a text embedding model based on GlobalVectorClusters
 is very similar to a model based on Topic Modeling. There are only two
 differences.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">global_vector_clusters_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  model_name<span class="op">=</span><span class="st">"global_vector_clusters_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via Clusters of GlobalVectors"</span>,</span>
@@ -707,7 +767,7 @@ counting the tokens of every cluster for every text.</p>
 </h4>
 <p>Using a transformer for creating a text embedding model is similar to
 the other two approaches.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  model_name<span class="op">=</span><span class="st">"bert_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via BERT"</span>,</span>
@@ -750,7 +810,11 @@ al. (2019).</p>
 useful to interconnect every chunk to bring context into the
 calculations. This can be done with <code>overlap</code> to determine
 how many tokens of the end of a prior chunk should be added to the
-next.</p>
+next.In our example the last 30 tokens of the prior chunks are added at
+the beginning of the following chunk. This can help to add the correct
+context of the text sections into the analysis. Altogether, this example
+model can analyse a maximum of 512+(4-1)*(512-30)=1958 tokens of a
+text.</p>
 <p>Finally, you have to decide from which hidden layer or layers the
 embeddings should be drawn (<code>aggregation="last"</code>). In their
 initial work, Devlin et al. (2019) used the hidden states of different
@@ -768,7 +832,7 @@ your model. To do this, you must provide the raw texts to
 <code>raw_text</code>. In addition, it is necessary that you provide a
 character vector containing the ID of every text. The IDs must be
 unique.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">topic_embeddings</span><span class="op">&lt;-</span><span class="va">topic_modeling</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
 <span>  raw_text<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
 <span>  doc_id<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span>, </span>
@@ -801,8 +865,8 @@ belonging to a semantic cluster.</li>
 the texts and the columns represents the contextualized text embedding
 or BERT’s understanding of the relevant text chunk.</li>
 </ul>
-<p>Please note that in the case of BERT models, the embeddings of every
-chunks are interlinked.</p>
+<p>Please note that in the case of transformer models, the embeddings of
+every chunks are interlinked.</p>
 <p>With the embedded texts you now have the input to train a new
 classifier or to apply a pre-trained classifier for predicting
 categories/classes. In the next chapter we will show you how to use
@@ -820,43 +884,50 @@ save the model to <code>model_dir</code>. Please do only pass the path
 of a directory and not the path of a file to this function. Internally
 the function creates a new folder in the directory where all files
 belonging to a model are stored.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">topic_modeling</span>, </span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">global_vector_clusters_modeling</span>, </span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">bert_modeling</span>, </span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span></code></pre></div>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>As you can see all three text embedding models are saved within the
 same directory named “text_embedding_models”. Within this directory the
 function creates a unique folder for every model. The name of the folder
 is created by using the models’ names. Since the files are stored with a
 special structure please do <strong>not</strong> change the files
 manually.</p>
+<p>If you change the argument <code>append_ID</code> to
+<code>append_ID=TRUE</code> the unique ID of the model is added to the
+directory. The ID is added automatically to ensure that every model has
+a unique name. This is important if you would like to share your work
+with other persons.</p>
 <p>If you want to load your model, just call the function
 <code>load_ai_model</code> and you can continue using your model.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">topic_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/topic_model_embedding_ID_DfO25E1Guuaqw7tM"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/topic_model_embedding"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">global_vector_clusters_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  ml_framework<span class="op">=</span><span class="st">"auto"</span>,</span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</span><span class="op">)</span></span></code></pre></div>
-<p>In the case of transformers you can decide which machine learning
-framework should be used for applying the model by specifying
-<code>ml_framework</code>. You can choose between
-PyTorch(<code>ml_framework="pytorch"</code>) and
-tensorflow(<code>ml_framework="tensorflow"</code>). If you set
-<code>ml_framework="auto"</code> the framework is used that was active
-when the model was saved.</p>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding"</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> In the documentation of the function you find
+an argument <code>ml_framework</code>. Please do <em>not</em> change the
+argument manually since this argument is controlled by the global
+configuration you have set at the beginning of a session (see section
+2).</p>
+</blockquote>
 <p><strong>Please note that you have to add the name of the model to the
 directory path.</strong> In our example we have stored three models in
 the directory “text_embedding_models”. Each model is saved within its
@@ -864,10 +935,6 @@ own folder. The folder’s name is created automatically with the help of
 the name of the model. Thus, for loading a model you must specify which
 model you want to load by adding the model’s name to the directory path
 as shown above.</p>
-<p>At this point you may wonder why there is an ID in model’s name
-although you did not enter an ID on model’s creation. The ID is added
-automatically to ensure that every model has a unique name. This is
-important if you would like to share your work with other persons.</p>
 <p>Now you can use your text embedding model.</p>
 </div>
 </div>
@@ -882,7 +949,7 @@ stored in objects of the class
 <code>TextEmbeddingClassifierNeuralNet</code>. You can create a new
 classifier by calling
 <code>TextEmbeddingClassifierNeuralNet$new()</code>.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_targets</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
@@ -943,6 +1010,19 @@ by Chollet, Kalinowski, and Allaire (2022, pp. 373).</p>
 <p>Masking, normalization, and the creation of the input layer as well
 as the output layer are done automatically.</p>
 <p>After you have created a new classifier, you can begin training.</p>
+<blockquote>
+<p><strong>Note:</strong> In the documentation of the function you find
+an argument <code>ml_framework</code>. Please do <em>not</em> change the
+argument manually since this argument is controlled by the global
+configuration you have set at the beginning of a session (see section
+2).</p>
+</blockquote>
+<blockquote>
+<p><strong>Note:</strong> Since the classifier is written with ‘keras’
+using a classifier with ‘PyTorch’ requires at least ‘keras version 3’.
+In the case your system is not compatible with ‘keras version 3’ you can
+sill use the classifiers with ‘tensorflow’.</p>
+</blockquote>
 </div>
 <div class="section level3">
 <h3 id="training-a-classifier">5.2 Training a Classifier<a class="anchor" aria-label="anchor" href="#training-a-classifier"></a>
@@ -968,7 +1048,7 @@ used to create a <em>training</em> and a <em>validation</em> sample. All
 performance values saved in the trained classifier refer to the test
 sample. This data has never been used during training and provides a
 more realistic estimation of a classifier`s performance.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_targets</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
@@ -1177,7 +1257,7 @@ step within balanced pseudo-labeling is reported.</p>
 <p>The central estimates for the reliability values can be found via
 <code>reliability$test_metric_mean</code>. In our example this would
 be:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;          iota_index min_iota2 avg_iota2 max_iota2 min_alpha avg_alpha max_alpha</span></span>
 <span><span class="co">#&gt; Baseline  0.5546667 0.4359583 0.5742172 0.7124761     0.544     0.714     0.884</span></span>
@@ -1217,13 +1297,13 @@ increases the alpha values for the minor class further, up to step
 <p>Finally, you can plot a coding stream scheme showing how the cases of
 different classes are labeled. Here we use the package
 <em>iotarelr</em>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/iotarelr/" class="external-link">iotarelr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: ggalluvial</span></span>
 <span><span class="fu">iotarelr</span><span class="fu">::</span><span class="fu"><a href="https://fberding.github.io/iotarelr/reference/plot_iota2_alluvial.html" class="external-link">plot_iota2_alluvial</a></span><span class="op">(</span><span class="va">test_classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">iota_object_end_free</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="classification_tasks_files/figure-html/unnamed-chunk-20-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
+<img src="classification_tasks_files/figure-html/unnamed-chunk-24-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
 Figure 6: Coding Stream of the Classifier
 </p>
 </div>
@@ -1244,25 +1324,36 @@ would like to dive deeper into this topic.</p>
 The process for saving a model is similar to the process for text
 embedding models. You only have to pass the model and a directory path
 to the function <code>save_ai_model</code>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">classifier</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers"</span>,</span>
-<span>  save_format <span class="op">=</span> <span class="st">"tf"</span><span class="op">)</span></span></code></pre></div>
+<span>  save_format <span class="op">=</span> <span class="st">"keras"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>In contrast to text embedding models you can specify the additional
 argument <code>save_format</code> allowing you to choose between
-<code>save_format = "tf"</code> and <code>save_format = "h5"</code>. We
-recommend to chose <code>save_format = "tf"</code> since this is the
-recommended format by tensorflow.</p>
+<code>save_format = "keras"</code>, <code>save_format = "tf"</code> and
+<code>save_format = "h5"</code>. We recommend to chose
+<code>save_format = "keras"</code> since this is allows to use the
+classifier with both ‘PyTorch’ and ‘tensorflow’.</p>
 <p>If you would like to load a model you can call the function
 <code>load_ai_model</code>.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"</span><span class="op">)</span></span></code></pre></div>
-<p>Similar to text embedding models an ID is added to the name during
-the creation of the classifier ensuring a unique name for your model.
-Thus, you have to specify the correct folder for loading a
-classifier.</p>
+<span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier"</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> In the documentation of the function you find
+an argument <code>ml_framework</code>. Please do <em>not</em> change the
+argument manually since this argument is controlled by the global
+configuration you have set at the beginning of a session (see section
+2).</p>
+</blockquote>
+<blockquote>
+<p><strong>Note:</strong> Since the classifier is written with ‘keras’
+using a classifier with ‘PyTorch’ requires at least ‘keras version 3’.
+In the case your system is not compatible with ‘keras version 3’ you can
+sill use the classifiers with ‘tensorflow’.</p>
+</blockquote>
 </div>
 <div class="section level3">
 <h3 id="predicting-new-data">5.5 Predicting New Data<a class="anchor" aria-label="anchor" href="#predicting-new-data"></a>
@@ -1270,10 +1361,62 @@ classifier.</p>
 <p>If you would like to apply your classifier to new data, two steps are
 necessary. You must first transform the raw text into a numerical
 expression by using <em>exactly</em> the same text embedding model that
-was used for training your classifier. The resulting object can then be
-passed to the method <code>predict</code> and you will get the
-predictions together with an estimate of certainty for each
-class/category.</p>
+was used for training your classifier. In the case of our example
+classifier we use our BERT model.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># If our mode is not loaded</span></span>
+<span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create a numerical representation of the text</span></span>
+<span><span class="va">text_embeddings</span><span class="op">&lt;-</span><span class="va">bert_modeling</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
+<span>  raw_text <span class="op">=</span> <span class="va">textual_data</span><span class="op">$</span><span class="va">texts</span>,</span>
+<span>  doc_id <span class="op">=</span> <span class="va">textual_data</span><span class="op">$</span><span class="va">doc_id</span>,</span>
+<span>  batch_size<span class="op">=</span><span class="fl">8</span>,</span>
+<span>  trace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>To transform raw texts into a numeric representation Just pass the
+raw texts and the IDs of every text to the method <code>embed</code> of
+the loaded model. This is very easy if you used the package <a href="https://cran.r-project.org/package=readtext" class="external-link">readtext</a> to read
+raw text from disk, since the object resulting from
+<code>readtext</code> always stores the texts in the column “texts” and
+the IDs in the column “doc_id”.</p>
+<p>Depending on your machine, embedding raw texts may take some time. In
+case you use a machine with a graphic device, it is possible that an
+“out of memory” error occurs. In this case reduce the batch size. If the
+error still occurs, restart the <em>R</em> session, switch to cpu-only
+mode <em>directly</em> after loading the libraries with
+<code><a href="../reference/set_config_cpu_only.html">aifeducation::set_config_cpu_only()</a></code> and request the
+embedding again.</p>
+<p>In the example above, the text embeddings are stored in
+<code>text_embedding</code>. Since embedding texts may take some time,
+it is a good idea to save the embeddings for future analysis (use the
+<code>save</code> function of <em>R</em>). This allows you to load the
+embedding without the need to apply the text embedding model on the same
+raw texts again.</p>
+<p>The resulting object can then be passed to the method
+<code>predict</code> of our classifier and you will get the predictions
+together with an estimate of certainty for each class/category.</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># If your classifier is not loaded</span></span>
+<span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Predict the classes of new texts</span></span>
+<span><span class="va">predicted_categories</span><span class="op">&lt;-</span><span class="va">classifier</span><span class="op">$</span><span class="fu">predict</span><span class="op">(</span></span>
+<span>  newdata <span class="op">=</span> <span class="va">text_embeddings</span>,</span>
+<span>  batch_size<span class="op">=</span><span class="fl">8</span>,</span>
+<span>  verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<p>After the classifier finishes the prediction, the estimated
+categories/classes are stored as <code>predicted_categories</code>. This
+object is a <code>data.frame</code> containing texts’ IDs in the rows
+and the probabilities of the different categories/classes in the
+columns. The last column with the name <code>expected_category</code>
+represents the category which is assigned to a text due the highest
+probability.</p>
+<p>The estimates can be used in further analysis with common methods of
+the educational and social sciences such as correlation analysis,
+regression analysis, structural equation modeling, latent class analysis
+or analysis of variance.</p>
 </div>
 </div>
 <div class="section level2">

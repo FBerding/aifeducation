@@ -3,6 +3,7 @@
 export(EmbeddedText)
 export(TextEmbeddingClassifierNeuralNet)
 export(TextEmbeddingModel)
+export(aifeducation_config)
 export(array_to_matrix)
 export(bow_pp_create_basic_text_rep)
 export(bow_pp_create_vocab_draft)

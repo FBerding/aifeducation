@@ -32,7 +32,7 @@ These packages can be used with a 'normal' computer and provide an easy
 installation. In terms of natural language processing, these approaches
 are currently limited. State-of-the-art approaches rely on neural nets
 with multiple layers and consist of a huge number of parameters making
-them computationally demanding. With specialized libraries such as keras
+them computationally demanding. With specialized libraries such as keras, PyTorch
 and tensorflow, graphical processing units (gpu) can help to speed up
 computations significantly. However, many of these specialized libraries
 for machine learning are written in python. Fortunately, an interface to
@@ -68,22 +68,19 @@ done by:
 install.packages("aifeducation")
 ```
 
-You can install the development version of aifeducation from
-[GitHub](https://github.com/) with:
-
-```{r, include = TRUE, eval=FALSE}
-install.packages("devtools")
-devtools::install_github("FBerding/aifeducation",
-                         dependencies = TRUE)
-```
-
 With this command, all necessary *R* packages are installed on your
 machine. 
+
+> **Note:** There is currently a bug in reticulate 1.32.0 which does not allow
+to load python packages such as tensorflow, keras or torch. The error has been
+fixed in the developer version of reticulate. You can install this version with
+`install.packages("pak")` and `pak::pak("rstudio/reticulate")`.
+With the release of reticulate 1.33.0 you can ignore this note.
 
 ## Step 2 - Install Python
 
 Since natural language processing with neural nets is based on
-models which are computationally intensive, *keras* and *tensorflow* are
+models which are computationally intensive, *keras*, *PyTorch*, and *tensorflow* are
 used within this package together with some other specialized python
 libraries. To install them, you need to install python on your machine
 first. This may take some time.
@@ -114,7 +111,7 @@ some further software. A list with links to downloads can be found here if you w
 like to use tensorflow as machine learning framework:
 https://www.tensorflow.org/install/pip#linux
 
-If you would like to use PyTorch as framework you can find furhter
+If you would like to use PyTorch as framework you can find further
 information here: https://pytorch.org/get-started/locally/
 
 In general you need
@@ -123,6 +120,9 @@ In general you need
 - CUDA Toolkit
 - cuDNN SDK
 
+This step is only relevant if you would like to use graphic acceleration for 
+your computations. If not you can skip this step.
+
 ## Step 5 - Install Specialized Python Libraries
 
 If everything is working, you can now install the remaining python
@@ -130,8 +130,14 @@ libraries. For convenience, *aifeducation* comes with an auxiliary
 function `install_py_modules()` doing that for you.
 
 ```{r, include = TRUE, eval=FALSE}
-install_py_modules(envname="aifeducation")
+aifeducation::install_py_modules(envname="aifeducation",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14")
 ```
+
+It is very important that you call this function *before* loading the package
+the first time. If you load the library without installing the necessary modules
+an error may occur.
 
 This function installs the following python modules:
 
@@ -142,6 +148,7 @@ This function installs the following python modules:
 -   keras,
 -   tensorflow 
 -   codecarbon
+-   accelerate
 
 and its dependencies in the environment "aifeducation". 
     
@@ -158,10 +165,9 @@ aifeducation::check_aif_py_modules(print=TRUE)
 
 Now everything is ready to use the package. 
 
-**When you start a new *R*
-session, please note that you have to call
+**Important note:** When you start a new *R* session, please note that you have to call
 `reticulate::use_condaenv(condaenv = "aifeducation")` 
-to make the python modules available for work.**
+to make the python modules available for work.
 
 # 2) Configuration
 
@@ -180,9 +186,9 @@ disable the graphic device support of tensorflow with the function
 aifeducation::set_config_cpu_only()
 ```
 
-Now your machine only uses cpus for computations.
+Now your machine only uses cpus only for computations.
 
-If your machine has a graphic card with limited memory, it is
+If your machine has a graphic card but with limited memory, it is
 recommended to change the configuration of the memory usage with
 `set_config_gpu_low_memory()`
 
@@ -197,9 +203,11 @@ decreases the computational speed.
 Finally, in some cases you might want to disable tensorflow to print
 information on the console. You can change the behavior with the
 function `set_config_tf_logger()`. 
+
 ```{r, include = TRUE, eval=FALSE}
 aifeducation::set_config_tf_logger()
 ```
+
 You can choose between five levels
 "FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
 for logging.

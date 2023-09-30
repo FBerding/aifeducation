@@ -176,6 +176,10 @@ for (n_classes in 2:3){
                     class="TextEmbeddingClassifierNeuralNet")
   })
 
+  test_that("te_classifier_sustainability_start",{
+    expect_false(classifier$get_sustainability_data()$sustainability_tracked)
+  })
+
 
   #-------------------------------------------------------------------------------
   classifier<-TextEmbeddingClassifierNeuralNet$new(
@@ -226,6 +230,9 @@ for (n_classes in 2:3){
         keras_trace=0,
         n_cores=1)
     )
+
+    expect_true(classifier$get_sustainability_data()$sustainability_tracked)
+
   })
 
   test_that(paste(ml_framework,"training_bsc_only","n_classes",n_classes), {
@@ -262,6 +269,8 @@ for (n_classes in 2:3){
         keras_trace=0,
         n_cores=1)
     )
+
+    expect_false(classifier$get_sustainability_data()$sustainability_tracked)
   })
 
   test_that(paste(ml_framework,"training_pbl_baseline","n_classes",n_classes), {

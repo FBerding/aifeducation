@@ -4,13 +4,21 @@
 \alias{install_py_modules}
 \title{Installing necessary python modules to an environment}
 \usage{
-install_py_modules(envname = "aifeducation", tf_version = "<=2.14")
+install_py_modules(
+  envname = "aifeducation",
+  tf_version = "<=2.14",
+  remove_first = FALSE
+)
 }
 \arguments{
 \item{envname}{\code{string} Name of the environment where the packages should
 be installed.}
 
 \item{tf_version}{\code{string} determining the desired version of 'tensorflow'.}
+
+\item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before
+recreating the environment and installing the packages. If \code{FALSE} the packages
+are installed in the existing environment without any prior changes.}
 }
 \value{
 Returns no values or objects. Function is used for installing the
@@ -22,6 +30,7 @@ Function for installing the necessary python modules
 \seealso{
 Other Installation and Configuration: 
 \code{\link{AifeducationConfiguration}},
+\code{\link{aifeducation_config}},
 \code{\link{check_aif_py_modules}()},
 \code{\link{set_config_cpu_only}()},
 \code{\link{set_config_gpu_low_memory}()},

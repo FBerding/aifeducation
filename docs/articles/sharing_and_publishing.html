@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -217,15 +217,18 @@ to a model are stored.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">topic_modeling</span>, </span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">global_vector_clusters_modeling</span>, </span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">bert_modeling</span>, </span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span><span class="op">)</span></span></code></pre></div>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models"</span>,</span>
+<span>  append_ID<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>As you can see all three text embedding models are saved within the
 same directory named “text_embedding_models”. Within this directory the
 function creates a unique folder for every model. The name of the folder
@@ -242,15 +245,15 @@ manually.</p>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  ml_framework <span class="op">=</span> <span class="st">"pytorch"</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</span><span class="op">)</span></span></code></pre></div>
-<p>In the case of transformers you can decide which machine learning
-framework should be used for applying the model by specifying
-<code>ml_framework</code>. You can choose between
-PyTorch(<code>ml_framework="pytorch"</code>) and
-tensorflow(<code>ml_framework="tensorflow"</code>). If you set
-<code>ml_framework="auto"</code> the framework is used that was active
-when the model was saved.</p>
+<blockquote>
+<p><strong>Note:</strong> In the case of transformers you can decide
+which machine learning framework should be used for applying the model
+by specifying <code>ml_framework</code>. Please do <em>not</em> edit the
+argument manually. It is recommend that you set your machine learning
+framework at the start of a session with
+<code>aifeducation_config$set_global_ml_backend()</code>.</p>
+</blockquote>
 <p><strong>Please note that you have to add the name of the model to the
 directory path.</strong> In our example we have stored three models in
 the directory “text_embedding_models”. Each model is saved within its
@@ -261,9 +264,11 @@ as shown above.</p>
 <p>At this point you may wonder why there is an ID in model’s name
 although you did not enter an ID on model’s creation. The ID is added
 automatically to ensure that every model has a unique name. This is
-important if you would like to share your work with other persons.</p>
+important if you would like to share your work with other persons.
+During saving the ID is appended automatically by setting
+<code>append_ID=TRUE</code>.</p>
 <p>Now you are ready to share your work. Just provide all files within
-your model folder. For the bert model in the example above this would be
+your model folder. For the BERT model in the example above this would be
 the folder
 <code>"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"</code>.</p>
 </div>
@@ -406,17 +411,32 @@ and a directory path to the function <code>save_ai_model</code>.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">classifier</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers"</span>,</span>
-<span>  save_format <span class="op">=</span> <span class="st">"tf"</span><span class="op">)</span></span></code></pre></div>
+<span>  save_format <span class="op">=</span> <span class="st">"keras"</span>,</span>
+<span>  append_ID <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>In contrast to text embedding models you can specify the additional
 argument <code>save_format</code> allowing you to choose between
-<code>save_format = "tf"</code> and <code>save_format = "h5"</code>. We
-recommend to chose <code>save_format = "tf"</code> since this is the
-recommended format by tensorflow.</p>
+<code>save_format = "keras"</code>, <code>save_format = "tf"</code> and
+<code>save_format = "h5"</code>. We recommend to chose
+<code>save_format = "keras"</code> since this is allows to use the
+classifier with both ‘PyTorch’ and ‘tensorflow’.</p>
 <p>If you would like to load a model you can call the function
 <code>load_ai_model</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> In the documentation of the function you find
+an argument <code>ml_framework</code>. Please do <em>not</em> change the
+argument manually since this argument is controlled by the global
+configuration you have set at the beginning of a session with
+<code>aifeducation_config$set_global_ml_backend()</code>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Note:</strong> Since the classifier is written with ‘keras’
+using a classifier with ‘PyTorch’ requires at least ‘keras version 3’.
+In the case your system is not compatible with ‘keras version 3’ you can
+sill use the classifiers with ‘tensorflow’.</p>
+</blockquote>
 <p>Similar to text embedding models an ID is added to the name during
 the creation of the classifier ensuring a unique name for your model.
 Thus, you have to specify the correct folder for loading a

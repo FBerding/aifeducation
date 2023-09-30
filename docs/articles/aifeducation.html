@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,11 +103,11 @@ easy installation. In terms of natural language processing, these
 approaches are currently limited. State-of-the-art approaches rely on
 neural nets with multiple layers and consist of a huge number of
 parameters making them computationally demanding. With specialized
-libraries such as keras and tensorflow, graphical processing units (gpu)
-can help to speed up computations significantly. However, many of these
-specialized libraries for machine learning are written in python.
-Fortunately, an interface to python is provided via the <em>R</em>
-package <a href="https://cran.r-project.org/package=reticulate" class="external-link">reticulate</a>.</p>
+libraries such as keras, PyTorch and tensorflow, graphical processing
+units (gpu) can help to speed up computations significantly. However,
+many of these specialized libraries for machine learning are written in
+python. Fortunately, an interface to python is provided via the
+<em>R</em> package <a href="https://cran.r-project.org/package=reticulate" class="external-link">reticulate</a>.</p>
 <p>The R package <em>Artificial Intelligence for Education
 (aifeducation)</em> aims to provide educators, educational researchers,
 and social researchers a convincing interface to these state-of-the-art
@@ -133,18 +133,25 @@ sufficient in most cases.</p>
 <p>In order to use the package, you first need to install it. This can
 be done by:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FBerding/aifeducation"</span>,</span>
-<span>                         dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
 <p>With this command, all necessary <em>R</em> packages are installed on
 your machine.</p>
+<blockquote>
+<p><strong>Note:</strong> There is currently a bug in reticulate 1.32.0
+which does not allow to load python packages such as tensorflow, keras
+or torch. The error has been fixed in the developer version of
+reticulate. You can install this version with
+<code>install.packages("pak")</code> and
+<code>pak::pak("rstudio/reticulate")</code>. With the release of
+reticulate 1.33.0 you can ignore this note.</p>
+</blockquote>
 </div>
 <div class="section level3">
 <h3 id="step-2---install-python">Step 2 - Install Python<a class="anchor" aria-label="anchor" href="#step-2---install-python"></a>
 </h3>
 <p>Since natural language processing with neural nets is based on models
-which are computationally intensive, <em>keras</em> and
-<em>tensorflow</em> are used within this package together with some
+which are computationally intensive, <em>keras</em>, <em>PyTorch</em>,
+and <em>tensorflow</em> are used within this package together with some
 other specialized python libraries. To install them, you need to install
 python on your machine first. This may take some time.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -170,7 +177,7 @@ uses conda environments for managing the different modules.</p>
 install some further software. A list with links to downloads can be
 found here if you would like to use tensorflow as machine learning
 framework: <a href="https://www.tensorflow.org/install/pip#linux" class="external-link uri">https://www.tensorflow.org/install/pip#linux</a></p>
-<p>If you would like to use PyTorch as framework you can find furhter
+<p>If you would like to use PyTorch as framework you can find further
 information here: <a href="https://pytorch.org/get-started/locally/" class="external-link uri">https://pytorch.org/get-started/locally/</a></p>
 <p>In general you need</p>
 <ul>
@@ -178,6 +185,8 @@ information here: <a href="https://pytorch.org/get-started/locally/" class="exte
 <li>CUDA Toolkit</li>
 <li>cuDNN SDK</li>
 </ul>
+<p>This step is only relevant if you would like to use graphic
+acceleration for your computations. If not you can skip this step.</p>
 </div>
 <div class="section level3">
 <h3 id="step-5---install-specialized-python-libraries">Step 5 - Install Specialized Python Libraries<a class="anchor" aria-label="anchor" href="#step-5---install-specialized-python-libraries"></a>
@@ -187,7 +196,12 @@ libraries. For convenience, <em>aifeducation</em> comes with an
 auxiliary function <code><a href="../reference/install_py_modules.html">install_py_modules()</a></code> doing that for
 you.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_py_modules.html">install_py_modules</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/install_py_modules.html">install_py_modules</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"aifeducation"</span>,</span>
+<span>                                 remove_first<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>                                 tf_version<span class="op">=</span><span class="st">"&lt;=2.14"</span><span class="op">)</span></span></code></pre></div>
+<p>It is very important that you call this function <em>before</em>
+loading the package the first time. If you load the library without
+installing the necessary modules an error may occur.</p>
 <p>This function installs the following python modules:</p>
 <ul>
 <li>transformers,</li>
@@ -197,6 +211,7 @@ you.</p>
 <li>keras,</li>
 <li>tensorflow</li>
 <li>codecarbon</li>
+<li>accelerate</li>
 </ul>
 <p>and its dependencies in the environment “aifeducation”.</p>
 <p>If you would like to use <em>aifeducation</em> with other packages or
@@ -207,10 +222,10 @@ modules are successfully installed.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Now everything is ready to use the package.</p>
-<p><strong>When you start a new <em>R</em> session, please note that you
-have to call
+<p><strong>Important note:</strong> When you start a new <em>R</em>
+session, please note that you have to call
 <code>reticulate::use_condaenv(condaenv = "aifeducation")</code> to make
-the python modules available for work.</strong></p>
+the python modules available for work.</p>
 </div>
 </div>
 <div class="section level2">
@@ -229,8 +244,8 @@ disable the graphic device support of tensorflow with the function
 <code><a href="../reference/set_config_cpu_only.html">set_config_cpu_only()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_cpu_only.html">set_config_cpu_only</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Now your machine only uses cpus for computations.</p>
-<p>If your machine has a graphic card with limited memory, it is
+<p>Now your machine only uses cpus only for computations.</p>
+<p>If your machine has a graphic card but with limited memory, it is
 recommended to change the configuration of the memory usage with
 <code><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">

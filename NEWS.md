@@ -1,4 +1,4 @@
-# aifeducation (Development Version)
+# aifeducation 0.2.1.9002
 
 -   Added DeBERTa and Funnel-Transformer support
 -   Fixed issues in training transformer models

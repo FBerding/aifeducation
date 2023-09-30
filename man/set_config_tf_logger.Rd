@@ -20,6 +20,7 @@ This function changes the level for logging information with 'tensorflow'.
 \seealso{
 Other Installation and Configuration: 
 \code{\link{AifeducationConfiguration}},
+\code{\link{aifeducation_config}},
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_py_modules}()},
 \code{\link{set_config_cpu_only}()},

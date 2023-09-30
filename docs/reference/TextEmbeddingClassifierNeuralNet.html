@@ -12,7 +12,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -214,6 +214,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 <p>Creating a new instance of this class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/TextEmbeddingClassifierNeuralNet.html">TextEmbeddingClassifierNeuralNet</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  ml_framework <span class="op">=</span> <span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">ClassifierFramework</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -232,7 +233,13 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>name</code></dt>
+<p></p><div class="arguments"><dl><dt><code>ml_framework</code></dt>
+<dd><p><code>string</code> Framework to use for training and inference.
+<code>ml_framework="tensorflow"</code> for 'tensorflow' and <code>ml_framework="pytorch"</code>
+for 'pytorch'</p></dd>
+
+
+<dt><code>name</code></dt>
 <dd><p><code>Character</code> Name of the new classifier. Please refer to
 common name conventions. Free text can be used with parameter <code>label</code>.</p></dd>
 
@@ -305,8 +312,7 @@ training.</p>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-train"></a><div class="section">
 <h3 id="method-train-">Method <code>train()</code><a class="anchor" aria-label="anchor" href="#method-train-"></a></h3>
-<p>Method for training a neural net with keras and
-tensorflow.</p><div class="section">
+<p>Method for training a neural net.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>  <span class="va">data_embeddings</span>,</span>
@@ -783,10 +789,10 @@ and the native language.</p>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-save_model"></a><div class="section">
 <h3 id="method-save-model-">Method <code>save_model()</code><a class="anchor" aria-label="anchor" href="#method-save-model-"></a></h3>
-<p>Method for saving a model to 'tensorflow' SavedModel format
-or h5 format.</p><div class="section">
+<p>Method for saving a model to 'Keras v3 format',
+'tensorflow' SavedModel format or h5 format.</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">save_model</span><span class="op">(</span><span class="va">dir_path</span>, save_format <span class="op">=</span> <span class="st">"tf"</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">save_model</span><span class="op">(</span><span class="va">dir_path</span>, save_format <span class="op">=</span> <span class="st">"keras"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -797,8 +803,8 @@ saved.</p></dd>
 
 
 <dt><code>save_format</code></dt>
-<dd><p>Format for saving the model. <code>"tf"</code> for SavedModel
-or <code>"h5"</code> for HDF5.</p></dd>
+<dd><p>Format for saving the model. <code>"keras"</code> for 'Keras v3 format',
+<code>"tf"</code> for SavedModel or <code>"h5"</code> for HDF5.</p></dd>
 
 
 </dl><p></p></div>
@@ -810,10 +816,13 @@ or <code>"h5"</code> for HDF5.</p></dd>
 
 </div><p></p><hr><a id="method-TextEmbeddingClassifierNeuralNet-load_model"></a><div class="section">
 <h3 id="method-load-model-">Method <code>load_model()</code><a class="anchor" aria-label="anchor" href="#method-load-model-"></a></h3>
-<p>Method for importing a model from 'tensorflow' SavedModel format
-or h5 format.</p><div class="section">
+<p>Method for importing a model from 'Keras v3 format',
+'tensorflow' SavedModel format or h5 format.</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span><span class="va">dir_path</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingClassifierNeuralNet</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span></span>
+<span>  <span class="va">dir_path</span>,</span>
+<span>  ml_framework <span class="op">=</span> <span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">ClassifierFramework</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -821,6 +830,12 @@ or h5 format.</p><div class="section">
 <p></p><div class="arguments"><dl><dt><code>dir_path</code></dt>
 <dd><p><code>string()</code> Path of the directory where the model is
 saved.</p></dd>
+
+
+<dt><code>ml_framework</code></dt>
+<dd><p><code>string</code> Determines the machine learning framework
+for using the model. Possible are <code>ml_framework="pytorch"</code> for 'pytorch',
+<code>ml_framework="tensorflow"</code> for 'tensorflow', and <code>ml_framework="auto"</code>.</p></dd>
 
 
 </dl><p></p></div>
