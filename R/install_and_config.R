@@ -22,7 +22,8 @@ install_py_modules<-function(envname="aifeducation",
                       "tokenizers",
                       "datasets",
                       "codecarbon",
-                      "accelerate")
+                      "accelerate"
+                      )
 
   if(remove_first==TRUE){
     conda_environments<-reticulate::conda_list()
@@ -40,7 +41,8 @@ install_py_modules<-function(envname="aifeducation",
     packages = c(
       paste0("tensorflow",tf_version),
       "torch",
-      "keras"),
+      "keras",
+      "cudatoolkit"),
     envname = envname,
     conda = "auto",
     pip = TRUE

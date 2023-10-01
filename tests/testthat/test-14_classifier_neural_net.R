@@ -174,12 +174,9 @@ for (n_classes in 2:3){
       rec_act_fct="tanh")
     expect_s3_class(classifier,
                     class="TextEmbeddingClassifierNeuralNet")
-  })
 
-  test_that("te_classifier_sustainability_start",{
     expect_false(classifier$get_sustainability_data()$sustainability_tracked)
   })
-
 
   #-------------------------------------------------------------------------------
   classifier<-TextEmbeddingClassifierNeuralNet$new(
