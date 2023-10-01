@@ -65,7 +65,9 @@ devtools::install_github(repo="FBerding/aifeducation",
 
 > **Note:** There is currently a bug in reticulate 1.32.0 which does not
 > allow to load python packages such as tensorflow, keras or torch. The
-> error has been fixed in the developer version of reticulate. You can
+> error seems to occur only when working with RStudio and Windows
+> machines. Using R console directly seems not to evoke the error. The
+> bug has been fixed in the developer version of reticulate. You can
 > install this version with `install.packages("pak")` and
 > `pak::pak("rstudio/reticulate")`. With the release of reticulate
 > 1.33.0 you can ignore this note.

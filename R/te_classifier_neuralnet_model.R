@@ -2007,7 +2007,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'of a model.
     #'@importFrom utils compareVersion
     load_model=function(dir_path,
-                        ml_framework=aifeducation_config$get_framework()$ClassifierFramework){
+                        ml_framework="auto"){
 
       # Set the correct ml framework
 

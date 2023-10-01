@@ -8,6 +8,8 @@
 #'@param remove_first \code{bool} If \code{TRUE} removes the environment completely before
 #'recreating the environment and installing the packages. If \code{FALSE} the packages
 #'are installed in the existing environment without any prior changes.
+#'@param cpu_only \code{bool} \code{TRUE} installs the cpu only version of the
+#'machine learning frameworks.
 #'@return Returns no values or objects. Function is used for installing the
 #'necessary python libraries in a conda environment.
 #'@importFrom reticulate conda_create
@@ -17,7 +19,8 @@
 #'@export
 install_py_modules<-function(envname="aifeducation",
                              tf_version="<=2.14",
-                             remove_first=FALSE){
+                             remove_first=FALSE,
+                             cpu_only=FALSE){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
@@ -37,16 +40,35 @@ install_py_modules<-function(envname="aifeducation",
     )
   }
 
-  reticulate::conda_install(
-    packages = c(
-      paste0("tensorflow",tf_version),
-      "torch",
-      "keras",
-      "cudatoolkit"),
-    envname = envname,
-    conda = "auto",
-    pip = TRUE
-  )
+  if(cpu_only==TRUE){
+    reticulate::conda_install(
+      packages = c(
+        "tensorflow-cpu",
+        "torch-cpu",
+        "keras"),
+      envname = envname,
+      conda = "auto",
+      pip = TRUE)
+  } else {
+      reticulate::conda_install(
+      packages = c(
+        paste0("tensorflow",tf_version),
+        "torch",
+        "keras"),
+      envname = envname,
+      conda = "auto",
+      pip = TRUE)
+  }
+
+  if(cpu_only==FALSE){
+    reticulate::conda_install(
+      packages = c(
+        "cudatoolkit",
+        "cuDNN"),
+      envname = envname,
+      conda = "auto",
+      pip = FALSE)
+  }
 
   reticulate::conda_install(
     packages = relevant_modules,

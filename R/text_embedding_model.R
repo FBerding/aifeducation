@@ -512,7 +512,7 @@ TextEmbeddingModel<-R6::R6Class(
     #'
     #'@importFrom utils read.csv
     load_model=function(model_dir,
-                        ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework){
+                        ml_framework="auto"){
 
       if((ml_framework %in% c("tensorflow","pytorch","auto","not_specified"))==FALSE) {
         stop("ml_framework must be 'auto', 'tensorflow' or 'pytorch'.")
@@ -533,7 +533,7 @@ TextEmbeddingModel<-R6::R6Class(
         private$transformer_components$ml_framework=="pytorch"
       }
 
-      #Serach for the corresponding files
+      #Search for the corresponding files
       if(private$transformer_components$ml_framework=="tensorflow"){
         if(file.exists(paste0(model_dir_main,"/tf_model.h5"))){
           from_pt=FALSE
@@ -554,8 +554,6 @@ TextEmbeddingModel<-R6::R6Class(
         from_pt=FALSE
         from_tf=FALSE
       }
-
-
         if((private$basic_components$method %in%private$supported_transformers)==TRUE){
 
           if(private$basic_components$method=="bert"){
@@ -709,7 +707,7 @@ TextEmbeddingModel<-R6::R6Class(
             tokens=private$transformer_components$tokenizer(
               raw_text[i],
               stride=as.integer(private$transformer_components$overlap),
-              padding=TRUE,
+              padding="max_length",
               truncation=TRUE,
               max_length=as.integer(private$basic_components$max_length),
               return_overflowing_tokens = TRUE,
@@ -722,7 +720,7 @@ TextEmbeddingModel<-R6::R6Class(
               tokens=private$transformer_components$tokenizer(
                 raw_text[i],
                 stride=as.integer(private$transformer_components$overlap),
-                padding=TRUE,
+                padding="max_length",
                 truncation=TRUE,
                 max_length=as.integer(private$basic_components$max_length),
                 return_overflowing_tokens = TRUE,
@@ -738,8 +736,12 @@ TextEmbeddingModel<-R6::R6Class(
             seq_len=tmp_dataset$num_rows
             chunk_list[i]=min(seq_len,private$transformer_components$chunks)
 
-            tmp_dataset=tmp_dataset$select(as.integer((1:chunk_list[i])-1))
-            encodings=datasets$concatenate_datasets(c(encodings,tmp_dataset))
+            if(chunk_list[i]==1){
+              encodings=datasets$concatenate_datasets(c(encodings,tmp_dataset))
+            } else {
+              tmp_dataset=tmp_dataset$select(as.integer((1:chunk_list[[i]])-1))
+              encodings=datasets$concatenate_datasets(c(encodings,tmp_dataset))
+            }
           }
           #print(encodings["input_ids"])
           return(encodings_list=list(encodings=encodings,
@@ -874,7 +876,7 @@ TextEmbeddingModel<-R6::R6Class(
     embed=function(raw_text=NULL,doc_id=NULL,batch_size=8, trace = FALSE){
 
       #transformer---------------------------------------------------------------------
-      if((private$basic_components$method %in%private$supported_transformers)==TRUE){
+      if((private$basic_components$method %in% private$supported_transformers)==TRUE){
 
         n_units<-length(raw_text)
         n_layer<-private$transformer_components$model$config$num_hidden_layers
