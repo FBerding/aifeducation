@@ -528,9 +528,9 @@ TextEmbeddingModel<-R6::R6Class(
 
       #Change ml framework if requested
       if(ml_framework=="tensorflow"){
-        private$transformer_components$ml_framework=="tensorflow"
+        private$transformer_components$ml_framework="tensorflow"
       } else if(ml_framework=="pytorch"){
-        private$transformer_components$ml_framework=="pytorch"
+        private$transformer_components$ml_framework="pytorch"
       }
 
       #Search for the corresponding files

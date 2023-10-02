@@ -753,4 +753,30 @@ for(ai_method in ai_methods){
   }
 }
 
+for(ai_method in ai_methods){
+  for(framework in ml_frameworks){
+    if(framework=="tensorflow"){
+      other_framework="pytorch"
+    } else {
+      other_framework="tensorflow"
+    }
+
+    tmp_path=testthat::test_path(
+      paste0(
+        "test_artefacts/tmp_full_models/",
+        other_framework,"/",
+        ai_method,"_embedding")
+    )
+
+    test_that(paste(ai_method,"load from",other_framework,"to",framework,"framework_check"),{
+      test<-load_ai_model(
+        model_dir = tmp_path,
+        ml_framework = framework)
+
+      tmp<-test$get_transformer_components()[[4]]
+
+      expect_equal(tmp,framework)
+    })
+  }
+}
 
