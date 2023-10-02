@@ -7,7 +7,8 @@
 install_py_modules(
   envname = "aifeducation",
   tf_version = "<=2.14",
-  remove_first = FALSE
+  remove_first = FALSE,
+  cpu_only = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,9 @@ be installed.}
 \item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before
 recreating the environment and installing the packages. If \code{FALSE} the packages
 are installed in the existing environment without any prior changes.}
+
+\item{cpu_only}{\code{bool} \code{TRUE} installs the cpu only version of the
+machine learning frameworks.}
 }
 \value{
 Returns no values or objects. Function is used for installing the

@@ -663,10 +663,7 @@ Function does not return a value. It saves the model to disk.
 Method for importing a model from 'Keras v3 format',
 'tensorflow' SavedModel format or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(
-  dir_path,
-  ml_framework = aifeducation_config$get_framework()$ClassifierFramework
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$load_model(dir_path, ml_framework = "auto")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
