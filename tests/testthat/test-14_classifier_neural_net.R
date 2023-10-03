@@ -186,7 +186,7 @@ for (n_classes in 2:3){
     text_embeddings=current_embeddings,
     targets=example_targets,
     hidden=NULL,
-    rec=c(4,4),
+    rec=c(3,3),
     self_attention_heads = 0,
     dropout=0.2,
     recurrent_dropout=0.4,
