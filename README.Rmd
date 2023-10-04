@@ -19,12 +19,12 @@ knitr::opts_chunk$set(
 # aifeducation
 
 <!-- badges: start -->
-
+**GitHub**
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
+**CRAN**
 [![CRAN
 status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-project.org/package=aifeducation)
 [![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/aifeducation)](https://cran.r-project.org/package=aifeducation)
-
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
@@ -77,6 +77,9 @@ devtools::install_github(repo="FBerding/aifeducation",
                          ref="master",
                          dependencies = TRUE)
 ```
+
+Further instructions for installation can be found in vignette 
+[01 get started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 
 > **Note:** There is currently a bug in reticulate 1.32.0 which does not allow
 to load python packages such as tensorflow, keras or torch. The error

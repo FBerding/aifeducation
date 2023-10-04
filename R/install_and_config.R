@@ -5,6 +5,8 @@
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
 #'@param tf_version \code{string} determining the desired version of 'tensorflow'.
+#'@param pytorch_cuda_version \code{string} determining the desired version of 'cuda' for
+#''PyTorch'.
 #'@param remove_first \code{bool} If \code{TRUE} removes the environment completely before
 #'recreating the environment and installing the packages. If \code{FALSE} the packages
 #'are installed in the existing environment without any prior changes.
@@ -19,6 +21,7 @@
 #'@export
 install_py_modules<-function(envname="aifeducation",
                              tf_version="<=2.14",
+                             pytorch_cuda_version="12.1",
                              remove_first=FALSE,
                              cpu_only=FALSE){
   relevant_modules<-c("transformers",
@@ -44,7 +47,7 @@ install_py_modules<-function(envname="aifeducation",
     reticulate::conda_install(
       packages = c(
         "tensorflow-cpu",
-        "torch-cpu",
+        "torch",
         "keras"),
       envname = envname,
       conda = "auto",
@@ -61,10 +64,17 @@ install_py_modules<-function(envname="aifeducation",
     reticulate::conda_install(
       packages = c(
         "cudatoolkit",
-        "cuDNN",
-        "pytorch",
-        "pytorch-cuda"),
+        "cuDNN"),
       envname = envname,
+      conda = "auto",
+      pip = FALSE)
+
+    reticulate::conda_install(
+      packages = c(
+        "pytorch",
+        paste0("pytorch-cuda","=",pytorch_cuda_version)),
+      envname = envname,
+      channel=c("pytorch","nvidia"),
       conda = "auto",
       pip = FALSE)
   }
@@ -268,6 +278,7 @@ AifeducationConfiguration<-R6::R6Class(
             If you would like to change the framework please restart the
             session and set framework to the desired backend.")
       }
+
     },
     #'@description Method for checking if the global ml framework is set.
     #'@return Return \code{TRUE} if the global machine learning framework ist set.

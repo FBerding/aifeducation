@@ -2059,8 +2059,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'R and python packages.
     get_package_versions=function(){
       return(
-        list(private$r_package_versions,
-             private$py_package_versions)
+        list(r_package_versions=private$r_package_versions,
+             py_package_versions=private$py_package_versions)
       )
     },
     #---------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 install_py_modules(
   envname = "aifeducation",
   tf_version = "<=2.14",
+  pytorch_cuda_version = "12.1",
   remove_first = FALSE,
   cpu_only = FALSE
 )
@@ -16,6 +17,9 @@ install_py_modules(
 be installed.}
 
 \item{tf_version}{\code{string} determining the desired version of 'tensorflow'.}
+
+\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for
+'PyTorch'.}
 
 \item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before
 recreating the environment and installing the packages. If \code{FALSE} the packages

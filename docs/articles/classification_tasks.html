@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
 Rebmann</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/articles/classification_tasks.Rmd" class="external-link"><code>vignettes/articles/classification_tasks.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/classification_tasks.Rmd" class="external-link"><code>vignettes/classification_tasks.Rmd</code></a></small>
       <div class="d-none name"><code>classification_tasks.Rmd</code></div>
     </div>
 
@@ -1258,27 +1258,29 @@ step within balanced pseudo-labeling is reported.</p>
 <code>reliability$test_metric_mean</code>. In our example this would
 be:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
-<span><span class="co">#&gt;          iota_index min_iota2 avg_iota2 max_iota2 min_alpha avg_alpha max_alpha</span></span>
-<span><span class="co">#&gt; Baseline  0.5546667 0.4359583 0.5742172 0.7124761     0.544     0.714     0.884</span></span>
-<span><span class="co">#&gt; BSC       0.5493333 0.4857597 0.5966513 0.7075429     0.630     0.742     0.854</span></span>
-<span><span class="co">#&gt; BPL       0.6213333 0.5620768 0.6560003 0.7499238     0.710     0.790     0.870</span></span>
-<span><span class="co">#&gt; Final     0.6213333 0.5620768 0.6560003 0.7499238     0.710     0.790     0.870</span></span>
-<span><span class="co">#&gt;          static_iota_index dynamic_iota_index kalpha_nominal kalpha_ordinal</span></span>
-<span><span class="co">#&gt; Baseline         0.2700657          0.4633180      0.4380976      0.4380976</span></span>
-<span><span class="co">#&gt; BSC              0.1967275          0.4601609      0.4803104      0.4803104</span></span>
-<span><span class="co">#&gt; BPL              0.2073401          0.5187046      0.5762644      0.5762644</span></span>
-<span><span class="co">#&gt; Final            0.2073401          0.5187046      0.5762644      0.5762644</span></span>
-<span><span class="co">#&gt;            kendall    kappa2 kappa_fleiss kappa_light percentage_agreement</span></span>
-<span><span class="co">#&gt; Baseline 0.7313550 0.4464147    0.4464147   0.4464147            0.7666667</span></span>
-<span><span class="co">#&gt; BSC      0.7476550 0.4851209    0.4851209   0.4851209            0.7720000</span></span>
-<span><span class="co">#&gt; BPL      0.7900515 0.5764172    0.5764172   0.5764172            0.8106667</span></span>
-<span><span class="co">#&gt; Final    0.7900515 0.5764172    0.5764172   0.5764172            0.8106667</span></span>
-<span><span class="co">#&gt;           gwet_ac</span></span>
-<span><span class="co">#&gt; Baseline 0.598012</span></span>
-<span><span class="co">#&gt; BSC      0.591286</span></span>
-<span><span class="co">#&gt; BPL      0.657888</span></span>
-<span><span class="co">#&gt; Final    0.657888</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">test_metric_mean</span></span>
+<span><span class="co">#&gt;          iota_index  min_iota2 avg_iota2 max_iota2 min_alpha avg_alpha</span></span>
+<span><span class="co">#&gt; Baseline  0.6506667 0.03214286 0.3494048 0.6666667     0.036     0.512</span></span>
+<span><span class="co">#&gt; BSC       0.4426667 0.13845210 0.3228694 0.5072866     0.170     0.551</span></span>
+<span><span class="co">#&gt; BPL       0.6213333 0.54736658 0.6511179 0.7548691     0.684     0.779</span></span>
+<span><span class="co">#&gt; Final     0.6213333 0.54736658 0.6511179 0.7548691     0.684     0.779</span></span>
+<span><span class="co">#&gt;          max_alpha static_iota_index dynamic_iota_index kalpha_nominal</span></span>
+<span><span class="co">#&gt; Baseline     0.988         0.6132927          0.5430432     -0.1408000</span></span>
+<span><span class="co">#&gt; BSC          0.932         0.3167674          0.3794889     -0.1295252</span></span>
+<span><span class="co">#&gt; BPL          0.874         0.2400980          0.5191440      0.5670360</span></span>
+<span><span class="co">#&gt; Final        0.874         0.2400980          0.5191440      0.5670360</span></span>
+<span><span class="co">#&gt;          kalpha_ordinal   kendall     kappa2 kappa_fleiss kappa_light</span></span>
+<span><span class="co">#&gt; Baseline     -0.1408000 0.5170819 0.02909091   0.02909091  0.02909091</span></span>
+<span><span class="co">#&gt; BSC          -0.1295252 0.5515114 0.09273689   0.09273689  0.09273689</span></span>
+<span><span class="co">#&gt; BPL           0.5670360 0.7853550 0.56712213   0.56712213  0.56712213</span></span>
+<span><span class="co">#&gt; Final         0.5670360 0.7853550 0.56712213   0.56712213  0.56712213</span></span>
+<span><span class="co">#&gt;          percentage_agreement  gwet_ac</span></span>
+<span><span class="co">#&gt; Baseline            0.6706667 0.535898</span></span>
+<span><span class="co">#&gt; BSC                 0.5453333 0.205388</span></span>
+<span><span class="co">#&gt; BPL                 0.8106667 0.663692</span></span>
+<span><span class="co">#&gt; Final               0.8106667 0.663692</span></span></code></pre></div>
 <p>You now have a table with all relevant values. Of particular interest
 are the values for alpha from the Iota Concept since they represent a
 measure of reliability which is independent from the frequency
@@ -1297,15 +1299,11 @@ increases the alpha values for the minor class further, up to step
 <p>Finally, you can plot a coding stream scheme showing how the cases of
 different classes are labeled. Here we use the package
 <em>iotarelr</em>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/iotarelr/" class="external-link">iotarelr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="co">#&gt; Loading required package: ggalluvial</span></span>
 <span><span class="fu">iotarelr</span><span class="fu">::</span><span class="fu"><a href="https://fberding.github.io/iotarelr/reference/plot_iota2_alluvial.html" class="external-link">plot_iota2_alluvial</a></span><span class="op">(</span><span class="va">test_classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">iota_object_end_free</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="classification_tasks_files/figure-html/unnamed-chunk-24-1.png" alt="Figure 6: Coding Stream of the Classifier" width="691.2"><p class="caption">
-Figure 6: Coding Stream of the Classifier
-</p>
+<div class="float">
+<img src="classif_fig_06.png" style="width:100.0%" alt="Figure 6: Coding Stream of the Classifier"><div class="figcaption">Figure 6: Coding Stream of the Classifier</div>
 </div>
 <p>Here you can see that a small number of negative reviews is treated
 as a good review while a larger number of positive reviews is treated as
@@ -1324,7 +1322,7 @@ would like to dive deeper into this topic.</p>
 The process for saving a model is similar to the process for text
 embedding models. You only have to pass the model and a directory path
 to the function <code>save_ai_model</code>.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_ai_model.html">save_ai_model</a></span><span class="op">(</span></span>
 <span>  model<span class="op">=</span><span class="va">classifier</span>,</span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers"</span>,</span>
@@ -1338,7 +1336,7 @@ argument <code>save_format</code> allowing you to choose between
 classifier with both ‘PyTorch’ and ‘tensorflow’.</p>
 <p>If you would like to load a model you can call the function
 <code>load_ai_model</code>.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier"</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
@@ -1363,7 +1361,7 @@ necessary. You must first transform the raw text into a numerical
 expression by using <em>exactly</em> the same text embedding model that
 was used for training your classifier. In the case of our example
 classifier we use our BERT model.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If our mode is not loaded</span></span>
 <span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
 <span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding"</span><span class="op">)</span></span>
@@ -1396,7 +1394,7 @@ raw texts again.</p>
 <p>The resulting object can then be passed to the method
 <code>predict</code> of our classifier and you will get the predictions
 together with an estimate of certainty for each class/category.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If your classifier is not loaded</span></span>
 <span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier"</span><span class="op">)</span></span>

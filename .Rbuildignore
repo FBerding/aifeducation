@@ -24,3 +24,5 @@ checkpoints
 .json
 cran-comments.md
 ^CRAN-SUBMISSION$
+^doc$
+^Meta$

@@ -70,7 +70,7 @@
     
     <a class="navbar-brand me-2" href="index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,7 +120,6 @@
 </h1></div>
 <!-- badges: start -->
 
-<!-- badges: end -->
 <p>The R package <em>Artificial Intelligence for Education (aifeducation)</em> is designed for the special requirements of educators, educational researchers, and social researchers. The target audience of this package are educators and researchers who would like to develop their own models as well as people who would like to use models created by other researchers/educators. The package supports the application of Artificial Intelligence (AI) for Natural Language Processing tasks such as text embedding and classification under the special conditions of the educational and social sciences.</p>
 <div class="section level2">
 <h2 id="features-overview">Features Overview<a class="anchor" aria-label="anchor" href="#features-overview"></a>
@@ -150,8 +149,9 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span>repo<span class="op">=</span><span class="st">"FBerding/aifeducation"</span>,</span>
 <span>                         ref<span class="op">=</span><span class="st">"master"</span>,</span>
 <span>                         dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Further instructions for installation can be found in vignette <a href="https://fberding.github.io/aifeducation/articles/aifeducation.html" class="external-link">01 get started</a>.</p>
 <blockquote>
-<p><strong>Note:</strong> There is currently a bug in reticulate 1.32.0 which does not allow to load python packages such as tensorflow, keras or torch. The error has been fixed in the developer version of reticulate. You can install this version with <code>install.packages("pak")</code> and <code>pak::pak("rstudio/reticulate")</code>. With the release of reticulate 1.33.0 you can ignore this note.</p>
+<p><strong>Note:</strong> There is currently a bug in reticulate 1.32.0 which does not allow to load python packages such as tensorflow, keras or torch. The error seems to occur only when working with RStudio and Windows machines. Using R console directly seems not to evoke the error. The bug has been fixed in the developer version of reticulate. You can install this version with <code>install.packages("pak")</code> and <code>pak::pak("rstudio/reticulate")</code>. With the release of reticulate 1.33.0 you can ignore this note.</p>
 </blockquote>
 </div>
 <div class="section level2">

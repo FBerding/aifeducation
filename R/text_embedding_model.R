@@ -905,12 +905,11 @@ TextEmbeddingModel<-R6::R6Class(
                     private$transformer_components$chunks,
                     n_layer_size))
 
-          #Clear session to ensure enough memory
           if(private$transformer_components$ml_framework=="tensorflow"){
+            #Clear session to ensure enough memory
             tf$keras$backend$clear_session()
 
             #Calculate tensors
-            #print(tokens)
             tokens$encodings$set_format(type="tensorflow")
 
             tensor_embeddings<-private$transformer_components$model(
@@ -919,6 +918,11 @@ TextEmbeddingModel<-R6::R6Class(
               token_type_ids=tokens$encodings["token_type_ids"],
               output_hidden_states=TRUE)$hidden_states
           } else {
+            #Clear memory
+            if(torch$cuda$is_available()){
+              torch$cuda$empty_cache()
+            }
+
             #Calculate tensors
             tokens$encodings$set_format(type="torch")
             tensor_embeddings<-private$transformer_components$model(
@@ -973,9 +977,10 @@ TextEmbeddingModel<-R6::R6Class(
             cat(paste(date(),
                         "Batch",b,"/",n_batches,"Done","\n"))
             }
+            base::gc(verbose = FALSE,full = TRUE)
           }
 
-      #Summarizing the results over all batchtes
+      #Summarizing the results over all batches
       text_embedding=abind::abind(batch_results,along = 1)
         #Glove Cluster----------------------------------------------------------
       } else if(private$basic_components$method=="glove_cluster"){
