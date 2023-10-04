@@ -636,7 +636,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    keras_trace=2,
                    n_cores=2){
 
+      requireNamespace(package="foreach")
       start_time=Sys.time()
+      base::gc(verbose = FALSE,full = TRUE)
 
       #Start Sustainability Tracking
       if(sustain_track==TRUE){
@@ -827,6 +829,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       private$model_info$model_name=paste0(private$model_info$model_name_root,"_id_",generate_id(16))
 
       for(iter in 1:folds$n_folds){
+        base::gc(verbose = FALSE,full = TRUE)
         #---------------------------------------------
         #Create a Train and Validation Sample
         names_targets_labaled_test=folds$val_sample[[iter]]
@@ -1044,7 +1047,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           #            "Test",length(targets_labeled_test)))
 
         }
-
+        base::gc(verbose = FALSE,full = TRUE)
         #Applying Pseudo Labeling-----------------------------------------------
         if(use_bpl==TRUE){
           categories<-names(table(data_targets))
@@ -1077,7 +1080,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           #Start of While-------------------------------------------------------
           while(step <=bpl_max_steps & added_cases_train>0){
-
+            base::gc(verbose = FALSE,full = TRUE)
             if(bpl_dynamic_inc==TRUE){
               bpl_inc_ratio=step/bpl_max_steps
             } else {
@@ -1317,6 +1320,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Final Training----------------------------------------------------------
+      base::gc(verbose = FALSE,full = TRUE)
       if((use_bsc==FALSE & use_bpl==FALSE) |
          #(use_baseline=TRUE) |
         (use_bsc==FALSE & use_bpl==TRUE)){
@@ -1355,7 +1359,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Final Training with BSC--------------------------------------------------
-
+      base::gc(verbose = FALSE,full = TRUE)
       if(use_bsc==TRUE){
         if(trace==TRUE){
           cat(paste(date(),
@@ -1515,7 +1519,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
         #Start of While-------------------------------------------------------
         while(step <=bpl_max_steps & added_cases_train>0){
-
+          base::gc(verbose = FALSE,full = TRUE)
           #cat(paste("Train",length(pseudo_label_targets_labeled_train),
           #            "Validation",length(pseudo_label_targets_labeled_val),
           #            "Unlabeled",length(names_unlabeled)))

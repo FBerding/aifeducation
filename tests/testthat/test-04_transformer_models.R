@@ -60,7 +60,7 @@ example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 for(framework in ml_frameworks){
 
 for(ai_method in ai_methods){
-
+  base::gc(verbose = FALSE,full = TRUE)
   path_01=paste0("test_artefacts/",ai_method)
   if(dir.exists(testthat::test_path(path_01))==FALSE){
     dir.create(testthat::test_path(path_01))
@@ -728,6 +728,7 @@ for(ai_method in ai_methods){
 
 for(ai_method in ai_methods){
   for(framework in ml_frameworks){
+    base::gc(verbose = FALSE,full = TRUE)
     if(framework=="tensorflow"){
       other_framework="pytorch"
     } else {

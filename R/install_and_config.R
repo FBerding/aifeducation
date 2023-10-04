@@ -53,18 +53,17 @@ install_py_modules<-function(envname="aifeducation",
       reticulate::conda_install(
       packages = c(
         paste0("tensorflow",tf_version),
-        "torch",
         "keras"),
       envname = envname,
       conda = "auto",
       pip = TRUE)
-  }
 
-  if(cpu_only==FALSE){
     reticulate::conda_install(
       packages = c(
         "cudatoolkit",
-        "cuDNN"),
+        "cuDNN",
+        "pytorch",
+        "pytorch-cuda"),
       envname = envname,
       conda = "auto",
       pip = FALSE)

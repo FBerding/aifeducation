@@ -1240,10 +1240,10 @@ TextEmbeddingModel<-R6::R6Class(
     get_transformer_components=function(){
       return(
         list(
-          private$transformer_components$aggregation,
-          private$transformer_components$chunks,
-          private$transformer_components$overlap,
-          private$transformer_components$ml_framework
+          aggregation=private$transformer_components$aggregation,
+          chunks=private$transformer_components$chunks,
+          overlap=private$transformer_components$overlap,
+          ml_framework=private$transformer_components$ml_framework
         )
       )
     },
