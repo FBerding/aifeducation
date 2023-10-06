@@ -170,9 +170,10 @@ return(TRUE)
 #'\item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
 #'\item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
 #'\item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
-#'\item{\strong{kappa2: }}{Cohen's Kappa with equal weights.}
-#'\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters with exact estimation.}
-#'\item{\strong{kappa_light: }}{Light's Kappa for multiple raters.}
+#'\item{\strong{kappa2_unweighted: }}{Cohen's Kappa with equal weights.}
+#'\item{\strong{kappa2_equal_weighted: }}{Weighted Cohen's Kappa with equal weights.}
+#'\item{\strong{kappa2_squared_weighted: }}{Weighted Cohen's Kappa with squared weights.}
+#'\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters without exact estimation.}
 #'\item{\strong{percentage_agreement: }}{Percentage Agreement.}
 #'\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
 #'}
@@ -198,9 +199,10 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
                  "kalpha_nominal",
                  "kalpha_ordinal",
                  "kendall",
-                 "kappa2",
+                 "kappa2_unweighted",
+                 "kappa2_equal_weighted",
+                 "kappa2_squared_weighted",
                  "kappa_fleiss",
-                 "kappa_light",
                  "percentage_agreement",
                  "gwet_ac")
   metric_values=vector(length = length(metric_names))
@@ -233,15 +235,24 @@ val_res=iotarelr::check_new_rater(true_values = true_values,
 
   metric_values["kendall"]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                 correct=TRUE)$value
-  metric_values["kappa2"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                               weight = "equal",
+
+  metric_values["kappa2_unweighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                               weight = "unweighted",
                                                sort.levels = FALSE)$value
+  metric_values["kappa2_equal_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                      weight = "equal",
+                                      sort.levels = FALSE)$value
+  metric_values["kappa2_squared_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                      weight = "squared",
+                                      sort.levels = FALSE)$value
+
   metric_values["kappa_fleiss"]=irr::kappam.fleiss(ratings=cbind(true_values,predicted_values),
-                                                       exact = TRUE,
+                                                       exact = FALSE,
                                                        detail = FALSE)$value
-  metric_values["kappa_light"]=irr::kappam.light(ratings=cbind(true_values,predicted_values))$value
+
   metric_values["percentage_agreement"]=irr::agree(ratings=cbind(true_values,predicted_values),
                                                tolerance = 0)$value/100
+
   metric_values["gwet_ac"]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
 
   return(metric_values)

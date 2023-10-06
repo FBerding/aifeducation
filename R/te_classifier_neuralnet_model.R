@@ -791,7 +791,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Initializing Objects for Saving Performance
       test_metric=array(dim=c(folds$n_folds,
                              4,
-                             17),
+                             18),
                        dimnames = list(iterations=NULL,
                                        steps=c("Baseline",
                                                "BSC",
@@ -809,9 +809,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                                  "kalpha_nominal",
                                                  "kalpha_ordinal",
                                                  "kendall",
-                                                 "kappa2",
+                                                 "kappa2_unweighted",
+                                                 "kappa2_equal_weighted",
+                                                 "kappa2_squared_weighted",
                                                  "kappa_fleiss",
-                                                 "kappa_light",
                                                  "percentage_agreement",
                                                  "gwet_ac")))
       iota_objects_start=NULL
@@ -1059,18 +1060,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           #Defining the basic parameter for while
           step=1
-          val_avg_alpha=0
+          val_avg_alpha=-100
+
+          pseudo_label_targets_labeled_test=targets_labeled_test
 
           if(use_bsc==TRUE){
             pseudo_label_embeddings_all=embeddings_all_and_synthetic
             pseudo_label_targets_labeled_train=targets_all_and_synthetic[names_targets_labeled_train_train]
-            pseudo_label_targets_labeled_test=targets_labeled_test
             pseudo_label_targets_labeled_val=targets_all_and_synthetic[names_targets_labeled_train_test]
           } else {
             pseudo_label_embeddings_all=embeddings_all
             pseudo_label_targets_labeled_train=targets_labeled_train_train
             pseudo_label_targets_labeled_val=targets_labeled_val
-            pseudo_label_targets_labeled_test=targets_labeled_test
           }
           weights_cases_list=NULL
           weights_cases_list[1]=list(names_targets_labeled_train_train)
@@ -1211,9 +1212,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               val_res=get_coder_metrics(true_values = pseudo_label_targets_labeled_val,
                                         predicted_values = val_pred_cat)
 
-              #cat(table(data.frame(pred=val_predictions$expected_category,
-              #              true=pseudo_label_targets_labeled_val)))
-
               #Predict test targets
               test_predictions=self$predict(newdata = embeddings_all[names(pseudo_label_targets_labeled_test),,],
                                             verbose = keras_trace,
@@ -1226,17 +1224,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
               if(val_avg_alpha<val_res["avg_alpha"]){
                 val_avg_alpha=val_res["avg_alpha"]
-                new_best_model=keras$models$clone_model(self$model)
+                #new_best_model=keras$models$clone_model(self$model)
+                self$model$save_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
                 best_val_metric=val_res
                 best_test_metric=test_res
               }
-              #cat(paste("Validation:",val_res["avg_alpha"]))
-              #cat(paste("Test:",test_res["avg_alpha"]))
-
-              #cat(paste("Train",length(targets_labeled_and_pseudo),
-              #            "Validation",length(pseudo_label_targets_labeled_val),
-              #            "Test",length(pseudo_label_targets_labeled_test),
-              #            "Unlabeled",length(targets_pseudo_labeled)))
 
               if(trace==TRUE){
                 cat(paste(date(),
@@ -1247,7 +1239,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             step=step+1
           }
 
-          self$model=keras$models$clone_model(new_best_model)
+          #self$model=keras$models$clone_model(new_best_model)
+          self$model$load_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
           test_metric[iter,"BPL",]<-best_test_metric
           test_res<-best_test_metric
         }
@@ -1498,7 +1491,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
         #Defining the basic parameter for while
         step=1
-        val_avg_alpha=0
+        val_avg_alpha=-100
 
         if(use_bsc==TRUE){
           pseudo_label_embeddings_all=embeddings_all_and_synthetic
@@ -1654,7 +1647,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
           if(val_avg_alpha<val_res["avg_alpha"]){
             val_avg_alpha=val_res["avg_alpha"]
-            new_best_model=keras$models$clone_model(self$model)
+            #new_best_model=keras$models$clone_model(self$model)
+            self$model$save_weights(paste0(dir_checkpoint,"/bpl_best_weights.h5"))
             best_val_metric=val_res
           }
           #cat(paste("Validation:",val_res["avg_alpha"]))
@@ -1668,7 +1662,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           step=step+1
         }
 
-        self$model=keras$models$clone_model(new_best_model)
+        #self$model=keras$models$clone_model(new_best_model)
+        self$model$load_weights(paste0(dir_checkpoint,"/bpl_best_weights.h5"))
       }
       #Save Final Information
       self$last_training$date=date()

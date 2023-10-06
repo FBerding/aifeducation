@@ -26,9 +26,10 @@ Returns a \code{vector} with the following reliability measures:
 \item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
 \item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
 \item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
-\item{\strong{kappa2: }}{Cohen's Kappa with equal weights.}
-\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters with exact estimation.}
-\item{\strong{kappa_light: }}{Light's Kappa for multiple raters.}
+\item{\strong{kappa2_unweighted: }}{Cohen's Kappa with equal weights.}
+\item{\strong{kappa2_equal_weighted: }}{Weighted Cohen's Kappa with equal weights.}
+\item{\strong{kappa2_squared_weighted: }}{Weighted Cohen's Kappa with squared weights.}
+\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters without exact estimation.}
 \item{\strong{percentage_agreement: }}{Percentage Agreement.}
 \item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
 }

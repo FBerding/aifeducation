@@ -1,5 +1,5 @@
 ---
-title: "02 Classification Tasks"
+title: "02 Text Embedding and Classification Tasks"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
@@ -17,10 +17,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(aifeducation)
-#load("data/test_classifier.rda")
-#load("data/bert_embeddings.rda")
-
-#classifier<-aifeducation::test_classifier
 ```
 
 # 1 Introduction and Overview
@@ -903,6 +899,12 @@ shown above.
 
 Now you can use your text embedding model.
 
+## 4.5 Sustainability
+
+In the case the underlying model was trained with an active sustainability tracker
+(section 3.3) you can receive a table showing you the energy consumption, CO2 emissions,
+and hardware used during training by calling `bert_modeling$get_sustainability_data()`.
+
 # 5 Using AI for Classification
 
 ## 5.1 Creating a New Classifier
@@ -1244,7 +1246,19 @@ beyond the scope of this vignette. Instead, we would like to refer to the
 cited literature of content analysis and machine learning if you would
 like to dive deeper into this topic.
 
-## 5.4 Saving and Loading a Classifier
+## 5.4 Sustainability
+
+In the case the classifier was trained with an active sustainability tracker
+you can receive information on sustainability by calling `classifier$get_sustainability_data()`.
+```{r, include = FALSE, eval=TRUE}
+sustainability_data<-test_classifier_sustainability
+```
+
+```{r, include = TRUE, eval=TRUE}
+sustainability_data
+```
+
+## 5.5 Saving and Loading a Classifier
 
 If you have created a classifier, saving and loading is very easy. The process
 for saving a model is similar to the process for text embedding models. You only have 
@@ -1277,7 +1291,7 @@ by the global configuration you have set at the beginning of a session (see sect
 'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
 with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
 
-## 5.5 Predicting New Data
+## 5.6 Predicting New Data
 
 If you would like to apply your classifier to new data, two steps are
 necessary. You must first transform the raw text into a numerical

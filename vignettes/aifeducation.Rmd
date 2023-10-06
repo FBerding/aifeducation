@@ -108,8 +108,21 @@ reticulate::install_miniconda()
 
 ## Step 4 - Install Support for Graphic Devices
 
-If you would like to use a graphic card for computations you need to install
-some further software. A list with links to downloads can be found here if you would
+PyTorch and tensorflow as underlying machine learning backend run on MacOS,
+Linux, and Windows. However, there are some limitations for accelerate
+computations with graphic cards. The following table provides an overview.
+
+*Table: Possible gpu acceleration by operating system*
+
+|Operating System|PyTorch|tensorflow|
+|----------------|-------|----------|
+|MacOS           |No     |No        |
+|Linux           |Yes    |Yes       |
+|Windows         |Yes    |Only with versions <=2.10|
+|Windows with WSL|Yes    |Yes       |
+
+If you have a suitable machine and would like to use a graphic card for computations you need to install
+some further software. If not you can skip this step. A list with links to downloads can be found here if you would
 like to use tensorflow as machine learning framework:
 https://www.tensorflow.org/install/pip#linux
 
@@ -122,8 +135,11 @@ In general you need
 - CUDA Toolkit
 - cuDNN SDK
 
-This step is only relevant if you would like to use graphic acceleration for 
-your computations. If not you can skip this step.
+Except the gpu drivers all components will be installed in step 5 automatically.
+
+If you would like to use Windows with WSL (Windows Subsystem for Linux) installing
+gpu acceleration is a more complex topic. In this case please refer to the specific
+Windows or Ubuntu documentations.
 
 ## Step 5 - Install Specialized Python Libraries
 
@@ -132,9 +148,32 @@ libraries. For convenience, *aifeducation* comes with an auxiliary
 function `install_py_modules()` doing that for you.
 
 ```{r, include = TRUE, eval=FALSE}
+#For Linux
 aifeducation::install_py_modules(envname="aifeducation",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.14")
+                                 remove_first=FALSE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=FALSE)
+
+#For Windows with gpu support
+aifeducation::install_py_modules(envname="aifeducation",
+                                 remove_first=FALSE,
+                                 tf_version="<=2.10",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=FALSE)
+#For Windows without gpu support
+aifeducation::install_py_modules(envname="aifeducation",
+                                 remove_first=FALSE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=TRUE)
+
+#For MacOS
+aifeducation::install_py_modules(envname="aifeducation",
+                                 remove_first=FALSE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=TRUE)
 ```
 
 It is very important that you call this function *before* loading the package
@@ -156,7 +195,7 @@ and its dependencies in the environment "aifeducation".
     
 If you would like to use *aifeducation* with other packages or within
 other environments, please ensure that these python modules are
-available.
+available. For gpu support some further packages are installed.
 
 With `check_aif_py_modules()` you can check, if all modules are
 successfully installed.
@@ -167,8 +206,8 @@ aifeducation::check_aif_py_modules(print=TRUE)
 
 Now everything is ready to use the package. 
 
-**Important note:** When you start a new *R* session, please note that you have to call
-`reticulate::use_condaenv(condaenv = "aifeducation")` 
+> **Important note:** When you start a new *R* session, please note that you have to call
+`reticulate::use_condaenv(condaenv = "aifeducation")` **before** loading the library
 to make the python modules available for work.
 
 # 2) Configuration
@@ -214,7 +253,7 @@ You can choose between five levels
 "FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
 for logging.
 
-# 3) Tutorial and Guides
+# 3) Tutorials and Guides
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette
