@@ -274,38 +274,38 @@ TextEmbeddingModel<-R6::R6Class(
         if(private$basic_components$method=="bert"){
           private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
-            private$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
+            private$transformer_components$model<-transformers$TFBertModel$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$BertForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$BertModel$from_pretrained(model_dir,from_tf=from_tf)
           }
         } else if(private$basic_components$method=="roberta"){
           private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
-            private$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
+            private$transformer_components$model<-transformers$TFRobertaModel$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$RobertaForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$RobertaModel$from_pretrained(model_dir,from_tf=from_tf)
           }
 
         } else if(private$basic_components$method=="longformer"){
           private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
-            private$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
+            private$transformer_components$model<-transformers$TFLongformerModel$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$LongformerForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$LongformerModel$from_pretrained(model_dir,from_tf=from_tf)
           }
         } else if(private$basic_components$method=="funnel"){
           private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
-            private$transformer_components$model<-transformers$TFFunnelForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
+            private$transformer_components$model<-transformers$TFFunnelBaseModel$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$FunnelForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$FunnelBaseModel$from_pretrained(model_dir,from_tf=from_tf)
           }
         } else if(private$basic_components$method=="deberta_v2"){
           private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
-            private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
+            private$transformer_components$model<-transformers$TFDebertaV2Model$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir,from_tf=from_tf)
           }
         } else if(private$basic_components$method=="rwkv"){
           private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
@@ -559,37 +559,37 @@ TextEmbeddingModel<-R6::R6Class(
           if(private$basic_components$method=="bert"){
             private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
-              private$transformer_components$model<-transformers$TFBertForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+              private$transformer_components$model<-transformers$TFBertModel$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$BertForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$BertModel$from_pretrained(model_dir_main,from_tf=from_tf)
             }
           } else if(private$basic_components$method=="roberta"){
             private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
-              private$transformer_components$model<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+              private$transformer_components$model<-transformers$TFRobertaModel$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$RobertaForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$RobertaModel$from_pretrained(model_dir_main,from_tf=from_tf)
             }
           } else if(private$basic_components$method=="longformer"){
             private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
-              private$transformer_components$model<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+              private$transformer_components$model<-transformers$TFLongformerModel$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$LongformerForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$LongformerModel$from_pretrained(model_dir_main,from_tf=from_tf)
             }
           }  else if(private$basic_components$method=="funnel"){
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
-              private$transformer_components$model<-transformers$TFFunnelForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+              private$transformer_components$model<-transformers$TFFunnelBaseModel$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$FunnelForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$FunnelBaseModel$from_pretrained(model_dir_main,from_tf=from_tf)
             }
           } else if(private$basic_components$method=="deberta_v2"){
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
-              private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+              private$transformer_components$model<-transformers$TFDebertaV2Model$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir_main,from_tf=from_tf)
             }
           } else if(private$basic_components$method=="rwkv"){
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)

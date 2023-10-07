@@ -789,32 +789,20 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       data_bsc_test=data_bsc_train
 
       #Initializing Objects for Saving Performance
+      metric_names=get_coder_metrics(
+        true_values=NULL,
+        predicted_values=NULL,
+        return_names_only=TRUE)
+
       test_metric=array(dim=c(folds$n_folds,
                              4,
-                             18),
+                             length(metric_names)),
                        dimnames = list(iterations=NULL,
                                        steps=c("Baseline",
                                                "BSC",
                                                "BPL",
                                                "Final"),
-                                       metrics=c("iota_index",
-                                                 "min_iota2",
-                                                 "avg_iota2",
-                                                 "max_iota2",
-                                                 "min_alpha",
-                                                 "avg_alpha",
-                                                 "max_alpha",
-                                                 "static_iota_index",
-                                                 "dynamic_iota_index",
-                                                 "kalpha_nominal",
-                                                 "kalpha_ordinal",
-                                                 "kendall",
-                                                 "kappa2_unweighted",
-                                                 "kappa2_equal_weighted",
-                                                 "kappa2_squared_weighted",
-                                                 "kappa_fleiss",
-                                                 "percentage_agreement",
-                                                 "gwet_ac")))
+                                       metrics=metric_names))
       iota_objects_start=NULL
       iota_objects_end=NULL
       iota_objects_start_free=NULL

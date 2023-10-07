@@ -174,7 +174,7 @@ create_roberta_model<-function(
   }
 
   configuration=transformers$RobertaConfig(
-    vocab_size=as.integer(vocab_size),
+    vocab_size=as.integer(length(tokenizer$get_vocab())),
     max_position_embeddings=as.integer(max_position_embeddings),
     hidden_size=as.integer(hidden_size),
     num_hidden_layer=as.integer(num_hidden_layer),

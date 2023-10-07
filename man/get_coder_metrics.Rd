@@ -4,15 +4,22 @@
 \alias{get_coder_metrics}
 \title{Calculate reliability measures based on content analysis}
 \usage{
-get_coder_metrics(true_values, predicted_values)
+get_coder_metrics(
+  true_values = NULL,
+  predicted_values = NULL,
+  return_names_only = FALSE
+)
 }
 \arguments{
 \item{true_values}{\code{factor} containing the true labels/categories.}
 
 \item{predicted_values}{\code{factor} containing the predicted labels/categories.}
+
+\item{return_names_only}{\code{bool} If \code{TRUE} returns only the names
+of the resulting vector. Use {FALSE} to request computation of the values.}
 }
 \value{
-Returns a \code{vector} with the following reliability measures:
+If \code{return_names_only=FALSE} returns a \code{vector} with the following reliability measures:
 #'\itemize{
 \item{\strong{iota_index: }}{Iota Index from the Iota Reliability Concept Version 2.}
 \item{\strong{min_iota2: }}{Minimal Iota from Iota Reliability Concept Version 2.}
@@ -33,6 +40,8 @@ Returns a \code{vector} with the following reliability measures:
 \item{\strong{percentage_agreement: }}{Percentage Agreement.}
 \item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
 }
+
+If \code{return_names_only=TRUE} returns only the names of the vector elements.
 }
 \description{
 This function calculates different reliability measures which are based on the

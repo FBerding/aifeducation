@@ -184,7 +184,7 @@ set_config_tf_logger<-function(level="ERROR"){
 #'This function changes the level for logging information with 'tensorflow' via
 #'the os environment. This function must be called before importing 'tensorflow'.
 #'
-#'@param level \code{string} Minimal level that should be printed to console. Five
+#'@param level \code{string} Minimal level that should be printed to console. Four
 #'levels are available: INFO, WARNING, ERROR and NONE.
 #'@return This function does not return anything. It is used for its
 #'side effects.
@@ -202,6 +202,30 @@ set_config_os_environ_logger<-function(level="ERROR"){
   }
 
   os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL","2")
+}
+
+#'Sets the level for logging information of the 'transformers' library.
+#'
+#'This function changes the level for logging information of the 'transformers' library.
+#'It influences the output printed to console for creating and training transformer models as well as
+#'\link{TextEmbeddingModel}s.
+#'
+#'@param level \code{string} Minimal level that should be printed to console. Four
+#'levels are available: INFO, WARNING, ERROR and DEBUG
+#'@return This function does not return anything. It is used for its
+#'side effects.
+#'@family Installation and Configuration
+#'@export
+set_transformers_logger<-function(level="ERROR"){
+  if(level=="ERROR"){
+    transformers$utils$logging$set_verbosity_error()
+  } else if (level=="WARNING"){
+    transformers$utils$logging$set_verbosity_warning()
+  } else if (level=="INFO"){
+    transformers$utils$logging$set_verbosity_info()
+  } else if(level=="DEBUG"){
+    transformers$utils$logging$set_verbosity_debug()
+  }
 }
 
 #'R6 class for settting the global machine learning framework.

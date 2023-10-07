@@ -224,19 +224,21 @@ suggested in vignette [01 Get started](articles/aifeducation.html) you
 may start a new session like this:
 
 ```{r, include = TRUE, eval=FALSE}
-library(aifeducation)
 reticulate::use_condaenv(condaenv = "aifeducation")
+library(aifeducation)
 ```
 
 Next you have to choose the machine learning framework you would like to use.
-You can set the framework for complete the session with
+You can set the framework for the complete session with
 
 ```{r, include = TRUE, eval=FALSE}
 #For tensorflow
 aifeducation_config$set_global_ml_backend("tensorflow")
+set_transformers_logger("ERROR")
 
 #For PyTorch
 aifeducation_config$set_global_ml_backend("pytorch")
+set_transformers_logger("ERROR")
 ```
 
 In the case that you would like to use tensorflow now is a good time to 
@@ -255,7 +257,7 @@ set_config_os_environ_logger(level = "ERROR")
 ```
 
 > **Note:** Please remember: Every time you start a new session in *R* you have to
-load the library, to set the correct conda environment after loading *aifeducation*, and
+to set the correct conda environment, to load the library *aifeducation*, and
 to chose your machine learning framework.
 
 # 2.2  Reading Texts into *R*

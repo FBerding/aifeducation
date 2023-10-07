@@ -7,7 +7,7 @@
 set_config_os_environ_logger(level = "ERROR")
 }
 \arguments{
-\item{level}{\code{string} Minimal level that should be printed to console. Five
+\item{level}{\code{string} Minimal level that should be printed to console. Four
 levels are available: INFO, WARNING, ERROR and NONE.}
 }
 \value{
@@ -26,6 +26,7 @@ Other Installation and Configuration:
 \code{\link{install_py_modules}()},
 \code{\link{set_config_cpu_only}()},
 \code{\link{set_config_gpu_low_memory}()},
-\code{\link{set_config_tf_logger}()}
+\code{\link{set_config_tf_logger}()},
+\code{\link{set_transformers_logger}()}
 }
 \concept{Installation and Configuration}

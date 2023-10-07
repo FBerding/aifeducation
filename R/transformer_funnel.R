@@ -204,7 +204,7 @@ create_funnel_model<-function(
   }
 
   configuration=transformers$FunnelConfig(
-    vocab_size=as.integer(vocab_size),
+    vocab_size=as.integer(length(tokenizer$get_vocab())),
     block_sizes =as.integer(block_sizes),
     block_repeats=NULL,
     num_decoder_layers=as.integer(num_decoder_layers),

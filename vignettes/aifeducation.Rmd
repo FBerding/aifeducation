@@ -210,17 +210,15 @@ Now everything is ready to use the package.
 `reticulate::use_condaenv(condaenv = "aifeducation")` **before** loading the library
 to make the python modules available for work.
 
-# 2) Configuration
+# 2) Configuration of Tensorflow
 
 In general, educators and educational researchers neither have access to
 high performance computing nor do they own computers with a performing
 graphic device for their work. Thus, some additional configuration can
 be done to get computations working on your machine.
 
-## 2.1) Tensorflow
-
-If you do use a computer that does not own a graphic device, you can
-disable the graphic device support of tensorflow with the function
+If you do use a computer that does own a graphic device, but you would like to use cpu only
+you can disable the graphic device support of tensorflow with the function
 `set_config_cpu_only()`.
 
 ```{r, include = TRUE, eval=FALSE}
@@ -253,7 +251,49 @@ You can choose between five levels
 "FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
 for logging.
 
-# 3) Tutorials and Guides
+# 3 Starting a New Session
+Before you can work with *aifeducation* you must set up a new *R*
+session. First, it is necessary that you load the library. Second, you
+must set up python via reticulate. In case you installed python as
+suggested in this vignette you may start a new session like this:
+
+```{r, include = TRUE, eval=FALSE}
+reticulate::use_condaenv(condaenv = "aifeducation")
+library(aifeducation)
+set_transformers_logger("ERROR")
+```
+
+Next you have to choose the machine learning framework you would like to use.
+You can set the framework for the complete session with
+
+```{r, include = TRUE, eval=FALSE}
+#For tensorflow
+aifeducation_config$set_global_ml_backend("tensorflow")
+
+#For PyTorch
+aifeducation_config$set_global_ml_backend("pytorch")
+```
+
+In the case that you would like to use tensorflow now is a good time to 
+configure that backend, since some configurations
+can only be done **before** tensorflow is used the first time.
+
+```{r, include = TRUE, eval=FALSE}
+#if you would like to use only cpus
+set_config_cpu_only()
+
+#if you have a graphic device with low memory
+set_config_gpu_low_memory()
+
+#if you would like to reduce the tensorflow output to errors
+set_config_os_environ_logger(level = "ERROR")
+```
+
+> **Note:** Please remember: Every time you start a new session in *R* you have to
+to set the correct conda environment, to load the library *aifeducation*, and
+to chose your machine learning framework.
+
+# 4) Tutorials and Guides
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette
