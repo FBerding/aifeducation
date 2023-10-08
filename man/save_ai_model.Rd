@@ -4,7 +4,7 @@
 \alias{save_ai_model}
 \title{Saving models created with 'aifeducation'}
 \usage{
-save_ai_model(model, model_dir, save_format = "tf", append_ID = TRUE)
+save_ai_model(model, model_dir, save_format = "keras", append_ID = TRUE)
 }
 \arguments{
 \item{model}{Object of class \link{TextEmbeddingClassifierNeuralNet} or

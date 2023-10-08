@@ -297,7 +297,7 @@ to chose your machine learning framework.
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette
-[02 classification tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+[02 classification tasks](classification_tasks.html).
 
 Documenting and sharing your work is described in vignette
-[03 sharing and using trained AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
+[03 sharing and using trained AI/models](sharing_and_publishing.html)

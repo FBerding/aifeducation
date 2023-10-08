@@ -220,7 +220,7 @@ on a pre-trained transformer.**
 Before you can work with *aifeducation* you must set up a new *R*
 session. First, it is necessary that you load the library. Second, you
 must set up python via reticulate. In case you installed python as
-suggested in vignette [01 Get started](articles/aifeducation.html) you
+suggested in vignette [01 Get started](aifeducation.html) you
 may start a new session like this:
 
 ```{r, include = TRUE, eval=FALSE}
@@ -1407,10 +1407,9 @@ Larusson, J. A., & White, B. (Eds.). (2014). Learning Analytics: From
 Research to Practice. New York: Springer.
 <https://doi.org/10.1007/978-1-4614-3305-7>
 
-Lee, D.‑H. (2013). Pseudo-Label : The Simple and Efficient
+Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
-Workshop : Challenges in RepresentationLearning.
-<https://www.researchgate.net/publication/280581078_Pseudo-Label_The_Simple_and_Efficient_Semi-Supervised_Learning_Method_for_Deep_Neural_Networks>
+Workshop: Challenges in Representation Learning.
 
 Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
 Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden: Springer.

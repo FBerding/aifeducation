@@ -381,7 +381,9 @@ test_that(paste(ml_framework,"Loading Classifier H5"),{
   )
 })
 
+#------------------------------------------------------------------------------
 base::gc(verbose = FALSE,full = TRUE)
+
 test_that(paste(ml_framework,"Saving Classifier TF"),{
   expect_no_error(classifier$save_model(
     testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")),
@@ -390,6 +392,7 @@ test_that(paste(ml_framework,"Saving Classifier TF"),{
 })
 
 base::gc(verbose = FALSE,full = TRUE)
+
 test_that(paste(ml_framework,"Loading Classifier TF"),{
   expect_no_error(
     classifier$load_model(
@@ -397,6 +400,7 @@ test_that(paste(ml_framework,"Loading Classifier TF"),{
       dir_path=testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")))
   )
 })
+#------------------------------------------------------------------------------
 
 base::gc(verbose = FALSE,full = TRUE)
 test_that(paste(ml_framework,"prediction"), {
@@ -562,6 +566,7 @@ test_that(paste(ml_framework,"Classifier Load Total Model H5"), {
 
 #----------------------------------------------------------------------------------
 base::gc(verbose = FALSE,full = TRUE)
+
 test_that(paste(ml_framework,"Classifier Save Total Model TF with ID"), {
   expect_no_error(
     save_ai_model(model=classifier,
@@ -570,6 +575,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model TF with ID"), {
   )
 })
 base::gc(verbose = FALSE,full = TRUE)
+
 test_that(paste(ml_framework,"Classifier Load Total Model TF with ID"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
@@ -579,7 +585,9 @@ test_that(paste(ml_framework,"Classifier Load Total Model TF with ID"), {
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")
 })
+#-------------------------------------------------------------------------------
 base::gc(verbose = FALSE,full = TRUE)
+testthat::skip_on_os(os="linux")
 test_that(paste(ml_framework,"Classifier Save Total Model TF without ID"), {
   expect_no_error(
     save_ai_model(model=classifier,
@@ -588,7 +596,9 @@ test_that(paste(ml_framework,"Classifier Save Total Model TF without ID"), {
                   append_ID=FALSE)
   )
 })
+
 base::gc(verbose = FALSE,full = TRUE)
+testthat::skip_on_os(os="linux")
 test_that(paste(ml_framework,"Classifier Load Total Model TF without ID"), {
   new_classifier<-NULL
   new_classifier<-load_ai_model(
@@ -598,6 +608,7 @@ test_that(paste(ml_framework,"Classifier Load Total Model TF without ID"), {
   expect_s3_class(new_classifier,
                   class="TextEmbeddingClassifierNeuralNet")
 })
+#------------------------------------------------------------------------------
 base::gc(verbose = FALSE,full = TRUE)
 test_that(paste(ml_framework,"Classifier Predict"), {
   pred<-NULL

@@ -88,7 +88,9 @@ load_ai_model<-function(model_dir,ml_framework="auto"){
 #'@family Saving and Loading
 #'
 #'@export
-save_ai_model<-function(model,model_dir,save_format="tf",append_ID=TRUE){
+save_ai_model<-function(model,model_dir,
+                        save_format="keras",
+                        append_ID=TRUE){
   if(methods::is(model,"TextEmbeddingClassifierNeuralNet") |
      methods::is(model,"TextEmbeddingModel")){
 

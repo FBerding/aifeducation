@@ -1,4 +1,4 @@
-# aifeducation 0.2.1.9003
+# aifeducation 0.3.0.9000
 
 -   Added DeBERTa and Funnel-Transformer support
 -   Fixed issues for installing the required python packages

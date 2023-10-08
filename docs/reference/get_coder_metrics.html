@@ -12,7 +12,7 @@ empirical research method of content analysis."><!-- mathjax --><script src="htt
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,11 @@ empirical research method of content analysis.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_coder_metrics</span><span class="op">(</span><span class="va">true_values</span>, <span class="va">predicted_values</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_coder_metrics</span><span class="op">(</span></span>
+<span>  true_values <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predicted_values <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  return_names_only <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -77,12 +81,17 @@ empirical research method of content analysis.</p>
 <dt>predicted_values</dt>
 <dd><p><code>factor</code> containing the predicted labels/categories.</p></dd>
 
+
+<dt>return_names_only</dt>
+<dd><p><code>bool</code> If <code>TRUE</code> returns only the names
+of the resulting vector. Use FALSE to request computation of the values.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Returns a <code>vector</code> with the following reliability measures:
+<p>If <code>return_names_only=FALSE</code> returns a <code>vector</code> with the following reliability measures:
 #'</p><ul><li><p><strong>iota_index: </strong>Iota Index from the Iota Reliability Concept Version 2.</p></li>
 <li><p><strong>min_iota2: </strong>Minimal Iota from Iota Reliability Concept Version 2.</p></li>
 <li><p><strong>avg_iota2: </strong>Average Iota from Iota Reliability Concept Version 2.</p></li>
@@ -95,12 +104,14 @@ empirical research method of content analysis.</p>
 <li><p><strong>kalpha_nominal: </strong>Krippendorff's Alpha for nominal variables.</p></li>
 <li><p><strong>kalpha_ordinal: </strong>Krippendorff's Alpha for ordinal variables.</p></li>
 <li><p><strong>kendall: </strong>Kendall's coefficient of concordance W.</p></li>
-<li><p><strong>kappa2: </strong>Cohen's Kappa with equal weights.</p></li>
-<li><p><strong>kappa_fleiss: </strong>Fleiss' Kappa for multiple raters with exact estimation.</p></li>
-<li><p><strong>kappa_light: </strong>Light's Kappa for multiple raters.</p></li>
+<li><p><strong>kappa2_unweighted: </strong>Cohen's Kappa with equal weights.</p></li>
+<li><p><strong>kappa2_equal_weighted: </strong>Weighted Cohen's Kappa with equal weights.</p></li>
+<li><p><strong>kappa2_squared_weighted: </strong>Weighted Cohen's Kappa with squared weights.</p></li>
+<li><p><strong>kappa_fleiss: </strong>Fleiss' Kappa for multiple raters without exact estimation.</p></li>
 <li><p><strong>percentage_agreement: </strong>Percentage Agreement.</p></li>
 <li><p><strong>gwet_ac: </strong>Gwet's AC1/AC2 agreement coefficient.</p></li>
-</ul></div>
+</ul><p>If <code>return_names_only=TRUE</code> returns only the names of the vector elements.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Auxiliary Functions: 

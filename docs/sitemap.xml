@@ -121,10 +121,16 @@
     <loc>/reference/set_config_tf_logger.html</loc>
   </url>
   <url>
+    <loc>/reference/set_transformers_logger.html</loc>
+  </url>
+  <url>
     <loc>/reference/split_labeled_unlabeled.html</loc>
   </url>
   <url>
     <loc>/reference/summarize_tracked_sustainability.html</loc>
+  </url>
+  <url>
+    <loc>/reference/test_classifier_sustainability.html</loc>
   </url>
   <url>
     <loc>/reference/test_metric_mean.html</loc>
