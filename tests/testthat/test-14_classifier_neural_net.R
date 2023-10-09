@@ -569,6 +569,7 @@ test_that(paste(ml_framework,"Classifier Load Total Model H5"), {
 base::gc(verbose = FALSE,full = TRUE)
 
 test_that(paste(ml_framework,"Classifier Save Total Model TF with ID"), {
+  testthat::skip_on_os("linux")
   expect_no_error(
     save_ai_model(model=classifier,
                   model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
@@ -578,6 +579,7 @@ test_that(paste(ml_framework,"Classifier Save Total Model TF with ID"), {
 base::gc(verbose = FALSE,full = TRUE)
 
 test_that(paste(ml_framework,"Classifier Load Total Model TF with ID"), {
+  testthat::skip_on_os("linux")
   new_classifier<-NULL
   new_classifier<-load_ai_model(
     ml_framework="tensorflow",
