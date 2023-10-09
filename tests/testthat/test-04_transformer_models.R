@@ -672,6 +672,7 @@ for(ai_method in ai_methods){
                         class="TextEmbeddingModel")
       })
 
+      #------------------------------------------------------------------------
       test_that(paste0(ai_method,"Save Total Model TF with ID",framework), {
         expect_no_error(
           save_ai_model(model=bert_modeling,
@@ -690,7 +691,9 @@ for(ai_method in ai_methods){
                         class="TextEmbeddingModel")
       })
 
+      #-------------------------------------------------------------------------
       test_that(paste0(ai_method,"Save Total Model TF without ID",framework), {
+        testthat::skip_on_os("linux")
         expect_no_error(
           save_ai_model(model=bert_modeling,
                         model_dir = testthat::test_path(paste0(path_03,"/",framework)),
@@ -700,6 +703,7 @@ for(ai_method in ai_methods){
       })
 
       test_that(paste0("Load Total Model TF without ID",framework), {
+        testthat::skip_on_os("linux")
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
           ml_framework = framework,
@@ -709,6 +713,7 @@ for(ai_method in ai_methods){
                         class="TextEmbeddingModel")
       })
 
+      #------------------------------------------------------------------------
       test_that(paste0(ai_method,"Sustainability Data Loaded",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(

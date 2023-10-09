@@ -100,9 +100,8 @@ based on BERT architecture with the help of the python libraries 'transformers',
 'datasets', and 'tokenizers'.
 }
 \note{
-if \code{aug_vocab_by > 0} the raw text is used for training a WordPiece
-tokenizer. At the end of this process, additional entries are added to the vocabulary
-that are not part of the original vocabulary. This is in an experimental state.
+This models uses a WordPiece Tokenizer like BERT and can be trained with
+whole word masking. Transformer library may show a warning which can be ignored.
 
 Pre-Trained models which can be fine-tuned with this function are available
 at \url{https://huggingface.co/}.

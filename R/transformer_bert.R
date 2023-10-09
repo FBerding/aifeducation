@@ -42,6 +42,9 @@
 #'and the vocabulary of the new model are saved on disk.
 #'@note To train the model, pass the directory of the model to the function
 #'\link{train_tune_bert_model}.
+#'@note This models uses a WordPiece Tokenizer like BERT and can be trained with
+#'whole word masking. Transformer library may show a warning which can be ignored.
+#'
 #'@references
 #'Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
 #'Pre-training of Deep Bidirectional Transformers for Language
@@ -290,9 +293,9 @@ create_bert_model<-function(
 #'
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
-#'@note if \code{aug_vocab_by > 0} the raw text is used for training a WordPiece
-#'tokenizer. At the end of this process, additional entries are added to the vocabulary
-#'that are not part of the original vocabulary. This is in an experimental state.
+#'@note This models uses a WordPiece Tokenizer like BERT and can be trained with
+#'whole word masking. Transformer library may show a warning which can be ignored.
+#'
 #'@note Pre-Trained models which can be fine-tuned with this function are available
 #'at \url{https://huggingface.co/}.
 #'@note New models can be created via the function \link{create_bert_model}.

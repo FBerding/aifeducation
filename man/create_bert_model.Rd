@@ -88,6 +88,9 @@ the python libraries 'transformers' and 'tokenizers'.
 \note{
 To train the model, pass the directory of the model to the function
 \link{train_tune_bert_model}.
+
+This models uses a WordPiece Tokenizer like BERT and can be trained with
+whole word masking. Transformer library may show a warning which can be ignored.
 }
 \references{
 Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
