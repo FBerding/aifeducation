@@ -134,7 +134,7 @@ create_funnel_model<-function(
   }
 
   #Creating a new Tokenizer for Computing Vocabulary
-  special_tokens=c("[PAD]","[CLS]","[SEP]","[UNK]","[MASK]")
+  special_tokens=c("<cls>","<sep>","<pad>","<unk>","<mask>")
   tok_new<-tok$Tokenizer(tok$models$WordPiece())
   tok_new$normalizer=tok$normalizers$BertNormalizer(
     lowercase=vocab_do_lower_case,
@@ -142,7 +142,13 @@ create_funnel_model<-function(
     handle_chinese_chars = TRUE,
     strip_accents = vocab_do_lower_case)
   tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
+  tok_new$post_processor<-tok$processors$BertProcessing(
+    sep=reticulate::tuple(list("<sep>",as.integer(1))),
+    cls=reticulate::tuple(list("<cls>",as.integer(0)))
+  )
+
   tok_new$decode=tok$decoders$WordPiece()
+
   trainer<-tok$trainers$WordPieceTrainer(
     vocab_size=as.integer(vocab_size),
     special_tokens = special_tokens,
@@ -172,17 +178,15 @@ create_funnel_model<-function(
               "Creating Tokenizer","\n"))
   }
 
-  tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
-                                           do_lower_case=vocab_do_lower_case,
-                                           clean_text=TRUE,
-                                           tokenize_chinese_chars=TRUE,
-                                           strip_accents=vocab_do_lower_case,
-                                           wordpieces_prefix="##",
-                                           unk_token="[UNK]",
-                                           sep_token="[SEP]",
-                                           pad_token="[PAD]",
-                                           cls_token="[CLS]",
-                                           mask_token="[MASK]")
+  tokenizer=transformers$PreTrainedTokenizerFast(
+    tokenizer_object=tok_new,
+    unk_token="<unk>",
+    sep_token="<sep>",
+    pad_token="<pad>",
+    cls_token="<cls>",
+    mask_token="<mask>",
+    bos_token = "<cls>",
+    eos_token = "<sep>")
 
   if(trace==TRUE){
     cat(paste(date(),
@@ -210,7 +214,7 @@ create_funnel_model<-function(
     truncate_seq=TRUE,
     pool_q_only=TRUE,
     max_position_embeddings=as.integer(max_position_embeddings),
-    )
+  )
 
   if(ml_framework=="tensorflow"){
     model=transformers$TFFunnelModel(configuration)
@@ -324,25 +328,25 @@ create_funnel_model<-function(
 #'
 #'@export
 train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
-                               output_dir,
-                               model_dir_path,
-                               raw_texts,
-                               p_mask=0.15,
-                               val_size=0.1,
-                               n_epoch=1,
-                               batch_size=12,
-                               chunk_size=250,
-                               min_seq_len=50,
-                               full_sequences_only=FALSE,
-                               learning_rate=3e-3,
-                               n_workers=1,
-                               multi_process=FALSE,
-                               sustain_track=TRUE,
-                               sustain_iso_code=NULL,
-                               sustain_region=NULL,
-                               sustain_interval=15,
-                               trace=TRUE,
-                               keras_trace=1){
+                                 output_dir,
+                                 model_dir_path,
+                                 raw_texts,
+                                 p_mask=0.15,
+                                 val_size=0.1,
+                                 n_epoch=1,
+                                 batch_size=12,
+                                 chunk_size=250,
+                                 min_seq_len=50,
+                                 full_sequences_only=FALSE,
+                                 learning_rate=3e-3,
+                                 n_workers=1,
+                                 multi_process=FALSE,
+                                 sustain_track=TRUE,
+                                 sustain_iso_code=NULL,
+                                 sustain_region=NULL,
+                                 sustain_interval=15,
+                                 trace=TRUE,
+                                 keras_trace=1){
 
   if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
@@ -422,15 +426,15 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
 
 
     tokenized_texts=tokenizer(raw_texts,
-                             truncation =TRUE,
-                             padding= TRUE,
-                             max_length=as.integer(chunk_size),
-                             return_overflowing_tokens = TRUE,
-                             return_length = TRUE,
-                             return_special_tokens_mask=TRUE,
-                             return_offsets_mapping = FALSE,
-                             return_attention_mask = TRUE,
-                             return_tensors="np")
+                              truncation =TRUE,
+                              padding= TRUE,
+                              max_length=as.integer(chunk_size),
+                              return_overflowing_tokens = TRUE,
+                              return_length = TRUE,
+                              return_special_tokens_mask=TRUE,
+                              return_offsets_mapping = FALSE,
+                              return_attention_mask = TRUE,
+                              return_tensors="np")
     tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
     tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
 
@@ -473,15 +477,15 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
   if(ml_framework=="tensorflow"){
 
 
-      if(trace==TRUE){
-        cat(paste(date(),"Using Token Masking","\n"))
-      }
-      data_collator=transformers$DataCollatorForLanguageModeling(
-        tokenizer = tokenizer,
-        mlm = TRUE,
-        mlm_probability = p_mask,
-        return_tensors = "tf"
-      )
+    if(trace==TRUE){
+      cat(paste(date(),"Using Token Masking","\n"))
+    }
+    data_collator=transformers$DataCollatorForLanguageModeling(
+      tokenizer = tokenizer,
+      mlm = TRUE,
+      mlm_probability = p_mask,
+      return_tensors = "tf"
+    )
 
     tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
@@ -544,15 +548,15 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
   } else {
 
 
-      if(trace==TRUE){
-        cat(paste(date(),"Using Token Masking","\n"))
-      }
-      data_collator=transformers$DataCollatorForLanguageModeling(
-        tokenizer = tokenizer,
-        mlm = TRUE,
-        mlm_probability = p_mask,
-        return_tensors = "pt"
-      )
+    if(trace==TRUE){
+      cat(paste(date(),"Using Token Masking","\n"))
+    }
+    data_collator=transformers$DataCollatorForLanguageModeling(
+      tokenizer = tokenizer,
+      mlm = TRUE,
+      mlm_probability = p_mask,
+      return_tensors = "pt"
+    )
 
 
     tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])

@@ -117,7 +117,7 @@ create_bert_model<-function(
   }
 
   #Creating a new Tokenizer for Computing Vocabulary
-  special_tokens=c("[PAD]","[CLS]","[SEP]","[UNK]","[MASK]")
+  special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]")
   tok_new<-tok$Tokenizer(tok$models$WordPiece())
   tok_new$normalizer=tok$normalizers$BertNormalizer(
     lowercase=vocab_do_lower_case,
@@ -125,7 +125,13 @@ create_bert_model<-function(
     handle_chinese_chars = TRUE,
     strip_accents = vocab_do_lower_case)
   tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
+  tok_new$post_processor<-tok$processors$BertProcessing(
+    sep=reticulate::tuple(list("[SEP]",as.integer(1))),
+    cls=reticulate::tuple(list("[CLS]",as.integer(0)))
+  )
+
   tok_new$decode=tok$decoders$WordPiece()
+
   trainer<-tok$trainers$WordPieceTrainer(
     vocab_size=as.integer(vocab_size),
     special_tokens = special_tokens,
@@ -154,17 +160,16 @@ create_bert_model<-function(
     cat(paste(date(),
               "Creating Tokenizer","\n"))
   }
-  tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
-                                           do_lower_case=vocab_do_lower_case,
-                                           clean_text=TRUE,
-                                           tokenize_chinese_chars=TRUE,
-                                           strip_accents=vocab_do_lower_case,
-                                           wordpieces_prefix="##",
-                                           unk_token="[UNK]",
-                                           sep_token="[SEP]",
-                                           pad_token="[PAD]",
-                                           cls_token="[CLS]",
-                                           mask_token="[MASK]")
+
+  tokenizer=transformers$PreTrainedTokenizerFast(
+    tokenizer_object=tok_new,
+    unk_token="[UNK]",
+    sep_token="[SEP]",
+    pad_token="[PAD]",
+    cls_token="[CLS]",
+    mask_token="[MASK]",
+    bos_token = "[CLS]",
+    eos_token = "[SEP]")
 
   if(trace==TRUE){
     cat(paste(date(),
@@ -188,7 +193,7 @@ create_bert_model<-function(
     position_embedding_type="absolute",
     is_decoder=FALSE,
     use_cache=TRUE
-    )
+  )
 
   if(ml_framework=="tensorflow"){
     bert_model=transformers$TFBertModel(configuration)
@@ -500,7 +505,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
 
-  tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
+    tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     tf_train_dataset=mlm_model$prepare_tf_dataset(
       dataset = tokenized_dataset$train,
