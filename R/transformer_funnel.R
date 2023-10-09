@@ -134,7 +134,7 @@ create_funnel_model<-function(
   }
 
   #Creating a new Tokenizer for Computing Vocabulary
-  special_tokens=c("<cls>","<sep>","<pad>","<unk>","<mask>")
+  special_tokens=c("[PAD]","[CLS]","[SEP]","[UNK]","[MASK]")
   tok_new<-tok$Tokenizer(tok$models$WordPiece())
   tok_new$normalizer=tok$normalizers$BertNormalizer(
     lowercase=vocab_do_lower_case,
@@ -142,13 +142,7 @@ create_funnel_model<-function(
     handle_chinese_chars = TRUE,
     strip_accents = vocab_do_lower_case)
   tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
-  tok_new$post_processor<-tok$processors$BertProcessing(
-    sep=reticulate::tuple(list("<sep>",as.integer(1))),
-    cls=reticulate::tuple(list("<cls>",as.integer(0)))
-  )
-
   tok_new$decode=tok$decoders$WordPiece()
-
   trainer<-tok$trainers$WordPieceTrainer(
     vocab_size=as.integer(vocab_size),
     special_tokens = special_tokens,
@@ -177,26 +171,18 @@ create_funnel_model<-function(
     cat(paste(date(),
               "Creating Tokenizer","\n"))
   }
-  #tokenizer=transformers$FunnelTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
-  #                                         do_lower_case=vocab_do_lower_case,
-  #                                         clean_text=TRUE,
-  #                                         tokenize_chinese_chars=TRUE,
-  #                                         strip_accents=vocab_do_lower_case,
-  #                                         wordpieces_prefix="##",
-  #                                         unk_token="<unk>",
-  #                                         sep_token="<sep>",
-  #                                         pad_token="<pad>",
-  #                                         cls_token="<cls>",
-  #                                         mask_token="<mask>")
-  tokenizer=transformers$PreTrainedTokenizerFast(
-    tokenizer_object=tok_new,
-     unk_token="<unk>",
-     sep_token="<sep>",
-     pad_token="<pad>",
-     cls_token="<cls>",
-    mask_token="<mask>",
-    bos_token = "<cls>",
-    eos_token = "<sep>")
+
+  tokenizer=transformers$BertTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.txt"),
+                                           do_lower_case=vocab_do_lower_case,
+                                           clean_text=TRUE,
+                                           tokenize_chinese_chars=TRUE,
+                                           strip_accents=vocab_do_lower_case,
+                                           wordpieces_prefix="##",
+                                           unk_token="[UNK]",
+                                           sep_token="[SEP]",
+                                           pad_token="[PAD]",
+                                           cls_token="[CLS]",
+                                           mask_token="[MASK]")
 
   if(trace==TRUE){
     cat(paste(date(),

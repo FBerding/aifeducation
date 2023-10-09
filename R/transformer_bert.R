@@ -385,7 +385,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     mlm_model=transformers$BertForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
   }
 
-  tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir_path)
+  tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_path)
 
   if(trace==TRUE){
     cat(paste(date(),"Tokenize Raw Texts","\n"))

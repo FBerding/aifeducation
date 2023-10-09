@@ -179,6 +179,7 @@ for (n_classes in 2:3){
   })
 
   #-------------------------------------------------------------------------------
+  classifier<-NULL
   classifier<-TextEmbeddingClassifierNeuralNet$new(
     ml_framework = ml_framework,
     name=paste0("movie_review_classifier_","classes_",n_classes),
@@ -587,8 +588,8 @@ test_that(paste(ml_framework,"Classifier Load Total Model TF with ID"), {
 })
 #-------------------------------------------------------------------------------
 base::gc(verbose = FALSE,full = TRUE)
-testthat::skip_on_os(os="linux")
 test_that(paste(ml_framework,"Classifier Save Total Model TF without ID"), {
+  testthat::skip_on_os(os="linux")
   expect_no_error(
     save_ai_model(model=classifier,
                   model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
@@ -598,8 +599,8 @@ test_that(paste(ml_framework,"Classifier Save Total Model TF without ID"), {
 })
 
 base::gc(verbose = FALSE,full = TRUE)
-testthat::skip_on_os(os="linux")
 test_that(paste(ml_framework,"Classifier Load Total Model TF without ID"), {
+  testthat::skip_on_os(os="linux")
   new_classifier<-NULL
   new_classifier<-load_ai_model(
     ml_framework="tensorflow",

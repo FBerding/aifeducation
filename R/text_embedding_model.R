@@ -272,7 +272,7 @@ TextEmbeddingModel<-R6::R6Class(
         }
 
         if(private$basic_components$method=="bert"){
-          private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir)
+          private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
             private$transformer_components$model<-transformers$TFBertModel$from_pretrained(model_dir,from_pt=from_pt)
           } else {
@@ -557,7 +557,7 @@ TextEmbeddingModel<-R6::R6Class(
         if((private$basic_components$method %in%private$supported_transformers)==TRUE){
 
           if(private$basic_components$method=="bert"){
-            private$transformer_components$tokenizer<-transformers$BertTokenizerFast$from_pretrained(model_dir_main)
+            private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
             if(private$transformer_components$ml_framework=="tensorflow"){
               private$transformer_components$model<-transformers$TFBertModel$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
