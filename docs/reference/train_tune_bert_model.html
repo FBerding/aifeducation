@@ -14,7 +14,7 @@ based on BERT architecture with the help of the python libraries 'transformers',
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -207,9 +207,8 @@ model is saved to disk.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>if <code>aug_vocab_by &gt; 0</code> the raw text is used for training a WordPiece
-tokenizer. At the end of this process, additional entries are added to the vocabulary
-that are not part of the original vocabulary. This is in an experimental state.</p>
+    <p>This models uses a WordPiece Tokenizer like BERT and can be trained with
+whole word masking. Transformer library may show a warning which can be ignored.</p>
 <p>Pre-Trained models which can be fine-tuned with this function are available
 at <a href="https://huggingface.co/" class="external-link">https://huggingface.co/</a>.</p>
 <p>New models can be created via the function <a href="create_bert_model.html">create_bert_model</a>.</p>
