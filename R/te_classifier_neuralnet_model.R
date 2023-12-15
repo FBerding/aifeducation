@@ -1,7 +1,7 @@
 #'@title Text embedding classifier with a neural net
 #'
-#'@description Abstract class for neural nets with 'keras' and
-#''tensorflow'.
+#'@description Abstract class for neural nets with 'keras'/'tensorflow' and
+#''pytorch'.
 #'
 #'@return Objects of this class are used for assigning texts to classes/categories. For
 #'the creation and training of a classifier an object of class \link{EmbeddedText} and a \code{factor}
@@ -30,13 +30,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\item{\code{model_config$input_variables: }}{Order and name of the input variables. Do not change this manually.}
     #'\item{\code{model_config$init_config: }}{List storing all parameters passed to method new().}
     #'}
-    model_config=list(
-      n_req=NULL,
-      n_hidden=NULL,
-      target_levels=NULL,
-      input_variables=NULL,
-      init_config=list()
-    ),
+    model_config=list(),
 
     #'@field last_training ('list()')\cr
     #'List for storing the history and the results of the last training. This
@@ -66,7 +60,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'}
     last_training=list(
       learning_time=NULL,
-      history=NULL,
+      history=list(
+        bsl=NULL,
+        bsc=NULL,
+        bpl=NULL
+      ),
       data=NULL,
       data_pbl=NULL,
       data_bsc_train=NULL,
@@ -172,21 +170,27 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param rec \code{vector} containing the number of neurons for each recurrent layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer,
     #'set this parameter to \code{NULL}.
+    #'@param attention_type \code{string} Choose the relevant attention type. Possible values
+    #'are \code{"fourier"} and \code{multihead}.
     #'@param self_attention_heads \code{integer} determining the number of attention heads
-    #'for a self-attention layer. If this value is greater 0, a self-attention layer is added
-    #'between the recurrent and dense layers together with a normalization and a
-    #'recurrent layer. If set to 0, none of these layers are added.
-    #'@param dropout \code{double} ranging between 0 and lower 1, determining the
-    #'dropout for each recurrent layer.
+    #'for a self-attention layer. Only relevant if \code{attention_type="multihead"}
+    #'@param repeat_encoder \code{int} determining how many times the encoder should be
+    #'added to the network.
+    #'@param intermediate_size \code{int} determining the size of the projection layer within
+    #'a each transformer encoder.
+    #'@param add_pos_embedding \code{bool} \code{TRUE} if positional embedding should be used.
+    #'@param encoder_dropout \code{double} ranging between 0 and lower 1, determining the
+    #'dropout for the dense projection within the encoder layers.
+    #'@param dense_dropout \code{double} ranging between 0 and lower 1, determining the
+    #'dropout between dense layers.
+    #'@param rec_dropout \code{double} ranging between 0 and lower 1, determining the
+    #'dropout between bidirectional gru layers.
     #'@param recurrent_dropout \code{double} ranging between 0 and lower 1, determining the
-    #'recurrent dropout for each recurrent layer.
-    #'@param l2_regularizer \code{double} determining the l2 regularizer for every dense layer.
+    #'recurrent dropout for each recurrent layer. Only relevant for keras models.
     #'@param optimizer Object of class \code{keras.optimizers}.
-    #'@param act_fct \code{character} naming the activation function for all dense layers.
-    #'@param rec_act_fct \code{character} naming the activation function for all recurrent layers.
     #'@return Returns an object of class \link{TextEmbeddingClassifierNeuralNet} which is ready for
     #'training.
-    initialize=function(ml_framework=aifeducation_config$get_framework()$ClassifierFramework,
+    initialize=function(ml_framework=aifeducation_config$get_framework(),
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -194,12 +198,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         hidden=c(128),
                         rec=c(128),
                         self_attention_heads=0,
-                        dropout=0.4,
+                        intermediate_size=NULL,
+                        attention_type="fourier",
+                        add_pos_embedding=TRUE,
+                        rec_dropout=0.1,
+                        repeat_encoder=1,
+                        dense_dropout=0.4,
                         recurrent_dropout=0.4,
-                        l2_regularizer=0.01,
-                        optimizer="adam",
-                        act_fct="gelu",
-                        rec_act_fct="tanh"
+                        encoder_dropout=0.1,
+                        optimizer="adam"
     ){
       #Checking of parameters--------------------------------------------------
       if(is.null(name)){
@@ -229,16 +236,15 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         stop("Optimzier must be 'adam' oder 'rmsprop'.")
       }
 
+      if(attention_type %in% c("fourier","multihead")==FALSE){
+        stop("Optimzier must be 'fourier' oder 'multihead'.")
+      }
+
       #------------------------------------------------------------------------
 
       #Setting ML Framework
       if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
         stop("ml_framework must be 'tensorflow' or 'pytorch'.")
-      }
-
-      if(keras["__version__"]<"3.0.0" & ml_framework=="pytorch"){
-        stop("Using a classifier object with PyTorch requires Keras version 3.
-             Please use this object with tensorflow.")
       }
 
       private$ml_framework=ml_framework
@@ -267,16 +273,37 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         }
       }
 
+      if(is.null(intermediate_size)==TRUE){
+        if(attention_type=="fourier" & length(rec)>0){
+          intermediate_size=2*rec[length(rec)]
+        } else if(attention_type=="fourier" & length(rec)==0){
+          intermediate_size=2*features
+        } else if(attention_type=="multihead" & length(rec)>0 & self_attention_heads>0){
+          intermediate_size=2*features
+        } else if(attention_type=="multihead" & length(rec)==0 & self_attention_heads>0){
+          intermediate_size=2*features
+        } else {
+          intermediate_size=NULL
+        }
+      }
+
       #Saving Configuration
       config=list(
+        features= private$text_embedding_model[["features"]],
+        times=private$text_embedding_model[["times"]],
         hidden=hidden,
         rec=rec,
-        dropout=dropout,
+        intermediate_size=intermediate_size,
+        attention_type=attention_type,
+        repeat_encoder=repeat_encoder,
+        dense_dropout=dense_dropout,
+        rec_dropout=rec_dropout,
         recurrent_dropout=recurrent_dropout,
-        l2_regularizer=l2_regularizer,
+        encoder_dropout=encoder_dropout,
+        add_pos_embedding=add_pos_embedding,
         optimizer=optimizer,
-        act_fct=act_fct,
-        rec_act_fct=rec_act_fct,
+        act_fct="gelu",
+        rec_act_fct="tanh",
         self_attention_heads=self_attention_heads)
 
       if(length(target_levels_order)>2){
@@ -291,221 +318,50 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         config["metric"]="binary_accuracy"
       }
 
-      #Defining basic keras model
-      layer_list=NULL
-      #Adding Input Layer
-      n_req=length(config$rec)
-      n_hidden=length(config$hidden)
-      if(n_req>0 |
-         self_attention_heads>0){
-        model_input<-keras$layers$Input(shape=list(as.integer(times),as.integer(features)),
-                                        name="input_embeddings")
-      } else {
-        model_input<-keras$layers$Input(shape=as.integer(times*features),
-                                        name="input_embeddings")
-      }
-      layer_list[1]<-list(model_input)
+      config["target_levels"]=list(target_levels_order)
+      config["input_variables"]=list(variable_name_order)
 
-      #Adding a Mask-Layer
-      if(n_req>0 |
-         self_attention_heads>0){
-        masking_layer<-keras$layers$Masking(
-                             mask_value = 0.0,
-                             name="masking_layer",
-                             input_shape=c(times,features),
-                             trainable=FALSE)(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(masking_layer)
-      }
+      self$model_config=config
 
-      #Adding a Normalization Layer
-      if(n_req>0|
-         self_attention_heads>0){
-        norm_layer<-keras$layers$LayerNormalization(
-          name = "normalizaion_layer")(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(norm_layer)
-      } else {
-        norm_layer<-keras$layers$BatchNormalization(
-          name = "normalizaion_layer")(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(norm_layer)
-      }
-
-      #Adding rec layer
-      if(n_req>0){
-        for(i in 1:n_req){
-          if(i<n_req){
-            layer_list[length(layer_list)+1]<-list(
-              keras$layers$Bidirectional(
-                layer=keras$layers$GRU(
-                   units=as.integer(config$rec[i]),
-                   input_shape=list(times,features),
-                   return_sequences = TRUE,
-                   dropout = config$dropout,
-                   recurrent_dropout = config$recurrent_dropout,
-                   activation = config$rec_act_fct,
-                   name=paste0("gru_",i)),
-                name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]])
-              )
-          } else {
-            if(config$self_attention_heads>0){
-              return_sequence=TRUE
-            } else {
-              return_sequence=FALSE
-            }
-            layer_list[length(layer_list)+1]<-list(
-              keras$layers$Bidirectional(
-                layer=keras$layers$GRU(
-                   units=as.integer(config$rec[i]),
-                   input_shape=list(times,features),
-                   return_sequences = return_sequence,
-                   dropout = config$dropout,
-                   recurrent_dropout = config$recurrent_dropout,
-                   activation = config$rec_act_fct,
-                   name=paste0("gru",i)),
-                name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]])
-              )
-          }
-        }
+      #Create_Model------------------------------------------------------------
+      if(private$ml_framework=="tensorflow"){
+        self$model=private$create_model_keras(
+          features=self$model_config$features ,
+          times=self$model_config$times,
+          hidden=self$model_config$hidden,
+          rec=self$model_config$rec,
+          embed_dim=self$model_config$embed_dim,
+          intermediate_size=self$model_config$intermediate_size,
+          attention_type=self$model_config$attention_type,
+          repeat_encoder=self$model_config$repeat_encoder,
+          dense_dropout=self$model_config$dense_dropout,
+          rec_dropout=self$model_config$rec_dropout,
+          recurrent_dropout=self$model_config$recurrent_dropout,
+          encoder_dropout=self$model_config$encoder_dropout,
+          add_pos_embedding=self$model_config$add_pos_embedding,
+          self_attention_heads=self$model_config$self_attention_heads,
+          target_levels=self$model_config$target_levels,
+          act_fct_last=self$model_config$act_fct_last,
+          name=private$model_info$model_name_root
+        )
+      } else if (private$ml_framework=="pytorch"){
+        self$model=private$create_model_pytorch(
+          features=self$model_config$features ,
+          times=self$model_config$times,
+          hidden=self$model_config$hidden,
+          rec=self$model_config$rec,
+          intermediate_size=self$model_config$intermediate_size,
+          attention_type=self$model_config$attention_type,
+          repeat_encoder=self$model_config$repeat_encoder,
+          dense_dropout=self$model_config$dense_dropout,
+          rec_dropout=self$model_config$rec_dropout,
+          encoder_dropout=self$model_config$encoder_dropout,
+          add_pos_embedding=self$model_config$add_pos_embedding,
+          self_attention_heads=self$model_config$self_attention_heads,
+          target_levels=self$model_config$target_levels
+        )
       }
 
-      if(n_req>0){
-        i=i
-      } else {
-        i=0
-      }
-
-      if(config$self_attention_heads>0){
-        if(length(config$rec)>0){
-          self_attention_units=config$rec[length(config$rec)]
-        } else {
-          self_attention_units=features/2
-        }
-
-        self_attention_layer<-keras$layers$MultiHeadAttention(
-          num_heads = as.integer(self_attention_heads),
-          key_dim = as.integer(self_attention_units),
-          name="self_attention")
-
-        layer_list[length(layer_list)+1]<-list(
-          self_attention_layer(layer_list[[length(layer_list)]],
-                               layer_list[[length(layer_list)]],
-                               layer_list[[length(layer_list)]]))
-
-        addition_layer_attention<-keras$layers$add(
-          inputs=list(layer_list[[length(layer_list)]],
-                      layer_list[[length(layer_list)-1]]))
-        layer_list[length(layer_list)+1]<-list(addition_layer_attention)
-
-        norm_layer_attention<-keras$layers$LayerNormalization(
-          name = "normalizaion_layer_attention")(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(norm_layer_attention)
-
-        proj_dense_1<-keras$layers$Dense(
-          units = as.integer(self_attention_heads*2*self_attention_units),
-          activation = config$act_fct,
-          kernel_regularizer = keras$regularizers$l2(config$l2_regularizer),
-          name="dense_projection_1")(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(proj_dense_1)
-
-        proj_dense_2<-keras$layers$Dense(
-          units = as.integer(2*self_attention_units),
-          activation = config$act_fct,
-          kernel_regularizer = keras$regularizers$l2(config$l2_regularizer),
-          name="dense_projection_2")(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(proj_dense_2)
-
-        addition_layer_projection<-keras$layers$add(
-          inputs=list(layer_list[[length(layer_list)]],
-                      layer_list[[length(layer_list)-2]]))
-        layer_list[length(layer_list)+1]<-list(addition_layer_projection)
-
-        norm_layer_projection<-keras$layers$LayerNormalization(
-          name = "normalizaion_layer_projection")(layer_list[[length(layer_list)]])
-        layer_list[length(layer_list)+1]<-list(norm_layer_projection)
-
-        layer_list[length(layer_list)+1]<-list(
-          keras$layers$Bidirectional(
-            layer=keras$layers$GRU(
-              units=as.integer(self_attention_units),
-              input_shape=list(times,features),
-              return_sequences = FALSE,
-              dropout = config$dropout,
-              recurrent_dropout = config$recurrent_dropout,
-              activation = config$rec_act_fct,
-              name=paste0("gru",i+1)),
-            name=paste0("bidirectional_",i+1))(layer_list[[length(layer_list)]])
-          )
-      }
-
-      #Adding standard layer
-      if(n_hidden>0){
-        for(i in 1:n_hidden){
-          layer_list[length(layer_list)+1]<-list(
-            keras$layers$Dense(
-              units = as.integer(config$hidden[i]),
-              activation = config$act_fct,
-              kernel_regularizer = keras$regularizers$l2(config$l2_regularizer),
-              name=paste0("dense",i))(layer_list[[length(layer_list)]])
-            )
-
-          if(i==(n_hidden-1) & n_hidden>=2){
-            #Add Dropout_Layer
-            layer_list[length(layer_list)+1]<-list(
-              keras$layers$Dropout(
-                rate = config$dropout,
-                name="dropout")(layer_list[[length(layer_list)]])
-              )
-          }
-        }
-      }
-
-      #Adding final Layer
-      if(length(target_levels_order)>2){
-        #Multi Class
-        layer_list[length(layer_list)+1]<-list(
-          keras$layers$Dense(
-            units = as.integer(length(levels(targets))),
-            activation = config$act_fct_last,
-            name="output_categories")(layer_list[[length(layer_list)]])
-          )
-      } else {
-        #Binary Class
-        layer_list[length(layer_list)+1]<-list(
-          keras$layers$Dense(
-            units = as.integer(1),
-            activation = config$act_fct_last,
-            name="output_categories")(layer_list[[length(layer_list)]])
-          )
-      }
-
-      #Creating Model
-      model<-keras$Model(
-        inputs = model_input,
-        outputs = layer_list[length(layer_list)],
-        name = name)
-
-        #if(config$optimizer=="adam"){
-        #  model$compile(
-        #    loss = config$err_fct,
-        #    optimizer=keras$optimizers$Adam(),
-        #    metrics=config$metric)
-
-        #} else if(config$optimizer=="rmsprop"){
-        #  model$compile(
-        #    loss = self$model_config$init_config$err_fct,
-        #    optimizer=keras$optimizers$RMSprop(),
-        #    metric=self$model_config$init_config$metric)
-        #}
-
-
-      self$model=model
-      private$init_weights=model$get_weights()
-
-      self$model_config$n_req=length(config$rec)
-      self$model_config$n_hidden=length(config$hidden)
-      self$model_config$n_self_attention_heads=config$self_attention_heads
-      self$model_config$target_levels=target_levels_order
-      self$model_config$input_variables=variable_name_order
-      self$model_config$init_config=config
       private$model_info$model_date=date()
 
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
@@ -526,6 +382,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'same names used in \code{data_embeddings}.
     #'@param data_n_test_samples \code{int} determining the number of cross-fold
     #'samples.
+    #'@param balance_class_weights \code{bool} If \code{TRUE} class weights are
+    #'generated based on the frequencies of the training data with the method
+    #'Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.
     #'@param use_baseline \code{bool} \code{TRUE} if the calculation of a baseline
     #'model is requested. This option is only relevant for \code{use_bsc=TRUE} or
     #'\code{use_pbl=TRUE}. If both are \code{FALSE}, a baseline model is calculated.
@@ -587,7 +446,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'phase should be printed to the console.
     #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
     #'information about the training process from keras on the console.
-    #'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
+    #'@param pytorch_trace \code{int} \code{pytorch_trace=0} does not print any
+    #'information about the training process from pytorch on the console.
+    #'\code{pytorch_trace=1} prints a progress bar. \code{pytorch_trace=2} prints
     #'one line of information for every epoch.
     #'@param n_cores \code{int} Number of cores used for creating synthetic units.
     #'@return Function does not return a value. It changes the object into a trained
@@ -607,6 +468,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     train=function(data_embeddings,
                    data_targets,
                    data_n_test_samples=5,
+                   balance_class_weights=TRUE,
                    use_baseline=TRUE,
                    bsl_val_size=0.25,
                    use_bsc=TRUE,
@@ -634,7 +496,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                    dir_checkpoint,
                    trace=TRUE,
                    keras_trace=2,
+                   pytorch_trace=2,
                    n_cores=2){
+
+      #Load Custom Model Scripts
+      if(private$ml_framework=="tensorflow"){
+        reticulate::py_run_file(system.file("python/keras_te_classifier.py",
+                                            package = "aifeducation"))
+      } else if(private$ml_framework=="pytorch"){
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+                                            package = "aifeducation"))
+      }
 
       requireNamespace(package="foreach")
       start_time=Sys.time()
@@ -849,7 +721,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           targets_labeled_val=targets_labeleld_all[names_targets_labeled_train_test]
 
           #Train model
-          private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,,],
+          tmp_history=private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,,],
                               target_train=targets_labeled_train_train,
                               embedding_test=embeddings_all[names_targets_labeled_train_test,,],
                               target_test=targets_labeled_val,
@@ -857,8 +729,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               batch_size=batch_size,
                               trace=FALSE,
                               keras_trace=keras_trace,
+                              pytorch_trace=pytorch_trace,
                               reset_model=TRUE,
-                              dir_checkpoint=dir_checkpoint)
+                              dir_checkpoint=dir_checkpoint,
+                              balance_class_weights=balance_class_weights)
+          self$last_training$history$bsl[iter]=list(tmp_history)
 
           #Predict val targets
           test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,,],
@@ -1008,7 +883,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         "Iter:",iter,"from",folds$n_folds,
                         "Start Training","\n"))
           }
-          private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,,],
+          tmp_history=private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,,],
                               target_train=targets_all_and_synthetic[names_targets_labeled_train_train],
                               embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,,],
                               target_test=targets_all_and_synthetic[names_targets_labeled_train_test],
@@ -1016,8 +891,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               batch_size=batch_size,
                               trace=FALSE,
                               keras_trace=keras_trace,
+                              pytorch_trace=pytorch_trace,
                               reset_model=TRUE,
-                              dir_checkpoint=dir_checkpoint)
+                              dir_checkpoint=dir_checkpoint,
+                              balance_class_weights=balance_class_weights)
+          self$last_training$history$bsc[iter]=list(tmp_history)
+
           #Predict val targets
           test_predictions=self$predict(newdata = embeddings_all[names_targets_labaled_test,,],
                                         verbose = keras_trace,
@@ -1177,7 +1056,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             } else {
               use_callback=FALSE
             }
-                private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),,],
+            tmp_history=private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),,],
                                     target_train=targets_labeled_and_pseudo,
                                     embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
                                     target_test=pseudo_label_targets_labeled_val,
@@ -1186,9 +1065,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                                     batch_size=batch_size,
                                     trace=FALSE,
                                     keras_trace=keras_trace,
+                                    pytorch_trace=pytorch_trace,
                                     reset_model=bpl_model_reset,
                                     dir_checkpoint=dir_checkpoint,
-                                    sample_weights=sample_weights)
+                                    sample_weights=sample_weights,
+                                    balance_class_weights=balance_class_weights)
+            self$last_training$history$bpl[iter][step]=list(tmp_history)
 
               #predict val targets
               val_predictions=self$predict(newdata=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
@@ -1213,7 +1095,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
               if(val_avg_alpha<val_res["avg_alpha"]){
                 val_avg_alpha=val_res["avg_alpha"]
                 #new_best_model=keras$models$clone_model(self$model)
-                self$model$save_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
+                if(private$ml_framework=="tensorflow"){
+                  self$model$save_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
+                } else if(private$ml_framework=="pytorch"){
+                  torch$save(self$model$state_dict(),paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.pt"))
+                }
+
                 best_val_metric=val_res
                 best_test_metric=test_res
               }
@@ -1228,7 +1115,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           }
 
           #self$model=keras$models$clone_model(new_best_model)
-          self$model$load_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
+          if(private$ml_framework=="tensorflow"){
+            self$model$load_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
+          } else if(private$ml_framework=="pytorch"){
+            self$model$load_state_dict(torch$load(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.pt")))
+          }
+
           test_metric[iter,"BPL",]<-best_test_metric
           test_res<-best_test_metric
         }
@@ -1323,7 +1215,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         targets_labeled_val=targets_labeleld_all[names_targets_labeled_train_test]
 
         #Train model
-        private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,,],
+        tmp_history=private$basic_train(embedding_train=embeddings_all[names_targets_labeled_train_train,,],
                             target_train=targets_labeled_train_train,
                             embedding_test=embeddings_all[names_targets_labeled_train_test,,],
                             target_test=targets_labeled_val,
@@ -1331,8 +1223,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             batch_size=batch_size,
                             trace=FALSE,
                             keras_trace=keras_trace,
+                            pytorch_trace=pytorch_trace,
                             reset_model=TRUE,
-                            dir_checkpoint=dir_checkpoint)
+                            dir_checkpoint=dir_checkpoint,
+                            balance_class_weights=balance_class_weights)
+        self$last_training$history$bsl["final"]=list(tmp_history)
+
 
         #cat(paste("Train",length(names_targets_labeled_train_train),
         #            "Validation",length(names_targets_labeled_train_test)))
@@ -1454,7 +1350,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                       "Final Training",
                       "Start Training","\n"))
         }
-        private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,,],
+        tmp_history=private$basic_train(embedding_train=embeddings_all_and_synthetic[names_targets_labeled_train_train,,],
                             target_train=targets_all_and_synthetic[names_targets_labeled_train_train],
                             embedding_test=embeddings_all_and_synthetic[names_targets_labeled_train_test,,],
                             target_test=targets_all_and_synthetic[names_targets_labeled_train_test],
@@ -1462,8 +1358,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                             batch_size=batch_size,
                             trace=FALSE,
                             keras_trace=keras_trace,
+                            pytorch_trace=pytorch_trace,
                             reset_model=TRUE,
-                            dir_checkpoint=dir_checkpoint)
+                            dir_checkpoint=dir_checkpoint,
+                            balance_class_weights=balance_class_weights)
+        self$last_training$history$bsc["final"]=list(tmp_history)
         #cat(paste("Train",length(names_targets_labeled_train_train),
         #            "Validation",length(names_targets_labeled_train_test)))
       }
@@ -1607,7 +1506,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           } else {
             use_callback=FALSE
           }
-          private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),,],
+          tmp_history=private$basic_train(embedding_train=pseudo_label_embeddings_all[names(targets_labeled_and_pseudo),,],
                               target_train=targets_labeled_and_pseudo,
                               embedding_test=pseudo_label_embeddings_all[names(pseudo_label_targets_labeled_val),,],
                               target_test=pseudo_label_targets_labeled_val,
@@ -1616,9 +1515,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                               batch_size=batch_size,
                               trace=FALSE,
                               keras_trace=keras_trace,
+                              pytorch_trace=pytorch_trace,
                               reset_model=bpl_model_reset,
                               dir_checkpoint=dir_checkpoint,
-                              sample_weights=sample_weights)
+                              sample_weights=sample_weights,
+                              balance_class_weights=balance_class_weights)
+          self$last_training$history$pbl["final"][step]=list(tmp_history)
           #cat(paste("Train",length(targets_labeled_and_pseudo),
           #            "Validation",length(pseudo_label_targets_labeled_val),
           #            "Unlabeled",length(targets_pseudo_labeled)))
@@ -1636,7 +1538,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           if(val_avg_alpha<val_res["avg_alpha"]){
             val_avg_alpha=val_res["avg_alpha"]
             #new_best_model=keras$models$clone_model(self$model)
-            self$model$save_weights(paste0(dir_checkpoint,"/bpl_best_weights.h5"))
+            if(private$ml_framework=="tensorflow"){
+              self$model$save_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
+            } else if(private$ml_framework=="pytorch"){
+              torch$save(self$model$state_dict(),paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.pt"))
+            }
+            #self$model$save_weights(paste0(dir_checkpoint,"/bpl_best_weights.h5"))
             best_val_metric=val_res
           }
           #cat(paste("Validation:",val_res["avg_alpha"]))
@@ -1651,7 +1558,11 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         }
 
         #self$model=keras$models$clone_model(new_best_model)
-        self$model$load_weights(paste0(dir_checkpoint,"/bpl_best_weights.h5"))
+        if(private$ml_framework=="tensorflow"){
+          self$model$load_weights(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.h5"))
+        } else if(private$ml_framework=="pytorch"){
+          self$model$load_state_dict(torch$load(paste0(dir_checkpoint,"/checkpoints/bpl_best_weights.pt")))
+        }
       }
       #Save Final Information
       self$last_training$date=date()
@@ -1739,6 +1650,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     predict=function(newdata,
                      batch_size=32,
                      verbose=1){
+
+      #Load Custom Model Scripts
+      if(private$ml_framework=="tensorflow"){
+        reticulate::py_run_file(system.file("python/keras_te_classifier.py",
+                                            package = "aifeducation"))
+      } else if(private$ml_framework=="pytorch"){
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+                                            package = "aifeducation"))
+      }
+
       #Checking input data
       #if(methods::isClass(where=newdata,"data.frame")==FALSE){
       #  stop("newdata mus be a data frame")
@@ -1759,8 +1680,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       #Ensuring the correct order of the variables for prediction
       real_newdata<-real_newdata[,,self$model_config$input_variables,drop=FALSE]
       current_row_names=rownames(real_newdata)
-      if(self$model_config$n_req==0 &
-         self$model_config$n_self_attention_heads==0){
+
+      if(is.null(self$model_config$rec)==TRUE){
+        n_req=0
+      } else {
+        n_req=length(self$model_config$rec)
+      }
+
+      if(n_req==0 &
+         self$model_config$self_attention_heads==0 &
+         self$model_config$attention_type=="multihead"){
         real_newdata=array_to_matrix(real_newdata)
       }
 
@@ -1768,24 +1697,49 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       if(length(self$model_config$target_levels)>2){
         #Multi Class
-        #Predicting target variable
-        #model<-bundle::unbundle(self$bundeled_model)
-        #predictions_prob<-predict(object = model,
-        #                          x = real_newdata,
-        #                          batch_size = as.integer(batch_size),
-        #                          verbose=as.integer(verbose))
-        predictions_prob<-model$predict(
-                                  x = np$array(real_newdata),
-                                  batch_size = as.integer(batch_size),
-                                  verbose=as.integer(verbose))
+        if(private$ml_framework=="tensorflow"){
+          predictions_prob<-model$predict(
+            x = np$array(real_newdata),
+            batch_size = as.integer(batch_size),
+            verbose=as.integer(verbose))
+        } else if(private$ml_framework=="pytorch"){
+          pytorch_predict_data=torch$utils$data$TensorDataset(
+            torch$from_numpy(np$array(real_newdata)))
+          #predictloader=torch$utils$data$DataLoader(
+          #  pytorch_predict_data,
+          #  batch_size=as.integer(batch_size),
+          #  shuffle=FALSE)
+
+          model$eval()
+          predictions_prob<-model(torch$from_numpy(np$array(real_newdata)),
+                                  predication_mode=TRUE)$detach()$numpy()
+          #predictions_prob<-model(x = predictloader)
+        }
+
 
         #Select index of column with maximum value and convert to zero based indices
         predictions<-max.col(predictions_prob)-1
       } else {
-        predictions_prob<-model$predict(
-                                  x = np$array(real_newdata),
-                                  batch_size = as.integer(batch_size),
-                                  verbose=as.integer(verbose))
+        if(private$ml_framework=="tensorflow"){
+          predictions_prob<-model$predict(
+            x = np$array(real_newdata),
+            batch_size = as.integer(batch_size),
+            verbose=as.integer(verbose))
+        } else if(private$ml_framework=="pytorch"){
+          #pytorch_predict_data=torch$utils$data$TensorDataset(
+          #  torch$from_numpy(np$array(real_newdata)))
+          #predictloader=torch$utils$data$DataLoader(
+          #  pytorch_predict_data,
+          #  batch_size=as.integer(batch_size),
+          #  shuffle=FALSE)
+
+          #predictions_prob<-model(x = predictloader)
+          model$eval()
+          predictions_prob<-model(torch$from_numpy(np$array(real_newdata)),
+                                  predication_mode=TRUE)$detach()$numpy()
+          #predictions_prob<-as.vector(predictions_prob$numpy)
+        }
+
 
         #Add Column for the second characteristic
         predictions=vector(length = length(predictions_prob))
@@ -1958,22 +1912,28 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@return Function does not return a value. It saves the model to disk.
     #'@importFrom utils write.csv
      save_model=function(dir_path,save_format="keras"){
-       if(save_format=="keras"){
-         extension=".keras"
-       } else if(save_format=="tf"){
-         extension=".tf"
-       } else {
-         extension=".h5"
+       if(private$ml_framework=="tensorflow"){
+         if(save_format=="keras"){
+           extension=".keras"
+         } else if(save_format=="tf"){
+           extension=".tf"
+         } else {
+           extension=".h5"
+         }
+         file_path=paste0(dir_path,"/","model_data",extension)
+         if(dir.exists(dir_path)==FALSE){
+           dir.create(dir_path)
+           #cat("Creating Directory\n")
+         }
+         self$model$save(file_path)
+       } else if(private$ml_framework=="pytorch"){
+         file_path=paste0(dir_path,"/","model_data",".pt")
+         if(dir.exists(dir_path)==FALSE){
+           dir.create(dir_path)
+           #cat("Creating Directory\n")
+         }
+         torch$save(self$model$state_dict(),file_path)
        }
-
-       file_path=paste0(dir_path,"/","model_data",extension)
-
-       if(dir.exists(dir_path)==FALSE){
-         dir.create(dir_path)
-         cat("Creating Directory\n")
-       }
-
-       self$model$save(file_path)
 
        #Saving Sustainability Data
        sustain_matrix=t(as.matrix(unlist(private$sustainability)))
@@ -2008,31 +1968,54 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
              the library to set the global framework. ")
       }
 
-      if(utils::compareVersion(keras["__version__"],"3.0.0")>=0 & ml_framework=="auto"){
-        private$ml_framework="tensorflow"
-      } else if (utils::compareVersion(keras["__version__"],"3.0.0")<0 & ml_framework=="pytorch"){
-        private$ml_framework="tensorflow"
-        warning("Using a classifier object with PyTorch requires at least Keras Version 3.
-                ml_framework is set to tensorflow.")
-      } else if (utils::compareVersion(keras["__version__"],"3.0.0")>=0 & ml_framework!="auto"){
+      #if(utils::compareVersion(keras["__version__"],"3.0.0")>=0 & ml_framework=="auto"){
+      #  private$ml_framework="tensorflow"
+      #} else if (utils::compareVersion(keras["__version__"],"3.0.0")<0 & ml_framework=="pytorch"){
+      #  private$ml_framework="tensorflow"
+      #  warning("Using a classifier object with PyTorch requires at least Keras Version 3.
+      #          ml_framework is set to tensorflow.")
+      #} else if (utils::compareVersion(keras["__version__"],"3.0.0")>=0 & ml_framework!="auto"){
+      #  private$ml_framework=ml_framework
+      #} else {
+      #  private$ml_framework="tensorflow"
+      #}
+
+      if(ml_framework!="auto"){
         private$ml_framework=ml_framework
-      } else {
-        private$ml_framework="tensorflow"
       }
 
       #Load the model
-      path=paste0(dir_path,"/","model_data",".keras")
-
-      if(file.exists(paths = path)==TRUE){
-        self$model<-keras$models$load_model(path)
-      } else {
-        path=paste0(dir_path,"/","model_data",".tf")
-        if(dir.exists(paths = path)==TRUE){
+      if(private$ml_framework=="tensorflow"){
+        path=paste0(dir_path,"/","model_data",".keras")
+        if(file.exists(paths = path)==TRUE){
           self$model<-keras$models$load_model(path)
         } else {
-          self$model<-keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
+          path=paste0(dir_path,"/","model_data",".tf")
+          if(dir.exists(paths = path)==TRUE){
+            self$model<-keras$models$load_model(path)
+          } else {
+            self$model<-keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
+          }
         }
-      }
+      } else if(private$ml_framework=="pytorch"){
+        path=paste0(dir_path,"/","model_data",".pt")
+        self$model=private$create_model_pytorch(
+          features=self$model_config$features ,
+          times=self$model_config$times,
+          hidden=self$model_config$hidden,
+          rec=self$model_config$rec,
+          intermediate_size=self$model_config$intermediate_size,
+          attention_type=self$model_config$attention_type,
+          repeat_encoder=self$model_config$repeat_encoder,
+          dense_dropout=self$model_config$dense_dropout,
+          rec_dropout=self$model_config$rec_dropout,
+          encoder_dropout=self$model_config$encoder_dropout,
+          add_pos_embedding=self$model_config$add_pos_embedding,
+          self_attention_heads=self$model_config$self_attention_heads,
+          target_levels=self$model_config$target_levels)
+        self$model$load_state_dict(torch$load(path))
+        }
+
 
     },
     #---------------------------------------------------------------------------
@@ -2138,6 +2121,212 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #Training Process----------------------------------------------------------
     init_weights=NULL,
     #--------------------------------------------------------------------------
+    create_model_pytorch=function(features,
+                                times,
+                                hidden,
+                                rec,
+                                intermediate_size,
+                                attention_type,
+                                repeat_encoder,
+                                dense_dropout,
+                                rec_dropout,
+                                recurrent_dropout,
+                                encoder_dropout,
+                                add_pos_embedding,
+                                self_attention_heads,
+                                target_levels){
+      #Load Custom Pytorch Objects and Functions
+      reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+                                          package = "aifeducation"))
+      return(py$TextEmbeddingClassifier_PT(features=as.integer(features),
+                                    times=as.integer(times),
+                                    hidden=if(!is.null(hidden)){as.integer(hidden)}else{NULL},
+                                    rec=if(!is.null(rec)){as.integer(rec)}else{NULL},
+                                    intermediate_size=as.integer(intermediate_size),
+                                    attention_type=attention_type,
+                                    repeat_encoder=as.integer(repeat_encoder),
+                                    dense_dropout=dense_dropout,
+                                    rec_dropout=rec_dropout,
+                                    encoder_dropout=encoder_dropout,
+                                    add_pos_embedding=add_pos_embedding,
+                                    self_attention_heads=as.integer(self_attention_heads),
+                                    target_levels=target_levels))
+
+    },
+    #--------------------------------------------------------------------------
+    create_model_keras=function(features,
+                                times,
+                                hidden,
+                                rec,
+                                embed_dim,
+                                intermediate_size,
+                                attention_type,
+                                repeat_encoder,
+                                dense_dropout,
+                                rec_dropout,
+                                recurrent_dropout,
+                                encoder_dropout,
+                                add_pos_embedding,
+                                self_attention_heads,
+                                target_levels,
+                                act_fct_last,
+                                name){
+      #Load Custom Layers
+      reticulate::py_run_file(system.file("python/keras_te_classifier.py",
+                                          package = "aifeducation"))
+      #Defining basic keras model
+      layer_list=NULL
+
+      if(is.null(rec)==TRUE){
+        n_req=0
+      } else {
+        n_req=length(rec)
+      }
+
+      if(is.null(hidden)==TRUE){
+        n_hidden=0
+      } else {
+        n_hidden=length(hidden)
+      }
+
+      #Adding Input Layer
+
+      if(n_req>0 | self_attention_heads>0 | attention_type=="fourier"){
+        model_input<-keras$layers$Input(shape=list(as.integer(times),as.integer(features)),
+                                        name="input_embeddings")
+      } else {
+        model_input<-keras$layers$Input(shape=as.integer(times*features),
+                                        name="input_embeddings")
+      }
+      layer_list[1]<-list(model_input)
+
+      #Adding a Mask-Layer
+      if(n_req>0 | (self_attention_heads>0 & attention_type=="multihead") | attention_type=="fourier"){
+        masking_layer<-keras$layers$Masking(
+          mask_value = 0.0,
+          name="masking_layer",
+          input_shape=c(times,features),
+          trainable=FALSE)(layer_list[[length(layer_list)]])
+        layer_list[length(layer_list)+1]<-list(masking_layer)
+
+        if(add_pos_embedding==TRUE){
+          positional_embedding<-py$AddPositionalEmbedding(sequence_length = as.integer(times),
+                                                          name="add_positional_embedding")(layer_list[[length(layer_list)]])
+          layer_list[length(layer_list)+1]<-list(positional_embedding)
+        }
+
+        norm_layer<-keras$layers$LayerNormalization(
+          name = "normalizaion_layer")(layer_list[[length(layer_list)]])
+        layer_list[length(layer_list)+1]<-list(norm_layer)
+
+     } else {
+        norm_layer<-keras$layers$BatchNormalization(
+          name = "normalizaion_layer")(layer_list[[length(layer_list)]])
+        layer_list[length(layer_list)+1]<-list(norm_layer)
+
+      }
+
+      #if(n_req>0){
+      #  i=i
+      #} else {
+      #  i=0
+      #}
+
+      if((self_attention_heads>0 & attention_type=="multihead") | attention_type=="fourier"){
+        for(r in 1:repeat_encoder){
+          if(attention_type=="multihead"){
+            layer_list[length(layer_list)+1]<-list(
+              py$TransformerEncoder(embed_dim = as.integer(features),
+                                    dense_dim= as.integer(intermediate_size),
+                                    num_heads =as.integer(self_attention_heads),
+                                    dropout_rate=encoder_dropout,
+                                    name=paste0("encoder_",r))(layer_list[[length(layer_list)]])
+            )
+          } else if(attention_type=="fourier"){
+            layer_list[length(layer_list)+1]<-list(
+              py$FourierEncoder(dense_dim=as.integer(intermediate_size),
+                                dropout_rate=encoder_dropout,
+                                name=paste0("encoder_",r))(layer_list[[length(layer_list)]])
+            )
+          }
+        }
+      }
+
+      #Adding rec layer
+      if(n_req>0){
+        for(i in 1:n_req){
+          layer_list[length(layer_list)+1]<-list(
+            keras$layers$Bidirectional(
+              layer=keras$layers$GRU(
+                units=as.integer(rec[i]),
+                input_shape=list(times,features),
+                return_sequences = TRUE,
+                dropout = 0,
+                recurrent_dropout = recurrent_dropout,
+                activation = "tanh",
+                name=paste0("gru_",i)),
+              name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+          if (i!=n_req){
+            layer_list[length(layer_list)+1]<-list(
+              keras$layers$Dropout(
+                rate = rec_dropout,
+                name=paste0("gru_dropout",i))(layer_list[[length(layer_list)]]))
+          }
+        }
+      }
+
+        if((self_attention_heads>0) | attention_type=="fourier" | n_req>0){
+          layer_list[length(layer_list)+1]<-list(
+            keras$layers$GlobalAveragePooling1D(
+              name="global_average_pooling")(layer_list[[length(layer_list)]]))
+        }
+
+
+      #Adding standard layer
+      if(n_hidden>0){
+        for(i in 1:n_hidden){
+          layer_list[length(layer_list)+1]<-list(
+            keras$layers$Dense(
+              units = as.integer(hidden[i]),
+              activation = "gelu",
+              name=paste0("dense_",i))(layer_list[[length(layer_list)]]))
+
+          if(i!=n_hidden){
+            #Add Dropout_Layer
+            layer_list[length(layer_list)+1]<-list(
+              keras$layers$Dropout(
+                rate = dense_dropout,
+                name=paste0("dense_dropout",i))(layer_list[[length(layer_list)]]))
+          }
+        }
+      }
+
+      #Adding final Layer
+      if(length(target_levels)>2){
+        #Multi Class
+        layer_list[length(layer_list)+1]<-list(
+          keras$layers$Dense(
+            units = as.integer(length(target_levels)),
+            activation = act_fct_last,
+            name="output_categories")(layer_list[[length(layer_list)]]))
+      } else {
+        #Binary Class
+        layer_list[length(layer_list)+1]<-list(
+          keras$layers$Dense(
+            units = as.integer(1),
+            activation = act_fct_last,
+            name="output_categories")(layer_list[[length(layer_list)]]))
+      }
+
+      #Creating Model
+      model<-keras$Model(
+        inputs = model_input,
+        outputs = layer_list[length(layer_list)],
+        name = name)
+
+      self$model=model
+
+    },
     basic_train=function(embedding_train,
                          target_train,
                          embedding_test,
@@ -2147,8 +2336,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                          use_callback=TRUE,
                          epochs=100,
                          batch_size=32,
+                         balance_class_weights=FALSE,
                          trace=TRUE,
                          keras_trace=2,
+                         pytorch_trace=2,
                          dir_checkpoint){
 
       if("EmbeddedText" %in% class(embedding_train)){
@@ -2163,7 +2354,13 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       #Clear session to provide enough resources for computations
-      keras$backend$clear_session()
+      if(private$ml_framework=="tensorflow"){
+        keras$backend$clear_session()
+      } else if(private$ml_framework=="pytorch"){
+        if(torch$cuda$is_available()){
+          torch$cuda$empty_cache()
+        }
+      }
 
       model<-self$model
 
@@ -2177,20 +2374,34 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       target_test<-factor(as.character(target_test),
                           levels = target_levels_order)
 
+      n_classes=length(levels(target_train))
+
       data_embedding_train<-data_embedding_train[,,variable_name_order]
       data_embedding_test<-data_embedding_test[,,variable_name_order]
-
-      #variable_name_order<-colnames(data_embedding_train)
-      #target_levels_order<-levels(target_train)
 
       #Transforming train_target for the use in keras.
       #That is switching characters to numeric
       target_train_transformed<-as.numeric(target_train)-1
       target_test_transformed<-as.numeric(target_test)-1
 
+      #Generating class weights
+      if(balance_class_weights==TRUE){
+        abs_freq_classes=table(target_train_transformed)
+        class_weights=as.vector(sum(abs_freq_classes)/(length(abs_freq_classes)*abs_freq_classes))
+      } else {
+        class_weights=rep(x=1,times=length(levels(target_train)))
+      }
+
       #Convert Input data if the network cannot process sequential data
-      if(self$model_config$n_req==0 &
-         self$model_config$n_self_attention_heads==0){
+      if(is.null(self$model_config$rec)==TRUE){
+        n_req=0
+      } else {
+        n_req=length(self$model_config$rec)
+      }
+
+      if(n_req==0 &
+        self$model_config$self_attention_heads==0 &
+        self$model_config$attention_type=="multihead"){
         input_embeddings_train= array_to_matrix(data_embedding_train)
         input_embeddings_test=array_to_matrix(data_embedding_test)
       } else {
@@ -2200,12 +2411,17 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       n_categories=as.integer(length(levels(target_train)))
 
+
       if(length(target_levels_order)>2){
         #Multi Class
-        output_categories_train=keras$utils$to_categorical(y=target_train_transformed,
-                                                              num_classes=n_categories)
-        output_categories_test=keras$utils$to_categorical(y=target_test_transformed,
-                                                            num_classes=n_categories)
+        #output_categories_train=keras$utils$to_categorical(y=target_train_transformed,
+        #                                                      num_classes=n_categories)
+        #output_categories_test=keras$utils$to_categorical(y=target_test_transformed,
+        #                                                    num_classes=n_categories)
+        output_categories_train=to_categorical_c(class_vector=target_train_transformed,
+                                                 n_classes=n_categories)
+        output_categories_test=to_categorical_c(class_vector=target_test_transformed,
+                                                n_classes=n_categories)
       } else {
         #Binary Classification
         output_categories_train=target_train_transformed
@@ -2213,69 +2429,137 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       }
 
       if(reset_model==TRUE){
-        model$set_weights(private$init_weights)
-        #cat("Model reseted")
+        if(private$ml_framework=="tensorflow"){
+          #According to the documentation the cloned model uses randomly
+          #assigned weights
+          model=tf$keras$models$clone_model(model)
+          #model$set_weights(private$init_weights)
+          #cat("Model reseted")
+        } else if(private$ml_framework=="pytorch"){
+          model=private$create_model_pytorch(
+            features=self$model_config$features ,
+            times=self$model_config$times,
+            hidden=self$model_config$hidden,
+            rec=self$model_config$rec,
+            intermediate_size=self$model_config$intermediate_size,
+            attention_type=self$model_config$attention_type,
+            repeat_encoder=self$model_config$repeat_encoder,
+            dense_dropout=self$model_config$dense_dropout,
+            rec_dropout=self$model_config$rec_dropout,
+            encoder_dropout=self$model_config$encoder_dropout,
+            add_pos_embedding=self$model_config$add_pos_embedding,
+            self_attention_heads=self$model_config$self_attention_heads,
+            target_levels=self$model_config$target_levels)
+        }
       }
 
-        if(self$model_config$init_config$optimizer=="adam"){
+      if(private$ml_framework=="tensorflow"){
+        if(self$model_config$optimizer=="adam"){
           model$compile(
-            loss = self$model_config$init_config$err_fct,
+            loss = self$model_config$err_fct,
             optimizer=keras$optimizers$Adam(),
-            metrics=self$model_config$init_config$metric)
-        } else if (self$model_config$init_config$optimizer=="rmsprop"){
+            metrics=self$model_config$metric)
+        } else if (self$model_config$optimizer=="rmsprop"){
           model$compile(
-            loss = self$model_config$init_config$err_fct,
+            loss = self$model_config$err_fct,
             optimizer=keras$optimizers$RMSprop(),
-            metrics=self$model_config$init_config$metric)
+            metrics=self$model_config$metric)
         }
+      } else if(private$ml_framework=="pytorch"){
+        loss=torch$nn$CrossEntropyLoss(
+          reduction="none",
+          weight = torch$tensor(np$array(class_weights)))
+        if(self$model_config$optimizer=="adam"){
+          optimizer=torch$optim$Adam(model$parameters())
+        } else if (self$model_config$optimizer=="rmsprop"){
+          optimizer=torch$optim$RMSprop(model$parameters())
+        }
+      }
 
       if(dir.exists(paste0(dir_checkpoint,"/checkpoints"))==FALSE){
-        cat(paste(date(),"Creating Checkpoint Directory"))
+        if(trace==TRUE){
+          cat(paste(date(),"Creating Checkpoint Directory"))
+        }
         dir.create(paste0(dir_checkpoint,"/checkpoints"))
       }
 
-      if(use_callback==TRUE){
-        callback=keras$callbacks$ModelCheckpoint(
-          filepath = paste0(dir_checkpoint,"/checkpoints/best_weights.h5"),
-          monitor = paste0("val_",self$model_config$init_config$metric),
-          verbose = as.integer(min(keras_trace,1)),
-          mode = "auto",
-          save_best_only = TRUE,
-          save_weights_only = TRUE)
-      } else {
-        callback=reticulate::py_none()
-      }
+      if(private$ml_framework=="tensorflow"){
+        if(use_callback==TRUE){
+          callback=keras$callbacks$ModelCheckpoint(
+            filepath = paste0(dir_checkpoint,"/checkpoints/best_weights.h5"),
+            monitor = paste0("val_",self$model_config$metric),
+            verbose = as.integer(min(keras_trace,1)),
+            mode = "auto",
+            save_best_only = TRUE,
+            save_weights_only = TRUE)
+        } else {
+          callback=reticulate::py_none()
+        }
 
-      if(!is.null(sample_weights)){
-        sample_weights=np$array(sample_weights)
-      } else {
-        sample_weights=reticulate::py_none()
-      }
+        if(!is.null(sample_weights)){
+          sample_weights=np$array(sample_weights)
+        } else {
+          sample_weights=reticulate::py_none()
+        }
 
-        train_results<-model$fit(
+        history<-model$fit(
           verbose=as.integer(keras_trace),
           x=np$array(input_embeddings_train),
           y=np$array(output_categories_train),
-          #validation_data=list(x_val=input_embeddings_test,
-          #                     y_val=output_categories_test),
           validation_data=reticulate::tuple(list(x_val=np$array(input_embeddings_test),
-                               y_val=np$array(output_categories_test))),
+                                                 y_val=np$array(output_categories_test))),
           epochs = as.integer(epochs),
           batch_size = as.integer(batch_size),
           callbacks = callback,
-          #view_metrics=view_metrics,
-          sample_weight=sample_weights)
+          sample_weight=sample_weights,
+          class_weight=reticulate::py_dict(keys = names(class_weights),values = class_weights))
 
 
-      if(use_callback==TRUE){
-        #cat(paste(date(),"Load Weights From Best Checkpoint"))
-        model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.h5"))
+        if(use_callback==TRUE){
+          #cat(paste(date(),"Load Weights From Best Checkpoint"))
+          #model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.h5"))
+          model$load_weights(paste0(dir_checkpoint,"/checkpoints/best_weights.h5"))
+        }
+
+        self$model=model
+        self$model_config$input_variables<-variable_name_order
+        self$model_config$target_levels<-target_levels_order
+        self$last_training$history<-train_results
+
+      } else if(private$ml_framework=="pytorch"){
+        if(!is.null(sample_weights)){
+          sample_weights=np$array(sample_weights)
+        } else {
+          sample_weights=np$array(rep.int(x=1,times = length(output_categories_train)))
+        }
+
+        pytorch_train_data=torch$utils$data$TensorDataset(
+          torch$tensor(np$array(input_embeddings_train)),
+          torch$tensor(np$array(as.matrix(output_categories_train))),
+          torch$tensor(sample_weights))
+
+        pytorch_val_data=torch$utils$data$TensorDataset(
+          torch$tensor(np$array(input_embeddings_test)),
+          torch$tensor(np$array(as.matrix(output_categories_test))))
+
+        history=py$TeClassifierTrain_PT(
+          model=model,
+          loss_fct=loss,
+          optimizer=optimizer,
+          epochs=as.integer(epochs),
+          trace=as.integer(pytorch_trace),
+          use_callback=use_callback,
+          batch_size=as.integer(batch_size),
+          train_data=pytorch_train_data,
+          val_data=pytorch_val_data,
+          filepath=paste0(dir_checkpoint,"/checkpoints/best_weights.pt"),
+          n_classes=n_classes)
+
+        self$model=model
+        self$model_config$input_variables<-variable_name_order
+        self$model_config$target_levels<-target_levels_order
       }
-
-      self$model=model
-      self$model_config$input_variables<-variable_name_order
-      self$model_config$target_levels<-target_levels_order
-      self$last_training$history<-train_results
+      return(history)
     },
     #--------------------------------------------------------------------------
     #Method for summarizing sustainability data for this classifier
