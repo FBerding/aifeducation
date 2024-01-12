@@ -56,10 +56,11 @@
 #'@references Hugging Face documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM}
 #'
+#'@importFrom reticulate py_module_available
 #'@family Transformer
 #'@export
 create_bert_model<-function(
-    ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+    ml_framework=aifeducation_config$get_framework(),
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=30522,
@@ -77,6 +78,12 @@ create_bert_model<-function(
     sustain_region=NULL,
     sustain_interval=15,
     trace=TRUE){
+
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0,
+                                   total = pgr_max,
+                                   title = "BERT Model")
 
   #argument checking-----------------------------------------------------------
   if(max_position_embeddings>512){
@@ -101,11 +108,22 @@ create_bert_model<-function(
              the library to set the global framework. ")
   }
 
-  #Start Sustainability Tracking
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
     }
     sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
       country_iso_code=sustain_iso_code,
@@ -117,9 +135,23 @@ create_bert_model<-function(
       save_to_api=FALSE
     )
     sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
   }
 
-  #Creating a new Tokenizer for Computing Vocabulary
+  update_aifeducation_progress_bar(value = 2,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Creating a new Tokenizer for Computing Vocabulary---------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Tokenizer Draft"))
+  }
+
   special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]")
   tok_new<-tok$Tokenizer(tok$models$WordPiece())
   tok_new$normalizer=tok$normalizers$BertNormalizer(
@@ -140,28 +172,47 @@ create_bert_model<-function(
     special_tokens = special_tokens,
     show_progress=trace)
 
-  #Calculating Vocabulary
+  update_aifeducation_progress_bar(value = 3,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Calculating Vocabulary------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary"))
   }
   tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary - Done","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary - Done"))
+  }
+
+  update_aifeducation_progress_bar(value = 4,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Saving Tokenizer Draft------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Saving Draft"))
   }
 
   if(dir.exists(model_dir)==FALSE){
-    cat(paste(date(),"Creating Directory","\n"))
+    message(paste(date(),"Creating Directory"))
     dir.create(model_dir)
   }
 
   write(c(special_tokens,names(tok_new$get_vocab())),
         file=paste0(model_dir,"/","vocab.txt"))
 
+  update_aifeducation_progress_bar(value = 5,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Final Tokenizer-------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer","\n"))
+    message(paste(date(),
+              "Creating Tokenizer"))
   }
 
   tokenizer=transformers$PreTrainedTokenizerFast(
@@ -175,8 +226,18 @@ create_bert_model<-function(
     eos_token = "[SEP]")
 
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer - Done","\n"))
+    message(paste(date(),
+              "Creating Tokenizer - Done"))
+  }
+
+  update_aifeducation_progress_bar(value = 6,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Creating Transformer Model--------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Transformer Model"))
   }
 
   configuration=transformers$BertConfig(
@@ -204,27 +265,48 @@ create_bert_model<-function(
     bert_model=transformers$BertModel(configuration)
   }
 
-  if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Bert Model","\n"))
-  }
-  bert_model$save_pretrained(save_directory=model_dir)
+  update_aifeducation_progress_bar(value = 7,
+                                   total = pgr_max,
+                                   title = "BERT Model")
 
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Tokenizer Model","\n"))
+    message(paste(date(),
+              "Saving Bert Model"))
+  }
+  if(ml_framework=="tensorflow"){
+    bert_model$save_pretrained(save_directory=model_dir)
+  } else {
+    bert_model$save_pretrained(save_directory=model_dir,
+                               safe_serilization=reticulate::py_module_available("safetensors"))
+  }
+
+
+
+  update_aifeducation_progress_bar(value = 8,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Saving Tokenizer------------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Saving Tokenizer Model"))
   }
   tokenizer$save_pretrained(model_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Stop Sustainability Tracking if requested------------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     write.csv(
@@ -233,9 +315,15 @@ create_bert_model<-function(
       row.names = FALSE)
   }
 
+  update_aifeducation_progress_bar(value = 10,
+                                   total = pgr_max,
+                                   title = "BERT Model")
+
+  #Finish----------------------------------------------------------------------
+
   if(trace==TRUE){
-    cat(paste(date(),
-              "Done","\n"))
+    message(paste(date(),
+              "Done"))
   }
 
 }
@@ -316,9 +404,10 @@ create_bert_model<-function(
 #'
 #'@importFrom utils write.csv
 #'@importFrom utils read.csv
+#'@importFrom reticulate py_module_available
 #'
 #'@export
-train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
                                output_dir,
                                model_dir_path,
                                raw_texts,
@@ -338,8 +427,14 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
                                sustain_region=NULL,
                                sustain_interval=15,
                                trace=TRUE,
-                               keras_trace=1){
+                               keras_trace=1,
+                               pytorch_trace=1){
 
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0, total = pgr_max, title = "BERT Model")
+
+  #argument checking-----------------------------------------------------------
   if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
@@ -349,25 +444,6 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
              aifeducation_config$set_global_ml_backend() directly after loading
              the library to set the global framework. ")
   }
-
-  #Start Sustainability Tracking
-  if(sustain_track==TRUE){
-    if(is.null(sustain_iso_code)==TRUE){
-      stop("Sustainability tracking is activated but iso code for the
-               country is missing. Add iso code or deactivate tracking.")
-    }
-    sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
-      country_iso_code=sustain_iso_code,
-      region=sustain_region,
-      tracking_mode="machine",
-      log_level="warning",
-      measure_power_secs=sustain_interval,
-      save_to_file=FALSE,
-      save_to_api=FALSE
-    )
-    sustainability_tracker$start()
-  }
-
 
   if(ml_framework=="tensorflow"){
     if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
@@ -387,6 +463,46 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     }
   }
 
+  if(sustain_track==TRUE){
+    if(is.null(sustain_iso_code)==TRUE){
+      stop("Sustainability tracking is activated but iso code for the
+               country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1, total = pgr_max, title = "BERT Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
+    }
+    sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
+      country_iso_code=sustain_iso_code,
+      region=sustain_region,
+      tracking_mode="machine",
+      log_level="warning",
+      measure_power_secs=sustain_interval,
+      save_to_file=FALSE,
+      save_to_api=FALSE
+    )
+    sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 2, total = pgr_max, title = "BERT Model")
+
+  #Loading existing model------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Loading Existing Model"))
+  }
+
   if(ml_framework=="tensorflow"){
     mlm_model=transformers$TFBertForMaskedLM$from_pretrained(model_dir_path,from_pt=from_pt)
   } else {
@@ -395,12 +511,25 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
 
   tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_path)
 
-  if(trace==TRUE){
-    cat(paste(date(),"Tokenize Raw Texts","\n"))
+  update_aifeducation_progress_bar(value = 3, total = pgr_max, title = "BERT Model")
+
+  #argument checking------------------------------------------------------------
+  if(chunk_size>(mlm_model$config$max_position_embeddings)){
+    stop(paste("Chunk size is",chunk_size,". This value is not allowed to exceed",
+               mlm_model$config$max_position_embeddings))
+  }
+  if(chunk_size<3){
+    stop("Chunk size must be at least 3.")
   }
 
+  #adjust chunk size. To elements are needed for begin and end of sequence
+  chunk_size=chunk_size-2
+
+  update_aifeducation_progress_bar(value = 4, total = pgr_max, title = "BERT Model")
+
+  #creating chunks of sequences------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Creating Sequence Chunks For Training","\n"))
+    message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
   if(full_sequences_only==FALSE){
@@ -450,19 +579,23 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
   n_chunks=tokenized_dataset$num_rows
 
   if(trace==TRUE){
-    cat(paste(date(),n_chunks,"Chunks Created","\n"))
+    message(paste(date(),n_chunks,"Chunks Created"))
   }
+
+  update_aifeducation_progress_bar(value = 5, total = pgr_max, title = "BERT Model")
+
+  #Seeting up DataCollator and Dataset------------------------------------------
 
   if(dir.exists(paste0(output_dir))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Output Directory","\n"))
+      message(paste(date(),"Creating Output Directory"))
     }
     dir.create(paste0(output_dir))
   }
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Checkpoint Directory","\n"))
+      message(paste(date(),"Creating Checkpoint Directory"))
     }
     dir.create(paste0(output_dir,"/checkpoints"))
   }
@@ -471,13 +604,13 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
 
     if(whole_word==TRUE){
       if(trace==TRUE){
-        cat(paste(date(),"Using Whole Word Masking","\n"))
+        message(paste(date(),"Using Whole Word Masking"))
       }
       word_ids=matrix(nrow = n_chunks,
                       ncol= chunk_size)
 
       if(trace==TRUE){
-        cat(paste(date(),"Adding Word Ids","\n"))
+        message(paste(date(),"Adding Word Ids"))
       }
 
       for(i in 0:(n_chunks-1)){
@@ -495,7 +628,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
         return_tensors = "tf")
     } else {
       if(trace==TRUE){
-        cat(paste(date(),"Using Token Masking","\n"))
+        message(paste(date(),"Using Token Masking"))
       }
       data_collator=transformers$DataCollatorForLanguageModeling(
         tokenizer = tokenizer,
@@ -524,7 +657,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     )
 
     if(trace==TRUE){
-      cat(paste(date(),"Preparing Training of the Model","\n"))
+      message(paste(date(),"Preparing Training of the Model"))
     }
     adam<-tf$keras$optimizers$Adam
 
@@ -539,8 +672,18 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
       save_weights_only= TRUE
     )
 
+    #Add Callback if Shiny App is running
+    if(require("shiny") & require("shinyWidgets")){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/keras_callbacks.py",
+                                            package = "aifeducation"))
+        callback_checkpoint=list(callback_checkpoint,py$ReportAiforeducationShiny())
+      }
+    }
+
     if(trace==TRUE){
-      cat(paste(date(),"Compile Model","\n"))
+      message(paste(date(),"Compile Model"))
     }
     mlm_model$compile(optimizer=adam(learning_rate),
                       loss="auto")
@@ -548,8 +691,11 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     #Clear session to provide enough resources for computations
     tf$keras$backend$clear_session()
 
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "BERT Model")
+
+    #Start Training------------------------------------------------------------
     if(trace==TRUE){
-      cat(paste(date(),"Start Fine Tuning","\n"))
+      message(paste(date(),"Start Fine Tuning"))
     }
     mlm_model$fit(x=tf_train_dataset,
                   validation_data=tf_test_dataset,
@@ -560,20 +706,20 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
                   verbose=as.integer(keras_trace))
 
     if(trace==TRUE){
-      cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
+      message(paste(date(),"Load Weights From Best Checkpoint"))
     }
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
 
     if(whole_word==TRUE){
       if(trace==TRUE){
-        cat(paste(date(),"Using Whole Word Masking","\n"))
+        message(paste(date(),"Using Whole Word Masking"))
       }
       word_ids=matrix(nrow = n_chunks,
                       ncol= chunk_size)
 
       if(trace==TRUE){
-        cat(paste(date(),"Adding Word Ids","\n"))
+        message(paste(date(),"Adding Word Ids"))
       }
 
       for(i in 0:(n_chunks-1)){
@@ -591,7 +737,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
         return_tensors = "pt")
     } else {
       if(trace==TRUE){
-        cat(paste(date(),"Using Token Masking","\n"))
+        message(paste(date(),"Using Token Masking"))
       }
       data_collator=transformers$DataCollatorForLanguageModeling(
         tokenizer = tokenizer,
@@ -623,7 +769,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
       auto_find_batch_size=FALSE,
       report_to="none",
       log_level="error",
-      disable_tqdm=!trace
+      disable_tqdm=!pytorch_trace
     )
 
     trainer=transformers$Trainer(
@@ -636,28 +782,57 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     )
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
 
+    #Add Callback if Shiny App is running
+    if(require("shiny") & require("shinyWidgets")){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/pytorch_transformer_callbacks.py",
+                                            package = "aifeducation"))
+        trainer$add_callback(py$ReportAiforeducationShiny_PT())
+      }
+    }
+
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "BERT Model")
+
+    #Start Training------------------------------------------------------------
+    if(trace==TRUE){
+      message(paste(date(),"Start Fine Tuning"))
+    }
     trainer$train()
   }
 
-  if(trace==TRUE){
-    cat(paste(date(),"Saving Bert Model","\n"))
-  }
-  mlm_model$save_pretrained(save_directory=output_dir)
+  update_aifeducation_progress_bar(value = 7, total = pgr_max, title = "BERT Model")
 
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Saving Tokenizer","\n"))
+    message(paste(date(),"Saving Bert Model"))
+  }
+  if(ml_framework=="tensorflow"){
+    mlm_model$save_pretrained(save_directory=output_dir)
+  } else {
+    mlm_model$save_pretrained(save_directory=output_dir,
+                               safe_serilization=reticulate::py_module_available("safetensors"))
+  }
+
+  update_aifeducation_progress_bar(value = 8, total = pgr_max, title = "BERT Model")
+
+  #Saving Tokenizer-------------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),"Saving Tokenizer"))
   }
   tokenizer$save_pretrained(output_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9, total = pgr_max, title = "BERT Model")
+
+  #Stop Sustainability Tracking if requested------------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     sustainability_data_file_path_input=paste0(model_dir_path,"/sustainability.csv")
@@ -683,8 +858,11 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework()$
     }
   }
 
+  update_aifeducation_progress_bar(value = 10, total = pgr_max, title = "BERT Model")
+
+  #Finish----------------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Done","\n"))
+    message(paste(date(),"Done"))
   }
 }
 

@@ -5,7 +5,7 @@
 \title{Function for creating a new transformer based on Longformer}
 \usage{
 create_longformer_model(
-  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
+  ml_framework = aifeducation_config$get_framework,
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 30522,

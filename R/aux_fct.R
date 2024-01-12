@@ -172,11 +172,12 @@ return(TRUE)
 #'\item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
 #'\item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
 #'\item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
-#'\item{\strong{kappa2_unweighted: }}{Cohen's Kappa with equal weights.}
+#'\item{\strong{kappa2_unweighted: }}{Cohen's Kappa unweighted.}
 #'\item{\strong{kappa2_equal_weighted: }}{Weighted Cohen's Kappa with equal weights.}
 #'\item{\strong{kappa2_squared_weighted: }}{Weighted Cohen's Kappa with squared weights.}
 #'\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters without exact estimation.}
 #'\item{\strong{percentage_agreement: }}{Percentage Agreement.}
+#'\item{\strong{balanced_accuracy: }}{Average accuracy within each class.}
 #'\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
 #'}
 #'
@@ -206,6 +207,7 @@ get_coder_metrics<-function(true_values=NULL,
                  "kappa2_squared_weighted",
                  "kappa_fleiss",
                  "percentage_agreement",
+                 "balanced_accuracy",
                  "gwet_ac")
   metric_values=vector(length = length(metric_names))
   names(metric_values)=metric_names
@@ -213,9 +215,6 @@ get_coder_metrics<-function(true_values=NULL,
   if(return_names_only==TRUE){
     return(metric_names)
   } else {
-    val_res=iotarelr::check_new_rater(true_values = true_values,
-                                      assigned_values = predicted_values,
-                                      free_aem = TRUE)
 
     val_res=iotarelr::check_new_rater(true_values = true_values,
                                       assigned_values = predicted_values,
@@ -261,6 +260,9 @@ get_coder_metrics<-function(true_values=NULL,
 
     metric_values["percentage_agreement"]=irr::agree(ratings=cbind(true_values,predicted_values),
                                                  tolerance = 0)$value/100
+
+    metric_values["balanced_accuracy"]=sum(diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix))/
+      ncol(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
 
     metric_values["gwet_ac"]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
 

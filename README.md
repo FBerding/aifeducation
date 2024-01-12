@@ -89,13 +89,9 @@ computer is located.
 
 This package allows all supported models based either on ‘PyTorch’ or
 ‘tensorflow’, providing a high level of flexibility. Even pre-trained
-models can be used with both frameworks. In general, users only have to
-decide which framework they would like to use when starting a new
-session.
-
-At the moment, using ‘PyTorch’ for classifier objects requires
-‘keras-core’ or ‘keras3’. If your system does not support these python
-packages you can still use classifiers with ‘tensorflow’.
+models can be used with both frameworks in some cases. In general, users
+only have to decide which framework they would like to use when starting
+a new session.
 
 ## Classification Tasks
 
@@ -203,9 +199,10 @@ evaluated with the following measures and concepts:
 - Percentage Agreement
 - Gwet’s AC1/AC2 (Gwet 2014)
 - Kendall’s coefficient of concordance W
+- Cohen’s Kappa unweighted
 - Cohen’s Kappa with equal weights
-- Fleiss’ Kappa for multiple raters with exact estimation
-- Light’s Kappa for multiple raters
+- Cohen’s Kappa with squared weights
+- Fleiss’ Kappa for multiple raters without exact estimation
 
 ## Sharing Trained AI
 

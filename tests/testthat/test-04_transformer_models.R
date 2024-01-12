@@ -530,17 +530,67 @@ for(ai_method in ai_methods){
 
       test_that(paste0(ai_method,"encoding",framework), {
         encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
-                                        token_encodings_only = TRUE)
+                                        token_encodings_only = TRUE,
+                                        to_int=TRUE)
+        expect_length(encodings,10)
+        expect_type(encodings,type="list")
+
+        encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
+                                        token_encodings_only = TRUE,
+                                        to_int=FALSE)
         expect_length(encodings,10)
         expect_type(encodings,type="list")
       })
 
       test_that(paste0(ai_method,"decoding_bert",framework), {
         encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
-                                        token_encodings_only = TRUE)
-        decodings<-bert_modeling$decode(encodings)
+                                        token_encodings_only = TRUE,
+                                        to_int=TRUE)
+        decodings<-bert_modeling$decode(encodings,
+                                        to_token = FALSE)
         expect_length(decodings,10)
         expect_type(decodings,type="list")
+
+        decodings<-bert_modeling$decode(encodings,
+                                        to_token = TRUE)
+        expect_length(decodings,10)
+        expect_type(decodings,type="list")
+      })
+
+      test_that(paste0(ai_method,"get_special_tokens",framework), {
+        tokens<-bert_modeling$get_special_tokens()
+        expect_equal(nrow(tokens),7)
+        expect_equal(ncol(tokens),3)
+      })
+
+      test_that(paste0(ai_method,"fill_mask",framework), {
+        tokens<-bert_modeling$get_special_tokens()
+        mask_token<-tokens[which(tokens[,1]=="mask_token"),2]
+
+        first_solution<-bert_modeling$fill_mask(text=paste("This is a",mask_token,"."),
+                                n_solutions = 5)
+        expect_equal(length(first_solution),1)
+        expect_true(is.data.frame(first_solution[[1]]))
+        expect_equal(nrow(first_solution[[1]]),5)
+        expect_equal(ncol(first_solution[[1]]),3)
+
+        second_solution<-bert_modeling$fill_mask(text=paste("This is a",mask_token,"."),
+                                                n_solutions = 1)
+        expect_equal(length(second_solution),1)
+        expect_true(is.data.frame(second_solution[[1]]))
+        expect_equal(nrow(second_solution[[1]]),1)
+        expect_equal(ncol(second_solution[[1]]),3)
+
+        third_solution<-bert_modeling$fill_mask(text=paste("This is a",mask_token,".",
+                                                           "The weather is",mask_token,"."),
+                                                 n_solutions = 5)
+        expect_equal(length(third_solution),2)
+        for(i in 1:2){
+
+          expect_true(is.data.frame(third_solution[[i]]))
+          expect_equal(nrow(third_solution[[i]]),5)
+          expect_equal(ncol(third_solution[[i]]),3)
+        }
       })
 
       test_that(paste0(ai_method,"descriptions",framework), {

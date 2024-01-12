@@ -15,7 +15,7 @@
 #'@importFrom utils compareVersion
 #'
 #'@export
-load_ai_model<-function(model_dir,ml_framework="auto"){
+load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework()){
 
   if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
@@ -78,9 +78,19 @@ load_ai_model<-function(model_dir,ml_framework="auto"){
 #'@param model Object of class \link{TextEmbeddingClassifierNeuralNet} or
 #'\link{TextEmbeddingModel} which should be saved.
 #'@param model_dir Path to the directory where the should model is stored.
-#'@param save_format Format for saving the model. \code{"tf"} for SavedModel
-#'or \code{"h5"} for HDF5. Only relevant if the model is of class \link{TextEmbeddingClassifierNeuralNet}.
-#'It is recommended to use \code{"tf"}.
+#'@param dir_name Name of the folder that will be created at \code{model_dir}.
+#'If\code{dir_name=NULL} the model's name will be used. If additionally \code{append_ID=TRUE}
+#'the models's name and ID will be used for generating a name for that directory.
+#'@param save_format Only relevant for \link{TextEmbeddingClassifierNeuralNet}.
+#'Format for saving the model. For 'tensorflow'/'keras' models
+#'\code{"keras"} for 'Keras v3 format',
+#'\code{"tf"} for SavedModel
+#'or \code{"h5"} for HDF5.
+#'For 'pytorch' models \code{"safetensors"} for 'safetensors' or
+#'\code{"pt"} for 'pytorch via pickle'.
+#'Use \code{"default"} for the standard format. This is keras for
+#''tensorflow'/'keras' models and safetensors for 'pytorch' models.
+#'@return Function does not return a value. It saves the model to disk.
 #'@param append_ID \code{bool} \code{TRUE} if the ID should be appended to
 #'the model directory for saving purposes. \code{FALSE} if not.
 #'@return No return value, called for side effects.
@@ -88,27 +98,37 @@ load_ai_model<-function(model_dir,ml_framework="auto"){
 #'@family Saving and Loading
 #'
 #'@export
-save_ai_model<-function(model,model_dir,
-                        save_format="keras",
+save_ai_model<-function(model,
+                        model_dir,
+                        dir_name=NULL,
+                        save_format="default",
                         append_ID=TRUE){
   if(methods::is(model,"TextEmbeddingClassifierNeuralNet") |
      methods::is(model,"TextEmbeddingModel")){
 
-    if(append_ID==TRUE){
-      final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name)
+    if(is.null(dir_name)){
+      if(append_ID==TRUE){
+        final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name)
+      } else {
+        final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name_root)
+      }
     } else {
-      final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name_root)
+      final_model_dir_path=paste0(model_dir,"/",dir_name)
     }
+
 
     if(dir.exists(final_model_dir_path)==FALSE){
       dir.create(final_model_dir_path)
     }
 
+    #Save R Interface------------------------------
     save(model,file = paste0(final_model_dir_path,"/r_interface.rda"))
 
+    #---------------------
     if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
       model$save_model(dir_path = final_model_dir_path,save_format=save_format)
     } else {
+      #TextEmbeddingModels
       if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
         model$save_model(model_dir = final_model_dir_path)
       }

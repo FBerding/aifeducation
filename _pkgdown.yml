@@ -22,6 +22,10 @@ reference:
 - contents:
   - has_concept("Installation and Configuration")
 
+- title: Graphical User Interface
+- contents:
+  - has_concept("Grapical User Interface")
+
 - title: Saving and Loading
 - contents:
   - has_concept("Saving and Loading")

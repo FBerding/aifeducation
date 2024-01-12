@@ -35,7 +35,8 @@ Other Auxiliary Functions:
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}
 \keyword{internal}

@@ -28,7 +28,9 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-save_model}{\code{TextEmbeddingModel$save_model()}}
 \item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
 \item \href{#method-TextEmbeddingModel-decode}{\code{TextEmbeddingModel$decode()}}
+\item \href{#method-TextEmbeddingModel-get_special_tokens}{\code{TextEmbeddingModel$get_special_tokens()}}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
+\item \href{#method-TextEmbeddingModel-fill_mask}{\code{TextEmbeddingModel$fill_mask()}}
 \item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
 \item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
 \item \href{#method-TextEmbeddingModel-set_software_license}{\code{TextEmbeddingModel$set_software_license()}}
@@ -229,6 +231,7 @@ Method for encoding words of raw texts into integers.
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$encode(
   raw_text,
   token_encodings_only = FALSE,
+  to_int = TRUE,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -241,6 +244,10 @@ Method for encoding words of raw texts into integers.
 \item{\code{token_encodings_only}}{\code{bool} If \code{TRUE}, only the token
 encodings are returned. If \code{FALSE}, the complete encoding is returned
 which is important for BERT models.}
+
+\item{\code{to_int}}{\code{bool} If \code{TRUE} the integer ids of the tokens are
+returned. If \code{FALSE} the tokens are returned. Argument only applies
+for transformer models and if \code{token_encodings_only==TRUE}.}
 
 \item{\code{trace}}{\code{bool} If \code{TRUE}, information of the progress
 is printed. \code{FALSE} if not requested.}
@@ -258,19 +265,37 @@ special tokens.
 \subsection{Method \code{decode()}}{
 Method for decoding a sequence of integers into tokens
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$decode(int_seqence)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$decode(int_seqence, to_token = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{int_seqence}}{\code{list} containing the integer sequences which
-should be transformed to tokens or a single integer sequence as \code{vector}}
+should be transformed to tokens or plain text.}
+
+\item{\code{to_token}}{\code{bool} If \code{FALSE} a plain text is returned.
+if \code{TRUE} a sequence of tokens is returned. Argument only relevant
+if the model is based on a transformer.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 \code{list} of token sequences
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_special_tokens"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_special_tokens}{}}}
+\subsection{Method \code{get_special_tokens()}}{
+Method for receiving the special tokens of the model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_special_tokens()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{matrix} containing the special tokens in the rows
+and their type, token, and id in the columns.
 }
 }
 \if{html}{\out{<hr>}}
@@ -309,6 +334,30 @@ should be printed on console.}
 Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
 contains the embeddings as a \code{data.frame} and information about the
 model creating the embeddings.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-fill_mask"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-fill_mask}{}}}
+\subsection{Method \code{fill_mask()}}{
+Method for calculating tokens behind mask tokens.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$fill_mask(text, n_solutions = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text}}{\code{string} Text containing mask tokens.}
+
+\item{\code{n_solutions}}{\code{int} Number estimated tokens for every mask.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{list} containing a \code{data.frame} for every
+mask. The \code{data.frame} contains the solutions in the rows and reports
+the score, token id, and token string in the columns.
 }
 }
 \if{html}{\out{<hr>}}

@@ -14,8 +14,8 @@ text. Missing values (unlabeled cases) are supported. For predictions an object 
 for training.
 }
 \description{
-Abstract class for neural nets with 'keras' and
-'tensorflow'.
+Abstract class for neural nets with 'keras'/'tensorflow' and
+'pytorch'.
 }
 \concept{Classification}
 \section{Public fields}{
@@ -28,7 +28,7 @@ Field for storing the tensorflow model after loading.}
 List for storing information about the configuration of the model. This
 information is used to predict new data.
 \itemize{
-\item{\code{model_config$n_req: }}{Number of recurrent layers.}
+\item{\code{model_config$n_rec: }}{Number of recurrent layers.}
 \item{\code{model_config$n_hidden: }}{Number of dense layers.}
 \item{\code{model_config$target_levels: }}{Levels of the target variable. Do not change this manually.}
 \item{\code{model_config$input_variables: }}{Order and name of the input variables. Do not change this manually.}
@@ -132,6 +132,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 \item \href{#method-TextEmbeddingClassifierNeuralNet-new}{\code{TextEmbeddingClassifierNeuralNet$new()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-train}{\code{TextEmbeddingClassifierNeuralNet$train()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-predict}{\code{TextEmbeddingClassifierNeuralNet$predict()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-check_embedding_model}{\code{TextEmbeddingClassifierNeuralNet$check_embedding_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_model_info}{\code{TextEmbeddingClassifierNeuralNet$get_model_info()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_text_embedding_model}{\code{TextEmbeddingClassifierNeuralNet$get_text_embedding_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-set_publication_info}{\code{TextEmbeddingClassifierNeuralNet$set_publication_info()}}
@@ -156,7 +157,7 @@ forcing the Assignment Error Matrix to be in line with the assumption of weak su
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$new(
-  ml_framework = aifeducation_config$get_framework()$ClassifierFramework,
+  ml_framework = aifeducation_config$get_framework(),
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -164,12 +165,15 @@ Creating a new instance of this class.
   hidden = c(128),
   rec = c(128),
   self_attention_heads = 0,
-  dropout = 0.4,
+  intermediate_size = NULL,
+  attention_type = "fourier",
+  add_pos_embedding = TRUE,
+  rec_dropout = 0.1,
+  repeat_encoder = 1,
+  dense_dropout = 0.4,
   recurrent_dropout = 0.4,
-  l2_regularizer = 0.01,
-  optimizer = "adam",
-  act_fct = "gelu",
-  rec_act_fct = "tanh"
+  encoder_dropout = 0.1,
+  optimizer = "adam"
 )}\if{html}{\out{</div>}}
 }
 
@@ -199,23 +203,32 @@ The length of the vector determines the number of dense layers. If you want no d
 set this parameter to \code{NULL}.}
 
 \item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads
-for a self-attention layer. If this value is greater 0, a self-attention layer is added
-between the recurrent and dense layers together with a normalization and a
-recurrent layer. If set to 0, none of these layers are added.}
+for a self-attention layer. Only relevant if \code{attention_type="multihead"}}
 
-\item{\code{dropout}}{\code{double} ranging between 0 and lower 1, determining the
-dropout for each recurrent layer.}
+\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within
+a each transformer encoder.}
+
+\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values
+are \code{"fourier"} and \code{multihead}.}
+
+\item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
+
+\item{\code{rec_dropout}}{\code{double} ranging between 0 and lower 1, determining the
+dropout between bidirectional gru layers.}
+
+\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be
+added to the network.}
+
+\item{\code{dense_dropout}}{\code{double} ranging between 0 and lower 1, determining the
+dropout between dense layers.}
 
 \item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1, determining the
-recurrent dropout for each recurrent layer.}
+recurrent dropout for each recurrent layer. Only relevant for keras models.}
 
-\item{\code{l2_regularizer}}{\code{double} determining the l2 regularizer for every dense layer.}
+\item{\code{encoder_dropout}}{\code{double} ranging between 0 and lower 1, determining the
+dropout for the dense projection within the encoder layers.}
 
 \item{\code{optimizer}}{Object of class \code{keras.optimizers}.}
-
-\item{\code{act_fct}}{\code{character} naming the activation function for all dense layers.}
-
-\item{\code{rec_act_fct}}{\code{character} naming the activation function for all recurrent layers.}
 }
 \if{html}{\out{</div>}}
 }
@@ -234,6 +247,7 @@ Method for training a neural net.
   data_embeddings,
   data_targets,
   data_n_test_samples = 5,
+  balance_class_weights = TRUE,
   use_baseline = TRUE,
   bsl_val_size = 0.25,
   use_bsc = TRUE,
@@ -245,7 +259,7 @@ Method for training a neural net.
   bpl_max_steps = 3,
   bpl_epochs_per_step = 1,
   bpl_dynamic_inc = FALSE,
-  bpl_balance = TRUE,
+  bpl_balance = FALSE,
   bpl_max = 1,
   bpl_anchor = 1,
   bpl_min = 0,
@@ -261,6 +275,7 @@ Method for training a neural net.
   dir_checkpoint,
   trace = TRUE,
   keras_trace = 2,
+  pytorch_trace = 2,
   n_cores = 2
 )}\if{html}{\out{</div>}}
 }
@@ -276,6 +291,10 @@ same names used in \code{data_embeddings}.}
 
 \item{\code{data_n_test_samples}}{\code{int} determining the number of cross-fold
 samples.}
+
+\item{\code{balance_class_weights}}{\code{bool} If \code{TRUE} class weights are
+generated based on the frequencies of the training data with the method
+Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.}
 
 \item{\code{use_baseline}}{\code{bool} \code{TRUE} if the calculation of a baseline
 model is requested. This option is only relevant for \code{use_bsc=TRUE} or
@@ -363,8 +382,11 @@ exist, it is created.}
 phase should be printed to the console.}
 
 \item{\code{keras_trace}}{\code{int} \code{keras_trace=0} does not print any
-information about the training process from keras on the console.
-\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
+information about the training process from keras on the console.}
+
+\item{\code{pytorch_trace}}{\code{int} \code{pytorch_trace=0} does not print any
+information about the training process from pytorch on the console.
+\code{pytorch_trace=1} prints a progress bar. \code{pytorch_trace=2} prints
 one line of information for every epoch.}
 
 \item{\code{n_cores}}{\code{int} Number of cores used for creating synthetic units.}
@@ -417,6 +439,28 @@ one line of information for every epoch.}
 \subsection{Returns}{
 Returns a \code{data.frame} containing the predictions and
 the probabilities of the different labels for each case.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-check_embedding_model"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-check_embedding_model}{}}}
+\subsection{Method \code{check_embedding_model()}}{
+Method for checking if the provided text embeddings are
+created with the same \link{TextEmbeddingModel} as the classifier.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$check_embedding_model(text_embeddings)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_embeddings}}{Object of class \link{EmbeddedText}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
+\code{FALSE} if the models differ.
 }
 }
 \if{html}{\out{<hr>}}
@@ -572,6 +616,9 @@ the license text.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Returns the license as a \code{string}.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-set_model_description"></a>}}
@@ -638,7 +685,7 @@ and the native language.
 Method for saving a model to 'Keras v3 format',
 'tensorflow' SavedModel format or h5 format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$save_model(dir_path, save_format = "keras")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$save_model(dir_path, save_format = "default")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -647,8 +694,14 @@ Method for saving a model to 'Keras v3 format',
 \item{\code{dir_path}}{\code{string()} Path of the directory where the model should be
 saved.}
 
-\item{\code{save_format}}{Format for saving the model. \code{"keras"} for 'Keras v3 format',
-\code{"tf"} for SavedModel or \code{"h5"} for HDF5.}
+\item{\code{save_format}}{Format for saving the model. For 'tensorflow'/'keras' models
+\code{"keras"} for 'Keras v3 format',
+\code{"tf"} for SavedModel
+or \code{"h5"} for HDF5.
+For 'pytorch' models \code{"safetensors"} for 'safetensors' or
+\code{"pt"} for 'pytorch via pickle'.
+Use \code{"default"} for the standard format. This is keras for
+'tensorflow'/'keras' models and safetensors for 'pytorch' models.}
 }
 \if{html}{\out{</div>}}
 }

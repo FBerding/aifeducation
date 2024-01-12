@@ -5,7 +5,7 @@
 \title{Function for training and fine-tuning a BERT model}
 \usage{
 train_tune_bert_model(
-  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
+  ml_framework = aifeducation_config$get_framework(),
   output_dir,
   model_dir_path,
   raw_texts,
@@ -25,7 +25,8 @@ train_tune_bert_model(
   sustain_region = NULL,
   sustain_interval = 15,
   trace = TRUE,
-  keras_trace = 1
+  keras_trace = 1,
+  pytorch_trace = 1
 )
 }
 \arguments{

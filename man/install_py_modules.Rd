@@ -6,6 +6,7 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
+  install = "all",
   tf_version = "<=2.14",
   pytorch_cuda_version = "12.1",
   remove_first = FALSE,
@@ -15,6 +16,10 @@ install_py_modules(
 \arguments{
 \item{envname}{\code{string} Name of the environment where the packages should
 be installed.}
+
+\item{install}{\code{character} determining which machine learning frameworks
+should be installed. \code{install="all"}  for 'pytorch' and 'tensorflow'.
+\code{install="pytorch"}  for 'pytorch', and \code{install="tensorflow"}  for 'tensorflow'.}
 
 \item{tf_version}{\code{string} determining the desired version of 'tensorflow'.}
 

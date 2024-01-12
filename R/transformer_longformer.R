@@ -54,11 +54,13 @@
 #'@references Hugging Face Documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/longformer#transformers.LongformerConfig}
 #'
+#'@importFrom reticulate py_module_available
+#'
 #'@family Transformer
 #'
 #'@export
 create_longformer_model<-function(
-    ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+    ml_framework=aifeducation_config$get_framework,
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=30522,
@@ -79,6 +81,12 @@ create_longformer_model<-function(
     sustain_interval=15,
     trace=TRUE){
 
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
   #argument checking-----------------------------------------------------------
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
     stop("hidden_act must be gelu, relu, silu or gelu_new")
@@ -94,11 +102,22 @@ create_longformer_model<-function(
              the library to set the global framework. ")
   }
 
-  #Start Sustainability Tracking
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
     }
     sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
       country_iso_code=sustain_iso_code,
@@ -110,9 +129,22 @@ create_longformer_model<-function(
       save_to_api=FALSE
     )
     sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
   }
 
-  #Creating a new Tokenizer for Computing Vocabulary
+  update_aifeducation_progress_bar(value = 2,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Creating a new Tokenizer for Computing Vocabulary---------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Tokenizer Draft"))
+  }
   tok_new<-tok$ByteLevelBPETokenizer(
     add_prefix_space = add_prefix_space,
     unicode_normalizer = "nfc",
@@ -120,23 +152,38 @@ create_longformer_model<-function(
     lowercase = FALSE)
   tok_new$enable_truncation(max_length = as.integer(max_position_embeddings))
   tok_new$enable_padding(pad_token = "<pad>")
-  #Calculating Vocabulary
+
+  update_aifeducation_progress_bar(value = 3,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Calculating Vocabulary------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary"))
   }
   tok_new$train_from_iterator(
     iterator = vocab_raw_texts,
     vocab_size = as.integer(vocab_size),
     special_tokens=c("<s>","<pad>","</s>","<unk>","<mask>"))
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary - Done","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary - Done"))
+  }
+
+  update_aifeducation_progress_bar(value = 4,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Saving Tokenizer Draft------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Saving Draft"))
   }
 
   if(dir.exists(model_dir)==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Model Directory","\n"))
+      message(paste(date(),"Creating Model Directory"))
     }
     dir.create(model_dir)
   }
@@ -144,9 +191,14 @@ create_longformer_model<-function(
   #Saving files
   tok_new$save_model(model_dir)
 
+  update_aifeducation_progress_bar(value = 5,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Final Tokenizer-------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer","\n"))
+    message(paste(date(),
+              "Creating Tokenizer"))
   }
   tokenizer=transformers$LongformerTokenizerFast(vocab_file = paste0(model_dir,"/","vocab.json"),
                                                  merges_file = paste0(model_dir,"/","merges.txt"),
@@ -161,8 +213,18 @@ create_longformer_model<-function(
                                                  trim_offsets=trim_offsets)
 
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer - Done","\n"))
+    message(paste(date(),
+              "Creating Tokenizer - Done"))
+  }
+
+  update_aifeducation_progress_bar(value = 6,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Creating Transformer Model--------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Transformer Model"))
   }
 
   configuration=transformers$LongformerConfig(
@@ -187,27 +249,45 @@ create_longformer_model<-function(
     longformer_model=transformers$LongformerModel(configuration)
   }
 
+  update_aifeducation_progress_bar(value = 7,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Longformer Model","\n"))
+    message(paste(date(),
+              "Saving Longformer Model"))
   }
-  longformer_model$save_pretrained(model_dir)
+  if(ml_framework=="tensorflow"){
+    longformer_model$save_pretrained(save_directory=model_dir)
+  } else {
+    longformer_model$save_pretrained(save_directory=model_dir,
+                          safe_serilization=reticulate::py_module_available("safetensors"))
+  }
 
+  update_aifeducation_progress_bar(value = 8,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Saving Tokenizer------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Tokenizer Model","\n"))
+    message(paste(date(),
+              "Saving Tokenizer Model"))
   }
   tokenizer$save_pretrained(model_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Stop Sustainability Tracking if requested-----------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     write.csv(
@@ -216,9 +296,14 @@ create_longformer_model<-function(
       row.names = FALSE)
   }
 
+  update_aifeducation_progress_bar(value = 10,
+                                   total = pgr_max,
+                                   title = "Longformer Model")
+
+  #Finish----------------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Done","\n"))
+    message(paste(date(),
+              "Done"))
   }
 }
 
@@ -290,9 +375,10 @@ create_longformer_model<-function(
 #'
 #'@importFrom utils write.csv
 #'@importFrom utils read.csv
+#'@importFrom reticulate py_module_available
 #'
 #'@export
-train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framework,
                                output_dir,
                                model_dir_path,
                                raw_texts,
@@ -311,8 +397,14 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
                                sustain_region=NULL,
                                sustain_interval=15,
                                trace=TRUE,
-                               keras_trace=1){
+                               keras_trace=1,
+                               pytorch_trace=1){
 
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0, total = pgr_max, title = "Longformer Model")
+
+  #argument checking-----------------------------------------------------------
   if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
@@ -321,24 +413,6 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
     stop("The global machine learning framework is not set. Please use
              aifeducation_config$set_global_ml_backend() directly after loading
              the library to set the global framework. ")
-  }
-
-  #Start Sustainability Tracking
-  if(sustain_track==TRUE){
-    if(is.null(sustain_iso_code)==TRUE){
-      stop("Sustainability tracking is activated but iso code for the
-               country is missing. Add iso code or deactivate tracking.")
-    }
-    sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
-      country_iso_code=sustain_iso_code,
-      region=sustain_region,
-      tracking_mode="machine",
-      log_level="warning",
-      measure_power_secs=sustain_interval,
-      save_to_file=FALSE,
-      save_to_api=FALSE
-    )
-    sustainability_tracker$start()
   }
 
   if(ml_framework=="tensorflow"){
@@ -359,6 +433,46 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
     }
   }
 
+  if(sustain_track==TRUE){
+    if(is.null(sustain_iso_code)==TRUE){
+      stop("Sustainability tracking is activated but iso code for the
+               country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1, total = pgr_max, title = "Longformer Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
+    }
+    sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
+      country_iso_code=sustain_iso_code,
+      region=sustain_region,
+      tracking_mode="machine",
+      log_level="warning",
+      measure_power_secs=sustain_interval,
+      save_to_file=FALSE,
+      save_to_api=FALSE
+    )
+    sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 2, total = pgr_max, title = "Longformer Model")
+
+  #Loading existing model------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Loading Existing Model"))
+  }
+
   if(ml_framework=="tensorflow"){
     mlm_model=transformers$TFLongformerForMaskedLM$from_pretrained(model_dir_path, from_pt=from_pt)
   } else {
@@ -367,6 +481,8 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
 
 
   tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir_path)
+
+  update_aifeducation_progress_bar(value = 3, total = pgr_max, title = "Longformer Model")
 
   #argument checking------------------------------------------------------------
   if(chunk_size>(mlm_model$config$max_position_embeddings)){
@@ -380,8 +496,11 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
   #adjust chunk size. To elements are needed for begin and end of sequence
   chunk_size=chunk_size-2
 
+  update_aifeducation_progress_bar(value = 4, total = pgr_max, title = "Longformer Model")
+
+  #creating chunks of sequences------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Creating Sequence Chunks For Training","\n"))
+    message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
   if(full_sequences_only==FALSE){
@@ -431,26 +550,32 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
   n_chunks=tokenized_dataset$num_rows
 
   if(trace==TRUE){
-    cat(paste(date(),n_chunks,"Chunks Created","\n"))
+    message(paste(date(),n_chunks,"Chunks Created"))
   }
+
+  update_aifeducation_progress_bar(value = 5, total = pgr_max, title = "Longformer Model")
+
+  #Seeting up DataCollator and Dataset------------------------------------------
 
   if(dir.exists(paste0(output_dir))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Output Directory","\n"))
+      message(paste(date(),"Creating Output Directory"))
     }
     dir.create(paste0(output_dir))
   }
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Checkpoint Directory","\n"))
+      message(paste(date(),"Creating Checkpoint Directory"))
     }
     dir.create(paste0(output_dir,"/checkpoints"))
   }
 
   if(ml_framework=="tensorflow"){
 
-    cat(paste(date(),"Using Token Masking","\n"))
+    if(trace==TRUE){
+      message(paste(date(),"Using Token Masking"))
+    }
     data_collator=transformers$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
       mlm = TRUE,
@@ -474,7 +599,7 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
       shuffle = TRUE)
 
     if(trace==TRUE){
-      cat(paste(date(),"Preparing Training of the Model","\n"))
+      message(paste(date(),"Preparing Training of the Model"))
     }
     adam<-tf$keras$optimizers$Adam
 
@@ -487,8 +612,18 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
       save_freq="epoch",
       save_weights_only= TRUE)
 
+    #Add Callback if Shiny App is running
+    if(require("shiny") & require("shinyWidgets")){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/keras_callbacks.py",
+                                            package = "aifeducation"))
+        callback_checkpoint=list(callback_checkpoint,py$ReportAiforeducationShiny())
+      }
+    }
+
     if(trace==TRUE){
-      cat(paste(date(),"Compile Model","\n"))
+      message(paste(date(),"Compile Model"))
     }
     mlm_model$compile(optimizer=adam(learning_rate),
                       loss="auto")
@@ -496,8 +631,11 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
     #Clear session to provide enough resources for computations
     tf$keras$backend$clear_session()
 
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "Longformer Model")
+
+    #Start Training------------------------------------------------------------
     if(trace==TRUE){
-      cat(paste(date(),"Start Fine Tuning","\n"))
+      message(paste(date(),"Start Fine Tuning"))
     }
 
     mlm_model$fit(x=tf_train_dataset,
@@ -509,13 +647,13 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
                   verbose=as.integer(keras_trace))
 
     if(trace==TRUE){
-      cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
+      message(paste(date(),"Load Weights From Best Checkpoint"))
     }
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
 
     if(trace==TRUE){
-      cat(paste(date(),"Using Token Masking","\n"))
+      message(paste(date(),"Using Token Masking"))
     }
     data_collator=transformers$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
@@ -543,7 +681,9 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
       per_device_eval_batch_size = as.integer(batch_size),
       save_safetensors=TRUE,
       auto_find_batch_size=FALSE,
-      report_to="none"
+      report_to="none",
+      log_level="error",
+      disable_tqdm=!pytorch_trace
     )
 
     trainer=transformers$Trainer(
@@ -556,29 +696,58 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
     )
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
 
+    #Add Callback if Shiny App is running
+    if(require("shiny") & require("shinyWidgets")){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/pytorch_transformer_callbacks.py",
+                                            package = "aifeducation"))
+        trainer$add_callback(py$ReportAiforeducationShiny_PT())
+      }
+    }
+
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "Longformer Model")
+
+    #Start Training------------------------------------------------------------
+    if(trace==TRUE){
+      message(paste(date(),"Start Fine Tuning"))
+    }
     trainer$train()
 
   }
 
-  if(trace==TRUE){
-    cat(paste(date(),"Saving Longformer Model","\n"))
-  }
-  mlm_model$save_pretrained(save_directory=output_dir)
+  update_aifeducation_progress_bar(value = 7, total = pgr_max, title = "Longformer Model")
 
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Saving Tokenizer","\n"))
+    message(paste(date(),"Saving Longformer Model"))
+  }
+  if(ml_framework=="tensorflow"){
+    mlm_model$save_pretrained(save_directory=output_dir)
+  } else {
+    mlm_model$save_pretrained(save_directory=output_dir,
+                              safe_serilization=reticulate::py_module_available("safetensors"))
+  }
+
+  update_aifeducation_progress_bar(value = 8, total = pgr_max, title = "Longformer Model")
+
+  #Saving Tokenizer-------------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),"Saving Tokenizer"))
   }
   tokenizer$save_pretrained(output_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9, total = pgr_max, title = "Longformer Model")
+
+  #Stop Sustainability Tracking if requested------------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     sustainability_data_file_path_input=paste0(model_dir_path,"/sustainability.csv")
@@ -603,9 +772,12 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
         row.names = FALSE)
     }
   }
+  update_aifeducation_progress_bar(value = 10, total = pgr_max, title = "Longformer Model")
+
+  #Finish----------------------------------------------------------------------
 
   if(trace==TRUE){
-    cat(paste(date(),"Done","\n"))
+    message(paste(date(),"Done"))
   }
 
 }

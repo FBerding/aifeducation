@@ -274,6 +274,11 @@ aifeducation_config$set_global_ml_backend("tensorflow")
 aifeducation_config$set_global_ml_backend("pytorch")
 ```
 
+You can change the framework at anytime during a session by calling this method
+again or by passing the framework to the `ml_framework` argument of a function
+or method. Please note that not all models are available for both frameworks and 
+that the weights of trained models cannot be shared across frameworks for all models.
+
 In the case that you would like to use tensorflow now is a good time to 
 configure that backend, since some configurations
 can only be done **before** tensorflow is used the first time.

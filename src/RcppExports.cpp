@@ -24,9 +24,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// to_categorical_c
+arma::mat to_categorical_c(arma::vec class_vector, arma::uword n_classes);
+RcppExport SEXP _aifeducation_to_categorical_c(SEXP class_vectorSEXP, SEXP n_classesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type class_vector(class_vectorSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type n_classes(n_classesSEXP);
+    rcpp_result_gen = Rcpp::wrap(to_categorical_c(class_vector, n_classes));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_aifeducation_matrix_to_array_c", (DL_FUNC) &_aifeducation_matrix_to_array_c, 3},
+    {"_aifeducation_to_categorical_c", (DL_FUNC) &_aifeducation_to_categorical_c, 2},
     {NULL, NULL, 0}
 };
 

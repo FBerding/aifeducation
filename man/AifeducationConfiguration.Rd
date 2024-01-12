@@ -13,13 +13,7 @@ R6 class for settting the global machine learning framework.
 }
 \details{
 R6 class for setting the global machine learning framework to 'PyTorch' or
-'tensorflow' depending of the available version of 'keras'.
-}
-\note{
-This function must be called directly after loading 'aifeducation' to take effect.
-
-Please note that using classifier objects with 'PyTorch' requires keras of
-at least version 3. If you have an older version 'tensorflow' is used.
+'tensorflow'.
 }
 \seealso{
 Other Installation and Configuration: 
@@ -52,7 +46,7 @@ Method for requesting the used machine learning framework.
 }
 
 \subsection{Returns}{
-Returns a \code{list} containing the used machine learning framework
+Returns a \code{string} containing the used machine learning framework
 for \link{TextEmbeddingModel}s as well as for \link{TextEmbeddingClassifierNeuralNet}.
 }
 }
@@ -60,7 +54,7 @@ for \link{TextEmbeddingModel}s as well as for \link{TextEmbeddingClassifierNeura
 \if{html}{\out{<a id="method-aifeducationConfiguration-set_global_ml_backend"></a>}}
 \if{latex}{\out{\hypertarget{method-aifeducationConfiguration-set_global_ml_backend}{}}}
 \subsection{Method \code{set_global_ml_backend()}}{
-Method for setting machine learning framework.
+Method for setting the global machine learning framework.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{AifeducationConfiguration$set_global_ml_backend(backend)}\if{html}{\out{</div>}}
 }
@@ -89,8 +83,8 @@ Method for checking if the global ml framework is set.
 }
 
 \subsection{Returns}{
-Return \code{TRUE} if the global machine learning framework ist set.
-Otherwiese \code{FALSE}.
+Return \code{TRUE} if the global machine learning framework is set.
+Otherwise \code{FALSE}.
 }
 }
 \if{html}{\out{<hr>}}

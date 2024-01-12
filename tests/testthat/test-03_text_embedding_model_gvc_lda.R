@@ -51,7 +51,8 @@ test_that("GlobalVectorClusters Save Total Model H5", {
 test_that("GlobalVectorClusters Load Total Model H5", {
   global_vector_clusters_modeling<-NULL
   global_vector_clusters_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name)),
+    ml_framework="auto"
   )
   expect_s3_class(global_vector_clusters_modeling,
                   class="TextEmbeddingModel")
@@ -68,7 +69,8 @@ test_that("GlobalVectorClusters Save Total Model TF", {
 test_that("GlobalVectorClusters Load Total Model TF", {
   global_vector_clusters_modeling<-NULL
   global_vector_clusters_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name)),
+    ml_framework="auto"
   )
   expect_s3_class(global_vector_clusters_modeling,
                   class="TextEmbeddingModel")
@@ -133,7 +135,8 @@ test_that("TopicModeling Save Total Model H5", {
 test_that("TopicModeling Load Total Model H5", {
   topic_modeling<-NULL
   topic_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name)),
+    ml_framework="auto"
   )
   expect_s3_class(topic_modeling,
                   class="TextEmbeddingModel")
@@ -150,7 +153,8 @@ test_that("TopicModeling Save Total Model TF", {
 test_that("TopicModeling Load Total Model TF", {
   topic_modeling<-NULL
   topic_modeling<-load_ai_model(
-    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name))
+    model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",model_name)),
+    ml_framework="auto"
   )
   expect_s3_class(topic_modeling,
                   class="TextEmbeddingModel")
