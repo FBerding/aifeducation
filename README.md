@@ -15,22 +15,25 @@ status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-proje
 The R package *Artificial Intelligence for Education (aifeducation)* is
 designed for the special requirements of educators, educational
 researchers, and social researchers. The target audience of this package
-are educators and researchers who would like to develop their own models
-as well as people who would like to use models created by other
-researchers/educators. The package supports the application of
-Artificial Intelligence (AI) for Natural Language Processing tasks such
-as text embedding and classification under the special conditions of the
-educational and social sciences.
+are educators and researchers with no coding skills who would like to
+develop their own models as well as people who would like to use models
+created by other researchers/educators. The package supports the
+application of Artificial Intelligence (AI) for Natural Language
+Processing tasks such as text embedding and classification under the
+special conditions of the educational and social sciences.
 
 ## Features Overview
 
 - Simple usage of artificial intelligence by providing routines for the
   most important tasks for educators and researchers from the social and
   educational sciences.
+- Providing a graphical user interface (Aifeducation Studio) allowing
+  persons to work with AI without any coding skills.
 - Supporting both ‘PyTorch’ and ‘Tensorflow’ as machine learning
   frameworks.
+- Using safetensors for saving models in ‘PyTorch’.
 - Supporting the usage of trained models on both frameworks providing a
-  high level of flexibility
+  high level of flexibility.
 - Supporting pre-trained language models from Hugging Face.
 - Supporting BERT, RoBERTa, DeBERTa, Longformer, and Funnel Transformer
   for creating context sensitive text embedding.
@@ -47,13 +50,13 @@ future, more tasks will be implemented.
 
 ## Installation
 
-You can install the package from CRAN with:
+You can install the latest stable version of the package from CRAN with:
 
 ``` r
 install.packages("aifeducation")
 ```
 
-You can install the development version of aifeducation from
+You can install the development version of *aifeducation* from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -66,20 +69,19 @@ devtools::install_github(repo="FBerding/aifeducation",
 Further instructions for installation can be found in vignette [01 get
 started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 
-> **Note:** There is currently a bug in reticulate 1.32.0 which does not
-> allow to load python packages such as tensorflow, keras or torch. The
-> error seems to occur only when working with RStudio and Windows
-> machines. Using R console directly seems not to evoke the error. The
-> bug has been fixed in the developer version of reticulate. You can
-> install this version with `install.packages("pak")` and
-> `pak::pak("rstudio/reticulate")`. With the release of reticulate
-> 1.33.0 you can ignore this note.
+## Graphical User Interface *Aifeducation Studio*
+
+The package ships with a shiny app that serves as a graphical user
+interface. *Aifeducation Studio* allows person to easily develop, train,
+apply, document, and analyse AI models without any coding skills. See
+the corresponding vignette for more details. [02a classification
+tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 
 ## Sustainability
 
 Training AI models consumes time and energy. To help researchers
 estimate the ecological impact of their work, a sustainability tracker
-is implemented. It is based on the python library codecarbon by Courty
+is implemented. It is based on the python library ‘codecarbon’ by Courty
 et al. (2023). This tracker allows to estimate the energy consumption
 for CPUs, GPUs and RAM during training and derives a value for the CO2
 emission. This value is based on the energy mix in the country where the
@@ -89,9 +91,19 @@ computer is located.
 
 This package allows all supported models based either on ‘PyTorch’ or
 ‘tensorflow’, providing a high level of flexibility. Even pre-trained
-models can be used with both frameworks in some cases. In general, users
-only have to decide which framework they would like to use when starting
-a new session.
+models can be used with both frameworks in some cases. The following
+table provides more details
+
+*Table: Framework compatibility*
+
+| Model                    | PyTorch | tensorflow | Weight Sharing |
+|--------------------------|---------|------------|----------------|
+| BERT                     | Yes     | Yes        | Yes            |
+| RoBERTa                  | Yes     | Yes        | Yes            |
+| DeBERTa                  | Yes     | Yes        | Yes            |
+| Funnel Transformer       | Yes     | Yes        | Yes            |
+| Longformer               | Yes     | Yes        | Yes            |
+| Text Embedding Classifer | Yes     | Yes        | No             |
 
 ## Classification Tasks
 
@@ -204,6 +216,13 @@ evaluated with the following measures and concepts:
 - Cohen’s Kappa with squared weights
 - Fleiss’ Kappa for multiple raters without exact estimation
 
+In Addition the some traditional measures from the machine learning
+literature are also available:
+
+- Precision
+- Recall
+- F1-Score
+
 ## Sharing Trained AI
 
 Since the package is based on keras, tensorflow, and the transformer
@@ -213,11 +232,14 @@ researchers. The package supports an easy use of pre-trained AI within
 environments.
 
 Using a pre-trained AI for classification only requires the classifier
-and the corresponding text embedding model. Just load both to *R* and
-start predictions. Vignette [02 classification
+and the corresponding text embedding model. Use *Aifeducation Studio* or
+just load both to *R* and start predictions. Vignette \[02a Using
+Aifeducation
+Studio\]\[<https://fberding.github.io/aifeducation/articles/gui_aife_studio.html>\]
+describes how to use the user interface. Vignette [02b classification
 tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
-describes how to save and load the objects. In vignette [03 Sharing and
-Using Trained
+describes how to save and load the objects with *R* syntax. In vignette
+[03 Sharing and Using Trained
 AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
 you can find a detailed guide on how to document and share your models.
 
@@ -225,8 +247,11 @@ you can find a detailed guide on how to document and share your models.
 
 - Installation and configuration of the package: [01 get
   started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
+- Introduction graphical user interface *Aifeducation Studio*: [02a
+  classification
+  tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 - A short introduction into the package with examples for classification
-  tasks:[02 classification
+  tasks: [02b classification
   tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 - A description for sharing models: [03 sharing and using trained
   AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)

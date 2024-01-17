@@ -122,6 +122,14 @@ synthetic cases, balanced pseudo-labeling or a combination of balanced
 synthetic cases and pseudo-labeling.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+\item{\code{reliability$standard_measures_end: }}{Object of class \code{list} containing the final
+measures for precision, recall, and f1 for every fold.
+Depending of the requested training method, these values
+refer to the baseline model, a trained model on the basis of balanced
+synthetic cases, balanced pseudo-labeling or a combination of balanced
+synthetic cases and pseudo-labeling.}
+\item{\code{reliability$standard_measures_mean: }}{\code{matrix} containing the mean
+measures for precision, recall, and f1 at the end of every fold.}
 }}
 }
 \if{html}{\out{</div>}}

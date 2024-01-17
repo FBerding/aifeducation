@@ -254,13 +254,14 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
         if i!=(n_hidden-1):
           layer_list.update({"dense_dropout_"+str(i+1):torch.nn.Dropout(p=dense_dropout)})
     
-    if n_hidden>0:
+    if n_hidden==0 and n_rec==0 and repeat_encoder==0:
+      last_in_features=features*times
+    elif  n_hidden>0:
       last_in_features=hidden[i]
+    elif n_rec>0:
+      last_in_features=2*rec[len(rec)-1]
     else:
-      if n_rec>0:
-        last_in_features=2*rec[len(rec)-1]
-      else:
-        last_in_features=features
+      last_in_features=features
 
     #Adding final Layer
     if self.n_target_levels>2:

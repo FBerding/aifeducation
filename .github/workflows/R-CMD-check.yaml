@@ -66,6 +66,8 @@ jobs:
             packages = c(
             "tensorflow-cpu",
             "torch",
+            "torcheval",
+            "safetensors",
             "keras",
             "accelerate"),
             envname = envname,

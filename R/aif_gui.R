@@ -10,21 +10,24 @@
 #'@import shinydashboard
 #'@import shinyFiles
 #'@import shinyWidgets
+#'@import readtext
+#'@import iotarelr
+#'@importFrom stringi stri_isempty
+#'@importFrom stringi stri_split_regex
+#'@importFrom stringi stri_trans_tolower
+#'@importFrom stringr str_extract_all
 #'
 #'@export
 start_aifeducation_studio<-function(){
 
   #Checking Requirements-------------------------------------------------------
-  requireNamespace(package="shiny")
-  requireNamespace(package="shinydashboard")
-  requireNamespace(package="shinyFiles")
-  requireNamespace(package="shinyWidgets")
 
   message("Setting the correct conda environment.")
   if(reticulate::py_available(FALSE)==FALSE){
     if(reticulate::condaenv_exists("aifeducation")==FALSE){
-      stop("Aifeducation studio requires a conda environment 'aifeducation. Please
-    install this. For more details please refer to the corresponding vignette.")
+      stop("Aifeducation studio requires a conda environment 'aifeducation' with
+      specific python libraries. Please install this. Please refer to the corresponding
+      vignette for more details.")
     } else {
       reticulate::use_condaenv("aifeducation")
     }
@@ -71,18 +74,7 @@ start_aifeducation_studio<-function(){
                                                     label = "Please choose the ML framework you would like to use:",
                                                     choices = available_ml_frameworks),
 
-                                        materialSwitch(
-                                          inputId = "config_tf_cpu_only",
-                                          label = "Tensorflow: Use CPU only",
-                                          value = FALSE,
-                                          right = TRUE,
-                                          status = "primary"),
-                                        materialSwitch(
-                                          inputId = "config_tf_gpu_low_memory",
-                                          label = "Tensorflow: Limited GPU memory",
-                                          value = TRUE,
-                                          right = TRUE,
-                                          status = "primary")
+                                        uiOutput(outputId = "config_ml_options")
                                     ),
                                     box(title = "Sustainability Tracking",
                                         solidHeader = TRUE,
@@ -122,22 +114,22 @@ start_aifeducation_studio<-function(){
                           #Page Data Preparation-----------------------------------------------------
                           tabItem(tabName = "data_preparation",
                                   fluidPage(
-                                    box(title = "Text sources",
+                                    box(title = "Text Sources",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
                                         shinyDirButton(id="dp_source_dir_select",
-                                                       label="Choose directory",
-                                                       title = "Please choose a directory",
+                                                       label="Choose Folder",
+                                                       title = "Please choose a folder",
                                                        icon=icon("folder-open")),
                                         textInput(inputId = "dp_text_source_dir",
-                                                  label = "Directory path"),
+                                                  label = tags$p(icon("folder"),"Path to Folder")),
                                         materialSwitch(inputId = "dp_include_subdirectories",
-                                                       label = "Include subdirectories",
+                                                       label = tags$p("Include Sub-Folders",icon("folder-tree")),
                                                        right = TRUE,
                                                        status = "primary")
                                     ),
-                                    box(title="File types",
+                                    box(title="File Types",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
@@ -164,18 +156,18 @@ start_aifeducation_studio<-function(){
                                         textInput(inputId = "dp_excel_text_column",
                                                   label = "Name of text column xlsx files")
                                     ),
-                                    box(title = "Text output",
+                                    box(title = "Text Output",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
                                         shinyDirButton(id="dp_output_dir_select",
-                                                       label = "Select directory",
-                                                       title = "Please select a directory",
+                                                       label = "Select Folder",
+                                                       title = "Please select a folder",
                                                        icon=icon("folder-open")),
                                         textInput(inputId = "dp_text_output_dir",
-                                                  label = "Directory path"),
+                                                  label = tags$p(icon("folder"),"Path to Folder")),
                                         textInput(inputId = "dp_text_output_filename",
-                                                  label = "File name")
+                                                  label = tags$p(icon("file"),"File Name"))
                                     ),
                                     box(title = "Start process",
                                         solidHeader = TRUE,
@@ -209,13 +201,13 @@ start_aifeducation_studio<-function(){
                                         tags$p("Please select a dataset with raw texts for generating a
                            vocabulary for the model."),
                                         shinyFilesButton(id="lm_text_file_vocab",
-                                                         label = "Choose dataset",
+                                                         label = "Choose Dataset",
                                                          title = "Please choose a file",
                                                          icon=icon("file"),
                                                          multiple = FALSE,
                                                          filetype=list(rdata=c('rda','rdata'))),
                                         textInput(inputId = "lm_vocab_texts_file_path",
-                                                  label = "File path"),
+                                                  label = tags$p(icon("file"),"File path")),
                                         uiOutput(outputId="lm_vocab_configuration")
                                     ),
                                     box(title = "Creation",
@@ -224,11 +216,11 @@ start_aifeducation_studio<-function(){
                                         status = "success",
                                         tags$p("Please select a directory where the model should be stored."),
                                         shinyDirButton(id="lm_save_created_model_dir",
-                                                       label = "Choose a directory",
+                                                       label = "Choose a Folder",
                                                        title = "Please choose a directory",
                                                        icon=icon("folder-open")),
                                         textInput(inputId = "lm_save_created_model_dir_path",
-                                                  label = "Directory path"),
+                                                  label = tags$p(icon("folder"),"Path to Folder")),
                                         actionButton(inputId = "lm_create",
                                                      label = "Start Creation",
                                                      icon = icon("paper-plane"))
@@ -242,14 +234,13 @@ start_aifeducation_studio<-function(){
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select a model for training or tuning. Please
-                           note that you have to select the directory that contains
-                           the model. Selection of files is not necessary."),
+                                        tags$p("Base models consists of several files which are stored in
+                                               a folder. Please select the folder that contains the entire model."),
                                         shinyDirButton(id="lm_db_select_model_for_training",
-                                                       label = "Choose a directory",
-                                                       title = "Please choose a directory",
+                                                       label = "Select a Folder",
+                                                       title = "Please choose a folder",
                                                        icon=icon("folder-open")),
-                                        tags$p(tags$b("Path to Base Model:")),
+                                        tags$p(icon("folder"),tags$b("Path to Base Model:")),
                                         textOutput(outputId = "lm_db_select_model_for_training_path")
                                     ),
                                     uiOutput(outputId = "lm_train_raw_texts"),
@@ -264,13 +255,13 @@ start_aifeducation_studio<-function(){
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select a language model which should
+                                        tags$p("Please select a base model which should
                              form the basis of your interface."),
                                         shinyDirButton(id="lm_db_select_model_for_interface",
-                                                       label = "Choose a directory",
-                                                       title = "Please choose a directory",
+                                                       label = "Choose a Folder",
+                                                       title = "Please choose a folder",
                                                        icon=icon("folder-open")),
-                                        tags$p(tags$b("Path to Base Model:")),
+                                        tags$p(icon("folder"),tags$b("Path to Folder with Base Model:")),
                                         textOutput(outputId = "lm_db_select_model_for_interface_path")
                                     ),
                                     uiOutput(outputId = "lm_interface_setting")
@@ -283,11 +274,11 @@ start_aifeducation_studio<-function(){
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select an interface to a language model. Please
-                           select only the folder which contains your model."),
+                                        tags$p("Text Embedding Models consist of several files. Please
+                                               select the folder that contains the entire model."),
                                         shinyDirButton(id="lm_db_select_model_for_use",
-                                                       label = "Choose a directory",
-                                                       title = "Please choose a directory",
+                                                       label = "Choose a Folder",
+                                                       title = "Please choose a folder",
                                                        icon=icon("folder-open")),
                                         tags$p(tags$b("Selected Interface for Masked Language Model:")),
                                         textOutput(outputId = "lm_use_selected_model_label")
@@ -302,11 +293,11 @@ start_aifeducation_studio<-function(){
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select an interface to a language model. Please
-                                   select only the folder which contains your model."),
+                                        tags$p("Text Embedding Models consist of several files. Please
+                                               select the folder that contains the entire model."),
                                         shinyDirButton(id="lm_db_select_model_for_documentation",
-                                                       label = "Choose a directory",
-                                                       title = "Please choose a directory",
+                                                       label = "Choose a Folder",
+                                                       title = "Please choose a folder",
                                                        icon=icon("folder-open")),
                                         tags$p(tags$b("Selected Interface:")),
                                         textOutput(outputId = "lm_document_selected_model_label")
@@ -328,8 +319,8 @@ start_aifeducation_studio<-function(){
                                           tags$p("Please select the file containing the text embeddings
                              which should be used for training."),
                                           shinyFilesButton(id="tec_select_embeddings_for_training",
-                                                           label = "Please selecet a file",
-                                                           title = "please select a file",
+                                                           label = "Select File",
+                                                           title = "Please select a file",
                                                            icon=icon("file"),
                                                            multiple = FALSE,
                                                            filetype=c("rda","rdata")),
@@ -347,7 +338,7 @@ start_aifeducation_studio<-function(){
                                           tags$p("Please not that the file must contain a column 'id' which
                              stores the corresponding documents ids."),
                                           shinyFilesButton(id="tec_select_target_data_for_training",
-                                                           label = "Please selecet a file",
+                                                           label = "Select File",
                                                            title = "please select a file",
                                                            icon=icon("file"),
                                                            multiple = FALSE,
@@ -519,7 +510,7 @@ start_aifeducation_studio<-function(){
                                                              label = "Add Synthetic Cases",
                                                              status = "primary"),
                                               sliderInput(inputId = "tec_n_cores",
-                                                          label = "Number or Cores",
+                                                          label = "Number of Cores",
                                                           min = 1,
                                                           max=parallel::detectCores(),
                                                           value = parallel::detectCores()),
@@ -540,7 +531,7 @@ start_aifeducation_studio<-function(){
                                                           max=0.5,
                                                           step = 0.01),
                                               materialSwitch(inputId = "tec_bsc_add_all",
-                                                             label = "Add all synthetic cases",
+                                                             label = "Add All Synthetic Cases",
                                                              value = FALSE,
                                                              status = "primary")
                                           ),
@@ -587,7 +578,7 @@ start_aifeducation_studio<-function(){
                                                         max = 2,
                                                         step = 0.01),
                                             sliderInput(inputId = "tec_bpl_weight_inc",
-                                                        label = "Weight Increase per Step",
+                                                        label = "Weight Increase Per Step",
                                                         value = 0.02,
                                                         min = 0,
                                                         max = 1,
@@ -602,12 +593,12 @@ start_aifeducation_studio<-function(){
                                           width = 12,
                                           shinyDirButton(id="tec_create_select_destination_folder",
                                                          title = "Please select a directory",
-                                                         label = "Choose directory",
+                                                         label = "Choose Directory",
                                                          icon=icon("folder-open")),
                                           textInput(inputId = "tec_create_select_destination_folder_path",
-                                                    label = "Directory Path"),
+                                                    label = tags$p(icon("folder"),"Directory Path")),
                                           textInput(inputId = "tec_create_folder_name",
-                                                    label = "Folder Name"),
+                                                    label = tags$p(icon("folder"),"Folder Name")),
                                           actionButton(inputId="tec_create_test_data_matching",
                                                        label = "Test Data Matching",
                                                        icon = icon("circle-question")),
@@ -625,9 +616,10 @@ start_aifeducation_studio<-function(){
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select a classifer."),
+                                        tags$p("A classifier consists of several files. Please select
+                                               the folder that contains the entire model."),
                                         shinyDirButton(id="tec_select_dir_for_use",
-                                                       label = "Choose a directory",
+                                                       label = "Select Folder",
                                                        title = "Please choose a directory",
                                                        icon=icon("folder-open")),
                                         tags$p(tags$b("Selected Classifier: ")),
@@ -643,14 +635,16 @@ start_aifeducation_studio<-function(){
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select an interface to a classifier. Please
-                             select only the folder which contains the model."),
+                                        tags$p("A classifier consists of several files. Please select
+                                               the folder that contains the entire model."),
                                         shinyDirButton(id="tec_db_select_model_for_documentation",
-                                                       label = "Choose a directory",
-                                                       title = "Please choose a directory",
+                                                       label = "Choose Folder",
+                                                       title = "Please choose a folder",
                                                        icon=icon("folder-open"))
                                     ),
-                                    uiOutput(outputId = "tec_document_tabs")
+                                    uiOutput(outputId = "tec_document_tabs"),
+                                    tags$p(tags$b("Selected Classifier: ")),
+                                    textOutput(outputId = "tec_document_selected_model_label")
                                   )
                           )
                         )
@@ -661,6 +655,12 @@ start_aifeducation_studio<-function(){
 
   # Define server logic ----
   server <- function(input, output,session) {
+    requireNamespace(package="shiny")
+    requireNamespace(package="shinydashboard")
+    requireNamespace(package="shinyFiles")
+    requireNamespace(package="shinyWidgets")
+    requireNamespace(package="iotarelr")
+
     session$onSessionEnded(stopApp)
     options(shiny.fullstacktrace = FALSE)
 
@@ -716,6 +716,27 @@ start_aifeducation_studio<-function(){
     shinydashboard::updateTabItems(selected="config",
                                    inputId = "main_panel")
 
+    output$config_ml_options<-renderUI({
+      if(input$config_ml_framework=="tensorflow"){
+        ui<-tagList(
+        materialSwitch(
+          inputId = "config_tf_cpu_only",
+          label = "Tensorflow: Use CPU only",
+          value = FALSE,
+          right = TRUE,
+          status = "primary"),
+        materialSwitch(
+          inputId = "config_tf_gpu_low_memory",
+          label = "Tensorflow: Limited GPU memory",
+          value = TRUE,
+          right = TRUE,
+          status = "primary"))
+        return(ui)
+      } else {
+        return(NULL)
+      }
+    })
+
     #Finish configuration-------------------------------------------------------
     observeEvent(input$config_start_session,{
 
@@ -738,11 +759,13 @@ start_aifeducation_studio<-function(){
                              icon = icon("database")),
                     menuItem(text = "Language Modeling",
                              icon = icon("book-open-reader"),
+                             tags$p(tags$b("Base Models")),
                              menuSubItem(text = "Create",
                                          tabName = "create_language_model"),
                              menuSubItem(text="Train/Tune",
                                          tabName = "train_tune_language_model"),
-                             menuSubItem(text = "Interface",
+                             tags$p(tags$b("Text Embedding Models")),
+                             menuSubItem(text = "Create",
                                          tabName = "interface_language_model"),
                              menuSubItem(text = "Use",
                                          tabName = "use_language_model"),
@@ -1093,7 +1116,7 @@ start_aifeducation_studio<-function(){
                               title = as.character(all_paths[i]))
             tmp_document=readtext::readtext(file=all_paths[i])
             #File name without extension
-            text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".",)[[1]][1]
+            text_corpus[counter,"id"]=stringi::stri_split_regex(tmp_document$doc_id,pattern=".")[[1]][1]
             text_corpus[counter,"text"]=tmp_document$text
             counter=counter+1
 
@@ -1343,28 +1366,24 @@ start_aifeducation_studio<-function(){
          input$lm_base_architecture=="funnel"){
         ui_vocab<-tagList(
           numericInput(inputId = "lm_vocab_size",
-                       label="Size of vocabulary",
+                       label="Size of Vocabulary",
                        value=30522,
                        min = 100,
                        max=200000,
                        step = 1),
           materialSwitch(inputId = "lm_vocab_do_lower_case",
                          value = FALSE,
-                         label = "Transform to lower case",
+                         label = "Transform to Lower Case",
                          status = "primary")
         )
       } else if(input$lm_base_architecture=="roberta"){
         ui_vocab<-tagList(
           numericInput(inputId = "lm_vocab_size",
-                       label="Size of vocabulary",
+                       label="Size of Vocabulary",
                        value=30522,
                        min = 100,
                        max=200000,
                        step = 1),
-          materialSwitch(inputId = "lm_vocab_do_lower_case",
-                         value = FALSE,
-                         label = "Transform to lower case",
-                         status = "primary"),
           materialSwitch(inputId = "lm_add_prefix_space",
                          value = FALSE,
                          right = TRUE,
@@ -1374,13 +1393,17 @@ start_aifeducation_studio<-function(){
                          value = TRUE,
                          right = TRUE,
                          label = "Trim Offsets",
+                         status = "primary"),
+          materialSwitch(inputId = "lm_vocab_do_lower_case",
+                         value = FALSE,
+                         label = "Transform to Lower Case",
                          status = "primary")
         )
       } else if(input$lm_base_architecture=="deberta_v2"|
                 input$lm_base_architecture=="longformer"){
         ui_vocab<-tagList(
           numericInput(inputId = "lm_vocab_size",
-                       label="Size of vocabulary",
+                       label="Size of Vocabulary",
                        value=30522,
                        min = 100,
                        max=200000,
@@ -1397,7 +1420,7 @@ start_aifeducation_studio<-function(){
                          status = "primary"),
           materialSwitch(inputId = "lm_vocab_do_lower_case",
                          value = FALSE,
-                         label = "Transform to lower case",
+                         label = "Transform to Lower Case",
                          status = "primary"),
         )
       }
@@ -1676,13 +1699,13 @@ start_aifeducation_studio<-function(){
           status = "primary",
           tags$p("Please select the file containing the raw texts for training."),
           shinyFilesButton(id="lm_db_select_raw_txt_for_training",
-                           label="Choose file",
-                           title="Please choose a file",
+                           label="Select File",
+                           title="Please select a file",
                            icon=icon("file"),
                            multiple=FALSE,
                            filetype=c("rda","rdata")),
           textInput(inputId = "lm_db_select_raw_txt_for_training_path",
-                    label = "File path")
+                    label = tags$p(icon("file"),"File Path"))
         )
 
         return(final_box)
@@ -1711,6 +1734,18 @@ start_aifeducation_studio<-function(){
         if(model_architecture=="BertModel"){
           ui_training_setting<-fluidRow(
             column(width = 6,
+                   sliderInput(inputId = "lm_chunk_size",
+                               label="Chunk Size",
+                               value=250,
+                               min = 100,
+                               max=max_position_embeddings,
+                               step = 1),
+                   sliderInput(inputId = "lm_min_seq_len",
+                               label="Minimal Sequence Length",
+                               value=50,
+                               min = 10,
+                               max=max_position_embeddings,
+                               step = 1),
                    sliderInput(inputId = "lm_p_mask",
                                label="Probability of Token Masking",
                                value=.15,
@@ -1728,18 +1763,6 @@ start_aifeducation_studio<-function(){
                                value=12,
                                min = 1,
                                max=64,
-                               step = 1),
-                   sliderInput(inputId = "lm_chunk_size",
-                               label="Chunk Size",
-                               value=250,
-                               min = 100,
-                               max=max_position_embeddings,
-                               step = 1),
-                   sliderInput(inputId = "lm_min_seq_len",
-                               label="Minimal Sequence Length",
-                               value=50,
-                               min = 10,
-                               max=max_position_embeddings,
                                step = 1)
             ),
             column(width = 6,
@@ -1842,14 +1865,14 @@ start_aifeducation_studio<-function(){
           width = 12,
           solidHeader = TRUE,
           status = "success",
-          tags$p("Please select a directory where the trained/tuned
+          tags$p("Please select a folder where the trained/tuned
                      model should be saved"),
           shinyDirButton(id="lm_db_select_final_model_destination",
-                         label = "Choose a directory",
-                         title = "Please choose a directory",
+                         label = "Choose a Folder",
+                         title = "Please choose a Folder",
                          icon=icon("folder-open")),
           textInput(inputId =  "lm_db_select_final_model_destination_path",
-                    label = "Directory Path"),
+                    label = tags$p(icon("Folder"),"Path to Folder")),
           actionButton(inputId = "lm_train_tune_start",
                        label = "Start Training/Tuning",
                        icon = icon("paper-plane"))
@@ -2112,12 +2135,14 @@ start_aifeducation_studio<-function(){
     })
 
     observe({
-      if(is.null(interface_architecture()$model_architecture) |
-         is.null(interface_architecture()$max_position_embeddings)){
-        show_alert(
-          title = "Error",
-          text = "There is no model to load in the directory.",
-          type = "error")
+      if(!identical(model_path_interface_LM(),character(0))){
+        if(is.null(interface_architecture()[[1]]) &
+           is.null(interface_architecture()[[2]])){
+          show_alert(
+            title = "Error",
+            text = "There is no model to load in the directory.",
+            type = "error")
+        }
       }
     })
 
@@ -2139,6 +2164,12 @@ start_aifeducation_studio<-function(){
                                    label = "Language")
                   ),
                   column(width = 6,
+                         sliderInput(inputId = "lm_chunks",
+                                     label="N Chunks",
+                                     value=1,
+                                     min = 1,
+                                     max= 50,
+                                     step = 1),
                          sliderInput(inputId = "lm_max_length",
                                      label=paste("Maximal Sequence Length","(Max:",interface_architecture()[2],")"),
                                      value=interface_architecture()[[2]],
@@ -2150,12 +2181,6 @@ start_aifeducation_studio<-function(){
                                      value=0,
                                      min = 0,
                                      max= interface_architecture()[[2]],
-                                     step = 1),
-                         sliderInput(inputId = "lm_chunks",
-                                     label="N Chunks",
-                                     value=1,
-                                     min = 1,
-                                     max= 50,
                                      step = 1),
                          selectInput(inputId = "lm_aggregation",
                                      label = "Aggregation Hidden States",
@@ -2173,13 +2198,15 @@ start_aifeducation_studio<-function(){
                          status = "success",
                          tags$p("Please select a directory where to save the interface."),
                          shinyDirButton(id="lm_db_select_interface_destination",
-                                        label = "Choose a directory",
+                                        label = "Choose a Directory",
                                         title = "Please choose a directory",
                                         icon=icon("folder-open")),
                          textInput(inputId =  "lm_db_select_interface_destination_path",
-                                   label = "Directory Path"),
+                                   label = tags$p(icon("folder"),"Directory Path")),
+                         tags$p("A folder is created within that directory. Please
+                                provide a name for the folder."),
                          textInput(inputId =  "lm_db_select_interface_destination_dir_name",
-                                   label = "Interface Name:"),
+                                   label = tags$p(icon("folder"),"Folder Name:")),
                          actionButton(inputId = "lm_save_interface",
                                       label = "Save Interface",
                                       icon = icon("floppy-disk"))
@@ -2538,7 +2565,7 @@ start_aifeducation_studio<-function(){
         ggplot2::xlab("tokens")+
         ggplot2::ylab("score")+
         ggplot2::theme_classic()+
-        ggplot2::theme(text = element_text(size = input$lm_mask_plot_text_size))
+        ggplot2::theme(text = ggplot2::element_text(size = input$lm_mask_plot_text_size))
       return(plot)
     },
     res = 2*72)
@@ -2617,31 +2644,31 @@ start_aifeducation_studio<-function(){
                                   solidHeader = TRUE,
                                   status = "primary",
                                   shinyFilesButton(id="lm_choose_file_raw_texts_for_embed",
-                                                   label="Choose file",
+                                                   label="Choose File",
                                                    title="Please choose a file",
                                                    icon=icon("file"),
                                                    multiple=FALSE),
                                   textInput(inputId = "lm_choose_file_raw_texts_for_embed_path",
-                                            label = "File path")
+                                            label = tags$p(icon("file"),"File Path"))
                               ),
                               box(title = "Text Embeddings Destination",
                                   solidHeader = TRUE,
                                   status = "primary",
                                   shinyDirButton(id="lm_choose_file_path_for_embeddings",
-                                                 title="Choose a directory for storing the embeddings",
-                                                 label = "Choose directory",
+                                                 title="Choose a folder for storing the embeddings",
+                                                 label = "Choose Folder",
                                                  icon=icon("folder-open")),
                                   textInput(inputId = "lm_choose_file_path_for_embeddings_path",
-                                            label = "File path"),
+                                            label = tags$p(icon("folder"),"Path to Folder")),
                                   textInput(inputId = "lm_choose_file_path_for_embeddings_file_name",
-                                            label = "File name"),
+                                            label = tags$p(icon("file"),"File Name")),
                                   numericInput(inputId = "lm_embed_batch_size",
-                                               label = "Batch size",
+                                               label = "Batch Size",
                                                min = 1,
                                                max = 512,
                                                value = 8),
                                   actionButton(inputId = "lm_embedd_start",
-                                               label = "Start embed",
+                                               label = "Start Embedding Texts",
                                                icon = icon("paper-plane"))
                               )
                             )
@@ -3118,7 +3145,7 @@ start_aifeducation_studio<-function(){
                    icon = icon("list"),
                    width=12),
           tags$h3("Model:",  model_info$model_label),
-          tags$p("Model Name:", model_info$model_name),
+          tags$p("Name:", model_info$model_name),
           tags$p("Created", model_info$model_date),
           renderTable(expr=info_table,
                       colnames=FALSE)
@@ -3148,7 +3175,7 @@ start_aifeducation_studio<-function(){
       file_path=tec_target_data_for_train_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
-          extension=stringi::stri_split_fixed(file_path,pattern=".",)[[1]]
+          extension=stringi::stri_split_regex(file_path,pattern=".")[[1]]
           extension=stringi::stri_trans_tolower(extension[[length(extension)]])
           show_alert(title="Loading",
                      text = "Please wait",
@@ -3219,7 +3246,7 @@ start_aifeducation_studio<-function(){
                    icon = icon("list"),
                    width=12),
           selectInput(inputId = "tec_target_data_column",
-                      label="Select a column",
+                      label="Select a Column",
                       choices = column_names),
           tableOutput(outputId = "tec_target_data_abs_freq")
         )
@@ -3253,10 +3280,10 @@ start_aifeducation_studio<-function(){
     })
 
     output$tec_dense_layer_check<-renderText({
-      as.numeric(stringi::stri_split_fixed(input$tec_hidden,pattern=",",)[[1]])
+      as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
     })
     output$tec_rec_layer_check<-renderText({
-      as.numeric(stringi::stri_split_fixed(input$tec_rec,pattern=",",)[[1]])
+      as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
     })
 
     #Training settings
@@ -3373,12 +3400,12 @@ start_aifeducation_studio<-function(){
         if(is.null(input$tec_hidden)|input$tec_hidden==""){
           hidden=NULL
         } else {
-          hidden=as.numeric(stringi::stri_split_fixed(input$tec_hidden,pattern=",",)[[1]])
+          hidden=as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
         }
         if(is.null(input$tec_rec)|input$tec_rec==""){
           rec=NULL
         } else {
-          rec=as.numeric(stringi::stri_split_fixed(input$tec_rec,pattern=",",)[[1]])
+          rec=as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
         }
 
         if(is.null(input$tec_bpl_min)){
@@ -3561,10 +3588,10 @@ start_aifeducation_studio<-function(){
                            ),
                            box(width = 6,
                                status = "primary",
-                               tags$h3("Underlying TextEmbeddingModel"),
+                               tags$h3("Underlying Text Embedding Model"),
                                tags$p("Label: ",classifier$get_text_embedding_model()$model$model_label),
                                tags$p("Method: ",classifier$get_text_embedding_model()$model$model_method),
-                               tags$p("Max Tokens per Chunk: ",classifier$get_text_embedding_model()$model$param_seq_length),
+                               tags$p("Max Tokens Per Chunk: ",classifier$get_text_embedding_model()$model$param_seq_length),
                                tags$p("Max Chunks: ",classifier$get_text_embedding_model()$model$param_chunks),
                                tags$p("Token Overlap: ",classifier$get_text_embedding_model()$model$param_overlap),
                                tags$p("Max Tokens: ",(classifier$get_text_embedding_model()$model$param_seq_length-classifier$get_text_embedding_model()$model$param_overlap)
@@ -3617,6 +3644,12 @@ start_aifeducation_studio<-function(){
                                                max = 20,
                                                step = 0.5,
                                                value = 12),
+                                   numericInput(inputId = "tec_performance_y_min",
+                                                label = "Y Min",
+                                                value = 0),
+                                   numericInput(inputId = "tec_performance_y_max",
+                                                label = "Y Max",
+                                                value = 1),
                                    radioGroupButtons(
                                      inputId = "tec_performance_training_phase",
                                      label = "Training Phase",
@@ -3642,7 +3675,7 @@ start_aifeducation_studio<-function(){
                            )
                   ),
                   tabPanel(title = "Reliability",
-                           box(title = "Coding Stream",
+                           box(title = "Coding Stream Analysis",
                                width = 12,
                                status = "primary",
                                solidHeader = TRUE,
@@ -3670,7 +3703,43 @@ start_aifeducation_studio<-function(){
                                  ),
                                  mainPanel =mainPanel(
                                    plotOutput(outputId = "tec_performance_coding_stream_plot"),
-                                   tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.")
+                                   tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
+                                          The categorical sizes are based on the relative frequencies of the training data.
+                                          These sizes are not identical with the sizes of field samples.")
+                                 )
+                               )
+                           ),
+                           box(title = "Spectral Analysis",
+                               width = 12,
+                               status = "primary",
+                               solidHeader = TRUE,
+                               sidebarLayout(
+                                 position="right",
+                                 sidebarPanel = sidebarPanel(
+                                   sliderInput(inputId = "tec_performance_codings_spectral_text_size",
+                                               label = "Text Size",
+                                               min = 1,
+                                               max = 20,
+                                               value = 10,
+                                               step = 0.25),
+                                   sliderInput(inputId = "tec_performance_codings_spectral_number_size",
+                                               label = "Number Size",
+                                               min = 0.1,
+                                               max = 5,
+                                               value = 3,
+                                               step = 0.1),
+                                   sliderInput(inputId = "tec_performance_codings_spectral_key_size",
+                                               label = "Key Size",
+                                               min = 0.1,
+                                               max = 2,
+                                               value = 0.1,
+                                               step = 0.1)
+                                 ),
+                                 mainPanel =mainPanel(
+                                   plotOutput(outputId = "tec_performance_coding_spectral_plot"),
+                                   tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
+                                          The categorical sizes are based on the relative frequencies of the training data.
+                                          These sizes are not identical with the sizes of field samples.")
                                  )
                                )
                            ),
@@ -3723,12 +3792,12 @@ start_aifeducation_studio<-function(){
                                status = "primary",
                                shinyDirButton(id="tec_choose_file_path_for_predictions",
                                               title="Choose a directory for storing the predictions",
-                                              label = "Choose directory",
+                                              label = "Select Folder",
                                               icon=icon("folder-open")),
                                textInput(inputId = "tec_choose_file_path_for_predictions_path",
-                                         label = "File path"),
+                                         label = tags$p(icon("file"),"Path to Folder")),
                                textInput(inputId = "tec_choose_file_path_for_predictions_file_name",
-                                         label = "File name"),
+                                         label = tags$p(icon("file"),"File Name")),
                                sliderInput(inputId = "tec_predict_batch_size",
                                            label = "Batch size",
                                            min = 1,
@@ -3791,6 +3860,38 @@ start_aifeducation_studio<-function(){
         return(NULL)
       }
     })
+
+    output$tec_performance_coding_stream_plot<-renderPlot(expr={
+      if(is.null(Classifier_for_Use())){
+        return(NULL)
+      } else {
+        classifier=Classifier_for_Use()
+        plot<-iotarelr::plot_iota2_alluvial(
+          object = classifier$reliability$iota_object_end_free,
+          label_categories_size = input$tec_performance_codings_stream_labels_size,
+          key_size=input$tec_performance_codings_stream_key_size,
+          text_size = input$tec_performance_codings_stream_text_size)
+        return(plot)
+      }
+    },
+    res = 2*72)
+
+    output$tec_performance_coding_spectral_plot<-renderPlot(expr={
+      if(is.null(Classifier_for_Use())){
+        return(NULL)
+      } else {
+        classifier=Classifier_for_Use()
+        plot<-iotarelr::plot_iota(
+          object = classifier$reliability$iota_object_end_free,
+          number_size = input$tec_performance_codings_spectral_number_size,
+          key_size=input$tec_performance_codings_spectral_key_size,
+          text_size = input$tec_performance_codings_spectral_text_size)
+        return(plot)
+      }
+    },
+    res = 2*72)
+
+
 
     #Documentation
     output$tect_desc_abstract_and_desc<-renderUI({
@@ -3988,18 +4089,14 @@ start_aifeducation_studio<-function(){
       plot_data=performance_data_for_visual()[[input$tec_performance_training_measures]]
 
       if(!is.null(plot_data)){
+        y_min=input$tec_performance_y_min
+        y_max=input$tec_performance_y_max
         if(input$tec_performance_training_measures=="loss"){
           y_label="loss"
-          y_min=0
-          y_max=1
         } else if(input$tec_performance_training_measures=="acc"){
           y_label="Accuracy"
-          y_min=0
-          y_max=1
         } else if(input$tec_performance_training_measures=="bacc"){
           y_label="Balanced Accuracy"
-          y_min=0
-          y_max=1
         }
 
         plot<-ggplot2::ggplot(data=plot_data)+
@@ -4046,7 +4143,7 @@ start_aifeducation_studio<-function(){
           ggplot2::scale_color_manual(values = c("train"="red",
                                                  "validation"="blue",
                                                  "test"="darkgreen"))+
-          ggplot2::theme(text = element_text(size = input$tec_performance_text_size),
+          ggplot2::theme(text = ggplot2::element_text(size = input$tec_performance_text_size),
                          legend.position="bottom")
         return(plot)
       } else {
@@ -4266,6 +4363,14 @@ start_aifeducation_studio<-function(){
         }
       } else {
         return(NULL)
+      }
+    })
+
+    output$tec_document_selected_model_label<-renderText({
+      if(is.null(Classifier_for_Documentation())){
+        return(NULL)
+      } else {
+        return (Classifier_for_Documentation()$get_model_info()$model_label)
       }
     })
 

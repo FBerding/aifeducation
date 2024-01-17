@@ -34,6 +34,7 @@ with the package iotarelr. This function is for internal use only.
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_synthetic_units}()},
 \code{\link{generate_id}()},

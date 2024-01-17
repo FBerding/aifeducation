@@ -71,14 +71,6 @@ install.packages("aifeducation")
 With this command, all necessary *R* packages are installed on your
 machine. 
 
-> **Note:** There is currently a bug in reticulate 1.32.0 which does not allow
-to load python packages such as tensorflow, keras or torch. The error
-seems to occur only when working with RStudio and Windows machines. Using R console
-directly seems not to evoke the error. The bug has been
-fixed in the developer version of reticulate. You can install this version with
-`install.packages("pak")` and `pak::pak("rstudio/reticulate")`.
-With the release of reticulate 1.33.0 you can ignore this note.
-
 ## Step 2 - Install Python
 
 Since natural language processing with neural nets is based on
@@ -150,6 +142,7 @@ function `install_py_modules()` doing that for you.
 ```{r, include = TRUE, eval=FALSE}
 #For Linux
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.14",
                                  pytorch_cuda_version = "12.1"
@@ -157,12 +150,14 @@ aifeducation::install_py_modules(envname="aifeducation",
 
 #For Windows with gpu support
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.10",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=FALSE)
 #For Windows without gpu support
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.14",
                                  pytorch_cuda_version = "12.1"
@@ -170,11 +165,17 @@ aifeducation::install_py_modules(envname="aifeducation",
 
 #For MacOS
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.14",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=TRUE)
 ```
+
+> With `install="all"` you can decide which machine learning framework should be
+installed. Use `install="all"` to request the installation of both 'PyTorch' and
+'tensorflow'. If you would like to install only 'PyTorch' or 'tensorflow' set
+`install="pytorch"` or `install="tenorflow"`.
 
 It is very important that you call this function *before* loading the package
 the first time. If you load the library without installing the necessary modules
@@ -186,6 +187,8 @@ This function installs the following python modules:
 -   tokenizers,
 -   datasets,
 -   torch,
+-   torcheval,
+-   safetensors,
 -   keras,
 -   tensorflow 
 -   codecarbon
@@ -198,10 +201,14 @@ other environments, please ensure that these python modules are
 available. For gpu support some further packages are installed.
 
 With `check_aif_py_modules()` you can check, if all modules are
-successfully installed.
+successfully installed or a specific machine learning framework.
 
 ```{r, include = TRUE, eval=FALSE}
-aifeducation::check_aif_py_modules(print=TRUE)
+aifeducation::check_aif_py_modules(print=TRUE,
+                                   check="pytorch")
+
+aifeducation::check_aif_py_modules(print=TRUE,
+                                   check="tensorflow")
 ```
 
 Now everything is ready to use the package. 
@@ -299,10 +306,12 @@ to set the correct conda environment, to load the library *aifeducation*, and
 to chose your machine learning framework.
 
 # 4) Tutorials and Guides
+A guide how to use the graphical user interface can be found in vignette
+  [02a classification tasks](gui_aife_studio.html). 
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette
-[02 classification tasks](classification_tasks.html).
+[02b classification tasks](classification_tasks.html).
 
 Documenting and sharing your work is described in vignette
 [03 sharing and using trained AI/models](sharing_and_publishing.html)

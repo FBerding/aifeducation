@@ -1,5 +1,10 @@
 # aifeducation 0.3.1
+**Graphical User Interface Aifeducation Studio**
+
+-   Added a shiny app to the package that servers as a graphical user interface.
+
 **Transformer Models**
+
 -   Fixed a bug of all transformers expect BERT concerning the unk_token.
 
 **TextEmbeddingModel**
@@ -31,6 +36,7 @@
     Balance class weights is activated by default.
 -   Added a method for checking the compatibility of the underlying TextEmbeddingModels
     of a classifier and an object of class EmbeddedText.
+-   Added precision, recall, and f1-score as new metrics.
     
 **Python Installation**
 -   Adding an argument to 'install_py_modules' allowing to choose which machine

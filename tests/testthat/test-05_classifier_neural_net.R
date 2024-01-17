@@ -13,6 +13,7 @@ path="test_data/classifier/bert_embeddings.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
 
+
 if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
   dir.create(testthat::test_path("test_artefacts"))
 }
@@ -403,7 +404,7 @@ for(framework in ml_frameworks){
     test_that(paste(framework,"Saving Classifier pytorch"),{
       expect_no_error(classifier$save_model(
         testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes")),
-        save_format = "keras")
+        save_format = "default")
       )
     })
 
@@ -665,7 +666,7 @@ for(framework in ml_frameworks){
       expect_no_error(
         save_ai_model(model=classifier,
                       model_dir = testthat::test_path("test_artefacts/tmp_full_models_pytorch"),
-                      save_format = "keras",
+                      save_format = "default",
                       append_ID = FALSE)
       )
     })
@@ -686,7 +687,7 @@ for(framework in ml_frameworks){
       expect_no_error(
         save_ai_model(model=classifier,
                       model_dir = testthat::test_path("test_artefacts/tmp_full_models_pytorch"),
-                      save_format = "keras")
+                      save_format = "default")
       )
     })
 

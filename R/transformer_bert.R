@@ -198,7 +198,9 @@ create_bert_model<-function(
   }
 
   if(dir.exists(model_dir)==FALSE){
-    message(paste(date(),"Creating Directory"))
+    if(trace==TRUE){
+      message(paste(date(),"Creating Directory"))
+    }
     dir.create(model_dir)
   }
 

@@ -208,7 +208,10 @@ get_coder_metrics<-function(true_values=NULL,
                  "kappa_fleiss",
                  "percentage_agreement",
                  "balanced_accuracy",
-                 "gwet_ac")
+                 "gwet_ac",
+                 "avg_precision",
+                 "avg_recall",
+                 "avg_f1")
   metric_values=vector(length = length(metric_names))
   names(metric_values)=metric_names
 
@@ -265,6 +268,12 @@ get_coder_metrics<-function(true_values=NULL,
       ncol(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
 
     metric_values["gwet_ac"]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
+
+    standard_measures<-calc_standard_classification_measures(true_values=true_values,
+                                                             predicted_values=predicted_values)
+    metric_values["avg_precision"]<-mean(standard_measures[,"precision"])
+    metric_values["avg_recall"]<-mean(standard_measures[,"recall"])
+    metric_values["avg_f1"]<-mean(standard_measures[,"f1"])
 
     return(metric_values)
   }
@@ -895,4 +904,43 @@ generate_id<-function(length=16){
     return(id_suffix)
 }
 
+#'Calculate standard classification measures
+#'
+#'Function for calculating recall, precision, and f1.
+#'
+#'@param true_values \code{factor} containing the true labels/categories.
+#'@param predicted_values \code{factor} containing the predicted labels/categories.
+#'@return Returns a matrix which contains the cases categories in the rows and
+#'the measures (precision, recall, f1) in the columns.
+#'
+#'@family Auxiliary Functions
+#'
+#'@export
+calc_standard_classification_measures<-function(true_values,predicted_values){
+  categories=levels(true_values)
+  results<-matrix(nrow = length(categories),
+                  ncol = 3)
+  colnames(results)=c("precision","recall","f1")
+  rownames(results)<-categories
 
+  for(i in 1:length(categories)){
+    bin_true_values=(true_values==categories[i])
+    bin_true_values=factor(as.character(bin_true_values),levels = c("TRUE","FALSE"))
+
+    bin_pred_values=(predicted_values==categories[i])
+    bin_pred_values=factor(as.character(bin_pred_values),levels = c("TRUE","FALSE"))
+
+    conf_matrix=table(bin_true_values,bin_pred_values)
+    conf_matrix=conf_matrix[c("TRUE","FALSE"),c("TRUE","FALSE")]
+
+    recall=conf_matrix[1,1]/(sum(conf_matrix[1,]))
+    precision=conf_matrix[1,1]/sum(conf_matrix[,1])
+    f1=2*precision*recall/(precision+recall)
+
+    results[categories[i],1]=precision
+    results[categories[i],2]=recall
+    results[categories[i],3]=f1
+  }
+
+  return(results)
+}

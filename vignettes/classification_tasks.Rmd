@@ -1,9 +1,9 @@
 ---
-title: "02 Text Embedding and Classification Tasks"
+title: "02b Text Embedding and Classification Tasks"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{02 Classification Tasks}
+  %\VignetteIndexEntry{02b Classification Tasks}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -64,9 +64,9 @@ humans. In this
 vignette, we would like to show how to create an AI that can help
 you with such tasks by using the package *aifedcuation*.
 
-**Please note that an introduction to content analysis, natural language
+> Please note that an introduction to content analysis, natural language
 processing or machine learning is beyond the scope of this vignette. If
-you would like to learn more, please refer to the cited literature.**
+you would like to learn more, please refer to the cited literature.
 
 Before we start it is necessary to introduce a definition of our
 understanding of some basic concepts since applying AI to educational
@@ -1406,17 +1406,21 @@ Intelligence in Educational Settings.: Introducing a New Reliability
 Concept Based on Content Analysis. Frontiers in Education, 1--21.
 <https://doi.org/10.3389/feduc.2022.818365>
 
-Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum
-Labeling: Revisiting Pseudo-Labeling for Semi-Supervised Learning.
-<https://doi.org/10.48550/arXiv.2001.06001>
-
 Campesato, O. (2021). Natural Language Processing Fundamentals for
 Developers. Mercury Learning & Information.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713>
 
+Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum
+Labeling: Revisiting Pseudo-Labeling for Semi-Supervised Learning.
+<https://doi.org/10.48550/arXiv.2001.06001>
+
 Chollet, F., Kalinowski, T., & Allaire, J. J. (2022). Deep learning with
 R (Second edition). Manning Publications Co.
 <https://learning.oreilly.com/library/view/-/9781633439849/?ar>
+
+Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
+Filtering out Sequential Redundancy for Efficient Language Processing.
+<https://doi.org/10.48550/arXiv.2006.03236>
 
 Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
 Pre-training of Deep Bidirectional Transformers for Language
@@ -1428,6 +1432,10 @@ Association for Computational Linguistics.
 Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive
 guide to measuring the extent of agreement among raters (Fourth
 edition). Gaithersburg: STATAXIS.
+
+He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
+BERT with Disentangled Attention.
+<https://doi.org/10.48550/arXiv.2006.03654>
 
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th ed.). Los Angeles: SAGE.
@@ -1446,6 +1454,11 @@ Workshop: Challenges in Representation Learning.
 
 Lee-Thorp, J., Ainslie, J., Eckstein, I. & Ontanon, S. (2021). 
 FNet: Mixing Tokens with Fourier Transforms. <https://doi.org/10.48550/arXiv.2105.03824>
+
+Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
+Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
+Optimized BERT Pretraining Approach.
+<https://doi.org/10.48550/arXiv.1907.11692>
 
 Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
 Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden: Springer.

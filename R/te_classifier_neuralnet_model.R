@@ -138,7 +138,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'synthetic cases and pseudo-labeling.
     #'Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+    #'\item{\code{reliability$standard_measures_end: }}{Object of class \code{list} containing the final
+    #'measures for precision, recall, and f1 for every fold.
+    #'Depending of the requested training method, these values
+    #'refer to the baseline model, a trained model on the basis of balanced
+    #'synthetic cases, balanced pseudo-labeling or a combination of balanced
+    #'synthetic cases and pseudo-labeling.}
+    #'\item{\code{reliability$standard_measures_mean: }}{\code{matrix} containing the mean
+    #'measures for precision, recall, and f1 at the end of every fold.}
     #'}
+    #'
     reliability=list(
       test_metric=NULL,
       test_metric_mean=NULL,
@@ -150,7 +159,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       iota_object_start=NULL,
       iota_object_start_free=NULL,
       iota_object_end=NULL,
-      iota_object_end_free=NULL
+      iota_object_end_free=NULL,
+      standard_measures_end=NULL,
+      standard_measures_mean=NULL
     ),
 
     #New-----------------------------------------------------------------------
@@ -1198,6 +1209,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         iota_objects_end_free[iter]=list(iotarelr::check_new_rater(true_values = targets_labeled_test,
                                                                      assigned_values = test_pred_cat,
                                                                      free_aem = TRUE))
+        self$reliability$standard_measures_end[iter]=list(calc_standard_classification_measures(true_values=targets_labeled_test,
+                                                                               predicted_values=test_pred_cat))
 
         #----------------------------------------------
       }
@@ -1248,6 +1261,28 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       } else {
         self$reliability$iota_objects_end_free=NULL
       }
+
+
+      standard_measures_mean_table<-matrix(
+        nrow = length(self$model_config$targets_level_order),
+        ncol = 3,
+        data = 0)
+      colnames(standard_measures_mean_table)=c("precision","recall","f1")
+      rownames(standard_measures_mean_table)<-self$model_config$targets_level_order
+
+      for(i in 1:folds$n_folds){
+        for(tmp_cat in self$model_config$targets_level_order){
+          standard_measures_mean_table[tmp_cat,"precision"]=standard_measures_mean_table[tmp_cat,"precision"]+
+            self$reliability$standard_measures_end[[i]][tmp_cat,"precision"]
+          standard_measures_mean_table[tmp_cat,"recall"]=standard_measures_mean_table[tmp_cat,"recall"]+
+            self$reliability$standard_measures_end[[i]][tmp_cat,"recall"]
+          standard_measures_mean_table[tmp_cat,"f1"]=standard_measures_mean_table[tmp_cat,"f1"]+
+            self$reliability$standard_measures_end[[i]][tmp_cat,"f1"]
+        }
+      }
+      standard_measures_mean_table=standard_measures_mean_table/folds$n_folds
+
+      self$reliability$standard_measures_mean<-standard_measures_mean_table
 
       #Final Training----------------------------------------------------------
       base::gc(verbose = FALSE,full = TRUE)
@@ -2016,6 +2051,18 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@return Function does not return a value. It saves the model to disk.
     #'@importFrom utils write.csv
      save_model=function(dir_path,save_format="default"){
+       if(private$ml_framework=="tensorflow"){
+         if(save_format%in%c("safetensors","pt")){
+           stop("'safetensors' and 'pt' are only supported for models based on
+           pytorch.")
+         }
+       } else if(private$ml_framework=="pytorch"){
+         if(save_format%in%c("keras","tf","h5")){
+           stop("'keras','tf', and 'h5' are only supported for models based on
+           tensorflow")
+         }
+       }
+
        if(save_format=="default"){
          if(private$ml_framework=="tensorflow"){
            save_format="keras"
@@ -2552,7 +2599,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         n_rec=length(self$model_config$rec)
       }
 
-      if(self$model_config$n_rec==0 & self$model_config$repeat_encoder==0){
+      if(n_rec==0 & self$model_config$repeat_encoder==0){
         input_embeddings_train= array_to_matrix(data_embedding_train)
         input_embeddings_val=array_to_matrix(data_embedding_val)
         if(is.null(embedding_test)==FALSE){
