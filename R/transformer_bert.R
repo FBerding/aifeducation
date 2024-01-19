@@ -380,6 +380,9 @@ create_bert_model<-function(
 #'information about the training process from keras on the console.
 #'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
 #'one line of information for every epoch. Only relevant if \code{ml_framework="tensorflow"}.
+#'@param pytorch_trace \code{int} \code{pytorch_trace=0} does not print any
+#'information about the training process from pytorch on the console.
+#'\code{pytorch_trace=1} prints a progress bar.
 #'
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.

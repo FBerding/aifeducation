@@ -4,14 +4,19 @@
 #'
 #'@return This function does nothing return. It is used to start a shiny app.
 #'
-#'@family Grapical User Interface
+#'@family Graphical User Interface
 #'
 #'@import shiny
 #'@import shinydashboard
 #'@import shinyFiles
+#'@import ggplot2
 #'@import shinyWidgets
 #'@import readtext
 #'@import iotarelr
+#'@importFrom shinyjs useShinyjs
+#'@importFrom shinyjs html
+#'@importFrom fs path_home
+#'@importFrom readxl read_xlsx
 #'@importFrom stringi stri_isempty
 #'@importFrom stringi stri_split_regex
 #'@importFrom stringi stri_trans_tolower

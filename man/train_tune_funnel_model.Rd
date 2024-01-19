@@ -85,6 +85,10 @@ to the console.}
 information about the training process from keras on the console.
 \code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
 one line of information for every epoch.}
+
+\item{pytorch_trace}{\code{int} \code{pytorch_trace=0} does not print any
+information about the training process from pytorch on the console.
+\code{pytorch_trace=1} prints a progress bar.}
 }
 \value{
 This function does not return an object. Instead the trained or fine-tuned

@@ -12,4 +12,4 @@ This function does nothing return. It is used to start a shiny app.
 \description{
 Functions starts a shiny app that represents the aifeducation studio
 }
-\concept{Grapical User Interface}
+\concept{Graphical User Interface}

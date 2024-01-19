@@ -12,7 +12,7 @@
 #'@family Auxiliary GUI Functions
 #'@keywords internal
 update_aifeducation_progress_bar<-function(value,total,title=NULL){
-  if(require("shiny") & require("shinyWidgets")){
+  if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
     if(shiny::isRunning()){
       updateProgressBar(id="pgr_bar_aifeducation",
                         value = value,

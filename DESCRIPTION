@@ -53,12 +53,17 @@ Imports:
     reticulate (>= 1.34.0),
     smotefamily,
     stringr,
+    stringi,
     utils,
     shiny,
     shinyFiles,
     shinyWidgets,
     shinydashboard,
-    readtext
+    shinyjs,
+    readtext,
+    readxl,
+    ggplot2,
+    fs
 Suggests: 
     text2vec,
     tidytext,
