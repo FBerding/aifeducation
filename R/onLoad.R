@@ -10,6 +10,8 @@ os<-NULL
 keras<-NULL
 accelerate<-NULL
 safetensors<-NULL
+py_update_aifeducation_progress_bar_epochs<-NULL
+py_update_aifeducation_progress_bar_steps<-NULL
 
 aifeducation_config<-NULL
 

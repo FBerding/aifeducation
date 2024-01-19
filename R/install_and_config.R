@@ -125,8 +125,7 @@ install_py_modules<-function(envname="aifeducation",
 #'In all other cases it returns \code{FALSE}
 #'@family Installation and Configuration
 #'@export
-check_aif_py_modules<-function(trace=TRUE,
-                               check="all"){
+check_aif_py_modules<-function(trace=TRUE, check="all"){
   if(!(check%in%c("all","pytorch","tensorflow"))){
     stop("check must be all, pytorch or tensorflow.")
   }

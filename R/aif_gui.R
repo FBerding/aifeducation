@@ -21,6 +21,11 @@
 #'@importFrom stringi stri_split_regex
 #'@importFrom stringi stri_trans_tolower
 #'@importFrom stringr str_extract_all
+#'@importFrom utils packageVersion
+#'@importFrom utils read.csv2
+#'@importFrom utils write.csv2
+#'@importFrom rlang .data
+#'
 #'
 #'@export
 start_aifeducation_studio<-function(){
@@ -841,7 +846,7 @@ start_aifeducation_studio<-function(){
 
       for(i in 1:nrow(r_packages_table)){
         r_packages_table[i,1]<-r_packages_names[[i]]
-        r_packages_table[i,2]<-as.character(packageVersion(r_packages_names[[i]]))
+        r_packages_table[i,2]<-as.character(utils::packageVersion(r_packages_names[[i]]))
       }
       colnames(r_packages_table)=c("Package","Version")
 
@@ -2313,7 +2318,7 @@ start_aifeducation_studio<-function(){
         model=try(load_ai_model(model_dir = model_path,
                                 ml_framework=input$config_ml_framework),
                   silent = TRUE)
-        if(("try-error"%in%class(model))==FALSE){
+        if(is(model,class2 = "try-error")==FALSE){
           if("TextEmbeddingModel"%in%class(model)){
             if(utils::compareVersion(as.character(model$get_package_versions()$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
@@ -2544,7 +2549,7 @@ start_aifeducation_studio<-function(){
           n_solutions=input$lm_n_fillments_for_fill_mask),
         silent = TRUE)
 
-      if(class(solutions)!="try-error"){
+      if(is(solutions,class2 = "try-error")==FALSE){
         updateNumericInput(inputId = "lm_select_mask_for_fill_mask",
                            max=length(solutions))
 
@@ -2812,7 +2817,7 @@ start_aifeducation_studio<-function(){
                    type="info")
         model=try(load_ai_model(model_dir = lm_interface_for_documentation_path(),
                                 ml_framework=input$config_ml_framework),silent = TRUE)
-        if(("try-error"%in%class(model))==FALSE){
+        if(is(model,class2 = "try-error")==FALSE){
           if("TextEmbeddingModel"%in%class(model)){
             if(utils::compareVersion(as.character(model$get_package_versions()$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
@@ -3187,7 +3192,7 @@ start_aifeducation_studio<-function(){
                      type="info")
           if(extension=="csv"|extension=="txt"){
             target_data=try(as.data.frame(
-              read.csv2(file = file_path,
+              utils::read.csv2(file = file_path,
                         header = TRUE)),silent = TRUE)
           } else if(extension=="xlsx"){
             target_data=try(
@@ -3524,7 +3529,7 @@ start_aifeducation_studio<-function(){
         classifier<-try(load_ai_model(model_dir = model_path,
                                       ml_framework=input$config_ml_framework),
                         silent = TRUE)
-        if(("try-error"%in%class(classifier))==FALSE){
+        if(is(classifier,class2 = "try-error")==FALSE){
           if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
@@ -4105,37 +4110,37 @@ start_aifeducation_studio<-function(){
         }
 
         plot<-ggplot2::ggplot(data=plot_data)+
-          ggplot2::geom_line(ggplot2::aes(x=epoch,y=train_mean,color="train"))+
-          ggplot2::geom_line(ggplot2::aes(x=epoch,y=validation_mean,color="validation"))
+          ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$train_mean,color="train"))+
+          ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$validation_mean,color="validation"))
 
         if(input$tec_performance_training_min_max==TRUE){
           plot<-plot+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=train_min,color="train"))+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=train_max,color="train"))+
-            ggplot2::geom_ribbon(ggplot2::aes(x=epoch,
-                                              ymin=train_min,
-                                              ymax=train_max),
+            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$train_min,color="train"))+
+            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$train_max,color="train"))+
+            ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
+                                              ymin=.data$train_min,
+                                              ymax=.data$train_max),
                                  alpha=0.25,
                                  fill="red")+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=validation_min,color="validation"))+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=validation_max,color="validation"))+
-            ggplot2::geom_ribbon(ggplot2::aes(x=epoch,
-                                              ymin=validation_min,
-                                              ymax=validation_max),
+            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$validation_min,color="validation"))+
+            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$validation_max,color="validation"))+
+            ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
+                                              ymin=.data$validation_min,
+                                              ymax=.data$validation_max),
                                  alpha=0.25,
                                  fill="blue")
         }
         if("test_mean"%in%colnames(plot_data)){
           plot=plot+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=test_mean,color="test"))
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_mean,color="test"))
           if(input$tec_performance_training_min_max==TRUE){
             plot=plot+
-              ggplot2::geom_line(ggplot2::aes(x=epoch,y=test_min,color="test"))+
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_min,color="test"))+
 
-              ggplot2::geom_line(ggplot2::aes(x=epoch,y=test_max,color="test"))+
-              ggplot2::geom_ribbon(ggplot2::aes(x=epoch,
-                                                ymin=test_min,
-                                                ymax=test_max),
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_max,color="test"))+
+              ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
+                                                ymin=.data$test_min,
+                                                ymax=.data$test_max),
                                    alpha=0.25,
                                    fill="darkgreen")
           }
@@ -4314,7 +4319,7 @@ start_aifeducation_studio<-function(){
                file = paste0(save_path_root,".rda"))
         }
         if(input$tec_pred_save_as_csv==TRUE){
-          write.csv2(predictions,
+          utils::write.csv2(predictions,
                      file = paste0(save_path_root,".csv"))
         }
         removeModal()
@@ -4340,7 +4345,7 @@ start_aifeducation_studio<-function(){
         classifier=try(load_ai_model(model_dir = tec_interface_for_documentation_path(),
                                      ml_framework=input$config_ml_framework),
                        silent = TRUE)
-        if(("try-error"%in%class(classifier))==FALSE){
+        if(is(classifier,class2 = "try-error")==FALSE){
           if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
