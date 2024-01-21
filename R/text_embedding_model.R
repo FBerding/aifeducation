@@ -253,22 +253,39 @@ TextEmbeddingModel<-R6::R6Class(
         private$transformer_components$overlap<-overlap
         private$transformer_components$aggregation<-aggregation
 
-        #Serach for the corresponding files
+        #Search for the corresponding files
         if(private$transformer_components$ml_framework=="tensorflow"){
           if(file.exists(paste0(model_dir,"/tf_model.h5"))){
             from_pt=FALSE
-          } else if (file.exists(paste0(model_dir,"/pytorch_model.bin"))){
+          } else if (file.exists(paste0(model_dir,"/pytorch_model.bin"))|
+                     file.exists(paste0(model_dir,"/model.safetensors"))){
             from_pt=TRUE
           } else {
-            stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+            stop("Directory does not contain a tf_model.h5, pytorch_model.bin
+                 or a model.saftensors file.")
           }
         } else {
-          if(file.exists(paste0(model_dir,"/pytorch_model.bin"))){
+          if(file.exists(paste0(model_dir,"/pytorch_model.bin"))|
+             file.exists(paste0(model_dir,"/model.safetensors"))){
             from_tf=FALSE
           } else if (file.exists(paste0(model_dir,"/tf_model.h5"))){
             from_tf=TRUE
           } else {
-            stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+            stop("Directory does not contain a tf_model.h5,pytorch_model.bin
+                 or a model.saftensors file.")
+          }
+        }
+
+        #In the case of pytorch
+        #Check to load from pt/bin or safetensors
+        #Use safetensors as preferred method
+        if(ml_framework=="pytorch"){
+          if((file.exists(paste0(model_dir,"/model.safetensors"))==FALSE &
+              from_tf==FALSE)|
+             reticulate::py_module_available("safetensors")==FALSE){
+            load_safe=FALSE
+          } else {
+            load_safe=TRUE
           }
         }
 
@@ -278,8 +295,12 @@ TextEmbeddingModel<-R6::R6Class(
             private$transformer_components$model<-transformers$TFBertModel$from_pretrained(model_dir,from_pt=from_pt)
             private$transformer_components$model_mlm<-transformers$TFBertForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$BertModel$from_pretrained(model_dir,from_tf=from_tf)
-            private$transformer_components$model_mlm<-transformers$BertForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$BertModel$from_pretrained(model_dir,
+                                                                                         from_tf=from_tf,
+                                                                                         use_safetensors=load_safe)
+            private$transformer_components$model_mlm<-transformers$BertForMaskedLM$from_pretrained(model_dir,
+                                                                                                   from_tf=from_tf,
+                                                                                                   use_safetensors=load_safe)
           }
         } else if(private$basic_components$method=="roberta"){
           private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir)
@@ -287,8 +308,12 @@ TextEmbeddingModel<-R6::R6Class(
             private$transformer_components$model<-transformers$TFRobertaModel$from_pretrained(model_dir,from_pt=from_pt)
             private$transformer_components$model_mlm<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$RobertaModel$from_pretrained(model_dir,from_tf=from_tf)
-            private$transformer_components$model_mlm<-transformers$RobertaForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$RobertaModel$from_pretrained(model_dir,
+                                                                                            from_tf=from_tf,
+                                                                                            use_safetensors=load_safe)
+            private$transformer_components$model_mlm<-transformers$RobertaForMaskedLM$from_pretrained(model_dir,
+                                                                                                      from_tf=from_tf,
+                                                                                                      use_safetensors=load_safe)
           }
 
         } else if(private$basic_components$method=="longformer"){
@@ -297,8 +322,12 @@ TextEmbeddingModel<-R6::R6Class(
             private$transformer_components$model<-transformers$TFLongformerModel$from_pretrained(model_dir,from_pt=from_pt)
             private$transformer_components$model_mlm<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$LongformerModel$from_pretrained(model_dir,from_tf=from_tf)
-            private$transformer_components$model_mlm<-transformers$LongformerForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$LongformerModel$from_pretrained(model_dir,
+                                                                                               from_tf=from_tf,
+                                                                                               use_safetensors=load_safe)
+            private$transformer_components$model_mlm<-transformers$LongformerForMaskedLM$from_pretrained(model_dir,
+                                                                                                         from_tf=from_tf,
+                                                                                                         use_safetensors=load_safe)
           }
         } else if(private$basic_components$method=="funnel"){
           private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
@@ -306,8 +335,12 @@ TextEmbeddingModel<-R6::R6Class(
             private$transformer_components$model<-transformers$TFFunnelBaseModel$from_pretrained(model_dir,from_pt=from_pt)
             private$transformer_components$model_mlm<-transformers$TFFunnelForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$FunnelBaseModel$from_pretrained(model_dir,from_tf=from_tf)
-            private$transformer_components$model_mlm<-transformers$FunnelForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$FunnelBaseModel$from_pretrained(model_dir,
+                                                                                               from_tf=from_tf,
+                                                                                               use_safetensors=load_safe)
+            private$transformer_components$model_mlm<-transformers$FunnelForMaskedLM$from_pretrained(model_dir,
+                                                                                                     from_tf=from_tf,
+                                                                                                     use_safetensors=load_safe)
           }
         } else if(private$basic_components$method=="deberta_v2"){
           private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
@@ -315,15 +348,21 @@ TextEmbeddingModel<-R6::R6Class(
             private$transformer_components$model<-transformers$TFDebertaV2Model$from_pretrained(model_dir,from_pt=from_pt)
             private$transformer_components$model_mlm<-transformers$TFDebertaForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir,from_tf=from_tf)
-            private$transformer_components$model_mlm<-transformers$DebertaForMaskedLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir,
+                                                                                              from_tf=from_tf,
+                                                                                              use_safetensors=load_safe)
+            private$transformer_components$model_mlm<-transformers$DebertaForMaskedLM$from_pretrained(model_dir,
+                                                                                                      from_tf=from_tf,
+                                                                                                      use_safetensors=load_safe)
           }
         } else if(private$basic_components$method=="rwkv"){
           private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir)
           if(ml_framework=="tensorflow"){
             #private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
           } else {
-            private$transformer_components$model<-transformers$RwkvForCausalLM$from_pretrained(model_dir,from_tf=from_tf)
+            private$transformer_components$model<-transformers$RwkvForCausalLM$from_pretrained(model_dir,
+                                                                                               from_tf=from_tf,
+                                                                                               use_safetensors=load_safe)
           }
         }
 
@@ -548,23 +587,42 @@ TextEmbeddingModel<-R6::R6Class(
       if(private$transformer_components$ml_framework=="tensorflow"){
         if(file.exists(paste0(model_dir_main,"/tf_model.h5"))){
           from_pt=FALSE
-        } else if (file.exists(paste0(model_dir_main,"/pytorch_model.bin"))){
+        } else if (file.exists(paste0(model_dir_main,"/pytorch_model.bin"))|
+                   file.exists(paste0(model_dir_main,"/model.safetensors"))){
           from_pt=TRUE
         } else {
-          stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+          stop("Directory does not contain a tf_model.h5 or pytorch_model.bin
+               or a model.safetensors file.")
         }
       } else if(private$transformer_components$ml_framework=="pytorch"){
-        if(file.exists(paste0(model_dir_main,"/pytorch_model.bin"))){
+        if(file.exists(paste0(model_dir_main,"/pytorch_model.bin"))|
+           file.exists(paste0(model_dir_main,"/model.safetensors"))){
           from_tf=FALSE
         } else if (file.exists(paste0(model_dir_main,"/tf_model.h5"))){
           from_tf=TRUE
         } else {
-          stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+          stop("Directory does not contain a tf_model.h5 or pytorch_model.bin
+               or a model.safetensors file.")
         }
       } else {
         from_pt=FALSE
         from_tf=FALSE
       }
+
+      #In the case of pytorch
+      #Check to load from pt/bin or safetensors
+      #Use safetensors as preferred method
+      if(ml_framework=="pytorch"){
+        if((file.exists(paste0(model_dir_main,"/model.safetensors"))==FALSE &
+            from_tf==FALSE)|
+           reticulate::py_module_available("safetensors")==FALSE){
+          load_safe=FALSE
+        } else {
+          load_safe=TRUE
+        }
+      }
+
+
         if((private$basic_components$method %in%private$supported_transformers)==TRUE){
 
           if(private$basic_components$method=="bert"){
@@ -573,8 +631,12 @@ TextEmbeddingModel<-R6::R6Class(
               private$transformer_components$model<-transformers$TFBertModel$from_pretrained(model_dir_main,from_pt=from_pt)
               private$transformer_components$model_mlm<-transformers$TFBertForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$BertModel$from_pretrained(model_dir_main,from_tf=from_tf)
-              private$transformer_components$model_mlm<-transformers$BertForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$BertModel$from_pretrained(model_dir_main,
+                                                                                           from_tf=from_tf,
+                                                                                           use_safetensors=load_safe)
+              private$transformer_components$model_mlm<-transformers$BertForMaskedLM$from_pretrained(model_dir_main,
+                                                                                                     from_tf=from_tf,
+                                                                                                     use_safetensors=load_safe)
             }
           } else if(private$basic_components$method=="roberta"){
             private$transformer_components$tokenizer<-transformers$RobertaTokenizerFast$from_pretrained(model_dir_main)
@@ -582,8 +644,12 @@ TextEmbeddingModel<-R6::R6Class(
               private$transformer_components$model<-transformers$TFRobertaModel$from_pretrained(model_dir_main,from_pt=from_pt)
               private$transformer_components$model_mlm<-transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$RobertaModel$from_pretrained(model_dir_main,from_tf=from_tf)
-              private$transformer_components$model_mlm<-transformers$RobertaForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$RobertaModel$from_pretrained(model_dir_main,
+                                                                                              from_tf=from_tf,
+                                                                                              use_safetensors=load_safe)
+              private$transformer_components$model_mlm<-transformers$RobertaForMaskedLM$from_pretrained(model_dir_main,
+                                                                                                        from_tf=from_tf,
+                                                                                                        use_safetensors=load_safe)
             }
           } else if(private$basic_components$method=="longformer"){
             private$transformer_components$tokenizer<-transformers$LongformerTokenizerFast$from_pretrained(model_dir_main)
@@ -591,8 +657,12 @@ TextEmbeddingModel<-R6::R6Class(
               private$transformer_components$model<-transformers$TFLongformerModel$from_pretrained(model_dir_main,from_pt=from_pt)
               private$transformer_components$model_mlm<-transformers$TFLongformerForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$LongformerModel$from_pretrained(model_dir_main,from_tf=from_tf)
-              private$transformer_components$model_mlm<-transformers$LongformerForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$LongformerModel$from_pretrained(model_dir_main,
+                                                                                                 from_tf=from_tf,
+                                                                                                 use_safetensors=load_safe)
+              private$transformer_components$model_mlm<-transformers$LongformerForMaskedLM$from_pretrained(model_dir_main,
+                                                                                                           from_tf=from_tf,
+                                                                                                           use_safetensors=load_safe)
             }
           }  else if(private$basic_components$method=="funnel"){
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)
@@ -600,8 +670,12 @@ TextEmbeddingModel<-R6::R6Class(
               private$transformer_components$model<-transformers$TFFunnelBaseModel$from_pretrained(model_dir_main,from_pt=from_pt)
               private$transformer_components$model_mlm<-transformers$TFFunnelForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$FunnelBaseModel$from_pretrained(model_dir_main,from_tf=from_tf)
-              private$transformer_components$model_mlm<-transformers$FunnelForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$FunnelBaseModel$from_pretrained(model_dir_main,
+                                                                                                 from_tf=from_tf,
+                                                                                                 use_safetensors=load_safe)
+              private$transformer_components$model_mlm<-transformers$FunnelForMaskedLM$from_pretrained(model_dir_main,
+                                                                                                       from_tf=from_tf,
+                                                                                                       use_safetensors=load_safe)
             }
           } else if(private$basic_components$method=="deberta_v2"){
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)
@@ -609,15 +683,21 @@ TextEmbeddingModel<-R6::R6Class(
               private$transformer_components$model<-transformers$TFDebertaV2Model$from_pretrained(model_dir_main,from_pt=from_pt)
               private$transformer_components$model_mlm<-transformers$TFDebertaForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir_main,from_tf=from_tf)
-              private$transformer_components$model_mlm<-transformers$DebertaForMaskedLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir_main,
+                                                                                                from_tf=from_tf,
+                                                                                                use_safetensors=load_safe)
+              private$transformer_components$model_mlm<-transformers$DebertaForMaskedLM$from_pretrained(model_dir_main,
+                                                                                                        from_tf=from_tf,
+                                                                                                        use_safetensors=load_safe)
             }
           } else if(private$basic_components$method=="rwkv"){
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
               #private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
-              private$transformer_components$model<-transformers$RwkvForCausalLM$from_pretrained(model_dir_main,from_tf=from_tf)
+              private$transformer_components$model<-transformers$RwkvForCausalLM$from_pretrained(model_dir_main,
+                                                                                                 from_tf=from_tf,
+                                                                                                 use_safetensors=load_safe)
             }
           }
 
@@ -920,27 +1000,39 @@ TextEmbeddingModel<-R6::R6Class(
     #'@return Returns a \code{matrix} containing the special tokens in the rows
     #'and their type, token, and id in the columns.
     get_special_tokens=function(){
-      special_tokens=private$transformer_components$tokenizer$special_tokens_map_extended
+      special_tokens=c("bos_token",
+                       "eos_token",
+                       "unk_token",
+                       "sep_token",
+                       "pad_token",
+                       "cls_token",
+                       "mask_token")
       tokens_map=matrix(nrow = length(special_tokens),
                         ncol=3,
                         data = NA)
       colnames(tokens_map)=c("type","token","id")
 
-      if(private$basic_components$method=="bert"|
-         private$basic_components$method=="funnel"|
-         private$basic_components$method=="deberta_v2"){
-        for(i in 1:nrow(tokens_map)){
-          tokens_map[i,1]=names(special_tokens)[[i]]
-          tokens_map[i,2]=special_tokens[[i]]
-          tokens_map[i,3]=private$transformer_components$tokenizer$convert_tokens_to_ids(special_tokens[[i]])
-        }
-      } else {
-        for(i in 1:nrow(tokens_map)){
-          tokens_map[i,1]=names(special_tokens)[[i]]
-          tokens_map[i,2]=special_tokens[[i]]$content
-          tokens_map[i,3]=private$transformer_components$tokenizer$convert_tokens_to_ids(special_tokens[[i]]$content)
-        }
+      for(i in 1:length(special_tokens)){
+        tokens_map[i,1]=special_tokens[i]
+        tokens_map[i,2]=private$transformer_components$tokenizer[special_tokens[i]]
+        tokens_map[i,3]=private$transformer_components$tokenizer[paste0(special_tokens[i],"_id")]
       }
+
+      #if(private$basic_components$method=="bert"|
+      #   private$basic_components$method=="funnel"|
+      #   private$basic_components$method=="deberta_v2"){
+      #  for(i in 1:nrow(tokens_map)){
+      #    tokens_map[i,1]=names(special_tokens)[[i]]
+      #    tokens_map[i,2]=special_tokens[[i]]
+      #    tokens_map[i,3]=private$transformer_components$tokenizer$convert_tokens_to_ids(special_tokens[[i]])
+      #  }
+      #} else {
+      #  for(i in 1:nrow(tokens_map)){
+      #    tokens_map[i,1]=names(special_tokens)[[i]]
+      #    tokens_map[i,2]=special_tokens[[i]]$content
+      #    tokens_map[i,3]=private$transformer_components$tokenizer$convert_tokens_to_ids(special_tokens[[i]]$content)
+      #  }
+      #}
 
 
       return(tokens_map)

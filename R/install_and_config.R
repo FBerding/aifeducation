@@ -38,7 +38,7 @@ install_py_modules<-function(envname="aifeducation",
                          "accelerate")
 
   #Check Arguments
-  if(!(check%in%c("all","pytorch","tensorflow"))){
+  if(!(install%in%c("all","pytorch","tensorflow"))){
     stop("install must be all, pytorch or tensorflow.")
   }
 

@@ -25,6 +25,7 @@
 #'@importFrom utils read.csv2
 #'@importFrom utils write.csv2
 #'@importFrom rlang .data
+#'@importFrom methods is
 #'
 #'
 #'@export
@@ -59,6 +60,11 @@ start_aifeducation_studio<-function(){
   if(is.null(available_ml_frameworks)){
     stop("No available machine learning frameworks found.")
   }
+
+  #Exporting Functions for Python
+  #These functions must be available in the global environment
+  py_update_aifeducation_progress_bar_epochs<<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
+  py_update_aifeducation_progress_bar_steps<<-reticulate::py_func(update_aifeducation_progress_bar_steps)
 
   #Start GUI--------------------------------------------------------------------
   options(shiny.reactlog=TRUE)
@@ -676,8 +682,8 @@ start_aifeducation_studio<-function(){
 
     #Logger for progressmodal
     log=reactiveVal(value = rep(x="",times=15))
-    py_update_aifeducation_progress_bar_epochs<<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
-    py_update_aifeducation_progress_bar_steps<<-reticulate::py_func(update_aifeducation_progress_bar_steps)
+    #py_update_aifeducation_progress_bar_epochs<<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
+    #py_update_aifeducation_progress_bar_steps<<-reticulate::py_func(update_aifeducation_progress_bar_steps)
 
 
 
@@ -1126,7 +1132,7 @@ start_aifeducation_studio<-function(){
                               title = as.character(all_paths[i]))
             tmp_document=readtext::readtext(file=all_paths[i])
             #File name without extension
-            text_corpus[counter,"id"]=stringi::stri_split_regex(tmp_document$doc_id,pattern=".")[[1]][1]
+            text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
             text_corpus[counter,"text"]=tmp_document$text
             counter=counter+1
 
@@ -1564,7 +1570,7 @@ start_aifeducation_studio<-function(){
             create_longformer_model(
               ml_framework=input$config_ml_framework,
               model_dir=input$lm_save_created_model_dir_path,
-              vocab_raw_texts=vocab_raw_texts,
+              vocab_raw_texts=raw_texts$text,
               vocab_size=input$lm_vocab_size,
               add_prefix_space=input$lm_add_prefix_space,
               trim_offsets=input$lm_trim_offsets,
@@ -1589,7 +1595,7 @@ start_aifeducation_studio<-function(){
             create_funnel_model(
               ml_framework=input$config_ml_framework,
               model_dir=input$lm_save_created_model_dir_path,
-              vocab_raw_texts=vocab_raw_texts,
+              vocab_raw_texts=raw_texts$text,
               vocab_size=input$lm_vocab_size,
               vocab_do_lower_case=input$lm_vocab_do_lower_case,
               max_position_embeddings=input$lm_max_position_embeddings,
@@ -2318,7 +2324,7 @@ start_aifeducation_studio<-function(){
         model=try(load_ai_model(model_dir = model_path,
                                 ml_framework=input$config_ml_framework),
                   silent = TRUE)
-        if(is(model,class2 = "try-error")==FALSE){
+        if(methods::is(model,class2 = "try-error")==FALSE){
           if("TextEmbeddingModel"%in%class(model)){
             if(utils::compareVersion(as.character(model$get_package_versions()$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
@@ -2549,7 +2555,7 @@ start_aifeducation_studio<-function(){
           n_solutions=input$lm_n_fillments_for_fill_mask),
         silent = TRUE)
 
-      if(is(solutions,class2 = "try-error")==FALSE){
+      if(methods::is(solutions,class2 = "try-error")==FALSE){
         updateNumericInput(inputId = "lm_select_mask_for_fill_mask",
                            max=length(solutions))
 
@@ -2570,7 +2576,7 @@ start_aifeducation_studio<-function(){
       plot_data=plot_data[order(plot_data$score,decreasing=FALSE),]
       plot_data$token_str=factor(plot_data$token_str,levels=(plot_data$token_str))
       plot=ggplot2::ggplot(data = plot_data)+
-        ggplot2::geom_col(ggplot2::aes(x=token_str,y=score))+
+        ggplot2::geom_col(ggplot2::aes(x=.data$token_str,y=.data$score))+
         ggplot2::coord_flip()+
         ggplot2::xlab("tokens")+
         ggplot2::ylab("score")+
@@ -2817,7 +2823,7 @@ start_aifeducation_studio<-function(){
                    type="info")
         model=try(load_ai_model(model_dir = lm_interface_for_documentation_path(),
                                 ml_framework=input$config_ml_framework),silent = TRUE)
-        if(is(model,class2 = "try-error")==FALSE){
+        if(methods::is(model,class2 = "try-error")==FALSE){
           if("TextEmbeddingModel"%in%class(model)){
             if(utils::compareVersion(as.character(model$get_package_versions()$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
@@ -3185,7 +3191,7 @@ start_aifeducation_studio<-function(){
       file_path=tec_target_data_for_train_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
-          extension=stringi::stri_split_regex(file_path,pattern=".")[[1]]
+          extension=stringi::stri_split_fixed(file_path,pattern=".")[[1]]
           extension=stringi::stri_trans_tolower(extension[[length(extension)]])
           show_alert(title="Loading",
                      text = "Please wait",
@@ -3208,6 +3214,8 @@ start_aifeducation_studio<-function(){
             target_data=try(
               as.data.frame(target_data),
               silent = TRUE)
+          } else {
+            target_data=NA
           }
 
           #Final Check
@@ -3529,7 +3537,7 @@ start_aifeducation_studio<-function(){
         classifier<-try(load_ai_model(model_dir = model_path,
                                       ml_framework=input$config_ml_framework),
                         silent = TRUE)
-        if(is(classifier,class2 = "try-error")==FALSE){
+        if(methods::is(classifier,class2 = "try-error")==FALSE){
           if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
               closeSweetAlert()
@@ -4110,20 +4118,20 @@ start_aifeducation_studio<-function(){
         }
 
         plot<-ggplot2::ggplot(data=plot_data)+
-          ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$train_mean,color="train"))+
-          ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$validation_mean,color="validation"))
+          ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_mean,color="train"))+
+          ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_mean,color="validation"))
 
         if(input$tec_performance_training_min_max==TRUE){
           plot<-plot+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$train_min,color="train"))+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$train_max,color="train"))+
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_min,color="train"))+
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_max,color="train"))+
             ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
                                               ymin=.data$train_min,
                                               ymax=.data$train_max),
                                  alpha=0.25,
                                  fill="red")+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$validation_min,color="validation"))+
-            ggplot2::geom_line(ggplot2::aes(x=epoch,y=.data$validation_max,color="validation"))+
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_min,color="validation"))+
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_max,color="validation"))+
             ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
                                               ymin=.data$validation_min,
                                               ymax=.data$validation_max),
@@ -4345,7 +4353,7 @@ start_aifeducation_studio<-function(){
         classifier=try(load_ai_model(model_dir = tec_interface_for_documentation_path(),
                                      ml_framework=input$config_ml_framework),
                        silent = TRUE)
-        if(is(classifier,class2 = "try-error")==FALSE){
+        if(methods::is(classifier,class2 = "try-error")==FALSE){
           if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
               closeSweetAlert()

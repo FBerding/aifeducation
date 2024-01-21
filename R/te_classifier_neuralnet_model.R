@@ -2082,7 +2082,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
          file_path=paste0(dir_path,"/","model_data",extension)
          if(dir.exists(dir_path)==FALSE){
            dir.create(dir_path)
-           #cat("Creating Directory\n")
          }
          self$model$save(file_path)
        } else if(private$ml_framework=="pytorch"){

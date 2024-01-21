@@ -453,18 +453,35 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
   if(ml_framework=="tensorflow"){
     if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
       from_pt=FALSE
-    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
+    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))|
+               file.exists(paste0(model_dir_path,"/model.safetensors"))){
       from_pt=TRUE
     } else {
-      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+      stop("Directory does not contain a tf_model.h5, pytorch_model.bin or a
+           model.safetensors file.")
     }
   } else {
-    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
+    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))|
+       file.exists(paste0(model_dir_path,"/model.safetensors"))){
       from_tf=FALSE
     } else if (file.exists(paste0(model_dir_path,"/tf_model.h5"))){
       from_tf=TRUE
     } else {
-      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
+      stop("Directory does not contain a tf_model.h5, pytorch_model.bin or a
+           model.safetensors file.")
+    }
+  }
+
+  #In the case of pytorch
+  #Check to load from pt/bin or safetensors
+  #Use safetensors as preferred method
+  if(ml_framework=="pytorch"){
+    if((file.exists(paste0(model_dir_path,"/model.safetensors"))==FALSE &
+        from_tf==FALSE)|
+      reticulate::py_module_available("safetensors")==FALSE){
+      load_safe=FALSE
+    } else {
+      load_safe=TRUE
     }
   }
 
@@ -511,7 +528,9 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
   if(ml_framework=="tensorflow"){
     mlm_model=transformers$TFBertForMaskedLM$from_pretrained(model_dir_path,from_pt=from_pt)
   } else {
-    mlm_model=transformers$BertForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
+    mlm_model=transformers$BertForMaskedLM$from_pretrained(model_dir_path,
+                                                           from_tf=from_tf,
+                                                           use_safetensors=load_safe)
   }
 
   tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_path)
@@ -678,7 +697,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
     )
 
     #Add Callback if Shiny App is running
-    if(require("shiny") & require("shinyWidgets")){
+    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
       if(shiny::isRunning()){
         shiny_app_active=TRUE
         reticulate::py_run_file(system.file("python/keras_callbacks.py",
@@ -788,7 +807,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
 
     #Add Callback if Shiny App is running
-    if(require("shiny") & require("shinyWidgets")){
+    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
       if(shiny::isRunning()){
         shiny_app_active=TRUE
         reticulate::py_run_file(system.file("python/pytorch_transformer_callbacks.py",
