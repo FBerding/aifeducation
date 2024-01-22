@@ -155,6 +155,7 @@ measures for precision, recall, and f1 at the end of every fold.}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-load_model}{\code{TextEmbeddingClassifierNeuralNet$load_model()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_package_versions}{\code{TextEmbeddingClassifierNeuralNet$get_package_versions()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-get_sustainability_data}{\code{TextEmbeddingClassifierNeuralNet$get_sustainability_data()}}
+\item \href{#method-TextEmbeddingClassifierNeuralNet-get_ml_framework}{\code{TextEmbeddingClassifierNeuralNet$get_ml_framework()}}
 \item \href{#method-TextEmbeddingClassifierNeuralNet-clone}{\code{TextEmbeddingClassifierNeuralNet$clone()}}
 }
 }
@@ -707,7 +708,7 @@ saved.}
 \code{"tf"} for SavedModel
 or \code{"h5"} for HDF5.
 For 'pytorch' models \code{"safetensors"} for 'safetensors' or
-\code{"pt"} for 'pytorch via pickle'.
+\code{"pt"} for 'pytorch' via pickle.
 Use \code{"default"} for the standard format. This is keras for
 'tensorflow'/'keras' models and safetensors for 'pytorch' models.}
 }
@@ -773,6 +774,21 @@ during training and an estimate of the resulting CO2 equivalents in kg.
 Returns a \code{list} containing the tracked energy consumption,
 CO2 equivalents in kg, information on the tracker used, and technical
 information on the training infrastructure.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingClassifierNeuralNet-get_ml_framework"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-get_ml_framework}{}}}
+\subsection{Method \code{get_ml_framework()}}{
+Method for requesting the machine learning framework used
+for the classifier.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$get_ml_framework()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{string} describing the machine learning framework used
+for the classifier
 }
 }
 \if{html}{\out{<hr>}}

@@ -719,12 +719,30 @@ TextEmbeddingModel<-R6::R6Class(
     #'only for transformer models.
     #'@param model_dir \code{string} containing the path to the relevant
     #'model directory.
+    #'@param save_format Format for saving the model. For 'tensorflow'/'keras' models
+    #' \code{"h5"} for HDF5.
+    #'For 'pytorch' models \code{"safetensors"} for 'safetensors' or
+    #'\code{"pt"} for 'pytorch' via pickle.
+    #'Use \code{"default"} for the standard format. This is h5 for
+    #''tensorflow'/'keras' models and safetensors for 'pytorch' models.
     #'@return Function does not return a value. It is used for saving a transformer model
     #'to disk.
     #'
     #'@importFrom utils write.csv
-    save_model=function(model_dir){
+    save_model=function(model_dir,save_format="default"){
       if((private$basic_components$method %in%private$supported_transformers)==TRUE){
+
+      if(save_format%in%c("default","h5","pt","safetensors")==FALSE){
+        stop("For TextEmbeddingModels save_format must be 'h5', 'pt', or 'safetensors'.")
+      }
+
+      if(save_format=="default"){
+        if(private$transformer_components$ml_framework=="tensorflow"){
+          save_format="h5"
+        } else if(private$transformer_components$ml_framework=="pytorch"){
+          save_format="safetensors"
+        }
+      }
 
       model_dir_data_path<-paste0(model_dir,"/","model_data")
 
@@ -733,8 +751,28 @@ TextEmbeddingModel<-R6::R6Class(
         cat("Creating Directory\n")
       }
 
-      private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path)
-      private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+      if(private$transformer_components$ml_framework=="pytorch"){
+        if(save_format=="safetensors" & reticulate::py_module_available("safetensors")==TRUE){
+
+          private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path,
+                                                               safe_serilization=TRUE)
+          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+
+        } else if (save_format=="safetensors" & reticulate::py_module_available("safetensors")==FALSE){
+          private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path,
+                                                               safe_serilization=FALSE)
+          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+          warning("Python library 'safetensors' is not available. Saving model in standard
+                  pytorch format.")
+        } else if (save_format=="pt"){
+          private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path,
+                                                               safe_serilization=FALSE)
+          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+        }
+      } else {
+        private$transformer_components$model$save_pretrained(save_directory=model_dir_data_path)
+        private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+      }
 
       #Saving Sustainability Data
       sustain_matrix=private$sustainability$track_log
@@ -1523,6 +1561,14 @@ TextEmbeddingModel<-R6::R6Class(
     #'information on the training infrastructure for every training run.
     get_sustainability_data=function(){
       return(private$sustainability$track_log)
+    },
+    #---------------------------------------------------------------------------
+    #'@description Method for requesting the machine learning framework used
+    #'for the classifier.
+    #'@return Returns a \code{string} describing the machine learning framework used
+    #'for the classifier
+    get_ml_framework=function(){
+      return(private$transformer_components$ml_framework)
     }
   )
 )
@@ -1655,7 +1701,7 @@ EmbeddedText<-R6::R6Class(
     #'generated this embedding.
     #'@return \code{string} Label of the corresponding text embedding model
     get_model_label=function(){
-      return(private$model_label)
+      return(private$transformer_components$ml_framework)
     }
   )
 )

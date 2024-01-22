@@ -45,6 +45,7 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-get_bow_components}{\code{TextEmbeddingModel$get_bow_components()}}
 \item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
 \item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
+\item \href{#method-TextEmbeddingModel-get_ml_framework}{\code{TextEmbeddingModel$get_ml_framework()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
@@ -206,7 +207,7 @@ transformer model into the R interface.
 Method for saving a transformer model on disk.Relevant
 only for transformer models.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_model(model_dir)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_model(model_dir, save_format = "default")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -214,6 +215,13 @@ only for transformer models.
 \describe{
 \item{\code{model_dir}}{\code{string} containing the path to the relevant
 model directory.}
+
+\item{\code{save_format}}{Format for saving the model. For 'tensorflow'/'keras' models
+\code{"h5"} for HDF5.
+For 'pytorch' models \code{"safetensors"} for 'safetensors' or
+\code{"pt"} for 'pytorch' via pickle.
+Use \code{"default"} for the standard format. This is h5 for
+'tensorflow'/'keras' models and safetensors for 'pytorch' models.}
 }
 \if{html}{\out{</div>}}
 }
@@ -618,6 +626,21 @@ during training and an estimate of the resulting CO2 equivalents in kg.
 Returns a \code{matrix} containing the tracked energy consumption,
 CO2 equivalents in kg, information on the tracker used, and technical
 information on the training infrastructure for every training run.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_ml_framework"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_ml_framework}{}}}
+\subsection{Method \code{get_ml_framework()}}{
+Method for requesting the machine learning framework used
+for the classifier.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_ml_framework()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{string} describing the machine learning framework used
+for the classifier
 }
 }
 \if{html}{\out{<hr>}}

@@ -406,6 +406,14 @@ for(framework in ml_frameworks){
         testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes")),
         save_format = "default")
       )
+
+      if(reticulate::py_module_available("safetensors")){
+        expect_true(file.exists(testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes","/model.safetensors"))))
+      } else {
+        expect_true(file.exists(testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes","/pytorch_model.bin"))))
+      }
+
+
     })
 
     base::gc(verbose = FALSE,full = TRUE)

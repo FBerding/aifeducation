@@ -705,34 +705,68 @@ for(ai_method in ai_methods){
         })
 
       #------------------------------------------------------------------------
-      test_that(paste0(ai_method,"Save Total Model H5",framework), {
-        expect_no_error(
-          save_ai_model(model=bert_modeling,
-                        model_dir = testthat::test_path(paste0(path_03,"/",framework)),
-                        save_format = "H5")
-        )
-      })
+      if(framework=="tensorflow"){
+        test_that(paste0(ai_method,"Save Total Model h5",framework), {
+          expect_no_error(
+            save_ai_model(model=bert_modeling,
+                          model_dir = testthat::test_path(paste0(path_03,"/",framework)),
+                          save_format = "h5")
+          )
+        })
 
-      test_that(paste0(ai_method,"Load Total Model H5",framework), {
-        bert_modeling<-NULL
-        bert_modeling<-load_ai_model(
-          ml_framework = framework,
-          model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
-        )
-        expect_s3_class(bert_modeling,
-                        class="TextEmbeddingModel")
-      })
+        test_that(paste0(ai_method,"Load Total Model h5",framework), {
+          bert_modeling<-NULL
+          bert_modeling<-load_ai_model(
+            ml_framework = framework,
+            model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
+          )
+          expect_s3_class(bert_modeling,
+                          class="TextEmbeddingModel")
+        })
+      } else {
+        test_that(paste0(ai_method,"Save Total Model safetensors",framework), {
+          expect_no_error(
+            save_ai_model(model=bert_modeling,
+                          model_dir = testthat::test_path(paste0(path_03,"/",framework)),
+                          save_format = "safetensors")
+          )
+          if(reticulate::py_module_available("safetensors")){
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model.safetensors"))))
+          } else {
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/pytorch_model.bin"))))
+          }
+        })
+
+        test_that(paste0(ai_method,"Load Total Model safetensors",framework), {
+          bert_modeling<-NULL
+          bert_modeling<-load_ai_model(
+            ml_framework = framework,
+            model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
+          )
+          expect_s3_class(bert_modeling,
+                          class="TextEmbeddingModel")
+        })
+      }
+
 
       #------------------------------------------------------------------------
-      test_that(paste0(ai_method,"Save Total Model TF with ID",framework), {
+      test_that(paste0(ai_method,"Save Total Model default with ID",framework), {
         expect_no_error(
           save_ai_model(model=bert_modeling,
                         model_dir = testthat::test_path(paste0(path_03,"/",framework)),
-                        save_format = "tf")
+                        save_format = "default")
         )
+        if(framework=="pytorch"){
+          if(reticulate::py_module_available("safetensors")){
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model.safetensors"))))
+          } else {
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/pytorch_model.bin"))))
+          }
+        }
+
       })
 
-      test_that(paste0(ai_method,"Load Total Model TF with ID",framework), {
+      test_that(paste0(ai_method,"Load Total Model default with ID",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
           ml_framework = framework,
@@ -743,16 +777,16 @@ for(ai_method in ai_methods){
       })
 
       #-------------------------------------------------------------------------
-      test_that(paste0(ai_method,"Save Total Model TF without ID",framework), {
+      test_that(paste0(ai_method,"Save Total Model default without ID",framework), {
         expect_no_error(
           save_ai_model(model=bert_modeling,
                         model_dir = testthat::test_path(paste0(path_03,"/",framework)),
-                        save_format = "tf",
+                        save_format = "default",
                         append_ID = FALSE)
         )
       })
 
-      test_that(paste0("Load Total Model TF without ID",framework), {
+      test_that(paste0("Load Total Model default without ID",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
           ml_framework = framework,

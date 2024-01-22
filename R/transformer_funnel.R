@@ -44,6 +44,9 @@
 #'@param sustain_interval \code{integer} Interval in seconds for measuring power
 #'usage.
 #'
+#'@param pytorch_safetensors \code{bool} If \code{TRUE} a 'pytorch' model
+#'is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+#'it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.
 #'@param trace \code{bool} \code{TRUE} if information about the progress should be
 #'printed to the console.
 #'@return This function does not return an object. Instead the configuration
@@ -92,7 +95,8 @@ create_funnel_model<-function(
     sustain_iso_code=NULL,
     sustain_region=NULL,
     sustain_interval=15,
-    trace=TRUE){
+    trace=TRUE,
+    pytorch_safetensors=TRUE){
 
   #Set Shiny Progress Tracking
   pgr_max=10
@@ -127,6 +131,19 @@ create_funnel_model<-function(
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  #Check possible save formats
+  if(ml_framework=="pytorch"){
+    if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==TRUE){
+      pt_safe_save=TRUE
+    } else if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==FALSE){
+      pt_safe_save=FALSE
+      warning("Python library 'safetensors' not available. Model will be saved
+            in the standard pytorch format.")
+    } else {
+      pt_safe_save=FALSE
     }
   }
 
@@ -299,7 +316,7 @@ create_funnel_model<-function(
     model$save_pretrained(save_directory=model_dir)
   } else {
     model$save_pretrained(save_directory=model_dir,
-                          safe_serilization=reticulate::py_module_available("safetensors"))
+                          safe_serilization=pt_safe_save)
   }
 
   update_aifeducation_progress_bar(value = 8,
@@ -387,6 +404,9 @@ create_funnel_model<-function(
 #'@param sustain_interval \code{integer} Interval in seconds for measuring power
 #'usage.
 #'
+#'@param pytorch_safetensors \code{bool} If \code{TRUE} a 'pytorch' model
+#'is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+#'it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.
 #'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
 #'to the console.
 #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
@@ -441,7 +461,8 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
                                  sustain_interval=15,
                                  trace=TRUE,
                                  keras_trace=1,
-                                 pytorch_trace=1){
+                                 pytorch_trace=1,
+                                 pytorch_safetensors=TRUE){
 
   #Set Shiny Progress Tracking
   pgr_max=10
@@ -497,6 +518,19 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  #Check possible save formats
+  if(ml_framework=="pytorch"){
+    if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==TRUE){
+      pt_safe_save=TRUE
+    } else if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==FALSE){
+      pt_safe_save=FALSE
+      warning("Python library 'safetensors' not available. Model will be saved
+            in the standard pytorch format.")
+    } else {
+      pt_safe_save=FALSE
     }
   }
 
@@ -794,7 +828,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     mlm_model$save_pretrained(save_directory=output_dir)
   } else {
     mlm_model$save_pretrained(save_directory=output_dir,
-                              safe_serilization=reticulate::py_module_available("safetensors"))
+                              safe_serilization=pt_safe_save)
   }
 
   update_aifeducation_progress_bar(value = 8, total = pgr_max, title = "Funnel Model")

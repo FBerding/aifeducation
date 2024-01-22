@@ -106,6 +106,36 @@ save_ai_model<-function(model,
   if(methods::is(model,"TextEmbeddingClassifierNeuralNet") |
      methods::is(model,"TextEmbeddingModel")){
 
+    #Check for valid save formats----------------------------------------------
+    if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
+      if(model$get_ml_framework()=="pytorch"){
+        if(save_format%in%c("default","pt","safetensors")==FALSE){
+          stop("For classifiers based on 'pytorch' only 'pt' and 'safetensors' are
+          valid save formats.")
+        }
+      } else if(model$get_ml_framework()=="tensorflow"){
+        if(save_format%in%c("default","h5","tf","keras")==FALSE){
+          stop("For classifiers based on 'tensorflow' only 'h5', 'tf', and 'keras' are
+          valid save formats.")
+        }
+      }
+    } else if(methods::is(model,"TextEmbeddingModel")){
+      if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
+        if(model$get_ml_framework()=="pytorch"){
+          if(save_format%in%c("default","pt","safetensors")==FALSE){
+            stop("For TextEmbeddingModels based on 'pytorch' only 'pt' and 'safetensors' are
+          valid save formats.")
+          }
+        } else if(model$get_ml_framework()=="tensorflow"){
+          if(save_format%in%c("default","h5","tf","keras")==FALSE){
+            stop("For TextEmbeddingModels based on 'tensorflow' only 'h5' is a
+          valid save format.")
+          }
+        }
+      }
+    }
+
+
     if(is.null(dir_name)){
       if(append_ID==TRUE){
         final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name)
@@ -124,15 +154,38 @@ save_ai_model<-function(model,
     #Save R Interface------------------------------
     save(model,file = paste0(final_model_dir_path,"/r_interface.rda"))
 
-    #---------------------
+    #Get Package Version
     if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
-      model$save_model(dir_path = final_model_dir_path,save_format=save_format)
+      aifeducation_version<-model$get_package_versions()[[1]]$aifeducation
     } else {
-      #TextEmbeddingModels
-      if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
-        model$save_model(model_dir = final_model_dir_path)
+      aifeducation_version<-model$get_package_versions()$aifeducation
+    }
+
+    #Save ML-Model---------------------
+    if(utils::compareVersion(as.character(aifeducation_version),"0.3.0")<=0){
+      if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
+        model$save_model(dir_path = final_model_dir_path,
+                         save_format=save_format)
+      } else {
+        #TextEmbeddingModels
+        if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
+          model$save_model(model_dir = final_model_dir_path)
+        }
+      }
+    } else {
+      if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
+        model$save_model(dir_path = final_model_dir_path,
+                         save_format=save_format)
+      } else {
+        #TextEmbeddingModels
+        if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
+          model$save_model(model_dir = final_model_dir_path,
+                           save_format=save_format)
+        }
       }
     }
+
+
   } else {
     stop("Function supports only objects of class TextEmbeddingClassifierNeuralNet or
          TextEmbeddingModel")

@@ -250,7 +250,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
       if(attention_type %in% c("fourier","multihead")==FALSE){
         stop("Optimzier must be 'fourier' oder 'multihead'.")
       }
-      if(repeat_encoder>0 & attention_type=="multihead" & self_attention_heads<0){
+      if(repeat_encoder>0 & attention_type=="multihead" & self_attention_heads<=0){
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
@@ -2045,7 +2045,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'\code{"tf"} for SavedModel
     #'or \code{"h5"} for HDF5.
     #'For 'pytorch' models \code{"safetensors"} for 'safetensors' or
-    #'\code{"pt"} for 'pytorch via pickle'.
+    #'\code{"pt"} for 'pytorch' via pickle.
     #'Use \code{"default"} for the standard format. This is keras for
     #''tensorflow'/'keras' models and safetensors for 'pytorch' models.
     #'@return Function does not return a value. It saves the model to disk.
@@ -2221,6 +2221,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'information on the training infrastructure.
     get_sustainability_data=function(){
       return(private$sustainability)
+    },
+    #---------------------------------------------------------------------------
+    #'@description Method for requesting the machine learning framework used
+    #'for the classifier.
+    #'@return Returns a \code{string} describing the machine learning framework used
+    #'for the classifier
+    get_ml_framework=function(){
+      return(private$ml_framework)
     }
   ),
   private = list(
