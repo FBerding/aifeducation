@@ -57,6 +57,8 @@ example_data<-data.frame(
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
+print(check_aif_py_modules())
+
 for(framework in ml_frameworks){
 
 for(ai_method in ai_methods){
@@ -731,9 +733,9 @@ for(ai_method in ai_methods){
                           save_format = "safetensors")
           )
           if(reticulate::py_module_available("safetensors")){
-            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model.safetensors"))))
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/model.safetensors"))))
           } else {
-            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/pytorch_model.bin"))))
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/pytorch_model.bin"))))
           }
         })
 
@@ -758,9 +760,9 @@ for(ai_method in ai_methods){
         )
         if(framework=="pytorch"){
           if(reticulate::py_module_available("safetensors")){
-            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model.safetensors"))))
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/model.safetensors"))))
           } else {
-            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/pytorch_model.bin"))))
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/pytorch_model.bin"))))
           }
         }
 

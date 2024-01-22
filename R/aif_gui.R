@@ -35,18 +35,22 @@ start_aifeducation_studio<-function(){
 
   message("Setting the correct conda environment.")
   if(reticulate::py_available(FALSE)==FALSE){
+    message("Python is not initalized.")
     if(reticulate::condaenv_exists("aifeducation")==FALSE){
       stop("Aifeducation studio requires a conda environment 'aifeducation' with
       specific python libraries. Please install this. Please refer to the corresponding
       vignette for more details.")
     } else {
+      message("Setting conda environment to 'aifeducation'.")
       reticulate::use_condaenv("aifeducation")
+      message("Initializing python.")
+      if(reticulate::py_available(TRUE)==FALSE){
+        stop("Python cannot be initalized. Please check your installation of python.")
+      }
     }
-  }
-
-  message("Initializing python.")
-  if(reticulate::py_available(TRUE)==FALSE){
-    stop("Python cannot be initalized. Please check your installation of python.")
+  } else {
+    message("Python is initalized. Try to start Aifeducation Studio with
+            the current environment.")
   }
 
   message("Checking machine learning frameworks.")
@@ -185,7 +189,7 @@ start_aifeducation_studio<-function(){
                                         textInput(inputId = "dp_text_output_filename",
                                                   label = tags$p(icon("file"),"File Name"))
                                     ),
-                                    box(title = "Start process",
+                                    box(title = "Start Process",
                                         solidHeader = TRUE,
                                         status = "success",
                                         width = 12,
