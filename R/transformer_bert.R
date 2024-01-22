@@ -296,6 +296,7 @@ create_bert_model<-function(
               "Saving Bert Model"))
   }
   if(ml_framework=="tensorflow"){
+    bert_model$build()
     bert_model$save_pretrained(save_directory=model_dir)
   } else {
     bert_model$save_pretrained(save_directory=model_dir,

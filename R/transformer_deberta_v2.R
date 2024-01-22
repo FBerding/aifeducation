@@ -284,6 +284,7 @@ create_deberta_v2_model<-function(
   )
 
   if(ml_framework=="tensorflow"){
+    model$build()
     model=transformers$TFDebertaV2ForMaskedLM(configuration)
   } else {
     model=transformers$DebertaV2ForMaskedLM(configuration)

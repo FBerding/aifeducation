@@ -49,7 +49,8 @@ install_py_modules<-function(envname="aifeducation",
 
     reticulate::conda_create(
       envname = envname,
-      channel=c("conda-forge")
+      channel=c("conda-forge"),
+      python_version = "3.9"
     )
   }
 

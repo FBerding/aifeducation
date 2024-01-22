@@ -275,6 +275,7 @@ create_longformer_model<-function(
               "Saving Longformer Model"))
   }
   if(ml_framework=="tensorflow"){
+    longformer_model$build()
     longformer_model$save_pretrained(save_directory=model_dir)
   } else {
     longformer_model$save_pretrained(save_directory=model_dir,

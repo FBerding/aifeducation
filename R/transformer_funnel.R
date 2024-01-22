@@ -313,6 +313,7 @@ create_funnel_model<-function(
               "Saving Funnel Transformer Model"))
   }
   if(ml_framework=="tensorflow"){
+    model$build()
     model$save_pretrained(save_directory=model_dir)
   } else {
     model$save_pretrained(save_directory=model_dir,

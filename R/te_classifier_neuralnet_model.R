@@ -2051,12 +2051,12 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@return Function does not return a value. It saves the model to disk.
     #'@importFrom utils write.csv
      save_model=function(dir_path,save_format="default"){
-       if(private$ml_framework=="tensorflow"){
+       if(private$ml_framework=="pytorch"){
          if(save_format%in%c("safetensors","pt")){
            stop("'safetensors' and 'pt' are only supported for models based on
            pytorch.")
          }
-       } else if(private$ml_framework=="pytorch"){
+       } else if(private$ml_framework=="tensorflow"){
          if(save_format%in%c("keras","tf","h5")){
            stop("'keras','tf', and 'h5' are only supported for models based on
            tensorflow")

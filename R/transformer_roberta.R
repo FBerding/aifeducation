@@ -269,6 +269,7 @@ create_roberta_model<-function(
   )
 
   if(ml_framework=="tensorflow"){
+    roberta_model$build()
     roberta_model=transformers$TFRobertaModel(configuration)
   } else {
     roberta_model=transformers$RobertaModel(configuration)
