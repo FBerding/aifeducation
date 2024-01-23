@@ -343,7 +343,6 @@ for(framework in ml_frameworks){
           n_cores=1)
       )
     })
-  }
 
   if(framework=="tensorflow"){
     base::gc(verbose = FALSE,full = TRUE)
@@ -364,7 +363,7 @@ for(framework in ml_frameworks){
     })
 
     base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Saving Classifier H5"),{
+    test_that(paste(framework,"Saving Classifier h5"),{
       expect_no_error(classifier$save_model(
         testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")),
         save_format = "h5")
@@ -372,7 +371,7 @@ for(framework in ml_frameworks){
     })
 
     base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Loading Classifier H5"),{
+    test_that(paste(framework,"Loading Classifier h5"),{
       expect_no_error(
         classifier$load_model(
           ml_framework="tensorflow",
@@ -401,23 +400,23 @@ for(framework in ml_frameworks){
     })
   } else if (framework=="pytorch"){
     base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Saving Classifier pytorch"),{
+    test_that(paste(framework,"Saving Classifier pytorch",n_classes),{
       expect_no_error(classifier$save_model(
         testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes")),
         save_format = "default")
       )
 
       if(reticulate::py_module_available("safetensors")){
-        expect_true(file.exists(testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes","/model.safetensors"))))
+        expect_true(file.exists(testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes","/model_data.safetensors"))))
       } else {
-        expect_true(file.exists(testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes","/pytorch_model.bin"))))
+        expect_true(file.exists(testthat::test_path(paste0("test_artefacts/tmp_pytorch/",n_classes,"_classes","/model_data.pt"))))
       }
 
 
     })
 
     base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Loading Classifier pytorch"),{
+    test_that(paste(framework,"Loading Classifier pytorch",n_classes),{
       expect_no_error(
         classifier$load_model(
           ml_framework="pytorch",
@@ -574,16 +573,16 @@ for(framework in ml_frameworks){
 
     #------------------------------------------------------------------------------
     base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Classifier Save Total Model H5"), {
+    test_that(paste(framework,"Classifier Save Total Model h5"), {
       expect_no_error(
         save_ai_model(model=classifier,
                       model_dir = testthat::test_path("test_artefacts/tmp_full_models"),
-                      save_format = "H5")
+                      save_format = "h5")
       )
     })
 
     base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Classifier Load Total Model H5"), {
+    test_that(paste(framework,"Classifier Load Total Model h5"), {
       new_classifier<-NULL
       new_classifier<-load_ai_model(
         ml_framework="tensorflow",
@@ -739,6 +738,7 @@ for(framework in ml_frameworks){
     })
 
   }
+ }
 }
 
 
