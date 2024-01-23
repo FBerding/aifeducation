@@ -269,7 +269,6 @@ create_roberta_model<-function(
   )
 
   if(ml_framework=="tensorflow"){
-    roberta_model$build()
     roberta_model=transformers$TFRobertaModel(configuration)
   } else {
     roberta_model=transformers$RobertaModel(configuration)
@@ -284,6 +283,7 @@ create_roberta_model<-function(
               "Saving Roberta Model"))
   }
   if(ml_framework=="tensorflow"){
+    roberta_model$build()
     roberta_model$save_pretrained(save_directory=model_dir)
   } else {
     roberta_model$save_pretrained(save_directory=model_dir,

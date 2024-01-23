@@ -284,7 +284,6 @@ create_deberta_v2_model<-function(
   )
 
   if(ml_framework=="tensorflow"){
-    model$build()
     model=transformers$TFDebertaV2ForMaskedLM(configuration)
   } else {
     model=transformers$DebertaV2ForMaskedLM(configuration)
@@ -300,6 +299,7 @@ create_deberta_v2_model<-function(
               "Saving DeBERTa V2 Model"))
   }
   if(ml_framework=="tensorflow"){
+    model$build()
     model$save_pretrained(save_directory=model_dir)
   } else {
     model$save_pretrained(save_directory=model_dir,
