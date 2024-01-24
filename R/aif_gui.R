@@ -66,8 +66,15 @@ start_aifeducation_studio<-function(){
 
   #Exporting Functions for Python
   #These functions must be available in the global environment
-  py_update_aifeducation_progress_bar_epochs<<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
-  py_update_aifeducation_progress_bar_steps<<-reticulate::py_func(update_aifeducation_progress_bar_steps)
+  #if(is.null(py_update_aifeducation_progress_bar_epochs)){
+  #  stop("Update function for epochs is not available.")
+  #}
+  #if(is.null(py_update_aifeducation_progress_bar_steps)){
+  #  stop("Update function for steps is not available.")
+  #}
+
+  #py_update_aifeducation_progress_bar_epochs<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
+  #py_update_aifeducation_progress_bar_steps<-reticulate::py_func(update_aifeducation_progress_bar_steps)
 
   #Start GUI--------------------------------------------------------------------
   options(shiny.reactlog=TRUE)
@@ -1892,7 +1899,7 @@ start_aifeducation_studio<-function(){
                          title = "Please choose a Folder",
                          icon=icon("folder-open")),
           textInput(inputId =  "lm_db_select_final_model_destination_path",
-                    label = tags$p(icon("Folder"),"Path to Folder")),
+                    label = tags$p(icon("folder"),"Path to Folder")),
           actionButton(inputId = "lm_train_tune_start",
                        label = "Start Training/Tuning",
                        icon = icon("paper-plane"))

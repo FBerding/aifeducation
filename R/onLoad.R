@@ -13,8 +13,23 @@ safetensors<-NULL
 
 aifeducation_config<-NULL
 
-py_update_aifeducation_progress_bar_epochs<-NULL
-py_update_aifeducation_progress_bar_steps<-NULL
+#To call a R function from python the wrapper must be in the global environment
+#These both functions allow to update the progressbar in the shiny app
+#Aifeducation Studio during training
+#Delayed is necessary in order to allow the user to choose a conda environment.
+delayedAssign(x="py_update_aifeducation_progress_bar_epochs",
+              value=reticulate::py_func(update_aifeducation_progress_bar_epochs),
+              assign.env=globalenv())
+delayedAssign(x="py_update_aifeducation_progress_bar_steps",
+              value = reticulate::py_func(update_aifeducation_progress_bar_steps),
+              assign.env=globalenv())
+
+#py_update_aifeducation_progress_bar_epochs=NULL
+#py_update_aifeducation_progress_bar_steps=NULL
+
+
+#py_update_aifeducation_progress_bar_epochs<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
+#py_update_aifeducation_progress_bar_steps<-reticulate::py_func(update_aifeducation_progress_bar_steps)
 
 .onLoad<-function(libname, pkgname){
   # use superassignment to update the global reference
@@ -33,7 +48,6 @@ py_update_aifeducation_progress_bar_steps<-NULL
   keras<<-reticulate::import("keras", delay_load = TRUE)
 
   aifeducation_config<<-AifeducationConfiguration$new()
-
 }
 
 
