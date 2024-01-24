@@ -54,17 +54,16 @@ Imports:
     rlang,
     smotefamily,
     stringr,
-    stringi,
     utils,
     shiny,
     shinyFiles,
     shinyWidgets,
     shinydashboard,
     shinyjs,
-    readtext,
-    readxl,
+    fs,
     ggplot2,
-    fs
+    readtext,
+    readxl
 Suggests: 
     text2vec,
     tidytext,

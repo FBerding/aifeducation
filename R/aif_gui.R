@@ -17,10 +17,9 @@
 #'@importFrom shinyjs html
 #'@importFrom fs path_home
 #'@importFrom readxl read_xlsx
-#'@importFrom stringi stri_isempty
-#'@importFrom stringi stri_split_regex
-#'@importFrom stringi stri_trans_tolower
 #'@importFrom stringr str_extract_all
+#'@importFrom stringr str_split_fixed
+#'@importFrom stringr str_to_lower
 #'@importFrom utils packageVersion
 #'@importFrom utils read.csv2
 #'@importFrom utils write.csv2
@@ -1136,7 +1135,8 @@ start_aifeducation_studio<-function(){
                               title = as.character(all_paths[i]))
             tmp_document=readtext::readtext(file=all_paths[i])
             #File name without extension
-            text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
+            #text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
+            text_corpus[counter,"id"]=stringr::str_split_fixed(tmp_document$doc_id,pattern="\\.")[1,-1]
             text_corpus[counter,"text"]=tmp_document$text
             counter=counter+1
 
@@ -2998,8 +2998,8 @@ start_aifeducation_studio<-function(){
         given=input[[paste0("lm_doc_","Developers","_fist_name_",i)]]
         family=input[[paste0("lm_doc_","Developers","_last_name_",i)]]
         mail=input[[paste0("lm_doc_","Developers","_mail_",i)]]
-        if((!is.null(given) & !stringi::stri_isempty(given)) &
-           (!is.null(family) & !stringi::stri_isempty(family))){
+        if((!is.null(given) & !(given="")) &
+           (!is.null(family) & !(family=""))){
           person=person(given=given,family=family,email=mail)
           tmp_person_list=append(x=tmp_person_list,
                                  values = person)
@@ -3025,8 +3025,8 @@ start_aifeducation_studio<-function(){
         given=input[[paste0("lm_doc_","Modifiers","_fist_name_",i)]]
         family=input[[paste0("lm_doc_","Modifiers","_last_name_",i)]]
         mail=input[[paste0("lm_doc_","Modifiers","_mail_",i)]]
-        if((!is.null(given) & !stringi::stri_isempty(given)) &
-           (!is.null(family) & !stringi::stri_isempty(family))){
+        if((!is.null(given) & !(given="")) &
+           (!is.null(family) & !(family=""))){
           person=person(given=given,family=family,email=mail)
           tmp_person_list=append(x=tmp_person_list,
                                  values = person)
@@ -3042,7 +3042,6 @@ start_aifeducation_studio<-function(){
       LanguageModel_for_Documentation<-reactive({model})
     })
 
-
     observeEvent(input$lm_doc_editor_abstract_eng_save_button,{
       model<-LanguageModel_for_Documentation()
       model$set_model_description(
@@ -3052,6 +3051,7 @@ start_aifeducation_studio<-function(){
       save(model,file = r_interface_path)
       LanguageModel_for_Documentation<-reactive({model})
     })
+
     observeEvent(input$lm_doc_editor_abstract_native_save_button,{
       model<-LanguageModel_for_Documentation()
       model$set_model_description(
@@ -3195,8 +3195,10 @@ start_aifeducation_studio<-function(){
       file_path=tec_target_data_for_train_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
-          extension=stringi::stri_split_fixed(file_path,pattern=".")[[1]]
-          extension=stringi::stri_trans_tolower(extension[[length(extension)]])
+          extension=stringr::str_split_fixed(file_path,pattern="\\.")[1,-1]
+          extension=stringr::str_to_lower(extension)
+          #extension=stringi::stri_split_fixed(file_path,pattern=".")[[1]]
+          #extension=stringi::stri_trans_tolower(extension[[length(extension)]])
           show_alert(title="Loading",
                      text = "Please wait",
                      type="info")
@@ -3302,10 +3304,12 @@ start_aifeducation_studio<-function(){
     })
 
     output$tec_dense_layer_check<-renderText({
-      as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
+      #as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
+      as.numeric(stringr::str_extract_all(input$tec_hidden,pattern = "\\d+")[[1]])
     })
     output$tec_rec_layer_check<-renderText({
-      as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
+      #as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
+      as.numeric(stringr::str_extract_all(input$tec_rec,pattern = "\\d+")[[1]])
     })
 
     #Training settings
@@ -3422,12 +3426,14 @@ start_aifeducation_studio<-function(){
         if(is.null(input$tec_hidden)|input$tec_hidden==""){
           hidden=NULL
         } else {
-          hidden=as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
+          #hidden=as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
+          hidden=as.numeric(stringr::str_extract_all(input$tec_hidden,pattern = "\\d+")[[1]])
         }
         if(is.null(input$tec_rec)|input$tec_rec==""){
           rec=NULL
         } else {
-          rec=as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
+          #rec=as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
+          rec=as.numeric(stringr::str_extract_all(input$tec_rec,pattern = "\\d+")[[1]])
         }
 
         if(is.null(input$tec_bpl_min)){
@@ -4527,8 +4533,8 @@ start_aifeducation_studio<-function(){
         given=input[[paste0("tec_doc_","Developers","_fist_name_",i)]]
         family=input[[paste0("tec_doc_","Developers","_last_name_",i)]]
         mail=input[[paste0("tec_doc_","Developers","_mail_",i)]]
-        if((!is.null(given) & !stringi::stri_isempty(given)) &
-           (!is.null(family) & !stringi::stri_isempty(family))){
+        if((!is.null(given) & !(given="")) &
+           (!is.null(family) & !(family==""))){
           person=person(given=given,family=family,email=mail)
           tmp_person_list=append(x=tmp_person_list,
                                  values = person)
