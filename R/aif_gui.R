@@ -1,36 +1,59 @@
 #'Aifeducation Studio
 #'
-#'Functions starts a shiny app that represents the aifeducation studio
+#'Functions starts a shiny app that represents the Aifeducation Studio
 #'
 #'@return This function does nothing return. It is used to start a shiny app.
 #'
 #'@family Graphical User Interface
 #'
-#'@import shiny
-#'@import shinydashboard
-#'@import shinyFiles
-#'@import ggplot2
-#'@import shinyWidgets
-#'@import readtext
 #'@import iotarelr
-#'@importFrom shinyjs useShinyjs
-#'@importFrom shinyjs html
-#'@importFrom fs path_home
-#'@importFrom readxl read_xlsx
 #'@importFrom stringr str_extract_all
 #'@importFrom stringr str_split_fixed
 #'@importFrom stringr str_to_lower
 #'@importFrom utils packageVersion
 #'@importFrom utils read.csv2
 #'@importFrom utils write.csv2
-#'@importFrom rlang .data
+#'@importFrom utils askYesNo
+#'@importFrom utils install.packages
 #'@importFrom methods is
-#'
 #'
 #'@export
 start_aifeducation_studio<-function(){
 
   #Checking Requirements-------------------------------------------------------
+  #Check necessary R packages
+  message("Checking R Packages.")
+  r_packages=c(
+    "shiny",
+    "shinyFiles",
+    "shinyWidgets",
+    "shinydashboard",
+    "shinyjs",
+    "ggplot2",
+    "readtext",
+    "readxl",
+    "rlang")
+
+  missing_r_packages=NULL
+  for(i in 1:length(r_packages)){
+    if(requireNamespace(r_packages[i])==FALSE){
+      missing_r_packages=append(x=missing_r_packages,
+                                values = r_packages[i] )
+    }
+  }
+
+  if(length(missing_r_packages)>0){
+    install_now<-utils::askYesNo(msg=paste("The following R packages are missing for Aifeducation Studio.",
+                              missing_r_packages,
+                              "Do you want to install them now?"),
+                    default = TRUE,
+             prompts = getOption("askYesNo", gettext(c("Yes", "No"))))
+    if(install_now==TRUE){
+      utils::install.packages(missing_r_packages)
+    } else {
+      stop("Some necessary R Packages are missing.")
+    }
+  }
 
   message("Setting the correct conda environment.")
   if(reticulate::py_available(FALSE)==FALSE){
@@ -81,529 +104,529 @@ start_aifeducation_studio<-function(){
   #options(shiny.fullstacktrace = TRUE)
 
   # Define UI ----
-  ui <- dashboardPage(skin = "blue",
-                      dashboardHeader(title="AI for Education",
-                                      dropdownMenuOutput(outputId = "header_notifications")
+  ui <- shinydashboard::dashboardPage(skin = "blue",
+                      shinydashboard::dashboardHeader(title="AI for Education",
+                                      shinydashboard::dropdownMenuOutput(outputId = "header_notifications")
                       ),
-                      dashboardSidebar(sidebarMenuOutput(outputId = "sidebar_menu")),
-                      dashboardBody(
+                      shinydashboard::dashboardSidebar(shinydashboard::sidebarMenuOutput(outputId = "sidebar_menu")),
+                      shinydashboard::dashboardBody(
                         shinyjs::useShinyjs(),
-                        tabItems(
+                        shinydashboard::tabItems(
                           #Configuration: Only shown at the start of the app-------------------------
-                          tabItem(tabName="config",
-                                  fluidPage(
-                                    box(title = "Machine Learning Framework",
+                          shinydashboard::tabItem(tabName="config",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Machine Learning Framework",
                                         solidHeader = TRUE,
                                         status = "primary",
 
-                                        selectInput(inputId = "config_ml_framework",
+                                        shiny::selectInput(inputId = "config_ml_framework",
                                                     label = "Please choose the ML framework you would like to use:",
                                                     choices = available_ml_frameworks),
 
-                                        uiOutput(outputId = "config_ml_options")
+                                        shiny::uiOutput(outputId = "config_ml_options")
                                     ),
-                                    box(title = "Sustainability Tracking",
+                                    shinydashboard::box(title = "Sustainability Tracking",
                                         solidHeader = TRUE,
                                         status = "success",
 
-                                        materialSwitch(
+                                        shinyWidgets::materialSwitch(
                                           inputId = "config_track_sustainability",
                                           label = "Activate Sustainability Tracking",
                                           value = TRUE,
                                           right = TRUE,
                                           status = "success"),
-                                        selectInput(
+                                        shiny::selectInput(
                                           inputId = "config_sustainability_country",
                                           label = "Please choose your country",
                                           choices=country_alpha_3_list,
                                           #choices=NULL,
                                           selected="DEU")
                                     ),
-                                    box(title="Start Session",
+                                    shinydashboard::box(title="Start Session",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        actionButton(
+                                        shiny::actionButton(
                                           inputId = "config_start_session",
                                           label = "start session",
                                           width = "100%",
-                                          icon = icon("paper-plane")
+                                          icon = shiny::icon("paper-plane")
                                         )
                                     )
                                   )
                           ),
                           #Start Page after Configuration--------------------------------------------
-                          tabItem(tabName = "start_page",
-                                  fluidPage(
-                                    uiOutput(outputId = "ui_home"))
+                          shinydashboard::tabItem(tabName = "start_page",
+                                  shiny::fluidPage(
+                                    shiny::uiOutput(outputId = "ui_home"))
                           ),
                           #Page Data Preparation-----------------------------------------------------
-                          tabItem(tabName = "data_preparation",
-                                  fluidPage(
-                                    box(title = "Text Sources",
+                          shinydashboard::tabItem(tabName = "data_preparation",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Text Sources",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
-                                        shinyDirButton(id="dp_source_dir_select",
+                                        shinyFiles::shinyDirButton(id="dp_source_dir_select",
                                                        label="Choose Folder",
                                                        title = "Please choose a folder",
-                                                       icon=icon("folder-open")),
-                                        textInput(inputId = "dp_text_source_dir",
-                                                  label = tags$p(icon("folder"),"Path to Folder")),
-                                        materialSwitch(inputId = "dp_include_subdirectories",
-                                                       label = tags$p("Include Sub-Folders",icon("folder-tree")),
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::textInput(inputId = "dp_text_source_dir",
+                                                  label = shiny::tags$p(shiny::icon("folder"),"Path to Folder")),
+                                        shinyWidgets::materialSwitch(inputId = "dp_include_subdirectories",
+                                                       label = shiny::tags$p("Include Sub-Folders",shiny::icon("folder-tree")),
                                                        right = TRUE,
                                                        status = "primary")
                                     ),
-                                    box(title="File Types",
+                                    shinydashboard::box(title="File Types",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
-                                        materialSwitch(inputId = "dp_include_csv",
-                                                       label = tags$p("Include .csv ",icon(name = "file-csv")),
+                                        shinyWidgets::materialSwitch(inputId = "dp_include_csv",
+                                                       label = shiny::tags$p("Include .csv ",shiny::icon(name = "file-csv")),
                                                        right = TRUE,
                                                        inline = FALSE,
                                                        value = TRUE,
                                                        status = "primary"),
-                                        materialSwitch(inputId = "dp_include_pdf",
-                                                       label = tags$p("Include .pdf",icon(name = "file-pdf")),
+                                        shinyWidgets::materialSwitch(inputId = "dp_include_pdf",
+                                                       label = shiny::tags$p("Include .pdf",shiny::icon(name = "file-pdf")),
                                                        right = TRUE,
                                                        inline = FALSE,
                                                        value = TRUE,
                                                        status = "primary"),
-                                        materialSwitch(inputId = "dp_include_xlsx",
-                                                       label = tags$p("Include .xlsx", icon(name = "file-excel")),
+                                        shinyWidgets::materialSwitch(inputId = "dp_include_xlsx",
+                                                       label = shiny::tags$p("Include .xlsx", shiny::icon(name = "file-excel")),
                                                        right = TRUE,
                                                        inline = FALSE,
                                                        value = TRUE,
                                                        status = "primary"),
-                                        textInput(inputId = "dp_excel_id_column",
+                                        shiny::textInput(inputId = "dp_excel_id_column",
                                                   label = "Name of ID column for xlsx files"),
-                                        textInput(inputId = "dp_excel_text_column",
+                                        shiny::textInput(inputId = "dp_excel_text_column",
                                                   label = "Name of text column xlsx files")
                                     ),
-                                    box(title = "Text Output",
+                                    shinydashboard::box(title = "Text Output",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
-                                        shinyDirButton(id="dp_output_dir_select",
+                                        shinyFiles::shinyDirButton(id="dp_output_dir_select",
                                                        label = "Select Folder",
                                                        title = "Please select a folder",
-                                                       icon=icon("folder-open")),
-                                        textInput(inputId = "dp_text_output_dir",
-                                                  label = tags$p(icon("folder"),"Path to Folder")),
-                                        textInput(inputId = "dp_text_output_filename",
-                                                  label = tags$p(icon("file"),"File Name"))
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::textInput(inputId = "dp_text_output_dir",
+                                                  label = shiny::tags$p(shiny::icon("folder"),"Path to Folder")),
+                                        shiny::textInput(inputId = "dp_text_output_filename",
+                                                  label = shiny::tags$p(shiny::icon("file"),"File Name"))
                                     ),
-                                    box(title = "Start Process",
+                                    shinydashboard::box(title = "Start Process",
                                         solidHeader = TRUE,
                                         status = "success",
                                         width = 12,
-                                        actionButton(inputId = "dp_start",
+                                        shiny::actionButton(inputId = "dp_start",
                                                      label = "Create text corpus",
-                                                     icon = icon("paper-plane")))
+                                                     icon = shiny::icon("paper-plane")))
                                   )
                           ),
                           #Page Create Language Model------------------------------------------------
-                          tabItem(tabName = "create_language_model",
-                                  fluidPage(
-                                    box(title = "Model Architecture",
+                          shinydashboard::tabItem(tabName = "create_language_model",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Model Architecture",
                                         solidHeader = TRUE,
                                         status = "primary",
                                         width = 4,
-                                        selectInput(inputId = "lm_base_architecture",
+                                        shiny::selectInput(inputId = "lm_base_architecture",
                                                     label="Base Architecture",
                                                     choices = c("bert",
                                                                 "roberta",
                                                                 "deberta_v2",
                                                                 "funnel",
                                                                 "longformer")),
-                                        uiOutput(outputId = "lm_base_configuration")
+                                        shiny::uiOutput(outputId = "lm_base_configuration")
                                     ),
-                                    box(title = "Vocabulary",
+                                    shinydashboard::box(title = "Vocabulary",
                                         width = 4,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select a dataset with raw texts for generating a
+                                        shiny::tags$p("Please select a dataset with raw texts for generating a
                            vocabulary for the model."),
-                                        shinyFilesButton(id="lm_text_file_vocab",
+                                        shinyFiles::shinyFilesButton(id="lm_text_file_vocab",
                                                          label = "Choose Dataset",
                                                          title = "Please choose a file",
-                                                         icon=icon("file"),
+                                                         icon=shiny::icon("file"),
                                                          multiple = FALSE,
                                                          filetype=list(rdata=c('rda','rdata'))),
-                                        textInput(inputId = "lm_vocab_texts_file_path",
-                                                  label = tags$p(icon("file"),"File path")),
-                                        uiOutput(outputId="lm_vocab_configuration")
+                                        shiny::textInput(inputId = "lm_vocab_texts_file_path",
+                                                  label = shiny::tags$p(shiny::icon("file"),"File path")),
+                                        shiny::uiOutput(outputId="lm_vocab_configuration")
                                     ),
-                                    box(title = "Creation",
+                                    shinydashboard::box(title = "Creation",
                                         width = 4,
                                         solidHeader = TRUE,
                                         status = "success",
-                                        tags$p("Please select a directory where the model should be stored."),
-                                        shinyDirButton(id="lm_save_created_model_dir",
+                                        shiny::tags$p("Please select a directory where the model should be stored."),
+                                        shinyFiles::shinyDirButton(id="lm_save_created_model_dir",
                                                        label = "Choose a Folder",
                                                        title = "Please choose a directory",
-                                                       icon=icon("folder-open")),
-                                        textInput(inputId = "lm_save_created_model_dir_path",
-                                                  label = tags$p(icon("folder"),"Path to Folder")),
-                                        actionButton(inputId = "lm_create",
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::textInput(inputId = "lm_save_created_model_dir_path",
+                                                  label = shiny::tags$p(shiny::icon("folder"),"Path to Folder")),
+                                        shiny::actionButton(inputId = "lm_create",
                                                      label = "Start Creation",
-                                                     icon = icon("paper-plane"))
+                                                     icon = shiny::icon("paper-plane"))
                                     )
                                   )
                           ),
                           #Page Train Language Model------------------------------------------------
-                          tabItem(tabName = "train_tune_language_model",
-                                  fluidPage(
-                                    box(title = "Base Model",
+                          shinydashboard::tabItem(tabName = "train_tune_language_model",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Base Model",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Base models consists of several files which are stored in
+                                        shiny::tags$p("Base models consists of several files which are stored in
                                                a folder. Please select the folder that contains the entire model."),
-                                        shinyDirButton(id="lm_db_select_model_for_training",
+                                        shinyFiles::shinyDirButton(id="lm_db_select_model_for_training",
                                                        label = "Select a Folder",
                                                        title = "Please choose a folder",
-                                                       icon=icon("folder-open")),
-                                        tags$p(icon("folder"),tags$b("Path to Base Model:")),
-                                        textOutput(outputId = "lm_db_select_model_for_training_path")
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::tags$p(shiny::icon("folder"),shiny::tags$b("Path to Base Model:")),
+                                        shiny::textOutput(outputId = "lm_db_select_model_for_training_path")
                                     ),
-                                    uiOutput(outputId = "lm_train_raw_texts"),
-                                    uiOutput(outputId = "lm_train_tune_train_settings"),
-                                    uiOutput(outputId = "lm_train_tune_save_settings")
+                                    shiny::uiOutput(outputId = "lm_train_raw_texts"),
+                                    shiny::uiOutput(outputId = "lm_train_tune_train_settings"),
+                                    shiny::uiOutput(outputId = "lm_train_tune_save_settings")
                                   )
                           ),
                           #Page Interface Language Model----------------------------------------------
-                          tabItem(tabName = "interface_language_model",
-                                  fluidPage(
-                                    box(title = "Base Model",
+                          shinydashboard::tabItem(tabName = "interface_language_model",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Base Model",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Please select a base model which should
+                                        shiny::tags$p("Please select a base model which should
                              form the basis of your interface."),
-                                        shinyDirButton(id="lm_db_select_model_for_interface",
+                                        shinyFiles::shinyDirButton(id="lm_db_select_model_for_interface",
                                                        label = "Choose a Folder",
                                                        title = "Please choose a folder",
-                                                       icon=icon("folder-open")),
-                                        tags$p(icon("folder"),tags$b("Path to Folder with Base Model:")),
-                                        textOutput(outputId = "lm_db_select_model_for_interface_path")
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::tags$p(shiny::icon("folder"),shiny::tags$b("Path to Folder with Base Model:")),
+                                        shiny::textOutput(outputId = "lm_db_select_model_for_interface_path")
                                     ),
-                                    uiOutput(outputId = "lm_interface_setting")
+                                    shiny::uiOutput(outputId = "lm_interface_setting")
                                   )
                           ),
                           #Page Use Language Model------------------------------------------------
-                          tabItem(tabName = "use_language_model",
-                                  fluidPage(
-                                    box(title = "Use Language Model",
+                          shinydashboard::tabItem(tabName = "use_language_model",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Use Language Model",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Text Embedding Models consist of several files. Please
+                                        shiny::tags$p("Text Embedding Models consist of several files. Please
                                                select the folder that contains the entire model."),
-                                        shinyDirButton(id="lm_db_select_model_for_use",
+                                        shinyFiles::shinyDirButton(id="lm_db_select_model_for_use",
                                                        label = "Choose a Folder",
                                                        title = "Please choose a folder",
-                                                       icon=icon("folder-open")),
-                                        tags$p(tags$b("Selected Interface for Masked Language Model:")),
-                                        textOutput(outputId = "lm_use_selected_model_label")
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::tags$p(shiny::tags$b("Selected Interface for Masked Language Model:")),
+                                        shiny::textOutput(outputId = "lm_use_selected_model_label")
                                     ),
-                                    uiOutput(outputId = "lm_use_tabs")
+                                    shiny::uiOutput(outputId = "lm_use_tabs")
                                   )
                           ),
                           #Document Page-------------------------------------------------------------
-                          tabItem(tabName = "document_language_model",
-                                  fluidPage(
-                                    box(title = "Document Language Model",
+                          shinydashboard::tabItem(tabName = "document_language_model",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Document Language Model",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("Text Embedding Models consist of several files. Please
+                                        shiny::tags$p("Text Embedding Models consist of several files. Please
                                                select the folder that contains the entire model."),
-                                        shinyDirButton(id="lm_db_select_model_for_documentation",
+                                        shinyFiles::shinyDirButton(id="lm_db_select_model_for_documentation",
                                                        label = "Choose a Folder",
                                                        title = "Please choose a folder",
-                                                       icon=icon("folder-open")),
-                                        tags$p(tags$b("Selected Interface:")),
-                                        textOutput(outputId = "lm_document_selected_model_label")
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::tags$p(shiny::tags$b("Selected Interface:")),
+                                        shiny::textOutput(outputId = "lm_document_selected_model_label")
                                     ),
-                                    uiOutput(outputId = "lm_document_tabs")
+                                    shiny::uiOutput(outputId = "lm_document_tabs")
                                   )
                           ),
                           #TextEmbeddingClassifiers Pages--------------------------------------------
                           #Create and Train Page-----------------------------------------------------
-                          tabItem(tabName = "create_and_train_classifier",
-                                  fluidPage(
-                                    fluidRow(
-                                      box(title = "Input Data",
+                          shinydashboard::tabItem(tabName = "create_and_train_classifier",
+                                  shiny::fluidPage(
+                                    shiny::fluidRow(
+                                      shinydashboard::box(title = "Input Data",
                                           width = 12,
                                           solidHeader = TRUE,
                                           status = "primary",
                                           collapsible = TRUE,
                                           collapsed = FALSE,
-                                          tags$p("Please select the file containing the text embeddings
+                                          shiny::tags$p("Please select the file containing the text embeddings
                              which should be used for training."),
-                                          shinyFilesButton(id="tec_select_embeddings_for_training",
+                                          shinyFiles::shinyFilesButton(id="tec_select_embeddings_for_training",
                                                            label = "Select File",
                                                            title = "Please select a file",
-                                                           icon=icon("file"),
+                                                           icon=shiny::icon("file"),
                                                            multiple = FALSE,
                                                            filetype=c("rda","rdata")),
-                                          uiOutput(outputId = "tec_embeddings_for_training_overview")
+                                          shiny::uiOutput(outputId = "tec_embeddings_for_training_overview")
                                       ),
-                                      box(title = "Target Data",
+                                      shinydashboard::box(title = "Target Data",
                                           width = 12,
                                           solidHeader = TRUE,
                                           status = "primary",
                                           collapsible = TRUE,
                                           collapsed = FALSE,
-                                          tags$p("Please select the file containing the corresponding
+                                          shiny::tags$p("Please select the file containing the corresponding
                              classes/categories for each document."),
-                                          tags$p("Possible file formats are .csv, .xlsx, .rda, .rdata."),
-                                          tags$p("Please not that the file must contain a column 'id' which
+                                          shiny::tags$p("Possible file formats are .csv, .xlsx, .rda, .rdata."),
+                                          shiny::tags$p("Please not that the file must contain a column 'id' which
                              stores the corresponding documents ids."),
-                                          shinyFilesButton(id="tec_select_target_data_for_training",
+                                          shinyFiles::shinyFilesButton(id="tec_select_target_data_for_training",
                                                            label = "Select File",
                                                            title = "please select a file",
-                                                           icon=icon("file"),
+                                                           icon=shiny::icon("file"),
                                                            multiple = FALSE,
                                                            filetype=c("csv","xlsx","rda","rdata")),
-                                          uiOutput(outputId = "tec_target_data_for_training_overview")
+                                          shiny::uiOutput(outputId = "tec_target_data_for_training_overview")
                                       )
                                     ),
-                                    fluidRow(
-                                      box(title = "Architecture",
+                                    shiny::fluidRow(
+                                      shinydashboard::box(title = "Architecture",
                                           width = 12,
                                           solidHeader = TRUE,
                                           status = "primary",
-                                          box(title = "General",
+                                          shinydashboard::box(title = "General",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = FALSE,
-                                              textInput(inputId = "tec_name",
+                                              shiny::textInput(inputId = "tec_name",
                                                         label = "Model Name",
                                                         width = "100%"),
-                                              textInput(inputId = "tec_label",
+                                              shiny::textInput(inputId = "tec_label",
                                                         label = "Model Label",
                                                         width = "100%")
                                           ),
-                                          box(title = "Positional Embedding",
+                                          shinydashboard::box(title = "Positional Embedding",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              materialSwitch(inputId="tec_add_pos_embedding",
+                                              shinyWidgets::materialSwitch(inputId="tec_add_pos_embedding",
                                                              label="Add Positional Embedding",
                                                              value = TRUE,
                                                              status = "primary")
                                           ),
-                                          box(title = "Encoder Layers",
+                                          shinydashboard::box(title = "Encoder Layers",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              selectInput(inputId = "tec_attention_type",
+                                              shiny::selectInput(inputId = "tec_attention_type",
                                                           choices = c("fourier","multihead"),
                                                           label = "Attention Type"),
-                                              uiOutput(outputId = "tec_attention_layers_for_training"),
-                                              sliderInput(inputId = "tec_intermediate_size",
+                                              shiny::uiOutput(outputId = "tec_attention_layers_for_training"),
+                                              shiny::sliderInput(inputId = "tec_intermediate_size",
                                                           label = "Intermediate Size",
                                                           min = 0,
                                                           value = 512,
                                                           max=8096,
                                                           step = 1,
                                                           round = TRUE),
-                                              sliderInput(inputId = "tec_repeat_encoder",
+                                              shiny::sliderInput(inputId = "tec_repeat_encoder",
                                                           label = "Number Encoding Layers",
                                                           value = 1,
                                                           min = 0,
                                                           max=48,
                                                           step = 1,
                                                           round = TRUE),
-                                              sliderInput(inputId="tec_encoder_dropout",
+                                              shiny::sliderInput(inputId="tec_encoder_dropout",
                                                           label="Encoder Layers Dropout",
                                                           value=0.1,
                                                           min=0,
                                                           max=0.99,
                                                           step = 0.01)
                                           ),
-                                          box(title = "Reccurent Layers",
+                                          shinydashboard::box(title = "Reccurent Layers",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              textInput(inputId = "tec_rec",
+                                              shiny::textInput(inputId = "tec_rec",
                                                         label = "Reccurrent Layers"),
-                                              textOutput(outputId = "tec_rec_layer_check"),
-                                              sliderInput(inputId="tec_rec_dropout",
+                                              shiny::textOutput(outputId = "tec_rec_layer_check"),
+                                              shiny::sliderInput(inputId="tec_rec_dropout",
                                                           label="Reccurent Layers Dropout",
                                                           value=0.1,
                                                           min=0,
                                                           max=0.99,
                                                           step = 0.01)
                                           ),
-                                          box(title = "Dense Layers",
+                                          shinydashboard::box(title = "Dense Layers",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              textInput(inputId = "tec_hidden",
+                                              shiny::textInput(inputId = "tec_hidden",
                                                         label = "Dense Layers",
                                                         width = "100%"),
-                                              textOutput(outputId = "tec_dense_layer_check"),
-                                              sliderInput(inputId="tec_dense_dropout",
+                                              shiny::textOutput(outputId = "tec_dense_layer_check"),
+                                              shiny::sliderInput(inputId="tec_dense_dropout",
                                                           label="Dense Dropout",
                                                           value=0.4,
                                                           min=0,
                                                           max=0.99,
                                                           step = 0.01)
                                           ),
-                                          box(title = "Optimizer",
+                                          shinydashboard::box(title = "Optimizer",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              selectInput(inputId = "tec_optimizer",
+                                              shiny::selectInput(inputId = "tec_optimizer",
                                                           label = "Optimizer",
                                                           choices = c("adam","rmsprop"))
                                           )
                                       ),
-                                      box(title = "Training Settings",
+                                      shinydashboard::box(title = "Training Settings",
                                           width = 12,
                                           solidHeader = TRUE,
                                           status = "primary",
-                                          box(title = "General Settings",
+                                          shinydashboard::box(title = "General Settings",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              materialSwitch(inputId = "tec_balance_class_weights",
+                                              shinyWidgets::materialSwitch(inputId = "tec_balance_class_weights",
                                                              label = "Balance Class Weights",
                                                              value = TRUE,
                                                              status = "primary"),
-                                              sliderInput(inputId = "tec_data_n_test_samples",
+                                              shiny::sliderInput(inputId = "tec_data_n_test_samples",
                                                           label = "Number of Folds",
                                                           value = 5,
                                                           min=1,
                                                           max=25,
                                                           round = TRUE,
                                                           step = 1),
-                                              sliderInput(inputId = "tec_bsl_val_size",
+                                              shiny::sliderInput(inputId = "tec_bsl_val_size",
                                                           label = "Proportion for Validation Sample",
                                                           min=0.02,
                                                           value = 0.25,
                                                           max=0.5,
                                                           step = 0.01),
-                                              numericInput(inputId = "tec_epochs",
+                                              shiny::numericInput(inputId = "tec_epochs",
                                                            label = "Epochs",
                                                            min = 1,
                                                            value = 40,
                                                            step = 1),
-                                              sliderInput(inputId = "tec_batch_size",
+                                              shiny::sliderInput(inputId = "tec_batch_size",
                                                           label = "Batch Size",
                                                           min = 1,
                                                           max= 256,
                                                           value = 32,
                                                           step = 1)
                                           ),
-                                          box(title = "Baseline Model",
+                                          shinydashboard::box(title = "Baseline Model",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              materialSwitch(inputId = "tec_use_baseline",
+                                              shinyWidgets::materialSwitch(inputId = "tec_use_baseline",
                                                              value = TRUE,
                                                              label = "Calculate Baseline Model",
                                                              status = "primary")
                                           ),
-                                          box(title = "Balanced Synthetic Cases",
+                                          shinydashboard::box(title = "Balanced Synthetic Cases",
                                               width = 12,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              materialSwitch(inputId = "tec_use_bsc",
+                                              shinyWidgets::materialSwitch(inputId = "tec_use_bsc",
                                                              value = FALSE,
                                                              label = "Add Synthetic Cases",
                                                              status = "primary"),
-                                              sliderInput(inputId = "tec_n_cores",
+                                              shiny::sliderInput(inputId = "tec_n_cores",
                                                           label = "Number of Cores",
                                                           min = 1,
                                                           max=parallel::detectCores(),
                                                           value = parallel::detectCores()),
-                                              selectInput(inputId = "tec_bsc_methods",
+                                              shiny::selectInput(inputId = "tec_bsc_methods",
                                                           label = "Method",
                                                           choices = c("dbsmote","adas","smote")),
-                                              sliderInput(inputId = "tec_bsc_max_k",
+                                              shiny::sliderInput(inputId = "tec_bsc_max_k",
                                                           label = "Max k",
                                                           value = 10,
                                                           min = 1,
                                                           max = 20,
                                                           step = 1,
                                                           round = TRUE),
-                                              sliderInput(inputId = "tec_bsc_val_size",
+                                              shiny::sliderInput(inputId = "tec_bsc_val_size",
                                                           label = "Proportion for Validation Sample",
                                                           min=0.02,
                                                           value = 0.25,
                                                           max=0.5,
                                                           step = 0.01),
-                                              materialSwitch(inputId = "tec_bsc_add_all",
+                                              shinyWidgets::materialSwitch(inputId = "tec_bsc_add_all",
                                                              label = "Add All Synthetic Cases",
                                                              value = FALSE,
                                                              status = "primary")
                                           ),
-                                          box(
+                                          shinydashboard::box(
                                             title = "Balanced Pseudo Labeling",
                                             width = 12,
                                             status = "primary",
                                             collapsible = TRUE,
                                             collapsed = TRUE,
-                                            materialSwitch(inputId = "tec_use_bpl",
+                                            shinyWidgets::materialSwitch(inputId = "tec_use_bpl",
                                                            value = FALSE,
                                                            label = "Add Pseudo Labeling",
                                                            status = "primary"),
-                                            sliderInput(inputId = "tec_bpl_max_steps",
+                                            shiny::sliderInput(inputId = "tec_bpl_max_steps",
                                                         label = "Max Steps",
                                                         value = 5,
                                                         min = 1,
                                                         max = 20,
                                                         step = 1,
                                                         round = TRUE),
-                                            materialSwitch(inputId = "tec_bpl_model_reset",
+                                            shinyWidgets::materialSwitch(inputId = "tec_bpl_model_reset",
                                                            label = "Reset Model After Every Step",
                                                            value = TRUE,
                                                            status = "primary"),
-                                            materialSwitch(inputId = "tec_bpl_dynamic_inc",
+                                            shinyWidgets::materialSwitch(inputId = "tec_bpl_dynamic_inc",
                                                            label = "Dynamic Weight Increase",
                                                            value = FALSE,
                                                            status = "primary"),
-                                            materialSwitch(inputId = "tec_bpl_balance",
+                                            shinyWidgets::materialSwitch(inputId = "tec_bpl_balance",
                                                            label = "Balance Pseudo Labels",
                                                            value = FALSE,
                                                            status = "primary"),
-                                            sliderInput(inputId = "tec_bpl_anchor",
+                                            shiny::sliderInput(inputId = "tec_bpl_anchor",
                                                         label = "Certainty Anchor",
                                                         value = 1,
                                                         max = 1,
                                                         min = 0,
                                                         step = 0.01),
-                                            uiOutput(outputId = "tec_dynamic_sample_weights"),
-                                            sliderInput(inputId = "tec_bpl_weight_start",
+                                            shiny::uiOutput(outputId = "tec_dynamic_sample_weights"),
+                                            shiny::sliderInput(inputId = "tec_bpl_weight_start",
                                                         label = "Start Weights",
                                                         value = 0,
                                                         min = 0,
                                                         max = 2,
                                                         step = 0.01),
-                                            sliderInput(inputId = "tec_bpl_weight_inc",
+                                            shiny::sliderInput(inputId = "tec_bpl_weight_inc",
                                                         label = "Weight Increase Per Step",
                                                         value = 0.02,
                                                         min = 0,
@@ -612,65 +635,65 @@ start_aifeducation_studio<-function(){
                                           )
                                       )
                                     ),
-                                    fluidRow(
-                                      box(title="Model Saving",
+                                    shiny::fluidRow(
+                                      shinydashboard::box(title="Model Saving",
                                           solidHeader = TRUE,
                                           status = "success",
                                           width = 12,
-                                          shinyDirButton(id="tec_create_select_destination_folder",
+                                          shinyFiles::shinyDirButton(id="tec_create_select_destination_folder",
                                                          title = "Please select a directory",
                                                          label = "Choose Directory",
-                                                         icon=icon("folder-open")),
-                                          textInput(inputId = "tec_create_select_destination_folder_path",
-                                                    label = tags$p(icon("folder"),"Directory Path")),
-                                          textInput(inputId = "tec_create_folder_name",
-                                                    label = tags$p(icon("folder"),"Folder Name")),
-                                          actionButton(inputId="tec_create_test_data_matching",
+                                                         icon=shiny::icon("folder-open")),
+                                          shiny::textInput(inputId = "tec_create_select_destination_folder_path",
+                                                    label = shiny::tags$p(shiny::icon("folder"),"Directory Path")),
+                                          shiny::textInput(inputId = "tec_create_folder_name",
+                                                    label = shiny::tags$p(shiny::icon("folder"),"Folder Name")),
+                                          shiny::actionButton(inputId="tec_create_test_data_matching",
                                                        label = "Test Data Matching",
-                                                       icon = icon("circle-question")),
-                                          actionButton(inputId = "tec_create_start",
+                                                       icon = shiny::icon("circle-question")),
+                                          shiny::actionButton(inputId = "tec_create_start",
                                                        label = "Start Training",
-                                                       icon = icon("paper-plane"))
+                                                       icon = shiny::icon("paper-plane"))
                                       )
                                     )
                                   )
                           ),
                           #Classifier Use page--------------------------------------------------------
-                          tabItem(tabName = "use_classifier",
-                                  fluidPage(
-                                    box(title = "Use Classifier",
+                          shinydashboard::tabItem(tabName = "use_classifier",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Use Classifier",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("A classifier consists of several files. Please select
+                                        shiny::tags$p("A classifier consists of several files. Please select
                                                the folder that contains the entire model."),
-                                        shinyDirButton(id="tec_select_dir_for_use",
+                                        shinyFiles::shinyDirButton(id="tec_select_dir_for_use",
                                                        label = "Select Folder",
                                                        title = "Please choose a directory",
-                                                       icon=icon("folder-open")),
-                                        tags$p(tags$b("Selected Classifier: ")),
-                                        textOutput(outputId = "tec_use_selected_model_label")
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::tags$p(shiny::tags$b("Selected Classifier: ")),
+                                        shiny::textOutput(outputId = "tec_use_selected_model_label")
                                     ),
-                                    uiOutput(outputId = "tec_use_tabs")
+                                    shiny::uiOutput(outputId = "tec_use_tabs")
                                   )
                           ),
                           #Document Page-------------------------------------------------------------
-                          tabItem(tabName = "document_classifier",
-                                  fluidPage(
-                                    box(title = "Document Classifier",
+                          shinydashboard::tabItem(tabName = "document_classifier",
+                                  shiny::fluidPage(
+                                    shinydashboard::box(title = "Document Classifier",
                                         width = 12,
                                         solidHeader = TRUE,
                                         status = "primary",
-                                        tags$p("A classifier consists of several files. Please select
+                                        shiny::tags$p("A classifier consists of several files. Please select
                                                the folder that contains the entire model."),
-                                        shinyDirButton(id="tec_db_select_model_for_documentation",
+                                        shinyFiles::shinyDirButton(id="tec_db_select_model_for_documentation",
                                                        label = "Choose Folder",
                                                        title = "Please choose a folder",
-                                                       icon=icon("folder-open"))
+                                                       icon=shiny::icon("folder-open"))
                                     ),
-                                    uiOutput(outputId = "tec_document_tabs"),
-                                    tags$p(tags$b("Selected Classifier: ")),
-                                    textOutput(outputId = "tec_document_selected_model_label")
+                                    shiny::uiOutput(outputId = "tec_document_tabs"),
+                                    shiny::tags$p(shiny::tags$b("Selected Classifier: ")),
+                                    shiny::textOutput(outputId = "tec_document_selected_model_label")
                                   )
                           )
                         )
@@ -687,11 +710,11 @@ start_aifeducation_studio<-function(){
     requireNamespace(package="shinyWidgets")
     requireNamespace(package="iotarelr")
 
-    session$onSessionEnded(stopApp)
+    session$onSessionEnded(shiny::stopApp)
     options(shiny.fullstacktrace = FALSE)
 
     #Logger for progressmodal
-    log=reactiveVal(value = rep(x="",times=15))
+    log=shiny::reactiveVal(value = rep(x="",times=15))
     #py_update_aifeducation_progress_bar_epochs<<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
     #py_update_aifeducation_progress_bar_steps<<-reticulate::py_func(update_aifeducation_progress_bar_steps)
 
@@ -734,24 +757,24 @@ start_aifeducation_studio<-function(){
     )
 
     #Starting the app------------------------------------------------------------
-    output$sidebar_menu<-renderMenu({
-      sidebarMenu(id="main_panel",
-                  menuItem(text = "Configuration",
+    output$sidebar_menu<-shinydashboard::renderMenu({
+      shinydashboard::sidebarMenu(id="main_panel",
+                  shinydashboard::menuItem(text = "Configuration",
                            tabName = "config")
       )})
     shinydashboard::updateTabItems(selected="config",
                                    inputId = "main_panel")
 
-    output$config_ml_options<-renderUI({
+    output$config_ml_options<-shiny::renderUI({
       if(input$config_ml_framework=="tensorflow"){
-        ui<-tagList(
-        materialSwitch(
+        ui<-shiny::tagList(
+        shinyWidgets::materialSwitch(
           inputId = "config_tf_cpu_only",
           label = "Tensorflow: Use CPU only",
           value = FALSE,
           right = TRUE,
           status = "primary"),
-        materialSwitch(
+        shinyWidgets::materialSwitch(
           inputId = "config_tf_gpu_low_memory",
           label = "Tensorflow: Limited GPU memory",
           value = TRUE,
@@ -764,7 +787,7 @@ start_aifeducation_studio<-function(){
     })
 
     #Finish configuration-------------------------------------------------------
-    observeEvent(input$config_start_session,{
+    shiny::observeEvent(input$config_start_session,{
 
       if(input$config_ml_framework=="tensorflow"){
         if(input$config_tf_cpu_only==TRUE){
@@ -775,35 +798,35 @@ start_aifeducation_studio<-function(){
         }
       }
 
-      output$sidebar_menu<-renderMenu({
-        sidebarMenu(id="main_panel",
-                    menuItem(text="Home",
+      output$sidebar_menu<-shinydashboard::renderMenu({
+        shinydashboard::sidebarMenu(id="main_panel",
+                    shinydashboard::menuItem(text="Home",
                              tabName = "start_page",
-                             icon = icon("house")),
-                    menuItem(text = "Data preparation",
+                             icon = shiny::icon("house")),
+                    shinydashboard::menuItem(text = "Data preparation",
                              tabName = "data_preparation",
-                             icon = icon("database")),
-                    menuItem(text = "Language Modeling",
-                             icon = icon("book-open-reader"),
-                             tags$p(tags$b("Base Models")),
-                             menuSubItem(text = "Create",
+                             icon = shiny::icon("database")),
+                    shinydashboard::menuItem(text = "Language Modeling",
+                             icon = shiny::icon("book-open-reader"),
+                             shiny::tags$p(shiny::tags$b("Base Models")),
+                             shinydashboard::menuSubItem(text = "Create",
                                          tabName = "create_language_model"),
-                             menuSubItem(text="Train/Tune",
+                             shinydashboard::menuSubItem(text="Train/Tune",
                                          tabName = "train_tune_language_model"),
-                             tags$p(tags$b("Text Embedding Models")),
-                             menuSubItem(text = "Create",
+                             shiny::tags$p(shiny::tags$b("Text Embedding Models")),
+                             shinydashboard::menuSubItem(text = "Create",
                                          tabName = "interface_language_model"),
-                             menuSubItem(text = "Use",
+                             shinydashboard::menuSubItem(text = "Use",
                                          tabName = "use_language_model"),
-                             menuSubItem(text = "Document",
+                             shinydashboard::menuSubItem(text = "Document",
                                          tabName = "document_language_model")),
-                    menuItem(text = "Classification",
-                             icon = icon("boxes-stacked"),
-                             menuSubItem(text="Create and Train",
+                    shinydashboard::menuItem(text = "Classification",
+                             icon = shiny::icon("boxes-stacked"),
+                             shinydashboard::menuSubItem(text="Create and Train",
                                          tabName = "create_and_train_classifier"),
-                             menuSubItem(text = "Use",
+                             shinydashboard::menuSubItem(text = "Use",
                                          tabName = "use_classifier"),
-                             menuSubItem(text = "Document",
+                             shinydashboard::menuSubItem(text = "Document",
                                          tabName = "document_classifier"))
         )
       })
@@ -813,7 +836,7 @@ start_aifeducation_studio<-function(){
     })
 
     #Header---------------------------------------------------------------------
-    chosen_framework<-eventReactive(input$config_start_session,{
+    chosen_framework<-shiny::eventReactive(input$config_start_session,{
 
       if(input$config_ml_framework=="tensorflow"){
         if(tf$test$is_built_with_cuda()==TRUE &
@@ -834,21 +857,21 @@ start_aifeducation_studio<-function(){
       return(list(framework=input$config_ml_framework,gpu_acc=gpu_available))
     },ignoreInit = TRUE)
 
-    output$header_notifications<-renderMenu({
-      framework=notificationItem(text = paste("Active ML Framework: ",chosen_framework()$framework),
-                                 icon("python"))
+    output$header_notifications<-shinydashboard::renderMenu({
+      framework=shinydashboard::notificationItem(text = paste("Active ML Framework: ",chosen_framework()$framework),
+                                 shiny::icon("python"))
 
-      gpu_support=notificationItem(text = paste("GPU Acceleration: ",chosen_framework()$gpu_acc),
-                                   icon("microchip"))
+      gpu_support=shinydashboard::notificationItem(text = paste("GPU Acceleration: ",chosen_framework()$gpu_acc),
+                                   shiny::icon("microchip"))
 
-      return(dropdownMenu(type = "notifications", badgeStatus = "primary",
+      return(shinydashboard::dropdownMenu(type = "notifications", badgeStatus = "primary",
                           framework,
                           gpu_support))
 
     })
 
     #Home Page------------------------------------------------------------------
-    output$ui_home<-renderUI({
+    output$ui_home<-shiny::renderUI({
       r_packages_names<-c(
         "aifeducation",
         "reticulate",
@@ -979,58 +1002,58 @@ start_aifeducation_studio<-function(){
       }
 
       ui<-list(
-        tags$div(
-          tags$h1("AI for Education"),
-          tags$h2("- Studio -"),
+        shiny::tags$div(
+          shiny::tags$h1("AI for Education"),
+          shiny::tags$h2("- Studio -"),
           style="text-align: center;"
         ),
-        box(title="R Packages",
+        shinydashboard::box(title="R Packages",
             width = 12,
             solidHeader = TRUE,
             status = "primary",
-            renderTable(r_packages_table)),
-        box(title = "Python Packages",
+            shiny::renderTable(r_packages_table)),
+        shinydashboard::box(title = "Python Packages",
             width = 12,
             solidHeader = TRUE,
             status = "primary",
-            renderTable(py_general_table)),
-        box(title="Python Packages - Pytorch",
+            shiny::renderTable(py_general_table)),
+        shinydashboard::box(title="Python Packages - Pytorch",
             width = 12,
             solidHeader = TRUE,
             status = "primary",
-            renderTable(py_torch_table)),
-        box(title = "Python Packages - Keras/Tensorflow",
+            shiny::renderTable(py_torch_table)),
+        shinydashboard::box(title = "Python Packages - Keras/Tensorflow",
             width = 12,
             solidHeader = TRUE,
             status = "primary",
-            renderTable(py_tf_table))
+            shiny::renderTable(py_tf_table))
       )
     })
 
     #Data Preparation Page-------------------------------------------------------
-    volumes <- c(Home = fs::path_home(), "R Installation" = R.home(), getVolumes()())
-    shinyDirChoose(input=input,
+    volumes <- c(Home=fs::path_home(), shinyFiles::getVolumes()())
+    shinyFiles::shinyDirChoose(input=input,
                    id="dp_source_dir_select",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="dp_output_dir_select",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
 
-    observeEvent(input$dp_source_dir_select,{
-      updateTextInput(inputId = "dp_text_source_dir",
-                      value = parseDirPath(volumes,input$dp_source_dir_select))
+    shiny::observeEvent(input$dp_source_dir_select,{
+      shiny::updateTextInput(inputId = "dp_text_source_dir",
+                      value = shinyFiles::parseDirPath(volumes,input$dp_source_dir_select))
     })
-    observeEvent(input$dp_output_dir_select,{
-      updateTextInput(inputId = "dp_text_output_dir",
-                      value = parseDirPath(volumes,input$dp_output_dir_select))
+    shiny::observeEvent(input$dp_output_dir_select,{
+      shiny::updateTextInput(inputId = "dp_text_output_dir",
+                      value = shinyFiles::parseDirPath(volumes,input$dp_output_dir_select))
     })
 
     #Create Text Data Set--------------------------------------------------------
-    observeEvent(input$dp_start,{
+    shiny::observeEvent(input$dp_start,{
       root_path=input$dp_text_source_dir
 
       save_file_path=paste0(input$dp_text_output_dir,"/",
@@ -1063,24 +1086,24 @@ start_aifeducation_studio<-function(){
         tmp_ui_error=NULL
         for(i in 1:length(error_list)){
           tmp_ui_error[length(tmp_ui_error)+1]=list(
-            tags$p(error_list[i])
+            shiny::tags$p(error_list[i])
           )
         }
 
-        error_modal<-modalDialog(
+        error_modal<-shiny::modalDialog(
           title = "Error",
           size = "l",
           easyClose = TRUE,
-          footer = modalButton("Close"),
-          tagList(tmp_ui_error)
+          footer = shiny::modalButton("Close"),
+          shiny::tagList(tmp_ui_error)
         )
-        showModal(error_modal)
+        shiny::showModal(error_modal)
 
       } else {
-        updateProgressBar(id="pgr_bar_aifeducation",
+        shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                           value = 0,
                           total=100)
-        showModal(progress_modal)
+        shiny::showModal(progress_modal)
 
         if(input$dp_include_csv==TRUE){
           file_paths_csv=list.files(
@@ -1130,13 +1153,13 @@ start_aifeducation_studio<-function(){
 
         counter=1
 
-        updateProgressBar(id="pgr_bar_aifeducation",
+        shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                           value = counter,
                           total=n_files)
 
         if(is.null(all_paths)==FALSE){
           for(i in 1:length(all_paths)){
-            updateProgressBar(id="pgr_bar_aifeducation",
+            shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                               value = counter,
                               total=n_files,
                               title = as.character(all_paths[i]))
@@ -1147,7 +1170,7 @@ start_aifeducation_studio<-function(){
             text_corpus[counter,"text"]=tmp_document$text
             counter=counter+1
 
-            updateProgressBar(id="pgr_bar_aifeducation",
+            shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                               value = counter,
                               total=n_files,
                               title = as.character(all_paths[i]))
@@ -1157,7 +1180,7 @@ start_aifeducation_studio<-function(){
 
         if(is.null(file_paths_xlsx)==FALSE){
           for(i in 1:length(file_paths_xlsx)){
-            updateProgressBar(id="pgr_bar_aifeducation",
+            shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                               value = counter,
                               total=n_files,
                               title = as.character(file_paths_xlsx[i]))
@@ -1170,7 +1193,7 @@ start_aifeducation_studio<-function(){
             text_corpus=rbind(text_corpus,tmp_matrix)
             counter=counter+1
 
-            updateProgressBar(id="pgr_bar_aifeducation",
+            shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                               value = counter,
                               total=n_files,
                               title = as.character(file_paths_xlsx[i]))
@@ -1179,7 +1202,7 @@ start_aifeducation_studio<-function(){
 
         text_corpus<-as.data.frame(text_corpus)
 
-        updateProgressBar(id="pgr_bar_aifeducation",
+        shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                           value = counter,
                           total=n_files,
                           title = paste("Write text file to:",save_file_path))
@@ -1187,7 +1210,7 @@ start_aifeducation_studio<-function(){
         save(file = save_file_path,text_corpus)
 
         shiny::removeModal()
-        show_alert(title = "Success",
+        shinyWidgets::show_alert(title = "Success",
                    type="success",
                    text = paste("Created text corpus with",nrow(text_corpus),"documents."))
       }
@@ -1195,65 +1218,65 @@ start_aifeducation_studio<-function(){
     })
 
     #Page Create Language Model-------------------------------------------------
-    shinyFileChoose(input=input,
+    shinyFiles::shinyFileChoose(input=input,
                     id="lm_text_file_vocab",
                     roots = volumes,
                     filetypes=c("rda","rdata"))
-    observeEvent(input$lm_text_file_vocab,{
-      tmp_file_path=parseFilePaths(volumes,input$lm_text_file_vocab)
+    shiny::observeEvent(input$lm_text_file_vocab,{
+      tmp_file_path=shinyFiles::parseFilePaths(volumes,input$lm_text_file_vocab)
       if(nrow(tmp_file_path)>0){
-        updateTextInput(inputId="lm_vocab_texts_file_path",
+        shiny::updateTextInput(inputId="lm_vocab_texts_file_path",
                         value = tmp_file_path[[1,"datapath"]])
       }
     })
 
     #Generate UI depending on the central approach
-    lm_ui<-eventReactive(input$lm_base_architecture,{
+    lm_ui<-shiny::eventReactive(input$lm_base_architecture,{
       #UI for architecture
       if(input$lm_base_architecture=="bert"|
          input$lm_base_architecture=="roberta"|
          input$lm_base_architecture=="deberta_v2"){
-        ui_architekture<-tagList(
-          numericInput(inputId = "lm_max_position_embeddings",
+        ui_architekture<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_max_position_embeddings",
                        label="Maximal sequence length",
                        value=512,
                        min = 100,
                        max=8192,
                        step = 1),
-          numericInput(inputId = "lm_hidden_size",
+          shiny::numericInput(inputId = "lm_hidden_size",
                        label="Hidden size",
                        value=768,
                        min = 10,
                        max=2048,
                        step = 1),
-          numericInput(inputId = "lm_intermediate_size",
+          shiny::numericInput(inputId = "lm_intermediate_size",
                        label="Intermediate size",
                        value=3072,
                        min = 16,
                        max=16384,
                        step = 1),
-          sliderInput(inputId = "lm_num_hidden_layer",
+          shiny::sliderInput(inputId = "lm_num_hidden_layer",
                       label="n Hidden Layers",
                       value=12,
                       min = 1,
                       max=56,
                       step = 1),
-          sliderInput(inputId = "lm_num_attention_heads",
+          shiny::sliderInput(inputId = "lm_num_attention_heads",
                       label="n Attentions Heads",
                       value=12,
                       min = 1,
                       max=56,
                       step = 1),
-          selectInput(inputId = "lm_hidden_act",
+          shiny::selectInput(inputId = "lm_hidden_act",
                       label = "Activation Function",
                       choices = c("gelu", "relu", "silu","gelu_new")),
-          sliderInput(inputId = "lm_hidden_dropout_prob",
+          shiny::sliderInput(inputId = "lm_hidden_dropout_prob",
                       label="Dropout Probability",
                       value=0.1,
                       min = 0,
                       max=.99,
                       step = .01),
-          sliderInput(inputId = "lm_attention_probs_dropout_prob",
+          shiny::sliderInput(inputId = "lm_attention_probs_dropout_prob",
                       label="Attention Dropout Probability",
                       value=0.1,
                       min = 0,
@@ -1261,71 +1284,71 @@ start_aifeducation_studio<-function(){
                       step = .01)
         )
       } else if(input$lm_base_architecture=="funnel"){
-        ui_architekture<-tagList(
-          numericInput(inputId = "lm_max_position_embeddings",
+        ui_architekture<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_max_position_embeddings",
                        label="Maximal sequence length",
                        value=512,
                        min = 100,
                        max=8192,
                        step = 1),
-          numericInput(inputId = "lm_hidden_size",
+          shiny::numericInput(inputId = "lm_hidden_size",
                        label="Hidden size",
                        value=768,
                        min = 10,
                        max=2048,
                        step = 1),
-          numericInput(inputId = "lm_target_hidden_size",
+          shiny::numericInput(inputId = "lm_target_hidden_size",
                        label="Target Hidden size",
                        value=64,
                        min = 2,
                        max=2048,
                        step = 1),
-          numericInput(inputId = "lm_intermediate_size",
+          shiny::numericInput(inputId = "lm_intermediate_size",
                        label="Intermediate size",
                        value=3072,
                        min = 16,
                        max=16384,
                        step = 1),
-          sliderInput(inputId = "lm_num_blocks",
+          shiny::sliderInput(inputId = "lm_num_blocks",
                       label="n Blocks",
                       value=12,
                       min = 1,
                       max=56,
                       step = 1),
-          sliderInput(inputId = "lm_block_sizes_size",
+          shiny::sliderInput(inputId = "lm_block_sizes_size",
                       label="Block Sizes",
                       value=4,
                       min = 1,
                       max= 56,
                       step = 1),
-          sliderInput(inputId = "lm_num_decoder_layers",
+          shiny::sliderInput(inputId = "lm_num_decoder_layers",
                       label="n Decoding Layers",
                       value=2,
                       min = 1,
                       max= 24,
                       step = 1),
-          sliderInput(inputId = "lm_num_attention_heads",
+          shiny::sliderInput(inputId = "lm_num_attention_heads",
                       label="n Attentions Heads",
                       value=12,
                       min = 1,
                       max=56,
                       step = 1),
-          selectInput(inputId = "lm_hidden_act",
+          shiny::selectInput(inputId = "lm_hidden_act",
                       label = "Activation Function",
                       choices = c("gelu", "relu", "silu","gelu_new")),
-          sliderInput(inputId = "lm_hidden_dropout_prob",
+          shiny::sliderInput(inputId = "lm_hidden_dropout_prob",
                       label="Dropout Probability",
                       value=0.1,
                       min = 0,
                       max=.99,
                       step = .01),
-          sliderInput(inputId = "lm_attention_probs_dropout_prob",
+          shiny::sliderInput(inputId = "lm_attention_probs_dropout_prob",
                       label="Attention Dropout Probability",
                       value=0.1,
                       min = 0,
                       max=.99,
                       step = .01),
-          sliderInput(inputId = "lm_activation_dropout ",
+          shiny::sliderInput(inputId = "lm_activation_dropout ",
                       label="Activation Dropout Probability",
                       value=0.0,
                       min = 0,
@@ -1333,53 +1356,53 @@ start_aifeducation_studio<-function(){
                       step = .01)
         )
       } else if(input$lm_base_architecture=="longformer"){
-        ui_architekture<-tagList(
-          numericInput(inputId = "lm_max_position_embeddings",
+        ui_architekture<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_max_position_embeddings",
                        label="Maximal sequence length",
                        value=512,
                        min = 100,
                        max=8192,
                        step = 1),
-          numericInput(inputId = "lm_hidden_size",
+          shiny::numericInput(inputId = "lm_hidden_size",
                        label="Hidden size",
                        value=768,
                        min = 10,
                        max=2048,
                        step = 1),
-          numericInput(inputId = "lm_intermediate_size",
+          shiny::numericInput(inputId = "lm_intermediate_size",
                        label="Intermediate size",
                        value=3072,
                        min = 16,
                        max=16384,
                        step = 1),
-          sliderInput(inputId = "lm_num_hidden_layer",
+          shiny::sliderInput(inputId = "lm_num_hidden_layer",
                       label="n Hidden Layers",
                       value=12,
                       min = 1,
                       max=56,
                       step = 1),
-          sliderInput(inputId = "lm_num_attention_heads",
+          shiny::sliderInput(inputId = "lm_num_attention_heads",
                       label="n Attentions Heads",
                       value=12,
                       min = 1,
                       max=56,
                       step = 1),
-          numericInput(inputId = "lm_attention_window ",
+          shiny::numericInput(inputId = "lm_attention_window ",
                        label="Size Attention Window",
                        value=512,
                        min = 10,
                        max=8192,
                        step = 1),
-          selectInput(inputId = "lm_hidden_act",
+          shiny::selectInput(inputId = "lm_hidden_act",
                       label = "Activation Function",
                       choices = c("gelu", "relu", "silu","gelu_new")),
-          sliderInput(inputId = "lm_hidden_dropout_prob",
+          shiny::sliderInput(inputId = "lm_hidden_dropout_prob",
                       label="Dropout Probability",
                       value=0.1,
                       min = 0,
                       max=.99,
                       step = .01),
-          sliderInput(inputId = "lm_attention_probs_dropout_prob",
+          shiny::sliderInput(inputId = "lm_attention_probs_dropout_prob",
                       label="Attention Dropout Probability",
                       value=0.1,
                       min = 0,
@@ -1391,61 +1414,61 @@ start_aifeducation_studio<-function(){
       #UI for vocab
       if(input$lm_base_architecture=="bert"|
          input$lm_base_architecture=="funnel"){
-        ui_vocab<-tagList(
-          numericInput(inputId = "lm_vocab_size",
+        ui_vocab<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_vocab_size",
                        label="Size of Vocabulary",
                        value=30522,
                        min = 100,
                        max=200000,
                        step = 1),
-          materialSwitch(inputId = "lm_vocab_do_lower_case",
+          shinyWidgets::materialSwitch(inputId = "lm_vocab_do_lower_case",
                          value = FALSE,
                          label = "Transform to Lower Case",
                          status = "primary")
         )
       } else if(input$lm_base_architecture=="roberta"){
-        ui_vocab<-tagList(
-          numericInput(inputId = "lm_vocab_size",
+        ui_vocab<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_vocab_size",
                        label="Size of Vocabulary",
                        value=30522,
                        min = 100,
                        max=200000,
                        step = 1),
-          materialSwitch(inputId = "lm_add_prefix_space",
+          shinyWidgets::materialSwitch(inputId = "lm_add_prefix_space",
                          value = FALSE,
                          right = TRUE,
                          label = "Add Prefix Space",
                          status = "primary"),
-          materialSwitch(inputId = "lm_trim_offsets",
+          shinyWidgets::materialSwitch(inputId = "lm_trim_offsets",
                          value = TRUE,
                          right = TRUE,
                          label = "Trim Offsets",
                          status = "primary"),
-          materialSwitch(inputId = "lm_vocab_do_lower_case",
+          shinyWidgets::materialSwitch(inputId = "lm_vocab_do_lower_case",
                          value = FALSE,
                          label = "Transform to Lower Case",
                          status = "primary")
         )
       } else if(input$lm_base_architecture=="deberta_v2"|
                 input$lm_base_architecture=="longformer"){
-        ui_vocab<-tagList(
-          numericInput(inputId = "lm_vocab_size",
+        ui_vocab<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_vocab_size",
                        label="Size of Vocabulary",
                        value=30522,
                        min = 100,
                        max=200000,
                        step = 1),
-          materialSwitch(inputId = "lm_add_prefix_space",
+          shinyWidgets::materialSwitch(inputId = "lm_add_prefix_space",
                          value = FALSE,
                          right = TRUE,
                          label = "Add Prefix Space",
                          status = "primary"),
-          materialSwitch(inputId = "lm_trim_offsets",
+          shinyWidgets::materialSwitch(inputId = "lm_trim_offsets",
                          value = TRUE,
                          right = TRUE,
                          label = "Trim Offsets",
                          status = "primary"),
-          materialSwitch(inputId = "lm_vocab_do_lower_case",
+          shinyWidgets::materialSwitch(inputId = "lm_vocab_do_lower_case",
                          value = FALSE,
                          label = "Transform to Lower Case",
                          status = "primary"),
@@ -1458,34 +1481,34 @@ start_aifeducation_studio<-function(){
       ))
     })
 
-    output$lm_base_configuration<-renderUI({lm_ui()[1]})
-    output$lm_vocab_configuration<-renderUI({lm_ui()[2]})
+    output$lm_base_configuration<-shiny::renderUI({lm_ui()[1]})
+    output$lm_vocab_configuration<-shiny::renderUI({lm_ui()[2]})
 
-    #Save Location Box
-    shinyDirChoose(input=input,
+    #Save Location shinydashboard::box
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_save_created_model_dir",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
 
-    observeEvent(input$lm_save_created_model_dir,{
-      updateTextInput(inputId = "lm_save_created_model_dir_path",
-                      value = parseDirPath(volumes,input$lm_save_created_model_dir))
+    shiny::observeEvent(input$lm_save_created_model_dir,{
+      shiny::updateTextInput(inputId = "lm_save_created_model_dir_path",
+                      value = shinyFiles::parseDirPath(volumes,input$lm_save_created_model_dir))
     })
 
     #Create model
-    observeEvent(input$lm_create,{
+    shiny::observeEvent(input$lm_create,{
       #Check inputs
       error_list=NULL
       if(!dir.exists(input$lm_save_created_model_dir_path)){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "The destination directory does not exist. Please check the path
         and/or create that directory.")
         )
       }
 
       if(!file.exists(input$lm_vocab_texts_file_path)){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "The file containing the raw texts does not exist. Please check
         the corresponding path.")
         )
@@ -1494,7 +1517,7 @@ start_aifeducation_studio<-function(){
         raw_texts<-get(x=raw_text_object)
 
         if("text"%in%colnames(raw_texts)==FALSE){
-          error_list[length(error_list)+1]=list(tags$p(
+          error_list[length(error_list)+1]=list(shiny::tags$p(
             "The file with the raw texts does not contain a column 'text'.
           Please check the file.")
           )
@@ -1502,7 +1525,7 @@ start_aifeducation_studio<-function(){
       }
 
       if(length(error_list)==0){
-        showModal(progress_modal)
+        shiny::showModal(progress_modal)
 
         raw_texts=as.data.frame(raw_texts)
         trace=TRUE
@@ -1642,39 +1665,42 @@ start_aifeducation_studio<-function(){
           log(output_print)
         }
         )
-        removeModal()
+        shiny::removeModal()
       } else {
         #Show error messages
-        show_alert(
+        shinyWidgets::show_alert(
           title = "Error",
-          text = tagList(error_list),
+          text = shiny::tagList(error_list),
           type = "error")
-        #error_modal<-modalDialog(
+        #error_modal<-shiny::modalDialog(
         #  title = "Error",
         #  size = "l",
         #  easyClose = TRUE,
-        #  footer = modalButton("Close"),
-        #  tagList(error_list)
+        #  footer = shiny::modalButton("Close"),
+        #  shiny::tagList(error_list)
         #)
-        #showModal(error_modal)
+        #shiny::showModal(error_modal)
       }
     })
 
     #Page Train and Tune a Language Model----------------------------------------
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_db_select_model_for_training",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
 
-    model_path_train_LM<-eventReactive(input$lm_db_select_model_for_training,{
-      path=parseDirPath(volumes,input$lm_db_select_model_for_training)
+    model_path_train_LM<-shiny::eventReactive(input$lm_db_select_model_for_training,{
+      path=shinyFiles::parseDirPath(volumes,input$lm_db_select_model_for_training)
 
-      output$lm_db_select_model_for_training_path=renderText(path)
+      output$lm_db_select_model_for_training_path=shiny::renderText(path)
       return(path)
     })
 
-    train_tune_model_architecture<-eventReactive(model_path_train_LM(),{
+    train_tune_model_architecture<-shiny::eventReactive(model_path_train_LM(),{
+      shinyWidgets::show_alert(title="Loading",
+                               text = "Please wait",
+                               type="info")
       model_path<-model_path_train_LM()
       if(!is.null(model_path)){
         if(file.exists(paste0(model_path,
@@ -1701,14 +1727,14 @@ start_aifeducation_studio<-function(){
         max_position_embeddings=NULL
         model_exists=NULL
       }
-
+      shinyWidgets::closeSweetAlert()
       return(list(model_architecture,max_position_embeddings,model_exists))
     })
 
-    observe({
+    shiny::observe({
       if(!is.null(train_tune_model_architecture()$model_exists)){
         if(train_tune_model_architecture()$model_exists==FALSE){
-          show_alert(
+          shinyWidgets::show_alert(
             title = "Error",
             text = "There is no model to load in the directory.",
             type = "error")
@@ -1716,23 +1742,23 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    #Create Box for Raw Text Selection
-    output$lm_train_raw_texts<-renderUI({
+    #Create shinydashboard::box for Raw Text Selection
+    output$lm_train_raw_texts<-shiny::renderUI({
       if(!is.null(train_tune_model_architecture()[[2]])){
-        final_box<-box(
+        final_box<-shinydashboard::box(
           title="Raw Texts",
           width = 12,
           solidHeader = TRUE,
           status = "primary",
-          tags$p("Please select the file containing the raw texts for training."),
-          shinyFilesButton(id="lm_db_select_raw_txt_for_training",
+          shiny::tags$p("Please select the file containing the raw texts for training."),
+          shinyFiles::shinyFilesButton(id="lm_db_select_raw_txt_for_training",
                            label="Select File",
                            title="Please select a file",
-                           icon=icon("file"),
+                           icon=shiny::icon("file"),
                            multiple=FALSE,
                            filetype=c("rda","rdata")),
-          textInput(inputId = "lm_db_select_raw_txt_for_training_path",
-                    label = tags$p(icon("file"),"File Path"))
+          shiny::textInput(inputId = "lm_db_select_raw_txt_for_training_path",
+                    label = shiny::tags$p(shiny::icon("file"),"File Path"))
         )
 
         return(final_box)
@@ -1741,137 +1767,137 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    shinyFileChoose(input=input,
+    shinyFiles::shinyFileChoose(input=input,
                     id="lm_db_select_raw_txt_for_training",
                     roots = volumes,
                     filetypes=c("rda","rdata"))
-    observeEvent(input$lm_db_select_raw_txt_for_training,{
-      tmp_file_path=parseFilePaths(volumes,input$lm_db_select_raw_txt_for_training)
+    shiny::observeEvent(input$lm_db_select_raw_txt_for_training,{
+      tmp_file_path=shinyFiles::parseFilePaths(volumes,input$lm_db_select_raw_txt_for_training)
       if(nrow(tmp_file_path)>0){
-        updateTextInput(inputId="lm_db_select_raw_txt_for_training_path",
+        shiny::updateTextInput(inputId="lm_db_select_raw_txt_for_training_path",
                         value = tmp_file_path[[1,"datapath"]])
       }
     })
 
-    #Box for Training Settings
-    output$lm_train_tune_train_settings<-renderUI({
+    #shinydashboard::box for Training Settings
+    output$lm_train_tune_train_settings<-shiny::renderUI({
       if(!is.null(train_tune_model_architecture()[[2]])){
         model_architecture=train_tune_model_architecture()[1]
         max_position_embeddings=train_tune_model_architecture()[[2]]
         if(model_architecture=="BertModel"){
-          ui_training_setting<-fluidRow(
-            column(width = 6,
-                   sliderInput(inputId = "lm_chunk_size",
+          ui_training_setting<-shiny::fluidRow(
+            shiny::column(width = 6,
+                   shiny::sliderInput(inputId = "lm_chunk_size",
                                label="Chunk Size",
                                value=250,
                                min = 100,
                                max=max_position_embeddings,
                                step = 1),
-                   sliderInput(inputId = "lm_min_seq_len",
+                   shiny::sliderInput(inputId = "lm_min_seq_len",
                                label="Minimal Sequence Length",
                                value=50,
                                min = 10,
                                max=max_position_embeddings,
                                step = 1),
-                   sliderInput(inputId = "lm_p_mask",
+                   shiny::sliderInput(inputId = "lm_p_mask",
                                label="Probability of Token Masking",
                                value=.15,
                                min = .05,
                                max=.95,
                                step = .01),
-                   sliderInput(inputId = "lm_val_size",
+                   shiny::sliderInput(inputId = "lm_val_size",
                                label="Validation Size",
                                value=.10,
                                min = .01,
                                max=.99,
                                step = .01),
-                   sliderInput(inputId = "lm_batch_size",
+                   shiny::sliderInput(inputId = "lm_batch_size",
                                label="Batch Size",
                                value=12,
                                min = 1,
                                max=64,
                                step = 1)
             ),
-            column(width = 6,
-                   numericInput(inputId = "lm_n_epoch",
+            shiny::column(width = 6,
+                   shiny::numericInput(inputId = "lm_n_epoch",
                                 label="N Epochs",
                                 value=50,
                                 min = 1,
                                 max=NA,
                                 step = 1),
-                   numericInput(inputId = "lm_learning_rate",
+                   shiny::numericInput(inputId = "lm_learning_rate",
                                 label="Learning Rate",
                                 value=0.003,
                                 min = 0.0001,
                                 max=1,
                                 step = .001),
-                   materialSwitch(inputId = "lm_full_sequences_only",
+                   shinyWidgets::materialSwitch(inputId = "lm_full_sequences_only",
                                   value = FALSE,
-                                  label = tags$b("Full Sequences Only"),
+                                  label = shiny::tags$b("Full Sequences Only"),
                                   status = "primary"),
-                   materialSwitch(inputId = "lm_whole_word ",
+                   shinyWidgets::materialSwitch(inputId = "lm_whole_word ",
                                   value = TRUE,
-                                  label = tags$b("Whole Word Masking"),
+                                  label = shiny::tags$b("Whole Word Masking"),
                                   status = "primary")
             )
 
           )
         } else {
-          ui_training_setting<-fluidRow(
-            column(width = 6,
-                   sliderInput(inputId = "lm_p_mask",
+          ui_training_setting<-shiny::fluidRow(
+            shiny::column(width = 6,
+                   shiny::sliderInput(inputId = "lm_p_mask",
                                label="Probability of Token Masking",
                                value=.15,
                                min = .05,
                                max=.95,
                                step = .01),
-                   sliderInput(inputId = "lm_val_size",
+                   shiny::sliderInput(inputId = "lm_val_size",
                                label="Validation Size",
                                value=.10,
                                min = .01,
                                max=.99,
                                step = .01),
-                   sliderInput(inputId = "lm_batch_size",
+                   shiny::sliderInput(inputId = "lm_batch_size",
                                label="Batch Size",
                                value=12,
                                min = 1,
                                max=64,
                                step = 1),
-                   sliderInput(inputId = "lm_chunk_size",
+                   shiny::sliderInput(inputId = "lm_chunk_size",
                                label="Chunk Size",
                                value=250,
                                min = 100,
                                max=max_position_embeddings,
                                step = 1),
-                   sliderInput(inputId = "lm_min_seq_len",
+                   shiny::sliderInput(inputId = "lm_min_seq_len",
                                label="Minimal Sequence Length",
                                value=50,
                                min = 10,
                                max=max_position_embeddings,
                                step = 1)
             ),
-            column(width = 6,
-                   numericInput(inputId = "lm_n_epoch",
+            shiny::column(width = 6,
+                   shiny::numericInput(inputId = "lm_n_epoch",
                                 label="N Epochs",
                                 value=50,
                                 min = 1,
                                 max=NA,
                                 step = 1),
-                   numericInput(inputId = "lm_learning_rate",
+                   shiny::numericInput(inputId = "lm_learning_rate",
                                 label="Learning Rate",
                                 value=0.003,
                                 min = 0.0001,
                                 max=1,
                                 step = .001),
-                   materialSwitch(inputId = "lm_full_sequences_only",
+                   shinyWidgets::materialSwitch(inputId = "lm_full_sequences_only",
                                   value = FALSE,
-                                  label = tags$b("Full Sequences Only"),
+                                  label = shiny::tags$b("Full Sequences Only"),
                                   status="primary")
             )
           )
         }
 
-        final_box<-box(title = "Train and Tune Settings",
+        final_box<-shinydashboard::box(title = "Train and Tune Settings",
                        width = 12,
                        status = "primary",
                        solidHeader = TRUE,
@@ -1884,25 +1910,25 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    #Box for Saving trained/tuned model
-    output$lm_train_tune_save_settings<-renderUI({
+    #shinydashboard::box for Saving trained/tuned model
+    output$lm_train_tune_save_settings<-shiny::renderUI({
       if(!is.null(train_tune_model_architecture()[[2]])){
-        ui_start<-box(
+        ui_start<-shinydashboard::box(
           title = "Start Training/Tuning",
           width = 12,
           solidHeader = TRUE,
           status = "success",
-          tags$p("Please select a folder where the trained/tuned
+          shiny::tags$p("Please select a folder where the trained/tuned
                      model should be saved"),
-          shinyDirButton(id="lm_db_select_final_model_destination",
+          shinyFiles::shinyDirButton(id="lm_db_select_final_model_destination",
                          label = "Choose a Folder",
                          title = "Please choose a Folder",
-                         icon=icon("folder-open")),
-          textInput(inputId =  "lm_db_select_final_model_destination_path",
-                    label = tags$p(icon("folder"),"Path to Folder")),
-          actionButton(inputId = "lm_train_tune_start",
+                         icon=shiny::icon("folder-open")),
+          shiny::textInput(inputId =  "lm_db_select_final_model_destination_path",
+                    label = shiny::tags$p(shiny::icon("folder"),"Path to Folder")),
+          shiny::actionButton(inputId = "lm_train_tune_start",
                        label = "Start Training/Tuning",
-                       icon = icon("paper-plane"))
+                       icon = shiny::icon("paper-plane"))
         )
         return(ui_start)
       } else {
@@ -1912,18 +1938,18 @@ start_aifeducation_studio<-function(){
     })
 
     #Final Management for final destination of the model
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_db_select_final_model_destination",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
-    observeEvent(input$lm_db_select_final_model_destination,{
-      updateTextInput(inputId = "lm_db_select_final_model_destination_path",
-                      value = parseDirPath(volumes,input$lm_db_select_final_model_destination))
+    shiny::observeEvent(input$lm_db_select_final_model_destination,{
+      shiny::updateTextInput(inputId = "lm_db_select_final_model_destination_path",
+                      value = shinyFiles::parseDirPath(volumes,input$lm_db_select_final_model_destination))
     })
 
     #Training and Tuning
-    observeEvent(input$lm_train_tune_start,{
+    shiny::observeEvent(input$lm_train_tune_start,{
       base_model_path=model_path_train_LM()
       raw_text_path=input$lm_db_select_raw_txt_for_training_path
       destination_dir=input$lm_db_select_final_model_destination_path
@@ -1931,22 +1957,22 @@ start_aifeducation_studio<-function(){
 
       error_list=NULL
       if(!dir.exists(destination_dir)){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "The destination directory does not exist. Please check the path
         and/or create that directory.")
         )
       }
 
       if(is.null(input$lm_db_select_raw_txt_for_training_path)){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "Path for the file containing the raw texts is missing."))
       } else {
         if(input$lm_db_select_raw_txt_for_training_path==""){
-          error_list[length(error_list)+1]=list(tags$p(
+          error_list[length(error_list)+1]=list(shiny::tags$p(
             "Path for the file containing the raw texts is missing."))
         } else {
           if(!file.exists(raw_text_path)){
-            error_list[length(error_list)+1]=list(tags$p(
+            error_list[length(error_list)+1]=list(shiny::tags$p(
               "The file containing the raw texts does not exist. Please check
         the corresponding path."))
           } else {
@@ -1954,7 +1980,7 @@ start_aifeducation_studio<-function(){
             raw_texts<-get(x=raw_text_object)
 
             if("text"%in%colnames(raw_texts)==FALSE){
-              error_list[length(error_list)+1]=list(tags$p(
+              error_list[length(error_list)+1]=list(shiny::tags$p(
                 "The file with the raw texts does not contain a column 'text'.
           Please check the file."))
             }
@@ -1963,7 +1989,7 @@ start_aifeducation_studio<-function(){
       }
 
       if(length(error_list)==0){
-        showModal(progress_modal)
+        shiny::showModal(progress_modal)
 
         raw_texts=as.data.frame(raw_texts)
         trace=TRUE
@@ -2110,37 +2136,37 @@ start_aifeducation_studio<-function(){
           log(output_print)
         }
         )
-        removeModal()
+        shiny::removeModal()
       } else {
         #Show error messages
-        show_alert(title = "Error",
-                   text = tagList(error_list),
+        shinyWidgets::show_alert(title = "Error",
+                   text = shiny::tagList(error_list),
                    type = "error")
-        #error_modal<-modalDialog(
+        #error_modal<-shiny::modalDialog(
         #  title = "Error",
         #  size = "l",
         #  easyClose = TRUE,
-        #  footer = modalButton("Close"),
-        #  tagList(error_list)
+        #  footer = shiny::modalButton("Close"),
+        #  shiny::tagList(error_list)
         #)
-        #showModal(error_modal)
+        #shiny::showModal(error_modal)
       }
     })
 
     #Interface Page-------------------------------------------------------------
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_db_select_model_for_interface",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
 
-    model_path_interface_LM<-eventReactive(input$lm_db_select_model_for_interface,{
-      path=parseDirPath(volumes,input$lm_db_select_model_for_interface)
-      output$lm_db_select_model_for_interface_path<-renderText({path})
+    model_path_interface_LM<-shiny::eventReactive(input$lm_db_select_model_for_interface,{
+      path=shinyFiles::parseDirPath(volumes,input$lm_db_select_model_for_interface)
+      output$lm_db_select_model_for_interface_path<-shiny::renderText({path})
       return(path)
     })
 
-    interface_architecture<-eventReactive(model_path_interface_LM(),{
+    interface_architecture<-shiny::eventReactive(model_path_interface_LM(),{
       model_path<-model_path_interface_LM()
       if(file.exists(paste0(model_path,
                             "/",
@@ -2161,11 +2187,11 @@ start_aifeducation_studio<-function(){
       return(list(model_architecture,max_position_embeddings))
     })
 
-    observe({
+    shiny::observe({
       if(!identical(model_path_interface_LM(),character(0))){
         if(is.null(interface_architecture()[[1]]) &
            is.null(interface_architecture()[[2]])){
-          show_alert(
+          shinyWidgets::show_alert(
             title = "Error",
             text = "There is no model to load in the directory.",
             type = "error")
@@ -2173,43 +2199,43 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$lm_interface_setting<-renderUI({
+    output$lm_interface_setting<-shiny::renderUI({
       if(length(interface_architecture()[[2]])>0){
-        ui<-box(title = "Interface Setting",
+        ui<-shinydashboard::box(title = "Interface Setting",
                 width = 12,
                 solidHeader = TRUE,
                 status = "primary",
-                fluidRow(
-                  column(width = 6,
-                         textInput(inputId = "lm_model_name",
+                shiny::fluidRow(
+                  shiny::column(width = 6,
+                         shiny::textInput(inputId = "lm_model_name",
                                    label = "Name"),
-                         textInput(inputId = "lm_model_label",
+                         shiny::textInput(inputId = "lm_model_label",
                                    label = "Label"),
-                         textInput(inputId = "lm_model_version",
+                         shiny::textInput(inputId = "lm_model_version",
                                    label = "Version"),
-                         textInput(inputId = "lm_model_language",
+                         shiny::textInput(inputId = "lm_model_language",
                                    label = "Language")
                   ),
-                  column(width = 6,
-                         sliderInput(inputId = "lm_chunks",
+                  shiny::column(width = 6,
+                         shiny::sliderInput(inputId = "lm_chunks",
                                      label="N Chunks",
                                      value=1,
                                      min = 1,
                                      max= 50,
                                      step = 1),
-                         sliderInput(inputId = "lm_max_length",
+                         shiny::sliderInput(inputId = "lm_max_length",
                                      label=paste("Maximal Sequence Length","(Max:",interface_architecture()[2],")"),
                                      value=interface_architecture()[[2]],
                                      min = 20,
                                      max= interface_architecture()[[2]],
                                      step = 1),
-                         sliderInput(inputId = "lm_overlap",
+                         shiny::sliderInput(inputId = "lm_overlap",
                                      label=paste("N Token Overlap","(Max:",interface_architecture()[2],")"),
                                      value=0,
                                      min = 0,
                                      max= interface_architecture()[[2]],
                                      step = 1),
-                         selectInput(inputId = "lm_aggregation",
+                         shiny::selectInput(inputId = "lm_aggregation",
                                      label = "Aggregation Hidden States",
                                      choices = c("last",
                                                  "second_to_last",
@@ -2219,24 +2245,24 @@ start_aifeducation_studio<-function(){
                   )
                 )
         )
-        ui_creation<-box(title = "Creation",
+        ui_creation<-shinydashboard::box(title = "Creation",
                          width = 12,
                          solidHeader = TRUE,
                          status = "success",
-                         tags$p("Please select a directory where to save the interface."),
-                         shinyDirButton(id="lm_db_select_interface_destination",
+                         shiny::tags$p("Please select a directory where to save the interface."),
+                         shinyFiles::shinyDirButton(id="lm_db_select_interface_destination",
                                         label = "Choose a Directory",
                                         title = "Please choose a directory",
-                                        icon=icon("folder-open")),
-                         textInput(inputId =  "lm_db_select_interface_destination_path",
-                                   label = tags$p(icon("folder"),"Directory Path")),
-                         tags$p("A folder is created within that directory. Please
+                                        icon=shiny::icon("folder-open")),
+                         shiny::textInput(inputId =  "lm_db_select_interface_destination_path",
+                                   label = shiny::tags$p(shiny::icon("folder"),"Directory Path")),
+                         shiny::tags$p("A folder is created within that directory. Please
                                 provide a name for the folder."),
-                         textInput(inputId =  "lm_db_select_interface_destination_dir_name",
-                                   label = tags$p(icon("folder"),"Folder Name:")),
-                         actionButton(inputId = "lm_save_interface",
+                         shiny::textInput(inputId =  "lm_db_select_interface_destination_dir_name",
+                                   label = shiny::tags$p(shiny::icon("folder"),"Folder Name:")),
+                         shiny::actionButton(inputId = "lm_save_interface",
                                       label = "Save Interface",
-                                      icon = icon("floppy-disk"))
+                                      icon = shiny::icon("floppy-disk"))
         )
         return(list(ui,ui_creation))
       } else {
@@ -2245,18 +2271,18 @@ start_aifeducation_studio<-function(){
 
     })
 
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_db_select_interface_destination",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
-    observeEvent(input$lm_db_select_interface_destination,{
-      updateTextInput(inputId = "lm_db_select_interface_destination_path",
-                      value = parseDirPath(volumes,input$lm_db_select_interface_destination))
+    shiny::observeEvent(input$lm_db_select_interface_destination,{
+      shiny::updateTextInput(inputId = "lm_db_select_interface_destination_path",
+                      value = shinyFiles::parseDirPath(volumes,input$lm_db_select_interface_destination))
     })
 
     #Create the interface
-    observeEvent(input$lm_save_interface,{
+    shiny::observeEvent(input$lm_save_interface,{
       model_architecture=interface_architecture()[1]
       if(model_architecture=="BertModel"){
         method="bert"
@@ -2273,13 +2299,13 @@ start_aifeducation_studio<-function(){
       #Check for errors
       error_list=NULL
       if(!dir.exists(input$lm_db_select_interface_destination_path)){
-        error_list[length(error_list)+1]=list(tags$p("The destination directory does not
+        error_list[length(error_list)+1]=list(shiny::tags$p("The destination directory does not
                                                    exist. Please check your directory path
                                                    and/or create that directory."))
       }
 
       if(length(error_list)==0){
-        show_alert(title="Working",
+        shinyWidgets::show_alert(title="Working",
                    text = "Please wait",
                    type="info")
 
@@ -2301,19 +2327,19 @@ start_aifeducation_studio<-function(){
                       dir_name=input$lm_db_select_interface_destination_dir_name)
         rm(new_interface)
         gc()
-        closeSweetAlert()
+        shinyWidgets::closeSweetAlert()
       } else {
-        show_alert(title = "Error",
-                   text=tagList(error_list),
+        shinyWidgets::show_alert(title = "Error",
+                   text=shiny::tagList(error_list),
                    type = "error")
-        #error_modal<-modalDialog(
+        #error_modal<-shiny::modalDialog(
         #  title = "Error",
         #  size = "l",
         #  easyClose = TRUE,
-        # footer = modalButton("Close"),
-        # tagList(error_list)
+        # footer = shiny::modalButton("Close"),
+        # shiny::tagList(error_list)
         #)
-        #showModal(error_modal)
+        #shiny::showModal(error_modal)
       }
 
     })
@@ -2321,15 +2347,15 @@ start_aifeducation_studio<-function(){
     #Use Language Model Page----------------------------------------------------
 
     #Choose Model
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_db_select_model_for_use",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
-    LanguageModel_for_Use<-eventReactive(input$lm_db_select_model_for_use,{
-      model_path=parseDirPath(volumes,input$lm_db_select_model_for_use)
+    LanguageModel_for_Use<-shiny::eventReactive(input$lm_db_select_model_for_use,{
+      model_path=shinyFiles::parseDirPath(volumes,input$lm_db_select_model_for_use)
       if(length(model_path)>0){
-        show_alert(title="Loading",
+        shinyWidgets::show_alert(title="Loading",
                    text = "Please wait",
                    type="info")
         model=try(load_ai_model(model_dir = model_path,
@@ -2338,10 +2364,10 @@ start_aifeducation_studio<-function(){
         if(methods::is(model,class2 = "try-error")==FALSE){
           if("TextEmbeddingModel"%in%class(model)){
             if(utils::compareVersion(as.character(model$get_package_versions()$aifeducation),"0.3.1")>=0){
-              closeSweetAlert()
+              shinyWidgets::closeSweetAlert()
               return(model)
             } else {
-              show_alert(title = "Error",
+              shinyWidgets::show_alert(title = "Error",
                          text = paste("The model was created with aifeducation version",
                                       as.character(model$get_package_versions()$aifeducation,"."),
                                       "Uster interface supports only models created with aifeducation version 0.3.1 or later."),
@@ -2349,13 +2375,13 @@ start_aifeducation_studio<-function(){
               return(NULL)
             }
           } else {
-            show_alert(title = "Error",
+            shinyWidgets::show_alert(title = "Error",
                        text = "The file does not contain an object of class TextEmbeddingModel.",
                        type = "error")
             return(NULL)
           }
         } else {
-          show_alert(title = "Error",
+          shinyWidgets::show_alert(title = "Error",
                      text = model,
                      type = "error")
           return(NULL)
@@ -2364,7 +2390,7 @@ start_aifeducation_studio<-function(){
     })
 
     #Header
-    output$lm_use_selected_model_label<-renderText({
+    output$lm_use_selected_model_label<-shiny::renderText({
       if(is.null(LanguageModel_for_Use())){
         return(NULL)
       }else{
@@ -2373,30 +2399,30 @@ start_aifeducation_studio<-function(){
     })
 
     #Description
-    output$lm_desc_abstract_and_desc<-renderUI({
+    output$lm_desc_abstract_and_desc<-shiny::renderUI({
       model=LanguageModel_for_Use()
       if(!is.null(model)){
         language_eng=input$lm_desc_language_select
         if(language_eng==TRUE){
           ui<-list(
-            tags$h3("Abstract"),
+            shiny::tags$h3("Abstract"),
             if(!is.null(model$get_model_description()$abstract_eng)){
-              tags$p(shiny::includeMarkdown(model$get_model_description()$abstract_eng))
+              shiny::tags$p(shiny::includeMarkdown(model$get_model_description()$abstract_eng))
             },
-            tags$h3("Description"),
+            shiny::tags$h3("Description"),
             if(!is.null(model$get_model_description()$eng)){
-              tags$p(shiny::includeMarkdown(model$get_model_description()$eng))
+              shiny::tags$p(shiny::includeMarkdown(model$get_model_description()$eng))
             }
           )
         } else {
           ui<-list(
-            tags$h3("Abstract"),
+            shiny::tags$h3("Abstract"),
             if(!is.null(model$get_model_description()$abstract_native)){
-              tags$p(shiny::includeMarkdown(model$get_model_description()$abstract_native))
+              shiny::tags$p(shiny::includeMarkdown(model$get_model_description()$abstract_native))
             },
-            tags$h3("Description"),
+            shiny::tags$h3("Description"),
             if(!is.null(model$get_model_description()$native)){
-              tags$p(shiny::includeMarkdown(model$get_model_description()$native))
+              shiny::tags$p(shiny::includeMarkdown(model$get_model_description()$native))
             }
           )
         }
@@ -2407,34 +2433,34 @@ start_aifeducation_studio<-function(){
     })
 
     #Routines for Embeddings
-    shinyFileChoose(input=input,
+    shinyFiles::shinyFileChoose(input=input,
                     id="lm_choose_file_raw_texts_for_embed",
                     roots = volumes,
                     filetypes="rda")
-    observeEvent(input$lm_choose_file_raw_texts_for_embed,{
-      tmp_file_path=parseFilePaths(volumes,input$lm_choose_file_raw_texts_for_embed)
+    shiny::observeEvent(input$lm_choose_file_raw_texts_for_embed,{
+      tmp_file_path=shinyFiles::parseFilePaths(volumes,input$lm_choose_file_raw_texts_for_embed)
       if(nrow(tmp_file_path)>0){
-        updateTextInput(inputId="lm_choose_file_raw_texts_for_embed_path",
+        shiny::updateTextInput(inputId="lm_choose_file_raw_texts_for_embed_path",
                         value = tmp_file_path[[1,"datapath"]])
       }
     })
 
-    shinyDirChoose(input = input,
+    shinyFiles::shinyDirChoose(input = input,
                    id="lm_choose_file_path_for_embeddings",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
-    observeEvent(input$lm_choose_file_path_for_embeddings,{
-      updateTextInput(inputId = "lm_choose_file_path_for_embeddings_path",
-                      value = parseDirPath(volumes,input$lm_choose_file_path_for_embeddings))
+    shiny::observeEvent(input$lm_choose_file_path_for_embeddings,{
+      shiny::updateTextInput(inputId = "lm_choose_file_path_for_embeddings_path",
+                      value = shinyFiles::parseDirPath(volumes,input$lm_choose_file_path_for_embeddings))
     })
 
-    observeEvent(input$lm_embedd_start,{
+    shiny::observeEvent(input$lm_embedd_start,{
       #Check input
       error_list=NULL
       file_path_raw_texts=input$lm_choose_file_raw_texts_for_embed_path
       if(!file.exists(file_path_raw_texts)){
-        error_list[length(error_list)+1]=tags$p("File for raw texts does not exist. Please check your path.")
+        error_list[length(error_list)+1]=shiny::tags$p("File for raw texts does not exist. Please check your path.")
       }
 
       directory_path_embeddings=input$lm_choose_file_path_for_embeddings_path
@@ -2442,17 +2468,17 @@ start_aifeducation_studio<-function(){
                                   input$lm_choose_file_path_for_embeddings_file_name,
                                   ".rda")
       if(!file.exists(directory_path_embeddings)){
-        error_list[length(error_list)+1]=tags$p("Directory for saving the embeddings does not exist.
+        error_list[length(error_list)+1]=shiny::tags$p("Directory for saving the embeddings does not exist.
       Please check your path or create the directory.")
       }
 
       tmp_text_data=load(file_path_raw_texts)
       if(!("id"%in%colnames(tmp_text_data))){
-        error_list[length(error_list)+1]=tags$p("The file for raw texts does not contain a
+        error_list[length(error_list)+1]=shiny::tags$p("The file for raw texts does not contain a
       column 'id'.")
       }
       if(!("text"%in%colnames(tmp_text_data))){
-        error_list[length(error_list)+1]=tags$p("The file for raw texts does not contain a
+        error_list[length(error_list)+1]=shiny::tags$p("The file for raw texts does not contain a
       column 'text'.")
       }
 
@@ -2469,19 +2495,19 @@ start_aifeducation_studio<-function(){
         rm(embeddings)
         gc()
       } else {
-        error_modal<-modalDialog(
+        error_modal<-shiny::modalDialog(
           title = "Error",
           size = "l",
           easyClose = TRUE,
-          footer = modalButton("Close"),
-          tagList(error_list)
+          footer = shiny::modalButton("Close"),
+          shiny::tagList(error_list)
         )
-        showModal(error_modal)
+        shiny::showModal(error_modal)
       }
     })
 
     #Routine for decode, encode, tokenize
-    lm_encodings<-eventReactive(input$lm_encode_start,{
+    lm_encodings<-shiny::eventReactive(input$lm_encode_start,{
       model=LanguageModel_for_Use()
 
       integer_sequence=model$encode(
@@ -2493,8 +2519,8 @@ start_aifeducation_studio<-function(){
       integer_output=NULL
       for(i in 1:length(integer_sequence)){
         tmp_sequence=paste(integer_sequence[[i]],collapse = " ")
-        integer_output[length(integer_output)+1]=list(tags$p(tags$b(paste("Chunk",i))))
-        integer_output[length(integer_output)+1]=list(tags$p(tmp_sequence))
+        integer_output[length(integer_output)+1]=list(shiny::tags$p(shiny::tags$b(paste("Chunk",i))))
+        integer_output[length(integer_output)+1]=list(shiny::tags$p(tmp_sequence))
       }
 
       token_sequence=model$encode(
@@ -2506,24 +2532,24 @@ start_aifeducation_studio<-function(){
       token_output=NULL
       for(i in 1:length(token_sequence)){
         tmp_sequence=paste(token_sequence[[i]],collapse = " ")
-        token_output[length(token_output)+1]=list(tags$p(tags$b(paste("Chunk",i))))
-        token_output[length(token_output)+1]=list(tags$p(tmp_sequence))
+        token_output[length(token_output)+1]=list(shiny::tags$p(shiny::tags$b(paste("Chunk",i))))
+        token_output[length(token_output)+1]=list(shiny::tags$p(tmp_sequence))
       }
 
       return(list(integer_encodings=integer_output,
                   token_encodings=token_output))
     })
 
-    output$lm_txt_to_int=renderUI(lm_encodings()$integer_encodings)
-    output$lm_txt_to_tokens=renderUI(lm_encodings()$token_encodings)
+    output$lm_txt_to_int=shiny::renderUI(lm_encodings()$integer_encodings)
+    output$lm_txt_to_tokens=shiny::renderUI(lm_encodings()$token_encodings)
 
-    observeEvent(input$lm_encode_clear,{
-      updateTextAreaInput(inputId = "lm_text_for_encode",value = "")
-      output$lm_txt_to_int=renderUI(NULL)
-      output$lm_txt_to_tokens=renderUI(NULL)
+    shiny::observeEvent(input$lm_encode_clear,{
+      shiny::updateTextAreaInput(inputId = "lm_text_for_encode",value = "")
+      output$lm_txt_to_int=shiny::renderUI(NULL)
+      output$lm_txt_to_tokens=shiny::renderUI(NULL)
     })
 
-    lm_decodings<-eventReactive(input$lm_decode_start,{
+    lm_decodings<-shiny::eventReactive(input$lm_decode_start,{
       model=LanguageModel_for_Use()
 
       int_sequence=stringr::str_extract_all(input$lm_ids_for_decode, "\\d+")
@@ -2536,28 +2562,28 @@ start_aifeducation_studio<-function(){
       token_list=NULL
 
       for(i in 1:length(output_list_text)){
-        text_list[length(text_list)+1]=list(tags$p(paste("Chunk",i)))
-        text_list[length(text_list)+1]=list(tags$p(output_list_text[[i]]))
+        text_list[length(text_list)+1]=list(shiny::tags$p(paste("Chunk",i)))
+        text_list[length(text_list)+1]=list(shiny::tags$p(output_list_text[[i]]))
 
-        token_list[length(token_list)+1]=list(tags$p(paste("Chunk",i)))
-        token_list[length(token_list)+1]=list(tags$p(output_list_token[[i]]))
+        token_list[length(token_list)+1]=list(shiny::tags$p(paste("Chunk",i)))
+        token_list[length(token_list)+1]=list(shiny::tags$p(output_list_token[[i]]))
       }
 
       return(list(text_decode=text_list,
                   token_decode=token_list))
     })
 
-    output$lm_ids_to_txt<-renderUI(lm_decodings()$text_decode)
-    output$lm_ids_to_tokens<-renderUI(lm_decodings()$token_decode)
+    output$lm_ids_to_txt<-shiny::renderUI(lm_decodings()$text_decode)
+    output$lm_ids_to_tokens<-shiny::renderUI(lm_decodings()$token_decode)
 
-    observeEvent(input$lm_decode_clear,{
-      updateTextAreaInput(inputId = "lm_ids_for_decode",value = "")
-      output$lm_ids_to_txt=renderUI(NULL)
-      output$lm_ids_to_tokens=renderUI(NULL)
+    shiny::observeEvent(input$lm_decode_clear,{
+      shiny::updateTextAreaInput(inputId = "lm_ids_for_decode",value = "")
+      output$lm_ids_to_txt=shiny::renderUI(NULL)
+      output$lm_ids_to_tokens=shiny::renderUI(NULL)
     })
 
     #Routine for fill mask
-    fill_masked_solutions=eventReactive(input$lm_fill_mask_start,{
+    fill_masked_solutions=shiny::eventReactive(input$lm_fill_mask_start,{
       model=LanguageModel_for_Use()
 
       solutions=try(
@@ -2567,12 +2593,12 @@ start_aifeducation_studio<-function(){
         silent = TRUE)
 
       if(methods::is(solutions,class2 = "try-error")==FALSE){
-        updateNumericInput(inputId = "lm_select_mask_for_fill_mask",
+        shiny::updateNumericInput(inputId = "lm_select_mask_for_fill_mask",
                            max=length(solutions))
 
         return(solutions)
       } else {
-        show_alert(title = "Error",
+        shinyWidgets::show_alert(title = "Error",
                    text = "Text does not contain at least one mask token. Please
                  check your input.",
                    type = "error")
@@ -2582,12 +2608,12 @@ start_aifeducation_studio<-function(){
 
     })
 
-    output$lm_scores_for_fill_mask<-renderPlot({
+    output$lm_scores_for_fill_mask<-shiny::renderPlot({
       plot_data=fill_masked_solutions()[[input$lm_select_mask_for_fill_mask]]
       plot_data=plot_data[order(plot_data$score,decreasing=FALSE),]
       plot_data$token_str=factor(plot_data$token_str,levels=(plot_data$token_str))
       plot=ggplot2::ggplot(data = plot_data)+
-        ggplot2::geom_col(ggplot2::aes(x=.data$token_str,y=.data$score))+
+        ggplot2::geom_col(ggplot2::aes(x=rlang::.data$token_str,y=rlang::.data$score))+
         ggplot2::coord_flip()+
         ggplot2::xlab("tokens")+
         ggplot2::ylab("score")+
@@ -2598,29 +2624,29 @@ start_aifeducation_studio<-function(){
     res = 2*72)
 
     #TabPanels
-    output$lm_use_tabs<-renderUI({
+    output$lm_use_tabs<-shiny::renderUI({
       if(!is.null(LanguageModel_for_Use())){
         model=LanguageModel_for_Use()
-        ui<-tabBox(width = 12,
+        ui<-shinydashboard::tabBox(width = 12,
                    #Model Description--------------------------------------------------
-                   tabPanel("Model Description",
-                            tags$h3(model$get_model_info()$model_label),
-                            tags$p("Developers: ",paste(format(x=model$get_publication_info()$developed_by$authors,
+                   shiny::tabPanel("Model Description",
+                            shiny::tags$h3(model$get_model_info()$model_label),
+                            shiny::tags$p("Developers: ",paste(format(x=model$get_publication_info()$developed_by$authors,
                                                                include = c("given","family")),
                                                         collapse = ", ")),
-                            tags$p("Citation: ",model$pub_info$developed_by$citation),
+                            shiny::tags$p("Citation: ",model$pub_info$developed_by$citation),
                             if(!is.null(model$pub_info$modifided_by$authors)){
-                              tags$p("Modifiers: ",paste(format(x=model$pub_info$modifided_by$authors,
+                              shiny::tags$p("Modifiers: ",paste(format(x=model$pub_info$modifided_by$authors,
                                                                 include = c("given","family")),
                                                          collapse = ", "))
                             },
                             if(!is.null(model$pub_info$modifided_by$citation)){
-                              tags$p("Citation: ",model$pub_info$modifided_by$citation)
+                              shiny::tags$p("Citation: ",model$pub_info$modifided_by$citation)
                             },
                             if(!is.null(model$pub_info$modifided_by$citation)){
-                              tags$p("Language: ",model$get_model_info()$model_language)
+                              shiny::tags$p("Language: ",model$get_model_info()$model_language)
                             },
-                            switchInput(
+                            shinyWidgets::switchInput(
                               inputId = "lm_desc_language_select",
                               label = "Language",
                               onLabel="English",
@@ -2628,185 +2654,185 @@ start_aifeducation_studio<-function(){
                               value = TRUE,
                               labelWidth = "80px"
                             ),
-                            fluidRow(
-                              column(width=6,
-                                     uiOutput(outputId = "lm_desc_abstract_and_desc")
+                            shiny::fluidRow(
+                              shiny::column(width=6,
+                                     shiny::uiOutput(outputId = "lm_desc_abstract_and_desc")
                               ),
-                              column(width=6,
-                                     tags$h3("Configuration"),
-                                     tags$p("Method: ",model$get_model_info()$model_method),
-                                     tags$p("Max Tokens per Chunk: ",model$get_model_info()$model_max_size),
-                                     tags$p("Max Chunks: ",model$get_transformer_components()$chunks),
-                                     tags$p("Token Overlap: ",model$get_transformer_components()$overlap),
-                                     tags$p("Max Tokens: ",(model$get_model_info()$model_max_size-model$get_transformer_components()$overlap)
+                              shiny::column(width=6,
+                                     shiny::tags$h3("Configuration"),
+                                     shiny::tags$p("Method: ",model$get_model_info()$model_method),
+                                     shiny::tags$p("Max Tokens per Chunk: ",model$get_model_info()$model_max_size),
+                                     shiny::tags$p("Max Chunks: ",model$get_transformer_components()$chunks),
+                                     shiny::tags$p("Token Overlap: ",model$get_transformer_components()$overlap),
+                                     shiny::tags$p("Max Tokens: ",(model$get_model_info()$model_max_size-model$get_transformer_components()$overlap)
                                             *model$get_transformer_components()$chunks+model$get_model_info()$model_max_size),
-                                     tags$p("Hidden States Aggregation: ",model$get_transformer_components()$aggregation),
-                                     tags$h3("Sustainability"),
+                                     shiny::tags$p("Hidden States Aggregation: ",model$get_transformer_components()$aggregation),
+                                     shiny::tags$h3("Sustainability"),
                                      if(methods::isClass(Class="data.frame",where = model$get_sustainability_data())){
                                        if(is.na(model$get_sustainability_data()[1,1])==FALSE){
-                                         tags$p("Energy Consumption (kWh): ",sum(model$get_sustainability_data()[,"sustainability_data.total_energy_kwh"]))
+                                         shiny::tags$p("Energy Consumption (kWh): ",sum(model$get_sustainability_data()[,"sustainability_data.total_energy_kwh"]))
                                        } else {
-                                         tags$p("Energy Consumption (kWh): ","not estimated")
+                                         shiny::tags$p("Energy Consumption (kWh): ","not estimated")
                                        }
                                      } else {
-                                       tags$p("Energy Consumption (kWh): ","not estimated")
+                                       shiny::tags$p("Energy Consumption (kWh): ","not estimated")
                                      },
                                      if(methods::isClass(Class="data.frame",where = model$get_sustainability_data())){
                                        if(is.na(model$get_sustainability_data()[1,1])==FALSE){
-                                         tags$p("Carbon Footprint (CO2eq. kg): ",sum(model$get_sustainability_data()[,"sustainability_data.co2eq_kg"]))
+                                         shiny::tags$p("Carbon Footprint (CO2eq. kg): ",sum(model$get_sustainability_data()[,"sustainability_data.co2eq_kg"]))
                                        } else {
-                                         tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
+                                         shiny::tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
                                        }
                                      } else {
-                                       tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
+                                       shiny::tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
                                      }
                               )
                             )
 
                    ),
                    #Create Text Embeddings---------------------------------------------
-                   tabPanel("Create Text Embeddings",
-                            fluidRow(
-                              box(title = "Raw Texts",
+                   shiny::tabPanel("Create Text Embeddings",
+                            shiny::fluidRow(
+                              shinydashboard::box(title = "Raw Texts",
                                   solidHeader = TRUE,
                                   status = "primary",
-                                  shinyFilesButton(id="lm_choose_file_raw_texts_for_embed",
+                                  shinyFiles::shinyFilesButton(id="lm_choose_file_raw_texts_for_embed",
                                                    label="Choose File",
                                                    title="Please choose a file",
-                                                   icon=icon("file"),
+                                                   icon=shiny::icon("file"),
                                                    multiple=FALSE),
-                                  textInput(inputId = "lm_choose_file_raw_texts_for_embed_path",
-                                            label = tags$p(icon("file"),"File Path"))
+                                  shiny::textInput(inputId = "lm_choose_file_raw_texts_for_embed_path",
+                                            label = shiny::tags$p(shiny::icon("file"),"File Path"))
                               ),
-                              box(title = "Text Embeddings Destination",
+                              shinydashboard::box(title = "Text Embeddings Destination",
                                   solidHeader = TRUE,
                                   status = "primary",
-                                  shinyDirButton(id="lm_choose_file_path_for_embeddings",
+                                  shinyFiles::shinyDirButton(id="lm_choose_file_path_for_embeddings",
                                                  title="Choose a folder for storing the embeddings",
                                                  label = "Choose Folder",
-                                                 icon=icon("folder-open")),
-                                  textInput(inputId = "lm_choose_file_path_for_embeddings_path",
-                                            label = tags$p(icon("folder"),"Path to Folder")),
-                                  textInput(inputId = "lm_choose_file_path_for_embeddings_file_name",
-                                            label = tags$p(icon("file"),"File Name")),
-                                  numericInput(inputId = "lm_embed_batch_size",
+                                                 icon=shiny::icon("folder-open")),
+                                  shiny::textInput(inputId = "lm_choose_file_path_for_embeddings_path",
+                                            label = shiny::tags$p(shiny::icon("folder"),"Path to Folder")),
+                                  shiny::textInput(inputId = "lm_choose_file_path_for_embeddings_file_name",
+                                            label = shiny::tags$p(shiny::icon("file"),"File Name")),
+                                  shiny::numericInput(inputId = "lm_embed_batch_size",
                                                label = "Batch Size",
                                                min = 1,
                                                max = 512,
                                                value = 8),
-                                  actionButton(inputId = "lm_embedd_start",
+                                  shiny::actionButton(inputId = "lm_embedd_start",
                                                label = "Start Embedding Texts",
-                                               icon = icon("paper-plane"))
+                                               icon = shiny::icon("paper-plane"))
                               )
                             )
                    ),
                    #Encode/Decode/Tokenize---------------------------------------------
-                   tabPanel("Encode/Decode/Tokenize",
-                            fluidRow(
-                              box(
+                   shiny::tabPanel("Encode/Decode/Tokenize",
+                            shiny::fluidRow(
+                              shinydashboard::box(
                                 title = "Encode",
                                 status = "primary",
                                 solidHeader = TRUE,
                                 width = 12,
-                                box(width = 4,
+                                shinydashboard::box(width = 4,
                                     title = "Raw Text",
                                     solidHeader=TRUE,
-                                    textAreaInput(inputId = "lm_text_for_encode",
+                                    shiny::textAreaInput(inputId = "lm_text_for_encode",
                                                   label = NULL,
                                                   rows=5),
-                                    actionButton(inputId = "lm_encode_start",
+                                    shiny::actionButton(inputId = "lm_encode_start",
                                                  label = "Encode",
                                                  width = "100%",
-                                                 icon = icon("paper-plane")),
-                                    actionButton(inputId = "lm_encode_clear",
+                                                 icon = shiny::icon("paper-plane")),
+                                    shiny::actionButton(inputId = "lm_encode_clear",
                                                  label = "Clear",
                                                  width = "100%",
-                                                 icon = icon("trash"))
+                                                 icon = shiny::icon("trash"))
                                 ),
-                                box(width = 4,
+                                shinydashboard::box(width = 4,
                                     title = "Token Sequence",
                                     solidHeader=TRUE,
-                                    uiOutput(outputId="lm_txt_to_tokens")
+                                    shiny::uiOutput(outputId="lm_txt_to_tokens")
                                 ),
-                                box(width = 4,
+                                shinydashboard::box(width = 4,
                                     title = "ID Sequence",
                                     solidHeader=TRUE,
-                                    uiOutput(outputId="lm_txt_to_int")
+                                    shiny::uiOutput(outputId="lm_txt_to_int")
                                 )
                               )
                             ),
-                            fluidRow(
-                              box(
+                            shiny::fluidRow(
+                              shinydashboard::box(
                                 title = "Decode",
                                 status = "primary",
                                 solidHeader = TRUE,
                                 width = 12,
-                                box(width = 4,
+                                shinydashboard::box(width = 4,
                                     title = "ID Sequence",
                                     solidHeader = TRUE,
-                                    textAreaInput(inputId = "lm_ids_for_decode",
+                                    shiny::textAreaInput(inputId = "lm_ids_for_decode",
                                                   label = NULL,
                                                   rows=5),
-                                    actionButton(inputId = "lm_decode_start",
+                                    shiny::actionButton(inputId = "lm_decode_start",
                                                  label = "Decode",
                                                  width = "100%",
-                                                 icon = icon("paper-plane")),
-                                    actionButton(inputId = "lm_decode_clear",
+                                                 icon = shiny::icon("paper-plane")),
+                                    shiny::actionButton(inputId = "lm_decode_clear",
                                                  label = "Clear",
                                                  width = "100%",
-                                                 icon = icon("trash"))
+                                                 icon = shiny::icon("trash"))
                                 ),
-                                box(width = 4,
+                                shinydashboard::box(width = 4,
                                     title = "Token Sequence",
                                     solidHeader=TRUE,
-                                    uiOutput(outputId="lm_ids_to_tokens")
+                                    shiny::uiOutput(outputId="lm_ids_to_tokens")
                                 ),
-                                box(width = 4,
+                                shinydashboard::box(width = 4,
                                     title = "Raw Text",
                                     solidHeader=TRUE,
-                                    uiOutput(outputId="lm_ids_to_txt")
+                                    shiny::uiOutput(outputId="lm_ids_to_txt")
                                 )
                               )
                             )
 
                    ),
                    #Fill Mask---------------------------------------------------------
-                   tabPanel("Fill Mask",
-                            fluidRow(
-                              box(title = "Text Sequence",
+                   shiny::tabPanel("Fill Mask",
+                            shiny::fluidRow(
+                              shinydashboard::box(title = "Text Sequence",
                                   solidHeader = TRUE,
                                   status = "primary",
                                   width = 6,
-                                  renderTable(model$get_special_tokens()),
-                                  textAreaInput(inputId = "lm_txt_for_fill_mask",
+                                  shiny::renderTable(model$get_special_tokens()),
+                                  shiny::textAreaInput(inputId = "lm_txt_for_fill_mask",
                                                 rows = 5,
                                                 label="Text"),
-                                  numericInput(inputId = "lm_n_fillments_for_fill_mask",
+                                  shiny::numericInput(inputId = "lm_n_fillments_for_fill_mask",
                                                label = "N Solutions per mask",
                                                value = 5,
                                                min = 1,
                                                max = 50),
-                                  actionButton(inputId="lm_fill_mask_start",
+                                  shiny::actionButton(inputId="lm_fill_mask_start",
                                                label =  "Calculate Tokens",
                                                width = "100%",
-                                               icon = icon("paper-plane"))
+                                               icon = shiny::icon("paper-plane"))
                               ),
-                              box(title = "Estimated Tokens",
+                              shinydashboard::box(title = "Estimated Tokens",
                                   solidHeader = TRUE,
                                   status = "primary",
                                   width = 6,
-                                  sliderInput(inputId = "lm_mask_plot_text_size",
+                                  shiny::sliderInput(inputId = "lm_mask_plot_text_size",
                                               min = 1,
                                               max = 20,
                                               value = 10,
                                               step = 0.5,
                                               label = "Text Size"),
-                                  numericInput(inputId = "lm_select_mask_for_fill_mask",
+                                  shiny::numericInput(inputId = "lm_select_mask_for_fill_mask",
                                                value = 1,
                                                min = 1,
                                                max = 1,
                                                label = "Select Mask Token"),
-                                  plotOutput(outputId = "lm_scores_for_fill_mask"))
+                                  shiny::plotOutput(outputId = "lm_scores_for_fill_mask"))
                             )
                    )
         )
@@ -2817,19 +2843,19 @@ start_aifeducation_studio<-function(){
     })
 
     #Document Page--------------------------------------------------------------
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="lm_db_select_model_for_documentation",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
-    lm_interface_for_documentation_path=eventReactive(input$lm_db_select_model_for_documentation,{
-      path=parseDirPath(volumes,input$lm_db_select_model_for_documentation)
+    lm_interface_for_documentation_path=shiny::eventReactive(input$lm_db_select_model_for_documentation,{
+      path=shinyFiles::parseDirPath(volumes,input$lm_db_select_model_for_documentation)
       return(path)
     })
 
-    LanguageModel_for_Documentation<-eventReactive(lm_interface_for_documentation_path(),{
+    LanguageModel_for_Documentation<-shiny::eventReactive(lm_interface_for_documentation_path(),{
       if(length(lm_interface_for_documentation_path())>0){
-        show_alert(title="Working",
+        shinyWidgets::show_alert(title="Working",
                    text = "Please wait",
                    type="info")
         model=try(load_ai_model(model_dir = lm_interface_for_documentation_path(),
@@ -2837,10 +2863,10 @@ start_aifeducation_studio<-function(){
         if(methods::is(model,class2 = "try-error")==FALSE){
           if("TextEmbeddingModel"%in%class(model)){
             if(utils::compareVersion(as.character(model$get_package_versions()$aifeducation),"0.3.1")>=0){
-              closeSweetAlert()
+              shinyWidgets::closeSweetAlert()
               return(model)
             } else {
-              show_alert(title = "Error",
+              shinyWidgets::show_alert(title = "Error",
                          text = paste("The model was created with aifeducation version",
                                       as.character(model$get_package_versions()$aifeducation,"."),
                                       "Uster interface supports only models created with aifeducation version 0.3.1 or later."),
@@ -2848,14 +2874,14 @@ start_aifeducation_studio<-function(){
               return(NULL)
             }
           } else {
-            show_alert(title = "Error",
+            shinyWidgets::show_alert(title = "Error",
                        text = "The directory does not contain an object of class TextEmbeddingModel.
                    Please check your directory.",
                        type = "error")
             return(NULL)
           }
         } else {
-          show_alert(title = "Error",
+          shinyWidgets::show_alert(title = "Error",
                      text = model,
                      type = "error")
           return(NULL)
@@ -2865,7 +2891,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$lm_document_selected_model_label<-renderText({
+    output$lm_document_selected_model_label<-shiny::renderText({
       model<-LanguageModel_for_Documentation()
       if(is.null(model)){
         return(NULL)
@@ -2874,13 +2900,13 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$lm_document_tabs<-renderUI({
+    output$lm_document_tabs<-shiny::renderUI({
       model<-LanguageModel_for_Documentation()
       if(is.null(model)){
         return(NULL)
       } else {
 
-        ui_parts=tagList()
+        ui_parts=shiny::tagList()
         pup_info_for=c("developed_by","modified_by")
         pup_info_titles=c("Developers","Modifiers")
         for(i in 1:length(pup_info_for)){
@@ -2888,21 +2914,21 @@ start_aifeducation_studio<-function(){
           for(j in 1:10){
             pup_info=model$get_publication_info()[[pup_info_for[i]]]$authors
             widgets[[j]]=list(
-              fluidRow(
-                column(width = 4,
-                       textInput(inputId = paste0("lm_doc_",pup_info_titles[i],"_fist_name_",j),
+              shiny::fluidRow(
+                shiny::column(width = 4,
+                       shiny::textInput(inputId = paste0("lm_doc_",pup_info_titles[i],"_fist_name_",j),
                                  label = paste("Given Name",j),
                                  value = pup_info[[j]]$given,
                                  width = "100%")
                 ),
-                column(width = 4,
-                       textInput(inputId = paste0("lm_doc_",pup_info_titles[i],"_last_name_",j),
+                shiny::column(width = 4,
+                       shiny::textInput(inputId = paste0("lm_doc_",pup_info_titles[i],"_last_name_",j),
                                  label = paste("Family Name",j),
                                  value = pup_info[[j]]$family,
                                  width = "100%")
                 ),
-                column(width = 4,
-                       textInput(inputId = paste0("lm_doc_",pup_info_titles[i],"_mail_",j),
+                shiny::column(width = 4,
+                       shiny::textInput(inputId = paste0("lm_doc_",pup_info_titles[i],"_mail_",j),
                                  label = paste("Mail",j),
                                  value = pup_info[[j]]$email,
                                  width = "100%")
@@ -2911,17 +2937,17 @@ start_aifeducation_studio<-function(){
             )
           }
           ui_parts[length(ui_parts)+1]=list(
-            tabPanel(title = pup_info_titles[i],
+            shiny::tabPanel(title = pup_info_titles[i],
                      widgets,
-                     textInput(inputId = paste0("lm_doc_",pup_info_for[i],"_citation"),
+                     shiny::textInput(inputId = paste0("lm_doc_",pup_info_for[i],"_citation"),
                                label = "Citation",
                                value = model$get_publication_info()[[pup_info_for[i]]]$citation),
-                     textInput(inputId = paste0("lm_doc_",pup_info_for[i],"_url"),
+                     shiny::textInput(inputId = paste0("lm_doc_",pup_info_for[i],"_url"),
                                label = "URL",
                                value = model$get_publication_info()[[pup_info_for[i]]]$url),
-                     actionButton(inputId = paste0("lm_doc_",pup_info_for[i],"_save"),
+                     shiny::actionButton(inputId = paste0("lm_doc_",pup_info_for[i],"_save"),
                                   label = "Save",
-                                  icon = icon("floppy-disk"))
+                                  icon = shiny::icon("floppy-disk"))
             )
           )
         }
@@ -2932,35 +2958,35 @@ start_aifeducation_studio<-function(){
         documentation_keywords=c("keywords_eng","keywords_native")
         for(i in 1:length(documention_part)){
 
-          tmp_tabPanel<-tabPanel(
+          tmp_tabPanel<-shiny::tabPanel(
             title = documention_titles[i],
-            fluidRow(
-              column(width = 6,
-                     textAreaInput(inputId = paste0("lm_doc_editor_",documention_part[i]),
+            shiny::fluidRow(
+              shiny::column(width = 6,
+                     shiny::textAreaInput(inputId = paste0("lm_doc_editor_",documention_part[i]),
                                    label = "Editor",
                                    rows = 6,
                                    value = model$get_model_description()[[documentation_field[i]]]
                      ),
                      if(i<=2){
-                       textInput(inputId = paste0("lm_doc_editor_",documention_part[i],"_keywords"),
+                       shiny::textInput(inputId = paste0("lm_doc_editor_",documention_part[i],"_keywords"),
                                  value = model$get_model_description()[[documentation_keywords[i]]],
                                  label = "Keywords")
                      },
-                     actionButton(inputId = paste0("lm_doc_editor_",documention_part[i],"_preview_button"),
+                     shiny::actionButton(inputId = paste0("lm_doc_editor_",documention_part[i],"_preview_button"),
                                   label = "Preview",
-                                  icon = icon("eye")),
-                     actionButton(inputId = paste0("lm_doc_editor_",documention_part[i],"_save_button"),
+                                  icon = shiny::icon("eye")),
+                     shiny::actionButton(inputId = paste0("lm_doc_editor_",documention_part[i],"_save_button"),
                                   label = "Save",
-                                  icon = icon("floppy-disk"))),
-              column(width = 6,
-                     tags$p(tags$b("Preview")),
-                     uiOutput(outputId = paste0("lm_doc_editor_",documention_part[i],"_preview")))
+                                  icon = shiny::icon("floppy-disk"))),
+              shiny::column(width = 6,
+                     shiny::tags$p(shiny::tags$b("Preview")),
+                     shiny::uiOutput(outputId = paste0("lm_doc_editor_",documention_part[i],"_preview")))
             )
           )
           ui_parts[length(ui_parts)+1]=list(tmp_tabPanel)
         }
 
-        ui<-tabBox(width = 12,
+        ui<-shinydashboard::tabBox(width = 12,
                    ui_parts[[1]],
                    ui_parts[[2]],
                    ui_parts[[3]],
@@ -2973,23 +2999,23 @@ start_aifeducation_studio<-function(){
     })
 
     #Preview Events
-    observeEvent(input$lm_doc_editor_abstract_eng_preview_button,{
-      output$lm_doc_editor_abstract_eng_preview<-renderUI({
+    shiny::observeEvent(input$lm_doc_editor_abstract_eng_preview_button,{
+      output$lm_doc_editor_abstract_eng_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$lm_doc_editor_abstract_eng))
       })
     })
-    observeEvent(input$lm_doc_editor_abstract_native_preview_button,{
-      output$lm_doc_editor_abstract_native_preview<-renderUI({
+    shiny::observeEvent(input$lm_doc_editor_abstract_native_preview_button,{
+      output$lm_doc_editor_abstract_native_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$lm_doc_editor_abstract_native))
       })
     })
-    observeEvent(input$lm_doc_editor_description_eng_preview_button,{
-      output$lm_doc_editor_description_eng_preview<-renderUI({
+    shiny::observeEvent(input$lm_doc_editor_description_eng_preview_button,{
+      output$lm_doc_editor_description_eng_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$lm_doc_editor_description_eng))
       })
     })
-    observeEvent(input$lm_doc_editor_description_native_preview_button,{
-      output$lm_doc_editor_description_native_preview<-renderUI({
+    shiny::observeEvent(input$lm_doc_editor_description_native_preview_button,{
+      output$lm_doc_editor_description_native_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$lm_doc_editor_description_native))
       })
     })
@@ -2997,7 +3023,7 @@ start_aifeducation_studio<-function(){
 
     #Save Events
     #Developers
-    observeEvent(input$lm_doc_developed_by_save,{
+    shiny::observeEvent(input$lm_doc_developed_by_save,{
       model<-LanguageModel_for_Documentation()
 
       tmp_person_list=NULL
@@ -3019,12 +3045,12 @@ start_aifeducation_studio<-function(){
                                  url = input[[paste0("lm_doc_","developed_by","_url")]])
       r_interface_path=paste0(lm_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      LanguageModel_for_Documentation<-reactive({model})
+      LanguageModel_for_Documentation<-shiny::reactive({model})
 
     })
 
     #Modifiers
-    observeEvent(input$lm_doc_modified_by_save,{
+    shiny::observeEvent(input$lm_doc_modified_by_save,{
       model<-LanguageModel_for_Documentation()
 
       tmp_person_list=NULL
@@ -3046,44 +3072,44 @@ start_aifeducation_studio<-function(){
                                  url = input[[paste0("lm_doc_","modified_by","_url")]])
       r_interface_path=paste0(lm_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      LanguageModel_for_Documentation<-reactive({model})
+      LanguageModel_for_Documentation<-shiny::reactive({model})
     })
 
-    observeEvent(input$lm_doc_editor_abstract_eng_save_button,{
+    shiny::observeEvent(input$lm_doc_editor_abstract_eng_save_button,{
       model<-LanguageModel_for_Documentation()
       model$set_model_description(
         abstract_eng=input$lm_doc_editor_abstract_eng,
         keywords_eng=input$lm_doc_editor_abstract_eng_keywords)
       r_interface_path=paste0(lm_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      LanguageModel_for_Documentation<-reactive({model})
+      LanguageModel_for_Documentation<-shiny::reactive({model})
     })
 
-    observeEvent(input$lm_doc_editor_abstract_native_save_button,{
+    shiny::observeEvent(input$lm_doc_editor_abstract_native_save_button,{
       model<-LanguageModel_for_Documentation()
       model$set_model_description(
         abstract_native=input$lm_doc_editor_abstract_native,
         keywords_native=input$lm_doc_editor_abstract_native_keywords)
       r_interface_path=paste0(lm_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      LanguageModel_for_Documentation<-reactive({model})
+      LanguageModel_for_Documentation<-shiny::reactive({model})
 
     })
-    observeEvent(input$lm_doc_editor_description_eng_save_button,{
+    shiny::observeEvent(input$lm_doc_editor_description_eng_save_button,{
       model<-LanguageModel_for_Documentation()
       model$set_model_description(
         eng =input$lm_doc_editor_description_eng)
       r_interface_path=paste0(lm_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      LanguageModel_for_Documentation<-reactive({model})
+      LanguageModel_for_Documentation<-shiny::reactive({model})
     })
-    observeEvent(input$lm_doc_editor_description_native_save_button,{
+    shiny::observeEvent(input$lm_doc_editor_description_native_save_button,{
       model<-LanguageModel_for_Documentation()
       model$set_model_description(
         native =input$lm_doc_editor_description_native)
       r_interface_path=paste0(lm_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      LanguageModel_for_Documentation<-reactive({model})
+      LanguageModel_for_Documentation<-shiny::reactive({model})
     })
 
 
@@ -3091,13 +3117,13 @@ start_aifeducation_studio<-function(){
     #TextEmbeddingClassifier Rounties--------------------------------------------
     #Create and Train Page-------------------------------------------------------
     #Select and load embedding
-    shinyFileChoose(input=input,
+    shinyFiles::shinyFileChoose(input=input,
                     id="tec_select_embeddings_for_training",
                     roots = volumes,
                     filetype=c("rda","rdata"))
 
-    tec_embeddings_for_train_path=eventReactive(input$tec_select_embeddings_for_training,{
-      tmp_file_path=parseFilePaths(volumes,input$tec_select_embeddings_for_training)
+    tec_embeddings_for_train_path=shiny::eventReactive(input$tec_select_embeddings_for_training,{
+      tmp_file_path=shinyFiles::parseFilePaths(volumes,input$tec_select_embeddings_for_training)
       if(nrow(tmp_file_path)>0){
         return(tmp_file_path[[1,"datapath"]])
       } else {
@@ -3106,21 +3132,21 @@ start_aifeducation_studio<-function(){
     },ignoreNULL = FALSE)
 
 
-    tec_embeddings_for_training=reactive({
+    tec_embeddings_for_training=shiny::reactive({
       file_path=tec_embeddings_for_train_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
-          show_alert(title="Loading",
+          shinyWidgets::show_alert(title="Loading",
                      text = "Please wait",
                      type="info")
           file=load(file_path)
           embeddings=get(x=file)
           if(("EmbeddedText" %in% class(embeddings))==TRUE){
-            closeSweetAlert()
+            shinyWidgets::closeSweetAlert()
             return(embeddings)
           } else {
-            closeSweetAlert()
-            show_alert(title="Error",
+            shinyWidgets::closeSweetAlert()
+            shinyWidgets::show_alert(title="Error",
                        text = "The file contains data in an unsupported format.
                      Text embeddings must be of class 'EmbeddedText'. Please
                      check data. Data embeddings should always be created via data
@@ -3132,8 +3158,8 @@ start_aifeducation_studio<-function(){
             return(NULL)
           }
         } else {
-          closeSweetAlert()
-          show_alert(title="Error",
+          shinyWidgets::closeSweetAlert()
+          shinyWidgets::show_alert(title="Error",
                      text = "The file does not exist on the path.",
                      type="error")
           return(NULL)
@@ -3143,7 +3169,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_embeddings_for_training_overview<-renderUI({
+    output$tec_embeddings_for_training_overview<-shiny::renderUI({
       embeddings=tec_embeddings_for_training()
       if(!is.null(embeddings)){
         model_info=embeddings$get_model_info()
@@ -3167,14 +3193,14 @@ start_aifeducation_studio<-function(){
         info_table[3,4]=model_info$param_overlap
 
         ui<-list(
-          valueBox(value=nrow(embeddings$embeddings),
+          shinydashboard::valueBox(value=nrow(embeddings$embeddings),
                    subtitle="Number of Cases",
-                   icon = icon("list"),
+                   icon = shiny::icon("list"),
                    width=12),
-          tags$h3("Model:",  model_info$model_label),
-          tags$p("Name:", model_info$model_name),
-          tags$p("Created", model_info$model_date),
-          renderTable(expr=info_table,
+          shiny::tags$h3("Model:",  model_info$model_label),
+          shiny::tags$p("Name:", model_info$model_name),
+          shiny::tags$p("Created", model_info$model_date),
+          shiny::renderTable(expr=info_table,
                       colnames=FALSE)
         )
         return(ui)
@@ -3184,13 +3210,13 @@ start_aifeducation_studio<-function(){
     })
 
     #Select and load Target Data
-    shinyFileChoose(input=input,
+    shinyFiles::shinyFileChoose(input=input,
                     id="tec_select_target_data_for_training",
                     roots = volumes,
                     filetypes=c("csv","rda","rdata","xlsx"))
 
-    tec_target_data_for_train_path=eventReactive(input$tec_select_target_data_for_training,{
-      tmp_file_path=parseFilePaths(volumes,input$tec_select_target_data_for_training)
+    tec_target_data_for_train_path=shiny::eventReactive(input$tec_select_target_data_for_training,{
+      tmp_file_path=shinyFiles::parseFilePaths(volumes,input$tec_select_target_data_for_training)
       if(nrow(tmp_file_path)>0){
         return(tmp_file_path[[1,"datapath"]])
       } else {
@@ -3198,7 +3224,7 @@ start_aifeducation_studio<-function(){
       }
     },ignoreNULL = FALSE)
 
-    tec_target_data_for_training<-reactive({
+    tec_target_data_for_training<-shiny::reactive({
       file_path=tec_target_data_for_train_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
@@ -3206,7 +3232,7 @@ start_aifeducation_studio<-function(){
           extension=stringr::str_to_lower(extension)
           #extension=stringi::stri_split_fixed(file_path,pattern=".")[[1]]
           #extension=stringi::stri_trans_tolower(extension[[length(extension)]])
-          show_alert(title="Loading",
+          shinyWidgets::show_alert(title="Loading",
                      text = "Please wait",
                      type="info")
           if(extension=="csv"|extension=="txt"){
@@ -3233,19 +3259,19 @@ start_aifeducation_studio<-function(){
 
           #Final Check
           if(is.character(target_data)){
-            closeSweetAlert()
-            show_alert(title="Error",
+            shinyWidgets::closeSweetAlert()
+            shinyWidgets::show_alert(title="Error",
                        text = "Data can not be loaded as data frame. Please
                      check your data.",
                        type="error")
             return(NULL)
           } else {
             if("id"%in%colnames(target_data)){
-              closeSweetAlert()
+              shinyWidgets::closeSweetAlert()
               return(target_data)
             } else {
-              closeSweetAlert()
-              show_alert(title="Error",
+              shinyWidgets::closeSweetAlert()
+              shinyWidgets::show_alert(title="Error",
                          text = "Data does not contain a column named 'id'. This
                        column is necessary to match the text embeddings to their
                        corresponding targets. Please check your data.",
@@ -3254,8 +3280,8 @@ start_aifeducation_studio<-function(){
             }
           }
         } else {
-          closeSweetAlert()
-          show_alert(title="Error",
+          shinyWidgets::closeSweetAlert()
+          shinyWidgets::show_alert(title="Error",
                      text = "The file does not exist on the path.",
                      type="error")
           return(NULL)
@@ -3266,37 +3292,37 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_target_data_for_training_overview<-renderUI({
+    output$tec_target_data_for_training_overview<-shiny::renderUI({
       target_data=tec_target_data_for_training()
       if(!is.null(target_data)){
         column_names=colnames(target_data)
         column_names=setdiff(x=column_names,y=c("id","text"))
         ui<-list(
-          valueBox(value = nrow(target_data),
+          shinydashboard::valueBox(value = nrow(target_data),
                    subtitle="Number of Cases",
-                   icon = icon("list"),
+                   icon = shiny::icon("list"),
                    width=12),
-          selectInput(inputId = "tec_target_data_column",
+          shiny::selectInput(inputId = "tec_target_data_column",
                       label="Select a Column",
                       choices = column_names),
-          tableOutput(outputId = "tec_target_data_abs_freq")
+          shiny::tableOutput(outputId = "tec_target_data_abs_freq")
         )
       } else {
         return(NULL)
       }
     })
 
-    output$tec_target_data_abs_freq<-renderTable({
+    output$tec_target_data_abs_freq<-shiny::renderTable({
       relevant_data=tec_target_data_for_training()
       relevant_data=relevant_data[input$tec_target_data_column]
       return(table(relevant_data,useNA = "always"))
     })
 
     #Architecture
-    output$tec_attention_layers_for_training<-renderUI({
+    output$tec_attention_layers_for_training<-shiny::renderUI({
       if(input$tec_attention_type=="multihead"){
         ui<-list(
-          sliderInput(inputId = "tec_self_attention_heads",
+          shiny::sliderInput(inputId = "tec_self_attention_heads",
                       label = "Number of Self Attention Heads",
                       min = 1,
                       value = 4,
@@ -3310,25 +3336,25 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_dense_layer_check<-renderText({
+    output$tec_dense_layer_check<-shiny::renderText({
       #as.numeric(stringi::stri_split_regex(input$tec_hidden,pattern=",|[:blank:]")[[1]])
       as.numeric(stringr::str_extract_all(input$tec_hidden,pattern = "\\d+")[[1]])
     })
-    output$tec_rec_layer_check<-renderText({
+    output$tec_rec_layer_check<-shiny::renderText({
       #as.numeric(stringi::stri_split_regex(input$tec_rec,pattern=",|[:blank:]")[[1]])
       as.numeric(stringr::str_extract_all(input$tec_rec,pattern = "\\d+")[[1]])
     })
 
     #Training settings
-    output$tec_dynamic_sample_weights<-renderUI({
+    output$tec_dynamic_sample_weights<-shiny::renderUI({
       ui<-list(
-        sliderInput(inputId = "tec_bpl_max",
+        shiny::sliderInput(inputId = "tec_bpl_max",
                     label = "Max Certainty Value",
                     value = 1,
                     max = 1,
                     min = input$tec_bpl_anchor,
                     step = 0.01),
-        sliderInput(inputId = "bpl_min",
+        shiny::sliderInput(inputId = "bpl_min",
                     label = "Min Certainty Value",
                     value = 0,
                     max = input$tec_bpl_anchor,
@@ -3340,18 +3366,18 @@ start_aifeducation_studio<-function(){
 
 
     #Model Destination
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="tec_create_select_destination_folder",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
-    observeEvent(input$tec_create_select_destination_folder,{
-      updateTextInput(inputId = "tec_create_select_destination_folder_path",
-                      value = parseDirPath(volumes,input$tec_create_select_destination_folder))
+    shiny::observeEvent(input$tec_create_select_destination_folder,{
+      shiny::updateTextInput(inputId = "tec_create_select_destination_folder_path",
+                      value = shinyFiles::parseDirPath(volumes,input$tec_create_select_destination_folder))
     })
 
     #Test Data matching
-    observeEvent(input$tec_create_test_data_matching,{
+    shiny::observeEvent(input$tec_create_test_data_matching,{
 
       cond_1=(!is.null(tec_embeddings_for_training()))
       cond_2=(!is.null(tec_target_data_for_training()))
@@ -3362,61 +3388,61 @@ start_aifeducation_studio<-function(){
         matched_cases=intersect(x=rownames(embeddings$embeddings),
                                 y=rownames(targets))
         n_matched_cases=length(matched_cases)
-        show_alert(title = "Matching Results",
+        shinyWidgets::show_alert(title = "Matching Results",
                    text = paste(n_matched_cases,
                                 "out of",
                                 nrow(embeddings$embeddings),
                                 "could be matched"),
                    type ="info")
       } else {
-        show_alert(title = "Error",
+        shinyWidgets::show_alert(title = "Error",
                    text = "Embeddings and target data must be selected before matching is possible.",
                    type = "error")
-        #error_modal<-modalDialog(
+        #error_modal<-shiny::modalDialog(
         #  title = "Error",
         #  size = "l",
         #  easyClose = TRUE,
-        #  footer = modalButton("Close"),
-        # tags$p("Embeddings and target data must be selected before matching is possible."))
-        #showModal(error_modal)
+        #  footer = shiny::modalButton("Close"),
+        # shiny::tags$p("Embeddings and target data must be selected before matching is possible."))
+        #shiny::showModal(error_modal)
       }
     },ignoreInit = TRUE)
 
     #Start Creation
-    observeEvent(input$tec_create_start,{
+    shiny::observeEvent(input$tec_create_start,{
       #Check requirements
       error_list=NULL
       if(is.null(tec_target_data_for_training())==TRUE){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "No target data selected."))
       }
       if(is.null(tec_embeddings_for_training())==TRUE){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "No input data selected. Please select a file with document embeddings."))
       }
       if(dir.exists(input$tec_create_select_destination_folder_path)==FALSE){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "The target directory does not exist. Please check path."))
       }
       if(is.null(input$tec_create_folder_name)|input$tec_create_folder_name==""){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "Folder name is not set."))
       }
       if(is.null(input$tec_name)|input$tec_create_folder_name==""){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "Name of the classifier ist not set."))
       }
       if(is.null(input$tec_label)|input$tec_create_folder_name==""){
-        error_list[length(error_list)+1]=list(tags$p(
+        error_list[length(error_list)+1]=list(shiny::tags$p(
           "Label of the classifier ist not set."))
       }
 
       if(length(error_list)>0){
-        show_alert(title = "Error",
-                   text = tagList(error_list),
+        shinyWidgets::show_alert(title = "Error",
+                   text = shiny::tagList(error_list),
                    type = "error")
       } else {
-        showModal(progress_modal)
+        shiny::showModal(progress_modal)
         destination_path=input$tec_create_select_destination_folder_path
 
         #if(dir.exists(destination_path)==FALSE){
@@ -3533,22 +3559,22 @@ start_aifeducation_studio<-function(){
         save_ai_model(model = new_classifier,
                       model_dir = destination_path,
                       dir_name = input$tec_create_folder_name)
-        removeModal()
+        shiny::removeModal()
       }
 
     })
 
     #Classifier Use Page---------------------------------------------------------
     #Choose Model
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="tec_select_dir_for_use",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
-    Classifier_for_Use<-eventReactive(input$tec_select_dir_for_use,{
-      model_path=parseDirPath(volumes,input$tec_select_dir_for_use)
+    Classifier_for_Use<-shiny::eventReactive(input$tec_select_dir_for_use,{
+      model_path=shinyFiles::parseDirPath(volumes,input$tec_select_dir_for_use)
       if(length(model_path)>0){
-        show_alert(title="Loading",
+        shinyWidgets::show_alert(title="Loading",
                    text = "Please wait",
                    type="info")
         classifier<-try(load_ai_model(model_dir = model_path,
@@ -3557,10 +3583,10 @@ start_aifeducation_studio<-function(){
         if(methods::is(classifier,class2 = "try-error")==FALSE){
           if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
-              closeSweetAlert()
+              shinyWidgets::closeSweetAlert()
               return(classifier)
             } else {
-              show_alert(title = "Error",
+              shinyWidgets::show_alert(title = "Error",
                          text = paste("The classifier was created with aifeducation version",
                                       as.character(classifier$get_package_versions()$r_package_versions$aifeducation,"."),
                                       "Uster interface supports only models created with aifeducation version 0.3.1 or later."),
@@ -3569,7 +3595,7 @@ start_aifeducation_studio<-function(){
             }
 
           } else {
-            show_alert(title="Error",
+            shinyWidgets::show_alert(title="Error",
                        text = "The file does not contain an Object of class
                    TextEmbeddingClassifierNeuralNet. Please check the
                    directory.",
@@ -3577,7 +3603,7 @@ start_aifeducation_studio<-function(){
             return(NULL)
           }
         } else {
-          show_alert(title="Error",
+          shinyWidgets::show_alert(title="Error",
                      text = classifier,
                      type="error")
           return(NULL)
@@ -3585,7 +3611,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_use_selected_model_label<-renderText({
+    output$tec_use_selected_model_label<-shiny::renderText({
       if(is.null(Classifier_for_Use())){
         return(NULL)
       } else {
@@ -3593,7 +3619,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_use_tabs<-renderUI({
+    output$tec_use_tabs<-shiny::renderUI({
       if(is.null(Classifier_for_Use())){
         return(NULL)
       } else {
@@ -3604,256 +3630,256 @@ start_aifeducation_studio<-function(){
         reliability_scale=classifier$reliability$test_metric_mean[,measures_shared]
         colnames(reliability_scale)=measure_labels[measures_shared]
 
-        ui<-box(status = "primary",
+        ui<-shinydashboard::box(status = "primary",
                 width = 12,
-                tabsetPanel(
+                shiny::tabsetPanel(
                   #Model Description--------------------------------------------------
-                  tabPanel("Model Description",
-                           box(width = 6,
+                  shiny::tabPanel("Model Description",
+                           shinydashboard::box(width = 6,
                                status = "primary",
-                               tags$h3(classifier$get_model_info()$model_label),
-                               tags$p("Developers: ",paste(format(x=classifier$get_publication_info()$developed_by$authors,
+                               shiny::tags$h3(classifier$get_model_info()$model_label),
+                               shiny::tags$p("Developers: ",paste(format(x=classifier$get_publication_info()$developed_by$authors,
                                                                   include = c("given","family")),
                                                            collapse = ", ")),
-                               tags$p("Citation: ",classifier$pub_info$developed_by$citation),
-                               tags$p("Date of Creation: ",classifier$get_model_info()$model_date),
-                               tags$p("Software License: ",classifier$get_software_license()),
-                               tags$p("Documentation License: ",classifier$get_documentation_license()),
-                               tags$p("Categories: ",paste(classifier$model_config$target_levels,collapse = ", "))
+                               shiny::tags$p("Citation: ",classifier$pub_info$developed_by$citation),
+                               shiny::tags$p("Date of Creation: ",classifier$get_model_info()$model_date),
+                               shiny::tags$p("Software License: ",classifier$get_software_license()),
+                               shiny::tags$p("Documentation License: ",classifier$get_documentation_license()),
+                               shiny::tags$p("Categories: ",paste(classifier$model_config$target_levels,collapse = ", "))
                            ),
-                           box(width = 6,
+                           shinydashboard::box(width = 6,
                                status = "primary",
-                               tags$h3("Underlying Text Embedding Model"),
-                               tags$p("Label: ",classifier$get_text_embedding_model()$model$model_label),
-                               tags$p("Method: ",classifier$get_text_embedding_model()$model$model_method),
-                               tags$p("Max Tokens Per Chunk: ",classifier$get_text_embedding_model()$model$param_seq_length),
-                               tags$p("Max Chunks: ",classifier$get_text_embedding_model()$model$param_chunks),
-                               tags$p("Token Overlap: ",classifier$get_text_embedding_model()$model$param_overlap),
-                               tags$p("Max Tokens: ",(classifier$get_text_embedding_model()$model$param_seq_length-classifier$get_text_embedding_model()$model$param_overlap)
+                               shiny::tags$h3("Underlying Text Embedding Model"),
+                               shiny::tags$p("Label: ",classifier$get_text_embedding_model()$model$model_label),
+                               shiny::tags$p("Method: ",classifier$get_text_embedding_model()$model$model_method),
+                               shiny::tags$p("Max Tokens Per Chunk: ",classifier$get_text_embedding_model()$model$param_seq_length),
+                               shiny::tags$p("Max Chunks: ",classifier$get_text_embedding_model()$model$param_chunks),
+                               shiny::tags$p("Token Overlap: ",classifier$get_text_embedding_model()$model$param_overlap),
+                               shiny::tags$p("Max Tokens: ",(classifier$get_text_embedding_model()$model$param_seq_length-classifier$get_text_embedding_model()$model$param_overlap)
                                       *classifier$get_text_embedding_model()$model$param_chunks+classifier$get_text_embedding_model()$model$param_seq_length),
-                               tags$p("Hidden States Aggregation: ",classifier$get_text_embedding_model()$model$param_aggregation),
-                               tags$h3("Sustainability"),
+                               shiny::tags$p("Hidden States Aggregation: ",classifier$get_text_embedding_model()$model$param_aggregation),
+                               shiny::tags$h3("Sustainability"),
                                if(methods::isClass(Class="list",where = classifier$get_sustainability_data())){
                                  if(classifier$get_sustainability_data()$sustainability_tracked==TRUE){
-                                   tags$p("Energy Consumption (kWh): ",classifier$get_sustainability_data()$sustainability_data$total_energy_kwh)
+                                   shiny::tags$p("Energy Consumption (kWh): ",classifier$get_sustainability_data()$sustainability_data$total_energy_kwh)
                                  } else {
-                                   tags$p("Energy Consumption (kWh): ","not estimated")
+                                   shiny::tags$p("Energy Consumption (kWh): ","not estimated")
                                  }
                                } else {
-                                 tags$p("Energy Consumption (kWh): ","not estimated")
+                                 shiny::tags$p("Energy Consumption (kWh): ","not estimated")
                                },
                                if(methods::isClass(Class="list",where = classifier$get_sustainability_data())){
                                  if(classifier$get_sustainability_data()$sustainability_tracked==TRUE){
-                                   tags$p("Carbon Footprint (CO2eq. kg): ",classifier$get_sustainability_data()$sustainability_data$co2eq_kg)
+                                   shiny::tags$p("Carbon Footprint (CO2eq. kg): ",classifier$get_sustainability_data()$sustainability_data$co2eq_kg)
                                  } else {
-                                   tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
+                                   shiny::tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
                                  }
                                } else {
-                                 tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
+                                 shiny::tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
                                }
                            ),
-                           box(width = 12,
+                           shinydashboard::box(width = 12,
                                status = "primary",
-                               switchInput(
+                               shinyWidgets::switchInput(
                                  inputId = "tec_desc_language_select",
                                  label = "Language",
                                  onLabel="English",
                                  offLabel = "Native",
                                  value = TRUE,
                                  labelWidth = "80px"),
-                               uiOutput(outputId = "tect_desc_abstract_and_desc")
+                               shiny::uiOutput(outputId = "tect_desc_abstract_and_desc")
                            )
                   ),
                   #Training Page------------------------------------------------
-                  tabPanel("Training",
-                           box(title = "Training",
+                  shiny::tabPanel("Training",
+                           shinydashboard::box(title = "Training",
                                solidHeader = TRUE,
                                status = "primary",
                                width = 12,
-                               sidebarLayout(
+                               shiny::sidebarLayout(
                                  position="right",
-                                 sidebarPanel=sidebarPanel(
-                                   sliderInput(inputId = "tec_performance_text_size",
+                                 sidebarPanel=shiny::sidebarPanel(
+                                   shiny::sliderInput(inputId = "tec_performance_text_size",
                                                label = "Text Size",
                                                min = 1,
                                                max = 20,
                                                step = 0.5,
                                                value = 12),
-                                   numericInput(inputId = "tec_performance_y_min",
+                                   shiny::numericInput(inputId = "tec_performance_y_min",
                                                 label = "Y Min",
                                                 value = 0),
-                                   numericInput(inputId = "tec_performance_y_max",
+                                   shiny::numericInput(inputId = "tec_performance_y_max",
                                                 label = "Y Max",
                                                 value = 1),
-                                   radioGroupButtons(
+                                   shinyWidgets::radioGroupButtons(
                                      inputId = "tec_performance_training_phase",
                                      label = "Training Phase",
                                      choices = list("Summary Folds"="summary_folds",
                                                     "Final Training"="final_training")),
-                                   radioGroupButtons(
+                                   shinyWidgets::radioGroupButtons(
                                      inputId = "tec_performance_training_measures",
                                      label = "Measures",
                                      choices = list("Loss"="loss",
                                                     "Accuracy"="acc",
                                                     "Balanced Accuracy"="bacc")),
-                                   materialSwitch(inputId = "tec_performance_training_min_max",
+                                   shinyWidgets::materialSwitch(inputId = "tec_performance_training_min_max",
                                                   label = "Add Min/Max",
                                                   value = TRUE,
                                                   status = "primary"),
-                                   uiOutput(outputId = "tec_performance_techniques_widget"),
-                                   uiOutput(outputId = "tec_performance_bpl_steps")
+                                   shiny::uiOutput(outputId = "tec_performance_techniques_widget"),
+                                   shiny::uiOutput(outputId = "tec_performance_bpl_steps")
                                  ),
-                                 mainPanel =mainPanel(
-                                   plotOutput(outputId = "tec_performance_training_loss")
+                                 mainPanel =shiny::mainPanel(
+                                   shiny::plotOutput(outputId = "tec_performance_training_loss")
                                  )
                                )
                            )
                   ),
-                  tabPanel(title = "Reliability",
-                           box(title = "Coding Stream Analysis",
+                  shiny::tabPanel(title = "Reliability",
+                           shinydashboard::box(title = "Coding Stream Analysis",
                                width = 12,
                                status = "primary",
                                solidHeader = TRUE,
-                               sidebarLayout(
+                               shiny::sidebarLayout(
                                  position="right",
-                                 sidebarPanel = sidebarPanel(
-                                   sliderInput(inputId = "tec_performance_codings_stream_text_size",
+                                 sidebarPanel = shiny::sidebarPanel(
+                                   shiny::sliderInput(inputId = "tec_performance_codings_stream_text_size",
                                                label = "Text Size",
                                                min = 1,
                                                max = 20,
                                                value = 10,
                                                step = 0.25),
-                                   sliderInput(inputId = "tec_performance_codings_stream_labels_size",
+                                   shiny::sliderInput(inputId = "tec_performance_codings_stream_labels_size",
                                                label = "Text Size Categories",
                                                min = 0.1,
                                                max = 5,
                                                value = 3,
                                                step = 0.1),
-                                   sliderInput(inputId = "tec_performance_codings_stream_key_size",
+                                   shiny::sliderInput(inputId = "tec_performance_codings_stream_key_size",
                                                label = "Key Size",
                                                min = 0.1,
                                                max = 2,
                                                value = 0.1,
                                                step = 0.1)
                                  ),
-                                 mainPanel =mainPanel(
-                                   plotOutput(outputId = "tec_performance_coding_stream_plot"),
-                                   tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
+                                 mainPanel =shiny::mainPanel(
+                                   shiny::plotOutput(outputId = "tec_performance_coding_stream_plot"),
+                                   shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
                                           The categorical sizes are based on the relative frequencies of the training data.
                                           These sizes are not identical with the sizes of field samples.")
                                  )
                                )
                            ),
-                           box(title = "Spectral Analysis",
+                           shinydashboard::box(title = "Spectral Analysis",
                                width = 12,
                                status = "primary",
                                solidHeader = TRUE,
-                               sidebarLayout(
+                               shiny::sidebarLayout(
                                  position="right",
-                                 sidebarPanel = sidebarPanel(
-                                   sliderInput(inputId = "tec_performance_codings_spectral_text_size",
+                                 sidebarPanel = shiny::sidebarPanel(
+                                   shiny::sliderInput(inputId = "tec_performance_codings_spectral_text_size",
                                                label = "Text Size",
                                                min = 1,
                                                max = 20,
                                                value = 10,
                                                step = 0.25),
-                                   sliderInput(inputId = "tec_performance_codings_spectral_number_size",
+                                   shiny::sliderInput(inputId = "tec_performance_codings_spectral_number_size",
                                                label = "Number Size",
                                                min = 0.1,
                                                max = 5,
                                                value = 3,
                                                step = 0.1),
-                                   sliderInput(inputId = "tec_performance_codings_spectral_key_size",
+                                   shiny::sliderInput(inputId = "tec_performance_codings_spectral_key_size",
                                                label = "Key Size",
                                                min = 0.1,
                                                max = 2,
                                                value = 0.1,
                                                step = 0.1)
                                  ),
-                                 mainPanel =mainPanel(
-                                   plotOutput(outputId = "tec_performance_coding_spectral_plot"),
-                                   tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
+                                 mainPanel =shiny::mainPanel(
+                                   shiny::plotOutput(outputId = "tec_performance_coding_spectral_plot"),
+                                   shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
                                           The categorical sizes are based on the relative frequencies of the training data.
                                           These sizes are not identical with the sizes of field samples.")
                                  )
                                )
                            ),
-                           box(title="Measures",
+                           shinydashboard::box(title="Measures",
                                solidHeader = TRUE,
                                status = "primary",
                                width = 12,
-                               box(title = "Scale Level",
+                               shinydashboard::box(title = "Scale Level",
                                    status = NULL,
                                    solidHeader = TRUE,
                                    width = 6,
-                                   renderTable(t(reliability_scale),
+                                   shiny::renderTable(t(reliability_scale),
                                                rownames=TRUE,
                                                colnames = TRUE),
-                                   tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
+                                   shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
                                ),
-                               box(title = "Categorical Level",
+                               shinydashboard::box(title = "Categorical Level",
                                    status = NULL,
                                    solidHeader = TRUE,
                                    width = 6,
-                                   tags$p(tags$b("Assignment-Error-Matrix")),
-                                   renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
+                                   shiny::tags$p(shiny::tags$b("Assignment-Error-Matrix")),
+                                   shiny::renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
                                                rownames = TRUE,
                                                colnames = TRUE),
-                                   tags$p(tags$b("Iota")),
-                                   renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
-                                   tags$p(tags$b("Alpha Reliability")),
-                                   renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability))),
-                                   tags$p(tags$b("Beta Reliability")),
-                                   renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
-                                   tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
+                                   shiny::tags$p(shiny::tags$b("Iota")),
+                                   shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
+                                   shiny::tags$p(shiny::tags$b("Alpha Reliability")),
+                                   shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability))),
+                                   shiny::tags$p(shiny::tags$b("Beta Reliability")),
+                                   shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
+                                   shiny::tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
 
                                )
                            )
                   ),
                   #Prediction Page--------------------------------------------------
-                  tabPanel("Prediction",
-                           box(title = "Text Embeddings",
+                  shiny::tabPanel("Prediction",
+                           shinydashboard::box(title = "Text Embeddings",
                                solidHeader = TRUE,
                                status = "primary",
-                               shinyFilesButton(id="tec_select_embeddings_for_prediction",
+                               shinyFiles::shinyFilesButton(id="tec_select_embeddings_for_prediction",
                                                 label="Choose file",
                                                 title="Please choose a file",
-                                                icon=icon("file"),
+                                                icon=shiny::icon("file"),
                                                 multiple=FALSE),
-                               uiOutput(outputId = "tec_embeddings_for_prediction")
+                               shiny::uiOutput(outputId = "tec_embeddings_for_prediction")
                            ),
-                           box(title = "Prediction Destination",
+                           shinydashboard::box(title = "Prediction Destination",
                                solidHeader = TRUE,
                                status = "primary",
-                               shinyDirButton(id="tec_choose_file_path_for_predictions",
+                               shinyFiles::shinyDirButton(id="tec_choose_file_path_for_predictions",
                                               title="Choose a directory for storing the predictions",
                                               label = "Select Folder",
-                                              icon=icon("folder-open")),
-                               textInput(inputId = "tec_choose_file_path_for_predictions_path",
-                                         label = tags$p(icon("file"),"Path to Folder")),
-                               textInput(inputId = "tec_choose_file_path_for_predictions_file_name",
-                                         label = tags$p(icon("file"),"File Name")),
-                               sliderInput(inputId = "tec_predict_batch_size",
+                                              icon=shiny::icon("folder-open")),
+                               shiny::textInput(inputId = "tec_choose_file_path_for_predictions_path",
+                                         label = shiny::tags$p(shiny::icon("file"),"Path to Folder")),
+                               shiny::textInput(inputId = "tec_choose_file_path_for_predictions_file_name",
+                                         label = shiny::tags$p(shiny::icon("file"),"File Name")),
+                               shiny::sliderInput(inputId = "tec_predict_batch_size",
                                            label = "Batch size",
                                            min = 1,
                                            max = 256,
                                            value = 8),
-                               tags$p(tags$b("Save Formats")),
-                               materialSwitch(inputId = "tec_pred_save_as_rda",
+                               shiny::tags$p(shiny::tags$b("Save Formats")),
+                               shinyWidgets::materialSwitch(inputId = "tec_pred_save_as_rda",
                                               label = "Save as .rda ",
                                               right = TRUE,
                                               inline = TRUE,
                                               value = TRUE,
                                               status = "primary"),
-                               materialSwitch(inputId = "tec_pred_save_as_csv",
+                               shinyWidgets::materialSwitch(inputId = "tec_pred_save_as_csv",
                                               label = "Save as .csv ",
                                               right = TRUE,
                                               inline = TRUE,
                                               value = TRUE,
                                               status = "primary"),
-                               actionButton(inputId = "text_start_prediction",
+                               shiny::actionButton(inputId = "text_start_prediction",
                                             label = "Start prediction",
-                                            icon = icon("paper-plane"))
+                                            icon = shiny::icon("paper-plane"))
                            )
                   )
                 )
@@ -3862,7 +3888,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_performance_coding_stream_plot<-renderPlot(expr={
+    output$tec_performance_coding_stream_plot<-shiny::renderPlot(expr={
       if(is.null(Classifier_for_Use())){
         return(NULL)
       } else {
@@ -3877,13 +3903,13 @@ start_aifeducation_studio<-function(){
     },
     res = 2*72)
 
-    output$tec_performance_bpl_steps<-renderUI({
+    output$tec_performance_bpl_steps<-shiny::renderUI({
       if(!is.null(input$tec_performance_training_techniques)){
         if(input$tec_performance_training_techniques=="bpl"){
           classifier=classifier=Classifier_for_Use()
           n_steps=ncol(classifier$last_training$data_pbl)
           return(
-            radioGroupButtons(
+            shinyWidgets::radioGroupButtons(
               inputId = "tec_training_bpl_step",
               label = "Step during Pseudo Labeling",
               choices = seq.int(from = 1,to=n_steps))
@@ -3896,7 +3922,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_performance_coding_stream_plot<-renderPlot(expr={
+    output$tec_performance_coding_stream_plot<-shiny::renderPlot(expr={
       if(is.null(Classifier_for_Use())){
         return(NULL)
       } else {
@@ -3911,7 +3937,7 @@ start_aifeducation_studio<-function(){
     },
     res = 2*72)
 
-    output$tec_performance_coding_spectral_plot<-renderPlot(expr={
+    output$tec_performance_coding_spectral_plot<-shiny::renderPlot(expr={
       if(is.null(Classifier_for_Use())){
         return(NULL)
       } else {
@@ -3929,30 +3955,30 @@ start_aifeducation_studio<-function(){
 
 
     #Documentation
-    output$tect_desc_abstract_and_desc<-renderUI({
+    output$tect_desc_abstract_and_desc<-shiny::renderUI({
       classifier=Classifier_for_Use()
       if(!is.null(classifier)){
         language_eng=input$tec_desc_language_select
         if(language_eng==TRUE){
           ui<-list(
-            tags$h3("Abstract"),
+            shiny::tags$h3("Abstract"),
             if(!is.null(classifier$get_model_description()$abstract_eng)){
-              tags$p(shiny::includeMarkdown(classifier$get_model_description()$abstract_eng))
+              shiny::tags$p(shiny::includeMarkdown(classifier$get_model_description()$abstract_eng))
             },
-            tags$h3("Description"),
+            shiny::tags$h3("Description"),
             if(!is.null(classifier$get_model_description()$eng)){
-              tags$p(shiny::includeMarkdown(classifier$get_model_description()$eng))
+              shiny::tags$p(shiny::includeMarkdown(classifier$get_model_description()$eng))
             }
           )
         } else {
           ui<-list(
-            tags$h3("Abstract"),
+            shiny::tags$h3("Abstract"),
             if(!is.null(classifier$get_model_description()$abstract_native)){
-              tags$p(shiny::includeMarkdown(classifier$get_model_description()$abstract_native))
+              shiny::tags$p(shiny::includeMarkdown(classifier$get_model_description()$abstract_native))
             },
-            tags$h3("Description"),
+            shiny::tags$h3("Description"),
             if(!is.null(classifier$get_model_description()$native)){
-              tags$p(shiny::includeMarkdown(classifier$get_model_description()$native))
+              shiny::tags$p(shiny::includeMarkdown(classifier$get_model_description()$native))
             }
           )
         }
@@ -3963,7 +3989,7 @@ start_aifeducation_studio<-function(){
     })
 
     #Performance
-    output$tec_performance_techniques_widget<-renderUI({
+    output$tec_performance_techniques_widget<-shiny::renderUI({
       classifier=Classifier_for_Use()
 
       if(!is.null(classifier) & !is.null(input$tec_performance_training_phase)){
@@ -3978,7 +4004,7 @@ start_aifeducation_studio<-function(){
         if(classifier$last_training$config$use_bpl==TRUE){
           training_techniques["Balanced Pseudo Labeling"]="bpl"
         }
-        return(radioGroupButtons(
+        return(shinyWidgets::radioGroupButtons(
           inputId = "tec_performance_training_techniques",
           label = "Techniques",
           choices = training_techniques)
@@ -3990,7 +4016,7 @@ start_aifeducation_studio<-function(){
     })
 
 
-    performance_data_for_visual<-reactive({
+    performance_data_for_visual<-shiny::reactive({
       if(is.null(Classifier_for_Use())==FALSE &
          is.null(input$tec_performance_training_techniques)==FALSE &
          is.null(input$tec_performance_training_phase)==FALSE){
@@ -4120,7 +4146,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_performance_training_loss<-renderPlot({
+    output$tec_performance_training_loss<-shiny::renderPlot({
       plot_data=performance_data_for_visual()[[input$tec_performance_training_measures]]
 
       if(!is.null(plot_data)){
@@ -4135,37 +4161,37 @@ start_aifeducation_studio<-function(){
         }
 
         plot<-ggplot2::ggplot(data=plot_data)+
-          ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_mean,color="train"))+
-          ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_mean,color="validation"))
+          ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$train_mean,color="train"))+
+          ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$validation_mean,color="validation"))
 
         if(input$tec_performance_training_min_max==TRUE){
           plot<-plot+
-            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_min,color="train"))+
-            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_max,color="train"))+
-            ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
-                                              ymin=.data$train_min,
-                                              ymax=.data$train_max),
+            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$train_min,color="train"))+
+            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$train_max,color="train"))+
+            ggplot2::geom_ribbon(ggplot2::aes(x=rlang::.data$epoch,
+                                              ymin=rlang::.data$train_min,
+                                              ymax=rlang::.data$train_max),
                                  alpha=0.25,
                                  fill="red")+
-            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_min,color="validation"))+
-            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_max,color="validation"))+
-            ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
-                                              ymin=.data$validation_min,
-                                              ymax=.data$validation_max),
+            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$validation_min,color="validation"))+
+            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$validation_max,color="validation"))+
+            ggplot2::geom_ribbon(ggplot2::aes(x=rlang::.data$epoch,
+                                              ymin=rlang::.data$validation_min,
+                                              ymax=rlang::.data$validation_max),
                                  alpha=0.25,
                                  fill="blue")
         }
         if("test_mean"%in%colnames(plot_data)){
           plot=plot+
-            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_mean,color="test"))
+            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$test_mean,color="test"))
           if(input$tec_performance_training_min_max==TRUE){
             plot=plot+
-              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_min,color="test"))+
+              ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$test_min,color="test"))+
 
-              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_max,color="test"))+
-              ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
-                                                ymin=.data$test_min,
-                                                ymax=.data$test_max),
+              ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$test_max,color="test"))+
+              ggplot2::geom_ribbon(ggplot2::aes(x=rlang::.data$epoch,
+                                                ymin=rlang::.data$test_min,
+                                                ymax=rlang::.data$test_max),
                                    alpha=0.25,
                                    fill="darkgreen")
           }
@@ -4187,13 +4213,13 @@ start_aifeducation_studio<-function(){
     },res = 72*2)
 
     #Prediction Page--------------------------------------------------------------
-    shinyFileChoose(input=input,
+    shinyFiles::shinyFileChoose(input=input,
                     id="tec_select_embeddings_for_prediction",
                     roots = volumes,
                     filetype=c("rda","rdata"))
 
-    tec_embeddings_for_prediction_path=eventReactive(input$tec_select_embeddings_for_prediction,{
-      tmp_file_path=parseFilePaths(volumes,input$tec_select_embeddings_for_prediction)
+    tec_embeddings_for_prediction_path=shiny::eventReactive(input$tec_select_embeddings_for_prediction,{
+      tmp_file_path=shinyFiles::parseFilePaths(volumes,input$tec_select_embeddings_for_prediction)
       if(nrow(tmp_file_path)>0){
         return(tmp_file_path[[1,"datapath"]])
       } else {
@@ -4201,11 +4227,11 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    tec_embeddings_for_prediction=eventReactive(tec_embeddings_for_prediction_path(),{
+    tec_embeddings_for_prediction=shiny::eventReactive(tec_embeddings_for_prediction_path(),{
       file_path=tec_embeddings_for_prediction_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
-          show_alert(title="Loading",
+          shinyWidgets::show_alert(title="Loading",
                      text = "Please wait",
                      type="info")
           file=load(file_path)
@@ -4213,8 +4239,8 @@ start_aifeducation_studio<-function(){
           if(("EmbeddedText" %in% class(embeddings))==TRUE){
             classifier=Classifier_for_Use()
             if(classifier$check_embedding_model(embeddings)==FALSE){
-              closeSweetAlert()
-              show_alert(title="Error",
+              shinyWidgets::closeSweetAlert()
+              shinyWidgets::show_alert(title="Error",
                          text = "The TextEmbeddingModel of the text embeddings
                        and the classifier are not the same.",
                          type="error")
@@ -4222,12 +4248,12 @@ start_aifeducation_studio<-function(){
               gc()
               return(NULL)
             } else {
-              closeSweetAlert()
+              shinyWidgets::closeSweetAlert()
               return(embeddings)
             }
           } else {
-            closeSweetAlert()
-            show_alert(title="Error",
+            shinyWidgets::closeSweetAlert()
+            shinyWidgets::show_alert(title="Error",
                        text = "The file contains data in an unsupported format.
                      Text embeddings must be of class 'EmbeddedText'. Please
                      check data. Data embeddings should always be created via data
@@ -4239,8 +4265,8 @@ start_aifeducation_studio<-function(){
             return(NULL)
           }
         } else {
-          closeSweetAlert()
-          show_alert(title="Error",
+          shinyWidgets::closeSweetAlert()
+          shinyWidgets::show_alert(title="Error",
                      text = "The file does not exist on the path.",
                      type="error")
           return(NULL)
@@ -4250,7 +4276,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_embeddings_for_prediction<-renderUI({
+    output$tec_embeddings_for_prediction<-shiny::renderUI({
       embeddings=tec_embeddings_for_prediction()
       if(!is.null(embeddings)){
         model_info=embeddings$get_model_info()
@@ -4274,14 +4300,14 @@ start_aifeducation_studio<-function(){
         info_table[3,4]=model_info$param_overlap
 
         ui<-list(
-          valueBox(value=nrow(embeddings$embeddings),
+          shinydashboard::valueBox(value=nrow(embeddings$embeddings),
                    subtitle="Number of Cases",
-                   icon = icon("list"),
+                   icon = shiny::icon("list"),
                    width=12),
-          tags$h3("Model:",  model_info$model_label),
-          tags$p("Model Name:", model_info$model_name),
-          tags$p("Created", model_info$model_date),
-          renderTable(expr=info_table,
+          shiny::tags$h3("Model:",  model_info$model_label),
+          shiny::tags$p("Model Name:", model_info$model_name),
+          shiny::tags$p("Created", model_info$model_date),
+          shiny::renderTable(expr=info_table,
                       colnames=FALSE)
         )
         return(ui)
@@ -4291,47 +4317,47 @@ start_aifeducation_studio<-function(){
     })
 
     #Destination folder for prediction
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="tec_choose_file_path_for_predictions",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = TRUE)
-    observeEvent(input$tec_choose_file_path_for_predictions,{
-      updateTextInput(inputId = "tec_choose_file_path_for_predictions_path",
-                      value = parseDirPath(volumes,input$tec_choose_file_path_for_predictions))
+    shiny::observeEvent(input$tec_choose_file_path_for_predictions,{
+      shiny::updateTextInput(inputId = "tec_choose_file_path_for_predictions_path",
+                      value = shinyFiles::parseDirPath(volumes,input$tec_choose_file_path_for_predictions))
     })
 
     #Start Prediction
-    observeEvent(input$text_start_prediction,{
+    shiny::observeEvent(input$text_start_prediction,{
       dir_path=input$tec_choose_file_path_for_predictions_path
 
       error_list=NULL
       #Check if all inputs are correctly set
       if(dir.exists(dir_path)==FALSE){
         error_list[length(error_list)+1]=list(
-          tags$p("Source directory does not exist. Please check your directory path."))
+          shiny::tags$p("Source directory does not exist. Please check your directory path."))
       }
       if(is.null(tec_embeddings_for_prediction())){
         error_list[length(error_list)+1]=list(
-          tags$p("No text embeddings provided. Please provide compatibel embeddings."))
+          shiny::tags$p("No text embeddings provided. Please provide compatibel embeddings."))
       }
       if(input$tec_pred_save_as_rda==FALSE &
          input$tec_pred_save_as_csv==FALSE){
         error_list[length(error_list)+1]=list(
-          tags$p("No save format selected. At least one save format must be selected."))
+          shiny::tags$p("No save format selected. At least one save format must be selected."))
       }
       if(is.null(input$tec_choose_file_path_for_predictions_file_name) |
          input$tec_choose_file_path_for_predictions_file_name==""){
         error_list[length(error_list)+1]=list(
-          tags$p("No file name provided for saving the predictions."))
+          shiny::tags$p("No file name provided for saving the predictions."))
       }
 
       if(length(error_list)>0){
-        show_alert(title = "Error",
-                   text = tagList(error_list),
+        shinyWidgets::show_alert(title = "Error",
+                   text = shiny::tagList(error_list),
                    type = "error")
       } else {
-        showModal(progress_modal)
+        shiny::showModal(progress_modal)
         save_path_root=paste0(dir_path,"/",input$tec_choose_file_path_for_predictions_file_name)
         classifier=Classifier_for_Use()
         predictions=classifier$predict(
@@ -4347,24 +4373,24 @@ start_aifeducation_studio<-function(){
           utils::write.csv2(predictions,
                      file = paste0(save_path_root,".csv"))
         }
-        removeModal()
+        shiny::removeModal()
       }
 
     })
 
     #Documentation Page----------------------------------------------------------------
-    shinyDirChoose(input=input,
+    shinyFiles::shinyDirChoose(input=input,
                    id="tec_db_select_model_for_documentation",
                    roots = volumes,
                    #session = session,
                    allowDirCreate = FALSE)
-    tec_interface_for_documentation_path=eventReactive(input$tec_db_select_model_for_documentation,{
-      return(parseDirPath(volumes,input$tec_db_select_model_for_documentation))
+    tec_interface_for_documentation_path=shiny::eventReactive(input$tec_db_select_model_for_documentation,{
+      return(shinyFiles::parseDirPath(volumes,input$tec_db_select_model_for_documentation))
     })
 
-    Classifier_for_Documentation<-eventReactive(tec_interface_for_documentation_path(),{
+    Classifier_for_Documentation<-shiny::eventReactive(tec_interface_for_documentation_path(),{
       if(length(tec_interface_for_documentation_path())>0){
-        show_alert(title="Working",
+        shinyWidgets::show_alert(title="Working",
                    text = "Please wait",
                    type="info")
         classifier=try(load_ai_model(model_dir = tec_interface_for_documentation_path(),
@@ -4373,10 +4399,10 @@ start_aifeducation_studio<-function(){
         if(methods::is(classifier,class2 = "try-error")==FALSE){
           if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
-              closeSweetAlert()
+              shinyWidgets::closeSweetAlert()
               return(classifier)
             } else {
-              show_alert(title = "Error",
+              shinyWidgets::show_alert(title = "Error",
                          text = paste("The classifier was created with aifeducation version",
                                       as.character(classifier$get_package_versions()$r_package_versions$aifeducation,"."),
                                       "Uster interface supports only models created with aifeducation version 0.3.1 or later."),
@@ -4384,14 +4410,14 @@ start_aifeducation_studio<-function(){
               return(NULL)
             }
           } else {
-            show_alert(title = "Error",
+            shinyWidgets::show_alert(title = "Error",
                        text = "The directory does not contain an object of class TextEmbeddingClassifierNeuralNet.
                    Please check your directory.",
                        type = "error")
             return(NULL)
           }
         } else {
-          show_alert(title = "Error",
+          shinyWidgets::show_alert(title = "Error",
                      text = classifier,
                      type = "error")
           return(NULL)
@@ -4401,7 +4427,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_document_selected_model_label<-renderText({
+    output$tec_document_selected_model_label<-shiny::renderText({
       if(is.null(Classifier_for_Documentation())){
         return(NULL)
       } else {
@@ -4409,7 +4435,7 @@ start_aifeducation_studio<-function(){
       }
     })
 
-    output$tec_document_tabs<-renderUI({
+    output$tec_document_tabs<-shiny::renderUI({
       classifier<-Classifier_for_Documentation()
       if(is.null(classifier)){
         return(NULL)
@@ -4423,21 +4449,21 @@ start_aifeducation_studio<-function(){
           for(j in 1:10){
             pup_info=classifier$get_publication_info()[[pup_info_for[i]]]$authors
             widgets[[j]]=list(
-              fluidRow(
-                column(width = 4,
-                       textInput(inputId = paste0("tec_doc_",pup_info_titles[i],"_fist_name_",j),
+              shiny::fluidRow(
+                shiny::column(width = 4,
+                       shiny::textInput(inputId = paste0("tec_doc_",pup_info_titles[i],"_fist_name_",j),
                                  label = paste("Given Name",j),
                                  value = pup_info[[j]]$given,
                                  width = "100%")
                 ),
-                column(width = 4,
-                       textInput(inputId = paste0("tec_doc_",pup_info_titles[i],"_last_name_",j),
+                shiny::column(width = 4,
+                       shiny::textInput(inputId = paste0("tec_doc_",pup_info_titles[i],"_last_name_",j),
                                  label = paste("Family Name",j),
                                  value = pup_info[[j]]$family,
                                  width = "100%")
                 ),
-                column(width = 4,
-                       textInput(inputId = paste0("tec_doc_",pup_info_titles[i],"_mail_",j),
+                shiny::column(width = 4,
+                       shiny::textInput(inputId = paste0("tec_doc_",pup_info_titles[i],"_mail_",j),
                                  label = paste("Mail",j),
                                  value = pup_info[[j]]$email,
                                  width = "100%")
@@ -4446,17 +4472,17 @@ start_aifeducation_studio<-function(){
             )
           }
           ui_parts[length(ui_parts)+1]=list(
-            tabPanel(title = pup_info_titles[i],
+            shiny::tabPanel(title = pup_info_titles[i],
                      widgets,
-                     textInput(inputId = paste0("tec_doc_",pup_info_for[i],"_citation"),
+                     shiny::textInput(inputId = paste0("tec_doc_",pup_info_for[i],"_citation"),
                                label = "Citation",
                                value = classifier$get_publication_info()[[pup_info_for[i]]]$citation),
-                     textInput(inputId = paste0("tec_doc_",pup_info_for[i],"_url"),
+                     shiny::textInput(inputId = paste0("tec_doc_",pup_info_for[i],"_url"),
                                label = "URL",
                                value = classifier$get_publication_info()[[pup_info_for[i]]]$url),
-                     actionButton(inputId = paste0("tec_doc_",pup_info_for[i],"_save"),
+                     shiny::actionButton(inputId = paste0("tec_doc_",pup_info_for[i],"_save"),
                                   label = "Save",
-                                  icon = icon("floppy-disk"))
+                                  icon = shiny::icon("floppy-disk"))
             )
           )
         }
@@ -4467,35 +4493,35 @@ start_aifeducation_studio<-function(){
         documentation_keywords=c("keywords_eng","keywords_native")
         for(i in 1:length(documention_part)){
 
-          tmp_tabPanel<-tabPanel(
+          tmp_tabPanel<-shiny::tabPanel(
             title = documention_titles[i],
-            fluidRow(
-              column(width = 6,
-                     textAreaInput(inputId = paste0("tec_doc_editor_",documention_part[i]),
+            shiny::fluidRow(
+              shiny::column(width = 6,
+                     shiny::textAreaInput(inputId = paste0("tec_doc_editor_",documention_part[i]),
                                    label = "Editor",
                                    rows = 6,
                                    value = classifier$get_model_description()[[documentation_field[i]]]
                      ),
                      if(i<=2){
-                       textInput(inputId = paste0("tec_doc_editor_",documention_part[i],"_keywords"),
+                       shiny::textInput(inputId = paste0("tec_doc_editor_",documention_part[i],"_keywords"),
                                  value = classifier$get_model_description()[[documentation_keywords[i]]],
                                  label = "Keywords")
                      },
-                     actionButton(inputId = paste0("tec_doc_editor_",documention_part[i],"_preview_button"),
+                     shiny::actionButton(inputId = paste0("tec_doc_editor_",documention_part[i],"_preview_button"),
                                   label = "Preview",
-                                  icon = icon("eye")),
-                     actionButton(inputId = paste0("tec_doc_editor_",documention_part[i],"_save_button"),
+                                  icon = shiny::icon("eye")),
+                     shiny::actionButton(inputId = paste0("tec_doc_editor_",documention_part[i],"_save_button"),
                                   label = "Save",
-                                  icon = icon("floppy-disk"))),
-              column(width = 6,
-                     tags$p(tags$b("Preview")),
-                     uiOutput(outputId = paste0("tec_doc_editor_",documention_part[i],"_preview")))
+                                  icon = shiny::icon("floppy-disk"))),
+              shiny::column(width = 6,
+                     shiny::tags$p(shiny::tags$b("Preview")),
+                     shiny::uiOutput(outputId = paste0("tec_doc_editor_",documention_part[i],"_preview")))
             )
           )
           ui_parts[length(ui_parts)+1]=list(tmp_tabPanel)
         }
 
-        ui<-tabBox(width = 12,
+        ui<-shinydashboard::tabBox(width = 12,
                    ui_parts[[1]],
                    ui_parts[[2]],
                    ui_parts[[3]],
@@ -4508,23 +4534,23 @@ start_aifeducation_studio<-function(){
     })
 
     #Preview Events
-    observeEvent(input$tec_doc_editor_abstract_eng_preview_button,{
-      output$tec_doc_editor_abstract_eng_preview<-renderUI({
+    shiny::observeEvent(input$tec_doc_editor_abstract_eng_preview_button,{
+      output$tec_doc_editor_abstract_eng_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$tec_doc_editor_abstract_eng))
       })
     })
-    observeEvent(input$tec_doc_editor_abstract_native_preview_button,{
-      output$tec_doc_editor_abstract_native_preview<-renderUI({
+    shiny::observeEvent(input$tec_doc_editor_abstract_native_preview_button,{
+      output$tec_doc_editor_abstract_native_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$tec_doc_editor_abstract_native))
       })
     })
-    observeEvent(input$tec_doc_editor_description_eng_preview_button,{
-      output$tec_doc_editor_description_eng_preview<-renderUI({
+    shiny::observeEvent(input$tec_doc_editor_description_eng_preview_button,{
+      output$tec_doc_editor_description_eng_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$tec_doc_editor_description_eng))
       })
     })
-    observeEvent(input$tec_doc_editor_description_native_preview_button,{
-      output$tec_doc_editor_description_native_preview<-renderUI({
+    shiny::observeEvent(input$tec_doc_editor_description_native_preview_button,{
+      output$tec_doc_editor_description_native_preview<-shiny::renderUI({
         return(shiny::includeMarkdown(input$tec_doc_editor_description_native))
       })
     })
@@ -4532,7 +4558,7 @@ start_aifeducation_studio<-function(){
 
     #Save Events
     #Developers
-    observeEvent(input$tec_doc_developed_by_save,{
+    shiny::observeEvent(input$tec_doc_developed_by_save,{
       model<-Classifier_for_Documentation()
 
       tmp_person_list=NULL
@@ -4553,81 +4579,77 @@ start_aifeducation_studio<-function(){
                                  url = input[[paste0("tec_doc_","developed_by","_url")]])
       r_interface_path=paste0(tec_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      Classifier_for_Documentation<-reactive({model})
+      Classifier_for_Documentation<-shiny::reactive({model})
 
     })
 
     #Modifiers
 
-    observeEvent(input$tec_doc_editor_abstract_eng_save_button,{
+    shiny::observeEvent(input$tec_doc_editor_abstract_eng_save_button,{
       model<-Classifier_for_Documentation()
       model$set_model_description(
         abstract_eng=input$tec_doc_editor_abstract_eng,
         keywords_eng=input$tec_doc_editor_abstract_eng_keywords)
       r_interface_path=paste0(tec_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      Classifier_for_Documentation<-reactive({model})
+      Classifier_for_Documentation<-shiny::reactive({model})
     })
-    observeEvent(input$tec_doc_editor_abstract_native_save_button,{
+    shiny::observeEvent(input$tec_doc_editor_abstract_native_save_button,{
       model<-Classifier_for_Documentation()
       model$set_model_description(
         abstract_native=input$tec_doc_editor_abstract_native,
         keywords_native=input$tec_doc_editor_abstract_native_keywords)
       r_interface_path=paste0(tec_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      Classifier_for_Documentation<-reactive({model})
+      Classifier_for_Documentation<-shiny::reactive({model})
 
     })
-    observeEvent(input$tec_doc_editor_description_eng_save_button,{
+    shiny::observeEvent(input$tec_doc_editor_description_eng_save_button,{
       model<-Classifier_for_Documentation()
       model$set_model_description(
         eng =input$tec_doc_editor_description_eng)
       r_interface_path=paste0(tec_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      Classifier_for_Documentation<-reactive({model})
+      Classifier_for_Documentation<-shiny::reactive({model})
     })
-    observeEvent(input$tec_doc_editor_description_native_save_button,{
+    shiny::observeEvent(input$tec_doc_editor_description_native_save_button,{
       model<-Classifier_for_Documentation()
       model$set_model_description(
         native =input$tec_doc_editor_description_native)
       r_interface_path=paste0(tec_interface_for_documentation_path(),"/r_interface.rda")
       save(model,file = r_interface_path)
-      Classifier_for_Documentation<-reactive({model})
+      Classifier_for_Documentation<-shiny::reactive({model})
     })
-
-
 
     #Progress_Modal--------------------------------------------------------------
     progress_modal=shiny::modalDialog(
       title="In progress. Please wait.",
       easyClose = FALSE,
       size = "l",
-      progressBar(id = "pgr_bar_aifeducation",
+      shinyWidgets::progressBar(id = "pgr_bar_aifeducation",
                   value = 0,
                   display_pct = TRUE,
                   title=""),
-      progressBar(id = "pgr_bar_aifeducation_epochs",
+      shinyWidgets::progressBar(id = "pgr_bar_aifeducation_epochs",
                   value = 0,
                   display_pct = TRUE,
                   title="Epoch"),
-      progressBar(id = "pgr_bar_aifeducation_steps",
+      shinyWidgets::progressBar(id = "pgr_bar_aifeducation_steps",
                   value = 0,
                   display_pct = TRUE,
                   title="Batche/Step"),
-      tags$p(tags$b("Log")),
-      uiOutput(outputId = "pgr_text_output_aifeducation"),
+      shiny::tags$p(shiny::tags$b("Log")),
+      shiny::uiOutput(outputId = "pgr_text_output_aifeducation"),
       footer="To stop the progress please close the browser."
-      #footer=actionButton(inputId = "pgr_cancel",
+      #footer=shiny::actionButton(inputId = "pgr_cancel",
       #                    label = "Cancel",
-      #                    icon = icon("ban"))
+      #                    icon = shiny::icon("ban"))
     )
 
-    #  observeEvent(input$pgr_cancel,{
+    #  shiny::observeEvent(input$pgr_cancel,{
     #    shiny::stopApp()
     #  })
   }
   # Run the app ----
-  shinyApp(ui = ui, server = server)
+  shiny::shinyApp(ui = ui, server = server)
 }
-
-

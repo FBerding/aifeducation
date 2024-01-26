@@ -28,36 +28,36 @@ Field for storing the tensorflow model after loading.}
 List for storing information about the configuration of the model. This
 information is used to predict new data.
 \itemize{
-\item{\code{model_config$n_rec: }}{Number of recurrent layers.}
-\item{\code{model_config$n_hidden: }}{Number of dense layers.}
-\item{\code{model_config$target_levels: }}{Levels of the target variable. Do not change this manually.}
-\item{\code{model_config$input_variables: }}{Order and name of the input variables. Do not change this manually.}
-\item{\code{model_config$init_config: }}{List storing all parameters passed to method new().}
+\item{\code{model_config$n_rec: }Number of recurrent layers.}
+\item{\code{model_config$n_hidden: }Number of dense layers.}
+\item{\code{model_config$target_levels: }Levels of the target variable. Do not change this manually.}
+\item{\code{model_config$input_variables: }Order and name of the input variables. Do not change this manually.}
+\item{\code{model_config$init_config: }List storing all parameters passed to method new().}
 }}
 
 \item{\code{last_training}}{('list()')\cr
 List for storing the history and the results of the last training. This
 information will be overwritten if a new training is started.
 \itemize{
-\item{\code{last_training$learning_time: }}{Duration of the training process.}
-\item{\code{config$history: }}{History of the last training.}
-\item{\code{config$data: }}{Object of class table storing the initial frequencies of the passed data.}
-\item{\code{config$data_pb:l }}{Matrix storing the number of additional cases (test and training) added
+\item{\code{last_training$learning_time: }Duration of the training process.}
+\item{\code{config$history: }History of the last training.}
+\item{\code{config$data: }Object of class table storing the initial frequencies of the passed data.}
+\item{\code{config$data_pb:l }Matrix storing the number of additional cases (test and training) added
 during balanced pseudo-labeling. The rows refer to folds and final training.
 The columns refer to the steps during pseudo-labeling.}
-\item{\code{config$data_bsc_test: }}{Matrix storing the number of cases for each category used for testing
+\item{\code{config$data_bsc_test: }Matrix storing the number of cases for each category used for testing
 during the phase of balanced synthetic units. Please note that the
 frequencies include original and synthetic cases. In case the number
 of original and synthetic cases exceeds the limit for the majority classes,
 the frequency represents the number of cases created by cluster analysis.}
-\item{\code{config$date: }}{Time when the last training finished.}
-\item{\code{config$config: }}{List storing which kind of estimation was requested during the last training.
+\item{\code{config$date: }Time when the last training finished.}
+\item{\code{config$config: }List storing which kind of estimation was requested during the last training.
 \itemize{
-\item{\code{config$config$use_bsc:  }}{\code{TRUE} if  balanced synthetic cases were requested. \code{FALSE}
+\item{\code{config$config$use_bsc:  }\code{TRUE} if  balanced synthetic cases were requested. \code{FALSE}
 if not.}
-\item{\code{config$config$use_baseline: }}{\code{TRUE} if baseline estimation were requested. \code{FALSE}
+\item{\code{config$config$use_baseline: }\code{TRUE} if baseline estimation were requested. \code{FALSE}
 if not.}
-\item{\code{ config$config$use_bpl: }}{\code{TRUE} if  balanced, pseudo-labeling cases were requested. \code{FALSE}
+\item{\code{ config$config$use_bpl: }\code{TRUE} if  balanced, pseudo-labeling cases were requested. \code{FALSE}
 if not.}
 }}
 }}
@@ -65,32 +65,32 @@ if not.}
 \item{\code{reliability}}{('list()')\cr
 List for storing central reliability measures of the last training.
 \itemize{
-\item{\code{reliability$test_metric: }}{Array containing the reliability measures for the validation data for
+\item{\code{reliability$test_metric: }Array containing the reliability measures for the validation data for
 every fold, method, and step (in case of pseudo-labeling).}
-\item{\code{reliability$test_metric_mean: }}{Array containing the reliability measures for the validation data for
+\item{\code{reliability$test_metric_mean: }Array containing the reliability measures for the validation data for
 every method and step (in case of pseudo-labeling). The values represent
 the mean values for every fold.}
-\item{\code{reliability$raw_iota_objects: }}{List containing all iota_object generated with the package [iotarelr]{iotarelr}
+\item{\code{reliability$raw_iota_objects: }List containing all iota_object generated with the package \code{iotarelr}
 for every fold at the start and the end of the last training.
 \itemize{
-\item{\code{reliability$raw_iota_objects$iota_objects_start: }}{List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_start: }List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
 If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.}
-\item{\code{reliability$raw_iota_objects$iota_objects_end: }}{List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_end: }List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the final model
 for every fold. Depending of the requested training method these values
 refer to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo labeling or a combination of balanced
 synthetic cases with pseudo labeling.}
-\item{\code{reliability$raw_iota_objects$iota_objects_start_free: }}{List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_start_free: }List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
 If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-\item{\code{reliability$raw_iota_objects$iota_objects_end_free: }}{List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_end_free: }List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the final model
 for every fold. Depending of the requested training method, these values
 refer to the baseline model, a trained model on the basis of balanced
@@ -100,21 +100,21 @@ Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
 }
 }
-\item{\code{reliability$iota_object_start: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+\item{\code{reliability$iota_object_start: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold. If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.}
-\item{\code{ reliability$iota_object_start_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+\item{\code{ reliability$iota_object_start_free: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold. If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-\item{\code{reliability$iota_object_end: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+\item{\code{reliability$iota_object_end: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold.
 Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo-labeling or a combination of balanced
 synthetic cases and pseudo-labeling.}
-\item{\code{reliability$iota_object_end_free: }}{Object of class \code{iotarelr_iota2} as a mean of the individual objects
+\item{\code{reliability$iota_object_end_free: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold.
 Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
@@ -122,13 +122,13 @@ synthetic cases, balanced pseudo-labeling or a combination of balanced
 synthetic cases and pseudo-labeling.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-\item{\code{reliability$standard_measures_end: }}{Object of class \code{list} containing the final
+\item{\code{reliability$standard_measures_end: }Object of class \code{list} containing the final
 measures for precision, recall, and f1 for every fold.
 Depending of the requested training method, these values
 refer to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo-labeling or a combination of balanced
 synthetic cases and pseudo-labeling.}
-\item{\code{reliability$standard_measures_mean: }}{\code{matrix} containing the mean
+\item{\code{reliability$standard_measures_mean: }\code{matrix} containing the mean
 measures for precision, recall, and f1 at the end of every fold.}
 }}
 }
@@ -405,11 +405,11 @@ one line of information for every epoch.}
 \subsection{Details}{
 \itemize{
 
-\item{bsc_max_k: }{All values from 2 up to bsc_max_k are successively used. If
+\item{\code{bsc_max_k: }All values from 2 up to bsc_max_k are successively used. If
 the number of bsc_max_k is too high, the value is reduced to a number that
 allows the calculating of synthetic units.}
 
-\item{bpl_anchor: }{With the help of this value, the new cases are sorted. For
+\item{\code{bpl_anchor: }With the help of this value, the new cases are sorted. For
 this aim, the distance from the anchor is calculated and all cases are arranged
 into an ascending order.
 }

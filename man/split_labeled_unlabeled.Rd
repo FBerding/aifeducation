@@ -15,13 +15,13 @@ labels.}
 \value{
 Returns a \code{list} with the following components
 \itemize{
-\item{\code{embeddings_labeled: }}{Object of class \link{EmbeddedText} containing
+\item{\code{embeddings_labeled: }Object of class \link{EmbeddedText} containing
 only the cases which have labels.}
 
-\item{\code{embeddings_unlabeled: }}{Object of class \link{EmbeddedText} containing
+\item{\code{embeddings_unlabeled: }Object of class \link{EmbeddedText} containing
 only the cases which have no labels.}
 
-\item{\code{targets_labeled: }}{Named \code{factor} containing the labels of
+\item{\code{targets_labeled: }Named \code{factor} containing the labels of
 relevant cases.}
 }
 }

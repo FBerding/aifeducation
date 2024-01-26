@@ -15,7 +15,7 @@ get_synthetic_cases(
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases, this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases, this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.}
 
 \item{times}{\code{int} for the number of sequences/times.}
 
@@ -31,13 +31,13 @@ Currently "smote","dbsmote", and "adas" from the package smotefamily are availab
 \value{
 \code{list} with the following components.
 \itemize{
-\item{\code{syntetic_embeddings: }}{Named \code{data.frame} containing the text embeddings of
+\item{\code{syntetic_embeddings: }Named \code{data.frame} containing the text embeddings of
 the synthetic cases.}
 
-\item{\code{syntetic_targets}}{Named \code{factor} containing the labels of the corresponding
+\item{\code{syntetic_targets }Named \code{factor} containing the labels of the corresponding
 synthetic cases.}
 
-\item{\code{n_syntetic_units}}{\code{table} showing the number of synthetic cases for every
+\item{\code{n_syntetic_units }\code{table} showing the number of synthetic cases for every
 label/category.}
 }
 }

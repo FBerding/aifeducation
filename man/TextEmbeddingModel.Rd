@@ -149,7 +149,7 @@ fitting cluster if \code{method="glove"}.}
 }
 \subsection{Details}{
 \itemize{
-\item{method: }{In the case of \code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"},
+\item{method: In the case of \code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"},
 a pretrained transformer model
 must be supplied via \code{model_dir}. For \code{method="glove"}
 and \code{method="lda"} a new model will be created based on the data provided
@@ -157,14 +157,14 @@ via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
 are clustered based on their word embeddings with kmeans.}
 
-\item{aggregation: }{For creating a text embedding with a transformer model, several options
+\item{aggregation: For creating a text embedding with a transformer model, several options
 are possible:
 \itemize{
-\item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
-\item{second_to_last: }{\code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
-\item{fourth_to_last: }{\code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
-\item{all: }{\code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
-\item{last_four: }{\code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
+\item{last: \code{aggregation="last"} uses only the hidden states of the last layer.}
+\item{second_to_last: \code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
+\item{fourth_to_last: \code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
+\item{all: \code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
+\item{last_four: \code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
 }}
 
 }

@@ -14,7 +14,7 @@
 update_aifeducation_progress_bar<-function(value,total,title=NULL){
   if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
     if(shiny::isRunning()){
-      updateProgressBar(id="pgr_bar_aifeducation",
+      shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                         value = value,
                         total=total,
                         title = title)
@@ -42,7 +42,7 @@ update_aifeducation_progress_bar<-function(value,total,title=NULL){
 #'@family Auxiliary GUI Functions
 #'@keywords internal
 update_aifeducation_progress_bar_epochs<-function(value,total,title=NULL){
-      updateProgressBar(id="pgr_bar_aifeducation_epochs",
+  shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation_epochs",
                         value = value,
                         total=total,
                         title = title)
@@ -68,7 +68,7 @@ update_aifeducation_progress_bar_epochs<-function(value,total,title=NULL){
 #'@family Auxiliary GUI Functions
 #'@keywords internal
 update_aifeducation_progress_bar_steps<-function(value,total,title=NULL){
-      updateProgressBar(id="pgr_bar_aifeducation_steps",
+  shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation_steps",
                         value = value,
                         total=total,
                         title = title)

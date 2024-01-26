@@ -15,13 +15,13 @@ should be declared with \code{NA}.}
 \value{
 Return a \code{list} with the following components:
 \itemize{
-\item{\code{val_sample: }}{\code{vector} of \code{strings} containing the names of cases of the validation sample.}
+\item{\code{val_sample: }\code{vector} of \code{strings} containing the names of cases of the validation sample.}
 
-\item{\code{train_sample: }}{\code{vector} of \code{strings} containing the names of cases of the train sample.}
+\item{\code{train_sample: }\code{vector} of \code{strings} containing the names of cases of the train sample.}
 
-\item{\code{n_folds: }}{\code{int} Number of realized folds.}
+\item{\code{n_folds: }\code{int} Number of realized folds.}
 
-\item{\code{unlabeled_cases: }}{\code{vector} of \code{strings} containing the names of the unlabeled cases.}
+\item{\code{unlabeled_cases: }\code{vector} of \code{strings} containing the names of the unlabeled cases.}
 }
 }
 \description{

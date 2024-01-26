@@ -67,31 +67,31 @@ printed to console.}
 \value{
 Returns a \code{list} of class \code{basic_text_rep} with the following components.
 \itemize{
-\item{\code{dfm: }}{Document-Feature-Matrix. Rows correspond to the documents. Columns represent
+\item{\code{dfm: } Document-Feature-Matrix. Rows correspond to the documents. Columns represent
 the number of tokens in the document.}
 
-\item{\code{fcm: }}{Feature-Co-Occurance-Matrix.}
+\item{\code{fcm: } Feature-Co-Occurance-Matrix.}
 
-\item{\code{information: }}{\code{list} containing information about the used vocabulary. These are:
+\item{\code{information: } \code{list} containing information about the used vocabulary. These are:
  \itemize{
- \item{\code{n_sentence: }} {Number of sentences}
- \item{\code{n_document_segments: }} {Number of document segments/raw texts}
- \item{\code{n_token_init: }} {Number of initial tokens}
- \item{\code{n_token_final: }} {Number of final tokens}
- \item{\code{n_lemmata: }} {Number of lemmas}
+ \item{\code{n_sentence: }Number of sentences}
+ \item{\code{n_document_segments: }Number of document segments/raw texts}
+ \item{\code{n_token_init: }Number of initial tokens}
+ \item{\code{n_token_final: }Number of final tokens}
+ \item{\code{n_lemmata: }Number of lemmas}
   }}
 
-\item{\code{configuration: }}{\code{list} containing information if the vocabulary was
+\item{\code{configuration: } \code{list} containing information if the vocabulary was
 created with lower cases and if the vocabulary uses original tokens or lemmas.}
 
-\item{\code{language_model: }}{\code{list} containing information about the applied
+\item{\code{language_model: } \code{list} containing information about the applied
 language model. These are:
 \itemize{
-\item{\code{model: }} {the udpipe language model}
-\item{\code{label: }} {the label of the udpipe language model}
-\item{\code{upos: }} {the applied universal part-of-speech tags}
-\item{\code{language: }} {the language}
-\item{\code{vocab: }} {a \code{data.frame} with the original vocabulary}
+\item{\code{model: }the udpipe language model}
+\item{\code{label: }the label of the udpipe language model}
+\item{\code{upos: }the applied universal part-of-speech tags}
+\item{\code{language: }the language}
+\item{\code{vocab: }a \code{data.frame} with the original vocabulary}
 }}
 
 }

@@ -17,13 +17,13 @@ frequency of cases which should be used as validation sample.}
 \value{
 Returns a \code{list} with the following components.
 \itemize{
-\item{\code{target_train: }}{Named \code{factor} containing the labels of the training sample.}
+\item{\code{target_train: }Named \code{factor} containing the labels of the training sample.}
 
-\item{\code{embeddings_train: }}{Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
+\item{\code{embeddings_train: }Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
 
-\item{\code{target_test: }}{Named \code{factor} containing the labels of the validation sample.}
+\item{\code{target_test: }Named \code{factor} containing the labels of the validation sample.}
 
-\item{\code{embeddings_test: }}{Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
+\item{\code{embeddings_test: }Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
 }
 }
 \description{

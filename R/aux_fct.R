@@ -157,28 +157,28 @@ return(TRUE)
 #'@param true_values \code{factor} containing the true labels/categories.
 #'@param predicted_values \code{factor} containing the predicted labels/categories.
 #'@param return_names_only \code{bool} If \code{TRUE} returns only the names
-#'of the resulting vector. Use {FALSE} to request computation of the values.
+#'of the resulting vector. Use \code{FALSE} to request computation of the values.
 #'@return If \code{return_names_only=FALSE} returns a \code{vector} with the following reliability measures:
 #'#'\itemize{
-#'\item{\strong{iota_index: }}{Iota Index from the Iota Reliability Concept Version 2.}
-#'\item{\strong{min_iota2: }}{Minimal Iota from Iota Reliability Concept Version 2.}
-#'\item{\strong{avg_iota2: }}{Average Iota from Iota Reliability Concept Version 2.}
-#'\item{\strong{max_iota2: }}{Maximum Iota from Iota Reliability Concept Version 2.}
-#'\item{\strong{min_alpha: }}{Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
-#'\item{\strong{avg_alpha: }}{Average Alpha Reliability from Iota Reliability Concept Version 2.}
-#'\item{\strong{max_alpha: }}{Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
-#'\item{\strong{static_iota_index: }}{Static Iota Index from Iota Reliability Concept Version 2.}
-#'\item{\strong{dynamic_iota_index: }}{Dynamic Iota Index Iota Reliability Concept Version 2.}
-#'\item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
-#'\item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
-#'\item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
-#'\item{\strong{kappa2_unweighted: }}{Cohen's Kappa unweighted.}
-#'\item{\strong{kappa2_equal_weighted: }}{Weighted Cohen's Kappa with equal weights.}
-#'\item{\strong{kappa2_squared_weighted: }}{Weighted Cohen's Kappa with squared weights.}
-#'\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters without exact estimation.}
-#'\item{\strong{percentage_agreement: }}{Percentage Agreement.}
-#'\item{\strong{balanced_accuracy: }}{Average accuracy within each class.}
-#'\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
+#'\item{\strong{iota_index: }Iota Index from the Iota Reliability Concept Version 2.}
+#'\item{\strong{min_iota2: }Minimal Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{avg_iota2: }Average Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{max_iota2: }Maximum Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{min_alpha: }Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{avg_alpha: }Average Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{max_alpha: }Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{static_iota_index: }Static Iota Index from Iota Reliability Concept Version 2.}
+#'\item{\strong{dynamic_iota_index: }Dynamic Iota Index Iota Reliability Concept Version 2.}
+#'\item{\strong{kalpha_nominal: }Krippendorff's Alpha for nominal variables.}
+#'\item{\strong{kalpha_ordinal: }Krippendorff's Alpha for ordinal variables.}
+#'\item{\strong{kendall: }Kendall's coefficient of concordance W.}
+#'\item{\strong{kappa2_unweighted: }Cohen's Kappa unweighted.}
+#'\item{\strong{kappa2_equal_weighted: }Weighted Cohen's Kappa with equal weights.}
+#'\item{\strong{kappa2_squared_weighted: }Weighted Cohen's Kappa with squared weights.}
+#'\item{\strong{kappa_fleiss: }Fleiss' Kappa for multiple raters without exact estimation.}
+#'\item{\strong{percentage_agreement: }Percentage Agreement.}
+#'\item{\strong{balanced_accuracy: }Average accuracy within each class.}
+#'\item{\strong{gwet_ac: }Gwet's AC1/AC2 agreement coefficient.}
 #'}
 #'
 #'@return If \code{return_names_only=TRUE} returns only the names of the vector elements.
@@ -292,13 +292,13 @@ get_coder_metrics<-function(true_values=NULL,
 #'frequency of cases which should be used as validation sample.
 #'@return Returns a \code{list} with the following components.
 #'\itemize{
-#'\item{\code{target_train: }}{Named \code{factor} containing the labels of the training sample.}
+#'\item{\code{target_train: }Named \code{factor} containing the labels of the training sample.}
 #'
-#'\item{\code{embeddings_train: }}{Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
+#'\item{\code{embeddings_train: }Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
 #'
-#'\item{\code{target_test: }}{Named \code{factor} containing the labels of the validation sample.}
+#'\item{\code{target_test: }Named \code{factor} containing the labels of the validation sample.}
 #'
-#'\item{\code{embeddings_test: }}{Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
+#'\item{\code{embeddings_test: }Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
 #'}
 #'@family Auxiliary Functions
 #'@keywords internal
@@ -344,13 +344,13 @@ get_train_test_split<-function(embedding,
 #'
 #'@return Return a \code{list} with the following components:
 #'\itemize{
-#'\item{\code{val_sample: }}{\code{vector} of \code{strings} containing the names of cases of the validation sample.}
+#'\item{\code{val_sample: }\code{vector} of \code{strings} containing the names of cases of the validation sample.}
 #'
-#'\item{\code{train_sample: }}{\code{vector} of \code{strings} containing the names of cases of the train sample.}
+#'\item{\code{train_sample: }\code{vector} of \code{strings} containing the names of cases of the train sample.}
 #'
-#'\item{\code{n_folds: }}{\code{int} Number of realized folds.}
+#'\item{\code{n_folds: }\code{int} Number of realized folds.}
 #'
-#'\item{\code{unlabeled_cases: }}{\code{vector} of \code{strings} containing the names of the unlabeled cases.}
+#'\item{\code{unlabeled_cases: }\code{vector} of \code{strings} containing the names of the unlabeled cases.}
 #'}
 #'@note The parameter \code{target} allows cases with missing categories/labels.
 #'These should be declared with \code{NA}. All these cases are ignored for creating the
@@ -450,13 +450,13 @@ get_folds<-function(target,
 #'labels.
 #'@return Returns a \code{list} with the following components
 #'\itemize{
-#'\item{\code{embeddings_labeled: }}{Object of class \link{EmbeddedText} containing
+#'\item{\code{embeddings_labeled: }Object of class \link{EmbeddedText} containing
 #'only the cases which have labels.}
 #'
-#'\item{\code{embeddings_unlabeled: }}{Object of class \link{EmbeddedText} containing
+#'\item{\code{embeddings_unlabeled: }Object of class \link{EmbeddedText} containing
 #'only the cases which have no labels.}
 #'
-#'\item{\code{targets_labeled: }}{Named \code{factor} containing the labels of
+#'\item{\code{targets_labeled: }Named \code{factor} containing the labels of
 #'relevant cases.}
 #'}
 #'@family Auxiliary Functions
@@ -555,7 +555,7 @@ create_iota2_mean_object<-function(iota2_list,
 #'object of the class \link{TextEmbeddingClassifierNeuralNet}.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases, this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases, this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.
 #'@param target Named \code{factor} containing the labels of the corresponding embeddings.
 #'@param times \code{int} for the number of sequences/times.
 #'@param features \code{int} for the number of features within each sequence.
@@ -564,13 +564,13 @@ create_iota2_mean_object<-function(iota2_list,
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
 #'@return \code{list} with the following components.
 #'\itemize{
-#'\item{\code{syntetic_embeddings: }}{Named \code{data.frame} containing the text embeddings of
+#'\item{\code{syntetic_embeddings: }Named \code{data.frame} containing the text embeddings of
 #'the synthetic cases.}
 #'
-#'\item{\code{syntetic_targets}}{Named \code{factor} containing the labels of the corresponding
+#'\item{\code{syntetic_targets }Named \code{factor} containing the labels of the corresponding
 #'synthetic cases.}
 #'
-#'\item{\code{n_syntetic_units}}{\code{table} showing the number of synthetic cases for every
+#'\item{\code{n_syntetic_units }\code{table} showing the number of synthetic cases for every
 #'label/category.}
 #'}
 #'
@@ -711,7 +711,7 @@ for(ckind in chunk_kind){
 #'computations.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.
 #'@param target Named \code{factor} containing the labels/categories of the corresponding cases.
 #'@param k \code{int} The number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.

@@ -8,7 +8,7 @@ create_synthetic_units(embedding, target, k, max_k, method, cat, cat_freq)
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.}
 
 \item{target}{Named \code{factor} containing the labels/categories of the corresponding cases.}
 
