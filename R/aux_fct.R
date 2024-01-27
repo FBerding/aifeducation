@@ -555,7 +555,7 @@ create_iota2_mean_object<-function(iota2_list,
 #'object of the class \link{TextEmbeddingClassifierNeuralNet}.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases, this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases, this object is taken from \link{EmbeddedText}$embeddings.
 #'@param target Named \code{factor} containing the labels of the corresponding embeddings.
 #'@param times \code{int} for the number of sequences/times.
 #'@param features \code{int} for the number of features within each sequence.
@@ -711,7 +711,7 @@ for(ckind in chunk_kind){
 #'computations.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases this object is taken from \link{EmbeddedText}$embeddings.
 #'@param target Named \code{factor} containing the labels/categories of the corresponding cases.
 #'@param k \code{int} The number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.

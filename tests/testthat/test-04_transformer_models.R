@@ -569,8 +569,10 @@ for(ai_method in ai_methods){
         tokens<-bert_modeling$get_special_tokens()
         mask_token<-tokens[which(tokens[,1]=="mask_token"),2]
 
-        first_solution<-bert_modeling$fill_mask(text=paste("This is a",mask_token,"."),
-                                n_solutions = 5)
+        first_solution<-bert_modeling$fill_mask(
+          text=paste("This is a",mask_token,"."),
+          n_solutions = 5)
+
         expect_equal(length(first_solution),1)
         expect_true(is.data.frame(first_solution[[1]]))
         expect_equal(nrow(first_solution[[1]]),5)

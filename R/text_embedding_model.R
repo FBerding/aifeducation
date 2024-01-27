@@ -1342,7 +1342,6 @@ TextEmbeddingModel<-R6::R6Class(
       special_tokens=self$get_special_tokens()
       mask_token=special_tokens[special_tokens[,"type"]=="mask_token","token"]
 
-      p
       n_mask_tokens=ncol(stringr::str_extract_all(text,
                                                     stringr::fixed(mask_token),
                                                     simplify = TRUE))

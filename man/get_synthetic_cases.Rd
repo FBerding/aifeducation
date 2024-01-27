@@ -15,7 +15,7 @@ get_synthetic_cases(
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases, this object is taken from \link[EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases, this object is taken from \link{EmbeddedText}$embeddings.}
 
 \item{times}{\code{int} for the number of sequences/times.}
 
