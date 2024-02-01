@@ -10,6 +10,9 @@
     <loc>/articles/classification_tasks.html</loc>
   </url>
   <url>
+    <loc>/articles/gui_aife_studio.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -38,6 +41,9 @@
   </url>
   <url>
     <loc>/reference/bow_pp_create_vocab_draft.html</loc>
+  </url>
+  <url>
+    <loc>/reference/calc_standard_classification_measures.html</loc>
   </url>
   <url>
     <loc>/reference/check_aif_py_modules.html</loc>
@@ -127,6 +133,9 @@
     <loc>/reference/split_labeled_unlabeled.html</loc>
   </url>
   <url>
+    <loc>/reference/start_aifeducation_studio.html</loc>
+  </url>
+  <url>
     <loc>/reference/summarize_tracked_sustainability.html</loc>
   </url>
   <url>
@@ -142,6 +151,9 @@
     <loc>/reference/TextEmbeddingModel.html</loc>
   </url>
   <url>
+    <loc>/reference/to_categorical_c.html</loc>
+  </url>
+  <url>
     <loc>/reference/train_tune_bert_model.html</loc>
   </url>
   <url>
@@ -155,5 +167,14 @@
   </url>
   <url>
     <loc>/reference/train_tune_roberta_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/update_aifeducation_progress_bar.html</loc>
+  </url>
+  <url>
+    <loc>/reference/update_aifeducation_progress_bar_epochs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/update_aifeducation_progress_bar_steps.html</loc>
   </url>
 </urlset>

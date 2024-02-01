@@ -8,8 +8,8 @@
 <meta name="description" content="aifeducation">
 <title>01 Get started • aifeducation</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="01 Get started">
 <meta property="og:description" content="aifeducation">
@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a>
-    <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
+    <a class="dropdown-item" href="../articles/gui_aife_studio.html">02a Aifeducation Studio</a>
+    <a class="dropdown-item" href="../articles/classification_tasks.html">02b Classification tasks</a>
     <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
 </li>
@@ -136,16 +137,6 @@ be done by:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
 <p>With this command, all necessary <em>R</em> packages are installed on
 your machine.</p>
-<blockquote>
-<p><strong>Note:</strong> There is currently a bug in reticulate 1.32.0
-which does not allow to load python packages such as tensorflow, keras
-or torch. The error seems to occur only when working with RStudio and
-Windows machines. Using R console directly seems not to evoke the error.
-The bug has been fixed in the developer version of reticulate. You can
-install this version with <code>install.packages("pak")</code> and
-<code>pak::pak("rstudio/reticulate")</code>. With the release of
-reticulate 1.33.0 you can ignore this note.</p>
-</blockquote>
 </div>
 <div class="section level3">
 <h3 id="step-2---install-python">Step 2 - Install Python<a class="anchor" aria-label="anchor" href="#step-2---install-python"></a>
@@ -235,30 +226,41 @@ auxiliary function <code><a href="../reference/install_py_modules.html">install_
 you.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">#For Linux</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#For Windows with gpu support</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.10"</span>,</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#For Windows without gpu support</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">TRUE</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#For MacOS</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#For Windows with gpu support</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.10"</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#For Windows without gpu support</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">TRUE</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#For MacOS</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<blockquote>
+<p>With <code>install="all"</code> you can decide which machine learning
+framework should be installed. Use <code>install="all"</code> to request
+the installation of both ‘PyTorch’ and ‘tensorflow’. If you would like
+to install only ‘PyTorch’ or ‘tensorflow’ set
+<code>install="pytorch"</code> or <code>install="tenorflow"</code>.</p>
+</blockquote>
 <p>It is very important that you call this function <em>before</em>
 loading the package the first time. If you load the library without
 installing the necessary modules an error may occur.</p>
@@ -268,6 +270,8 @@ installing the necessary modules an error may occur.</p>
 <li>tokenizers,</li>
 <li>datasets,</li>
 <li>torch,</li>
+<li>torcheval,</li>
+<li>safetensors,</li>
 <li>keras,</li>
 <li>tensorflow</li>
 <li>codecarbon</li>
@@ -278,9 +282,14 @@ installing the necessary modules an error may occur.</p>
 within other environments, please ensure that these python modules are
 available. For gpu support some further packages are installed.</p>
 <p>With <code><a href="../reference/check_aif_py_modules.html">check_aif_py_modules()</a></code> you can check, if all
-modules are successfully installed.</p>
+modules are successfully installed or a specific machine learning
+framework.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>                                   check<span class="op">=</span><span class="st">"pytorch"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>                                   check<span class="op">=</span><span class="st">"tensorflow"</span><span class="op">)</span></span></code></pre></div>
 <p>Now everything is ready to use the package.</p>
 <blockquote>
 <p><strong>Important note:</strong> When you start a new <em>R</em>
@@ -341,6 +350,12 @@ to use. You can set the framework for the complete session with</p>
 <span></span>
 <span><span class="co">#For PyTorch</span></span>
 <span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"pytorch"</span><span class="op">)</span></span></code></pre></div>
+<p>You can change the framework at anytime during a session by calling
+this method again or by passing the framework to the
+<code>ml_framework</code> argument of a function or method. Please note
+that not all models are available for both frameworks and that the
+weights of trained models cannot be shared across frameworks for all
+models.</p>
 <p>In the case that you would like to use tensorflow now is a good time
 to configure that backend, since some configurations can only be done
 <strong>before</strong> tensorflow is used the first time.</p>
@@ -363,8 +378,11 @@ learning framework.</p>
 <div class="section level2">
 <h2 id="tutorials-and-guides">4) Tutorials and Guides<a class="anchor" aria-label="anchor" href="#tutorials-and-guides"></a>
 </h2>
+<p>A guide how to use the graphical user interface can be found in
+vignette <a href="gui_aife_studio.html">02a classification
+tasks</a>.</p>
 <p>A short introduction into the package with examples for
-classification tasks can be found in vignette <a href="classification_tasks.html">02 classification tasks</a>.</p>
+classification tasks can be found in vignette <a href="classification_tasks.html">02b classification tasks</a>.</p>
 <p>Documenting and sharing your work is described in vignette <a href="sharing_and_publishing.html">03 sharing and using trained
 AI/models</a></p>
 </div>

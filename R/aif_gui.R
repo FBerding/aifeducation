@@ -7,6 +7,7 @@
 #'@family Graphical User Interface
 #'
 #'@import iotarelr
+#'@importFrom rlang .data
 #'@importFrom stringr str_extract_all
 #'@importFrom stringr str_split_fixed
 #'@importFrom stringr str_to_lower
@@ -24,15 +25,16 @@ start_aifeducation_studio<-function(){
   #Check necessary R packages
   message("Checking R Packages.")
   r_packages=c(
+    "ggplot2",
+    "rlang",
     "shiny",
     "shinyFiles",
     "shinyWidgets",
     "shinydashboard",
     "shinyjs",
-    "ggplot2",
     "readtext",
-    "readxl",
-    "rlang")
+    "readxl"
+)
 
   missing_r_packages=NULL
   for(i in 1:length(r_packages)){
@@ -689,10 +691,10 @@ start_aifeducation_studio<-function(){
                                         shinyFiles::shinyDirButton(id="tec_db_select_model_for_documentation",
                                                        label = "Choose Folder",
                                                        title = "Please choose a folder",
-                                                       icon=shiny::icon("folder-open"))
+                                                       icon=shiny::icon("folder-open")),
+                                        shiny::tags$p(shiny::tags$b("Selected Classifier: "))
                                     ),
                                     shiny::uiOutput(outputId = "tec_document_tabs"),
-                                    shiny::tags$p(shiny::tags$b("Selected Classifier: ")),
                                     shiny::textOutput(outputId = "tec_document_selected_model_label")
                                   )
                           )
@@ -803,7 +805,7 @@ start_aifeducation_studio<-function(){
                     shinydashboard::menuItem(text="Home",
                              tabName = "start_page",
                              icon = shiny::icon("house")),
-                    shinydashboard::menuItem(text = "Data preparation",
+                    shinydashboard::menuItem(text = "Data Preparation",
                              tabName = "data_preparation",
                              icon = shiny::icon("database")),
                     shinydashboard::menuItem(text = "Language Modeling",
@@ -1007,6 +1009,25 @@ start_aifeducation_studio<-function(){
           shiny::tags$h2("- Studio -"),
           style="text-align: center;"
         ),
+        shinydashboard::box(title="Welcome",
+                            width = 12,
+                            solidHeader = TRUE,
+                            status = "primary",
+                            shiny::tags$p("A brief introduction for using
+                                          Aifeducation Studio can be
+                                          found on the package's home page",
+                                          shiny::tags$a(
+                                            "in the internet",
+                                            href="https://fberding.github.io/aifeducation/",
+                                            target="_blank"
+                                          )),
+                            shiny::tags$p("We appreciate any constructive feedback and
+                                          bug reports at",
+                                          shiny::tags$a(
+                                           "https://github.com/cran/aifeducation/issues",
+                                            href="https://github.com/cran/aifeducation/issues",
+                                            target="_blank"
+                                          ))),
         shinydashboard::box(title="R Packages",
             width = 12,
             solidHeader = TRUE,
@@ -1104,6 +1125,14 @@ start_aifeducation_studio<-function(){
                           value = 0,
                           total=100)
         shiny::showModal(progress_modal)
+        update_aifeducation_progress_bar_steps(
+          value=0,
+          total=1,
+          title=NULL)
+        update_aifeducation_progress_bar_epochs(
+          value=0,
+          total=1,
+          title=NULL)
 
         if(input$dp_include_csv==TRUE){
           file_paths_csv=list.files(
@@ -1130,7 +1159,7 @@ start_aifeducation_studio<-function(){
         }
 
         if(input$dp_include_xlsx==TRUE){
-          file_paths_xslx=list.files(
+          file_paths_xlsx=list.files(
             path = root_path,
             include.dirs = FALSE,
             all.files = TRUE,
@@ -1166,7 +1195,8 @@ start_aifeducation_studio<-function(){
             tmp_document=readtext::readtext(file=all_paths[i])
             #File name without extension
             #text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
-            text_corpus[counter,"id"]=stringr::str_split_fixed(tmp_document$doc_id,pattern="\\.")[1,-1]
+            tmp_string=stringr::str_split_fixed(tmp_document$doc_id,pattern="\\.",n=Inf)
+            text_corpus[counter,"id"]=tmp_string[1,ncol(tmp_string)]
             text_corpus[counter,"text"]=tmp_document$text
             counter=counter+1
 
@@ -1348,7 +1378,7 @@ start_aifeducation_studio<-function(){
                       min = 0,
                       max=.99,
                       step = .01),
-          shiny::sliderInput(inputId = "lm_activation_dropout ",
+          shiny::sliderInput(inputId = "lm_activation_dropout",
                       label="Activation Dropout Probability",
                       value=0.0,
                       min = 0,
@@ -1387,7 +1417,7 @@ start_aifeducation_studio<-function(){
                       min = 1,
                       max=56,
                       step = 1),
-          shiny::numericInput(inputId = "lm_attention_window ",
+          shiny::numericInput(inputId = "lm_attention_window",
                        label="Size Attention Window",
                        value=512,
                        min = 10,
@@ -1526,6 +1556,14 @@ start_aifeducation_studio<-function(){
 
       if(length(error_list)==0){
         shiny::showModal(progress_modal)
+        update_aifeducation_progress_bar_steps(
+          value=0,
+          total=1,
+          title=NULL)
+        update_aifeducation_progress_bar_epochs(
+          value=0,
+          total=1,
+          title=NULL)
 
         raw_texts=as.data.frame(raw_texts)
         trace=TRUE
@@ -1990,6 +2028,14 @@ start_aifeducation_studio<-function(){
 
       if(length(error_list)==0){
         shiny::showModal(progress_modal)
+        update_aifeducation_progress_bar_steps(
+          value=0,
+          total=1,
+          title=NULL)
+        update_aifeducation_progress_bar_epochs(
+          value=0,
+          total=1,
+          title=NULL)
 
         raw_texts=as.data.frame(raw_texts)
         trace=TRUE
@@ -2284,15 +2330,16 @@ start_aifeducation_studio<-function(){
     #Create the interface
     shiny::observeEvent(input$lm_save_interface,{
       model_architecture=interface_architecture()[1]
-      if(model_architecture=="BertModel"){
+      print(model_architecture)
+      if(model_architecture=="BertForMaskedLM"){
         method="bert"
-      } else if(model_architecture=="FunnelModel"){
+      } else if(model_architecture=="FunnelForMaskedLM"){
         method="funnel"
-      } else if(model_architecture=="LongformerModel"){
+      } else if(model_architecture=="LongformerForMaskedLM"){
         method="longformer"
-      } else if(model_architecture=="RobertaModel"){
+      } else if(model_architecture=="RobertaForMaskedLM"){
         method="roberta"
-      } else if(model_architecture=="DebertaV2Model"){
+      } else if(model_architecture=="DebertaV2ForMaskedLM"){
         method="deberta_v2"
       }
 
@@ -2473,27 +2520,31 @@ start_aifeducation_studio<-function(){
       }
 
       tmp_text_data=load(file_path_raw_texts)
+      tmp_text_data=get(x=tmp_text_data)
+
       if(!("id"%in%colnames(tmp_text_data))){
-        error_list[length(error_list)+1]=shiny::tags$p("The file for raw texts does not contain a
-      column 'id'.")
+        error_list[length(error_list)+1]=list(shiny::tags$p("The file for raw texts does not contain a
+      column 'id'."))
       }
       if(!("text"%in%colnames(tmp_text_data))){
-        error_list[length(error_list)+1]=shiny::tags$p("The file for raw texts does not contain a
-      column 'text'.")
+        error_list[length(error_list)+1]=list(shiny::tags$p("The file for raw texts does not contain a
+      column 'text'."))
       }
 
       if(length(error_list)==0){
         model=LanguageModel_for_Use()
+        shiny::showModal(progress_modal)
         embeddings=model$embed(
           raw_text=tmp_text_data$text,
           doc_id=tmp_text_data$id,
           batch_size=input$lm_embed_batch_size,
-          trace=FALSE)
+          trace=TRUE)
 
         save(embeddings,
              file = file_path_embeddings)
         rm(embeddings)
         gc()
+        shiny::removeModal()
       } else {
         error_modal<-shiny::modalDialog(
           title = "Error",
@@ -2612,8 +2663,10 @@ start_aifeducation_studio<-function(){
       plot_data=fill_masked_solutions()[[input$lm_select_mask_for_fill_mask]]
       plot_data=plot_data[order(plot_data$score,decreasing=FALSE),]
       plot_data$token_str=factor(plot_data$token_str,levels=(plot_data$token_str))
+      plot_data=as.data.frame(plot_data)
       plot=ggplot2::ggplot(data = plot_data)+
-        ggplot2::geom_col(ggplot2::aes(x=rlang::.data$token_str,y=rlang::.data$score))+
+        ggplot2::geom_col(ggplot2::aes(x=.data$token_str,
+                                       y=.data$score))+
         ggplot2::coord_flip()+
         ggplot2::xlab("tokens")+
         ggplot2::ylab("score")+
@@ -3228,7 +3281,8 @@ start_aifeducation_studio<-function(){
       file_path=tec_target_data_for_train_path()
       if(!is.null(file_path)){
         if(file.exists(file_path)==TRUE){
-          extension=stringr::str_split_fixed(file_path,pattern="\\.")[1,-1]
+          extension=stringr::str_split_fixed(file_path,pattern="\\.",n=Inf)
+          extension=extension[1,ncol(extension)]
           extension=stringr::str_to_lower(extension)
           #extension=stringi::stri_split_fixed(file_path,pattern=".")[[1]]
           #extension=stringi::stri_trans_tolower(extension[[length(extension)]])
@@ -3443,6 +3497,14 @@ start_aifeducation_studio<-function(){
                    type = "error")
       } else {
         shiny::showModal(progress_modal)
+        update_aifeducation_progress_bar_steps(
+          value=0,
+          total=1,
+          title=NULL)
+        update_aifeducation_progress_bar_epochs(
+          value=0,
+          total=1,
+          title=NULL)
         destination_path=input$tec_create_select_destination_folder_path
 
         #if(dir.exists(destination_path)==FALSE){
@@ -4161,37 +4223,37 @@ start_aifeducation_studio<-function(){
         }
 
         plot<-ggplot2::ggplot(data=plot_data)+
-          ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$train_mean,color="train"))+
-          ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$validation_mean,color="validation"))
+          ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_mean,color="train"))+
+          ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_mean,color="validation"))
 
         if(input$tec_performance_training_min_max==TRUE){
           plot<-plot+
-            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$train_min,color="train"))+
-            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$train_max,color="train"))+
-            ggplot2::geom_ribbon(ggplot2::aes(x=rlang::.data$epoch,
-                                              ymin=rlang::.data$train_min,
-                                              ymax=rlang::.data$train_max),
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_min,color="train"))+
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train_max,color="train"))+
+            ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
+                                              ymin=.data$train_min,
+                                              ymax=.data$train_max),
                                  alpha=0.25,
                                  fill="red")+
-            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$validation_min,color="validation"))+
-            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$validation_max,color="validation"))+
-            ggplot2::geom_ribbon(ggplot2::aes(x=rlang::.data$epoch,
-                                              ymin=rlang::.data$validation_min,
-                                              ymax=rlang::.data$validation_max),
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_min,color="validation"))+
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation_max,color="validation"))+
+            ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
+                                              ymin=.data$validation_min,
+                                              ymax=.data$validation_max),
                                  alpha=0.25,
                                  fill="blue")
         }
         if("test_mean"%in%colnames(plot_data)){
           plot=plot+
-            ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$test_mean,color="test"))
+            ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_mean,color="test"))
           if(input$tec_performance_training_min_max==TRUE){
             plot=plot+
-              ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$test_min,color="test"))+
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_min,color="test"))+
 
-              ggplot2::geom_line(ggplot2::aes(x=rlang::.data$epoch,y=rlang::.data$test_max,color="test"))+
-              ggplot2::geom_ribbon(ggplot2::aes(x=rlang::.data$epoch,
-                                                ymin=rlang::.data$test_min,
-                                                ymax=rlang::.data$test_max),
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$test_max,color="test"))+
+              ggplot2::geom_ribbon(ggplot2::aes(x=.data$epoch,
+                                                ymin=.data$test_min,
+                                                ymax=.data$test_max),
                                    alpha=0.25,
                                    fill="darkgreen")
           }
@@ -4358,6 +4420,14 @@ start_aifeducation_studio<-function(){
                    type = "error")
       } else {
         shiny::showModal(progress_modal)
+        update_aifeducation_progress_bar_steps(
+          value=0,
+          total=1,
+          title=NULL)
+        update_aifeducation_progress_bar_epochs(
+          value=0,
+          total=1,
+          title=NULL)
         save_path_root=paste0(dir_path,"/",input$tec_choose_file_path_for_predictions_file_name)
         classifier=Classifier_for_Use()
         predictions=classifier$predict(

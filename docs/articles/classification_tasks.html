@@ -6,12 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="aifeducation">
-<title>02 Text Embedding and Classification Tasks • aifeducation</title>
+<title>02b Text Embedding and Classification Tasks • aifeducation</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="02 Text Embedding and Classification Tasks">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="02b Text Embedding and Classification Tasks">
 <meta property="og:description" content="aifeducation">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a>
-    <a class="dropdown-item" href="../articles/classification_tasks.html">02 Classification tasks</a>
+    <a class="dropdown-item" href="../articles/gui_aife_studio.html">02a Aifeducation Studio</a>
+    <a class="dropdown-item" href="../articles/classification_tasks.html">02b Classification tasks</a>
     <a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a>
   </div>
 </li>
@@ -76,7 +77,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>02 Text Embedding and Classification Tasks</h1>
+      <img src="" class="logo" alt=""><h1>02b Text Embedding and Classification Tasks</h1>
                         <h4 data-toc-skip class="author">Florian
 Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
 Rebmann</h4>
@@ -129,10 +130,12 @@ analysis of textual data is a challenging and time-consuming task for
 humans. In this vignette, we would like to show how to create an AI that
 can help you with such tasks by using the package
 <em>aifedcuation</em>.</p>
-<p><strong>Please note that an introduction to content analysis, natural
+<blockquote>
+<p>Please note that an introduction to content analysis, natural
 language processing or machine learning is beyond the scope of this
 vignette. If you would like to learn more, please refer to the cited
-literature.</strong></p>
+literature.</p>
+</blockquote>
 <p>Before we start it is necessary to introduce a definition of our
 understanding of some basic concepts since applying AI to educational
 contexts means to combine the knowledge of different scientific
@@ -302,6 +305,10 @@ to use. You can set the framework for the complete session with</p>
 <span><span class="co">#For PyTorch</span></span>
 <span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"pytorch"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/set_transformers_logger.html">set_transformers_logger</a></span><span class="op">(</span><span class="st">"ERROR"</span><span class="op">)</span></span></code></pre></div>
+<p>Setting the global machine learning framework is only for
+convenience. You can change the framework at any time during a session
+by calling this method again or by setting the argument ‘ml_framework’
+of methods and functions manually.</p>
 <p>In the case that you would like to use tensorflow now is a good time
 to configure that backend, since some configurations can only be done
 <strong>before</strong> tensorflow is used the first time.</p>
@@ -544,24 +551,29 @@ includes the creation of a set of vocabulary. In <em>aifedcuation</em>
 you can do this by calling the function
 <code><a href="../reference/create_bert_model.html">create_bert_model()</a></code>. For our example this could look like
 this:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>basic_text_rep<span class="ot">&lt;-</span><span class="fu">bow_pp_create_basic_text_rep</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">create_bert_model</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>    <span class="at">model_dir =</span> <span class="st">"my_own_transformer"</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>    <span class="at">vocab_raw_texts=</span>example_data<span class="sc">$</span>text,</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>    <span class="at">vocab_size=</span><span class="dv">30522</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>    <span class="at">vocab_do_lower_case=</span><span class="cn">FALSE</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>    <span class="at">max_position_embeddings=</span><span class="dv">512</span>,</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>    <span class="at">hidden_size=</span><span class="dv">768</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>    <span class="at">num_hidden_layer=</span><span class="dv">12</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>    <span class="at">num_attention_heads=</span><span class="dv">12</span>,</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>    <span class="at">intermediate_size=</span><span class="dv">3072</span>,</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>    <span class="at">hidden_act=</span><span class="st">"gelu"</span>,</span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>    <span class="at">hidden_dropout_prob=</span><span class="fl">0.1</span>,</span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>    <span class="at">sustain_track=</span><span class="cn">TRUE</span>,</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>    <span class="at">sustain_iso_code=</span><span class="st">"DEU"</span>,</span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>    <span class="at">sustain_region=</span><span class="cn">NULL</span>,</span>
-<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>    <span class="at">sustain_interval=</span><span class="dv">15</span>,</span>
-<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>    <span class="at">trace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_bert_model.html">create_bert_model</a></span><span class="op">(</span></span>
+<span>    ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    model_dir <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
+<span>    vocab_raw_texts<span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
+<span>    vocab_size<span class="op">=</span><span class="fl">30522</span>,</span>
+<span>    vocab_do_lower_case<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>    max_position_embeddings<span class="op">=</span><span class="fl">512</span>,</span>
+<span>    hidden_size<span class="op">=</span><span class="fl">768</span>,</span>
+<span>    num_hidden_layer<span class="op">=</span><span class="fl">12</span>,</span>
+<span>    num_attention_heads<span class="op">=</span><span class="fl">12</span>,</span>
+<span>    intermediate_size<span class="op">=</span><span class="fl">3072</span>,</span>
+<span>    hidden_act<span class="op">=</span><span class="st">"gelu"</span>,</span>
+<span>    hidden_dropout_prob<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span>    sustain_track<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>    sustain_iso_code<span class="op">=</span><span class="st">"DEU"</span>,</span>
+<span>    sustain_region<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>    sustain_interval<span class="op">=</span><span class="fl">15</span>,</span>
+<span>    trace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>First, the function receives the machine learning framework you chose
+at the start of the session. However, you can change this by setting
+<code>ml_framework="tensorflow"</code> or by
+<code>ml_framework="pytorch"</code>.</p>
 <p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved. Furthermore, you must
 provide raw texts. These texts are <strong>not</strong> used for
@@ -608,6 +620,7 @@ model directory. The next step is to train your model by calling
 <code><a href="../reference/train_tune_bert_model.html">train_tune_bert_model()</a></code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/train_tune_bert_model.html">train_tune_bert_model</a></span><span class="op">(</span></span>
+<span>  ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"my_own_transformer_trained"</span>,</span>
 <span>  bert_model_dir_path <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
 <span>  raw_texts <span class="op">=</span> <span class="va">example_data</span><span class="op">$</span><span class="va">text</span>,</span>
@@ -647,13 +660,10 @@ at the beginning of the session.</p>
 <p>After the training finishes, you can find the transformer ready to
 use in your output_directory. Now you are able to create a text
 embedding model.</p>
-<blockquote>
-<p><strong>Note:</strong> In the documentation of the functions you find
-an argument <code>ml_framework</code>. Please do <em>not</em> change the
-argument manually since this argument is controlled by the global
-configuration you have set at the beginning of a session (see section
-2).</p>
-</blockquote>
+<p>Again you can change the machine learning framework by setting
+<code>ml_framework="tensorflow"</code> or by
+<code>ml_framework="pytorch"</code>. If you do not change this argument
+the framework you chose at the beginning is used.</p>
 </div>
 </div>
 <div class="section level2">
@@ -771,6 +781,7 @@ counting the tokens of every cluster for every text.</p>
 the other two approaches.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  model_name<span class="op">=</span><span class="st">"bert_embedding"</span>,</span>
 <span>  model_label<span class="op">=</span><span class="st">"Text Embedding via BERT"</span>,</span>
 <span>  model_version<span class="op">=</span><span class="st">"0.0.1"</span>,</span>
@@ -822,6 +833,13 @@ embeddings should be drawn (<code>aggregation="last"</code>). In their
 initial work, Devlin et al. (2019) used the hidden states of different
 layers for classification.</p>
 <p>After deciding about the configuration, you can use your model.</p>
+<blockquote>
+<p><strong>Note:</strong> With version 0.3.1 of aifeducation every
+transformer can be used with both machine learning frameworks. Even the
+pre-trained weights can be used across backends. However, in the future
+models my be implemented that are available only for a specific
+framework.</p>
+</blockquote>
 </div>
 </div>
 <div class="section level3">
@@ -916,20 +934,22 @@ with other persons.</p>
 <code>load_ai_model</code> and you can continue using your model.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">topic_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/topic_model_embedding"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/topic_model_embedding"</span>,</span>
+<span>  ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">global_vector_clusters_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding"</span><span class="op">)</span></span>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/global_vector_clusters_embedding"</span>,</span>
+<span>  ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bert_modeling</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
-<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding"</span><span class="op">)</span></span></code></pre></div>
-<blockquote>
-<p><strong>Note:</strong> In the documentation of the function you find
-an argument <code>ml_framework</code>. Please do <em>not</em> change the
-argument manually since this argument is controlled by the global
-configuration you have set at the beginning of a session (see section
-2).</p>
-</blockquote>
+<span>  model_dir<span class="op">=</span><span class="st">"text_embedding_models/bert_embedding"</span>,</span>
+<span>  ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>With <code>ml_framework</code> you can decide which framework the
+model should use. If you set <code>ml_framework="auto"</code> the models
+will be initialized with the same framework during saving the model.
+Please note that at the moment all implemented text embedding models can
+be used with both frameworks. However, this may change in the
+future.</p>
 <p><strong>Please note that you have to add the name of the model to the
 directory path.</strong> In our example we have stored three models in
 the directory “text_embedding_models”. Each model is saved within its
@@ -964,19 +984,23 @@ classifier by calling
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">example_targets</span><span class="op">)</span><span class="op">=</span><span class="va">example_data</span><span class="op">$</span><span class="va">id</span></span>
 <span></span>
 <span><span class="va">classifier</span><span class="op">&lt;-</span><span class="va"><a href="../reference/TextEmbeddingClassifierNeuralNet.html">TextEmbeddingClassifierNeuralNet</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  ml_framework<span class="op">=</span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  name<span class="op">=</span><span class="st">"movie_review_classifier"</span>,</span>
 <span>  label<span class="op">=</span><span class="st">"Classifier for Estimating a Postive or Negative Rating of Movie Reviews"</span>,</span>
 <span>  text_embeddings<span class="op">=</span><span class="va">bert_embeddings</span>,</span>
 <span>  targets<span class="op">=</span><span class="va">example_targets</span>,</span>
 <span>  hidden<span class="op">=</span><span class="cn">NULL</span>,</span>
 <span>  rec<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">256</span><span class="op">)</span>,</span>
-<span>  self_attention_heads <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  dropout<span class="op">=</span><span class="fl">0.4</span>,</span>
+<span>  self_attention_heads<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  intermediate_size<span class="op">=</span><span class="fl">512</span>,</span>
+<span>  attention_type<span class="op">=</span><span class="st">"fourier"</span>,</span>
+<span>  add_pos_embedding<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>  rec_dropout<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span>  repeat_encoder<span class="op">=</span><span class="fl">1</span>,</span>
+<span>  dense_dropout<span class="op">=</span><span class="fl">0.4</span>,</span>
 <span>  recurrent_dropout<span class="op">=</span><span class="fl">0.4</span>,</span>
-<span>  l2_regularizer<span class="op">=</span><span class="fl">0.01</span>,</span>
-<span>  optimizer<span class="op">=</span><span class="st">"adam"</span>,</span>
-<span>  act_fct<span class="op">=</span><span class="st">"gelu"</span>,</span>
-<span>  rec_act_fct<span class="op">=</span><span class="st">"tanh"</span><span class="op">)</span></span></code></pre></div>
+<span>  encoder_dropout<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span>  optimizer<span class="op">=</span><span class="st">"adam"</span><span class="op">)</span></span></code></pre></div>
 <p>Similar to the text embedding model you should provide a name
 (<code>name</code>) and a label (<code>label</code>) for your new
 classifier. With <code>text_embeddings</code> you have to provide an
@@ -1013,25 +1037,31 @@ to use the sequential structure of your data. In all other cases you can
 rely on dense layers only.</p>
 <p>If you use text embeddings with more than one chunk, it is a good
 idea to try self-attention layering in order to take the context of all
-chunks into account. To add a self-attention layer you must provide an
-integer greater 0 to <code>self_attention_heads</code>. This will not
-only add a self-attention layer but a transformer encoder as described
-by Chollet, Kalinowski, and Allaire (2022, pp. 373).</p>
+chunks into account. To add self-attention you have two choices: - You
+can use the attention mechanism used in classic transformer models as
+multihead attention (Vaswani et al. 2017). For this variant you have to
+set <code>attention_type="multihead</code>, <code>repeat_encoder</code>
+to a value of at least 1, and
+self_attention_heads<code>to a value of at least 1.  - Furthermore you can use the attention mechanism described in Lee-Thorp et al. (2021)  of the FNet model which allows much fast computations at low accuracy costs. To use this kind of attention you have to set</code>attention_type=“fourier<code>and</code>repeat_encoder`
+to a value of at least 1.</p>
+<p>With <code>repeat_encoder</code> you can chose how many times an
+encoder layer should be added. The encoder is implemented as described
+by Chollet, Kalinowski, and Allaire (2022, pp. 373) for both variants of
+attention.</p>
+<p>You can further extend the abilities of your network by adding
+positional embeddings. Positional embeddings take care for the order of
+your chunks. Thus, adding such a layer may increase performance if the
+order of information is important. You can add this layer by setting
+<code>add_pos_embedding=TRUE</code>. The layer is created as described
+by Chollet, Kalinowski, and Allaire (2022, pp. 378)</p>
 <p>Masking, normalization, and the creation of the input layer as well
 as the output layer are done automatically.</p>
 <p>After you have created a new classifier, you can begin training.</p>
 <blockquote>
-<p><strong>Note:</strong> In the documentation of the function you find
-an argument <code>ml_framework</code>. Please do <em>not</em> change the
-argument manually since this argument is controlled by the global
-configuration you have set at the beginning of a session (see section
-2).</p>
-</blockquote>
-<blockquote>
-<p><strong>Note:</strong> Since the classifier is written with ‘keras’
-using a classifier with ‘PyTorch’ requires at least ‘keras version 3’.
-In the case your system is not compatible with ‘keras version 3’ you can
-sill use the classifiers with ‘tensorflow’.</p>
+<p><strong>Note:</strong> In contrast to the text embedding models your
+decision about the machine learning framework is more important since
+the classifier can only be used with the framework you created and
+trained the model.</p>
 </blockquote>
 </div>
 <div class="section level3">
@@ -1255,9 +1285,10 @@ content analysis. These are</p>
 <li>Percentage Agreement</li>
 <li>Gwet’s AC1/AC2 (Gwet 2014)</li>
 <li>Kendall’s coefficient of concordance W</li>
+<li>Cohen’s Kappa unweighted</li>
 <li>Cohen’s Kappa with equal weights</li>
-<li>Fleiss’ Kappa for multiple raters with exact estimation</li>
-<li>Light’s Kappa for multiple raters</li>
+<li>Cohen’s Kappa with squared weights</li>
+<li>Fleiss’ Kappa for multiple raters without exact estimation</li>
 </ul>
 <p>You can access the concrete values by accessing the field
 <code>reliability</code> which stores all relevant information. In this
@@ -1409,25 +1440,19 @@ to the function <code>save_ai_model</code>.</p>
 argument <code>save_format</code> allowing you to choose between
 <code>save_format = "keras"</code>, <code>save_format = "tf"</code> and
 <code>save_format = "h5"</code>. We recommend to chose
-<code>save_format = "keras"</code> since this is allows to use the
-classifier with both ‘PyTorch’ and ‘tensorflow’.</p>
+<code>save_format = "keras"</code> since this is the recommended format
+by keras. Classifiers created for pytorch are saved as .pt in all cases.
+Thus, <code>save_format</code> is ignored.</p>
 <p>If you would like to load a model you can call the function
 <code>load_ai_model</code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_ai_model.html">load_ai_model</a></span><span class="op">(</span></span>
 <span>  model_dir<span class="op">=</span><span class="st">"classifiers/movie_review_classifier"</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
-<p><strong>Note:</strong> In the documentation of the function you find
-an argument <code>ml_framework</code>. Please do <em>not</em> change the
-argument manually since this argument is controlled by the global
-configuration you have set at the beginning of a session (see section
-2).</p>
-</blockquote>
-<blockquote>
-<p><strong>Note:</strong> Since the classifier is written with ‘keras’
-using a classifier with ‘PyTorch’ requires at least ‘keras version 3’.
-In the case your system is not compatible with ‘keras version 3’ you can
-sill use the classifiers with ‘tensorflow’.</p>
+<p><strong>Note:</strong> Classifiers depend on the framework which was
+used during creation. Thus, a classifier is always initalized with its
+original framework. The argument <code>ml_framework</code> has no
+effect.</p>
 </blockquote>
 </div>
 <div class="section level3">
@@ -1505,13 +1530,16 @@ the Second Generation. Berlin: Logos. <a href="https://doi.org/10.30819/5581" cl
 &amp; Rebmann, K. (2022). Performance and Configuration of Artificial
 Intelligence in Educational Settings.: Introducing a New Reliability
 Concept Based on Content Analysis. Frontiers in Education, 1–21. <a href="https://doi.org/10.3389/feduc.2022.818365" class="external-link uri">https://doi.org/10.3389/feduc.2022.818365</a></p>
+<p>Campesato, O. (2021). Natural Language Processing Fundamentals for
+Developers. Mercury Learning &amp; Information. <a href="https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713" class="external-link uri">https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713</a></p>
 <p>Cascante-Bonilla, P., Tan, F., Qi, Y. &amp; Ordonez, V. (2020).
 Curriculum Labeling: Revisiting Pseudo-Labeling for Semi-Supervised
 Learning. <a href="https://doi.org/10.48550/arXiv.2001.06001" class="external-link uri">https://doi.org/10.48550/arXiv.2001.06001</a></p>
-<p>Campesato, O. (2021). Natural Language Processing Fundamentals for
-Developers. Mercury Learning &amp; Information. <a href="https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713" class="external-link uri">https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713</a></p>
 <p>Chollet, F., Kalinowski, T., &amp; Allaire, J. J. (2022). Deep
 learning with R (Second edition). Manning Publications Co. <a href="https://learning.oreilly.com/library/view/-/9781633439849/?ar" class="external-link uri">https://learning.oreilly.com/library/view/-/9781633439849/?ar</a></p>
+<p>Dai, Z., Lai, G., Yang, Y. &amp; Le, Q. V. (2020).
+Funnel-Transformer: Filtering out Sequential Redundancy for Efficient
+Language Processing. <a href="https://doi.org/10.48550/arXiv.2006.03236" class="external-link uri">https://doi.org/10.48550/arXiv.2006.03236</a></p>
 <p>Devlin, J., Chang, M.‑W., Lee, K., &amp; Toutanova, K. (2019). BERT:
 Pre-training of Deep Bidirectional Transformers for Language
 Understanding. In J. Burstein, C. Doran, &amp; T. Solorio (Eds.),
@@ -1520,6 +1548,8 @@ Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/
 <p>Gwet, K. L. (2014). Handbook of inter-rater reliability: The
 definitive guide to measuring the extent of agreement among raters
 (Fourth edition). Gaithersburg: STATAXIS.</p>
+<p>He, P., Liu, X., Gao, J. &amp; Chen, W. (2020). DeBERTa:
+Decoding-enhanced BERT with Disentangled Attention. <a href="https://doi.org/10.48550/arXiv.2006.03654" class="external-link uri">https://doi.org/10.48550/arXiv.2006.03654</a></p>
 <p>Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th ed.). Los Angeles: SAGE.</p>
 <p>Lane, H., Howard, C., &amp; Hapke, H. M. (2019). Natural language
@@ -1530,6 +1560,11 @@ From Research to Practice. New York: Springer. <a href="https://doi.org/10.1007/
 <p>Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
 Workshop: Challenges in Representation Learning.</p>
+<p>Lee-Thorp, J., Ainslie, J., Eckstein, I. &amp; Ontanon, S. (2021).
+FNet: Mixing Tokens with Fourier Transforms. <a href="https://doi.org/10.48550/arXiv.2105.03824" class="external-link uri">https://doi.org/10.48550/arXiv.2105.03824</a></p>
+<p>Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
+Lewis, M., Zettlemoyer, L., &amp; Stoyanov, V. (2019). RoBERTa: A
+Robustly Optimized BERT Pretraining Approach. <a href="https://doi.org/10.48550/arXiv.1907.11692" class="external-link uri">https://doi.org/10.48550/arXiv.1907.11692</a></p>
 <p>Papilloud, C., &amp; Hinneburg, A. (2018). Qualitative Textanalyse
 mit Topic-Modellen: Eine Einführung für Sozialwissenschaftler.
 Wiesbaden: Springer. <a href="https://doi.org/10.1007/978-3-658-21980-2" class="external-link uri">https://doi.org/10.1007/978-3-658-21980-2</a></p>

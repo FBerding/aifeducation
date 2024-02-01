@@ -53,6 +53,7 @@ Imports:
     reticulate (>= 1.34.0),
     smotefamily,
     stringr,
+    rlang,
     utils
 Suggests: 
     text2vec,
@@ -64,14 +65,13 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
+    ggplot2,
     shiny,
     shinyFiles,
     shinyWidgets,
     shinydashboard,
     shinyjs,
     fs,
-    ggplot2,
-    rlang,
     readtext,
     readxl
 LinkingTo: 

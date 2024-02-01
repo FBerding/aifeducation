@@ -681,12 +681,12 @@ TextEmbeddingModel<-R6::R6Class(
             private$transformer_components$tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_main)
             if(private$transformer_components$ml_framework=="tensorflow"){
               private$transformer_components$model<-transformers$TFDebertaV2Model$from_pretrained(model_dir_main,from_pt=from_pt)
-              private$transformer_components$model_mlm<-transformers$TFDebertaForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+              private$transformer_components$model_mlm<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
             } else {
               private$transformer_components$model<-transformers$DebertaV2Model$from_pretrained(model_dir_main,
                                                                                                 from_tf=from_tf,
                                                                                                 use_safetensors=load_safe)
-              private$transformer_components$model_mlm<-transformers$DebertaForMaskedLM$from_pretrained(model_dir_main,
+              private$transformer_components$model_mlm<-transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_main,
                                                                                                         from_tf=from_tf,
                                                                                                         use_safetensors=load_safe)
             }

@@ -23,10 +23,10 @@ library(aifeducation)
 
 ## 1.1 Preface
 
-This vignetteintroduces *aifeducation - Studio* which is a graphical
+This vignette introduces *Aifeducation - Studio* which is a graphical
 user interface for creating, training, documenting, analyzing, and
 applying artificial intelligence (AI). It is made for users unfamiliar
-with *R* or thosw who do not have coding skills in relevant languages
+with *R* or those who do not have coding skills in relevant languages
 (e.g., python). For more experienced users, the interface provides a
 convenient way for working with AI in an educational context.
 
@@ -92,8 +92,7 @@ disciplines using different, sometimes overlapping concepts. Even within
 a single research area, concepts are not unified. Figure 1 illustrates
 this package's understanding.
 
-![Figure 1: Understanding of
-CentralConcepts](classif_fig_01.png){width="100%"}
+![Figure 1: Understanding of Central Concepts](classif_fig_01.png){width="100%"}
 
 Since *aifeducation* looks at the application of AI for classification
 tasks from the perspective of the empirical method of content analysis,
@@ -114,8 +113,7 @@ labeled with the correct class. As Figure 2 illustrates, two kinds of
 data are necessary to train an AI to classify text in line with
 supervised machine learning principles.
 
-![Figure 2: Basic Structure of Supervised Machine
-Learning](classif_fig_02.png){width="100%"}
+![Figure 2: Basic Structure of Supervised Machine Learning](classif_fig_02.png){width="100%"}
 
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -149,8 +147,7 @@ target data for training AI to classify a text.
 In *aifeducation,* these steps are covered with three different types of
 models, as shown in Figure 3.
 
-![Figure 3: Modells in
-aifeducation](classif_model_hierachy.png){width="100%"}
+![Figure 3: Modells Types in aifeducation](classif_model_hierachy.png){width="100%"}
 
 -   **Base Models:** The base models are the models which contain the
     capacities to understand natural language. In general, these are
@@ -165,7 +162,7 @@ aifeducation](classif_model_hierachy.png){width="100%"}
 
 -   **Classifiers:** Classifiers are used on top of a text embedding
     model. They are used to classify a text into categories/classes
-    based on the numeric representation provided be the corresponding
+    based on the numeric representation provided by the corresponding
     text embedding model. Please note that a text embedding model can be
     used to create different classifiers (e.g. one classifier for
     colors, one classifier to estimate the quality of a text, etc.).
@@ -179,7 +176,8 @@ We recommend to start with a clean *R* session. Then you can start
 Aifeducation Studio by entering the following into the console:
 
 ```{r, include = TRUE,eval=FALSE}
-aifeducation::start_aifeducation_studio()
+library(aifeducation)
+start_aifeducation_studio()
 ```
 
 Please note that this can take a moment.
@@ -187,26 +185,25 @@ Please note that this can take a moment.
 At the beginning you will see the start page (Figure 4). Here you can
 configure your current session. First, it is very important that you
 choose the machine learning framework that you would like to use during
-the session (point 1). This choice cannot be changed after the session
-starts. To change the framework you have to restart *Aifeducation
-Studio*.
+the session (box *Machine Learning Framework*). This choice cannot be changed after the session
+starts. To change the framework you have to restart *Aifeducation Studio*.
 
-![Figure 4: Start Page](gui_start_page.png){width="100%"}
+![Figure 4: Start Page](gui_aife_studio_config.jpg){width="100%"}
 
 Depending on the chosen framework, you can activate some further
-settings (point 2). If you would like to use tensorflow and your
+settings (box *Machine Learning Framework*). If you would like to use tensorflow and your
 computer has a graphic device with low memory, we recommend to activate
-the option for low memory. For pytorch, no further changes are
-necessary.
+the option for low memory. For pytorch, no configuration is necessary.
 
 On the right side of the start page, you can decide if energy
-consumption should be recorded during training AI. Tracking energy
+consumption should be recorded during training AI (box *Sustainability Tracking*). 
+Tracking energy
 consumption allows to estimate the CO2 emissions of using AI. Since our
 world faces the challenge of climate change, we recommend to enable this
 option. In this case you have to choose your country in order to allow a
 more accurate estimation of the model's sustainability impact.
 
-If you are ready you can press the start button (point 3), which directs
+If you are ready you can press the start button (box *Start Session*), which directs
 you to the home page.
 
 # 3 Using Aifeducation Studio
@@ -225,50 +222,55 @@ to fine-tune base models. Second, to transform texts into texts
 embeddings which can be used as input for training a classifier or for
 predicting the texts' labels via classifier.
 
-To create a collection of raw text, you have to choose the data
-preparation page on the right side as shown in Figure 5. ![Figure 5:
-Start Page](gui_home_page_data_preparation.png){width="100%"} On the
-resulting page, you first have to choose the directory where the texts
-are stored (point 1). We recommend that you store all texts you would
+To create a collection of raw texts, you have to choose the 
+*Data Preparation* page on the right side as shown in Figure 5. 
+
+![Figure 5: Start Page](gui_aife_studio_home.jpg){width="100%"} 
+
+On the
+resulting page (see Figure 6), you first have to choose the directory where the texts
+are stored (box *Text Sources*). We recommend that you store all texts you would
 like to use in a single folder. Within this folder, you can structure
 your data with sub-folders. In case you use sub-folders, please ensure
-that you include them for creating a collection of raw texts (point 2).
+that you include them for creating a collection of raw texts.
+
+![Figure 6: Data Preparation Page](gui_aife_studio_create_text_collection.jpg){width="100%"}
 
 In the next step, you can decide which file formats should be included
-(point 3). Currently, *aifeducation* supports .pdf, .csv, and .xlsx
+(box *File Types*). Currently, *aifeducation* supports .pdf, .csv, and .xlsx
 files. If enabled, all files of the requested file format are included
 in your data collection.
 
 In case you would like to consider .xlsx files, **all** files must have
 one column containing the texts and one column for the texts' IDs as
-shown in Figure 6. The name for the corresponding columns must be
-identical for all files and you have to provide the name (point 4).
+shown in Figure 7. The name for the corresponding columns must be
+identical for all files and you have to provide the column names (first row in
+Figure 7).
 
-![Figure 6: Structure of Raw Texts within an Excel
-Sheet](gui_excel_raw_texts.png){width="50%"}
+![Figure 7: Structure of Raw Texts within an Excel Sheet](gui_excel_raw_texts.png){width="50%"}
 
 The last step is to choose a folder where your collection of raw texts
 should be saved. Please select a folder and provide a name for your file
-(point 5).
+(box *Text Output*).
 
-Finally, you can start creating the collection (point 6). Please note
+Finally, you can start creating the collection (box *Start Process*). Please note
 that this can take some time.
 
 When the process finishes, you have a single file which can be used for
-further tasks. The file contains a data.table that stores the ids of the
+further tasks. The file contains a `data.table` that stores the
 texts together with their IDs. In case of .xlsx files, the texts' IDs
 are set to the IDs stored in the corresponding column for ID. In the
 case of .pdf and .csv files, the file names are used as ID (without the
-file extension).
+file extension, see Figure 8).
 
-![Figure 7: Filnames as IDs](gui_excel_raw_texts_ids.png){width="50%"}
+![Figure 8: Filnames as IDs](gui_excel_raw_texts_ids.png){width="50%"}
 
 > Please note that a consequence of this is that two files *text_01.csv*
 > and *text_01.pdf* have the same ID, which is not allowed. Please
 > ensure that you use unique IDs across file formats.
 
 The IDs are very important since they are used to match the
-corresponding label if available.
+corresponding class/category if available.
 
 ### 3.1.2 Collections of Texts' Labels
 
@@ -276,13 +278,13 @@ Labels are necessary if you would like to train a classifier. The
 easiest way is to create a table that contains a column for the texts'
 ID and one or multiple columns that contain the texts'
 categories/classes. Supported file formats are .xlsx, .csv, and
-.rda/rdata. Figure 8 illustrates an example for a .xslx file.
+.rda/.rdata. Figure 9 illustrates an example for a .xslx file.
 
-![Figure 8: Filnames as IDs](gui_excel_target_data.png){width="50%"}
+![Figure 9: Filnames as IDs](gui_excel_target_data.png){width="50%"}
 
-> In any case, the table must contain a column with the name "ID" which
+> In any case, the table must contain a column with the name "id" which
 > contains the texts' IDs. All other columns must also have unique
-> names.
+> names. Please pay attention to use "id" and not "ID" or "Id".
 
 ## 3.2 Base Models
 
@@ -306,28 +308,28 @@ train/fine-tune base models.
 ### 3.2.2 Creation of Base Models
 
 In order to create a new base model you have to choose the option
-"Create" on the tab "Masked Language Modeling" on the right side of the
-app (Figure 9).
+*Create* on the tab *Language Modeling* for the *Base Models* on the right side of the
+app (Figure 5). 
 
-![Figure 9: Start Page](gui_home_page_lm_create.png){width="100%"} Every
-transformer model is composed of two parts: 1) the tokenizer which
-splits raw text into smaller pieces to model a large number of words
+![Figure 10: Language Modeling - Create Transformer](gui_aife_studio_create_transformer.jpg){width="100%"}
+
+Every transformer model is composed of two parts: 1) the tokenizer which
+splits raw texts into smaller pieces to model a large number of words
 with a limited, small number of tokens and 2) the neural network that is
 used to model the capabilities for understanding natural language.
 
 At the beginning you can choose between the different supported
-transformer architectures (point 1). Depending on the architecture, you
-have different options determining the shape of your neural network
-(point 2).
+transformer architectures (box *Model Architecture*). Depending on the architecture, you
+have different options determining the shape of your neural network.
 
-In the middle, you find a box named "Vocabulary". Here you must provide
+In the middle, you find a box named *Vocabulary*. Here you must provide
 the path to a file which contains a collection of raw texts. These raw
-texts are used to calculate the vocabulary of the transformer (point 3).
+texts are used to calculate the vocabulary of the transformer.
 This file should be created with *Aifeducation Studio* to ensure
 compatibility. See section 3.1.1 for more details. It is very important
 that you provide a number of how many tokens the vocabulary should
-include (point 4). Depending on the transformer method, you can set
-additional options affecting a transformer's vocabulary (point 5).
+include. Depending on the transformer method, you can set
+additional options affecting a transformer's vocabulary.
 
 -   **Transform to lower:** If this option is enabled, all words in a
     raw text are transformed to lower cases. For instance, the resulting
@@ -337,15 +339,15 @@ additional options affecting a transformer's vocabulary (point 5).
 -   **Add Prefix Spaces:** If enabled, a space is added to the first
     word if there is not already one. Thus, enabling this option leads
     to a similar tokenization for the word *learners* in both cases: 1)
-    "learners need a high motivation for high achievement." and 2) "A
-    high motivation is necessary for learners to achieve high
+    "*learners* need a high motivation for high achievement." and 2) "A
+    high motivation is necessary for *learners* to achieve high
     performance.".
 
 -   **Trim Offsets:** If this option is enabled, the white spaces of the
     produced offsets are trimmed.
 
 The last step is to choose a folder where the new base model should be
-saved (point 6). Finally, you can start the creation of your model by
+saved (box *Creation*). Finally, you can start the creation of your model by
 clicking on the button "Start Creation". The creation of the model may
 take some time.
 
@@ -355,12 +357,12 @@ If you would like to train a new base model (see section 3.2.2) for the
 first time or want to adapt a pre-trained model to a domain-specific
 language or task, you have to click on "Train/Tune" on the right side of
 the app. You can find this option via "Language Modeling" as shown in
-Figure 10.
+Figure 5.
 
-![Figure 10: Start Page](gui_home_page_lm_train_mlm.png){width="100%"}
+![Figure 11: Language Modeling - Train/Tune  Transformer](gui_aife_studio_train_transformer.jpg){width="100%"}
 
 In the first step, you have to choose the base model you would like to
-train/tune. Please note that every base model consists of several files.
+train/tune (box *Base Model*). Please note that every base model consists of several files.
 Thus, you cannot provide neither single nor multiple files. Instead you
 have to provide the folder that stores the entire model.
 
@@ -370,14 +372,11 @@ Compatible models are all base models that you have created with
 implemented in *aifeducation* such as BERT, DeBERTa etc.
 
 After choosing a base model, new boxes appear as shown in Figure 11. To
-train a model, you must first provide a collection of raw texts (point
-1). We recommend that you create this collection of texts as described
+train a model, you must first provide a collection of raw texts (box *Raw Texts*).
+We recommend that you create this collection of texts as described
 in section 3.1.1.
 
-![Figure 11: Start
-Page](gui_home_page_lm_train_mlm_full.png){width="100%"}
-
-Next you can configure the training of your base model (point 2):
+Next you can configure the training of your base model (box *Train and Tune Settings*):
 
 -   **Chunk Size:** For training and validating a base model, the raw
     texts are split into several smaller texts. This value determines
@@ -399,7 +398,7 @@ Next you can configure the training of your base model (point 2):
 
 -   **Whole Word Masking:** If this option is activated, all tokens
     belonging to a single word are masked. If this options is disabled
-    or not, available token masking is used.
+    or not available token masking is used.
 
 -   **Validation Size:** This option determines how many sequences
     should be used for validating the performance of the base model.
@@ -416,7 +415,7 @@ Next you can configure the training of your base model (point 2):
 -   **Learning Rate:** The initial learning rate.
 
 In the last step, you have to provide the directory where your trained
-model should be saved after training (point 3). The corresponding folder
+model should be saved after training (box *Start Training/Tuning*). The corresponding folder
 will also contain the checkpoints during training. It is very important
 that this directory is not the same directory as the one you stored the
 original model in. By clicking the button "Start Training/Tuning", the
@@ -431,31 +430,28 @@ amount of data, and the capacities of your machine.
 The text embedding model is the interface to *R* in *aifeducation*. In
 order to create a new model, you need a base model that provides the
 ability to understand natural language. You can open the creation page
-by clicking on "Interface" via "Language Modeling" (see Figure 12).
+by clicking on "Create" in the section "Text Embedding Model" 
+via "Language Modeling" (see Figure 5).
 
-![Figure 12: Start
-Page](gui_home_page_lm_train_mlm_full.png){width="100%"}
+![Figure 13: Text Embedding Model - Create](gui_aife_studio_emb_interface_create.jpg){width="100%"}
 
 First you have to choose the base model that should form the foundation
 of your new text embedding model. Please select the folder that contains
-the entire model and not single files.
+the entire model and not single files (box *Base Model*).
 
 After choosing a model, new boxes appear which allow you to customize
-your interface (point 1 in Figure 13). Here it is very important that
+your interface (box *Interface Setting*). Here it is very important that
 you give your model a unique name and label. The difference between
 *Name* and *Label* is that *Name* is used for the computer and *Label*
 for users. Thus, *Name* should not contain any spaces or special
 characters. *Label* does not have any restrictions. Think of *Label* as
 the title of a book or paper. With *Version* you can provide a version
 number if you create a newer version of your model. In case you create a
-new model, we recommend to use "0.1". For *Language,* it is necessary
+new model, we recommend to use "0.0.1". For *Language,* it is necessary
 that you choose which language your model is created for, such as
 English, French, German, etc.
 
-![Figure 13: Start
-Page](gui_home_page_lm_train_mlm_full.png){width="100%"}
-
-On the right side of the box (point 2) you can set how the interface
+On the right side of the box *Interface Setting* you can set how the interface
 should process raw text:
 
 -   **N chunks:** Sometimes texts are very long. With this value, you
@@ -476,16 +472,16 @@ should process raw text:
     layer are used as a numeric representation.
 
 The maximum number of tokens your model can process and provide for
-downstream tasks can be calculated as $$
-Max Tokens = NChunks*MaximalSequenceLength-(NChunks-1)*NOverlap
-$$ If the text is longer, the remaining tokens are ignored and lost for
+downstream tasks can be calculated as 
+$$Max Tokens = NChunks*MaximalSequenceLength-(NChunks-1)*NOverlap$$ 
+If the text is longer, the remaining tokens are ignored and lost for
 further analysis.
 
 > Please note that you can create multiple text embedding models with a
 > different configuration based on the same base model.
 
 The last step is to provide and name a folder to save the model to
-(point 3).
+(box *Creation*).
 
 ### 3.3.2 Using a Text Embedding Model
 
@@ -500,17 +496,21 @@ different aspects of the model and how you can use it.
 The tab *Model Description* provides you with the documentation of the
 model.
 
+![Figure 14: Text Embedding Model - Description](gui_aife_studio_emb_interface_use_desc.jpg){width="100%"}
+
 The tab *Create Text Embeddings* allows you to transform raw texts into
 a numerical representation of these texts, called text embeddings. These
 text embeddings can be used in downstream tasks such as classifying
 texts. In order to transform raw texts into embedded texts, you first
-have to select a collection of raw texts (point 1 in Figure). We
+have to select a collection of raw texts. We
 recommend that you create this collection according to section 3.1.1.
 Next you have to provide the folder where the embeddings should be
-stored and name it (point 2). With *Batch Size* you can determine how
+stored and name it. With *Batch Size* you can determine how
 many raw texts should be processed simultaneously. Please adjust this
 value to your machine's capacities. By clicking on the button "Start
 Embed" the transformation of texts begins.
+
+![Figure 15: Text Embedding Model - Embeddings](gui_aife_studio_emb_interface_use_embed.jpg){width="100%"}
 
 The tab *Encode/Decode/Tokenize* offers you insights into the way your
 text embedding model processes data. In the box *Encode* you can insert
@@ -521,6 +521,8 @@ text. The box *Decode* allows you to reverse this process. There you can
 insert a sequence of numbers (separated with a comma or with spaces) and
 after clicking on *Decode,* the corresponding tokens and the raw text
 appear.
+
+![Figure 16: Text Embedding Model - Encode/Decode/Tokenize](gui_aife_studio_emb_interface_use_encode_decode.jpg){width="100%"}
 
 Finally, the tab *Fill Mask* allows you to request the underlying base
 model of your text embedding model to calculate a solution to a
@@ -534,6 +536,8 @@ you will find an image on the right side of the box, showing you the
 most reasonable token for the selected gap. The tokens are ordered by
 certainty; from the perspective of the model, the most reasonable tokens
 are at the top and the less reasonable tokens are at the bottom.
+
+![Figure 17: Text Embedding Model - Fill Mask](gui_aife_studio_emb_interface_use_fill_mask.jpg){width="100%"}
 
 ### 3.3.3 Documenting a Text Embedding Model
 
@@ -554,8 +558,10 @@ After choosing a model, a new box appears, allowing you to insert the
 necessary information. Via the tabs *Developers* and *Modifiers,* you
 can provide the names and email addresses of all relevant contributors.
 *Developers* refer to the people who created a model, while *Modifiers*
-refers to the peple who adapted a pre-trained model to another domain or
+refers to the people who adapted a pre-trained model to another domain or
 task.
+
+![Figure 18: Text Embedding Model - Documentation](gui_aife_studio_emb_doc.jpg){width="100%"}
 
 In the tabs *Abstract* and *Description,* you can provide an abstract
 and a detailed description of your work in English and/or in the native
@@ -568,15 +574,16 @@ internet, you can click on the button "Preview". Saving your changes is
 possible by clicking on *Save*.
 
 > For more information on how to document your model, please refer to
-> the vignette [03 Sharing and Using Trained
-> AI/Models](sharing_and_publishing.html).
+> the vignette [03 Sharing and Using Trained AI/Models](sharing_and_publishing.html).
 
 ## 3.4 Classifiers
 
 ### 3.4.1 Create a Classifier
 
 Classifiers are built on top of a text embedding model. To create a
-classifier, click on "Create and Train" in the tab *Classification*.
+classifier, click on "Create and Train" in the tab *Classification* (see Figure 5).
+
+![Figure 18: Classifier - Creation Part 1](gui_aife_studio_classifier_create_part_1.jpg){width="100%"}
 
 Creating a classifier requires two kinds of data. First, a text
 embedding of a collection of texts. These embeddings should be created
@@ -585,7 +592,7 @@ table with the labels of every text. This kind of data should be created
 as described in section 3.1.2.
 
 You can provide the text embeddings by opening the corresponding file in
-the first box (point 1). After selecting the embeddings, you will see a
+the first box (*Input Data*). After selecting the embeddings, you will see a
 summary of the underlying text embedding model that generated the
 embeddings. In addition, you can see how many documents are in the file.
 
@@ -595,8 +602,8 @@ embeddings. In addition, you can see how many documents are in the file.
 > text embedding model is necessary to transform raw texts into a format
 > that the classifier can understand.
 
-In the second box, you can select the file that contains the
-corresponding labels (point 2). After loading the file, you can select
+In the second box (*Target Data*), you can select the file that contains the
+corresponding labels. After loading the file, you can select
 the column of the table that you would like to use as target data for
 training. In addition, you can see a short summary of the absolute
 frequencies of the single classes/categories.
@@ -607,12 +614,14 @@ frequencies of the single classes/categories.
 > particular, you can use the same text embeddings for training
 > different classifiers.
 
-In the third box you create the architecture of your neural network. It
-is very important that you provide the model's name and label in the
+In the third box (*Architecture*) you create the architecture of your neural network
+(Figure 19). It is very important that you provide the model's name and label in the
 section *General*. The *Model Name* is used for internal purposes by the
 machine while the *Model Label* is used as a title of your classifiers
 for other users. Thus, the *Model Name* should not contain any spaces or
 special characters. For *Model Label,* there are no restrictions.
+
+![Figure 19: Classifier - Creation Part 2](gui_aife_studio_classifier_create_part_2.jpg){width="100%"}
 
 To expand the different sections you can click on the "+" on the right
 side, since a detailed explanation of every option is beyond the scope
@@ -632,7 +641,7 @@ of this introduction. Here we can only provide an overview.
     order within a sequence. In order to add these layers, just pass the
     numbers to the input field *Reccurent Layers* and separate them with
     a comma or space. Every number represents a layer and the number
-    determines the number of neurons. Below the field you can see a what
+    determines the number of neurons. Below the field you can see what
     *Aifeducation Studio* does with your input. This is helpful to avoid
     invalid specifications of layers.
 -   **Dense Layers:** In this section you can add dense layers to your
@@ -641,8 +650,8 @@ of this introduction. Here we can only provide an overview.
 -   **Optimizer:** Here you can choose between different optimizers for
     training.
 
-The next box contains the setting for training your classifier. Going
-into detail is again beyond the scope of this introduction. Here we can
+The next box (*Training Settings*) contains the setting for training your classifier
+(Figure 19). Going into detail is again beyond the scope of this introduction. Here we can
 only provide an overview.
 
 **Section: General Setting**
@@ -752,13 +761,16 @@ al. (2020). Therefore, the following parameters have to be set:
     all unlabeled data is considered for training and that cases with
     the highest certainty are used for training.)
 
-In the last box, you have to provide the directory where you would like
-to save model. The name of the folder created within that directory can
+
+![Figure 20: Classifier - Creation Part 3](gui_aife_studio_classifier_create_part_3.jpg){width="100%"}
+
+In the last box (Figure 20), you have to provide the directory where you would like
+to save the model. The name of the folder created within that directory can
 be set with *Folder Name*.
 
 Before you start training, you can check how many cases can be matched
 between the text embeddings and the target data by clicking on the
-button *Test Data Matching*. This allows you to check if the structure
+button *Test Data Matching* (box *Model Saving*). This allows you to check if the structure
 of the data is working. If everything is okay you can start training the
 model by clicking on *Start Training*. Please note that training a
 classifier can take up to several hours.
@@ -780,17 +792,23 @@ appears.
 In the first tab, *Model Description,* you will find the documentation
 of the model.
 
+![Figure 21: Classifier - Description](gui_aife_studio_classifier_use_desc.jpg){width="100%"}
+
 In the second tab, *Training,* you receive a summary of the training
 process of the model. This includes a visualization of the loss, the
 accuracy, and the balanced accuracy for every fold and every epoch.
 Depending on the applied training techniques (such as *Balanced
 Pseudo-Labeling*), you can request additional images.
 
+![Figure 22: Classifier - Training](gui_aife_studio_classifier_use_train.jpg){width="100%"}
+
 The third tab, *Reliability,* provides you with information on the
 quality of the model. Here you find visualizations giving you insights
 into how the classifier is able to generate reliable results. In
 addition, measures from content analysis as well as machine learning
 allow you to analyze specific aspects of the model's performance.
+
+![Figure 23: Classifier - Reliability](gui_aife_studio_classifier_use_reliability.jpg){width="100%"}
 
 The last tab, *Prediction,* allows you to apply a trained model to new
 data. Here you can use the trained model to assign classes/categories to
@@ -799,6 +817,8 @@ contains the text embeddings of the documents you would like to
 classify. You can create these embeddings with the text embedding model
 used for providing the training data of the classifier. The necessary
 steps are described in section 3.3.2.
+
+![Figure 24: Classifier - Prediction](gui_aife_studio_classifier_use_predictions.jpg){width="100%"}
 
 > These embeddings must be created with the same text embedding model
 > that created the text embeddings for training. If not, an error will
@@ -809,12 +829,14 @@ predictions and to provide a file name. The default case is to store the
 predictions in an .rda file, allowing you to load the data directly into
 *R* for further analysis. However, you can additionally save the results
 in a .csv file, allowing you to export the predictions to other
-programs.
+programs. The resulting data table may look like shown in Figure 25.
+
+![Figure 25: Classifier - Prediction Results](gui_aife_studio_classifier_predictions.jpg){width="100%"}
 
 ### 3.4.3 Documenting a Classifier
 
 Documenting a classifier is similar to the documentation of a text
-embedding model (section 3.3.3).
+embedding model (section 3.3.3, see Figure 18).
 
 To support developers in documenting their work, *Aifeducation Studio*
 provides an easy way to add a comprehensive description. You find this

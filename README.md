@@ -54,18 +54,34 @@ future, more tasks will be implemented.
 You can install the latest stable version of the package from CRAN with:
 
 ``` r
+#Minimal version
 install.packages("aifeducation")
+
+#Full version
+install.packages("aifeducation",dependencies=TRUE)
 ```
 
 You can install the development version of *aifeducation* from
 [GitHub](https://github.com/) with:
 
 ``` r
+#Minimal version
+install.packages("devtools")
+devtools::install_github(repo="FBerding/aifeducation",
+                         ref="master",
+                         dependencies = "Imports")
+                         
+#Maximal version
 install.packages("devtools")
 devtools::install_github(repo="FBerding/aifeducation",
                          ref="master",
                          dependencies = TRUE)
 ```
+
+The minimal version includes all functions but is limited to the use of
+transformers. The full version additionally includes Aifeducation Studio
+(graphical user interface) and older approaches (GlobalVectors, Topic
+Modeling).
 
 Further instructions for installation can be found in vignette [01 Get
 Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
@@ -73,9 +89,18 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 ## Graphical User Interface *Aifeducation Studio*
 
 The package ships with a shiny app that serves as a graphical user
-interface. *Aifeducation Studio* allows users to easily develop, train,
-apply, document, and analyse AI models without any coding skills. See
-the corresponding vignette for more details: [02a Classification
+interface.
+
+<figure>
+<img src="man/figures/gui_aife_readme.jpg" style="width:100.0%"
+alt="Figure 1: Aifeducation Studio" />
+<figcaption aria-hidden="true">Figure 1: Aifeducation
+Studio</figcaption>
+</figure>
+
+*Aifeducation Studio* allows users to easily develop, train, apply,
+document, and analyse AI models without any coding skills. See the
+corresponding vignette for more details: [02a Classification
 Tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 
 ## Sustainability
