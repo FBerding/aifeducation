@@ -6,9 +6,10 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  install = "all",
+  install = "pytorch",
   tf_version = "<=2.14",
   pytorch_cuda_version = "12.1",
+  python_version = "3.9",
   remove_first = FALSE,
   cpu_only = FALSE
 )
@@ -25,6 +26,8 @@ should be installed. \code{install="all"}  for 'pytorch' and 'tensorflow'.
 
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for
 'PyTorch'.}
+
+\item{python_version}{\code{string} Python version to use.}
 
 \item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before
 recreating the environment and installing the packages. If \code{FALSE} the packages

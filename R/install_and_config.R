@@ -10,6 +10,7 @@
 #'@param tf_version \code{string} determining the desired version of 'tensorflow'.
 #'@param pytorch_cuda_version \code{string} determining the desired version of 'cuda' for
 #''PyTorch'.
+#'@param python_version \code{string} Python version to use.
 #'@param remove_first \code{bool} If \code{TRUE} removes the environment completely before
 #'recreating the environment and installing the packages. If \code{FALSE} the packages
 #'are installed in the existing environment without any prior changes.
@@ -18,21 +19,23 @@
 #'@return Returns no values or objects. Function is used for installing the
 #'necessary python libraries in a conda environment.
 #'@importFrom reticulate conda_create
+#'@importFrom reticulate conda_remove
+#'@importFrom reticulate condaenv_exists
 #'@importFrom reticulate py_install
 #'@importFrom utils compareVersion
 #'@family Installation and Configuration
 #'@export
 install_py_modules<-function(envname="aifeducation",
-                             install="all",
+                             install="pytorch",
                              tf_version="<=2.14",
                              pytorch_cuda_version="12.1",
+                             python_version="3.9",
                              remove_first=FALSE,
                              cpu_only=FALSE){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
-                      "codecarbon"
-                      )
+                      "codecarbon")
   relevant_modules_pt<-c("safetensors",
                          "torcheval",
                          "accelerate")
@@ -42,15 +45,20 @@ install_py_modules<-function(envname="aifeducation",
     stop("install must be all, pytorch or tensorflow.")
   }
 
-  if(remove_first==TRUE){
-    if(reticulate::condaenv_exists(envname = envname)==TRUE){
+  if(reticulate::condaenv_exists(envname = envname)==TRUE){
+    if(remove_first==TRUE){
       reticulate::conda_remove(envname = envname)
+      reticulate::conda_create(
+        envname = envname,
+        channel=c("conda-forge"),
+        python_version = python_version
+      )
     }
-
+  } else {
     reticulate::conda_create(
       envname = envname,
       channel=c("conda-forge"),
-      python_version = "3.9"
+      python_version = python_version
     )
   }
 
@@ -60,7 +68,6 @@ install_py_modules<-function(envname="aifeducation",
       reticulate::conda_install(
         packages = c(
           "tensorflow-cpu",
-          "torch",
           "keras"),
         envname = envname,
         conda = "auto",
@@ -81,14 +88,14 @@ install_py_modules<-function(envname="aifeducation",
         envname = envname,
         conda = "auto",
         pip = FALSE)
-
-      reticulate::conda_install(
-        packages = relevant_modules,
-        envname = envname,
-        conda = "auto",
-        pip = TRUE
-      )
     }
+
+    reticulate::conda_install(
+      packages = relevant_modules,
+      envname = envname,
+      conda = "auto",
+      pip = TRUE
+    )
   }
 
     if(install=="all" | install=="pytorch"){
