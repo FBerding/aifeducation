@@ -59,6 +59,8 @@ example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
 
 print(check_aif_py_modules())
 
+ml_frameworks<-c("pytorch")
+
 for(framework in ml_frameworks){
 
 for(ai_method in ai_methods){

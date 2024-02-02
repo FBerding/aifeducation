@@ -954,7 +954,7 @@ start_aifeducation_studio<-function(){
       }
 
       py_torch_table[2,1]<-"torcheval"
-      if(reticulate::py_module_available("torch")==TRUE){
+      if(reticulate::py_module_available("torcheval")==TRUE){
         py_torch_table[2,2]<-TRUE
         py_torch_table[2,3]<-torcheval["__version__"]
       } else {

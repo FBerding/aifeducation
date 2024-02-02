@@ -1107,6 +1107,12 @@ TextEmbeddingModel<-R6::R6Class(
           if(private$transformer_components$ml_framework=="pytorch"){
             #Set model to evaluation mode
             private$transformer_components$model$eval()
+            if(torch$cuda$is_available()){
+              pytorch_device="cuda"
+            } else {
+              pytorch_device="cpu"
+            }
+            private$transformer_components$model$to(pytorch_device)
           }
 
           #tokens<-self$encode(raw_text = raw_text,
@@ -1136,9 +1142,9 @@ TextEmbeddingModel<-R6::R6Class(
             tokens$encodings$set_format(type="tensorflow")
 
             tensor_embeddings<-private$transformer_components$model(
-              input_ids=tokens$encodings["input_ids"],
-              attention_mask=tokens$encodings["attention_mask"],
-              token_type_ids=tokens$encodings["token_type_ids"],
+              input_ids=tokens$encodings["input_ids"]$to(pytorch_device),
+              attention_mask=tokens$encodings["attention_mask"]$to(pytorch_device),
+              token_type_ids=tokens$encodings["token_type_ids"]$to(pytorch_device),
               output_hidden_states=TRUE)$hidden_states
           } else {
             #Clear memory

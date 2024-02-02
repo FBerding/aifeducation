@@ -296,16 +296,17 @@ set_transformers_logger<-function(level="ERROR"){
 AifeducationConfiguration<-R6::R6Class(
   classname = "aifeducationConfiguration",
   private = list(
+    ml_framework_config=list(
     global_ml_framework="not_specified",
     TextEmbeddingFramework="not_specified",
-    ClassifierFramework="not_specified"
+    ClassifierFramework="not_specified")
   ),
   public = list(
     #'@description Method for requesting the used machine learning framework.
     #'@return Returns a \code{string} containing the used machine learning framework
     #'for \link{TextEmbeddingModel}s as well as for \link{TextEmbeddingClassifierNeuralNet}.
     get_framework=function(){
-      return(private$global_ml_framework)
+      return(private$ml_framework_config)
     },
     #'@description Method for setting the global machine learning framework.
     #'@param backend \code{string} Framework to use for training and inference.
@@ -324,7 +325,9 @@ AifeducationConfiguration<-R6::R6Class(
       #    private$TextEmbeddingFramework=backend
       #    private$ClassifierFramework=backend
 
-      private$global_ml_framework=backend
+      private$ml_framework_config$global_ml_framework=backend
+      private$ml_framework_config$TextEmbeddingFramework=backend
+      private$ml_framework_config$ClassifierFramework=backend
       os$environ$setdefault("KERAS_BACKEND","tensorflow")
       cat("Global Backend set to:",backend,"\n")
 
@@ -339,7 +342,7 @@ AifeducationConfiguration<-R6::R6Class(
     #'@return Return \code{TRUE} if the global machine learning framework is set.
     #'Otherwise \code{FALSE}.
     global_framework_set=function(){
-      if(private$global_ml_framework=="not_specified"){
+      if(private$ml_framework_config$global_ml_framework=="not_specified"){
         return(FALSE)
       } else {
         return(TRUE)
