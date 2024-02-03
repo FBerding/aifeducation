@@ -1190,9 +1190,16 @@ TextEmbeddingModel<-R6::R6Class(
                     tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy()
                   )
                 } else {
-                  text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
-                    tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$numpy()
-                  )
+                  if(torch$cuda$is_available()==FALSE){
+                    text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$numpy()
+                    )
+                  } else {
+                    text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$cpu()$numpy()
+                    )
+                  }
+
                 }
 
               }
@@ -1333,6 +1340,7 @@ TextEmbeddingModel<-R6::R6Class(
     fill_mask=function(text,n_solutions=5){
       if(private$transformer_components$ml_framework=="pytorch"){
         framework="pt"
+        private$transformer_components$model_mlm$to("cpu")
       } else {
         framework="tf"
       }

@@ -1738,7 +1738,9 @@ start_aifeducation_studio<-function(){
     train_tune_model_architecture<-shiny::eventReactive(model_path_train_LM(),{
       shinyWidgets::show_alert(title="Loading",
                                text = "Please wait",
-                               type="info")
+                               type="info",
+                               closeOnClickOutside = FALSE,
+                               showCloseButton = FALSE)
       model_path<-model_path_train_LM()
       if(!is.null(model_path)){
         if(file.exists(paste0(model_path,
@@ -2404,7 +2406,9 @@ start_aifeducation_studio<-function(){
       if(length(model_path)>0){
         shinyWidgets::show_alert(title="Loading",
                    text = "Please wait",
-                   type="info")
+                   type="info",
+                   closeOnClickOutside = FALSE,
+                   showCloseButton = FALSE)
         model=try(load_ai_model(model_dir = model_path,
                                 ml_framework=input$config_ml_framework),
                   silent = TRUE)
@@ -3191,7 +3195,9 @@ start_aifeducation_studio<-function(){
         if(file.exists(file_path)==TRUE){
           shinyWidgets::show_alert(title="Loading",
                      text = "Please wait",
-                     type="info")
+                     type="info",
+                     closeOnClickOutside = FALSE,
+                     showCloseButton = FALSE)
           file=load(file_path)
           embeddings=get(x=file)
           if(("EmbeddedText" %in% class(embeddings))==TRUE){
@@ -3288,7 +3294,9 @@ start_aifeducation_studio<-function(){
           #extension=stringi::stri_trans_tolower(extension[[length(extension)]])
           shinyWidgets::show_alert(title="Loading",
                      text = "Please wait",
-                     type="info")
+                     type="info",
+                     closeOnClickOutside = FALSE,
+                     showCloseButton = FALSE)
           if(extension=="csv"|extension=="txt"){
             target_data=try(as.data.frame(
               utils::read.csv2(file = file_path,
@@ -3638,7 +3646,9 @@ start_aifeducation_studio<-function(){
       if(length(model_path)>0){
         shinyWidgets::show_alert(title="Loading",
                    text = "Please wait",
-                   type="info")
+                   type="info",
+                   closeOnClickOutside = FALSE,
+                   showCloseButton = FALSE)
         classifier<-try(load_ai_model(model_dir = model_path,
                                       ml_framework=input$config_ml_framework),
                         silent = TRUE)
@@ -3866,7 +3876,7 @@ start_aifeducation_studio<-function(){
                                  )
                                )
                            ),
-                           shinydashboard::box(title="Measures",
+                           shinydashboard::box(title="Measures - Content Analysis",
                                solidHeader = TRUE,
                                status = "primary",
                                width = 12,
@@ -3894,7 +3904,12 @@ start_aifeducation_studio<-function(){
                                    shiny::tags$p(shiny::tags$b("Beta Reliability")),
                                    shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
                                    shiny::tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
-
+                               ),
+                               shinydashboard::box(title="Measures - Machine Learning",
+                                   solidHeader = TRUE,
+                                   status = "primary",
+                                   width = 12,
+                                   shiny::renderTable(classifier$reliability$standard_measures_mean)
                                )
                            )
                   ),
@@ -4295,7 +4310,9 @@ start_aifeducation_studio<-function(){
         if(file.exists(file_path)==TRUE){
           shinyWidgets::show_alert(title="Loading",
                      text = "Please wait",
-                     type="info")
+                     type="info",
+                     closeOnClickOutside = FALSE,
+                     showCloseButton = FALSE)
           file=load(file_path)
           embeddings=get(x=file)
           if(("EmbeddedText" %in% class(embeddings))==TRUE){
