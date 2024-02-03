@@ -24,7 +24,7 @@ editor_options:
 -   Added a new argument to the method 'decode', allowing to chose
     between decoding into single tokens or into plain text.
 -   Fixed a bug for embedding texts when using pytorch. The fix should
-    decrease computational time.
+    decrease computational time and enables gpu support (if available on machine).
 
 **TextEmbeddingClassifiers**
 

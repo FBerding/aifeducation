@@ -265,18 +265,11 @@ to install only ‘PyTorch’ or ‘tensorflow’ set
 loading the package the first time. If you load the library without
 installing the necessary modules an error may occur.</p>
 <p>This function installs the following python modules:</p>
-<ul>
-<li>transformers,</li>
-<li>tokenizers,</li>
-<li>datasets,</li>
-<li>torch,</li>
-<li>torcheval,</li>
-<li>safetensors,</li>
-<li>keras,</li>
-<li>tensorflow</li>
-<li>codecarbon</li>
-<li>accelerate</li>
-</ul>
+<p><strong>both frameworks:</strong> - transformers, - tokenizers, -
+datasets, - codecarbon</p>
+<p><strong>Pytorch</strong> - torch, - torcheval, - safetensors, -
+accelerate</p>
+<p><strong>Tensorflow</strong> - keras, - tensorflow</p>
 <p>and its dependencies in the environment “aifeducation”.</p>
 <p>If you would like to use <em>aifeducation</em> with other packages or
 within other environments, please ensure that these python modules are
@@ -385,6 +378,46 @@ tasks</a>.</p>
 classification tasks can be found in vignette <a href="classification_tasks.html">02b classification tasks</a>.</p>
 <p>Documenting and sharing your work is described in vignette <a href="sharing_and_publishing.html">03 sharing and using trained
 AI/models</a></p>
+</div>
+<div class="section level2">
+<h2 id="update-aifeducation">5) Update <em>aifeducation</em><a class="anchor" aria-label="anchor" href="#update-aifeducation"></a>
+</h2>
+<p>In the case you already use <em>aifeducation</em> and you want to
+update to a newer version of this package it is recommended to update
+the used python libraries. The easiest way is to remove the conda
+environment “aifeducation” and to install the libraries into a fresh
+environment. This can be done by setting <code>remove_first=TRUE</code>
+in <code>install_py_modules</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co">#For Linux</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">TRUE</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#For Windows with gpu support</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">TRUE</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.10"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#For Windows without gpu support</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">TRUE</span>,</span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">TRUE</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#For MacOS</span></span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">TRUE</span>,</span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.14"</span>,</span>
+<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
+<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

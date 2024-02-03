@@ -100,6 +100,12 @@ transformers. The full version additionally includes Aifeducation Studio
 Further instructions for installation can be found in vignette [01 Get
 Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 
+> Please note that an update of your version of *aifeducation* may require
+an update of your python libraries. Refer to
+[01 Get
+Started](https://fberding.github.io/aifeducation/articles/aifeducation.html)
+for more details.
+
 ## Graphical User Interface *Aifeducation Studio*
 
 The package ships with a shiny app that serves as a graphical user
@@ -121,7 +127,7 @@ for CPUs, GPUs and RAM during training and derives a value for CO2
 emission. This value is based on the energy mix in the country where the
 computer is located.
 
-## PyTorch and Tensorflow Compatiblity
+## PyTorch and Tensorflow Compatibility
 
 This package allows all supported models either based on 'PyTorch' or
 'tensorflow', thus providing a high level of flexibility. Even
@@ -271,7 +277,7 @@ Using a pre-trained AI for classification only requires the classifier
 and the corresponding text embedding model. Use *Aifeducation Studio* or
 just load both to *R* and start predictions. Vignette [02a Using
 Aifeducation
-Studio][<https://fberding.github.io/aifeducation/articles/gui_aife_studio.html>]
+Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
 describes how to use the user interface. Vignette [02b Classification
 Tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
 describes how to save and load the objects with *R* syntax. In vignette

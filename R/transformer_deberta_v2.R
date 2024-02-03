@@ -695,7 +695,7 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       save_freq="epoch",
       save_weights_only= TRUE)
 
-    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
+    if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
       if(shiny::isRunning()){
         shiny_app_active=TRUE
         reticulate::py_run_file(system.file("python/keras_callbacks.py",

@@ -735,7 +735,7 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
     )
 
     #Add Callback if Shiny App is running
-    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
+    if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
       if(shiny::isRunning()){
         shiny_app_active=TRUE
         reticulate::py_run_file(system.file("python/keras_callbacks.py",

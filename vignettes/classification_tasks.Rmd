@@ -865,44 +865,54 @@ to a model are stored.
 save_ai_model(
   model=topic_modeling, 
   model_dir="text_embedding_models",
+  dir_name="model_topic_modeling",
+  save_format="default",
   append_ID=FALSE)
 
 save_ai_model(
   model=global_vector_clusters_modeling, 
   model_dir="text_embedding_models",
+    dir_name="model_global_vectors",
+  save_format="default",
   append_ID=FALSE)
 
 save_ai_model(
   model=bert_modeling, 
   model_dir="text_embedding_models",
+  dir_name="model_transformer_bert",
+  save_format="default",
   append_ID=FALSE)
 ```
 
 As you can see all three text embedding models are saved within the same
 directory named "text_embedding_models". Within this directory the function
-creates a unique folder for every model. The name of the folder is created 
-by using the models' names. Since the files are stored with
-a special structure please do **not** change the files manually. 
+creates a unique folder for every model. The name of this folder is
+specified with `dir_name`.
 
-If you change the argument `append_ID` to `append_ID=TRUE` the unique ID of the model
-is added to the directory. The ID is added automatically to ensure
+If you set `dir_name=NULL` and `append_ID=FALSE` the the name of the folder is created 
+by using the models' names. 
+If you change the argument `append_ID` to `append_ID=TRUE` and set `dir_name=NULL`
+the unique ID of the model is added to the directory. The ID is added automatically to ensure
 that every model has a unique name. This is important if you would like to share your 
 work with other persons. 
+
+> Since the files are stored with
+a special structure please do **not** change the files manually.
 
 If you want to load your model, just call the function `load_ai_model` and you can continue
 using your model.
 
 ```{r, include = TRUE, eval=FALSE}
 topic_modeling<-load_ai_model(
-  model_dir="text_embedding_models/topic_model_embedding",
+  model_dir="text_embedding_models/model_topic_modeling",
   ml_framework=aifeducation_config$get_framework())
 
 global_vector_clusters_modeling<-load_ai_model(
-  model_dir="text_embedding_models/global_vector_clusters_embedding",
+  model_dir="text_embedding_models/model_global_vectors",
   ml_framework=aifeducation_config$get_framework())
 
 bert_modeling<-load_ai_model(
-  model_dir="text_embedding_models/bert_embedding",
+  model_dir="text_embedding_models/model_transformer_bert",
   ml_framework=aifeducation_config$get_framework())
 ```
 
@@ -1306,20 +1316,27 @@ to pass the model and a directory path to the function `save_ai_model`.
 save_ai_model(
   model=classifier,
   model_dir="classifiers",
-  save_format = "keras",
+  dir_name="movie_classifier",
+  save_format = "default",
   append_ID=FALSE)
 ```
 
-In contrast to text embedding models you can specify the additional argument `save_format`
-allowing you to choose between `save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
+In contrast to text embedding models you can specify the additional argument `save_format`.
+In the case of pytorch models this arguments allows you to choose between
+`save_format = "safetensors"` and `save_format = "pt"`.
+We recommend to chose `save_format = "safetensors"` since this is a safer method
+to save your models.
+In the case of tensorflow models this arguments allows you to choose between
+`save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
 We recommend to chose `save_format = "keras"` since this is the recommended format
-by keras. Classifiers created for pytorch are saved as .pt in all cases. Thus,
-`save_format` is ignored.
+by keras. 
+If you set `save_format = "default"` .safetensors is used for pytorch models and
+.keras is used for tensorflow models.
 
 If you would like to load a model you can call the function `load_ai_model`.
 ```{r, include = TRUE, eval=FALSE}
 classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier")
+  model_dir="classifiers/movie_classifier")
 ```
 
 > **Note:** Classifiers depend on the framework which was used during creation. 

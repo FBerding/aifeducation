@@ -27,3 +27,4 @@ cran-comments.md
 ^doc$
 ^Meta$
 gui_aife_studio.Rmd
+intel_power_gadget_log.csv

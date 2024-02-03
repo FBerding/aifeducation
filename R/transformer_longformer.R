@@ -670,7 +670,7 @@ train_tune_longformer_model=function(ml_framework=aifeducation_config$get_framew
       save_weights_only= TRUE)
 
     #Add Callback if Shiny App is running
-    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
+    if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
       if(shiny::isRunning()){
         shiny_app_active=TRUE
         reticulate::py_run_file(system.file("python/keras_callbacks.py",

@@ -1,6 +1,6 @@
 #'Aifeducation Studio
 #'
-#'Functions starts a shiny app that represents the Aifeducation Studio
+#'Functions starts a shiny app that represents Aifeducation Studio
 #'
 #'@return This function does nothing return. It is used to start a shiny app.
 #'
@@ -3329,6 +3329,7 @@ start_aifeducation_studio<-function(){
             return(NULL)
           } else {
             if("id"%in%colnames(target_data)){
+              rownames(target_data)=target_data$id
               shinyWidgets::closeSweetAlert()
               return(target_data)
             } else {

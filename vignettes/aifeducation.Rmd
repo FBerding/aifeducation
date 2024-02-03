@@ -183,16 +183,21 @@ an error may occur.
 
 This function installs the following python modules:
 
+**both frameworks:**
 -   transformers,
 -   tokenizers,
 -   datasets,
+-   codecarbon
+
+**Pytorch**
 -   torch,
 -   torcheval,
 -   safetensors,
--   keras,
--   tensorflow 
--   codecarbon
 -   accelerate
+
+**Tensorflow**
+-   keras,
+-   tensorflow
 
 and its dependencies in the environment "aifeducation". 
     
@@ -315,3 +320,46 @@ package with examples for classification tasks can be found in vignette
 
 Documenting and sharing your work is described in vignette
 [03 sharing and using trained AI/models](sharing_and_publishing.html)
+
+# 5) Update *aifeducation*
+
+In the case you already use *aifeducation* and you want to update to a newer version
+of this package it is recommended to update the used python libraries. The
+easiest way is to remove the conda environment "aifeducation" and to install the
+libraries into a fresh environment. This can be done by setting `remove_first=TRUE`
+in `install_py_modules`.
+
+```{r, include = TRUE, eval=FALSE}
+#For Linux
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=FALSE)
+
+#For Windows with gpu support
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.10",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=FALSE)
+#For Windows without gpu support
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=TRUE)
+
+#For MacOS
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=TRUE)
+```
+
+

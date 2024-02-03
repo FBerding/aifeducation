@@ -66,7 +66,7 @@
 <ul><li>Added a method for ‘fill-mask’.</li>
 <li>Added a new argument to the method ‘encode’, allowing to chose between encoding into token ids or into token strings.</li>
 <li>Added a new argument to the method ‘decode’, allowing to chose between decoding into single tokens or into plain text.</li>
-<li>Fixed a bug for embedding texts when using pytorch. The fix should decrease computational time.</li>
+<li>Fixed a bug for embedding texts when using pytorch. The fix should decrease computational time and enables gpu support (if available on machine).</li>
 </ul><p><strong>TextEmbeddingClassifiers</strong></p>
 <ul><li>Adding support for pytorch without the need for kerasV3 or keras-core. Classifiers for pytorch are now implemented in native pytorch.</li>
 <li>Changed the architecture for new classifiers and extended the abilities of neural nets by adding the possibility to add positional embedding.</li>
