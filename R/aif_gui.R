@@ -90,6 +90,13 @@ start_aifeducation_studio<-function(){
   }
 
   #Exporting Functions for Python
+  #assign(x="py_update_aifeducation_progress_bar_epochs",
+  #              value=reticulate::py_func(update_aifeducation_progress_bar_epochs),
+  #              assign.env=globalenv())
+  #assign(x="py_update_aifeducation_progress_bar_steps",
+  #              value = reticulate::py_func(update_aifeducation_progress_bar_steps),
+  #              assign.env=globalenv())
+
   #These functions must be available in the global environment
   #if(is.null(py_update_aifeducation_progress_bar_epochs)){
   #  stop("Update function for epochs is not available.")

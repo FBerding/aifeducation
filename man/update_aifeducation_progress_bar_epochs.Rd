@@ -33,4 +33,3 @@ Other Auxiliary GUI Functions:
 \code{\link{update_aifeducation_progress_bar}()}
 }
 \concept{Auxiliary GUI Functions}
-\keyword{internal}

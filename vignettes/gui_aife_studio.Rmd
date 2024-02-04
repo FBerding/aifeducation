@@ -188,7 +188,7 @@ choose the machine learning framework that you would like to use during
 the session (box *Machine Learning Framework*). This choice cannot be changed after the session
 starts. To change the framework you have to restart *Aifeducation Studio*.
 
-![Figure 4: Start Page](gui_aife_studio_config.jpg){width="100%"}
+![Figure 4: Start Page](img_articles/gui_aife_studio_config.jpg){width="100%"}
 
 Depending on the chosen framework, you can activate some further
 settings (box *Machine Learning Framework*). If you would like to use tensorflow and your
@@ -225,7 +225,7 @@ predicting the texts' labels via classifier.
 To create a collection of raw texts, you have to choose the 
 *Data Preparation* page on the right side as shown in Figure 5. 
 
-![Figure 5: Start Page](gui_aife_studio_home.jpg){width="100%"} 
+![Figure 5: Start Page](img_articles/gui_aife_studio_home.jpg){width="100%"} 
 
 On the
 resulting page (see Figure 6), you first have to choose the directory where the texts
@@ -234,7 +234,7 @@ like to use in a single folder. Within this folder, you can structure
 your data with sub-folders. In case you use sub-folders, please ensure
 that you include them for creating a collection of raw texts.
 
-![Figure 6: Data Preparation Page](gui_aife_studio_create_text_collection.jpg){width="100%"}
+![Figure 6: Data Preparation Page](img_articles/gui_aife_studio_create_text_collection.jpg){width="100%"}
 
 In the next step, you can decide which file formats should be included
 (box *File Types*). Currently, *aifeducation* supports .pdf, .csv, and .xlsx
@@ -247,7 +247,7 @@ shown in Figure 7. The name for the corresponding columns must be
 identical for all files and you have to provide the column names (first row in
 Figure 7).
 
-![Figure 7: Structure of Raw Texts within an Excel Sheet](gui_excel_raw_texts.png){width="50%"}
+![Figure 7: Structure of Raw Texts within an Excel Sheet](img_articles/gui_excel_raw_texts.png){width="50%"}
 
 The last step is to choose a folder where your collection of raw texts
 should be saved. Please select a folder and provide a name for your file
@@ -263,7 +263,7 @@ are set to the IDs stored in the corresponding column for ID. In the
 case of .pdf and .csv files, the file names are used as ID (without the
 file extension, see Figure 8).
 
-![Figure 8: Filnames as IDs](gui_excel_raw_texts_ids.png){width="50%"}
+![Figure 8: Filnames as IDs](img_articles/gui_excel_raw_texts_ids.png){width="50%"}
 
 > Please note that a consequence of this is that two files *text_01.csv*
 > and *text_01.pdf* have the same ID, which is not allowed. Please
@@ -280,7 +280,7 @@ ID and one or multiple columns that contain the texts'
 categories/classes. Supported file formats are .xlsx, .csv, and
 .rda/.rdata. Figure 9 illustrates an example for a .xslx file.
 
-![Figure 9: Filnames as IDs](gui_excel_target_data.png){width="50%"}
+![Figure 9: Filnames as IDs](img_articles/gui_excel_target_data.png){width="50%"}
 
 > In any case, the table must contain a column with the name "id" which
 > contains the texts' IDs. All other columns must also have unique
@@ -311,7 +311,7 @@ In order to create a new base model you have to choose the option
 *Create* on the tab *Language Modeling* for the *Base Models* on the right side of the
 app (Figure 5). 
 
-[![Figure 10: Language Modeling - Create Transformer](gui_aife_studio_create_transformer.jpg){width="100%"}](gui_aife_studio_create_transformer.jpg)
+[![Figure 10: Language Modeling - Create Transformer](img_articles/gui_aife_studio_create_transformer.jpg){width="100%"}](img_articles/gui_aife_studio_create_transformer.jpg)
 Figure 10: Language Modeling - Create Transformer (click image to enlarge)
 
 Every transformer model is composed of two parts: 1) the tokenizer which
@@ -360,7 +360,7 @@ language or task, you have to click on "Train/Tune" on the right side of
 the app. You can find this option via "Language Modeling" as shown in
 Figure 5.
 
-[![Figure 11: Language Modeling - Train/Tune  Transformer](gui_aife_studio_train_transformer.jpg){width="100%"}](gui_aife_studio_train_transformer.jpg)
+[![Figure 11: Language Modeling - Train/Tune  Transformer](img_articles/gui_aife_studio_train_transformer.jpg){width="100%"}](img_articles/gui_aife_studio_train_transformer.jpg)
 Figure 11: Language Modeling - Train/Tune  Transformer (click image to enlarge)
 
 In the first step, you have to choose the base model you would like to
@@ -435,7 +435,7 @@ ability to understand natural language. You can open the creation page
 by clicking on "Create" in the section "Text Embedding Model" 
 via "Language Modeling" (see Figure 5).
 
-[![Figure 12: Text Embedding Model - Create](gui_aife_studio_emb_interface_create.jpg){width="100%"}](gui_aife_studio_emb_interface_create.jpg)
+[![Figure 12: Text Embedding Model - Create](img_articles/gui_aife_studio_emb_interface_create.jpg){width="100%"}](img_articles/gui_aife_studio_emb_interface_create.jpg)
 Figure 12: Text Embedding Model - Create (click image to enlarge)
 
 First you have to choose the base model that should form the foundation
@@ -499,7 +499,7 @@ different aspects of the model and how you can use it.
 The tab *Model Description* provides you with the documentation of the
 model.
 
-[![Figure 13: Text Embedding Model - Description](gui_aife_studio_emb_interface_use_desc.jpg){width="100%"}](gui_aife_studio_emb_interface_use_desc.jpg)
+[![Figure 13: Text Embedding Model - Description](img_articles/gui_aife_studio_emb_interface_use_desc.jpg){width="100%"}](img_articles/gui_aife_studio_emb_interface_use_desc.jpg)
 Figure 13: Text Embedding Model - Description (click image to enlarge)
  
 The tab *Create Text Embeddings* allows you to transform raw texts into
@@ -514,7 +514,7 @@ many raw texts should be processed simultaneously. Please adjust this
 value to your machine's capacities. By clicking on the button "Start
 Embed" the transformation of texts begins.
 
-[![Figure 14: Text Embedding Model - Embeddings](gui_aife_studio_emb_interface_use_embed.jpg){width="100%"}](gui_aife_studio_emb_interface_use_embed.jpg)
+[![Figure 14: Text Embedding Model - Embeddings](img_articles/gui_aife_studio_emb_interface_use_embed.jpg){width="100%"}](img_articles/gui_aife_studio_emb_interface_use_embed.jpg)
 Figure 14: Text Embedding Model - Embeddings (click image to enlarge)
 
 The tab *Encode/Decode/Tokenize* offers you insights into the way your
@@ -527,7 +527,7 @@ insert a sequence of numbers (separated with a comma or with spaces) and
 after clicking on *Decode,* the corresponding tokens and the raw text
 appear.
 
-[![Figure 15: Text Embedding Model - Encode/Decode/Tokenize](gui_aife_studio_emb_interface_use_encode_decode.jpg){width="100%"}](gui_aife_studio_emb_interface_use_encode_decode.jpg)
+[![Figure 15: Text Embedding Model - Encode/Decode/Tokenize](img_articles/gui_aife_studio_emb_interface_use_encode_decode.jpg){width="100%"}](img_articles/gui_aife_studio_emb_interface_use_encode_decode.jpg)
 Figure 15: Text Embedding Model - Encode/Decode/Tokenize (click image to enlarge)
 
 Finally, the tab *Fill Mask* allows you to request the underlying base
@@ -543,7 +543,7 @@ most reasonable token for the selected gap. The tokens are ordered by
 certainty; from the perspective of the model, the most reasonable tokens
 are at the top and the less reasonable tokens are at the bottom.
 
-[![Figure 16: Text Embedding Model - Fill Mask](gui_aife_studio_emb_interface_use_fill_mask.jpg){width="100%"}](gui_aife_studio_emb_interface_use_fill_mask.jpg)
+[![Figure 16: Text Embedding Model - Fill Mask](img_articles/gui_aife_studio_emb_interface_use_fill_mask.jpg){width="100%"}](img_articles/gui_aife_studio_emb_interface_use_fill_mask.jpg)
 Figure 16: Text Embedding Model - Fill Mask (click image to enlarge)
 
 ### 3.3.3 Documenting a Text Embedding Model
@@ -568,7 +568,7 @@ can provide the names and email addresses of all relevant contributors.
 refers to the people who adapted a pre-trained model to another domain or
 task.
 
-[![Figure 17: Text Embedding Model - Documentation](gui_aife_studio_emb_doc.jpg){width="100%"}](gui_aife_studio_emb_doc.jpg)
+[![Figure 17: Text Embedding Model - Documentation](img_articles/gui_aife_studio_emb_doc.jpg){width="100%"}](img_articles/gui_aife_studio_emb_doc.jpg)
 Figure 17: Text Embedding Model - Documentation (click image to enlarge)
 
 In the tabs *Abstract* and *Description,* you can provide an abstract
@@ -591,7 +591,7 @@ possible by clicking on *Save*.
 Classifiers are built on top of a text embedding model. To create a
 classifier, click on "Create and Train" in the tab *Classification* (see Figure 5).
 
-[![Figure 18: Classifier - Creation Part 1](gui_aife_studio_classifier_create_part_1.jpg){width="100%"}](gui_aife_studio_classifier_create_part_1.jpg)
+[![Figure 18: Classifier - Creation Part 1](img_articles/gui_aife_studio_classifier_create_part_1.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_create_part_1.jpg)
 Figure 18: Classifier - Creation Part 1 (click image to enlarge)
 
 Creating a classifier requires two kinds of data. First, a text
@@ -630,7 +630,7 @@ machine while the *Model Label* is used as a title of your classifiers
 for other users. Thus, the *Model Name* should not contain any spaces or
 special characters. For *Model Label,* there are no restrictions.
 
-[![Figure 19: Classifier - Creation Part 2](gui_aife_studio_classifier_create_part_2.jpg){width="100%"}](gui_aife_studio_classifier_create_part_2.jpg)
+[![Figure 19: Classifier - Creation Part 2](img_articles/gui_aife_studio_classifier_create_part_2.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_create_part_2.jpg)
 Figure 19: Classifier - Creation Part 2 (click image to enlarge)
 
 To expand the different sections you can click on the "+" on the right
@@ -772,7 +772,7 @@ al. (2020). Therefore, the following parameters have to be set:
     the highest certainty are used for training.)
 
 
-[![Figure 20: Classifier - Creation Part 3](gui_aife_studio_classifier_create_part_3.jpg){width="100%"}](gui_aife_studio_classifier_create_part_3.jpg)
+[![Figure 20: Classifier - Creation Part 3](img_articles/gui_aife_studio_classifier_create_part_3.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_create_part_3.jpg)
 Figure 20: Classifier - Creation Part 3 (click image to enlarge)
 
 In the last box (Figure 20), you have to provide the directory where you would like
@@ -803,7 +803,7 @@ appears.
 In the first tab, *Model Description,* you will find the documentation
 of the model.
 
-[![Figure 21: Classifier - Description](gui_aife_studio_classifier_use_desc.jpg){width="100%"}](gui_aife_studio_classifier_use_desc.jpg)
+[![Figure 21: Classifier - Description](img_articles/gui_aife_studio_classifier_use_desc.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_use_desc.jpg)
 Figure 21: Classifier - Description (click image to enlarge)
 
 In the second tab, *Training,* you receive a summary of the training
@@ -812,7 +812,7 @@ accuracy, and the balanced accuracy for every fold and every epoch.
 Depending on the applied training techniques (such as *Balanced
 Pseudo-Labeling*), you can request additional images.
 
-[![Figure 22: Classifier - Training](gui_aife_studio_classifier_use_train.jpg){width="100%"}](gui_aife_studio_classifier_use_train.jpg)
+[![Figure 22: Classifier - Training](img_articles/gui_aife_studio_classifier_use_train.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_use_train.jpg)
 Figure 22: Classifier - Training (click image to enlarge)
 
 The third tab, *Reliability,* provides you with information on the
@@ -821,7 +821,7 @@ into how the classifier is able to generate reliable results. In
 addition, measures from content analysis as well as machine learning
 allow you to analyze specific aspects of the model's performance.
 
-[![Figure 23: Classifier - Reliability](gui_aife_studio_classifier_use_reliability.jpg){width="100%"}](gui_aife_studio_classifier_use_reliability.jpg)
+[![Figure 23: Classifier - Reliability](img_articles/gui_aife_studio_classifier_use_reliability.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_use_reliability.jpg)
 Figure 23: Classifier - Reliability (click image to enlarge)
 
 The last tab, *Prediction,* allows you to apply a trained model to new
@@ -832,7 +832,7 @@ classify. You can create these embeddings with the text embedding model
 used for providing the training data of the classifier. The necessary
 steps are described in section 3.3.2.
 
-[![Figure 24: Classifier - Prediction](gui_aife_studio_classifier_use_predictions.jpg){width="100%"}](gui_aife_studio_classifier_use_predictions.jpg)
+[![Figure 24: Classifier - Prediction](img_articles/gui_aife_studio_classifier_use_predictions.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_use_predictions.jpg)
 Figure 24: Classifier - Prediction (click image to enlarge)
 
 > These embeddings must be created with the same text embedding model
@@ -846,7 +846,7 @@ predictions in an .rda file, allowing you to load the data directly into
 in a .csv file, allowing you to export the predictions to other
 programs. The resulting data table may look like shown in Figure 25.
 
-[![Figure 25: Classifier - Prediction Results](gui_aife_studio_classifier_predictions.jpg){width="100%"}](gui_aife_studio_classifier_predictions.jpg)
+[![Figure 25: Classifier - Prediction Results](img_articles/gui_aife_studio_classifier_predictions.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_predictions.jpg)
 Figure 25: Classifier - Prediction Results (click image to enlarge)
 
 ### 3.4.3 Documenting a Classifier

@@ -17,12 +17,12 @@ aifeducation_config<-NULL
 #These both functions allow to update the progressbar in the shiny app
 #Aifeducation Studio during training
 #Delayed is necessary in order to allow the user to choose a conda environment.
-delayedAssign(x="py_update_aifeducation_progress_bar_epochs",
-              value=reticulate::py_func(update_aifeducation_progress_bar_epochs),
-              assign.env=globalenv())
-delayedAssign(x="py_update_aifeducation_progress_bar_steps",
-              value = reticulate::py_func(update_aifeducation_progress_bar_steps),
-              assign.env=globalenv())
+#delayedAssign(x="py_update_aifeducation_progress_bar_epochs",
+#              value=reticulate::py_func(update_aifeducation_progress_bar_epochs),
+#              assign.env=globalenv())
+#delayedAssign(x="py_update_aifeducation_progress_bar_steps",
+#              value = reticulate::py_func(update_aifeducation_progress_bar_steps),
+#              assign.env=globalenv())
 
 #py_update_aifeducation_progress_bar_epochs=NULL
 #py_update_aifeducation_progress_bar_steps=NULL
@@ -46,6 +46,13 @@ delayedAssign(x="py_update_aifeducation_progress_bar_steps",
 
   codecarbon<<-reticulate::import("codecarbon", delay_load = TRUE)
   keras<<-reticulate::import("keras", delay_load = TRUE)
+
+  delayedAssign(x="py_update_aifeducation_progress_bar_epochs",
+                value=reticulate::py_func(update_aifeducation_progress_bar_epochs),
+                assign.env=globalenv())
+  delayedAssign(x="py_update_aifeducation_progress_bar_steps",
+                value = reticulate::py_func(update_aifeducation_progress_bar_steps),
+                assign.env=globalenv())
 
   aifeducation_config<<-AifeducationConfiguration$new()
 }

@@ -44,7 +44,7 @@ Imports:
     abind,
     foreach,
     doParallel,
-    iotarelr(>= 0.1.4),
+    iotarelr(>= 0.1.5),
     irr,
     irrCAC,
     methods,

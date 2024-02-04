@@ -10,9 +10,9 @@
 #'\code{"pgr_bar_aifeducation"}.
 #'
 #'@family Auxiliary GUI Functions
-#'@keywords internal
+#'@export
 update_aifeducation_progress_bar<-function(value,total,title=NULL){
-  if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
+  if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
     if(shiny::isRunning()){
       shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation",
                         value = value,
@@ -40,7 +40,7 @@ update_aifeducation_progress_bar<-function(value,total,title=NULL){
 #'implemented separately.
 #'
 #'@family Auxiliary GUI Functions
-#'@keywords internal
+#'@export
 update_aifeducation_progress_bar_epochs<-function(value,total,title=NULL){
   shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation_epochs",
                         value = value,
@@ -66,7 +66,7 @@ update_aifeducation_progress_bar_epochs<-function(value,total,title=NULL){
 #'implemented separately.
 #'
 #'@family Auxiliary GUI Functions
-#'@keywords internal
+#'@export
 update_aifeducation_progress_bar_steps<-function(value,total,title=NULL){
   shinyWidgets::updateProgressBar(id="pgr_bar_aifeducation_steps",
                         value = value,

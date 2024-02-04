@@ -10,6 +10,6 @@ start_aifeducation_studio()
 This function does nothing return. It is used to start a shiny app.
 }
 \description{
-Functions starts a shiny app that represents the Aifeducation Studio
+Functions starts a shiny app that represents Aifeducation Studio
 }
 \concept{Graphical User Interface}

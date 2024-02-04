@@ -134,7 +134,6 @@ class AddPositionalEmbedding_PT(torch.nn.Module):
     input=torch.arange(start=1, end=(self.sequence_length+1), step=1)
     input=input.repeat(x.shape[0], 1)
     input.masked_fill_(mask,value=0)
-    
     embedded_positions_masked=self.embedding(input)
    
     return x+embedded_positions_masked
@@ -291,26 +290,26 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     if predication_mode==False:
       return self.model(x)
     else:
-      device=('cuda' if torch.cuda.is_available() else 'cpu')
-      if device=="cpu":
-        self.model.to(device,dtype=float)
-      else:
-        self.model.to(device)
       if self.n_target_levels>2:
         return torch.nn.Softmax(dim=1)(self.model(x))
       else:
         return torch.nn.Sigmoid()(self.model(x))
     
   
-def TeClassifierTrain_PT(model,loss_fct, optimizer, epochs, trace,batch_size,
+def TeClassifierTrain_PT(model,loss_fct, optimizer_method, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,test_data=None,shiny_app_active=False):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
-  if device=="cpu":
-    model.to(device,dtype=float)
-  else:
-    model.to(device)
+  #if device=="cpu":
+  model.to(device,dtype=float)
+  #else:
+  #  model.to(device,dtype=torch.double)
+  
+  if optimizer_method=="adam":
+    optimizer=torch.optim.Adam(model.parameters())
+  elif optimizer_method=="rmsprop":
+    optimizer=torch.optim.RMSprop(model.parameters())
   
   trainloader=torch.utils.data.DataLoader(
     train_data,
@@ -368,6 +367,7 @@ train_data,val_data,filepath,use_callback,n_classes,test_data=None,shiny_app_act
       
       inputs = inputs.to(device)
       labels=labels.to(device)
+      sample_weights=sample_weights.to(device)
       
       optimizer.zero_grad()
       

@@ -2694,9 +2694,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           reduction="none",
           weight = torch$tensor(np$array(class_weights)))
         if(self$model_config$optimizer=="adam"){
-          optimizer=torch$optim$Adam(model$parameters())
+          optimizer="adam"
         } else if (self$model_config$optimizer=="rmsprop"){
-          optimizer=torch$optim$RMSprop(model$parameters())
+          optimizer="rmsprop"
         }
       }
 
@@ -2793,7 +2793,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
         history=py$TeClassifierTrain_PT(
           model=model,
           loss_fct=loss,
-          optimizer=optimizer,
+          optimizer_method=optimizer,
           epochs=as.integer(epochs),
           trace=as.integer(pytorch_trace),
           use_callback=use_callback,
