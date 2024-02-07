@@ -175,7 +175,8 @@ aifeducation::install_py_modules(envname="aifeducation",
 > With `install="all"` you can decide which machine learning framework should be
 installed. Use `install="all"` to request the installation of both 'PyTorch' and
 'tensorflow'. If you would like to install only 'PyTorch' or 'tensorflow' set
-`install="pytorch"` or `install="tenorflow"`.
+`install="pytorch"` or `install="tenorflow"`. Starting with version 0.3.1 tensorflow
+of version 2.13 or higher is necessary.
 
 It is very important that you call this function *before* loading the package
 the first time. If you load the library without installing the necessary modules

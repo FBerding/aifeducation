@@ -89,24 +89,10 @@ start_aifeducation_studio<-function(){
     stop("No available machine learning frameworks found.")
   }
 
-  #Exporting Functions for Python
-  #assign(x="py_update_aifeducation_progress_bar_epochs",
-  #              value=reticulate::py_func(update_aifeducation_progress_bar_epochs),
-  #              assign.env=globalenv())
-  #assign(x="py_update_aifeducation_progress_bar_steps",
-  #              value = reticulate::py_func(update_aifeducation_progress_bar_steps),
-  #              assign.env=globalenv())
-
-  #These functions must be available in the global environment
-  #if(is.null(py_update_aifeducation_progress_bar_epochs)){
-  #  stop("Update function for epochs is not available.")
-  #}
-  #if(is.null(py_update_aifeducation_progress_bar_steps)){
-  #  stop("Update function for steps is not available.")
-  #}
-
-  #py_update_aifeducation_progress_bar_epochs<-reticulate::py_func(update_aifeducation_progress_bar_epochs)
-  #py_update_aifeducation_progress_bar_steps<-reticulate::py_func(update_aifeducation_progress_bar_steps)
+  #Set Transformer Logger to Error
+  set_transformers_logger(level="ERROR")
+  #Disable tqdm progressbar
+  transformers$utils$logging$disable_progress_bar()
 
   #Start GUI--------------------------------------------------------------------
   options(shiny.reactlog=TRUE)

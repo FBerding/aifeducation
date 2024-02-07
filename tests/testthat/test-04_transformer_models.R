@@ -12,6 +12,7 @@ transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM","false")
 set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
+transformers$utils$logging$disable_progress_bar()
 
 if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
   dir.create(testthat::test_path("test_artefacts"))
