@@ -1264,14 +1264,14 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
 
       standard_measures_mean_table<-matrix(
-        nrow = length(self$model_config$targets_level_order),
+        nrow = length(self$model_config$target_levels),
         ncol = 3,
         data = 0)
       colnames(standard_measures_mean_table)=c("precision","recall","f1")
-      rownames(standard_measures_mean_table)<-self$model_config$targets_level_order
+      rownames(standard_measures_mean_table)<-self$model_config$target_levels
 
       for(i in 1:folds$n_folds){
-        for(tmp_cat in self$model_config$targets_level_order){
+        for(tmp_cat in self$model_config$target_levels){
           standard_measures_mean_table[tmp_cat,"precision"]=standard_measures_mean_table[tmp_cat,"precision"]+
             self$reliability$standard_measures_end[[i]][tmp_cat,"precision"]
           standard_measures_mean_table[tmp_cat,"recall"]=standard_measures_mean_table[tmp_cat,"recall"]+
@@ -1824,10 +1824,23 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           #  batch_size=as.integer(batch_size),
           #  shuffle=FALSE)
 
-          model$eval()
-          predictions_prob<-model(torch$from_numpy(np$array(real_newdata)),
-                                  predication_mode=TRUE)$detach()$numpy()
-          #predictions_prob<-model(x = predictloader)
+          if(torch$cuda$is_available()){
+            device="cuda"
+            dtype=torch$double
+            model$to(device)
+            model$eval()
+            input=torch$from_numpy(np$array(real_newdata))
+            predictions_prob<-model(input$to(device,dtype=dtype),
+                                    predication_mode=TRUE)$detach()$cpu()$numpy()
+          } else {
+            device="cpu"
+            dtype=torch$float
+            model$to(device,dtype=dtype)
+            model$eval()
+            input=torch$from_numpy(np$array(real_newdata))
+            predictions_prob<-model(input$to(device,dtype=dtype),
+                                    predication_mode=TRUE)$detach()$numpy()
+          }
         }
 
 
@@ -1840,18 +1853,23 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             batch_size = as.integer(batch_size),
             verbose=as.integer(verbose))
         } else if(private$ml_framework=="pytorch"){
-          #pytorch_predict_data=torch$utils$data$TensorDataset(
-          #  torch$from_numpy(np$array(real_newdata)))
-          #predictloader=torch$utils$data$DataLoader(
-          #  pytorch_predict_data,
-          #  batch_size=as.integer(batch_size),
-          #  shuffle=FALSE)
-
-          #predictions_prob<-model(x = predictloader)
-          model$eval()
-          predictions_prob<-model(torch$from_numpy(np$array(real_newdata)),
-                                  predication_mode=TRUE)$detach()$numpy()
-          #predictions_prob<-as.vector(predictions_prob$numpy)
+          if(torch$cuda$is_available()){
+            device="cuda"
+            dtype=torch$double
+            model$to(device)
+            model$eval()
+            input=torch$from_numpy(np$array(real_newdata))
+            predictions_prob<-model(input$to(device,dtype=dtype),
+                                    predication_mode=TRUE)$detach()$cpu()$numpy()
+          } else {
+            device="cpu"
+            dtype=torch$float
+            model$to(device,dtype=dtype)
+            model$eval()
+            input=torch$from_numpy(np$array(real_newdata))
+            predictions_prob<-model(input$to(device,dtype=dtype),
+                                    predication_mode=TRUE)$detach()$numpy()
+          }
         }
 
 
@@ -2690,9 +2708,10 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             metrics=c(self$model_config$metric,balanced_metric))
         }
       } else if(private$ml_framework=="pytorch"){
-        loss=torch$nn$CrossEntropyLoss(
-          reduction="none",
-          weight = torch$tensor(np$array(class_weights)))
+        #loss=torch$nn$CrossEntropyLoss(
+        #  reduction="none",
+        #  weight = torch$tensor(np$array(class_weights)))
+        loss_fct_name="CrossEntropyLoss"
         if(self$model_config$optimizer=="adam"){
           optimizer="adam"
         } else if (self$model_config$optimizer=="rmsprop"){
@@ -2792,7 +2811,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
         history=py$TeClassifierTrain_PT(
           model=model,
-          loss_fct=loss,
+          loss_fct_name=loss_fct_name,
           optimizer_method=optimizer,
           epochs=as.integer(epochs),
           trace=as.integer(pytorch_trace),
@@ -2804,7 +2823,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           #filepath=paste0(dir_checkpoint,"/checkpoints/best_weights.pt"),
           filepath=paste0(dir_checkpoint,"/checkpoints/best_weights.safetensors"),
           n_classes=n_classes,
-          shiny_app_active=shiny_app_active)
+          shiny_app_active=shiny_app_active,
+          class_weights=torch$tensor(np$array(class_weights)))
 
         self$model=model
         self$model_config$input_variables<-variable_name_order

@@ -38,7 +38,7 @@ start_aifeducation_studio<-function(){
 
   missing_r_packages=NULL
   for(i in 1:length(r_packages)){
-    if(requireNamespace(r_packages[i])==FALSE){
+    if(requireNamespace(r_packages[i],quietly = TRUE,)==FALSE){
       missing_r_packages=append(x=missing_r_packages,
                                 values = r_packages[i] )
     }
@@ -464,7 +464,7 @@ start_aifeducation_studio<-function(){
                                                           max=0.99,
                                                           step = 0.01)
                                           ),
-                                          shinydashboard::box(title = "Reccurent Layers",
+                                          shinydashboard::box(title = "Recurrent Layers",
                                               width = 12,
                                               solidHeader = FALSE,
                                               status = "primary",

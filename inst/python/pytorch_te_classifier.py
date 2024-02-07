@@ -130,17 +130,23 @@ class AddPositionalEmbedding_PT(torch.nn.Module):
     
   def forward(self, x):
     mask=self.get_mask(x)
+    device=('cuda' if torch.cuda.is_available() else 'cpu')
 
-    input=torch.arange(start=1, end=(self.sequence_length+1), step=1)
-    input=input.repeat(x.shape[0], 1)
-    input.masked_fill_(mask,value=0)
-    embedded_positions_masked=self.embedding(input)
+    input_seq=torch.arange(start=1, end=(self.sequence_length+1), step=1)
+    input_seq=input_seq.to(device)
+    
+    input_seq=input_seq.repeat(x.shape[0], 1)
+    input_seq.masked_fill_(mask,value=0)
+    embedded_positions_masked=self.embedding(input_seq)
    
     return x+embedded_positions_masked
   
   def get_mask(self,x):
-     with torch.no_grad():
-      return ~torch.sum(x,dim=2,dtype=torch.bool)
+    device=('cuda' if torch.cuda.is_available() else 'cpu')
+    with torch.no_grad():
+      masks=~torch.sum(x,dim=2,dtype=torch.bool)
+      masks=masks.to(device)
+      return masks
  
 class GlobalAveragePooling1D_PT(torch.nn.Module):
   def __init__(self,sequence_length):
@@ -296,20 +302,28 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
         return torch.nn.Sigmoid()(self.model(x))
     
   
-def TeClassifierTrain_PT(model,loss_fct, optimizer_method, epochs, trace,batch_size,
-train_data,val_data,filepath,use_callback,n_classes,test_data=None,shiny_app_active=False):
+def TeClassifierTrain_PT(model,loss_fct_name, optimizer_method, epochs, trace,batch_size,
+train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
+shiny_app_active=False):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
-  #if device=="cpu":
-  model.to(device,dtype=float)
-  #else:
-  #  model.to(device,dtype=torch.double)
+  if device=="cpu":
+    model.to(device,dtype=float)
+  else:
+    model.to(device,dtype=torch.double)
   
   if optimizer_method=="adam":
     optimizer=torch.optim.Adam(model.parameters())
   elif optimizer_method=="rmsprop":
     optimizer=torch.optim.RMSprop(model.parameters())
+    
+  class_weights=class_weights.clone()
+  class_weights=class_weights.to(device)
+  if loss_fct_name=="CrossEntropyLoss":
+    loss_fct=torch.nn.CrossEntropyLoss(
+      reduction="none",
+      weight = class_weights)
   
   trainloader=torch.utils.data.DataLoader(
     train_data,
@@ -354,6 +368,7 @@ train_data,val_data,filepath,use_callback,n_classes,test_data=None,shiny_app_act
     n_matches_train=0
     n_total_train=0
     confusion_matrix_train=torch.zeros(size=(n_classes,n_classes))
+    confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
     
     #Gui ProgressBar
     if shiny_app_active is True:
@@ -412,6 +427,7 @@ train_data,val_data,filepath,use_callback,n_classes,test_data=None,shiny_app_act
     n_total_val=0
     
     confusion_matrix_val=torch.zeros(size=(n_classes,n_classes))
+    confusion_matrix_val=confusion_matrix_val.to(device,dtype=torch.double)
 
     model.eval()
     with torch.no_grad():
@@ -457,6 +473,7 @@ train_data,val_data,filepath,use_callback,n_classes,test_data=None,shiny_app_act
       n_total_test=0
       
       confusion_matrix_test=torch.zeros(size=(n_classes,n_classes))
+      confusion_matrix_test=confusion_matrix_test.to(device,dtype=torch.double)
   
       model.eval()
       with torch.no_grad():
