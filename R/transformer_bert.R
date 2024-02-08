@@ -809,6 +809,8 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
       )
     }
 
+    rm(tokenized_texts)
+
     tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="torch")
 

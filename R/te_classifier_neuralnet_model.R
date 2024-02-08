@@ -1827,7 +1827,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           if(torch$cuda$is_available()){
             device="cuda"
             dtype=torch$double
-            model$to(device)
+            model$to(device,dtype=dtype)
             model$eval()
             input=torch$from_numpy(np$array(real_newdata))
             predictions_prob<-model(input$to(device,dtype=dtype),
@@ -1856,7 +1856,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
           if(torch$cuda$is_available()){
             device="cuda"
             dtype=torch$double
-            model$to(device)
+            model$to(device,dtype=dtype)
             model$eval()
             input=torch$from_numpy(np$array(real_newdata))
             predictions_prob<-model(input$to(device,dtype=dtype),
@@ -2109,7 +2109,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
            dir.create(dir_path)
          }
          self$model$save(file_path)
+
        } else if(private$ml_framework=="pytorch"){
+         self$model$to("cpu",dtype=torch$float)
          if(save_format=="safetensors"){
           file_path=paste0(dir_path,"/","model_data",".safetensors")
            if(dir.exists(dir_path)==FALSE){
@@ -2481,7 +2483,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             layer_list[length(layer_list)+1]<-list(
               keras$layers$Dropout(
                 rate = rec_dropout,
-                name=paste0("gru_dropout",i))(layer_list[[length(layer_list)]]))
+                name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
           }
         }
       }
@@ -2506,7 +2508,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
             layer_list[length(layer_list)+1]<-list(
               keras$layers$Dropout(
                 rate = dense_dropout,
-                name=paste0("dense_dropout",i))(layer_list[[length(layer_list)]]))
+                name=paste0("dense_dropout_",i))(layer_list[[length(layer_list)]]))
           }
         }
       }

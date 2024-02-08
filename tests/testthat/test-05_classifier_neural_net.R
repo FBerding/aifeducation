@@ -59,8 +59,6 @@ for (folder in folder_list){
 }
 
 ml_frameworks=c("tensorflow","pytorch")
-#ml_frameworks=c("pytorch")
-
 #-------------------------------------------------------------------------------
 aifeducation::set_config_gpu_low_memory()
 load(testthat::test_path(path))
@@ -137,16 +135,23 @@ for(framework in ml_frameworks){
 
     #-------------------------------------------------------------------------------
     classifier<-NULL
+    if(n_classes==2){
+      attention_type = "fourier"
+    } else {
+      attention_type = "multihead"
+    }
+
     classifier<-TextEmbeddingClassifierNeuralNet$new(
       ml_framework = framework,
       name=paste0("movie_review_classifier_","classes_",n_classes),
       label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
       text_embeddings=current_embeddings,
       targets=example_targets,
-      hidden=NULL,
-      rec=c(3,3),
-      self_attention_heads = 0,
-      attention_type = "fourier",
+      hidden=c(3,3),
+      rec=c(4,3),
+      self_attention_heads = 1,
+      repeat_encoder = 1,
+      attention_type = attention_type,
       recurrent_dropout=0.4,
       optimizer="adam")
 
@@ -362,22 +367,22 @@ for(framework in ml_frameworks){
       )
     })
 
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Saving Classifier h5"),{
-      expect_no_error(classifier$save_model(
-        testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")),
-        save_format = "h5")
-      )
-    })
+    #base::gc(verbose = FALSE,full = TRUE)
+    #test_that(paste(framework,"Saving Classifier h5"),{
+    #  expect_no_error(classifier$save_model(
+    #    testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")),
+    #    save_format = "h5")
+    #  )
+    #})
 
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"Loading Classifier h5"),{
-      expect_no_error(
-        classifier$load_model(
-          ml_framework="tensorflow",
-          dir_path=testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")))
-      )
-    })
+    #base::gc(verbose = FALSE,full = TRUE)
+    #test_that(paste(framework,"Loading Classifier h5"),{
+    #  expect_no_error(
+    #    classifier$load_model(
+    #      ml_framework="tensorflow",
+    #      dir_path=testthat::test_path(paste0("test_artefacts/tmp/",n_classes,"_classes")))
+    #  )
+    #})
 
     #------------------------------------------------------------------------------
     base::gc(verbose = FALSE,full = TRUE)

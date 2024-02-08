@@ -642,6 +642,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     relevant_indices=which(tokenized_dataset["length"]==chunk_size)
     tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
   }
+  rm(tokenized_texts)
 
   n_chunks=tokenized_dataset$num_rows
 

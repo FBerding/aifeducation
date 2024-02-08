@@ -247,15 +247,22 @@ get_coder_metrics<-function(true_values=NULL,
     metric_values["kendall"]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                   correct=TRUE)$value
 
-    metric_values["kappa2_unweighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                                 weight = "unweighted",
-                                                 sort.levels = FALSE)$value
-    metric_values["kappa2_equal_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                        weight = "equal",
-                                        sort.levels = FALSE)$value
-    metric_values["kappa2_squared_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                        weight = "squared",
-                                        sort.levels = FALSE)$value
+    if(length(table(predicted_values))<=1){
+      metric_values["kappa2_unweighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                                     weight = "unweighted",
+                                                     sort.levels = FALSE)$value
+      metric_values["kappa2_equal_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                                         weight = "equal",
+                                                         sort.levels = FALSE)$value
+      metric_values["kappa2_squared_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                                           weight = "squared",
+                                                           sort.levels = FALSE)$value
+    } else {
+      metric_values["kappa2_unweighted"]=NA
+      metric_values["kappa2_equal_weighted"]=NA
+      metric_values["kappa2_squared_weighted"]=NA
+    }
+
 
     metric_values["kappa_fleiss"]=irr::kappam.fleiss(ratings=cbind(true_values,predicted_values),
                                                          exact = FALSE,
@@ -933,9 +940,25 @@ calc_standard_classification_measures<-function(true_values,predicted_values){
     conf_matrix=table(bin_true_values,bin_pred_values)
     conf_matrix=conf_matrix[c("TRUE","FALSE"),c("TRUE","FALSE")]
 
-    recall=conf_matrix[1,1]/(sum(conf_matrix[1,]))
-    precision=conf_matrix[1,1]/sum(conf_matrix[,1])
-    f1=2*precision*recall/(precision+recall)
+    TP_FN=(sum(conf_matrix[1,]))
+    if(TP_FN==0){
+      recall=NA
+    } else {
+      recall=conf_matrix[1,1]/TP_FN
+    }
+
+    TP_FP=sum(conf_matrix[,1])
+    if(TP_FP==0){
+      precision=NA
+    } else {
+      precision=conf_matrix[1,1]/TP_FP
+    }
+
+    if(is.na(recall)|is.na(precision)){
+      f1=NA
+    } else {
+      f1=2*precision*recall/(precision+recall)
+    }
 
     results[categories[i],1]=precision
     results[categories[i],2]=recall

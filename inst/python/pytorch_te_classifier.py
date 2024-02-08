@@ -10,7 +10,7 @@ class PackAndMasking_PT(torch.nn.Module):
   def forward(self,x):
     return torch.nn.utils.rnn.pack_padded_sequence(
     input=x,
-    lengths=self.get_length(x),
+    lengths=self.get_length(x).to("cpu",dtype=torch.int64),
     enforce_sorted=False, 
     batch_first=True)
   
@@ -572,16 +572,16 @@ shiny_app_active=False):
         if trace>=1:
           print("Val Balanced Accuracy increased from {:.4f} to {:.4f}".format(best_bacc,bacc_val))
           print("Save checkpoint to {}".format(filepath))
-        #torch.save(model.state_dict(),filepath)
-        safetensors.torch.save_model(model=model,filename=filepath)
+        torch.save(model.state_dict(),filepath)
+        #safetensors.torch.save_model(model=model,filename=filepath)
         best_bacc=bacc_val
   
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
     if trace>=1:
       print("Load Best Weights from {}".format(filepath))
-    #model.load_state_dict(torch.load(filepath))
-    safetensors.torch.load_model(model=model,filename=filepath)
+    model.load_state_dict(torch.load(filepath))
+    #safetensors.torch.load_model(model=model,filename=filepath)
 
 
   history={
