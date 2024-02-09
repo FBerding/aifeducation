@@ -12,7 +12,9 @@ navbar:
       menu:
       - text: "01 Get started"
         href: "articles/aifeducation.html"
-      - text: "02 Classification tasks"
+      - text: "02a Aifeducation Studio"
+        href: "articles/gui_aife_studio.html"
+      - text: "02b Classification tasks"
         href: "articles/classification_tasks.html"
       - text: "03 Sharing and Using Trained AI/Models"
         href: "articles/sharing_and_publishing.html"
@@ -21,6 +23,10 @@ reference:
 - title: Installation and Configuration
 - contents:
   - has_concept("Installation and Configuration")
+
+- title: Graphical User Interface
+- contents:
+  - has_concept("Graphical User Interface")
 
 - title: Saving and Loading
 - contents:
@@ -45,4 +51,10 @@ reference:
 - title: Auxiliary Functions
 - contents:
   - has_concept("Auxiliary Functions")
+
+- title: Auxiliary GUI Functions
+- contents:
+  - has_concept("Auxiliary GUI Functions")
+
+
 

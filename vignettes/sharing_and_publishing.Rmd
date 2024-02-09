@@ -3,7 +3,7 @@ title: "03 Sharing and Using Trained AI/Models"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Sharing and Using Trained AI/Models}
+  %\VignetteIndexEntry{03 Sharing and Using Trained AI/Models}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -170,27 +170,50 @@ to a model are stored.
 save_ai_model(
   model=topic_modeling, 
   model_dir="text_embedding_models",
-  append_ID=TRUE)
+  append_ID=FALSE)
 
 save_ai_model(
   model=global_vector_clusters_modeling, 
   model_dir="text_embedding_models",
-  append_ID=TRUE)
+  append_ID=FALSE)
 
 save_ai_model(
   model=bert_modeling, 
   model_dir="text_embedding_models",
-  append_ID=TRUE)
+  append_ID=FALSE)
 ```
 
 As you can see all three text embedding models are saved within the same
 directory named "text_embedding_models". Within this directory the function
-creates a unique folder for every model. The name of the folder is created 
-by using the models' names. Since the files are stored with
-a special structure please do **not** edit the files manually. 
+creates a unique folder for every model. The name of this folder is
+specified with `dir_name`.
+
+If you set `dir_name=NULL` and `append_ID=FALSE` the the name of the folder is created 
+by using the models' names. 
+If you change the argument `append_ID` to `append_ID=TRUE` and set `dir_name=NULL`
+the unique ID of the model is added to the directory. The ID is added automatically to ensure
+that every model has a unique name. This is important if you would like to share your 
+work with other persons.
 
 If you want to load your model, just call the function `load_ai_model` and you can continue
-using your model.
+using your model. The following code assumes that you have specified `dir_name` manually.
+
+```{r, include = TRUE, eval=FALSE}
+topic_modeling<-load_ai_model(
+  model_dir="text_embedding_models/model_topic_modeling",
+  ml_framework=aifeducation_config$get_framework())
+
+global_vector_clusters_modeling<-load_ai_model(
+  model_dir="text_embedding_models/model_global_vectors",
+  ml_framework=aifeducation_config$get_framework())
+
+bert_modeling<-load_ai_model(
+  model_dir="text_embedding_models/model_transformer_bert",
+  ml_framework=aifeducation_config$get_framework())
+```
+
+In the case you set `dir_name=NULL` and `append_ID=TRUE` loading the models may
+look as shown in the following code snippet:
 
 ```{r, include = TRUE, eval=FALSE}
 topic_modeling<-load_ai_model(
@@ -202,11 +225,6 @@ global_vector_clusters_modeling<-load_ai_model(
 bert_modeling<-load_ai_model(
   model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
 ```
-
-> **Note:** In the case of transformers you can decide which machine learning framework should
-be used for applying the model by specifying `ml_framework`. Please do *not* edit
-the argument manually. It is recommend that you set your machine learning framework
-at the start of a session with `aifeducation_config$set_global_ml_backend()`.
 
 **Please note that you have to add the name of the model to the directory path.**
 In our example we have stored three models in the directory "text_embedding_models". Each
@@ -223,7 +241,9 @@ setting `append_ID=TRUE`.
 
 Now you are ready to share your work. Just provide all files within your model
 folder. For the BERT model in the example above this would be the folder 
-`"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"`.
+`"text_embedding_models/model_transformer_bert"` or
+`"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"` depending on how 
+you saved the model.
 
 # 3 Classifiers
 
@@ -363,42 +383,49 @@ your changes as described in the following section 3.2.
 If you have created a classifier, saving and loading is very easy due to
 the functions `save_ai_model` and `load_ai_model`. The process
 for saving a model is similar to the process for text embedding models. You only have 
-to pass the model and a directory path to the function `save_ai_model`.
+to pass the model and a directory path to the function `save_ai_model`. The folder
+name is set with `dir_name`.
 
 ```{r, include = TRUE, eval=FALSE}
 save_ai_model(
   model=classifier,
   model_dir="classifiers",
-  save_format = "keras",
-  append_ID = TRUE)
+  dir_name="movie_review_classifier",
+  save_format = "default",
+  append_ID = FALSE)
 ```
 
-In contrast to text embedding models you can specify the additional argument `save_format`
-allowing you to choose between `save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
-We recommend to chose `save_format = "keras"` since this is allows to use the classifier
-with both 'PyTorch' and 'tensorflow'.
+In contrast to text embedding models you can specify the additional argument `save_format`.
+In the case of pytorch models this arguments allows you to choose between
+`save_format = "safetensors"` and `save_format = "pt"`.
+We recommend to chose `save_format = "safetensors"` since this is a safer method
+to save your models.
+In the case of tensorflow models this arguments allows you to choose between
+`save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
+We recommend to chose `save_format = "keras"` since this is the recommended format
+by keras. 
+If you set `save_format = "default"` .safetensors is used for pytorch models and
+.keras is used for tensorflow models.
 
 If you would like to load a model you can call the function `load_ai_model`.
 ```{r, include = TRUE, eval=FALSE}
 classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB")
+  model_dir="classifiers/movie_review_classifier")
 ```
 
-> **Note:** In the documentation of the function you find an argument `ml_framework`.
-Please do *not* change the argument manually since this argument is controlled 
-by the global configuration you have set at the beginning of a session with
-`aifeducation_config$set_global_ml_backend()`.
+> **Note:** Classifiers depend on the framework which was used during creation. 
+Thus, a classifier is always initalized with its original framework. The argument
+`ml_framework` has no effect. 
 
-> **Note:** Since the classifier is written with 'keras' using a classifier with
-'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
-with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
-
-Similar to text embedding models an ID is added to the name during the creation
-of the classifier ensuring a unique name for your model. Thus, you have to specify
-the correct folder for loading a classifier.
+In the case you would like to share your classifier with a broader audience we recommend
+to set `dir_name=NULL` and `append_ID = TRUE`. This will create a folder name
+automatically using the classifier's name and unique ID. 
+Similar to text embedding models ID is added to the name during the creation
+of the classifier ensuring a unique name for your model. With this options
+the folder name may look like `"movie_review_classifier_ID_oWsaNEB7b09A1pPB"`.
 
 If you would like to share your classifier with other persons you have to 
-provide all files within the folder `"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"`.
+provide all files within this folder `"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"`.
 Since all files are stored with a specific structure do **not** change or
 edit the files manually.
 

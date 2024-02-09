@@ -15,7 +15,7 @@ get_synthetic_cases(
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases, this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases, this object is taken from \link{EmbeddedText}$embeddings.}
 
 \item{times}{\code{int} for the number of sequences/times.}
 
@@ -31,13 +31,13 @@ Currently "smote","dbsmote", and "adas" from the package smotefamily are availab
 \value{
 \code{list} with the following components.
 \itemize{
-\item{\code{syntetic_embeddings: }}{Named \code{data.frame} containing the text embeddings of
+\item{\code{syntetic_embeddings: }Named \code{data.frame} containing the text embeddings of
 the synthetic cases.}
 
-\item{\code{syntetic_targets}}{Named \code{factor} containing the labels of the corresponding
+\item{\code{syntetic_targets }Named \code{factor} containing the labels of the corresponding
 synthetic cases.}
 
-\item{\code{n_syntetic_units}}{\code{table} showing the number of synthetic cases for every
+\item{\code{n_syntetic_units }\code{table} showing the number of synthetic cases for every
 label/category.}
 }
 }
@@ -48,6 +48,7 @@ object of the class \link{TextEmbeddingClassifierNeuralNet}.
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -59,6 +60,7 @@ Other Auxiliary Functions:
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}

@@ -36,16 +36,15 @@ should be used to build the vocabulary.}
 \value{
 \code{list} with the following components.
 \itemize{
-\item{\code{vocab}}{\code{data.frame} containing the tokens, lemmas, tokens in lower case, and
+\item{\code{vocab:} \code{data.frame} containing the tokens, lemmas, tokens in lower case, and
 lemmas in lower case.}
-\item{\code{language_model}}{\code{}}
-\item{\code{ud_language_model}}{udpipe language model that is used for tagging.}
-\item{\code{label_language_model}}{Label of the udpipe language model.}
-\item{\code{language}}{Language of the raw texts.}
-\item{\code{upos}}{Used univerisal part-of-speech tags.}
-\item{\code{n_sentence}}{\code{int} Estimated number of sentences in the raw texts.}
-\item{\code{n_token}}{\code{int} Estimated number of tokens in the raw texts.}
-\item{\code{n_document_segments}}{\code{int} Estimated number of document segments/raw texts.}
+\item{\code{ud_language_model} udpipe language model that is used for tagging.}
+\item{\code{label_language_model} Label of the udpipe language model.}
+\item{\code{language} Language of the raw texts.}
+\item{\code{upos} Used univerisal part-of-speech tags.}
+\item{\code{n_sentence} \code{int} Estimated number of sentences in the raw texts.}
+\item{\code{n_token} \code{int} Estimated number of tokens in the raw texts.}
+\item{\code{n_document_segments} \code{int} Estimated number of document segments/raw texts.}
 }
 }
 \description{

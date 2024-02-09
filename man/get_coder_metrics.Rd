@@ -16,29 +16,30 @@ get_coder_metrics(
 \item{predicted_values}{\code{factor} containing the predicted labels/categories.}
 
 \item{return_names_only}{\code{bool} If \code{TRUE} returns only the names
-of the resulting vector. Use {FALSE} to request computation of the values.}
+of the resulting vector. Use \code{FALSE} to request computation of the values.}
 }
 \value{
 If \code{return_names_only=FALSE} returns a \code{vector} with the following reliability measures:
 #'\itemize{
-\item{\strong{iota_index: }}{Iota Index from the Iota Reliability Concept Version 2.}
-\item{\strong{min_iota2: }}{Minimal Iota from Iota Reliability Concept Version 2.}
-\item{\strong{avg_iota2: }}{Average Iota from Iota Reliability Concept Version 2.}
-\item{\strong{max_iota2: }}{Maximum Iota from Iota Reliability Concept Version 2.}
-\item{\strong{min_alpha: }}{Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
-\item{\strong{avg_alpha: }}{Average Alpha Reliability from Iota Reliability Concept Version 2.}
-\item{\strong{max_alpha: }}{Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
-\item{\strong{static_iota_index: }}{Static Iota Index from Iota Reliability Concept Version 2.}
-\item{\strong{dynamic_iota_index: }}{Dynamic Iota Index Iota Reliability Concept Version 2.}
-\item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
-\item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
-\item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
-\item{\strong{kappa2_unweighted: }}{Cohen's Kappa with equal weights.}
-\item{\strong{kappa2_equal_weighted: }}{Weighted Cohen's Kappa with equal weights.}
-\item{\strong{kappa2_squared_weighted: }}{Weighted Cohen's Kappa with squared weights.}
-\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters without exact estimation.}
-\item{\strong{percentage_agreement: }}{Percentage Agreement.}
-\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
+\item{\strong{iota_index: }Iota Index from the Iota Reliability Concept Version 2.}
+\item{\strong{min_iota2: }Minimal Iota from Iota Reliability Concept Version 2.}
+\item{\strong{avg_iota2: }Average Iota from Iota Reliability Concept Version 2.}
+\item{\strong{max_iota2: }Maximum Iota from Iota Reliability Concept Version 2.}
+\item{\strong{min_alpha: }Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
+\item{\strong{avg_alpha: }Average Alpha Reliability from Iota Reliability Concept Version 2.}
+\item{\strong{max_alpha: }Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
+\item{\strong{static_iota_index: }Static Iota Index from Iota Reliability Concept Version 2.}
+\item{\strong{dynamic_iota_index: }Dynamic Iota Index Iota Reliability Concept Version 2.}
+\item{\strong{kalpha_nominal: }Krippendorff's Alpha for nominal variables.}
+\item{\strong{kalpha_ordinal: }Krippendorff's Alpha for ordinal variables.}
+\item{\strong{kendall: }Kendall's coefficient of concordance W.}
+\item{\strong{kappa2_unweighted: }Cohen's Kappa unweighted.}
+\item{\strong{kappa2_equal_weighted: }Weighted Cohen's Kappa with equal weights.}
+\item{\strong{kappa2_squared_weighted: }Weighted Cohen's Kappa with squared weights.}
+\item{\strong{kappa_fleiss: }Fleiss' Kappa for multiple raters without exact estimation.}
+\item{\strong{percentage_agreement: }Percentage Agreement.}
+\item{\strong{balanced_accuracy: }Average accuracy within each class.}
+\item{\strong{gwet_ac: }Gwet's AC1/AC2 agreement coefficient.}
 }
 
 If \code{return_names_only=TRUE} returns only the names of the vector elements.
@@ -50,6 +51,7 @@ empirical research method of content analysis.
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -61,6 +63,7 @@ Other Auxiliary Functions:
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}

@@ -15,13 +15,13 @@ labels.}
 \value{
 Returns a \code{list} with the following components
 \itemize{
-\item{\code{embeddings_labeled: }}{Object of class \link{EmbeddedText} containing
+\item{\code{embeddings_labeled: }Object of class \link{EmbeddedText} containing
 only the cases which have labels.}
 
-\item{\code{embeddings_unlabeled: }}{Object of class \link{EmbeddedText} containing
+\item{\code{embeddings_unlabeled: }Object of class \link{EmbeddedText} containing
 only the cases which have no labels.}
 
-\item{\code{targets_labeled: }}{Named \code{factor} containing the labels of
+\item{\code{targets_labeled: }Named \code{factor} containing the labels of
 relevant cases.}
 }
 }
@@ -31,6 +31,7 @@ This functions splits data into labeled and unlabeled data.
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -42,7 +43,8 @@ Other Auxiliary Functions:
 \code{\link{get_synthetic_cases}()},
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}
 \keyword{internal}

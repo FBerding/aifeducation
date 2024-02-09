@@ -1,9 +1,9 @@
 ---
-title: "02 Text Embedding and Classification Tasks"
+title: "02b Text Embedding and Classification Tasks"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{02 Classification Tasks}
+  %\VignetteIndexEntry{02b Classification Tasks}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -64,9 +64,9 @@ humans. In this
 vignette, we would like to show how to create an AI that can help
 you with such tasks by using the package *aifedcuation*.
 
-**Please note that an introduction to content analysis, natural language
+> Please note that an introduction to content analysis, natural language
 processing or machine learning is beyond the scope of this vignette. If
-you would like to learn more, please refer to the cited literature.**
+you would like to learn more, please refer to the cited literature.
 
 Before we start it is necessary to introduce a definition of our
 understanding of some basic concepts since applying AI to educational
@@ -240,6 +240,10 @@ set_transformers_logger("ERROR")
 aifeducation_config$set_global_ml_backend("pytorch")
 set_transformers_logger("ERROR")
 ```
+
+Setting the global machine learning framework is only for convenience. You can
+change the framework at any time during a session by calling this method again or
+by setting the argument 'ml_framework' of methods and functions manually.
 
 In the case that you would like to use tensorflow now is a good time to 
 configure that backend, since some configurations
@@ -497,8 +501,8 @@ by calling the function `create_bert_model()`. For our example this
 could look like this:
 
 ```{r, include = TRUE, eval=FALSE}
-basic_text_rep<-bow_pp_create_basic_text_rep(
 create_bert_model(
+    ml_framework=aifeducation_config$get_framework(),
     model_dir = "my_own_transformer",
     vocab_raw_texts=example_data$text,
     vocab_size=30522,
@@ -516,6 +520,10 @@ create_bert_model(
     sustain_interval=15,
     trace=TRUE)
 ```
+
+First, the function receives the machine learning framework you chose at the 
+start of the session. However, you can change this by setting `ml_framework="tensorflow"`
+or by `ml_framework="pytorch"`.
 
 For this function to work, you must provide a path to a directory where
 your new transformer should be saved. Furthermore, you must provide raw
@@ -565,6 +573,7 @@ directory. The next step is to train your model by calling
 
 ```{r, include = TRUE, eval=FALSE}
 train_tune_bert_model(
+  ml_framework=aifeducation_config$get_framework(),
   output_dir = "my_own_transformer_trained",
   bert_model_dir_path = "my_own_transformer",
   raw_texts = example_data$text,
@@ -608,9 +617,9 @@ After the training finishes, you can find the transformer ready to use
 in your output_directory. Now you are able to create a text embedding
 model.
 
-> **Note:** In the documentation of the functions you find an argument `ml_framework`.
-Please do *not* change the argument manually since this argument is controlled 
-by the global configuration you have set at the beginning of a session (see section 2).
+Again you can change the machine learning framework by setting `ml_framework="tensorflow"`
+or by `ml_framework="pytorch"`. If you do not change this argument the framework
+you chose at the beginning is used.
 
 # 4 Text Embedding
 
@@ -733,6 +742,7 @@ the other two approaches.
 
 ```{r, include = TRUE, eval=FALSE}
 bert_modeling<-TextEmbeddingModel$new(
+  ml_framework=aifeducation_config$get_framework(),
   model_name="bert_embedding",
   model_label="Text Embedding via BERT",
   model_version="0.0.1",
@@ -787,6 +797,11 @@ should be drawn (`aggregation="last"`). In their initial work, Devlin et al. (20
 the hidden states of different layers for classification.
 
 After deciding about the configuration, you can use your model.
+
+> **Note:** With version 0.3.1 of aifeducation every transformer can be used with both
+machine learning frameworks. Even the pre-trained weights can be used across
+backends. However, in the future models my be implemented that are available only
+for a specific framework. 
 
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
@@ -850,47 +865,62 @@ to a model are stored.
 save_ai_model(
   model=topic_modeling, 
   model_dir="text_embedding_models",
+  dir_name="model_topic_modeling",
+  save_format="default",
   append_ID=FALSE)
 
 save_ai_model(
   model=global_vector_clusters_modeling, 
   model_dir="text_embedding_models",
+    dir_name="model_global_vectors",
+  save_format="default",
   append_ID=FALSE)
 
 save_ai_model(
   model=bert_modeling, 
   model_dir="text_embedding_models",
+  dir_name="model_transformer_bert",
+  save_format="default",
   append_ID=FALSE)
 ```
 
 As you can see all three text embedding models are saved within the same
 directory named "text_embedding_models". Within this directory the function
-creates a unique folder for every model. The name of the folder is created 
-by using the models' names. Since the files are stored with
-a special structure please do **not** change the files manually. 
+creates a unique folder for every model. The name of this folder is
+specified with `dir_name`.
 
-If you change the argument `append_ID` to `append_ID=TRUE` the unique ID of the model
-is added to the directory. The ID is added automatically to ensure
+If you set `dir_name=NULL` and `append_ID=FALSE` the the name of the folder is created 
+by using the models' names. 
+If you change the argument `append_ID` to `append_ID=TRUE` and set `dir_name=NULL`
+the unique ID of the model is added to the directory. The ID is added automatically to ensure
 that every model has a unique name. This is important if you would like to share your 
 work with other persons. 
+
+> Since the files are stored with
+a special structure please do **not** change the files manually.
 
 If you want to load your model, just call the function `load_ai_model` and you can continue
 using your model.
 
 ```{r, include = TRUE, eval=FALSE}
 topic_modeling<-load_ai_model(
-  model_dir="text_embedding_models/topic_model_embedding")
+  model_dir="text_embedding_models/model_topic_modeling",
+  ml_framework=aifeducation_config$get_framework())
 
 global_vector_clusters_modeling<-load_ai_model(
-  model_dir="text_embedding_models/global_vector_clusters_embedding")
+  model_dir="text_embedding_models/model_global_vectors",
+  ml_framework=aifeducation_config$get_framework())
 
 bert_modeling<-load_ai_model(
-  model_dir="text_embedding_models/bert_embedding")
+  model_dir="text_embedding_models/model_transformer_bert",
+  ml_framework=aifeducation_config$get_framework())
 ```
 
-> **Note:** In the documentation of the function you find an argument `ml_framework`.
-Please do *not* change the argument manually since this argument is controlled 
-by the global configuration you have set at the beginning of a session (see section 2).
+With `ml_framework` you can decide which framework the model should use. 
+If you set `ml_framework="auto"` the models will be initialized with the same framework
+during saving the model. Please note
+that at the moment all implemented text embedding models can be used with both frameworks.
+However, this may change in the future. 
 
 **Please note that you have to add the name of the model to the directory path.**
 In our example we have stored three models in the directory "text_embedding_models". Each
@@ -920,19 +950,23 @@ example_targets<-as.factor(example_data$label)
 names(example_targets)=example_data$id
 
 classifier<-TextEmbeddingClassifierNeuralNet$new(
+  ml_framework=aifeducation_config$get_framework(),
   name="movie_review_classifier",
   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings=bert_embeddings,
   targets=example_targets,
   hidden=NULL,
   rec=c(256),
-  self_attention_heads = 2,
-  dropout=0.4,
+  self_attention_heads=2,
+  intermediate_size=512,
+  attention_type="fourier",
+  add_pos_embedding=TRUE,
+  rec_dropout=0.1,
+  repeat_encoder=1,
+  dense_dropout=0.4,
   recurrent_dropout=0.4,
-  l2_regularizer=0.01,
-  optimizer="adam",
-  act_fct="gelu",
-  rec_act_fct="tanh")
+  encoder_dropout=0.1,
+  optimizer="adam")
 ```
 
 Similar to the text embedding model you should provide a name (`name`)
@@ -973,24 +1007,35 @@ use the sequential structure of your data. In all other cases you can
 rely on dense layers only.
 
 If you use text embeddings with more than one chunk, it is a good idea to try self-attention
-layering in order to take the context of all chunks into account. To add
-a self-attention layer you must provide an integer greater 0 to
-`self_attention_heads`. This will not only add a self-attention layer but a
-transformer encoder as described by Chollet, Kalinowski, and
-Allaire (2022, pp. 373). 
+layering in order to take the context of all chunks into account. To add self-attention
+you have two choices:
+- You can use the attention mechanism used in classic transformer models as 
+multihead attention (Vaswani et al. 2017). For this variant you have to set
+`attention_type="multihead`, `repeat_encoder` to a value of at least 1, and
+self_attention_heads`to a value of at least 1. 
+- Furthermore you can use the attention mechanism described in Lee-Thorp et al. (2021) 
+of the FNet model which allows much fast computations at low accuracy costs. To use
+this kind of attention you have to set `attention_type="fourier` and 
+`repeat_encoder` to a value of at least 1.
+
+With `repeat_encoder` you can chose how many times an encoder layer should be added.
+The encoder is implemented as described by Chollet, Kalinowski, and
+Allaire (2022, pp. 373) for both variants of attention. 
+
+You can further extend the abilities of your network by adding positional embeddings.
+Positional embeddings take care for the order of your chunks. Thus, adding such a 
+layer may increase performance if the order of information is important. You can 
+add this layer by setting `add_pos_embedding=TRUE`. The layer is created as
+described by Chollet, Kalinowski, and Allaire (2022, pp. 378)
 
 Masking, normalization, and the creation of the input layer as well as
 the output layer are done automatically.
 
 After you have created a new classifier, you can begin training.
 
-> **Note:** In the documentation of the function you find an argument `ml_framework`.
-Please do *not* change the argument manually since this argument is controlled 
-by the global configuration you have set at the beginning of a session (see section 2).
-
-> **Note:** Since the classifier is written with 'keras' using a classifier with
-'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
-with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
+> **Note:** In contrast to the text embedding models your decision about the 
+machine learning framework is more important since the classifier can only be used
+with the framework you created and trained the model. 
 
 ## 5.2 Training a Classifier
 
@@ -1191,9 +1236,10 @@ analysis. These are
 -   Percentage Agreement
 -   Gwet's AC1/AC2 (Gwet 2014)
 -   Kendall's coefficient of concordance W
+-   Cohen's Kappa unweighted
 -   Cohen's Kappa with equal weights
--   Fleiss' Kappa for multiple raters with exact estimation
--   Light's Kappa for multiple raters
+-   Cohen's Kappa with squared weights
+-   Fleiss' Kappa for multiple raters without exact estimation
 
 You can access the concrete values by accessing the field `reliability`
 which stores all relevant information. In this list you will find the
@@ -1270,28 +1316,32 @@ to pass the model and a directory path to the function `save_ai_model`.
 save_ai_model(
   model=classifier,
   model_dir="classifiers",
-  save_format = "keras",
+  dir_name="movie_classifier",
+  save_format = "default",
   append_ID=FALSE)
 ```
 
-In contrast to text embedding models you can specify the additional argument `save_format`
-allowing you to choose between `save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
-We recommend to chose `save_format = "keras"` since this is allows to use the classifier
-with both 'PyTorch' and 'tensorflow'.
+In contrast to text embedding models you can specify the additional argument `save_format`.
+In the case of pytorch models this arguments allows you to choose between
+`save_format = "safetensors"` and `save_format = "pt"`.
+We recommend to chose `save_format = "safetensors"` since this is a safer method
+to save your models.
+In the case of tensorflow models this arguments allows you to choose between
+`save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
+We recommend to chose `save_format = "keras"` since this is the recommended format
+by keras. 
+If you set `save_format = "default"` .safetensors is used for pytorch models and
+.keras is used for tensorflow models.
 
 If you would like to load a model you can call the function `load_ai_model`.
 ```{r, include = TRUE, eval=FALSE}
 classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier")
+  model_dir="classifiers/movie_classifier")
 ```
 
-> **Note:** In the documentation of the function you find an argument `ml_framework`.
-Please do *not* change the argument manually since this argument is controlled 
-by the global configuration you have set at the beginning of a session (see section 2).
-
-> **Note:** Since the classifier is written with 'keras' using a classifier with
-'PyTorch' requires at least 'keras version 3'. In the case your system is not compatible
-with 'keras version 3' you can sill use the classifiers with 'tensorflow'.
+> **Note:** Classifiers depend on the framework which was used during creation. 
+Thus, a classifier is always initalized with its original framework. The argument
+`ml_framework` has no effect. 
 
 ## 5.6 Predicting New Data
 
@@ -1373,17 +1423,21 @@ Intelligence in Educational Settings.: Introducing a New Reliability
 Concept Based on Content Analysis. Frontiers in Education, 1--21.
 <https://doi.org/10.3389/feduc.2022.818365>
 
-Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum
-Labeling: Revisiting Pseudo-Labeling for Semi-Supervised Learning.
-<https://doi.org/10.48550/arXiv.2001.06001>
-
 Campesato, O. (2021). Natural Language Processing Fundamentals for
 Developers. Mercury Learning & Information.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713>
 
+Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum
+Labeling: Revisiting Pseudo-Labeling for Semi-Supervised Learning.
+<https://doi.org/10.48550/arXiv.2001.06001>
+
 Chollet, F., Kalinowski, T., & Allaire, J. J. (2022). Deep learning with
 R (Second edition). Manning Publications Co.
 <https://learning.oreilly.com/library/view/-/9781633439849/?ar>
+
+Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
+Filtering out Sequential Redundancy for Efficient Language Processing.
+<https://doi.org/10.48550/arXiv.2006.03236>
 
 Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
 Pre-training of Deep Bidirectional Transformers for Language
@@ -1395,6 +1449,10 @@ Association for Computational Linguistics.
 Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive
 guide to measuring the extent of agreement among raters (Fourth
 edition). Gaithersburg: STATAXIS.
+
+He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
+BERT with Disentangled Attention.
+<https://doi.org/10.48550/arXiv.2006.03654>
 
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th ed.). Los Angeles: SAGE.
@@ -1410,6 +1468,14 @@ Research to Practice. New York: Springer.
 Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
 Workshop: Challenges in Representation Learning.
+
+Lee-Thorp, J., Ainslie, J., Eckstein, I. & Ontanon, S. (2021). 
+FNet: Mixing Tokens with Fourier Transforms. <https://doi.org/10.48550/arXiv.2105.03824>
+
+Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
+Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
+Optimized BERT Pretraining Approach.
+<https://doi.org/10.48550/arXiv.1907.11692>
 
 Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
 Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden: Springer.

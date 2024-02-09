@@ -5,7 +5,7 @@
 \title{Function for creating a new transformer based on RoBERTa}
 \usage{
 create_roberta_model(
-  ml_framework = aifeducation_config$get_framework()$TextEmbeddingFramework,
+  ml_framework = aifeducation_config$get_framework(),
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 30522,
@@ -23,7 +23,8 @@ create_roberta_model(
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15,
-  trace = TRUE
+  trace = TRUE,
+  pytorch_safetensors = TRUE
 )
 }
 \arguments{
@@ -80,6 +81,10 @@ usage.}
 
 \item{trace}{\code{bool} \code{TRUE} if information about the progress should be
 printed to the console.}
+
+\item{pytorch_safetensors}{\code{bool} If \code{TRUE} a 'pytorch' model
+is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.}
 }
 \value{
 This function does not return an object. Instead the configuration

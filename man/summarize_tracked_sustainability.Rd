@@ -20,6 +20,7 @@ of the python library 'codecarbon'.
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -31,7 +32,8 @@ Other Auxiliary Functions:
 \code{\link{get_synthetic_cases}()},
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
-\code{\link{split_labeled_unlabeled}()}
+\code{\link{split_labeled_unlabeled}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}
 \keyword{internal}

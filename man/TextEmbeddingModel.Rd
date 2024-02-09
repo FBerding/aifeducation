@@ -28,7 +28,9 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-save_model}{\code{TextEmbeddingModel$save_model()}}
 \item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
 \item \href{#method-TextEmbeddingModel-decode}{\code{TextEmbeddingModel$decode()}}
+\item \href{#method-TextEmbeddingModel-get_special_tokens}{\code{TextEmbeddingModel$get_special_tokens()}}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
+\item \href{#method-TextEmbeddingModel-fill_mask}{\code{TextEmbeddingModel$fill_mask()}}
 \item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
 \item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
 \item \href{#method-TextEmbeddingModel-set_software_license}{\code{TextEmbeddingModel$set_software_license()}}
@@ -43,6 +45,7 @@ Other Text Embedding:
 \item \href{#method-TextEmbeddingModel-get_bow_components}{\code{TextEmbeddingModel$get_bow_components()}}
 \item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
 \item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
+\item \href{#method-TextEmbeddingModel-get_ml_framework}{\code{TextEmbeddingModel$get_ml_framework()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
@@ -146,7 +149,7 @@ fitting cluster if \code{method="glove"}.}
 }
 \subsection{Details}{
 \itemize{
-\item{method: }{In the case of \code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"},
+\item{method: In the case of \code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"},
 a pretrained transformer model
 must be supplied via \code{model_dir}. For \code{method="glove"}
 and \code{method="lda"} a new model will be created based on the data provided
@@ -154,14 +157,14 @@ via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
 are clustered based on their word embeddings with kmeans.}
 
-\item{aggregation: }{For creating a text embedding with a transformer model, several options
+\item{aggregation: For creating a text embedding with a transformer model, several options
 are possible:
 \itemize{
-\item{last: }{\code{aggregation="last"} uses only the hidden states of the last layer.}
-\item{second_to_last: }{\code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
-\item{fourth_to_last: }{\code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
-\item{all: }{\code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
-\item{last_four: }{\code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
+\item{last: \code{aggregation="last"} uses only the hidden states of the last layer.}
+\item{second_to_last: \code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
+\item{fourth_to_last: \code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
+\item{all: \code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
+\item{last_four: \code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
 }}
 
 }
@@ -204,7 +207,7 @@ transformer model into the R interface.
 Method for saving a transformer model on disk.Relevant
 only for transformer models.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_model(model_dir)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save_model(model_dir, save_format = "default")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -212,6 +215,13 @@ only for transformer models.
 \describe{
 \item{\code{model_dir}}{\code{string} containing the path to the relevant
 model directory.}
+
+\item{\code{save_format}}{Format for saving the model. For 'tensorflow'/'keras' models
+\code{"h5"} for HDF5.
+For 'pytorch' models \code{"safetensors"} for 'safetensors' or
+\code{"pt"} for 'pytorch' via pickle.
+Use \code{"default"} for the standard format. This is h5 for
+'tensorflow'/'keras' models and safetensors for 'pytorch' models.}
 }
 \if{html}{\out{</div>}}
 }
@@ -229,6 +239,7 @@ Method for encoding words of raw texts into integers.
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$encode(
   raw_text,
   token_encodings_only = FALSE,
+  to_int = TRUE,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -241,6 +252,10 @@ Method for encoding words of raw texts into integers.
 \item{\code{token_encodings_only}}{\code{bool} If \code{TRUE}, only the token
 encodings are returned. If \code{FALSE}, the complete encoding is returned
 which is important for BERT models.}
+
+\item{\code{to_int}}{\code{bool} If \code{TRUE} the integer ids of the tokens are
+returned. If \code{FALSE} the tokens are returned. Argument only applies
+for transformer models and if \code{token_encodings_only==TRUE}.}
 
 \item{\code{trace}}{\code{bool} If \code{TRUE}, information of the progress
 is printed. \code{FALSE} if not requested.}
@@ -258,19 +273,37 @@ special tokens.
 \subsection{Method \code{decode()}}{
 Method for decoding a sequence of integers into tokens
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$decode(int_seqence)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$decode(int_seqence, to_token = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{int_seqence}}{\code{list} containing the integer sequences which
-should be transformed to tokens or a single integer sequence as \code{vector}}
+should be transformed to tokens or plain text.}
+
+\item{\code{to_token}}{\code{bool} If \code{FALSE} a plain text is returned.
+if \code{TRUE} a sequence of tokens is returned. Argument only relevant
+if the model is based on a transformer.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 \code{list} of token sequences
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_special_tokens"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_special_tokens}{}}}
+\subsection{Method \code{get_special_tokens()}}{
+Method for receiving the special tokens of the model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_special_tokens()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{matrix} containing the special tokens in the rows
+and their type, token, and id in the columns.
 }
 }
 \if{html}{\out{<hr>}}
@@ -309,6 +342,30 @@ should be printed on console.}
 Method returns a \link[R6]{R6} object of class \link{EmbeddedText}. This object
 contains the embeddings as a \code{data.frame} and information about the
 model creating the embeddings.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-fill_mask"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-fill_mask}{}}}
+\subsection{Method \code{fill_mask()}}{
+Method for calculating tokens behind mask tokens.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$fill_mask(text, n_solutions = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text}}{\code{string} Text containing mask tokens.}
+
+\item{\code{n_solutions}}{\code{int} Number estimated tokens for every mask.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{list} containing a \code{data.frame} for every
+mask. The \code{data.frame} contains the solutions in the rows and reports
+the score, token id, and token string in the columns.
 }
 }
 \if{html}{\out{<hr>}}
@@ -569,6 +626,21 @@ during training and an estimate of the resulting CO2 equivalents in kg.
 Returns a \code{matrix} containing the tracked energy consumption,
 CO2 equivalents in kg, information on the tracker used, and technical
 information on the training infrastructure for every training run.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_ml_framework"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_ml_framework}{}}}
+\subsection{Method \code{get_ml_framework()}}{
+Method for requesting the machine learning framework used
+for the classifier.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_ml_framework()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{string} describing the machine learning framework used
+for the classifier
 }
 }
 \if{html}{\out{<hr>}}

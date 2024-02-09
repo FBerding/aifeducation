@@ -18,6 +18,7 @@ tests/testthat/test_artefacts
 _pkgdown.yml
 docs
 ^vignettes/articles$
+^vignettes/img_articles$
 ^\.github$
 checkpoints
 .txt
@@ -26,3 +27,5 @@ cran-comments.md
 ^CRAN-SUBMISSION$
 ^doc$
 ^Meta$
+gui_aife_studio.Rmd
+intel_power_gadget_log.csv

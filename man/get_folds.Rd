@@ -15,13 +15,13 @@ should be declared with \code{NA}.}
 \value{
 Return a \code{list} with the following components:
 \itemize{
-\item{\code{val_sample: }}{\code{vector} of \code{strings} containing the names of cases of the validation sample.}
+\item{\code{val_sample: }\code{vector} of \code{strings} containing the names of cases of the validation sample.}
 
-\item{\code{train_sample: }}{\code{vector} of \code{strings} containing the names of cases of the train sample.}
+\item{\code{train_sample: }\code{vector} of \code{strings} containing the names of cases of the train sample.}
 
-\item{\code{n_folds: }}{\code{int} Number of realized folds.}
+\item{\code{n_folds: }\code{int} Number of realized folds.}
 
-\item{\code{unlabeled_cases: }}{\code{vector} of \code{strings} containing the names of the unlabeled cases.}
+\item{\code{unlabeled_cases: }\code{vector} of \code{strings} containing the names of the unlabeled cases.}
 }
 }
 \description{
@@ -44,6 +44,7 @@ At least four cases per fold are necessary to ensure that the training of
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -55,7 +56,8 @@ Other Auxiliary Functions:
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}
 \keyword{internal}

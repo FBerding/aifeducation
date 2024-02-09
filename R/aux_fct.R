@@ -157,27 +157,28 @@ return(TRUE)
 #'@param true_values \code{factor} containing the true labels/categories.
 #'@param predicted_values \code{factor} containing the predicted labels/categories.
 #'@param return_names_only \code{bool} If \code{TRUE} returns only the names
-#'of the resulting vector. Use {FALSE} to request computation of the values.
+#'of the resulting vector. Use \code{FALSE} to request computation of the values.
 #'@return If \code{return_names_only=FALSE} returns a \code{vector} with the following reliability measures:
 #'#'\itemize{
-#'\item{\strong{iota_index: }}{Iota Index from the Iota Reliability Concept Version 2.}
-#'\item{\strong{min_iota2: }}{Minimal Iota from Iota Reliability Concept Version 2.}
-#'\item{\strong{avg_iota2: }}{Average Iota from Iota Reliability Concept Version 2.}
-#'\item{\strong{max_iota2: }}{Maximum Iota from Iota Reliability Concept Version 2.}
-#'\item{\strong{min_alpha: }}{Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
-#'\item{\strong{avg_alpha: }}{Average Alpha Reliability from Iota Reliability Concept Version 2.}
-#'\item{\strong{max_alpha: }}{Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
-#'\item{\strong{static_iota_index: }}{Static Iota Index from Iota Reliability Concept Version 2.}
-#'\item{\strong{dynamic_iota_index: }}{Dynamic Iota Index Iota Reliability Concept Version 2.}
-#'\item{\strong{kalpha_nominal: }}{Krippendorff's Alpha for nominal variables.}
-#'\item{\strong{kalpha_ordinal: }}{Krippendorff's Alpha for ordinal variables.}
-#'\item{\strong{kendall: }}{Kendall's coefficient of concordance W.}
-#'\item{\strong{kappa2_unweighted: }}{Cohen's Kappa with equal weights.}
-#'\item{\strong{kappa2_equal_weighted: }}{Weighted Cohen's Kappa with equal weights.}
-#'\item{\strong{kappa2_squared_weighted: }}{Weighted Cohen's Kappa with squared weights.}
-#'\item{\strong{kappa_fleiss: }}{Fleiss' Kappa for multiple raters without exact estimation.}
-#'\item{\strong{percentage_agreement: }}{Percentage Agreement.}
-#'\item{\strong{gwet_ac: }}{Gwet's AC1/AC2 agreement coefficient.}
+#'\item{\strong{iota_index: }Iota Index from the Iota Reliability Concept Version 2.}
+#'\item{\strong{min_iota2: }Minimal Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{avg_iota2: }Average Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{max_iota2: }Maximum Iota from Iota Reliability Concept Version 2.}
+#'\item{\strong{min_alpha: }Minmal Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{avg_alpha: }Average Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{max_alpha: }Maximum Alpha Reliability from Iota Reliability Concept Version 2.}
+#'\item{\strong{static_iota_index: }Static Iota Index from Iota Reliability Concept Version 2.}
+#'\item{\strong{dynamic_iota_index: }Dynamic Iota Index Iota Reliability Concept Version 2.}
+#'\item{\strong{kalpha_nominal: }Krippendorff's Alpha for nominal variables.}
+#'\item{\strong{kalpha_ordinal: }Krippendorff's Alpha for ordinal variables.}
+#'\item{\strong{kendall: }Kendall's coefficient of concordance W.}
+#'\item{\strong{kappa2_unweighted: }Cohen's Kappa unweighted.}
+#'\item{\strong{kappa2_equal_weighted: }Weighted Cohen's Kappa with equal weights.}
+#'\item{\strong{kappa2_squared_weighted: }Weighted Cohen's Kappa with squared weights.}
+#'\item{\strong{kappa_fleiss: }Fleiss' Kappa for multiple raters without exact estimation.}
+#'\item{\strong{percentage_agreement: }Percentage Agreement.}
+#'\item{\strong{balanced_accuracy: }Average accuracy within each class.}
+#'\item{\strong{gwet_ac: }Gwet's AC1/AC2 agreement coefficient.}
 #'}
 #'
 #'@return If \code{return_names_only=TRUE} returns only the names of the vector elements.
@@ -206,16 +207,17 @@ get_coder_metrics<-function(true_values=NULL,
                  "kappa2_squared_weighted",
                  "kappa_fleiss",
                  "percentage_agreement",
-                 "gwet_ac")
+                 "balanced_accuracy",
+                 "gwet_ac",
+                 "avg_precision",
+                 "avg_recall",
+                 "avg_f1")
   metric_values=vector(length = length(metric_names))
   names(metric_values)=metric_names
 
   if(return_names_only==TRUE){
     return(metric_names)
   } else {
-    val_res=iotarelr::check_new_rater(true_values = true_values,
-                                      assigned_values = predicted_values,
-                                      free_aem = TRUE)
 
     val_res=iotarelr::check_new_rater(true_values = true_values,
                                       assigned_values = predicted_values,
@@ -245,15 +247,22 @@ get_coder_metrics<-function(true_values=NULL,
     metric_values["kendall"]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                   correct=TRUE)$value
 
-    metric_values["kappa2_unweighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                                 weight = "unweighted",
-                                                 sort.levels = FALSE)$value
-    metric_values["kappa2_equal_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                        weight = "equal",
-                                        sort.levels = FALSE)$value
-    metric_values["kappa2_squared_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
-                                        weight = "squared",
-                                        sort.levels = FALSE)$value
+    if(length(table(predicted_values))<=1){
+      metric_values["kappa2_unweighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                                     weight = "unweighted",
+                                                     sort.levels = FALSE)$value
+      metric_values["kappa2_equal_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                                         weight = "equal",
+                                                         sort.levels = FALSE)$value
+      metric_values["kappa2_squared_weighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
+                                                           weight = "squared",
+                                                           sort.levels = FALSE)$value
+    } else {
+      metric_values["kappa2_unweighted"]=NA
+      metric_values["kappa2_equal_weighted"]=NA
+      metric_values["kappa2_squared_weighted"]=NA
+    }
+
 
     metric_values["kappa_fleiss"]=irr::kappam.fleiss(ratings=cbind(true_values,predicted_values),
                                                          exact = FALSE,
@@ -262,7 +271,16 @@ get_coder_metrics<-function(true_values=NULL,
     metric_values["percentage_agreement"]=irr::agree(ratings=cbind(true_values,predicted_values),
                                                  tolerance = 0)$value/100
 
+    metric_values["balanced_accuracy"]=sum(diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix))/
+      ncol(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
+
     metric_values["gwet_ac"]=irrCAC::gwet.ac1.raw(ratings=cbind(true_values,predicted_values))$est$coeff.val
+
+    standard_measures<-calc_standard_classification_measures(true_values=true_values,
+                                                             predicted_values=predicted_values)
+    metric_values["avg_precision"]<-mean(standard_measures[,"precision"])
+    metric_values["avg_recall"]<-mean(standard_measures[,"recall"])
+    metric_values["avg_f1"]<-mean(standard_measures[,"f1"])
 
     return(metric_values)
   }
@@ -281,13 +299,13 @@ get_coder_metrics<-function(true_values=NULL,
 #'frequency of cases which should be used as validation sample.
 #'@return Returns a \code{list} with the following components.
 #'\itemize{
-#'\item{\code{target_train: }}{Named \code{factor} containing the labels of the training sample.}
+#'\item{\code{target_train: }Named \code{factor} containing the labels of the training sample.}
 #'
-#'\item{\code{embeddings_train: }}{Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
+#'\item{\code{embeddings_train: }Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
 #'
-#'\item{\code{target_test: }}{Named \code{factor} containing the labels of the validation sample.}
+#'\item{\code{target_test: }Named \code{factor} containing the labels of the validation sample.}
 #'
-#'\item{\code{embeddings_test: }}{Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
+#'\item{\code{embeddings_test: }Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
 #'}
 #'@family Auxiliary Functions
 #'@keywords internal
@@ -333,13 +351,13 @@ get_train_test_split<-function(embedding,
 #'
 #'@return Return a \code{list} with the following components:
 #'\itemize{
-#'\item{\code{val_sample: }}{\code{vector} of \code{strings} containing the names of cases of the validation sample.}
+#'\item{\code{val_sample: }\code{vector} of \code{strings} containing the names of cases of the validation sample.}
 #'
-#'\item{\code{train_sample: }}{\code{vector} of \code{strings} containing the names of cases of the train sample.}
+#'\item{\code{train_sample: }\code{vector} of \code{strings} containing the names of cases of the train sample.}
 #'
-#'\item{\code{n_folds: }}{\code{int} Number of realized folds.}
+#'\item{\code{n_folds: }\code{int} Number of realized folds.}
 #'
-#'\item{\code{unlabeled_cases: }}{\code{vector} of \code{strings} containing the names of the unlabeled cases.}
+#'\item{\code{unlabeled_cases: }\code{vector} of \code{strings} containing the names of the unlabeled cases.}
 #'}
 #'@note The parameter \code{target} allows cases with missing categories/labels.
 #'These should be declared with \code{NA}. All these cases are ignored for creating the
@@ -439,13 +457,13 @@ get_folds<-function(target,
 #'labels.
 #'@return Returns a \code{list} with the following components
 #'\itemize{
-#'\item{\code{embeddings_labeled: }}{Object of class \link{EmbeddedText} containing
+#'\item{\code{embeddings_labeled: }Object of class \link{EmbeddedText} containing
 #'only the cases which have labels.}
 #'
-#'\item{\code{embeddings_unlabeled: }}{Object of class \link{EmbeddedText} containing
+#'\item{\code{embeddings_unlabeled: }Object of class \link{EmbeddedText} containing
 #'only the cases which have no labels.}
 #'
-#'\item{\code{targets_labeled: }}{Named \code{factor} containing the labels of
+#'\item{\code{targets_labeled: }Named \code{factor} containing the labels of
 #'relevant cases.}
 #'}
 #'@family Auxiliary Functions
@@ -544,7 +562,7 @@ create_iota2_mean_object<-function(iota2_list,
 #'object of the class \link{TextEmbeddingClassifierNeuralNet}.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases, this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases, this object is taken from \link{EmbeddedText}$embeddings.
 #'@param target Named \code{factor} containing the labels of the corresponding embeddings.
 #'@param times \code{int} for the number of sequences/times.
 #'@param features \code{int} for the number of features within each sequence.
@@ -553,13 +571,13 @@ create_iota2_mean_object<-function(iota2_list,
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
 #'@return \code{list} with the following components.
 #'\itemize{
-#'\item{\code{syntetic_embeddings: }}{Named \code{data.frame} containing the text embeddings of
+#'\item{\code{syntetic_embeddings: }Named \code{data.frame} containing the text embeddings of
 #'the synthetic cases.}
 #'
-#'\item{\code{syntetic_targets}}{Named \code{factor} containing the labels of the corresponding
+#'\item{\code{syntetic_targets }Named \code{factor} containing the labels of the corresponding
 #'synthetic cases.}
 #'
-#'\item{\code{n_syntetic_units}}{\code{table} showing the number of synthetic cases for every
+#'\item{\code{n_syntetic_units }\code{table} showing the number of synthetic cases for every
 #'label/category.}
 #'}
 #'
@@ -700,7 +718,7 @@ for(ckind in chunk_kind){
 #'computations.
 #'
 #'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.
+#'In most cases this object is taken from \link{EmbeddedText}$embeddings.
 #'@param target Named \code{factor} containing the labels/categories of the corresponding cases.
 #'@param k \code{int} The number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
@@ -893,4 +911,59 @@ generate_id<-function(length=16){
     return(id_suffix)
 }
 
+#'Calculate standard classification measures
+#'
+#'Function for calculating recall, precision, and f1.
+#'
+#'@param true_values \code{factor} containing the true labels/categories.
+#'@param predicted_values \code{factor} containing the predicted labels/categories.
+#'@return Returns a matrix which contains the cases categories in the rows and
+#'the measures (precision, recall, f1) in the columns.
+#'
+#'@family Auxiliary Functions
+#'
+#'@export
+calc_standard_classification_measures<-function(true_values,predicted_values){
+  categories=levels(true_values)
+  results<-matrix(nrow = length(categories),
+                  ncol = 3)
+  colnames(results)=c("precision","recall","f1")
+  rownames(results)<-categories
 
+  for(i in 1:length(categories)){
+    bin_true_values=(true_values==categories[i])
+    bin_true_values=factor(as.character(bin_true_values),levels = c("TRUE","FALSE"))
+
+    bin_pred_values=(predicted_values==categories[i])
+    bin_pred_values=factor(as.character(bin_pred_values),levels = c("TRUE","FALSE"))
+
+    conf_matrix=table(bin_true_values,bin_pred_values)
+    conf_matrix=conf_matrix[c("TRUE","FALSE"),c("TRUE","FALSE")]
+
+    TP_FN=(sum(conf_matrix[1,]))
+    if(TP_FN==0){
+      recall=NA
+    } else {
+      recall=conf_matrix[1,1]/TP_FN
+    }
+
+    TP_FP=sum(conf_matrix[,1])
+    if(TP_FP==0){
+      precision=NA
+    } else {
+      precision=conf_matrix[1,1]/TP_FP
+    }
+
+    if(is.na(recall)|is.na(precision)){
+      f1=NA
+    } else {
+      f1=2*precision*recall/(precision+recall)
+    }
+
+    results[categories[i],1]=precision
+    results[categories[i],2]=recall
+    results[categories[i],3]=f1
+  }
+
+  return(results)
+}

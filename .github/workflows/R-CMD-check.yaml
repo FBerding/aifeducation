@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, version_0_3_1_dev]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, version_0_3_1_dev]
 
 name: R-CMD-check
 
@@ -20,12 +20,14 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
+          - {os: macos-latest,   r: 'devel'}
+          - {os: ubuntu-latest,   r: 'devel'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -40,7 +42,7 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: r-reticulate
           auto-update-conda: true
@@ -66,6 +68,8 @@ jobs:
             packages = c(
             "tensorflow-cpu",
             "torch",
+            "torcheval",
+            "safetensors",
             "keras",
             "accelerate"),
             envname = envname,

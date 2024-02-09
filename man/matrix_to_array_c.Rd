@@ -19,11 +19,12 @@ the second to the times, and the third to the features.
 }
 \description{
 Function written in C++ for reshaping a matrix containing sequential data into
-an array for use with 'keras'.
+an array for use with keras.
 }
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -35,6 +36,7 @@ Other Auxiliary Functions:
 \code{\link{get_synthetic_cases}()},
 \code{\link{get_train_test_split}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}

@@ -8,7 +8,7 @@ create_synthetic_units(embedding, target, k, max_k, method, cat, cat_freq)
 }
 \arguments{
 \item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases this object is taken from [EmbeddedText]{EmbeddedText$embeddings}.}
+In most cases this object is taken from \link{EmbeddedText}$embeddings.}
 
 \item{target}{Named \code{factor} containing the labels/categories of the corresponding cases.}
 
@@ -38,6 +38,7 @@ computations.
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{generate_id}()},
@@ -49,6 +50,7 @@ Other Auxiliary Functions:
 \code{\link{get_train_test_split}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}

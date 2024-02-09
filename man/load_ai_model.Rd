@@ -4,7 +4,7 @@
 \alias{load_ai_model}
 \title{Loading models created with 'aifeducation'}
 \usage{
-load_ai_model(model_dir, ml_framework = "auto")
+load_ai_model(model_dir, ml_framework = aifeducation_config$get_framework())
 }
 \arguments{
 \item{model_dir}{Path to the directory where the model is stored.}

@@ -17,13 +17,13 @@ frequency of cases which should be used as validation sample.}
 \value{
 Returns a \code{list} with the following components.
 \itemize{
-\item{\code{target_train: }}{Named \code{factor} containing the labels of the training sample.}
+\item{\code{target_train: }Named \code{factor} containing the labels of the training sample.}
 
-\item{\code{embeddings_train: }}{Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
+\item{\code{embeddings_train: }Object of class \link{EmbeddedText} containing the text embeddings for the training sample}
 
-\item{\code{target_test: }}{Named \code{factor} containing the labels of the validation sample.}
+\item{\code{target_test: }Named \code{factor} containing the labels of the validation sample.}
 
-\item{\code{embeddings_test: }}{Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
+\item{\code{embeddings_test: }Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
 }
 }
 \description{
@@ -34,6 +34,7 @@ equal the relative frequencies of the initial data (proportional stratified samp
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{check_embedding_models}()},
 \code{\link{create_iota2_mean_object}()},
 \code{\link{create_synthetic_units}()},
@@ -45,7 +46,8 @@ Other Auxiliary Functions:
 \code{\link{get_synthetic_cases}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()}
+\code{\link{summarize_tracked_sustainability}()},
+\code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}
 \keyword{internal}

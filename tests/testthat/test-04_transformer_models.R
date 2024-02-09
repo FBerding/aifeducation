@@ -12,6 +12,7 @@ transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM","false")
 set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
+transformers$utils$logging$disable_progress_bar()
 
 if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
   dir.create(testthat::test_path("test_artefacts"))
@@ -56,6 +57,10 @@ example_data<-data.frame(
   id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
   label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
 example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
+
+print(check_aif_py_modules())
+
+#ml_frameworks<-c("pytorch")
 
 for(framework in ml_frameworks){
 
@@ -530,17 +535,69 @@ for(ai_method in ai_methods){
 
       test_that(paste0(ai_method,"encoding",framework), {
         encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
-                                        token_encodings_only = TRUE)
+                                        token_encodings_only = TRUE,
+                                        to_int=TRUE)
+        expect_length(encodings,10)
+        expect_type(encodings,type="list")
+
+        encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
+                                        token_encodings_only = TRUE,
+                                        to_int=FALSE)
         expect_length(encodings,10)
         expect_type(encodings,type="list")
       })
 
       test_that(paste0(ai_method,"decoding_bert",framework), {
         encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
-                                        token_encodings_only = TRUE)
-        decodings<-bert_modeling$decode(encodings)
+                                        token_encodings_only = TRUE,
+                                        to_int=TRUE)
+        decodings<-bert_modeling$decode(encodings,
+                                        to_token = FALSE)
         expect_length(decodings,10)
         expect_type(decodings,type="list")
+
+        decodings<-bert_modeling$decode(encodings,
+                                        to_token = TRUE)
+        expect_length(decodings,10)
+        expect_type(decodings,type="list")
+      })
+
+      test_that(paste0(ai_method,"get_special_tokens",framework), {
+        tokens<-bert_modeling$get_special_tokens()
+        expect_equal(nrow(tokens),7)
+        expect_equal(ncol(tokens),3)
+      })
+
+      test_that(paste0(ai_method,"fill_mask",framework), {
+        tokens<-bert_modeling$get_special_tokens()
+        mask_token<-tokens[which(tokens[,1]=="mask_token"),2]
+
+        first_solution<-bert_modeling$fill_mask(
+          text=paste("This is a",mask_token,"."),
+          n_solutions = 5)
+
+        expect_equal(length(first_solution),1)
+        expect_true(is.data.frame(first_solution[[1]]))
+        expect_equal(nrow(first_solution[[1]]),5)
+        expect_equal(ncol(first_solution[[1]]),3)
+
+        second_solution<-bert_modeling$fill_mask(text=paste("This is a",mask_token,"."),
+                                                n_solutions = 1)
+        expect_equal(length(second_solution),1)
+        expect_true(is.data.frame(second_solution[[1]]))
+        expect_equal(nrow(second_solution[[1]]),1)
+        expect_equal(ncol(second_solution[[1]]),3)
+
+        third_solution<-bert_modeling$fill_mask(text=paste("This is a",mask_token,".",
+                                                           "The weather is",mask_token,"."),
+                                                 n_solutions = 5)
+        expect_equal(length(third_solution),2)
+        for(i in 1:2){
+
+          expect_true(is.data.frame(third_solution[[i]]))
+          expect_equal(nrow(third_solution[[i]]),5)
+          expect_equal(ncol(third_solution[[i]]),3)
+        }
       })
 
       test_that(paste0(ai_method,"descriptions",framework), {
@@ -655,34 +712,68 @@ for(ai_method in ai_methods){
         })
 
       #------------------------------------------------------------------------
-      test_that(paste0(ai_method,"Save Total Model H5",framework), {
-        expect_no_error(
-          save_ai_model(model=bert_modeling,
-                        model_dir = testthat::test_path(paste0(path_03,"/",framework)),
-                        save_format = "H5")
-        )
-      })
+      if(framework=="tensorflow"){
+        test_that(paste0(ai_method,"Save Total Model h5",framework), {
+          expect_no_error(
+            save_ai_model(model=bert_modeling,
+                          model_dir = testthat::test_path(paste0(path_03,"/",framework)),
+                          save_format = "h5")
+          )
+        })
 
-      test_that(paste0(ai_method,"Load Total Model H5",framework), {
-        bert_modeling<-NULL
-        bert_modeling<-load_ai_model(
-          ml_framework = framework,
-          model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
-        )
-        expect_s3_class(bert_modeling,
-                        class="TextEmbeddingModel")
-      })
+        test_that(paste0(ai_method,"Load Total Model h5",framework), {
+          bert_modeling<-NULL
+          bert_modeling<-load_ai_model(
+            ml_framework = framework,
+            model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
+          )
+          expect_s3_class(bert_modeling,
+                          class="TextEmbeddingModel")
+        })
+      } else {
+        test_that(paste0(ai_method,"Save Total Model safetensors",framework), {
+          expect_no_error(
+            save_ai_model(model=bert_modeling,
+                          model_dir = testthat::test_path(paste0(path_03,"/",framework)),
+                          save_format = "safetensors")
+          )
+          if(reticulate::py_module_available("safetensors")){
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/model.safetensors"))))
+          } else {
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/pytorch_model.bin"))))
+          }
+        })
+
+        test_that(paste0(ai_method,"Load Total Model safetensors",framework), {
+          bert_modeling<-NULL
+          bert_modeling<-load_ai_model(
+            ml_framework = framework,
+            model_dir = testthat::test_path(paste0(path_03,"/",framework,"/",model_name))
+          )
+          expect_s3_class(bert_modeling,
+                          class="TextEmbeddingModel")
+        })
+      }
+
 
       #------------------------------------------------------------------------
-      test_that(paste0(ai_method,"Save Total Model TF with ID",framework), {
+      test_that(paste0(ai_method,"Save Total Model default with ID",framework), {
         expect_no_error(
           save_ai_model(model=bert_modeling,
                         model_dir = testthat::test_path(paste0(path_03,"/",framework)),
-                        save_format = "tf")
+                        save_format = "default")
         )
+        if(framework=="pytorch"){
+          if(reticulate::py_module_available("safetensors")){
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/model.safetensors"))))
+          } else {
+            expect_true(file.exists(testthat::test_path(paste0(path_03,"/",framework,"/",model_name,"/model_data/pytorch_model.bin"))))
+          }
+        }
+
       })
 
-      test_that(paste0(ai_method,"Load Total Model TF with ID",framework), {
+      test_that(paste0(ai_method,"Load Total Model default with ID",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
           ml_framework = framework,
@@ -693,16 +784,16 @@ for(ai_method in ai_methods){
       })
 
       #-------------------------------------------------------------------------
-      test_that(paste0(ai_method,"Save Total Model TF without ID",framework), {
+      test_that(paste0(ai_method,"Save Total Model default without ID",framework), {
         expect_no_error(
           save_ai_model(model=bert_modeling,
                         model_dir = testthat::test_path(paste0(path_03,"/",framework)),
-                        save_format = "tf",
+                        save_format = "default",
                         append_ID = FALSE)
         )
       })
 
-      test_that(paste0("Load Total Model TF without ID",framework), {
+      test_that(paste0("Load Total Model default without ID",framework), {
         bert_modeling<-NULL
         bert_modeling<-load_ai_model(
           ml_framework = framework,

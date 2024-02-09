@@ -44,6 +44,9 @@
 #'@param sustain_interval \code{integer} Interval in seconds for measuring power
 #'usage.
 #'
+#'@param pytorch_safetensors \code{bool} If \code{TRUE} a 'pytorch' model
+#'is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+#'it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.
 #'@param trace \code{bool} \code{TRUE} if information about the progress should be
 #'printed to the console.
 #'@return This function does not return an object. Instead the configuration
@@ -66,10 +69,12 @@
 #'@references Hugging Face documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/funnel#funnel-transformer}
 #'
+#'@importFrom reticulate py_module_available
+#'
 #'@family Transformer
 #'@export
 create_funnel_model<-function(
-    ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+    ml_framework=aifeducation_config$get_framework(),
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=30522,
@@ -90,7 +95,14 @@ create_funnel_model<-function(
     sustain_iso_code=NULL,
     sustain_region=NULL,
     sustain_interval=15,
-    trace=TRUE){
+    trace=TRUE,
+    pytorch_safetensors=TRUE){
+
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
 
   #argument checking-----------------------------------------------------------
   #if(max_position_embeddings>512){
@@ -115,11 +127,35 @@ create_funnel_model<-function(
              the library to set the global framework. ")
   }
 
-  #Start Sustainability Tracking
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  #Check possible save formats
+  if(ml_framework=="pytorch"){
+    if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==TRUE){
+      pt_safe_save=TRUE
+    } else if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==FALSE){
+      pt_safe_save=FALSE
+      warning("Python library 'safetensors' not available. Model will be saved
+            in the standard pytorch format.")
+    } else {
+      pt_safe_save=FALSE
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
     }
     sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
       country_iso_code=sustain_iso_code,
@@ -131,10 +167,24 @@ create_funnel_model<-function(
       save_to_api=FALSE
     )
     sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
   }
 
-  #Creating a new Tokenizer for Computing Vocabulary
-  special_tokens=c("<cls>","<sep>","<pad>","<unk>","<mask>")
+  update_aifeducation_progress_bar(value = 2,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Creating a new Tokenizer for Computing Vocabulary---------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Tokenizer Draft"))
+  }
+
+  special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]")
   tok_new<-tok$Tokenizer(tok$models$WordPiece())
   tok_new$normalizer=tok$normalizers$BertNormalizer(
     lowercase=vocab_do_lower_case,
@@ -143,8 +193,8 @@ create_funnel_model<-function(
     strip_accents = vocab_do_lower_case)
   tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
   tok_new$post_processor<-tok$processors$BertProcessing(
-    sep=reticulate::tuple(list("<sep>",as.integer(1))),
-    cls=reticulate::tuple(list("<cls>",as.integer(0)))
+    sep=reticulate::tuple(list("[SEP]",as.integer(1))),
+    cls=reticulate::tuple(list("[CLS]",as.integer(0)))
   )
 
   tok_new$decode=tok$decoders$WordPiece()
@@ -154,43 +204,74 @@ create_funnel_model<-function(
     special_tokens = special_tokens,
     show_progress=trace)
 
-  #Calculating Vocabulary
+  update_aifeducation_progress_bar(value = 3,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Calculating Vocabulary------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary"))
   }
   tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary - Done","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary - Done"))
+  }
+
+  update_aifeducation_progress_bar(value = 4,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Saving Tokenizer Draft------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Saving Draft"))
   }
 
   if(dir.exists(model_dir)==FALSE){
-    cat(paste(date(),"Creating Directory","\n"))
+    if(trace==TRUE){
+      message(paste(date(),"Creating Directory"))
+    }
     dir.create(model_dir)
   }
 
   write(c(special_tokens,names(tok_new$get_vocab())),
         file=paste0(model_dir,"/","vocab.txt"))
 
+  update_aifeducation_progress_bar(value = 5,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Final Tokenizer-------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer","\n"))
+    message(paste(date(),
+              "Creating Tokenizer"))
   }
 
   tokenizer=transformers$PreTrainedTokenizerFast(
     tokenizer_object=tok_new,
-    unk_token="<unk>",
-    sep_token="<sep>",
-    pad_token="<pad>",
-    cls_token="<cls>",
-    mask_token="<mask>",
-    bos_token = "<cls>",
-    eos_token = "<sep>")
+    unk_token="[UNK]",
+    sep_token="[SEP]",
+    pad_token="[PAD]",
+    cls_token="[CLS]",
+    mask_token="[MASK]",
+    bos_token = "[CLS]",
+    eos_token = "[SEP]")
 
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer - Done","\n"))
+    message(paste(date(),
+              "Creating Tokenizer - Done"))
+  }
+
+  update_aifeducation_progress_bar(value = 6,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Creating Transformer Model--------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Transformer Model"))
   }
 
   configuration=transformers$FunnelConfig(
@@ -222,27 +303,47 @@ create_funnel_model<-function(
     model=transformers$FunnelModel(configuration)
   }
 
-  if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Funnel Transformer Model","\n"))
-  }
-  model$save_pretrained(save_directory=model_dir)
+  update_aifeducation_progress_bar(value = 7,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
 
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Tokenizer Model","\n"))
+    message(paste(date(),
+              "Saving Funnel Transformer Model"))
+  }
+  if(ml_framework=="tensorflow"){
+    model$build()
+    model$save_pretrained(save_directory=model_dir)
+  } else {
+    model$save_pretrained(save_directory=model_dir,
+                          safe_serilization=pt_safe_save)
+  }
+
+  update_aifeducation_progress_bar(value = 8,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Saving Tokenizer------------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Saving Tokenizer Model"))
   }
   tokenizer$save_pretrained(model_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Stop Sustainability Tracking if requested-----------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     write.csv(
@@ -251,9 +352,15 @@ create_funnel_model<-function(
       row.names = FALSE)
   }
 
+  update_aifeducation_progress_bar(value = 10,
+                                   total = pgr_max,
+                                   title = "Funnel Model")
+
+  #Finish----------------------------------------------------------------------
+
   if(trace==TRUE){
-    cat(paste(date(),
-              "Done","\n"))
+    message(paste(date(),
+              "Done"))
   }
 }
 
@@ -298,12 +405,19 @@ create_funnel_model<-function(
 #'@param sustain_interval \code{integer} Interval in seconds for measuring power
 #'usage.
 #'
+#'@param pytorch_safetensors \code{bool} If \code{TRUE} a 'pytorch' model
+#'is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+#'it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.
 #'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
 #'to the console.
 #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
 #'information about the training process from keras on the console.
 #'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
 #'one line of information for every epoch.
+#'@param pytorch_trace \code{int} \code{pytorch_trace=0} does not print any
+#'information about the training process from pytorch on the console.
+#'\code{pytorch_trace=1} prints a progress bar.
+#'
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
 #'@note if \code{aug_vocab_by > 0} the raw text is used for training a WordPiece
@@ -325,9 +439,10 @@ create_funnel_model<-function(
 #'
 #'@importFrom utils write.csv
 #'@importFrom utils read.csv
+#'@importFrom reticulate py_module_available
 #'
 #'@export
-train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(),
                                  output_dir,
                                  model_dir_path,
                                  raw_texts,
@@ -346,8 +461,15 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
                                  sustain_region=NULL,
                                  sustain_interval=15,
                                  trace=TRUE,
-                                 keras_trace=1){
+                                 keras_trace=1,
+                                 pytorch_trace=1,
+                                 pytorch_safetensors=TRUE){
 
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0, total = pgr_max, title = "Funnel Model")
+
+  #argument checking-----------------------------------------------------------
   if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
@@ -358,11 +480,68 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
              the library to set the global framework. ")
   }
 
-  #Start Sustainability Tracking
+  if(ml_framework=="tensorflow"){
+    if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
+      from_pt=FALSE
+    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))|
+               file.exists(paste0(model_dir_path,"/model.safetensors"))){
+      from_pt=TRUE
+    } else {
+      stop("Directory does not contain a tf_model.h5, pytorch_model.bin or a
+           model.safetensors file.")
+    }
+  } else {
+    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))|
+       file.exists(paste0(model_dir_path,"/model.safetensors"))){
+      from_tf=FALSE
+    } else if (file.exists(paste0(model_dir_path,"/tf_model.h5"))){
+      from_tf=TRUE
+    } else {
+      stop("Directory does not contain a tf_model.h5, pytorch_model.bin or a
+           model.safetensors file.")
+    }
+  }
+
+  #In the case of pytorch
+  #Check to load from pt/bin or safetensors
+  #Use safetensors as preferred method
+  if(ml_framework=="pytorch"){
+    if((file.exists(paste0(model_dir_path,"/model.safetensors"))==FALSE &
+        from_tf==FALSE)|
+       reticulate::py_module_available("safetensors")==FALSE){
+      load_safe=FALSE
+    } else {
+      load_safe=TRUE
+    }
+  }
+
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  #Check possible save formats
+  if(ml_framework=="pytorch"){
+    if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==TRUE){
+      pt_safe_save=TRUE
+    } else if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==FALSE){
+      pt_safe_save=FALSE
+      warning("Python library 'safetensors' not available. Model will be saved
+            in the standard pytorch format.")
+    } else {
+      pt_safe_save=FALSE
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1, total = pgr_max, title = "Funnel Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
     }
     sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
       country_iso_code=sustain_iso_code,
@@ -374,40 +553,50 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
       save_to_api=FALSE
     )
     sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
   }
 
-  if(ml_framework=="tensorflow"){
-    if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
-      from_pt=FALSE
-    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
-      from_pt=TRUE
-    } else {
-      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
-    }
-  } else {
-    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
-      from_tf=FALSE
-    } else if (file.exists(paste0(model_dir_path,"/tf_model.h5"))){
-      from_tf=TRUE
-    } else {
-      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
-    }
+  update_aifeducation_progress_bar(value = 2, total = pgr_max, title = "Funnel Model")
+
+  #Loading existing model------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Loading Existing Model"))
   }
 
   if(ml_framework=="tensorflow"){
     mlm_model=transformers$TFFunnelForMaskedLM$from_pretrained(model_dir_path, from_pt=from_pt)
   } else {
-    mlm_model=transformers$FunnelForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
+    mlm_model=transformers$FunnelForMaskedLM$from_pretrained(model_dir_path,
+                                                             from_tf=from_tf,
+                                                             use_safetensors=load_safe)
   }
 
   tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_path)
 
-  if(trace==TRUE){
-    cat(paste(date(),"Tokenize Raw Texts","\n"))
+  update_aifeducation_progress_bar(value = 3, total = pgr_max, title = "Funnel Model")
+
+  #argument checking------------------------------------------------------------
+  if(chunk_size>(mlm_model$config$max_position_embeddings)){
+    stop(paste("Chunk size is",chunk_size,". This value is not allowed to exceed",
+               mlm_model$config$max_position_embeddings))
+  }
+  if(chunk_size<3){
+    stop("Chunk size must be at least 3.")
   }
 
+  #adjust chunk size. To elements are needed for begin and end of sequence
+  chunk_size=chunk_size-2
+
+  update_aifeducation_progress_bar(value = 4, total = pgr_max, title = "Funnel Model")
+
+  #creating chunks of sequences------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Creating Sequence Chunks For Training","\n"))
+    message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
   if(full_sequences_only==FALSE){
@@ -453,23 +642,28 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     relevant_indices=which(tokenized_dataset["length"]==chunk_size)
     tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
   }
+  rm(tokenized_texts)
 
   n_chunks=tokenized_dataset$num_rows
 
   if(trace==TRUE){
-    cat(paste(date(),n_chunks,"Chunks Created","\n"))
+    message(paste(date(),n_chunks,"Chunks Created"))
   }
+
+  update_aifeducation_progress_bar(value = 5, total = pgr_max, title = "Funnel Model")
+
+  #Seeting up DataCollator and Dataset------------------------------------------
 
   if(dir.exists(paste0(output_dir))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Output Directory","\n"))
+      message(paste(date(),"Creating Output Directory"))
     }
     dir.create(paste0(output_dir))
   }
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Checkpoint Directory","\n"))
+      message(paste(date(),"Creating Checkpoint Directory"))
     }
     dir.create(paste0(output_dir,"/checkpoints"))
   }
@@ -478,7 +672,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
 
 
     if(trace==TRUE){
-      cat(paste(date(),"Using Token Masking","\n"))
+      message(paste(date(),"Using Token Masking"))
     }
     data_collator=transformers$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
@@ -506,7 +700,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     )
 
     if(trace==TRUE){
-      cat(paste(date(),"Preparing Training of the Model","\n"))
+      message(paste(date(),"Preparing Training of the Model"))
     }
     adam<-tf$keras$optimizers$Adam
 
@@ -521,8 +715,18 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
       save_weights_only= TRUE
     )
 
+    #Add Callback if Shiny App is running
+    if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/keras_callbacks.py",
+                                            package = "aifeducation"))
+        callback_checkpoint=list(callback_checkpoint,py$ReportAiforeducationShiny())
+      }
+    }
+
     if(trace==TRUE){
-      cat(paste(date(),"Compile Model","\n"))
+      message(paste(date(),"Compile Model"))
     }
     mlm_model$compile(optimizer=adam(learning_rate),
                       loss="auto")
@@ -530,8 +734,11 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     #Clear session to provide enough resources for computations
     tf$keras$backend$clear_session()
 
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "Funnel Model")
+
+    #Start Training------------------------------------------------------------
     if(trace==TRUE){
-      cat(paste(date(),"Start Fine Tuning","\n"))
+      message(paste(date(),"Start Fine Tuning"))
     }
     mlm_model$fit(x=tf_train_dataset,
                   validation_data=tf_test_dataset,
@@ -542,14 +749,14 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
                   verbose=as.integer(keras_trace))
 
     if(trace==TRUE){
-      cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
+      message(paste(date(),"Load Weights From Best Checkpoint"))
     }
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
 
 
     if(trace==TRUE){
-      cat(paste(date(),"Using Token Masking","\n"))
+      message(paste(date(),"Using Token Masking"))
     }
     data_collator=transformers$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
@@ -579,7 +786,9 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
       per_device_eval_batch_size = as.integer(batch_size),
       save_safetensors=TRUE,
       auto_find_batch_size=FALSE,
-      report_to="none"
+      report_to="none",
+      log_level="error",
+      disable_tqdm=!pytorch_trace
     )
 
     trainer=transformers$Trainer(
@@ -592,28 +801,57 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     )
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
 
+    #Add Callback if Shiny App is running
+    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/pytorch_transformer_callbacks.py",
+                                            package = "aifeducation"))
+        trainer$add_callback(py$ReportAiforeducationShiny_PT())
+      }
+    }
+
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "Funnel Model")
+
+    #Start Training------------------------------------------------------------
+    if(trace==TRUE){
+      message(paste(date(),"Start Fine Tuning"))
+    }
     trainer$train()
   }
 
-  if(trace==TRUE){
-    cat(paste(date(),"Saving Funnel Model","\n"))
-  }
-  mlm_model$save_pretrained(save_directory=output_dir)
+  update_aifeducation_progress_bar(value = 7, total = pgr_max, title = "Funnel Model")
 
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Saving Tokenizer","\n"))
+    message(paste(date(),"Saving Funnel Model"))
+  }
+  if(ml_framework=="tensorflow"){
+    mlm_model$save_pretrained(save_directory=output_dir)
+  } else {
+    mlm_model$save_pretrained(save_directory=output_dir,
+                              safe_serilization=pt_safe_save)
+  }
+
+  update_aifeducation_progress_bar(value = 8, total = pgr_max, title = "Funnel Model")
+
+  #Saving Tokenizer-------------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),"Saving Tokenizer"))
   }
   tokenizer$save_pretrained(output_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9, total = pgr_max, title = "Funnel Model")
+
+  #Stop Sustainability Tracking if requested------------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     sustainability_data_file_path_input=paste0(model_dir_path,"/sustainability.csv")
@@ -639,8 +877,11 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     }
   }
 
+  update_aifeducation_progress_bar(value = 10, total = pgr_max, title = "Funnel Model")
+
+  #Finish----------------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Done","\n"))
+    message(paste(date(),"Done"))
   }
 }
 

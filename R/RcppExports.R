@@ -4,7 +4,7 @@
 #'Reshape matrix to array
 #'
 #'Function written in C++ for reshaping a matrix containing sequential data into
-#'an array for use with 'keras'.
+#'an array for use with keras.
 #'
 #'@param matrix \code{matrix} containing the sequential data.
 #'@param times \code{uword} Number of sequences.
@@ -18,5 +18,24 @@
 #'@export
 matrix_to_array_c <- function(matrix, times, features) {
     .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)
+}
+
+#'Transforming classes to one-hot encoding
+#'
+#'Function written in C++ transforming a vector of classes (int) into
+#'a binary class matrix.
+#'
+#'@param class_vector \code{vector} containing integers for every class. The
+#'integers must range from 0 to n_classes-1.
+#'@param n_classes \code{int} Total number of classes.
+#'@return Returns a \code{matrix} containing the binary representation for
+#'every class.
+#'
+#'@import Rcpp
+#'@useDynLib aifeducation, .registration = TRUE
+#'@family Auxiliary Functions
+#'@export
+to_categorical_c <- function(class_vector, n_classes) {
+    .Call(`_aifeducation_to_categorical_c`, class_vector, n_classes)
 }
 

@@ -71,14 +71,6 @@ install.packages("aifeducation")
 With this command, all necessary *R* packages are installed on your
 machine. 
 
-> **Note:** There is currently a bug in reticulate 1.32.0 which does not allow
-to load python packages such as tensorflow, keras or torch. The error
-seems to occur only when working with RStudio and Windows machines. Using R console
-directly seems not to evoke the error. The bug has been
-fixed in the developer version of reticulate. You can install this version with
-`install.packages("pak")` and `pak::pak("rstudio/reticulate")`.
-With the release of reticulate 1.33.0 you can ignore this note.
-
 ## Step 2 - Install Python
 
 Since natural language processing with neural nets is based on
@@ -150,6 +142,7 @@ function `install_py_modules()` doing that for you.
 ```{r, include = TRUE, eval=FALSE}
 #For Linux
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.14",
                                  pytorch_cuda_version = "12.1"
@@ -157,12 +150,14 @@ aifeducation::install_py_modules(envname="aifeducation",
 
 #For Windows with gpu support
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.10",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=FALSE)
 #For Windows without gpu support
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.14",
                                  pytorch_cuda_version = "12.1"
@@ -170,11 +165,18 @@ aifeducation::install_py_modules(envname="aifeducation",
 
 #For MacOS
 aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.14",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=TRUE)
 ```
+
+> With `install="all"` you can decide which machine learning framework should be
+installed. Use `install="all"` to request the installation of both 'PyTorch' and
+'tensorflow'. If you would like to install only 'PyTorch' or 'tensorflow' set
+`install="pytorch"` or `install="tenorflow"`. Starting with version 0.3.1 tensorflow
+of version 2.13 or higher is necessary.
 
 It is very important that you call this function *before* loading the package
 the first time. If you load the library without installing the necessary modules
@@ -182,14 +184,21 @@ an error may occur.
 
 This function installs the following python modules:
 
+**both frameworks:**
 -   transformers,
 -   tokenizers,
 -   datasets,
--   torch,
--   keras,
--   tensorflow 
 -   codecarbon
+
+**Pytorch**
+-   torch,
+-   torcheval,
+-   safetensors,
 -   accelerate
+
+**Tensorflow**
+-   keras,
+-   tensorflow
 
 and its dependencies in the environment "aifeducation". 
     
@@ -198,10 +207,14 @@ other environments, please ensure that these python modules are
 available. For gpu support some further packages are installed.
 
 With `check_aif_py_modules()` you can check, if all modules are
-successfully installed.
+successfully installed or a specific machine learning framework.
 
 ```{r, include = TRUE, eval=FALSE}
-aifeducation::check_aif_py_modules(print=TRUE)
+aifeducation::check_aif_py_modules(print=TRUE,
+                                   check="pytorch")
+
+aifeducation::check_aif_py_modules(print=TRUE,
+                                   check="tensorflow")
 ```
 
 Now everything is ready to use the package. 
@@ -274,6 +287,11 @@ aifeducation_config$set_global_ml_backend("tensorflow")
 aifeducation_config$set_global_ml_backend("pytorch")
 ```
 
+You can change the framework at anytime during a session by calling this method
+again or by passing the framework to the `ml_framework` argument of a function
+or method. Please note that not all models are available for both frameworks and 
+that the weights of trained models cannot be shared across frameworks for all models.
+
 In the case that you would like to use tensorflow now is a good time to 
 configure that backend, since some configurations
 can only be done **before** tensorflow is used the first time.
@@ -294,10 +312,55 @@ to set the correct conda environment, to load the library *aifeducation*, and
 to chose your machine learning framework.
 
 # 4) Tutorials and Guides
+A guide how to use the graphical user interface can be found in vignette
+  [02a classification tasks](gui_aife_studio.html). 
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette
-[02 classification tasks](classification_tasks.html).
+[02b classification tasks](classification_tasks.html).
 
 Documenting and sharing your work is described in vignette
 [03 sharing and using trained AI/models](sharing_and_publishing.html)
+
+# 5) Update *aifeducation*
+
+In the case you already use *aifeducation* and you want to update to a newer version
+of this package it is recommended to update the used python libraries. The
+easiest way is to remove the conda environment "aifeducation" and to install the
+libraries into a fresh environment. This can be done by setting `remove_first=TRUE`
+in `install_py_modules`.
+
+```{r, include = TRUE, eval=FALSE}
+#For Linux
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=FALSE)
+
+#For Windows with gpu support
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.10",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=FALSE)
+#For Windows without gpu support
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=TRUE)
+
+#For MacOS
+aifeducation::install_py_modules(envname="aifeducation",
+                                 install="all",
+                                 remove_first=TRUE,
+                                 tf_version="<=2.14",
+                                 pytorch_cuda_version = "12.1"
+                                 cpu_only=TRUE)
+```
+
+

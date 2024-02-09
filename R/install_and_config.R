@@ -4,9 +4,13 @@
 #'
 #'@param envname \code{string} Name of the environment where the packages should
 #'be installed.
+#'@param install \code{character} determining which machine learning frameworks
+#'should be installed. \code{install="all"}  for 'pytorch' and 'tensorflow'.
+#'\code{install="pytorch"}  for 'pytorch', and \code{install="tensorflow"}  for 'tensorflow'.
 #'@param tf_version \code{string} determining the desired version of 'tensorflow'.
 #'@param pytorch_cuda_version \code{string} determining the desired version of 'cuda' for
 #''PyTorch'.
+#'@param python_version \code{string} Python version to use.
 #'@param remove_first \code{bool} If \code{TRUE} removes the environment completely before
 #'recreating the environment and installing the packages. If \code{FALSE} the packages
 #'are installed in the existing environment without any prior changes.
@@ -15,76 +19,102 @@
 #'@return Returns no values or objects. Function is used for installing the
 #'necessary python libraries in a conda environment.
 #'@importFrom reticulate conda_create
+#'@importFrom reticulate conda_remove
+#'@importFrom reticulate condaenv_exists
 #'@importFrom reticulate py_install
 #'@importFrom utils compareVersion
 #'@family Installation and Configuration
 #'@export
 install_py_modules<-function(envname="aifeducation",
+                             install="pytorch",
                              tf_version="<=2.14",
                              pytorch_cuda_version="12.1",
+                             python_version="3.9",
                              remove_first=FALSE,
                              cpu_only=FALSE){
   relevant_modules<-c("transformers",
                       "tokenizers",
                       "datasets",
-                      "codecarbon",
-                      "accelerate"
-                      )
+                      "codecarbon")
+  relevant_modules_pt<-c("safetensors",
+                         "torcheval",
+                         "accelerate")
 
-  if(remove_first==TRUE){
-    conda_environments<-reticulate::conda_list()
-      if((envname %in% conda_environments$name)==TRUE){
+  #Check Arguments
+  if(!(install%in%c("all","pytorch","tensorflow"))){
+    stop("install must be all, pytorch or tensorflow.")
+  }
+
+  if(reticulate::condaenv_exists(envname = envname)==TRUE){
+    if(remove_first==TRUE){
       reticulate::conda_remove(envname = envname)
+      reticulate::conda_create(
+        envname = envname,
+        channel=c("conda-forge"),
+        python_version = python_version
+      )
     }
-
+  } else {
     reticulate::conda_create(
       envname = envname,
-      channel=c("conda-forge")
+      channel=c("conda-forge"),
+      python_version = python_version
     )
   }
 
-  if(cpu_only==TRUE){
-    reticulate::conda_install(
-      packages = c(
-        "tensorflow-cpu",
-        "torch",
-        "keras"),
-      envname = envname,
-      conda = "auto",
-      pip = TRUE)
-  } else {
+  #Tensorflow Installation
+  if(install=="all" | install=="tensorflow"){
+    if(cpu_only==TRUE){
       reticulate::conda_install(
-      packages = c(
-        paste0("tensorflow",tf_version),
-        "keras"),
-      envname = envname,
-      conda = "auto",
-      pip = TRUE)
+        packages = c(
+          "tensorflow-cpu",
+          "keras"),
+        envname = envname,
+        conda = "auto",
+        pip = TRUE)
+    } else {
+      reticulate::conda_install(
+        packages = c(
+          paste0("tensorflow",tf_version),
+          "keras"),
+        envname = envname,
+        conda = "auto",
+        pip = TRUE)
+
+      reticulate::conda_install(
+        packages = c(
+          "cudatoolkit",
+          "cuDNN"),
+        envname = envname,
+        conda = "auto",
+        pip = FALSE)
+    }
 
     reticulate::conda_install(
-      packages = c(
-        "cudatoolkit",
-        "cuDNN"),
+      packages = relevant_modules,
       envname = envname,
       conda = "auto",
-      pip = FALSE)
-
-    reticulate::conda_install(
-      packages = c(
-        "pytorch",
-        paste0("pytorch-cuda","=",pytorch_cuda_version)),
-      envname = envname,
-      channel=c("pytorch","nvidia"),
-      conda = "auto",
-      pip = FALSE)
+      pip = TRUE
+    )
   }
 
-  reticulate::conda_install(
-    packages = relevant_modules,
-    envname = envname,
-    conda = "auto",
-    pip = TRUE
-  )
+    if(install=="all" | install=="pytorch"){
+        reticulate::conda_install(
+          packages = c(
+            "pytorch",
+            paste0("pytorch-cuda","=",pytorch_cuda_version)),
+          envname = envname,
+          channel=c("pytorch","nvidia"),
+          conda = "auto",
+          pip = FALSE)
+
+      reticulate::conda_install(
+        packages = c(relevant_modules,relevant_modules_pt),
+        envname = envname,
+        conda = "auto",
+        pip = TRUE
+      )
+    }
 
 }
 
@@ -94,21 +124,45 @@ install_py_modules<-function(envname="aifeducation",
 #'aifeducation to work are available.
 #'@param trace \code{bool} \code{TRUE} if a list with all modules and their
 #'availability should be printed to the console.
+#'@param check \code{string} determining the machine learning framework to check for.
+#'\code{check="pytorch"} for 'pytorch', \code{check="tensorflow"} for 'tensorflow',
+#'and \code{check="all"} for both frameworks.
 #'@return The function prints a table with all relevant packages and shows
 #' which modules are available or unavailable.
 #'@return If all relevant modules are available, the functions returns \code{TRUE}.
 #'In all other cases it returns \code{FALSE}
 #'@family Installation and Configuration
 #'@export
-check_aif_py_modules<-function(trace=TRUE){
-  relevant_modules<-c("os",
-                      "transformers",
-                      "tokenizers",
-                      "datasets",
-                      "torch",
-                      "keras",
-                      "tensorflow",
-                      "codecarbon")
+check_aif_py_modules<-function(trace=TRUE, check="all"){
+  if(!(check%in%c("all","pytorch","tensorflow"))){
+    stop("check must be all, pytorch or tensorflow.")
+  }
+
+  general_modules=c("os",
+                    "transformers",
+                    "tokenizers",
+                    "datasets",
+                    "codecarbon")
+  pytorch_modules=c("torch",
+                    "torcheval",
+                    "safetensors",
+                    "accelerate")
+  tensorflow_modules=c("keras",
+                       "tensorflow")
+
+  if(check=="all"){
+    relevant_modules<-c(general_modules,
+                        pytorch_modules,
+                        tensorflow_modules)
+  } else if(check=="pytorch"){
+    relevant_modules<-c(general_modules,
+                        pytorch_modules)
+  } else if(check=="tensorflow"){
+    relevant_modules<-c(general_modules,
+                        tensorflow_modules)
+  }
+
+
   matrix_overview=matrix(data=NA,
                          nrow = length(relevant_modules),
                          ncol= 2)
@@ -231,33 +285,30 @@ set_transformers_logger<-function(level="ERROR"){
 #'R6 class for settting the global machine learning framework.
 #'
 #'R6 class for setting the global machine learning framework to 'PyTorch' or
-#''tensorflow' depending of the available version of 'keras'.
+#''tensorflow'.
 #'
 #'@param backend \code{string} Determines the machine learning framework
 #'for using with 'keras'. Possible are \code{keras_framework="pytorch"} for 'pytorch',
 #'\code{keras_framework="tensorflow"} for 'tensorflow'.
 #'@return The function does nothing return. It is used for its side effects.
-#'@note This function must be called directly after loading 'aifeducation' to take effect.
-#'@note Please note that using classifier objects with 'PyTorch' requires keras of
-#'at least version 3. If you have an older version 'tensorflow' is used.
 #'
 #'@family Installation and Configuration
 AifeducationConfiguration<-R6::R6Class(
   classname = "aifeducationConfiguration",
   private = list(
+    ml_framework_config=list(
+    global_ml_framework="not_specified",
     TextEmbeddingFramework="not_specified",
-    ClassifierFramework="not_specified"
+    ClassifierFramework="not_specified")
   ),
   public = list(
     #'@description Method for requesting the used machine learning framework.
-    #'@return Returns a \code{list} containing the used machine learning framework
+    #'@return Returns a \code{string} containing the used machine learning framework
     #'for \link{TextEmbeddingModel}s as well as for \link{TextEmbeddingClassifierNeuralNet}.
     get_framework=function(){
-      return(
-        list(TextEmbeddingFramework=private$TextEmbeddingFramework,
-             ClassifierFramework=private$ClassifierFramework))
+      return(private$ml_framework_config)
     },
-    #'@description Method for setting machine learning framework.
+    #'@description Method for setting the global machine learning framework.
     #'@param backend \code{string} Framework to use for training and inference.
     #'\code{backend="tensorflow"} for 'tensorflow' and \code{backend="pytorch"}
     #'for 'PyTorch'.
@@ -270,45 +321,28 @@ AifeducationConfiguration<-R6::R6Class(
         stop("backend must be 'tensorflow' or 'pytorch'.")
       }
 
+      #if(private$TextEmbeddingFramework=="not_specified"){
+      #    private$TextEmbeddingFramework=backend
+      #    private$ClassifierFramework=backend
 
-      py_package_list<-reticulate::py_list_packages()
-      keras_version<-as.character(py_package_list[which(py_package_list$package=="keras"),"version"])
+      private$ml_framework_config$global_ml_framework=backend
+      private$ml_framework_config$TextEmbeddingFramework=backend
+      private$ml_framework_config$ClassifierFramework=backend
+      os$environ$setdefault("KERAS_BACKEND","tensorflow")
+      cat("Global Backend set to:",backend,"\n")
 
-      if(private$TextEmbeddingFramework=="not_specified"){
-        if(utils::compareVersion(keras_version,"2.4.0")>=0 &
-           utils::compareVersion(keras_version,"3.0.0")<0){
-          private$TextEmbeddingFramework=backend
-          private$ClassifierFramework="tensorflow"
-          os$environ$setdefault("KERAS_BACKEND","tensorflow")
-
-          cat("keras Version:",keras_version,"\n")
-          cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
-          cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
-
-        } else if(utils::compareVersion(keras_version,"3.0.0")>=0){
-          private$TextEmbeddingFramework=backend
-          private$ClassifierFramework=backend
-          os$environ$setdefault("KERAS_BACKEND",backend)
-
-          cat("keras Version:",keras_version,"\n")
-          cat("Backend for TextEmbeddingModels:",private$TextEmbeddingFramework,"\n")
-          cat("Backend for Classifiers:",private$ClassifierFramework,"\n")
-
-        } else {
-          stop("No compatible version of keras found.")
-        }
-      } else {
-        warning("The global machine learning framework has already been set.
-            If you would like to change the framework please restart the
-            session and set framework to the desired backend.")
-      }
+      #} else {
+      #  warning("The global machine learning framework has already been set.
+      #      If you would like to change the framework please restart the
+      #      session and set framework to the desired backend.")
+      #}
 
     },
     #'@description Method for checking if the global ml framework is set.
-    #'@return Return \code{TRUE} if the global machine learning framework ist set.
-    #'Otherwiese \code{FALSE}.
+    #'@return Return \code{TRUE} if the global machine learning framework is set.
+    #'Otherwise \code{FALSE}.
     global_framework_set=function(){
-      if(private$TextEmbeddingFramework=="not_specified"){
+      if(private$ml_framework_config$global_ml_framework=="not_specified"){
         return(FALSE)
       } else {
         return(TRUE)

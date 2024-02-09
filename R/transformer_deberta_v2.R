@@ -40,6 +40,9 @@
 #'@param sustain_interval \code{integer} Interval in seconds for measuring power
 #'usage.
 #'
+#'@param pytorch_safetensors \code{bool} If \code{TRUE} a 'pytorch' model
+#'is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+#'it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.
 #'@param trace \code{bool} \code{TRUE} if information about the progress should be
 #'printed to the console.
 #'@return This function does not return an object. Instead the configuration
@@ -54,6 +57,8 @@
 #'He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT
 #'with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
 #'
+#'@importFrom reticulate py_module_available
+#'
 #'@references Hugging Face Documentation
 #'\url{https://huggingface.co/docs/transformers/model_doc/deberta-v2#debertav2}
 #'
@@ -61,7 +66,7 @@
 #'
 #'@export
 create_deberta_v2_model<-function(
-    ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
+    ml_framework=aifeducation_config$get_framework(),
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=128100,
@@ -80,7 +85,14 @@ create_deberta_v2_model<-function(
     sustain_iso_code=NULL,
     sustain_region=NULL,
     sustain_interval=15,
-    trace=TRUE){
+    trace=TRUE,
+    pytorch_safetensors=TRUE){
+
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
 
   #argument checking-----------------------------------------------------------
   #if(max_position_embeddings>512){
@@ -105,11 +117,34 @@ create_deberta_v2_model<-function(
     stop("hidden_act must be gelu, relu, silu or gelu_new")
   }
 
-  #Start Sustainability Tracking
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  #Check possible save formats
+  if(ml_framework=="pytorch"){
+    if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==TRUE){
+      pt_safe_save=TRUE
+    } else if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==FALSE){
+      pt_safe_save=FALSE
+      warning("Python library 'safetensors' not available. Model will be saved
+            in the standard pytorch format.")
+    } else {
+      pt_safe_save=FALSE
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
     }
     sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
       country_iso_code=sustain_iso_code,
@@ -121,9 +156,23 @@ create_deberta_v2_model<-function(
       save_to_api=FALSE
     )
     sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
   }
 
-  #Creating a new Tokenizer for Computing Vocabulary
+  update_aifeducation_progress_bar(value = 2,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Creating a new Tokenizer for Computing Vocabulary---------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Tokenizer Draft"))
+  }
+
   tok_new<-tok$SentencePieceUnigramTokenizer()
   tok_new$normalizer<-tok$normalizers$BertNormalizer(
     clean_text = TRUE,
@@ -137,36 +186,55 @@ create_deberta_v2_model<-function(
     trim_offsets=trim_offsets,
     add_prefix_space = add_prefix_space
   )
-  #tok_new$enable_truncation(max_length = as.integer(max_position_embeddings))
   tok_new$enable_padding(pad_token = "[PAD]")
 
-  #Calculating Vocabulary
+  update_aifeducation_progress_bar(value = 3,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Calculating Vocabulary------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary"))
   }
+
   tok_new$train_from_iterator(
     iterator = vocab_raw_texts,
     vocab_size = as.integer(vocab_size),
-    special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"))
+    special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"),
+    unk_token="[UNK]")
+
   if(trace==TRUE){
-    cat(paste(date(),
-              "Start Computing Vocabulary - Done","\n"))
+    message(paste(date(),
+              "Start Computing Vocabulary - Done"))
+  }
+  update_aifeducation_progress_bar(value = 4,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Saving Tokenizer Draft------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Saving Draft"))
   }
 
   if(dir.exists(model_dir)==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Model Directory","\n"))
+      message(paste(date(),"Creating Model Directory"))
     }
     dir.create(model_dir)
   }
 
-  #Saving files
   tok_new$save_model(model_dir)
 
+  update_aifeducation_progress_bar(value = 5,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Final Tokenizer-------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer","\n"))
+    message(paste(date(),
+              "Creating Tokenizer"))
   }
   tokenizer=transformers$PreTrainedTokenizerFast(
     tokenizer_object=tok_new,
@@ -180,9 +248,19 @@ create_deberta_v2_model<-function(
     add_prefix_space = add_prefix_space,
     trim_offsets=trim_offsets)
 
+
   if(trace==TRUE){
-    cat(paste(date(),
-              "Creating Tokenizer - Done","\n"))
+    message(paste(date(),
+              "Creating Tokenizer - Done"))
+  }
+  update_aifeducation_progress_bar(value = 6,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Creating Transformer Model--------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Creating Transformer Model"))
   }
 
   configuration=transformers$DebertaV2Config(
@@ -211,27 +289,48 @@ create_deberta_v2_model<-function(
     model=transformers$DebertaV2ForMaskedLM(configuration)
   }
 
+  update_aifeducation_progress_bar(value = 7,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),
-              "Saving DeBERTa V2 Model","\n"))
+    message(paste(date(),
+              "Saving DeBERTa V2 Model"))
   }
-  model$save_pretrained(model_dir)
+  if(ml_framework=="tensorflow"){
+    model$build()
+    model$save_pretrained(save_directory=model_dir)
+  } else {
+    model$save_pretrained(save_directory=model_dir,
+                               safe_serilization=pt_safe_save)
+  }
+
+  update_aifeducation_progress_bar(value = 8,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Saving Tokenizer------------------------------------------------------------
 
   if(trace==TRUE){
-    cat(paste(date(),
-              "Saving Tokenizer Model","\n"))
+    message(paste(date(),
+              "Saving Tokenizer Model"))
   }
   tokenizer$save_pretrained(model_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+
+  #Stop Sustainability Tracking if requested-----------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     write.csv(
@@ -240,10 +339,16 @@ create_deberta_v2_model<-function(
       row.names = FALSE)
   }
 
+  update_aifeducation_progress_bar(value = 10,
+                                   total = pgr_max,
+                                   title = "DeBERTa V2 Model")
+  #Finish----------------------------------------------------------------------
+
   if(trace==TRUE){
-    cat(paste(date(),
-              "Done","\n"))
+    message(paste(date(),
+              "Done"))
   }
+
 }
 
 
@@ -288,12 +393,18 @@ create_deberta_v2_model<-function(
 #'@param sustain_interval \code{integer} Interval in seconds for measuring power
 #'usage.
 #'
+#'@param pytorch_safetensors \code{bool} If \code{TRUE} a 'pytorch' model
+#'is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
+#'it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.
 #'@param trace \code{bool} \code{TRUE} if information on the progress should be printed
 #'to the console.
 #'@param keras_trace \code{int} \code{keras_trace=0} does not print any
 #'information about the training process from keras on the console.
 #'\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
 #'one line of information for every epoch. Only relevant if \code{ml_framework="tensorflow"}.
+#'@param pytorch_trace \code{int} \code{pytorch_trace=0} does not print any
+#'information about the training process from pytorch on the console.
+#'\code{pytorch_trace=1} prints a progress bar.
 #'
 #'@return This function does not return an object. Instead the trained or fine-tuned
 #'model is saved to disk.
@@ -313,10 +424,11 @@ create_deberta_v2_model<-function(
 #'
 #'@importFrom utils write.csv
 #'@importFrom utils read.csv
+#'@importFrom reticulate py_module_available
 #'
 #'@export
-train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framework()$TextEmbeddingFramework,
-                                  output_dir,
+train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framework(),
+                               output_dir,
                                model_dir_path,
                                raw_texts,
                                p_mask=0.15,
@@ -334,8 +446,15 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
                                sustain_region=NULL,
                                sustain_interval=15,
                                trace=TRUE,
-                               keras_trace=1){
+                               keras_trace=1,
+                               pytorch_trace=1,
+                               pytorch_safetensors=TRUE){
 
+  #Set Shiny Progress Tracking
+  pgr_max=10
+  update_aifeducation_progress_bar(value = 0, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #argument checking-----------------------------------------------------------
   if((ml_framework %in%c("pytorch","tensorflow","not_specified"))==FALSE){
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
   }
@@ -346,11 +465,68 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
              the library to set the global framework. ")
   }
 
-  #Start Sustainability Tracking
+  if(ml_framework=="tensorflow"){
+    if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
+      from_pt=FALSE
+    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))|
+               file.exists(paste0(model_dir_path,"/model.safetensors"))){
+      from_pt=TRUE
+    } else {
+      stop("Directory does not contain a tf_model.h5, pytorch_model.bin or a
+           model.safetensors file.")
+    }
+  } else {
+    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))|
+       file.exists(paste0(model_dir_path,"/model.safetensors"))){
+      from_tf=FALSE
+    } else if (file.exists(paste0(model_dir_path,"/tf_model.h5"))){
+      from_tf=TRUE
+    } else {
+      stop("Directory does not contain a tf_model.h5, pytorch_model.bin or a
+           model.safetensors file.")
+    }
+  }
+
+  #In the case of pytorch
+  #Check to load from pt/bin or safetensors
+  #Use safetensors as preferred method
+  if(ml_framework=="pytorch"){
+    if((file.exists(paste0(model_dir_path,"/model.safetensors"))==FALSE &
+        from_tf==FALSE)|
+       reticulate::py_module_available("safetensors")==FALSE){
+      load_safe=FALSE
+    } else {
+      load_safe=TRUE
+    }
+  }
+
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
+    }
+  }
+
+  #Check possible save formats
+  if(ml_framework=="pytorch"){
+    if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==TRUE){
+      pt_safe_save=TRUE
+    } else if(pytorch_safetensors==TRUE & reticulate::py_module_available("safetensors")==FALSE){
+      pt_safe_save=FALSE
+      warning("Python library 'safetensors' not available. Model will be saved
+            in the standard pytorch format.")
+    } else {
+      pt_safe_save=FALSE
+    }
+  }
+
+  update_aifeducation_progress_bar(value = 1, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #Start Sustainability Tracking-----------------------------------------------
+  if(sustain_track==TRUE){
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start Sustainability Tracking"))
     }
     sustainability_tracker<-codecarbon$OfflineEmissionsTracker(
       country_iso_code=sustain_iso_code,
@@ -362,33 +538,32 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       save_to_api=FALSE
     )
     sustainability_tracker$start()
+  } else {
+    if(trace==TRUE){
+      message(paste(date(),
+                "Start without Sustainability Tracking"))
+    }
   }
 
-  if(ml_framework=="tensorflow"){
-    if(file.exists(paste0(model_dir_path,"/tf_model.h5"))){
-      from_pt=FALSE
-    } else if (file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
-      from_pt=TRUE
-    } else {
-      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
-    }
-  } else {
-    if(file.exists(paste0(model_dir_path,"/pytorch_model.bin"))){
-      from_tf=FALSE
-    } else if (file.exists(paste0(model_dir_path,"/tf_model.h5"))){
-      from_tf=TRUE
-    } else {
-      stop("Directory does not contain a tf_model.h5 or pytorch_model.bin file.")
-    }
+  update_aifeducation_progress_bar(value = 2, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #Loading existing model------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),
+              "Loading Existing Model"))
   }
 
   if(ml_framework=="tensorflow"){
     mlm_model=transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_path, from_pt=from_pt)
   } else {
-    mlm_model=transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_path,from_tf=from_tf)
+    mlm_model=transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_path,
+                                                                from_tf=from_tf,
+                                                                use_safetensors=load_safe)
   }
 
   tokenizer<-transformers$AutoTokenizer$from_pretrained(model_dir_path)
+
+  update_aifeducation_progress_bar(value = 3, total = pgr_max, title = "DeBERTa V2 Model")
 
   #argument checking------------------------------------------------------------
   if(chunk_size>(mlm_model$config$max_position_embeddings)){
@@ -402,8 +577,11 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
   #adjust chunk size. To elements are needed for begin and end of sequence
   chunk_size=chunk_size-2
 
+  update_aifeducation_progress_bar(value = 4, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #creating chunks of sequences------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Creating Sequence Chunks For Training","\n"))
+    message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
   if(full_sequences_only==FALSE){
@@ -419,7 +597,6 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
                               return_tensors="np")
     tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
     relevant_indices=which(tokenized_dataset["length"]<=chunk_size & tokenized_dataset["length"]>=min_seq_len)
-
 
     tokenized_texts=tokenizer(raw_texts,
                               truncation =TRUE,
@@ -449,32 +626,37 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     relevant_indices=which(tokenized_dataset["length"]==chunk_size)
     tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
   }
+  rm(tokenized_texts)
 
   n_chunks=tokenized_dataset$num_rows
 
   if(trace==TRUE){
-    cat(paste(date(),n_chunks,"Chunks Created","\n"))
+    message(paste(date(),n_chunks,"Chunks Created"))
   }
+
+  update_aifeducation_progress_bar(value = 5, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #Seeting up DataCollator and Dataset------------------------------------------
 
   if(dir.exists(paste0(output_dir))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Output Directory","\n"))
+      message(paste(date(),"Creating Output Directory"))
     }
     dir.create(paste0(output_dir))
   }
 
   if(dir.exists(paste0(output_dir,"/checkpoints"))==FALSE){
     if(trace==TRUE){
-      cat(paste(date(),"Creating Checkpoint Directory","\n"))
+      message(paste(date(),"Creating Checkpoint Directory"))
     }
     dir.create(paste0(output_dir,"/checkpoints"))
   }
 
   if(ml_framework=="tensorflow"){
-
     if(trace==TRUE){
-      cat(paste(date(),"Using Token Masking","\n"))
+      message(paste(date(),"Using Token Masking"))
     }
+
     data_collator=transformers$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
       mlm = TRUE,
@@ -498,10 +680,12 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       shuffle = TRUE)
 
     if(trace==TRUE){
-      cat(paste(date(),"Preparing Training of the Model","\n"))
+      message(paste(date(),"Preparing Training of the Model"))
     }
+
     adam<-tf$keras$optimizers$Adam
 
+    #Add Callback if Shiny App is running
     callback_checkpoint=tf$keras$callbacks$ModelCheckpoint(
       filepath = paste0(output_dir,"/checkpoints/best_weights.h5"),
       monitor="val_loss",
@@ -511,8 +695,17 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       save_freq="epoch",
       save_weights_only= TRUE)
 
+    if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/keras_callbacks.py",
+                                            package = "aifeducation"))
+        callback_checkpoint=list(callback_checkpoint,py$ReportAiforeducationShiny())
+      }
+    }
+
     if(trace==TRUE){
-      cat(paste(date(),"Compile Model","\n"))
+      message(paste(date(),"Compile Model"))
     }
     mlm_model$compile(optimizer=adam(learning_rate),
                       loss="auto")
@@ -520,9 +713,13 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     #Clear session to provide enough resources for computations
     tf$keras$backend$clear_session()
 
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "DeBERTa V2 Model")
+
+    #Start Training------------------------------------------------------------
     if(trace==TRUE){
-      cat(paste(date(),"Start Fine Tuning","\n"))
+      message(paste(date(),"Start Fine Tuning"))
     }
+
     mlm_model$fit(x=tf_train_dataset,
                   validation_data=tf_test_dataset,
                   epochs=as.integer(n_epoch),
@@ -532,13 +729,14 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
                   verbose=as.integer(keras_trace))
 
     if(trace==TRUE){
-      cat(paste(date(),"Load Weights From Best Checkpoint","\n"))
+      message(paste(date(),"Load Weights From Best Checkpoint"))
     }
+
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
 
     if(trace==TRUE){
-      cat(paste(date(),"Using Token Masking","\n"))
+      message(paste(date(),"Using Token Masking"))
     }
     data_collator=transformers$DataCollatorForLanguageModeling(
       tokenizer = tokenizer,
@@ -550,6 +748,11 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     tokenized_dataset$set_format(type="torch")
 
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
+
+
+    if(trace==TRUE){
+      message(paste(date(),"Preparing Training of the Model"))
+    }
 
     training_args=transformers$TrainingArguments(
       output_dir = paste0(output_dir,"/checkpoints"),
@@ -566,7 +769,9 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       per_device_eval_batch_size = as.integer(batch_size),
       save_safetensors=TRUE,
       auto_find_batch_size=FALSE,
-      report_to="none"
+      report_to="none",
+      log_level="error",
+      disable_tqdm=!pytorch_trace
     )
 
     trainer=transformers$Trainer(
@@ -579,29 +784,59 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     )
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
 
+    #Add Callback if Shiny App is running
+    if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){
+      if(shiny::isRunning()){
+        shiny_app_active=TRUE
+        reticulate::py_run_file(system.file("python/pytorch_transformer_callbacks.py",
+                                            package = "aifeducation"))
+        trainer$add_callback(py$ReportAiforeducationShiny_PT())
+      }
+    }
+
+    update_aifeducation_progress_bar(value = 6, total = pgr_max, title = "DeBERTa V2 Model")
+
+    #Start Training------------------------------------------------------------
+    if(trace==TRUE){
+      message(paste(date(),"Start Fine Tuning"))
+    }
     trainer$train()
 
   }
 
-  if(trace==TRUE){
-    cat(paste(date(),"Saving DeBERTa V2 Model","\n"))
-  }
-  mlm_model$save_pretrained(save_directory=output_dir)
+  update_aifeducation_progress_bar(value = 7, total = pgr_max, title = "DeBERTa V2 Model")
 
+  #Saving Model----------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Saving Tokenizer","\n"))
+    message(paste(date(),"Saving DeBERTa V2 Model"))
+  }
+
+  if(ml_framework=="tensorflow"){
+    mlm_model$save_pretrained(save_directory=output_dir)
+  } else {
+    mlm_model$save_pretrained(save_directory=output_dir,
+                              safe_serilization=pt_safe_save)
+  }
+
+  update_aifeducation_progress_bar(value = 8, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #Saving Tokenizer-------------------------------------------------------------
+  if(trace==TRUE){
+    message(paste(date(),"Saving Tokenizer"))
   }
   tokenizer$save_pretrained(output_dir)
 
-  #Stop Sustainability Tracking if requested
+  update_aifeducation_progress_bar(value = 9, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #Stop Sustainability Tracking if requested------------------------------------
   if(sustain_track==TRUE){
     sustainability_tracker$stop()
     sustainability_data<-summarize_tracked_sustainability(sustainability_tracker)
     sustain_matrix=t(as.matrix(unlist(sustainability_data)))
 
     if(trace==TRUE){
-      cat(paste(date(),
-                "Saving Sustainability Data","\n"))
+      message(paste(date(),
+                "Saving Sustainability Data"))
     }
 
     sustainability_data_file_path_input=paste0(model_dir_path,"/sustainability.csv")
@@ -626,9 +861,13 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     }
   }
 
+  update_aifeducation_progress_bar(value = 10, total = pgr_max, title = "DeBERTa V2 Model")
+
+  #Finish----------------------------------------------------------------------
   if(trace==TRUE){
-    cat(paste(date(),"Done","\n"))
+    message(paste(date(),"Done"))
   }
+
 
 }
 
