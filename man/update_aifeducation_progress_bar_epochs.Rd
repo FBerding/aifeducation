@@ -29,7 +29,7 @@ implemented separately.
 }
 \seealso{
 Other Auxiliary GUI Functions: 
-\code{\link{update_aifeducation_progress_bar_steps}()},
-\code{\link{update_aifeducation_progress_bar}()}
+\code{\link{update_aifeducation_progress_bar}()},
+\code{\link{update_aifeducation_progress_bar_steps}()}
 }
 \concept{Auxiliary GUI Functions}

@@ -1521,6 +1521,13 @@ start_aifeducation_studio<-function(){
 
     #Create model
     shiny::observeEvent(input$lm_create,{
+
+      shinyWidgets::show_alert(title="Loading",
+                               text = "Checking arguments and data. Please wait.",
+                               type="info",
+                               closeOnClickOutside = FALSE,
+                               showCloseButton = FALSE)
+
       #Check inputs
       error_list=NULL
       if(!dir.exists(input$lm_save_created_model_dir_path)){
@@ -1546,6 +1553,9 @@ start_aifeducation_studio<-function(){
           )
         }
       }
+
+      #Close Checking SweetAlert
+      shinyWidgets::closeSweetAlert()
 
       if(length(error_list)==0){
         shiny::showModal(progress_modal)
@@ -1746,6 +1756,13 @@ start_aifeducation_studio<-function(){
         } else if(file.exists(paste0(model_path,
                                      "/",
                                      "pytorch_model.bin"))){
+          model<-transformers$AutoModel$from_pretrained(model_path)
+          model_architecture<-model$config$architectures
+          max_position_embeddings=model$config$max_position_embeddings
+          model_exists=TRUE
+        } else if(file.exists(paste0(model_path,
+                                     "/",
+                                     "model.safetensors"))){
           model<-transformers$AutoModel$from_pretrained(model_path)
           model_architecture<-model$config$architectures
           max_position_embeddings=model$config$max_position_embeddings
@@ -1983,6 +2000,12 @@ start_aifeducation_studio<-function(){
 
     #Training and Tuning
     shiny::observeEvent(input$lm_train_tune_start,{
+      shinyWidgets::show_alert(title="Loading",
+                               text = "Checking arguments and data. Please wait.",
+                               type="info",
+                               closeOnClickOutside = FALSE,
+                               showCloseButton = FALSE)
+
       base_model_path=model_path_train_LM()
       raw_text_path=input$lm_db_select_raw_txt_for_training_path
       destination_dir=input$lm_db_select_final_model_destination_path
@@ -2021,6 +2044,9 @@ start_aifeducation_studio<-function(){
         }
       }
 
+      #Close Checking SweetAlert
+      shinyWidgets::closeSweetAlert()
+
       if(length(error_list)==0){
         shiny::showModal(progress_modal)
         update_aifeducation_progress_bar_steps(
@@ -2040,7 +2066,7 @@ start_aifeducation_studio<-function(){
           log(rep(x="",times=15))
           shinyjs::html(id="pgr_text_output_aifeducation",html = "")
 
-          if(input$lm_base_architecture=="bert"){
+          if(model_architecture=="BertModel"){
             train_tune_bert_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2065,7 +2091,7 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="roberta"){
+          } else if(model_architecture=="RobertaModel"){
             train_tune_roberta_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2089,7 +2115,7 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="deberta_v2"){
+          } else if(model_architecture=="DebertaV2ForMaskedLM"){
             train_tune_deberta_v2_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2113,7 +2139,7 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="longformer"){
+          } else if(model_architecture=="LongformerModel"){
             train_tune_longformer_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2137,7 +2163,7 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="funnel"){
+          } else if(model_architecture=="FunnelModel"){
             train_tune_funnel_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2218,6 +2244,12 @@ start_aifeducation_studio<-function(){
       } else if(file.exists(paste0(model_path,
                                    "/",
                                    "pytorch_model.bin"))){
+        model<-transformers$AutoModel$from_pretrained(model_path)
+        model_architecture<-model$config$architectures
+        max_position_embeddings=model$config$max_position_embeddings
+      } else if(file.exists(paste0(model_path,
+                                  "/",
+                                  "model.safetensors"))){
         model<-transformers$AutoModel$from_pretrained(model_path)
         model_architecture<-model$config$architectures
         max_position_embeddings=model$config$max_position_embeddings
