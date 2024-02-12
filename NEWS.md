@@ -25,6 +25,10 @@ editor_options:
     between decoding into single tokens or into plain text.
 -   Fixed a bug for embedding texts when using pytorch. The fix should
     decrease computational time and enables gpu support (if available on machine).
+-   Fixed two missing columns for saving the results of sustainability tracking on machines
+    without gpu.
+-   Implemented the advantages of datasets from the python library 'datasets' increasing
+    computational speed and allowing the use of large datasets.
 
 **TextEmbeddingClassifiers**
 

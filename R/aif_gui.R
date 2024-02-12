@@ -92,7 +92,7 @@ start_aifeducation_studio<-function(){
   #Set Transformer Logger to Error
   set_transformers_logger(level="ERROR")
   #Disable tqdm progressbar
-  transformers$utils$logging$disable_progress_bar()
+  transformers$logging$disable_progress_bar()
 
   #Start GUI--------------------------------------------------------------------
   options(shiny.reactlog=TRUE)

@@ -36,6 +36,9 @@ special conditions of the educational and social sciences.
   people to work with AI without any coding skills.
 - Supports both ‘PyTorch’ and ‘Tensorflow’ as machine learning
   frameworks.
+- Implements the advantages of datasets from the python library
+  ‘datasets’ increasing computational speed and allowing the use of
+  large datasets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports the usage of trained models on both frameworks, providing a
   high level of flexibility.
@@ -131,14 +134,14 @@ following table provides more details:
 
 *Table: Framework compatibility*
 
-| Model                    | PyTorch | tensorflow | Weight Sharing |
-|--------------------------|---------|------------|----------------|
-| BERT                     | Yes     | Yes        | Yes            |
-| RoBERTa                  | Yes     | Yes        | Yes            |
-| DeBERTa                  | Yes     | Yes        | Yes            |
-| Funnel Transformer       | Yes     | Yes        | Yes            |
-| Longformer               | Yes     | Yes        | Yes            |
-| Text Embedding Classifer | Yes     | Yes        | No             |
+| Model                     | PyTorch | tensorflow | Weight Sharing |
+|---------------------------|---------|------------|----------------|
+| BERT                      | Yes     | Yes        | Yes            |
+| RoBERTa                   | Yes     | Yes        | Yes            |
+| DeBERTa                   | Yes     | Yes        | Yes            |
+| Funnel Transformer        | Yes     | Yes        | Yes            |
+| Longformer                | Yes     | Yes        | Yes            |
+| Text Embedding Classifier | Yes     | Yes        | No             |
 
 ## Classification Tasks
 

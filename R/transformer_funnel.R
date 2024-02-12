@@ -127,6 +127,17 @@ create_funnel_model<-function(
              the library to set the global framework. ")
   }
 
+  if(class(vocab_raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(list(text=vocab_raw_texts))
+    )
+  } else {
+    raw_text_dataset=vocab_raw_texts
+    if(is.null(raw_text_dataset$features$text)){
+      stop("Dataset does not contain a colum 'text' storing the raw texts.")
+    }
+  }
+
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
@@ -213,7 +224,20 @@ create_funnel_model<-function(
     message(paste(date(),
               "Start Computing Vocabulary"))
   }
-  tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
+  reticulate::py_run_file(system.file("python/datasets_transformer_compute_vocabulary.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
+  }
+  tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(200),
+                                                dataset=raw_text_dataset,
+                                                report_to_shiny_app=shiny_app_active),
+                              trainer=trainer,
+                              length=length(raw_text_dataset))
   if(trace==TRUE){
     message(paste(date(),
               "Start Computing Vocabulary - Done"))
@@ -599,50 +623,53 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
-  if(full_sequences_only==FALSE){
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]<=chunk_size & tokenized_dataset["length"]>=min_seq_len)
-
-
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= TRUE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
-
-  } else {
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]==chunk_size)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
+  reticulate::py_run_file(system.file("python/datasets_transformer_prepare_data.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
   }
-  rm(tokenized_texts)
+
+  if(class(raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    #Create Dataset
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(
+        list(text=raw_texts)
+      )
+    )
+  }
+
+  #Preparing Data
+  tokenized_texts_raw=raw_text_dataset$map(
+    py$tokenize_raw_text,
+    batched=TRUE,
+    batch_size=2L,
+    fn_kwargs=reticulate::dict(list(
+      tokenizer=tokenizer,
+      truncation =TRUE,
+      padding= FALSE,
+      max_length=as.integer(chunk_size),
+      return_overflowing_tokens = TRUE,
+      return_length = TRUE,
+      return_special_tokens_mask=TRUE,
+      return_offsets_mapping = FALSE,
+      return_attention_mask = TRUE,
+      return_tensors="np",
+      request_word_ids=FALSE,
+      report_to_aifeducation_studio=shiny_app_active)),
+    remove_columns=raw_text_dataset$column_names
+  )
+
+  if(full_sequences_only==FALSE){
+    relevant_indices=which(tokenized_texts_raw["length"]<=chunk_size & tokenized_texts_raw["length"]>=min_seq_len)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  } else {
+    relevant_indices=which(tokenized_texts_raw["length"]==chunk_size)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  }
 
   n_chunks=tokenized_dataset$num_rows
 
@@ -681,7 +708,6 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
       return_tensors = "tf"
     )
 
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
 
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
@@ -766,7 +792,6 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     )
 
 
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="torch")
 
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)

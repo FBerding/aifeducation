@@ -93,7 +93,6 @@ create_deberta_v2_model<-function(
   update_aifeducation_progress_bar(value = 0,
                                    total = pgr_max,
                                    title = "DeBERTa V2 Model")
-
   #argument checking-----------------------------------------------------------
   #if(max_position_embeddings>512){
   #  warning("Due to a quadratic increase in memory requirments it is not
@@ -111,6 +110,17 @@ create_deberta_v2_model<-function(
     stop("The global machine learning framework is not set. Please use
              aifeducation_config$set_global_ml_backend() directly after loading
              the library to set the global framework. ")
+  }
+
+  if(class(vocab_raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(list(text=vocab_raw_texts))
+    )
+  } else {
+    raw_text_dataset=vocab_raw_texts
+    if(is.null(raw_text_dataset$features$text)){
+      stop("Dataset does not contain a colum 'text' storing the raw texts.")
+    }
   }
 
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
@@ -198,11 +208,23 @@ create_deberta_v2_model<-function(
               "Start Computing Vocabulary"))
   }
 
-  tok_new$train_from_iterator(
-    iterator = vocab_raw_texts,
-    vocab_size = as.integer(vocab_size),
-    special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"),
-    unk_token="[UNK]")
+  reticulate::py_run_file(system.file("python/datasets_transformer_compute_vocabulary.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
+  }
+  tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(200),
+                                                dataset=raw_text_dataset,
+                                                report_to_shiny_app=shiny_app_active),
+                              #trainer=trainer,
+                              length=length(raw_text_dataset),
+                              vocab_size = as.integer(vocab_size),
+                              special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"),
+                              unk_token="[UNK]")
 
   if(trace==TRUE){
     message(paste(date(),
@@ -584,51 +606,59 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
-  if(full_sequences_only==FALSE){
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]<=chunk_size & tokenized_dataset["length"]>=min_seq_len)
-
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= TRUE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
-
-  } else {
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]==chunk_size)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
+  reticulate::py_run_file(system.file("python/datasets_transformer_prepare_data.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
   }
-  rm(tokenized_texts)
+
+  if(class(raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    #Create Dataset
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(
+        list(text=raw_texts)
+      )
+    )
+  }
+
+  #Preparing Data
+  tokenized_texts_raw=raw_text_dataset$map(
+    py$tokenize_raw_text,
+    batched=TRUE,
+    batch_size=2L,
+    fn_kwargs=reticulate::dict(list(
+      tokenizer=tokenizer,
+      truncation =TRUE,
+      padding= FALSE,
+      max_length=as.integer(chunk_size),
+      return_overflowing_tokens = TRUE,
+      return_length = TRUE,
+      return_special_tokens_mask=TRUE,
+      return_offsets_mapping = FALSE,
+      return_attention_mask = TRUE,
+      return_tensors="np",
+      request_word_ids=FALSE,
+      report_to_aifeducation_studio=shiny_app_active)),
+    remove_columns=raw_text_dataset$column_names
+  )
+
+  if(full_sequences_only==FALSE){
+    relevant_indices=which(tokenized_texts_raw["length"]<=chunk_size & tokenized_texts_raw["length"]>=min_seq_len)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  } else {
+    relevant_indices=which(tokenized_texts_raw["length"]==chunk_size)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  }
 
   n_chunks=tokenized_dataset$num_rows
+
+  if(trace==TRUE){
+    message(paste(date(),n_chunks,"Chunks Created"))
+  }
 
   if(trace==TRUE){
     message(paste(date(),n_chunks,"Chunks Created"))
@@ -662,10 +692,7 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       mlm = TRUE,
       mlm_probability = p_mask,
       return_tensors = "tf")
-
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     tf_train_dataset=mlm_model$prepare_tf_dataset(
@@ -743,8 +770,6 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
       mlm = TRUE,
       mlm_probability = p_mask,
       return_tensors = "pt")
-
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="torch")
 
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
@@ -799,6 +824,9 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     #Start Training------------------------------------------------------------
     if(trace==TRUE){
       message(paste(date(),"Start Fine Tuning"))
+    }
+    if(torch$cuda$is_available()){
+      torch$cuda$empty_cache()
     }
     trainer$train()
 
