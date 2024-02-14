@@ -11,11 +11,11 @@
 #'@param vocab_raw_texts \code{vector} containing the raw texts for creating the
 #'vocabulary.
 #'@param vocab_size \code{int} Size of the vocabulary.
+#'@param do_lower_case \code{bool} If \code{TRUE} all characters are transformed to lower case.
 #'@param add_prefix_space \code{bool} \code{TRUE} if an additional space should be insert
 #'to the leading words.
 #'@param trim_offsets \code{bool} If \code{TRUE} post processing trims offsets
 #'to avoid including whitespaces.
-#'@param do_lower_case \code{bool} If \code{TRUE} all characters are transformed to lower case.
 #'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
 #'also determines the maximum length of a sequence which can be processed with the model.
 #'@param hidden_size \code{int} Number of neurons in each layer. This parameter determines the
@@ -70,7 +70,7 @@ create_deberta_v2_model<-function(
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=128100,
-    add_prefix_space=FALSE,
+    add_prefix_space = FALSE,
     trim_offsets=TRUE,
     do_lower_case=FALSE,
     max_position_embeddings=512,
@@ -217,14 +217,16 @@ create_deberta_v2_model<-function(
       shiny_app_active=TRUE
     }
   }
-  tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(200),
+  tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(2),
                                                 dataset=raw_text_dataset,
                                                 report_to_shiny_app=shiny_app_active),
                               #trainer=trainer,
                               length=length(raw_text_dataset),
                               vocab_size = as.integer(vocab_size),
                               special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"),
-                              unk_token="[UNK]")
+                              unk_token="[UNK]"
+                              )
+
 
   if(trace==TRUE){
     message(paste(date(),
