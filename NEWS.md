@@ -15,6 +15,9 @@ editor_options:
 
 -   Fixed a bug in all transformers except BERT concerning the
     unk_token.
+-   Switched from SentencePiece tokenizer to WordPiece tokenizer for DeBERTa_V2.
+-   Add the possibility to train DeBERTa_V2 and FunnelTransformer models with
+    Whole Word Masking.
 
 **TextEmbeddingModel**
 
@@ -55,9 +58,12 @@ editor_options:
     EmbeddedText.
 -   Added precision, recall, and f1-score as new metrics.
 
-**Python Installation** - Added an argument to 'install_py_modules',
-allowing to choose which machine learning framework should be
-installed. - Updated 'check_aif_py_modules'.
+**Python Installation** 
+
+-   Added an argument to 'install_py_modules',
+    allowing to choose which machine learning framework should be
+    installed. 
+- Updated 'check_aif_py_modules'.
 
 **Further Changes**
 

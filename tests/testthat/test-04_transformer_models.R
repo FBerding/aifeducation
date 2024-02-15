@@ -47,10 +47,10 @@ rows_susatainability<-vector(length = length(ai_methods))
 
 names(rows_susatainability)<-ai_methods
 rows_susatainability["bert"]=3
-rows_susatainability["funnel"]=2
+rows_susatainability["funnel"]=3
 rows_susatainability["roberta"]=2
 rows_susatainability["longformer"]=2
-rows_susatainability["deberta_v2"]=2
+rows_susatainability["deberta_v2"]=3
 
 
 example_data<-data.frame(
@@ -266,7 +266,7 @@ for(ai_method in ai_methods){
             vocab_raw_texts=example_data$text,
             vocab_size=10000,
             do_lower_case=FALSE,
-            add_prefix_space=FALSE,
+            #add_prefix_space=FALSE,
             max_position_embeddings=512,
             hidden_size=32,
             num_hidden_layer=2,
@@ -287,7 +287,7 @@ for(ai_method in ai_methods){
             vocab_raw_texts=example_data$text,
             vocab_size=10000,
             do_lower_case=TRUE,
-            add_prefix_space=TRUE,
+            #add_prefix_space=TRUE,
             max_position_embeddings=512,
             hidden_size=32,
             num_hidden_layer=2,
@@ -446,6 +446,7 @@ for(ai_method in ai_methods){
                                   model_dir_path=testthat::test_path(paste0(path_01,"/",framework)),
                                   raw_texts= example_data$text[1:20],
                                   p_mask=0.15,
+                                  whole_word=TRUE,
                                   val_size=0.1,
                                   n_epoch=2,
                                   batch_size=2,
@@ -460,6 +461,27 @@ for(ai_method in ai_methods){
                                   sustain_interval = 15,
                                   trace=FALSE,
                                   keras_trace = 0))
+          expect_no_error(
+            train_tune_funnel_model(ml_framework = framework,
+                                    output_dir=testthat::test_path(paste0(path_01,"/",framework)),
+                                    model_dir_path=testthat::test_path(paste0(path_01,"/",framework)),
+                                    raw_texts= example_data$text[1:20],
+                                    p_mask=0.15,
+                                    whole_word=FALSE,
+                                    val_size=0.1,
+                                    n_epoch=2,
+                                    batch_size=2,
+                                    min_seq_len = 50,
+                                    full_sequences_only = TRUE,
+                                    chunk_size=250,
+                                    n_workers=1,
+                                    multi_process=FALSE,
+                                    sustain_track=TRUE,
+                                    sustain_iso_code = "DEU",
+                                    sustain_region = NULL,
+                                    sustain_interval = 15,
+                                    trace=FALSE,
+                                    keras_trace = 0))
 
         }  else if(ai_method=="deberta_v2"){
           expect_no_error(
@@ -469,6 +491,29 @@ for(ai_method in ai_methods){
               model_dir_path=testthat::test_path(paste0(path_01,"/",framework)),
               raw_texts= example_data$text[1:5],
               p_mask=0.15,
+              whole_word=TRUE,
+              val_size=0.1,
+              n_epoch=2,
+              batch_size=2,
+              chunk_size=100,
+              full_sequences_only = FALSE,
+              n_workers=1,
+              multi_process=FALSE,
+              sustain_track=TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              keras_trace = 0,
+              trace=FALSE))
+
+          expect_no_error(
+            train_tune_deberta_v2_model(
+              ml_framework = framework,
+              output_dir=testthat::test_path(paste0(path_01,"/",framework)),
+              model_dir_path=testthat::test_path(paste0(path_01,"/",framework)),
+              raw_texts= example_data$text[1:5],
+              p_mask=0.15,
+              whole_word=FALSE,
               val_size=0.1,
               n_epoch=2,
               batch_size=2,

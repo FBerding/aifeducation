@@ -405,6 +405,8 @@ create_funnel_model<-function(
 #'model is stored.
 #'@param raw_texts \code{vector} containing the raw texts for training.
 #'@param p_mask \code{double} Ratio determining the number of words/tokens for masking.
+#'@param whole_word \code{bool} \code{TRUE} if whole word masking should be applied.
+#'If \code{FALSE} token masking is used.
 #'@param val_size \code{double} Ratio determining the amount of token chunks used for
 #'validation.
 #'@param n_epoch \code{int} Number of epochs for training.
@@ -471,6 +473,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
                                  model_dir_path,
                                  raw_texts,
                                  p_mask=0.15,
+                                 whole_word=TRUE,
                                  val_size=0.1,
                                  n_epoch=1,
                                  batch_size=12,
@@ -658,7 +661,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
       return_offsets_mapping = FALSE,
       return_attention_mask = TRUE,
       return_tensors="np",
-      request_word_ids=FALSE,
+      request_word_ids=whole_word,
       report_to_aifeducation_studio=shiny_app_active)),
     remove_columns=raw_text_dataset$column_names
   )
@@ -696,20 +699,28 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
   }
 
   if(ml_framework=="tensorflow"){
-
-
-    if(trace==TRUE){
-      message(paste(date(),"Using Token Masking"))
+    if(whole_word==TRUE){
+      if(trace==TRUE){
+        message(paste(date(),"Using Whole Word Masking"))
+      }
+      data_collator=transformers$DataCollatorForWholeWordMask(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "tf")
+    } else {
+      if(trace==TRUE){
+        message(paste(date(),"Using Token Masking"))
+      }
+      data_collator=transformers$DataCollatorForLanguageModeling(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "tf"
+      )
     }
-    data_collator=transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = "tf"
-    )
 
     tokenized_dataset$set_format(type="tensorflow")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     tf_train_dataset=mlm_model$prepare_tf_dataset(
@@ -779,21 +790,28 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     }
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
-
-
-    if(trace==TRUE){
-      message(paste(date(),"Using Token Masking"))
+    if(whole_word==TRUE){
+      if(trace==TRUE){
+        message(paste(date(),"Using Whole Word Masking"))
+      }
+      data_collator=transformers$DataCollatorForWholeWordMask(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "pt")
+    } else {
+      if(trace==TRUE){
+        message(paste(date(),"Using Token Masking"))
+      }
+      data_collator=transformers$DataCollatorForLanguageModeling(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "pt"
+      )
     }
-    data_collator=transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = "pt"
-    )
-
 
     tokenized_dataset$set_format(type="torch")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     training_args=transformers$TrainingArguments(

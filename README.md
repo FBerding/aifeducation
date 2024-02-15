@@ -36,9 +36,8 @@ special conditions of the educational and social sciences.
   people to work with AI without any coding skills.
 - Supports both ‘PyTorch’ and ‘Tensorflow’ as machine learning
   frameworks.
-- Implements the advantages of datasets from the python library
-  ‘datasets’ increasing computational speed and allowing the use of
-  large datasets.
+- Implements the advantages of the python library ‘datasets’ increasing
+  computational speed and allowing the use of large datasets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports the usage of trained models on both frameworks, providing a
   high level of flexibility.
@@ -104,7 +103,7 @@ The package ships with a shiny app that serves as a graphical user
 interface.
 
 <figure>
-<img src="man/figures/gui_aife_readme.jpg" style="width:100.0%"
+<img src="man/figures/gui_aife_readme.JPG" style="width:100.0%"
 alt="Figure 1: Aifeducation Studio" />
 <figcaption aria-hidden="true">Figure 1: Aifeducation
 Studio</figcaption>

@@ -1472,8 +1472,20 @@ start_aifeducation_studio<-function(){
                          label = "Transform to Lower Case",
                          status = "primary")
         )
-      } else if(input$lm_base_architecture=="deberta_v2"|
-                input$lm_base_architecture=="longformer"){
+      } else if(input$lm_base_architecture=="deberta_v2"){
+        ui_vocab<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_vocab_size",
+                              label="Size of Vocabulary",
+                              value=30522,
+                              min = 100,
+                              max=200000,
+                              step = 1),
+          shinyWidgets::materialSwitch(inputId = "lm_vocab_do_lower_case",
+                                       value = FALSE,
+                                       label = "Transform to Lower Case",
+                                       status = "primary"),
+        )
+      } else if(input$lm_base_architecture=="longformer"){
         ui_vocab<-shiny::tagList(
           shiny::numericInput(inputId = "lm_vocab_size",
                        label="Size of Vocabulary",
@@ -1624,8 +1636,8 @@ start_aifeducation_studio<-function(){
               model_dir=input$lm_save_created_model_dir_path,
               vocab_raw_texts=raw_texts$text,
               vocab_size=input$lm_vocab_size,
-              add_prefix_space=input$lm_add_prefix_space,
-              trim_offsets=input$lm_trim_offsets,
+              #add_prefix_space=input$lm_add_prefix_space,
+              #trim_offsets=input$lm_trim_offsets,
               do_lower_case=input$lm_vocab_do_lower_case,
               max_position_embeddings=input$lm_max_position_embeddings,
               hidden_size=input$lm_hidden_size,
@@ -1834,7 +1846,9 @@ start_aifeducation_studio<-function(){
       if(!is.null(train_tune_model_architecture()[[2]])){
         model_architecture=train_tune_model_architecture()[1]
         max_position_embeddings=train_tune_model_architecture()[[2]]
-        if(model_architecture=="BertModel"){
+        if(model_architecture=="BertModel"|
+           model_architecture=="FunnelModel"|
+           model_architecture=="DebertaV2ForMaskedLM"){
           ui_training_setting<-shiny::fluidRow(
             shiny::column(width = 6,
                    shiny::sliderInput(inputId = "lm_chunk_size",
@@ -1885,7 +1899,7 @@ start_aifeducation_studio<-function(){
                                   value = FALSE,
                                   label = shiny::tags$b("Full Sequences Only"),
                                   status = "primary"),
-                   shinyWidgets::materialSwitch(inputId = "lm_whole_word ",
+                   shinyWidgets::materialSwitch(inputId = "lm_whole_word",
                                   value = TRUE,
                                   label = shiny::tags$b("Whole Word Masking"),
                                   status = "primary")
@@ -2073,7 +2087,7 @@ start_aifeducation_studio<-function(){
               model_dir_path=base_model_path,
               raw_texts=raw_texts$text,
               p_mask=input$lm_p_mask,
-              whole_word=TRUE,
+              whole_word=input$lm_whole_word,
               val_size=input$lm_val_size,
               n_epoch=input$lm_n_epoch,
               batch_size=input$lm_batch_size,
@@ -2122,6 +2136,7 @@ start_aifeducation_studio<-function(){
               model_dir_path=base_model_path,
               raw_texts=raw_texts$text,
               p_mask=input$lm_p_mask,
+              whole_word=input$lm_whole_word,
               val_size=input$lm_val_size,
               n_epoch=input$lm_n_epoch,
               batch_size=input$lm_batch_size,
@@ -2170,6 +2185,7 @@ start_aifeducation_studio<-function(){
               model_dir_path=base_model_path,
               raw_texts=raw_texts$text,
               p_mask=input$lm_p_mask,
+              whole_word=input$lm_whole_word,
               val_size=input$lm_val_size,
               n_epoch=input$lm_n_epoch,
               batch_size=input$lm_batch_size,

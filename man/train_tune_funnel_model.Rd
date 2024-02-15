@@ -10,6 +10,7 @@ train_tune_funnel_model(
   model_dir_path,
   raw_texts,
   p_mask = 0.15,
+  whole_word = TRUE,
   val_size = 0.1,
   n_epoch = 1,
   batch_size = 12,
@@ -43,6 +44,9 @@ model is stored.}
 \item{raw_texts}{\code{vector} containing the raw texts for training.}
 
 \item{p_mask}{\code{double} Ratio determining the number of words/tokens for masking.}
+
+\item{whole_word}{\code{bool} \code{TRUE} if whole word masking should be applied.
+If \code{FALSE} token masking is used.}
 
 \item{val_size}{\code{double} Ratio determining the amount of token chunks used for
 validation.}

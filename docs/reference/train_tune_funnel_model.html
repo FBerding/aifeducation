@@ -75,6 +75,7 @@ based on Funnel Transformer architecture with the help of the python libraries '
 <span>  <span class="va">model_dir_path</span>,</span>
 <span>  <span class="va">raw_texts</span>,</span>
 <span>  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
+<span>  whole_word <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  val_size <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  n_epoch <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
@@ -119,6 +120,11 @@ model is stored.</p></dd>
 
 <dt>p_mask</dt>
 <dd><p><code>double</code> Ratio determining the number of words/tokens for masking.</p></dd>
+
+
+<dt>whole_word</dt>
+<dd><p><code>bool</code> <code>TRUE</code> if whole word masking should be applied.
+If <code>FALSE</code> token masking is used.</p></dd>
 
 
 <dt>val_size</dt>

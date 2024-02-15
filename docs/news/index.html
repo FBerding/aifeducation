@@ -62,11 +62,15 @@
 <ul><li>Added a shiny app to the package that serves as a graphical user interface.</li>
 </ul><p><strong>Transformer Models</strong></p>
 <ul><li>Fixed a bug in all transformers except BERT concerning the unk_token.</li>
+<li>Switched from SentencePiece tokenizer to WordPiece tokenizer for DeBERTa_V2.</li>
+<li>Add the possibility to train DeBERTa_V2 and FunnelTransformer models with Whole Word Masking.</li>
 </ul><p><strong>TextEmbeddingModel</strong></p>
 <ul><li>Added a method for ‘fill-mask’.</li>
 <li>Added a new argument to the method ‘encode’, allowing to chose between encoding into token ids or into token strings.</li>
 <li>Added a new argument to the method ‘decode’, allowing to chose between decoding into single tokens or into plain text.</li>
 <li>Fixed a bug for embedding texts when using pytorch. The fix should decrease computational time and enables gpu support (if available on machine).</li>
+<li>Fixed two missing columns for saving the results of sustainability tracking on machines without gpu.</li>
+<li>Implemented the advantages of datasets from the python library ‘datasets’ increasing computational speed and allowing the use of large datasets.</li>
 </ul><p><strong>TextEmbeddingClassifiers</strong></p>
 <ul><li>Adding support for pytorch without the need for kerasV3 or keras-core. Classifiers for pytorch are now implemented in native pytorch.</li>
 <li>Changed the architecture for new classifiers and extended the abilities of neural nets by adding the possibility to add positional embedding.</li>
@@ -77,8 +81,10 @@
 <li>Added the option to balance class weights for calculating training loss according to the Inverse Frequency method. Balance class weights is activated by default.</li>
 <li>Added a method for checking the compatibility of the underlying TextEmbeddingModels of a classifier and an object of class EmbeddedText.</li>
 <li>Added precision, recall, and f1-score as new metrics.</li>
-</ul><p><strong>Python Installation</strong> - Added an argument to ‘install_py_modules’, allowing to choose which machine learning framework should be installed. - Updated ‘check_aif_py_modules’.</p>
-<p><strong>Further Changes</strong></p>
+</ul><p><strong>Python Installation</strong></p>
+<ul><li>Added an argument to ‘install_py_modules’, allowing to choose which machine learning framework should be installed.</li>
+<li>Updated ‘check_aif_py_modules’.</li>
+</ul><p><strong>Further Changes</strong></p>
 <ul><li>Setting the machine learning framework at the start of a session is no longer necessary. The function for setting the global ml_framework remains active for convenience. The ml_framework can now be switched at any time during a session.</li>
 <li>Updated documentation.</li>
 </ul></div>
