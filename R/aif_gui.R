@@ -92,7 +92,7 @@ start_aifeducation_studio<-function(){
   #Set Transformer Logger to Error
   set_transformers_logger(level="ERROR")
   #Disable tqdm progressbar
-  transformers$utils$logging$disable_progress_bar()
+  transformers$logging$disable_progress_bar()
 
   #Start GUI--------------------------------------------------------------------
   options(shiny.reactlog=TRUE)
@@ -1472,8 +1472,20 @@ start_aifeducation_studio<-function(){
                          label = "Transform to Lower Case",
                          status = "primary")
         )
-      } else if(input$lm_base_architecture=="deberta_v2"|
-                input$lm_base_architecture=="longformer"){
+      } else if(input$lm_base_architecture=="deberta_v2"){
+        ui_vocab<-shiny::tagList(
+          shiny::numericInput(inputId = "lm_vocab_size",
+                              label="Size of Vocabulary",
+                              value=30522,
+                              min = 100,
+                              max=200000,
+                              step = 1),
+          shinyWidgets::materialSwitch(inputId = "lm_vocab_do_lower_case",
+                                       value = FALSE,
+                                       label = "Transform to Lower Case",
+                                       status = "primary"),
+        )
+      } else if(input$lm_base_architecture=="longformer"){
         ui_vocab<-shiny::tagList(
           shiny::numericInput(inputId = "lm_vocab_size",
                        label="Size of Vocabulary",
@@ -1521,6 +1533,13 @@ start_aifeducation_studio<-function(){
 
     #Create model
     shiny::observeEvent(input$lm_create,{
+
+      shinyWidgets::show_alert(title="Loading",
+                               text = "Checking arguments and data. Please wait.",
+                               type="info",
+                               closeOnClickOutside = FALSE,
+                               showCloseButton = FALSE)
+
       #Check inputs
       error_list=NULL
       if(!dir.exists(input$lm_save_created_model_dir_path)){
@@ -1546,6 +1565,9 @@ start_aifeducation_studio<-function(){
           )
         }
       }
+
+      #Close Checking SweetAlert
+      shinyWidgets::closeSweetAlert()
 
       if(length(error_list)==0){
         shiny::showModal(progress_modal)
@@ -1614,8 +1636,8 @@ start_aifeducation_studio<-function(){
               model_dir=input$lm_save_created_model_dir_path,
               vocab_raw_texts=raw_texts$text,
               vocab_size=input$lm_vocab_size,
-              add_prefix_space=input$lm_add_prefix_space,
-              trim_offsets=input$lm_trim_offsets,
+              #add_prefix_space=input$lm_add_prefix_space,
+              #trim_offsets=input$lm_trim_offsets,
               do_lower_case=input$lm_vocab_do_lower_case,
               max_position_embeddings=input$lm_max_position_embeddings,
               hidden_size=input$lm_hidden_size,
@@ -1750,6 +1772,13 @@ start_aifeducation_studio<-function(){
           model_architecture<-model$config$architectures
           max_position_embeddings=model$config$max_position_embeddings
           model_exists=TRUE
+        } else if(file.exists(paste0(model_path,
+                                     "/",
+                                     "model.safetensors"))){
+          model<-transformers$AutoModel$from_pretrained(model_path)
+          model_architecture<-model$config$architectures
+          max_position_embeddings=model$config$max_position_embeddings
+          model_exists=TRUE
         } else {
           model_architecture=NULL
           max_position_embeddings=NULL
@@ -1817,7 +1846,9 @@ start_aifeducation_studio<-function(){
       if(!is.null(train_tune_model_architecture()[[2]])){
         model_architecture=train_tune_model_architecture()[1]
         max_position_embeddings=train_tune_model_architecture()[[2]]
-        if(model_architecture=="BertModel"){
+        if(model_architecture=="BertModel"|
+           model_architecture=="FunnelModel"|
+           model_architecture=="DebertaV2ForMaskedLM"){
           ui_training_setting<-shiny::fluidRow(
             shiny::column(width = 6,
                    shiny::sliderInput(inputId = "lm_chunk_size",
@@ -1868,7 +1899,7 @@ start_aifeducation_studio<-function(){
                                   value = FALSE,
                                   label = shiny::tags$b("Full Sequences Only"),
                                   status = "primary"),
-                   shinyWidgets::materialSwitch(inputId = "lm_whole_word ",
+                   shinyWidgets::materialSwitch(inputId = "lm_whole_word",
                                   value = TRUE,
                                   label = shiny::tags$b("Whole Word Masking"),
                                   status = "primary")
@@ -1983,6 +2014,12 @@ start_aifeducation_studio<-function(){
 
     #Training and Tuning
     shiny::observeEvent(input$lm_train_tune_start,{
+      shinyWidgets::show_alert(title="Loading",
+                               text = "Checking arguments and data. Please wait.",
+                               type="info",
+                               closeOnClickOutside = FALSE,
+                               showCloseButton = FALSE)
+
       base_model_path=model_path_train_LM()
       raw_text_path=input$lm_db_select_raw_txt_for_training_path
       destination_dir=input$lm_db_select_final_model_destination_path
@@ -2021,6 +2058,9 @@ start_aifeducation_studio<-function(){
         }
       }
 
+      #Close Checking SweetAlert
+      shinyWidgets::closeSweetAlert()
+
       if(length(error_list)==0){
         shiny::showModal(progress_modal)
         update_aifeducation_progress_bar_steps(
@@ -2040,14 +2080,14 @@ start_aifeducation_studio<-function(){
           log(rep(x="",times=15))
           shinyjs::html(id="pgr_text_output_aifeducation",html = "")
 
-          if(input$lm_base_architecture=="bert"){
+          if(model_architecture=="BertModel"){
             train_tune_bert_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
               model_dir_path=base_model_path,
               raw_texts=raw_texts$text,
               p_mask=input$lm_p_mask,
-              whole_word=TRUE,
+              whole_word=input$lm_whole_word,
               val_size=input$lm_val_size,
               n_epoch=input$lm_n_epoch,
               batch_size=input$lm_batch_size,
@@ -2065,7 +2105,7 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="roberta"){
+          } else if(model_architecture=="RobertaModel"){
             train_tune_roberta_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2089,13 +2129,14 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="deberta_v2"){
+          } else if(model_architecture=="DebertaV2ForMaskedLM"){
             train_tune_deberta_v2_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
               model_dir_path=base_model_path,
               raw_texts=raw_texts$text,
               p_mask=input$lm_p_mask,
+              whole_word=input$lm_whole_word,
               val_size=input$lm_val_size,
               n_epoch=input$lm_n_epoch,
               batch_size=input$lm_batch_size,
@@ -2113,7 +2154,7 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="longformer"){
+          } else if(model_architecture=="LongformerModel"){
             train_tune_longformer_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
@@ -2137,13 +2178,14 @@ start_aifeducation_studio<-function(){
               keras_trace=0,
               pytorch_trace=0)
 
-          } else if(input$lm_base_architecture=="funnel"){
+          } else if(model_architecture=="FunnelModel"){
             train_tune_funnel_model(
               ml_framework=input$config_ml_framework,
               output_dir=destination_dir,
               model_dir_path=base_model_path,
               raw_texts=raw_texts$text,
               p_mask=input$lm_p_mask,
+              whole_word=input$lm_whole_word,
               val_size=input$lm_val_size,
               n_epoch=input$lm_n_epoch,
               batch_size=input$lm_batch_size,
@@ -2218,6 +2260,12 @@ start_aifeducation_studio<-function(){
       } else if(file.exists(paste0(model_path,
                                    "/",
                                    "pytorch_model.bin"))){
+        model<-transformers$AutoModel$from_pretrained(model_path)
+        model_architecture<-model$config$architectures
+        max_position_embeddings=model$config$max_position_embeddings
+      } else if(file.exists(paste0(model_path,
+                                  "/",
+                                  "model.safetensors"))){
         model<-transformers$AutoModel$from_pretrained(model_path)
         model_architecture<-model$config$architectures
         max_position_embeddings=model$config$max_position_embeddings

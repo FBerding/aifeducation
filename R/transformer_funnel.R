@@ -127,6 +127,17 @@ create_funnel_model<-function(
              the library to set the global framework. ")
   }
 
+  if(class(vocab_raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(list(text=vocab_raw_texts))
+    )
+  } else {
+    raw_text_dataset=vocab_raw_texts
+    if(is.null(raw_text_dataset$features$text)){
+      stop("Dataset does not contain a colum 'text' storing the raw texts.")
+    }
+  }
+
   if(sustain_track==TRUE){
     if(is.null(sustain_iso_code)==TRUE){
       stop("Sustainability tracking is activated but iso code for the
@@ -213,7 +224,20 @@ create_funnel_model<-function(
     message(paste(date(),
               "Start Computing Vocabulary"))
   }
-  tok_new$train_from_iterator(vocab_raw_texts,trainer=trainer)
+  reticulate::py_run_file(system.file("python/datasets_transformer_compute_vocabulary.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
+  }
+  tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(200),
+                                                dataset=raw_text_dataset,
+                                                report_to_shiny_app=shiny_app_active),
+                              trainer=trainer,
+                              length=length(raw_text_dataset))
   if(trace==TRUE){
     message(paste(date(),
               "Start Computing Vocabulary - Done"))
@@ -381,6 +405,8 @@ create_funnel_model<-function(
 #'model is stored.
 #'@param raw_texts \code{vector} containing the raw texts for training.
 #'@param p_mask \code{double} Ratio determining the number of words/tokens for masking.
+#'@param whole_word \code{bool} \code{TRUE} if whole word masking should be applied.
+#'If \code{FALSE} token masking is used.
 #'@param val_size \code{double} Ratio determining the amount of token chunks used for
 #'validation.
 #'@param n_epoch \code{int} Number of epochs for training.
@@ -447,6 +473,7 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
                                  model_dir_path,
                                  raw_texts,
                                  p_mask=0.15,
+                                 whole_word=TRUE,
                                  val_size=0.1,
                                  n_epoch=1,
                                  batch_size=12,
@@ -599,50 +626,53 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
-  if(full_sequences_only==FALSE){
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]<=chunk_size & tokenized_dataset["length"]>=min_seq_len)
-
-
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= TRUE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
-
-  } else {
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]==chunk_size)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
+  reticulate::py_run_file(system.file("python/datasets_transformer_prepare_data.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
   }
-  rm(tokenized_texts)
+
+  if(class(raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    #Create Dataset
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(
+        list(text=raw_texts)
+      )
+    )
+  }
+
+  #Preparing Data
+  tokenized_texts_raw=raw_text_dataset$map(
+    py$tokenize_raw_text,
+    batched=TRUE,
+    batch_size=2L,
+    fn_kwargs=reticulate::dict(list(
+      tokenizer=tokenizer,
+      truncation =TRUE,
+      padding= FALSE,
+      max_length=as.integer(chunk_size),
+      return_overflowing_tokens = TRUE,
+      return_length = TRUE,
+      return_special_tokens_mask=TRUE,
+      return_offsets_mapping = FALSE,
+      return_attention_mask = TRUE,
+      return_tensors="np",
+      request_word_ids=whole_word,
+      report_to_aifeducation_studio=shiny_app_active)),
+    remove_columns=raw_text_dataset$column_names
+  )
+
+  if(full_sequences_only==FALSE){
+    relevant_indices=which(tokenized_texts_raw["length"]<=chunk_size & tokenized_texts_raw["length"]>=min_seq_len)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  } else {
+    relevant_indices=which(tokenized_texts_raw["length"]==chunk_size)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  }
 
   n_chunks=tokenized_dataset$num_rows
 
@@ -669,21 +699,28 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
   }
 
   if(ml_framework=="tensorflow"){
-
-
-    if(trace==TRUE){
-      message(paste(date(),"Using Token Masking"))
+    if(whole_word==TRUE){
+      if(trace==TRUE){
+        message(paste(date(),"Using Whole Word Masking"))
+      }
+      data_collator=transformers$DataCollatorForWholeWordMask(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "tf")
+    } else {
+      if(trace==TRUE){
+        message(paste(date(),"Using Token Masking"))
+      }
+      data_collator=transformers$DataCollatorForLanguageModeling(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "tf"
+      )
     }
-    data_collator=transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = "tf"
-    )
 
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     tf_train_dataset=mlm_model$prepare_tf_dataset(
@@ -753,22 +790,28 @@ train_tune_funnel_model=function(ml_framework=aifeducation_config$get_framework(
     }
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
-
-
-    if(trace==TRUE){
-      message(paste(date(),"Using Token Masking"))
+    if(whole_word==TRUE){
+      if(trace==TRUE){
+        message(paste(date(),"Using Whole Word Masking"))
+      }
+      data_collator=transformers$DataCollatorForWholeWordMask(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "pt")
+    } else {
+      if(trace==TRUE){
+        message(paste(date(),"Using Token Masking"))
+      }
+      data_collator=transformers$DataCollatorForLanguageModeling(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "pt"
+      )
     }
-    data_collator=transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = "pt"
-    )
 
-
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="torch")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     training_args=transformers$TrainingArguments(

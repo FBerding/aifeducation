@@ -18,6 +18,18 @@ summarize_tracked_sustainability<-function(sustainability_tracker){
     region=sustainability_tracker$final_emissions_data$region
   }
 
+  if(is.null(sustainability_tracker$final_emissions_data$gpu_count)){
+    gpu_count_tmp=NA
+  }else{
+      gpu_count_tmp=sustainability_tracker$final_emissions_data$gpu_count
+    }
+
+  if(is.null(sustainability_tracker$final_emissions_data$gpu_model)){
+    gpu_model_tmp=NA
+  }else{
+    gpu_model_tmp=sustainability_tracker$final_emissions_data$gpu_model
+  }
+
   results<-list(
     sustainability_tracked=TRUE,
     date=date(),
@@ -36,8 +48,8 @@ summarize_tracked_sustainability<-function(sustainability_tracker){
       cpu_count=sustainability_tracker$final_emissions_data$cpu_count,
       cpu_model=sustainability_tracker$final_emissions_data$cpu_model,
 
-      gpu_count=sustainability_tracker$final_emissions_data$gpu_count,
-      gpu_model=sustainability_tracker$final_emissions_data$gpu_model,
+      gpu_count=gpu_count_tmp,
+      gpu_model=gpu_model_tmp,
 
       ram_total_size=sustainability_tracker$final_emissions_data$ram_total_size
      ),

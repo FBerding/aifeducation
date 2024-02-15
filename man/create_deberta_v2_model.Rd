@@ -9,8 +9,6 @@ create_deberta_v2_model(
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 128100,
-  add_prefix_space = FALSE,
-  trim_offsets = TRUE,
   do_lower_case = FALSE,
   max_position_embeddings = 512,
   hidden_size = 1536,
@@ -39,12 +37,6 @@ for 'pytorch'.}
 vocabulary.}
 
 \item{vocab_size}{\code{int} Size of the vocabulary.}
-
-\item{add_prefix_space}{\code{bool} \code{TRUE} if an additional space should be insert
-to the leading words.}
-
-\item{trim_offsets}{\code{bool} If \code{TRUE} post processing trims offsets
-to avoid including whitespaces.}
 
 \item{do_lower_case}{\code{bool} If \code{TRUE} all characters are transformed to lower case.}
 
@@ -102,9 +94,9 @@ the python libraries 'transformers' and 'tokenizers'.
 To train the model, pass the directory of the model to the function
 \link{train_tune_deberta_v2_model}.
 
-For this model a SentencePiece tokenizer is created which does not rely
-on the corresponding python library sentencepiece. Instead an implementation
-of the tokenizer library.
+For this model a WordPiece tokenizer is created. The standard implementation
+of DeBERTa version 2 from HuggingFace uses a SentencePiece tokenizer. Thus, please
+use \code{AutoTokenizer} from the 'transformers' library to use this model.
 }
 \references{
 He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT

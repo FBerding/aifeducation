@@ -11,10 +11,6 @@
 #'@param vocab_raw_texts \code{vector} containing the raw texts for creating the
 #'vocabulary.
 #'@param vocab_size \code{int} Size of the vocabulary.
-#'@param add_prefix_space \code{bool} \code{TRUE} if an additional space should be insert
-#'to the leading words.
-#'@param trim_offsets \code{bool} If \code{TRUE} post processing trims offsets
-#'to avoid including whitespaces.
 #'@param do_lower_case \code{bool} If \code{TRUE} all characters are transformed to lower case.
 #'@param max_position_embeddings \code{int} Number of maximal position embeddings. This parameter
 #'also determines the maximum length of a sequence which can be processed with the model.
@@ -49,9 +45,9 @@
 #'and the vocabulary of the new model are saved on disk.
 #'@note To train the model, pass the directory of the model to the function
 #'\link{train_tune_deberta_v2_model}.
-#'@note For this model a SentencePiece tokenizer is created which does not rely
-#'on the corresponding python library sentencepiece. Instead an implementation
-#'of the tokenizer library.
+#'@note For this model a WordPiece tokenizer is created. The standard implementation
+#'of DeBERTa version 2 from HuggingFace uses a SentencePiece tokenizer. Thus, please
+#'use \code{AutoTokenizer} from the 'transformers' library to use this model.
 #'
 #'@references
 #'He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT
@@ -70,8 +66,6 @@ create_deberta_v2_model<-function(
     model_dir,
     vocab_raw_texts=NULL,
     vocab_size=128100,
-    add_prefix_space=FALSE,
-    trim_offsets=TRUE,
     do_lower_case=FALSE,
     max_position_embeddings=512,
     hidden_size=1536,
@@ -93,7 +87,6 @@ create_deberta_v2_model<-function(
   update_aifeducation_progress_bar(value = 0,
                                    total = pgr_max,
                                    title = "DeBERTa V2 Model")
-
   #argument checking-----------------------------------------------------------
   #if(max_position_embeddings>512){
   #  warning("Due to a quadratic increase in memory requirments it is not
@@ -111,6 +104,17 @@ create_deberta_v2_model<-function(
     stop("The global machine learning framework is not set. Please use
              aifeducation_config$set_global_ml_backend() directly after loading
              the library to set the global framework. ")
+  }
+
+  if(class(vocab_raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(list(text=vocab_raw_texts))
+    )
+  } else {
+    raw_text_dataset=vocab_raw_texts
+    if(is.null(raw_text_dataset$features$text)){
+      stop("Dataset does not contain a colum 'text' storing the raw texts.")
+    }
   }
 
   if((hidden_act %in% c("gelu", "relu", "silu","gelu_new"))==FALSE){
@@ -173,20 +177,41 @@ create_deberta_v2_model<-function(
               "Creating Tokenizer Draft"))
   }
 
-  tok_new<-tok$SentencePieceUnigramTokenizer()
-  tok_new$normalizer<-tok$normalizers$BertNormalizer(
+  #tok_new<-tok$SentencePieceUnigramTokenizer()
+  #tok_new$normalizer<-tok$normalizers$BertNormalizer(
+  #  clean_text = TRUE,
+  #  handle_chinese_chars = TRUE,
+  #  strip_accents = do_lower_case,
+  #  lowercase = do_lower_case
+  #)
+  #tok_new$post_processor<-tok$processors$RobertaProcessing(
+  #  sep=reticulate::tuple(list("[SEP]",as.integer(1))),
+  #  cls=reticulate::tuple(list("[CLS]",as.integer(0))),
+  #  trim_offsets=trim_offsets,
+  #  add_prefix_space = add_prefix_space
+  #)
+  #tok_new$enable_padding(pad_token = "[PAD]")
+
+  special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]")
+  tok_new<-tok$Tokenizer(tok$models$WordPiece())
+  tok_new$normalizer=tok$normalizers$BertNormalizer(
+    lowercase=do_lower_case,
     clean_text = TRUE,
     handle_chinese_chars = TRUE,
-    strip_accents = do_lower_case,
-    lowercase = do_lower_case
-  )
-  tok_new$post_processor<-tok$processors$RobertaProcessing(
+    strip_accents = do_lower_case)
+  tok_new$pre_tokenizer=tok$pre_tokenizers$BertPreTokenizer()
+  tok_new$post_processor<-tok$processors$BertProcessing(
     sep=reticulate::tuple(list("[SEP]",as.integer(1))),
-    cls=reticulate::tuple(list("[CLS]",as.integer(0))),
-    trim_offsets=trim_offsets,
-    add_prefix_space = add_prefix_space
+    cls=reticulate::tuple(list("[CLS]",as.integer(0)))
   )
-  tok_new$enable_padding(pad_token = "[PAD]")
+
+  tok_new$decode=tok$decoders$WordPiece()
+
+  trainer<-tok$trainers$WordPieceTrainer(
+    vocab_size=as.integer(vocab_size),
+    special_tokens = special_tokens,
+    show_progress=trace)
+
 
   update_aifeducation_progress_bar(value = 3,
                                    total = pgr_max,
@@ -198,11 +223,30 @@ create_deberta_v2_model<-function(
               "Start Computing Vocabulary"))
   }
 
-  tok_new$train_from_iterator(
-    iterator = vocab_raw_texts,
-    vocab_size = as.integer(vocab_size),
-    special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"),
-    unk_token="[UNK]")
+  reticulate::py_run_file(system.file("python/datasets_transformer_compute_vocabulary.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
+  }
+  #tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(2),
+  #                                              dataset=raw_text_dataset,
+  #                                              report_to_shiny_app=shiny_app_active),
+  #                            #trainer=trainer,
+  #                            length=length(raw_text_dataset),
+  #                            vocab_size = as.integer(vocab_size),
+  #                            special_tokens=c("[CLS]","[SEP]","[PAD]","[UNK]","[MASK]"),
+  #                            unk_token="[UNK]"
+  #                            )
+  tok_new$train_from_iterator(py$batch_iterator(batch_size = as.integer(200),
+                                                dataset=raw_text_dataset,
+                                                report_to_shiny_app=shiny_app_active),
+                              trainer=trainer,
+                              length=length(raw_text_dataset))
+
 
   if(trace==TRUE){
     message(paste(date(),
@@ -225,7 +269,11 @@ create_deberta_v2_model<-function(
     dir.create(model_dir)
   }
 
-  tok_new$save_model(model_dir)
+
+  write(c(special_tokens,names(tok_new$get_vocab())),
+        file=paste0(model_dir,"/","vocab.txt"))
+
+  #tok_new$save_model(model_dir)
 
   update_aifeducation_progress_bar(value = 5,
                                    total = pgr_max,
@@ -236,18 +284,27 @@ create_deberta_v2_model<-function(
     message(paste(date(),
               "Creating Tokenizer"))
   }
+  #tokenizer=transformers$PreTrainedTokenizerFast(
+  #  tokenizer_object=tok_new,
+  #  bos_token = "[CLS]",
+  #  eos_token = "[SEP]",
+  #  sep_token = "[SEP]",
+  #  cls_token = "[CLS]",
+  #  unk_token = "[UNK]",
+  #  pad_token = "[PAD]",
+  #  mask_token = "[MASK]",
+  #  add_prefix_space = add_prefix_space,
+  #  trim_offsets=trim_offsets)
+
   tokenizer=transformers$PreTrainedTokenizerFast(
     tokenizer_object=tok_new,
+    unk_token="[UNK]",
+    sep_token="[SEP]",
+    pad_token="[PAD]",
+    cls_token="[CLS]",
+    mask_token="[MASK]",
     bos_token = "[CLS]",
-    eos_token = "[SEP]",
-    sep_token = "[SEP]",
-    cls_token = "[CLS]",
-    unk_token = "[UNK]",
-    pad_token = "[PAD]",
-    mask_token = "[MASK]",
-    add_prefix_space = add_prefix_space,
-    trim_offsets=trim_offsets)
-
+    eos_token = "[SEP]")
 
   if(trace==TRUE){
     message(paste(date(),
@@ -368,6 +425,8 @@ create_deberta_v2_model<-function(
 #'model is stored.
 #'@param raw_texts \code{vector} containing the raw texts for training.
 #'@param p_mask \code{double} Ratio determining the number of words/tokens for masking.
+#'@param whole_word \code{bool} \code{TRUE} if whole word masking should be applied.
+#'If \code{FALSE} token masking is used.
 #'@param val_size \code{double} Ratio determining the amount of token chunks used for
 #'validation.
 #'@param n_epoch \code{int} Number of epochs for training.
@@ -432,6 +491,7 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
                                model_dir_path,
                                raw_texts,
                                p_mask=0.15,
+                               whole_word=TRUE,
                                val_size=0.1,
                                n_epoch=1,
                                batch_size=12,
@@ -584,51 +644,59 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     message(paste(date(),"Creating Chunks of Sequences for Training"))
   }
 
-  if(full_sequences_only==FALSE){
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]<=chunk_size & tokenized_dataset["length"]>=min_seq_len)
-
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= TRUE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
-
-  } else {
-    tokenized_texts=tokenizer(raw_texts,
-                              truncation =TRUE,
-                              padding= FALSE,
-                              max_length=as.integer(chunk_size),
-                              return_overflowing_tokens = TRUE,
-                              return_length = TRUE,
-                              return_special_tokens_mask=TRUE,
-                              return_offsets_mapping = FALSE,
-                              return_attention_mask = TRUE,
-                              return_tensors="np")
-    tokenized_dataset=datasets$Dataset$from_dict(tokenized_texts)
-    relevant_indices=which(tokenized_dataset["length"]==chunk_size)
-    tokenized_dataset=tokenized_dataset$select(as.integer(relevant_indices-1))
+  reticulate::py_run_file(system.file("python/datasets_transformer_prepare_data.py",
+                                      package = "aifeducation"))
+  shiny_app_active=FALSE
+  if(requireNamespace("shiny",quietly = TRUE) &
+     requireNamespace("shinyWidgets",quietly = TRUE)){
+    if(shiny::isRunning()){
+      shiny_app_active=TRUE
+    }
   }
-  rm(tokenized_texts)
+
+  if(class(raw_texts)%in%c("datasets.arrow_dataset.Dataset")==FALSE){
+    #Create Dataset
+    raw_text_dataset=datasets$Dataset$from_dict(
+      reticulate::dict(
+        list(text=raw_texts)
+      )
+    )
+  }
+
+  #Preparing Data
+  tokenized_texts_raw=raw_text_dataset$map(
+    py$tokenize_raw_text,
+    batched=TRUE,
+    batch_size=2L,
+    fn_kwargs=reticulate::dict(list(
+      tokenizer=tokenizer,
+      truncation =TRUE,
+      padding= FALSE,
+      max_length=as.integer(chunk_size),
+      return_overflowing_tokens = TRUE,
+      return_length = TRUE,
+      return_special_tokens_mask=TRUE,
+      return_offsets_mapping = FALSE,
+      return_attention_mask = TRUE,
+      return_tensors="np",
+      request_word_ids=whole_word,
+      report_to_aifeducation_studio=shiny_app_active)),
+    remove_columns=raw_text_dataset$column_names
+  )
+
+  if(full_sequences_only==FALSE){
+    relevant_indices=which(tokenized_texts_raw["length"]<=chunk_size & tokenized_texts_raw["length"]>=min_seq_len)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  } else {
+    relevant_indices=which(tokenized_texts_raw["length"]==chunk_size)
+    tokenized_dataset=tokenized_texts_raw$select(as.integer(relevant_indices-1))
+  }
 
   n_chunks=tokenized_dataset$num_rows
+
+  if(trace==TRUE){
+    message(paste(date(),n_chunks,"Chunks Created"))
+  }
 
   if(trace==TRUE){
     message(paste(date(),n_chunks,"Chunks Created"))
@@ -653,19 +721,27 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
   }
 
   if(ml_framework=="tensorflow"){
-    if(trace==TRUE){
-      message(paste(date(),"Using Token Masking"))
+    if(whole_word==TRUE){
+      if(trace==TRUE){
+        message(paste(date(),"Using Whole Word Masking"))
+      }
+      data_collator=transformers$DataCollatorForWholeWordMask(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "tf")
+    } else {
+      if(trace==TRUE){
+        message(paste(date(),"Using Token Masking"))
+      }
+      data_collator=transformers$DataCollatorForLanguageModeling(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "tf"
+      )
     }
-
-    data_collator=transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = "tf")
-
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="tensorflow")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
 
     tf_train_dataset=mlm_model$prepare_tf_dataset(
@@ -735,20 +811,28 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     mlm_model$load_weights(paste0(output_dir,"/checkpoints/best_weights.h5"))
   } else {
 
-    if(trace==TRUE){
-      message(paste(date(),"Using Token Masking"))
+    if(whole_word==TRUE){
+      if(trace==TRUE){
+        message(paste(date(),"Using Whole Word Masking"))
+      }
+      data_collator=transformers$DataCollatorForWholeWordMask(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "pt")
+    } else {
+      if(trace==TRUE){
+        message(paste(date(),"Using Token Masking"))
+      }
+      data_collator=transformers$DataCollatorForLanguageModeling(
+        tokenizer = tokenizer,
+        mlm = TRUE,
+        mlm_probability = p_mask,
+        return_tensors = "pt"
+      )
     }
-    data_collator=transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = "pt")
-
-    tokenized_dataset=tokenized_dataset$add_column(name="labels",column=tokenized_dataset["input_ids"])
     tokenized_dataset$set_format(type="torch")
-
     tokenized_dataset=tokenized_dataset$train_test_split(test_size=val_size)
-
 
     if(trace==TRUE){
       message(paste(date(),"Preparing Training of the Model"))
@@ -799,6 +883,9 @@ train_tune_deberta_v2_model=function(ml_framework=aifeducation_config$get_framew
     #Start Training------------------------------------------------------------
     if(trace==TRUE){
       message(paste(date(),"Start Fine Tuning"))
+    }
+    if(torch$cuda$is_available()){
+      torch$cuda$empty_cache()
     }
     trainer$train()
 

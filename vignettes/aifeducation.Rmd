@@ -313,7 +313,7 @@ to chose your machine learning framework.
 
 # 4) Tutorials and Guides
 A guide how to use the graphical user interface can be found in vignette
-  [02a classification tasks](gui_aife_studio.html). 
+  [02a classification tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html). 
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette

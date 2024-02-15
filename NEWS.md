@@ -15,6 +15,9 @@ editor_options:
 
 -   Fixed a bug in all transformers except BERT concerning the
     unk_token.
+-   Switched from SentencePiece tokenizer to WordPiece tokenizer for DeBERTa_V2.
+-   Add the possibility to train DeBERTa_V2 and FunnelTransformer models with
+    Whole Word Masking.
 
 **TextEmbeddingModel**
 
@@ -25,6 +28,10 @@ editor_options:
     between decoding into single tokens or into plain text.
 -   Fixed a bug for embedding texts when using pytorch. The fix should
     decrease computational time and enables gpu support (if available on machine).
+-   Fixed two missing columns for saving the results of sustainability tracking on machines
+    without gpu.
+-   Implemented the advantages of datasets from the python library 'datasets' increasing
+    computational speed and allowing the use of large datasets.
 
 **TextEmbeddingClassifiers**
 
@@ -51,9 +58,12 @@ editor_options:
     EmbeddedText.
 -   Added precision, recall, and f1-score as new metrics.
 
-**Python Installation** - Added an argument to 'install_py_modules',
-allowing to choose which machine learning framework should be
-installed. - Updated 'check_aif_py_modules'.
+**Python Installation** 
+
+-   Added an argument to 'install_py_modules',
+    allowing to choose which machine learning framework should be
+    installed. 
+- Updated 'check_aif_py_modules'.
 
 **Further Changes**
 

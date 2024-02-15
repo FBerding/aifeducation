@@ -74,8 +74,6 @@ the python libraries 'transformers' and 'tokenizers'.</p>
 <span>  <span class="va">model_dir</span>,</span>
 <span>  vocab_raw_texts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vocab_size <span class="op">=</span> <span class="fl">128100</span>,</span>
-<span>  add_prefix_space <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  trim_offsets <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  do_lower_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  max_position_embeddings <span class="op">=</span> <span class="fl">512</span>,</span>
 <span>  hidden_size <span class="op">=</span> <span class="fl">1536</span>,</span>
@@ -113,16 +111,6 @@ vocabulary.</p></dd>
 
 <dt>vocab_size</dt>
 <dd><p><code>int</code> Size of the vocabulary.</p></dd>
-
-
-<dt>add_prefix_space</dt>
-<dd><p><code>bool</code> <code>TRUE</code> if an additional space should be insert
-to the leading words.</p></dd>
-
-
-<dt>trim_offsets</dt>
-<dd><p><code>bool</code> If <code>TRUE</code> post processing trims offsets
-to avoid including whitespaces.</p></dd>
 
 
 <dt>do_lower_case</dt>
@@ -209,9 +197,9 @@ and the vocabulary of the new model are saved on disk.</p>
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>To train the model, pass the directory of the model to the function
 <a href="train_tune_deberta_v2_model.html">train_tune_deberta_v2_model</a>.</p>
-<p>For this model a SentencePiece tokenizer is created which does not rely
-on the corresponding python library sentencepiece. Instead an implementation
-of the tokenizer library.</p>
+<p>For this model a WordPiece tokenizer is created. The standard implementation
+of DeBERTa version 2 from HuggingFace uses a SentencePiece tokenizer. Thus, please
+use <code>AutoTokenizer</code> from the 'transformers' library to use this model.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
