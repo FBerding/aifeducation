@@ -168,7 +168,7 @@ classification tasks from the perspective of the empirical method of
 content analysis, there is some overlapping between the concepts of
 content analysis and machine learning. In content analysis, a phenomenon
 like performance or colors can be described as a scale/dimension which
-is made up by several categories (e.g. Schreier 2012 pp. 59). In our
+is made up by several categories (e.g. Schreier 2012, pp. 59). In our
 example, an exam’s performance (scale/dimension) could be “good”,
 “average” or “poor”. In terms of colors (scale/dimension) categories
 could be “blue”, “green”, etc. Machine learning literature uses other
@@ -207,7 +207,7 @@ set of language modeling and feature learning techniques (…) where words
 or phrases from the vocabulary are mapped to vectors of real numbers.”
 The definition of a word vector is similar: „Word vectors represent the
 semantic meaning of words as vectors in the context of the training
-corpus.” (Lane, Howard &amp; Hapke 2019, p. 191) In the next step, the
+corpus.” (Lane, Howard &amp; Hapke 2019, p. 191). In the next step, the
 words or text embeddings can be used as input data and the labels as
 target data for training AI to classify a text.</p>
 <p>In <em>aifeducation,</em> these steps are covered with three
@@ -381,7 +381,8 @@ train/fine-tune base models.</p>
 </h4>
 <p>In order to create a new base model you have to choose the option
 <em>Create</em> on the tab <em>Language Modeling</em> for the <em>Base
-Models</em> on the right side of the app (Figure 5).</p>
+Models</em> on the right side of the app (Figure 5). Figure 10 shows the
+corresponding page.</p>
 <p><a href="img_articles/gui_aife_studio_create_transformer.jpg"><img src="img_articles/gui_aife_studio_create_transformer.jpg" style="width:100.0%" alt="Figure 10: Language Modeling - Create Transformer"></a> Figure
 10: Language Modeling - Create Transformer (click image to enlarge)</p>
 <p>Every transformer model is composed of two parts: 1) the tokenizer
@@ -402,7 +403,7 @@ It is very important that you provide a number of how many tokens the
 vocabulary should include. Depending on the transformer method, you can
 set additional options affecting a transformer’s vocabulary.</p>
 <ul>
-<li><p><strong>Transform to lower:</strong> If this option is enabled,
+<li><p><strong>Transform to Lower:</strong> If this option is enabled,
 all words in a raw text are transformed to lower cases. For instance,
 the resulting token of <em>Learners</em> and <em>learners</em> are the
 same. If disabled, <em>Learners</em> and <em>learners</em> will have a
@@ -439,7 +440,7 @@ nor multiple files. Instead you have to provide the folder that stores
 the entire model.</p>
 <p>Compatible models are all base models that you have created with
 <em>Aifeducation Studio</em>. In addition you can use any model from <a href="https://huggingface.co/" class="external-link">Huggingface</a> that uses an architecture
-implemented in <em>aifeducation</em> such as BERT, DeBERTa etc.</p>
+implemented in <em>aifeducation</em> such as BERT, DeBERTa, etc.</p>
 <p>After choosing a base model, new boxes appear as shown in Figure 11.
 To train a model, you must first provide a collection of raw texts (box
 <em>Raw Texts</em>). We recommend that you create this collection of
@@ -498,7 +499,8 @@ capacities of your machine.</p>
 <em>aifeducation</em>. In order to create a new model, you need a base
 model that provides the ability to understand natural language. You can
 open the creation page by clicking on “Create” in the section “Text
-Embedding Model” via “Language Modeling” (see Figure 5).</p>
+Embedding Model” via “Language Modeling” (see Figure 5). Figure 12 shows
+the corresponding page.</p>
 <p><a href="img_articles/gui_aife_studio_emb_interface_create.jpg"><img src="img_articles/gui_aife_studio_emb_interface_create.jpg" style="width:100.0%" alt="Figure 12: Text Embedding Model - Create"></a> Figure 12: Text
 Embedding Model - Create (click image to enlarge)</p>
 <p>First you have to choose the base model that should form the
@@ -559,37 +561,38 @@ select the folder that contains the entire model instead of selecting
 single files. After selecting and loading a model, a new box appears
 that shows you the different aspects of the model and how you can use
 it.</p>
-<p>The tab <em>Model Description</em> provides you with the
+<p>The tab <em>Model Description</em> (Figure 13) provides you with the
 documentation of the model.</p>
 <p><a href="img_articles/gui_aife_studio_emb_interface_use_desc.jpg"><img src="img_articles/gui_aife_studio_emb_interface_use_desc.jpg" style="width:100.0%" alt="Figure 13: Text Embedding Model - Description"></a> Figure 13:
 Text Embedding Model - Description (click image to enlarge)</p>
-<p>The tab <em>Create Text Embeddings</em> allows you to transform raw
-texts into a numerical representation of these texts, called text
-embeddings. These text embeddings can be used in downstream tasks such
-as classifying texts. In order to transform raw texts into embedded
-texts, you first have to select a collection of raw texts. We recommend
-that you create this collection according to section 3.1.1. Next you
-have to provide the folder where the embeddings should be stored and
-name it. With <em>Batch Size</em> you can determine how many raw texts
-should be processed simultaneously. Please adjust this value to your
-machine’s capacities. By clicking on the button “Start Embed” the
-transformation of texts begins.</p>
+<p>The tab <em>Create Text Embeddings</em> (Figure 14) allows you to
+transform raw texts into a numerical representation of these texts,
+called text embeddings. These text embeddings can be used in downstream
+tasks such as classifying texts. In order to transform raw texts into
+embedded texts, you first have to select a collection of raw texts. We
+recommend that you create this collection according to section 3.1.1.
+Next you have to provide the folder where the embeddings should be
+stored and name it. With <em>Batch Size</em> you can determine how many
+raw texts should be processed simultaneously. Please adjust this value
+to your machine’s capacities. By clicking on the button “Start Embed”
+the transformation of texts begins.</p>
 <p><a href="img_articles/gui_aife_studio_emb_interface_use_embed.jpg"><img src="img_articles/gui_aife_studio_emb_interface_use_embed.jpg" style="width:100.0%" alt="Figure 14: Text Embedding Model - Embeddings"></a> Figure 14:
 Text Embedding Model - Embeddings (click image to enlarge)</p>
-<p>The tab <em>Encode/Decode/Tokenize</em> offers you insights into the
-way your text embedding model processes data. In the box <em>Encode</em>
-you can insert a raw text and after clicking on <em>Encode</em> you can
-see how the text is divided into tokens and their corresponding IDs. The
-IDs are passed to the base model and are used to generate the numeric
-representation of a text. The box <em>Decode</em> allows you to reverse
-this process. There you can insert a sequence of numbers (separated with
-a comma or with spaces) and after clicking on <em>Decode,</em> the
-corresponding tokens and the raw text appear.</p>
+<p>The tab <em>Encode/Decode/Tokenize</em> (Figure 15) offers you
+insights into the way your text embedding model processes data. In the
+box <em>Encode</em> you can insert a raw text and after clicking on
+<em>Encode</em> you can see how the text is divided into tokens and
+their corresponding IDs. The IDs are passed to the base model and are
+used to generate the numeric representation of a text. The box
+<em>Decode</em> allows you to reverse this process. There you can insert
+a sequence of numbers (separated with a comma or with spaces) and after
+clicking on <em>Decode,</em> the corresponding tokens and the raw text
+appear.</p>
 <p><a href="img_articles/gui_aife_studio_emb_interface_use_encode_decode.jpg"><img src="img_articles/gui_aife_studio_emb_interface_use_encode_decode.jpg" style="width:100.0%" alt="Figure 15: Text Embedding Model - Encode/Decode/Tokenize"></a>
 Figure 15: Text Embedding Model - Encode/Decode/Tokenize (click image to
 enlarge)</p>
-<p>Finally, the tab <em>Fill Mask</em> allows you to request the
-underlying base model of your text embedding model to calculate a
+<p>Finally, the tab <em>Fill Mask</em> (Figure 16) allows you to request
+the underlying base model of your text embedding model to calculate a
 solution to a fill-in-the-blank text. In the box <em>Text</em> you can
 insert a raw text. A gap is signaled by insert the corresponding masking
 token. This token can be found in the table above in the row for
@@ -626,15 +629,16 @@ created a model, while <em>Modifiers</em> refers to the people who
 adapted a pre-trained model to another domain or task.</p>
 <p><a href="img_articles/gui_aife_studio_emb_doc.jpg"><img src="img_articles/gui_aife_studio_emb_doc.jpg" style="width:100.0%" alt="Figure 17: Text Embedding Model - Documentation"></a> Figure 17:
 Text Embedding Model - Documentation (click image to enlarge)</p>
-<p>In the tabs <em>Abstract</em> and <em>Description,</em> you can
+<p>In the tabs <em>Abstract</em> and <em>Description</em>, you can
 provide an abstract and a detailed description of your work in English
 and/or in the native language of your text embedding model (e.g.,
-French, German, etc.), allowing you to reach a broader audience. In all
-four tabs you can provide your documentation in plain text, html, and/or
-markdown allowing you to insert tables or to highlight parts of your
-documentation. If you would like to see what your documentation will
-look like on the internet, you can click on the button “Preview”. Saving
-your changes is possible by clicking on <em>Save</em>.</p>
+French, German, etc.), allowing you to reach a broader audience (Figure
+17). In all four tabs you can provide your documentation in plain text,
+html, and/or markdown allowing you to insert tables or to highlight
+parts of your documentation. If you would like to see what your
+documentation will look like on the internet, you can click on the
+button “Preview”. Saving your changes is possible by clicking on
+<em>Save</em>.</p>
 <blockquote>
 <p>For more information on how to document your model, please refer to
 the vignette <a href="sharing_and_publishing.html">03 Sharing and Using
@@ -650,7 +654,8 @@ Trained AI/Models</a>.</p>
 </h4>
 <p>Classifiers are built on top of a text embedding model. To create a
 classifier, click on “Create and Train” in the tab
-<em>Classification</em> (see Figure 5).</p>
+<em>Classification</em> (see Figure 5). Figure 18 shows the
+corresponding page.</p>
 <p><a href="img_articles/gui_aife_studio_classifier_create_part_1.jpg"><img src="img_articles/gui_aife_studio_classifier_create_part_1.jpg" style="width:100.0%" alt="Figure 18: Classifier - Creation Part 1"></a> Figure 18:
 Classifier - Creation Part 1 (click image to enlarge)</p>
 <p>Creating a classifier requires two kinds of data. First, a text
@@ -886,27 +891,28 @@ Please note that a classifier is made up of several files. Thus,
 <em>Aifeducation Studio</em> asks you to select the folder containing
 these files and not single files. After loading a classifier, a new box
 appears.</p>
-<p>In the first tab, <em>Model Description,</em> you will find the
-documentation of the model.</p>
+<p>In the first tab, <em>Model Description</em>, (Figure 21) you will
+find the documentation of the model.</p>
 <p><a href="img_articles/gui_aife_studio_classifier_use_desc.jpg"><img src="img_articles/gui_aife_studio_classifier_use_desc.jpg" style="width:100.0%" alt="Figure 21: Classifier - Description"></a>
 Figure 21: Classifier - Description (click image to enlarge)</p>
-<p>In the second tab, <em>Training,</em> you receive a summary of the
-training process of the model. This includes a visualization of the
-loss, the accuracy, and the balanced accuracy for every fold and every
-epoch. Depending on the applied training techniques (such as
-<em>Balanced Pseudo-Labeling</em>), you can request additional
+<p>In the second tab, <em>Training</em> (Figure 22) you receive a
+summary of the training process of the model. This includes a
+visualization of the loss, the accuracy, and the balanced accuracy for
+every fold and every epoch. Depending on the applied training techniques
+(such as <em>Balanced Pseudo-Labeling</em>), you can request additional
 images.</p>
 <p><a href="img_articles/gui_aife_studio_classifier_use_train.jpg"><img src="img_articles/gui_aife_studio_classifier_use_train.jpg" style="width:100.0%" alt="Figure 22: Classifier - Training"></a>
 Figure 22: Classifier - Training (click image to enlarge)</p>
-<p>The third tab, <em>Reliability,</em> provides you with information on
-the quality of the model. Here you find visualizations giving you
-insights into how the classifier is able to generate reliable results.
-In addition, measures from content analysis as well as machine learning
-allow you to analyze specific aspects of the model’s performance.</p>
+<p>The third tab, <em>Reliability</em>, (Figure 23) provides you with
+information on the quality of the model. Here you find visualizations
+giving you insights into how the classifier is able to generate reliable
+results. In addition, measures from content analysis as well as machine
+learning allow you to analyze specific aspects of the model’s
+performance.</p>
 <p><a href="img_articles/gui_aife_studio_classifier_use_reliability.jpg"><img src="img_articles/gui_aife_studio_classifier_use_reliability.jpg" style="width:100.0%" alt="Figure 23: Classifier - Reliability"></a>
 Figure 23: Classifier - Reliability (click image to enlarge)</p>
-<p>The last tab, <em>Prediction,</em> allows you to apply a trained
-model to new data. Here you can use the trained model to assign
+<p>The last tab, <em>Prediction</em> (Figure 24) allows you to apply a
+trained model to new data. Here you can use the trained model to assign
 classes/categories to new texts. For this purpose, you must first
 provide the file that contains the text embeddings of the documents you
 would like to classify. You can create these embeddings with the text

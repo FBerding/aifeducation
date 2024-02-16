@@ -166,7 +166,7 @@ From these different groups, *aifedcuation* implements several methods.
     approach for many natural language tasks (Tunstall, von Werra & Wolf
     2022, p. xv). With the help of the self-attention mechanism (Vaswani
     et al. 2017), they are able to produce context-sensitive *word*
-    embeddings (Chollet, Kalinowski & Allaire, 2022 pp.366). 
+    embeddings (Chollet, Kalinowski & Allaire, 2022, pp. 366). 
 
 All the approaches are managed and used with a unified interface
 provided by the object `TextEmbeddingModel`. With this object you can
