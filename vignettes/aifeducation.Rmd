@@ -317,7 +317,7 @@ A guide how to use the graphical user interface can be found in vignette
 
 A short introduction into the
 package with examples for classification tasks can be found in vignette
-[02b classification tasks](classification_tasks.html).
+[02b classification tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 
 Documenting and sharing your work is described in vignette
 [03 sharing and using trained AI/models](sharing_and_publishing.html)

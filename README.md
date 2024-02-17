@@ -111,8 +111,8 @@ Studio</figcaption>
 
 *Aifeducation Studio* allows users to easily develop, train, apply,
 document, and analyse AI models without any coding skills. See the
-corresponding vignette for more details: [02a Classification
-Tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
+corresponding vignette for more details: [02a Using Aifeducation
+Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 
 ## Sustainability
 
@@ -285,8 +285,8 @@ you can find a detailed guide on how to document and share your models.
 - Installation and configuration of the package: [01 Get
   Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 - Introduction graphical user interface *Aifeducation Studio*: [02a
-  Classification
-  Tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
+  Using Aifeducation
+  Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 - A short introduction into the package with examples for classification
   tasks: [02b Classification
   Tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).

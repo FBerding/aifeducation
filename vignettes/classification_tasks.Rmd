@@ -76,7 +76,7 @@ a research area, concepts are not unified. Figure 1 illustrates this
 package's understanding.
 
 ![Figure 1: Understanding of Central
-Concepts](classif_fig_01.png){width="100%"}
+Concepts](img_articles/classif_fig_01.png){width="100%"}
 
 Since *aifeducation* looks at the application of AI for classification
 tasks from the perspective of the empirical method of content analysis,
@@ -98,7 +98,7 @@ to train an AI to classify text in line with supervised machine learning
 principles.
 
 ![Figure 2: Basic Structure of Supervised Machine
-Learning](classif_fig_02.png){width="100%"}
+Learning](img_articles/classif_fig_02.png){width="100%"}
 
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -114,7 +114,7 @@ necessary. Figure 3 provides an overview integrating the functions and
 objects of *aifeducation*.
 
 ![Figure 3: Overview of the Steps to Perform a
-Classification](classif_fig_03.png){width="100%"}
+Classification](img_articles/classif_fig_03.png){width="100%"}
 
 The first step is to transform raw texts into a form computers can use.
 That is, the raw texts must be transformed into numbers. In modern
@@ -988,7 +988,7 @@ With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.
 
 ![Figure 4: Overview of Possible Structure of a
-Classifier](classif_fig_04.png){width="100%"}
+Classifier](img_articles/classif_fig_04.png){width="100%"}
 
 `hidden` takes a vector of integers, determining the number of layers
 and the number of neurons. In our example, there are no dense layers.
@@ -1186,7 +1186,7 @@ Figure 5 illustrates the training loop for the cases that all three
 options are set to `TRUE`.
 
 ![Figure 5: Overview of the Steps to Perform a
-Classification](classif_fig_05.png){width="100%"}
+Classification](img_articles/classif_fig_05.png){width="100%"}
 
 The example above applies the algorithm proposed by Cascante-Bonilla et
 al. (2020). After training the classifier on the labeled data, the
@@ -1281,7 +1281,7 @@ library(iotarelr)
 iotarelr::plot_iota2_alluvial(test_classifier$reliability$iota_object_end_free)
 ```
 
-![Figure 6: Coding Stream of the Classifier](classif_fig_06.png){width="100%"}
+![Figure 6: Coding Stream of the Classifier](img_articles/classif_fig_06.png){width="100%"}
 
 Here you can see that a small number of negative reviews is treated
 as a good review while a larger number of positive reviews is

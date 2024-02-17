@@ -92,7 +92,7 @@ disciplines using different, sometimes overlapping concepts. Even within
 a single research area, concepts are not unified. Figure 1 illustrates
 this package's understanding.
 
-![Figure 1: Understanding of Central Concepts](classif_fig_01.png){width="100%"}
+![Figure 1: Understanding of Central Concepts](img_articles/classif_fig_01.png){width="100%"}
 
 Since *aifeducation* looks at the application of AI for classification
 tasks from the perspective of the empirical method of content analysis,
@@ -113,7 +113,7 @@ labeled with the correct class. As Figure 2 illustrates, two kinds of
 data are necessary to train an AI to classify text in line with
 supervised machine learning principles.
 
-![Figure 2: Basic Structure of Supervised Machine Learning](classif_fig_02.png){width="100%"}
+![Figure 2: Basic Structure of Supervised Machine Learning](img_articles/classif_fig_02.png){width="100%"}
 
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -147,7 +147,7 @@ target data for training AI to classify a text.
 In *aifeducation,* these steps are covered with three different types of
 models, as shown in Figure 3.
 
-![Figure 3: Modells Types in aifeducation](classif_model_hierachy.png){width="100%"}
+![Figure 3: Modells Types in aifeducation](img_articles/classif_model_hierachy.png){width="100%"}
 
 -   **Base Models:** The base models are the models which contain the
     capacities to understand natural language. In general, these are
