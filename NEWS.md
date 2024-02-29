@@ -11,15 +11,22 @@ editor_options:
 -   Fixed a bug in GlobalAveragePooling1D_PT. Now the layer makes a correct pooling.
     This change has an effect on models trained with version 0.3.1.
     
+**TextEmbeddingModel**
+- Replaced the parameter 'aggregation' with three new parameters allowing to explicitly
+  choose the start and end layer to be included in the creation of embeddings. Furthermore,
+  two options for the pooling method within each layer is added ("cls" and "average").
+    
 **Transformer Models**
 
 -  Fixed a bug in the creation of all transformer models except funnel. Now choosing the
    number of layers is working.
    
-**Further Changes**
+**EmbeddedText**
 
 -   Changed the process for validating if EmbeddedTexts are compatible. Now only
     the model's unique name is used for the validation.
+-   Added new fields and updated methods to account for the new options in creating embeddings (layer
+    selection and pooling type).
 
 # aifeducation 0.3.1
 
