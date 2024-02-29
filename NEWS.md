@@ -4,6 +4,23 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 0.3.2
+
+**TextEmbeddingClassifiers**
+
+-   Fixed a bug in GlobalAveragePooling1D_PT. Now the layer makes a correct pooling.
+    This change has an effect on models trained with version 0.3.1.
+    
+**Transformer Models**
+
+-  Fixed a bug in the creation of all transformer models except funnel. Now choosing the
+   number of layers is working.
+   
+**Further Changes**
+
+-   Changed the process for validating if EmbeddedTexts are compatible. Now only
+    the model's unique name is used for the validation.
+
 # aifeducation 0.3.1
 
 **Graphical User Interface Aifeducation Studio**

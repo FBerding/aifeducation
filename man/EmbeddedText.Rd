@@ -59,6 +59,9 @@ Creates a new object representing text embeddings.
   param_seq_length = NA,
   param_chunks = NULL,
   param_overlap = NULL,
+  param_emb_layer_min = NULL,
+  param_emb_layer_max = NULL,
+  param_emb_pool_type = NULL,
   param_aggregation = NULL,
   embeddings
 )}\if{html}{\out{</div>}}
@@ -86,7 +89,17 @@ Creates a new object representing text embeddings.
 \item{\code{param_overlap}}{\code{int} Number of tokens that were added at the beginning of the sequence for the next chunk
 by this model.}
 
-\item{\code{param_aggregation}}{\code{string} Aggregation method of the hidden states.}
+\item{\code{param_emb_layer_min}}{\code{int} or \code{string} determining the first layer to be included
+in the creation of embeddings.}
+
+\item{\code{param_emb_layer_max}}{\code{int} or \code{string} determining the last layer to be included
+in the creation of embeddings.}
+
+\item{\code{param_emb_pool_type}}{\code{string} determining the method for pooling the token embeddings
+within each layer.}
+
+\item{\code{param_aggregation}}{\code{string} Aggregation method of the hidden states. Deprecated. Only included
+for backward compatibility.}
 
 \item{\code{embeddings}}{\code{data.frame} containing the text embeddings.}
 }

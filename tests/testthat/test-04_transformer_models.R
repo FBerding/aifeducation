@@ -228,7 +228,7 @@ for(ai_method in ai_methods){
             max_position_embeddings=512,
             hidden_size=32,
             block_sizes = c(2,2,2),
-            num_decoder_layers = 1,
+            num_decoder_layers = 2,
             num_attention_heads=2,
             intermediate_size=128,
             hidden_act="gelu",
@@ -532,19 +532,44 @@ for(ai_method in ai_methods){
 
       #Embedding of the Model-------------------------------------------------------
 
-      bert_modeling<-TextEmbeddingModel$new(
-        model_name=paste0(ai_method,"_embedding"),
-        model_label=paste0("Text Embedding via",ai_method),
-        model_version="0.0.1",
-        model_language="english",
-        method = ai_method,
-        ml_framework=framework,
-        max_length = 256,
-        chunks=4,
-        overlap=10,
-        aggregation="last",
-        model_dir=testthat::test_path(paste0(path_01,"/",framework))
-      )
+      pooling_types=c("cls","average")
+      max_layers=1:2
+
+      for(pooling_type in pooling_types){
+        for(max_layer in max_layers){
+          bert_modeling<-TextEmbeddingModel$new(
+            model_name=paste0(ai_method,"_embedding"),
+            model_label=paste0("Text Embedding via",ai_method),
+            model_version="0.0.1",
+            model_language="english",
+            method = ai_method,
+            ml_framework=framework,
+            max_length = 20,
+            chunks=4,
+            overlap=10,
+            emb_layer_min = 1,
+            emb_layer_max = max_layer,
+            emb_pool_type = pooling_type,
+            model_dir=testthat::test_path(paste0(path_01,"/",framework))
+          )
+
+          test_that(paste0(ai_method,"embedding",framework,"for loading"), {
+            embeddings<-bert_modeling$embed(raw_text = example_data$text[1:10],
+                                            doc_id = example_data$id[1:10])
+            expect_s3_class(embeddings, class="EmbeddedText")
+
+            embeddings<-NULL
+            embeddings<-bert_modeling$embed(raw_text = example_data$text[1:1],
+                                            doc_id = example_data$id[1:1])
+            expect_s3_class(embeddings, class="EmbeddedText")
+
+          })
+        }
+      }
+
+
+      embeddings<-bert_modeling$embed(raw_text = "This is a test",
+                                      doc_id = "test_01")
 
       model_name=bert_modeling$get_model_info()$model_name
       model_name_root=bert_modeling$get_model_info()$model_name_root

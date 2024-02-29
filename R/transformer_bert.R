@@ -290,7 +290,7 @@ create_bert_model<-function(
     vocab_size=as.integer(length(tokenizer$get_vocab())),
     max_position_embeddings=as.integer(max_position_embeddings),
     hidden_size=as.integer(hidden_size),
-    num_hidden_layer=as.integer(num_hidden_layer),
+    num_hidden_layers=as.integer(num_hidden_layer),
     num_attention_heads=as.integer(num_attention_heads),
     intermediate_size=as.integer(intermediate_size),
     hidden_act=hidden_act,

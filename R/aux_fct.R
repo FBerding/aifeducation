@@ -76,8 +76,10 @@ check_embedding_models<-function(object_list,
   #field to check
   #to_check<-c("model_name","model_date","model_method","model_version","model_language",
   #            "param_seq_length","param_chunks","param_overlap","param_aggregation")
-  to_check<-c("model_name","model_method","model_version","model_language",
-              "param_seq_length","param_chunks","param_overlap","param_aggregation")
+  #to_check<-c("model_name","model_method","model_version","model_language",
+  #            "param_seq_length","param_chunks","param_overlap","param_aggregation")
+  to_check<-c("model_name")
+
   tmp_model_config<-NULL
   tmp_results<-NULL
   for(i in 1:length(object_list)){

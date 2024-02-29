@@ -149,15 +149,18 @@ class AddPositionalEmbedding_PT(torch.nn.Module):
       return masks
  
 class GlobalAveragePooling1D_PT(torch.nn.Module):
-  def __init__(self,sequence_length):
+  def __init__(self):
     super().__init__()
-    self.kernel_size=sequence_length
-    self.pooling=torch.nn.AvgPool1d(kernel_size=self.kernel_size)
-    
+
   def forward(self,x):
-    x=x.permute(0,2,1)
-    x=self.pooling(x)
-    return torch.squeeze(input=x, dim=2)
+    x=torch.sum(x,dim=1)*(1/self.get_length(x))
+    return x
+  
+  def get_length(self,x):
+    with torch.no_grad():
+      length=torch.sum(torch.sum(x,dim=2,dtype=torch.bool),dim=1).repeat(x.size(2),1)
+      length=torch.transpose(length,dim0=0,dim1=1)
+      return length
   
 
 class TextEmbeddingClassifier_PT(torch.nn.Module):
