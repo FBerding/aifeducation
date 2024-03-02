@@ -221,6 +221,9 @@ TextEmbeddingModel<-R6::R6Class(
           stop("ml_framework must be 'tensorflow' or 'pytorch'.")
         }
       }
+      if(method=="funnel" & emb_pool_type!="cls"){
+        stop("Funnel currently supports only cls as pooling type.")
+      }
 
       #------------------------------------------------------------------------
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
@@ -1218,6 +1221,10 @@ TextEmbeddingModel<-R6::R6Class(
                     private$transformer_components$chunks,
                     n_layer_size))
 
+          #Selecting the relevant layers
+          selected_layer=private$transformer_components$emb_layer_min:private$transformer_components$emb_layer_max
+          tmp_selected_layer=1+selected_layer
+
           if(private$transformer_components$ml_framework=="tensorflow"){
             #Clear session to ensure enough memory
             tf$keras$backend$clear_session()
@@ -1232,7 +1239,7 @@ TextEmbeddingModel<-R6::R6Class(
               output_hidden_states=TRUE)$hidden_states
             if(private$transformer_components$emb_pool_type=="average"){
               #Average Pooling over all tokens
-              for(i in 1:length(tensor_embeddings)){
+              for(i in tmp_selected_layer){
                 tensor_embeddings[i]=list(pooling(
                   inputs=tensor_embeddings[[as.integer(i)]],
                   mask=tokens$encodings["attention_mask"]))
@@ -1256,10 +1263,10 @@ TextEmbeddingModel<-R6::R6Class(
               token_type_ids=tokens$encodings["token_type_ids"]$to(pytorch_device),
               output_hidden_states=TRUE)$hidden_states
             )
-            print(tensor_embeddings)
+            #print(tensor_embeddings)
             if(private$transformer_components$emb_pool_type=="average"){
               #Average Pooling over all tokens
-              for(i in 1:length(tensor_embeddings)){
+              for(i in tmp_selected_layer){
                 tensor_embeddings[i]=list(pooling(tensor_embeddings[[as.integer(i)]]))
               }
             }
@@ -1270,8 +1277,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
 
 
-          #Selecting the relevant layers
-          selected_layer=private$transformer_components$emb_layer_min:private$transformer_components$emb_layer_max
+
 
           #if(private$transformer_components$aggregation=="last"){
           #  selected_layer=private$transformer_components$model$config$num_hidden_layers
@@ -1288,7 +1294,6 @@ TextEmbeddingModel<-R6::R6Class(
           #Sorting the hidden states to the corresponding cases and times
           #If more than one layer is selected the mean is calculated
           index=0
-          tmp_selected_layer=1+selected_layer
           for(i in 1:length(batch)){
             for(j in 1:tokens$chunks[i]){
               for(layer in tmp_selected_layer){
@@ -1694,10 +1699,14 @@ TextEmbeddingModel<-R6::R6Class(
     get_transformer_components=function(){
       return(
         list(
-          aggregation=private$transformer_components$aggregation,
           chunks=private$transformer_components$chunks,
           overlap=private$transformer_components$overlap,
-          ml_framework=private$transformer_components$ml_framework
+          ml_framework=private$transformer_components$ml_framework,
+
+          emb_layer_min=private$transformer_components$emb_layer_min,
+          emb_layer_max=private$transformer_components$emb_layer_max,
+          emb_pool_type=private$transformer_components$emb_pool_type
+
         )
       )
     },

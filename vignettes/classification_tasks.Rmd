@@ -751,7 +751,9 @@ bert_modeling<-TextEmbeddingModel$new(
   max_length = 512,
   chunks=4,
   overlap=30,
-  aggregation="last",
+  emb_layer_min="middle",
+  emb_layer_max="2_3_layer",
+  emb_pool_type="average",
   model_dir="my_own_transformer_trained"
   )
 ```
@@ -793,8 +795,15 @@ this example model can analyse a maximum of 512+(4-1)*(512-30)=1958 tokens of a
 text.
 
 Finally, you have to decide from which hidden layer or layers the embeddings 
-should be drawn (`aggregation="last"`). In their initial work, Devlin et al. (2019) used
+should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide over which layers
+the average value for every token should be calculated. Please note that the calculation
+considers all layers between `emb_layer_min` and `emb_layer_max`. 
+In their initial work, Devlin et al. (2019) used
 the hidden states of different layers for classification.
+
+With `emb_pool_type` you decide which tokens are used for pooling within every layer. 
+In the case of `emb_pool_type="cls"` only the cls token is used. In the case of
+`emb_pool_type="average"` all tokens within a layer are averaged except padding tokens.
 
 After deciding about the configuration, you can use your model.
 
@@ -1011,7 +1020,7 @@ layering in order to take the context of all chunks into account. To add self-at
 you have two choices:
 - You can use the attention mechanism used in classic transformer models as 
 multihead attention (Vaswani et al. 2017). For this variant you have to set
-`attention_type="multihead`, `repeat_encoder` to a value of at least 1, and
+`attention_type="multihead"`, `repeat_encoder` to a value of at least 1, and
 self_attention_heads`to a value of at least 1. 
 - Furthermore you can use the attention mechanism described in Lee-Thorp et al. (2021) 
 of the FNet model which allows much fast computations at low accuracy costs. To use

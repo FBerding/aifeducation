@@ -234,7 +234,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
           layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
       
     if n_rec>0 or repeat_encoder>0:
-      layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT(sequence_length=times)})
+      layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
       
     if(n_rec>0):
       current_size_2=2*rec[len(rec)-1]

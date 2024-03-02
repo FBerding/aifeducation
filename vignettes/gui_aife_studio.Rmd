@@ -469,10 +469,18 @@ should process raw text:
     prior chunk should be included in the current chunk. An overlap can
     be useful to provide the correct context for every chunk.
 
--   **Aggregation Hidden States**: Base models transform raw data into a
-    sequence of numbers. With this option you can decide how these
-    numbers are generated. In general, the hidden states of the last
-    layer are used as a numeric representation.
+-   **Layers for Embeddings - Min**: Base models transform raw data into a
+    sequence of numbers by using the different layers' hidden states. With this 
+    option you can decide which is the first layer to use. 
+    
+-   **Layers for Embeddings - Max**: With this option you can decide which is the last layer
+    to use. The hidden states of all layers between min and max are averaged to form
+    the embedding of a text chunk.
+    
+-   **Pooling Type**: With this option you can decide if only the hidden states of
+    the cls-token should be used for the embedding. If you set thisn option to
+    "average" the hidden states of all tokens are averaged within each layer except
+    the hidden states for padding tokens.
 
 The maximum number of tokens your model can process and provide for
 downstream tasks can be calculated as 
