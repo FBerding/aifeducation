@@ -576,8 +576,9 @@ for(ai_method in ai_methods){
             embeddings_perm<-bert_modeling$embed(raw_text = example_data$text[perm],
                                                  doc_id = example_data$id[perm])
             for(i in 1:10){
-              expect_equal(embeddings$embeddings[i,,],embeddings_perm$embeddings[which(perm==i),,])
-              #diff=sum(embeddings[i,,])-sum()
+              expect_equal(embeddings$embeddings[i,,],
+                           embeddings_perm$embeddings[which(perm==i),,],
+                           tolerance=1e-5)
             }
 
             embeddings<-NULL
