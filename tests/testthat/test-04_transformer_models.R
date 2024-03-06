@@ -560,6 +560,15 @@ for(ai_method in ai_methods){
             model_dir=testthat::test_path(paste0(path_01,"/",framework))
           )
 
+          test_that(paste0(ai_method,"training history after creation",framework),{
+            history=bert_modeling$last_training$history
+            expect_equal(nrow(history),2)
+            expect_equal(ncol(history),3)
+            expect_true("epoch"%in%colnames(history))
+            expect_true("loss"%in%colnames(history))
+            expect_true("val_loss"%in%colnames(history))
+          })
+
           test_that(paste0(ai_method,"embedding",framework,"get_transformer_components"),{
             expect_equal(bert_modeling$get_transformer_components()$emb_layer_min,min_layer)
             expect_equal(bert_modeling$get_transformer_components()$emb_layer_max,max_layer)
@@ -822,6 +831,14 @@ for(ai_method in ai_methods){
           )
           expect_s3_class(bert_modeling,
                           class="TextEmbeddingModel")
+
+          history=bert_modeling$last_training$history
+          expect_equal(nrow(history),2)
+          expect_equal(ncol(history),3)
+          expect_true("epoch"%in%colnames(history))
+          expect_true("loss"%in%colnames(history))
+          expect_true("val_loss"%in%colnames(history))
+
         })
       } else {
         test_that(paste0(ai_method,"Save Total Model safetensors",framework), {
@@ -845,6 +862,12 @@ for(ai_method in ai_methods){
           )
           expect_s3_class(bert_modeling,
                           class="TextEmbeddingModel")
+          history=bert_modeling$last_training$history
+          expect_equal(nrow(history),2)
+          expect_equal(ncol(history),3)
+          expect_true("epoch"%in%colnames(history))
+          expect_true("loss"%in%colnames(history))
+          expect_true("val_loss"%in%colnames(history))
         })
       }
 
@@ -874,6 +897,12 @@ for(ai_method in ai_methods){
         )
         expect_s3_class(bert_modeling,
                         class="TextEmbeddingModel")
+        history=bert_modeling$last_training$history
+        expect_equal(nrow(history),2)
+        expect_equal(ncol(history),3)
+        expect_true("epoch"%in%colnames(history))
+        expect_true("loss"%in%colnames(history))
+        expect_true("val_loss"%in%colnames(history))
       })
 
       #-------------------------------------------------------------------------
@@ -894,6 +923,12 @@ for(ai_method in ai_methods){
         )
         expect_s3_class(bert_modeling,
                         class="TextEmbeddingModel")
+        history=bert_modeling$last_training$history
+        expect_equal(nrow(history),2)
+        expect_equal(ncol(history),3)
+        expect_true("epoch"%in%colnames(history))
+        expect_true("loss"%in%colnames(history))
+        expect_true("val_loss"%in%colnames(history))
       })
 
       #------------------------------------------------------------------------

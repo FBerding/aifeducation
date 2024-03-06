@@ -20,6 +20,15 @@ Other Text Embedding:
 \code{\link{combine_embeddings}()}
 }
 \concept{Text Embedding}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{last_training}}{('list()')\cr
+List for storing the history and the results of the last training. This
+information will be overwritten if a new training is started.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

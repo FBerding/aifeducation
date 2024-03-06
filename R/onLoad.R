@@ -10,6 +10,7 @@ os<-NULL
 keras<-NULL
 accelerate<-NULL
 safetensors<-NULL
+pandas<-NULL
 
 aifeducation_config<-NULL
 
@@ -43,6 +44,7 @@ aifeducation_config<-NULL
   torcheval<<-reticulate::import("torcheval", delay_load = TRUE)
   accelerate<<-reticulate::import("accelerate", delay_load = TRUE)
   safetensors<<-reticulate::import("safetensors", delay_load = TRUE)
+  pandas<<-reticulate::import("pandas", delay_load = TRUE)
 
   codecarbon<<-reticulate::import("codecarbon", delay_load = TRUE)
   keras<<-reticulate::import("keras", delay_load = TRUE)

@@ -152,7 +152,10 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
   def __init__(self):
     super().__init__()
 
-  def forward(self,x):
+  def forward(self,x,mask=None):
+    if not mask is None:
+      mask_r=mask.reshape(mask.size()[0],mask.size()[1],1)
+      x=torch.mul(x,mask_r)
     x=torch.sum(x,dim=1)*(1/self.get_length(x))
     return x
   

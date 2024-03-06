@@ -97,6 +97,14 @@ TextEmbeddingModel<-R6::R6Class(
     )
   ),
   public = list(
+
+    #'@field last_training ('list()')\cr
+    #'List for storing the history and the results of the last training. This
+    #'information will be overwritten if a new training is started.
+    last_training=list(
+      history=NULL
+    ),
+
     #--------------------------------------------------------------------------
     #'@description Method for creating a new text embedding model
     #'@param model_name \code{string} containing the name of the new model.
@@ -376,6 +384,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
         }
 
+        #Sustainability tracking
         sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
         if(file.exists(sustainability_datalog_path)){
           tmp_sustainability_data<-read.csv(sustainability_datalog_path)
@@ -385,6 +394,15 @@ TextEmbeddingModel<-R6::R6Class(
           private$sustainability$sustainability_tracked=FALSE
           private$sustainability$track_log=NA
         }
+
+        #Training history
+        training_datalog_path=paste0(model_dir,"/","history.log")
+        if(file.exists(training_datalog_path)==TRUE){
+          self$last_training$history=read.csv2(file = training_datalog_path)
+        } else {
+          self$last_training$history=NA
+        }
+
 
         #Check Embedding Configuration
         if(method=="funnel"){
@@ -778,6 +796,7 @@ TextEmbeddingModel<-R6::R6Class(
             }
           }
 
+          #Sustainability Data
           sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
           if(file.exists(sustainability_datalog_path)){
             tmp_sustainability_data<-read.csv(sustainability_datalog_path)
@@ -787,6 +806,15 @@ TextEmbeddingModel<-R6::R6Class(
             private$sustainability$sustainability_tracked=FALSE
             private$sustainability$track_log=NA
           }
+
+          #Training History
+          training_datalog_path=paste0(model_dir,"/","history.log")
+          if(file.exists(training_datalog_path)){
+            self$last_training$history=read.csv2(file = training_datalog_path)
+          } else {
+            self$last_training$history=NULL
+          }
+
 
       } else {
         message("Method only relevant for transformer models.")
@@ -858,6 +886,15 @@ TextEmbeddingModel<-R6::R6Class(
         file=paste0(model_dir,"/","sustainability.csv"),
         row.names = FALSE
       )
+
+      #Saving training history
+      if(is.null_or_na(self$last_training$history)==FALSE){
+        write.csv2(
+          x=self$last_training$history,
+          file=paste0(model_dir,"/","history.log"),
+          row.names = FALSE,
+          quote = FALSE)
+      }
 
       } else {
         message("Method only relevant for transformer models.")
@@ -1267,7 +1304,8 @@ TextEmbeddingModel<-R6::R6Class(
             if(private$transformer_components$emb_pool_type=="average"){
               #Average Pooling over all tokens
               for(i in tmp_selected_layer){
-                tensor_embeddings[i]=list(pooling(tensor_embeddings[[as.integer(i)]]))
+                tensor_embeddings[i]=list(pooling(x=tensor_embeddings[[as.integer(i)]],
+                                                  mask=tokens$encodings["attention_mask"]))
               }
             }
 

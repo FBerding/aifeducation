@@ -2308,7 +2308,7 @@ start_aifeducation_studio<-function(){
       if(length(interface_architecture()[[2]])>0){
 
         max_layer_transformer=interface_architecture()[[3]]
-        print(interface_architecture()[[1]])
+
         if(interface_architecture()[[1]]=="FunnelForMaskedLM"|
            interface_architecture()[[1]]=="FunnelModel"){
           pool_type_choices=c("cls")
@@ -2404,7 +2404,7 @@ start_aifeducation_studio<-function(){
 
     #Create the interface
     shiny::observeEvent(input$lm_save_interface,{
-      model_architecture=interface_architecture()[1]
+      model_architecture=interface_architecture()[[1]]
       print(model_architecture)
       if(model_architecture=="BertForMaskedLM"|
          model_architecture=="BertModel"){
@@ -2836,6 +2836,37 @@ start_aifeducation_studio<-function(){
                             )
 
                    ),
+                   #Language Model Training------------------------------------------
+                   shiny::tabPanel("Training",
+                                   shiny::fluidRow(
+                       shinydashboard::box(title = "Training",
+                                           solidHeader = TRUE,
+                                           status = "primary",
+                                           width = 12,
+                                           shiny::sidebarLayout(
+                                             position="right",
+                                             sidebarPanel=shiny::sidebarPanel(
+                                               shiny::sliderInput(inputId = "lm_performance_text_size",
+                                                                  label = "Text Size",
+                                                                  min = 1,
+                                                                  max = 20,
+                                                                  step = 0.5,
+                                                                  value = 12),
+                                               shiny::numericInput(inputId = "lm_performance_y_min",
+                                                                   label = "Y Min",
+                                                                   value = 0),
+                                               shiny::numericInput(inputId = "lm_performance_y_max",
+                                                                   label = "Y Max",
+                                                                   value = 20),
+                                             ),
+                                             mainPanel =shiny::mainPanel(
+                                               shiny::plotOutput(outputId = "lm_performance_training_loss")
+                                             )
+                                           )
+                              )
+                            )
+
+                   ),
                    #Create Text Embeddings---------------------------------------------
                    shiny::tabPanel("Create Text Embeddings",
                             shiny::fluidRow(
@@ -2987,6 +3018,38 @@ start_aifeducation_studio<-function(){
         return(NULL)
       }
     })
+
+        output$lm_performance_training_loss<-shiny::renderPlot({
+          plot_data=LanguageModel_for_Use()$last_training$history
+
+          if(!is.null(plot_data)){
+            y_min=input$lm_performance_y_min
+            y_max=input$lm_performance_y_max
+
+            val_loss_min=min(plot_data$val_loss)
+            best_model_epoch=which(x=(plot_data$val_loss)==val_loss_min)
+
+            plot<-ggplot2::ggplot(data=plot_data)+
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$loss,color="train"))+
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$val_loss,color="validation"))+
+              ggplot2::geom_vline(xintercept = best_model_epoch,
+                                  linetype="dashed")
+
+            plot=plot+ggplot2::theme_classic()+
+              ggplot2::ylab("value")+
+              ggplot2::coord_cartesian(ylim=c(y_min,y_max))+
+              ggplot2::xlab("epoch")+
+              ggplot2::scale_color_manual(values = c("train"="red",
+                                                     "validation"="blue",
+                                                     "test"="darkgreen"))+
+              ggplot2::theme(text = ggplot2::element_text(size = input$lm_performance_text_size),
+                             legend.position="bottom")
+            return(plot)
+          } else {
+            return(NULL)
+          }
+        },res = 72*2)
+
 
     #Document Page--------------------------------------------------------------
     shinyFiles::shinyDirChoose(input=input,

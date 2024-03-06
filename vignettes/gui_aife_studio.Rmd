@@ -509,7 +509,11 @@ model.
 
 [![Figure 13: Text Embedding Model - Description](img_articles/gui_aife_studio_emb_interface_use_desc.jpg){width="100%"}](img_articles/gui_aife_studio_emb_interface_use_desc.jpg)
 Figure 13: Text Embedding Model - Description (click image to enlarge)
- 
+
+The tab *Training* shows the development of the loss and the validation loss
+during the last training of the corresponding base model. If no plot is displayed no 
+history data is available.
+
 The tab *Create Text Embeddings* (Figure 14) allows you to transform raw texts into
 a numerical representation of these texts, called text embeddings. These
 text embeddings can be used in downstream tasks such as classifying
