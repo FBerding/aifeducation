@@ -374,7 +374,7 @@ for(ai_method in ai_methods){
                                 sustain_interval = 15,
                                 trace=FALSE,
                                 keras_trace = 0))
-          Sys.sleep(2)
+          Sys.sleep(5)
         expect_no_error(
           train_tune_bert_model(ml_framework = framework,
                                 output_dir=testthat::test_path(paste0(path_01,"/",framework)),

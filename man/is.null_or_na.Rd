@@ -14,7 +14,7 @@ Returns \code{FALSE} if the object is not \code{NULL} and not \code{NA}.
 Returns \code{TRUE} in all other cases.
 }
 \description{
-Function for checking if an object is \code{NULL} or \codee{NA}
+Function for checking if an object is \code{NULL} or \code{NA}
 }
 \seealso{
 Other Auxiliary Functions: 

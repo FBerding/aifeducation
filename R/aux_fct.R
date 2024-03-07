@@ -1009,7 +1009,7 @@ clean_pytorch_log_transformers<-function(log){
 
 #'Check if NULL or NA
 #'
-#'Function for checking if an object is \code{NULL} or \codee{NA}
+#'Function for checking if an object is \code{NULL} or \code{NA}
 #'
 #'@param object An object to test.
 #'
