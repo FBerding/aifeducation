@@ -27,7 +27,7 @@
 #'@export
 install_py_modules<-function(envname="aifeducation",
                              install="pytorch",
-                             tf_version="<=2.14",
+                             tf_version="<=2.15",
                              pytorch_cuda_version="12.1",
                              python_version="3.9",
                              remove_first=FALSE,
@@ -68,8 +68,7 @@ install_py_modules<-function(envname="aifeducation",
     if(cpu_only==TRUE){
       reticulate::conda_install(
         packages = c(
-          "tensorflow-cpu",
-          "tf-keras"),
+          paste0("tensorflow-cpu",tf_version)),
         envname = envname,
         conda = "auto",
         pip = TRUE)
