@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,25 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.1" id="aifeducation-031">aifeducation 0.3.1<a class="anchor" aria-label="anchor" href="#aifeducation-031"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.2" id="aifeducation-032">aifeducation 0.3.2<a class="anchor" aria-label="anchor" href="#aifeducation-032"></a></h2>
+<p><strong>TextEmbeddingClassifiers</strong></p>
+<ul><li>Fixed a bug in GlobalAveragePooling1D_PT. Now the layer makes a correct pooling. <strong>This change has an effect on PyTorch models trained with version 0.3.1.</strong>
+</li>
+</ul><p><strong>TextEmbeddingModel</strong></p>
+<ul><li>Replaced the parameter ‘aggregation’ with three new parameters allowing to explicitly choose the start and end layer to be included in the creation of embeddings. Furthermore, two options for the pooling method within each layer is added (“cls” and “average”).</li>
+<li>Added support for reporting the training and validation loss during training the corresponding base model.</li>
+</ul><p><strong>Transformer Models</strong></p>
+<ul><li>Fixed a bug in the creation of all transformer models except funnel. Now choosing the number of layers is working.</li>
+<li>A file ‘history.log’ is now saved within the model’s folder reporting the loss and validation loss during training for each epoch.</li>
+</ul><p><strong>EmbeddedText</strong></p>
+<ul><li>Changed the process for validating if EmbeddedTexts are compatible. Now only the model’s unique name is used for the validation.</li>
+<li>Added new fields and updated methods to account for the new options in creating embeddings (layer selection and pooling type).</li>
+</ul><p><strong>Graphical User Interface Aifeducation Studio</strong></p>
+<ul><li>Adapted the interface according to the changes made in this version.</li>
+<li>Improved the read of raw texts. Reading now reduces multiple spaces characters to one single space character. Hyphenation is removed.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.1" id="aifeducation-031">aifeducation 0.3.1<a class="anchor" aria-label="anchor" href="#aifeducation-031"></a></h2><p class="text-muted">CRAN release: 2024-02-18</p>
 <p><strong>Graphical User Interface Aifeducation Studio</strong></p>
 <ul><li>Added a shiny app to the package that serves as a graphical user interface.</li>
 </ul><p><strong>Transformer Models</strong></p>

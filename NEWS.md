@@ -36,6 +36,8 @@ editor_options:
 **Graphical User Interface Aifeducation Studio**
 
 - Adapted the interface according to the changes made in this version.
+- Improved the read of raw texts. Reading now reduces multiple spaces characters to 
+  one single space character. Hyphenation is removed.
 
 
 # aifeducation 0.3.1

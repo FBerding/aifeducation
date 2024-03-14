@@ -317,7 +317,7 @@ The remaining cases are part of the training data.}
 balanced synthetic cases. \code{FALSE} if not.}
 
 \item{\code{bsc_methods}}{\code{vector} containing the methods for generating
-synthetic cases via \link[smotefamily]{smotefamily}. Multiple methods can
+synthetic cases via 'smotefamily'. Multiple methods can
 be passed. Currently \code{bsc_methods=c("adas")}, \code{bsc_methods=c("smote")}
 and \code{bsc_methods=c("dbsmote")} are possible.}
 

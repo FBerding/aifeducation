@@ -1186,6 +1186,8 @@ start_aifeducation_studio<-function(){
                               total=n_files,
                               title = as.character(all_paths[i]))
             tmp_document=readtext::readtext(file=all_paths[i])
+            tmp_document$text=stringr::str_replace_all(tmp_document$text,pattern = "[:space:]{1,}",replacement = " ")
+            tmp_document$text=stringr::str_replace_all(tmp_document$text,pattern = "-(?=[:space:])",replacement = "")
             #File name without extension
             #text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
             tmp_string=stringr::str_split_fixed(tmp_document$doc_id,pattern="\\.",n=Inf)
@@ -1751,12 +1753,16 @@ start_aifeducation_studio<-function(){
     })
 
     train_tune_model_architecture<-shiny::eventReactive(model_path_train_LM(),{
-      shinyWidgets::show_alert(title="Loading",
-                               text = "Please wait",
-                               type="info",
-                               closeOnClickOutside = FALSE,
-                               showCloseButton = FALSE)
       model_path<-model_path_train_LM()
+      print(model_path)
+      if(!is.null(model_path) &
+         !identical(model_path,character(0))){
+        shinyWidgets::show_alert(title="Loading",
+                                 text = "Please wait",
+                                 type="info",
+                                 closeOnClickOutside = FALSE,
+                                 showCloseButton = FALSE)
+      }
       if(!is.null(model_path)){
         if(file.exists(paste0(model_path,
                               "/",

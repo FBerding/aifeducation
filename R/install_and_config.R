@@ -34,6 +34,7 @@ install_py_modules<-function(envname="aifeducation",
                              cpu_only=FALSE){
   relevant_modules<-c("transformers",
                       "tokenizers",
+                      "pandas",
                       "datasets",
                       "codecarbon")
   relevant_modules_pt<-c("safetensors",
@@ -146,7 +147,8 @@ check_aif_py_modules<-function(trace=TRUE, check="all"){
   pytorch_modules=c("torch",
                     "torcheval",
                     "safetensors",
-                    "accelerate")
+                    "accelerate",
+                    "pandas")
   tensorflow_modules=c("keras",
                        "tensorflow")
 
