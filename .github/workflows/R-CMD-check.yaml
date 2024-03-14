@@ -67,6 +67,7 @@ jobs:
           conda_install(
             packages = c(
             "tensorflow-cpu",
+            "tf-keras",
             "torch",
             "torcheval",
             "safetensors",

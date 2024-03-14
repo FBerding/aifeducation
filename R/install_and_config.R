@@ -69,7 +69,7 @@ install_py_modules<-function(envname="aifeducation",
       reticulate::conda_install(
         packages = c(
           "tensorflow-cpu",
-          "keras"),
+          "tf-keras"),
         envname = envname,
         conda = "auto",
         pip = TRUE)
@@ -77,7 +77,7 @@ install_py_modules<-function(envname="aifeducation",
       reticulate::conda_install(
         packages = c(
           paste0("tensorflow",tf_version),
-          "keras"),
+          "tf-keras"),
         envname = envname,
         conda = "auto",
         pip = TRUE)

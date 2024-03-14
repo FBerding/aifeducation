@@ -38,6 +38,10 @@ editor_options:
 - Adapted the interface according to the changes made in this version.
 - Improved the read of raw texts. Reading now reduces multiple spaces characters to 
   one single space character. Hyphenation is removed.
+  
+**Python Installation** 
+
+- Updated installation to account for the new version of keras.
 
 
 # aifeducation 0.3.1
@@ -99,7 +103,7 @@ editor_options:
 -   Added an argument to 'install_py_modules',
     allowing to choose which machine learning framework should be
     installed. 
-- Updated 'check_aif_py_modules'.
+-   Updated 'check_aif_py_modules'.
 
 **Further Changes**
 

@@ -1227,7 +1227,6 @@ TextEmbeddingModel<-R6::R6Class(
         }
 
         for (b in 1:n_batches){
-
           if(private$transformer_components$ml_framework=="pytorch"){
             #Set model to evaluation mode
             private$transformer_components$model$eval()
@@ -1237,6 +1236,9 @@ TextEmbeddingModel<-R6::R6Class(
               pytorch_device="cpu"
             }
             private$transformer_components$model$to(pytorch_device)
+            if(private$transformer_components$emb_pool_type=="average"){
+              pooling$to(pytorch_device)
+            }
           }
 
           #tokens<-self$encode(raw_text = raw_text,
@@ -1304,8 +1306,8 @@ TextEmbeddingModel<-R6::R6Class(
             if(private$transformer_components$emb_pool_type=="average"){
               #Average Pooling over all tokens
               for(i in tmp_selected_layer){
-                tensor_embeddings[i]=list(pooling(x=tensor_embeddings[[as.integer(i)]],
-                                                  mask=tokens$encodings["attention_mask"]))
+                tensor_embeddings[i]=list(pooling(x=tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
+                                                  mask=tokens$encodings["attention_mask"]$to(pytorch_device)))
               }
             }
 
