@@ -149,8 +149,7 @@ check_aif_py_modules<-function(trace=TRUE, check="all"){
                     "safetensors",
                     "accelerate",
                     "pandas")
-  tensorflow_modules=c("keras",
-                       "tensorflow")
+  tensorflow_modules=c("tensorflow")
 
   if(check=="all"){
     relevant_modules<-c(general_modules,

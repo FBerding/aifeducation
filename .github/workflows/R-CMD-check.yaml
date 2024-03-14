@@ -70,7 +70,6 @@ jobs:
             "torch",
             "torcheval",
             "safetensors",
-            "keras",
             "accelerate"),
             envname = envname,
             conda = "auto",
