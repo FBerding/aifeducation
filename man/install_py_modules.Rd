@@ -7,7 +7,7 @@
 install_py_modules(
   envname = "aifeducation",
   install = "pytorch",
-  tf_version = "<=2.14",
+  tf_version = "<=2.15",
   pytorch_cuda_version = "12.1",
   python_version = "3.9",
   remove_first = FALSE,
