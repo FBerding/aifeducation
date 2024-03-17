@@ -27,13 +27,14 @@
 #'@export
 install_py_modules<-function(envname="aifeducation",
                              install="pytorch",
-                             tf_version="<=2.14",
+                             tf_version="<=2.15",
                              pytorch_cuda_version="12.1",
                              python_version="3.9",
                              remove_first=FALSE,
                              cpu_only=FALSE){
   relevant_modules<-c("transformers",
                       "tokenizers",
+                      "pandas",
                       "datasets",
                       "codecarbon")
   relevant_modules_pt<-c("safetensors",
@@ -67,8 +68,7 @@ install_py_modules<-function(envname="aifeducation",
     if(cpu_only==TRUE){
       reticulate::conda_install(
         packages = c(
-          "tensorflow-cpu",
-          "keras"),
+          paste0("tensorflow-cpu",tf_version)),
         envname = envname,
         conda = "auto",
         pip = TRUE)
@@ -76,7 +76,7 @@ install_py_modules<-function(envname="aifeducation",
       reticulate::conda_install(
         packages = c(
           paste0("tensorflow",tf_version),
-          "keras"),
+          "tf-keras"),
         envname = envname,
         conda = "auto",
         pip = TRUE)
@@ -146,9 +146,9 @@ check_aif_py_modules<-function(trace=TRUE, check="all"){
   pytorch_modules=c("torch",
                     "torcheval",
                     "safetensors",
-                    "accelerate")
-  tensorflow_modules=c("keras",
-                       "tensorflow")
+                    "accelerate",
+                    "pandas")
+  tensorflow_modules=c("tensorflow")
 
   if(check=="all"){
     relevant_modules<-c(general_modules,

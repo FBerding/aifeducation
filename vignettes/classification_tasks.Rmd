@@ -76,7 +76,7 @@ a research area, concepts are not unified. Figure 1 illustrates this
 package's understanding.
 
 ![Figure 1: Understanding of Central
-Concepts](classif_fig_01.png){width="100%"}
+Concepts](img_articles/classif_fig_01.png){width="100%"}
 
 Since *aifeducation* looks at the application of AI for classification
 tasks from the perspective of the empirical method of content analysis,
@@ -98,7 +98,7 @@ to train an AI to classify text in line with supervised machine learning
 principles.
 
 ![Figure 2: Basic Structure of Supervised Machine
-Learning](classif_fig_02.png){width="100%"}
+Learning](img_articles/classif_fig_02.png){width="100%"}
 
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -114,7 +114,7 @@ necessary. Figure 3 provides an overview integrating the functions and
 objects of *aifeducation*.
 
 ![Figure 3: Overview of the Steps to Perform a
-Classification](classif_fig_03.png){width="100%"}
+Classification](img_articles/classif_fig_03.png){width="100%"}
 
 The first step is to transform raw texts into a form computers can use.
 That is, the raw texts must be transformed into numbers. In modern
@@ -307,6 +307,16 @@ textual_data<-readtext::readtext(
 If you read texts for sever files you do not need to specify the arguments
 `docid_field` and `text_field`. The id of the texts is automatically set to
 the file names. 
+
+After the text is read we recommend to do some text cleaning.
+```{r, include = TRUE, eval=FALSE}
+#remove multiple spaces and new lines
+textual_data$text=stringr::str_replace_all(textual_data$text,pattern = "[:space:]{1,}",replacement = " ")
+
+#remove hyphenation
+textual_data$text=stringr::str_replace_all(textual_data$text,pattern = "-(?=[:space:])",replacement = "")
+```
+
 
 Please refer to the documentation of the function readtext within the readtext
 library for more information.
@@ -751,7 +761,9 @@ bert_modeling<-TextEmbeddingModel$new(
   max_length = 512,
   chunks=4,
   overlap=30,
-  aggregation="last",
+  emb_layer_min="middle",
+  emb_layer_max="2_3_layer",
+  emb_pool_type="average",
   model_dir="my_own_transformer_trained"
   )
 ```
@@ -793,8 +805,15 @@ this example model can analyse a maximum of 512+(4-1)*(512-30)=1958 tokens of a
 text.
 
 Finally, you have to decide from which hidden layer or layers the embeddings 
-should be drawn (`aggregation="last"`). In their initial work, Devlin et al. (2019) used
+should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide over which layers
+the average value for every token should be calculated. Please note that the calculation
+considers all layers between `emb_layer_min` and `emb_layer_max`. 
+In their initial work, Devlin et al. (2019) used
 the hidden states of different layers for classification.
+
+With `emb_pool_type` you decide which tokens are used for pooling within every layer. 
+In the case of `emb_pool_type="cls"` only the cls token is used. In the case of
+`emb_pool_type="average"` all tokens within a layer are averaged except padding tokens.
 
 After deciding about the configuration, you can use your model.
 
@@ -988,7 +1007,7 @@ With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.
 
 ![Figure 4: Overview of Possible Structure of a
-Classifier](classif_fig_04.png){width="100%"}
+Classifier](img_articles/classif_fig_04.png){width="100%"}
 
 `hidden` takes a vector of integers, determining the number of layers
 and the number of neurons. In our example, there are no dense layers.
@@ -1011,7 +1030,7 @@ layering in order to take the context of all chunks into account. To add self-at
 you have two choices:
 - You can use the attention mechanism used in classic transformer models as 
 multihead attention (Vaswani et al. 2017). For this variant you have to set
-`attention_type="multihead`, `repeat_encoder` to a value of at least 1, and
+`attention_type="multihead"`, `repeat_encoder` to a value of at least 1, and
 self_attention_heads`to a value of at least 1. 
 - Furthermore you can use the attention mechanism described in Lee-Thorp et al. (2021) 
 of the FNet model which allows much fast computations at low accuracy costs. To use
@@ -1186,7 +1205,7 @@ Figure 5 illustrates the training loop for the cases that all three
 options are set to `TRUE`.
 
 ![Figure 5: Overview of the Steps to Perform a
-Classification](classif_fig_05.png){width="100%"}
+Classification](img_articles/classif_fig_05.png){width="100%"}
 
 The example above applies the algorithm proposed by Cascante-Bonilla et
 al. (2020). After training the classifier on the labeled data, the
@@ -1281,7 +1300,7 @@ library(iotarelr)
 iotarelr::plot_iota2_alluvial(test_classifier$reliability$iota_object_end_free)
 ```
 
-![Figure 6: Coding Stream of the Classifier](classif_fig_06.png){width="100%"}
+![Figure 6: Coding Stream of the Classifier](img_articles/classif_fig_06.png){width="100%"}
 
 Here you can see that a small number of negative reviews is treated
 as a good review while a larger number of positive reviews is

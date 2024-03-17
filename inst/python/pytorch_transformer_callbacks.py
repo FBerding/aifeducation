@@ -9,8 +9,7 @@ class ReportAiforeducationShiny_PT(transformers.TrainerCallback):
     r.py_update_aifeducation_progress_bar_epochs(value=state.epoch,total=args.num_train_epochs,title=("Epoch: "+str(int(state.epoch))+"/"+str(args.num_train_epochs)))
   
   def on_step_end(self, args, state, control, **kwargs):
-    r.py_update_aifeducation_progress_bar_steps(value=(state.global_step % (state.max_steps/args.num_train_epochs)),total=state.max_steps/args.num_train_epochs,title=("Batch/Step: "+str(state.global_step)+"/"+str(int(state.max_steps/args.num_train_epochs))))
+    r.py_update_aifeducation_progress_bar_steps(value=(state.global_step % (state.max_steps/args.num_train_epochs)),total=state.max_steps/args.num_train_epochs,title=("Batch/Step: "+str((state.global_step % (state.max_steps/args.num_train_epochs)))+"/"+str(int(state.max_steps/args.num_train_epochs))))
     
     
 
-    

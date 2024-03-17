@@ -1186,6 +1186,8 @@ start_aifeducation_studio<-function(){
                               total=n_files,
                               title = as.character(all_paths[i]))
             tmp_document=readtext::readtext(file=all_paths[i])
+            tmp_document$text=stringr::str_replace_all(tmp_document$text,pattern = "[:space:]{1,}",replacement = " ")
+            tmp_document$text=stringr::str_replace_all(tmp_document$text,pattern = "-(?=[:space:])",replacement = "")
             #File name without extension
             #text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
             tmp_string=stringr::str_split_fixed(tmp_document$doc_id,pattern="\\.",n=Inf)
@@ -1751,12 +1753,16 @@ start_aifeducation_studio<-function(){
     })
 
     train_tune_model_architecture<-shiny::eventReactive(model_path_train_LM(),{
-      shinyWidgets::show_alert(title="Loading",
-                               text = "Please wait",
-                               type="info",
-                               closeOnClickOutside = FALSE,
-                               showCloseButton = FALSE)
       model_path<-model_path_train_LM()
+      print(model_path)
+      if(!is.null(model_path) &
+         !identical(model_path,character(0))){
+        shinyWidgets::show_alert(title="Loading",
+                                 text = "Please wait",
+                                 type="info",
+                                 closeOnClickOutside = FALSE,
+                                 showCloseButton = FALSE)
+      }
       if(!is.null(model_path)){
         if(file.exists(paste0(model_path,
                               "/",
@@ -2257,23 +2263,39 @@ start_aifeducation_studio<-function(){
         model<-transformers$TFAutoModel$from_pretrained(model_path)
         model_architecture<-model$config$architectures
         max_position_embeddings=model$config$max_position_embeddings
+        if(model_architecture=="FunnelForMaskedLM"){
+          max_layer=sum(model$config$block_repeats*model$config$block_sizes)
+        } else {
+          max_layer=model$config$num_hidden_layers
+        }
       } else if(file.exists(paste0(model_path,
                                    "/",
                                    "pytorch_model.bin"))){
         model<-transformers$AutoModel$from_pretrained(model_path)
         model_architecture<-model$config$architectures
         max_position_embeddings=model$config$max_position_embeddings
+        if(model_architecture=="FunnelForMaskedLM"){
+          max_layer=sum(model$config$block_repeats*model$config$block_sizes)
+        } else {
+          max_layer=model$config$num_hidden_layers
+        }
       } else if(file.exists(paste0(model_path,
                                   "/",
                                   "model.safetensors"))){
         model<-transformers$AutoModel$from_pretrained(model_path)
         model_architecture<-model$config$architectures
         max_position_embeddings=model$config$max_position_embeddings
+        if(model_architecture=="FunnelForMaskedLM"){
+          max_layer=sum(model$config$block_repeats*model$config$block_sizes)
+        } else {
+          max_layer=model$config$num_hidden_layers
+        }
       } else {
         model_architecture=NULL
         max_position_embeddings=NULL
+        max_layer=NULL
       }
-      return(list(model_architecture,max_position_embeddings))
+      return(list(model_architecture,max_position_embeddings,max_layer))
     })
 
     shiny::observe({
@@ -2290,6 +2312,16 @@ start_aifeducation_studio<-function(){
 
     output$lm_interface_setting<-shiny::renderUI({
       if(length(interface_architecture()[[2]])>0){
+
+        max_layer_transformer=interface_architecture()[[3]]
+
+        if(interface_architecture()[[1]]=="FunnelForMaskedLM"|
+           interface_architecture()[[1]]=="FunnelModel"){
+          pool_type_choices=c("cls")
+        } else {
+          pool_type_choices=c("average","cls")
+        }
+
         ui<-shinydashboard::box(title = "Interface Setting",
                 width = 12,
                 solidHeader = TRUE,
@@ -2324,13 +2356,19 @@ start_aifeducation_studio<-function(){
                                      min = 0,
                                      max= interface_architecture()[[2]],
                                      step = 1),
-                         shiny::selectInput(inputId = "lm_aggregation",
-                                     label = "Aggregation Hidden States",
-                                     choices = c("last",
-                                                 "second_to_last",
-                                                 "fourth_to_last",
-                                                 "all",
-                                                 "last_four"))
+                         shiny::sliderInput(inputId = "lm_emb_layers",
+                                     label = "Layers for Embeddings",
+                                     value=c(
+                                       max(1,floor(0.5*max_layer_transformer)),
+                                       max(1,floor(2/3*max_layer_transformer))),
+                                     min=1,
+                                     max=max_layer_transformer,
+                                     step=1),
+                         shiny::selectInput(inputId = "lm_emb_pool_type",
+                                            label=paste("Pooling Type"),
+                                            choices=pool_type_choices,
+                                            multiple=FALSE
+                                            ),
                   )
                 )
         )
@@ -2372,17 +2410,22 @@ start_aifeducation_studio<-function(){
 
     #Create the interface
     shiny::observeEvent(input$lm_save_interface,{
-      model_architecture=interface_architecture()[1]
+      model_architecture=interface_architecture()[[1]]
       print(model_architecture)
-      if(model_architecture=="BertForMaskedLM"){
+      if(model_architecture=="BertForMaskedLM"|
+         model_architecture=="BertModel"){
         method="bert"
-      } else if(model_architecture=="FunnelForMaskedLM"){
+      } else if(model_architecture=="FunnelForMaskedLM"|
+                model_architecture=="FunnelModel"){
         method="funnel"
-      } else if(model_architecture=="LongformerForMaskedLM"){
+      } else if(model_architecture=="LongformerForMaskedLM"|
+                model_architecture=="LongformerModel"){
         method="longformer"
-      } else if(model_architecture=="RobertaForMaskedLM"){
+      } else if(model_architecture=="RobertaForMaskedLM"|
+                model_architecture=="RobertaModel"){
         method="roberta"
-      } else if(model_architecture=="DebertaV2ForMaskedLM"){
+      } else if(model_architecture=="DebertaV2ForMaskedLM"|
+                model_architecture=="DebertaV2Model"){
         method="deberta_v2"
       }
 
@@ -2407,7 +2450,9 @@ start_aifeducation_studio<-function(){
           max_length = input$lm_max_length,
           overlap = input$lm_overlap,
           chunks = input$lm_chunks,
-          aggregation = input$lm_aggregation,
+          emb_layer_min=input$lm_emb_layers[1],
+          emb_layer_max=input$lm_emb_layers[2],
+          emb_pool_type=input$lm_emb_pool_type,
           ml_framework = input$config_ml_framework,
           model_dir = model_path_interface_LM(),
           method = method)
@@ -2764,7 +2809,16 @@ start_aifeducation_studio<-function(){
                                      shiny::tags$p("Token Overlap: ",model$get_transformer_components()$overlap),
                                      shiny::tags$p("Max Tokens: ",(model$get_model_info()$model_max_size-model$get_transformer_components()$overlap)
                                             *model$get_transformer_components()$chunks+model$get_model_info()$model_max_size),
-                                     shiny::tags$p("Hidden States Aggregation: ",model$get_transformer_components()$aggregation),
+                                     if(!is.null(model$get_transformer_components()$aggregation)){
+                                       shiny::tags$p("Hidden States Aggregation: ",model$get_transformer_components()$aggregation)
+                                     },
+                                     if(!is.null(model$get_transformer_components()$emb_pool_type)){
+                                       shiny::tags$div(
+                                         shiny::tags$p("Pool Type: ",model$get_transformer_components()$emb_pool_type),
+                                         shiny::tags$p("Embedding Layers - Min: ",model$get_transformer_components()$emb_layer_min),
+                                         shiny::tags$p("Embedding Layers - Max: ",model$get_transformer_components()$emb_layer_max)
+                                       )
+                                     },
                                      shiny::tags$h3("Sustainability"),
                                      if(methods::isClass(Class="data.frame",where = model$get_sustainability_data())){
                                        if(is.na(model$get_sustainability_data()[1,1])==FALSE){
@@ -2784,6 +2838,37 @@ start_aifeducation_studio<-function(){
                                      } else {
                                        shiny::tags$p("Carbon Footprint (CO2eq. kg): ","not estimated")
                                      }
+                              )
+                            )
+
+                   ),
+                   #Language Model Training------------------------------------------
+                   shiny::tabPanel("Training",
+                                   shiny::fluidRow(
+                       shinydashboard::box(title = "Training",
+                                           solidHeader = TRUE,
+                                           status = "primary",
+                                           width = 12,
+                                           shiny::sidebarLayout(
+                                             position="right",
+                                             sidebarPanel=shiny::sidebarPanel(
+                                               shiny::sliderInput(inputId = "lm_performance_text_size",
+                                                                  label = "Text Size",
+                                                                  min = 1,
+                                                                  max = 20,
+                                                                  step = 0.5,
+                                                                  value = 12),
+                                               shiny::numericInput(inputId = "lm_performance_y_min",
+                                                                   label = "Y Min",
+                                                                   value = 0),
+                                               shiny::numericInput(inputId = "lm_performance_y_max",
+                                                                   label = "Y Max",
+                                                                   value = 20),
+                                             ),
+                                             mainPanel =shiny::mainPanel(
+                                               shiny::plotOutput(outputId = "lm_performance_training_loss")
+                                             )
+                                           )
                               )
                             )
 
@@ -2939,6 +3024,38 @@ start_aifeducation_studio<-function(){
         return(NULL)
       }
     })
+
+        output$lm_performance_training_loss<-shiny::renderPlot({
+          plot_data=LanguageModel_for_Use()$last_training$history
+
+          if(!is.null(plot_data)){
+            y_min=input$lm_performance_y_min
+            y_max=input$lm_performance_y_max
+
+            val_loss_min=min(plot_data$val_loss)
+            best_model_epoch=which(x=(plot_data$val_loss)==val_loss_min)
+
+            plot<-ggplot2::ggplot(data=plot_data)+
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$loss,color="train"))+
+              ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$val_loss,color="validation"))+
+              ggplot2::geom_vline(xintercept = best_model_epoch,
+                                  linetype="dashed")
+
+            plot=plot+ggplot2::theme_classic()+
+              ggplot2::ylab("value")+
+              ggplot2::coord_cartesian(ylim=c(y_min,y_max))+
+              ggplot2::xlab("epoch")+
+              ggplot2::scale_color_manual(values = c("train"="red",
+                                                     "validation"="blue",
+                                                     "test"="darkgreen"))+
+              ggplot2::theme(text = ggplot2::element_text(size = input$lm_performance_text_size),
+                             legend.position="bottom")
+            return(plot)
+          } else {
+            return(NULL)
+          }
+        },res = 72*2)
+
 
     #Document Page--------------------------------------------------------------
     shinyFiles::shinyDirChoose(input=input,

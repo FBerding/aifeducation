@@ -4,6 +4,46 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 0.3.2
+
+**TextEmbeddingClassifiers**
+
+-   Fixed a bug in GlobalAveragePooling1D_PT. Now the layer makes a correct pooling.
+    **This change has an effect on PyTorch models trained with version 0.3.1.**
+    
+**TextEmbeddingModel**
+
+- Replaced the parameter 'aggregation' with three new parameters allowing to explicitly
+  choose the start and end layer to be included in the creation of embeddings. Furthermore,
+  two options for the pooling method within each layer is added ("cls" and "average").
+- Added support for reporting the training and validation loss during training 
+  the corresponding base model.
+    
+**Transformer Models**
+
+-  Fixed a bug in the creation of all transformer models except funnel. Now choosing the
+   number of layers is working.
+-  A file 'history.log' is now saved within the model's folder reporting the loss
+   and validation loss during training for each epoch.
+   
+**EmbeddedText**
+
+-   Changed the process for validating if EmbeddedTexts are compatible. Now only
+    the model's unique name is used for the validation.
+-   Added new fields and updated methods to account for the new options in creating embeddings (layer
+    selection and pooling type).
+    
+**Graphical User Interface Aifeducation Studio**
+
+- Adapted the interface according to the changes made in this version.
+- Improved the read of raw texts. Reading now reduces multiple spaces characters to 
+  one single space character. Hyphenation is removed.
+  
+**Python Installation** 
+
+- Updated installation to account for the new version of keras.
+
+
 # aifeducation 0.3.1
 
 **Graphical User Interface Aifeducation Studio**
@@ -63,7 +103,7 @@ editor_options:
 -   Added an argument to 'install_py_modules',
     allowing to choose which machine learning framework should be
     installed. 
-- Updated 'check_aif_py_modules'.
+-   Updated 'check_aif_py_modules'.
 
 **Further Changes**
 

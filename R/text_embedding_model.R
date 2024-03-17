@@ -33,7 +33,9 @@ TextEmbeddingModel<-R6::R6Class(
       model=NULL,
       model_mlm=NULL,
       tokenizer=NULL,
-      aggregation=NULL,
+      emb_layer_min=NULL,
+      emb_layer_max=NULL,
+      emb_pool_type=NULL,
       chunks=NULL,
       overlap=NULL,
       ml_framework=NULL),
@@ -95,6 +97,14 @@ TextEmbeddingModel<-R6::R6Class(
     )
   ),
   public = list(
+
+    #'@field last_training ('list()')\cr
+    #'List for storing the history and the results of the last training. This
+    #'information will be overwritten if a new training is started.
+    last_training=list(
+      history=NULL
+    ),
+
     #--------------------------------------------------------------------------
     #'@description Method for creating a new text embedding model
     #'@param model_name \code{string} containing the name of the new model.
@@ -122,8 +132,19 @@ TextEmbeddingModel<-R6::R6Class(
     #'transformer models.
     #'@param overlap \code{int} determining the number of tokens which should be added
     #'at the beginning of the next chunk. Only relevant for BERT models.
-    #'@param aggregation \code{string} method for aggregating the text embeddings
-    #'created by transformer models. See details for more information.
+    #'@param emb_layer_min \code{int} or \code{string} determining the first layer to be included
+    #'in the creation of embeddings. An integer correspondents to the layer number. The first
+    #'layer has the number 1. Instead of an integer the following strings are possible:
+    #'\code{"start"} for the first layer, \code{"middle"} for the middle layer,
+    #'\code{"2_3_layer"} for the layer two-third layer, and \code{"last"} for the last layer.
+    #'@param emb_layer_max \code{int} or \code{string} determining the last layer to be included
+    #'in the creation of embeddings. An integer correspondents to the layer number. The first
+    #'layer has the number 1. Instead of an integer the following strings are possible:
+    #'\code{"start"} for the first layer, \code{"middle"} for the middle layer,
+    #'\code{"2_3_layer"} for the layer two-third layer, and \code{"last"} for the last layer.
+    #'@param emb_pool_type \code{string} determining the method for pooling the token embeddings
+    #'within each layer. If \code{"cls"} only the embedding of the CLS token is used. If
+    #'\code{"average"} the token embedding of all tokens are averaged (excluding padding tokens).
     #'@param model_dir \code{string} path to the directory where the
     #'BERT model is stored.
     #'@param bow_basic_text_rep object of class \code{basic_text_rep} created via
@@ -152,16 +173,6 @@ TextEmbeddingModel<-R6::R6Class(
     #'only word embeddings, not text embeddings. To achieve text embeddings the words
     #'are clustered based on their word embeddings with kmeans.}
     #'
-    #'\item{aggregation: For creating a text embedding with a transformer model, several options
-    #'are possible:
-    #'\itemize{
-    #'\item{last: \code{aggregation="last"} uses only the hidden states of the last layer.}
-    #'\item{second_to_last: \code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
-    #'\item{fourth_to_last: \code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
-    #'\item{all: \code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
-    #'\item{last_four: \code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
-    #'}}
-    #'
     #'}
     #'@import reticulate
     #'@import stats
@@ -175,7 +186,9 @@ TextEmbeddingModel<-R6::R6Class(
                         max_length=0,
                         chunks=1,
                         overlap=0,
-                        aggregation="last",
+                        emb_layer_min="middle",
+                        emb_layer_max="2_3_layer",
+                        emb_pool_type="average",
                         model_dir,
                         bow_basic_text_rep,
                         bow_n_dim=10,
@@ -216,16 +229,10 @@ TextEmbeddingModel<-R6::R6Class(
           stop("ml_framework must be 'tensorflow' or 'pytorch'.")
         }
       }
-
-      if((aggregation %in% c("last",
-                            "second_to_last",
-                            "fourth_to_last",
-                            "all",
-                            "last_four"))==FALSE){
-        stop("aggregation must be last, second_to_last, fourth_to_last, all or
-                            last_four.")
-
+      if(method=="funnel" & emb_pool_type!="cls"){
+        stop("Funnel currently supports only cls as pooling type.")
       }
+
       #------------------------------------------------------------------------
       private$r_package_versions$aifeducation<-packageVersion("aifeducation")
       private$r_package_versions$reticulate<-packageVersion("reticulate")
@@ -251,7 +258,10 @@ TextEmbeddingModel<-R6::R6Class(
         private$transformer_components$ml_framework=ml_framework
         private$transformer_components$chunks<-chunks
         private$transformer_components$overlap<-overlap
-        private$transformer_components$aggregation<-aggregation
+
+        if(emb_pool_type%in%c("cls","average")==FALSE){
+          stop("emb_pool_type must be 'cls' or 'average'.")
+        }
 
         #Search for the corresponding files
         if(private$transformer_components$ml_framework=="tensorflow"){
@@ -374,6 +384,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
         }
 
+        #Sustainability tracking
         sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
         if(file.exists(sustainability_datalog_path)){
           tmp_sustainability_data<-read.csv(sustainability_datalog_path)
@@ -383,6 +394,90 @@ TextEmbeddingModel<-R6::R6Class(
           private$sustainability$sustainability_tracked=FALSE
           private$sustainability$track_log=NA
         }
+
+        #Training history
+        training_datalog_path=paste0(model_dir,"/","history.log")
+        if(file.exists(training_datalog_path)==TRUE){
+          self$last_training$history=read.csv2(file = training_datalog_path)
+        } else {
+          self$last_training$history=NA
+        }
+
+
+        #Check Embedding Configuration
+        if(method=="funnel"){
+          max_layers_funnel=sum(private$transformer_components$model$config$block_repeats*
+            private$transformer_components$model$config$block_sizes)
+
+          if(emb_layer_min=="first"){
+            emb_layer_min=1
+          } else if (emb_layer_min=="middle"){
+            emb_layer_min=floor(0.5*max_layers_funnel)
+          } else if(emb_layer_min=="2_3_layer"){
+            emb_layer_min=floor(2/3*max_layers_funnel)
+          } else if (emb_layer_min=="last"){
+            emb_layer_min=max_layers_funnel
+          }
+
+          if(emb_layer_max=="first"){
+            emb_layer_max=1
+          } else if (emb_layer_max=="middle"){
+            emb_layer_max=floor(0.5*max_layers_funnel)
+          } else if(emb_layer_max=="2_3_layer"){
+            emb_layer_max=floor(2/3*max_layers_funnel)
+          } else if (emb_layer_max=="last"){
+            emb_layer_max=max_layers_funnel
+          }
+
+        } else {
+          if(emb_layer_min=="first"){
+            emb_layer_min=1
+          } else if (emb_layer_min=="middle"){
+            emb_layer_min=floor(0.5*private$transformer_components$model$config$num_hidden_layers)
+          } else if(emb_layer_min=="2_3_layer"){
+            emb_layer_min=floor(2/3*private$transformer_components$model$config$num_hidden_layers)
+          } else if (emb_layer_min=="last"){
+            emb_layer_min=private$transformer_components$model$config$num_hidden_layers
+          }
+
+          if(emb_layer_max=="first"){
+            emb_layer_max=1
+          } else if (emb_layer_max=="middle"){
+            emb_layer_max=floor(0.5*private$transformer_components$model$config$num_hidden_layers)
+          } else if(emb_layer_max=="2_3_layer"){
+            emb_layer_max=floor(2/3*private$transformer_components$model$config$num_hidden_layers)
+          } else if (emb_layer_max=="last"){
+            emb_layer_max=private$transformer_components$model$config$num_hidden_layers
+          }
+
+        }
+
+        if(emb_layer_min>emb_layer_max){
+          stop("emb_layer_min layer must be smaller or equal emb_layer_max.")
+        }
+        if(emb_layer_min<1){
+          stop("emb_laser_min must be at least 1.")
+        }
+        if(method=="funnel"){
+          if(emb_layer_max>private$transformer_components$model$config$num_hidden_layers){
+            stop(paste0("emb_layer_max can not exceed the number of layers. The transformer has",
+                        max_layers_funnel,"layers."))
+          }
+        } else {
+          if(emb_layer_max>private$transformer_components$model$config$num_hidden_layers){
+            stop(paste0("emb_layer_max can not exceed the number of layers. The transformer has",
+                        private$transformer_components$model$config$num_hidden_layers,"layers."))
+          }
+        }
+
+        if(is.integer(as.integer(emb_layer_min))==FALSE | is.integer(as.integer(emb_layer_max))==FALSE){
+          stop("emb_layer_min and emb_layer_max must be integers or the following string:
+               'first','last','middle','2_3_layer'")
+        }
+
+        private$transformer_components$emb_layer_min=emb_layer_min
+        private$transformer_components$emb_layer_max=emb_layer_max
+        private$transformer_components$emb_pool_type=emb_pool_type
 
         #------------------------------------------------------------------------
       } else if(private$basic_components$method=="glove_cluster"){
@@ -701,6 +796,7 @@ TextEmbeddingModel<-R6::R6Class(
             }
           }
 
+          #Sustainability Data
           sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
           if(file.exists(sustainability_datalog_path)){
             tmp_sustainability_data<-read.csv(sustainability_datalog_path)
@@ -710,6 +806,15 @@ TextEmbeddingModel<-R6::R6Class(
             private$sustainability$sustainability_tracked=FALSE
             private$sustainability$track_log=NA
           }
+
+          #Training History
+          training_datalog_path=paste0(model_dir,"/","history.log")
+          if(file.exists(training_datalog_path)){
+            self$last_training$history=read.csv2(file = training_datalog_path)
+          } else {
+            self$last_training$history=NULL
+          }
+
 
       } else {
         message("Method only relevant for transformer models.")
@@ -781,6 +886,15 @@ TextEmbeddingModel<-R6::R6Class(
         file=paste0(model_dir,"/","sustainability.csv"),
         row.names = FALSE
       )
+
+      #Saving training history
+      if(is.null_or_na(self$last_training$history)==FALSE){
+        write.csv2(
+          x=self$last_training$history,
+          file=paste0(model_dir,"/","history.log"),
+          row.names = FALSE,
+          quote = FALSE)
+      }
 
       } else {
         message("Method only relevant for transformer models.")
@@ -1102,8 +1216,17 @@ TextEmbeddingModel<-R6::R6Class(
 
         update_aifeducation_progress_bar(value = 0,total = n_batches,title = "Embedding")
 
-        for (b in 1:n_batches){
+        if(private$transformer_components$emb_pool_type=="average"){
+          if(private$transformer_components$ml_framework=="pytorch"){
+            reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+                                                package = "aifeducation"))
+            pooling=py$GlobalAveragePooling1D_PT()
+          } else if(private$transformer_components$ml_framework=="tensorflow"){
+            pooling=keras$layers$GlobalAveragePooling1D()
+          }
+        }
 
+        for (b in 1:n_batches){
           if(private$transformer_components$ml_framework=="pytorch"){
             #Set model to evaluation mode
             private$transformer_components$model$eval()
@@ -1113,6 +1236,9 @@ TextEmbeddingModel<-R6::R6Class(
               pytorch_device="cpu"
             }
             private$transformer_components$model$to(pytorch_device)
+            if(private$transformer_components$emb_pool_type=="average"){
+              pooling$to(pytorch_device)
+            }
           }
 
           #tokens<-self$encode(raw_text = raw_text,
@@ -1134,6 +1260,10 @@ TextEmbeddingModel<-R6::R6Class(
                     private$transformer_components$chunks,
                     n_layer_size))
 
+          #Selecting the relevant layers
+          selected_layer=private$transformer_components$emb_layer_min:private$transformer_components$emb_layer_max
+          tmp_selected_layer=1+selected_layer
+
           if(private$transformer_components$ml_framework=="tensorflow"){
             #Clear session to ensure enough memory
             tf$keras$backend$clear_session()
@@ -1146,6 +1276,16 @@ TextEmbeddingModel<-R6::R6Class(
               attention_mask=tokens$encodings["attention_mask"],
               token_type_ids=tokens$encodings["token_type_ids"],
               output_hidden_states=TRUE)$hidden_states
+            if(private$transformer_components$emb_pool_type=="average"){
+              #Average Pooling over all tokens
+              for(i in tmp_selected_layer){
+                tensor_embeddings[i]=list(pooling(
+                  inputs=tensor_embeddings[[as.integer(i)]],
+                  mask=tokens$encodings["attention_mask"]))
+              }
+            }
+
+
           } else {
             #Clear memory
             if(torch$cuda$is_available()){
@@ -1162,42 +1302,76 @@ TextEmbeddingModel<-R6::R6Class(
               token_type_ids=tokens$encodings["token_type_ids"]$to(pytorch_device),
               output_hidden_states=TRUE)$hidden_states
             )
+            #print(tensor_embeddings)
+            if(private$transformer_components$emb_pool_type=="average"){
+              #Average Pooling over all tokens
+              for(i in tmp_selected_layer){
+                tensor_embeddings[i]=list(pooling(x=tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
+                                                  mask=tokens$encodings["attention_mask"]$to(pytorch_device)))
+              }
+            }
+
+            #print(tensor_embeddings)
+            #print(tensor_embeddings[[as.integer(2)]])
+            #print(tokens$encodings["attention_mask"])
           }
 
-          #Selecting the relevant layers
-          if(private$transformer_components$aggregation=="last"){
-            selected_layer=private$transformer_components$model$config$num_hidden_layers
-          } else if (private$transformer_components$aggregation=="second_to_last") {
-            selected_layer=private$transformer_components$model$config$num_hidden_layers-2
-          } else if (private$transformer_components$aggregation=="fourth_to_last") {
-            selected_layer=private$transformer_components$model$config$num_hidden_layers-4
-          } else if (private$transformer_components$aggregation=="all") {
-            selected_layer=2:private$transformer_components$model$config$num_hidden_layers
-          } else if (private$transformer_components$aggregation=="last_four") {
-            selected_layer=(private$transformer_components$model$config$num_hidden_layers-4):private$transformer_components$model$config$num_hidden_layers
-          }
+
+
+
+          #if(private$transformer_components$aggregation=="last"){
+          #  selected_layer=private$transformer_components$model$config$num_hidden_layers
+          #} else if (private$transformer_components$aggregation=="second_to_last") {
+          #  selected_layer=private$transformer_components$model$config$num_hidden_layers-2
+          #} else if (private$transformer_components$aggregation=="fourth_to_last") {
+          #  selected_layer=private$transformer_components$model$config$num_hidden_layers-4
+          #} else if (private$transformer_components$aggregation=="all") {
+          #  selected_layer=2:private$transformer_components$model$config$num_hidden_layers
+          #} else if (private$transformer_components$aggregation=="last_four") {
+          #  selected_layer=(private$transformer_components$model$config$num_hidden_layers-4):private$transformer_components$model$config$num_hidden_layers
+          #}
 
           #Sorting the hidden states to the corresponding cases and times
           #If more than one layer is selected the mean is calculated
-          #CLS Token is always the first token
           index=0
-          tmp_selected_layer=1+selected_layer
           for(i in 1:length(batch)){
             for(j in 1:tokens$chunks[i]){
               for(layer in tmp_selected_layer){
                 if(private$transformer_components$ml_framework=="tensorflow"){
-                  text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
-                    tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy()
-                  )
+                  if(private$transformer_components$emb_pool_type=="cls"){
+                    #CLS Token is always the first token
+                    text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy()
+                    )
+                  } else if(private$transformer_components$emb_pool_type=="average"){
+                    text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$numpy()
+                    )
+                  }
+
                 } else {
                   if(torch$cuda$is_available()==FALSE){
-                    text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
-                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$numpy()
-                    )
+                    if(private$transformer_components$emb_pool_type=="cls"){
+                      #CLS Token is always the first token
+                      text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$numpy()
+                      )
+                    } else if(private$transformer_components$emb_pool_type=="average"){
+                      text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$detach()$numpy()
+                      )
+                    }
                   } else {
-                    text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
-                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$cpu()$numpy()
-                    )
+                    if(private$transformer_components$emb_pool_type=="cls"){
+                      #CLS Token is always the first token
+                      text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$cpu()$numpy()
+                      )
+                    } else if(private$transformer_components$emb_pool_type=="average"){
+                      text_embedding[i,j,]<-text_embedding[i,j,]+as.vector(
+                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$detach()$cpu()$numpy()
+                      )
+                    }
                   }
 
                 }
@@ -1309,7 +1483,12 @@ TextEmbeddingModel<-R6::R6Class(
           param_seq_length =private$basic_components$max_length,
           param_chunks = private$transformer_components$chunks,
           param_overlap = private$transformer_components$overlap,
-          param_aggregation = private$transformer_components$aggregation,
+
+          param_emb_layer_min=private$transformer_components$emb_layer_min,
+          param_emb_layer_max=private$transformer_components$emb_layer_max,
+          param_emb_pool_type=private$transformer_components$emb_pool_type,
+
+          param_aggregation = NA,
           embeddings = text_embedding
         )
       } else if(private$basic_components$method=="glove_cluster" |
@@ -1560,10 +1739,14 @@ TextEmbeddingModel<-R6::R6Class(
     get_transformer_components=function(){
       return(
         list(
-          aggregation=private$transformer_components$aggregation,
           chunks=private$transformer_components$chunks,
           overlap=private$transformer_components$overlap,
-          ml_framework=private$transformer_components$ml_framework
+          ml_framework=private$transformer_components$ml_framework,
+
+          emb_layer_min=private$transformer_components$emb_layer_min,
+          emb_layer_max=private$transformer_components$emb_layer_max,
+          emb_pool_type=private$transformer_components$emb_pool_type
+
         )
       )
     },
@@ -1642,8 +1825,18 @@ EmbeddedText<-R6::R6Class(
     #Maximal number of chunks which are supported by the generating model.
     param_chunks=NA,
 
+    #Minimal layer to be included in the creation of embeddings.
+    param_emb_layer_min=NA,
 
-    #Aggregation method of the hidden states.
+    #Maximal layer to be included in the creation of embeddings.
+    param_emb_layer_max=NA,
+
+    #Type of pooling tokens embeddings within each layer.
+    param_emb_pool_type=NA,
+
+
+    #Aggregation method of the hidden states. Deprecated. Included for backward
+    #compatibility.
     param_aggregation=NA
   ),
   public = list(
@@ -1663,7 +1856,16 @@ EmbeddedText<-R6::R6Class(
     #'@param param_chunks \code{int} Maximum number of chunks which are supported by the generating model.
     #'@param param_overlap \code{int} Number of tokens that were added at the beginning of the sequence for the next chunk
     #'by this model.
-    #'@param param_aggregation \code{string} Aggregation method of the hidden states.
+    #'
+    #'@param param_emb_layer_min \code{int} or \code{string} determining the first layer to be included
+    #'in the creation of embeddings.
+    #'@param param_emb_layer_max \code{int} or \code{string} determining the last layer to be included
+    #'in the creation of embeddings.
+    #'@param param_emb_pool_type \code{string} determining the method for pooling the token embeddings
+    #'within each layer.
+    #'
+    #'@param param_aggregation \code{string} Aggregation method of the hidden states. Deprecated. Only included
+    #'for backward compatibility.
     #'@param embeddings \code{data.frame} containing the text embeddings.
     #'@return Returns an object of class \link{EmbeddedText} which stores the
     #'text embeddings produced by an objects of class \link{TextEmbeddingModel}.
@@ -1677,6 +1879,10 @@ EmbeddedText<-R6::R6Class(
                         param_seq_length=NA,
                         param_chunks=NULL,
                         param_overlap=NULL,
+                        param_emb_layer_min=NULL,
+                        param_emb_layer_max=NULL,
+                        param_emb_pool_type=NULL,
+
                         param_aggregation=NULL,
                         embeddings){
       private$model_name = model_name
@@ -1688,6 +1894,12 @@ EmbeddedText<-R6::R6Class(
       private$param_seq_length = param_seq_length
       private$param_chunks = param_chunks
       private$param_overlap = param_overlap
+
+
+      private$param_emb_layer_min=param_emb_layer_min
+      private$param_emb_layer_max=param_emb_layer_max
+      private$param_emb_pool_type=param_emb_pool_type
+
       private$param_aggregation = param_aggregation
       self$embeddings=embeddings
     },
@@ -1706,6 +1918,9 @@ EmbeddedText<-R6::R6Class(
                 param_seq_length=private$param_seq_length,
                 param_chunks=private$param_chunks,
                 param_overlap=private$param_overlap,
+                param_emb_layer_min=private$param_emb_layer_min,
+                param_emb_layer_max=private$param_emb_layer_max,
+                param_emb_pool_type=private$param_emb_pool_type,
                 param_aggregation=private$param_aggregation)
       return(tmp)
     },
@@ -1792,6 +2007,11 @@ combine_embeddings<-function(embeddings_list){
     param_seq_length=embeddings_list[[1]]$get_model_info()$param_seq_length,
     param_chunks=embeddings_list[[1]]$get_model_info()$param_chunks,
     param_overlap=embeddings_list[[1]]$get_model_info()$param_overlap,
+
+    param_emb_layer_min=embeddings_list[[1]]$get_model_info()$param_emb_layer_min,
+    param_emb_layer_max=embeddings_list[[1]]$get_model_info()$param_emb_layer_max,
+    param_emb_pool_type=embeddings_list[[1]]$get_model_info()$param_emb_pool_type,
+
     param_aggregation=embeddings_list[[1]]$get_model_info()$param_aggregation
 
   )

@@ -20,6 +20,15 @@ Other Text Embedding:
 \code{\link{combine_embeddings}()}
 }
 \concept{Text Embedding}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{last_training}}{('list()')\cr
+List for storing the history and the results of the last training. This
+information will be overwritten if a new training is started.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -65,7 +74,9 @@ Method for creating a new text embedding model
   max_length = 0,
   chunks = 1,
   overlap = 0,
-  aggregation = "last",
+  emb_layer_min = "middle",
+  emb_layer_max = "2_3_layer",
+  emb_pool_type = "average",
   model_dir,
   bow_basic_text_rep,
   bow_n_dim = 10,
@@ -115,8 +126,21 @@ transformer models.}
 \item{\code{overlap}}{\code{int} determining the number of tokens which should be added
 at the beginning of the next chunk. Only relevant for BERT models.}
 
-\item{\code{aggregation}}{\code{string} method for aggregating the text embeddings
-created by transformer models. See details for more information.}
+\item{\code{emb_layer_min}}{\code{int} or \code{string} determining the first layer to be included
+in the creation of embeddings. An integer correspondents to the layer number. The first
+layer has the number 1. Instead of an integer the following strings are possible:
+\code{"start"} for the first layer, \code{"middle"} for the middle layer,
+\code{"2_3_layer"} for the layer two-third layer, and \code{"last"} for the last layer.}
+
+\item{\code{emb_layer_max}}{\code{int} or \code{string} determining the last layer to be included
+in the creation of embeddings. An integer correspondents to the layer number. The first
+layer has the number 1. Instead of an integer the following strings are possible:
+\code{"start"} for the first layer, \code{"middle"} for the middle layer,
+\code{"2_3_layer"} for the layer two-third layer, and \code{"last"} for the last layer.}
+
+\item{\code{emb_pool_type}}{\code{string} determining the method for pooling the token embeddings
+within each layer. If \code{"cls"} only the embedding of the CLS token is used. If
+\code{"average"} the token embedding of all tokens are averaged (excluding padding tokens).}
 
 \item{\code{model_dir}}{\code{string} path to the directory where the
 BERT model is stored.}
@@ -156,16 +180,6 @@ and \code{method="lda"} a new model will be created based on the data provided
 via \code{bow_basic_text_rep}. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
 are clustered based on their word embeddings with kmeans.}
-
-\item{aggregation: For creating a text embedding with a transformer model, several options
-are possible:
-\itemize{
-\item{last: \code{aggregation="last"} uses only the hidden states of the last layer.}
-\item{second_to_last: \code{aggregation="second_to_last"} uses the hidden states of the second to last layer.}
-\item{fourth_to_last: \code{aggregation="fourth_to_last"} uses the hidden states of the fourth to last layer.}
-\item{all: \code{aggregation="all"} uses the mean of the hidden states of all hidden layers.}
-\item{last_four: \code{aggregation="last_four"} uses the mean of the hidden states of the last four layers.}
-}}
 
 }
 }

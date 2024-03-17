@@ -14,7 +14,7 @@ unique interface for different text processing methods."><!-- mathjax --><script
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,6 +84,16 @@ of integers back to tokens.</p>
 <code><a href="combine_embeddings.html">combine_embeddings</a>()</code></p></div>
     </div>
     <div class="section level2">
+    <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
+    <p></p><div class="r6-fields"><dl><dt><code>last_training</code></dt>
+<dd><p>('list()')<br>
+List for storing the history and the results of the last training. This
+information will be overwritten if a new training is started.</p></dd>
+
+
+</dl><p></p></div>
+    </div>
+    <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
     
 <div class="section">
@@ -127,7 +137,9 @@ of integers back to tokens.</p>
 <span>  max_length <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  chunks <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  aggregation <span class="op">=</span> <span class="st">"last"</span>,</span>
+<span>  emb_layer_min <span class="op">=</span> <span class="st">"middle"</span>,</span>
+<span>  emb_layer_max <span class="op">=</span> <span class="st">"2_3_layer"</span>,</span>
+<span>  emb_pool_type <span class="op">=</span> <span class="st">"average"</span>,</span>
 <span>  <span class="va">model_dir</span>,</span>
 <span>  <span class="va">bow_basic_text_rep</span>,</span>
 <span>  bow_n_dim <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -194,9 +206,26 @@ transformer models.</p></dd>
 at the beginning of the next chunk. Only relevant for BERT models.</p></dd>
 
 
-<dt><code>aggregation</code></dt>
-<dd><p><code>string</code> method for aggregating the text embeddings
-created by transformer models. See details for more information.</p></dd>
+<dt><code>emb_layer_min</code></dt>
+<dd><p><code>int</code> or <code>string</code> determining the first layer to be included
+in the creation of embeddings. An integer correspondents to the layer number. The first
+layer has the number 1. Instead of an integer the following strings are possible:
+<code>"start"</code> for the first layer, <code>"middle"</code> for the middle layer,
+<code>"2_3_layer"</code> for the layer two-third layer, and <code>"last"</code> for the last layer.</p></dd>
+
+
+<dt><code>emb_layer_max</code></dt>
+<dd><p><code>int</code> or <code>string</code> determining the last layer to be included
+in the creation of embeddings. An integer correspondents to the layer number. The first
+layer has the number 1. Instead of an integer the following strings are possible:
+<code>"start"</code> for the first layer, <code>"middle"</code> for the middle layer,
+<code>"2_3_layer"</code> for the layer two-third layer, and <code>"last"</code> for the last layer.</p></dd>
+
+
+<dt><code>emb_pool_type</code></dt>
+<dd><p><code>string</code> determining the method for pooling the token embeddings
+within each layer. If <code>"cls"</code> only the embedding of the CLS token is used. If
+<code>"average"</code> the token embedding of all tokens are averaged (excluding padding tokens).</p></dd>
 
 
 <dt><code>model_dir</code></dt>
@@ -256,14 +285,6 @@ and <code>method="lda"</code> a new model will be created based on the data prov
 via <code>bow_basic_text_rep</code>. The original algorithm for GlobalVectors provides
 only word embeddings, not text embeddings. To achieve text embeddings the words
 are clustered based on their word embeddings with kmeans.</p></li>
-<li><p>aggregation: For creating a text embedding with a transformer model, several options
-are possible:
-</p><ul><li><p>last: <code>aggregation="last"</code> uses only the hidden states of the last layer.</p></li>
-<li><p>second_to_last: <code>aggregation="second_to_last"</code> uses the hidden states of the second to last layer.</p></li>
-<li><p>fourth_to_last: <code>aggregation="fourth_to_last"</code> uses the hidden states of the fourth to last layer.</p></li>
-<li><p>all: <code>aggregation="all"</code> uses the mean of the hidden states of all hidden layers.</p></li>
-<li><p>last_four: <code>aggregation="last_four"</code> uses the mean of the hidden states of the last four layers.</p></li>
-</ul></li>
 </ul></div>
 
 <div class="section">

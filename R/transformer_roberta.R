@@ -279,7 +279,7 @@ create_roberta_model<-function(
     vocab_size=as.integer(length(tokenizer$get_vocab())),
     max_position_embeddings=as.integer(max_position_embeddings),
     hidden_size=as.integer(hidden_size),
-    num_hidden_layer=as.integer(num_hidden_layer),
+    num_hidden_layers=as.integer(num_hidden_layer),
     num_attention_heads=as.integer(num_attention_heads),
     intermediate_size=as.integer(intermediate_size),
     hidden_act=hidden_act,
@@ -705,13 +705,20 @@ train_tune_roberta_model=function(ml_framework=aifeducation_config$get_framework
       save_freq="epoch",
       save_weights_only= TRUE)
 
+    callback_history=tf$keras$callbacks$CSVLogger(
+      filename=paste0(output_dir,"/checkpoints/history.log"),
+      separator=",",
+      append=FALSE)
+
+    callbacks=list(callback_checkpoint,callback_history)
+
     #Add Callback if Shiny App is running
     if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
       if(shiny::isRunning()){
         shiny_app_active=TRUE
         reticulate::py_run_file(system.file("python/keras_callbacks.py",
                                             package = "aifeducation"))
-        callback_checkpoint=list(callback_checkpoint,py$ReportAiforeducationShiny())
+        callbacks=list(callback_checkpoint,callback_history,py$ReportAiforeducationShiny())
       }
     }
 
@@ -735,7 +742,7 @@ train_tune_roberta_model=function(ml_framework=aifeducation_config$get_framework
                   epochs=as.integer(n_epoch),
                   workers=as.integer(n_workers),
                   use_multiprocessing=multi_process,
-                  callbacks=list(callback_checkpoint),
+                  callbacks=list(callbacks),
                   verbose=as.integer(keras_trace))
 
     if(trace==TRUE){
@@ -815,9 +822,20 @@ train_tune_roberta_model=function(ml_framework=aifeducation_config$get_framework
   }
   if(ml_framework=="tensorflow"){
     mlm_model$save_pretrained(save_directory=output_dir)
+    history_log=read.csv(file = paste0(output_dir,"/checkpoints/history.log"))
+    write.csv2(history_log,
+               file=paste0(output_dir,"/history.log"),
+               row.names=FALSE,
+               quote=FALSE)
   } else {
     mlm_model$save_pretrained(save_directory=output_dir,
                               safe_serilization=pt_safe_save)
+    history_log=pandas$DataFrame(trainer$state$log_history)
+    history_log=clean_pytorch_log_transformers(history_log)
+    write.csv2(history_log,
+               file=paste0(output_dir,"/history.log"),
+               row.names=FALSE,
+               quote=FALSE)
   }
 
   update_aifeducation_progress_bar(value = 8, total = pgr_max, title = "RoBERTa Model")

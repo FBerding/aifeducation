@@ -443,4 +443,5 @@ used to train your classifier. The resulting object can be passed to the
 method `predict` and you will receive the predictions together with an
 estimate of certainty for each class/category.
 
-More information can be found in the vignette [02 classification tasks](classification_tasks.html).
+More information can be found in the vignette [02a Using Aifeducation Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html) or in
+[02 classification tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).

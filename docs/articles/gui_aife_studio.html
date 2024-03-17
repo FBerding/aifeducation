@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -160,7 +160,7 @@ disciplines using different, sometimes overlapping concepts. Even within
 a single research area, concepts are not unified. Figure 1 illustrates
 this package’s understanding.</p>
 <div class="float">
-<img src="classif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
+<img src="img_articles/classif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
 Concepts</div>
 </div>
 <p>Since <em>aifeducation</em> looks at the application of AI for
@@ -181,7 +181,7 @@ text is labeled with the correct class. As Figure 2 illustrates, two
 kinds of data are necessary to train an AI to classify text in line with
 supervised machine learning principles.</p>
 <div class="float">
-<img src="classif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
+<img src="img_articles/classif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
 Learning</div>
 </div>
 <p>By providing AI with both the textual data as input data and the
@@ -213,7 +213,7 @@ target data for training AI to classify a text.</p>
 <p>In <em>aifeducation,</em> these steps are covered with three
 different types of models, as shown in Figure 3.</p>
 <div class="float">
-<img src="classif_model_hierachy.png" style="width:100.0%" alt="Figure 3: Modells Types in aifeducation"><div class="figcaption">Figure 3: Modells Types in aifeducation</div>
+<img src="img_articles/classif_model_hierachy.png" style="width:100.0%" alt="Figure 3: Modells Types in aifeducation"><div class="figcaption">Figure 3: Modells Types in aifeducation</div>
 </div>
 <ul>
 <li><p><strong>Base Models:</strong> The base models are the models
@@ -533,10 +533,19 @@ chunk.</p></li>
 tokens form the prior chunk should be included in the current chunk. An
 overlap can be useful to provide the correct context for every
 chunk.</p></li>
-<li><p><strong>Aggregation Hidden States</strong>: Base models transform
-raw data into a sequence of numbers. With this option you can decide how
-these numbers are generated. In general, the hidden states of the last
-layer are used as a numeric representation.</p></li>
+<li><p><strong>Layers for Embeddings - Min</strong>: Base models
+transform raw data into a sequence of numbers by using the different
+layers’ hidden states. With this option you can decide which is the
+first layer to use.</p></li>
+<li><p><strong>Layers for Embeddings - Max</strong>: With this option
+you can decide which is the last layer to use. The hidden states of all
+layers between min and max are averaged to form the embedding of a text
+chunk.</p></li>
+<li><p><strong>Pooling Type</strong>: With this option you can decide if
+only the hidden states of the cls-token should be used for the
+embedding. If you set thisn option to “average” the hidden states of all
+tokens are averaged within each layer except the hidden states for
+padding tokens.</p></li>
 </ul>
 <p>The maximum number of tokens your model can process and provide for
 downstream tasks can be calculated as <span class="math display">\[Max
@@ -565,6 +574,9 @@ it.</p>
 documentation of the model.</p>
 <p><a href="img_articles/gui_aife_studio_emb_interface_use_desc.jpg"><img src="img_articles/gui_aife_studio_emb_interface_use_desc.jpg" style="width:100.0%" alt="Figure 13: Text Embedding Model - Description"></a> Figure 13:
 Text Embedding Model - Description (click image to enlarge)</p>
+<p>The tab <em>Training</em> shows the development of the loss and the
+validation loss during the last training of the corresponding base
+model. If no plot is displayed no history data is available.</p>
 <p>The tab <em>Create Text Embeddings</em> (Figure 14) allows you to
 transform raw texts into a numerical representation of these texts,
 called text embeddings. These text embeddings can be used in downstream

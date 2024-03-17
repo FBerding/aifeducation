@@ -410,7 +410,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param use_bsc \code{bool} \code{TRUE} if the estimation should integrate
     #'balanced synthetic cases. \code{FALSE} if not.
     #'@param bsc_methods \code{vector} containing the methods for generating
-    #'synthetic cases via \link[smotefamily]{smotefamily}. Multiple methods can
+    #'synthetic cases via 'smotefamily'. Multiple methods can
     #'be passed. Currently \code{bsc_methods=c("adas")}, \code{bsc_methods=c("smote")}
     #'and \code{bsc_methods=c("dbsmote")} are possible.
     #'@param bsc_max_k \code{int} determining the maximal number of k which is used

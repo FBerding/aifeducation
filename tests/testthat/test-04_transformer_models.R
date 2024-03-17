@@ -12,7 +12,7 @@ transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM","false")
 set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
-transformers$utils$logging$disable_progress_bar()
+transformers$logging$disable_progress_bar()
 
 if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
   dir.create(testthat::test_path("test_artefacts"))
@@ -228,7 +228,7 @@ for(ai_method in ai_methods){
             max_position_embeddings=512,
             hidden_size=32,
             block_sizes = c(2,2,2),
-            num_decoder_layers = 1,
+            num_decoder_layers = 2,
             num_attention_heads=2,
             intermediate_size=128,
             hidden_act="gelu",
@@ -374,7 +374,7 @@ for(ai_method in ai_methods){
                                 sustain_interval = 15,
                                 trace=FALSE,
                                 keras_trace = 0))
-
+          Sys.sleep(5)
         expect_no_error(
           train_tune_bert_model(ml_framework = framework,
                                 output_dir=testthat::test_path(paste0(path_01,"/",framework)),
@@ -461,6 +461,7 @@ for(ai_method in ai_methods){
                                   sustain_interval = 15,
                                   trace=FALSE,
                                   keras_trace = 0))
+          Sys.sleep(2)
           expect_no_error(
             train_tune_funnel_model(ml_framework = framework,
                                     output_dir=testthat::test_path(paste0(path_01,"/",framework)),
@@ -506,6 +507,7 @@ for(ai_method in ai_methods){
               keras_trace = 0,
               trace=FALSE))
 
+          Sys.sleep(2)
           expect_no_error(
             train_tune_deberta_v2_model(
               ml_framework = framework,
@@ -532,19 +534,70 @@ for(ai_method in ai_methods){
 
       #Embedding of the Model-------------------------------------------------------
 
-      bert_modeling<-TextEmbeddingModel$new(
-        model_name=paste0(ai_method,"_embedding"),
-        model_label=paste0("Text Embedding via",ai_method),
-        model_version="0.0.1",
-        model_language="english",
-        method = ai_method,
-        ml_framework=framework,
-        max_length = 256,
-        chunks=4,
-        overlap=10,
-        aggregation="last",
-        model_dir=testthat::test_path(paste0(path_01,"/",framework))
-      )
+      if(ai_method=="funnel"){
+        pooling_types=c("cls")
+      } else {
+        pooling_types=c("cls","average")
+      }
+      max_layers=1:2
+
+      for(pooling_type in pooling_types){
+        for(max_layer in max_layers){
+          for(min_layer in 1:max_layer)
+          bert_modeling<-TextEmbeddingModel$new(
+            model_name=paste0(ai_method,"_embedding"),
+            model_label=paste0("Text Embedding via",ai_method),
+            model_version="0.0.1",
+            model_language="english",
+            method = ai_method,
+            ml_framework=framework,
+            max_length = 20,
+            chunks=4,
+            overlap=10,
+            emb_layer_min = min_layer,
+            emb_layer_max = max_layer,
+            emb_pool_type = pooling_type,
+            model_dir=testthat::test_path(paste0(path_01,"/",framework))
+          )
+
+          test_that(paste0(ai_method,"training history after creation",framework),{
+            history=bert_modeling$last_training$history
+            expect_equal(nrow(history),2)
+            expect_equal(ncol(history),3)
+            expect_true("epoch"%in%colnames(history))
+            expect_true("loss"%in%colnames(history))
+            expect_true("val_loss"%in%colnames(history))
+          })
+
+          test_that(paste0(ai_method,"embedding",framework,"get_transformer_components"),{
+            expect_equal(bert_modeling$get_transformer_components()$emb_layer_min,min_layer)
+            expect_equal(bert_modeling$get_transformer_components()$emb_layer_max,max_layer)
+            expect_equal(bert_modeling$get_transformer_components()$emb_pool_type,pooling_type)
+          })
+
+          test_that(paste0(ai_method,"embedding",framework,"for loading"), {
+            embeddings<-bert_modeling$embed(raw_text = example_data$text[1:10],
+                                            doc_id = example_data$id[1:10])
+            expect_s3_class(embeddings, class="EmbeddedText")
+
+
+            perm=sample(x=1:10,size = 10,replace = FALSE)
+            embeddings_perm<-bert_modeling$embed(raw_text = example_data$text[perm],
+                                                 doc_id = example_data$id[perm])
+            for(i in 1:10){
+              expect_equal(embeddings$embeddings[i,,],
+                           embeddings_perm$embeddings[which(perm==i),,],
+                           tolerance=1e-5)
+            }
+
+            embeddings<-NULL
+            embeddings<-bert_modeling$embed(raw_text = example_data$text[1:1],
+                                            doc_id = example_data$id[1:1])
+            expect_s3_class(embeddings, class="EmbeddedText")
+
+          })
+        }
+      }
 
       model_name=bert_modeling$get_model_info()$model_name
       model_name_root=bert_modeling$get_model_info()$model_name_root
@@ -579,6 +632,8 @@ for(ai_method in ai_methods){
         expect_s3_class(embeddings, class="EmbeddedText")
 
       })
+
+
 
       test_that(paste0(ai_method,"encoding",framework), {
         encodings<-bert_modeling$encode(raw_text = example_data$text[1:10],
@@ -776,6 +831,14 @@ for(ai_method in ai_methods){
           )
           expect_s3_class(bert_modeling,
                           class="TextEmbeddingModel")
+
+          history=bert_modeling$last_training$history
+          expect_equal(nrow(history),2)
+          expect_equal(ncol(history),3)
+          expect_true("epoch"%in%colnames(history))
+          expect_true("loss"%in%colnames(history))
+          expect_true("val_loss"%in%colnames(history))
+
         })
       } else {
         test_that(paste0(ai_method,"Save Total Model safetensors",framework), {
@@ -799,6 +862,12 @@ for(ai_method in ai_methods){
           )
           expect_s3_class(bert_modeling,
                           class="TextEmbeddingModel")
+          history=bert_modeling$last_training$history
+          expect_equal(nrow(history),2)
+          expect_equal(ncol(history),3)
+          expect_true("epoch"%in%colnames(history))
+          expect_true("loss"%in%colnames(history))
+          expect_true("val_loss"%in%colnames(history))
         })
       }
 
@@ -828,6 +897,12 @@ for(ai_method in ai_methods){
         )
         expect_s3_class(bert_modeling,
                         class="TextEmbeddingModel")
+        history=bert_modeling$last_training$history
+        expect_equal(nrow(history),2)
+        expect_equal(ncol(history),3)
+        expect_true("epoch"%in%colnames(history))
+        expect_true("loss"%in%colnames(history))
+        expect_true("val_loss"%in%colnames(history))
       })
 
       #-------------------------------------------------------------------------
@@ -848,6 +923,12 @@ for(ai_method in ai_methods){
         )
         expect_s3_class(bert_modeling,
                         class="TextEmbeddingModel")
+        history=bert_modeling$last_training$history
+        expect_equal(nrow(history),2)
+        expect_equal(ncol(history),3)
+        expect_true("epoch"%in%colnames(history))
+        expect_true("loss"%in%colnames(history))
+        expect_true("val_loss"%in%colnames(history))
       })
 
       #------------------------------------------------------------------------
@@ -892,8 +973,7 @@ for(ai_method in ai_methods){
         )
       )
 
-      tmp<-test$get_transformer_components()[[4]]
-
+      tmp<-test$get_transformer_components()[["ml_framework"]]
       expect_equal(tmp,framework)
 
     }

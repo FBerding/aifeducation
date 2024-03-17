@@ -52,6 +52,9 @@
     <loc>/reference/check_embedding_models.html</loc>
   </url>
   <url>
+    <loc>/reference/clean_pytorch_log_transformers.html</loc>
+  </url>
+  <url>
     <loc>/reference/combine_embeddings.html</loc>
   </url>
   <url>
@@ -104,6 +107,9 @@
   </url>
   <url>
     <loc>/reference/install_py_modules.html</loc>
+  </url>
+  <url>
+    <loc>/reference/is.null_or_na.html</loc>
   </url>
   <url>
     <loc>/reference/load_ai_model.html</loc>

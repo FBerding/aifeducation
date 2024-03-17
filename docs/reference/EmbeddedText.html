@@ -14,7 +14,7 @@ embed()."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/ma
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,6 +122,9 @@ in the rows. Embedding dimensions are in the columns.</p></dd>
 <span>  param_seq_length <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  param_chunks <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  param_overlap <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  param_emb_layer_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  param_emb_layer_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  param_emb_pool_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  param_aggregation <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">embeddings</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -166,8 +169,24 @@ in the rows. Embedding dimensions are in the columns.</p></dd>
 by this model.</p></dd>
 
 
+<dt><code>param_emb_layer_min</code></dt>
+<dd><p><code>int</code> or <code>string</code> determining the first layer to be included
+in the creation of embeddings.</p></dd>
+
+
+<dt><code>param_emb_layer_max</code></dt>
+<dd><p><code>int</code> or <code>string</code> determining the last layer to be included
+in the creation of embeddings.</p></dd>
+
+
+<dt><code>param_emb_pool_type</code></dt>
+<dd><p><code>string</code> determining the method for pooling the token embeddings
+within each layer.</p></dd>
+
+
 <dt><code>param_aggregation</code></dt>
-<dd><p><code>string</code> Aggregation method of the hidden states.</p></dd>
+<dd><p><code>string</code> Aggregation method of the hidden states. Deprecated. Only included
+for backward compatibility.</p></dd>
 
 
 <dt><code>embeddings</code></dt>

@@ -149,15 +149,21 @@ class AddPositionalEmbedding_PT(torch.nn.Module):
       return masks
  
 class GlobalAveragePooling1D_PT(torch.nn.Module):
-  def __init__(self,sequence_length):
+  def __init__(self):
     super().__init__()
-    self.kernel_size=sequence_length
-    self.pooling=torch.nn.AvgPool1d(kernel_size=self.kernel_size)
-    
-  def forward(self,x):
-    x=x.permute(0,2,1)
-    x=self.pooling(x)
-    return torch.squeeze(input=x, dim=2)
+
+  def forward(self,x,mask=None):
+    if not mask is None:
+      mask_r=mask.reshape(mask.size()[0],mask.size()[1],1)
+      x=torch.mul(x,mask_r)
+    x=torch.sum(x,dim=1)*(1/self.get_length(x))
+    return x
+  
+  def get_length(self,x):
+    with torch.no_grad():
+      length=torch.sum(torch.sum(x,dim=2,dtype=torch.bool),dim=1).repeat(x.size(2),1)
+      length=torch.transpose(length,dim0=0,dim1=1)
+      return length
   
 
 class TextEmbeddingClassifier_PT(torch.nn.Module):
@@ -231,7 +237,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
           layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
       
     if n_rec>0 or repeat_encoder>0:
-      layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT(sequence_length=times)})
+      layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
       
     if(n_rec>0):
       current_size_2=2*rec[len(rec)-1]
