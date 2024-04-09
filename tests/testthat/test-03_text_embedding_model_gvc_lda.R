@@ -1,3 +1,4 @@
+testthat::skip_on_os("windows")
 path="test_data/gvc_lda/basic_text_rep_movie_reviews.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
@@ -10,13 +11,12 @@ if(dir.exists(testthat::test_path("test_artefacts/tmp_full_models"))==FALSE){
   dir.create(testthat::test_path("test_artefacts/tmp_full_models"))
 }
 
+datasets$disable_progress_bars()
+
 #------------------------------------------------------------------------------
 load(testthat::test_path(path))
 
-example_data<-data.frame(
-  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
-  label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
-example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
+example_data<-imdb_movie_reviews
 #------------------------------------------------------------------------------
 
 global_vector_clusters_modeling<-TextEmbeddingModel$new(

@@ -1,5 +1,9 @@
 
 testthat::skip_on_os("windows")
+testthat::skip_if_not_installed(pkg="quanteda")
+testthat::skip_if_not_installed(pkg="topicmodels")
+testthat::skip_if_not_installed(pkg="text2vec")
+testthat::skip_if_not_installed(pkg="tidytext")
 
 path="test_data/gvc_lda/vocab_draft_movie_review.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
@@ -10,10 +14,7 @@ load(testthat::test_path(path))
 #------------------------------------------------------------------------------
 test_that("bow_pp_create_vocab_draft", {
 
-  example_data<-data.frame(
-    id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
-    label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
-  example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
+  example_data<-imdb_movie_reviews
 
   res<-bow_pp_create_basic_text_rep(
      data=example_data$text[1:100],

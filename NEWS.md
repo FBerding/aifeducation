@@ -3,6 +3,17 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+# aifeducation 0.3.3
+
+**Graphical User Interface Aifeducation Studio**
+
+- Fixed a bug concerning the ids of .pdf and .csv files. Now the ids are correctly
+  saved within a text collection file.
+  
+**Further Changes**
+
+- Removed quanteda.textmodels as necessary library for testing the package.
+- Added a dataset for testing the package based on Maas et al. (2011).
 
 # aifeducation 0.3.2
 
