@@ -27,7 +27,7 @@
 #'@export
 install_py_modules<-function(envname="aifeducation",
                              install="pytorch",
-                             tf_version="<=2.15",
+                             tf_version="2.15",
                              pytorch_cuda_version="12.1",
                              python_version="3.9",
                              remove_first=FALSE,
@@ -73,13 +73,23 @@ install_py_modules<-function(envname="aifeducation",
         conda = "auto",
         pip = TRUE)
     } else {
-      reticulate::conda_install(
-        packages = c(
-          paste0("tensorflow",tf_version),
-          "tf-keras"),
-        envname = envname,
-        conda = "auto",
-        pip = TRUE)
+      if(utils::compareVersion(tf_version,"2.15")<=0){
+        reticulate::conda_install(
+          packages = c(
+            paste0("tensorflow<=",tf_version)),
+          envname = envname,
+          conda = "auto",
+          pip = TRUE)
+      } else {
+        reticulate::conda_install(
+          packages = c(
+            paste0("tensorflow<=",tf_version),
+            "tf-keras"),
+          envname = envname,
+          conda = "auto",
+          pip = TRUE)
+      }
+
 
       reticulate::conda_install(
         packages = c(

@@ -73,6 +73,7 @@ for(framework in ml_frameworks){
     example_data<-example_data[intersect(
       rownames(example_data),rownames(current_embeddings$embeddings)),]
 
+    example_data$label<-as.character(example_data$label)
     example_data$label[c(201:300)]=NA
     if(n_classes>2){
       example_data$label[c(201:250)]<-"medium"

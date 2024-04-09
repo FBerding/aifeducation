@@ -9,6 +9,17 @@ editor_options:
 
 - Fixed a bug concerning the ids of .pdf and .csv files. Now the ids are correctly
   saved within a text collection file.
+- Fixed a bug while checking for the selection of at least one file type during
+  creation of a text collection.
+  
+**TextEmbeddingClassifiers**
+
+-   Fixed the process for checking if TextEmbeddingModels are compatible.
+  
+**Python Installation** 
+
+- Fixed a bug which caused the installation of incompatible versions of keras
+  and Tensorflow.
   
 **Further Changes**
 
