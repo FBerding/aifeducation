@@ -73,7 +73,7 @@ install_py_modules<-function(envname="aifeducation",
         conda = "auto",
         pip = TRUE)
     } else {
-      if(utils::compareVersion(tf_version,"2.15")<=0){
+      if(utils::compareVersion(tf_version,"2.16")<0){
         reticulate::conda_install(
           packages = c(
             paste0("tensorflow<=",tf_version)),
