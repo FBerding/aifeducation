@@ -90,7 +90,6 @@ install_py_modules<-function(envname="aifeducation",
           pip = TRUE)
       }
 
-
       reticulate::conda_install(
         packages = c(
           "cudatoolkit",

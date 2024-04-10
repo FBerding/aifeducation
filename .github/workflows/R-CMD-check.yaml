@@ -66,7 +66,15 @@ jobs:
 
           conda_install(
             packages = c(
-            "tensorflow<=2.15",
+            "tensorflow<=2.14"
+            ),
+            envname = envname,
+            conda = "auto",
+            pip = TRUE
+          )
+
+          conda_install(
+            packages = c(
             "torch",
             "torcheval",
             "safetensors",
