@@ -142,7 +142,8 @@ following table provides more details:
 | Longformer                | Yes     | Yes        | Yes            |
 | Text Embedding Classifier | Yes     | Yes        | No             |
 
-Please not that tensorflow is currently supported up to version 2.15.
+Please not that tensorflow is currently supported for the following
+versions: 2.13-2.15.
 
 ## Classification Tasks
 
