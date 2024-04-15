@@ -7,7 +7,7 @@
 get_n_chunks(text_embeddings, features, times)
 }
 \arguments{
-\item{text_embeddings}{\code{data.frame} containing the text embeddings.}
+\item{text_embeddings}{\code{data.frame} or \code{array} containing the text embeddings.}
 
 \item{features}{\code{int} Number of features within each sequence.}
 

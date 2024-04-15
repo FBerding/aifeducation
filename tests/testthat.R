@@ -8,7 +8,6 @@
 
 library(testthat)
 library(aifeducation)
-library(quanteda.textmodels)
 
 test_results<-test_check("aifeducation")
            #reporter = LocationReporter(),

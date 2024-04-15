@@ -311,7 +311,7 @@ get_coder_metrics<-function(true_values=NULL,
 #'}
 #'@family Auxiliary Functions
 #'@keywords internal
-get_train_test_split<-function(embedding,
+get_train_test_split<-function(embedding=NULL,
                                target,
                                val_size){
   categories=names(table(target))
@@ -325,17 +325,26 @@ get_train_test_split<-function(embedding,
   val_data=target[unlist(val_sampe)]
   train_data=target[setdiff(names(target),names(val_data))]
 
-  val_embeddings=embedding$clone(deep=TRUE)
-  val_embeddings$embeddings=val_embeddings$embeddings[names(val_data),]
-  val_embeddings$embeddings=na.omit(val_embeddings$embeddings)
-  train_embeddings=embedding$clone(deep=TRUE)
-  train_embeddings$embeddings=train_embeddings$embeddings[names(train_data),]
-  train_embeddings$embeddings=na.omit(train_embeddings$embeddings)
+  if(is.null(embedding)==FALSE){
 
-  results<-list(target_train=train_data,
-                embeddings_train=train_embeddings,
-                target_test=val_data,
-                embeddings_test=val_embeddings)
+    val_embeddings=embedding$clone(deep=TRUE)
+    val_embeddings$embeddings=val_embeddings$embeddings[names(val_data),]
+    val_embeddings$embeddings=na.omit(val_embeddings$embeddings)
+    train_embeddings=embedding$clone(deep=TRUE)
+    train_embeddings$embeddings=train_embeddings$embeddings[names(train_data),]
+    train_embeddings$embeddings=na.omit(train_embeddings$embeddings)
+
+    results<-list(target_train=train_data,
+                  embeddings_train=train_embeddings,
+                  target_test=val_data,
+                  embeddings_test=val_embeddings)
+  } else {
+    results<-list(target_train=train_data,
+                  embeddings_train=NA,
+                  target_test=val_data,
+                  embeddings_test=NA)
+  }
+
   return(results)
 }
 
@@ -840,7 +849,7 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
 #'
 #'Function for calculating the number of chunks/sequences for every case
 #'
-#'@param text_embeddings \code{data.frame} containing the text embeddings.
+#'@param text_embeddings \code{data.frame} or \code{array} containing the text embeddings.
 #'@param features \code{int} Number of features within each sequence.
 #'@param times \code{int} Number of sequences
 #'@return Named\code{vector} of integers representing the number of chunks/sequences
@@ -852,12 +861,25 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
 get_n_chunks<-function(text_embeddings,features,times){
   n_chunks<-vector(length = nrow(text_embeddings))
   n_chunks[]<-0
-  for(i in 1:times){
-    window<-c(1:features)+(i-1)*features
-    sub_matrix<-text_embeddings[,window]
-    tmp_sums<-rowSums(abs(sub_matrix))
-    n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
+
+  if(length(dim(text_embeddings))==2){
+    for(i in 1:times){
+      window<-c(1:features)+(i-1)*features
+      sub_matrix<-text_embeddings[,window]
+      tmp_sums<-rowSums(abs(sub_matrix))
+      n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
+    }
+  } else if (length(dim(text_embeddings))==3){
+    for(i in 1:times){
+      sub_matrix<-text_embeddings[,i,]
+      tmp_sums<-rowSums(abs(sub_matrix))
+      n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
+    }
+  } else {
+    stop("Dimensionality of text_embeddings must be 2 (matrix) or 3 (array).")
   }
+
+
   names(n_chunks)<-rownames(text_embeddings)
   return(n_chunks)
 }

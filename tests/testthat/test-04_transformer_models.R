@@ -53,10 +53,7 @@ rows_susatainability["longformer"]=2
 rows_susatainability["deberta_v2"]=3
 
 
-example_data<-data.frame(
-  id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id1,
-  label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
-example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
+example_data<-imdb_movie_reviews
 
 print(check_aif_py_modules())
 

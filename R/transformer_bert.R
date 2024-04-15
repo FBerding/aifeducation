@@ -836,6 +836,10 @@ train_tune_bert_model=function(ml_framework=aifeducation_config$get_framework(),
       data_collator = data_collator,
       tokenizer = tokenizer)
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
+    if(as.logical(pytorch_trace)==FALSE){
+      trainer$remove_callback(transformers$PrinterCallback)
+      trainer$remove_callback(transformers$ProgressCallback)
+    }
 
     #Load Custom Callbacks
 

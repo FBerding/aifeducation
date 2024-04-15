@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,20 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.2" id="aifeducation-032">aifeducation 0.3.2<a class="anchor" aria-label="anchor" href="#aifeducation-032"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.3" id="aifeducation-033">aifeducation 0.3.3<a class="anchor" aria-label="anchor" href="#aifeducation-033"></a></h2>
+<p><strong>Graphical User Interface Aifeducation Studio</strong></p>
+<ul><li>Fixed a bug concerning the ids of .pdf and .csv files. Now the ids are correctly saved within a text collection file.</li>
+<li>Fixed a bug while checking for the selection of at least one file type during creation of a text collection.</li>
+</ul><p><strong>TextEmbeddingClassifiers</strong></p>
+<ul><li>Fixed the process for checking if TextEmbeddingModels are compatible.</li>
+</ul><p><strong>Python Installation</strong></p>
+<ul><li>Fixed a bug which caused the installation of incompatible versions of keras and Tensorflow.</li>
+</ul><p><strong>Further Changes</strong></p>
+<ul><li>Removed quanteda.textmodels as necessary library for testing the package.</li>
+<li>Added a dataset for testing the package based on Maas et al. (2011).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.2" id="aifeducation-032">aifeducation 0.3.2<a class="anchor" aria-label="anchor" href="#aifeducation-032"></a></h2><p class="text-muted">CRAN release: 2024-03-15</p>
 <p><strong>TextEmbeddingClassifiers</strong></p>
 <ul><li>Fixed a bug in GlobalAveragePooling1D_PT. Now the layer makes a correct pooling. <strong>This change has an effect on PyTorch models trained with version 0.3.1.</strong>
 </li>

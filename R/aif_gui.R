@@ -93,6 +93,7 @@ start_aifeducation_studio<-function(){
   set_transformers_logger(level="ERROR")
   #Disable tqdm progressbar
   transformers$logging$disable_progress_bar()
+  datasets$disable_progress_bars()
 
   #Start GUI--------------------------------------------------------------------
   options(shiny.reactlog=TRUE)
@@ -1091,7 +1092,7 @@ start_aifeducation_studio<-function(){
       }
       if(input$dp_include_csv==FALSE &
          input$dp_include_pdf==FALSE &
-         input$dp_include_csv==FALSE){
+         input$dp_include_xlsx==FALSE){
         error_list[length(error_list)+1]="No file types selected. Please select
       at least one file type."
       }
@@ -1191,7 +1192,7 @@ start_aifeducation_studio<-function(){
             #File name without extension
             #text_corpus[counter,"id"]=stringi::stri_split_fixed(tmp_document$doc_id,pattern=".")[[1]][1]
             tmp_string=stringr::str_split_fixed(tmp_document$doc_id,pattern="\\.",n=Inf)
-            text_corpus[counter,"id"]=tmp_string[1,ncol(tmp_string)]
+            text_corpus[counter,"id"]=paste0(tmp_string[1,1:(ncol(tmp_string)-1)],collapse = ".")
             text_corpus[counter,"text"]=tmp_document$text
             counter=counter+1
 

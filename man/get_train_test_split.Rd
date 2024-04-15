@@ -4,7 +4,7 @@
 \alias{get_train_test_split}
 \title{Function for splitting data into a train and validation sample}
 \usage{
-get_train_test_split(embedding, target, val_size)
+get_train_test_split(embedding = NULL, target, val_size)
 }
 \arguments{
 \item{embedding}{Object of class \link{EmbeddedText}.}

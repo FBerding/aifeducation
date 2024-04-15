@@ -110,7 +110,7 @@ computations with graphic cards. The following table provides an overview.
 |----------------|-------|----------|
 |MacOS           |No     |No        |
 |Linux           |Yes    |Yes       |
-|Windows         |Yes    |Only with versions <=2.10|
+|Windows         |Yes    |<= version 2.10|
 |Windows with WSL|Yes    |Yes       |
 
 If you have a suitable machine and would like to use a graphic card for computations you need to install
@@ -144,39 +144,25 @@ function `install_py_modules()` doing that for you.
 aifeducation::install_py_modules(envname="aifeducation",
                                  install="all",
                                  remove_first=FALSE,
-                                 tf_version="<=2.14",
+                                 tf_version="<=2.15",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=FALSE)
 
-#For Windows with gpu support
+#For Windows and MacOS
 aifeducation::install_py_modules(envname="aifeducation",
                                  install="all",
                                  remove_first=FALSE,
-                                 tf_version="<=2.10",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=FALSE)
-#For Windows without gpu support
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=FALSE,
-                                 tf_version="<=2.14",
+                                 tf_version="<=2.15",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=TRUE)
 
-#For MacOS
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=FALSE,
-                                 tf_version="<=2.14",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
 ```
 
 > With `install="all"` you can decide which machine learning framework should be
 installed. Use `install="all"` to request the installation of both 'PyTorch' and
 'tensorflow'. If you would like to install only 'PyTorch' or 'tensorflow' set
-`install="pytorch"` or `install="tenorflow"`. Starting with version 0.3.1 tensorflow
-of version 2.13 or higher is necessary.
+`install="pytorch"` or `install="tenorflow"`. For *aifeducation* a version of 
+tensorflow between 2.13 and 2.15 is necessary.
 
 It is very important that you call this function *before* loading the package
 the first time. If you load the library without installing the necessary modules
@@ -195,6 +181,7 @@ This function installs the following python modules:
 -   torcheval,
 -   safetensors,
 -   accelerate
+-   pandas
 
 **Tensorflow**
 -   keras,

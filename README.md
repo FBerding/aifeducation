@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 **GitHub**
-[![](https://img.shields.io/badge/devel%20version-0.3.1-green.svg)](https://github.com/fberding/iotarelr)
+[![](https://img.shields.io/badge/devel%20version-0.3.3-green.svg)](https://github.com/fberding/iotarelr)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 **CRAN** [![CRAN
 status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-project.org/package=aifeducation)
@@ -141,6 +141,9 @@ following table provides more details:
 | Funnel Transformer        | Yes     | Yes        | Yes            |
 | Longformer                | Yes     | Yes        | Yes            |
 | Text Embedding Classifier | Yes     | Yes        | No             |
+
+Please not that tensorflow is currently supported for the following
+versions: 2.13-2.15.
 
 ## Classification Tasks
 

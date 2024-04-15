@@ -444,7 +444,7 @@ basic_text_rep<-bow_pp_create_basic_text_rep(
   remove_separators = TRUE,
   split_hyphens = FALSE,
   split_tags = FALSE,
-  language_stopwords="eng",
+  language_stopwords="en",
   use_lemmata = FALSE,
   to_lower=FALSE,
   min_termfreq = NULL,
@@ -585,7 +585,7 @@ directory. The next step is to train your model by calling
 train_tune_bert_model(
   ml_framework=aifeducation_config$get_framework(),
   output_dir = "my_own_transformer_trained",
-  bert_model_dir_path = "my_own_transformer",
+  model_dir_path = "my_own_transformer",
   raw_texts = example_data$text,
   p_mask=0.15,
   whole_word=TRUE,

@@ -169,7 +169,7 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
 class TextEmbeddingClassifier_PT(torch.nn.Module):
   def __init__(self,features, times, hidden, rec, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
-  add_pos_embedding, self_attention_heads, target_levels):
+  add_pos_embedding, self_attention_heads, target_levels,classification_head=True):
     
     super().__init__()
     
@@ -275,24 +275,22 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
       last_in_features=features
 
     #Adding final Layer
-    if self.n_target_levels>2:
-      #Multi Class
-      layer_list.update({"output_categories":
-        torch.nn.Linear(
-            in_features=last_in_features,
-            out_features=self.n_target_levels
-        )})
-      #layer_list.append(
-      #  torch.nn.Softmax(dim=1))
-    else:
-      #Binary Class
-      layer_list.update({"output_categories":
-        torch.nn.Linear(
-            in_features=last_in_features,
-            out_features=1)})
-      #layer_list.append(
-      #  torch.nn.Sigmoid())
-      
+    if classification_head==True:
+      if self.n_target_levels>2:
+        #Multi Class
+        layer_list.update({"output_categories":
+          torch.nn.Linear(
+              in_features=last_in_features,
+              out_features=self.n_target_levels
+          )})
+      else:
+        #Binary Class
+        layer_list.update({"output_categories":
+          torch.nn.Linear(
+              in_features=last_in_features,
+              out_features=1)})
+
+    #Summarize Model
     model=torch.nn.Sequential()
     for id,layer in layer_list.items():
       model.add_module(name=id,module=layer)

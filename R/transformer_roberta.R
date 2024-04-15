@@ -793,6 +793,10 @@ train_tune_roberta_model=function(ml_framework=aifeducation_config$get_framework
       tokenizer = tokenizer
     )
     trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
+    if(as.logical(pytorch_trace)==FALSE){
+      trainer$remove_callback(transformers$PrinterCallback)
+      trainer$remove_callback(transformers$ProgressCallback)
+    }
 
     #Add Callback if Shiny App is running
     if(requireNamespace("shiny") & requireNamespace("shinyWidgets")){

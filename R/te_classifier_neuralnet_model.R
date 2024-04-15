@@ -1924,7 +1924,16 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       embedding_model_config<-text_embeddings$get_model_info()
       for(check in names(embedding_model_config)){
-        if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+        if(!is.null_or_na(embedding_model_config[[check]]) &
+           !is.null_or_na(private$text_embedding_model$model[[check]])){
+          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+            return(FALSE)
+          }
+        } else if (!is.null_or_na(embedding_model_config[[check]]) &
+                   is.null_or_na(private$text_embedding_model$model[[check]])){
+          return(FALSE)
+        } else if (is.null_or_na(embedding_model_config[[check]]) &
+                   !is.null_or_na(private$text_embedding_model$model[[check]])){
           return(FALSE)
         }
       }

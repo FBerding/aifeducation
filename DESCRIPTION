@@ -1,7 +1,7 @@
 Type: Package
 Package: aifeducation
 Title: Artificial Intelligence for Education
-Version: 0.3.2
+Version: 0.3.3
 Authors@R: c(
     person("Berding", "Florian", , "florian.berding@uni-hamburg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3593-1695")),
@@ -61,7 +61,6 @@ Suggests:
     topicmodels,
     udpipe,
     quanteda,
-    quanteda.textmodels,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),

@@ -66,16 +66,14 @@ current_embeddings<-bert_embeddings$clone(deep = TRUE)
 
 for(framework in ml_frameworks){
   for (n_classes in 2:3){
-    example_data<-data.frame(
-      id=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$id2,
-      label=quanteda::docvars(quanteda.textmodels::data_corpus_moviereviews)$sentiment)
-    example_data$text<-as.character(quanteda.textmodels::data_corpus_moviereviews)
-    example_data$label<-as.character(example_data$label)
+    example_data<-imdb_movie_reviews
 
-    rownames(example_data)<-example_data$id
+    rownames(example_data)<-rownames(current_embeddings$embeddings)
+    example_data$id<-rownames(current_embeddings$embeddings)
     example_data<-example_data[intersect(
       rownames(example_data),rownames(current_embeddings$embeddings)),]
 
+    example_data$label<-as.character(example_data$label)
     example_data$label[c(201:300)]=NA
     if(n_classes>2){
       example_data$label[c(201:250)]<-"medium"
