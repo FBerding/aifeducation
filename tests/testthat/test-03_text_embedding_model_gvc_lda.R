@@ -1,4 +1,10 @@
 testthat::skip_on_os("windows")
+
+testthat::skip_if_not_installed(pkg="quanteda")
+testthat::skip_if_not_installed(pkg="topicmodels")
+testthat::skip_if_not_installed(pkg="text2vec")
+testthat::skip_if_not_installed(pkg="tidytext")
+
 path="test_data/gvc_lda/basic_text_rep_movie_reviews.rda"
 testthat::skip_if_not(condition=file.exists(testthat::test_path(path)),
                       message  = "Necessary dataset not available")
@@ -11,7 +17,6 @@ if(dir.exists(testthat::test_path("test_artefacts/tmp_full_models"))==FALSE){
   dir.create(testthat::test_path("test_artefacts/tmp_full_models"))
 }
 
-datasets$disable_progress_bars()
 
 #------------------------------------------------------------------------------
 load(testthat::test_path(path))

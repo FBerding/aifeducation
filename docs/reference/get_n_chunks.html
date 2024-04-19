@@ -109,6 +109,44 @@ for every case.</p>
 <code><a href="to_categorical_c.html">to_categorical_c</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">test_array</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,</span></span>
+<span class="r-in"><span>                        <span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">5</span>,<span class="fl">6</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,</span></span>
+<span class="r-in"><span>                        <span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">5</span>,<span class="fl">6</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">0</span>,<span class="fl">4</span>,<span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                        dim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">test_array</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    1    0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1    0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    2    2    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    1    5    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1    6    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    6    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2    1    4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    5    2    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co">#test array has shape (batch,times,features) with</span></span></span>
+<span class="r-in"><span><span class="co">#times=3 and features=3</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Slices where all values are zero are padded.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">get_n_chunks</span><span class="op">(</span>text_embeddings<span class="op">=</span><span class="va">test_array</span>,features<span class="op">=</span><span class="fl">3</span>,times<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2 3 3</span>
+<span class="r-in"><span><span class="co">#The length of case 1 is 1, case 2 is 3, and case 3 is 2.</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -14,6 +14,8 @@ set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 transformers$logging$disable_progress_bar()
 
+datasets$disable_progress_bars()
+
 if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
   dir.create(testthat::test_path("test_artefacts"))
 }

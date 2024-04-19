@@ -17,6 +17,16 @@ represent the features of all sequences. The sequences are concatenated.
 \description{
 Function transforming an array to a matrix.
 }
+\examples{
+#text embedding is an array of shape (batch,times,features)
+example_embedding<-c(1:24)
+example_embedding<-array(example_embedding,dim=c(4,3,2))
+example_embedding
+
+#Transform array to a matrix
+#matrix has shape (batch,times*features)
+array_to_matrix(example_embedding)
+}
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{calc_standard_classification_measures}()},

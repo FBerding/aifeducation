@@ -167,6 +167,37 @@ Otherwise <code>FALSE</code>.</p>
 
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/aifeducation/" class="external-link">aifeducation</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Example for setting the global machine learning framework</span></span></span>
+<span class="r-in"><span><span class="co">#aifeducation_config is the object created during loading the package</span></span></span>
+<span class="r-in"><span><span class="co">#For using PyTorch</span></span></span>
+<span class="r-in"><span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"pytorch"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Global Backend set to: pytorch </span>
+<span class="r-in"><span><span class="co">#For using Tensorflow</span></span></span>
+<span class="r-in"><span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"pytorch"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Global Backend set to: pytorch </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Example for requesting the global machine learning framework</span></span></span>
+<span class="r-in"><span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">get_framework</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $global_ml_framework</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "pytorch"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $TextEmbeddingFramework</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "pytorch"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ClassifierFramework</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "pytorch"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Example for checking if the global macheine learning framework is set</span></span></span>
+<span class="r-in"><span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">global_framework_set</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
