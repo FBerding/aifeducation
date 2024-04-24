@@ -268,7 +268,7 @@ Figure 1: Aifeducation Studio
 <li>
 <strong>imbalanced data:</strong> Finally, data in the educational and social sciences often occurs in an imbalanced pattern as several empirical studies show (Bloemen 2011; Stütz et al. 2022). Imbalanced means that some categories or characteristics of a data set have very high absolute frequencies compared to other categories and characteristics. Imbalance during AI training guides algorithms to focus and prioritize the categories and characteristics with high absolute frequencies, increasing the risk to miss categories/characteristics with low frequencies (Haixiang et al. 2017). This can lead AI to prefer special groups of people/material, imply false recommendations and conclusions, or to miss rare categories or characteristics.</li>
 </ul>
-<p>In order to deal with the problem of imbalanced data sets, the package integrates the <em>Synthetic Minority Oversampling Technique</em> into the learning process. Currently, the <em>Basic Synthetic Minority Oversampling Technique</em> (Chawla et al. 2002), <em>Density-Bases Synthetic Minority Oversampling Technique</em> (Bunkhumpornpat, Sinapiromsaran &amp; Lursinsap 2012), and <em>Adaptive Synthetic Sampling Approach for Imbalanced Learning</em> (Hem Garcia &amp; Li 2008) are implemented via the <em>R</em> package <em>smotefamiliy</em>.</p>
+<p>In order to deal with the problem of imbalanced data sets, the package integrates the <em>Synthetic Minority Oversampling Technique</em> into the learning process. Currently, the <em>Basic Synthetic Minority Oversampling Technique</em> (Chawla et al. 2002), <em>Density-Based Synthetic Minority Oversampling Technique</em> (Bunkhumpornpat, Sinapiromsaran &amp; Lursinsap 2012), and <em>Adaptive Synthetic Sampling Approach for Imbalanced Learning</em> (Hem Garcia &amp; Li 2008) are implemented via the <em>R</em> package <em>smotefamiliy</em>.</p>
 <p>In order to address the problem of small data sets, training loops of AI integrate <em>pseudo-labeling</em> (e.g., Lee 2013). Pseudo-labeling is a technique which can be used for supervised learning. More specifically, educators and researchers rate a part of a data set and train AI with this very part. The remainder of the data is not processed by humans. Instead, AI uses this part of data to learn on its own. Thus, educators and researchers only have to provide additional data for the AI’s learning process without coding it themselves. This offers the possibility to add more data to the training process and to reduce labor costs.</p>
 </div>
 <div class="section level3">
@@ -286,7 +286,7 @@ Figure 1: Aifeducation Studio
 <li>Cohen’s Kappa with squared weights</li>
 <li>Fleiss’ Kappa for multiple raters without exact estimation</li>
 </ul>
-<p>In Addition the some traditional measures from the machine learning literature are also available:</p>
+<p>In addition the some traditional measures from the machine learning literature are also available:</p>
 <ul>
 <li>Precision</li>
 <li>Recall</li>
@@ -297,7 +297,7 @@ Figure 1: Aifeducation Studio
 <div class="section level2">
 <h2 id="sharing-trained-ai">Sharing Trained AI<a class="anchor" aria-label="anchor" href="#sharing-trained-ai"></a>
 </h2>
-<p>Since the package is based on keras, tensorflow, and the transformer libraries, every trained AI can be shared with other educators and researchers. The package supports an easy use of pre-trained AI within <em>R</em>, but also provides the possibility to export trained AI to other environments.</p>
+<p>Since the package is based on torch, tensorflow, and the transformer libraries, every trained AI can be shared with other educators and researchers. The package supports an easy use of pre-trained AI within <em>R</em>, but also provides the possibility to export trained AI to other environments.</p>
 <p>Using a pre-trained AI for classification only requires the classifier and the corresponding text embedding model. Use <em>Aifeducation Studio</em> or just load both to <em>R</em> and start predictions. Vignette <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html" class="external-link">02a Using Aifeducation Studio</a> describes how to use the user interface. Vignette <a href="https://fberding.github.io/aifeducation/articles/classification_tasks.html" class="external-link">02b Classification Tasks</a> describes how to save and load the objects with <em>R</em> syntax. In vignette <a href="https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html" class="external-link">03 Sharing and Using Trained AI/Models</a> you can find a detailed guide on how to document and share your models.</p>
 </div>
 <div class="section level2">
