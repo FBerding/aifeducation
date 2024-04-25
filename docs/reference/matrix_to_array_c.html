@@ -112,6 +112,46 @@ the second to the times, and the third to the features.</p>
 <code><a href="to_categorical_c.html">to_categorical_c</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#matrix has shape (batch,times*features)</span></span></span>
+<span class="r-in"><span><span class="va">matrix</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,</span></span>
+<span class="r-in"><span>                     <span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,</span></span>
+<span class="r-in"><span>                     <span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>              nrow<span class="op">=</span><span class="fl">3</span>,</span></span>
+<span class="r-in"><span>              byrow<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">matrix</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3] [,4] [,5] [,6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    1    1    2    2    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2    2    2    3    3    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1    1    1    1    1    1</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Transform matrix to a array</span></span></span>
+<span class="r-in"><span><span class="co">#array has shape (batch,times*features)</span></span></span>
+<span class="r-in"><span><span class="fu">matrix_to_array_c</span><span class="op">(</span>matrix<span class="op">=</span><span class="va">matrix</span>,times<span class="op">=</span><span class="fl">2</span>,features<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

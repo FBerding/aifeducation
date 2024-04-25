@@ -20,6 +20,20 @@ for every case.
 \description{
 Function for calculating the number of chunks/sequences for every case
 }
+\examples{
+test_array<-array(data=c(1,1,1,0,0,0,0,0,0,
+                        2,1,1,2,5,6,0,0,0,
+                        1,2,5,6,1,2,0,4,2),
+                        dim=c(3,3,3))
+test_array
+#test array has shape (batch,times,features) with
+#times=3 and features=3
+
+#Slices where all values are zero are padded.
+
+get_n_chunks(text_embeddings=test_array,features=3,times=3)
+#The length of case 1 is 1, case 2 is 3, and case 3 is 2.
+}
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},

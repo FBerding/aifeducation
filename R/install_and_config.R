@@ -302,6 +302,22 @@ set_transformers_logger<-function(level="ERROR"){
 #'@return The function does nothing return. It is used for its side effects.
 #'
 #'@family Installation and Configuration
+#'@examples
+#'
+#'library(aifeducation)
+#'
+#'#Example for setting the global machine learning framework
+#'#aifeducation_config is the object created during loading the package
+#'#For using PyTorch
+#'aifeducation_config$set_global_ml_backend("pytorch")
+#'#For using Tensorflow
+#'aifeducation_config$set_global_ml_backend("pytorch")
+#'
+#'#Example for requesting the global machine learning framework
+#'aifeducation_config$get_framework()
+#'
+#'#Example for checking if the global macheine learning framework is set
+#'aifeducation_config$global_framework_set()
 AifeducationConfiguration<-R6::R6Class(
   classname = "aifeducationConfiguration",
   private = list(
@@ -337,7 +353,7 @@ AifeducationConfiguration<-R6::R6Class(
       private$ml_framework_config$global_ml_framework=backend
       private$ml_framework_config$TextEmbeddingFramework=backend
       private$ml_framework_config$ClassifierFramework=backend
-      os$environ$setdefault("KERAS_BACKEND","tensorflow")
+      #os$environ$setdefault("KERAS_BACKEND","tensorflow")
       cat("Global Backend set to:",backend,"\n")
 
       #} else {

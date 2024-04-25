@@ -15,6 +15,18 @@
 #'@import Rcpp
 #'@useDynLib aifeducation, .registration = TRUE
 #'@family Auxiliary Functions
+#'@examples
+#'#matrix has shape (batch,times*features)
+#'matrix<-matrix(data=c(1,1,1,2,2,2,
+#'                      2,2,2,3,3,3,
+#'                      1,1,1,1,1,1),
+#'               nrow=3,
+#'               byrow=TRUE)
+#'matrix
+#'
+#'#Transform matrix to a array
+#'#array has shape (batch,times*features)
+#'matrix_to_array_c(matrix=matrix,times=2,features=3)
 #'@export
 matrix_to_array_c <- function(matrix, times, features) {
     .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)

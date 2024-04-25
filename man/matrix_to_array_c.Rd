@@ -21,6 +21,19 @@ the second to the times, and the third to the features.
 Function written in C++ for reshaping a matrix containing sequential data into
 an array for use with keras.
 }
+\examples{
+#matrix has shape (batch,times*features)
+matrix<-matrix(data=c(1,1,1,2,2,2,
+                     2,2,2,3,3,3,
+                     1,1,1,1,1,1),
+              nrow=3,
+              byrow=TRUE)
+matrix
+
+#Transform matrix to a array
+#array has shape (batch,times*features)
+matrix_to_array_c(matrix=matrix,times=2,features=3)
+}
 \seealso{
 Other Auxiliary Functions: 
 \code{\link{array_to_matrix}()},

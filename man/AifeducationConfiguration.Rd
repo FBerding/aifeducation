@@ -15,6 +15,23 @@ R6 class for settting the global machine learning framework.
 R6 class for setting the global machine learning framework to 'PyTorch' or
 'tensorflow'.
 }
+\examples{
+
+library(aifeducation)
+
+#Example for setting the global machine learning framework
+#aifeducation_config is the object created during loading the package
+#For using PyTorch
+aifeducation_config$set_global_ml_backend("pytorch")
+#For using Tensorflow
+aifeducation_config$set_global_ml_backend("pytorch")
+
+#Example for requesting the global machine learning framework
+aifeducation_config$get_framework()
+
+#Example for checking if the global macheine learning framework is set
+aifeducation_config$global_framework_set()
+}
 \seealso{
 Other Installation and Configuration: 
 \code{\link{aifeducation_config}},

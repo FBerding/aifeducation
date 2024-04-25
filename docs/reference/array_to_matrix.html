@@ -102,6 +102,39 @@ represent the features of all sequences. The sequences are concatenated.</p>
 <code><a href="to_categorical_c.html">to_categorical_c</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#text embedding is an array of shape (batch,times,features)</span></span></span>
+<span class="r-in"><span><span class="va">example_embedding</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">24</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">example_embedding</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="va">example_embedding</span>,dim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">example_embedding</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    5    9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2    6   10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    3    7   11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]    4    8   12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> , , 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   13   17   21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]   14   18   22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   15   19   23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   16   20   24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#Transform array to a matrix</span></span></span>
+<span class="r-in"><span><span class="co">#matrix has shape (batch,times*features)</span></span></span>
+<span class="r-in"><span><span class="fu">array_to_matrix</span><span class="op">(</span><span class="va">example_embedding</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      feat_1 feat_2 feat_3 feat_4 feat_5 feat_6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]      1     13      5     17      9     21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      2     14      6     18     10     22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      3     15      7     19     11     23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]      4     16      8     20     12     24</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

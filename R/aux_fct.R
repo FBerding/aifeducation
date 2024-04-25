@@ -10,6 +10,15 @@
 #'@family Auxiliary Functions
 #'
 #'@export
+#'@examples
+#'#text embedding is an array of shape (batch,times,features)
+#'example_embedding<-c(1:24)
+#'example_embedding<-array(example_embedding,dim=c(4,3,2))
+#'example_embedding
+#'
+#'#Transform array to a matrix
+#'#matrix has shape (batch,times*features)
+#'array_to_matrix(example_embedding)
 array_to_matrix<-function(text_embedding){
   features=dim(text_embedding)[3]
   times=dim(text_embedding)[2]
@@ -858,6 +867,19 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
 #'@family Auxiliary Functions
 #'
 #'@export
+#'@examples
+#'test_array<-array(data=c(1,1,1,0,0,0,0,0,0,
+#'                         2,1,1,2,5,6,0,0,0,
+#'                         1,2,5,6,1,2,0,4,2),
+#'                         dim=c(3,3,3))
+#'test_array
+#'#test array has shape (batch,times,features) with
+#'#times=3 and features=3
+#'
+#'#Slices where all values are zero are padded.
+#'
+#'get_n_chunks(text_embeddings=test_array,features=3,times=3)
+#'#The length of case 1 is 1, case 2 is 3, and case 3 is 2.
 get_n_chunks<-function(text_embeddings,features,times){
   n_chunks<-vector(length = nrow(text_embeddings))
   n_chunks[]<-0
@@ -1053,3 +1075,6 @@ is.null_or_na<-function(object){
     return(TRUE)
   }
 }
+
+
+
