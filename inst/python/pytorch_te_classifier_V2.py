@@ -3,6 +3,37 @@ from torcheval.metrics.functional import multiclass_confusion_matrix
 import numpy as np
 import safetensors
 
+class LayerNorm_with_Mask_PT(torch.nn.Module):
+    def __init__(self, features,eps=1e-5):
+      super().__init__()
+      self.eps=eps
+      self.features = features
+      self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
+      self.beta = torch.nn.Parameter(torch.zeros(1, 1, self.features))
+
+    def forward(self, x):
+      mask=self.get_mask(x)
+
+      n_elements=torch.sum(~mask,dim=1)*self.features
+
+      mean=torch.sum(torch.sum(x,dim=1),dim=1)/n_elements
+      mean=torch.reshape(mean,(x.size(dim=0),1))
+      
+      mean_long=torch.reshape(mean.repeat(1,x.size(dim=1)*self.features),(x.size(dim=0),x.size(dim=1),self.features))
+      mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features,dim=1),(x.size(dim=0),x.size(dim=1),self.features))
+     
+      var=torch.square((x-mean_long)*(~mask_long))
+
+      normalized=((~mask_long)*(x-mean_long)/torch.sqrt(var+self.eps))*self.gamma+self.beta
+      return normalized
+    
+    def get_mask(self,x):
+      device=('cuda' if torch.cuda.is_available() else 'cpu')
+      time_sums=torch.sum(x,dim=2)
+      mask=(time_sums==0)
+      mask=mask.to(device)
+      return mask
+
 class PackAndMasking_PT(torch.nn.Module):
   def __init__(self):
     super().__init__()
@@ -15,8 +46,9 @@ class PackAndMasking_PT(torch.nn.Module):
     batch_first=True)
   
   def get_length(self,x):
-    #with torch.no_grad():
-    return torch.sum(torch.sum(x,dim=2,dtype=torch.bool),dim=1)
+    time_sum=torch.sum(x,dim=2)
+    time_sum=(time_sum!=0)
+    return torch.sum(time_sum,dim=1)
   
 class UnPackAndMasking_PT(torch.nn.Module):
   def __init__(self,sequence_length):
@@ -64,13 +96,13 @@ class FourierEncoder_PT(torch.nn.Module):
    
     self.attention=FourierTransformation_PT()
     self.dropout=torch.nn.Dropout(p=dropout_rate)
-    self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.features)
+    self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
     self.dense_proj=torch.nn.Sequential(
       torch.nn.Linear(in_features=self.features,out_features=self.dense_dim),
       torch.nn.GELU(),
       torch.nn.Linear(in_features=self.dense_dim,out_features=self.features)
     )
-    self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.features)
+    self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
     
   def forward(self,x):
     attention_output=self.attention(x)
@@ -94,12 +126,12 @@ class TransformerEncoder_PT(torch.nn.Module):
       dropout=0,
       batch_first=True)
     self.dropout=torch.nn.Dropout(p=dropout_rate)
-    self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.embed_dim)
+    self.layernorm_1=LayerNorm_with_Mask_PT(features=self.embed_dim)
     self.dense_proj=torch.nn.Sequential(
       torch.nn.Linear(in_features=self.embed_dim,out_features=self.dense_dim),
       torch.nn.GELU(),
       torch.nn.Linear(in_features=self.dense_dim,out_features=self.embed_dim))
-    self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.embed_dim)
+    self.layernorm_2=LayerNorm_with_Mask_PT(features=self.embed_dim)
 
   def forward(self,x):
     attention_output=self.attention(
@@ -113,8 +145,9 @@ class TransformerEncoder_PT(torch.nn.Module):
     return self.layernorm_2(proj_input+proj_output)
   
   def get_mask(self,x):
-    #with torch.no_grad():
-    return ~torch.sum(x,dim=2,dtype=torch.bool)
+    time_sum=torch.sum(x,dim=2)
+    time_sum=(time_sum!=0)
+    return ~time_sum
 
 class AddPositionalEmbedding_PT(torch.nn.Module):
   def __init__(self, sequence_length,embedding_dim):
@@ -143,8 +176,9 @@ class AddPositionalEmbedding_PT(torch.nn.Module):
   
   def get_mask(self,x):
     device=('cuda' if torch.cuda.is_available() else 'cpu')
-    #with torch.no_grad():
-    masks=~torch.sum(x,dim=2,dtype=torch.bool)
+    time_sum=torch.sum(x,dim=2)
+    time_sum=(time_sum!=0)
+    masks=~time_sum
     masks=masks.to(device)
     return masks
  
@@ -160,7 +194,6 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
     return x
   
   def get_length(self,x):
-    #with torch.no_grad():
     length=torch.sum(x,dim=2)
     length=(length!=0)
     length=torch.sum(length,dim=1).repeat(x.size(2),1)
@@ -194,12 +227,12 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     self.n_target_levels=len(target_levels)
     layer_list=torch.nn.ModuleDict()
     
-    if n_rec>0 or repeat_encoder>0:
+    if n_rec>0 or repeat_encoder>0 or times >1:
       if add_pos_embedding==True:
         layer_list.update({"add_positional_embedding":AddPositionalEmbedding_PT(
           sequence_length=times,
           embedding_dim=features)})
-      layer_list.update({"normalizaion_layer":torch.nn.LayerNorm(normalized_shape=features)})
+      layer_list.update({"normalizaion_layer":LayerNorm_with_Mask_PT(features=features)})
       current_size=features
     else:
       layer_list.update({"normalizaion_layer":torch.nn.BatchNorm1d(num_features=times*features)})
@@ -238,7 +271,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
         if i!=(n_rec-1):
           layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
       
-    if n_rec>0 or repeat_encoder>0:
+    if n_rec>0 or repeat_encoder>0 or times >1:
       layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
       
     if(n_rec>0):
@@ -278,19 +311,12 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
 
     #Adding final Layer
     if classification_head==True:
-      if self.n_target_levels>2:
-        #Multi Class
-        layer_list.update({"output_categories":
-          torch.nn.Linear(
-              in_features=last_in_features,
-              out_features=self.n_target_levels
-          )})
-      else:
-        #Binary Class
-        layer_list.update({"output_categories":
-          torch.nn.Linear(
-              in_features=last_in_features,
-              out_features=1)})
+      layer_list.update({"output_categories":
+        torch.nn.Linear(
+            in_features=last_in_features,
+            out_features=self.n_target_levels
+        )})
+
 
     #Summarize Model
     model=torch.nn.Sequential()
@@ -302,304 +328,8 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     if predication_mode==False:
       return self.model(x)
     else:
-      if self.n_target_levels>2:
-        return torch.nn.Softmax(dim=1)(self.model(x))
-      else:
-        return torch.nn.Sigmoid()(self.model(x))
-    
-  
-def TeClassifierTrain_PT(model,loss_fct_name, optimizer_method, epochs, trace,batch_size,
-train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
-shiny_app_active=False):
-  
-  device=('cuda' if torch.cuda.is_available() else 'cpu')
-  
-  if device=="cpu":
-    model.to(device,dtype=float)
-  else:
-    model.to(device,dtype=torch.double)
-  
-  if optimizer_method=="adam":
-    optimizer=torch.optim.Adam(model.parameters())
-  elif optimizer_method=="rmsprop":
-    optimizer=torch.optim.RMSprop(model.parameters())
-    
-  class_weights=class_weights.clone()
-  class_weights=class_weights.to(device)
-  if loss_fct_name=="CrossEntropyLoss":
-    loss_fct=torch.nn.CrossEntropyLoss(
-      reduction="mean",
-      weight = class_weights)
-  
-  trainloader=torch.utils.data.DataLoader(
-    train_data,
-    batch_size=batch_size,
-    shuffle=True)
-    
-  valloader=torch.utils.data.DataLoader(
-    val_data,
-    batch_size=batch_size,
-    shuffle=False)
-    
-  if not (test_data is None):
-    testloader=torch.utils.data.DataLoader(
-      test_data,
-      batch_size=batch_size,
-      shuffle=False)
-      
-  #Tensor for Saving Training History
-  if not (test_data is None):
-    history_loss=torch.zeros(size=(3,epochs),requires_grad=False)
-    history_acc=torch.zeros(size=(3,epochs),requires_grad=False)
-    history_bacc=torch.zeros(size=(3,epochs),requires_grad=False)
-  else:
-    history_loss=torch.zeros(size=(2,epochs),requires_grad=False)
-    history_acc=torch.zeros(size=(2,epochs),requires_grad=False)
-    history_bacc=torch.zeros(size=(2,epochs),requires_grad=False)
-  
-  best_bacc=float('-inf')
-  
-  #GUI ProgressBar
-  if shiny_app_active is True:
-    current_step=0
-    total_epochs=epochs
-    total_steps=len(trainloader)
-    r.py_update_aifeducation_progress_bar_steps(value=0,total=total_steps,title=("Batch/Step: "+str(0)+"/"+str(total_steps)))
-    r.py_update_aifeducation_progress_bar_epochs(value=0,total=epochs,title=("Epoch: "+str(0)+"/"+str(epochs)))
+      return torch.nn.Softmax(dim=1)(self.model(x))
 
-  for epoch in range(epochs):
-    
-    #Training------------------------------------------------------------------
-    train_loss=0.0
-    n_matches_train=0
-    n_total_train=0
-    confusion_matrix_train=torch.zeros(size=(n_classes,n_classes))
-    confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
-    
-    #Gui ProgressBar
-    if shiny_app_active is True:
-      current_step=0
-    
-    model.train(True)
-    for inputs, labels, sample_weights in trainloader:
-      print("Train")
-      inputs=inputs.clone()
-      labels=labels.clone()
-      sample_weights=sample_weights.clone()
-      
-      inputs = inputs.to(device)
-      labels=labels.to(device)
-      sample_weights=sample_weights.to(device)
-      
-      optimizer.zero_grad()
-      
-      outputs=model(inputs,predication_mode=False)
-      
-      if n_classes==2:
-        outputs=torch.cat((1-outputs,outputs),dim=1)
-        labels=torch.cat((1-labels,labels),dim=1)
-      
-      loss=torch.mean((loss_fct(outputs,labels)*sample_weights))
-      loss.backward()
-      optimizer.step()
-      
-      train_loss +=loss.item()
-      
-      #Calc Accuracy
-      if labels.shape[1]==2:
-        pred_idx=torch.nn.Sigmoid()(outputs).max(dim=1).indices
-        label_idx=torch.nn.Sigmoid()(labels).max(dim=1).indices
-      else:
-        pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-        label_idx=torch.nn.Softmax(dim=1)(labels).max(dim=1).indices
-          
-      match=(pred_idx==label_idx)
-      n_matches_train+=match.sum().item()
-      n_total_train+=outputs.size(0)
-      
-      #Calc Balanced Accuracy
-      confusion_matrix_train+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
-      
-      #Update Progress Logger
-      if shiny_app_active is True:
-        current_step+=1
-        r.py_update_aifeducation_progress_bar_steps(value=current_step,total=total_steps,title=("Batch/Step: "+str(current_step)+"/"+str(total_steps)))
-    
-    acc_train=n_matches_train/n_total_train
-    bacc_train=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
-
-    #Validation----------------------------------------------------------------
-    val_loss=0.0
-    n_matches_val=0
-    n_total_val=0
-    
-    confusion_matrix_val=torch.zeros(size=(n_classes,n_classes))
-    confusion_matrix_val=confusion_matrix_val.to(device,dtype=torch.double)
-
-    model.eval()
-    with torch.no_grad():
-      for inputs, labels in valloader:
-        print("VAL")
-        inputs=inputs.clone()
-        labels=labels.clone()
-        
-        inputs = inputs.to(device)
-        labels=labels.to(device)
-      
-        outputs=model(inputs,predication_mode=False)
-        
-        
-        if n_classes==2:
-          outputs=torch.cat((1-outputs,outputs),dim=1)
-          labels=torch.cat((1-labels,labels),dim=1)
-        
-        loss=loss_fct(outputs,labels).mean()
-        val_loss +=loss.item()
-      
-        #Calc Accuracy
-        if labels.shape[1]==2:
-          pred_idx=torch.nn.Sigmoid()(outputs).max(dim=1).indices
-          label_idx=torch.nn.Sigmoid()(labels).max(dim=1).indices
-        else:
-          pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-          label_idx=torch.nn.Softmax(dim=1)(labels).max(dim=1).indices
-          
-        match=(pred_idx==label_idx)
-        n_matches_val+=match.sum().item()
-        n_total_val+=outputs.size(0)
-        
-        #Calc Balanced Accuracy
-        confusion_matrix_val+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
-
-    acc_val=n_matches_val/n_total_val
-    bacc_val=torch.sum(torch.diagonal(confusion_matrix_val)/torch.sum(confusion_matrix_val,dim=1))/n_classes
-    
-    #Test----------------------------------------------------------------------
-    if not (test_data is None):
-      test_loss=0.0
-      n_matches_test=0
-      n_total_test=0
-      
-      confusion_matrix_test=torch.zeros(size=(n_classes,n_classes))
-      confusion_matrix_test=confusion_matrix_test.to(device,dtype=torch.double)
-  
-      model.eval()
-      with torch.no_grad():
-        for inputs, labels in testloader:
-          print("Test")
-          inputs=inputs.clone()
-          labels=labels.clone()
-          
-          inputs = inputs.to(device)
-          labels=labels.to(device)
-        
-          outputs=model(inputs,predication_mode=False)
-          
-          if n_classes==2:
-            labels=torch.cat((1-labels,labels),dim=1)
-            outputs=torch.cat((1-outputs,outputs),dim=1)
-          
-          loss=loss_fct(outputs,labels).mean()
-          test_loss +=loss.item()
-        
-          #Calc Accuracy
-          if labels.shape[1]==2:
-            pred_idx=torch.nn.Sigmoid()(outputs).max(dim=1).indices
-            label_idx=torch.nn.Sigmoid()(labels).max(dim=1).indices
-          else:
-            pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-            label_idx=torch.nn.Softmax(dim=1)(labels).max(dim=1).indices
-            
-          match=(pred_idx==label_idx)
-          n_matches_test+=match.sum().item()
-          n_total_test+=outputs.size(0)
-          
-          #Calc Balanced Accuracy
-          confusion_matrix_test+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
-  
-      acc_test=n_matches_test/n_total_test
-      bacc_test=torch.sum(torch.diagonal(confusion_matrix_test)/torch.sum(confusion_matrix_test,dim=1))/n_classes
-    
-    
-    #Record History
-    if not (test_data is None):
-      history_loss[0,epoch]=train_loss/len(trainloader)
-      history_loss[1,epoch]=val_loss/len(valloader)
-      history_loss[2,epoch]=test_loss/len(testloader)
-      
-      history_acc[0,epoch]=acc_train
-      history_acc[1,epoch]=acc_val
-      history_acc[2,epoch]=acc_test
-      
-      history_bacc[0,epoch]=bacc_train
-      history_bacc[1,epoch]=bacc_val
-      history_bacc[2,epoch]=bacc_test
-    else:
-      history_loss[0,epoch]=train_loss/len(trainloader)
-      history_loss[1,epoch]=val_loss/len(valloader)
-      
-      history_acc[0,epoch]=acc_train
-      history_acc[1,epoch]=acc_val
-      
-      history_bacc[0,epoch]=bacc_train
-      history_bacc[1,epoch]=bacc_val
-
-    #Trace---------------------------------------------------------------------
-    if trace>=1:
-      if test_data is None:
-        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
-          epoch+1,
-          epochs,
-          train_loss/len(trainloader),
-          acc_train,
-          bacc_train,
-          val_loss/len(valloader),
-          acc_val,
-          bacc_val))
-      else:
-        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} | Test Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
-          epoch+1,
-          epochs,
-          train_loss/len(trainloader),
-          acc_train,
-          bacc_train,
-          val_loss/len(valloader),
-          acc_val,
-          bacc_val,
-          test_loss/len(testloader),
-          acc_test,
-          bacc_test))
-          
-    #Update ProgressBar in Shiny
-    if shiny_app_active is True:
-        r.py_update_aifeducation_progress_bar_epochs(value=epoch+1,total=epochs,title=("Epoch: "+str(epoch+1)+"/"+str(epochs)))
-        
-    
-    #Callback-------------------------------------------------------------------
-    if use_callback==True:
-      if bacc_val>best_bacc:
-        if trace>=1:
-          print("Val Balanced Accuracy increased from {:.4f} to {:.4f}".format(best_bacc,bacc_val))
-          print("Save checkpoint to {}".format(filepath))
-        torch.save(model.state_dict(),filepath)
-        #safetensors.torch.save_model(model=model,filename=filepath)
-        best_bacc=bacc_val
-  
-  #Finalize--------------------------------------------------------------------
-  if use_callback==True:
-    if trace>=1:
-      print("Load Best Weights from {}".format(filepath))
-    model.load_state_dict(torch.load(filepath))
-    #safetensors.torch.load_model(model=model,filename=filepath)
-
-
-  history={
-    "loss":history_loss.numpy(),
-    "accuracy":history_acc.numpy(),
-    "balanced_accuracy":history_bacc.numpy()} 
- 
-    
-  return history
 
 
 def TeClassifierTrain_PT_with_Datasets(model,loss_fct_name, optimizer_method, epochs, trace,batch_size,
@@ -620,10 +350,11 @@ shiny_app_active=False):
     
   class_weights=class_weights.clone()
   class_weights=class_weights.to(device)
+  
   if loss_fct_name=="CrossEntropyLoss":
     loss_fct=torch.nn.CrossEntropyLoss(
-      reduction="none",
-      weight = class_weights)
+        reduction="none",
+        weight = class_weights)
   
   trainloader=torch.utils.data.DataLoader(
     train_data,
@@ -652,6 +383,7 @@ shiny_app_active=False):
     history_bacc=torch.zeros(size=(2,epochs),requires_grad=False)
   
   best_bacc=float('-inf')
+  best_val_loss=float('inf')
   
   #GUI ProgressBar
   if shiny_app_active is True:
@@ -677,12 +409,8 @@ shiny_app_active=False):
     model.train(True)
     for batch in trainloader:
       inputs=batch["input"]
-      inputs=inputs.clone()
       labels=batch["labels"]
-      labels=labels.clone()
-      if n_classes==2:
-        labels=torch.reshape(input=labels,shape=(labels.size(dim=0),1))
-      
+
       sample_weights=batch["sample_weights"]
       sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
 
@@ -693,25 +421,15 @@ shiny_app_active=False):
       optimizer.zero_grad()
       
       outputs=model(inputs,predication_mode=False)
-
-      if n_classes==2:
-        outputs=torch.cat((1-outputs,outputs),dim=1)
-        labels=torch.cat((1-labels,labels),dim=1)
-      
       loss=loss_fct(outputs,labels)*sample_weights
       loss=loss.mean()
       loss.backward()
       optimizer.step()
-      
       train_loss +=loss.item()
       
       #Calc Accuracy
-      if labels.shape[1]==2:
-        pred_idx=torch.nn.Sigmoid()(outputs).max(dim=1).indices
-        label_idx=torch.nn.Sigmoid()(labels).max(dim=1).indices
-      else:
-        pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-        label_idx=torch.nn.Softmax(dim=1)(labels).max(dim=1).indices
+      pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
+      label_idx=labels.max(dim=1).indices
           
       match=(pred_idx==label_idx)
       n_matches_train+=match.sum().item()
@@ -735,34 +453,23 @@ shiny_app_active=False):
     
     confusion_matrix_val=torch.zeros(size=(n_classes,n_classes))
     confusion_matrix_val=confusion_matrix_val.to(device,dtype=torch.double)
-
+    
     model.eval()
     with torch.no_grad():
       for batch in valloader:
         inputs=batch["input"]
         labels=batch["labels"]
-        if n_classes==2:
-          labels=torch.reshape(input=labels,shape=(labels.size(dim=0),1))
-        
+
         inputs = inputs.to(device)
         labels=labels.to(device)
       
         outputs=model(inputs,predication_mode=False)
         
-        if n_classes==2:
-          outputs=torch.cat((1-outputs,outputs),dim=1)
-          labels=torch.cat((1-labels,labels),dim=1)
-        
         loss=loss_fct(outputs,labels).mean()
         val_loss +=loss.item()
       
-        #Calc Accuracy
-        if labels.shape[1]==2:
-          pred_idx=torch.nn.Sigmoid()(outputs).max(dim=1).indices
-          label_idx=torch.nn.Sigmoid()(labels).max(dim=1).indices
-        else:
-          pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-          label_idx=torch.nn.Softmax(dim=1)(labels).max(dim=1).indices
+        pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
+        label_idx=labels.max(dim=1).indices
           
         match=(pred_idx==label_idx)
         n_matches_val+=match.sum().item()
@@ -788,28 +495,17 @@ shiny_app_active=False):
         for batch in testloader:
           inputs=batch["input"]
           labels=batch["labels"]
-          if n_classes==2:
-            labels=torch.reshape(input=labels,shape=(labels.size(dim=0),1))
-          
+
           inputs = inputs.to(device)
           labels=labels.to(device)
         
           outputs=model(inputs,predication_mode=False)
           
-          if n_classes==2:
-            labels=torch.cat((1-labels,labels),dim=1)
-            outputs=torch.cat((1-outputs,outputs),dim=1)
-          
           loss=loss_fct(outputs,labels).mean()
           test_loss +=loss.item()
         
-          #Calc Accuracy
-          if labels.shape[1]==2:
-            pred_idx=torch.nn.Sigmoid()(outputs).max(dim=1).indices
-            label_idx=torch.nn.Sigmoid()(labels).max(dim=1).indices
-          else:
-            pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-            label_idx=torch.nn.Softmax(dim=1)(labels).max(dim=1).indices
+          pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
+          label_idx=labels.max(dim=1).indices
             
           match=(pred_idx==label_idx)
           n_matches_test+=match.sum().item()
@@ -883,15 +579,21 @@ shiny_app_active=False):
           print("Val Balanced Accuracy increased from {:.4f} to {:.4f}".format(best_bacc,bacc_val))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
-        #safetensors.torch.save_model(model=model,filename=filepath)
         best_bacc=bacc_val
+        best_val_loss=val_loss/len(valloader)
+      if bacc_val==best_bacc and val_loss/len(valloader)<best_val_loss:
+        if trace>=1:
+          print("Val Loss decreased from {:.4f} to {:.4f}".format(best_val_loss,val_loss/len(valloader)))
+          print("Save checkpoint to {}".format(filepath))
+        torch.save(model.state_dict(),filepath)
+        best_bacc=bacc_val
+        best_val_loss=val_loss/len(valloader)
   
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
     if trace>=1:
       print("Load Best Weights from {}".format(filepath))
     model.load_state_dict(torch.load(filepath))
-    #safetensors.torch.load_model(model=model,filename=filepath)
 
 
   history={

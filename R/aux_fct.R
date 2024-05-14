@@ -249,7 +249,7 @@ get_coder_metrics<-function(true_values=NULL,
     metric_values["kendall"]=irr::kendall(ratings=cbind(true_values,predicted_values),
                                                   correct=TRUE)$value
 
-    if(length(table(predicted_values))<=1){
+    if(length(table(predicted_values))>1){
       metric_values["kappa2_unweighted"]=irr::kappa2(ratings=cbind(true_values,predicted_values),
                                                      weight = "unweighted",
                                                      sort.levels = FALSE)$value
@@ -865,13 +865,13 @@ get_n_chunks<-function(text_embeddings,features,times){
   if(length(dim(text_embeddings))==2){
     for(i in 1:times){
       window<-c(1:features)+(i-1)*features
-      sub_matrix<-text_embeddings[,window]
+      sub_matrix<-text_embeddings[,window,drop=FALSE]
       tmp_sums<-rowSums(abs(sub_matrix))
       n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
     }
   } else if (length(dim(text_embeddings))==3){
     for(i in 1:times){
-      sub_matrix<-text_embeddings[,i,]
+      sub_matrix<-text_embeddings[,i,,drop=FALSE]
       tmp_sums<-rowSums(abs(sub_matrix))
       n_chunks<-n_chunks+as.numeric(!tmp_sums==0)
     }

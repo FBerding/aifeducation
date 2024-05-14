@@ -1,6 +1,10 @@
 import tensorflow as tf
 import keras
 
+def extract_sample_weight(inputs, labels):
+    weight = inputs.pop("sample_weights")
+    return inputs, labels, weight
+
 @keras.saving.register_keras_serializable(package="aifeducation")
 class TransformerEncoder(keras.layers.Layer):
   def __init__(self, embed_dim, dense_dim, num_heads,dropout_rate, **kwargs):
