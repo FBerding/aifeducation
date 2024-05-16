@@ -4,13 +4,14 @@
 #'This function creates synthetic cases for balancing the training with an
 #'object of the class \link{TextEmbeddingClassifierNeuralNet}.
 #'
-#'@param embedding Named \code{data.frame} containing the text embeddings.
-#'In most cases, this object is taken from \link{EmbeddedText}$embeddings.
+#'@param matrix_form Named \code{matrix} containing the text embeddings in a matrix form.
 #'@param target Named \code{factor} containing the labels of the corresponding embeddings.
 #'@param times \code{int} for the number of sequences/times.
 #'@param features \code{int} for the number of features within each sequence.
+#'@param sequence_length \code{int} Length of the text embedding sequences.
 #'@param method \code{vector} containing strings of the requested methods for generating new cases.
 #'Currently "smote","dbsmote", and "adas" from the package smotefamily are available.
+#'@param min_k \code{int} The minimal number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
 #'@return \code{list} with the following components.
 #'\itemize{
@@ -88,7 +89,6 @@ get_synthetic_cases_from_matrix<-function(matrix_form,
                                    method=method[m],
                                    selected_cases=idx,
                                    chunks=current_seq_length,
-                                   max_freq=max_freq,
                                    k_s=length(min_k_final:max_k_final),
                                    max_k=max_k_final)
               index=index+1
@@ -100,7 +100,6 @@ get_synthetic_cases_from_matrix<-function(matrix_form,
                                  method=method[m],
                                  selected_cases=idx,
                                  chunks=current_seq_length,
-                                 max_freq=max_freq,
                                  k_s=1,
                                  max_k=0)
             index=index+1
@@ -121,7 +120,6 @@ get_synthetic_cases_from_matrix<-function(matrix_form,
       k=input[[index]]$k,
       method=input[[index]]$method,
       cat=input[[index]]$cat,
-      max_freq=input[[index]]$max_freq,
       k_s=input[[index]]$k_s,
       max_k=input[[index]]$max_k)
   }
@@ -180,11 +178,14 @@ get_synthetic_cases_from_matrix<-function(matrix_form,
 #'function for use with \link{get_synthetic_cases} to allow parallel
 #'computations.
 #'
-#'@param embedding Named \code{data.frame} containing the text embeddings.
+#'@param matrix_form Named \code{matrix} containing the text embeddings in matrix form.
 #'In most cases this object is taken from \link{EmbeddedText}$embeddings.
 #'@param target Named \code{factor} containing the labels/categories of the corresponding cases.
+#'@param required_cases \code{int} Number of cases necessary to fill the gab between the frequency
+#'of the class under investigation and the major class.
 #'@param k \code{int} The number of nearest neighbors during sampling process.
 #'@param max_k \code{int} The maximum number of nearest neighbors during sampling process.
+#'@param k_s \code{int} Number of ks in the complete generation process.
 #'@param method \code{vector} containing strings of the requested methods for generating new cases.
 #'Currently "smote","dbsmote", and "adas" from the package smotefamily are available.
 #'@param cat \code{string} The category for which new cases should be created.
@@ -203,7 +204,6 @@ create_synthetic_units_from_matrix<-function(matrix_form,
                                  k,
                                  method,
                                  cat,
-                                 max_freq,
                                  k_s,
                                  max_k){
 

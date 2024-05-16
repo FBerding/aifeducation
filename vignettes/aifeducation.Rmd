@@ -32,8 +32,8 @@ These packages can be used with a 'normal' computer and provide an easy
 installation. In terms of natural language processing, these approaches
 are currently limited. State-of-the-art approaches rely on neural nets
 with multiple layers and consist of a huge number of parameters making
-them computationally demanding. With specialized libraries such as keras, PyTorch
-and tensorflow, graphical processing units (gpu) can help to speed up
+them computationally demanding. With specialized libraries such as *keras*, *PyTorch*
+and *tensorflow*, graphical processing units (gpu) can help to speed up
 computations significantly. However, many of these specialized libraries
 for machine learning are written in python. Fortunately, an interface to
 python is provided via the *R* package
@@ -45,7 +45,7 @@ researchers a convincing interface to these state-of-the-art models for
 natural language processing and tries to address the special needs and
 challenges of the educational and social sciences. The package currently
 supports the application of Artificial Intelligence (AI) for tasks such
-as text embedding, classification, and question answering.
+as text embedding and classification.
 
 Since state-of-the-art approaches in natural language processing rely on
 large models compared to classical statistical methods (e.g., latent
@@ -100,7 +100,7 @@ reticulate::install_miniconda()
 
 ## Step 4 - Install Support for Graphic Devices
 
-PyTorch and tensorflow as underlying machine learning backend run on MacOS,
+*PyTorch* and *tensorflow* as underlying machine learning backend run on MacOS,
 Linux, and Windows. However, there are some limitations for accelerate
 computations with graphic cards. The following table provides an overview.
 
@@ -115,10 +115,10 @@ computations with graphic cards. The following table provides an overview.
 
 If you have a suitable machine and would like to use a graphic card for computations you need to install
 some further software. If not you can skip this step. A list with links to downloads can be found here if you would
-like to use tensorflow as machine learning framework:
+like to use *tensorflow* as machine learning framework:
 https://www.tensorflow.org/install/pip#linux
 
-If you would like to use PyTorch as framework you can find further
+If you would like to use *PyTorch* as framework you can find further
 information here: https://pytorch.org/get-started/locally/
 
 In general you need
@@ -140,21 +140,12 @@ libraries. For convenience, *aifeducation* comes with an auxiliary
 function `install_py_modules()` doing that for you.
 
 ```{r, include = TRUE, eval=FALSE}
-#For Linux
 aifeducation::install_py_modules(envname="aifeducation",
                                  install="all",
                                  remove_first=FALSE,
                                  tf_version="<=2.15",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=FALSE)
-
-#For Windows and MacOS
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=FALSE,
-                                 tf_version="<=2.15",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
 
 ```
 
@@ -194,7 +185,7 @@ other environments, please ensure that these python modules are
 available. For gpu support some further packages are installed.
 
 With `check_aif_py_modules()` you can check, if all modules are
-successfully installed or a specific machine learning framework.
+successfully installed for a specific machine learning framework.
 
 ```{r, include = TRUE, eval=FALSE}
 aifeducation::check_aif_py_modules(print=TRUE,
@@ -218,7 +209,7 @@ graphic device for their work. Thus, some additional configuration can
 be done to get computations working on your machine.
 
 If you do use a computer that does own a graphic device, but you would like to use cpu only
-you can disable the graphic device support of tensorflow with the function
+you can disable the graphic device support of *tensorflow* with the function
 `set_config_cpu_only()`.
 
 ```{r, include = TRUE, eval=FALSE}
@@ -239,7 +230,7 @@ This enables your machine to compute 'large' models with limited
 resources. For 'small' models, this option is not relevant since it
 decreases the computational speed.
 
-Finally, in some cases you might want to disable tensorflow to print
+Finally, in some cases you might want to disable *tensorflow* to print
 information on the console. You can change the behavior with the
 function `set_config_tf_logger()`. 
 
@@ -251,7 +242,7 @@ You can choose between five levels
 "FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
 for logging.
 
-# 3 Starting a New Session
+# 3) Starting a New Session
 Before you can work with *aifeducation* you must set up a new *R*
 session. First, it is necessary that you load the library. Second, you
 must set up python via reticulate. In case you installed python as
@@ -279,9 +270,9 @@ again or by passing the framework to the `ml_framework` argument of a function
 or method. Please note that not all models are available for both frameworks and 
 that the weights of trained models cannot be shared across frameworks for all models.
 
-In the case that you would like to use tensorflow now is a good time to 
+In the case that you would like to use *tensorflow* now is a good time to 
 configure that backend, since some configurations
-can only be done **before** tensorflow is used the first time.
+can only be done **before** *tensorflow* is used the first time.
 
 ```{r, include = TRUE, eval=FALSE}
 #if you would like to use only cpus
@@ -318,36 +309,12 @@ libraries into a fresh environment. This can be done by setting `remove_first=TR
 in `install_py_modules`.
 
 ```{r, include = TRUE, eval=FALSE}
-#For Linux
 aifeducation::install_py_modules(envname="aifeducation",
                                  install="all",
                                  remove_first=TRUE,
-                                 tf_version="<=2.14",
+                                 tf_version="<=2.15",
                                  pytorch_cuda_version = "12.1"
                                  cpu_only=FALSE)
-
-#For Windows with gpu support
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.10",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=FALSE)
-#For Windows without gpu support
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.14",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
-
-#For MacOS
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.14",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
 ```
 
 

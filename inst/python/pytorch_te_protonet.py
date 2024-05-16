@@ -96,7 +96,7 @@ class ProtoNetLossWithMargin_PT(torch.nn.Module):
     return loss
 
 class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
-  def __init__(self,features, times, hidden, rec, intermediate_size,
+  def __init__(self,features, times, hidden, rec,rec_type, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
   add_pos_embedding, self_attention_heads, target_levels,embedding_dim):
     
@@ -145,6 +145,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
       times=times,
       hidden=hidden, 
       rec=rec, 
+      rec_type=rec_type,
       intermediate_size=intermediate_size,
       attention_type=attention_type, 
       repeat_encoder=repeat_encoder, 

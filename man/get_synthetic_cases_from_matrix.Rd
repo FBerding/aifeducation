@@ -16,19 +16,22 @@ get_synthetic_cases_from_matrix(
 )
 }
 \arguments{
+\item{matrix_form}{Named \code{matrix} containing the text embeddings in a matrix form.}
+
 \item{times}{\code{int} for the number of sequences/times.}
 
 \item{features}{\code{int} for the number of features within each sequence.}
 
 \item{target}{Named \code{factor} containing the labels of the corresponding embeddings.}
 
+\item{sequence_length}{\code{int} Length of the text embedding sequences.}
+
 \item{method}{\code{vector} containing strings of the requested methods for generating new cases.
 Currently "smote","dbsmote", and "adas" from the package smotefamily are available.}
 
-\item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
+\item{min_k}{\code{int} The minimal number of nearest neighbors during sampling process.}
 
-\item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases, this object is taken from \link{EmbeddedText}$embeddings.}
+\item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
 }
 \value{
 \code{list} with the following components.

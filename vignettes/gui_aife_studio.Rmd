@@ -1,9 +1,9 @@
 ---
-title: "02a Using Aifeducation Studio"
+title: "02 Using the graphical user interface Aifeducation - Studio"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{02a Graphical User Interface}
+  %\VignetteIndexEntry{02 Graphical user interface}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -30,11 +30,12 @@ with *R* or those who do not have coding skills in relevant languages
 (e.g., python). For more experienced users, the interface provides a
 convenient way for working with AI in an educational context.
 
-This article overlaps with vignette [02b Classification
-Tasks](classification_tasks.html), which explains how to use the package
+This article overlaps with vignette 
+[03 Using R syntax](classification_tasks.html),
+which explains how to use the package
 with *R* syntax. We assume that *aifeducation* is installed as described
-in vignette [01 Get
-Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
+in vignette 
+[01 Get Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 The introduction starts with a brief explanation of basic concepts,
 which are necessary to work with this package.
 
@@ -191,9 +192,9 @@ starts. To change the framework you have to restart *Aifeducation Studio*.
 ![Figure 4: Start Page](img_articles/gui_aife_studio_config.jpg){width="100%"}
 
 Depending on the chosen framework, you can activate some further
-settings (box *Machine Learning Framework*). If you would like to use tensorflow and your
+settings (box *Machine Learning Framework*). If you would like to use *tensorflow* and your
 computer has a graphic device with low memory, we recommend to activate
-the option for low memory. For pytorch, no configuration is necessary.
+the option for low memory. For *pytorch*, no configuration is necessary.
 
 On the right side of the start page, you can decide if energy
 consumption should be recorded during training AI (box *Sustainability Tracking*). 
@@ -302,7 +303,7 @@ resulting in high computational time, it is recommended to use
 pre-trained models. These can be found on
 [Huggingface](https://huggingface.co/). Sometimes, however, it is more
 straightforward to create a new model to fit a specific purpose.
-Aifeducation Studio supports the opportunitiy to both create and
+Aifeducation Studio supports the opportunity to both create and
 train/fine-tune base models.
 
 ### 3.2.2 Creation of Base Models
@@ -378,7 +379,8 @@ train a model, you must first provide a collection of raw texts (box *Raw Texts*
 We recommend that you create this collection of texts as described
 in section 3.1.1.
 
-Next you can configure the training of your base model (box *Train and Tune Settings*):
+Next you can configure the training of your base model (box *Train and Tune Settings*).
+Possible options depend on the kind of model.
 
 -   **Chunk Size:** For training and validating a base model, the raw
     texts are split into several smaller texts. This value determines
@@ -431,7 +433,22 @@ amount of data, and the capacities of your machine.
 
 The text embedding model is the interface to *R* in *aifeducation*. In
 order to create a new model, you need a base model that provides the
-ability to understand natural language. You can open the creation page
+ability to understand natural language. This object contains all relevant
+information for transforming raw texts into a numeric representation
+that can be used for machine learning.
+
+In *aifedcuation*, the transformation of raw texts into numbers is a
+separate step from downstream tasks such as classification. This is to
+reduce computational time on machines with low performance. By
+separating text embedding from other tasks, the text embedding has to be
+calculated only once and can be used for different tasks at the same
+time. Another advantage is that the training of the downstream tasks
+involves only the downstream tasks an not the parameters of the
+embedding model, making training less time-consuming, thus decreasing
+computational intensity. Finally, this approach allows the analysis of
+long documents by applying the same algorithm to different parts.
+
+You can open the creation page
 by clicking on "Create" in the section "Text Embedding Model" 
 via "Language Modeling" (see Figure 5). Figure 12 shows the corresponding page.
 
@@ -654,11 +671,13 @@ of this introduction. Here we can only provide an overview.
     positional embedding to your classifier. This provides the neural
     network with the ability to take the order within a sequence into
     account.
+    
 -   **Encoding Layers:** These layers are similar to encoding layers
     used in some transformer models, allowing to calculate
     context-sensitive text embeddings. That is, they provide your
     classifier with the ability to take the surrounding text chunks (see
     section 3.3.1) of the sequences into account.
+    
 -   **Recurrent Layers:** This section allows you to add recurrent
     layers to your classifier. These layers are able to account for the
     order within a sequence. In order to add these layers, just pass the
@@ -667,9 +686,11 @@ of this introduction. Here we can only provide an overview.
     determines the number of neurons. Below the field you can see what
     *Aifeducation Studio* does with your input. This is helpful to avoid
     invalid specifications of layers.
+    
 -   **Dense Layers:** In this section you can add dense layers to your
     network. The process to add layers is similar to the process of
     recurrent layers.
+    
 -   **Optimizer:** Here you can choose between different optimizers for
     training.
 
@@ -683,106 +704,82 @@ only provide an overview.
     adjusted to the absolute frequencies of the classes/categories
     according to the 'Inverse Class Frequency' method. This option
     should be activated if you have to deal with imbalanced data.
+    
+-   **Balance Sequence Length**: Activating this
+    option can increase performance if you have to deal with texts that
+    differ in their lengths and have an imbalanced frequency. If this option is 
+    enabled, the loss is adjusted to the absolute frequencies of length of your texts
+    according to the 'Inverse Class Frequency' method. 
+    
 -   **Number of Folds:** The number of folds used for estimating the
     performance of your classifier.
+    
 -   **Proportion for Validation Sample:** The percentage of cases within
     each fold used as a validation sample. This sample is used to
     determine the state of the model that generalizes best.
+    
 -   **Epochs:** Maximal number of epochs. During training, the model
     with the best balanced accuracy is saved and used.
+    
 -   **Batch Size:** The number of cases that should be processed
     simultaneously. Please adjust this value to your machine's
     capacities. Please note that the batch size can have an impact on
     the classifier's performance.
 
-**Section: Baseline Model**
-
--   **Calculate Baseline Model:** If active, the performance of a
-    baseline model is estimated. This does not include *Balanced Pseudo
-    Labeling* and *Balanced Synthetic Cases*.
-
-**Section: Balanced Synthetic Cases**
+**Section: Synthetic Cases**
 
 -   **Add Synthetic Cases:** If active, the creation of additional
-    synthetic cases is applied during training, they are added to the
+    synthetic cases is applied during training. They are added to the train
     data. The way these cases are generated can be configured with the
     following parameters:
-    -   **Number of Cores:** The number of cores which can be used for
-        generating the synthetic cases. A higher number can speed up the
-        training process.
-    -   **Method:** The method which should be used for generating the
-        cases.
-    -   **Max k:** The maximum number of neighbors used for generating
-        the synthetic cases. The algorithm will create cases up to this
-        and draw a random sample from it.
-    -   **Proportion for Validation Sample:** The percentage of
-        synthetic cases which should be added to the validation sample
-        instead of the training sample.
--   **Add All Synthetic Cases:** If enabled, all synthetic cases are
-    added. If disabled, only the given number of cases is added to the
-    sample to ensure a balanced frequency of all classes/categories.
+    
+-   **Method:** The method which should be used for generating the
+    cases.
+    
+-   **Min k:** The minimal number of neighbors used for generating
+    the synthetic cases.
+    
+-   **Max k:** The maximum number of neighbors used for generating
+    the synthetic cases. 
 
-**Section: Balanced Pseudo-Labeling**
+The algorithm will generate a number of synthetic cases for every class to ensure
+that the number of cases for every class equals the number of cases of the majority 
+class. The synthetic cases for every class a generated for all *k* between *Min k* and
+*Max k*. Every *k* contributes proportional to the synthetic cases.
+
+
+**Section: Pseudo-Labeling**
 
 -   **Add Pseudo Labeling:** If activated, pseudo-labeling is used
-    during training. The way pseudo-labeling is applied can be
+    during training as described by Cascante-Bonilla et
+    al. (2020). The way pseudo-labeling is applied can be
     configured with the following parameters:
 
-    -   **Max Steps:** The number of steps during pseudo-labeling. For
-        example, in the first step, 1/Max Steps pseudo-labeled cases are
-        added, in the second step, 2/Max Steps pseudo-labeled cases are
-        added, etc.. Which cases are added can be influenced by *Balance
-        Pseudo-Labels*, *Certainty Anchor*, *Max Certainty Value*, and
-        *Min Certainty Value*.
+-   **Max Steps:** The number of steps during pseudo-labeling. For
+    example, in the first step, 1/Max Steps pseudo-labeled cases are
+    added, in the second step, 2/Max Steps pseudo-labeled cases are
+    added, etc.. Which cases are added can be influenced by *Balance
+    Pseudo-Labels*, *Certainty Anchor*, *Max Certainty Value*, and
+    *Min Certainty Value*.
 
-    -   **Balance Pseudo-Labels:** If this option is active, the same
-        number of pseudo-labeled cases is added for every
-        class/category. In general, this number is determined by the
-        class with the smallest absolute frequency.
+-   **Certainty Anchor:** This value determines the reference point
+    for choosing pseudo-labeled cases. 1 refers to perfect
+    certainty, 0 refers to a certainty similar to random guessing.
+    Selected are the cases that are closest to this value.
 
-    -   **Certainty Anchor:** This value determines the reference point
-        for choosing pseudo-labeled cases. 1 refers to perfect
-        certainty, 0 refers to a certainty similar to random guessing.
-        Selected are the cases that are closest to this value.
+-   **Max Certainty Value:** Pseudo-labeled cases exceeding this
+    value are not included during training.
 
-    -   **Max Certainty Value:** Pseudo-labeled cases exceeding this
-        value are not included during training.
-
-    -   **Min Certainty Value:** Pseudo-labeled cases falling bellow
-        this value are not included during training.
-
-    -   **Reset Model After Every Step:** If enabled, the classier is
-        set to an untrained state. This can prevent over-fitting.
-
-    -   **Dynamic Weight Increase**: If enabled, the sample weights of
-        the pseudo-labeled cases increase with every step. The weights
-        are determined with *Start Weights* and *Weight Increase per
-        Step*.
-
-    -   **Start Weights:** Initial value for the sample weights of the
-        included pseudo-labeled cases.
-
-    -   **Weight Increase per Step:** Value determining how much the
-        sample weights are increased for the included pseudo-labeled
-        cases in every step.
+-   **Min Certainty Value:** Pseudo-labeled cases falling bellow
+    this value are not included during training.
 
 We recommend to use pseudo-labeling as described by Cascante-Bonilla et
 al. (2020). Therefore, the following parameters have to be set:
 
--   `bpl_max_steps = 5` (splits the unlabeled data into five chunks)
--   `bpl_dynamic_inc = TRUE` (ensures that the number of used chunks
-    increases at every step)
--   `bpl_model_reset = TRUE` (re-initializes the model for every step)
--   `bpl_epochs_per_step=30` (number of training epochs within each
-    step)
--   `bpl_balance=FALSE` (ensures that the cases with the highest
-    certainty are added to training regardless of the absolute
-    frequencies of the classes)
--   `bpl_weight_inc=0.00` and `bpl_weight_start=1.00` (ensures that
-    labeled and unlabeled data have the same weight during training)
--   `bpl_max=1.00`, `bpl_anchor=1.00`, and `bpl_min=0.00` (ensures that
-    all unlabeled data is considered for training and that cases with
-    the highest certainty are used for training.)
+-   Max Steps = 5 
+-   Max Certainty Value=1.00 
+-   Certainty Anchor=1.00
+-   Min Certainty Value=0.00
 
 
 [![Figure 20: Classifier - Creation Part 3](img_articles/gui_aife_studio_classifier_create_part_3.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_create_part_3.jpg)

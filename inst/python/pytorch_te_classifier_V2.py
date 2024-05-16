@@ -78,13 +78,31 @@ class BiDirectionalGRU_PT(torch.nn.Module):
   def forward(self,x):
     result=self.gru_layer(x)
     return result[0]
+  
+class BiDirectionalLSTM_PT(torch.nn.Module):
+  def __init__(self,input_size,hidden_size):
+    super().__init__()
+    self.input_size=input_size
+    self.hidden_size=hidden_size
+    
+    self.lstm_layer=torch.nn.LSTM(
+    input_size= self.input_size,
+    hidden_size=self.hidden_size,
+    bias=True,
+    batch_first=True,
+    dropout=0.0,
+    bidirectional=True)
+    
+  def forward(self,x):
+    result=self.lstm_layer(x)
+    return result[0]
 
 class FourierTransformation_PT(torch.nn.Module):
   def __init__(self):
     super().__init__()
     
   def forward(self,x):
-    return torch.real(torch.fft.fft2(x))
+    return torch.real(torch.fft.fft(torch.fft.fft(input=x,dim=2),dim=1))
   
 class FourierEncoder_PT(torch.nn.Module):
   def __init__(self, dense_dim, features, dropout_rate):
@@ -202,7 +220,7 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
   
 
 class TextEmbeddingClassifier_PT(torch.nn.Module):
-  def __init__(self,features, times, hidden, rec, intermediate_size,
+  def __init__(self,features, times, hidden, rec, rec_type, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
   add_pos_embedding, self_attention_heads, target_levels,classification_head=True):
     
@@ -257,15 +275,27 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
       for i in range(n_rec):
         layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
         if i==0:
-          layer_list.update({"bidirectional_"+str(i+1):
-            BiDirectionalGRU_PT(
-              input_size=current_size,
-              hidden_size=rec[i])})
+          if rec_type=="gru":
+            layer_list.update({"bidirectional_gru_"+str(i+1):
+              BiDirectionalGRU_PT(
+                input_size=current_size,
+                hidden_size=rec[i])})
+          elif rec_type=="lstm":
+            layer_list.update({"bidirectional_lstm_"+str(i+1):
+              BiDirectionalLSTM_PT(
+                input_size=current_size,
+                hidden_size=rec[i])})
         else:
-          layer_list.update({"bidirectional_"+str(i+1):
-            BiDirectionalGRU_PT(
-              input_size=2*rec[i-1],
-              hidden_size=rec[i])})
+          if rec_type=="gru":
+            layer_list.update({"bidirectional_gru_"+str(i+1):
+              BiDirectionalGRU_PT(
+                input_size=2*rec[i-1],
+                hidden_size=rec[i])})
+          elif rec_type=="lstm":
+            layer_list.update({"bidirectional_lstm_"+str(i+1):
+              BiDirectionalLSTM_PT(
+                input_size=2*rec[i-1],
+                hidden_size=rec[i])})
         layer_list.update({"unpackandmasking_"+str(i+1):UnPackAndMasking_PT(sequence_length=times)})
         
         if i!=(n_rec-1):

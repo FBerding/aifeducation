@@ -6,7 +6,7 @@
 \value{
 Objects of this class are used for ensuring the correct data management
 for training different types of classifier. Objects of this class are also used
-for data augmentation by creating synthetic cases with different techniques. DataManager
+for data augmentation by creating synthetic cases with different techniques. DataManagerClassifier
 are used with \link{TEClassifierRegular} and \link{TEClassifierProtoNet}.
 }
 \description{
@@ -24,10 +24,10 @@ Other Classification:
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{config}}{('list')\cr
-Field for storing configuration of the DataManager.}
+Field for storing configuration of the DataManagerClassifier.}
 
 \item{\code{state}}{('list')\cr
-Field for storing the current state of the DataManager.}
+Field for storing the current state of the DataManagerClassifier.}
 
 \item{\code{datasets}}{('list')\cr
 Field for storing the data sets used during training. All elements of the
@@ -48,7 +48,7 @@ for labeled and unlabeled data are separated.}
 Field for storing the assignment of every cases to a train, validation or
 test data set depending on the concrete fold. Only the indexes and not the
 names are stored. In addition, the list contains the assignment for the final
-training which excludes a test data set. If the DataManager uses \eqn{i} folds the
+training which excludes a test data set. If the DataManagerClassifier uses \eqn{i} folds the
 sample for the final training can be requested with \eqn{i+1}.}
 }
 \if{html}{\out{</div>}}
@@ -98,7 +98,7 @@ Creating a new instance of this class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{data_embeddings}}{Object of class \link{EmbeddedText} from which
-the DataManager should be created.}
+the DataManagerClassifier should be created.}
 
 \item{\code{data_targets}}{\code{Factor} containing the labels for cases
 stored in \code{data_embeddings}. Factor must be named and has to use the
@@ -132,20 +132,20 @@ synthetic cases.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Method retuns an initalized object of class \code{DataManager}.
+Method retuns an initalized object of class \code{DataManagerClassifier}.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DataManagerClassifier-get_config"></a>}}
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_config}{}}}
 \subsection{Method \code{get_config()}}{
-Method for requesting the configuration of the DataManager.
+Method for requesting the configuration of the DataManagerClassifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$get_config()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Returns a \code{list} storing the configuration of the DataManager.
+Returns a \code{list} storing the configuration of the DataManagerClassifier.
 }
 }
 \if{html}{\out{<hr>}}
@@ -196,7 +196,7 @@ the test data set is always empty (\code{NULL}).
 \if{html}{\out{<a id="method-DataManagerClassifier-set_state"></a>}}
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-set_state}{}}}
 \subsection{Method \code{set_state()}}{
-Method for setting the current state of the DataManager.
+Method for setting the current state of the DataManagerClassifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$set_state(iteration, step = NULL)}\if{html}{\out{</div>}}
 }
@@ -223,14 +223,14 @@ of the DataManaeger.
 \if{html}{\out{<a id="method-DataManagerClassifier-get_n_folds"></a>}}
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_n_folds}{}}}
 \subsection{Method \code{get_n_folds()}}{
-Method for requesting the number of folds the DataManager can
+Method for requesting the number of folds the DataManagerClassifier can
 use with the current data.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$get_n_folds()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Returns the number of folds the DataManager uses.
+Returns the number of folds the DataManagerClassifier uses.
 }
 }
 \if{html}{\out{<hr>}}
@@ -265,7 +265,7 @@ The rows contain the length of the sequences while the columns contain the label
 \if{html}{\out{<a id="method-DataManagerClassifier-get_dataset"></a>}}
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_dataset}{}}}
 \subsection{Method \code{get_dataset()}}{
-Method for requesting a data set for training depending in the current state of the DataManager.
+Method for requesting a data set for training depending in the current state of the DataManagerClassifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$get_dataset(
   inc_labeled = TRUE,
@@ -300,7 +300,7 @@ corresponding test data set with \link{get_test_dataset}.
 \if{html}{\out{<a id="method-DataManagerClassifier-get_val_dataset"></a>}}
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_val_dataset}{}}}
 \subsection{Method \code{get_val_dataset()}}{
-Method for requesting a data set for validation depending in the current state of the DataManager.
+Method for requesting a data set for validation depending in the current state of the DataManagerClassifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$get_val_dataset()}\if{html}{\out{</div>}}
 }
@@ -316,7 +316,7 @@ the corresponding data set for testing with \link{get_test_dataset}.
 \if{html}{\out{<a id="method-DataManagerClassifier-get_test_dataset"></a>}}
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_test_dataset}{}}}
 \subsection{Method \code{get_test_dataset()}}{
-Method for requesting a data set for testing depending in the current state of the DataManager.
+Method for requesting a data set for testing depending in the current state of the DataManagerClassifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$get_test_dataset()}\if{html}{\out{</div>}}
 }
@@ -333,7 +333,7 @@ the corresponding data set for validation with \link{get_val_dataset}.
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-create_synthetic}{}}}
 \subsection{Method \code{create_synthetic()}}{
 Method for generating synthetic data used during training. The process uses
-all labeled data belonging to the current state of the DataManager.
+all labeled data belonging to the current state of the DataManagerClassifier.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$create_synthetic(trace = TRUE, inc_pseudo_data = FALSE)}\if{html}{\out{</div>}}
 }

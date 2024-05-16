@@ -1,0 +1,86 @@
+---
+title: "04 Optimal model configuration"
+author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{04 model configuration}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(aifeducation)
+```
+
+# 1 Introduction and Overview
+Training an AI model requires a lot of data,  is time, and energy consuming. In general
+several configurations for a model have to be tested before the best performing model
+is achieved. Thus, it is very important to choose a good starting configuration to
+avoid unnecessary computations and time investments. With the help of this vignette
+we would like to present research results that provide rules of thumb for creating 
+AI models that are efficient in computation and offer the potential for a good performance.
+
+The vignette is structured according to the three main objects that are used in *aifeducation*. 
+These are the *base models*, the *text embedding models* and the *classifiers.*
+
+# 2 Base Models
+The base models are the core models for understanding natural language. 
+Assuming that researchers from educational and social sciences have access only to limited data
+and computational resources AI models should be as small and efficient as possible. 
+In recent years researchers generated some insights into how language models can
+reduced in size without loosing to much performance. In the following we present some
+of these concepts that can be realised with *aifeducation*.
+
+**Vocabulary and embedding matrix**
+
+A first step in creating a language model is to generate a vocabulary that is used
+to split text into tokens. With the help of an embedding matrix these tokens are
+translated into a numerical representation. In the original study by 
+Devlin et al. (2019, p. 4174) the BERT model used a vocabulary size of 30,000 tokens.
+In the study conducted by Zhao et al. (2019, p.2) they calculated a vocabulary with
+about 5,000 tokens that was able to completely cover the textual data. Furthermore,
+they calculated a vocabulary with about 30,000 tokens that included about 94% of the
+tokens of the small vocabulary. Thus, the smaller vocabulary has the potential to represent
+the textual data in a more efficient way. Chen et al. (2019, p. 3494) report study results
+showing  that for classification task a vocabulary size for 100 to 999 tokens can 
+be enough for a reasonable performance while a vocabulary size of 1,000 to 10,000 is 
+required for natural language inference. Gowda and May (2020, p. 3960) revealed that
+for small and medium data sizes a vocabulary of 8,000 tokens provides good performance.
+While a large vocabulary is able to represent rare words better words with a higher
+frequency are even covered well with a smaller vocabulary (Ganesh et al. 2021, p. 1070).
+Thus, we recommend to try a the vocabulary size of 10,000.
+
+The study by Wies et al. (2021) investigates the relationship between the
+vocabulary size, the dimension of the embedding matrix, and the width/depth 
+of a transformer model (hidden size and number of layers). They are able to show
+that the size and the dimension of the embedding matrix should be equal or 
+higher as the hidden size of the transformer model. As explained in the 
+paragraph before the vocabulary size will 
+be greater as 1,000. Thus, the dimension of the embedding matrix should be equal
+or higher as the hidden size. Since *aifeducation* relies on the 
+*transformers* library all base models implemented in *aifeducation* use
+the hidden size as dimension for the embedding matrix ensuring that they equal in size.
+Thus, this recommendation is always satisfied. 
+
+
+
+
+
+
+
+
+
+Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
+Pre-training of Deep Bidirectional Transformers for Language
+Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
+Proceedings of the 2019 Conference of the North (pp. 4171--4186).
+Association for Computational Linguistics.
+<https://doi.org/10.18653/v1/N19-1423>
+

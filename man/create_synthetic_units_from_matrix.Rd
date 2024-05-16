@@ -11,13 +11,18 @@ create_synthetic_units_from_matrix(
   k,
   method,
   cat,
-  max_freq,
   k_s,
   max_k
 )
 }
 \arguments{
+\item{matrix_form}{Named \code{matrix} containing the text embeddings in matrix form.
+In most cases this object is taken from \link{EmbeddedText}$embeddings.}
+
 \item{target}{Named \code{factor} containing the labels/categories of the corresponding cases.}
+
+\item{required_cases}{\code{int} Number of cases necessary to fill the gab between the frequency
+of the class under investigation and the major class.}
 
 \item{k}{\code{int} The number of nearest neighbors during sampling process.}
 
@@ -26,10 +31,9 @@ Currently "smote","dbsmote", and "adas" from the package smotefamily are availab
 
 \item{cat}{\code{string} The category for which new cases should be created.}
 
-\item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
+\item{k_s}{\code{int} Number of ks in the complete generation process.}
 
-\item{embedding}{Named \code{data.frame} containing the text embeddings.
-In most cases this object is taken from \link{EmbeddedText}$embeddings.}
+\item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
 
 \item{cat_freq}{Object of class \code{"table"} containing the absolute frequencies
 of every category/label.}

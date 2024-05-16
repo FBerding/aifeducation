@@ -16,6 +16,9 @@
     <loc>/articles/index.html</loc>
   </url>
   <url>
+    <loc>/articles/model_configuration.html</loc>
+  </url>
+  <url>
     <loc>/articles/sharing_and_publishing.html</loc>
   </url>
   <url>
@@ -79,6 +82,12 @@
     <loc>/reference/create_synthetic_units.html</loc>
   </url>
   <url>
+    <loc>/reference/create_synthetic_units_from_matrix.html</loc>
+  </url>
+  <url>
+    <loc>/reference/DataManagerClassifier.html</loc>
+  </url>
+  <url>
     <loc>/reference/EmbeddedText.html</loc>
   </url>
   <url>
@@ -98,6 +107,9 @@
   </url>
   <url>
     <loc>/reference/get_synthetic_cases.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_synthetic_cases_from_matrix.html</loc>
   </url>
   <url>
     <loc>/reference/get_train_test_split.html</loc>
@@ -148,6 +160,12 @@
     <loc>/reference/summarize_tracked_sustainability.html</loc>
   </url>
   <url>
+    <loc>/reference/TEClassifierProtoNet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/TEClassifierRegular.html</loc>
+  </url>
+  <url>
     <loc>/reference/test_classifier_sustainability.html</loc>
   </url>
   <url>
@@ -185,5 +203,8 @@
   </url>
   <url>
     <loc>/reference/update_aifeducation_progress_bar_steps.html</loc>
+  </url>
+  <url>
+    <loc>/reference/vignette_classifier.html</loc>
   </url>
 </urlset>

@@ -1,3 +1,14 @@
+#' Vignette classifier
+#'
+#' An object of class \code{TEClassifierRegular} trained with the a subset of
+#' the Standford Movie Review Dataset. The purpose of classifier is for illustration
+#' in vignettes.
+#'
+#' @docType data
+#' @format R6
+#' @keywords internal
+"vignette_classifier"
+
 #' Test metric for an example classifier
 #'
 #' A matrix of 4 rows and 17 columns containing test metrics for an example

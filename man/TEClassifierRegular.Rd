@@ -54,6 +54,7 @@ every fold and step (in case of pseudo-labeling).}
 The values represent the mean values for every fold.}
 \item{\code{reliability$raw_iota_objects: }List containing all iota_object generated with the package \code{iotarelr}
 for every fold at the end of the last training.}
+}
 \itemize{
 \item{\code{reliability$raw_iota_objects$iota_objects_end: }List of objects with class \code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the final model
@@ -62,13 +63,13 @@ for every fold.}
 estimated iota reliability of the second generation for the final model
 for every fold. Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-}
-}
 \item{\code{reliability$iota_object_end: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
-for every fold.
+for every fold.}
 \item{\code{reliability$iota_object_end_free: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
 for every fold. Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+}
+\itemize{
 \item{\code{reliability$standard_measures_end: }Object of class \code{list} containing the final
 measures for precision, recall, and f1 for every fold.}
 \item{\code{reliability$standard_measures_mean: }\code{matrix} containing the mean
@@ -116,6 +117,7 @@ Creating a new instance of this class.
   targets = NULL,
   hidden = c(128),
   rec = c(128),
+  rec_type = "gru",
   self_attention_heads = 0,
   intermediate_size = NULL,
   attention_type = "fourier",
@@ -153,6 +155,9 @@ set this parameter to \code{NULL}.}
 \item{\code{rec}}{\code{vector} containing the number of neurons for each recurrent layer.
 The length of the vector determines the number of dense layers. If you want no dense layer,
 set this parameter to \code{NULL}.}
+
+\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type="gru"} for
+Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.}
 
 \item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads
 for a self-attention layer. Only relevant if \code{attention_type="multihead"}}

@@ -53,6 +53,7 @@ TEClassifierRegular<-R6::R6Class(
     #'The values represent the mean values for every fold.}
     #'\item{\code{reliability$raw_iota_objects: }List containing all iota_object generated with the package \code{iotarelr}
     #'for every fold at the end of the last training.}
+    #'}
     #'\itemize{
     #'\item{\code{reliability$raw_iota_objects$iota_objects_end: }List of objects with class \code{iotarelr_iota2} containing the
     #'estimated iota reliability of the second generation for the final model
@@ -61,13 +62,13 @@ TEClassifierRegular<-R6::R6Class(
     #'estimated iota reliability of the second generation for the final model
     #'for every fold. Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-    #'}
-    #'}
     #'\item{\code{reliability$iota_object_end: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
-    #'for every fold.
+    #'for every fold.}
     #'\item{\code{reliability$iota_object_end_free: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
     #'for every fold. Please note that the model is estimated without
     #'forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
+    #'}
+    #'\itemize{
     #'\item{\code{reliability$standard_measures_end: }Object of class \code{list} containing the final
     #'measures for precision, recall, and f1 for every fold.}
     #'\item{\code{reliability$standard_measures_mean: }\code{matrix} containing the mean
@@ -103,6 +104,8 @@ TEClassifierRegular<-R6::R6Class(
     #'@param rec \code{vector} containing the number of neurons for each recurrent layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer,
     #'set this parameter to \code{NULL}.
+    #'@param rec_type \code{string} Type of the recurrent layers. \code{rec_type="gru"} for
+    #'Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.
     #'@param attention_type \code{string} Choose the relevant attention type. Possible values
     #'are \code{"fourier"} and \code{multihead}.
     #'@param self_attention_heads \code{integer} determining the number of attention heads
@@ -130,6 +133,7 @@ TEClassifierRegular<-R6::R6Class(
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
+                        rec_type="gru",
                         self_attention_heads=0,
                         intermediate_size=NULL,
                         attention_type="fourier",
@@ -229,6 +233,7 @@ TEClassifierRegular<-R6::R6Class(
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
         rec=rec,
+        rec_type=rec_type,
         intermediate_size=intermediate_size,
         attention_type=attention_type,
         repeat_encoder=repeat_encoder,
@@ -1211,22 +1216,42 @@ TEClassifierRegular<-R6::R6Class(
         #Adding rec layer
         if(n_rec>0){
           for(i in 1:n_rec){
-            layer_list[length(layer_list)+1]<-list(
-              keras$layers$Bidirectional(
-                layer=keras$layers$GRU(
-                  units=as.integer(self$model_config$rec[i]),
-                  input_shape=list(self$model_config$times,self$model_config$features),
-                  return_sequences = TRUE,
-                  dropout = 0,
-                  recurrent_dropout = self$model_config$recurrent_dropout,
-                  activation = "tanh",
-                  name=paste0("gru_",i)),
-                name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
-            if (i!=n_rec){
+            if(self$model_config$rec_type=="gru"){
               layer_list[length(layer_list)+1]<-list(
-                keras$layers$Dropout(
-                  rate = self$model_config$rec_dropout,
-                  name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+                keras$layers$Bidirectional(
+                  layer=keras$layers$GRU(
+                    units=as.integer(self$model_config$rec[i]),
+                    input_shape=list(self$model_config$times,self$model_config$features),
+                    return_sequences = TRUE,
+                    dropout = 0,
+                    recurrent_dropout = self$model_config$recurrent_dropout,
+                    activation = "tanh",
+                    name=paste0("gru_",i)),
+                  name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+              if (i!=n_rec){
+                layer_list[length(layer_list)+1]<-list(
+                  keras$layers$Dropout(
+                    rate = self$model_config$rec_dropout,
+                    name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+              }
+            } else if (self$model_config$rec_type=="lstm"){
+              layer_list[length(layer_list)+1]<-list(
+                keras$layers$Bidirectional(
+                  layer=keras$layers$LSTM(
+                    units=as.integer(self$model_config$rec[i]),
+                    input_shape=list(self$model_config$times,self$model_config$features),
+                    return_sequences = TRUE,
+                    dropout = 0,
+                    recurrent_dropout = self$model_config$recurrent_dropout,
+                    activation = "tanh",
+                    name=paste0("lstm",i)),
+                  name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+              if (i!=n_rec){
+                layer_list[length(layer_list)+1]<-list(
+                  keras$layers$Dropout(
+                    rate = self$model_config$rec_dropout,
+                    name=paste0("lstm_dropout_",i))(layer_list[[length(layer_list)]]))
+              }
             }
           }
         }
@@ -1289,6 +1314,7 @@ TEClassifierRegular<-R6::R6Class(
                                                times=as.integer(self$model_config$times),
                                                hidden=if(!is.null(self$model_config$hidden)){as.integer(self$model_config$hidden)}else{NULL},
                                                rec=if(!is.null(self$model_config$rec)){as.integer(self$model_config$rec)}else{NULL},
+                                               rec_type=self$model_config$rec_type,
                                                intermediate_size=as.integer(self$model_config$intermediate_size),
                                                attention_type=self$model_config$attention_type,
                                                repeat_encoder=as.integer(self$model_config$repeat_encoder),

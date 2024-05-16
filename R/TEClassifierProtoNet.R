@@ -3,6 +3,11 @@
 #'@description Abstract class for neural nets with 'keras'/'tensorflow' and
 #''pytorch'.
 #'
+#'This object represents in implementation of a prototypical network for
+#'few-shot learning as described by Snell, Swersky, and Zemel (2017). The network
+#'uses a multi way contrastive loss described by Zhang et al. (2019). The network
+#'learns to scale the metric as described by Oreshkin, Rodriguez, and Lacoste (2018)
+#'
 #'@return Objects of this class are used for assigning texts to classes/categories. For
 #'the creation and training of a classifier an object of class \link{EmbeddedText} and a \code{factor}
 #'are necessary. The object of class \link{EmbeddedText} contains the numerical text
@@ -11,6 +16,15 @@
 #'text. Missing values (unlabeled cases) are supported. For predictions an object of class
 #'\link{EmbeddedText} has to be used which was created with the same text embedding model as
 #'for training.
+#'
+#'@references Oreshkin, B. N., Rodriguez, P. & Lacoste, A. (2018). TADAM:
+#'Task dependent adaptive metric for improved few-shot learning. https://doi.org/10.48550/arXiv.1805.10123
+#'@references Snell, J., Swersky, K. & Zemel, R. S. (2017). Prototypical Networks
+#'for Few-shot Learning. https://doi.org/10.48550/arXiv.1703.05175
+#'@references Zhang, X., Nie, J., Zong, L., Yu, H. & Liang, W. (2019). One Shot
+#'Learning with Margin. In Q. Yang, Z.-H. Zhou, Z. Gong, M.-L. Zhang & S.-J. Huang (Eds.),
+#' Lecture Notes in Computer Science. Advances in Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317).
+#' Springer International Publishing. https://doi.org/10.1007/978-3-030-16145-3_24
 #'@family Classification
 #'@export
 TEClassifierProtoNet<-R6::R6Class(
@@ -34,6 +48,8 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param rec \code{vector} containing the number of neurons for each recurrent layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer,
     #'set this parameter to \code{NULL}.
+    #'@param rec_type \code{string} Type of the recurrent layers. \code{rec_type="gru"} for
+    #'Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.
     #'@param embedding_dim \code{Int} determining the dimensionality of the embedding.
     #'@param attention_type \code{string} Choose the relevant attention type. Possible values
     #'are \code{"fourier"} and \code{multihead}.
@@ -62,6 +78,7 @@ TEClassifierProtoNet<-R6::R6Class(
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
+                        rec_type="gru",
                         embedding_dim=3,
                         self_attention_heads=0,
                         intermediate_size=NULL,
@@ -166,6 +183,7 @@ TEClassifierProtoNet<-R6::R6Class(
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
         rec=rec,
+        rec_type=rec_type,
         intermediate_size=intermediate_size,
         attention_type=attention_type,
         repeat_encoder=repeat_encoder,
@@ -271,7 +289,14 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param sustain_interval \code{integer} Interval in seconds for measuring power
     #'usage.
     #'@param epochs \code{int} Number of training epochs.
-    #'@param batch_size \code{int} Size of batches.
+    #'@param Ns \code{int} Number of cases for every class in the sample.
+    #'@param Nq \code{int} Number of cases for every class in the query.
+    #'@param loss_alpha \code{double} Value between 0 and 1 indicating how strong
+    #'the loss should focus on pulling cases to its corresponding prototypes or
+    #'pushing cases away from other prototypes. The higher the value the more the loss
+    #'concentrates on pulling cases to its corresponding prototypes.
+    #'@param loss_margin \code{dobule} Value greater 0 indicating the minimal
+    #'distance of every case from prototypes of other classes.
     #'@param dir_checkpoint \code{string} Path to the directory where
     #'the checkpoint during training should be saved. If the directory does not
     #'exist, it is created.
@@ -580,22 +605,42 @@ TEClassifierProtoNet<-R6::R6Class(
         #Adding rec layer
         if(n_rec>0){
           for(i in 1:n_rec){
-            layer_list[length(layer_list)+1]<-list(
-              keras$layers$Bidirectional(
-                layer=keras$layers$GRU(
-                  units=as.integer(self$model_config$rec[i]),
-                  input_shape=list(self$model_config$times,self$model_config$features),
-                  return_sequences = TRUE,
-                  dropout = 0,
-                  recurrent_dropout = self$model_config$recurrent_dropout,
-                  activation = "tanh",
-                  name=paste0("gru_",i)),
-                name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
-            if (i!=n_rec){
+            if(self$model_config$rec_type=="gru"){
               layer_list[length(layer_list)+1]<-list(
-                keras$layers$Dropout(
-                  rate = self$model_config$rec_dropout,
-                  name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+                keras$layers$Bidirectional(
+                  layer=keras$layers$GRU(
+                    units=as.integer(self$model_config$rec[i]),
+                    input_shape=list(self$model_config$times,self$model_config$features),
+                    return_sequences = TRUE,
+                    dropout = 0,
+                    recurrent_dropout = self$model_config$recurrent_dropout,
+                    activation = "tanh",
+                    name=paste0("gru_",i)),
+                  name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+              if (i!=n_rec){
+                layer_list[length(layer_list)+1]<-list(
+                  keras$layers$Dropout(
+                    rate = self$model_config$rec_dropout,
+                    name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+              }
+            } else if (self$model_config$rec_type=="lstm"){
+              layer_list[length(layer_list)+1]<-list(
+                keras$layers$Bidirectional(
+                  layer=keras$layers$LSTM(
+                    units=as.integer(self$model_config$rec[i]),
+                    input_shape=list(self$model_config$times,self$model_config$features),
+                    return_sequences = TRUE,
+                    dropout = 0,
+                    recurrent_dropout = self$model_config$recurrent_dropout,
+                    activation = "tanh",
+                    name=paste0("lstm",i)),
+                  name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+              if (i!=n_rec){
+                layer_list[length(layer_list)+1]<-list(
+                  keras$layers$Dropout(
+                    rate = self$model_config$rec_dropout,
+                    name=paste0("lstm_dropout_",i))(layer_list[[length(layer_list)]]))
+              }
             }
           }
         }
@@ -658,6 +703,7 @@ TEClassifierProtoNet<-R6::R6Class(
                                                times=as.integer(self$model_config$times),
                                                hidden=if(!is.null(self$model_config$hidden)){as.integer(self$model_config$hidden)}else{NULL},
                                                rec=if(!is.null(self$model_config$rec)){as.integer(self$model_config$rec)}else{NULL},
+                                               rec_type=self$model_config$rec_type,
                                                intermediate_size=as.integer(self$model_config$intermediate_size),
                                                attention_type=self$model_config$attention_type,
                                                repeat_encoder=as.integer(self$model_config$repeat_encoder),

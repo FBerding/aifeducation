@@ -16,6 +16,23 @@ for training.
 \description{
 Abstract class for neural nets with 'keras'/'tensorflow' and
 'pytorch'.
+
+This object represents in implementation of a prototypical network for
+few-shot learning as described by Snell, Swersky, and Zemel (2017). The network
+uses a multi way contrastive loss described by Zhang et al. (2019). The network
+learns to scale the metric as described by Oreshkin, Rodriguez, and Lacoste (2018)
+}
+\references{
+Oreshkin, B. N., Rodriguez, P. & Lacoste, A. (2018). TADAM:
+Task dependent adaptive metric for improved few-shot learning. https://doi.org/10.48550/arXiv.1805.10123
+
+Snell, J., Swersky, K. & Zemel, R. S. (2017). Prototypical Networks
+for Few-shot Learning. https://doi.org/10.48550/arXiv.1703.05175
+
+Zhang, X., Nie, J., Zong, L., Yu, H. & Liang, W. (2019). One Shot
+Learning with Margin. In Q. Yang, Z.-H. Zhou, Z. Gong, M.-L. Zhang & S.-J. Huang (Eds.),
+Lecture Notes in Computer Science. Advances in Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317).
+Springer International Publishing. https://doi.org/10.1007/978-3-030-16145-3_24
 }
 \seealso{
 Other Classification: 
@@ -72,6 +89,7 @@ Creating a new instance of this class.
   targets = NULL,
   hidden = c(128),
   rec = c(128),
+  rec_type = "gru",
   embedding_dim = 3,
   self_attention_heads = 0,
   intermediate_size = NULL,
@@ -110,6 +128,9 @@ set this parameter to \code{NULL}.}
 \item{\code{rec}}{\code{vector} containing the number of neurons for each recurrent layer.
 The length of the vector determines the number of dense layers. If you want no dense layer,
 set this parameter to \code{NULL}.}
+
+\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type="gru"} for
+Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.}
 
 \item{\code{embedding_dim}}{\code{Int} determining the dimensionality of the embedding.}
 
@@ -245,6 +266,18 @@ usage.}
 
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 
+\item{\code{Ns}}{\code{int} Number of cases for every class in the sample.}
+
+\item{\code{Nq}}{\code{int} Number of cases for every class in the query.}
+
+\item{\code{loss_alpha}}{\code{double} Value between 0 and 1 indicating how strong
+the loss should focus on pulling cases to its corresponding prototypes or
+pushing cases away from other prototypes. The higher the value the more the loss
+concentrates on pulling cases to its corresponding prototypes.}
+
+\item{\code{loss_margin}}{\code{dobule} Value greater 0 indicating the minimal
+distance of every case from prototypes of other classes.}
+
 \item{\code{dir_checkpoint}}{\code{string} Path to the directory where
 the checkpoint during training should be saved. If the directory does not
 exist, it is created.}
@@ -266,8 +299,6 @@ Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.}
 \item{\code{balance_sequence_length}}{\code{bool} If \code{TRUE} sample weights are
 generated for the length of sequences based on the frequencies of the training data with the method
 Inverse Class Frequency'. If \code{FALSE} each sequences length has the weight 1.}
-
-\item{\code{batch_size}}{\code{int} Size of batches.}
 }
 \if{html}{\out{</div>}}
 }

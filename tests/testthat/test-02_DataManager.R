@@ -41,7 +41,7 @@ for(method in methods){
       trace=FALSE
     )
 
-    for(i in 1:test_datamanager$get_n_folds()){
+    for(i in 1:(test_datamanager$get_n_folds()+1)){
       sample=test_datamanager$get_samples()[[i]]
       #-----------------------------------------------------------------------------
       test_that(paste("DataManager - Valid Splits","Fold:",i),{
@@ -58,13 +58,17 @@ for(method in methods){
         #Test if every class is part of a split
         expect_true(length(table(test_datamanager$datasets$data_labeled[sample$train]["labels"]))==n_classes)
         expect_true(length(table(test_datamanager$datasets$data_labeled[sample$val]["labels"]))==n_classes)
-        expect_true(length(table(test_datamanager$datasets$data_labeled[sample$test]["labels"]))==n_classes)
+        if(i<=test_datamanager$get_n_folds()){
+          expect_true(length(table(test_datamanager$datasets$data_labeled[sample$test]["labels"]))==n_classes)
+        }
         gc()
 
         #Test if the splits have the minimal absolute frequency
         expect_true(min(table(test_datamanager$datasets$data_labeled[sample$train]["labels"]))>2)
         expect_true(min(table(test_datamanager$datasets$data_labeled[sample$val]["labels"]))>1)
-        expect_true(min(table(test_datamanager$datasets$data_labeled[sample$test]["labels"]))>1)
+        if(i<=test_datamanager$get_n_folds()){
+          expect_true(min(table(test_datamanager$datasets$data_labeled[sample$test]["labels"]))>1)
+        }
         gc()
 
         #Test if the ratio of the labels is correct (stratified sample)
@@ -80,11 +84,13 @@ for(method in methods){
                          table(example_targets)/sum(table(example_targets))
         )
         gc()
-        expect_identical(ignore_attr = TRUE,
-                         table(test_datamanager$datasets$data_labeled[sample$test]["labels"])/
-                           sum(table(test_datamanager$datasets$data_labeled[sample$test]["labels"])),
-                         table(example_targets)/sum(table(example_targets))
-        )
+        if(i<=test_datamanager$get_n_folds()){
+          expect_identical(ignore_attr = TRUE,
+                           table(test_datamanager$datasets$data_labeled[sample$test]["labels"])/
+                             sum(table(test_datamanager$datasets$data_labeled[sample$test]["labels"])),
+                           table(example_targets)/sum(table(example_targets))
+          )
+        }
         gc()
       })
 
