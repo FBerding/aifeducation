@@ -20,6 +20,7 @@ library(aifeducation)
 ```
 
 # 1 Introduction and Overview
+
 Training an AI model requires a lot of data,  is time, and energy consuming. In general
 several configurations for a model have to be tested before the best performing model
 is achieved. Thus, it is very important to choose a good starting configuration to
@@ -34,16 +35,18 @@ These are the *base models*, the *text embedding models* and the *classifiers.*
 The base models are the core models for understanding natural language. 
 Assuming that researchers from educational and social sciences have access only to limited data
 and computational resources AI models should be as small and efficient as possible. 
-In recent years researchers generated some insights into how language models can
+In recent years researchers generated some insights into how language models can be
 reduced in size without loosing to much performance. In the following we present some
-of these concepts that can be realised with *aifeducation*.
+of these concepts that can be realized with *aifeducation*.
 
-**Vocabulary and embedding matrix**
+**Vocabulary size and embedding matrix**
 
 A first step in creating a language model is to generate a vocabulary that is used
 to split text into tokens. With the help of an embedding matrix these tokens are
-translated into a numerical representation. In the original study by 
-Devlin et al. (2019, p. 4174) the BERT model used a vocabulary size of 30,000 tokens.
+translated into a numerical representation. That is, every token is transformed
+into a vector with the same dimension. The number of rows of the embedding matrix
+equals the number of tokens while the number of columns can be chosen by the developer.
+In the original study by Devlin et al. (2019, p. 4174) the BERT model used a vocabulary size of 30,000 tokens.
 In the study conducted by Zhao et al. (2019, p.2) they calculated a vocabulary with
 about 5,000 tokens that was able to completely cover the textual data. Furthermore,
 they calculated a vocabulary with about 30,000 tokens that included about 94% of the
@@ -57,30 +60,233 @@ While a large vocabulary is able to represent rare words better words with a hig
 frequency are even covered well with a smaller vocabulary (Ganesh et al. 2021, p. 1070).
 Thus, we recommend to try a the vocabulary size of 10,000.
 
+It is important to note that the vocabulary size has in impact on how words are split 
+into tokens. As Kaya and Tantug (2024, p. 5) illustrate a higher vocabulary size allows
+a tokenizer to split words into a smaller number of tokens while a smaller number
+requires the tokenizer to use more tokens. Thus, the length of the token sequence
+generated for a given chunk of text is longer for a tokenizer with a small vocabulary compared to
+a tokenizer with a large vocabulary.
+In order to describe the effect
+Kaya and Tantug (2024, p. 5) propose the *tokenization granularity rate* which
+is calculated as the number of all tokens divided by all words. As a consequence
+reducing the vocabulary size requires an increase of the maximal sequence length
+of a transformer in order to allow the transformer to process the same number of words. 
+
 The study by Wies et al. (2021) investigates the relationship between the
 vocabulary size, the dimension of the embedding matrix, and the width/depth 
 of a transformer model (hidden size and number of layers). They are able to show
 that the size and the dimension of the embedding matrix should be equal or 
 higher as the hidden size of the transformer model. As explained in the 
-paragraph before the vocabulary size will 
-be greater as 1,000. Thus, the dimension of the embedding matrix should be equal
+paragraph before the vocabulary size will generally
+be greater as 1,000. It can be treated as a given parameter. 
+Thus, the dimension of the embedding matrix should be equal
 or higher as the hidden size. Since *aifeducation* relies on the 
 *transformers* library all base models implemented in *aifeducation* use
 the hidden size as dimension for the embedding matrix ensuring that they equal in size.
 Thus, this recommendation is always satisfied. 
 
+**With vs depth**
+
+Levine et al. (2020, p. 2) investigate the architecture of transformers and reveal
+that the minimal depth of an transformer encoder with multi-head attention should
+be $L_{min}=log(d)$ where $d$ is the hidden size. For example, if the hidden size
+of the attention layer is 768 this formula suggest at least 
+$L_{min}=log(768)=6.64379$ seven layers. In addition, 
+their work offers a formula for estimating the optimal depth depending on the 
+hidden size (Levine et al. 2020, p. 8):
+$$L_{optim}(d)=\frac{log(d)-5.039}{0.0555}$$
+For a hidden size of 768 $L_{optim}(768)=28.91513033$ would be about 29 layers.
+
+**Number of attention heads**
+
+The hidden size (the width of the layers) of a transformer has an influence on
+how well the attention mechanism can be used. Wies et al. (2021) showed that the 
+product of the number of attention head $H$ and the dimension
+of the internal attention representation $d_{a}$ should equal the dimension of 
+the hidden size $d$ of a transformer. In the case that this product is greater as 
+the hidden dimension $d$ a bottleneck occurs reducing performance of the model.
+In *aifeducation* all transformers
+determine the dimension $d_{a}$ with $d_{a}=d/H$ ensuring that this rule is always fulfilled. 
+Please do not mix the internal attention representation $d_{a}$ with the intermediate
+size of a multi-head attention layer.
+
+Regarding the number of attention heads Liu, Liu, and Han (2021) develop a singe-head
+attention and can show that a transformer with single-head attention achieves
+better performance as a transformer with multi-head attention and a similar model size.
+Before this study Michel, Omer, and Neubig (2019, p. 4) revealed that at *test* time
+one head is enough for stable performance even when the model was trained with
+12 or 16 heads. Based on these findings Ganesh et al. (2021, p. 1068) conclude that
+1 to 2 heads in encoder layers can be sufficient for high accuracy. Voita et al. 2019 (p. 5802)
+showed that a high number of attention heads can be removed after training without 
+a significant decrease in model's performance. The study also reveals that training a
+model from scratch with a reduced number of attention heads results in lower performance
+compared with a model trained with a higher number of heads and pruning after training. 
+However, the difference is only small (Voita et al. 2019, p. 5803). Tu sum up, we
+recommend to start modeling with 1 up to 2 attention head per layer.
+
+# 3 Text Embedding Models
+
+Text embedding models are built on top of a base model. They are used to create
+a numerical representation from raw texts that is able to represent the semantic 
+meaning of a text as best as possible. These representations are used for further
+downstream tasks such as classification.
+
+Rogers, Kovaleva, and Rumshisky (2020) summarize the knowledge about how BERT models work
+providing a good starting point for deriving recommendations for a "good" configuration
+of a text embedding model. Their review provides some evidence that most information
+about linear word order is represented in the lower layers while the middle layers
+represent foremost syntactic information. It is not clear where semantic knowledge
+is located but it seems that semantic information is spread across all layers. The 
+final layer is the most task-specific layer which changes most during fine-tuning.
+
+Since a text embedding model aims to provide a numerical representation that can 
+be used for varying task the final layer may not be the best choice due to 
+its connection to the learning objective (e.g., masked language modeling). A study 
+conducted by (Liu et al. 2019, p. 1078) investigates the performance of models on 16
+linguistic tasks revealing that for transformers there is no
+single best layer but the best layers are located in an area of the middle up
+to the two-third layer. In the original study done by Devlin et al. (2019, p. 4179)
+the BERT model performed best with the representation drawn from the
+the second-to-last hidden layer, a weighted sum of the last four layers, and
+a concatenation of the last four layers for named entity recognition. 
+
+The usual approach to generate representations for texts is to use the representation
+of the [CLS] token from the final layer. However, as stated in the paragraph before,
+the representation of other layers may be more transferable to varying tasks. Furthermore,
+instead of using the representation of the [CLS] token representations of other tokens or a mean of their representations can be used. In Tanaka et al.'s (2020, p. 151) study the
+mean of the representations of all tokens (except special tokens) performs better
+for a classification task as the representation of the [CLS] token. The representations
+are drawn from the final layer. Toshniwal et al. (2020, p. 168) use the weighted
+average of all layers to generate token representations which are reduced in their 
+number of dimension. They compare six different methods of aggregating the different
+token representations to a single text representation and reveal that average pooling
+is inferior to all other methods while max pooling is a simple and competitive method
+(Toshniwal et al. 2020, p. 169). "Max pooling takes the maximum value over time
+for each dimension of the contextualized embeddings within the span." 
+(Toshniwal et al. 2020, p. 168). In contrast the study conducted by Ma et al. (2019)
+reveals that Max pooling is better as CLS and Mean pooling is superior to
+Max pooling. However, the results in Ma et al.'s (2019) study are averaged across
+different layers providing limited information on how to combine the different pooling
+methods with different layers.
+To sum up, we recommend to use the embeddings between the middle and the two-third layer
+in combination with Max or Mean pooling.
+
+# 4 Classifiers
+
+Classifiers are built on the top of a text embedding model and represent the final 
+step for classification tasks. Although the underlying transformer is not part of
+training a classifier in the approach used by *aifeducation* transformers' hidden size is still
+a challenge. For example the hidden size in the original BERT model is 768 for base
+and 1024 for the large variation (Devlin et al. 2019, p. 4173). Against the backdrop
+that the number of available data is low in the educational and social sience 
+a low performance has to be expected. 
+
+A solution to solve this problem is to reduce the dimension as 
+proposed by Ganesan et al. (2021). In their study they investigate the relationship
+between sample size, dimension, and dimension reduction method. The text representations
+was built by calculating the mean over all tokens of the second to last layer 
+(Ganesan et al. 2021, p. 4517). Their central findings are 
+
+- that fine-tuning a transformer with only a few training examples (10,000) results in a
+  lower performance than using a not fine-tuned transformer (Ganesan et al. 2021, p. 4519).
+- Principal component analysis performed best but multi-layer non linear auto encoders
+  (NLAE) is also a good choice (Ganesan et al. 2021, p. 4520).
+- that the number of dimensions depends on the specific task. However, a larger train
+  sample allows for a higher number of dimension. In some cases, about $1/12$ to $1/6$
+  of the dimension were sufficient (Ganesan et al. 2021, p. 4522).
+  
+Ganesan et al. (2021) work shows that a reduction of the dimension is necessary
+in the case that the transformer model uses a large hidden size. Since most models in
+*aifeducation* work with sequential data the package contains a LSTM (`fe_method="lstm"`)
+and dense feature extractor (`fe_method="dense"`).
+To use it for training a classifier set `use_fe=TRUE` during the creation of 
+the object and specify the desired number of dimensions with `fe_features`. 
+
+# 5 Limitations
+Please note that the findings presented in this vignette refer to different 
+architectures of AI models. In general, the results cannot be transfered directly
+to other model architectures. Thus, all recommendations can only serve as rule of thumb. 
 
 
+# References
+
+Chen, W., Su, Y., Shen, Y., Chen, Z., Yan, X., & Wang, W. Y. (2019). How Large a 
+Vocabulary Does Text Classification Need? A Variational Approach to Vocabulary 
+Selection. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019 
+Conference of the North (pp. 3487–3497). Association for Computational Linguistics. 
+https://doi.org/10.18653/v1/N19-1352
+
+Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of
+Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. 
+Doran, & T. Solorio (Eds.), Proceedings of the 2019 Conference of the North 
+(pp. 4171–4186). Association for Computational Linguistics. https://doi.org/10.18653/v1/N19-1423
+
+Ganesan, A. V., Matero, M., Ravula, A. R., Vu, H., & Schwartz, H. A. (2021). 
+Empirical Evaluation of Pre-trained Transformers for Human-Level NLP: The Role 
+of Sample Size and Dimensionality. Proceedings of the Conference. Association 
+for Computational Linguistics. North American Chapter. Meeting, 2021, 4515–4532. 
+https://doi.org/10.18653/v1/2021.naacl-main.357
+
+Ganesh, P., Chen, Y., Lou, X., Khan, M. A., Yang, Y., Sajjad, H., Nakov, P.,
+Chen, D., & Winslett, M. (2021). Compressing Large-Scale Transformer-Based Models: 
+A Case Study on BERT. Transactions of the Association for Computational Linguistics,
+9, 1061–1080. https://doi.org/10.1162/tacl_a_00413
+
+Gowda, T., & May, J. (2020). Finding the Optimal Vocabulary Size for Neural Machine 
+Translation. In T. Cohn, Y. He, & Y. Liu (Eds.), Findings of the Association for 
+Computational Linguistics: EMNLP 2020 (pp. 3955–3964). Association for Computational 
+Linguistics. https://doi.org/10.18653/v1/2020.findings-emnlp.352
+
+Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish 
+large language models. Intelligent Systems with Applications, 21, 200335. 
+https://doi.org/10.1016/j.iswa.2024.200335
+
+Levine, Y., Wies, N., Sharir, O., Bata, H., & Shashua, A. (2020). Limits to Depth 
+Efficiencies of Self-Attention. In H. Larochelle, M. Ranzato, R. Hadsell, 
+M.F. Balcan, & H. Lin (Eds.), Advances in Neural Information Processing Systems 
+(Vol. 33, pp. 22640–22651). Curran Associates, Inc. 
+https://proceedings.neurips.cc/paper_files/paper/2020/file/ff4dfdf5904e920ce52b48c1cef97829-Paper.pdf
+
+Liu, L., Liu, J., & Han, J. (2021). Multi-head or Single-head? An Empirical 
+Comparison for Transformer Training. https://doi.org/10.48550/arXiv.2106.09650
+
+Liu, N. F., Gardner, M., Belinkov, Y., Peters, M. E., & Smith, N. A. (2019). 
+Linguistic Knowledge and Transferability of Contextual Representations. In J. Burstein, 
+C. Doran, & T. Solorio (Eds.), Proceedings of the 2019 Conference of the North 
+(pp. 1073–1094). Association for Computational Linguistics. https://doi.org/10.18653/v1/N19-1112
+
+Ma, X., Wang, Z., Ng, P., Nallapati, R., & Xiang, B. (2019). Universal Text Representation 
+from BERT: An Empirical Study. https://doi.org/10.48550/arXiv.1910.07973
+
+Michel, P., Levy, O., & Neubig, G. (2019). Are Sixteen Heads Really Better than One?
+https://doi.org/10.48550/arXiv.1905.10650
+
+Rogers, A., Kovaleva, O., & Rumshisky, A. (2020). A Primer in BERTology: 
+What We Know About How BERT Works. Transactions of the Association for Computational 
+Linguistics, 8, 842–866. https://doi.org/10.1162/tacl_a_00349
+
+Tanaka, H., Shinnou, H., Cao, R., Bai, J., & Ma, W. (2020). Document Classification 
+by Word Embeddings of BERT. In L.-M. Nguyen, X.-H. Phan, K. Hasida, & S. Tojo (Eds.),
+Communications in Computer and Information Science. Computational Linguistics 
+(Vol. 1215, pp. 145–154). Springer Singapore. https://doi.org/10.1007/978-981-15-6168-9_13
+
+Toshniwal, S., Shi, H., Shi, B., Gao, L., Livescu, K., & Gimpel, K. (2020). A 
+Cross-Task Analysis of Text Span Representations. In S. Gella, J. Welbl, M. Rei, F. Petroni, 
+P. Lewis, E. Strubell, M. Seo, & H. Hajishirzi (Eds.), Proceedings of the 5th 
+Workshop on Representation Learning for NLP (pp. 166–176). Association for 
+Computational Linguistics. https://doi.org/10.18653/v1/2020.repl4nlp-1.20
+
+Voita, E., Talbot, D., Moiseev, F., Sennrich, R., & Titov, I. (2019). Analyzing 
+Multi-Head Self-Attention: Specialized Heads Do the Heavy Lifting, the Rest Can 
+Be Pruned. In A. Korhonen, D. Traum, & L. Màrquez (Eds.), Proceedings of the 
+57th Annual Meeting of the Association for Computational Linguistics (pp. 5797–5808). 
+Association for Computational Linguistics. https://doi.org/10.18653/v1/P19-1580
+
+Wies, N., Levine, Y., Jannai, D., & Shashua, A. (2021). Which transformer architecture 
+fits my data? A vocabulary bottleneck in self-attention. https://doi.org/10.48550/arXiv.2105.03928
+
+Zhao, S., Gupta, R., Song, Y., & Zhou, D. (2019). Extremely Small BERT 
+Models from Mixed-Vocabulary Training. https://doi.org/10.48550/arXiv.1909.11687
 
 
-
-
-
-
-Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
-Pre-training of Deep Bidirectional Transformers for Language
-Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
-Proceedings of the 2019 Conference of the North (pp. 4171--4186).
-Association for Computational Linguistics.
-<https://doi.org/10.18653/v1/N19-1423>
 

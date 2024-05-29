@@ -367,6 +367,9 @@ example, you could increase the number of hidden layers from 12 to 24 or
 reduce the hidden size from 768 to 256, allowing you to build and to
 test larger or smaller models.
 
+> The vignette [Optimal model configuration](model_configuration.html) provides
+details on how to configurate a base model.
+
 Please note that with `max_position_embeddings` you determine how many
 tokens your transformer can process. If your text has more tokens, these tokens 
 are ignored. However, if you would
@@ -545,6 +548,9 @@ With `emb_pool_type` you decide which tokens are used for pooling within every l
 In the case of `emb_pool_type="cls"` only the cls token is used. In the case of
 `emb_pool_type="average"` all tokens within a layer are averaged except padding tokens.
 
+> The vignette [Optimal model configuration](model_configuration.html) provides
+details on how to configurate a text embedding model.
+
 After deciding about the configuration, you can use your model.
 
 > **Note:** With version 0.3.1 of aifeducation every transformer can be used with both
@@ -649,6 +655,10 @@ classifier<-TEClassifierRegular$new(
   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings=bert_embeddings,
   targets=example_targets,
+  use_fe=TRUE,
+  fe_features=128,
+  fe_method="lstm",
+  fe_noise_factor=0.2,
   hidden=c(40,20),
   rec=c(40,40),
   rec_type="gru",
@@ -678,6 +688,17 @@ error will occur. It is also important that you name your elements of the factor
 is, the entries of the factor mus have names that correspond to the IDs
 of the corresponding texts. Without these names the method cannot match
 the input data (text embeddings) to the target data.
+
+With `use_fe` you can request a feature extractor. The aim of the feature extractor
+is to reduce the number of dimensions of the text embeddings and saving as much
+information as possible. Reducing the number of dimensions can speed up training
+and inference and at the same time increase the performance of your classifier.
+For more details please refer to vignette [Optimal model configuration](model_configuration.html).
+With `fe_features` you can decide to which number of dimensions the text embeddings
+should be compressed. `fe_method` allows you to select a model for the reduction
+("lstm" or "dense"). Sine all feature extractors in *aifeducation* are based
+on denoising autoencoder you can decide how many noise should be added during 
+training the extractor (`fe_noise_factor`).
 
 With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.
@@ -727,7 +748,10 @@ You can further extend the abilities of your network by adding positional embedd
 Positional embeddings take care for the order of your chunks. Thus, adding such a 
 layer may increase performance if the order of information is important. You can 
 add this layer by setting `add_pos_embedding=TRUE`. The layer is created as
-described by Chollet, Kalinowski, and Allaire (2022, pp. 378)
+described by Chollet, Kalinowski, and Allaire (2022, pp. 378).
+
+> The vignette [Optimal model configuration](model_configuration.html) provides
+details on how to configurate a classifier.
 
 Masking, normalization, and the creation of the input layer as well as
 the output layer are done automatically.
@@ -772,6 +796,8 @@ classifier$train(
    data_targets = example_targets,
    data_folds=5,
    data_val_size=0.25,
+   fe_epochs=1000,
+   fe_val_size=0.25,
    balance_class_weights=TRUE,
    balance_sequence_length=TRUE,
    use_sc=TRUE,
@@ -878,6 +904,13 @@ the maximal amount of data for the best performance in final training.
 
 In the case options like the generation of synthetic cases (`use_sc`) or 
 pseudo-labeling (`use_pl`) are disabled the training process is shorter.
+
+In the case your classifier uses a feature extractor you can configure the
+training process with `fe_epochs` and `fe_val_size`. The first argument 
+determines the maximal number of training steps while the last determines
+the number of text embeddings used as a validation sample. The model
+with the lowest loss on the validation sample is applied for compressing
+the text embeddings.
 
 Since training a neural net is energy consuming *aifeducation* allows 
 you to estimate its ecological impact with help of the python library

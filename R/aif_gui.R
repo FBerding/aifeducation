@@ -409,6 +409,27 @@ start_aifeducation_studio<-function(){
                                                         label = "Model Label",
                                                         width = "100%")
                                           ),
+                                          shinydashboard::box(title = "Feature Extractor",
+                                                              width = 12,
+                                                              solidHeader = FALSE,
+                                                              status = "primary",
+                                                              collapsible = TRUE,
+                                                              collapsed = TRUE,
+                                                              shinyWidgets::materialSwitch(inputId = "tec_use_fe",
+                                                                                           label = "Use Feature Extractor",
+                                                                                           value = TRUE,
+                                                                                           status = "primary"),
+                                                              shiny::selectInput(inputId = "tec_fe_method",
+                                                                                 label = "Method",
+                                                                                 choices = c("lstm","dense")),
+                                                              shiny::sliderInput(inputId = "tec_fe_features",
+                                                                                 label = "Target Features",
+                                                                                 min = 1,
+                                                                                 value = 256,
+                                                                                 max=768,
+                                                                                 step = 1,
+                                                                                 round = TRUE)
+                                          ),
                                           shinydashboard::box(title = "Positional Embedding",
                                               width = 12,
                                               solidHeader = FALSE,
@@ -465,7 +486,14 @@ start_aifeducation_studio<-function(){
                                                           value=0.1,
                                                           min=0,
                                                           max=0.99,
-                                                          step = 0.01)
+                                                          step = 0.01),
+                                              shiny::selectInput(inputId = "tec_rec_type",
+                                                                 label = "Type",
+                                                                 choices = c("gru","lstm")),
+                                              shinyWidgets::materialSwitch(inputId = "tec_rec_bidirectional",
+                                                                           value = FALSE,
+                                                                           label = "Bidirectional",
+                                                                           status = "primary")
                                           ),
                                           shinydashboard::box(title = "Dense Layers",
                                               width = 12,
@@ -509,24 +537,45 @@ start_aifeducation_studio<-function(){
                                                              label = "Balance Class Weights",
                                                              value = TRUE,
                                                              status = "primary"),
-                                              shiny::sliderInput(inputId = "tec_data_n_test_samples",
+                                              shinyWidgets::materialSwitch(inputId = "tec_balance_sequence_length",
+                                                                           label = "Balance Sequnce Length",
+                                                                           value = TRUE,
+                                                                           status = "primary"),
+                                              shiny::sliderInput(inputId = "tec_data_folds",
                                                           label = "Number of Folds",
                                                           value = 5,
                                                           min=1,
                                                           max=25,
                                                           round = TRUE,
                                                           step = 1),
-                                              shiny::sliderInput(inputId = "tec_bsl_val_size",
+                                              shiny::sliderInput(inputId = "tec_val_size",
                                                           label = "Proportion for Validation Sample",
                                                           min=0.02,
                                                           value = 0.25,
                                                           max=0.5,
                                                           step = 0.01),
+                                              shiny::sliderInput(inputId = "tec_fe_val_size",
+                                                                 label = "Feature Extractor: Proportion for Validation Sample",
+                                                                 min=0.02,
+                                                                 value = 0.25,
+                                                                 max=0.5,
+                                                                 step = 0.01),
+                                              shiny::sliderInput(inputId = "tec_fe_noise_factor",
+                                                                 label = "Feature Extractor: Noise Factor",
+                                                                 min=0.00,
+                                                                 value = 0.20,
+                                                                 max=0.90,
+                                                                 step = 0.01),
                                               shiny::numericInput(inputId = "tec_epochs",
                                                            label = "Epochs",
                                                            min = 1,
                                                            value = 40,
                                                            step = 1),
+                                              shiny::numericInput(inputId = "tec_fe_epochs",
+                                                                  label = "Feature Extractor: Epochs",
+                                                                  min = 1,
+                                                                  value = 500,
+                                                                  step = 1),
                                               shiny::sliderInput(inputId = "tec_batch_size",
                                                           label = "Batch Size",
                                                           min = 1,
@@ -534,100 +583,50 @@ start_aifeducation_studio<-function(){
                                                           value = 32,
                                                           step = 1)
                                           ),
-                                          shinydashboard::box(title = "Baseline Model",
-                                              width = 12,
-                                              solidHeader = FALSE,
-                                              status = "primary",
-                                              collapsible = TRUE,
-                                              collapsed = TRUE,
-                                              shinyWidgets::materialSwitch(inputId = "tec_use_baseline",
-                                                             value = TRUE,
-                                                             label = "Calculate Baseline Model",
-                                                             status = "primary")
-                                          ),
-                                          shinydashboard::box(title = "Balanced Synthetic Cases",
+                                          shinydashboard::box(title = "Synthetic Cases",
                                               width = 12,
                                               status = "primary",
                                               collapsible = TRUE,
                                               collapsed = TRUE,
-                                              shinyWidgets::materialSwitch(inputId = "tec_use_bsc",
+                                              shinyWidgets::materialSwitch(inputId = "tec_use_sc",
                                                              value = FALSE,
                                                              label = "Add Synthetic Cases",
                                                              status = "primary"),
-                                              shiny::sliderInput(inputId = "tec_n_cores",
-                                                          label = "Number of Cores",
-                                                          min = 1,
-                                                          max=parallel::detectCores(),
-                                                          value = parallel::detectCores()),
-                                              shiny::selectInput(inputId = "tec_bsc_methods",
+                                              shiny::selectInput(inputId = "tec_sc_methods",
                                                           label = "Method",
                                                           choices = c("dbsmote","adas","smote")),
-                                              shiny::sliderInput(inputId = "tec_bsc_max_k",
-                                                          label = "Max k",
-                                                          value = 10,
-                                                          min = 1,
-                                                          max = 20,
-                                                          step = 1,
-                                                          round = TRUE),
-                                              shiny::sliderInput(inputId = "tec_bsc_val_size",
-                                                          label = "Proportion for Validation Sample",
-                                                          min=0.02,
-                                                          value = 0.25,
-                                                          max=0.5,
-                                                          step = 0.01),
-                                              shinyWidgets::materialSwitch(inputId = "tec_bsc_add_all",
-                                                             label = "Add All Synthetic Cases",
-                                                             value = FALSE,
-                                                             status = "primary")
+                                              shiny::sliderInput(inputId = "tec_sc_min_max_k",
+                                                                 label = "Min k",
+                                                                 value = c(1,10),
+                                                                 min = 1,
+                                                                 max = 20,
+                                                                 step = 1,
+                                                                 round = TRUE)
                                           ),
                                           shinydashboard::box(
-                                            title = "Balanced Pseudo Labeling",
+                                            title = "Pseudo Labeling",
                                             width = 12,
                                             status = "primary",
                                             collapsible = TRUE,
                                             collapsed = TRUE,
-                                            shinyWidgets::materialSwitch(inputId = "tec_use_bpl",
+                                            shinyWidgets::materialSwitch(inputId = "tec_use_pl",
                                                            value = FALSE,
                                                            label = "Add Pseudo Labeling",
                                                            status = "primary"),
-                                            shiny::sliderInput(inputId = "tec_bpl_max_steps",
+                                            shiny::sliderInput(inputId = "tec_pl_max_steps",
                                                         label = "Max Steps",
                                                         value = 5,
                                                         min = 1,
                                                         max = 20,
                                                         step = 1,
                                                         round = TRUE),
-                                            shinyWidgets::materialSwitch(inputId = "tec_bpl_model_reset",
-                                                           label = "Reset Model After Every Step",
-                                                           value = TRUE,
-                                                           status = "primary"),
-                                            shinyWidgets::materialSwitch(inputId = "tec_bpl_dynamic_inc",
-                                                           label = "Dynamic Weight Increase",
-                                                           value = FALSE,
-                                                           status = "primary"),
-                                            shinyWidgets::materialSwitch(inputId = "tec_bpl_balance",
-                                                           label = "Balance Pseudo Labels",
-                                                           value = FALSE,
-                                                           status = "primary"),
-                                            shiny::sliderInput(inputId = "tec_bpl_anchor",
+                                            shiny::sliderInput(inputId = "tec_pl_anchor",
                                                         label = "Certainty Anchor",
                                                         value = 1,
                                                         max = 1,
                                                         min = 0,
                                                         step = 0.01),
                                             shiny::uiOutput(outputId = "tec_dynamic_sample_weights"),
-                                            shiny::sliderInput(inputId = "tec_bpl_weight_start",
-                                                        label = "Start Weights",
-                                                        value = 0,
-                                                        min = 0,
-                                                        max = 2,
-                                                        step = 0.01),
-                                            shiny::sliderInput(inputId = "tec_bpl_weight_inc",
-                                                        label = "Weight Increase Per Step",
-                                                        value = 0.02,
-                                                        min = 0,
-                                                        max = 1,
-                                                        step = 0.01)
                                           )
                                       )
                                     ),
@@ -3716,14 +3715,20 @@ start_aifeducation_studio<-function(){
           log(rep(x="",times=15))
           shinyjs::html(id="pgr_text_output_aifeducation",html = "")
 
-          new_classifier=TextEmbeddingClassifierNeuralNet$new(
+          new_classifier=TEClassifierRegular$new(
             ml_framework=input$config_ml_framework,
             name=input$tec_name,
             label=input$tec_label,
             text_embeddings=tec_embeddings_for_training(),
             targets=target_data,
+            use_fe=input$tec_use_fe,
+            fe_method = input$tec_fe_method,
+            fe_features = input$tec_fe_features,
+            fe_noise_factor = input$tec_fe_noise_factor,
             hidden=hidden,
             rec=rec,
+            rec_type = input$tec_rec_type,
+            rec_bidirectional = input$tec_rec_bidirectional,
             self_attention_heads=self_attention_heads,
             intermediate_size=input$tec_intermediate_size,
             attention_type=input$tec_attention_type,
@@ -3738,37 +3743,38 @@ start_aifeducation_studio<-function(){
           new_classifier$train(
             data_embeddings=tec_embeddings_for_training(),
             data_targets=target_data,
-            data_n_test_samples=input$tec_data_n_test_samples,
+            data_folds=input$tec_data_folds,
+            data_val_size=input$tec_val_size,
+
             balance_class_weights=input$tec_balance_class_weights,
-            use_baseline=input$tec_use_baseline,
-            bsl_val_size=input$tec_bsl_val_size,
-            use_bsc=input$tec_use_bsc,
-            bsc_methods=input$tec_bsc_methods,
-            bsc_max_k=input$tec_bsc_max_k,
-            bsc_val_size=input$tec_bsc_val_size,
-            bsc_add_all=input$tec_bsc_add_all,
-            use_bpl=input$tec_use_bpl,
-            bpl_max_steps=input$tec_bpl_max_steps,
-            bpl_epochs_per_step=input$tec_epochs,
-            bpl_dynamic_inc=input$tec_bpl_dynamic_inc,
-            bpl_balance=input$tec_bpl_balance,
-            bpl_max=bpl_max,
-            bpl_anchor=input$tec_bpl_anchor,
-            bpl_min=bpl_min,
-            bpl_weight_inc=input$tec_bpl_weight_inc,
-            bpl_weight_start=input$tec_bpl_weight_start,
-            bpl_model_reset=input$tec_bpl_model_reset,
+            balance_sequence_length=input$tec_balance_sequence_length,
+
+            use_bsc=input$tec_use_sc,
+            bsc_methods=input$tec_sc_methods,
+            sc_min_k=input$tec_min_max_k[0],
+            sc_max_k=input$tec_min_max_k[1],
+
+            use_pl=input$tec_use_pl,
+            pl_max_steps=input$tec_pl_max_steps,
+            pl_max=bpl_max,
+            pl_anchor=input$tec_bpl_anchor,
+            pl_min=bpl_min,
+
             sustain_track=input$config_track_sustainability,
             sustain_iso_code=input$config_sustainability_country,
             sustain_region=NULL,
             sustain_interval=15,
+
             epochs=input$tec_epochs,
             batch_size=input$tec_batch_size,
+
+            fe_epochs=input$tec_fe_epochs,
+            fe_val_size=input$tec_fe_val_size,
+
             dir_checkpoint=input$tec_create_select_destination_folder_path,
             trace=TRUE,
             keras_trace=0,
-            pytorch_trace=0,
-            n_cores=input$tec_n_cores)
+            pytorch_trace=0)
         },
         message=function(m){
           #Vector with old messages
@@ -3813,7 +3819,8 @@ start_aifeducation_studio<-function(){
                                       ml_framework=input$config_ml_framework),
                         silent = TRUE)
         if(methods::is(classifier,class2 = "try-error")==FALSE){
-          if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
+          if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)|
+             "TEClassifierRegular"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
               shinyWidgets::closeSweetAlert()
               return(classifier)
@@ -3856,11 +3863,20 @@ start_aifeducation_studio<-function(){
         return(NULL)
       } else {
         classifier=Classifier_for_Use()
-        measures_shared=intersect(x=names(measure_labels[measures_scale_level]),
-                                  y=colnames(classifier$reliability$test_metric_mean))
+        if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
+          measures_shared=intersect(x=names(measure_labels[measures_scale_level]),
+                                    y=colnames(classifier$reliability$test_metric_mean))
+          reliability_scale=classifier$reliability$test_metric_mean[,measures_shared]
+          colnames(reliability_scale)=measure_labels[measures_shared]
+        } else {
+          measures_shared=intersect(x=names(measure_labels[measures_scale_level]),
+                                    y=names(classifier$reliability$test_metric_mean))
+          reliability_scale=classifier$reliability$test_metric_mean[measures_shared]
+          reliability_scale=t(as.matrix(reliability_scale))
+          colnames(reliability_scale)=measure_labels[measures_shared]
+        }
 
-        reliability_scale=classifier$reliability$test_metric_mean[,measures_shared]
-        colnames(reliability_scale)=measure_labels[measures_shared]
+
 
         ui<-shinydashboard::box(status = "primary",
                 width = 12,
@@ -3922,6 +3938,35 @@ start_aifeducation_studio<-function(){
                                shiny::uiOutput(outputId = "tect_desc_abstract_and_desc")
                            )
                   ),
+                  #Feature Extractor-------------------------------------------
+                  shiny::tabPanel("Feature Extractor",
+                                  shinydashboard::box(title = "Feature Extractor",
+                                                      solidHeader = TRUE,
+                                                      status = "primary",
+                                                      width = 12,
+                                                      shiny::sidebarLayout(
+                                                        position="right",
+                                                        sidebarPanel=shiny::sidebarPanel(
+                                                          shiny::sliderInput(inputId = "tec_fe_performance_text_size",
+                                                                             label = "Text Size",
+                                                                             min = 1,
+                                                                             max = 20,
+                                                                             step = 0.5,
+                                                                             value = 12),
+                                                          shiny::numericInput(inputId = "tec_fe_performance_y_min",
+                                                                              label = "Y Min",
+                                                                              value = 0),
+                                                          shiny::numericInput(inputId = "tec_fe_performance_y_max",
+                                                                              label = "Y Max",
+                                                                              value = 1)
+                                                        ),
+                                                        mainPanel =shiny::mainPanel(
+                                                          shiny::plotOutput(outputId = "tec_fe_performance_training_loss")
+                                                        )
+                                                      )
+                                  )
+                  ),
+
                   #Training Page------------------------------------------------
                   shiny::tabPanel("Training",
                            shinydashboard::box(title = "Training",
@@ -3958,8 +4003,9 @@ start_aifeducation_studio<-function(){
                                                   label = "Add Min/Max",
                                                   value = TRUE,
                                                   status = "primary"),
-                                   shiny::uiOutput(outputId = "tec_performance_techniques_widget"),
-                                   shiny::uiOutput(outputId = "tec_performance_bpl_steps")
+                                   shiny::uiOutput(outputId = "tec_performance_bpl_steps"),
+                                   #Only relevant for old classifiers of class TextEmbeddingClassifierNeuralNet
+                                   shiny::uiOutput(outputId = "tec_performance_techniques_widget")
                                  ),
                                  mainPanel =shiny::mainPanel(
                                    shiny::plotOutput(outputId = "tec_performance_training_loss")
@@ -4228,156 +4274,283 @@ start_aifeducation_studio<-function(){
     #Performance
     output$tec_performance_techniques_widget<-shiny::renderUI({
       classifier=Classifier_for_Use()
-
       if(!is.null(classifier) & !is.null(input$tec_performance_training_phase)){
-        training_techniques=NULL
-        if(classifier$last_training$config$use_baseline==TRUE &
-           input$tec_performance_training_phase!="final_training"){
-          training_techniques["Baseline Model"]="bsl"
+        if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
+          training_techniques=NULL
+          if((classifier$last_training$config$use_baseline==TRUE &
+             input$tec_performance_training_phase!="final_training") |
+             (classifier$last_training$config$use_bsc==FALSE &
+              classifier$last_training$config$use_bpl==FALSE
+              )){
+            training_techniques["Baseline Model"]="bsl"
+          }
+          if(classifier$last_training$config$use_bsc==TRUE){
+            training_techniques["Balanced Synthetic Cases"]="bsc"
+          }
+          if(classifier$last_training$config$use_bpl==TRUE){
+            training_techniques["Balanced Pseudo Labeling"]="bpl"
+          }
+          return(shinyWidgets::radioGroupButtons(
+            inputId = "tec_performance_training_techniques",
+            label = "Techniques",
+            choices = training_techniques)
+          )
+        } else {
+          return(NULL)
         }
-        if(classifier$last_training$config$use_bsc==TRUE){
-          training_techniques["Balanced Synthetic Cases"]="bsc"
-        }
-        if(classifier$last_training$config$use_bpl==TRUE){
-          training_techniques["Balanced Pseudo Labeling"]="bpl"
-        }
-        return(shinyWidgets::radioGroupButtons(
-          inputId = "tec_performance_training_techniques",
-          label = "Techniques",
-          choices = training_techniques)
-        )
       } else {
         return(NULL)
       }
-
     })
 
 
     performance_data_for_visual<-shiny::reactive({
-      if(is.null(Classifier_for_Use())==FALSE &
-         is.null(input$tec_performance_training_techniques)==FALSE &
-         is.null(input$tec_performance_training_phase)==FALSE){
-
-        if(input$tec_performance_training_techniques=="bsl" &
-           input$tec_performance_training_phase=="final_training"){
-          return(NULL)
-        } else {
-          classifier=Classifier_for_Use()
-          plot_data=classifier$last_training$history[[input$tec_performance_training_techniques]]
-
-          if(input$tec_performance_training_phase=="summary_folds"){
-            if(input$tec_performance_training_techniques!="bpl"){
-              n_epochs=ncol(plot_data[[1]]$loss)
-              n_sample_type=nrow(plot_data[[1]]$loss)
-              n_folds=classifier$last_training$n_samples
+      if(is.null(Classifier_for_Use())==FALSE){
+        if("TextEmbeddingClassifierNeuralNet"%in%class(Classifier_for_Use())==TRUE){
+          if(is.null(input$tec_performance_training_techniques)==FALSE &
+             is.null(input$tec_performance_training_phase)==FALSE){
+            if(input$tec_performance_training_techniques=="bsl" &
+               input$tec_performance_training_phase=="final_training"){
+              return(NULL)
             } else {
-              n_epochs=ncol(plot_data[[1]][[as.numeric(input$tec_training_bpl_step)]]$loss)
-              n_sample_type=nrow(plot_data[[1]][[as.numeric(input$tec_training_bpl_step)]]$loss)
-              n_folds=classifier$last_training$n_samples
-            }
-          } else {
-            if(input$tec_performance_training_techniques!="bpl"){
-              n_epochs=ncol(plot_data[["final"]]$loss)
-              n_sample_type=nrow(plot_data[["final"]]$loss)
-              n_folds=1
-            } else {
-              n_epochs=ncol(plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$loss)
-              n_sample_type=nrow(plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$loss)
-              n_folds=1
-            }
-          }
+              classifier=Classifier_for_Use()
+              plot_data=classifier$last_training$history[[input$tec_performance_training_techniques]]
 
-          if(n_sample_type==3){
-            sample_type_name=c("train","validation","test")
-          } else {
-            sample_type_name=c("train","validation")
-          }
-
-          loss_array=array(dim = c(n_folds,
-                                   n_sample_type,
-                                   n_epochs),
-                           dimnames = list(fold=NULL,sample_type=sample_type_name,epoch=NULL))
-          bacc_array=loss_array
-          acc_array=loss_array
-
-          final_data_loss=matrix(data = NA,
-                                 nrow = n_epochs,
-                                 ncol = 3*n_sample_type+1)
-          colnames(final_data_loss)=c("epoch",
-                                      paste0(sample_type_name,
-                                             c(rep("_min",times=n_sample_type),
-                                               rep("_mean",times=n_sample_type),
-                                               rep("_max",times=n_sample_type))))
-          final_data_loss[,"epoch"]=seq.int(from = 1,to=n_epochs)
-          final_data_bacc=final_data_loss
-          final_data_acc=final_data_loss
-
-          if(input$tec_performance_training_phase=="summary_folds"){
-            for(i in 1:n_folds){
-              if(input$tec_performance_training_techniques!="bpl"){
-                loss_array[i,,]=plot_data[[i]]$loss
-                bacc_array[i,,]=plot_data[[i]]$balanced_accuracy
-                acc_array[i,,]=plot_data[[i]]$accuracy
+              if(input$tec_performance_training_phase=="summary_folds"){
+                if(input$tec_performance_training_techniques!="bpl"){
+                  n_epochs=ncol(plot_data[[1]]$loss)
+                  n_sample_type=nrow(plot_data[[1]]$loss)
+                  n_folds=classifier$last_training$n_samples
+                } else {
+                  n_epochs=ncol(plot_data[[1]][[as.numeric(input$tec_training_bpl_step)]]$loss)
+                  n_sample_type=nrow(plot_data[[1]][[as.numeric(input$tec_training_bpl_step)]]$loss)
+                  n_folds=classifier$last_training$n_samples
+                }
               } else {
-                loss_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$loss
-                bacc_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$balanced_accuracy
-                acc_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$accuracy
+                if(input$tec_performance_training_techniques!="bpl"){
+                  n_epochs=ncol(plot_data[["final"]]$loss)
+                  n_sample_type=nrow(plot_data[["final"]]$loss)
+                  n_folds=1
+                } else {
+                  n_epochs=ncol(plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$loss)
+                  n_sample_type=nrow(plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$loss)
+                  n_folds=1
+                }
               }
-            }
-          } else if(input$tec_performance_training_phase=="final_training"){
-            if(input$tec_performance_training_techniques!="bpl"){
-              loss_array[1,,]=plot_data[["final"]]$loss
-              bacc_array[1,,]=plot_data[["final"]]$balanced_accuracy
-              acc_array[1,,]=plot_data[["final"]]$accuracy
-            } else {
-              loss_array[1,,]=plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$loss
-              bacc_array[1,,]=plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$balanced_accuracy
-              acc_array[1,,]=plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$accuracy
-            }
+
+              if(n_sample_type==3){
+                sample_type_name=c("train","validation","test")
+              } else {
+                sample_type_name=c("train","validation")
+              }
+
+              loss_array=array(dim = c(n_folds,
+                                       n_sample_type,
+                                       n_epochs),
+                               dimnames = list(fold=NULL,sample_type=sample_type_name,epoch=NULL))
+              bacc_array=loss_array
+              acc_array=loss_array
+
+              final_data_loss=matrix(data = NA,
+                                     nrow = n_epochs,
+                                     ncol = 3*n_sample_type+1)
+              colnames(final_data_loss)=c("epoch",
+                                          paste0(sample_type_name,
+                                                 c(rep("_min",times=n_sample_type),
+                                                   rep("_mean",times=n_sample_type),
+                                                   rep("_max",times=n_sample_type))))
+              final_data_loss[,"epoch"]=seq.int(from = 1,to=n_epochs)
+              final_data_bacc=final_data_loss
+              final_data_acc=final_data_loss
+
+              if(input$tec_performance_training_phase=="summary_folds"){
+                for(i in 1:n_folds){
+                  if(input$tec_performance_training_techniques!="bpl"){
+                    loss_array[i,,]=plot_data[[i]]$loss
+                    bacc_array[i,,]=plot_data[[i]]$balanced_accuracy
+                    acc_array[i,,]=plot_data[[i]]$accuracy
+                  } else {
+                    loss_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$loss
+                    bacc_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$balanced_accuracy
+                    acc_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$accuracy
+                  }
+                }
+              } else if(input$tec_performance_training_phase=="final_training"){
+                if(input$tec_performance_training_techniques!="bpl"){
+                  loss_array[1,,]=plot_data[["final"]]$loss
+                  bacc_array[1,,]=plot_data[["final"]]$balanced_accuracy
+                  acc_array[1,,]=plot_data[["final"]]$accuracy
+                } else {
+                  loss_array[1,,]=plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$loss
+                  bacc_array[1,,]=plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$balanced_accuracy
+                  acc_array[1,,]=plot_data[["final"]][[as.numeric(input$tec_training_bpl_step)]]$accuracy
+                }
+              }
+
+              for(i in 1:n_epochs){
+                final_data_loss[i,"train_min"]=min(loss_array[,"train",i])
+                final_data_loss[i,"train_mean"]=mean(loss_array[,"train",i])
+                final_data_loss[i,"train_max"]=max(loss_array[,"train",i])
+
+                final_data_bacc[i,"train_min"]=min(bacc_array[,"train",i])
+                final_data_bacc[i,"train_mean"]=mean(bacc_array[,"train",i])
+                final_data_bacc[i,"train_max"]=max(bacc_array[,"train",i])
+
+                final_data_acc[i,"train_min"]=min(acc_array[,"train",i])
+                final_data_acc[i,"train_mean"]=mean(acc_array[,"train",i])
+                final_data_acc[i,"train_max"]=max(acc_array[,"train",i])
+
+                final_data_loss[i,"validation_min"]=min(loss_array[,"validation",i])
+                final_data_loss[i,"validation_mean"]=mean(loss_array[,"validation",i])
+                final_data_loss[i,"validation_max"]=max(loss_array[,"validation",i])
+
+                final_data_bacc[i,"validation_min"]=min(bacc_array[,"validation",i])
+                final_data_bacc[i,"validation_mean"]=mean(bacc_array[,"validation",i])
+                final_data_bacc[i,"validation_max"]=max(bacc_array[,"validation",i])
+
+                final_data_acc[i,"validation_min"]=min(acc_array[,"validation",i])
+                final_data_acc[i,"validation_mean"]=mean(acc_array[,"validation",i])
+                final_data_acc[i,"validation_max"]=max(acc_array[,"validation",i])
+                if(n_sample_type==3){
+                  final_data_loss[i,"test_min"]=min(loss_array[,"test",i])
+                  final_data_loss[i,"test_mean"]=mean(loss_array[,"test",i])
+                  final_data_loss[i,"test_max"]=max(loss_array[,"test",i])
+
+                  final_data_bacc[i,"test_min"]=min(bacc_array[,"test",i])
+                  final_data_bacc[i,"test_mean"]=mean(bacc_array[,"test",i])
+                  final_data_bacc[i,"test_max"]=max(bacc_array[,"test",i])
+
+                  final_data_acc[i,"test_min"]=min(acc_array[,"test",i])
+                  final_data_acc[i,"test_mean"]=mean(acc_array[,"test",i])
+                  final_data_acc[i,"test_max"]=max(acc_array[,"test",i])
+                }
+              }
+              return(list(loss=as.data.frame(final_data_loss),
+                          bacc=as.data.frame(final_data_bacc),
+                          acc=as.data.frame(final_data_acc)))
           }
-
-          for(i in 1:n_epochs){
-            final_data_loss[i,"train_min"]=min(loss_array[,"train",i])
-            final_data_loss[i,"train_mean"]=mean(loss_array[,"train",i])
-            final_data_loss[i,"train_max"]=max(loss_array[,"train",i])
-
-            final_data_bacc[i,"train_min"]=min(bacc_array[,"train",i])
-            final_data_bacc[i,"train_mean"]=mean(bacc_array[,"train",i])
-            final_data_bacc[i,"train_max"]=max(bacc_array[,"train",i])
-
-            final_data_acc[i,"train_min"]=min(acc_array[,"train",i])
-            final_data_acc[i,"train_mean"]=mean(acc_array[,"train",i])
-            final_data_acc[i,"train_max"]=max(acc_array[,"train",i])
-
-            final_data_loss[i,"validation_min"]=min(loss_array[,"validation",i])
-            final_data_loss[i,"validation_mean"]=mean(loss_array[,"validation",i])
-            final_data_loss[i,"validation_max"]=max(loss_array[,"validation",i])
-
-            final_data_bacc[i,"validation_min"]=min(bacc_array[,"validation",i])
-            final_data_bacc[i,"validation_mean"]=mean(bacc_array[,"validation",i])
-            final_data_bacc[i,"validation_max"]=max(bacc_array[,"validation",i])
-
-            final_data_acc[i,"validation_min"]=min(acc_array[,"validation",i])
-            final_data_acc[i,"validation_mean"]=mean(acc_array[,"validation",i])
-            final_data_acc[i,"validation_max"]=max(acc_array[,"validation",i])
-            if(n_sample_type==3){
-              final_data_loss[i,"test_min"]=min(loss_array[,"test",i])
-              final_data_loss[i,"test_mean"]=mean(loss_array[,"test",i])
-              final_data_loss[i,"test_max"]=max(loss_array[,"test",i])
-
-              final_data_bacc[i,"test_min"]=min(bacc_array[,"test",i])
-              final_data_bacc[i,"test_mean"]=mean(bacc_array[,"test",i])
-              final_data_bacc[i,"test_max"]=max(bacc_array[,"test",i])
-
-              final_data_acc[i,"test_min"]=min(acc_array[,"test",i])
-              final_data_acc[i,"test_mean"]=mean(acc_array[,"test",i])
-              final_data_acc[i,"test_max"]=max(acc_array[,"test",i])
-            }
-          }
-          return(list(loss=as.data.frame(final_data_loss),
-                      bacc=as.data.frame(final_data_bacc),
-                      acc=as.data.frame(final_data_acc)))
         }
+      } else {
+      #Plot data for all other classifiers
+        classifier=Classifier_for_Use()
+        plot_data=classifier$last_training$history
+
+        #Get standard statistics
+        n_epochs=classifier$last_training$config$epochs
+        index_final=length(classifier$last_training$history)
+
+
+        #Get information about the existence of a training, validation, and test data set
+        #Get Number of folds for the request
+        if(input$tec_performance_training_phase=="summary_folds"){
+          n_folds=length(classifier$last_training$history)-1
+          if(classifier$last_training$config$use_pl==FALSE){
+            n_sample_type=nrow(plot_data[[1]]$loss)
+          } else {
+            n_sample_type=nrow(plot_data[[1]][[as.numeric(input$tec_training_bpl_step)]]$loss)
+          }
+        } else {
+          n_folds=1
+          if(classifier$last_training$config$use_pl==FALSE){
+            n_sample_type=nrow(plot_data[[index_final]]$loss)
+          } else {
+            n_sample_type=nrow(plot_data[[index_final]][[as.numeric(input$tec_training_bpl_step)]]$loss)
+          }
+        }
+      }
+
+        if(n_sample_type==3){
+          sample_type_name=c("train","validation","test")
+        } else {
+          sample_type_name=c("train","validation")
+        }
+
+        #Create array for saving the data
+        loss_array=array(dim = c(n_folds,
+                                 n_sample_type,
+                                 n_epochs),
+                         dimnames = list(fold=NULL,sample_type=sample_type_name,epoch=NULL))
+        bacc_array=loss_array
+        acc_array=loss_array
+
+        final_data_loss=matrix(data = NA,
+                               nrow = n_epochs,
+                               ncol = 3*n_sample_type+1)
+        colnames(final_data_loss)=c("epoch",
+                                    paste0(sample_type_name,
+                                           c(rep("_min",times=n_sample_type),
+                                             rep("_mean",times=n_sample_type),
+                                             rep("_max",times=n_sample_type))))
+        final_data_loss[,"epoch"]=seq.int(from = 1,to=n_epochs)
+        final_data_bacc=final_data_loss
+        final_data_acc=final_data_loss
+
+        #Create data set for plot
+        if(input$tec_performance_training_phase=="summary_folds"){
+          for(i in 1:n_folds){
+            if(classifier$last_training$config$use_pl==FALSE){
+              loss_array[i,,]=plot_data[[i]]$loss
+              bacc_array[i,,]=plot_data[[i]]$balanced_accuracy
+              acc_array[i,,]=plot_data[[i]]$accuracy
+            } else {
+              loss_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$loss
+              bacc_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$balanced_accuracy
+              acc_array[i,,]=plot_data[[i]][[as.numeric(input$tec_training_bpl_step)]]$accuracy
+            }
+          }
+        } else if(input$tec_performance_training_phase=="final_training"){
+          if(classifier$last_training$config$use_pl==FALSE){
+            loss_array[1,,]=plot_data[[index_final]]$loss
+            bacc_array[1,,]=plot_data[[index_final]]$balanced_accuracy
+            acc_array[1,,]=plot_data[[index_final]]$accuracy
+          } else {
+            loss_array[1,,]=plot_data[[index_final]][[as.numeric(input$tec_training_bpl_step)]]$loss
+            bacc_array[1,,]=plot_data[[index_final]][[as.numeric(input$tec_training_bpl_step)]]$balanced_accuracy
+            acc_array[1,,]=plot_data[[index_final]][[as.numeric(input$tec_training_bpl_step)]]$accuracy
+          }
+        }
+
+        for(i in 1:n_epochs){
+          final_data_loss[i,"train_min"]=min(loss_array[,"train",i])
+          final_data_loss[i,"train_mean"]=mean(loss_array[,"train",i])
+          final_data_loss[i,"train_max"]=max(loss_array[,"train",i])
+
+          final_data_bacc[i,"train_min"]=min(bacc_array[,"train",i])
+          final_data_bacc[i,"train_mean"]=mean(bacc_array[,"train",i])
+          final_data_bacc[i,"train_max"]=max(bacc_array[,"train",i])
+
+          final_data_acc[i,"train_min"]=min(acc_array[,"train",i])
+          final_data_acc[i,"train_mean"]=mean(acc_array[,"train",i])
+          final_data_acc[i,"train_max"]=max(acc_array[,"train",i])
+
+          final_data_loss[i,"validation_min"]=min(loss_array[,"validation",i])
+          final_data_loss[i,"validation_mean"]=mean(loss_array[,"validation",i])
+          final_data_loss[i,"validation_max"]=max(loss_array[,"validation",i])
+
+          final_data_bacc[i,"validation_min"]=min(bacc_array[,"validation",i])
+          final_data_bacc[i,"validation_mean"]=mean(bacc_array[,"validation",i])
+          final_data_bacc[i,"validation_max"]=max(bacc_array[,"validation",i])
+
+          final_data_acc[i,"validation_min"]=min(acc_array[,"validation",i])
+          final_data_acc[i,"validation_mean"]=mean(acc_array[,"validation",i])
+          final_data_acc[i,"validation_max"]=max(acc_array[,"validation",i])
+          if(n_sample_type==3){
+            final_data_loss[i,"test_min"]=min(loss_array[,"test",i])
+            final_data_loss[i,"test_mean"]=mean(loss_array[,"test",i])
+            final_data_loss[i,"test_max"]=max(loss_array[,"test",i])
+
+            final_data_bacc[i,"test_min"]=min(bacc_array[,"test",i])
+            final_data_bacc[i,"test_mean"]=mean(bacc_array[,"test",i])
+            final_data_bacc[i,"test_max"]=max(bacc_array[,"test",i])
+
+            final_data_acc[i,"test_min"]=min(acc_array[,"test",i])
+            final_data_acc[i,"test_mean"]=mean(acc_array[,"test",i])
+            final_data_acc[i,"test_max"]=max(acc_array[,"test",i])
+          }
+        }
+        return(list(loss=as.data.frame(final_data_loss),
+                    bacc=as.data.frame(final_data_bacc),
+                    acc=as.data.frame(final_data_acc)))
       } else {
         return(NULL)
       }
@@ -4444,6 +4617,53 @@ start_aifeducation_studio<-function(){
           ggplot2::theme(text = ggplot2::element_text(size = input$tec_performance_text_size),
                          legend.position="bottom")
         return(plot)
+      } else {
+        return(NULL)
+      }
+    },res = 72*2)
+
+    #Plot Training Feature Extractor-------------------------------------------
+    output$tec_fe_performance_training_loss<-shiny::renderPlot({
+      classifier=Classifier_for_Use()
+      if(!is.null(classifier)){
+        if(!"TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
+          if(classifier$model_config$use_fe==TRUE){
+
+            plot_data=matrix(nrow = ncol(classifier$feature_extractor$history),
+                             ncol = 3)
+            for(i in 1:nrow(plot_data)){
+              plot_data[i,1]=classifier$feature_extractor$history[1,i]
+              plot_data[i,2]=classifier$feature_extractor$history[2,i]
+              plot_data[i,3]=i
+            }
+            colnames(plot_data)=c("train","validation","epoch")
+            plot_data=as.data.frame(plot_data)
+
+            y_min=input$tec_fe_performance_y_min
+            y_max=input$tec_fe_performance_y_max
+            y_label="loss"
+
+
+              plot<-ggplot2::ggplot(data=plot_data)+
+                ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$train,color="train"))+
+                ggplot2::geom_line(ggplot2::aes(x=.data$epoch,y=.data$validation,color="validation"))
+
+              plot=plot+ggplot2::theme_classic()+
+                ggplot2::ylab(y_label)+
+                ggplot2::coord_cartesian(ylim=c(y_min,y_max))+
+                ggplot2::xlab("epoch")+
+                ggplot2::scale_color_manual(values = c("train"="red",
+                                                       "validation"="blue",
+                                                       "test"="darkgreen"))+
+                ggplot2::theme(text = ggplot2::element_text(size = input$tec_fe_performance_text_size),
+                               legend.position="bottom")
+              return(plot)
+          } else {
+            return(NULL)
+          }
+        } else {
+          return(NULL)
+        }
       } else {
         return(NULL)
       }
@@ -4644,7 +4864,8 @@ start_aifeducation_studio<-function(){
                                      ml_framework=input$config_ml_framework),
                        silent = TRUE)
         if(methods::is(classifier,class2 = "try-error")==FALSE){
-          if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)){
+          if("TextEmbeddingClassifierNeuralNet"%in%class(classifier)|
+             "TEClassifierRegular"%in%class(classifier)){
             if(utils::compareVersion(as.character(classifier$get_package_versions()$r_package_versions$aifeducation),"0.3.1")>=0){
               shinyWidgets::closeSweetAlert()
               return(classifier)

@@ -37,6 +37,9 @@ load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework
 
     if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
       aifeducation_version<-loaded_model$get_package_versions()[[1]]$aifeducation
+    } else if(methods::is(loaded_model,"TEClassifierRegular")|
+              methods::is(loaded_model,"TEClassifierProtoNet")){
+      aifeducation_version<-loaded_model$get_package_versions()$r_package_versions$aifeducation
     } else {
       aifeducation_version<-loaded_model$get_package_versions()$aifeducation
     }
@@ -53,7 +56,9 @@ load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework
       return(loaded_model)
     } else {
       #For aifeducation 0.2.1 and higher-----------------------------------------
-      if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
+      if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")|
+         methods::is(loaded_model,"TEClassifierRegular")|
+         methods::is(loaded_model,"TEClassifierProtoNet")){
         loaded_model$load_model(
           dir_path=model_dir,
           ml_framework=ml_framework)
@@ -103,11 +108,15 @@ save_ai_model<-function(model,
                         dir_name=NULL,
                         save_format="default",
                         append_ID=TRUE){
-  if(methods::is(model,"TextEmbeddingClassifierNeuralNet") |
+  if(methods::is(model,"TextEmbeddingClassifierNeuralNet")|
+     methods::is(model,"TEClassifierRegular")|
+     methods::is(model,"TEClassifierProtoNet") |
      methods::is(model,"TextEmbeddingModel")){
 
     #Check for valid save formats----------------------------------------------
-    if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
+    if(methods::is(model,"TextEmbeddingClassifierNeuralNet")|
+       methods::is(model,"TEClassifierRegular")|
+       methods::is(model,"TEClassifierProtoNet")){
       if(model$get_ml_framework()=="pytorch"){
         if(save_format%in%c("default","pt","safetensors")==FALSE){
           stop("For classifiers based on 'pytorch' only 'pt' and 'safetensors' are
@@ -157,6 +166,9 @@ save_ai_model<-function(model,
     #Get Package Version
     if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
       aifeducation_version<-model$get_package_versions()[[1]]$aifeducation
+    } else if(methods::is(model,"TEClassifierRegular")|
+              methods::is(model,"TEClassifierProtoNet")){
+      aifeducation_version<-model$get_package_versions()$r_package_versions$aifeducation
     } else {
       aifeducation_version<-model$get_package_versions()$aifeducation
     }
@@ -173,7 +185,9 @@ save_ai_model<-function(model,
         }
       }
     } else {
-      if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
+      if(methods::is(model,"TextEmbeddingClassifierNeuralNet")|
+         methods::is(model,"TEClassifierRegular")|
+         methods::is(model,"TEClassifierProtoNet")){
         model$save_model(dir_path = final_model_dir_path,
                          save_format=save_format)
       } else {

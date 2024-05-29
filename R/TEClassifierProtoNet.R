@@ -41,6 +41,15 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param label \code{Character} Label for the new classifier. Here you can use
     #'free text.
     #'@param text_embeddings An object of class\code{TextEmbeddingModel}.
+    #'@param use_fe \code{bool} If \code{TRUE} a feature extractor is applied in
+    #'order to reduce the dimensionality of the text embeddings.
+    #'@param fe_features \code{int} determining the number of dimensions to which
+    #'the dimension of the text embedding should be reduced.
+    #'@param fe_method \code{string} Method to use for the feature extraction.
+    #'\code{"lstm"} for an extractor based on LSTM-layers or \code{"dense"} for
+    #'dense layers.
+    #'@param fe_noise_factor \code{double} between 0 and a value lower 1 indicating
+    #'how much noise should be added for the training of the feature extractor.
     #'@param targets \code{factor} containing the target values of the classifier.
     #'@param hidden \code{vector} containing the number of neurons for each dense layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer,
@@ -50,6 +59,8 @@ TEClassifierProtoNet<-R6::R6Class(
     #'set this parameter to \code{NULL}.
     #'@param rec_type \code{string} Type of the recurrent layers. \code{rec_type="gru"} for
     #'Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.
+    #'@param rec_bidirectional \code{bool} If \code{TRUE} a bidirectional version of the reccurent
+    #'layers is used.
     #'@param embedding_dim \code{Int} determining the dimensionality of the embedding.
     #'@param attention_type \code{string} Choose the relevant attention type. Possible values
     #'are \code{"fourier"} and \code{multihead}.
@@ -75,10 +86,15 @@ TEClassifierProtoNet<-R6::R6Class(
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
+                        use_fe=TRUE,
+                        fe_features=128,
+                        fe_method="lstm",
+                        fe_noise_factor=0.2,
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
                         rec_type="gru",
+                        rec_bidirectional=FALSE,
                         embedding_dim=3,
                         self_attention_heads=0,
                         intermediate_size=NULL,
@@ -177,13 +193,23 @@ TEClassifierProtoNet<-R6::R6Class(
         }
       }
 
+      if(use_fe==TRUE){
+        features=fe_features
+      } else {
+        features=private$text_embedding_model[["features"]]
+      }
+
       #Saving Configuration
       config=list(
-        features= private$text_embedding_model[["features"]],
+        use_fe=use_fe,
+        fe_method=fe_method,
+        fe_noise_factor=fe_noise_factor,
+        features=features,
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
         rec=rec,
         rec_type=rec_type,
+        rec_bidirectional=rec_bidirectional,
         intermediate_size=intermediate_size,
         attention_type=attention_type,
         repeat_encoder=repeat_encoder,
@@ -229,6 +255,9 @@ TEClassifierProtoNet<-R6::R6Class(
 
       #Create_Model------------------------------------------------------------
       private$create_reset_model()
+      if(self$model_config$use_fe==TRUE){
+        self$feature_extractor$model=private$create_feature_extractor()
+      }
 
       private$model_info$model_date=date()
 
@@ -252,6 +281,8 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param data_val_size \code{double} between 0 and 1, indicating the proportion of cases of each class
     #'which should be used for the validation sample during the estimation of the baseline model.
     #'The remaining cases are part of the training data.
+    #'@param fe_val_size \code{double} between 0 and 1, indicating the proportion of cases
+    #'which should be used for the validation sample during the training of the feature extractor.
     #'@param balance_class_weights \code{bool} If \code{TRUE} class weights are
     #'generated based on the frequencies of the training data with the method
     #'Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.
@@ -288,7 +319,9 @@ TEClassifierProtoNet<-R6::R6Class(
     #'\url{https://mlco2.github.io/codecarbon/parameters.html}
     #'@param sustain_interval \code{integer} Interval in seconds for measuring power
     #'usage.
+    #'@param batch_size \code{int} Size of the batches for the feature extractor.
     #'@param epochs \code{int} Number of training epochs.
+    #'@param fe_epochs \code{int} Number of training epochs for the feature extractor.
     #'@param Ns \code{int} Number of cases for every class in the sample.
     #'@param Nq \code{int} Number of cases for every class in the query.
     #'@param loss_alpha \code{double} Value between 0 and 1 indicating how strong
@@ -339,6 +372,8 @@ TEClassifierProtoNet<-R6::R6Class(
                    sustain_region=NULL,
                    sustain_interval=15,
                    epochs=40,
+                   batch_size=35,
+                   fe_epochs=1000,
                    Ns=5,
                    Nq=3,
                    loss_alpha,
@@ -392,6 +427,7 @@ TEClassifierProtoNet<-R6::R6Class(
       self$last_training$config$sustain_region=sustain_region
       self$last_training$config$sustain_interval=sustain_interval
       self$last_training$config$epochs=epochs
+      self$last_training$config$batch_size=batch_size
       self$last_training$config$Ns=Ns
       self$last_training$config$Nq=Nq
       self$last_training$config$loss_alpha=loss_alpha
@@ -401,6 +437,9 @@ TEClassifierProtoNet<-R6::R6Class(
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
 
+      self$feature_extractor$val_size=fe_val_size
+      self$feature_extractor$epochs=fe_epochs
+
       #Start-------------------------------------------------------------------
       if(self$last_training$config$trace==TRUE){
         message(paste(date(),
@@ -408,18 +447,37 @@ TEClassifierProtoNet<-R6::R6Class(
       }
 
       #Create DataManager------------------------------------------------------
-      data_manager=DataManagerClassifier$new(
-        data_embeddings=data_embeddings,
-        data_targets=data_targets,
-        folds=data_folds,
-        val_size=self$last_training$config$data_val_size,
-        class_levels=self$model_config$target_levels,
-        one_hot_encoding=self$model_config$require_one_hot,
-        add_matrix_map=if(self$model_config$require_matrix_map==TRUE|self$last_training$config$use_sc==TRUE){TRUE}else{FALSE},
-        sc_method=sc_method,
-        sc_min_k=sc_min_k,
-        sc_max_k=sc_max_k,
-        trace=trace)
+      if(self$model_config$use_fe==TRUE){
+        private$train_feature_extractor(data_embeddings = data_embeddings)
+
+        data_manager=DataManagerClassifier$new(
+          data_embeddings=self$extract_features(data_embeddings = data_embeddings,
+                                                as.integer(batch_size=self$last_training$config$batch_size),
+                                                return_r_object = TRUE),
+          data_targets=data_targets,
+          folds=data_folds,
+          val_size=self$last_training$config$data_val_size,
+          class_levels=self$model_config$target_levels,
+          one_hot_encoding=self$model_config$require_one_hot,
+          add_matrix_map=if(self$model_config$require_matrix_map==TRUE|self$last_training$config$use_sc==TRUE){TRUE}else{FALSE},
+          sc_method=sc_method,
+          sc_min_k=sc_min_k,
+          sc_max_k=sc_max_k,
+          trace=trace)
+      } else {
+        data_manager=DataManagerClassifier$new(
+          data_embeddings=data_embeddings,
+          data_targets=data_targets,
+          folds=data_folds,
+          val_size=self$last_training$config$data_val_size,
+          class_levels=self$model_config$target_levels,
+          one_hot_encoding=self$model_config$require_one_hot,
+          add_matrix_map=if(self$model_config$require_matrix_map==TRUE|self$last_training$config$use_sc==TRUE){TRUE}else{FALSE},
+          sc_method=sc_method,
+          sc_min_k=sc_min_k,
+          sc_max_k=sc_max_k,
+          trace=trace)
+      }
 
       #Save Data Statistics
       self$last_training$data=data_manager$get_statistics()
@@ -429,6 +487,9 @@ TEClassifierProtoNet<-R6::R6Class(
 
       #Init Training------------------------------------------------------------
       private$init_train()
+
+      #disable Progress bars
+      datasets$disable_progress_bars()
 
       #SetUp GUI----------------------------------------------------------------
       private$init_gui(data_manager = data_manager)
@@ -704,6 +765,7 @@ TEClassifierProtoNet<-R6::R6Class(
                                                hidden=if(!is.null(self$model_config$hidden)){as.integer(self$model_config$hidden)}else{NULL},
                                                rec=if(!is.null(self$model_config$rec)){as.integer(self$model_config$rec)}else{NULL},
                                                rec_type=self$model_config$rec_type,
+                                               rec_bidirectional=self$model_config$rec_bidirectional,
                                                intermediate_size=as.integer(self$model_config$intermediate_size),
                                                attention_type=self$model_config$attention_type,
                                                repeat_encoder=as.integer(self$model_config$repeat_encoder),

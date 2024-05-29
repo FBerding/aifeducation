@@ -58,7 +58,8 @@ for (folder in folder_list){
   }
 }
 
-ml_frameworks=c("tensorflow","pytorch")
+#ml_frameworks=c("tensorflow","pytorch")
+ml_frameworks="pytorch"
 #-------------------------------------------------------------------------------
 aifeducation::set_config_gpu_low_memory()
 load(testthat::test_path(path))
@@ -81,70 +82,96 @@ for(framework in ml_frameworks){
     example_targets<-as.factor(example_data$label)
     names(example_targets)=example_data$id
 
-    #-------------------------------------------------------------------------------
-    #Test Creation of the models
-
+    #Test creation and prediction of the classifier----------------------------
+    feature_extractor_list=list(TRUE,FALSE)
     rec_list=list(NULL,c(28),c(28,14))
+    rec_type_list=list("gru","lstm")
+    rec_bidirectiona_list=list(TRUE,FALSE)
     hidden_list=list(NULL,c(27),c(27,13))
     r_encoder_list=list(0,1,2)
     attention_list=list("fourier","multihead")
     pos_embedding_list=list(TRUE,FALSE)
 
 
+    for(feature_extractor in feature_extractor_list){
       for(rec in rec_list){
         for(hidden in hidden_list){
           for(r in r_encoder_list){
             for(attention in attention_list){
               for(pos_embedding in pos_embedding_list){
-                test_that(paste(framework,"creation_classifier_neural_net","n_classes",n_classes,
-                                "rec",paste(rec,collapse = "_"),"hidden",paste(hidden,collapse = "_"),"encoder",r,"attention",attention,"pos",pos_embedding), {
-                  classifier<-NULL
-                  classifier<-TextEmbeddingClassifierNeuralNet$new(
-                    ml_framework = framework,
-                    name="movie_review_classifier",
-                    label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-                    text_embeddings=current_embeddings,
-                    targets=example_targets,
-                    hidden=hidden,
-                    rec=rec,
-                    self_attention_heads = 2,
-                    add_pos_embedding = pos_embedding,
-                    attention_type =  attention,
-                    encoder_dropout = 0.1,
-                    repeat_encoder = r,
-                    recurrent_dropout=0.4)
+                for(rec_type in rec_type_list){
+                  for(rec_bidirectional in rec_bidirectiona_list){
+                classifier<-NULL
+                gc()
+                classifier<-TEClassifierRegular$new(
+                  ml_framework = framework,
+                  name="movie_review_classifier",
+                  label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+                  text_embeddings=current_embeddings,
+                  use_fe=feature_extractor,
+                  fe_features=64,
+                  targets=example_targets,
+                  hidden=hidden,
+                  rec=rec,
+                  rec_type = rec_type,
+                  rec_bidirectional=rec_bidirectional,
+                  self_attention_heads = 2,
+                  add_pos_embedding = pos_embedding,
+                  attention_type =  attention,
+                  encoder_dropout = 0.1,
+                  repeat_encoder = r,
+                  recurrent_dropout=0.4)
+                test_that(paste(framework,"creation_classifier_regular",
+                                "n_classes",n_classes,
+                                "features_extractor",feature_extractor,
+                                "rec",paste(rec,collapse = "_"),
+                                "rec_type",rec_type,
+                                "rec_bidirectional",rec_bidirectional,
+                                "hidden",paste(hidden,collapse = "_"),
+                                "encoder",r,
+                                "attention",attention,
+                                "pos",pos_embedding),
+                          {
+                            expect_s3_class(classifier,
+                                            class="TEClassifierRegular")
 
-                  expect_s3_class(classifier,
-                                  class="TextEmbeddingClassifierNeuralNet")
+                            predictions=classifier$predict(
+                              newdata = current_embeddings$embeddings[1:3,,],
+                              batch_size = 2,
+                              verbose = 0)
+                            expect_equal(object = length(predictions$expected_category),expected = 3)
 
-                  predictions=classifier$predict(
-                    newdata = current_embeddings$embeddings[1:3,,],
-                    batch_size = 2,
-                    verbose = 0)
-                  expect_equal(object = length(predictions$expected_category),expected = 3)
-
-                  expect_false(classifier$get_sustainability_data()$sustainability_tracked)
-                })
+                            expect_false(classifier$get_sustainability_data()$sustainability_tracked)
+                            })
+                  }
+                }
               }
             }
           }
         }
       }
+    }
 
-    #-------------------------------------------------------------------------------
+    #Test training of the classifier-------------------------------------------
     classifier<-NULL
     if(n_classes==2){
       attention_type = "fourier"
+      add_pos_embedding=FALSE
     } else {
       attention_type = "multihead"
+      add_pos_embedding=TRUE
     }
 
-    classifier<-TextEmbeddingClassifierNeuralNet$new(
+    classifier<-TEClassifierRegular$new(
       ml_framework = framework,
       name=paste0("movie_review_classifier_","classes_",n_classes),
       label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
       text_embeddings=current_embeddings,
       targets=example_targets,
+      use_fe = TRUE,
+      fe_method = "dense",
+      add_pos_embedding=add_pos_embedding,
+      fe_features=30,
       hidden=c(3,3),
       rec=c(4,3),
       self_attention_heads = 1,
@@ -153,200 +180,52 @@ for(framework in ml_frameworks){
       recurrent_dropout=0.4,
       optimizer="adam")
 
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"training_baseline_only","n_classes",n_classes), {
-      expect_no_error(
-        classifier$train(
-          data_embeddings = current_embeddings,
-          data_targets = example_targets,
-          data_n_test_samples=2,
-          balance_class_weights=TRUE,
-          use_baseline=TRUE,
-          bsl_val_size=0.25,
-          use_bsc=FALSE,
-          bsc_methods=c("dbsmote"),
-          bsc_max_k=10,
-          bsc_val_size=0.25,
-          use_bpl=FALSE,
-          bpl_max_steps=2,
-          bpl_epochs_per_step=1,
-          bpl_dynamic_inc=FALSE,
-          bpl_balance=TRUE,
-          bpl_max=1.00,
-          bpl_anchor=1.00,
-          bpl_min=0.00,
-          bpl_weight_inc=0.02,
-          bpl_weight_start=0.00,
-          bpl_model_reset=FALSE,
-          sustain_track=TRUE,
-          sustain_iso_code = "DEU",
-          epochs=2,
-          batch_size=4,
-          dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
-          trace=FALSE,
-          keras_trace=0,
-          pytorch_trace=0,
-          n_cores=1)
-      )
+    sc_list=list(FALSE,TRUE)
+    pl_list=list(FALSE,TRUE)
 
-      expect_true(classifier$get_sustainability_data()$sustainability_tracked)
+    for(use_sc in sc_list){
+      for(use_pl in pl_list){
+        test_that(paste(framework,"creation_classifier_regular",
+                        "n_classes",n_classes,
+                        "sc",use_sc,
+                        "pl",use_pl),{
 
-    })
+                          expect_no_error(
+                            classifier$train(
+                              data_embeddings = current_embeddings,
+                              data_targets = example_targets,
+                              data_folds=2,
+                              balance_class_weights=TRUE,
+                              balance_sequence_length=TRUE,
+                              use_sc=use_sc,
+                              sc_method="dbsmote",
+                              sc_min_k=1,
+                              sc_max_k=2,
+                              use_pl=use_pl,
+                              pl_max_steps=2,
+                              pl_max=1.00,
+                              pl_anchor=1.00,
+                              pl_min=0.00,
+                              sustain_track=TRUE,
+                              sustain_iso_code="DEU",
+                              sustain_region=NULL,
+                              sustain_interval=15,
+                              epochs=2,
+                              fe_epochs=10,
+                              fe_val_size=0.25,
+                              batch_size=32,
+                              dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
+                              trace=FALSE,
+                              keras_trace=0,
+                              pytorch_trace=0)
+                          )
+                          expect_true(classifier$get_sustainability_data()$sustainability_tracked)
+                        })
+        gc()
+      }
+    }
 
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"training_bsc_only","n_classes",n_classes), {
-      expect_no_error(
-        classifier$train(
-          data_embeddings = current_embeddings,
-          data_targets = example_targets,
-          data_n_test_samples=2,
-          use_baseline=FALSE,
-          bsl_val_size=0.25,
-          use_bsc=TRUE,
-          bsc_methods=c("dbsmote"),
-          bsc_max_k=10,
-          bsc_val_size=0.25,
-          use_bpl=FALSE,
-          bpl_max_steps=2,
-          bpl_epochs_per_step=1,
-          bpl_dynamic_inc=FALSE,
-          bpl_balance=FALSE,
-          bpl_max=1.00,
-          bpl_anchor=1.00,
-          bpl_min=0.00,
-          bpl_weight_inc=0.02,
-          bpl_weight_start=0.00,
-          bpl_model_reset=FALSE,
-          epochs=2,
-          batch_size=4,
-          dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
-          sustain_track=FALSE,
-          sustain_iso_code = "DEU",
-          sustain_region = NULL,
-          sustain_interval = 15,
-          trace=FALSE,
-          keras_trace=0,
-          pytorch_trace=0,
-          n_cores=1)
-      )
-
-      expect_false(classifier$get_sustainability_data()$sustainability_tracked)
-    })
-
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"training_pbl_baseline","n_classes",n_classes), {
-      expect_no_error(
-        classifier$train(
-          data_embeddings = current_embeddings,
-          data_targets = example_targets,
-          data_n_test_samples=2,
-          use_baseline=TRUE,
-          bsl_val_size=0.25,
-          use_bsc=FALSE,
-          bsc_methods=c("dbsmote"),
-          bsc_max_k=10,
-          bsc_val_size=0.25,
-          use_bpl=TRUE,
-          bpl_max_steps=2,
-          bpl_epochs_per_step=1,
-          bpl_dynamic_inc=FALSE,
-          bpl_balance=TRUE,
-          bpl_max=1.00,
-          bpl_anchor=1.00,
-          bpl_min=0.00,
-          bpl_weight_inc=0.02,
-          bpl_weight_start=0.00,
-          bpl_model_reset=FALSE,
-          epochs=2,
-          batch_size=4,
-          dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
-          sustain_track=FALSE,
-          sustain_iso_code = "DEU",
-          sustain_region = NULL,
-          sustain_interval = 15,
-          trace=FALSE,
-          keras_trace=0,
-          pytorch_trace=0,
-          n_cores=1)
-      )
-    })
-
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"training_pbl_bsc","n_classes",n_classes), {
-      expect_no_error(
-        classifier$train(
-          data_embeddings = current_embeddings,
-          data_targets = example_targets,
-          data_n_test_samples=2,
-          use_baseline=FALSE,
-          bsl_val_size=0.25,
-          use_bsc=TRUE,
-          bsc_methods=c("dbsmote"),
-          bsc_max_k=10,
-          bsc_val_size=0.25,
-          use_bpl=TRUE,
-          bpl_max_steps=2,
-          bpl_epochs_per_step=1,
-          bpl_dynamic_inc=FALSE,
-          bpl_balance=TRUE,
-          bpl_max=1.00,
-          bpl_anchor=1.00,
-          bpl_min=0.00,
-          bpl_weight_inc=0.02,
-          bpl_weight_start=0.00,
-          bpl_model_reset=FALSE,
-          epochs=2,
-          batch_size=4,
-          dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
-          sustain_track=FALSE,
-          sustain_iso_code = "DEU",
-          sustain_region = NULL,
-          sustain_interval = 15,
-          trace=FALSE,
-          keras_trace=0,
-          pytorch_trace=0,
-          n_cores=1)
-      )
-    })
-
-    base::gc(verbose = FALSE,full = TRUE)
-    test_that(paste(framework,"training_pbl_bsc","n_classes",n_classes), {
-      expect_no_error(
-        classifier$train(
-          data_embeddings = current_embeddings,
-          data_targets = example_targets,
-          data_n_test_samples=2,
-          use_baseline=FALSE,
-          bsl_val_size=0.25,
-          use_bsc=TRUE,
-          bsc_methods=c("dbsmote"),
-          bsc_max_k=10,
-          bsc_val_size=0.25,
-          use_bpl=TRUE,
-          bpl_max_steps=2,
-          bpl_epochs_per_step=1,
-          bpl_dynamic_inc=FALSE,
-          bpl_balance=FALSE,
-          bpl_max=1.00,
-          bpl_anchor=1.00,
-          bpl_min=0.00,
-          bpl_weight_inc=0.02,
-          bpl_weight_start=0.00,
-          bpl_model_reset=FALSE,
-          epochs=2,
-          batch_size=4,
-          dir_checkpoint=testthat::test_path("test_artefacts/classifier"),
-          sustain_track=FALSE,
-          sustain_iso_code = "DEU",
-          sustain_region = NULL,
-          sustain_interval = 15,
-          trace=FALSE,
-          keras_trace=0,
-          pytorch_trace=0,
-          n_cores=1)
-      )
-    })
-
+#------------------------------------------------------------------------------
   if(framework=="tensorflow"){
     base::gc(verbose = FALSE,full = TRUE)
     test_that(paste(framework,"Saving Classifier Keras_V3"),{
@@ -551,7 +430,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models_keras/",classifier$get_model_info()$model_name_root))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
 
     base::gc(verbose = FALSE,full = TRUE)
@@ -571,7 +450,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models_keras/",classifier$get_model_info()$model_name))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
 
     #------------------------------------------------------------------------------
@@ -592,7 +471,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
 
     #----------------------------------------------------------------------------------
@@ -616,7 +495,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
     #-------------------------------------------------------------------------------
     base::gc(verbose = FALSE,full = TRUE)
@@ -639,7 +518,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models/",classifier$get_model_info()$model_name_root))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
     #------------------------------------------------------------------------------
     base::gc(verbose = FALSE,full = TRUE)
@@ -689,7 +568,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models_pytorch/",classifier$get_model_info()$model_name_root))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
 
     base::gc(verbose = FALSE,full = TRUE)
@@ -709,7 +588,7 @@ for(framework in ml_frameworks){
         model_dir = testthat::test_path(paste0("test_artefacts/tmp_full_models_pytorch/",classifier$get_model_info()$model_name))
       )
       expect_s3_class(new_classifier,
-                      class="TextEmbeddingClassifierNeuralNet")
+                      class="TEClassifierRegular")
     })
 
     base::gc(verbose = FALSE,full = TRUE)

@@ -24,6 +24,10 @@ TEClassifierRegular<-R6::R6Class(
     #'List for storing information about the configuration of the model.
     model_config=list(),
 
+    #'@field feature_extractor ('list()')\cr
+    #'List for storing information and objects about the feature_extractor.
+    feature_extractor=list(),
+
     #'@field last_training ('list()')\cr
     #'List for storing the history, the configuration, and the results of the last training. This
     #'information will be overwritten if a new training is started.
@@ -97,6 +101,15 @@ TEClassifierRegular<-R6::R6Class(
     #'@param label \code{Character} Label for the new classifier. Here you can use
     #'free text.
     #'@param text_embeddings An object of class\code{TextEmbeddingModel}.
+    #'@param use_fe \code{bool} If \code{TRUE} a feature extractor is applied in
+    #'order to reduce the dimensionality of the text embeddings.
+    #'@param fe_features \code{int} determining the number of dimensions to which
+    #'the dimension of the text embedding should be reduced.
+    #'@param fe_method \code{string} Method to use for the feature extraction.
+    #'\code{"lstm"} for an extractor based on LSTM-layers or \code{"dense"} for
+    #'dense layers.
+    #'@param fe_noise_factor \code{double} between 0 and a value lower 1 indicating
+    #'how much noise should be added for the training of the feature extractor.
     #'@param targets \code{factor} containing the target values of the classifier.
     #'@param hidden \code{vector} containing the number of neurons for each dense layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer,
@@ -106,6 +119,8 @@ TEClassifierRegular<-R6::R6Class(
     #'set this parameter to \code{NULL}.
     #'@param rec_type \code{string} Type of the recurrent layers. \code{rec_type="gru"} for
     #'Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.
+    #'@param rec_bidirectional \code{bool} If \code{TRUE} a bidirectional version of the reccurent
+    #'layers is used.
     #'@param attention_type \code{string} Choose the relevant attention type. Possible values
     #'are \code{"fourier"} and \code{multihead}.
     #'@param self_attention_heads \code{integer} determining the number of attention heads
@@ -130,10 +145,15 @@ TEClassifierRegular<-R6::R6Class(
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
+                        use_fe=TRUE,
+                        fe_features=128,
+                        fe_method="lstm",
+                        fe_noise_factor=0.2,
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
                         rec_type="gru",
+                        rec_bidirectional=FALSE,
                         self_attention_heads=0,
                         intermediate_size=NULL,
                         attention_type="fourier",
@@ -227,13 +247,23 @@ TEClassifierRegular<-R6::R6Class(
         }
       }
 
+      if(use_fe==TRUE){
+        features=fe_features
+      } else {
+        features=private$text_embedding_model[["features"]]
+      }
+
       #Saving Configuration
       config=list(
-        features= private$text_embedding_model[["features"]],
+        use_fe=use_fe,
+        fe_method=fe_method,
+        fe_noise_factor=fe_noise_factor,
+        features=features,
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
         rec=rec,
         rec_type=rec_type,
+        rec_bidirectional=rec_bidirectional,
         intermediate_size=intermediate_size,
         attention_type=attention_type,
         repeat_encoder=repeat_encoder,
@@ -285,6 +315,9 @@ TEClassifierRegular<-R6::R6Class(
 
       #Create_Model------------------------------------------------------------
       private$create_reset_model()
+      if(self$model_config$use_fe==TRUE){
+        self$feature_extractor$model=private$create_feature_extractor()
+      }
 
       private$model_info$model_date=date()
 
@@ -308,6 +341,8 @@ TEClassifierRegular<-R6::R6Class(
     #'@param data_val_size \code{double} between 0 and 1, indicating the proportion of cases of each class
     #'which should be used for the validation sample during the estimation of the baseline model.
     #'The remaining cases are part of the training data.
+    #'@param fe_val_size \code{double} between 0 and 1, indicating the proportion of cases
+    #'which should be used for the validation sample during the training of the feature extractor.
     #'@param balance_class_weights \code{bool} If \code{TRUE} class weights are
     #'generated based on the frequencies of the training data with the method
     #'Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.
@@ -345,6 +380,7 @@ TEClassifierRegular<-R6::R6Class(
     #'@param sustain_interval \code{integer} Interval in seconds for measuring power
     #'usage.
     #'@param epochs \code{int} Number of training epochs.
+    #'@param fe_epochs \code{int} Number of training epochs for the feature extractor.
     #'@param batch_size \code{int} Size of batches.
     #'@param dir_checkpoint \code{string} Path to the directory where
     #'the checkpoint during training should be saved. If the directory does not
@@ -390,6 +426,8 @@ TEClassifierRegular<-R6::R6Class(
                    sustain_region=NULL,
                    sustain_interval=15,
                    epochs=40,
+                   fe_epochs=1000,
+                   fe_val_size=0.25,
                    batch_size=32,
                    dir_checkpoint,
                    trace=TRUE,
@@ -424,7 +462,7 @@ TEClassifierRegular<-R6::R6Class(
         stop("data_folds must be at least 2.")
       }
 
-      #Saving training condifuration-------------------------------------------
+      #Saving training configuration-------------------------------------------
       self$last_training$config$balance_class_weights=balance_class_weights
       self$last_training$config$balance_sequence_length=balance_sequence_length
       self$last_training$config$data_val_size=data_val_size
@@ -448,6 +486,9 @@ TEClassifierRegular<-R6::R6Class(
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
 
+      self$feature_extractor$val_size=fe_val_size
+      self$feature_extractor$epochs=fe_epochs
+
       #Start-------------------------------------------------------------------
       if(self$last_training$config$trace==TRUE){
         message(paste(date(),
@@ -455,18 +496,37 @@ TEClassifierRegular<-R6::R6Class(
       }
 
       #Create DataManager------------------------------------------------------
-      data_manager=DataManagerClassifier$new(
-        data_embeddings=data_embeddings,
-        data_targets=data_targets,
-        folds=data_folds,
-        val_size=self$last_training$config$data_val_size,
-        class_levels=self$model_config$target_levels,
-        one_hot_encoding=self$model_config$require_one_hot,
-        add_matrix_map=if(self$model_config$require_matrix_map==TRUE|self$last_training$config$use_sc==TRUE){TRUE}else{FALSE},
-        sc_method=sc_method,
-        sc_min_k=sc_min_k,
-        sc_max_k=sc_max_k,
-        trace=trace)
+      if(self$model_config$use_fe==TRUE){
+        private$train_feature_extractor(data_embeddings = data_embeddings)
+
+        data_manager=DataManagerClassifier$new(
+          data_embeddings=self$extract_features(data_embeddings = data_embeddings,
+                                                as.integer(batch_size=self$last_training$config$batch_size),
+                                                return_r_object = TRUE),
+          data_targets=data_targets,
+          folds=data_folds,
+          val_size=self$last_training$config$data_val_size,
+          class_levels=self$model_config$target_levels,
+          one_hot_encoding=self$model_config$require_one_hot,
+          add_matrix_map=if(self$model_config$require_matrix_map==TRUE|self$last_training$config$use_sc==TRUE){TRUE}else{FALSE},
+          sc_method=sc_method,
+          sc_min_k=sc_min_k,
+          sc_max_k=sc_max_k,
+          trace=trace)
+      } else {
+        data_manager=DataManagerClassifier$new(
+          data_embeddings=data_embeddings,
+          data_targets=data_targets,
+          folds=data_folds,
+          val_size=self$last_training$config$data_val_size,
+          class_levels=self$model_config$target_levels,
+          one_hot_encoding=self$model_config$require_one_hot,
+          add_matrix_map=if(self$model_config$require_matrix_map==TRUE|self$last_training$config$use_sc==TRUE){TRUE}else{FALSE},
+          sc_method=sc_method,
+          sc_min_k=sc_min_k,
+          sc_max_k=sc_max_k,
+          trace=trace)
+      }
 
       #Save Data Statistics
       self$last_training$data=data_manager$get_statistics()
@@ -476,6 +536,10 @@ TEClassifierRegular<-R6::R6Class(
 
       #Init Training------------------------------------------------------------
       private$init_train()
+
+      #config datasets
+      datasets$disable_progress_bars()
+      #datasets$disable_caching()
 
       #SetUp GUI----------------------------------------------------------------
       private$init_gui(data_manager = data_manager)
@@ -525,6 +589,7 @@ TEClassifierRegular<-R6::R6Class(
         private$calculate_measures_on_categorical_level(
           data_manager=data_manager,
           iteration=iter)
+        gc()
       }
 
       #Finalize Training
@@ -551,7 +616,107 @@ TEClassifierRegular<-R6::R6Class(
 
       if(self$last_training$config$trace==TRUE){
         message(paste(date(),
-                    "Training Complete"))
+                      "Training Complete"))
+      }
+    },
+    #--------------------------------------------------------------------------
+    extract_features=function(data_embeddings,batch_size,return_r_object=TRUE){
+      if(self$model_config$use_fe==TRUE){
+        #Prepare data set
+
+        if("EmbeddedText" %in% class(data_embeddings)){
+          if(nrow(data_embeddings$embeddings)>1){
+            extractor_dataset=datasets$Dataset$from_dict(
+              reticulate::dict(
+                list(id=rownames(data_embeddings$embeddings),
+                     input=np$squeeze(np$split(reticulate::np_array(data_embeddings$embeddings),as.integer(nrow(data_embeddings$embeddings)),axis=0L))),
+                convert = FALSE))
+          } else {
+            extractor_dataset=data_embeddings$embeddings
+          }
+
+        } else if("array" %in% class(data_embeddings)){
+          if(nrow(data_embeddings)>1){
+            extractor_dataset=datasets$Dataset$from_dict(
+              reticulate::dict(
+                list(id=rownames(data_embeddings),
+                     input=np$squeeze(np$split(reticulate::np_array(data_embeddings),as.integer(nrow(data_embeddings)),axis=0L))),
+                convert = FALSE))
+          } else {
+            extractor_dataset=data_embeddings
+          }
+        }
+
+        #Extract features
+        if(private$ml_framework=="pytorch"){
+          if(torch$cuda$is_available()){
+            device="cuda"
+            dtype=torch$double
+
+            if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
+              extractor_dataset$set_format("torch",device=device)
+              self$feature_extractor$model$to(device,dtype=dtype)
+              self$feature_extractor$model$eval()
+              reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
+                                                               encoder_mode=TRUE)$detach()$cpu()$numpy()
+            } else {
+              self$feature_extractor$model$to(device,dtype=dtype)
+              self$feature_extractor$model$eval()
+              input=torch$from_numpy(np$array(extractor_dataset))
+              reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
+                                                               encoder_mode=TRUE)$detach()$cpu()$numpy()
+            }
+          } else {
+            device="cpu"
+            dtype=torch$float
+            if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
+              extractor_dataset$set_format("torch",device=device)
+
+              self$feature_extractor$model$to(device,dtype=dtype)
+              self$feature_extractor$model$eval()
+              reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
+                                                               encoder_mode=TRUE)$detach()$numpy()
+            } else {
+              self$feature_extractor$model$to(device,dtype=dtype)
+              self$feature_extractor$model$eval()
+              input=torch$from_numpy(np$array(extractor_dataset))
+              reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
+                                                               encoder_mode=TRUE)$detach()$numpy()
+            }
+          }
+        }
+
+        #Prepare output
+        if(return_r_object==TRUE){
+          reduced_embeddings=reduced_embeddings
+          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
+            rownames(reduced_embeddings)=extractor_dataset["id"]
+          } else {
+            rownames(reduced_embeddings)=rownames(data_embeddings)
+          }
+
+
+          model_info=self$get_text_embedding_model()
+
+          reduced_embeddings=EmbeddedText$new(
+            model_name=paste0("feature_extracted_",model_info$model_name),
+            model_label=model_info$model_label,
+            model_date=model_info$model_date,
+            model_method=model_info$model_method,
+            model_version=model_info$model_version,
+            model_language=model_info$model_language,
+            param_seq_length=model_info$param_seq_length,
+            param_chunks=model_info$param_chunks,
+            param_overlap=model_info$param_overlap,
+            param_emb_layer_min=model_info$param_emb_layer_min,
+            param_emb_layer_max=model_info$param_emb_layer_max,
+            param_emb_pool_type=model_info$param_emb_pool_type,
+            param_aggregation=model_info$param_aggregation,
+            embeddings=reduced_embeddings)
+          return(reduced_embeddings)
+        }
+      } else {
+        stop("A feature extractor is not part of the model.")
       }
     },
     #-------------------------------------------------------------------------
@@ -586,7 +751,12 @@ TEClassifierRegular<-R6::R6Class(
         } else {
           real_newdata=newdata
         }
+      if(self$model_config$use_fe==TRUE){
+        real_newdata=self$extract_features(data_embedding = real_newdata,
+                                      batch_size=as.integer(batch_size),
+                                      return_r_object = TRUE)$embeddings
       }
+    }
 
       #Ensuring the correct order of the variables for prediction
       #real_newdata<-real_newdata[,,self$model_config$input_variables,drop=FALSE]
@@ -598,7 +768,7 @@ TEClassifierRegular<-R6::R6Class(
         n_rec=length(self$model_config$rec)
       }
 
-      if(n_rec==0 & self$model_config$repeat_encoder==0){
+      if(n_rec==0 & self$model_config$repeat_encoder==0 & self$model_config$times==1){
         real_newdata=array_to_matrix(real_newdata)
       }
 
@@ -613,28 +783,28 @@ TEClassifierRegular<-R6::R6Class(
             verbose=as.integer(verbose))
           predictions<-max.col(predictions_prob)-1
         } else {
-            predictions_prob<-model$predict(
-              x = np$array(real_newdata),
-              batch_size = as.integer(batch_size),
-              verbose=as.integer(verbose))
+          predictions_prob<-model$predict(
+            x = np$array(real_newdata),
+            batch_size = as.integer(batch_size),
+            verbose=as.integer(verbose))
 
-            #Add Column for the second characteristic
-            predictions=vector(length = length(predictions_prob))
-            predictions_binary_prob<-matrix(ncol=2,
-                                            nrow=length(predictions_prob))
+          #Add Column for the second characteristic
+          predictions=vector(length = length(predictions_prob))
+          predictions_binary_prob<-matrix(ncol=2,
+                                          nrow=length(predictions_prob))
 
-            for(i in 1:length(predictions_prob)){
-              if(predictions_prob[i]>=0.5){
-                predictions_binary_prob[i,1]=1-predictions_prob[i]
-                predictions_binary_prob[i,2]=predictions_prob[i]
-                predictions[i]=1
-              } else {
-                predictions_binary_prob[i,1]=1-predictions_prob[i]
-                predictions_binary_prob[i,2]=predictions_prob[i]
-                predictions[i]=0
-              }
+          for(i in 1:length(predictions_prob)){
+            if(predictions_prob[i]>=0.5){
+              predictions_binary_prob[i,1]=1-predictions_prob[i]
+              predictions_binary_prob[i,2]=predictions_prob[i]
+              predictions[i]=1
+            } else {
+              predictions_binary_prob[i,1]=1-predictions_prob[i]
+              predictions_binary_prob[i,2]=predictions_prob[i]
+              predictions[i]=0
             }
-            predictions_prob<-predictions_binary_prob
+          }
+          predictions_prob<-predictions_binary_prob
         }
       } else if (private$ml_framework=="pytorch"){
         pytorch_predict_data=torch$utils$data$TensorDataset(
@@ -847,72 +1017,88 @@ TEClassifierRegular<-R6::R6Class(
     #''tensorflow'/'keras' models and safetensors for 'pytorch' models.
     #'@return Function does not return a value. It saves the model to disk.
     #'@importFrom utils write.csv
-     save_model=function(dir_path,save_format="default"){
-       if(private$ml_framework=="tensorflow"){
-         if(save_format%in%c("safetensors","pt")){
-           stop("'safetensors' and 'pt' are only supported for models based on
+    save_model=function(dir_path,save_format="default"){
+      if(private$ml_framework=="tensorflow"){
+        if(save_format%in%c("safetensors","pt")){
+          stop("'safetensors' and 'pt' are only supported for models based on
            pytorch.")
-         }
-       } else if(private$ml_framework=="pytorch"){
-         if(save_format%in%c("keras","tf","h5")){
-           stop("'keras','tf', and 'h5' are only supported for models based on
+        }
+      } else if(private$ml_framework=="pytorch"){
+        if(save_format%in%c("keras","tf","h5")){
+          stop("'keras','tf', and 'h5' are only supported for models based on
            tensorflow")
-         }
-       }
+        }
+      }
 
-       if(save_format=="default"){
-         if(private$ml_framework=="tensorflow"){
-           save_format="keras"
-         } else if(private$ml_framework=="pytorch"){
-           save_format="safetensors"
-         }
-       }
+      if(save_format=="default"){
+        if(private$ml_framework=="tensorflow"){
+          save_format="keras"
+        } else if(private$ml_framework=="pytorch"){
+          save_format="safetensors"
+        }
+      }
 
-       if(save_format=="safetensors" &
-          reticulate::py_module_available("safetensors")==FALSE){
-         warning("Python library 'safetensors' is not available. Using
+      if(save_format=="safetensors" &
+         reticulate::py_module_available("safetensors")==FALSE){
+        warning("Python library 'safetensors' is not available. Using
                  standard save format for pytorch.")
-         save_format="pt"
-       }
+        save_format="pt"
+      }
 
-       if(private$ml_framework=="tensorflow"){
-         if(save_format=="keras"){
-           extension=".keras"
-         } else if(save_format=="tf"){
-           extension=".tf"
-         } else {
-           extension=".h5"
-         }
-         file_path=paste0(dir_path,"/","model_data",extension)
-         if(dir.exists(dir_path)==FALSE){
-           dir.create(dir_path)
-         }
-         self$model$save(file_path)
+      if(private$ml_framework=="tensorflow"){
+        if(save_format=="keras"){
+          extension=".keras"
+        } else if(save_format=="tf"){
+          extension=".tf"
+        } else {
+          extension=".h5"
+        }
+        file_path=paste0(dir_path,"/","model_data",extension)
+        if(dir.exists(dir_path)==FALSE){
+          dir.create(dir_path)
+        }
+        self$model$save(file_path)
 
-       } else if(private$ml_framework=="pytorch"){
-         self$model$to("cpu",dtype=torch$float)
-         if(save_format=="safetensors"){
+        if(self$model_config$use_fe==TRUE){
+          file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
+          self$feature_extractor$model$save(file_path_extractor)
+        }
+
+      } else if(private$ml_framework=="pytorch"){
+        if(dir.exists(dir_path)==FALSE){
+          dir.create(dir_path)
+        }
+        self$model$to("cpu",dtype=torch$float)
+        if(save_format=="safetensors"){
           file_path=paste0(dir_path,"/","model_data",".safetensors")
-           if(dir.exists(dir_path)==FALSE){
-             dir.create(dir_path)
-           }
-           safetensors$torch$save_model(model=self$model,filename=file_path)
-         } else if (save_format=="pt"){
-           file_path=paste0(dir_path,"/","model_data",".pt")
-           if(dir.exists(dir_path)==FALSE){
-             dir.create(dir_path)
-           }
-           torch$save(self$model$state_dict(),file_path)
-         }
-       }
+          safetensors$torch$save_model(model=self$model,filename=file_path)
+        } else if (save_format=="pt"){
+          file_path=paste0(dir_path,"/","model_data",".pt")
+          torch$save(self$model$state_dict(),file_path)
+        }
 
-       #Saving Sustainability Data
-       sustain_matrix=t(as.matrix(unlist(private$sustainability)))
-       write.csv(
-         x=sustain_matrix,
-         file=paste0(dir_path,"/","sustainability.csv"),
-         row.names = FALSE
-       )
+        if(self$model_config$use_fe==TRUE){
+          self$feature_extractor$model$to("cpu",dtype=torch$float)
+          if(save_format=="safetensors"){
+            extension=".safetensors"
+            file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
+            safetensors$torch$save_model(model=self$feature_extractor$model,
+                                         filename=file_path_extractor)
+          } else if (save_format=="pt"){
+            extension=".pt"
+            file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
+            torch$save(self$feature_extractor$model$state_dict(),file_path_extractor)
+          }
+        }
+      }
+
+      #Saving Sustainability Data
+      sustain_matrix=t(as.matrix(unlist(private$sustainability)))
+      write.csv(
+        x=sustain_matrix,
+        file=paste0(dir_path,"/","sustainability.csv"),
+        row.names = FALSE
+      )
     },
     #'@description Method for importing a model from 'Keras v3 format',
     #' 'tensorflow' SavedModel format or h5 format.
@@ -943,7 +1129,7 @@ TEClassifierRegular<-R6::R6Class(
         private$ml_framework=ml_framework
       }
 
-      #Load the model
+      #Load the model---------------------------------------------------------
       if(private$ml_framework=="tensorflow"){
         path=paste0(dir_path,"/","model_data",".keras")
         if(file.exists(paths = path)==TRUE){
@@ -964,49 +1150,61 @@ TEClassifierRegular<-R6::R6Class(
           }
         }
       } else if(private$ml_framework=="pytorch"){
-          path_pt=paste0(dir_path,"/","model_data",".pt")
-          path_safe_tensors=paste0(dir_path,"/","model_data",".safetensors")
+        path_pt=paste0(dir_path,"/","model_data",".pt")
+        path_safe_tensors=paste0(dir_path,"/","model_data",".safetensors")
+        private$create_reset_model()
+        if(file.exists(path_safe_tensors)){
+          safetensors$torch$load_model(model=self$model,filename=path_safe_tensors)
+        } else {
+          if(file.exists(paths = path_pt)==TRUE){
+            self$model$load_state_dict(torch$load(path_pt))
+          } else {
+            stop("There is no compatible model file in the choosen directory.
+                     Please check path. Please note that classifiers have to be loaded with
+                     the same framework as during creation.")
+          }
+        }
+      }
+
+      #Load feature extractor if necessary-------------------------------------
+      if(self$model_config$use_fe==TRUE){
+        if(private$ml_framework=="tensorflow"){
+          path=paste0(dir_path,"/","feature_extractor",".keras")
+          if(file.exists(paths = path)==TRUE){
+            self$feature_extractor$model<-keras$models$load_model(path)
+          } else {
+            path=paste0(dir_path,"/","feature_extractor",".tf")
+            if(dir.exists(paths = path)==TRUE){
+              self$feature_extractor$model<-keras$models$load_model(path)
+            } else {
+              path=paste0(dir_path,"/","feature_extractor",".h5")
+              if(file.exists(paths = path)==TRUE){
+                self$feature_extractor$model<-keras$models$load_model(paste0(dir_path,"/","feature_extractor",".h5"))
+              } else {
+                stop("There is no compatible model file in the choosen directory.
+                   Please check path. Please note that classifiers have to be loaded with
+                   the same framework as during creation.")
+              }
+            }
+          }
+        } else if(private$ml_framework=="pytorch"){
+          path_pt=paste0(dir_path,"/","feature_extractor",".pt")
+          path_safe_tensors=paste0(dir_path,"/","feature_extractor",".safetensors")
+          private$create_feature_extractor()
           if(file.exists(path_safe_tensors)){
-            self$model=private$create_model_pytorch(
-              features=self$model_config$features ,
-              times=self$model_config$times,
-              hidden=self$model_config$hidden,
-              rec=self$model_config$rec,
-              intermediate_size=self$model_config$intermediate_size,
-              attention_type=self$model_config$attention_type,
-              repeat_encoder=self$model_config$repeat_encoder,
-              dense_dropout=self$model_config$dense_dropout,
-              rec_dropout=self$model_config$rec_dropout,
-              encoder_dropout=self$model_config$encoder_dropout,
-              add_pos_embedding=self$model_config$add_pos_embedding,
-              self_attention_heads=self$model_config$self_attention_heads,
-              target_levels=self$model_config$target_levels)
-            safetensors$torch$load_model(model=self$model,filename=path_safe_tensors)
+            safetensors$torch$load_model(model=self$feature_extractor$model,
+                                         filename=path_safe_tensors)
           } else {
             if(file.exists(paths = path_pt)==TRUE){
-              self$model=private$create_model_pytorch(
-                features=self$model_config$features ,
-                times=self$model_config$times,
-                hidden=self$model_config$hidden,
-                rec=self$model_config$rec,
-                intermediate_size=self$model_config$intermediate_size,
-                attention_type=self$model_config$attention_type,
-                repeat_encoder=self$model_config$repeat_encoder,
-                dense_dropout=self$model_config$dense_dropout,
-                rec_dropout=self$model_config$rec_dropout,
-                encoder_dropout=self$model_config$encoder_dropout,
-                add_pos_embedding=self$model_config$add_pos_embedding,
-                self_attention_heads=self$model_config$self_attention_heads,
-                target_levels=self$model_config$target_levels)
-
-              self$model$load_state_dict(torch$load(path_pt))
+              self$feature_extractor$model$load_state_dict(torch$load(path_pt))
             } else {
-              stop("There is no compatible model file in the choosen directory.
+              stop("There is no compatible model file in the choosen directory for the feature extractor.
                      Please check path. Please note that classifiers have to be loaded with
                      the same framework as during creation.")
             }
           }
         }
+      }
     },
     #---------------------------------------------------------------------------
     #'@description Method for requesting a summary of the R and python packages'
@@ -1132,6 +1330,9 @@ TEClassifierRegular<-R6::R6Class(
       } else if(private$ml_framework=="pytorch"){
         reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
                                             package = "aifeducation"))
+        reticulate::py_run_file(system.file("python/pytorch_autoencoder.py",
+                                            package = "aifeducation"))
+
       }
     },
     #--------------------------------------------------------------------------
@@ -1215,42 +1416,82 @@ TEClassifierRegular<-R6::R6Class(
 
         #Adding rec layer
         if(n_rec>0){
-          for(i in 1:n_rec){
-            if(self$model_config$rec_type=="gru"){
-              layer_list[length(layer_list)+1]<-list(
-                keras$layers$Bidirectional(
-                  layer=keras$layers$GRU(
-                    units=as.integer(self$model_config$rec[i]),
-                    input_shape=list(self$model_config$times,self$model_config$features),
-                    return_sequences = TRUE,
-                    dropout = 0,
-                    recurrent_dropout = self$model_config$recurrent_dropout,
-                    activation = "tanh",
-                    name=paste0("gru_",i)),
-                  name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
-              if (i!=n_rec){
+          if(self$model_config$rec_bidirectional==TRUE){
+            for(i in 1:n_rec){
+              if(self$model_config$rec_type=="gru"){
                 layer_list[length(layer_list)+1]<-list(
-                  keras$layers$Dropout(
-                    rate = self$model_config$rec_dropout,
-                    name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+                  keras$layers$Bidirectional(
+                    layer=keras$layers$GRU(
+                      units=as.integer(self$model_config$rec[i]),
+                      input_shape=list(self$model_config$times,self$model_config$features),
+                      return_sequences = TRUE,
+                      dropout = 0,
+                      recurrent_dropout = self$model_config$recurrent_dropout,
+                      activation = "tanh",
+                      name=paste0("gru_",i)),
+                    name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+                if (i!=n_rec){
+                  layer_list[length(layer_list)+1]<-list(
+                    keras$layers$Dropout(
+                      rate = self$model_config$rec_dropout,
+                      name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+                }
+              } else if (self$model_config$rec_type=="lstm"){
+                layer_list[length(layer_list)+1]<-list(
+                  keras$layers$Bidirectional(
+                    layer=keras$layers$LSTM(
+                      units=as.integer(self$model_config$rec[i]),
+                      input_shape=list(self$model_config$times,self$model_config$features),
+                      return_sequences = TRUE,
+                      dropout = 0,
+                      recurrent_dropout = self$model_config$recurrent_dropout,
+                      activation = "tanh",
+                      name=paste0("lstm",i)),
+                    name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
+                if (i!=n_rec){
+                  layer_list[length(layer_list)+1]<-list(
+                    keras$layers$Dropout(
+                      rate = self$model_config$rec_dropout,
+                      name=paste0("lstm_dropout_",i))(layer_list[[length(layer_list)]]))
+                }
               }
-            } else if (self$model_config$rec_type=="lstm"){
-              layer_list[length(layer_list)+1]<-list(
-                keras$layers$Bidirectional(
-                  layer=keras$layers$LSTM(
-                    units=as.integer(self$model_config$rec[i]),
-                    input_shape=list(self$model_config$times,self$model_config$features),
-                    return_sequences = TRUE,
-                    dropout = 0,
-                    recurrent_dropout = self$model_config$recurrent_dropout,
-                    activation = "tanh",
-                    name=paste0("lstm",i)),
-                  name=paste0("bidirectional_",i))(layer_list[[length(layer_list)]]))
-              if (i!=n_rec){
+            }
+          } else {
+            for(i in 1:n_rec){
+              if(self$model_config$rec_type=="gru"){
                 layer_list[length(layer_list)+1]<-list(
-                  keras$layers$Dropout(
-                    rate = self$model_config$rec_dropout,
-                    name=paste0("lstm_dropout_",i))(layer_list[[length(layer_list)]]))
+                    layer=keras$layers$GRU(
+                      units=as.integer(self$model_config$rec[i]),
+                      input_shape=list(self$model_config$times,self$model_config$features),
+                      return_sequences = TRUE,
+                      dropout = 0,
+                      recurrent_dropout = self$model_config$recurrent_dropout,
+                      activation = "tanh",
+                      name=paste0("gru_",i)),
+                    name=paste0("bidirectional_",i)(layer_list[[length(layer_list)]]))
+                if (i!=n_rec){
+                  layer_list[length(layer_list)+1]<-list(
+                    keras$layers$Dropout(
+                      rate = self$model_config$rec_dropout,
+                      name=paste0("gru_dropout_",i))(layer_list[[length(layer_list)]]))
+                }
+              } else if (self$model_config$rec_type=="lstm"){
+                layer_list[length(layer_list)+1]<-list(
+                    layer=keras$layers$LSTM(
+                      units=as.integer(self$model_config$rec[i]),
+                      input_shape=list(self$model_config$times,self$model_config$features),
+                      return_sequences = TRUE,
+                      dropout = 0,
+                      recurrent_dropout = self$model_config$recurrent_dropout,
+                      activation = "tanh",
+                      name=paste0("lstm",i)),
+                    name=paste0("bidirectional_",i)(layer_list[[length(layer_list)]]))
+                if (i!=n_rec){
+                  layer_list[length(layer_list)+1]<-list(
+                    keras$layers$Dropout(
+                      rate = self$model_config$rec_dropout,
+                      name=paste0("lstm_dropout_",i))(layer_list[[length(layer_list)]]))
+                }
               }
             }
           }
@@ -1311,21 +1552,140 @@ TEClassifierRegular<-R6::R6Class(
         private$load_reload_python_scripts()
 
         self$model=py$TextEmbeddingClassifier_PT(features=as.integer(self$model_config$features),
-                                               times=as.integer(self$model_config$times),
-                                               hidden=if(!is.null(self$model_config$hidden)){as.integer(self$model_config$hidden)}else{NULL},
-                                               rec=if(!is.null(self$model_config$rec)){as.integer(self$model_config$rec)}else{NULL},
-                                               rec_type=self$model_config$rec_type,
-                                               intermediate_size=as.integer(self$model_config$intermediate_size),
-                                               attention_type=self$model_config$attention_type,
-                                               repeat_encoder=as.integer(self$model_config$repeat_encoder),
-                                               dense_dropout=self$model_config$dense_dropout,
-                                               rec_dropout=self$model_config$rec_dropout,
-                                               encoder_dropout=self$model_config$encoder_dropout,
-                                               add_pos_embedding=self$model_config$add_pos_embedding,
-                                               self_attention_heads=as.integer(self$model_config$self_attention_heads),
-                                               target_levels=self$model_config$target_levels)
+                                                 times=as.integer(self$model_config$times),
+                                                 hidden=if(!is.null(self$model_config$hidden)){as.integer(self$model_config$hidden)}else{NULL},
+                                                 rec=if(!is.null(self$model_config$rec)){as.integer(self$model_config$rec)}else{NULL},
+                                                 rec_type=self$model_config$rec_type,
+                                                 rec_bidirectional=self$model_config$rec_bidirectional,
+                                                 intermediate_size=as.integer(self$model_config$intermediate_size),
+                                                 attention_type=self$model_config$attention_type,
+                                                 repeat_encoder=as.integer(self$model_config$repeat_encoder),
+                                                 dense_dropout=self$model_config$dense_dropout,
+                                                 rec_dropout=self$model_config$rec_dropout,
+                                                 encoder_dropout=self$model_config$encoder_dropout,
+                                                 add_pos_embedding=self$model_config$add_pos_embedding,
+                                                 self_attention_heads=as.integer(self$model_config$self_attention_heads),
+                                                 target_levels=self$model_config$target_levels)
 
 
+      }
+    },
+    #--------------------------------------------------------------------------
+    create_feature_extractor=function(){
+      if(private$ml_framework=="pytorch"){
+        if(self$model_config$fe_method=="lstm"){
+          self$feature_extractor$model=feature_extractor=py$LSTMAutoencoder_with_Mask_PT(
+            times=as.integer(private$text_embedding_model["times"]),
+            features_in=as.integer(private$text_embedding_model["features"]),
+            features_out=as.integer(self$model_config$features),
+            noise_factor=self$model_config$fe_noise_factor)
+        } else if(self$model_config$fe_method=="dense") {
+          self$feature_extractor$model=feature_extractor=py$DenseAutoencoder_with_Mask_PT(
+            #times=as.integer(private$text_embedding_model["times"]),
+            features_in=as.integer(private$text_embedding_model["features"]),
+            features_out=as.integer(self$model_config$features),
+            noise_factor=self$model_config$fe_noise_factor)
+        }
+      } else if(private$ml_framework=="tensorflow"){
+        features_in=as.integer(private$text_embedding_model["features"])
+        features_out=as.integer(self$model_config$features)
+        difference=features_in-features_out
+
+        if(self$model_config$fe_method=="lstm"){
+
+          LSTMAutoencoder_with_Mask<-NULL
+          layer_list=NULL
+
+          #Input layer
+          layer_list[1]<-list(
+            keras$layers$Input(shape=list(as.integer(private$text_embedding_model["times"]),features_in),
+                               name="input_embeddings"))
+          #Masking layer
+          layer_list[length(layer_list)+1]=list(
+            keras.layers.Masking(mask_value=0.0)
+          )
+          #Encoder
+          layer_list[length(layer_list)+1]=list(
+            keras$layers$LSTM(
+              units=as.integer(ceiling(features_in-difference*(1/2))))(layer_list[length(layer_list)])
+            )
+          #Latent Space
+          layer_list[length(layer_list)+1]=list(
+            keras$layers$LSTM(
+              units=as.integer(features_out))(layer_list[length(layer_list)])
+          )
+          #Decoder
+          layer_list[length(layer_list)+1]=list(
+            keras$layers$LSTM(
+              units=as.integer(ceiling(features_in-difference*(1/2))))(layer_list[length(layer_list)])
+          )
+          layer_list[length(layer_list)+1]=list(
+            keras$layers$LSTM(
+              units=as.integer(features_in))(layer_list[length(layer_list)])
+          )
+
+
+
+
+        }
+      }
+    },
+    #--------------------------------------------------------------------------
+    train_feature_extractor=function(data_embeddings){
+      private$load_reload_python_scripts()
+      if(self$last_training$config$trace==TRUE){
+        message(paste(date(),"Feature extractor | Start training"))
+      }
+
+      if("EmbeddedText" %in% class(data_embeddings)){
+        #Reduce to unique cases for training
+        data=unique(data_embeddings$embeddings)
+
+        #create a data set
+       extractor_dataset=datasets$Dataset$from_dict(
+          reticulate::dict(
+            list(id=rownames(data),
+                 input=np$squeeze(np$split(reticulate::np_array(data),as.integer(nrow(data)),axis=0L))),
+            convert = FALSE))
+
+       #remove data
+       rm(data)
+
+       #Copy input as label for training
+       extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
+      }
+
+      if(private$ml_framework=="pytorch"){
+        #Set format
+        extractor_dataset$set_format("torch")
+
+        #Split into train and validation data
+        extractor_dataset=extractor_dataset$train_test_split(self$feature_extractor$val_size)
+
+        #Check directory for checkpoints
+        if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints_feature_extractor"))==FALSE){
+          if(self$last_training$config$trace==TRUE){
+            message(paste(date(),"Creating Checkpoint Directory"))
+          }
+          dir.create(paste0(self$last_training$config$dir_checkpoint,"/checkpoints_feature_extractor"))
+        }
+        #print(extractor_dataset$train)
+        self$feature_extractor$history=py$AutoencoderTrain_PT_with_Datasets(
+          model=self$feature_extractor$model,
+          epochs=as.integer(self$feature_extractor$epochs),
+          trace=as.integer(self$last_training$config$pytorch_trace),
+          batch_size=as.integer(self$last_training$config$batch_size),
+          train_data=extractor_dataset$train,
+          val_data=extractor_dataset$test,
+          filepath=paste0(self$last_training$config$dir_checkpoint,"/checkpoints_feature_extractor/best_weights.pt"),
+          use_callback=TRUE,
+          shiny_app_active=self$gui$shiny_app_active)$loss
+      }
+
+      rownames(self$feature_extractor$history)=c("train","val")
+
+      if(self$last_training$config$trace==TRUE){
+        message(paste(date(),"Feature extractor | Training finished"))
       }
     },
     #--------------------------------------------------------------------------
@@ -1413,15 +1773,15 @@ TEClassifierRegular<-R6::R6Class(
 
         #Calculate iota objects
         self$reliability$iota_objects_end[iteration]=list(iotarelr::check_new_rater(true_values = factor(x=test_data["labels"],
-                                                                                        levels=0:(length(self$model_config$target_levels)-1),
-                                                                                        labels=self$model_config$target_levels),
-                                                              assigned_values = test_pred_cat,
-                                                              free_aem = FALSE))
+                                                                                                         levels=0:(length(self$model_config$target_levels)-1),
+                                                                                                         labels=self$model_config$target_levels),
+                                                                                    assigned_values = test_pred_cat,
+                                                                                    free_aem = FALSE))
         self$reliability$iota_objects_end_free[iteration]=list(iotarelr::check_new_rater(true_values = factor(x=test_data["labels"],
                                                                                                               levels=0:(length(self$model_config$target_levels)-1),
                                                                                                               labels=self$model_config$target_levels),
-                                                                   assigned_values = test_pred_cat,
-                                                                   free_aem = TRUE))
+                                                                                         assigned_values = test_pred_cat,
+                                                                                         free_aem = TRUE))
       } else if(iteration<=data_manager$get_n_folds()) {
         warning("Unable to calculate test scores. There is no test data.")
       }
@@ -1497,7 +1857,7 @@ TEClassifierRegular<-R6::R6Class(
     init_gui=function(data_manager){
       #Check for a running Shiny App and set the configuration
       #The Gui functions must be set in the server function of shiny globally
-      if(require("shiny") & require("shinyWidgets")){
+      if(requireNamespace("shiny",quietly=TRUE) & requireNamespace("shinyWidgets",quietly=TRUE)){
         if(shiny::isRunning()){
           private$gui$shiny_app_active=TRUE
         } else {
@@ -1759,7 +2119,7 @@ TEClassifierRegular<-R6::R6Class(
 
       #Reducing the new categories to the desired range
       condition=(new_categories[,2]>=self$last_training$config$pl_min &
-                 new_categories[,2]<=self$last_training$config$pl_max)
+                   new_categories[,2]<=self$last_training$config$pl_max)
       new_categories=subset(new_categories,condition)
 
       #Calculate number of cases to include
@@ -1959,6 +2319,7 @@ TEClassifierRegular<-R6::R6Class(
             sample_weights=sample_weights)
           )
         )
+
         dataset_train=train_data$add_column("sample_weights",data_set_weights["sample_weights"])
         dataset_train=dataset_train$select_columns(c("input",target_column,"sample_weights"))
         if(self$model_config$require_one_hot==TRUE){
@@ -2002,13 +2363,13 @@ TEClassifierRegular<-R6::R6Class(
 
       #Provide rownames for the history
       for(i in 1:length(history)){
-          if(!is.null(history[[i]])){
-              if(nrow(history[[i]])==2){
-                rownames(history[[i]])=c("train","val")
-              } else {
-                rownames(history[[i]])=c("train","val","test")
-              }
+        if(!is.null(history[[i]])){
+          if(nrow(history[[i]])==2){
+            rownames(history[[i]])=c("train","val")
+          } else {
+            rownames(history[[i]])=c("train","val","test")
           }
+        }
       }
       return(history)
     },

@@ -79,6 +79,24 @@ class BiDirectionalGRU_PT(torch.nn.Module):
     result=self.gru_layer(x)
     return result[0]
   
+class UniDirectionalGRU_PT(torch.nn.Module):
+  def __init__(self,input_size,hidden_size):
+    super().__init__()
+    self.input_size=input_size
+    self.hidden_size=hidden_size
+    
+    self.gru_layer=torch.nn.GRU(
+    input_size= self.input_size,
+    hidden_size=self.hidden_size,
+    bias=True,
+    batch_first=True,
+    dropout=0.0,
+    bidirectional=False)
+    
+  def forward(self,x):
+    result=self.gru_layer(x)
+    return result[0]
+  
 class BiDirectionalLSTM_PT(torch.nn.Module):
   def __init__(self,input_size,hidden_size):
     super().__init__()
@@ -92,6 +110,24 @@ class BiDirectionalLSTM_PT(torch.nn.Module):
     batch_first=True,
     dropout=0.0,
     bidirectional=True)
+    
+  def forward(self,x):
+    result=self.lstm_layer(x)
+    return result[0]
+
+class UniDirectionalLSTM_PT(torch.nn.Module):
+  def __init__(self,input_size,hidden_size):
+    super().__init__()
+    self.input_size=input_size
+    self.hidden_size=hidden_size
+    
+    self.lstm_layer=torch.nn.LSTM(
+    input_size= self.input_size,
+    hidden_size=self.hidden_size,
+    bias=True,
+    batch_first=True,
+    dropout=0.0,
+    bidirectional=False)
     
   def forward(self,x):
     result=self.lstm_layer(x)
@@ -220,7 +256,7 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
   
 
 class TextEmbeddingClassifier_PT(torch.nn.Module):
-  def __init__(self,features, times, hidden, rec, rec_type, intermediate_size,
+  def __init__(self,features, times, hidden, rec, rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
   add_pos_embedding, self_attention_heads, target_levels,classification_head=True):
     
@@ -272,40 +308,71 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                                 dropout_rate=encoder_dropout)})
                                 
     if n_rec>0:
-      for i in range(n_rec):
-        layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
-        if i==0:
-          if rec_type=="gru":
-            layer_list.update({"bidirectional_gru_"+str(i+1):
-              BiDirectionalGRU_PT(
-                input_size=current_size,
-                hidden_size=rec[i])})
-          elif rec_type=="lstm":
-            layer_list.update({"bidirectional_lstm_"+str(i+1):
-              BiDirectionalLSTM_PT(
-                input_size=current_size,
-                hidden_size=rec[i])})
-        else:
-          if rec_type=="gru":
-            layer_list.update({"bidirectional_gru_"+str(i+1):
-              BiDirectionalGRU_PT(
-                input_size=2*rec[i-1],
-                hidden_size=rec[i])})
-          elif rec_type=="lstm":
-            layer_list.update({"bidirectional_lstm_"+str(i+1):
-              BiDirectionalLSTM_PT(
-                input_size=2*rec[i-1],
-                hidden_size=rec[i])})
-        layer_list.update({"unpackandmasking_"+str(i+1):UnPackAndMasking_PT(sequence_length=times)})
-        
-        if i!=(n_rec-1):
-          layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
+      if rec_bidirectional==True:
+        for i in range(n_rec):
+          layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
+          if i==0:
+            if rec_type=="gru":
+              layer_list.update({"bidirectional_gru_"+str(i+1):
+                BiDirectionalGRU_PT(
+                  input_size=current_size,
+                  hidden_size=rec[i])})
+            elif rec_type=="lstm":
+              layer_list.update({"bidirectional_lstm_"+str(i+1):
+                BiDirectionalLSTM_PT(
+                  input_size=current_size,
+                  hidden_size=rec[i])})
+          else:
+            if rec_type=="gru":
+              layer_list.update({"bidirectional_gru_"+str(i+1):
+                BiDirectionalGRU_PT(
+                  input_size=2*rec[i-1],
+                  hidden_size=rec[i])})
+            elif rec_type=="lstm":
+              layer_list.update({"bidirectional_lstm_"+str(i+1):
+                BiDirectionalLSTM_PT(
+                  input_size=2*rec[i-1],
+                  hidden_size=rec[i])})
+          layer_list.update({"unpackandmasking_"+str(i+1):UnPackAndMasking_PT(sequence_length=times)})
+          if i!=(n_rec-1):
+            layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
+      else:
+        for i in range(n_rec):
+          layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
+          if i==0:
+            if rec_type=="gru":
+              layer_list.update({"unidirectional_gru_"+str(i+1):
+                UniDirectionalGRU_PT(
+                  input_size=current_size,
+                  hidden_size=rec[i])})
+            elif rec_type=="lstm":
+              layer_list.update({"unidirectional_lstm_"+str(i+1):
+                UniDirectionalLSTM_PT(
+                  input_size=current_size,
+                  hidden_size=rec[i])})
+          else:
+            if rec_type=="gru":
+              layer_list.update({"unidirectional_gru_"+str(i+1):
+                UniDirectionalGRU_PT(
+                  input_size=rec[i-1],
+                  hidden_size=rec[i])})
+            elif rec_type=="lstm":
+              layer_list.update({"unidirectional_lstm_"+str(i+1):
+                UniDirectionalLSTM_PT(
+                  input_size=rec[i-1],
+                  hidden_size=rec[i])})
+          layer_list.update({"unpackandmasking_"+str(i+1):UnPackAndMasking_PT(sequence_length=times)})
+          if i!=(n_rec-1):
+            layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
       
     if n_rec>0 or repeat_encoder>0 or times >1:
       layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
       
     if(n_rec>0):
-      current_size_2=2*rec[len(rec)-1]
+      if rec_bidirectional==True:
+        current_size_2=2*rec[len(rec)-1]
+      else:
+        current_size_2=rec[len(rec)-1]
     else:
       current_size_2=current_size
     
@@ -330,12 +397,15 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
         if i!=(n_hidden-1):
           layer_list.update({"dense_dropout_"+str(i+1):torch.nn.Dropout(p=dense_dropout)})
     
-    if n_hidden==0 and n_rec==0 and repeat_encoder==0:
+    if n_hidden==0 and n_rec==0 and repeat_encoder==0 and times==1:
       last_in_features=features*times
     elif  n_hidden>0:
-      last_in_features=hidden[i]
+      last_in_features=hidden[len(hidden)-1]
     elif n_rec>0:
-      last_in_features=2*rec[len(rec)-1]
+      if rec_bidirectional==True:
+        last_in_features=2*rec[len(rec)-1]
+      else:
+        last_in_features=rec[len(rec)-1]
     else:
       last_in_features=features
 
@@ -374,7 +444,7 @@ shiny_app_active=False):
     model.to(device,dtype=torch.double)
   
   if optimizer_method=="adam":
-    optimizer=torch.optim.Adam(model.parameters())
+    optimizer=torch.optim.Adam(params=model.parameters(),weight_decay=1e-3)
   elif optimizer_method=="rmsprop":
     optimizer=torch.optim.RMSprop(model.parameters())
     
