@@ -89,14 +89,18 @@ class ProtoNetLossWithMargin_PT(torch.nn.Module):
     index_matrix=torch.Tensor.to(index_matrix,dtype=distance_matrix.dtype)
     
     distance_to_min=self.alpha*(torch.sum(torch.diag(torch.matmul(index_matrix.float(),torch.square(torch.transpose(distance_matrix,0,1))))))
+    
     distance_margin=(self.margin-torch.transpose(distance_matrix,0,1))
     distance_margin=torch.where(distance_margin<0,torch.zeros(size=distance_margin.size()),distance_margin)
+    
     distance_to_max=(1-self.alpha)*(torch.sum(torch.diag(torch.matmul(1-index_matrix.float(),torch.square(distance_margin)))))
     loss=(1/K)*(distance_to_min+distance_to_max)
+    #print(distance_to_min)
+    #print(distance_to_max)
     return loss
 
 class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
-  def __init__(self,features, times, hidden, rec,rec_type, intermediate_size,
+  def __init__(self,features, times, hidden, rec,rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
   add_pos_embedding, self_attention_heads, target_levels,embedding_dim):
     
@@ -129,7 +133,10 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     elif  n_hidden>0:
       last_in_features=hidden[n_hidden-1]
     elif n_rec>0:
-      last_in_features=2*rec[len(rec)-1]
+      if rec_bidirectional==True:
+        last_in_features=2*rec[len(rec)-1]
+      else:
+        last_in_features=rec[len(rec)-1]
     else:
       last_in_features=features
 
@@ -146,6 +153,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
       hidden=hidden, 
       rec=rec, 
       rec_type=rec_type,
+      rec_bidirectional=rec_bidirectional,
       intermediate_size=intermediate_size,
       attention_type=attention_type, 
       repeat_encoder=repeat_encoder, 
@@ -164,14 +172,14 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
       #Sample set
       sample_embeddings=self.core_net(input_s)
       #print(sample_embeddings)
-      sample_embeddings=torch.tanh(self.embedding_head(sample_embeddings))
+      sample_embeddings=self.embedding_head(sample_embeddings)
       #print(sample_embeddings)
       prototypes=self.class_mean(x=sample_embeddings,classes=classes_s)
       #print(prototypes)
 
     #Query set
     query_embeddings=self.core_net(input_q)
-    query_embeddings=torch.tanh(self.embedding_head(query_embeddings))
+    query_embeddings=self.embedding_head(query_embeddings)
 
     #Calc distance from query embeddings to global global prototypes
     distances=self.metric(x=query_embeddings,prototypes=prototypes)
@@ -458,7 +466,7 @@ shiny_app_active=False):
         print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
           epoch+1,
           epochs,
-          train_loss/len(trainloader),
+          train_loss,
           acc_train,
           bacc_train,
           val_loss/len(valloader),

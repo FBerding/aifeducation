@@ -623,7 +623,6 @@ TEClassifierRegular<-R6::R6Class(
     extract_features=function(data_embeddings,batch_size,return_r_object=TRUE){
       if(self$model_config$use_fe==TRUE){
         #Prepare data set
-
         if("EmbeddedText" %in% class(data_embeddings)){
           if(nrow(data_embeddings$embeddings)>1){
             extractor_dataset=datasets$Dataset$from_dict(
@@ -759,7 +758,6 @@ TEClassifierRegular<-R6::R6Class(
     }
 
       #Ensuring the correct order of the variables for prediction
-      #real_newdata<-real_newdata[,,self$model_config$input_variables,drop=FALSE]
       current_row_names=rownames(real_newdata)
 
       if(is.null(self$model_config$rec)==TRUE){

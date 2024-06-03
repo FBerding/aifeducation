@@ -374,6 +374,7 @@ TEClassifierProtoNet<-R6::R6Class(
                    epochs=40,
                    batch_size=35,
                    fe_epochs=1000,
+                   fe_val_size=0.25,
                    Ns=5,
                    Nq=3,
                    loss_alpha,
@@ -567,7 +568,99 @@ TEClassifierProtoNet<-R6::R6Class(
         message(paste(date(),
                     "Training Complete"))
       }
+    },
+  #---------------------------------------------------------------------------
+  embed=function(embeddings_q=NULL,classes_q=NULL,embeddings_s=NULL,classes_s=NULL){
+    #Parameter check
+    if(is.null(embeddings_q)|is.null(classes_q)){
+      stop("Embeddings and classes for the query are not set.")
     }
+    if(is.null(embeddings_s)&!is.null(classes_s)){
+      stop("classes_s is set but embeddings_s not. Please provide embeddings
+           or set classes_s to NULL.in order to use the trained
+           prototypes.")
+    }
+    if(!is.null(embeddings_s)&is.null(classes_s)){
+      stop("embeddings_s is set but classes_s not. Please provide classes for
+           the sample or set embeddings_s to NULL in order to use the trained
+           prototypes.")
+    }
+
+    if(self$model_config$use_fe==TRUE){
+      embeddings_q=self$extract_features(embeddings_q)
+      if(!is.null(embeddings_s)){
+        embeddings_s=self$extract_features(embeddings_q)
+      }
+    }
+
+    if(self$model_config$use_fe==TRUE){
+      #Prepare data set
+      if("EmbeddedText" %in% class(data_embeddings)){
+        if(nrow(data_embeddings$embeddings)>1){
+          extractor_dataset=datasets$Dataset$from_dict(
+            reticulate::dict(
+              list(id=rownames(data_embeddings$embeddings),
+                   input=np$squeeze(np$split(reticulate::np_array(data_embeddings$embeddings),as.integer(nrow(data_embeddings$embeddings)),axis=0L))),
+              convert = FALSE))
+        } else {
+          extractor_dataset=data_embeddings$embeddings
+        }
+
+      } else if("array" %in% class(data_embeddings)){
+        if(nrow(data_embeddings)>1){
+          extractor_dataset=datasets$Dataset$from_dict(
+            reticulate::dict(
+              list(id=rownames(data_embeddings),
+                   input=np$squeeze(np$split(reticulate::np_array(data_embeddings),as.integer(nrow(data_embeddings)),axis=0L))),
+              convert = FALSE))
+        } else {
+          extractor_dataset=data_embeddings
+        }
+      }
+
+      #Extract features
+      if(private$ml_framework=="pytorch"){
+        if(torch$cuda$is_available()){
+          device="cuda"
+          dtype=torch$double
+
+          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
+            extractor_dataset$set_format("torch",device=device)
+            self$feature_extractor$model$to(device,dtype=dtype)
+            self$feature_extractor$model$eval()
+            reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
+                                                             encoder_mode=TRUE)$detach()$cpu()$numpy()
+          } else {
+            self$feature_extractor$model$to(device,dtype=dtype)
+            self$feature_extractor$model$eval()
+            input=torch$from_numpy(np$array(extractor_dataset))
+            reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
+                                                             encoder_mode=TRUE)$detach()$cpu()$numpy()
+          }
+        } else {
+          device="cpu"
+          dtype=torch$float
+          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
+            extractor_dataset$set_format("torch",device=device)
+
+            self$feature_extractor$model$to(device,dtype=dtype)
+            self$feature_extractor$model$eval()
+            reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
+                                                             encoder_mode=TRUE)$detach()$numpy()
+          } else {
+            self$feature_extractor$model$to(device,dtype=dtype)
+            self$feature_extractor$model$eval()
+            input=torch$from_numpy(np$array(extractor_dataset))
+            reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
+                                                             encoder_mode=TRUE)$detach()$numpy()
+          }
+        }
+      }
+
+    if(private$ml_framework=="pytorch"){
+
+    }
+  }
   ),
   private = list(
     #--------------------------------------------------------------------------

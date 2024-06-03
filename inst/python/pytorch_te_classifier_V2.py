@@ -308,6 +308,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                                 dropout_rate=encoder_dropout)})
                                 
     if n_rec>0:
+      
       if rec_bidirectional==True:
         for i in range(n_rec):
           layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
@@ -317,6 +318,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                 BiDirectionalGRU_PT(
                   input_size=current_size,
                   hidden_size=rec[i])})
+              
             elif rec_type=="lstm":
               layer_list.update({"bidirectional_lstm_"+str(i+1):
                 BiDirectionalLSTM_PT(
