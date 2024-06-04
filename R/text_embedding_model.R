@@ -1837,7 +1837,10 @@ EmbeddedText<-R6::R6Class(
 
     #Aggregation method of the hidden states. Deprecated. Included for backward
     #compatibility.
-    param_aggregation=NA
+    param_aggregation=NA,
+
+    #Bool indicating if the text embedding model was compressed by a feature extractor
+    compressed=FALSE
   ),
   public = list(
     #'@field embeddings ('data.frame()')\cr
@@ -1882,8 +1885,8 @@ EmbeddedText<-R6::R6Class(
                         param_emb_layer_min=NULL,
                         param_emb_layer_max=NULL,
                         param_emb_pool_type=NULL,
-
                         param_aggregation=NULL,
+                        compressed=FALSE,
                         embeddings){
       private$model_name = model_name
       private$model_label = model_label
@@ -1901,6 +1904,9 @@ EmbeddedText<-R6::R6Class(
       private$param_emb_pool_type=param_emb_pool_type
 
       private$param_aggregation = param_aggregation
+
+      private$compressed=compressed
+
       self$embeddings=embeddings
     },
     #--------------------------------------------------------------------------
@@ -1921,7 +1927,8 @@ EmbeddedText<-R6::R6Class(
                 param_emb_layer_min=private$param_emb_layer_min,
                 param_emb_layer_max=private$param_emb_layer_max,
                 param_emb_pool_type=private$param_emb_pool_type,
-                param_aggregation=private$param_aggregation)
+                param_aggregation=private$param_aggregation,
+                compressed=private$compressed)
       return(tmp)
     },
     #--------------------------------------------------------------------------

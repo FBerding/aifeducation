@@ -617,6 +617,7 @@ TEClassifierProtoNet<-R6::R6Class(
           extractor_dataset=data_embeddings
         }
       }
+    }
 
       #Extract features
       if(private$ml_framework=="pytorch"){

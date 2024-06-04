@@ -15,38 +15,11 @@
 #'@export
 TEClassifierRegular<-R6::R6Class(
   classname = "TEClassifierRegular",
+  inherit = AIFEBaseModel,
   public = list(
-    #'@field model ('tensorflow_model' or 'pytorch_model')\cr
-    #'Field for storing the tensorflow or pytorch model after loading.
-    model=NULL,
-
-    #'@field model_config ('list()')\cr
-    #'List for storing information about the configuration of the model.
-    model_config=list(),
-
     #'@field feature_extractor ('list()')\cr
     #'List for storing information and objects about the feature_extractor.
     feature_extractor=list(),
-
-    #'@field last_training ('list()')\cr
-    #'List for storing the history, the configuration, and the results of the last training. This
-    #'information will be overwritten if a new training is started.
-    #'\itemize{
-    #'\item{\code{last_training$start_time: }Time point when training started.}
-    #'\item{\code{last_training$learning_time: }Duration of the training process.}
-    #'\item{\code{last_training$finish_time: }Time when the last training finished.}
-    #'\item{\code{last_training$history: }History of the last training.}
-    #'\item{\code{last_training$data: }Object of class \code{table} storing the initial frequencies of the passed data.}
-    #'\item{\code{last_training$config: }List storing the configuration used for the last training.}
-    #'}
-    last_training=list(
-      learning_time=NULL,
-      start_time=NA,
-      history=list(),
-      data=NULL,
-      finish_time=NULL,
-      config=list()
-    ),
 
     #'@field reliability ('list()')\cr
     #'List for storing central reliability measures of the last training.
@@ -101,15 +74,9 @@ TEClassifierRegular<-R6::R6Class(
     #'@param label \code{Character} Label for the new classifier. Here you can use
     #'free text.
     #'@param text_embeddings An object of class\code{TextEmbeddingModel}.
-    #'@param use_fe \code{bool} If \code{TRUE} a feature extractor is applied in
-    #'order to reduce the dimensionality of the text embeddings.
-    #'@param fe_features \code{int} determining the number of dimensions to which
-    #'the dimension of the text embedding should be reduced.
-    #'@param fe_method \code{string} Method to use for the feature extraction.
-    #'\code{"lstm"} for an extractor based on LSTM-layers or \code{"dense"} for
-    #'dense layers.
-    #'@param fe_noise_factor \code{double} between 0 and a value lower 1 indicating
-    #'how much noise should be added for the training of the feature extractor.
+    #'@param feature_extractor Object of class \code{TEFeatureExtractor} which should be used in
+    #'order to reduce the dimensionality of the text embeddings. If no feature extractor should be
+    #'applied set \code{NULL}.
     #'@param targets \code{factor} containing the target values of the classifier.
     #'@param hidden \code{vector} containing the number of neurons for each dense layer.
     #'The length of the vector determines the number of dense layers. If you want no dense layer,
@@ -145,10 +112,7 @@ TEClassifierRegular<-R6::R6Class(
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
-                        use_fe=TRUE,
-                        fe_features=128,
-                        fe_method="lstm",
-                        fe_noise_factor=0.2,
+                        feature_extractor=NULL,
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
@@ -166,6 +130,11 @@ TEClassifierRegular<-R6::R6Class(
                         optimizer="adam"
     ){
       #Checking of parameters--------------------------------------------------
+      #Setting ML Framework
+      if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
+        stop("ml_framework must be 'tensorflow' or 'pytorch'.")
+      }
+
       if(is.null(name)){
         stop("name is NULL but must be a character.")
       }
@@ -200,13 +169,17 @@ TEClassifierRegular<-R6::R6Class(
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
-      #------------------------------------------------------------------------
-
-      #Setting ML Framework
-      if((ml_framework %in% c("tensorflow","pytorch"))==FALSE) {
-        stop("ml_framework must be 'tensorflow' or 'pytorch'.")
+      use_fe=FALSE
+      if(!is.null(feature_extractor)){
+        if("TEFeatureExtractor"%in% class(feature_extractor)==FALSE){
+          stop("Object passed to feature_extractor must be an object of class
+               TEFeatureExtractor.")
+        } else {
+          use_fe=TRUE
+        }
       }
 
+      #------------------------------------------------------------------------
       private$ml_framework=ml_framework
 
       #Setting Label and Name-------------------------------------------------
@@ -248,7 +221,7 @@ TEClassifierRegular<-R6::R6Class(
       }
 
       if(use_fe==TRUE){
-        features=fe_features
+        features=feature_extractor$model_config$features
       } else {
         features=private$text_embedding_model[["features"]]
       }
@@ -256,8 +229,6 @@ TEClassifierRegular<-R6::R6Class(
       #Saving Configuration
       config=list(
         use_fe=use_fe,
-        fe_method=fe_method,
-        fe_noise_factor=fe_noise_factor,
         features=features,
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
@@ -316,7 +287,8 @@ TEClassifierRegular<-R6::R6Class(
       #Create_Model------------------------------------------------------------
       private$create_reset_model()
       if(self$model_config$use_fe==TRUE){
-        self$feature_extractor$model=private$create_feature_extractor()
+        self$feature_extractor=feature_extractor$clone(deep=TRUE)
+        #private$check_feature_extractor()
       }
 
       private$model_info$model_date=date()
@@ -380,8 +352,6 @@ TEClassifierRegular<-R6::R6Class(
     #'@param sustain_interval \code{integer} Interval in seconds for measuring power
     #'usage.
     #'@param epochs \code{int} Number of training epochs.
-    #'@param fe_epochs \code{int} Number of training epochs for the feature extractor.
-    #'@param batch_size \code{int} Size of batches.
     #'@param dir_checkpoint \code{string} Path to the directory where
     #'the checkpoint during training should be saved. If the directory does not
     #'exist, it is created.
@@ -426,8 +396,6 @@ TEClassifierRegular<-R6::R6Class(
                    sustain_region=NULL,
                    sustain_interval=15,
                    epochs=40,
-                   fe_epochs=1000,
-                   fe_val_size=0.25,
                    batch_size=32,
                    dir_checkpoint,
                    trace=TRUE,
@@ -486,9 +454,6 @@ TEClassifierRegular<-R6::R6Class(
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
 
-      self$feature_extractor$val_size=fe_val_size
-      self$feature_extractor$epochs=fe_epochs
-
       #Start-------------------------------------------------------------------
       if(self$last_training$config$trace==TRUE){
         message(paste(date(),
@@ -497,10 +462,9 @@ TEClassifierRegular<-R6::R6Class(
 
       #Create DataManager------------------------------------------------------
       if(self$model_config$use_fe==TRUE){
-        private$train_feature_extractor(data_embeddings = data_embeddings)
 
         data_manager=DataManagerClassifier$new(
-          data_embeddings=self$extract_features(data_embeddings = data_embeddings,
+          data_embeddings=self$feature_extractor$extract_features(data_embeddings = data_embeddings,
                                                 as.integer(batch_size=self$last_training$config$batch_size),
                                                 return_r_object = TRUE),
           data_targets=data_targets,
@@ -619,105 +583,6 @@ TEClassifierRegular<-R6::R6Class(
                       "Training Complete"))
       }
     },
-    #--------------------------------------------------------------------------
-    extract_features=function(data_embeddings,batch_size,return_r_object=TRUE){
-      if(self$model_config$use_fe==TRUE){
-        #Prepare data set
-        if("EmbeddedText" %in% class(data_embeddings)){
-          if(nrow(data_embeddings$embeddings)>1){
-            extractor_dataset=datasets$Dataset$from_dict(
-              reticulate::dict(
-                list(id=rownames(data_embeddings$embeddings),
-                     input=np$squeeze(np$split(reticulate::np_array(data_embeddings$embeddings),as.integer(nrow(data_embeddings$embeddings)),axis=0L))),
-                convert = FALSE))
-          } else {
-            extractor_dataset=data_embeddings$embeddings
-          }
-
-        } else if("array" %in% class(data_embeddings)){
-          if(nrow(data_embeddings)>1){
-            extractor_dataset=datasets$Dataset$from_dict(
-              reticulate::dict(
-                list(id=rownames(data_embeddings),
-                     input=np$squeeze(np$split(reticulate::np_array(data_embeddings),as.integer(nrow(data_embeddings)),axis=0L))),
-                convert = FALSE))
-          } else {
-            extractor_dataset=data_embeddings
-          }
-        }
-
-        #Extract features
-        if(private$ml_framework=="pytorch"){
-          if(torch$cuda$is_available()){
-            device="cuda"
-            dtype=torch$double
-
-            if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-              extractor_dataset$set_format("torch",device=device)
-              self$feature_extractor$model$to(device,dtype=dtype)
-              self$feature_extractor$model$eval()
-              reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
-                                                               encoder_mode=TRUE)$detach()$cpu()$numpy()
-            } else {
-              self$feature_extractor$model$to(device,dtype=dtype)
-              self$feature_extractor$model$eval()
-              input=torch$from_numpy(np$array(extractor_dataset))
-              reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
-                                                               encoder_mode=TRUE)$detach()$cpu()$numpy()
-            }
-          } else {
-            device="cpu"
-            dtype=torch$float
-            if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-              extractor_dataset$set_format("torch",device=device)
-
-              self$feature_extractor$model$to(device,dtype=dtype)
-              self$feature_extractor$model$eval()
-              reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
-                                                               encoder_mode=TRUE)$detach()$numpy()
-            } else {
-              self$feature_extractor$model$to(device,dtype=dtype)
-              self$feature_extractor$model$eval()
-              input=torch$from_numpy(np$array(extractor_dataset))
-              reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
-                                                               encoder_mode=TRUE)$detach()$numpy()
-            }
-          }
-        }
-
-        #Prepare output
-        if(return_r_object==TRUE){
-          reduced_embeddings=reduced_embeddings
-          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-            rownames(reduced_embeddings)=extractor_dataset["id"]
-          } else {
-            rownames(reduced_embeddings)=rownames(data_embeddings)
-          }
-
-
-          model_info=self$get_text_embedding_model()
-
-          reduced_embeddings=EmbeddedText$new(
-            model_name=paste0("feature_extracted_",model_info$model_name),
-            model_label=model_info$model_label,
-            model_date=model_info$model_date,
-            model_method=model_info$model_method,
-            model_version=model_info$model_version,
-            model_language=model_info$model_language,
-            param_seq_length=model_info$param_seq_length,
-            param_chunks=model_info$param_chunks,
-            param_overlap=model_info$param_overlap,
-            param_emb_layer_min=model_info$param_emb_layer_min,
-            param_emb_layer_max=model_info$param_emb_layer_max,
-            param_emb_pool_type=model_info$param_emb_pool_type,
-            param_aggregation=model_info$param_aggregation,
-            embeddings=reduced_embeddings)
-          return(reduced_embeddings)
-        }
-      } else {
-        stop("A feature extractor is not part of the model.")
-      }
-    },
     #-------------------------------------------------------------------------
     #'@description Method for predicting new data with a trained neural net.
     #'@param newdata Object of class \code{TextEmbeddingModel} or
@@ -751,7 +616,7 @@ TEClassifierRegular<-R6::R6Class(
           real_newdata=newdata
         }
       if(self$model_config$use_fe==TRUE){
-        real_newdata=self$extract_features(data_embedding = real_newdata,
+        real_newdata=self$feature_extractor$extract_features(data_embedding = real_newdata,
                                       batch_size=as.integer(batch_size),
                                       return_r_object = TRUE)$embeddings
       }
@@ -848,476 +713,9 @@ TEClassifierRegular<-R6::R6Class(
 
       return(predictions_prob)
 
-    },
-    #Check Embedding Model compatibility of the text embedding
-    #'@description Method for checking if the provided text embeddings are
-    #'created with the same \link{TextEmbeddingModel} as the classifier.
-    #'@param text_embeddings Object of class \link{EmbeddedText}.
-    #'@return \code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
-    #'\code{FALSE} if the models differ.
-    check_embedding_model=function(text_embeddings){
-      if(("EmbeddedText" %in% class(text_embeddings))==FALSE){
-        stop("text_embeddings is not of class EmbeddedText.")
-      }
-
-      embedding_model_config<-text_embeddings$get_model_info()
-      for(check in names(embedding_model_config)){
-        if(!is.null_or_na(embedding_model_config[[check]]) &
-           !is.null_or_na(private$text_embedding_model$model[[check]])){
-          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
-            return(FALSE)
-          }
-        } else if (!is.null_or_na(embedding_model_config[[check]]) &
-                   is.null_or_na(private$text_embedding_model$model[[check]])){
-          return(FALSE)
-        } else if (is.null_or_na(embedding_model_config[[check]]) &
-                   !is.null_or_na(private$text_embedding_model$model[[check]])){
-          return(FALSE)
-        }
-      }
-      return(TRUE)
-    },
-    #General Information set and get--------------------------------------------
-    #'@description Method for requesting the model information
-    #'@return \code{list} of all relevant model information
-    get_model_info=function(){
-      return(list(
-        model_license=private$model_info$model_license,
-        model_name=private$model_info$model_name,
-        model_name_root=private$model_info$model_name_root,
-        model_label=private$model_info$model_label,
-        model_date=private$model_info$model_date
-      )
-      )
-    },
-    #'@description Method for requesting the text embedding model information
-    #'@return \code{list} of all relevant model information on the text embedding model
-    #'underlying the classifier
-    get_text_embedding_model=function(){
-      return(private$text_embedding_model)
-    },
-    #---------------------------------------------------------------------------
-    #'@description Method for setting publication information of the classifier
-    #'@param authors List of authors.
-    #'@param citation Free text citation.
-    #'@param url URL of a corresponding homepage.
-    #'@return Function does not return a value. It is used for setting the private
-    #'members for publication information.
-    set_publication_info=function(authors ,
-                                  citation,
-                                  url=NULL){
-
-      private$publication_info$developed_by$authors<-authors
-      private$publication_info$developed_by$citation<-citation
-      private$publication_info$developed_by$url<-url
-
-    },
-    #--------------------------------------------------------------------------
-    #'@description Method for requesting the bibliographic information of the classifier.
-    #'@return \code{list} with all saved bibliographic information.
-    get_publication_info=function(){
-      return(private$publication_info)
-    },
-    #--------------------------------------------------------------------------
-    #'@description Method for setting the license of the classifier.
-    #'@param license \code{string} containing the abbreviation of the license or
-    #'the license text.
-    #'@return Function does not return a value. It is used for setting the private member for
-    #'the software license of the model.
-    set_software_license=function(license="GPL-3"){
-      private$model_info$model_license<-license
-    },
-    #'@description Method for getting the license of the classifier.
-    #'@param license \code{string} containing the abbreviation of the license or
-    #'the license text.
-    #'@return \code{string} representing the license for the software.
-    get_software_license=function(){
-      return(private$model_info$model_license)
-    },
-    #--------------------------------------------------------------------------
-    #'@description Method for setting the license of the classifier's documentation.
-    #'@param license \code{string} containing the abbreviation of the license or
-    #'the license text.
-    #'@return Function does not return a value. It is used for setting the private member for
-    #'the documentation license of the model.
-    set_documentation_license=function(license="CC BY-SA"){
-      private$model_description$license<-license
-    },
-    #'@description Method for getting the license of the classifier's documentation.
-    #'@param license \code{string} containing the abbreviation of the license or
-    #'the license text.
-    #'@return Returns the license as a \code{string}.
-    get_documentation_license=function(){
-      return(private$model_description$license)
-    },
-    #--------------------------------------------------------------------------
-    #'@description Method for setting a description of the classifier.
-    #'@param eng \code{string} A text describing the training of the learner,
-    #'its theoretical and empirical background, and the different output labels
-    #'in English.
-    #'@param native \code{string} A text describing the training of the learner,
-    #'its theoretical and empirical background, and the different output labels
-    #'in the native language of the classifier.
-    #'@param abstract_eng \code{string} A text providing a summary of the description
-    #'in English.
-    #'@param abstract_native \code{string} A text providing a summary of the description
-    #'in the native language of the classifier.
-    #'@param keywords_eng \code{vector} of keyword in English.
-    #'@param keywords_native \code{vector} of keyword in the native language of the classifier.
-    #'@return Function does not return a value. It is used for setting the private members for the
-    #'description of the model.
-    set_model_description=function(eng=NULL,
-                                   native=NULL,
-                                   abstract_eng=NULL,
-                                   abstract_native=NULL,
-                                   keywords_eng=NULL,
-                                   keywords_native=NULL){
-      if(!is.null(eng)){
-        private$model_description$eng=eng
-      }
-      if(!is.null(native)){
-        private$model_description$native=native
-      }
-
-      if(!is.null(abstract_eng)){
-        private$model_description$abstract_eng=abstract_eng
-      }
-      if(!is.null(abstract_native)){
-        private$model_description$abstract_native=abstract_native
-      }
-
-      if(!is.null(keywords_eng)){
-        private$model_description$keywords_eng=keywords_eng
-      }
-      if(!is.null(keywords_native)){
-        private$model_description$keywords_native=keywords_native
-      }
-
-    },
-    #'@description Method for requesting the model description.
-    #'@return \code{list} with the description of the classifier in English
-    #'and the native language.
-    get_model_description=function(){
-      return(private$model_description)
-    },
-    #-------------------------------------------------------------------------
-    #'@description Method for saving a model to 'Keras v3 format',
-    #''tensorflow' SavedModel format or h5 format.
-    #'@param dir_path \code{string()} Path of the directory where the model should be
-    #'saved.
-    #'@param save_format Format for saving the model. For 'tensorflow'/'keras' models
-    #'\code{"keras"} for 'Keras v3 format',
-    #'\code{"tf"} for SavedModel
-    #'or \code{"h5"} for HDF5.
-    #'For 'pytorch' models \code{"safetensors"} for 'safetensors' or
-    #'\code{"pt"} for 'pytorch' via pickle.
-    #'Use \code{"default"} for the standard format. This is keras for
-    #''tensorflow'/'keras' models and safetensors for 'pytorch' models.
-    #'@return Function does not return a value. It saves the model to disk.
-    #'@importFrom utils write.csv
-    save_model=function(dir_path,save_format="default"){
-      if(private$ml_framework=="tensorflow"){
-        if(save_format%in%c("safetensors","pt")){
-          stop("'safetensors' and 'pt' are only supported for models based on
-           pytorch.")
-        }
-      } else if(private$ml_framework=="pytorch"){
-        if(save_format%in%c("keras","tf","h5")){
-          stop("'keras','tf', and 'h5' are only supported for models based on
-           tensorflow")
-        }
-      }
-
-      if(save_format=="default"){
-        if(private$ml_framework=="tensorflow"){
-          save_format="keras"
-        } else if(private$ml_framework=="pytorch"){
-          save_format="safetensors"
-        }
-      }
-
-      if(save_format=="safetensors" &
-         reticulate::py_module_available("safetensors")==FALSE){
-        warning("Python library 'safetensors' is not available. Using
-                 standard save format for pytorch.")
-        save_format="pt"
-      }
-
-      if(private$ml_framework=="tensorflow"){
-        if(save_format=="keras"){
-          extension=".keras"
-        } else if(save_format=="tf"){
-          extension=".tf"
-        } else {
-          extension=".h5"
-        }
-        file_path=paste0(dir_path,"/","model_data",extension)
-        if(dir.exists(dir_path)==FALSE){
-          dir.create(dir_path)
-        }
-        self$model$save(file_path)
-
-        if(self$model_config$use_fe==TRUE){
-          file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
-          self$feature_extractor$model$save(file_path_extractor)
-        }
-
-      } else if(private$ml_framework=="pytorch"){
-        if(dir.exists(dir_path)==FALSE){
-          dir.create(dir_path)
-        }
-        self$model$to("cpu",dtype=torch$float)
-        if(save_format=="safetensors"){
-          file_path=paste0(dir_path,"/","model_data",".safetensors")
-          safetensors$torch$save_model(model=self$model,filename=file_path)
-        } else if (save_format=="pt"){
-          file_path=paste0(dir_path,"/","model_data",".pt")
-          torch$save(self$model$state_dict(),file_path)
-        }
-
-        if(self$model_config$use_fe==TRUE){
-          self$feature_extractor$model$to("cpu",dtype=torch$float)
-          if(save_format=="safetensors"){
-            extension=".safetensors"
-            file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
-            safetensors$torch$save_model(model=self$feature_extractor$model,
-                                         filename=file_path_extractor)
-          } else if (save_format=="pt"){
-            extension=".pt"
-            file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
-            torch$save(self$feature_extractor$model$state_dict(),file_path_extractor)
-          }
-        }
-      }
-
-      #Saving Sustainability Data
-      sustain_matrix=t(as.matrix(unlist(private$sustainability)))
-      write.csv(
-        x=sustain_matrix,
-        file=paste0(dir_path,"/","sustainability.csv"),
-        row.names = FALSE
-      )
-    },
-    #'@description Method for importing a model from 'Keras v3 format',
-    #' 'tensorflow' SavedModel format or h5 format.
-    #'@param dir_path \code{string()} Path of the directory where the model is
-    #'saved.
-    #'@param ml_framework \code{string} Determines the machine learning framework
-    #'for using the model. Possible are \code{ml_framework="pytorch"} for 'pytorch',
-    #'\code{ml_framework="tensorflow"} for 'tensorflow', and \code{ml_framework="auto"}.
-    #'@return Function does not return a value. It is used to load the weights
-    #'of a model.
-    #'@importFrom utils compareVersion
-    load_model=function(dir_path,
-                        ml_framework="auto"){
-
-      # Set the correct ml framework
-
-      if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
-        stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
-      }
-
-      if(ml_framework=="not_specified"){
-        stop("The global machine learning framework is not set. Please use
-             aifeducation_config$set_global_ml_backend() directly after loading
-             the library to set the global framework. ")
-      }
-
-      if(ml_framework!="auto"){
-        private$ml_framework=ml_framework
-      }
-
-      #Load the model---------------------------------------------------------
-      if(private$ml_framework=="tensorflow"){
-        path=paste0(dir_path,"/","model_data",".keras")
-        if(file.exists(paths = path)==TRUE){
-          self$model<-keras$models$load_model(path)
-        } else {
-          path=paste0(dir_path,"/","model_data",".tf")
-          if(dir.exists(paths = path)==TRUE){
-            self$model<-keras$models$load_model(path)
-          } else {
-            path=paste0(dir_path,"/","model_data",".h5")
-            if(file.exists(paths = path)==TRUE){
-              self$model<-keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
-            } else {
-              stop("There is no compatible model file in the choosen directory.
-                   Please check path. Please note that classifiers have to be loaded with
-                   the same framework as during creation.")
-            }
-          }
-        }
-      } else if(private$ml_framework=="pytorch"){
-        path_pt=paste0(dir_path,"/","model_data",".pt")
-        path_safe_tensors=paste0(dir_path,"/","model_data",".safetensors")
-        private$create_reset_model()
-        if(file.exists(path_safe_tensors)){
-          safetensors$torch$load_model(model=self$model,filename=path_safe_tensors)
-        } else {
-          if(file.exists(paths = path_pt)==TRUE){
-            self$model$load_state_dict(torch$load(path_pt))
-          } else {
-            stop("There is no compatible model file in the choosen directory.
-                     Please check path. Please note that classifiers have to be loaded with
-                     the same framework as during creation.")
-          }
-        }
-      }
-
-      #Load feature extractor if necessary-------------------------------------
-      if(self$model_config$use_fe==TRUE){
-        if(private$ml_framework=="tensorflow"){
-          path=paste0(dir_path,"/","feature_extractor",".keras")
-          if(file.exists(paths = path)==TRUE){
-            self$feature_extractor$model<-keras$models$load_model(path)
-          } else {
-            path=paste0(dir_path,"/","feature_extractor",".tf")
-            if(dir.exists(paths = path)==TRUE){
-              self$feature_extractor$model<-keras$models$load_model(path)
-            } else {
-              path=paste0(dir_path,"/","feature_extractor",".h5")
-              if(file.exists(paths = path)==TRUE){
-                self$feature_extractor$model<-keras$models$load_model(paste0(dir_path,"/","feature_extractor",".h5"))
-              } else {
-                stop("There is no compatible model file in the choosen directory.
-                   Please check path. Please note that classifiers have to be loaded with
-                   the same framework as during creation.")
-              }
-            }
-          }
-        } else if(private$ml_framework=="pytorch"){
-          path_pt=paste0(dir_path,"/","feature_extractor",".pt")
-          path_safe_tensors=paste0(dir_path,"/","feature_extractor",".safetensors")
-          private$create_feature_extractor()
-          if(file.exists(path_safe_tensors)){
-            safetensors$torch$load_model(model=self$feature_extractor$model,
-                                         filename=path_safe_tensors)
-          } else {
-            if(file.exists(paths = path_pt)==TRUE){
-              self$feature_extractor$model$load_state_dict(torch$load(path_pt))
-            } else {
-              stop("There is no compatible model file in the choosen directory for the feature extractor.
-                     Please check path. Please note that classifiers have to be loaded with
-                     the same framework as during creation.")
-            }
-          }
-        }
-      }
-    },
-    #---------------------------------------------------------------------------
-    #'@description Method for requesting a summary of the R and python packages'
-    #'versions used for creating the classifier.
-    #'@return Returns a \code{list} containing the versions of the relevant
-    #'R and python packages.
-    get_package_versions=function(){
-      return(
-        list(r_package_versions=private$r_package_versions,
-             py_package_versions=private$py_package_versions)
-      )
-    },
-    #---------------------------------------------------------------------------
-    #'@description Method for requesting a summary of tracked energy consumption
-    #'during training and an estimate of the resulting CO2 equivalents in kg.
-    #'@return Returns a \code{list} containing the tracked energy consumption,
-    #'CO2 equivalents in kg, information on the tracker used, and technical
-    #'information on the training infrastructure.
-    get_sustainability_data=function(){
-      return(private$sustainability)
-    },
-    #---------------------------------------------------------------------------
-    #'@description Method for requesting the machine learning framework used
-    #'for the classifier.
-    #'@return Returns a \code{string} describing the machine learning framework used
-    #'for the classifier
-    get_ml_framework=function(){
-      return(private$ml_framework)
     }
   ),
   private = list(
-    ml_framework=NA,
-
-    #General Information-------------------------------------------------------
-    model_info=list(
-      model_license=NA,
-      model_name=NA,
-      name_root=NA,
-      model_label=NA,
-      model_date=NA
-    ),
-
-    text_embedding_model=list(
-      model=list(),
-      times=NA,
-      features=NA
-    ),
-
-
-    publication_info=list(
-      developed_by=list(
-        authors =NULL,
-        citation=NULL,
-        url=NULL
-      )
-    ),
-
-    model_description=list(
-      eng=NULL,
-      native=NULL,
-      abstract_eng=NULL,
-      abstract_native=NULL,
-      keywords_eng=NULL,
-      keywords_native=NULL,
-      license=NA
-    ),
-
-    r_package_versions=list(
-      aifeducation=NA,
-      smotefamily=NA,
-      reticulate=NA
-    ),
-
-    py_package_versions=list(
-      tensorflow=NA,
-      torch=NA,
-      keras=NA,
-      numpy=NA
-    ),
-
-    sustainability=list(
-      sustainability_tracked=FALSE,
-      date=NA,
-      sustainability_data=list(
-        duration_sec=NA,
-        co2eq_kg=NA,
-        cpu_energy_kwh=NA,
-        gpu_energy_kwh=NA,
-        ram_energy_kwh=NA,
-        total_energy_kwh=NA
-      ),
-      technical=list(
-        tracker=NA,
-        py_package_version=NA,
-
-        cpu_count=NA,
-        cpu_model=NA,
-
-        gpu_count=NA,
-        gpu_model=NA,
-
-        ram_total_size=NA
-      ),
-      region=list(
-        country_name=NA,
-        country_iso_code=NA,
-        region=NA
-      )
-    ),
-
-    gui=list(
-      shiny_app_active=NA,
-      pgr_value=0,
-      pgr_max_value=0
-    ),
     #--------------------------------------------------------------------------
     load_reload_python_scripts=function(){
       if(private$ml_framework=="tensorflow"){
@@ -1566,124 +964,6 @@ TEClassifierRegular<-R6::R6Class(
                                                  target_levels=self$model_config$target_levels)
 
 
-      }
-    },
-    #--------------------------------------------------------------------------
-    create_feature_extractor=function(){
-      if(private$ml_framework=="pytorch"){
-        if(self$model_config$fe_method=="lstm"){
-          self$feature_extractor$model=feature_extractor=py$LSTMAutoencoder_with_Mask_PT(
-            times=as.integer(private$text_embedding_model["times"]),
-            features_in=as.integer(private$text_embedding_model["features"]),
-            features_out=as.integer(self$model_config$features),
-            noise_factor=self$model_config$fe_noise_factor)
-        } else if(self$model_config$fe_method=="dense") {
-          self$feature_extractor$model=feature_extractor=py$DenseAutoencoder_with_Mask_PT(
-            #times=as.integer(private$text_embedding_model["times"]),
-            features_in=as.integer(private$text_embedding_model["features"]),
-            features_out=as.integer(self$model_config$features),
-            noise_factor=self$model_config$fe_noise_factor)
-        }
-      } else if(private$ml_framework=="tensorflow"){
-        features_in=as.integer(private$text_embedding_model["features"])
-        features_out=as.integer(self$model_config$features)
-        difference=features_in-features_out
-
-        if(self$model_config$fe_method=="lstm"){
-
-          LSTMAutoencoder_with_Mask<-NULL
-          layer_list=NULL
-
-          #Input layer
-          layer_list[1]<-list(
-            keras$layers$Input(shape=list(as.integer(private$text_embedding_model["times"]),features_in),
-                               name="input_embeddings"))
-          #Masking layer
-          layer_list[length(layer_list)+1]=list(
-            keras.layers.Masking(mask_value=0.0)
-          )
-          #Encoder
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(ceiling(features_in-difference*(1/2))))(layer_list[length(layer_list)])
-            )
-          #Latent Space
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(features_out))(layer_list[length(layer_list)])
-          )
-          #Decoder
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(ceiling(features_in-difference*(1/2))))(layer_list[length(layer_list)])
-          )
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(features_in))(layer_list[length(layer_list)])
-          )
-
-
-
-
-        }
-      }
-    },
-    #--------------------------------------------------------------------------
-    train_feature_extractor=function(data_embeddings){
-      private$load_reload_python_scripts()
-      if(self$last_training$config$trace==TRUE){
-        message(paste(date(),"Feature extractor | Start training"))
-      }
-
-      if("EmbeddedText" %in% class(data_embeddings)){
-        #Reduce to unique cases for training
-        data=unique(data_embeddings$embeddings)
-
-        #create a data set
-       extractor_dataset=datasets$Dataset$from_dict(
-          reticulate::dict(
-            list(id=rownames(data),
-                 input=np$squeeze(np$split(reticulate::np_array(data),as.integer(nrow(data)),axis=0L))),
-            convert = FALSE))
-
-       #remove data
-       rm(data)
-
-       #Copy input as label for training
-       extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
-      }
-
-      if(private$ml_framework=="pytorch"){
-        #Set format
-        extractor_dataset$set_format("torch")
-
-        #Split into train and validation data
-        extractor_dataset=extractor_dataset$train_test_split(self$feature_extractor$val_size)
-
-        #Check directory for checkpoints
-        if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints_feature_extractor"))==FALSE){
-          if(self$last_training$config$trace==TRUE){
-            message(paste(date(),"Creating Checkpoint Directory"))
-          }
-          dir.create(paste0(self$last_training$config$dir_checkpoint,"/checkpoints_feature_extractor"))
-        }
-        #print(extractor_dataset$train)
-        self$feature_extractor$history=py$AutoencoderTrain_PT_with_Datasets(
-          model=self$feature_extractor$model,
-          epochs=as.integer(self$feature_extractor$epochs),
-          trace=as.integer(self$last_training$config$pytorch_trace),
-          batch_size=as.integer(self$last_training$config$batch_size),
-          train_data=extractor_dataset$train,
-          val_data=extractor_dataset$test,
-          filepath=paste0(self$last_training$config$dir_checkpoint,"/checkpoints_feature_extractor/best_weights.pt"),
-          use_callback=TRUE,
-          shiny_app_active=self$gui$shiny_app_active)$loss
-      }
-
-      rownames(self$feature_extractor$history)=c("train","val")
-
-      if(self$last_training$config$trace==TRUE){
-        message(paste(date(),"Feature extractor | Training finished"))
       }
     },
     #--------------------------------------------------------------------------
@@ -2370,40 +1650,6 @@ TEClassifierRegular<-R6::R6Class(
         }
       }
       return(history)
-    },
-    #--------------------------------------------------------------------------
-    #Method for summarizing sustainability data for this classifier
-    #List for results must correspond to the private fields of the classifier
-    summarize_tracked_sustainability=function(sustainability_tracker){
-
-      results<-list(
-        sustainability_tracked=TRUE,
-        sustainability_data=list(
-          co2eq_kg=sustainability_tracker$final_emissions_data$emissions,
-          cpu_energy_kwh=sustainability_tracker$final_emissions_data$cpu_energy,
-          gpu_energy_kwh=sustainability_tracker$final_emissions_data$gpu_energy,
-          ram_energy_kwh=sustainability_tracker$final_emissions_data$ram_energy,
-          total_energy_kwh=sustainability_tracker$final_emissions_data$energy_consumed
-        ),
-        technical=list(
-          tracker="codecarbon",
-          py_package_version=codecarbon$"__version__",
-
-          cpu_count=sustainability_tracker$final_emissions_data$cpu_count,
-          cpu_model=sustainability_tracker$final_emissions_data$cpu_model,
-
-          gpu_count=sustainability_tracker$final_emissions_data$gpu_count,
-          gpu_model=sustainability_tracker$final_emissions_data$gpu_model,
-
-          ram_total_size=sustainability_tracker$final_emissions_data$ram_total_size
-        ),
-        region=list(
-          country_name=sustainability_tracker$final_emissions_data$country_name,
-          country_iso_code=sustainability_tracker$final_emissions_data$country_iso_code,
-          region=sustainability_tracker$final_emissions_data$region
-        )
-      )
-      return(results)
     }
   )
 )
