@@ -65,6 +65,13 @@ TEFeatureExtractor<-R6::R6Class(
         stop("ml_framework must be 'tensorflow' or 'pytorch'.")
       }
 
+      if(method%in%c("lstm","dense","conv")==FALSE){
+        stop("Method must be lstm, dense or conv. Please check.")
+      }
+      if(ml_framework=="tensorflow" & method!="lstm"){
+        stop("For tensorflow only the method lstm is implemented.")
+      }
+
       private$ml_framework=ml_framework
 
       #Setting Label and Name-------------------------------------------------
@@ -91,6 +98,7 @@ TEFeatureExtractor<-R6::R6Class(
       self$model_config=config
 
       #Create_Model------------------------------------------------------------
+      private$load_reload_python_scripts()
       private$create_reset_model()
 
       private$model_info$model_date=date()
@@ -153,10 +161,7 @@ TEFeatureExtractor<-R6::R6Class(
         stop("data_embeddings must be an object of class EmbeddedText")
       }
 
-      if(self$check_embedding_model(data_embeddings)==FALSE){
-        stop("The TextEmbeddingModel that generated the data_embeddings is not
-               the same as the TextEmbeddingModel when generating the classifier.")
-      }
+      self$check_embedding_model(data_embeddings)
 
       #Saving training configuration-------------------------------------------
       self$last_training$config$data_val_size=data_val_size
@@ -199,6 +204,14 @@ TEFeatureExtractor<-R6::R6Class(
         extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
       }
 
+      #Check directory for checkpoints
+      if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))==FALSE){
+        if(self$last_training$config$trace==TRUE){
+          message(paste(date(),"Creating Checkpoint Directory"))
+        }
+        dir.create(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))
+      }
+
       if(private$ml_framework=="pytorch"){
         #Set format
         extractor_dataset$set_format("torch")
@@ -206,13 +219,6 @@ TEFeatureExtractor<-R6::R6Class(
         #Split into train and validation data
         extractor_dataset=extractor_dataset$train_test_split(self$last_training$config$data_val_size)
 
-        #Check directory for checkpoints
-        if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))==FALSE){
-          if(self$last_training$config$trace==TRUE){
-            message(paste(date(),"Creating Checkpoint Directory"))
-          }
-          dir.create(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))
-        }
         #print(extractor_dataset$train)
         self$last_training$history=py$AutoencoderTrain_PT_with_Datasets(
           model=self$model,
@@ -224,6 +230,58 @@ TEFeatureExtractor<-R6::R6Class(
           filepath=paste0(self$last_training$config$dir_checkpoint,"/best_weights.pt"),
           use_callback=TRUE,
           shiny_app_active=self$gui$shiny_app_active)$loss
+        #-----------------------------------------------------------------------
+      } else if(private$ml_framework=="tensorflow"){
+        #Set format
+        extractor_dataset$set_format("torch")
+
+        #Split into train and validation data
+        extractor_dataset=extractor_dataset$train_test_split(self$last_training$config$data_val_size)
+
+        #Set Callback
+        callback=keras$callbacks$ModelCheckpoint(
+          filepath = paste0(self$last_training$config$dir_checkpoint,"/best_weights.keras"),
+          monitor = "val_loss",
+          verbose = as.integer(min(self$last_training$config$keras_trace,1)),
+          mode = "auto",
+          save_best_only = TRUE,
+          save_weights_only = TRUE)
+
+        #Set optimizer
+        if(self$model_config$optimizer=="adam"){
+          self$model$compile(
+            loss = "MSE",
+            optimizer=keras$optimizers$Adam())
+        } else if (self$model_config$optimizer=="rmsprop"){
+          self$model$compile(
+            loss = "MSE",
+            optimizer=keras$optimizers$RMSprop())
+        }
+
+          tf_dataset_train=extractor_dataset$train$to_tf_dataset(
+            columns=c("input"),
+            batch_size=as.integer(self$last_training$config$batch_size),
+            shuffle=TRUE,
+            label_cols="labels")
+
+          tf_dataset_val=extractor_dataset$test$to_tf_dataset(
+            columns=c("input"),
+            batch_size=as.integer(self$last_training$config$batch_size),
+            shuffle=FALSE,
+            label_cols="labels")
+
+          history<-self$model$fit(
+            verbose=as.integer(self$last_training$config$keras_trace),
+            x=tf_dataset_train,
+            validation_data=tf_dataset_val,
+            epochs = as.integer(self$last_training$config$epochs),
+            callbacks = callback)$history
+
+          history=rbind(history$loss,history$val_loss)
+          self$last_training$history=history
+
+          self$model$load_weights(paste0(self$last_training$config$dir_checkpoint,"/best_weights.keras"))
+
       }
 
       rownames(self$last_training$history)=c("train","val")
@@ -235,78 +293,75 @@ TEFeatureExtractor<-R6::R6Class(
     },
     #--------------------------------------------------------------------------
     extract_features=function(data_embeddings,batch_size,return_r_object=TRUE){
-        #Prepare data set
-        if("EmbeddedText" %in% class(data_embeddings)){
-          if(nrow(data_embeddings$embeddings)>1){
-            extractor_dataset=datasets$Dataset$from_dict(
-              reticulate::dict(
-                list(id=rownames(data_embeddings$embeddings),
-                     input=np$squeeze(np$split(reticulate::np_array(data_embeddings$embeddings),as.integer(nrow(data_embeddings$embeddings)),axis=0L))),
-                convert = FALSE))
-          } else {
-            extractor_dataset=data_embeddings$embeddings
-          }
 
-        } else if("array" %in% class(data_embeddings)){
-          if(nrow(data_embeddings)>1){
-            extractor_dataset=datasets$Dataset$from_dict(
-              reticulate::dict(
-                list(id=rownames(data_embeddings),
-                     input=np$squeeze(np$split(reticulate::np_array(data_embeddings),as.integer(nrow(data_embeddings)),axis=0L))),
-                convert = FALSE))
-          } else {
-            extractor_dataset=data_embeddings
-          }
+      #Load Custom Model Scripts
+      private$load_reload_python_scripts()
+
+      #Check number of cases in the data
+      single_prediction=private$check_single_prediction(data_embeddings)
+
+      #Get current row names/name of the cases
+      current_row_names=private$get_rownames_from_embeddings(data_embeddings)
+
+      #If at least two cases are part of the data set---------------------------
+      if(single_prediction==FALSE){
+        prepared_embeddings=private$prepare_embeddings_as_dataset(data_embeddings)
+
+        if(private$ml_framework=="pytorch"){
+          prepared_embeddings$set_format("torch")
+          reduced_tensors=py$TeFeatureExtractorBatchExtract(
+            model=self$model,
+            dataset=prepared_embeddings,
+            batch_size=as.integer(batch_size)
+          )
+          reduced_embeddings=private$detach_tensors(reduced_tensors)
+        } else if(private$ml_framework=="tensorflow"){
+          prepared_embeddings$set_format("tf")
+          prepared_embeddings_tf=prepared_embeddings$to_tf_dataset(
+            columns=c("input"),
+            batch_size=as.integer(batch_size),
+            shuffle=FALSE)
+
+          encoder_model= tf$keras$Model(inputs=self$model$input, outputs=self$model$get_layer("latent_space_output")$output)
+
+          reduced_embeddings=encoder_model$predict(prepared_embeddings_tf)
         }
-
-        #Extract features
+        #---------------------------------------------------------------------
+      } else {
+        prepared_embeddings=private$prepare_embeddings_as_np_array(data_embeddings)
         if(private$ml_framework=="pytorch"){
           if(torch$cuda$is_available()){
             device="cuda"
             dtype=torch$double
-
-            if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-              extractor_dataset$set_format("torch",device=device)
-              self$model$to(device,dtype=dtype)
-              self$model$eval()
-              reduced_embeddings<-self$model(extractor_dataset["input"],
-                                                               encoder_mode=TRUE)$detach()$cpu()$numpy()
-            } else {
-              self$model$to(device,dtype=dtype)
-              self$model$eval()
-              input=torch$from_numpy(np$array(extractor_dataset))
-              reduced_embeddings<-self$model(input$to(device,dtype=dtype),
-                                                               encoder_mode=TRUE)$detach()$cpu()$numpy()
-            }
+            self$model$to(device,dtype=dtype)
+            self$model$eval()
+            input=torch$from_numpy(prepared_embeddings)
+            reduced_tensors<-self$model(input$to(device,dtype=dtype),
+                                         encoder_mode=TRUE)
+            reduced_embeddings=private$detach_tensors(reduced_tensors)
           } else {
             device="cpu"
             dtype=torch$float
-            if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-              extractor_dataset$set_format("torch",device=device)
-
-              self$model$to(device,dtype=dtype)
-              self$model$eval()
-              reduced_embeddings<-self$model(extractor_dataset["input"],
-                                                               encoder_mode=TRUE)$detach()$numpy()
-            } else {
-              self$model$to(device,dtype=dtype)
-              self$model$eval()
-              input=torch$from_numpy(np$array(extractor_dataset))
-              reduced_embeddings<-self$model(input$to(device,dtype=dtype),
-                                                               encoder_mode=TRUE)$detach()$numpy()
-            }
+            self$model$to(device,dtype=dtype)
+            self$model$eval()
+            input=torch$from_numpy(prepared_embeddings)
+            reduced_tensors<-self$model(input$to(device,dtype=dtype),
+                                        encoder_mode=TRUE)
+            reduced_embeddings=private$detach_tensors(reduced_tensors)
           }
+        } else if(private$ml_framework=="tensorflow"){
+          encoder_model= tf$keras$Model(inputs=self$model$input, outputs=self$model$get_layer("latent_space_output")$output)
+          reduced_embeddings=encoder_model$predict(prepared_embeddings)
         }
+      }
 
         #Prepare output
         if(return_r_object==TRUE){
-          reduced_embeddings=reduced_embeddings
-          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
+          if("datasets.arrow_dataset.Dataset"%in%class(data_embeddings)){
             rownames(reduced_embeddings)=extractor_dataset["id"]
           } else {
-            rownames(reduced_embeddings)=rownames(data_embeddings)
+            rownames(reduced_embeddings)=current_row_names
           }
-
 
           model_info=self$get_text_embedding_model()
 
@@ -325,9 +380,25 @@ TEFeatureExtractor<-R6::R6Class(
             param_emb_pool_type=model_info$param_emb_pool_type,
             param_aggregation=model_info$param_aggregation,
             embeddings=reduced_embeddings)
-          return(reduced_embeddings)
+
+          reduced_embeddings$add_feature_extractor_info(model_name=private$model_info$model_name,
+                                                model_label=private$model_info$model_label,
+                                                features=self$model_config$features,
+                                                method=self$model_config$method,
+                                                noise_factor=self$model_config$noise_factor,
+                                                optimizer=self$model_config$optimizer)
+        } else {
+          reduced_embeddings=datasets$Dataset$from_dict(
+            reticulate::dict(
+              list(id=current_row_names,
+                   input=np$squeeze(np$split(reticulate::np_array(reduced_embeddings),as.integer(nrow(reduced_embeddings)),axis=0L))),
+              convert = FALSE))
+
         }
+    return(reduced_embeddings)
+
     },
+      #-----------------------------------------------------------------------
     is_trained=function(){
       return(private$trained)
     }
@@ -337,7 +408,7 @@ TEFeatureExtractor<-R6::R6Class(
     #--------------------------------------------------------------------------
     load_reload_python_scripts=function(){
       if(private$ml_framework=="tensorflow"){
-        reticulate::py_run_file(system.file("python/keras_te_classifier.py",
+        reticulate::py_run_file(system.file("python/keras_autoencoder.py",
                                             package = "aifeducation"))
         reticulate::py_run_file(system.file("python/keras_callbacks.py",
                                             package = "aifeducation"))
@@ -358,49 +429,24 @@ TEFeatureExtractor<-R6::R6Class(
             features_in=as.integer(private$text_embedding_model["features"]),
             features_out=as.integer(self$model_config$features),
             noise_factor=self$model_config$noise_factor)
-        } else if(self$model_config$fe_method=="dense") {
+        } else if(self$model_config$method=="dense") {
           self$model=feature_extractor=py$DenseAutoencoder_with_Mask_PT(
+            features_in=as.integer(private$text_embedding_model["features"]),
+            features_out=as.integer(self$model_config$features),
+            noise_factor=self$model_config$noise_factor)
+        } else if(self$model_config$method=="conv") {
+          self$model=feature_extractor=py$ConvAutoencoder_with_Mask_PT(
             features_in=as.integer(private$text_embedding_model["features"]),
             features_out=as.integer(self$model_config$features),
             noise_factor=self$model_config$noise_factor)
         }
       } else if(private$ml_framework=="tensorflow"){
-        features_in=as.integer(private$text_embedding_model["features"])
-        features_out=as.integer(self$model_config$features)
-        difference=features_in-features_out
-
-        if(self$model_config$fe_method=="lstm"){
-
-          LSTMAutoencoder_with_Mask<-NULL
-          layer_list=NULL
-
-          #Input layer
-          layer_list[1]<-list(
-            keras$layers$Input(shape=list(as.integer(private$text_embedding_model["times"]),features_in),
-                               name="input_embeddings"))
-          #Masking layer
-          layer_list[length(layer_list)+1]=list(
-            keras.layers.Masking(mask_value=0.0)
-          )
-          #Encoder
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(ceiling(features_in-difference*(1/2))))(layer_list[length(layer_list)])
-          )
-          #Latent Space
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(features_out))(layer_list[length(layer_list)])
-          )
-          #Decoder
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(ceiling(features_in-difference*(1/2))))(layer_list[length(layer_list)])
-          )
-          layer_list[length(layer_list)+1]=list(
-            keras$layers$LSTM(
-              units=as.integer(features_in))(layer_list[length(layer_list)])
-          )
+        if(self$model_config$method=="lstm"){
+          self$model=py$LSTMAutoencoder_with_Mask_TF(
+            times=as.integer(private$text_embedding_model["times"]),
+            features_in=as.integer(private$text_embedding_model["features"]),
+            features_out=as.integer(self$model_config$features),
+            noise_factor=self$model_config$noise_factor)
         }
       }
     },

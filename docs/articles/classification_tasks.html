@@ -431,6 +431,11 @@ tokens, they are able to represent a very large number of words.</p>
 example, you could increase the number of hidden layers from 12 to 24 or
 reduce the hidden size from 768 to 256, allowing you to build and to
 test larger or smaller models.</p>
+<blockquote>
+<p>The vignette <a href="model_configuration.html">Optimal model
+configuration</a> provides details on how to configurate a base
+model.</p>
+</blockquote>
 <p>Please note that with <code>max_position_embeddings</code> you
 determine how many tokens your transformer can process. If your text has
 more tokens, these tokens are ignored. However, if you would like to
@@ -611,6 +616,11 @@ pooling within every layer. In the case of
 <code>emb_pool_type="cls"</code> only the cls token is used. In the case
 of <code>emb_pool_type="average"</code> all tokens within a layer are
 averaged except padding tokens.</p>
+<blockquote>
+<p>The vignette <a href="model_configuration.html">Optimal model
+configuration</a> provides details on how to configurate a text
+embedding model.</p>
+</blockquote>
 <p>After deciding about the configuration, you can use your model.</p>
 <blockquote>
 <p><strong>Note:</strong> With version 0.3.1 of aifeducation every
@@ -723,6 +733,10 @@ embeddings instead of raw texts.</p>
 <span>  label<span class="op">=</span><span class="st">"Classifier for Estimating a Postive or Negative Rating of Movie Reviews"</span>,</span>
 <span>  text_embeddings<span class="op">=</span><span class="va">bert_embeddings</span>,</span>
 <span>  targets<span class="op">=</span><span class="va">example_targets</span>,</span>
+<span>  use_fe<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>  fe_features<span class="op">=</span><span class="fl">128</span>,</span>
+<span>  fe_method<span class="op">=</span><span class="st">"lstm"</span>,</span>
+<span>  fe_noise_factor<span class="op">=</span><span class="fl">0.2</span>,</span>
 <span>  hidden<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>,<span class="fl">20</span><span class="op">)</span>,</span>
 <span>  rec<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>,<span class="fl">40</span><span class="op">)</span>,</span>
 <span>  rec_type<span class="op">=</span><span class="st">"gru"</span>,</span>
@@ -751,6 +765,19 @@ elements of the factor. That is, the entries of the factor mus have
 names that correspond to the IDs of the corresponding texts. Without
 these names the method cannot match the input data (text embeddings) to
 the target data.</p>
+<p>With <code>use_fe</code> you can request a feature extractor. The aim
+of the feature extractor is to reduce the number of dimensions of the
+text embeddings and saving as much information as possible. Reducing the
+number of dimensions can speed up training and inference and at the same
+time increase the performance of your classifier. For more details
+please refer to vignette <a href="model_configuration.html">Optimal
+model configuration</a>. With <code>fe_features</code> you can decide to
+which number of dimensions the text embeddings should be compressed.
+<code>fe_method</code> allows you to select a model for the reduction
+(“lstm” or “dense”). Sine all feature extractors in
+<em>aifeducation</em> are based on denoising autoencoder you can decide
+how many noise should be added during training the extractor
+(<code>fe_noise_factor</code>).</p>
 <p>With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.</p>
 <div class="float">
@@ -799,7 +826,12 @@ positional embeddings. Positional embeddings take care for the order of
 your chunks. Thus, adding such a layer may increase performance if the
 order of information is important. You can add this layer by setting
 <code>add_pos_embedding=TRUE</code>. The layer is created as described
-by Chollet, Kalinowski, and Allaire (2022, pp. 378)</p>
+by Chollet, Kalinowski, and Allaire (2022, pp. 378).</p>
+<blockquote>
+<p>The vignette <a href="model_configuration.html">Optimal model
+configuration</a> provides details on how to configurate a
+classifier.</p>
+</blockquote>
 <p>Masking, normalization, and the creation of the input layer as well
 as the output layer are done automatically.</p>
 <p>After you have created a new classifier, you can begin training.</p>
@@ -846,6 +878,8 @@ estimation of a classifier`s performance.</p>
 <span>   data_targets <span class="op">=</span> <span class="va">example_targets</span>,</span>
 <span>   data_folds<span class="op">=</span><span class="fl">5</span>,</span>
 <span>   data_val_size<span class="op">=</span><span class="fl">0.25</span>,</span>
+<span>   fe_epochs<span class="op">=</span><span class="fl">1000</span>,</span>
+<span>   fe_val_size<span class="op">=</span><span class="fl">0.25</span>,</span>
 <span>   balance_class_weights<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>   balance_sequence_length<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>   use_sc<span class="op">=</span><span class="cn">TRUE</span>,</span>
@@ -953,6 +987,13 @@ best performance in final training.</p>
 <p>In the case options like the generation of synthetic cases
 (<code>use_sc</code>) or pseudo-labeling (<code>use_pl</code>) are
 disabled the training process is shorter.</p>
+<p>In the case your classifier uses a feature extractor you can
+configure the training process with <code>fe_epochs</code> and
+<code>fe_val_size</code>. The first argument determines the maximal
+number of training steps while the last determines the number of text
+embeddings used as a validation sample. The model with the lowest loss
+on the validation sample is applied for compressing the text
+embeddings.</p>
 <p>Since training a neural net is energy consuming <em>aifeducation</em>
 allows you to estimate its ecological impact with help of the python
 library <code>codecarbon</code>. Thus, <code>sustain_track</code> is set

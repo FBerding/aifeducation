@@ -197,6 +197,8 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     return sample_embeddings
   def set_trained_prototypes(self,prototypes):
     self.trained_prototypes=torch.nn.Parameter(prototypes)
+  def get_trained_prototypes(self):
+    return self.trained_prototypes
   
 
 #-------------------------------------------------------------------------------    
@@ -523,4 +525,34 @@ shiny_app_active=False):
  
     
   return history
+
+def TeProtoNetBatchEmbed(model,dataset_q,batch_size):
+  
+  device=('cuda' if torch.cuda.is_available() else 'cpu')
+  
+  if device=="cpu":
+    model.to(device,dtype=float)
+  else:
+    model.to(device,dtype=torch.double)
+    
+  model.eval()
+  predictionloader=torch.utils.data.DataLoader(
+    dataset_q,
+    batch_size=batch_size,
+    shuffle=False)
+
+  with torch.no_grad():
+    iteration=0
+    for batch in predictionloader:
+      inputs=batch["input"]
+      inputs = inputs.to(device)
       
+      predictions=model.embed(inputs)
+      
+      if iteration==0:
+        predictions_list=predictions.to("cpu")
+      else:
+        predictions_list=torch.concatenate((predictions_list,predictions.to("cpu")), axis=0, out=None)
+      iteration+=1
+  
+  return predictions_list      

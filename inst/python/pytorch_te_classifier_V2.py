@@ -702,6 +702,39 @@ shiny_app_active=False):
     "loss":history_loss.numpy(),
     "accuracy":history_acc.numpy(),
     "balanced_accuracy":history_bacc.numpy()} 
- 
-    
   return history
+
+
+def TeClassifierBatchPredict(model,dataset,batch_size):
+  
+  device=('cuda' if torch.cuda.is_available() else 'cpu')
+  
+  if device=="cpu":
+    model.to(device,dtype=float)
+  else:
+    model.to(device,dtype=torch.double)
+    
+  model.eval()
+  predictionloader=torch.utils.data.DataLoader(
+    dataset,
+    batch_size=batch_size,
+    shuffle=False)
+
+  with torch.no_grad():
+    iteration=0
+    for batch in predictionloader:
+      inputs=batch["input"]
+      inputs = inputs.to(device)
+      predictions=model(inputs,predication_mode=True)
+      
+      if iteration==0:
+        predictions_list=predictions.to("cpu")
+      else:
+        predictions_list=torch.concatenate((predictions_list,predictions.to("cpu")), axis=0, out=None)
+      iteration+=1
+  
+  return predictions_list
+      
+      
+    
+    

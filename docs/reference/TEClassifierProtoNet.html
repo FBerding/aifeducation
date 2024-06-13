@@ -122,8 +122,10 @@ Springer International Publishing. https://doi.org/10.1007/978-3-030-16145-3_24<
 
 <ul><li><p><a href="#method-TEClassifierProtoNet-new"><code>TEClassifierProtoNet$new()</code></a></p></li>
 <li><p><a href="#method-TEClassifierProtoNet-train"><code>TEClassifierProtoNet$train()</code></a></p></li>
+<li><p><a href="#method-TEClassifierProtoNet-embed"><code>TEClassifierProtoNet$embed()</code></a></p></li>
 <li><p><a href="#method-TEClassifierProtoNet-clone"><code>TEClassifierProtoNet$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="check_embedding_model"><a href="../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-check_embedding_model"><code>aifeducation::TEClassifierRegular$check_embedding_model()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="extract_features"><a href="../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-extract_features"><code>aifeducation::TEClassifierRegular$extract_features()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="get_documentation_license"><a href="../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-get_documentation_license"><code>aifeducation::TEClassifierRegular$get_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="get_ml_framework"><a href="../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-get_ml_framework"><code>aifeducation::TEClassifierRegular$get_ml_framework()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="get_model_description"><a href="../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-get_model_description"><code>aifeducation::TEClassifierRegular$get_model_description()</code></a></span></li>
@@ -149,10 +151,15 @@ Springer International Publishing. https://doi.org/10.1007/978-3-030-16145-3_24<
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  use_fe <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fe_features <span class="op">=</span> <span class="fl">128</span>,</span>
+<span>  fe_method <span class="op">=</span> <span class="st">"lstm"</span>,</span>
+<span>  fe_noise_factor <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  hidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>,</span>
 <span>  rec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>,</span>
 <span>  rec_type <span class="op">=</span> <span class="st">"gru"</span>,</span>
+<span>  rec_bidirectional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  embedding_dim <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  self_attention_heads <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  intermediate_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -189,6 +196,27 @@ free text.</p></dd>
 <dd><p>An object of class<code>TextEmbeddingModel</code>.</p></dd>
 
 
+<dt><code>use_fe</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> a feature extractor is applied in
+order to reduce the dimensionality of the text embeddings.</p></dd>
+
+
+<dt><code>fe_features</code></dt>
+<dd><p><code>int</code> determining the number of dimensions to which
+the dimension of the text embedding should be reduced.</p></dd>
+
+
+<dt><code>fe_method</code></dt>
+<dd><p><code>string</code> Method to use for the feature extraction.
+<code>"lstm"</code> for an extractor based on LSTM-layers or <code>"dense"</code> for
+dense layers.</p></dd>
+
+
+<dt><code>fe_noise_factor</code></dt>
+<dd><p><code>double</code> between 0 and a value lower 1 indicating
+how much noise should be added for the training of the feature extractor.</p></dd>
+
+
 <dt><code>targets</code></dt>
 <dd><p><code>factor</code> containing the target values of the classifier.</p></dd>
 
@@ -208,6 +236,11 @@ set this parameter to <code>NULL</code>.</p></dd>
 <dt><code>rec_type</code></dt>
 <dd><p><code>string</code> Type of the recurrent layers. <code>rec_type="gru"</code> for
 Gated Recurrent Unit and <code>rec_type="lstm"</code> for Long Short-Term Memory.</p></dd>
+
+
+<dt><code>rec_bidirectional</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> a bidirectional version of the reccurent
+layers is used.</p></dd>
 
 
 <dt><code>embedding_dim</code></dt>
@@ -293,6 +326,9 @@ training.</p>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">35</span>,</span>
+<span>  fe_epochs <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  fe_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  Ns <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  Nq <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  <span class="va">loss_alpha</span>,</span>
@@ -400,6 +436,19 @@ usage.</p></dd>
 <dd><p><code>int</code> Number of training epochs.</p></dd>
 
 
+<dt><code>batch_size</code></dt>
+<dd><p><code>int</code> Size of the batches for the feature extractor.</p></dd>
+
+
+<dt><code>fe_epochs</code></dt>
+<dd><p><code>int</code> Number of training epochs for the feature extractor.</p></dd>
+
+
+<dt><code>fe_val_size</code></dt>
+<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases
+which should be used for the validation sample during the training of the feature extractor.</p></dd>
+
+
 <dt><code>Ns</code></dt>
 <dd><p><code>int</code> Number of cases for every class in the sample.</p></dd>
 
@@ -473,10 +522,24 @@ into an ascending order.</p></li>
 classifier.</p>
 </div>
 
+</div><p></p><hr><a id="method-TEClassifierProtoNet-embed"></a><div class="section">
+<h3 id="method-embed-">Method <code><a href="https://rdrr.io/r/stats/embed.html" class="external-link">embed()</a></code><a class="anchor" aria-label="anchor" href="#method-embed-"></a></h3>
+
+<div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierProtoNet</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
+<span>  embeddings_q <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  classes_q <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  embeddings_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  classes_s <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-TEClassifierProtoNet-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierProtoNet</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

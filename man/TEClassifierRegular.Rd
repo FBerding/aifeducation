@@ -33,6 +33,9 @@ Field for storing the tensorflow or pytorch model after loading.}
 \item{\code{model_config}}{('list()')\cr
 List for storing information about the configuration of the model.}
 
+\item{\code{feature_extractor}}{('list()')\cr
+List for storing information and objects about the feature_extractor.}
+
 \item{\code{last_training}}{('list()')\cr
 List for storing the history, the configuration, and the results of the last training. This
 information will be overwritten if a new training is started.
@@ -83,6 +86,7 @@ measures for precision, recall, and f1.}
 \itemize{
 \item \href{#method-TEClassifierRegular-new}{\code{TEClassifierRegular$new()}}
 \item \href{#method-TEClassifierRegular-train}{\code{TEClassifierRegular$train()}}
+\item \href{#method-TEClassifierRegular-extract_features}{\code{TEClassifierRegular$extract_features()}}
 \item \href{#method-TEClassifierRegular-predict}{\code{TEClassifierRegular$predict()}}
 \item \href{#method-TEClassifierRegular-check_embedding_model}{\code{TEClassifierRegular$check_embedding_model()}}
 \item \href{#method-TEClassifierRegular-get_model_info}{\code{TEClassifierRegular$get_model_info()}}
@@ -114,10 +118,15 @@ Creating a new instance of this class.
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
+  use_fe = TRUE,
+  fe_features = 128,
+  fe_method = "lstm",
+  fe_noise_factor = 0.2,
   targets = NULL,
   hidden = c(128),
   rec = c(128),
   rec_type = "gru",
+  rec_bidirectional = FALSE,
   self_attention_heads = 0,
   intermediate_size = NULL,
   attention_type = "fourier",
@@ -146,6 +155,19 @@ free text.}
 
 \item{\code{text_embeddings}}{An object of class\code{TextEmbeddingModel}.}
 
+\item{\code{use_fe}}{\code{bool} If \code{TRUE} a feature extractor is applied in
+order to reduce the dimensionality of the text embeddings.}
+
+\item{\code{fe_features}}{\code{int} determining the number of dimensions to which
+the dimension of the text embedding should be reduced.}
+
+\item{\code{fe_method}}{\code{string} Method to use for the feature extraction.
+\code{"lstm"} for an extractor based on LSTM-layers or \code{"dense"} for
+dense layers.}
+
+\item{\code{fe_noise_factor}}{\code{double} between 0 and a value lower 1 indicating
+how much noise should be added for the training of the feature extractor.}
+
 \item{\code{targets}}{\code{factor} containing the target values of the classifier.}
 
 \item{\code{hidden}}{\code{vector} containing the number of neurons for each dense layer.
@@ -158,6 +180,9 @@ set this parameter to \code{NULL}.}
 
 \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type="gru"} for
 Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.}
+
+\item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the reccurent
+layers is used.}
 
 \item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads
 for a self-attention layer. Only relevant if \code{attention_type="multihead"}}
@@ -221,6 +246,8 @@ Method for training a neural net.
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 40,
+  fe_epochs = 1000,
+  fe_val_size = 0.25,
   batch_size = 32,
   dir_checkpoint,
   trace = TRUE,
@@ -298,6 +325,11 @@ usage.}
 
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 
+\item{\code{fe_epochs}}{\code{int} Number of training epochs for the feature extractor.}
+
+\item{\code{fe_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases
+which should be used for the validation sample during the training of the feature extractor.}
+
 \item{\code{batch_size}}{\code{int} Size of batches.}
 
 \item{\code{dir_checkpoint}}{\code{string} Path to the directory where
@@ -334,6 +366,19 @@ into an ascending order.
 Function does not return a value. It changes the object into a trained
 classifier.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifierRegular-extract_features"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierRegular-extract_features}{}}}
+\subsection{Method \code{extract_features()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierRegular$extract_features(
+  data_embeddings,
+  batch_size,
+  return_r_object = TRUE
+)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TEClassifierRegular-predict"></a>}}

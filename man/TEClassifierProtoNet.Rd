@@ -49,6 +49,7 @@ Other Classification:
 \itemize{
 \item \href{#method-TEClassifierProtoNet-new}{\code{TEClassifierProtoNet$new()}}
 \item \href{#method-TEClassifierProtoNet-train}{\code{TEClassifierProtoNet$train()}}
+\item \href{#method-TEClassifierProtoNet-embed}{\code{TEClassifierProtoNet$embed()}}
 \item \href{#method-TEClassifierProtoNet-clone}{\code{TEClassifierProtoNet$clone()}}
 }
 }
@@ -56,6 +57,7 @@ Other Classification:
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="check_embedding_model"><a href='../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-check_embedding_model'><code>aifeducation::TEClassifierRegular$check_embedding_model()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="extract_features"><a href='../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-extract_features'><code>aifeducation::TEClassifierRegular$extract_features()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="get_documentation_license"><a href='../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-get_documentation_license'><code>aifeducation::TEClassifierRegular$get_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="get_ml_framework"><a href='../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-get_ml_framework'><code>aifeducation::TEClassifierRegular$get_ml_framework()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifierRegular" data-id="get_model_description"><a href='../../aifeducation/html/TEClassifierRegular.html#method-TEClassifierRegular-get_model_description'><code>aifeducation::TEClassifierRegular$get_model_description()</code></a></span></li>
@@ -86,10 +88,15 @@ Creating a new instance of this class.
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
+  use_fe = TRUE,
+  fe_features = 128,
+  fe_method = "lstm",
+  fe_noise_factor = 0.2,
   targets = NULL,
   hidden = c(128),
   rec = c(128),
   rec_type = "gru",
+  rec_bidirectional = FALSE,
   embedding_dim = 3,
   self_attention_heads = 0,
   intermediate_size = NULL,
@@ -119,6 +126,19 @@ free text.}
 
 \item{\code{text_embeddings}}{An object of class\code{TextEmbeddingModel}.}
 
+\item{\code{use_fe}}{\code{bool} If \code{TRUE} a feature extractor is applied in
+order to reduce the dimensionality of the text embeddings.}
+
+\item{\code{fe_features}}{\code{int} determining the number of dimensions to which
+the dimension of the text embedding should be reduced.}
+
+\item{\code{fe_method}}{\code{string} Method to use for the feature extraction.
+\code{"lstm"} for an extractor based on LSTM-layers or \code{"dense"} for
+dense layers.}
+
+\item{\code{fe_noise_factor}}{\code{double} between 0 and a value lower 1 indicating
+how much noise should be added for the training of the feature extractor.}
+
 \item{\code{targets}}{\code{factor} containing the target values of the classifier.}
 
 \item{\code{hidden}}{\code{vector} containing the number of neurons for each dense layer.
@@ -131,6 +151,9 @@ set this parameter to \code{NULL}.}
 
 \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type="gru"} for
 Gated Recurrent Unit and \code{rec_type="lstm"} for Long Short-Term Memory.}
+
+\item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the reccurent
+layers is used.}
 
 \item{\code{embedding_dim}}{\code{Int} determining the dimensionality of the embedding.}
 
@@ -194,6 +217,9 @@ Method for training a neural net.
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 40,
+  batch_size = 35,
+  fe_epochs = 1000,
+  fe_val_size = 0.25,
   Ns = 5,
   Nq = 3,
   loss_alpha,
@@ -266,6 +292,13 @@ usage.}
 
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 
+\item{\code{batch_size}}{\code{int} Size of the batches for the feature extractor.}
+
+\item{\code{fe_epochs}}{\code{int} Number of training epochs for the feature extractor.}
+
+\item{\code{fe_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases
+which should be used for the validation sample during the training of the feature extractor.}
+
 \item{\code{Ns}}{\code{int} Number of cases for every class in the sample.}
 
 \item{\code{Nq}}{\code{int} Number of cases for every class in the query.}
@@ -320,6 +353,20 @@ into an ascending order.
 Function does not return a value. It changes the object into a trained
 classifier.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifierProtoNet-embed"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-embed}{}}}
+\subsection{Method \code{embed()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$embed(
+  embeddings_q = NULL,
+  classes_q = NULL,
+  embeddings_s = NULL,
+  classes_s = NULL
+)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TEClassifierProtoNet-clone"></a>}}

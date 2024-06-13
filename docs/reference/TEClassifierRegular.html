@@ -99,6 +99,11 @@ Field for storing the tensorflow or pytorch model after loading.</p></dd>
 List for storing information about the configuration of the model.</p></dd>
 
 
+<dt><code>feature_extractor</code></dt>
+<dd><p>('list()')<br>
+List for storing information and objects about the feature_extractor.</p></dd>
+
+
 <dt><code>last_training</code></dt>
 <dd><p>('list()')<br>
 List for storing the history, the configuration, and the results of the last training. This
@@ -148,6 +153,7 @@ measures for precision, recall, and f1.</p></li>
 
 <ul><li><p><a href="#method-TEClassifierRegular-new"><code>TEClassifierRegular$new()</code></a></p></li>
 <li><p><a href="#method-TEClassifierRegular-train"><code>TEClassifierRegular$train()</code></a></p></li>
+<li><p><a href="#method-TEClassifierRegular-extract_features"><code>TEClassifierRegular$extract_features()</code></a></p></li>
 <li><p><a href="#method-TEClassifierRegular-predict"><code>TEClassifierRegular$predict()</code></a></p></li>
 <li><p><a href="#method-TEClassifierRegular-check_embedding_model"><code>TEClassifierRegular$check_embedding_model()</code></a></p></li>
 <li><p><a href="#method-TEClassifierRegular-get_model_info"><code>TEClassifierRegular$get_model_info()</code></a></p></li>
@@ -175,10 +181,15 @@ measures for precision, recall, and f1.</p></li>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  use_fe <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fe_features <span class="op">=</span> <span class="fl">128</span>,</span>
+<span>  fe_method <span class="op">=</span> <span class="st">"lstm"</span>,</span>
+<span>  fe_noise_factor <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  hidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>,</span>
 <span>  rec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span><span class="op">)</span>,</span>
 <span>  rec_type <span class="op">=</span> <span class="st">"gru"</span>,</span>
+<span>  rec_bidirectional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  self_attention_heads <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  intermediate_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  attention_type <span class="op">=</span> <span class="st">"fourier"</span>,</span>
@@ -214,6 +225,27 @@ free text.</p></dd>
 <dd><p>An object of class<code>TextEmbeddingModel</code>.</p></dd>
 
 
+<dt><code>use_fe</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> a feature extractor is applied in
+order to reduce the dimensionality of the text embeddings.</p></dd>
+
+
+<dt><code>fe_features</code></dt>
+<dd><p><code>int</code> determining the number of dimensions to which
+the dimension of the text embedding should be reduced.</p></dd>
+
+
+<dt><code>fe_method</code></dt>
+<dd><p><code>string</code> Method to use for the feature extraction.
+<code>"lstm"</code> for an extractor based on LSTM-layers or <code>"dense"</code> for
+dense layers.</p></dd>
+
+
+<dt><code>fe_noise_factor</code></dt>
+<dd><p><code>double</code> between 0 and a value lower 1 indicating
+how much noise should be added for the training of the feature extractor.</p></dd>
+
+
 <dt><code>targets</code></dt>
 <dd><p><code>factor</code> containing the target values of the classifier.</p></dd>
 
@@ -233,6 +265,11 @@ set this parameter to <code>NULL</code>.</p></dd>
 <dt><code>rec_type</code></dt>
 <dd><p><code>string</code> Type of the recurrent layers. <code>rec_type="gru"</code> for
 Gated Recurrent Unit and <code>rec_type="lstm"</code> for Long Short-Term Memory.</p></dd>
+
+
+<dt><code>rec_bidirectional</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> a bidirectional version of the reccurent
+layers is used.</p></dd>
 
 
 <dt><code>self_attention_heads</code></dt>
@@ -316,6 +353,8 @@ training.</p>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
+<span>  fe_epochs <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  fe_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
 <span>  <span class="va">dir_checkpoint</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -432,6 +471,15 @@ usage.</p></dd>
 <dd><p><code>int</code> Number of training epochs.</p></dd>
 
 
+<dt><code>fe_epochs</code></dt>
+<dd><p><code>int</code> Number of training epochs for the feature extractor.</p></dd>
+
+
+<dt><code>fe_val_size</code></dt>
+<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases
+which should be used for the validation sample during the training of the feature extractor.</p></dd>
+
+
 <dt><code>batch_size</code></dt>
 <dd><p><code>int</code> Size of batches.</p></dd>
 
@@ -477,10 +525,23 @@ into an ascending order.</p></li>
 classifier.</p>
 </div>
 
+</div><p></p><hr><a id="method-TEClassifierRegular-extract_features"></a><div class="section">
+<h3 id="method-extract-features-">Method <code>extract_features()</code><a class="anchor" aria-label="anchor" href="#method-extract-features-"></a></h3>
+
+<div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">extract_features</span><span class="op">(</span></span>
+<span>  <span class="va">data_embeddings</span>,</span>
+<span>  <span class="va">batch_size</span>,</span>
+<span>  return_r_object <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-TEClassifierRegular-predict"></a><div class="section">
 <h3 id="method-predict-">Method <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code><a class="anchor" aria-label="anchor" href="#method-predict-"></a></h3>
 <p>Method for predicting new data with a trained neural net.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">predict</span><span class="op">(</span><span class="va">newdata</span>, batch_size <span class="op">=</span> <span class="fl">32</span>, verbose <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -514,7 +575,7 @@ the probabilities of the different labels for each case.</p>
 <h3 id="method-check-embedding-model-">Method <code>check_embedding_model()</code><a class="anchor" aria-label="anchor" href="#method-check-embedding-model-"></a></h3>
 <p>Method for checking if the provided text embeddings are
 created with the same <a href="TextEmbeddingModel.html">TextEmbeddingModel</a> as the classifier.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">check_embedding_model</span><span class="op">(</span><span class="va">text_embeddings</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -535,7 +596,7 @@ created with the same <a href="TextEmbeddingModel.html">TextEmbeddingModel</a> a
 </div><p></p><hr><a id="method-TEClassifierRegular-get_model_info"></a><div class="section">
 <h3 id="method-get-model-info-">Method <code>get_model_info()</code><a class="anchor" aria-label="anchor" href="#method-get-model-info-"></a></h3>
 <p>Method for requesting the model information</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_model_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -547,7 +608,7 @@ created with the same <a href="TextEmbeddingModel.html">TextEmbeddingModel</a> a
 </div><p></p><hr><a id="method-TEClassifierRegular-get_text_embedding_model"></a><div class="section">
 <h3 id="method-get-text-embedding-model-">Method <code>get_text_embedding_model()</code><a class="anchor" aria-label="anchor" href="#method-get-text-embedding-model-"></a></h3>
 <p>Method for requesting the text embedding model information</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_text_embedding_model</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -560,7 +621,7 @@ underlying the classifier</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-set_publication_info"></a><div class="section">
 <h3 id="method-set-publication-info-">Method <code>set_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-set-publication-info-"></a></h3>
 <p>Method for setting publication information of the classifier</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span><span class="va">authors</span>, <span class="va">citation</span>, url <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -589,7 +650,7 @@ members for publication information.</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-get_publication_info"></a><div class="section">
 <h3 id="method-get-publication-info-">Method <code>get_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-get-publication-info-"></a></h3>
 <p>Method for requesting the bibliographic information of the classifier.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_publication_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -601,7 +662,7 @@ members for publication information.</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-set_software_license"></a><div class="section">
 <h3 id="method-set-software-license-">Method <code>set_software_license()</code><a class="anchor" aria-label="anchor" href="#method-set-software-license-"></a></h3>
 <p>Method for setting the license of the classifier.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">set_software_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -623,7 +684,7 @@ the software license of the model.</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-get_software_license"></a><div class="section">
 <h3 id="method-get-software-license-">Method <code>get_software_license()</code><a class="anchor" aria-label="anchor" href="#method-get-software-license-"></a></h3>
 <p>Method for getting the license of the classifier.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_software_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -644,7 +705,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TEClassifierRegular-set_documentation_license"></a><div class="section">
 <h3 id="method-set-documentation-license-">Method <code>set_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-set-documentation-license-"></a></h3>
 <p>Method for setting the license of the classifier's documentation.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span>license <span class="op">=</span> <span class="st">"CC BY-SA"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -666,7 +727,7 @@ the documentation license of the model.</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-get_documentation_license"></a><div class="section">
 <h3 id="method-get-documentation-license-">Method <code>get_documentation_license()</code><a class="anchor" aria-label="anchor" href="#method-get-documentation-license-"></a></h3>
 <p>Method for getting the license of the classifier's documentation.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_documentation_license</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -687,7 +748,7 @@ the license text.</p></dd>
 </div><p></p><hr><a id="method-TEClassifierRegular-set_model_description"></a><div class="section">
 <h3 id="method-set-model-description-">Method <code>set_model_description()</code><a class="anchor" aria-label="anchor" href="#method-set-model-description-"></a></h3>
 <p>Method for setting a description of the classifier.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
 <span>  eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  native <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -741,7 +802,7 @@ description of the model.</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-get_model_description"></a><div class="section">
 <h3 id="method-get-model-description-">Method <code>get_model_description()</code><a class="anchor" aria-label="anchor" href="#method-get-model-description-"></a></h3>
 <p>Method for requesting the model description.</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_model_description</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -755,7 +816,7 @@ and the native language.</p>
 <h3 id="method-save-model-">Method <code>save_model()</code><a class="anchor" aria-label="anchor" href="#method-save-model-"></a></h3>
 <p>Method for saving a model to 'Keras v3 format',
 'tensorflow' SavedModel format or h5 format.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">save_model</span><span class="op">(</span><span class="va">dir_path</span>, save_format <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -788,7 +849,7 @@ Use <code>"default"</code> for the standard format. This is keras for
 <h3 id="method-load-model-">Method <code>load_model()</code><a class="anchor" aria-label="anchor" href="#method-load-model-"></a></h3>
 <p>Method for importing a model from 'Keras v3 format',
 'tensorflow' SavedModel format or h5 format.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">load_model</span><span class="op">(</span><span class="va">dir_path</span>, ml_framework <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -817,7 +878,7 @@ of a model.</p>
 <h3 id="method-get-package-versions-">Method <code>get_package_versions()</code><a class="anchor" aria-label="anchor" href="#method-get-package-versions-"></a></h3>
 <p>Method for requesting a summary of the R and python packages'
 versions used for creating the classifier.</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_package_versions</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -831,7 +892,7 @@ R and python packages.</p>
 <h3 id="method-get-sustainability-data-">Method <code>get_sustainability_data()</code><a class="anchor" aria-label="anchor" href="#method-get-sustainability-data-"></a></h3>
 <p>Method for requesting a summary of tracked energy consumption
 during training and an estimate of the resulting CO2 equivalents in kg.</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -846,7 +907,7 @@ information on the training infrastructure.</p>
 <h3 id="method-get-ml-framework-">Method <code>get_ml_framework()</code><a class="anchor" aria-label="anchor" href="#method-get-ml-framework-"></a></h3>
 <p>Method for requesting the machine learning framework used
 for the classifier.</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">get_ml_framework</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -859,7 +920,7 @@ for the classifier</p>
 </div><p></p><hr><a id="method-TEClassifierRegular-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierRegular</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

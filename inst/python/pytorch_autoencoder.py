@@ -2,6 +2,21 @@ import torch
 import numpy as np
 import math
 
+def calc_SquaredCovSum(x):
+  times=x.size(dim=1)
+  cov_sum=0.0
+
+  for i in range(times):
+    current_time_point=torch.squeeze(x[:,i,:])
+    current_cases_index=torch.nonzero(torch.sum(current_time_point,axis=1))
+    if current_cases_index.size(dim=0)>1:
+      current_cases=torch.squeeze(current_time_point[current_cases_index])
+      covariance=torch.cov(torch.transpose(current_cases,dim0=0,dim1=1))
+      covariance=torch.square(covariance)
+      cov_sum=cov_sum+(torch.sum(covariance)-torch.sum(torch.diag(covariance)))/current_cases.size(dim=0)
+  cov_sum=cov_sum/times
+  return cov_sum
+
 class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
     def __init__(self,times, features_in,features_out,noise_factor):
       super().__init__()
@@ -38,7 +53,7 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         batch_first=True,
         bias=True)
         
-    def forward(self, x, encoder_mode=False):
+    def forward(self, x, encoder_mode=False, return_scs=False):
       if encoder_mode==False:
         if self.training==True:
           mask=self.get_mask(x)
@@ -46,11 +61,14 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
           x=~mask*x
         x=self.PackAndMasking_PT(x)
         x=self.encoder_1(x)[0]
-        x=self.latent_space(x)[0]
-        x=self.decoder_1(x)[0]
+        latent_space=self.latent_space(x)[0]
+        x=self.decoder_1(latent_space)[0]
         x=self.output(x)[0]
         x=self.UnPackAndMasking_PT(x)
-        return x
+        if return_scs==False:
+          return x
+        else:
+          return x, calc_SquaredCovSum(self.UnPackAndMasking_PT(latent_space))
       elif encoder_mode==True:
         x=self.PackAndMasking_PT(x)
         x=self.encoder_1(x)[0]
@@ -81,9 +99,8 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
       torch.nn.utils.parametrizations.orthogonal(self, "param_w3",orthogonal_map="householder")
 
-    def forward(self, x, encoder_mode=False):
+    def forward(self, x, encoder_mode=False, return_scs=False):
       if encoder_mode==False:
-        
         #Add noise
         if self.training==True:
           mask=self.get_mask(x)
@@ -95,14 +112,17 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w2))
         
         #Latent Space
-        x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w3))
+        latent_space=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w3))
         
         #Decoder
-        x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w3,dim0=1,dim1=0)))
+        x=torch.nn.functional.tanh(torch.nn.functional.linear(latent_space,weight=torch.transpose(self.param_w3,dim0=1,dim1=0)))
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w2,dim0=1,dim1=0)))
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w1,dim0=1,dim1=0)))
         
-        return x
+        if return_scs==False:
+          return x
+        else:
+          return x, calc_SquaredCovSum(latent_space)
       elif encoder_mode==True:
         #Encoder
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w1))
@@ -119,7 +139,71 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
       mask_long=mask_long.to(device)
       return mask_long
+    
+class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
+    def __init__(self, features_in,features_out,noise_factor):
+      super().__init__()
+      self.features_in=features_in
+      self.features_out=features_out
+      self.noise_factor=noise_factor
+      self.difference=self.features_in-self.features_out
+      self.stride=2
       
+      self.param_w1=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/2)),self.features_in,self.stride))
+      self.param_w2=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/2)),self.stride))
+      
+      torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map="householder")
+      torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
+
+    def forward(self, x, encoder_mode=False, return_scs=False):
+      if encoder_mode==False:
+        #Add noise
+        if self.training==True:
+          mask=self.get_mask(x)
+          x=x+self.noise_factor*torch.rand(size=x.size())
+          x=~mask*x
+        
+        #Change position of time and features
+        x=torch.transpose(x, dim0=1, dim1=2)
+        
+        #Encoder
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride))
+
+        #Latent Space
+        latent_space=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride))
+        
+        #Decoder
+        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(latent_space,weight=self.param_w2,stride=self.stride))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(x,weight=self.param_w1,stride=self.stride))
+        
+        #Change position of time and features
+        x=torch.transpose(x, dim0=1, dim1=2)
+        
+        if return_scs==False:
+          return x
+        else:
+          latent_space=torch.transpose(latent_space, dim0=1, dim1=2)
+          return x, calc_SquaredCovSum(latent_space)
+      elif encoder_mode==True:
+        #Change position of time and features
+        x=torch.transpose(x, dim0=1, dim1=2)
+        #Encoder
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride))
+
+        #Latent Space
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride))
+        #Change position of time and features
+        x=torch.transpose(x, dim0=1, dim1=2)
+        return x
+      
+    def get_mask(self,x):
+      device=('cuda' if torch.cuda.is_available() else 'cpu')
+      time_sums=torch.sum(x,dim=2)
+      mask=(time_sums==0)
+      mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
+      mask_long=mask_long.to(device)
+      return mask_long    
+    
 def AutoencoderTrain_PT_with_Datasets(model,epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,shiny_app_active=False):
   
@@ -177,8 +261,8 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
 
       optimizer.zero_grad()
       
-      outputs=model(inputs,encoder_mode=False)
-      loss=loss_fct(outputs,labels)
+      outputs=model(inputs,encoder_mode=False,return_scs=True)
+      loss=loss_fct(outputs[0],labels)+outputs[1]
       loss.backward()
       optimizer.step()
       train_loss +=loss.item()
@@ -200,9 +284,9 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
         inputs = inputs.to(device=device,dtype=dtype)
         labels=labels.to(device=device,dtype=dtype)
       
-        outputs=model(inputs,encoder_mode=False)
+        outputs=model(inputs,encoder_mode=False,return_scs=True)
         
-        loss=loss_fct(outputs,labels)
+        loss=loss_fct(outputs[0],labels)+outputs[1]
         val_loss +=loss.item()
     
     #Record History------------------------------------------------------------
@@ -240,3 +324,35 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
   history={"loss":history_loss.numpy()} 
     
   return history
+
+def TeFeatureExtractorBatchExtract(model,dataset,batch_size):
+  
+  device=('cuda' if torch.cuda.is_available() else 'cpu')
+  
+  if device=="cpu":
+    dtype=float
+    model.to(device,dtype=dtype)
+  else:
+    model.to(device,dtype=torch.double)
+    dtype=torch.double
+    
+  model.eval()
+  predictionloader=torch.utils.data.DataLoader(
+    dataset,
+    batch_size=batch_size,
+    shuffle=False)
+
+  with torch.no_grad():
+    iteration=0
+    for batch in predictionloader:
+      inputs=batch["input"]
+      inputs = inputs.to(device,dtype=dtype)
+      predictions=model(inputs,encoder_mode=True)
+      
+      if iteration==0:
+        predictions_list=predictions.to("cpu")
+      else:
+        predictions_list=torch.concatenate((predictions_list,predictions.to("cpu")), axis=0, out=None)
+      iteration+=1
+  
+  return predictions_list

@@ -86,10 +86,7 @@ TEClassifierProtoNet<-R6::R6Class(
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
-                        use_fe=TRUE,
-                        fe_features=128,
-                        fe_method="lstm",
-                        fe_noise_factor=0.2,
+                        feature_extractor=NULL,
                         targets=NULL,
                         hidden=c(128),
                         rec=c(128),
@@ -117,6 +114,7 @@ TEClassifierProtoNet<-R6::R6Class(
       if(!("EmbeddedText" %in% class(text_embeddings))){
         stop("text_embeddings must be of class EmbeddedText.")
       }
+
       if(is.factor(targets)==FALSE){
         stop("targets must be of class factor.")
       }
@@ -154,6 +152,28 @@ TEClassifierProtoNet<-R6::R6Class(
       }
 
       private$ml_framework=ml_framework
+
+      #Check feature extractor
+      use_fe=FALSE
+      if(!is.null(feature_extractor)){
+        if("TEFeatureExtractor"%in% class(feature_extractor)==FALSE){
+          stop("Object passed to feature_extractor must be an object of class
+               TEFeatureExtractor.")
+        } else {
+          if(feature_extractor$get_ml_framework()!= private$ml_framework){
+            stop("The machine learning framework of the feature extractior and
+                 classifier do not match. Please provide a feature extractor
+                 with the same machine learning framework as the classifier.")
+          } else {
+            if(feature_extractor$is_trained()==TRUE){
+              use_fe=TRUE
+            } else {
+              stop("The supplied feature extractor is not trained. Please
+                provide train and try again.")
+            }
+          }
+        }
+      }
 
       #Setting Label and Name-------------------------------------------------
       private$model_info$model_name_root=name
@@ -194,7 +214,7 @@ TEClassifierProtoNet<-R6::R6Class(
       }
 
       if(use_fe==TRUE){
-        features=fe_features
+        features=feature_extractor$model_config$features
       } else {
         features=private$text_embedding_model[["features"]]
       }
@@ -202,8 +222,6 @@ TEClassifierProtoNet<-R6::R6Class(
       #Saving Configuration
       config=list(
         use_fe=use_fe,
-        fe_method=fe_method,
-        fe_noise_factor=fe_noise_factor,
         features=features,
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
@@ -256,7 +274,8 @@ TEClassifierProtoNet<-R6::R6Class(
       #Create_Model------------------------------------------------------------
       private$create_reset_model()
       if(self$model_config$use_fe==TRUE){
-        self$feature_extractor$model=private$create_feature_extractor()
+        self$feature_extractor=feature_extractor$clone(deep=TRUE)
+        #private$check_feature_extractor()
       }
 
       private$model_info$model_date=date()
@@ -389,10 +408,7 @@ TEClassifierProtoNet<-R6::R6Class(
         stop("data_embeddings must be an object of class EmbeddedText")
       }
 
-      if(self$check_embedding_model(data_embeddings)==FALSE){
-        stop("The TextEmbeddingModel that generated the data_embeddings is not
-               the same as the TextEmbeddingModel when generating the classifier.")
-      }
+      self$check_embedding_model(data_embeddings)
 
       if(is.factor(data_targets)==FALSE){
         stop("data_targets must be a factor.")
@@ -453,7 +469,7 @@ TEClassifierProtoNet<-R6::R6Class(
 
         data_manager=DataManagerClassifier$new(
           data_embeddings=self$extract_features(data_embeddings = data_embeddings,
-                                                as.integer(batch_size=self$last_training$config$batch_size),
+                                                as.integer(self$last_training$config$batch_size),
                                                 return_r_object = TRUE),
           data_targets=data_targets,
           folds=data_folds,
@@ -570,100 +586,172 @@ TEClassifierProtoNet<-R6::R6Class(
       }
     },
   #---------------------------------------------------------------------------
-  embed=function(embeddings_q=NULL,classes_q=NULL,embeddings_s=NULL,classes_s=NULL){
-    #Parameter check
-    if(is.null(embeddings_q)|is.null(classes_q)){
-      stop("Embeddings and classes for the query are not set.")
-    }
-    if(is.null(embeddings_s)&!is.null(classes_s)){
-      stop("classes_s is set but embeddings_s not. Please provide embeddings
-           or set classes_s to NULL.in order to use the trained
-           prototypes.")
-    }
-    if(!is.null(embeddings_s)&is.null(classes_s)){
-      stop("embeddings_s is set but classes_s not. Please provide classes for
-           the sample or set embeddings_s to NULL in order to use the trained
-           prototypes.")
+  embed=function(embeddings_q=NULL,batch_size){
+    #Check input for compatible text embedding models and feature extractors
+    if("EmbeddedText"%in%class(embeddings_q)){
+      self$check_embedding_model(text_embeddings=embeddings_q)
+      requires_compression=self$requires_compression(embeddings_q)
+    } else if ("array"%in%class(embeddings_q)) {
+      requires_compression=self$requires_compression(embeddings_q)
+    } else {
+      requires_compression=FALSE
     }
 
-    if(self$model_config$use_fe==TRUE){
-      embeddings_q=self$extract_features(embeddings_q)
-      if(!is.null(embeddings_s)){
-        embeddings_s=self$extract_features(embeddings_q)
+    #Load Custom Model Scripts
+    private$load_reload_python_scripts()
+
+    #Check number of cases in the data
+    single_prediction=private$check_single_prediction(embeddings_q)
+
+    #Get current row names/name of the cases
+    current_row_names=private$get_rownames_from_embeddings(embeddings_q)
+
+    #If at least two cases are part of the data set---------------------------
+    if(single_prediction==FALSE){
+
+      #Returns a data set object
+      prediction_data_q_embeddings=private$prepare_embeddings_as_dataset(embeddings_q)
+
+      #Apply feature extractor if it is part of the model
+      if(requires_compression==TRUE){
+
+        #Returns a data set
+        prediction_data_q_embeddings=self$feature_extractor$extract_features(
+          data_embeddings=prediction_data_q_embeddings,
+          batch_size=as.integer(batch_size),
+          return_r_object=FALSE
+        )
       }
-    }
 
-    if(self$model_config$use_fe==TRUE){
-      #Prepare data set
-      if("EmbeddedText" %in% class(data_embeddings)){
-        if(nrow(data_embeddings$embeddings)>1){
-          extractor_dataset=datasets$Dataset$from_dict(
-            reticulate::dict(
-              list(id=rownames(data_embeddings$embeddings),
-                   input=np$squeeze(np$split(reticulate::np_array(data_embeddings$embeddings),as.integer(nrow(data_embeddings$embeddings)),axis=0L))),
-              convert = FALSE))
-        } else {
-          extractor_dataset=data_embeddings$embeddings
-        }
-
-      } else if("array" %in% class(data_embeddings)){
-        if(nrow(data_embeddings)>1){
-          extractor_dataset=datasets$Dataset$from_dict(
-            reticulate::dict(
-              list(id=rownames(data_embeddings),
-                   input=np$squeeze(np$split(reticulate::np_array(data_embeddings),as.integer(nrow(data_embeddings)),axis=0L))),
-              convert = FALSE))
-        } else {
-          extractor_dataset=data_embeddings
-        }
+      if(private$ml_framework=="pytorch"){
+        prediction_data_q_embeddings$set_format("torch")
+        embeddings_tensors_q=py$TeProtoNetBatchEmbed(
+          model=self$model,
+          dataset_q=prediction_data_q_embeddings,
+          batch_size=as.integer(batch_size)
+        )
+        embeddings_tensors_q=private$detach_tensors(embeddings_tensors_q)
       }
-    }
+    } else {
+      prediction_data_q_embeddings=private$prepare_embeddings_as_np_array(embeddings_q)
 
-      #Extract features
+      #Apply feature extractor if it is part of the model
+      if(requires_compression==TRUE){
+
+        #Returns a data set
+        prediction_data_q=np$array(self$feature_extractor$extract_features(
+          data_embeddings=prediction_data_q_embeddings,
+          batch_size=as.integer(batch_size),
+          return_r_object=TRUE
+        )$embeddings)
+      }
+
       if(private$ml_framework=="pytorch"){
         if(torch$cuda$is_available()){
           device="cuda"
           dtype=torch$double
-
-          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-            extractor_dataset$set_format("torch",device=device)
-            self$feature_extractor$model$to(device,dtype=dtype)
-            self$feature_extractor$model$eval()
-            reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
-                                                             encoder_mode=TRUE)$detach()$cpu()$numpy()
-          } else {
-            self$feature_extractor$model$to(device,dtype=dtype)
-            self$feature_extractor$model$eval()
-            input=torch$from_numpy(np$array(extractor_dataset))
-            reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
-                                                             encoder_mode=TRUE)$detach()$cpu()$numpy()
-          }
+          self$model$to(device,dtype=dtype)
+          self$model$eval()
+          input=torch$from_numpy(prediction_data_q_embeddings)
+          embeddings_tensors_q<-self$model$embed(input$to(device,dtype=dtype))
+          embeddings_tensors_q=private$detach_tensors(embeddings_tensors_q)
         } else {
           device="cpu"
           dtype=torch$float
-          if("datasets.arrow_dataset.Dataset"%in%class(extractor_dataset)){
-            extractor_dataset$set_format("torch",device=device)
-
-            self$feature_extractor$model$to(device,dtype=dtype)
-            self$feature_extractor$model$eval()
-            reduced_embeddings<-self$feature_extractor$model(extractor_dataset["input"],
-                                                             encoder_mode=TRUE)$detach()$numpy()
-          } else {
-            self$feature_extractor$model$to(device,dtype=dtype)
-            self$feature_extractor$model$eval()
-            input=torch$from_numpy(np$array(extractor_dataset))
-            reduced_embeddings<-self$feature_extractor$model(input$to(device,dtype=dtype),
-                                                             encoder_mode=TRUE)$detach()$numpy()
-          }
+          self$model$to(device,dtype=dtype)
+          self$model$eval()
+          input=torch$from_numpy(prediction_data_q_embeddings)
+          embeddings_tensors_q<-self$model$embed(input$to(device,dtype=dtype))
+          embeddings_tensors_q=private$detach_tensors(embeddings_tensors_q)
         }
       }
+    }
 
     if(private$ml_framework=="pytorch"){
-
+      embeddings_prototypes=private$detach_tensors(
+        self$model$get_trained_prototypes()
+      )
     }
+
+    #Post processing
+    rownames(embeddings_tensors_q)=current_row_names
+    rownames(embeddings_prototypes)=self$model_config$target_levels
+
+    return(list(embeddings_q=embeddings_tensors_q,
+                embeddings_prototypes=embeddings_prototypes))
+
+  },
+  #----------------------------------------------------------------------------
+  plot_embeddings=function(embeddings_q,classes_q,batch_size){
+    embeddings=self$embed(embeddings_q = embeddings_q,
+                          batch_size = batch_size)
+
+    prototypes=as.data.frame(embeddings$embeddings_prototypes)
+    prototypes$class=rownames(embeddings$embeddings_prototypes)
+    prototypes$type=rep("prototype",nrow(embeddings$embeddings_prototypes))
+    colnames(prototypes)=c("x","y","class","type")
+
+
+    true_values_names=intersect(x=names(na.omit(classes_q)),
+                                y=private$get_rownames_from_embeddings(embeddings_q))
+    true_values=as.data.frame(embeddings$embeddings_q[true_values_names,,drop=FALSE])
+    true_values$class=classes_q[true_values_names]
+    true_values$type=rep("labeled",length(true_values_names))
+    colnames(true_values)=c("x","y","class","type")
+
+    estimated_values_names=setdiff(x=private$get_rownames_from_embeddings(embeddings_q),
+                                   y=true_values_names)
+    if(length(estimated_values_names)>0){
+      estimated_values=as.data.frame(embeddings$embeddings_q[estimated_values_names,,drop=FALSE])
+      estimated_values$class=private$calc_classes_on_distance(
+        embeddings=embeddings$embeddings_q[estimated_values_names,,drop=FALSE],
+        prototypes=embeddings$embeddings_prototypes
+      )
+      estimated_values$type=rep("unlabeled",length(estimated_values_names))
+      colnames(estimated_values)=c("x","y","class","type")
+    }
+
+    if(length(estimated_values_names)>0){
+      plot_data=rbind(prototypes,true_values,estimated_values)
+    } else {
+      plot_data=rbind(prototypes,true_values)
+    }
+
+    plot=ggplot2::ggplot(data = plot_data)+
+      ggplot2::geom_point(
+        mapping =ggplot2::aes(x=x,y=y,color=class,shape=type)
+      )
+    return(plot)
+
   }
   ),
   private = list(
+    #-------------------------------------------------------------------------
+    calc_classes_on_distance=function(embeddings,prototypes){
+      distance_matrix=matrix(data = 0,
+                             nrow = nrow(embeddings),
+                             ncol = nrow(prototypes))
+
+      index_vector=vector(length = nrow(embeddings))
+
+      for (i in nrow(prototypes)) {
+        prototype_embeddings=prototypes[i,]
+        distance=(embeddings-prototype_embeddings)^2
+        distance=rowSums(distance)
+        distance_matrix[,i]=distance
+      }
+
+      for(i in 1:length(index_vector)){
+        index_vector[i]=which.min(distance_matrix[i,])
+      }
+
+      classes=factor(index_vector,
+                     levels = 1:nrow(prototypes),
+                     labels = rownames(prototypes))
+      return(classes)
+
+
+    },
     #--------------------------------------------------------------------------
     load_reload_python_scripts=function(){
       if(private$ml_framework=="tensorflow"){

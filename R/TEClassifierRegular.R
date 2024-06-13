@@ -169,18 +169,32 @@ TEClassifierRegular<-R6::R6Class(
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
+
+
+      #------------------------------------------------------------------------
+      private$ml_framework=ml_framework
+
+      #Check feature extractor
       use_fe=FALSE
       if(!is.null(feature_extractor)){
         if("TEFeatureExtractor"%in% class(feature_extractor)==FALSE){
           stop("Object passed to feature_extractor must be an object of class
                TEFeatureExtractor.")
         } else {
-          use_fe=TRUE
+          if(feature_extractor$get_ml_framework()!=self$get_ml_framework()){
+            stop("The machine learning framework of the feature extractior and
+                 classifier do not match. Please provide a feature extractor
+                 with the same machine learning framework as the classifier.")
+          } else {
+            if(feature_extractor$is_trained()==TRUE){
+              use_fe=TRUE
+            } else {
+              stop("The supplied feature extractor is not trained. Please
+                provide trained feature extractor and try again.")
+            }
+          }
         }
       }
-
-      #------------------------------------------------------------------------
-      private$ml_framework=ml_framework
 
       #Setting Label and Name-------------------------------------------------
       private$model_info$model_name_root=name
@@ -196,6 +210,7 @@ TEClassifierRegular<-R6::R6Class(
       features=dim(text_embeddings$embeddings)[3]
 
       private$text_embedding_model["model"]=list(model_info)
+      private$text_embedding_model["feature_extractor"]=text_embeddings$get_feature_extractor_info()
       private$text_embedding_model["times"]=times
       private$text_embedding_model["features"]=features
 
@@ -407,10 +422,7 @@ TEClassifierRegular<-R6::R6Class(
         stop("data_embeddings must be an object of class EmbeddedText")
       }
 
-      if(self$check_embedding_model(data_embeddings)==FALSE){
-        stop("The TextEmbeddingModel that generated the data_embeddings is not
-               the same as the TextEmbeddingModel when generating the classifier.")
-      }
+      self$check_embedding_model(data_embeddings)
 
       if(is.factor(data_targets)==FALSE){
         stop("data_targets must be a factor.")
@@ -462,10 +474,9 @@ TEClassifierRegular<-R6::R6Class(
 
       #Create DataManager------------------------------------------------------
       if(self$model_config$use_fe==TRUE){
-
         data_manager=DataManagerClassifier$new(
           data_embeddings=self$feature_extractor$extract_features(data_embeddings = data_embeddings,
-                                                as.integer(batch_size=self$last_training$config$batch_size),
+                                                as.integer(self$last_training$config$batch_size),
                                                 return_r_object = TRUE),
           data_targets=data_targets,
           folds=data_folds,
@@ -598,104 +609,166 @@ TEClassifierRegular<-R6::R6Class(
                      batch_size=32,
                      verbose=1){
 
+      #Check input for compatible text embedding models and feature extractors
+      if("EmbeddedText"%in%class(newdata)){
+        self$check_embedding_model(text_embeddings=newdata)
+        requires_compression=self$requires_compression(newdata)
+      } else if ("array"%in%class(newdata)) {
+        requires_compression=self$requires_compression(newdata)
+       } else {
+        requires_compression=FALSE
+       }
+
       #Load Custom Model Scripts
       private$load_reload_python_scripts()
 
-      if("datasets.arrow_dataset.Dataset"%in%class(newdata)){
-        newdata$set_format("np")
-        real_newdata=newdata["input"]
-        rownames(real_newdata)=newdata["id"]
-      } else {
-        if("EmbeddedText" %in% class(newdata)){
-          if(self$check_embedding_model(newdata)==FALSE){
-            stop("The TextEmbeddingModel that generated the newdata is not
-               the same as the TextEmbeddingModel when generating the classifier.")
-          }
-          real_newdata=newdata$embeddings
-        } else {
-          real_newdata=newdata
+      #Check number of cases in the data
+      single_prediction=private$check_single_prediction(newdata)
+
+      #Get current row names/name of the cases
+      current_row_names=private$get_rownames_from_embeddings(newdata)
+
+      #If at least two cases are part of the data set---------------------------
+      if(single_prediction==FALSE){
+
+        #Returns a data set object
+        prediction_data=private$prepare_embeddings_as_dataset(newdata)
+
+        #Apply feature extractor if it is part of the model
+        if(requires_compression==TRUE){
+
+          #Returns a data set
+          prediction_data=self$feature_extractor$extract_features(
+            data_embeddings=prediction_data,
+            batch_size=as.integer(batch_size),
+            return_r_object=FALSE
+          )
         }
-      if(self$model_config$use_fe==TRUE){
-        real_newdata=self$feature_extractor$extract_features(data_embedding = real_newdata,
-                                      batch_size=as.integer(batch_size),
-                                      return_r_object = TRUE)$embeddings
-      }
-    }
 
-      #Ensuring the correct order of the variables for prediction
-      current_row_names=rownames(real_newdata)
+          #Tensorflow----------------------------------------------------------
+          if(private$ml_framework=="tensorflow"){
+            #Prepare data set for tensorflow
+            prediction_data=prediction_data$rename_column('input', 'input_embeddings')
+            prediction_data$with_format("tf")
+            tf_dataset_predict=prediction_data$to_tf_dataset(
+              columns=c("input_embeddings"),
+              batch_size=as.integer(batch_size),
+              shuffle=FALSE)
 
-      if(is.null(self$model_config$rec)==TRUE){
-        n_rec=0
-      } else {
-        n_rec=length(self$model_config$rec)
-      }
-
-      if(n_rec==0 & self$model_config$repeat_encoder==0 & self$model_config$times==1){
-        real_newdata=array_to_matrix(real_newdata)
-      }
-
-      model<-self$model
-
-      if(private$ml_framework=="tensorflow"){
-        if(length(self$model_config$target_levels)>2){
-          #Multi Class
-          predictions_prob<-model$predict(
-            x = np$array(real_newdata),
-            batch_size = as.integer(batch_size),
-            verbose=as.integer(verbose))
-          predictions<-max.col(predictions_prob)-1
-        } else {
-          predictions_prob<-model$predict(
-            x = np$array(real_newdata),
-            batch_size = as.integer(batch_size),
-            verbose=as.integer(verbose))
-
-          #Add Column for the second characteristic
-          predictions=vector(length = length(predictions_prob))
-          predictions_binary_prob<-matrix(ncol=2,
-                                          nrow=length(predictions_prob))
-
-          for(i in 1:length(predictions_prob)){
-            if(predictions_prob[i]>=0.5){
-              predictions_binary_prob[i,1]=1-predictions_prob[i]
-              predictions_binary_prob[i,2]=predictions_prob[i]
-              predictions[i]=1
+            if(length(self$model_config$target_levels)>2){
+              #Multi Class
+              predictions_prob<-self$model$predict(
+                x = tf_dataset_predict,
+                verbose=as.integer(verbose))
+              predictions<-max.col(predictions_prob)-1
             } else {
-              predictions_binary_prob[i,1]=1-predictions_prob[i]
-              predictions_binary_prob[i,2]=predictions_prob[i]
-              predictions[i]=0
-            }
-          }
-          predictions_prob<-predictions_binary_prob
-        }
-      } else if (private$ml_framework=="pytorch"){
-        pytorch_predict_data=torch$utils$data$TensorDataset(
-          torch$from_numpy(np$array(real_newdata)))
+              predictions_prob<-self$model$predict(
+                x = tf_dataset_predict,
+                verbose=as.integer(verbose))
 
-        if(torch$cuda$is_available()){
-          device="cuda"
-          dtype=torch$double
-          model$to(device,dtype=dtype)
-          model$eval()
-          input=torch$from_numpy(np$array(real_newdata))
-          predictions_prob<-model(input$to(device,dtype=dtype),
-                                  predication_mode=TRUE)$detach()$cpu()$numpy()
-        } else {
-          device="cpu"
-          dtype=torch$float
-          model$to(device,dtype=dtype)
-          model$eval()
-          input=torch$from_numpy(np$array(real_newdata))
-          predictions_prob<-model(input$to(device,dtype=dtype),
-                                  predication_mode=TRUE)$detach()$numpy()
+              #Add Column for the second characteristic
+              predictions=vector(length = length(predictions_prob))
+              predictions_binary_prob<-matrix(ncol=2,
+                                              nrow=length(predictions_prob))
+
+              for(i in 1:length(predictions_prob)){
+                if(predictions_prob[i]>=0.5){
+                  predictions_binary_prob[i,1]=1-predictions_prob[i]
+                  predictions_binary_prob[i,2]=predictions_prob[i]
+                  predictions[i]=1
+                } else {
+                  predictions_binary_prob[i,1]=1-predictions_prob[i]
+                  predictions_binary_prob[i,2]=predictions_prob[i]
+                  predictions[i]=0
+                }
+              }
+              predictions_prob<-predictions_binary_prob
+            }
+            #Pytorch----------------------------------------------------------
+          } else if(private$ml_framework=="pytorch"){
+            prediction_data$set_format("torch")
+            predictions_prob=py$TeClassifierBatchPredict(
+              model=self$model,
+              dataset=prediction_data,
+              batch_size=as.integer(batch_size)
+            )
+            predictions_prob=private$detach_tensors(predictions_prob)
+            predictions<-max.col(predictions_prob)-1
+          }
+
+        #In the case the data has one single row-------------------------------
+      } else {
+        prediction_data=private$prepare_embeddings_as_np_array(newdata)
+
+        #Apply feature extractor if it is part of the model
+        if(requires_compression==TRUE){
+
+          #Returns a data set
+          prediction_data=np$array(self$feature_extractor$extract_features(
+            data_embeddings=prediction_data,
+            batch_size=as.integer(batch_size),
+            return_r_object=TRUE
+          )$embeddings)
         }
-        predictions<-max.col(predictions_prob)-1
+
+        #Tensorflow------------------------------------------------------------
+        if(private$ml_framework=="tensorflow"){
+          if(length(self$model_config$target_levels)>2){
+            #Multi Class
+            predictions_prob<-self$model$predict(
+              x = prediction_data,
+              batch_size = as.integer(batch_size),
+              verbose=as.integer(verbose))
+            predictions<-max.col(predictions_prob)-1
+          } else {
+            predictions_prob<-self$model$predict(
+              x = prediction_data,
+              batch_size = as.integer(batch_size),
+              verbose=as.integer(verbose))
+
+            #Add Column for the second characteristic
+            predictions=vector(length = length(predictions_prob))
+            predictions_binary_prob<-matrix(ncol=2,
+                                            nrow=length(predictions_prob))
+
+            for(i in 1:length(predictions_prob)){
+              if(predictions_prob[i]>=0.5){
+                predictions_binary_prob[i,1]=1-predictions_prob[i]
+                predictions_binary_prob[i,2]=predictions_prob[i]
+                predictions[i]=1
+              } else {
+                predictions_binary_prob[i,1]=1-predictions_prob[i]
+                predictions_binary_prob[i,2]=predictions_prob[i]
+                predictions[i]=0
+              }
+            }
+            predictions_prob<-predictions_binary_prob
+          }
+        } else if(private$ml_framework=="pytorch"){
+          if(torch$cuda$is_available()){
+            device="cuda"
+            dtype=torch$double
+            self$model$to(device,dtype=dtype)
+            self$model$eval()
+            input=torch$from_numpy(prediction_data)
+            predictions_prob<-self$model(input$to(device,dtype=dtype),
+                                    predication_mode=TRUE)
+            predictions_prob=private$detach_tensors(predictions_prob)
+          } else {
+            device="cpu"
+            dtype=torch$float
+            self$model$to(device,dtype=dtype)
+            self$model$eval()
+            input=torch$from_numpy(prediction_data)
+            predictions_prob<-self$model(input$to(device,dtype=dtype),
+                                    predication_mode=TRUE)
+            predictions_prob=private$detach_tensors(predictions_prob)
+          }
+          predictions<-max.col(predictions_prob)-1
+        }
       }
 
-
-
-      #Transforming predictions to target levels
+      #Transforming predictions to target levels------------------------------
       predictions<-as.character(as.vector(predictions))
       for(i in 0:(length(self$model_config$target_levels)-1)){
         predictions<-replace(x=predictions,
@@ -713,6 +786,88 @@ TEClassifierRegular<-R6::R6Class(
 
       return(predictions_prob)
 
+    },
+    #Check Embedding Model compatibility of the text embedding
+    #'@description Method for checking if the provided text embeddings are
+    #'created with the same \link{TextEmbeddingModel} as the classifier.
+    #'@param text_embeddings Object of class \link{EmbeddedText}.
+    #'@return \code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
+    #'\code{FALSE} if the models differ.
+    check_embedding_model=function(text_embeddings){
+      if(("EmbeddedText" %in% class(text_embeddings))==FALSE){
+        stop("text_embeddings is not of class EmbeddedText.")
+      }
+
+      embedding_model_config<-text_embeddings$get_model_info()
+      to_check<-c("model_name")
+      for(check in to_check){
+        if(!is.null_or_na(embedding_model_config[[check]]) &
+           !is.null_or_na(private$text_embedding_model$model[[check]])){
+          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+            text_embedding_compatible=FALSE
+          } else {
+            text_embedding_compatible=TRUE
+          }
+        } else if (!is.null_or_na(embedding_model_config[[check]]) &
+                   is.null_or_na(private$text_embedding_model$model[[check]])){
+          text_embedding_compatible=FALSE
+        } else if (is.null_or_na(embedding_model_config[[check]]) &
+                   !is.null_or_na(private$text_embedding_model$model[[check]])){
+          text_embedding_compatible=FALSE
+        }
+      }
+
+      if(text_embedding_compatible==FALSE){
+        stop("The TextEmbeddingModel that generated the data_embeddings is not
+               the same as the TextEmbeddingModel when generating the classifier.")
+      }
+
+      #----------
+      feature_extractor_info=text_embeddings$get_feature_extractor_info()
+      if(!is.null(feature_extractor_info$model_name)&self$model_config$use_fe==FALSE){
+        stop("Compressed embeddings provided but the classifier does not support
+             compressed embeddings.")
+      } else if(!is.null(feature_extractor_info$model_name) & self$model_config$use_fe==TRUE){
+        if(private$text_embedding_model$feature_extractor$model_name==feature_extractor_info$model_name){
+          feature_extractor_compatible==TRUE
+        } else {
+          stop("The feature extractor of the compressed embeddings is not the same as
+               the feature extractor during the creation of the classifier.")
+        }
+      }
+    },
+    #--------------------------------------------------------------------------
+    check_is_compressed=function(text_embeddings){
+      feature_extractor_info=text_embeddings$get_feature_extractor_info()
+      if(is.null_or_na(feature_extractor_info$model_name)==FALSE){
+        return(TRUE)
+      } else {
+        return(FALSE)
+      }
+    },
+    #--------------------------------------------------------------------------
+    requires_compression=function(text_embeddings){
+    if("EmbeddedText"%in%class(text_embeddings)){
+      if(self$model_config$use_fe==TRUE & self$check_is_compressed(text_embeddings)==FALSE){
+        return(TRUE)
+      } else {
+        return(FALSE)
+      }
+    } else if("array"%in%class(text_embeddings)){
+      if(dim(text_embeddings)[3]>self$model_config$features){
+        return(TRUE)
+      } else {
+        return(FALSE)
+      }
+    } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
+      embeddings$set_format("np")
+      tensors=embeddings["input"][1,,,drop=FALSE]
+      if(dim(tensors)[3]>self$model_config$features){
+        return(TRUE)
+      } else {
+        return(FALSE)
+      }
+    }
     }
   ),
   private = list(
@@ -863,8 +1018,7 @@ TEClassifierRegular<-R6::R6Class(
                       dropout = 0,
                       recurrent_dropout = self$model_config$recurrent_dropout,
                       activation = "tanh",
-                      name=paste0("gru_",i)),
-                    name=paste0("bidirectional_",i)(layer_list[[length(layer_list)]]))
+                      name=paste0("uni_directional_gru_",i))(layer_list[[length(layer_list)]]))
                 if (i!=n_rec){
                   layer_list[length(layer_list)+1]<-list(
                     keras$layers$Dropout(
@@ -880,8 +1034,7 @@ TEClassifierRegular<-R6::R6Class(
                       dropout = 0,
                       recurrent_dropout = self$model_config$recurrent_dropout,
                       activation = "tanh",
-                      name=paste0("lstm",i)),
-                    name=paste0("bidirectional_",i)(layer_list[[length(layer_list)]]))
+                      name=paste0("unidirectional_lstm",i))(layer_list[[length(layer_list)]]))
                 if (i!=n_rec){
                   layer_list[length(layer_list)+1]<-list(
                     keras$layers$Dropout(
@@ -1014,9 +1167,12 @@ TEClassifierRegular<-R6::R6Class(
       test_pred_cat=test_predictions$expected_category
       names(test_pred_cat)=rownames(test_predictions)
       test_pred_cat<-test_pred_cat[test_data["id"]]
-      test_res=get_coder_metrics(true_values = factor(x=test_data["labels"],
-                                                      levels=0:(length(self$model_config$target_levels)-1),
-                                                      labels=self$model_config$target_levels),
+      test_data$set_format("np")
+      true_values=factor(x=test_data["labels"],
+                   levels=0:(length(self$model_config$target_levels)-1),
+                   labels=self$model_config$target_levels)
+      names(true_values)=test_data["id"]
+      test_res=get_coder_metrics(true_values = true_values,
                                  predicted_values = test_pred_cat)
 
       #Save results
@@ -1042,11 +1198,14 @@ TEClassifierRegular<-R6::R6Class(
         test_pred_cat<-test_pred_cat[test_data["id"]]
 
         #Calculate standard measures
+        test_data$set_format("np")
+        true_values=factor(x=test_data["labels"],
+                           levels=0:(length(self$model_config$target_levels)-1),
+                           labels=self$model_config$target_levels)
+        names(true_values)=test_data["id"]
         self$reliability$standard_measures_end[iteration]=list(
           calc_standard_classification_measures(
-            true_values=factor(x=test_data["labels"],
-                               levels=0:(length(self$model_config$target_levels)-1),
-                               labels=self$model_config$target_levels),
+            true_values=true_values,
             predicted_values=test_pred_cat))
 
         #Calculate iota objects

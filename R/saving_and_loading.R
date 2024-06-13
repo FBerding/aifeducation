@@ -62,6 +62,16 @@ load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework
         loaded_model$load_model(
           dir_path=model_dir,
           ml_framework=ml_framework)
+        if(         methods::is(loaded_model,"TEClassifierRegular")|
+                    methods::is(loaded_model,"TEClassifierProtoNet")){
+          if(loaded_model$model_config$use_fe==TRUE){
+            loaded_model$feature_extractor$load_model(
+              dir_path=paste0(model_dir,"/feature_extractor"),
+              ml_framework=ml_framework
+            )
+          }
+        }
+
       } else if (methods::is(loaded_model,"TextEmbeddingModel")){
         if(loaded_model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
           loaded_model$load_model(
@@ -190,6 +200,18 @@ save_ai_model<-function(model,
          methods::is(model,"TEClassifierProtoNet")){
         model$save_model(dir_path = final_model_dir_path,
                          save_format=save_format)
+        if(methods::is(model,"TEClassifierRegular")|
+           methods::is(model,"TEClassifierProtoNet")){
+          if(model$model_config$use_fe==TRUE){
+            if(dir.exists(paste0(final_model_dir_path,"/feature_extractor"))==FALSE){
+              dir.create(paste0(final_model_dir_path,"/feature_extractor"))
+            }
+            model$feature_extractor$save_model(
+              dir_path = paste0(final_model_dir_path,"/feature_extractor"),
+              save_format=save_format
+            )
+          }
+        }
       } else {
         #TextEmbeddingModels
         if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){

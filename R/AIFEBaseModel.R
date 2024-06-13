@@ -43,36 +43,6 @@ AIFEBaseModel<-R6::R6Class(
       finish_time=NULL,
       config=list()
     ),
-    #Check Embedding Model compatibility of the text embedding
-    #'@description Method for checking if the provided text embeddings are
-    #'created with the same \link{TextEmbeddingModel} as the classifier.
-    #'@param text_embeddings Object of class \link{EmbeddedText}.
-    #'@return \code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
-    #'\code{FALSE} if the models differ.
-    check_embedding_model=function(text_embeddings){
-      if(("EmbeddedText" %in% class(text_embeddings))==FALSE){
-        stop("text_embeddings is not of class EmbeddedText.")
-      }
-
-      embedding_model_config<-text_embeddings$get_model_info()
-      to_check<-c("model_name")
-      for(check in to_check){
-        if(!is.null_or_na(embedding_model_config[[check]]) &
-           !is.null_or_na(private$text_embedding_model$model[[check]])){
-          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
-            return(FALSE)
-          }
-        } else if (!is.null_or_na(embedding_model_config[[check]]) &
-                   is.null_or_na(private$text_embedding_model$model[[check]])){
-          return(FALSE)
-        } else if (is.null_or_na(embedding_model_config[[check]]) &
-                   !is.null_or_na(private$text_embedding_model$model[[check]])){
-          return(FALSE)
-        }
-      }
-      return(TRUE)
-    },
-
     #General Information set and get--------------------------------------------
     #'@description Method for requesting the model information
     #'@return \code{list} of all relevant model information
@@ -373,6 +343,68 @@ AIFEBaseModel<-R6::R6Class(
     #'for the classifier
     get_ml_framework=function(){
       return(private$ml_framework)
+    },
+    #--------------------------------------------------------------------------
+    #Check Embedding Model compatibility of the text embedding
+    #'@description Method for checking if the provided text embeddings are
+    #'created with the same \link{TextEmbeddingModel} as the classifier.
+    #'@param text_embeddings Object of class \link{EmbeddedText}.
+    #'@return \code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
+    #'\code{FALSE} if the models differ.
+    check_embedding_model=function(text_embeddings){
+      if(("EmbeddedText" %in% class(text_embeddings))==FALSE){
+        stop("text_embeddings is not of class EmbeddedText.")
+      }
+
+      embedding_model_config<-text_embeddings$get_model_info()
+      to_check<-c("model_name")
+      for(check in to_check){
+        if(!is.null_or_na(embedding_model_config[[check]]) &
+           !is.null_or_na(private$text_embedding_model$model[[check]])){
+          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+            text_embedding_compatible=FALSE
+          } else {
+            text_embedding_compatible=TRUE
+          }
+        } else if (!is.null_or_na(embedding_model_config[[check]]) &
+                   is.null_or_na(private$text_embedding_model$model[[check]])){
+          text_embedding_compatible=FALSE
+        } else if (is.null_or_na(embedding_model_config[[check]]) &
+                   !is.null_or_na(private$text_embedding_model$model[[check]])){
+          text_embedding_compatible=FALSE
+        }
+      }
+
+      if(text_embedding_compatible==FALSE){
+        stop("The TextEmbeddingModel that generated the data_embeddings is not
+               the same as the TextEmbeddingModel when generating the classifier.")
+      }
+    },
+    #---------------------------------------------------------------------------
+    #'@description Method for counting the trainable parameters of a model.
+    #'@return Returns the number of trainable parameters of the model.
+    count_parameter=function(){
+      if(private$ml_framework=="tensorflow"){
+        count=0
+        for (i in 1:length(self$model$trainable_weights)){
+          count=count+tf$keras$backend$count_params(self$model$trainable_weights[[i]])
+        }
+      } else if(private$ml_framework=="pytorch"){
+        iterator=reticulate::as_iterator(self$model$parameters())
+        iteration_finished=FALSE
+        count=0
+        while(iteration_finished==FALSE){
+          iter_results=reticulate::iter_next(it=iterator)
+          if(is.null(iter_results)){
+            iteration_finished=TRUE
+          } else {
+            if(iter_results$requires_grad==TRUE){
+              count=count+iter_results$numel()
+            }
+          }
+        }
+      }
+      return(count)
     }
   ),
   private = list(
@@ -492,6 +524,75 @@ AIFEBaseModel<-R6::R6Class(
         )
       )
       return(results)
+    },
+    #------------------------------------------------------------------------
+    detach_tensors=function(tensors){
+      if(torch$cuda$is_available()){
+        return(tensors$detach()$cpu()$numpy())
+      } else {
+        return(tensors$detach()$numpy())
+      }
+    },
+    #-------------------------------------------------------------------------
+    check_single_prediction=function(embeddings){
+      if("EmbeddedText" %in% class(embeddings)){
+        if(nrow(embeddings$embeddings)>1){
+          single_prediction=FALSE
+        } else {
+          single_prediction=TRUE
+        }
+      } else if("array" %in% class(embeddings)){
+        if(nrow(embeddings)>1){
+          single_prediction=FALSE
+        } else {
+          single_prediction=TRUE
+        }
+      } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
+        single_prediction=FALSE
+      }
+      return(single_prediction)
+    },
+    #--------------------------------------------------------------------------
+    prepare_embeddings_as_dataset=function(embeddings){
+      if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
+        prepared_dataset=embeddings
+      } else if("EmbeddedText" %in% class(embeddings)){
+          prepared_dataset=datasets$Dataset$from_dict(
+            reticulate::dict(
+              list(id=rownames(embeddings$embeddings),
+                   input=np$squeeze(np$split(reticulate::np_array(embeddings$embeddings),as.integer(nrow(embeddings$embeddings)),axis=0L))),
+              convert = FALSE))
+      } else if("array" %in% class(embeddings)){
+        prepared_dataset=datasets$Dataset$from_dict(
+          reticulate::dict(
+            list(id=rownames(embeddings),
+                 input=np$squeeze(np$split(reticulate::np_array(embeddings),as.integer(nrow(embeddings)),axis=0L))),
+            convert = FALSE))
+      }
+      return(prepared_dataset)
+    },
+    #-------------------------------------------------------------------------
+    prepare_embeddings_as_np_array=function(embeddings){
+      if("EmbeddedText" %in% class(embeddings)){
+        prepared_dataset=embeddings$embeddings
+        return(np$array(prepared_dataset))
+      } else if("array" %in% class(embeddings)){
+        prepared_dataset=embeddings
+        return(np$array(prepared_dataset))
+      } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
+        prepared_dataset=embeddings$set_format("np")
+        return(prepared_dataset["input"])
+      }
+    },
+    #--------------------------------------------------------------------------
+    get_rownames_from_embeddings=function(embeddings){
+      if("EmbeddedText" %in% class(embeddings)){
+        return(rownames(embeddings$embeddings))
+      } else if("array" %in% class(embeddings)){
+        return(rownames(embeddings))
+      } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
+        return(embeddings["id"])
+      }
     }
   )
 )
