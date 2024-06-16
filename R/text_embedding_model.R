@@ -37,6 +37,7 @@ TextEmbeddingModel<-R6::R6Class(
       emb_layer_max=NULL,
       emb_pool_type=NULL,
       chunks=NULL,
+      features=NULL,
       overlap=NULL,
       ml_framework=NULL),
 
@@ -1508,6 +1509,55 @@ TextEmbeddingModel<-R6::R6Class(
         )
       }
       return(embeddings)
+    },
+    #--------------------------------------------------------------------------
+    embed_large=function(large_datas_set,batch_size=32,trace=FALSE){
+      #Get total number of batches for the loop
+      total_number_of_bachtes=ceiling(large_datas_set$n_rows()/batch_size)
+
+      #Get indices for every batch
+      batches_index=get_batches_index(number_rows=large_datas_set$n_rows(),
+                                      batch_size=batch_size)
+      #Process every batch
+      for(i in 1:total_number_of_bachtes){
+        subset=large_datas_set$select(as.integer(batches_index[[i]]))
+        embeddings=self$embed(
+          raw_text=subset["text"],
+          doc_id=subset["id"],
+          batch_size=batch_size,
+          trace = FALSE
+        )
+        if(i==1){
+          #Create Large Dataset
+          embedded_texts_large=LargeDataSetForTextEmbeddings$new(
+            model_name = private$model_info$model_name,
+            model_label = private$model_info$model_label,
+            model_date = private$model_info$model_date,
+            model_method = private$basic_components$method,
+            model_version = private$model_info$model_version,
+            model_language = private$model_info$model_language,
+            param_seq_length =private$basic_components$max_length,
+            param_features = dim(embeddings$embeddings)[3],
+            param_chunks = private$transformer_components$chunks,
+            param_overlap = private$transformer_components$overlap,
+            param_emb_layer_min=private$transformer_components$emb_layer_min,
+            param_emb_layer_max=private$transformer_components$emb_layer_max,
+            param_emb_pool_type=private$transformer_components$emb_pool_type,
+            param_aggregation = NA
+          )
+          #Add new data
+          embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
+        } else {
+          #Add new data
+          embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
+        }
+        if(trace==TRUE){
+          cat(paste(date(),
+                    "Batch",i,"/",total_number_of_bachtes,"done","\n"))
+        }
+        gc()
+      }
+      return(embedded_texts_large)
     },
     #Fill Mask------------------------------------------------------------------
     #'@description Method for calculating tokens behind mask tokens.
