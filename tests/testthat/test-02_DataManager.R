@@ -2,6 +2,7 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
 #SetUp-------------------------------------------------------------------------
+#Load test data
 path="test_data/classifier/imdb_embeddings.rda"
 load(testthat::test_path(path))
 current_embeddings<-imdb_embeddings$clone(deep = TRUE)
@@ -21,8 +22,10 @@ table(example_targets)
 data_targets=example_targets
 data_embeddings=current_embeddings
 
+#config test
 folds=c(2,5)
 methods=c("dbsmote","smote")
+datasets$disable_progress_bars()
 
 #Start Tests-------------------------------------------------------------------
 for(method in methods){

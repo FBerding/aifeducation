@@ -1,12 +1,12 @@
 #'@title Data manager for managing data and samples
 #'
 #'@description Abstract class for managing the data and samples during training
-#'a classifier.
+#'a classifier. DataManagerClassifier
+#'is used with \link{TEClassifierRegular} and \link{TEClassifierProtoNet}.
 #'
 #'@return Objects of this class are used for ensuring the correct data management
-#'for training different types of classifier. Objects of this class are also used
-#'for data augmentation by creating synthetic cases with different techniques. DataManagerClassifier
-#'are used with \link{TEClassifierRegular} and \link{TEClassifierProtoNet}.
+#'for training different types of classifiers. Objects of this class are also used
+#'for data augmentation by creating synthetic cases with different techniques.
 #'@family Classification
 #'@export
 DataManagerClassifier<-R6::R6Class(
@@ -70,7 +70,7 @@ DataManagerClassifier<-R6::R6Class(
     #'@param sc_max_k \code{int} determining the minimal number of neighbors during the creating of
     #'synthetic cases.
     #'@param trace \code{bool} If \code{True} information on the process are printed to the console.
-    #'@return Method retuns an initalized object of class \code{DataManagerClassifier}.
+    #'@return Method returns an initialized object of class \code{DataManagerClassifier}.
     initialize=function(data_embeddings,
                         data_targets,
                         folds=5,
@@ -84,8 +84,10 @@ DataManagerClassifier<-R6::R6Class(
                         trace=TRUE){
 
       #Checking Prerequisites---------------------------------------------------
-      if(!("EmbeddedText" %in% class(data_embeddings))){
-        stop("data_embeddings must be an object of class EmbeddedText")
+      if(!("EmbeddedText" %in% class(data_embeddings))&
+         !("LargeDataSetForTextEmbeddings" %in% class(data_embeddings))){
+        stop("data_embeddings must be an object of class EmbeddedText or
+             LargeDataSetForTextEmbeddings.")
       }
 
       if(is.factor(data_targets)==FALSE){
@@ -99,62 +101,18 @@ DataManagerClassifier<-R6::R6Class(
         stop("folds must be at least 2.")
       }
 
-      #Preprocessing Data-------------------------------------------------------
-      if(trace==TRUE){
-        message(paste(date(),
-                      "Matching Input and Target Data"))
-      }
+      #Create Dataset-------------------------------------------------------
+      private$prepare_datasets(
+        data_embeddings=data_embeddings,
+        data_targets=data_targets,
+        trace = trace
+      )
 
-      #Matching Input and Target Data
-      data_embeddings=data_embeddings$clone(deep=TRUE)
-      viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
-                                   names(data_targets))
-      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,,drop=FALSE]
-      data_targets=data_targets[viable_cases]
-
-      #Reducing to Unique Cases
-      if(trace==TRUE){
-        message(paste(date(),
-                      "Checking Uniqueness of Data"))
-      }
-      n_init_cases=nrow(data_embeddings$embeddings)
-      data_embeddings$embeddings=unique(data_embeddings$embeddings)
-      n_final_cases=nrow(data_embeddings$embeddings)
-      viable_cases=base::intersect(x=rownames(data_embeddings$embeddings),
-                                   names(data_targets))
-      #Reduce and sort rows
-      data_embeddings$embeddings=data_embeddings$embeddings[viable_cases,,,drop=FALSE]
-      data_targets=data_targets[viable_cases]
-      data_targets_names=names(data_targets)
-
-      #Transform categories/classes to index
-      data_targets<-as.numeric(data_targets)-1
-      names(data_targets)=data_targets_names
-
-      if(trace==TRUE){
-        message(paste(date(),
-                      "Total Cases:",n_init_cases,
-                      "Unique Cases:",n_final_cases,
-                      "Labeled Cases:",length(na.omit(data_targets))))
-      }
+      #Create indices name mapping for labeled and unlabeled data--------------
+      private$create_indices_name_map()
 
       #Check for valid number of folds------------------------------------------
-      sample_target=na.omit(data_targets)
-      freq_cat=table(sample_target)
-      categories=names(freq_cat)
-      min_freq=min(freq_cat)
-      if(min_freq<6){
-        stop(paste("Frequency of the smallest category/class is",min_freq,". At least
-                   6 cases are necessary. Consider to remove this category/class."))
-      } else {
-        if(min_freq/folds<3){
-          fin_k_folds=min_freq
-          warning(paste("Frequency of the smallest category/class is not sufficent to ensure
-                    at least 3 cases per fold. Adjusting number of folds from ",folds,"to",fin_k_folds,"."))
-        } else {
-          fin_k_folds=folds
-        }
-      }
+      fin_k_folds=private$check_and_calculate_number_folds(folds)
 
       #Saving Configuration-----------------------------------------------------
       self$config$n_folds=fin_k_folds
@@ -163,112 +121,29 @@ DataManagerClassifier<-R6::R6Class(
       self$config$add_matrix_map=add_matrix_map
       self$config$class_levels=class_levels
       self$config$n_classes=length(class_levels)
-
-      self$config$features=dim(data_embeddings$embeddings)[[3]]
-      self$config$times=dim(data_embeddings$embeddings)[[2]]
-
+      self$config$features=data_embeddings$get_features()
+      self$config$times=data_embeddings$get_times()
       self$config$sc$methods=sc_methods
       self$config$sc$max_k=sc_max_k
       self$config$sc$min_k=sc_min_k
 
-      #Transform Data for Python-----------------------------------------------
-      #Labeled Data
-      data_labeled_targets=na.omit(data_targets)
-      data_labeled_input=data_embeddings$embeddings[names(data_labeled_targets),,,drop=FALSE]
-
-      self$datasets$data_labeled=datasets$Dataset$from_dict(
-        reticulate::dict(
-          list(id=rownames(data_labeled_input),
-               input=np$squeeze(np$split(reticulate::np_array(data_labeled_input),as.integer(nrow(data_labeled_input)),axis=0L)),
-               labels=data_labeled_targets,
-               length=get_n_chunks(text_embeddings=data_labeled_input,features=self$config$features,times=self$config$times)),
-          convert = FALSE))
-
+      #Add one hot encoding if necessary
       if(self$config$one_hot_encoding==TRUE){
-        one_hot_encoding_data=datasets$Dataset$from_dict(
-          reticulate::dict(
-            one_hot_encoding=np$squeeze(np$split(
-              reticulate::np_array(to_categorical_c(data_labeled_targets,self$config$n_classes)),
-              as.integer(nrow(data_labeled_input)),
-              axis=0L))
-          )
-        )
-        self$datasets$data_labeled=self$datasets$data_labeled$add_column("one_hot_encoding",one_hot_encoding_data["one_hot_encoding"])
+        self$datasets$data_labeled=private$add_one_hot_encoding(self$datasets$data_labeled)
       }
 
+      #Add matrix map if necessary
       if(self$config$add_matrix_map==TRUE){
-        matrix_form=datasets$Dataset$from_dict(
-          reticulate::dict(
-            matrix_form=np$squeeze(np$split(
-              reticulate::np_array(array_to_matrix(data_labeled_input)),
-              as.integer(nrow(data_labeled_input)),
-              axis=0L))
-          )
-        )
-        self$datasets$data_labeled=self$datasets$data_labeled$add_column("matrix_form",matrix_form["matrix_form"])
+        self$datasets$data_labeled=private$add_matrix_form(self$datasets$data_labeled)
+        self$datasets$data_unlabeled=private$add_matrix_form(self$datasets$data_unlabeled)
       }
 
-      #Provide IDs for every name
-      self$name_idx$labeled_data=seq.int(from = 0,to=(length(self$datasets$data_labeled["id"]))-1)
-      names(self$name_idx$labeled_data)=self$datasets$data_labeled["id"]
+      #create folds
+      private$create_folds()
 
-      #Unlabeled Data
-      data_unlabeled_names=setdiff(x=names(data_targets),y=names(data_labeled_targets))
-      data_unlabeled_input=data_embeddings$embeddings[data_unlabeled_names,,,drop=FALSE]
+      #create sample for final training
+      private$create_final_sample()
 
-      self$datasets$data_unlabeled=datasets$Dataset$from_dict(
-        reticulate::dict(
-          list(id=rownames(data_unlabeled_input),
-               input=np$squeeze(np$split(reticulate::np_array(data_unlabeled_input),as.integer(nrow(data_unlabeled_input)),axis=0L)),
-               length=get_n_chunks(text_embeddings=data_unlabeled_input,features=self$config$features,times=self$config$times)),
-          convert = FALSE))
-
-      if(self$config$add_matrix_map==TRUE){
-        matrix_form=datasets$Dataset$from_dict(
-          reticulate::dict(list(
-            matrix_form=np$squeeze(np$split(
-              reticulate::np_array(array_to_matrix(data_unlabeled_input)),
-              as.integer(nrow(data_unlabeled_input)),
-              axis=0L))
-            )
-          )
-        )
-        self$datasets$data_unlabeled=self$datasets$data_unlabeled$add_column("matrix_form",matrix_form["matrix_form"])
-      }
-
-      self$name_idx$unlabeled_data=seq.int(from = 0,to=(length(self$datasets$data_unlabeled["id"]))-1)
-      names(self$name_idx$unlabeled_data)=self$datasets$data_unlabeled["id"]
-
-      #Create Train, Test, and Validation Samples--------------------------------
-      #Check maximal number of folds, adjust, and create folds
-      folds=get_folds(
-        target = data_targets,
-        k_folds=self$config$n_folds)
-
-      self$samples=NULL
-      for(i in 1:self$config$n_folds){
-        train_val_split=get_train_test_split(
-          embedding = NULL,
-          target = data_targets[folds$train_sample[[i]]],
-          val_size = self$config$val_size)
-
-        fold=list(
-          train=self$name_idx$labeled_data[names(train_val_split$target_train)],
-          val=self$name_idx$labeled_data[names(train_val_split$target_test)],
-          test=self$name_idx$labeled_data[folds$val_sample[[i]]])
-
-        self$samples[i]=list(fold)
-      }
-
-      #Create final sample split
-      names_final_split=get_stratified_train_test_split(
-        targets = data_labeled_targets,
-        val_size = self$config$val_size)
-      final_split=list(
-        train=self$name_idx$labeled_data[names_final_split$train_sample],
-        val=self$name_idx$labeled_data[names_final_split$test_sample],
-        test=NULL)
-      self$samples[length(self$samples)+1]=list(final_split)
     },
 
   #'@description Method for requesting the configuration of the DataManagerClassifier.
@@ -495,34 +370,20 @@ DataManagerClassifier<-R6::R6Class(
       self$datasets$data_labeled_synthetic=datasets$Dataset$from_dict(
         reticulate::dict(
           list(id=rownames(embeddings_syntehtic),
-               input=np$squeeze(np$split(reticulate::np_array(embeddings_syntehtic),as.integer(nrow(embeddings_syntehtic)),axis=0L)),
+               input=prepare_r_array_for_dataset(embeddings_syntehtic),
                labels=targets_synthetic,
-               length=get_n_chunks(text_embeddings=embeddings_syntehtic,features=self$config$features,times=self$config$times)),
+               length=get_n_chunks(text_embeddings=embeddings_syntehtic,
+                                   features=self$config$features,
+                                   times=self$config$times)),
           convert = FALSE))
 
 
       if(self$config$one_hot_encoding==TRUE){
-        one_hot_encoding_data=datasets$Dataset$from_dict(
-          reticulate::dict(
-            one_hot_encoding=np$squeeze(np$split(
-              reticulate::np_array(to_categorical_c(targets_synthetic,self$config$n_classes)),
-              as.integer(nrow(embeddings_syntehtic)),
-              axis=0L))
-          )
-        )
-        self$datasets$data_labeled_synthetic=self$datasets$data_labeled_synthetic$add_column("one_hot_encoding",one_hot_encoding_data["one_hot_encoding"])
-      }
+        self$datasets$data_labeled_synthetic=private$add_one_hot_encoding(self$datasets$data_labeled_synthetic)
+        }
 
       if(self$config$add_matrix_map==TRUE){
-        matrix_form=datasets$Dataset$from_dict(
-          reticulate::dict(
-            matrix_form=np$squeeze(np$split(
-              reticulate::np_array(array_to_matrix(embeddings_syntehtic)),
-              as.integer(nrow(embeddings_syntehtic)),
-              axis=0L))
-          )
-        )
-        self$datasets$data_labeled_synthetic=self$datasets$data_labeled_synthetic$add_column("matrix_form",matrix_form["matrix_form"])
+        self$datasets$data_labeled_synthetic=private$add_matrix_form(self$datasets$data_labeled_synthetic)
       }
     } else {
       self$datasets$data_labeled_synthetic=NULL
@@ -555,43 +416,191 @@ DataManagerClassifier<-R6::R6Class(
   #'in the corresponding field.
   add_replace_pseudo_data=function(inputs,
                                    labels){
+    private$check_labels(labels)
 
     #Add or replace current dataset for pseudo data
     self$datasets$data_labeled_pseudo=datasets$Dataset$from_dict(
       reticulate::dict(
         list(id=rownames(inputs),
-             input=np$squeeze(np$split(reticulate::np_array(inputs),as.integer(nrow(inputs)),axis=0L)),
-             labels=as.numeric(labels),
+             input=prepare_r_array_for_dataset(inputs),
+             labels=as.numeric(labels)-1,
              length=get_n_chunks(text_embeddings=inputs,features=self$config$features,times=self$config$times)),
         convert = FALSE))
 
     if(self$config$one_hot_encoding==TRUE){
-      one_hot_encoding_data=datasets$Dataset$from_dict(
-        reticulate::dict(
-          one_hot_encoding=np$squeeze(np$split(
-            reticulate::np_array(to_categorical_c(labels,self$config$n_classes)),
-            as.integer(nrow(inputs)),
-            axis=0L))
-        )
-      )
-      self$datasets$data_labeled_pseudo=self$datasets$data_labeled_pseudo$add_column("one_hot_encoding",one_hot_encoding_data["one_hot_encoding"])
-    }
+      self$datasets$data_labeled_pseudo=private$add_one_hot_encoding(self$datasets$data_labeled_pseudo)
+     }
 
     if(self$config$add_matrix_map==TRUE){
-      matrix_form=datasets$Dataset$from_dict(
-        reticulate::dict(
-          matrix_form=np$squeeze(np$split(
-            reticulate::np_array(array_to_matrix(inputs)),
-            as.integer(nrow(inputs)),
-            axis=0L))
-        )
-      )
-      self$datasets$data_labeled_pseudo=self$datasets$data_labeled_pseudo$add_column("matrix_form",matrix_form["matrix_form"])
-    }
+      self$datasets$data_labeled_pseudo=private$add_matrix_form(self$datasets$data_labeled_pseudo)
+      }
   }
   #-----------------------------------------------------------------------------
   ),
-  private = list()
+  private = list(
+    prepare_datasets=function(data_embeddings,data_targets,trace){
+      if("EmbeddedText"%in%class(data_embeddings)){
+        data_set_embeddings=data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+        data_set_embeddings=data_set_embeddings$get_dataset()
+      } else {
+        data_set_embeddings=data_embeddings$get_dataset()
+      }
+
+      #Reduce embeddings to unique ids
+      n_init_cases=data_set_embeddings$num_rows
+      data_set_embeddings=reduce_to_unique(data_set_embeddings,"id")
+      n_final_cases=data_set_embeddings$num_rows
+
+      #Prepare classes for join
+      class_vector=vector(length=n_final_cases)
+      class_vector[]=NA
+      names(class_vector)=data_set_embeddings["id"]
+
+      #Convert labels
+      data_targets=na.omit(data_targets)
+      data_targets_names=names(data_targets)
+      data_targets<-as.numeric(data_targets)-1
+      names(data_targets)=data_targets_names
+
+      #Estimate all targets which have an embedding input
+      relevant_target_names=intersect(names(class_vector),y=names(data_targets))
+
+      #Add relevant data to the class vector
+      class_vector[relevant_target_names]=data_targets[relevant_target_names]
+
+      #Sort class vector according to the input ids
+      class_vector=class_vector[data_set_embeddings["id"]]
+
+      #Get indices for labeled-unlabeled split
+      indices_unlabeled=which(is.na(class_vector))-1
+      indices_labeled=which(!is.na(class_vector))-1
+
+      #Add labels to data set
+      data_set_embeddings=data_set_embeddings$add_column("labels",np$array(class_vector))
+
+      #Split data
+      self$datasets$data_labeled=data_set_embeddings$select(as.integer(indices_labeled))
+      if(length(indices_unlabeled)!=0){
+        self$datasets$data_unlabeled=data_set_embeddings$select(as.integer(indices_unlabeled))
+      } else {
+        self$datasets$data_unlabeled=NULL
+      }
+
+
+      #Report numbers
+      if(trace==TRUE){
+        message(paste(date(),
+                      "Total Cases:",n_init_cases,
+                      "Unique Cases:",n_final_cases,
+                      "Labeled Cases:",length(indices_labeled)))
+      }
+    },
+    check_and_calculate_number_folds=function(folds){
+      sample_target=self$datasets$data_labeled["labels"]
+      freq_cat=table(sample_target)
+      min_freq=min(freq_cat)
+      if(min_freq<6){
+        stop(paste("Frequency of the smallest category/class is",min_freq,". At least
+                   6 cases are necessary. Consider to remove this category/class."))
+      } else {
+        if(min_freq/folds<3){
+          fin_k_folds=min_freq
+          warning(paste("Frequency of the smallest category/class is not sufficent to ensure
+                    at least 3 cases per fold. Adjusting number of folds from ",folds,"to",fin_k_folds,"."))
+        } else {
+          fin_k_folds=folds
+        }
+      }
+      return(fin_k_folds)
+    },
+    add_matrix_form=function(dataset){
+      if(!is.null(dataset)){
+        private$load_reload_python_scripts()
+        dataset=dataset$map(py$map_input_to_matrix_form,fn_kwargs=list(times= as.integer(self$config$times),
+                                                                       features=as.integer(self$config$features)))
+        return(dataset)
+      } else {
+        return(NULL)
+      }
+    },
+    add_one_hot_encoding=function(dataset){
+      if(!is.null(dataset)){
+        private$load_reload_python_scripts()
+        dataset=dataset$map(py$map_labels_to_one_hot,
+                            fn_kwargs=reticulate::dict(list(num_classes=as.integer(self$config$n_classes))))
+        return(dataset)
+      } else {
+        return(NULL)
+      }
+    },
+    load_reload_python_scripts=function(){
+      reticulate::py_run_file(system.file("python/py_functions.py",
+                                          package = "aifeducation"))
+    },
+    create_indices_name_map=function(){
+      self$name_idx$labeled_data=seq.int(from = 0,to=(length(self$datasets$data_labeled["id"]))-1)
+      names(self$name_idx$labeled_data)=self$datasets$data_labeled["id"]
+
+      if(!is.null(self$datasets$data_unlabeled)){
+        self$name_idx$unlabeled_data=seq.int(from = 0,to=(length(self$datasets$data_unlabeled["id"]))-1)
+        names(self$name_idx$unlabeled_data)=self$datasets$data_unlabeled["id"]
+      } else {
+        self$name_idx$unlabeled_data=NULL
+      }
+
+
+    },
+    create_folds=function(){
+      #Create Train, Test, and Validation Samples--------------------------------
+      #Check maximal number of folds, adjust, and create folds
+      data_targets=factor(x=self$datasets$data_labeled["labels"])
+      names(data_targets)=self$datasets$data_labeled["id"]
+
+      folds=get_folds(
+        target = data_targets,
+        k_folds=self$config$n_folds)
+
+      self$samples=NULL
+      for(i in 1:self$config$n_folds){
+        train_val_split=get_train_test_split(
+          embedding = NULL,
+          target = data_targets[folds$train_sample[[i]]],
+          val_size = self$config$val_size)
+
+        fold=list(
+          train=self$name_idx$labeled_data[names(train_val_split$target_train)],
+          val=self$name_idx$labeled_data[names(train_val_split$target_test)],
+          test=self$name_idx$labeled_data[folds$val_sample[[i]]])
+
+        self$samples[i]=list(fold)
+      }
+    },
+    create_final_sample=function(data_targets){
+      data_targets=factor(x=self$datasets$data_labeled["labels"])
+      names(data_targets)=self$datasets$data_labeled["id"]
+
+      names_final_split=get_stratified_train_test_split(
+        targets = data_targets,
+        val_size = self$config$val_size)
+      final_split=list(
+        train=self$name_idx$labeled_data[names_final_split$train_sample],
+        val=self$name_idx$labeled_data[names_final_split$test_sample],
+        test=NULL)
+      self$samples[length(self$samples)+1]=list(final_split)
+    },
+    check_labels=function(labels){
+      if(is.factor(labels)==FALSE){
+        stop("labels must be an object of class factor.")
+      } else {
+        levels_identical=sum(levels(labels)==self$config$class_levels)
+        if(levels_identical!=self$config$n_classes){
+          stop(paste("Levels of the labels are not identical with the levels of the classifier.",
+                     "Necessary levels:",self$config$class_levels,
+                     "Provided levels":levels(labels)))
+        }
+      }
+    }
+  )
 )
 
 

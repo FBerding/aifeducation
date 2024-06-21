@@ -157,10 +157,6 @@ TEFeatureExtractor<-R6::R6Class(
                    pytorch_trace=1){
 
       #Checking Arguments------------------------------------------------------
-      if(!("EmbeddedText" %in% class(data_embeddings))){
-        stop("data_embeddings must be an object of class EmbeddedText")
-      }
-
       self$check_embedding_model(data_embeddings)
 
       #Saving training configuration-------------------------------------------
@@ -185,24 +181,17 @@ TEFeatureExtractor<-R6::R6Class(
                       "Start"))
       }
 
-      #Set up training and validation data
+      #Set up dataset
       if("EmbeddedText" %in% class(data_embeddings)){
-        #Reduce to unique cases for training
-        data=unique(data_embeddings$embeddings)
-
-        #create a data set
-        extractor_dataset=datasets$Dataset$from_dict(
-          reticulate::dict(
-            list(id=rownames(data),
-                 input=np$squeeze(np$split(reticulate::np_array(data),as.integer(nrow(data)),axis=0L))),
-            convert = FALSE))
-
-        #remove data
-        rm(data)
-
-        #Copy input as label for training
-        extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
+        data=data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
       }
+
+      #Reduce to unique cases for training
+      data=reduce_to_unique(data,"input")
+
+      #Copy input as label for training
+      #extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
+      extractor_dataset=extractor_dataset$map(py$map_input_to_labels)
 
       #Check directory for checkpoints
       if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))==FALSE){
@@ -292,7 +281,15 @@ TEFeatureExtractor<-R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    extract_features=function(data_embeddings,batch_size,return_r_object=TRUE){
+    extract_features=function(data_embeddings,batch_size){
+
+      #check data_embeddings object
+      if("EmbeddedText"%in%class(newdata)|
+         "LargeDataSetForTextEmbeddings"%in%class(newdata)){
+        self$check_embedding_model(text_embeddings=newdata,require_compressed = FALSE)
+      } else {
+        private$check_embeddings_object_type(newdata,strict=FALSE)
+      }
 
       #Load Custom Model Scripts
       private$load_reload_python_scripts()
@@ -356,7 +353,6 @@ TEFeatureExtractor<-R6::R6Class(
       }
 
         #Prepare output
-        if(return_r_object==TRUE){
           if("datasets.arrow_dataset.Dataset"%in%class(data_embeddings)){
             rownames(reduced_embeddings)=extractor_dataset["id"]
           } else {
@@ -373,6 +369,7 @@ TEFeatureExtractor<-R6::R6Class(
             model_version=model_info$model_version,
             model_language=model_info$model_language,
             param_seq_length=model_info$param_seq_length,
+            param_features=dim(reduced_embeddings)[3],
             param_chunks=model_info$param_chunks,
             param_overlap=model_info$param_overlap,
             param_emb_layer_min=model_info$param_emb_layer_min,
@@ -387,16 +384,65 @@ TEFeatureExtractor<-R6::R6Class(
                                                 method=self$model_config$method,
                                                 noise_factor=self$model_config$noise_factor,
                                                 optimizer=self$model_config$optimizer)
-        } else {
-          reduced_embeddings=datasets$Dataset$from_dict(
-            reticulate::dict(
-              list(id=current_row_names,
-                   input=np$squeeze(np$split(reticulate::np_array(reduced_embeddings),as.integer(nrow(reduced_embeddings)),axis=0L))),
-              convert = FALSE))
 
-        }
     return(reduced_embeddings)
 
+    },
+    #--------------------------------------------------------------------------
+    extract_features_large=function(data_embeddings,batch_size,trace=FALSE){
+      #Get total number of batches for the loop
+      total_number_of_bachtes=ceiling(data_embeddings$n_rows()/batch_size)
+
+      #Get indices for every batch
+      batches_index=get_batches_index(number_rows=data_embeddings$n_rows(),
+                                      batch_size=batch_size,
+                                      zero_based=TRUE)
+      #Process every batch
+      for(i in 1:total_number_of_bachtes){
+        subset=data_embeddings$select(as.integer(batches_index[[i]]))
+        embeddings=self$extract_features(
+          data_embeddings = subset,
+          batch_size=batch_size
+        )
+        if(i==1){
+          #Create Large Dataset
+          model_info=self$get_text_embedding_model()
+
+          embedded_texts_large=LargeDataSetForTextEmbeddings$new(
+            model_label=model_info$model_label,
+            model_date=model_info$model_date,
+            model_method=model_info$model_method,
+            model_version=model_info$model_version,
+            model_language=model_info$model_language,
+            param_seq_length=model_info$param_seq_length,
+            param_features=dim(reduced_embeddings)[3],
+            param_chunks=model_info$param_chunks,
+            param_overlap=model_info$param_overlap,
+            param_emb_layer_min=model_info$param_emb_layer_min,
+            param_emb_layer_max=model_info$param_emb_layer_max,
+            param_emb_pool_type=model_info$param_emb_pool_type,
+            param_aggregation=model_info$param_aggregation
+            )
+          embedded_texts_large$add_feature_extractor_info(model_name=private$model_info$model_name,
+                                                        model_label=private$model_info$model_label,
+                                                        features=self$model_config$features,
+                                                        method=self$model_config$method,
+                                                        noise_factor=self$model_config$noise_factor,
+                                                        optimizer=self$model_config$optimizer)
+
+          #Add new data
+          embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
+        } else {
+          #Add new data
+          embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
+        }
+        if(trace==TRUE){
+          cat(paste(date(),
+                    "Batch",i,"/",total_number_of_bachtes,"done","\n"))
+        }
+        gc()
+      }
+      return(embedded_texts_large)
     },
       #-----------------------------------------------------------------------
     is_trained=function(){
@@ -407,6 +453,8 @@ TEFeatureExtractor<-R6::R6Class(
     trained=FALSE,
     #--------------------------------------------------------------------------
     load_reload_python_scripts=function(){
+      reticulate::py_run_file(system.file("python/py_functions.py",
+                                          package = "aifeducation"))
       if(private$ml_framework=="tensorflow"){
         reticulate::py_run_file(system.file("python/keras_autoencoder.py",
                                             package = "aifeducation"))

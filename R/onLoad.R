@@ -11,6 +11,7 @@ keras<-NULL
 accelerate<-NULL
 safetensors<-NULL
 pandas<-NULL
+pyarrow<-NULL
 
 aifeducation_config<-NULL
 
@@ -45,7 +46,7 @@ aifeducation_config<-NULL
   accelerate<<-reticulate::import("accelerate", delay_load = TRUE)
   safetensors<<-reticulate::import("safetensors", delay_load = TRUE)
   pandas<<-reticulate::import("pandas", delay_load = TRUE)
-
+  pyarrow<<-reticulate::import("pyarrow", delay_load = TRUE)
   codecarbon<<-reticulate::import("codecarbon", delay_load = TRUE)
   keras<<-reticulate::import("keras", delay_load = TRUE)
 

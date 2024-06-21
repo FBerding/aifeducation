@@ -352,32 +352,19 @@ AIFEBaseModel<-R6::R6Class(
     #'@return \code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
     #'\code{FALSE} if the models differ.
     check_embedding_model=function(text_embeddings){
-      if(("EmbeddedText" %in% class(text_embeddings))==FALSE){
-        stop("text_embeddings is not of class EmbeddedText.")
-      }
+      #Check object type
+      private$check_embeddings_object_type(text_embeddings,strict = TRUE)
 
+      #Check original text embedding model
       embedding_model_config<-text_embeddings$get_model_info()
-      to_check<-c("model_name")
-      for(check in to_check){
-        if(!is.null_or_na(embedding_model_config[[check]]) &
-           !is.null_or_na(private$text_embedding_model$model[[check]])){
-          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
-            text_embedding_compatible=FALSE
-          } else {
-            text_embedding_compatible=TRUE
-          }
-        } else if (!is.null_or_na(embedding_model_config[[check]]) &
-                   is.null_or_na(private$text_embedding_model$model[[check]])){
-          text_embedding_compatible=FALSE
-        } else if (is.null_or_na(embedding_model_config[[check]]) &
-                   !is.null_or_na(private$text_embedding_model$model[[check]])){
-          text_embedding_compatible=FALSE
-        }
-      }
+      check<-c("model_name")
 
-      if(text_embedding_compatible==FALSE){
-        stop("The TextEmbeddingModel that generated the data_embeddings is not
+      if(!is.null_or_na(embedding_model_config[[check]]) &
+         !is.null_or_na(private$text_embedding_model$model[[check]])){
+        if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+          stop("The TextEmbeddingModel that generated the data_embeddings is not
                the same as the TextEmbeddingModel when generating the classifier.")
+        }
       }
     },
     #---------------------------------------------------------------------------
@@ -525,6 +512,22 @@ AIFEBaseModel<-R6::R6Class(
       )
       return(results)
     },
+    check_embeddings_object_type=function(embeddings,strict=TRUE){
+      if(strict==TRUE){
+        if(!("EmbeddedText" %in% class(embeddings))&
+           !("LargeDataSetForTextEmbeddings" %in% class(embeddings))){
+          stop("text_embeddings must be of class EmbeddedText or LargeDataSetForTextEmbeddings.")
+        }
+      } else {
+        if(!("EmbeddedText" %in% class(embeddings))&
+           !("LargeDataSetForTextEmbeddings" %in% class(embeddings))&
+           !("array" %in% class(embeddings))&
+           !("datasets.arrow_dataset.Dataset" %in% class(embeddings))){
+          stop("text_embeddings must be of class EmbeddedText, LargeDataSetForTextEmbeddings,
+               datasets.arrow_dataset.Dataset or array.")
+        }
+      }
+    },
     #------------------------------------------------------------------------
     detach_tensors=function(tensors){
       if(torch$cuda$is_available()){
@@ -535,13 +538,14 @@ AIFEBaseModel<-R6::R6Class(
     },
     #-------------------------------------------------------------------------
     check_single_prediction=function(embeddings){
-      if("EmbeddedText" %in% class(embeddings)){
-        if(nrow(embeddings$embeddings)>1){
+      if("EmbeddedText" %in% class(embeddings)|
+         "LargeDataSetForTextEmbeddings" %in% class(embeddings)){
+        if(embeddings$n_rows()>1){
           single_prediction=FALSE
         } else {
           single_prediction=TRUE
         }
-      } else if("array" %in% class(embeddings)){
+      }else if("array" %in% class(embeddings)){
         if(nrow(embeddings)>1){
           single_prediction=FALSE
         } else {
@@ -568,6 +572,8 @@ AIFEBaseModel<-R6::R6Class(
             list(id=rownames(embeddings),
                  input=np$squeeze(np$split(reticulate::np_array(embeddings),as.integer(nrow(embeddings)),axis=0L))),
             convert = FALSE))
+      } else if("EmbeddedText" %in% class(embeddings)){
+        prepared_dataset=embeddings$get_dataset()
       }
       return(prepared_dataset)
     },
@@ -582,6 +588,10 @@ AIFEBaseModel<-R6::R6Class(
       } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
         prepared_dataset=embeddings$set_format("np")
         return(prepared_dataset["input"])
+      }else if("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
+        prepared_dataset=embeddings$get_dataset()
+        prepared_dataset=embeddings$set_format("np")
+        return(prepared_dataset["input"])
       }
     },
     #--------------------------------------------------------------------------
@@ -592,6 +602,8 @@ AIFEBaseModel<-R6::R6Class(
         return(rownames(embeddings))
       } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
         return(embeddings["id"])
+      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
+        embeddings$get_ids()
       }
     }
   )

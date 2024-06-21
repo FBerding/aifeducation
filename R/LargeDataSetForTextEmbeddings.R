@@ -1,280 +1,3 @@
-
-#'@export
-LargeDataSetBase<-R6::R6Class(
-  classname = "LargeDataSetBase",
-  public = list(
-    n_cols=function(){
-      retrun(private$data$num_columns)
-    },
-    #------------------------------------------------------
-    n_rows=function(){
-      return(private$data$num_rows)
-    },
-    #-----------------------------------------------------
-    get_colnames=function(){
-      return(private$data$column_names)
-    },
-    #-----------------------------------------------------
-    get_dataset=function(){
-      return(private$data)
-    },
-    #------------------------------------------------------
-    reduce_to_unique_ids=function(){
-
-    },
-    #----------------------------------------------------
-    select=function(indicies){
-      return(private$data$select(indicies))
-    }
-  ),
-  private = list(
-    data=NULL,
-    #--------------------------------------------------------------------------
-    add=function(new_dataset){
-      if(is.null(private$data)){
-        private$data=new_dataset
-      } else {
-        private$data=datasets$concatenate_datasets(
-          list(private$data,new_dataset))
-      }
-    }
-  )
-)
-
-
-#'@export
-LargeDataSetForText<-R6::R6Class(
-  classname = "LargeDataSetForText",
-  inherit = LargeDataSetBase,
-  public = list(
-    add_from_files_txt=function(dir_path,batch_size=500,trace=TRUE){
-      #Gather all text files
-      file_paths=private$get_file_paths(".txt")
-
-      #calculate number of batches
-      n_batches=ceiling(length(file_paths)/batch_size)
-
-      #get indices for every batch
-      batches=get_batches_index(number_rows=length(file_paths),
-                                batch_size = batch_size)
-
-      #Process every batch
-      list_datasets=list()
-      for(i in 1:n_batches){
-        chunk=private$get_batch(batches[[i]],
-                        file_paths=file_paths,
-                        clean_text=TRUE)
-        chunk_dataset=data.frame_to_py_dataset(chunk)
-        list_datasets[i]=list(chunk_dataset)
-        if(trace==TRUE){
-          message(paste(date(),
-                        "Batch",i,"from",n_batches,"processed"))
-        }
-      }
-
-      #concatenate datasets
-      new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
-
-      #Add new dataset
-      private$add(new_dataset)
-     },
-    add_from_files_pdf=function(dir_path,batch_size=500,trace=TRUE){
-      #Gather all text files
-      file_paths=private$get_file_paths(".pdf")
-
-      #calculate number of batches
-      n_batches=ceiling(length(file_paths)/batch_size)
-
-      #get indices for every batch
-      batches=get_batches_index(number_rows=length(file_paths),
-                                        batch_size = batch_size)
-
-      #Process every batch
-      list_datasets=list()
-      for(i in 1:n_batches){
-        chunk=private$get_batch(batches[[i]],
-                                file_paths=file_paths,
-                                clean_text=TRUE)
-        chunk_dataset=data.frame_to_py_dataset(chunk)
-        list_datasets[i]=list(chunk_dataset)
-        if(trace==TRUE){
-          message(paste(date(),
-                        "Batch",i,"from",n_batches,"processed"))
-        }
-      }
-
-      #concatenate datasets
-      new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
-
-      #Add new dataset
-      private$add(new_dataset)
-    },
-    add_from_filex_xlsx=function(dir_path,trace=TRUE,
-                                 id_column="id",
-                                 text_column="text",
-                                 bib_entry_column="bib_entry",
-                                 license_column="license"){
-      #Gather all text files
-      file_paths=private$get_file_paths(".xlsx")
-      n_batches=length(file_paths)
-
-      #Process every batch
-      list_datasets=list()
-      for(i in 1:n_batches){
-        chunk=readtext::readtext(
-          file=file_paths[i],
-          docid_field = id_column,
-          text_field = text_column)
-
-        #Set correct name of id column
-        index=which(colnames(chunk)%in%"doc_id")
-        colnames(chunk)[index]="id"
-        print(chunk)
-
-        #Bib_entry column
-        index=which(colnames(chunk)%in%bib_entry_column)
-        if (length(index)==0)
-        {
-          bib_entry=vector(length = nrow(chunk))
-          bib_entry[]=NA
-          chunk$bib_entry=bib_entry
-        } else {
-          colnames(chunk)[index]="bib_entry"
-        }
-        print(chunk)
-
-        #License column
-        index=which(colnames(chunk)%in%license_column)
-        if (length(index)==0)
-        {
-          license=vector(length = nrow(chunk))
-          license[]=NA
-          chunk$license=license
-        } else {
-          colnames(chunk)[index]="license"
-        }
-        print(chunk)
-
-        chunk_dataset=data.frame_to_py_dataset(chunk)
-        list_datasets[i]=list(chunk_dataset)
-        if(trace==TRUE){
-          message(paste(date(),
-                        "Batch",i,"from",n_batches,"processed"))
-        }
-
-        #concatenate datasets
-        new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
-
-        #Add new dataset
-        private$add(new_dataset)
-      }
-
-    },
-    add_from_data.frame=function(data_frame){
-      if(is.data.frame(data_frame)==FALSE){
-        stop("Input must be of type data.frame")
-      }
-      if("id"%in%colnames(data_frame)==FALSE){
-        stop("data.frame must contain a column id.")
-      }
-      if("text"%in%colnames(data_frame)==FALSE){
-        stop("data.frame must contain a column text.")
-      }
-      if("bib_entry"%in%colnames(data_frame)==FALSE){
-        stop("data.frame must contain a column bib_entry.")
-      }
-      if("license"%in%colnames(data_frame)==FALSE){
-        stop("data.frame must contain a column license.")
-      }
-
-      #Transform to a python dataset
-      new_dataset=data.frame_to_py_dataset(data_frame[c("id","text","bib_entry","license")])
-
-      #Add new dataset
-      private$add(new_dataset)
-    }
-  ),
-        private=list(
-          get_file_paths=function(file_type){
-            file_paths=list.files(
-              path = dir_path,
-              include.dirs = FALSE,
-              all.files = TRUE,
-              full.names = TRUE,
-              recursive = TRUE,
-              pattern = paste0("*",file_type))
-            file_paths=private$clean_path(file_paths)
-            return(file_paths)
-            },
-
-          clean_path=function(paths){
-            new_paths=vector(length = length(paths))
-            new_paths[]=NA
-            for(i in 1:length(paths)){
-              path=paths[i]
-              bib_entry_path=paste0(
-                dirname(path),"/bib_entry.txt"
-              )
-              licence_path=paste0(
-                dirname(path),"/license.txt"
-              )
-              if(path!=bib_entry_path & path!=licence_path){
-                new_paths[i]=path
-              }
-            }
-            return(na.omit(new_paths))
-          },
-          get_batch=function(batch,file_paths,clean_text=TRUE){
-            data=matrix(data = NA,
-                        nrow = length(batch),
-                        ncol = 4)
-            colnames(data)=c("id","text","bib_entry","license")
-
-            for(i in batch){
-              document=readtext::readtext(file=file_paths[i])
-
-              #ID
-              data[i,1]=private$remove_file_extenstion(document$doc_id)
-
-              #Text
-              if(clean_text==TRUE){
-                text=private$clean_text(document$text)
-              } else {
-                text=document$text
-              }
-              data[i,2]=text
-
-              #Bib_entry
-              file_path=paste0(dir(file_paths[i]),"/bib_entry.txt")
-              if(file.exists(file_path)==TRUE){
-                data[i,3]=read.csv(file = (file_path))
-              } else {
-                data[i,3]=NA
-              }
-
-              #License
-              file_path=paste0(dir(file_paths[i]),"/license.txt")
-              if(file.exists(file_path)==TRUE){
-                data[i,4]=read.csv(file = (file_path))
-              } else {
-                data[i,4]=NA
-              }
-            }
-            return(as.data.frame(data))
-          },
-          clean_text=function(text){
-            text=stringr::str_replace_all(text,pattern = "[:space:]{1,}",replacement = " ")
-            text=stringr::str_replace_all(text,pattern = "-(?=[:space:])",replacement = "")
-            return(text)
-          },
-          remove_file_extenstion=function(file){
-            tmp_string=stringr::str_split_fixed(file,pattern="\\.",n=Inf)
-            return(paste0(tmp_string[1,1:(ncol(tmp_string)-1)],collapse = "."))
-          }
-        )
-)
-
-
 LargeDataSetForTextEmbeddings<-R6::R6Class(
   classname = "LargeDataSetForTextEmbeddings",
   inherit = LargeDataSetBase,
@@ -548,6 +271,38 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       }
       #add dataset
       private$add(new_dataset)
+    },
+    #-------------------------------------------------------------------------
+    convert_to_EmbeddedText=function(){
+      new_data_set=EmbeddedText$new(
+        model_name=private$model_name,
+        model_label=private$model_label,
+        model_date=private$model_date,
+        model_method=private$model_method,
+        model_version=private$model_version,
+        model_language=private$model_language,
+        param_seq_length=private$param_seq_length,
+        param_chunks=private$param_chunks,
+        param_features=private$param_features,
+        param_overlap=private$param_overlap,
+        param_emb_layer_min=private$param_emb_layer_min,
+        param_emb_layer_max=private$param_emb_layer_max,
+        param_emb_pool_type=private$param_emb_pool_type,
+        param_aggregation=private$param_aggregation,
+        embeddings =py_dataset_to_embeddings(self$get_dataset())
+      )
+
+      if(self$is_compressed()==TRUE){
+        new_data_set$add_feature_extractor_info(
+          model_name=private$feature_extractor$model_name,
+          model_label=private$feature_extractor$model_label,
+          features=private$feature_extractor$features,
+          method=private$feature_extractor$method,
+          noise_factor=private$feature_extractor$noise_factor,
+          optimizer=private$feature_extractor$optimizer
+        )
+      }
+      return(new_data_set)
     }
   )
 )

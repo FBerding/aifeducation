@@ -141,9 +141,9 @@ TEClassifierRegular<-R6::R6Class(
       if(is.null(label)){
         stop("label is NULL but must be a character.")
       }
-      if(!("EmbeddedText" %in% class(text_embeddings))){
-        stop("text_embeddings must be of class EmbeddedText.")
-      }
+
+      private$check_embeddings_object_type(text_embeddings)
+
       if(is.factor(targets)==FALSE){
         stop("targets must be of class factor.")
       }
@@ -174,27 +174,13 @@ TEClassifierRegular<-R6::R6Class(
       #------------------------------------------------------------------------
       private$ml_framework=ml_framework
 
-      #Check feature extractor
-      use_fe=FALSE
-      if(!is.null(feature_extractor)){
-        if("TEFeatureExtractor"%in% class(feature_extractor)==FALSE){
-          stop("Object passed to feature_extractor must be an object of class
-               TEFeatureExtractor.")
-        } else {
-          if(feature_extractor$get_ml_framework()!=self$get_ml_framework()){
-            stop("The machine learning framework of the feature extractior and
-                 classifier do not match. Please provide a feature extractor
-                 with the same machine learning framework as the classifier.")
-          } else {
-            if(feature_extractor$is_trained()==TRUE){
-              use_fe=TRUE
-            } else {
-              stop("The supplied feature extractor is not trained. Please
-                provide trained feature extractor and try again.")
-            }
-          }
-        }
-      }
+      #Check feature extractor-------------------------------------------------
+      check_feature_extractor_object_type(feature_extractor)
+      if("TEFeatureExtractor"%in% class(feature_extractor)==TRUE){
+        use_fe=TRUE
+      } else {
+        use_fe=FALSE      }
+
 
       #Setting Label and Name-------------------------------------------------
       private$model_info$model_name_root=name
@@ -206,13 +192,11 @@ TEClassifierRegular<-R6::R6Class(
       target_levels_order<-levels(targets)
 
       model_info=text_embeddings$get_model_info()
-      times=model_info$param_chunks
-      features=dim(text_embeddings$embeddings)[3]
 
       private$text_embedding_model["model"]=list(model_info)
       private$text_embedding_model["feature_extractor"]=text_embeddings$get_feature_extractor_info()
-      private$text_embedding_model["times"]=times
-      private$text_embedding_model["features"]=features
+      private$text_embedding_model["times"]=text_embeddings$get_times()
+      private$text_embedding_model["features"]=text_embeddings$get_features()
 
       if(is.null(rec) & self_attention_heads>0){
         if(features %% 2 !=0){
@@ -422,7 +406,7 @@ TEClassifierRegular<-R6::R6Class(
         stop("data_embeddings must be an object of class EmbeddedText")
       }
 
-      self$check_embedding_model(data_embeddings)
+      self$check_embedding_model(data_embeddings,require_compressed=FALSE)
 
       if(is.factor(data_targets)==FALSE){
         stop("data_targets must be a factor.")
@@ -475,9 +459,9 @@ TEClassifierRegular<-R6::R6Class(
       #Create DataManager------------------------------------------------------
       if(self$model_config$use_fe==TRUE){
         data_manager=DataManagerClassifier$new(
-          data_embeddings=self$feature_extractor$extract_features(data_embeddings = data_embeddings,
+          data_embeddings=self$feature_extractor$extract_features_large(data_embeddings = data_embeddings,
                                                 as.integer(self$last_training$config$batch_size),
-                                                return_r_object = TRUE),
+                                                trace = self$last_training$config$trace),
           data_targets=data_targets,
           folds=data_folds,
           val_size=self$last_training$config$data_val_size,
@@ -610,14 +594,15 @@ TEClassifierRegular<-R6::R6Class(
                      verbose=1){
 
       #Check input for compatible text embedding models and feature extractors
-      if("EmbeddedText"%in%class(newdata)){
-        self$check_embedding_model(text_embeddings=newdata)
-        requires_compression=self$requires_compression(newdata)
-      } else if ("array"%in%class(newdata)) {
-        requires_compression=self$requires_compression(newdata)
-       } else {
-        requires_compression=FALSE
-       }
+      if("EmbeddedText"%in%class(newdata)|
+         "LargeDataSetForTextEmbeddings"%in%class(newdata)){
+        self$check_embedding_model(text_embeddings=newdata,require_compressed = FALSE)
+      } else {
+        private$check_embeddings_object_type(newdata,strict=FALSE)
+      }
+
+      #Check if the embeddings must be compressed before passing to the model
+      requires_compression=self$requires_compression(newdata)
 
       #Load Custom Model Scripts
       private$load_reload_python_scripts()
@@ -638,7 +623,7 @@ TEClassifierRegular<-R6::R6Class(
         if(requires_compression==TRUE){
 
           #Returns a data set
-          prediction_data=self$feature_extractor$extract_features(
+          prediction_data=self$feature_extractor$extract_features_large(
             data_embeddings=prediction_data,
             batch_size=as.integer(batch_size),
             return_r_object=FALSE
@@ -783,7 +768,6 @@ TEClassifierRegular<-R6::R6Class(
       predictions_prob<-as.data.frame(predictions_prob)
       predictions_prob$expected_category=predictions
       rownames(predictions_prob)=current_row_names
-
       return(predictions_prob)
 
     },
@@ -793,62 +777,66 @@ TEClassifierRegular<-R6::R6Class(
     #'@param text_embeddings Object of class \link{EmbeddedText}.
     #'@return \code{TRUE} if the underlying \link{TextEmbeddingModel} are the same.
     #'\code{FALSE} if the models differ.
-    check_embedding_model=function(text_embeddings){
-      if(("EmbeddedText" %in% class(text_embeddings))==FALSE){
-        stop("text_embeddings is not of class EmbeddedText.")
-      }
+    check_embedding_model=function(text_embeddings, require_compressed=FALSE){
+      #Check Embeddings Object Type
+      private$check_embeddings_object_type(text_embeddings,strict=TRUE)
 
+      #Check original text embedding model.
       embedding_model_config<-text_embeddings$get_model_info()
-      to_check<-c("model_name")
-      for(check in to_check){
-        if(!is.null_or_na(embedding_model_config[[check]]) &
-           !is.null_or_na(private$text_embedding_model$model[[check]])){
-          if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
-            text_embedding_compatible=FALSE
-          } else {
-            text_embedding_compatible=TRUE
-          }
-        } else if (!is.null_or_na(embedding_model_config[[check]]) &
-                   is.null_or_na(private$text_embedding_model$model[[check]])){
-          text_embedding_compatible=FALSE
-        } else if (is.null_or_na(embedding_model_config[[check]]) &
-                   !is.null_or_na(private$text_embedding_model$model[[check]])){
-          text_embedding_compatible=FALSE
-        }
-      }
+      check<-c("model_name")
 
-      if(text_embedding_compatible==FALSE){
-        stop("The TextEmbeddingModel that generated the data_embeddings is not
+      if(!is.null_or_na(embedding_model_config[[check]]) &
+         !is.null_or_na(private$text_embedding_model$model[[check]])){
+        if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+          stop("The TextEmbeddingModel that generated the data_embeddings is not
                the same as the TextEmbeddingModel when generating the classifier.")
+          }
       }
 
-      #----------
+      #Check if a compressed version is necessary and if true if the feature extractor is
+      compatible
       feature_extractor_info=text_embeddings$get_feature_extractor_info()
-      if(!is.null(feature_extractor_info$model_name)&self$model_config$use_fe==FALSE){
-        stop("Compressed embeddings provided but the classifier does not support
+      if(require_compressed==TRUE){
+        if(!is.null(feature_extractor_info$model_name) & self$model_config$use_fe==FALSE){
+          stop("Compressed embeddings provided but the classifier does not support
              compressed embeddings.")
-      } else if(!is.null(feature_extractor_info$model_name) & self$model_config$use_fe==TRUE){
-        if(private$text_embedding_model$feature_extractor$model_name==feature_extractor_info$model_name){
-          feature_extractor_compatible==TRUE
-        } else {
-          stop("The feature extractor of the compressed embeddings is not the same as
+        } else if(!is.null(feature_extractor_info$model_name) & self$model_config$use_fe==TRUE){
+          if(private$text_embedding_model$feature_extractor$model_name!=feature_extractor_info$model_name){
+            stop("The feature extractor of the compressed embeddings is not the same as
                the feature extractor during the creation of the classifier.")
+          }
+        }
+      } else {
+        if(!is.null(feature_extractor_info$model_name)){
+          stop("Compressed embeddings are provided but uncompressed are needed.")
         }
       }
     },
     #--------------------------------------------------------------------------
-    check_is_compressed=function(text_embeddings){
-      feature_extractor_info=text_embeddings$get_feature_extractor_info()
-      if(is.null_or_na(feature_extractor_info$model_name)==FALSE){
-        return(TRUE)
-      } else {
-        return(FALSE)
+    check_feature_extractor_object_type=function(feature_extractor){
+      if(!is.null(feature_extractor)){
+        if("TEFeatureExtractor"%in% class(feature_extractor)==FALSE){
+          stop("Object passed to feature_extractor must be an object of class
+               TEFeatureExtractor or NULL.")
+        } else {
+          if(feature_extractor$get_ml_framework()!=self$get_ml_framework()){
+            stop("The machine learning framework of the feature extractior and
+                 classifier do not match. Please provide a feature extractor
+                 with the same machine learning framework as the classifier.")
+          } else {
+            if(feature_extractor$is_trained()==FALSE){
+              stop("The supplied feature extractor is not trained. Please
+                provide trained feature extractor and try again.")
+            }
+          }
+        }
       }
     },
     #--------------------------------------------------------------------------
     requires_compression=function(text_embeddings){
-    if("EmbeddedText"%in%class(text_embeddings)){
-      if(self$model_config$use_fe==TRUE & self$check_is_compressed(text_embeddings)==FALSE){
+    if("EmbeddedText"%in%class(text_embeddings)|
+       "LargeDataSetForTextEmbeddings"%in%class(text_embeddings)){
+      if(self$model_config$use_fe==TRUE & text_embeddings$is_compressed()==FALSE){
         return(TRUE)
       } else {
         return(FALSE)
