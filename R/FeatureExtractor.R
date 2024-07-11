@@ -53,9 +53,7 @@ TEFeatureExtractor<-R6::R6Class(
       if(is.null(label)){
         stop("label is NULL but must be a character.")
       }
-      if(!("EmbeddedText" %in% class(text_embeddings))){
-        stop("text_embeddings must be of class EmbeddedText.")
-      }
+      private$check_embeddings_object_type(text_embeddings,strict=TRUE)
 
       if(optimizer %in% c("adam","rmsprop")==FALSE){
         stop("Optimzier must be 'adam' oder 'rmsprop'.")
@@ -82,8 +80,8 @@ TEFeatureExtractor<-R6::R6Class(
       #Basic Information of Input and Target Data
       model_info=text_embeddings$get_model_info()
       private$text_embedding_model["model"]=list(model_info)
-      private$text_embedding_model["times"]=model_info$param_chunks
-      private$text_embedding_model["features"]=dim(text_embeddings$embeddings)[3]
+      private$text_embedding_model["times"]=text_embeddings$get_times()
+      private$text_embedding_model["features"]=text_embeddings$get_original_features()
 
       #Saving Configuration
       config=list(
@@ -184,14 +182,17 @@ TEFeatureExtractor<-R6::R6Class(
       #Set up dataset
       if("EmbeddedText" %in% class(data_embeddings)){
         data=data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+        data=data$get_dataset()
+      } else {
+        data=data_embeddings$get_dataset()
       }
 
       #Reduce to unique cases for training
-      data=reduce_to_unique(data,"input")
+      data=reduce_to_unique(data,"id")
 
       #Copy input as label for training
       #extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
-      extractor_dataset=extractor_dataset$map(py$map_input_to_labels)
+      extractor_dataset=data$map(py$map_input_to_labels)
 
       #Check directory for checkpoints
       if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))==FALSE){
@@ -284,11 +285,11 @@ TEFeatureExtractor<-R6::R6Class(
     extract_features=function(data_embeddings,batch_size){
 
       #check data_embeddings object
-      if("EmbeddedText"%in%class(newdata)|
-         "LargeDataSetForTextEmbeddings"%in%class(newdata)){
-        self$check_embedding_model(text_embeddings=newdata,require_compressed = FALSE)
+      if("EmbeddedText"%in%class(data_embeddings)|
+         "LargeDataSetForTextEmbeddings"%in%class(data_embeddings)){
+        self$check_embedding_model(text_embeddings=data_embeddings)
       } else {
-        private$check_embeddings_object_type(newdata,strict=FALSE)
+        private$check_embeddings_object_type(data_embeddings,strict=FALSE)
       }
 
       #Load Custom Model Scripts
@@ -321,7 +322,8 @@ TEFeatureExtractor<-R6::R6Class(
 
           encoder_model= tf$keras$Model(inputs=self$model$input, outputs=self$model$get_layer("latent_space_output")$output)
 
-          reduced_embeddings=encoder_model$predict(prepared_embeddings_tf)
+          reduced_embeddings=encoder_model$predict(prepared_embeddings_tf,
+                                                   verbose=as.integer(0))
         }
         #---------------------------------------------------------------------
       } else {
@@ -348,34 +350,31 @@ TEFeatureExtractor<-R6::R6Class(
           }
         } else if(private$ml_framework=="tensorflow"){
           encoder_model= tf$keras$Model(inputs=self$model$input, outputs=self$model$get_layer("latent_space_output")$output)
-          reduced_embeddings=encoder_model$predict(prepared_embeddings)
+          reduced_embeddings=encoder_model$predict(prepared_embeddings,
+                                                   verbose=as.integer(0))
         }
       }
 
         #Prepare output
-          if("datasets.arrow_dataset.Dataset"%in%class(data_embeddings)){
-            rownames(reduced_embeddings)=extractor_dataset["id"]
-          } else {
-            rownames(reduced_embeddings)=current_row_names
-          }
+          rownames(reduced_embeddings)=current_row_names
 
           model_info=self$get_text_embedding_model()
 
           reduced_embeddings=EmbeddedText$new(
             model_name=paste0("feature_extracted_",model_info$model_name),
-            model_label=model_info$model_label,
-            model_date=model_info$model_date,
-            model_method=model_info$model_method,
-            model_version=model_info$model_version,
-            model_language=model_info$model_language,
-            param_seq_length=model_info$param_seq_length,
+            model_label=model_info$model$model_label,
+            model_date=model_info$model$model_date,
+            model_method=model_info$model$model_method,
+            model_version=model_info$model$model_version,
+            model_language=model_info$model$model_language,
+            param_seq_length=model_info$model$param_seq_length,
             param_features=dim(reduced_embeddings)[3],
-            param_chunks=model_info$param_chunks,
-            param_overlap=model_info$param_overlap,
-            param_emb_layer_min=model_info$param_emb_layer_min,
-            param_emb_layer_max=model_info$param_emb_layer_max,
-            param_emb_pool_type=model_info$param_emb_pool_type,
-            param_aggregation=model_info$param_aggregation,
+            param_chunks=model_info$model$param_chunks,
+            param_overlap=model_info$model$param_overlap,
+            param_emb_layer_min=model_info$model$param_emb_layer_min,
+            param_emb_layer_max=model_info$model$param_emb_layer_max,
+            param_emb_pool_type=model_info$model$param_emb_pool_type,
+            param_aggregation=model_info$model$param_aggregation,
             embeddings=reduced_embeddings)
 
           reduced_embeddings$add_feature_extractor_info(model_name=private$model_info$model_name,
@@ -415,13 +414,13 @@ TEFeatureExtractor<-R6::R6Class(
             model_version=model_info$model_version,
             model_language=model_info$model_language,
             param_seq_length=model_info$param_seq_length,
-            param_features=dim(reduced_embeddings)[3],
-            param_chunks=model_info$param_chunks,
-            param_overlap=model_info$param_overlap,
-            param_emb_layer_min=model_info$param_emb_layer_min,
-            param_emb_layer_max=model_info$param_emb_layer_max,
-            param_emb_pool_type=model_info$param_emb_pool_type,
-            param_aggregation=model_info$param_aggregation
+            param_features=dim(embeddings)[3],
+            param_chunks=model_info$model$param_chunks,
+            param_overlap=model_info$model$param_overlap,
+            param_emb_layer_min=model_info$model$param_emb_layer_min,
+            param_emb_layer_max=model_info$model$param_emb_layer_max,
+            param_emb_pool_type=model_info$model$param_emb_pool_type,
+            param_aggregation=model_info$model$param_aggregation
             )
           embedded_texts_large$add_feature_extractor_info(model_name=private$model_info$model_name,
                                                         model_label=private$model_info$model_label,

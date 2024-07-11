@@ -175,7 +175,7 @@ TEClassifierRegular<-R6::R6Class(
       private$ml_framework=ml_framework
 
       #Check feature extractor-------------------------------------------------
-      check_feature_extractor_object_type(feature_extractor)
+      self$check_feature_extractor_object_type(feature_extractor)
       if("TEFeatureExtractor"%in% class(feature_extractor)==TRUE){
         use_fe=TRUE
       } else {
@@ -198,6 +198,12 @@ TEClassifierRegular<-R6::R6Class(
       private$text_embedding_model["times"]=text_embeddings$get_times()
       private$text_embedding_model["features"]=text_embeddings$get_features()
 
+      if(use_fe==TRUE){
+        features=feature_extractor$model_config$features
+      } else {
+        features=private$text_embedding_model[["features"]]
+      }
+
       if(is.null(rec) & self_attention_heads>0){
         if(features %% 2 !=0){
           stop("The number of features of the TextEmbeddingmodel is
@@ -217,12 +223,6 @@ TEClassifierRegular<-R6::R6Class(
         } else {
           intermediate_size=NULL
         }
-      }
-
-      if(use_fe==TRUE){
-        features=feature_extractor$model_config$features
-      } else {
-        features=private$text_embedding_model[["features"]]
       }
 
       #Saving Configuration
@@ -273,7 +273,7 @@ TEClassifierRegular<-R6::R6Class(
         config["require_one_hot"]=list(TRUE)
       }
 
-      if(times>1|length(rec)>0|repeat_encoder>0){
+      if(length(rec)>0|repeat_encoder>0){
         config["require_matrix_map"]=list(FALSE)
       } else {
         config["require_matrix_map"]=list(TRUE)
@@ -402,8 +402,9 @@ TEClassifierRegular<-R6::R6Class(
                    pytorch_trace=1){
 
       #Checking Arguments------------------------------------------------------
-      if(!("EmbeddedText" %in% class(data_embeddings))){
-        stop("data_embeddings must be an object of class EmbeddedText")
+      if(!("EmbeddedText" %in% class(data_embeddings))&
+         !("LargeDataSetForTextEmbeddings" %in% class(data_embeddings))){
+        stop("data_embeddings must be an object of class EmbeddedText or LargeDataSetForTextEmbeddings.")
       }
 
       self$check_embedding_model(data_embeddings,require_compressed=FALSE)
@@ -456,12 +457,21 @@ TEClassifierRegular<-R6::R6Class(
                       "Start"))
       }
 
+      #Set up data
+      if("EmbeddedText" %in% class(data_embeddings)){
+        data=data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+      } else {
+        data=data_embeddings
+      }
+
       #Create DataManager------------------------------------------------------
       if(self$model_config$use_fe==TRUE){
+        compressed_embeddings=self$feature_extractor$extract_features_large(
+          data_embeddings = data,
+          as.integer(self$last_training$config$batch_size),
+          trace = self$last_training$config$trace)
         data_manager=DataManagerClassifier$new(
-          data_embeddings=self$feature_extractor$extract_features_large(data_embeddings = data_embeddings,
-                                                as.integer(self$last_training$config$batch_size),
-                                                trace = self$last_training$config$trace),
+          data_embeddings=compressed_embeddings,
           data_targets=data_targets,
           folds=data_folds,
           val_size=self$last_training$config$data_val_size,
@@ -474,7 +484,7 @@ TEClassifierRegular<-R6::R6Class(
           trace=trace)
       } else {
         data_manager=DataManagerClassifier$new(
-          data_embeddings=data_embeddings,
+          data_embeddings=data,
           data_targets=data_targets,
           folds=data_folds,
           val_size=self$last_training$config$data_val_size,
@@ -593,16 +603,35 @@ TEClassifierRegular<-R6::R6Class(
                      batch_size=32,
                      verbose=1){
 
+      #Check if the embeddings must be compressed before passing to the model
+      requires_compression=self$requires_compression(newdata)
+
       #Check input for compatible text embedding models and feature extractors
       if("EmbeddedText"%in%class(newdata)|
          "LargeDataSetForTextEmbeddings"%in%class(newdata)){
         self$check_embedding_model(text_embeddings=newdata,require_compressed = FALSE)
       } else {
         private$check_embeddings_object_type(newdata,strict=FALSE)
+        if(requires_compression==TRUE){
+          stop("Objects of class datasets.arrow_dataset.Dataset must be provided in
+               compressed form.")
+        }
       }
 
-      #Check if the embeddings must be compressed before passing to the model
-      requires_compression=self$requires_compression(newdata)
+      #Apply feature extractor if it is part of the model
+      if(requires_compression==TRUE){
+        if("EmbeddedText"%in%class(newdata)){
+          newdata=newdata$convert_to_LargeDataSetForTextEmbeddings()
+        } else {
+          newdata=newdata
+        }
+
+        #Returns a data set
+        newdata=self$feature_extractor$extract_features_large(
+          data_embeddings=newdata,
+          batch_size=as.integer(batch_size)
+        )
+      }
 
       #Load Custom Model Scripts
       private$load_reload_python_scripts()
@@ -619,26 +648,19 @@ TEClassifierRegular<-R6::R6Class(
         #Returns a data set object
         prediction_data=private$prepare_embeddings_as_dataset(newdata)
 
-        #Apply feature extractor if it is part of the model
-        if(requires_compression==TRUE){
-
-          #Returns a data set
-          prediction_data=self$feature_extractor$extract_features_large(
-            data_embeddings=prediction_data,
-            batch_size=as.integer(batch_size),
-            return_r_object=FALSE
-          )
-        }
-
           #Tensorflow----------------------------------------------------------
           if(private$ml_framework=="tensorflow"){
             #Prepare data set for tensorflow
             prediction_data=prediction_data$rename_column('input', 'input_embeddings')
-            prediction_data$with_format("tf")
+            if("labels"%in%prediction_data$column_names){
+              prediction_data=prediction_data$remove_columns("labels")
+            }
+            prediction_data$set_format("tf")
             tf_dataset_predict=prediction_data$to_tf_dataset(
               columns=c("input_embeddings"),
               batch_size=as.integer(batch_size),
               shuffle=FALSE)
+
 
             if(length(self$model_config$target_levels)>2){
               #Multi Class
@@ -685,21 +707,10 @@ TEClassifierRegular<-R6::R6Class(
       } else {
         prediction_data=private$prepare_embeddings_as_np_array(newdata)
 
-        #Apply feature extractor if it is part of the model
-        if(requires_compression==TRUE){
-
-          #Returns a data set
-          prediction_data=np$array(self$feature_extractor$extract_features(
-            data_embeddings=prediction_data,
-            batch_size=as.integer(batch_size),
-            return_r_object=TRUE
-          )$embeddings)
-        }
-
         #Tensorflow------------------------------------------------------------
         if(private$ml_framework=="tensorflow"){
           if(length(self$model_config$target_levels)>2){
-            #Multi Class
+            #Multy Class
             predictions_prob<-self$model$predict(
               x = prediction_data,
               batch_size = as.integer(batch_size),
@@ -794,7 +805,7 @@ TEClassifierRegular<-R6::R6Class(
       }
 
       #Check if a compressed version is necessary and if true if the feature extractor is
-      compatible
+      #compatible
       feature_extractor_info=text_embeddings$get_feature_extractor_info()
       if(require_compressed==TRUE){
         if(!is.null(feature_extractor_info$model_name) & self$model_config$use_fe==FALSE){
@@ -847,9 +858,9 @@ TEClassifierRegular<-R6::R6Class(
       } else {
         return(FALSE)
       }
-    } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
-      embeddings$set_format("np")
-      tensors=embeddings["input"][1,,,drop=FALSE]
+    } else if("datasets.arrow_dataset.Dataset"%in%class(text_embeddings)){
+      text_embeddings$set_format("np")
+      tensors=text_embeddings["input"][1,,,drop=FALSE]
       if(dim(tensors)[3]>self$model_config$features){
         return(TRUE)
       } else {
@@ -898,13 +909,13 @@ TEClassifierRegular<-R6::R6Class(
 
         #Adding Input Layer
 
-        if(n_rec>0 | self$model_config$repeat_encoder>0 | self$model_config$times>1){
+        if(n_rec>0 | self$model_config$repeat_encoder>0){
           model_input<-keras$layers$Input(shape=list(as.integer(self$model_config$times),as.integer(self$model_config$features)),
                                           name="input_embeddings")
-        } else {
-          model_input<-keras$layers$Input(shape=as.integer(self$model_config$times*self$model_config$features),
-                                          name="input_embeddings")
-        }
+        } #else {
+          #model_input<-keras$layers$Input(shape=as.integer(self$model_config$times*self$model_config$features),
+          #                                name="input_embeddings")
+        #}
         layer_list[1]<-list(model_input)
 
         #Adding a Mask-Layer
@@ -926,12 +937,11 @@ TEClassifierRegular<-R6::R6Class(
             name = "normalizaion_layer")(layer_list[[length(layer_list)]])
           layer_list[length(layer_list)+1]<-list(norm_layer)
 
-        } else {
-          norm_layer<-keras$layers$BatchNormalization(
-            name = "normalizaion_layer")(layer_list[[length(layer_list)]])
-          layer_list[length(layer_list)+1]<-list(norm_layer)
-
-        }
+        } #else {
+          #norm_layer<-keras$layers$BatchNormalization(
+          #  name = "normalizaion_layer")(layer_list[[length(layer_list)]])
+          #layer_list[length(layer_list)+1]<-list(norm_layer)
+        #}
 
         if(self$model_config$repeat_encoder>0){
           for(r in 1:self$model_config$repeat_encoder){
@@ -1034,11 +1044,11 @@ TEClassifierRegular<-R6::R6Class(
           }
         }
 
-        if(n_rec>0 | self$model_config$repeat_encoder>0 | self$model_config$times>1){
+
           layer_list[length(layer_list)+1]<-list(
             keras$layers$GlobalAveragePooling1D(
               name="global_average_pooling")(layer_list[[length(layer_list)]]))
-        }
+
 
         #Adding standard layer
         if(n_hidden>0){
@@ -1562,6 +1572,11 @@ TEClassifierRegular<-R6::R6Class(
       targets_pseudo_labeled=as.numeric(targets_pseudo_labeled)
       names(targets_pseudo_labeled)<-names_final_new_categories
 
+      #Transform pseudo labels to a factor
+      targets_pseudo_labeled=factor(x=targets_pseudo_labeled,
+                                    levels=0:(length(self$model_config$target_levels)-1),
+                                    labels = self$model_config$target_levels)
+
       #get the corresponding input
       unlabeled_data$set_format("np")
       embeddings=unlabeled_data["input"]
@@ -1693,7 +1708,7 @@ TEClassifierRegular<-R6::R6Class(
         #Choose correct target column and rename
         dataset_tf=dataset_tf$rename_column(target_column, 'targets')
 
-        dataset_tf$with_format("tf")
+        dataset_tf$set_format("tf")
         tf_dataset_train=dataset_tf$to_tf_dataset(
           columns=c("input_embeddings","sample_weights"),
           batch_size=as.integer(self$last_training$config$batch_size),
@@ -1751,20 +1766,20 @@ TEClassifierRegular<-R6::R6Class(
           dataset_train=dataset_train$rename_column(target_column, "labels")
         }
 
-        pytorch_train_data=dataset_train$with_format("torch")
+        pytorch_train_data=dataset_train$set_format("torch")
 
         pytorch_val_data=val_data$select_columns(c("input",target_column))
         if(self$model_config$require_one_hot==TRUE){
           pytorch_val_data=pytorch_val_data$rename_column(target_column, "labels")
         }
-        pytorch_val_data=pytorch_val_data$with_format("torch")
+        pytorch_val_data=pytorch_val_data$set_format("torch")
 
         if(!is.null(test_data)){
           pytorch_test_data=test_data$select_columns(c("input",target_column))
           if(self$model_config$require_one_hot==TRUE){
             pytorch_test_data=pytorch_test_data$rename_column(target_column, "labels")
           }
-          pytorch_test_data=pytorch_test_data$with_format("torch")
+          pytorch_test_data=pytorch_test_data$set_format("torch")
         } else {
           pytorch_test_data=NULL
         }

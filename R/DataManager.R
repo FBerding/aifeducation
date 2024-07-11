@@ -417,7 +417,6 @@ DataManagerClassifier<-R6::R6Class(
   add_replace_pseudo_data=function(inputs,
                                    labels){
     private$check_labels(labels)
-
     #Add or replace current dataset for pseudo data
     self$datasets$data_labeled_pseudo=datasets$Dataset$from_dict(
       reticulate::dict(

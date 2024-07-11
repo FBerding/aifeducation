@@ -281,16 +281,16 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     self.n_target_levels=len(target_levels)
     layer_list=torch.nn.ModuleDict()
     
-    if n_rec>0 or repeat_encoder>0 or times >1:
+    if n_rec>0 or repeat_encoder>0:
       if add_pos_embedding==True:
         layer_list.update({"add_positional_embedding":AddPositionalEmbedding_PT(
           sequence_length=times,
           embedding_dim=features)})
       layer_list.update({"normalizaion_layer":LayerNorm_with_Mask_PT(features=features)})
       current_size=features
-    else:
-      layer_list.update({"normalizaion_layer":torch.nn.BatchNorm1d(num_features=times*features)})
-      current_size=times*features
+    #else:
+    #  layer_list.update({"normalizaion_layer":torch.nn.BatchNorm1d(num_features=times*features)})
+    #  current_size=times*features
     
     if repeat_encoder>0:
         for r in range(repeat_encoder):
@@ -367,8 +367,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
           if i!=(n_rec-1):
             layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
       
-    if n_rec>0 or repeat_encoder>0 or times >1:
-      layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
+    layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
       
     if(n_rec>0):
       if rec_bidirectional==True:

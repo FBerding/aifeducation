@@ -154,6 +154,7 @@ EmbeddedText<-R6::R6Class(
                 model_language=private$model_language,
                 param_seq_length=private$param_seq_length,
                 param_chunks=private$param_chunks,
+                param_features=private$param_features,
                 param_overlap=private$param_overlap,
                 param_emb_layer_min=private$param_emb_layer_min,
                 param_emb_layer_max=private$param_emb_layer_max,
@@ -248,6 +249,9 @@ EmbeddedText<-R6::R6Class(
 
       new_data_set$add_embeddings_from_array(self$embeddings)
       return(new_data_set)
+    },
+    n_rows=function(){
+      return(dim(self$embeddings)[1])
     }
   )
 )

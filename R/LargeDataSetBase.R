@@ -24,7 +24,12 @@ LargeDataSetBase<-R6::R6Class(
     },
     #----------------------------------------------------
     select=function(indicies){
-      return(private$data$select(indicies))
+      private$data$set_format("np")
+      if(length(indicies)>1){
+        return(private$data$select(as.integer(indicies)))
+      } else {
+        return(private$data$select(list(as.integer(indicies))))
+      }
     },
     #----------------------------------------------------
     get_ids=function(){

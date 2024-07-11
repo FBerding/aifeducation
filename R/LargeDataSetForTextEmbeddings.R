@@ -212,7 +212,8 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       }
 
       #Check the number of rows and duplicate if necessary
-      if(dim(embedding_array)[1]==1){
+      n_cases=dim(embedding_array)[1]
+      if(n_cases==1){
         embedding_array=abind::abind(embedding_array,embedding_array,
                                      along = 1)
       }
@@ -226,7 +227,7 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       #Create new dataset
       new_dataset=datasets$Dataset$from_dict(new_dataset_dict)
       #Check the number of rows and remove duplicate if necessary
-      if(dim(embedding_array)[1]==1){
+      if(n_cases==1){
         new_dataset=new_dataset$select(indices=list(as.integer(0)))
       }
       #add dataset
@@ -240,6 +241,7 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
 
       #Select array
       embedding_array=EmbeddedText$embeddings
+      n_cases=dim(embedding_array)[1]
 
       if(self$get_features()!=dim(embedding_array)[3]){
         stop("The number of features does not fit to the underlying
@@ -252,7 +254,7 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       }
 
       #Check the number of rows and duplicate if necessary
-      if(dim(embedding_array)[1]==1){
+      if(n_cases==1){
         embedding_array=abind::abind(embedding_array,embedding_array,
                                      along = 1)
       }
@@ -266,8 +268,9 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       #Create new dataset
       new_dataset=datasets$Dataset$from_dict(new_dataset_dict)
       #Check the number of rows and remove duplicate if necessary
-      if(dim(embedding_array)[1]==1){
+      if(n_cases==1){
         new_dataset=new_dataset$select(indices=list(as.integer(0)))
+
       }
       #add dataset
       private$add(new_dataset)

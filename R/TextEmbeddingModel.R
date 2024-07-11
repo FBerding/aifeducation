@@ -657,27 +657,9 @@ TextEmbeddingModel<-R6::R6Class(
     #'transformer model into the R interface.
     #'
     #'@importFrom utils read.csv
-    load_model=function(model_dir,
-                        ml_framework="auto"){
-
-      if((ml_framework %in% c("tensorflow","pytorch","auto","not_specified"))==FALSE) {
-        stop("ml_framework must be 'auto', 'tensorflow' or 'pytorch'.")
-      }
-
-      if(ml_framework=="not_specified"){
-        stop("The global machine learning framework is not set. Please use
-             aifeducation_config$set_global_ml_backend() directly after loading
-             the library to set the global framework. ")
-      }
+    load=function(model_dir){
 
       model_dir_main<-paste0(model_dir,"/","model_data")
-
-      #Change ml framework if requested
-      if(ml_framework=="tensorflow"){
-        private$transformer_components$ml_framework="tensorflow"
-      } else if(ml_framework=="pytorch"){
-        private$transformer_components$ml_framework="pytorch"
-      }
 
       #Search for the corresponding files
       if(private$transformer_components$ml_framework=="tensorflow"){
@@ -708,7 +690,7 @@ TextEmbeddingModel<-R6::R6Class(
       #In the case of pytorch
       #Check to load from pt/bin or safetensors
       #Use safetensors as preferred method
-      if(ml_framework=="pytorch"){
+      if(private$transformer_components$ml_framework=="pytorch"){
         if((file.exists(paste0(model_dir_main,"/model.safetensors"))==FALSE &
             from_tf==FALSE)|
            reticulate::py_module_available("safetensors")==FALSE){
@@ -835,27 +817,26 @@ TextEmbeddingModel<-R6::R6Class(
     #'to disk.
     #'
     #'@importFrom utils write.csv
-    save_model=function(model_dir,save_format="default"){
+    save=function(model_dir,folder_name){
       if((private$basic_components$method %in%private$supported_transformers)==TRUE){
 
-      if(save_format%in%c("default","h5","pt","safetensors")==FALSE){
-        stop("For TextEmbeddingModels save_format must be 'h5', 'pt', or 'safetensors'.")
-      }
-
-      if(save_format=="default"){
         if(private$transformer_components$ml_framework=="tensorflow"){
           save_format="h5"
         } else if(private$transformer_components$ml_framework=="pytorch"){
           save_format="safetensors"
         }
-      }
 
-      model_dir_data_path<-paste0(model_dir,"/","model_data")
+        save_location=paste0(model_dir,"/",folder_name)
+        if(dir.exists(model_dir)==FALSE){
+          dir.create(model_dir)
+          cat("Creating Directory\n")
+        }
+        if(dir.exists(save_location)==FALSE){
+          dir.create(save_location)
+          cat("Creating Directory\n")
+        }
 
-      if(dir.exists(model_dir)==FALSE){
-        dir.create(model_dir)
-        cat("Creating Directory\n")
-      }
+      model_dir_data_path<-paste0(save_location,"/","model_data")
 
       if(private$transformer_components$ml_framework=="pytorch"){
         if(save_format=="safetensors" & reticulate::py_module_available("safetensors")==TRUE){
@@ -884,7 +865,7 @@ TextEmbeddingModel<-R6::R6Class(
       sustain_matrix=private$sustainability$track_log
       write.csv(
         x=sustain_matrix,
-        file=paste0(model_dir,"/","sustainability.csv"),
+        file=paste0(save_location,"/","sustainability.csv"),
         row.names = FALSE
       )
 
@@ -892,7 +873,7 @@ TextEmbeddingModel<-R6::R6Class(
       if(is.null_or_na(self$last_training$history)==FALSE){
         write.csv2(
           x=self$last_training$history,
-          file=paste0(model_dir,"/","history.log"),
+          file=paste0(save_location,"/","history.log"),
           row.names = FALSE,
           quote = FALSE)
       }

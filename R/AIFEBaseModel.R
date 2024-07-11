@@ -180,26 +180,15 @@ AIFEBaseModel<-R6::R6Class(
     #''tensorflow'/'keras' models and safetensors for 'pytorch' models.
     #'@return Function does not return a value. It saves the model to disk.
     #'@importFrom utils write.csv
-    save_model=function(dir_path,save_format="default"){
-      if(private$ml_framework=="tensorflow"){
-        if(save_format%in%c("safetensors","pt")){
-          stop("'safetensors' and 'pt' are only supported for models based on
-           pytorch.")
-        }
-      } else if(private$ml_framework=="pytorch"){
-        if(save_format%in%c("keras","tf","h5")){
-          stop("'keras','tf', and 'h5' are only supported for models based on
-           tensorflow")
-        }
-      }
+    save=function(model_dir,folder_name){
+      save_location=paste0(model_dir,"/",folder_name)
 
-      if(save_format=="default"){
-        if(private$ml_framework=="tensorflow"){
+      if(private$ml_framework=="tensorflow"){
           save_format="keras"
         } else if(private$ml_framework=="pytorch"){
           save_format="safetensors"
         }
-      }
+
 
       if(save_format=="safetensors" &
          reticulate::py_module_available("safetensors")==FALSE){
@@ -216,27 +205,22 @@ AIFEBaseModel<-R6::R6Class(
         } else {
           extension=".h5"
         }
-        file_path=paste0(dir_path,"/","model_data",extension)
-        if(dir.exists(dir_path)==FALSE){
-          dir.create(dir_path)
+        file_path=paste0(save_location,"/","model_data",extension)
+        if(dir.exists(save_location)==FALSE){
+          dir.create(save_location)
         }
         self$model$save(file_path)
 
-        if(self$model_config$use_fe==TRUE){
-          file_path_extractor=paste0(dir_path,"/","feature_extractor",extension)
-          self$feature_extractor$model$save(file_path_extractor)
-        }
-
       } else if(private$ml_framework=="pytorch"){
-        if(dir.exists(dir_path)==FALSE){
-          dir.create(dir_path)
+        if(dir.exists(save_location)==FALSE){
+          dir.create(save_location)
         }
         self$model$to("cpu",dtype=torch$float)
         if(save_format=="safetensors"){
-          file_path=paste0(dir_path,"/","model_data",".safetensors")
+          file_path=paste0(save_location,"/","model_data",".safetensors")
           safetensors$torch$save_model(model=self$model,filename=file_path)
         } else if (save_format=="pt"){
-          file_path=paste0(dir_path,"/","model_data",".pt")
+          file_path=paste0(save_location,"/","model_data",".pt")
           torch$save(self$model$state_dict(),file_path)
         }
 
@@ -246,7 +230,7 @@ AIFEBaseModel<-R6::R6Class(
       sustain_matrix=t(as.matrix(unlist(private$sustainability)))
       write.csv(
         x=sustain_matrix,
-        file=paste0(dir_path,"/","sustainability.csv"),
+        file=paste0(save_location,"/","sustainability.csv"),
         row.names = FALSE
       )
     },
@@ -260,38 +244,21 @@ AIFEBaseModel<-R6::R6Class(
     #'@return Function does not return a value. It is used to load the weights
     #'of a model.
     #'@importFrom utils compareVersion
-    load_model=function(dir_path,
-                        ml_framework="auto"){
-
-      # Set the correct ml framework
-
-      if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
-        stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
-      }
-
-      if(ml_framework=="not_specified"){
-        stop("The global machine learning framework is not set. Please use
-             aifeducation_config$set_global_ml_backend() directly after loading
-             the library to set the global framework. ")
-      }
-
-      if(ml_framework!="auto"){
-        private$ml_framework=ml_framework
-      }
+    load=function(model_dir){
 
       #Load the model---------------------------------------------------------
       if(private$ml_framework=="tensorflow"){
-        path=paste0(dir_path,"/","model_data",".keras")
+        path=paste0(model_dir,"/","model_data",".keras")
         if(file.exists(paths = path)==TRUE){
           self$model<-keras$models$load_model(path)
         } else {
-          path=paste0(dir_path,"/","model_data",".tf")
+          path=paste0(model_dir,"/","model_data",".tf")
           if(dir.exists(paths = path)==TRUE){
             self$model<-keras$models$load_model(path)
           } else {
-            path=paste0(dir_path,"/","model_data",".h5")
+            path=paste0(model_dir,"/","model_data",".h5")
             if(file.exists(paths = path)==TRUE){
-              self$model<-keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
+              self$model<-keras$models$load_model(paste0(model_dir,"/","model_data",".h5"))
             } else {
               stop("There is no compatible model file in the choosen directory.
                    Please check path. Please note that classifiers have to be loaded with
@@ -300,8 +267,8 @@ AIFEBaseModel<-R6::R6Class(
           }
         }
       } else if(private$ml_framework=="pytorch"){
-        path_pt=paste0(dir_path,"/","model_data",".pt")
-        path_safe_tensors=paste0(dir_path,"/","model_data",".safetensors")
+        path_pt=paste0(model_dir,"/","model_data",".pt")
+        path_safe_tensors=paste0(model_dir,"/","model_data",".safetensors")
         private$create_reset_model()
         if(file.exists(path_safe_tensors)){
           safetensors$torch$load_model(model=self$model,filename=path_safe_tensors)
@@ -572,7 +539,7 @@ AIFEBaseModel<-R6::R6Class(
             list(id=rownames(embeddings),
                  input=np$squeeze(np$split(reticulate::np_array(embeddings),as.integer(nrow(embeddings)),axis=0L))),
             convert = FALSE))
-      } else if("EmbeddedText" %in% class(embeddings)){
+      } else if("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
         prepared_dataset=embeddings$get_dataset()
       }
       return(prepared_dataset)
@@ -590,7 +557,7 @@ AIFEBaseModel<-R6::R6Class(
         return(prepared_dataset["input"])
       }else if("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
         prepared_dataset=embeddings$get_dataset()
-        prepared_dataset=embeddings$set_format("np")
+        prepared_dataset$set_format("np")
         return(prepared_dataset["input"])
       }
     },

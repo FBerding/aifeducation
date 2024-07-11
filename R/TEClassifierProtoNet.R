@@ -454,23 +454,27 @@ TEClassifierProtoNet<-R6::R6Class(
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
 
-      self$feature_extractor$val_size=fe_val_size
-      self$feature_extractor$epochs=fe_epochs
-
       #Start-------------------------------------------------------------------
       if(self$last_training$config$trace==TRUE){
         message(paste(date(),
                       "Start"))
       }
 
+      #Set up data
+      if("EmbeddedText" %in% class(data_embeddings)){
+        data=data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+      } else {
+        data=data_embeddings
+      }
+
       #Create DataManager------------------------------------------------------
       if(self$model_config$use_fe==TRUE){
-        private$train_feature_extractor(data_embeddings = data_embeddings)
-
+        compressed_embeddings=self$feature_extractor$extract_features_large(
+          data_embeddings = data,
+          as.integer(self$last_training$config$batch_size),
+          trace = self$last_training$config$trace)
         data_manager=DataManagerClassifier$new(
-          data_embeddings=self$extract_features(data_embeddings = data_embeddings,
-                                                as.integer(self$last_training$config$batch_size),
-                                                return_r_object = TRUE),
+          data_embeddings=compressed_embeddings,
           data_targets=data_targets,
           folds=data_folds,
           val_size=self$last_training$config$data_val_size,
@@ -483,7 +487,7 @@ TEClassifierProtoNet<-R6::R6Class(
           trace=trace)
       } else {
         data_manager=DataManagerClassifier$new(
-          data_embeddings=data_embeddings,
+          data_embeddings=data,
           data_targets=data_targets,
           folds=data_folds,
           val_size=self$last_training$config$data_val_size,
@@ -606,22 +610,22 @@ TEClassifierProtoNet<-R6::R6Class(
     #Get current row names/name of the cases
     current_row_names=private$get_rownames_from_embeddings(embeddings_q)
 
+    #Apply feature extractor if it is part of the model
+    if(requires_compression==TRUE){
+
+      #Returns a data set
+      embeddings_q=self$feature_extractor$extract_features(
+        data_embeddings=embeddings_q,
+        batch_size=as.integer(batch_size)
+      )
+    }
+
+
     #If at least two cases are part of the data set---------------------------
     if(single_prediction==FALSE){
 
       #Returns a data set object
       prediction_data_q_embeddings=private$prepare_embeddings_as_dataset(embeddings_q)
-
-      #Apply feature extractor if it is part of the model
-      if(requires_compression==TRUE){
-
-        #Returns a data set
-        prediction_data_q_embeddings=self$feature_extractor$extract_features(
-          data_embeddings=prediction_data_q_embeddings,
-          batch_size=as.integer(batch_size),
-          return_r_object=FALSE
-        )
-      }
 
       if(private$ml_framework=="pytorch"){
         prediction_data_q_embeddings$set_format("torch")
@@ -641,8 +645,7 @@ TEClassifierProtoNet<-R6::R6Class(
         #Returns a data set
         prediction_data_q=np$array(self$feature_extractor$extract_features(
           data_embeddings=prediction_data_q_embeddings,
-          batch_size=as.integer(batch_size),
-          return_r_object=TRUE
+          batch_size=as.integer(batch_size)
         )$embeddings)
       }
 

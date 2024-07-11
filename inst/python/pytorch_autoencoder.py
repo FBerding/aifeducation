@@ -147,11 +147,14 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       self.features_out=features_out
       self.noise_factor=noise_factor
       self.difference=self.features_in-self.features_out
-      self.stride=2
+      self.stride=1
+      self.kernel_size=2
       
-      self.param_w1=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/2)),self.features_in,self.stride))
-      self.param_w2=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/2)),self.stride))
+      self.param_w1=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/2)),self.features_in,self.kernel_size))
+      self.param_w2=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/2)),self.kernel_size))
       
+      self.sequence_reduction=torch.nn.AvgPool1d(kernel_size=(self.kernel_size),stride=1,padding=0)
+
       torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map="householder")
       torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
 
@@ -167,14 +170,19 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
         x=torch.transpose(x, dim0=1, dim1=2)
         
         #Encoder
-        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride,padding='same'))
 
         #Latent Space
-        latent_space=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride))
-        
+        latent_space=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride,padding='same'))
+        latent_space=torch.transpose(latent_space, dim0=1, dim1=2)
+        latent_space=~self.get_mask(latent_space)*latent_space
+        latent_space=torch.transpose(latent_space, dim0=1, dim1=2)
+
         #Decoder
-        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(latent_space,weight=self.param_w2,stride=self.stride))
-        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(x,weight=self.param_w1,stride=self.stride))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(latent_space,weight=self.param_w2,stride=self.stride,padding=0,output_padding=0))
+        x=self.sequence_reduction(x)
+        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(x,weight=self.param_w1,stride=self.stride,padding=0,output_padding=0))
+        x=self.sequence_reduction(x)
         
         #Change position of time and features
         x=torch.transpose(x, dim0=1, dim1=2)
@@ -188,19 +196,20 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
         #Change position of time and features
         x=torch.transpose(x, dim0=1, dim1=2)
         #Encoder
-        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride,padding='same'))
 
         #Latent Space
-        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride,padding='same'))
         #Change position of time and features
         x=torch.transpose(x, dim0=1, dim1=2)
+        x=~self.get_mask(x)*x
         return x
       
     def get_mask(self,x):
       device=('cuda' if torch.cuda.is_available() else 'cpu')
       time_sums=torch.sum(x,dim=2)
       mask=(time_sums==0)
-      mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
+      mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=x.size(dim=2),dim=1),(x.size(dim=0),x.size(dim=1),x.size(dim=2)))
       mask_long=mask_long.to(device)
       return mask_long    
     

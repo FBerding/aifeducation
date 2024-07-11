@@ -3,10 +3,18 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
 
 #SetUp Test---------------------------------------------------------------------
 root_path_data=testthat::test_path("test_data/LargeDataSetForTexts")
+if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
+  dir.create(testthat::test_path("test_artefacts"))
+}
 root_path_results=testthat::test_path("test_artefacts/LargeDataSetForTexts")
 if(dir.exists(root_path_results)==FALSE){
   dir.create(root_path_results)
 }
+
+#SetUp datasets
+#Disable tqdm progressbar
+transformers$logging$disable_progress_bar()
+datasets$disable_progress_bars()
 
 #Start test---------------------------------------------------------------------
 
