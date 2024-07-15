@@ -73,13 +73,13 @@ the number of tokens in the document.}
 \item{\code{fcm: } Feature-Co-Occurance-Matrix.}
 
 \item{\code{information: } \code{list} containing information about the used vocabulary. These are:
- \itemize{
- \item{\code{n_sentence: }Number of sentences}
- \item{\code{n_document_segments: }Number of document segments/raw texts}
- \item{\code{n_token_init: }Number of initial tokens}
- \item{\code{n_token_final: }Number of final tokens}
- \item{\code{n_lemmata: }Number of lemmas}
-  }}
+\itemize{
+\item{\code{n_sentence: }Number of sentences}
+\item{\code{n_document_segments: }Number of document segments/raw texts}
+\item{\code{n_token_init: }Number of initial tokens}
+\item{\code{n_token_final: }Number of final tokens}
+\item{\code{n_lemmata: }Number of lemmas}
+}}
 
 \item{\code{configuration: } \code{list} containing information if the vocabulary was
 created with lower cases and if the vocabulary uses original tokens or lemmas.}
