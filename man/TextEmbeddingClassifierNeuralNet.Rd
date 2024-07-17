@@ -19,9 +19,10 @@ Abstract class for neural nets with 'keras'/'tensorflow' and
 }
 \seealso{
 Other Classification: 
-\code{\link{DataManagerClassifier}},
+\code{\link{AIFEBaseModel}},
 \code{\link{TEClassifierProtoNet}},
-\code{\link{TEClassifierRegular}}
+\code{\link{TEClassifierRegular}},
+\code{\link{TEFeatureExtractor}}
 }
 \concept{Classification}
 \section{Public fields}{

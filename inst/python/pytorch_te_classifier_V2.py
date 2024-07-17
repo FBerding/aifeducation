@@ -281,13 +281,14 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     self.n_target_levels=len(target_levels)
     layer_list=torch.nn.ModuleDict()
     
+    current_size=features
     if n_rec>0 or repeat_encoder>0:
       if add_pos_embedding==True:
         layer_list.update({"add_positional_embedding":AddPositionalEmbedding_PT(
           sequence_length=times,
           embedding_dim=features)})
       layer_list.update({"normalizaion_layer":LayerNorm_with_Mask_PT(features=features)})
-      current_size=features
+      #current_size=features
     #else:
     #  layer_list.update({"normalizaion_layer":torch.nn.BatchNorm1d(num_features=times*features)})
     #  current_size=times*features
@@ -709,9 +710,11 @@ def TeClassifierBatchPredict(model,dataset,batch_size):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    model.to(device,dtype=float)
+    dtype=float
+    model.to(device,dtype=dtype)
   else:
-    model.to(device,dtype=torch.double)
+    dtype=torch.double
+    model.to(device,dtype=dtype)
     
   model.eval()
   predictionloader=torch.utils.data.DataLoader(
@@ -723,7 +726,7 @@ def TeClassifierBatchPredict(model,dataset,batch_size):
     iteration=0
     for batch in predictionloader:
       inputs=batch["input"]
-      inputs = inputs.to(device)
+      inputs = inputs.to(device,dtype=dtype)
       predictions=model(inputs,predication_mode=True)
       
       if iteration==0:

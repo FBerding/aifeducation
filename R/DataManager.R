@@ -1,23 +1,23 @@
-#'@title Data manager for managing data and samples
+#'@title Data manager for classification tasks
 #'
 #'@description Abstract class for managing the data and samples during training
 #'a classifier. DataManagerClassifier
-#'is used with \link{TEClassifierRegular} and \link{TEClassifierProtoNet}.
+#'is used with [TEClassifierRegular] and [TEClassifierProtoNet].
 #'
 #'@return Objects of this class are used for ensuring the correct data management
 #'for training different types of classifiers. Objects of this class are also used
 #'for data augmentation by creating synthetic cases with different techniques.
-#'@family Classification
+#'@family Data Management
 #'@export
 DataManagerClassifier<-R6::R6Class(
   classname = "DataManagerClassifier",
   public = list(
     #'@field config ('list')\cr
-    #'Field for storing configuration of the DataManagerClassifier.
+    #'Field for storing configuration of the [DataManagerClassifier].
     config=NULL,
 
     #'@field state ('list')\cr
-    #'Field for storing the current state of the DataManagerClassifier.
+    #'Field for storing the current state of the [DataManagerClassifier].
     state=list(
       iteration=NULL,
       step=NULL
@@ -25,14 +25,14 @@ DataManagerClassifier<-R6::R6Class(
 
     #'@field datasets ('list')\cr
     #'Field for storing the data sets used during training. All elements of the
-    #'list are data sets of class \code{datasets.arrow_dataset.Dataset}. The following data sets are
+    #'list are data sets of class `datasets.arrow_dataset.Dataset`. The following data sets are
     #'available:
-    #'#'\itemize{
-    #'\item{data_labeled: all cases which have a label.}
-    #'\item{data_unlabeled: all cases which have no label.}
-    #'\item{data_labeled_synthetic: all synthetic cases with their corresponding labels.}
-    #'\item{data_labeled_pseudo: subset of data_unlabeled if pseudo labels were estimated by a classifier .}
-    #'}
+    #'
+    #' * data_labeled: all cases which have a label.
+    #' * data_unlabeled: all cases which have no label.
+    #' * data_labeled_synthetic: all synthetic cases with their corresponding labels.
+    #' * data_labeled_pseudo: subset of data_unlabeled if pseudo labels were estimated by a classifier .
+    #'
     datasets=NULL,
 
     #'@field name_idx ('named vector')\cr
@@ -44,33 +44,34 @@ DataManagerClassifier<-R6::R6Class(
     #'Field for storing the assignment of every cases to a train, validation or
     #'test data set depending on the concrete fold. Only the indexes and not the
     #'names are stored. In addition, the list contains the assignment for the final
-    #'training which excludes a test data set. If the DataManagerClassifier uses \eqn{i} folds the
-    #'sample for the final training can be requested with \eqn{i+1}.
+    #'training which excludes a test data set. If the [DataManagerClassifier] uses $i$ folds the
+    #'sample for the final training can be requested with $i+1$.
     samples=NULL,
 
     #'@description Creating a new instance of this class.
-    #'@param data_embeddings Object of class \link{EmbeddedText} from which
-    #'the DataManagerClassifier should be created.
-    #'@param data_targets \code{Factor} containing the labels for cases
-    #'stored in \code{data_embeddings}. Factor must be named and has to use the
-    #'same names used in \code{data_embeddings}.
-    #'@param folds \code{int} determining the number of cross-fold
-    #'samples.
-    #'@param val_size \code{double} between 0 and 1, indicating the proportion of cases of each class
+    #'@param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] from which
+    #'the [DataManagerClassifier] should be created.
+    #'@param data_targets `factor` containing the labels for cases
+    #'stored in `data_embeddings`. Factor must be named and has to use the
+    #'same names used in `data_embeddings`. Missing values are supported and should be
+    #'supplied (e.g., for pseudo labeling).
+    #'@param folds `int` determining the number of cross-fold
+    #'samples. Value must be at least 2.
+    #'@param val_size `double` between 0 and 1, indicating the proportion of cases of each class
     #'which should be used for the validation sample. The remaining cases are part of the training data.
-    #'@param class_levels \code{Vector} containing the possible levels of the labels.
-    #'@param one_hot_encoding \code{bool} If \code{True} all labels are converted to
+    #'@param class_levels `vector` containing the possible levels of the labels.
+    #'@param one_hot_encoding `bool` If `TRUE` all labels are converted to
     #'one hot encoding.
-    #'@param add_matrix_map \code{bool} If \code{True} all embeddings are transformed
+    #'@param add_matrix_map `bool` If `TRUE` all embeddings are transformed
     #'into a two dimensional matrix. The number of rows equals the number of cases. The number
-    #'of columns equals \eqn{times*features}.
-    #'@param sc_methods \code{string} determining the technique used for creating synthetic cases.
-    #'@param sc_min_k \code{int} determining the minimal number of neighbors during the creating of
+    #'of columns equals $times*features$.
+    #'@param sc_methods `string` determining the technique used for creating synthetic cases.
+    #'@param sc_min_k `int` determining the minimal number of neighbors during the creating of
     #'synthetic cases.
-    #'@param sc_max_k \code{int} determining the minimal number of neighbors during the creating of
+    #'@param sc_max_k `int` determining the minimal number of neighbors during the creating of
     #'synthetic cases.
-    #'@param trace \code{bool} If \code{True} information on the process are printed to the console.
-    #'@return Method returns an initialized object of class \code{DataManagerClassifier}.
+    #'@param trace `bool` If `TRUE` information on the process are printed to the console.
+    #'@return Method returns an initialized object of class [DataManagerClassifier].
     initialize=function(data_embeddings,
                         data_targets,
                         folds=5,
@@ -84,22 +85,23 @@ DataManagerClassifier<-R6::R6Class(
                         trace=TRUE){
 
       #Checking Prerequisites---------------------------------------------------
-      if(!("EmbeddedText" %in% class(data_embeddings))&
-         !("LargeDataSetForTextEmbeddings" %in% class(data_embeddings))){
-        stop("data_embeddings must be an object of class EmbeddedText or
-             LargeDataSetForTextEmbeddings.")
-      }
-
-      if(is.factor(data_targets)==FALSE){
-        stop("data_targets must be a factor.")
-      }
+      check_class(data_embeddings,c("EmbeddedText","LargeDataSetForTextEmbeddings"),FALSE)
+      check_class(data_targets,c("factor"),FALSE)
       if(is.null(names(data_targets))){
         stop("data_targets must be a named factor.")
       }
-
+      check_type(folds,"int")
       if(folds<2){
         stop("folds must be at least 2.")
       }
+      check_type(val_size,"double")
+      check_type(class_levels,"vector")
+      check_type(one_hot_encoding,"bool")
+      check_type(add_matrix_map,"bool")
+      check_type(sc_methods,"string")
+      check_type(sc_min_k,"int")
+      check_type(sc_max_k,"int")
+      check_type(trace,"bool")
 
       #Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -146,21 +148,21 @@ DataManagerClassifier<-R6::R6Class(
 
     },
 
-  #'@description Method for requesting the configuration of the DataManagerClassifier.
-  #'@return Returns a \code{list} storing the configuration of the DataManagerClassifier.
+  #'@description Method for requesting the configuration of the [DataManagerClassifier].
+  #'@return Returns a `list` storing the configuration of the [DataManagerClassifier].
   get_config=function(){
     return(self$config)
   },
 
   #'@description Method for requesting the complete labeled data set.
-  #'@return Returns an object of class \code{datasets.arrow_dataset.Dataset} containing
+  #'@return Returns an object of class `datasets.arrow_dataset.Dataset` containing
   #'all cases with labels.
   get_labeled_data=function(){
     return(self$datasets$data_labeled)
   },
 
   #'@description Method for requesting the complete unlabeled data set.
-  #'@return Returns an object of class \code{datasets.arrow_dataset.Dataset} containing
+  #'@return Returns an object of class `datasets.arrow_dataset.Dataset` containing
   #'all cases without labels.
   get_unlabeled_data=function(){
     return(self$datasets$data_unlabeled)
@@ -168,23 +170,25 @@ DataManagerClassifier<-R6::R6Class(
 
   #'@description Method for requesting the assignments to train, validation, and test
   #'data sets for every fold and the final training.
-  #'@return Returns a \code{list} storing the assignments to a train, validation, and
+  #'@return Returns a `list` storing the assignments to a train, validation, and
   #'test data set for every fold. In the case of the sample for the final training
-  #'the test data set is always empty (\code{NULL}).
+  #'the test data set is always empty (`NULL`).
   get_samples=function(){
     return(self$samples)
   },
 
-  #'@description Method for setting the current state of the DataManagerClassifier.
-  #'@param iteration \code{int} determining the current iteration of the training.
+  #'@description Method for setting the current state of the [DataManagerClassifier].
+  #'@param iteration `int` determining the current iteration of the training.
   #'That is iteration determines the fold to use for training, validation, and testing.
-  #'If \eqn{i} is the number of fold \eqn{i+1} request the sample for the final training.
-  #'For requesting the sample for the final training iteration can take a string \code{"final"}.
-  #'@param step \code{int} determining the step for estimating and using pseudo labels during
+  #'If *i* is the number of fold *i+1* request the sample for the final training.
+  #'For requesting the sample for the final training iteration can take a string `"final"`.
+  #'@param step `int` determining the step for estimating and using pseudo labels during
   #'training. Only relevant if training is requested with pseudo labels.
-  #'@return Method does not return anythin. It is used for setting the internal state
+  #'@return Method does not return anything. It is used for setting the internal state
   #'of the DataManaeger.
   set_state=function(iteration,step=NULL){
+    check_type(step,"int",TRUE)
+
     if(is.numeric(iteration)==FALSE){
       if(iteration=="final"){
         iteration=self$config$n_folds+1
@@ -200,9 +204,9 @@ DataManagerClassifier<-R6::R6Class(
     self$state$step=step
   },
 
-  #'@description Method for requesting the number of folds the DataManagerClassifier can
+  #'@description Method for requesting the number of folds the [DataManagerClassifier] can
   #'use with the current data.
-  #'@return Returns the number of folds the DataManagerClassifier uses.
+  #'@return Returns the number of folds the [DataManagerClassifier] uses.
   get_n_folds=function(){
     return(self$config$n_folds)
   },
@@ -231,19 +235,24 @@ DataManagerClassifier<-R6::R6Class(
   },
 
   #'@description Method for requesting a data set for training depending in the current state of the DataManagerClassifier.
-  #'@param inc_labeled \code{bool} If \code{True} the data set includes all cases which have labels.
-  #'@param inc_unlabeled \code{bool} If \code{True} the data set includes all cases which have no labels.
-  #'@param inc_synthetic \code{bool} If \code{True} the data set includes all synthetic cases with their corresponding labels.
-  #'@param inc_pseudo_data \code{bool} If \code{True} the data set includes all cases which have pseudo labels.
-  #'@return Returns an object of class \code{datasets.arrow_dataset.Dataset} containing
+  #'@param inc_labeled `bool` If `TRUE` the data set includes all cases which have labels.
+  #'@param inc_unlabeled `bool` If `TRUE` the data set includes all cases which have no labels.
+  #'@param inc_synthetic `bool` If `TRUE` the data set includes all synthetic cases with their corresponding labels.
+  #'@param inc_pseudo_data `bool` If `TRUE` the data set includes all cases which have pseudo labels.
+  #'@return Returns an object of class `datasets.arrow_dataset.Dataset` containing
   #'the requested kind of data along with all requested transformations for training.
   #'Please note that this method returns a data sets that is designed for training only.
-  #'The corresponding validation data set is requested with \link{get_val_dataset} and the
-  #'corresponding test data set with \link{get_test_dataset}.
+  #'The corresponding validation data set is requested with `get_val_dataset` and the
+  #'corresponding test data set with `get_test_dataset`.
   get_dataset=function(inc_labeled=TRUE,
                        inc_unlabeled=FALSE,
                        inc_synthetic=FALSE,
                        inc_pseudo_data=FALSE){
+    #Checks
+    check_type(inc_labeled,"bool",FALSE)
+    check_type(inc_unlabeled,"bool",FALSE)
+    check_type(inc_synthetic,"bool",FALSE)
+    check_type(inc_pseudo_data,"bool",FALSE)
 
     data=NULL
 
@@ -277,20 +286,20 @@ DataManagerClassifier<-R6::R6Class(
     return(data)
   },
 
-  #'@description Method for requesting a data set for validation depending in the current state of the DataManagerClassifier.
-  #'@return Returns an object of class \code{datasets.arrow_dataset.Dataset} containing
+  #'@description Method for requesting a data set for validation depending in the current state of the [DataManagerClassifier].
+  #'@return Returns an object of class `datasets.arrow_dataset.Dataset` containing
   #'the requested kind of data along with all requested transformations for validation.
-  #'The corresponding data set for training can be requested with \link{get_dataset} and
-  #'the corresponding data set for testing with \link{get_test_dataset}.
+  #'The corresponding data set for training can be requested with `get_dataset` and
+  #'the corresponding data set for testing with `get_test_dataset`.
   get_val_dataset=function(){
     return(self$datasets$data_labeled$select(as.integer(self$samples[[self$state$iteration]]$val)))
   },
 
   #'@description Method for requesting a data set for testing depending in the current state of the DataManagerClassifier.
-  #'@return Returns an object of class \code{datasets.arrow_dataset.Dataset} containing
+  #'@return Returns an object of class `datasets.arrow_dataset.Dataset` containing
   #'the requested kind of data along with all requested transformations for validation.
-  #'The corresponding data set for training can be requested with \link{get_dataset} and
-  #'the corresponding data set for validation with \link{get_val_dataset}.
+  #'The corresponding data set for training can be requested with `get_dataset` and
+  #'the corresponding data set for validation with `get_val_dataset`.
   get_test_dataset=function(){
     if(self$state$iteration<=self$get_n_folds()){
       return(self$datasets$data_labeled$select(as.integer(self$samples[[self$state$iteration]]$test)))
@@ -301,16 +310,20 @@ DataManagerClassifier<-R6::R6Class(
 
   #'@description Method for generating synthetic data used during training. The process uses
   #'all labeled data belonging to the current state of the DataManagerClassifier.
-  #'@param  trace \code{bool} If \code{True} information on the process are printed to the console.
-  #'@param inc_pseudo_data \code{bool} If \code{True} data with pseudo labels are used in addition
+  #'@param  trace `bool` If `TRUE` information on the process are printed to the console.
+  #'@param inc_pseudo_data `bool` If `TRUE` data with pseudo labels are used in addition
   #'to the labeled data for generating synthetic cases.
   #'@return This method does nothing return. It generates a new data set for synthetic cases
-  #'which are stored as an object of class \code{datasets.arrow_dataset.Dataset} in the field
-  #'\code{datasets$data_labeled_synthetic}.
+  #'which are stored as an object of class `datasets.arrow_dataset.Dataset` in the field
+  #' `datasets$data_labeled_synthetic`.
   #'Please note that a call of this method will override an existing data set
   #'in the corresponding field.
   create_synthetic=function(trace=TRUE,
                    inc_pseudo_data=FALSE){
+    #checks
+    check_type(trace,"bool",FALSE)
+    check_type(inc_pseudo_data,"bool",FALSE)
+
     #Print status message to console
     if(trace==TRUE){
       if(self$state$iteration<=self$config$n_folds){
@@ -407,15 +420,19 @@ DataManagerClassifier<-R6::R6Class(
   },
 
   #'@description Method for adding data with pseudo labels generated by a classifier
-  #'@param inputs \code{array} or \code{matrix} representing the input data.
-  #'@param labels \code{factor} containing the corresponding pseudo labels.
+  #'@param inputs `array` or `matrix` representing the input data.
+  #'@param labels `factor` containing the corresponding pseudo labels.
   #'@return This method does nothing return. It generates a new data set for synthetic cases
-  #'which are stored as an object of class \code{datasets.arrow_dataset.Dataset} in the field
-  #'\code{datasets$data_labeled_pseudo}.
+  #'which are stored as an object of class `datasets.arrow_dataset.Dataset` in the field
+  #' `datasets$data_labeled_pseudo`.
   #'Please note that a call of this method will override an existing data set
   #'in the corresponding field.
   add_replace_pseudo_data=function(inputs,
                                    labels){
+    #checks
+    check_class(inputs,c("array","matrix"),FALSE)
+    check_class(labels,c("factor"),FALSE)
+
     private$check_labels(labels)
     #Add or replace current dataset for pseudo data
     self$datasets$data_labeled_pseudo=datasets$Dataset$from_dict(
@@ -601,6 +618,8 @@ DataManagerClassifier<-R6::R6Class(
     }
   )
 )
+
+
 
 
 

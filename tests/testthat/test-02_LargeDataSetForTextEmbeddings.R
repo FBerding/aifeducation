@@ -103,25 +103,85 @@ test_that("LargeDataSetForTextEmbeddings - No FeatureExtractor",{
 })
 
 #-----------------------------------------------------------------------------
-test_that("LargeDataSetForTextEmbeddings - Save and Load",{
+test_that("LargeDataSetForTextEmbeddings - Method Save and Load",{
   save_path=paste0(root_path_results,"/dataset")
-  new_dataset=LargeDataSetForText$new()
-  new_dataset$add_from_files_txt(
-    dir_path = root_path_data_multiple_texts,
-    trace = FALSE)
-  expect_no_error(new_dataset$save(save_path))
+  folder_name=generate_id()
+  load_path=paste0(save_path,"/",folder_name)
 
+  new_dataset=LargeDataSetForTextEmbeddings$new(
+    model_name=imdb_embeddings$get_model_info()$model_name,
+    model_label=imdb_embeddings$get_model_info()$model_label,
+    model_date=imdb_embeddings$get_model_info()$model_date,
+    model_method=imdb_embeddings$get_model_info()$model_method,
+    model_version=imdb_embeddings$get_model_info()$model_version,
+    model_language=imdb_embeddings$get_model_info()$model_language,
+    param_seq_length=imdb_embeddings$get_model_info()$param_seq_length,
+    param_chunks=imdb_embeddings$get_model_info()$param_chunks,
+    param_features=imdb_embeddings$get_features(),
+    param_overlap=imdb_embeddings$get_model_info()$param_overlap,
+    param_emb_layer_min=imdb_embeddings$get_model_info()$param_emb_layer_min,
+    param_emb_layer_max=imdb_embeddings$get_model_info()$param_emb_layer_max,
+    param_emb_pool_type=imdb_embeddings$get_model_info()$param_emb_pool_type,
+    param_aggregation=imdb_embeddings$get_model_info()$param_aggregation
+  )
+
+  new_dataset$add_embeddings_from_array(imdb_embeddings$embeddings)
+  expect_no_error(new_dataset$save(save_path,folder_name=folder_name))
+
+  new_dataset$load(load_path)
+
+  #Number of cases
+  expect_equal(new_dataset$n_rows(),nrow(imdb_embeddings$embeddings))
+
+})
+#-----------------------------------------------------------------------------
+test_that("LargeDataSetForTextEmbeddings - Function Save and Load",{
+  save_path=paste0(root_path_results,"/dataset")
+  folder_name=generate_id()
+  load_path=paste0(save_path,"/",folder_name)
+
+  new_dataset=LargeDataSetForTextEmbeddings$new(
+    model_name=imdb_embeddings$get_model_info()$model_name,
+    model_label=imdb_embeddings$get_model_info()$model_label,
+    model_date=imdb_embeddings$get_model_info()$model_date,
+    model_method=imdb_embeddings$get_model_info()$model_method,
+    model_version=imdb_embeddings$get_model_info()$model_version,
+    model_language=imdb_embeddings$get_model_info()$model_language,
+    param_seq_length=imdb_embeddings$get_model_info()$param_seq_length,
+    param_chunks=imdb_embeddings$get_model_info()$param_chunks,
+    param_features=imdb_embeddings$get_features(),
+    param_overlap=imdb_embeddings$get_model_info()$param_overlap,
+    param_emb_layer_min=imdb_embeddings$get_model_info()$param_emb_layer_min,
+    param_emb_layer_max=imdb_embeddings$get_model_info()$param_emb_layer_max,
+    param_emb_pool_type=imdb_embeddings$get_model_info()$param_emb_pool_type,
+    param_aggregation=imdb_embeddings$get_model_info()$param_aggregation
+  )
+
+  new_dataset$add_embeddings_from_array(imdb_embeddings$embeddings)
+
+  #Save
+  expect_no_error(save_to_disk(object = new_dataset,
+                               dir_path = save_path,
+                               folder_name = folder_name))
+  #Load
   new_dataset=NULL
-  new_dataset=LargeDataSetForText$new()
-  new_dataset$load(save_path)
+  new_dataset=load_from_disk(dir_path = load_path)
 
-  expect_equal(new_dataset$n_rows(),2)
+  #Number of cases
+  expect_equal(new_dataset$n_rows(),nrow(imdb_embeddings$embeddings))
 
-  id=new_dataset$get_ids()
-  true_ids=c("text_a","text_b")
-  ids_complete=sum(true_ids%in%id)
-  expect_equal(ids_complete,length(true_ids))
+  #Correct Features
+  expect_equal(new_dataset$get_features(),imdb_embeddings$get_features())
 
-  expect_equal(new_dataset$get_colnames(),
-               c("id","text","bib_entry","license" ))
+  #Correct original features
+  expect_equal(new_dataset$get_original_features(),imdb_embeddings$get_features())
+
+  #Correct Times
+  expect_equal(new_dataset$get_times(),imdb_embeddings$get_times())
+
+  #Check model information
+  for(entry in names(new_dataset$get_model_info())){
+    expect_equal(new_dataset$get_model_info()[entry],
+                 imdb_embeddings$get_model_info()[entry])
+  }
 })

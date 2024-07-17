@@ -1,8 +1,29 @@
+#'@title Abstract class for large data sets containing text embeddings.
+#'
+#'@description This object stores text embeddings which are usually produced
+#'by an object of class [TextEmbeddingModel]. The data of this objects is not
+#'stored in memory directly. By using memory mapping these objects allow to work
+#'with data sets which do not fit into memory/RAM.
+#'
+#'[LargeDataSetForTextEmbeddings] are used
+#'for storing and managing the text embeddings created with objects of class [TextEmbeddingModel].
+#'Objects of class [LargeDataSetForTextEmbeddings] serve as input for objects of class
+#'[TEClassifierRegular], [TEClassifierProtoNet], and [TEFeatureExtractor].
+#'The main aim of this class is to provide a structured link between
+#'embedding models and classifiers. Since objects of this class save information on
+#'the text embedding model that created the text embedding it ensures that only
+#'embedding generated with same embedding model are combined. Furthermore, the stored information allows
+#'objects to check if embeddings of the correct text embedding model are used for
+#'training and predicting.
+#'
+#'@return Returns a new object of this class.
+#'@export
+#'@family Data Management
 LargeDataSetForTextEmbeddings<-R6::R6Class(
   classname = "LargeDataSetForTextEmbeddings",
   inherit = LargeDataSetBase,
   private = list(
-    #'dataset based on pyarrow containing the text embeddings for all chunks.
+    #dataset based on pyarrow containing the text embeddings for all chunks.
     embeddings=NA,
 
     #model_name \code{string} Name of the model that generates this embedding.
@@ -63,30 +84,28 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
   ),
   public = list(
     #'@description Creates a new object representing text embeddings.
-    #'@param model_name \code{string} Name of the model that generates this embedding.
-    #'@param model_label \code{string} Label of the model that generates this embedding.
-    #'@param model_date \code{string} Date when the embedding generating model was created.
-    #'@param model_method \code{string} Method of the underlying embedding model.
-    #'@param model_version \code{string} Version of the model that generated this embedding.
-    #'@param model_language \code{string} Language of the model that generated this embedding.
-    #'@param param_seq_length \code{int} Maximum number of tokens that processes the generating model for a chunk.
-    #'@param param_chunks \code{int} Maximum number of chunks which are supported by the generating model.
-    #'@param param_overlap \code{int} Number of tokens that were added at the beginning of the sequence for the next chunk
+    #'@param model_name `string` Name of the model that generates this embedding.
+    #'@param model_label `string` Label of the model that generates this embedding.
+    #'@param model_date `string` Date when the embedding generating model was created.
+    #'@param model_method `string` Method of the underlying embedding model.
+    #'@param model_version `string` Version of the model that generated this embedding.
+    #'@param model_language `string` Language of the model that generated this embedding.
+    #'@param param_seq_length `int` Maximum number of tokens that processes the generating model for a chunk.
+    #'@param param_chunks `int` Maximum number of chunks which are supported by the generating model.
+    #'@param param_features `int` Number of dimensions of the text embeddings.
+    #'@param param_overlap `int` Number of tokens that were added at the beginning of the sequence for the next chunk
     #'by this model.
     #'
-    #'@param param_emb_layer_min \code{int} or \code{string} determining the first layer to be included
+    #'@param param_emb_layer_min `int` or `string` determining the first layer to be included
     #'in the creation of embeddings.
-    #'@param param_emb_layer_max \code{int} or \code{string} determining the last layer to be included
+    #'@param param_emb_layer_max `int` or `string` determining the last layer to be included
     #'in the creation of embeddings.
-    #'@param param_emb_pool_type \code{string} determining the method for pooling the token embeddings
+    #'@param param_emb_pool_type `string` determining the method for pooling the token embeddings
     #'within each layer.
     #'
-    #'@param param_aggregation \code{string} Aggregation method of the hidden states. Deprecated. Only included
+    #'@param param_aggregation `string` Aggregation method of the hidden states. Deprecated. Only included
     #'for backward compatibility.
-    #'@param embeddings \code{data.frame} containing the text embeddings.
-    #'@return Returns an object of class \link{EmbeddedText} which stores the
-    #'text embeddings produced by an objects of class \link{TextEmbeddingModel}.
-    #'The object serves as input for objects of class \link{TextEmbeddingClassifierNeuralNet}.
+    #'@return The method returns a new object of this class.
     initialize=function(model_name=NA,
                         model_label=NA,
                         model_date=NA,
@@ -119,10 +138,11 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
 
       private$param_aggregation = param_aggregation
     },
+
     #--------------------------------------------------------------------------
     #'@description Method for retrieving information about the model that
     #'generated this embedding.
-    #'@return \code{list} contains all saved information about the underlying
+    #'@return `list` containing all saved information about the underlying
     #'text embedding model.
     get_model_info=function(){
       tmp<-list(model_name=private$model_name,
@@ -144,11 +164,23 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
     #--------------------------------------------------------------------------
     #'@description Method for retrieving the label of the model that
     #'generated this embedding.
-    #'@return \code{string} Label of the corresponding text embedding model
+    #'@return `string` Label of the corresponding text embedding model
     get_model_label=function(){
       return(private$transformer_components$ml_framework)
     },
+
     #--------------------------------------------------------------------------
+    #'@description Method setting information on the [TEFeatureExtractor] that
+    #'was used to reduce the number of dimensions of the text embeddings. This
+    #'information should only be used if a [TEFeatureExtractor] was applied.
+    #'@param model_name `string` Name of the underlying [TextEmbeddingModel].
+    #'@param model_label `string` Label of the underlying [TextEmbeddingModel].
+    #'@param features `int` Number of dimension (features) for the **compressed** text embeddings.
+    #'@param method `string` Method that the [TEFeatureExtractor] applies for genereating the
+    #'compressed text embeddings.
+    #'@param noise_factor `double` Noise factor of the [TEFeatureExtractor].
+    #'@param optimizer `string` Optimizer used during training the [TEFeatureExtractor].
+    #'@return Method does nothing return. It sets information on a [TEFeatureExtractor].
     add_feature_extractor_info=function(model_name,
                                         model_label=NA,
                                         features=NA,
@@ -164,7 +196,12 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
         optimizer=optimizer
       )
     },
+
     #--------------------------------------------------------------------------
+    #'@description Method for receiving information on the [TEFeatureExtractor] that
+    #'was used to reduce the number of dimensions of the text embeddings.
+    #'@return Returns a `list` with information on the [TEFeatureExtractor].
+    #'If no [TEFeatureExtractor] was used it returns `NULL`.
     get_feature_extractor_info=function(){
       if(is.null_or_na(private$feature_extractor$model_name)){
         return(NULL)
@@ -172,7 +209,11 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
         return(private$feature_extractor)
       }
     },
+
     #--------------------------------------------------------------------------
+    #'@description Checks if the text embedding were reduced by a [TEFeatureExtractor].
+    #'@return Returns `TRUE` if the number of dimensions was reduced by a [TEFeatureExtractor].
+    #'If not return `FALSE`.
     is_compressed=function(){
       if(is.null_or_na(private$feature_extractor$model_name)){
         return(FALSE)
@@ -180,11 +221,23 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
         return(TRUE)
       }
     },
+
     #--------------------------------------------------------------------------
+    #'@description Number of chunks/times of the text embeddings.
+    #'@return Returns an `int` describing the number of chunks/times of the
+    #'text embeddings.
     get_times=function(){
       return(private$param_chunks)
     },
+
     #--------------------------------------------------------------------------
+    #'@description Number of actual features/dimensions of the text embeddings.In the
+    #'case a [TEFeatureExtractor] was used the number of features is smaller as the
+    #'original number of features. To receive the original number of features (the number of features before
+    #'applying a [TEFeatureExtractor]) you can use the method `get_original_features`
+    #'of this class.
+    #'@return Returns an `int` describing the number of features/dimensions of the
+    #'text embeddings.
     get_features=function(){
       if(self$is_compressed()==TRUE){
         return(private$feature_extractor$features)
@@ -192,11 +245,22 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
         return(private$param_features)
       }
     },
-    #-------------------------------------------------------------------------
+
+    #--------------------------------------------------------------------------
+    #'@description Number of original features/dimensions of the text embeddings.
+    #'@return Returns an `int` describing the number of features/dimensions if no
+    #'[TEFeatureExtractor]) is used or before a
+    #'[TEFeatureExtractor]) is applied.
     get_original_features=function(){
       return(private$param_features)
     },
+
     #--------------------------------------------------------------------------
+    #'@description Method for adding new data to the data set from an `array`.
+    #'Please note that the method does not check if cases already exist in the data
+    #'set. To reduce the data set to unique cases call the method `reduce_to_unique_ids`.
+    #'@param embedding_array `array` containing the text embeddings.
+    #'@return The method does not return anything. It adds new data to the data set.
     add_embeddings_from_array=function(embedding_array){
       if(is.array(embedding_array)==FALSE){
         stop("Input must be an array.")
@@ -233,7 +297,13 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       #add dataset
       private$add(new_dataset)
     },
-    #-------------------------------------------------------------------------
+
+    #--------------------------------------------------------------------------
+    #'@description Method for adding new data to the data set from an [EmbeddedText].
+    #'Please note that the method does not check if cases already exist in the data
+    #'set. To reduce the data set to unique cases call the method `reduce_to_unique_ids`.
+    #'@param EmbeddedText Object of class [EmbeddedText].
+    #'@return The method does not return anything. It adds new data to the data set.
     add_embeddings_from_EmbeddedText=function(EmbeddedText){
       if("EmbeddedText"%in%class(EmbeddedText)==FALSE){
         stop("Input must be an object of class EmbeddedText.")
@@ -275,7 +345,14 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       #add dataset
       private$add(new_dataset)
     },
-    #-------------------------------------------------------------------------
+
+    #--------------------------------------------------------------------------
+    #'@description Method for converting this object to an object of class [EmbeddedText].
+    #'**Attention** This object uses memory mapping to allow the usage of data sets
+    #'that do not fit into memory. By calling this method the data set will be loaded
+    #'and stored into memory/RAM. This may lead to an out-of-memory error.
+    #'@return LargeDataSetForTextEmbeddings an object of class [EmbeddedText] which is stored in the
+    #'memory/RAM.
     convert_to_EmbeddedText=function(){
       new_data_set=EmbeddedText$new(
         model_name=private$model_name,

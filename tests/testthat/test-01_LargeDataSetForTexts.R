@@ -63,7 +63,7 @@ test_that("LargeDataSetForTexts - Add pdf",{
 test_that("LargeDataSetForTexts - Add excel",{
   new_dataset=LargeDataSetForText$new()
   expect_no_error(
-    new_dataset$add_from_filex_xlsx(
+    new_dataset$add_from_files_xlsx(
       dir_path = root_path_data_multiple_texts,
       trace = FALSE)
   )
@@ -142,7 +142,7 @@ test_that("LargeDataSetForTexts - Add single pdf",{
 test_that("LargeDataSetForTexts - Add single excel",{
   new_dataset=LargeDataSetForText$new()
   expect_no_error(
-    new_dataset$add_from_filex_xlsx(
+    new_dataset$add_from_files_xlsx(
       dir_path = root_path_data_single_texts,
       trace = FALSE)
   )
@@ -186,17 +186,50 @@ test_that("LargeDataSetForTexts -Unique IDS",{
 })
 
 #-----------------------------------------------------------------------------
-test_that("LargeDataSetForTexts - Save and Load",{
+test_that("LargeDataSetForTexts - Method Save and Load",{
   save_path=paste0(root_path_results,"/dataset")
+  folder_name=generate_id()
+  load_path=paste0(save_path,"/",folder_name)
+
   new_dataset=LargeDataSetForText$new()
   new_dataset$add_from_files_txt(
     dir_path = root_path_data_multiple_texts,
     trace = FALSE)
-  expect_no_error(new_dataset$save(save_path))
+  expect_no_error(new_dataset$save(save_path,
+                                   folder_name=folder_name))
 
   new_dataset=NULL
   new_dataset=LargeDataSetForText$new()
-  new_dataset$load(save_path)
+  new_dataset$load(load_path)
+
+  expect_equal(new_dataset$n_rows(),2)
+
+  id=new_dataset$get_ids()
+  true_ids=c("text_a","text_b")
+  ids_complete=sum(true_ids%in%id)
+  expect_equal(ids_complete,length(true_ids))
+
+  expect_equal(new_dataset$get_colnames(),
+               c("id","text","bib_entry","license" ))
+})
+
+#-----------------------------------------------------------------------------
+test_that("LargeDataSetForTexts - Function Save and Load",{
+  save_path=paste0(root_path_results,"/dataset")
+  folder_name=generate_id()
+  load_path=paste0(save_path,"/",folder_name)
+
+  new_dataset=LargeDataSetForText$new()
+  new_dataset$add_from_files_txt(
+    dir_path = root_path_data_multiple_texts,
+    trace = FALSE)
+  #Save
+  expect_no_error(save_to_disk(object = new_dataset,
+                               dir_path =  save_path,
+                              folder_name = folder_name))
+  #Load
+  new_dataset=NULL
+  new_dataset=load_from_disk(dir_path = load_path)
 
   expect_equal(new_dataset$n_rows(),2)
 

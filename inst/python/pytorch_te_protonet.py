@@ -128,9 +128,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     else:
       n_hidden=len(hidden)
     
-    if n_hidden==0 and n_rec==0 and repeat_encoder==0:
-      last_in_features=features*times
-    elif  n_hidden>0:
+    if  n_hidden>0:
       last_in_features=hidden[n_hidden-1]
     elif n_rec>0:
       if rec_bidirectional==True:
@@ -209,9 +207,11 @@ shiny_app_active=False):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    model.to(device,dtype=float)
+    dtype=float
+    model.to(device,dtype=dtype)
   else:
-    model.to(device,dtype=torch.double)
+    dtype=torch.double
+    model.to(device,dtype=dtype)
   
   if optimizer_method=="adam":
     optimizer=torch.optim.Adam(model.parameters())
@@ -293,11 +293,11 @@ shiny_app_active=False):
       sample_classes=labels[0:(n_classes*Ns)].clone()
       query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
 
-      sample_inputs = sample_inputs.to(device)
-      query_inputs = query_inputs.to(device)
+      sample_inputs = sample_inputs.to(device,dtype=dtype)
+      query_inputs = query_inputs.to(device,dtype=dtype)
   
-      sample_classes = sample_classes.to(device)
-      query_classes = query_classes.to(device)
+      sample_classes = sample_classes.to(device,dtype=dtype)
+      query_classes = query_classes.to(device,dtype=dtype)
       
       optimizer.zero_grad()
       outputs=model(input_q=query_inputs,
@@ -343,8 +343,8 @@ shiny_app_active=False):
       inputs=batch["input"]
       labels=batch["labels"]
       
-      inputs = inputs.to(device)
-      labels=labels.to(device)
+      inputs = inputs.to(device,dtype=dtype)
+      labels=labels.to(device,dtype=dtype)
       
       embeddings=model.embed(inputs)
       new_class_means=get_class_mean(x=embeddings,classes=labels)
@@ -380,8 +380,8 @@ shiny_app_active=False):
         inputs=batch["input"]
         labels=batch["labels"]
         
-        inputs = inputs.to(device)
-        labels=labels.to(device)
+        inputs = inputs.to(device,dtype=dtype)
+        labels=labels.to(device,dtype=dtype)
         outputs=model(inputs,predication_mode=False)
 
         loss=loss_fct(classes_q=labels,distance_matrix=outputs[1])
@@ -416,8 +416,8 @@ shiny_app_active=False):
           inputs=batch["input"]
           labels=batch["labels"]
           
-          inputs = inputs.to(device)
-          labels=labels.to(device)
+          inputs = inputs.to(device,dtype=dtype)
+          labels=labels.to(device,dtype=dtype)
         
           outputs=model(inputs,predication_mode=False)
  
@@ -531,9 +531,11 @@ def TeProtoNetBatchEmbed(model,dataset_q,batch_size):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    model.to(device,dtype=float)
+    dtype=float
+    model.to(device,dtype=dtype)
   else:
-    model.to(device,dtype=torch.double)
+    dtype=torch.double
+    model.to(device,dtype=dtype)
     
   model.eval()
   predictionloader=torch.utils.data.DataLoader(
@@ -545,7 +547,7 @@ def TeProtoNetBatchEmbed(model,dataset_q,batch_size):
     iteration=0
     for batch in predictionloader:
       inputs=batch["input"]
-      inputs = inputs.to(device)
+      inputs = inputs.to(device,dtype=dtype)
       
       predictions=model.embed(inputs)
       

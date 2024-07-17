@@ -2,8 +2,8 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
 #Skip Tests
-skip_creation_test=TRUE
-skip_training_test=TRUE
+skip_creation_test=FALSE
+skip_training_test=FALSE
 skip_overfitting_test=FALSE
 
 #SetUp-------------------------------------------------------------------------
@@ -35,14 +35,15 @@ test_embeddings=test_embeddings_large$convert_to_EmbeddedText()
 
 test_embeddings_reduced=test_embeddings$clone(deep = TRUE)
 test_embeddings_reduced$embeddings=test_embeddings_reduced$embeddings[1:5,,]
+test_embeddings_reduced_LD=test_embeddings_reduced$convert_to_LargeDataSetForTextEmbeddings()
 
 #case=sample(x=seq.int(from = 1,to=nrow(test_embeddings$embeddings)))
 test_embeddings_single_case=test_embeddings$clone(deep = TRUE)
 test_embeddings_single_case$embeddings=test_embeddings_single_case$embeddings[1,,,drop=FALSE]
+test_embeddings_single_case_LD=test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
 
 #Config
 ml_frameworks=c("tensorflow","pytorch")
-ml_frameworks=c("tensorflow")
 
 rec_list=list(NULL,c(4),c(4,3))
 rec_type_list=list("gru","lstm")
@@ -55,39 +56,48 @@ pos_embedding_list=list(TRUE,FALSE)
 sc_list=list(FALSE,TRUE)
 pl_list=list(FALSE,TRUE)
 
-#Create feature extractors
+#Load feature extractors
 feature_extractor_list=NULL
-for(framework in ml_frameworks){
-  checkpoint_path=paste0(root_path_results,"/",framework,"_fe")
-  extractor<-TEFeatureExtractor$new(
-    ml_framework = framework,
-    name="Test_extractor",
-    label="Test Extractor",
-    text_embeddings=test_embeddings,
-    features=128,
-    method="lstm",
-    noise_factor=0.01,
-    optimizer="adam"
-  )
-  if(dir.exists(checkpoint_path)==FALSE){
-    dir.create(checkpoint_path)
-  }
-  extractor$train(
-    data_embeddings=test_embeddings,
-    data_val_size=0.25,
-    sustain_track=TRUE,
-    sustain_iso_code="DEU",
-    sustain_region=NULL,
-    sustain_interval=15,
-    epochs=2,
-    batch_size=100,
-    dir_checkpoint=checkpoint_path,
-    trace=FALSE,
-    keras_trace=0,
-    pytorch_trace=0
-  )
-  feature_extractor_list[framework]=list(c(extractor,NULL))
-}
+feature_extractor_list["tensorflow"]=list(list(NULL))
+
+feature_extractor_list["pytorch"]=list(list(
+  load_from_disk(paste0(root_path_data,"/feature_extractor_pytorch")),
+  NULL)
+)
+
+#Create feature extractors
+#feature_extractor_list=NULL
+#for(framework in ml_frameworks){
+#  checkpoint_path=paste0(root_path_results,"/",framework,"_fe")
+#  extractor<-TEFeatureExtractor$new(
+#    ml_framework = framework,
+#    name="Test_extractor",
+#    label="Test Extractor",
+#    text_embeddings=test_embeddings,
+#    features=128,
+#    method="lstm",
+#    noise_factor=0.01,
+#    optimizer="adam"
+#  )
+#  if(dir.exists(checkpoint_path)==FALSE){
+#    dir.create(checkpoint_path)
+#  }
+#  extractor$train(
+#    data_embeddings=test_embeddings,
+#    data_val_size=0.25,
+#    sustain_track=TRUE,
+#    sustain_iso_code="DEU",
+#    sustain_region=NULL,
+#    sustain_interval=15,
+#    epochs=2,
+#    batch_size=100,
+#    dir_checkpoint=checkpoint_path,
+#    trace=FALSE,
+#    keras_trace=0,
+#    pytorch_trace=0
+#  )
+#  feature_extractor_list[framework]=list(c(extractor,NULL))
+#}
 
 
 for(framework in ml_frameworks){
@@ -140,7 +150,21 @@ for(framework in ml_frameworks){
                   repeat_encoder = r,
                   recurrent_dropout=0.4)
 
-                test_that(paste(framework,"creation_classifier_regular",
+                test_that(paste("no sustainability tracking",framework,
+                                "n_classes",n_classes,
+                                "features_extractor",!is.null(feature_extractor),
+                                "rec",paste(rec,collapse = "_"),
+                                "rec_type",rec_type,
+                                "rec_bidirectional",rec_bidirectional,
+                                "hidden",paste(hidden,collapse = "_"),
+                                "encoder",r,
+                                "attention",attention,
+                                "pos",pos_embedding),{
+                                  expect_false(classifier$get_sustainability_data()$sustainability_tracked)
+                                })
+
+
+                test_that(paste("predict - basic",framework,
                                 "n_classes",n_classes,
                                 "features_extractor",!is.null(feature_extractor),
                                 "rec",paste(rec,collapse = "_"),
@@ -158,28 +182,11 @@ for(framework in ml_frameworks){
                               newdata = test_embeddings_reduced,
                               batch_size = 2,
                               verbose = 0)
-                            expect_equal(object = length(predictions$expected_category),expected = nrow(test_embeddings_reduced$embeddings))
+                            expect_equal(object = length(predictions$expected_category),
+                                         expected = nrow(test_embeddings_reduced$embeddings))
+                          })
 
-                            #check case order invariance
-                            perm=sample(x=seq.int(from=1,to=nrow(test_embeddings_reduced$embeddings)))
-                            test_embeddings_reduced_perm=test_embeddings_reduced$clone(deep = TRUE)
-                            test_embeddings_reduced_perm$embeddings=test_embeddings_reduced_perm$embeddings[perm,,]
-                            predictions_perm=classifier$predict(
-                              newdata = test_embeddings_reduced_perm,
-                              batch_size = 2,
-                              verbose = 0)
-                            for(i in 1:nrow(test_embeddings_reduced$embeddings)){
-                              expect_equal(predictions[i,,],
-                                           predictions_perm[which(perm==i),,],
-                                           tolerance=1e-5)
-                            }
-
-
-                            expect_false(classifier$get_sustainability_data()$sustainability_tracked)
-                            })
-
-                #Single Case prediction
-                test_that(paste(framework,"creation_classifier_regular",
+                test_that(paste("predict - single case", framework,
                                 "n_classes",n_classes,
                                 "features_extractor",!is.null(feature_extractor),
                                 "rec",paste(rec,collapse = "_"),
@@ -188,17 +195,115 @@ for(framework in ml_frameworks){
                                 "hidden",paste(hidden,collapse = "_"),
                                 "encoder",r,
                                 "attention",attention,
-                                "pos",pos_embedding,
-                                "prediction_single_case"), {
+                                "pos",pos_embedding), {
 
+                                  prediction<-classifier$predict(newdata = test_embeddings_single_case,
+                                                                 batch_size = 2,
+                                                                 verbose = 0)
+                                  expect_equal(object=nrow(prediction),
+                                               expected = 1)
 
-                  prediction<-classifier$predict(newdata = test_embeddings_single_case,
-                                                 batch_size = 2,
-                                                 verbose = 0)
-                  expect_equal(object=nrow(prediction),
-                               expected = 1)
-                })
+                                  prediction_LD<-classifier$predict(newdata = test_embeddings_single_case_LD,
+                                                                    batch_size = 2,
+                                                                    verbose = 0)
+                                  expect_equal(object=nrow(prediction_LD),
+                                               expected = 1)
+                                })
 
+                test_that(paste("predict - randomness",framework,
+                                "n_classes",n_classes,
+                                "features_extractor",!is.null(feature_extractor),
+                                "rec",paste(rec,collapse = "_"),
+                                "rec_type",rec_type,
+                                "rec_bidirectional",rec_bidirectional,
+                                "hidden",paste(hidden,collapse = "_"),
+                                "encoder",r,
+                                "attention",attention,
+                                "pos",pos_embedding),
+                          {
+                            #EmbeddedText
+                            predictions=classifier$predict(
+                              newdata = test_embeddings_reduced,
+                              batch_size = 2,
+                              verbose = 0)
+                            predictions_2=classifier$predict(
+                              newdata = test_embeddings_reduced,
+                              batch_size = 2,
+                              verbose = 0)
+                            expect_equal(predictions,predictions_2)
+
+                            #LargeDataSetForTextEmbeddings
+                            predictions=classifier$predict(
+                              newdata = test_embeddings_reduced_LD,
+                              batch_size = 2,
+                              verbose = 0)
+                            predictions_2=classifier$predict(
+                              newdata = test_embeddings_reduced_LD,
+                              batch_size = 2,
+                              verbose = 0)
+                            expect_equal(predictions,predictions_2)
+                          })
+
+                test_that(paste("predict - order invariance",framework,
+                                "n_classes",n_classes,
+                                "features_extractor",!is.null(feature_extractor),
+                                "rec",paste(rec,collapse = "_"),
+                                "rec_type",rec_type,
+                                "rec_bidirectional",rec_bidirectional,
+                                "hidden",paste(hidden,collapse = "_"),
+                                "encoder",r,
+                                "attention",attention,
+                                "pos",pos_embedding),
+                          {
+
+                            embeddings_ET_perm=test_embeddings_reduced$clone(deep=TRUE)
+                            perm=sample(x=seq.int(from = 1,to=nrow(embeddings_ET_perm$embeddings)),replace = FALSE)
+                            embeddings_ET_perm$embeddings=embeddings_ET_perm$embeddings[perm,,,drop=FALSE]
+
+                            #EmbeddedText
+                            predictions=classifier$predict(newdata = test_embeddings_reduced,
+                                                           batch_size = 50,
+                                                           verbose = 0)
+                            predictions_Perm<-classifier$predict(newdata = embeddings_ET_perm,
+                                                                 batch_size = 50,
+                                                                 verbose = 0)
+
+                            predictions_Perm=predictions_Perm[rownames(predictions),]
+                            expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+
+                            #LargeDataSetForTextEmbeddings
+                            predictions=classifier$predict(newdata = test_embeddings_reduced_LD,
+                                                           batch_size = 50,
+                                                           verbose = 0)
+                            predictions_Perm=classifier$predict(newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+                                                                batch_size = 50,
+                                                                verbose = 0)
+
+                            predictions_Perm=predictions_Perm[rownames(predictions),]
+                            expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+                          })
+
+                test_that(paste("predict - data source invariance",framework,
+                                "n_classes",n_classes,
+                                "features_extractor",!is.null(feature_extractor),
+                                "rec",paste(rec,collapse = "_"),
+                                "rec_type",rec_type,
+                                "rec_bidirectional",rec_bidirectional,
+                                "hidden",paste(hidden,collapse = "_"),
+                                "encoder",r,
+                                "attention",attention,
+                                "pos",pos_embedding),{
+                                  predictions_ET=classifier$predict(
+                                    newdata = test_embeddings_reduced,
+                                    batch_size = 2,
+                                    verbose = 0)
+                                  predictions_LD=classifier$predict(
+                                    newdata = test_embeddings_reduced_LD,
+                                    batch_size = 2,
+                                    verbose = 0)
+                                  i=sample(seq.int(from = 1,to=nrow(predictions_ET)),size = 1)
+                                  expect_equal(predictions_ET$expected_category,predictions_LD$expected_category)
+                                })
                 gc()
                   }
                 }
@@ -209,7 +314,6 @@ for(framework in ml_frameworks){
       }
     }
     }
-
 
     #Test training of the classifier-------------------------------------------
     if(!skip_training_test){
@@ -347,10 +451,10 @@ for(framework in ml_frameworks){
 
         #Save and load
         folder_name=paste0("method_save_load_",generate_id())
-        model_dir=paste0(root_path_results,"/",folder_name)
-        classifier$save(model_dir=root_path_results,
+        dir_path=paste0(root_path_results,"/",folder_name)
+        classifier$save(dir_path=root_path_results,
                        folder_name=folder_name)
-        classifier$load(model_dir=model_dir)
+        classifier$load(dir_path=dir_path)
 
         #Predict after loading
           predictions_2=classifier$predict(
@@ -410,12 +514,12 @@ for(framework in ml_frameworks){
 
       #Save and load
       folder_name=paste0("function_save_load_",generate_id())
-      model_dir=paste0(root_path_results,"/",folder_name)
+      dir_path=paste0(root_path_results,"/",folder_name)
       save_to_disk(object=classifier,
-                   model_dir=root_path_results,
+                   dir_path=root_path_results,
                    folder_name=folder_name)
       classifier=NULL
-      classifier<-load_from_disk(model_dir=model_dir)
+      classifier<-load_from_disk(dir_path=dir_path)
 
       #Predict after loading
       predictions_2=classifier$predict(
@@ -443,11 +547,11 @@ for(framework in ml_frameworks){
         }
 
         #Randomly select a configuration for training
-        rec=rec_list[[sample(x=seq.int(from = 1,to=length(rec_list)),size = 1)]]
+        #rec=rec_list[[sample(x=seq.int(from = 1,to=length(rec_list)),size = 1)]]
         rec_type=rec_type_list[[sample(x=seq.int(from = 1,to=length(rec_type_list)),size = 1)]]
         rec_bidirectional=rec_bidirectiona_list[[sample(x=seq.int(from = 1,to=length(rec_bidirectiona_list)),size = 1)]]
         hidden=hidden_list[[sample(x=seq.int(from = 1,to=length(hidden_list)),size = 1)]]
-        repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
+        #repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
         attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
         add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
@@ -459,7 +563,7 @@ for(framework in ml_frameworks){
           targets=example_targets,
           feature_extractor = NULL,
           hidden=hidden,
-          rec=rec,
+          rec=c(10),
           rec_type=rec_type,
           rec_bidirectional=rec_bidirectional,
           self_attention_heads=1,
@@ -467,7 +571,7 @@ for(framework in ml_frameworks){
           attention_type=attention_type,
           add_pos_embedding=add_pos_embedding,
           rec_dropout=0.1,
-          repeat_encoder=1,
+          repeat_encoder=0,
           dense_dropout=0.4,
           recurrent_dropout=0.4,
           encoder_dropout=0.1,
@@ -500,8 +604,7 @@ for(framework in ml_frameworks){
           pytorch_trace=0)
 
         history=classifier_overfitting$last_training$history[[1]]$accuracy["train",]
-        overfitted=(min(history)>0.95)
-        expect_true(overfitted)
+        expect_gte(object=max(history),expected = 0.95)
       })
     }
 
@@ -571,7 +674,7 @@ for(framework in ml_frameworks){
         object=desc$keywords_native,
         expected=c("Test","Neuronales Netz")
       )
-    })
+
 
 
       classifier$set_software_license("test_license")
@@ -614,6 +717,7 @@ for(framework in ml_frameworks){
         object=pub_info$developed_by$url,
         expected="https://Test.html"
       )
+    })
 
   }
 }

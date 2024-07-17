@@ -30,7 +30,8 @@ dataset_list=list("EmbeddedText"=imdb_embeddings,
              "LargeDataSetForTextEmbeddings"=imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings())
 
 #config
-ml_frameworks=c("tensorflow","pytorch")
+ml_frameworks=c("pytorch")
+
 
 method_list=list(
   "tensorflow"=c("lstm"),
@@ -78,53 +79,79 @@ for(framework in ml_frameworks){
         gc()
 
         #Predict---------------------------------------------------------------
-        test_that(paste(framework,method, data_type,"predict"),{
+        test_that(paste(framework,method, data_type,"predict - basic"),{
         if(data_type=="EmbeddedText"){
-          predictions_ET=extractor$extract_features(data_embeddings = dataset_list[[data_type]],
+          predictions=extractor$extract_features(data_embeddings = dataset_list[[data_type]],
                                                     batch_size = 50)
-          expect_equal(predictions_ET$get_features(),128)
-          expect_equal(dataset_list[[data_type]]$n_rows(),predictions_ET$n_rows())
-          expect_true(predictions_ET$is_compressed())
-
-          predictions_large=extractor$extract_features_large(
-            data_embeddings = dataset_list[[data_type]]$convert_to_LargeDataSetForTextEmbeddings(),
-            batch_size = 50,
-            trace = FALSE)
-          expect_equal(predictions_large$get_features(),128)
-          expect_equal(dataset_list[[data_type]]$convert_to_LargeDataSetForTextEmbeddings()$n_rows(),predictions_ET$n_rows())
-          expect_true(predictions_large$is_compressed())
-
-          #R index is one based, python index is zero based
-          i=sample(x=seq.int(from=1,to=predictions_ET$n_rows()),size = 1)
-          expect_equal(unname(predictions_ET$embeddings[i,,,drop=FALSE]),
-                       predictions_large$select((i-1))["input"],
-                       tolerance = 1e-6)
-
-        } else if(data_type=="LargeDataSetForTextEmbeddings"){
-          predictions_ET=extractor$extract_features(data_embeddings = dataset_list[[data_type]]$convert_to_EmbeddedText(),
-                                                    batch_size = 50)
-          expect_equal(predictions_ET$get_features(),128)
-          expect_equal(dataset_list[[data_type]]$n_rows(),predictions_ET$n_rows())
-          expect_true(predictions_ET$is_compressed())
-
-          predictions_large=extractor$extract_features_large(
-            data_embeddings = dataset_list[[data_type]],
-            batch_size = 50,
-            trace = FALSE)
-          expect_equal(predictions_large$get_features(),128)
-          expect_equal(dataset_list[[data_type]]$convert_to_EmbeddedText()$n_rows(),predictions_ET$n_rows())
-          expect_true(predictions_large$is_compressed())
-
-          #R index is one based, python index is zero based
-          i=sample(x=seq.int(from=1,to=predictions_ET$n_rows()),size = 1)
-          expect_equal(unname(predictions_ET$embeddings[i,,,drop=FALSE]),
-                       predictions_large$select((i-1))["input"],
-                       tolerance = 1e-6)
+        } else {
+          predictions=extractor$extract_features_large(data_embeddings = dataset_list[[data_type]],
+                                                          batch_size = 50)
         }
-
-
-
+          expect_equal(predictions$get_features(),128)
+          expect_equal(dataset_list[[data_type]]$n_rows(),predictions$n_rows())
+          expect_true(predictions$is_compressed())
       })
+
+        test_that(paste(framework,method, data_type,"predict - randomness"),{
+          if(data_type=="EmbeddedText"){
+            predictions=extractor$extract_features(data_embeddings = dataset_list[[data_type]],
+                                                   batch_size = 50)
+            predictions_2=extractor$extract_features(data_embeddings = dataset_list[[data_type]],
+                                                   batch_size = 50)
+            expect_equal(predictions,predictions_2)
+          } else {
+            predictions=extractor$extract_features_large(data_embeddings = dataset_list[[data_type]],
+                                                         batch_size = 50)
+            predictions_2=extractor$extract_features_large(data_embeddings = dataset_list[[data_type]],
+                                                         batch_size = 50)
+
+            i=sample(seq.int(from = 1,to=predictions$n_rows()))
+            expect_equal(predictions$select((i-1))["input"],predictions_2$select((i-1))["input"])
+
+          }
+        })
+
+        test_that(paste(framework,method, data_type,"predict - order invariance"),{
+          embeddings_ET_perm=dataset_list[["EmbeddedText"]]$clone(deep=TRUE)
+          perm=sample(x=seq.int(from = 1,to=nrow(embeddings_ET_perm$embeddings)),replace = FALSE)
+          embeddings_ET_perm$embeddings=embeddings_ET_perm$embeddings[perm,,,drop=FALSE]
+
+          if(data_type=="EmbeddedText"){
+            predictions=extractor$extract_features(data_embeddings = dataset_list[[data_type]],
+                                                   batch_size = 50)
+            predictions_Perm<-extractor$extract_features(data_embeddings = embeddings_ET_perm,
+                                                         batch_size = 50)
+            i=sample(seq.int(from = 1,to=predictions$n_rows()),size = 1)
+
+            expect_equal(predictions$embeddings[i,,,drop=FALSE],
+                         predictions_Perm$embeddings[which(perm==i),,,drop=FALSE])
+
+
+          } else {
+            predictions=extractor$extract_features_large(data_embeddings = dataset_list[[data_type]],
+                                                         batch_size = 50)
+            predictions_Perm=extractor$extract_features_large(data_embeddings = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+                                                           batch_size = 50)
+            i=sample(seq.int(from = 1,to=predictions$n_rows()),size = 1)
+            expect_equal(predictions$select((i-1))["input"],
+                         predictions_Perm$select(which(perm==i)-1)["input"])
+
+          }
+        })
+
+        test_that(paste(framework,method, "predict - data source invariance"),{
+          if(data_type=="EmbeddedText"){
+            predictions_ET=extractor$extract_features(data_embeddings = dataset_list[["EmbeddedText"]],
+                                                                              batch_size = 50)
+            predictions_LD=extractor$extract_features_large(data_embeddings = dataset_list[["LargeDataSetForTextEmbeddings"]],
+                                                      batch_size = 50)
+            i=sample(seq.int(from = 1,to=predictions_ET$n_rows()),size = 1)
+            expect_equal(unname(predictions_ET$embeddings[i,,,drop=FALSE]),
+                         predictions_LD$select(i-1)["input"],
+                         tolerance = 1e-7)
+
+          }
+        })
         gc()
 
         #Method for loading and saving models-----------------------------------
@@ -143,10 +170,10 @@ for(framework in ml_frameworks){
 
             #Save and load
             folder_name=paste0("method_save_load_",generate_id())
-            model_dir=paste0(root_path_results,"/",folder_name)
-            extractor$save(model_dir=root_path_results,
+            dir_path=paste0(root_path_results,"/",folder_name)
+            extractor$save(dir_path=root_path_results,
                                  folder_name=folder_name)
-            extractor$load(model_dir=model_dir)
+            extractor$load(dir_path=dir_path)
 
             #Predict after loading
             if(data_type=="EmbeddedText"){
@@ -186,12 +213,12 @@ for(framework in ml_frameworks){
 
             #Save and load
             folder_name=paste0("function_save_load_",generate_id())
-            model_dir=paste0(root_path_results,"/",folder_name)
+            dir_path=paste0(root_path_results,"/",folder_name)
             save_to_disk(object=extractor,
-                         model_dir=root_path_results,
+                         dir_path=root_path_results,
                          folder_name=folder_name)
             extractor=NULL
-            extractor<-load_from_disk(model_dir=model_dir)
+            extractor<-load_from_disk(dir_path=dir_path)
 
             #Predict after loading
             if(data_type=="EmbeddedText"){

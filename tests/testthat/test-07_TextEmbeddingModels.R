@@ -95,7 +95,7 @@ for(framework in ml_frameworks){
             emb_layer_min = min_layer,
             emb_layer_max = max_layer,
             emb_pool_type = pooling_type,
-            model_dir=model_path)
+            dir_path=model_path)
 
         #Central methods--------------------------------------------------------
         #Check history
@@ -252,10 +252,10 @@ for(framework in ml_frameworks){
                                                  doc_id = example_data$id[1:10])
 
           #Save Model
-          expect_no_error(text_embedding_model$save(model_dir = root_path_results,
+          expect_no_error(text_embedding_model$save(dir_path = root_path_results,
                                                           folder_name=folder_name))
           #Load Model
-          expect_no_error(text_embedding_model$load(model_dir = save_location))
+          expect_no_error(text_embedding_model$load(dir_path = save_location))
 
           #embeddings after loading saving
           embeddings_2<-text_embedding_model$embed(raw_text = example_data$text[1:10],
@@ -288,10 +288,10 @@ for(framework in ml_frameworks){
 
           #Save Model
           expect_no_error(save_to_disk(object=text_embedding_model,
-                                                          model_dir = root_path_results,
+                                                          dir_path = root_path_results,
                                                           folder_name=folder_name))
           #Load Model
-          text_embedding_model_reloaded=load_from_disk(model_dir = save_location)
+          text_embedding_model_reloaded=load_from_disk(dir_path = save_location)
 
           #embeddings after loading saving
           embeddings_2<-text_embedding_model_reloaded$embed(raw_text = example_data$text[1:10],
