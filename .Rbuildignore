@@ -5,12 +5,9 @@ Trial
 materials
 test_model
 tests/testthat/test_data/language_models
-tests/testthat/test_data/tmp
-tests/testthat/tmp
-tests/testthat/tmp_full_models
-tests/testthat/test_data/bert/checkpoints
-tests/testthat/test_data/longformer/checkpoints
-tests/testthat/test_data/roberta/checkpoints
+tests/testthat/test_data/LargeDataSetForTexts
+tests/testthat/test_data/TextEmbeddingModel
+tests/testthat/test_data/classifier
 tests/testthat/test_artefacts
 .h5
 .git

@@ -32,36 +32,45 @@ LargeDataSetForText<-R6::R6Class(
     #'to the console.
     #'@return The method does not return anything. It adds new raw texts to
     #'the data set.
-    add_from_files_txt=function(dir_path,batch_size=500,trace=TRUE){
+    add_from_files_txt=function(dir_path,batch_size=500,log_file=NULL,log_intervall=2,trace=TRUE){
       #Gather all text files
       file_paths=private$get_file_paths(dir_path,".txt")
 
-      #calculate number of batches
-      n_batches=ceiling(length(file_paths)/batch_size)
+      if(length(file_paths)>0){
 
-      #get indices for every batch
-      batches=get_batches_index(number_rows=length(file_paths),
-                                batch_size = batch_size)
+        #calculate number of batches
+        n_batches=ceiling(length(file_paths)/batch_size)
 
-      #Process every batch
-      list_datasets=list()
-      for(i in 1:n_batches){
-        chunk=private$get_batch(batches[[i]],
-                                file_paths=file_paths,
-                                clean_text=TRUE)
-        chunk_dataset=data.frame_to_py_dataset(chunk)
-        list_datasets[i]=list(chunk_dataset)
-        if(trace==TRUE){
-          message(paste(date(),
-                        "Batch",i,"from",n_batches,"processed"))
+        #get indices for every batch
+        batches=get_batches_index(number_rows=length(file_paths),
+                                  batch_size = batch_size)
+
+        #Process every batch
+        list_datasets=list()
+        last_log=NULL
+        for(i in 1:n_batches){
+          chunk=private$get_batch(batches[[i]],
+                                  file_paths=file_paths,
+                                  clean_text=TRUE)
+          chunk_dataset=data.frame_to_py_dataset(chunk)
+          list_datasets[i]=list(chunk_dataset)
+          if(trace==TRUE){
+            message(paste(date(),
+                          "Batch",i,"from",n_batches,"processed"))
+          }
+          last_log=private$log(log_file=log_file,
+                      value=i,
+                      total=n_batches,
+                      last_log=last_log,
+                      intervall=log_intervall)
         }
+
+        #concatenate datasets
+        new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
+
+        #Add new dataset
+        private$add(new_dataset)
       }
-
-      #concatenate datasets
-      new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
-
-      #Add new dataset
-      private$add(new_dataset)
     },
 
     #--------------------------------------------------------------------------
@@ -88,33 +97,34 @@ LargeDataSetForText<-R6::R6Class(
     add_from_files_pdf=function(dir_path,batch_size=500,trace=TRUE){
       #Gather all text files
       file_paths=private$get_file_paths(dir_path,".pdf")
+      if(length(file_paths)>0){
+        #calculate number of batches
+        n_batches=ceiling(length(file_paths)/batch_size)
 
-      #calculate number of batches
-      n_batches=ceiling(length(file_paths)/batch_size)
+        #get indices for every batch
+        batches=get_batches_index(number_rows=length(file_paths),
+                                  batch_size = batch_size)
 
-      #get indices for every batch
-      batches=get_batches_index(number_rows=length(file_paths),
-                                batch_size = batch_size)
-
-      #Process every batch
-      list_datasets=list()
-      for(i in 1:n_batches){
-        chunk=private$get_batch(batches[[i]],
-                                file_paths=file_paths,
-                                clean_text=TRUE)
-        chunk_dataset=data.frame_to_py_dataset(chunk)
-        list_datasets[i]=list(chunk_dataset)
-        if(trace==TRUE){
-          message(paste(date(),
-                        "Batch",i,"from",n_batches,"processed"))
+        #Process every batch
+        list_datasets=list()
+        for(i in 1:n_batches){
+          chunk=private$get_batch(batches[[i]],
+                                  file_paths=file_paths,
+                                  clean_text=TRUE)
+          chunk_dataset=data.frame_to_py_dataset(chunk)
+          list_datasets[i]=list(chunk_dataset)
+          if(trace==TRUE){
+            message(paste(date(),
+                          "Batch",i,"from",n_batches,"processed"))
+          }
         }
+
+        #concatenate datasets
+        new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
+
+        #Add new dataset
+        private$add(new_dataset)
       }
-
-      #concatenate datasets
-      new_dataset=datasets$concatenate_datasets(dsets = list_datasets,axis = 0L)
-
-      #Add new dataset
-      private$add(new_dataset)
     },
 
     #--------------------------------------------------------------------------
@@ -143,6 +153,14 @@ LargeDataSetForText<-R6::R6Class(
                                  text_column="text",
                                  bib_entry_column="bib_entry",
                                  license_column="license"){
+      #Check
+      check_type(id_column,"string",FALSE)
+      check_type(text_column,"string",FALSE)
+      check_type(bib_entry_column,"string",TRUE)
+      check_type(license_column,"string",TRUE)
+      check_type(trace,"bool",FALSE)
+      check_type(dir_path,"string",FALSE)
+
       #Gather all text files
       file_paths=private$get_file_paths(dir_path,file_type=".xlsx")
       n_batches=length(file_paths)
@@ -251,7 +269,9 @@ LargeDataSetForText<-R6::R6Class(
         full.names = TRUE,
         recursive = TRUE,
         pattern = paste0("*",file_type))
-      file_paths=private$clean_path(file_paths)
+      if(length(file_paths)>0){
+        file_paths=private$clean_path(file_paths)
+      }
       return(file_paths)
     },
 
@@ -278,8 +298,9 @@ LargeDataSetForText<-R6::R6Class(
                   ncol = 4)
       colnames(data)=c("id","text","bib_entry","license")
 
-      for(i in batch){
-        document=readtext::readtext(file=file_paths[i])
+      for(i in 1:length(batch)){
+        index=batch[i]
+        document=readtext::readtext(file=file_paths[index])
 
         #ID
         data[i,1]=private$remove_file_extenstion(document$doc_id)
@@ -293,7 +314,7 @@ LargeDataSetForText<-R6::R6Class(
         data[i,2]=text
 
         #Bib_entry
-        file_path=paste0(dir(file_paths[i]),"/bib_entry.txt")
+        file_path=paste0(dir(file_paths[index]),"/bib_entry.txt")
         if(file.exists(file_path)==TRUE){
           data[i,3]=read.csv(file = (file_path))
         } else {
@@ -301,7 +322,7 @@ LargeDataSetForText<-R6::R6Class(
         }
 
         #License
-        file_path=paste0(dir(file_paths[i]),"/license.txt")
+        file_path=paste0(dir(file_paths[index]),"/license.txt")
         if(file.exists(file_path)==TRUE){
           data[i,4]=read.csv(file = (file_path))
         } else {
@@ -318,6 +339,40 @@ LargeDataSetForText<-R6::R6Class(
     remove_file_extenstion=function(file){
       tmp_string=stringr::str_split_fixed(file,pattern="\\.",n=Inf)
       return(paste0(tmp_string[1,1:(ncol(tmp_string)-1)],collapse = "."))
+    },
+    log=function(log_file,value,total,last_log,intervall=2){
+      if(!is.null(log_file)){
+        if(value==total|value==1){
+          data_point=c(value,total)
+          names(data_point)=c("value","total")
+          log=try(write.csv(x=t(data_point),file=log_file,row.names = FALSE))
+          if(class(log)!="try-error"){
+            return(Sys.time())
+          }
+        } else {
+          if(!is.null(last_log)){
+            diff=difftime(Sys.time(),last_log,units = "secs")[[1]]
+            if(diff>intervall){
+              data_point=c(value,total)
+              names(data_point)=c("value","total")
+              try(write.csv(x=t(data_point),file=log_file,row.names = FALSE))
+              if(class(log)!="try-error"){
+                return(Sys.time())
+              } else {
+                return(last_log)
+              }
+            }
+          } else {
+            data_point=c(value,total)
+            names(data_point)=c("value","total")
+            try(write.csv(x=t(data_point),file=log_file,row.names = FALSE))
+            if(class(log)!="try-error"){
+              return(Sys.time())
+            }
+          }
+        }
+      }
+
     }
   )
 )
