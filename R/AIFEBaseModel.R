@@ -432,6 +432,12 @@ AIFEBaseModel<-R6::R6Class(
       pgr_max_value=0
     ),
 
+    log_config=list(
+      log_dir=NULL,
+      log_state_file=NULL,
+      log_write_intervall=10
+    ),
+
     #--------------------------------------------------------------------------
     #Method for summarizing sustainability data for this classifier
     #List for results must correspond to the private fields of the classifier

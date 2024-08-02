@@ -205,8 +205,8 @@ TextEmbeddingModel<-R6::R6Class(
       check_type(model_version,"string",TRUE)
       check_type(model_language,"string",FALSE)
       check_type(method,"string",FALSE)
-      if(method%in%c(supported_transformers,"lda","glove_cluster")==FALSE){
-        stop(paste0("Method must be",paste(supported_transformers,collapse = ", "),"lda or glove_cluster."))
+      if(method%in%c(private$supported_transformers,"lda","glove_cluster")==FALSE){
+        stop(paste0("Method must be",paste(private$supported_transformers,collapse = ", "),"lda or glove_cluster."))
       }
       check_type(ml_framework,"string",TRUE)
       if((method %in% c("glove_cluster","lda"))==FALSE){
@@ -786,7 +786,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
 
           #Sustainability Data
-          sustainability_datalog_path=paste0(model_dir,"/","sustainability.csv")
+          sustainability_datalog_path=paste0(dir_path,"/","sustainability.csv")
           if(file.exists(sustainability_datalog_path)){
             tmp_sustainability_data<-read.csv(sustainability_datalog_path)
             private$sustainability$sustainability_tracked=TRUE
@@ -797,7 +797,7 @@ TextEmbeddingModel<-R6::R6Class(
           }
 
           #Training History
-          training_datalog_path=paste0(model_dir,"/","history.log")
+          training_datalog_path=paste0(dir_path,"/","history.log")
           if(file.exists(training_datalog_path)){
             self$last_training$history=read.csv2(file = training_datalog_path)
           } else {
@@ -1551,7 +1551,9 @@ TextEmbeddingModel<-R6::R6Class(
     #'@param trace `bool` `TRUE`, if information about the progression
     #'should be printed on console.
     #'@return Method returns an object of class [LargeDataSetForTextEmbeddings].
-    embed_large=function(large_datas_set,batch_size=32,trace=FALSE){
+    embed_large=function(large_datas_set,batch_size=32,trace=FALSE,
+                         log_file = NULL,
+                         log_write_interval = 2){
       #Check arguments
       check_class(large_datas_set,c("LargeDataSetForText",FALSE))
       check_type(batch_size,"int",FALSE)
@@ -1564,6 +1566,9 @@ TextEmbeddingModel<-R6::R6Class(
       batches_index=get_batches_index(number_rows=large_datas_set$n_rows(),
                                       batch_size=batch_size,
                                       zero_based=TRUE)
+      #Set up log
+      last_log <- NULL
+
       #Process every batch
       for(i in 1:total_number_of_bachtes){
         subset=large_datas_set$select(as.integer(batches_index[[i]]))
@@ -1601,6 +1606,22 @@ TextEmbeddingModel<-R6::R6Class(
           cat(paste(date(),
                     "Batch",i,"/",total_number_of_bachtes,"done","\n"))
         }
+
+        #Update log
+        last_log <- write_log(
+          log_file = log_file,
+          last_log = last_log,
+          write_interval = log_write_interval,
+          value_top = i,
+          value_middle = 0,
+          value_bottom = 0,
+          total_top = total_number_of_bachtes,
+          total_middle = 1,
+          total_bottom = 1,
+          message_top = "Batches",
+          message_middle = NA,
+          message_bottom = NA
+        )
         gc()
       }
       return(embedded_texts_large)

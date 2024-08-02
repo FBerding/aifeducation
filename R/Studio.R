@@ -1,5 +1,5 @@
 start_studio_new <- function() {
-  #shiny::devmode()
+  # shiny::devmode()
   base::requireNamespace("future")
   base::requireNamespace("shiny")
   base::requireNamespace("bslib")
@@ -13,7 +13,7 @@ start_studio_new <- function() {
     ),
     nav_panel(
       title = "Base Models",
-      page_navbar(
+      navset_underline(
         nav_panel(
           title = "Create"
         ),
@@ -24,29 +24,52 @@ start_studio_new <- function() {
     ),
     nav_panel(
       title = "TextEmbeddingModels",
-      page_navbar(
+      navset_tab(
         nav_panel(
-          title = "Create"
+          title = "Create",
+          TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
         ),
         nav_panel(
-          title = "Use"
+          title = "Use",
+          TextEmbeddingModel_Use_UI("TextEmbeddingModel_Use")
         ),
         nav_panel(
-          title = "Document"
+          title = "Document",
+          DocumentPage_UI("TextEmbeddingModel_Document")
         )
       )
     ),
     nav_panel(
-      title = "Classification",
-      page_navbar(
+      title = "FeatureExtractors",
+      navset_tab(
         nav_panel(
-          title = "Create"
+          title = "Create",
+          FeatureExtractors_Create_UI("FeatureExtractors_Create")
         ),
         nav_panel(
-          title = "Use"
+          title = "Use",
+          TextEmbeddingModel_Use_UI("FeatureExtractors_Use")
         ),
         nav_panel(
-          title = "Document"
+          title = "Document",
+          DocumentPage_UI("FeatureExtractors_Document")
+        )
+      )
+    ),
+    nav_panel(
+      title = "Classifiers",
+      navset_tab(
+        nav_panel(
+          title = "Create",
+          Classifiers_Create_UI("Classifiers_Create")
+        ),
+        nav_panel(
+          title = "Use",
+          Classifiers_Use_UI("Classifiers_Use")
+        ),
+        nav_panel(
+          title = "Document",
+          DocumentPage_UI("Classifiers_Document")
         )
       )
     )
@@ -65,7 +88,57 @@ start_studio_new <- function() {
   )
 
   server <- function(input, output, session) {
-    DataManagement_RawTextsServer("DataSetRawTexts")
+    #Set up global variables----------------------------------------------------
+    log_dir=getwd()
+    volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
+
+    #Functions
+    DataManagement_RawTextsServer(
+      id="DataSetRawTexts",
+      log_dir=log_dir,
+      volumes=volumes)
+
+    #TextEmbeddingModels
+    TextEmbeddingModel_Create_Server(
+      id="TextEmbeddingModel_Create",
+      log_dir=log_dir,
+      volumes=volumes)
+    TextEmbeddingModel_Use_Server(
+      id="TextEmbeddingModel_Use",
+      log_dir=log_dir,
+      volumes=volumes
+      )
+    DocumentPage_Server(
+      id="TextEmbeddingModel_Document",
+      volumes=volumes,
+      type = "TextEmbeddingModel"
+    )
+
+    #FeatureExtractors
+    DocumentPage_Server(
+      id="FeatureExtractors_Document",
+      volumes=volumes,
+      type = "FeatureExtractors"
+    )
+
+    #Classifiers
+    Classifiers_Create_Server(
+      id="Classifiers_Create",
+      log_dir=log_dir,
+      volumes=volumes)
+
+    Classifiers_Use_Server(
+      id="Classifiers_Use",
+      log_dir=log_dir,
+      volumes=volumes
+      )
+    DocumentPage_Server(
+      id="Classifiers_Document",
+      volumes=volumes,
+      type = "FeatureExtractors"
+    )
+
+
   }
   shinyApp(ui = ui, server = server)
 }

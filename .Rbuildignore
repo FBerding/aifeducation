@@ -28,3 +28,5 @@ gui_aife_studio.Rmd
 classification_tasks.Rmd
 intel_power_gadget_log.csv
 reference
+aifeducation_state.log
+aifeducation_loss.log

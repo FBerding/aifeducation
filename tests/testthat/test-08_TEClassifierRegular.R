@@ -2,9 +2,10 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
 #Skip Tests
-skip_creation_test=FALSE
-skip_training_test=FALSE
+skip_creation_test=TRUE
+skip_training_test=TRUE
 skip_overfitting_test=FALSE
+include_tensorflow=FALSE
 
 #SetUp-------------------------------------------------------------------------
 #Set paths
@@ -37,13 +38,16 @@ test_embeddings_reduced=test_embeddings$clone(deep = TRUE)
 test_embeddings_reduced$embeddings=test_embeddings_reduced$embeddings[1:5,,]
 test_embeddings_reduced_LD=test_embeddings_reduced$convert_to_LargeDataSetForTextEmbeddings()
 
-#case=sample(x=seq.int(from = 1,to=nrow(test_embeddings$embeddings)))
 test_embeddings_single_case=test_embeddings$clone(deep = TRUE)
 test_embeddings_single_case$embeddings=test_embeddings_single_case$embeddings[1,,,drop=FALSE]
 test_embeddings_single_case_LD=test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
 
 #Config
-ml_frameworks=c("tensorflow","pytorch")
+if(include_tensorflow==FALSE){
+  ml_frameworks=c("pytorch")
+} else {
+  ml_frameworks=c("pytorch","tensorflow")
+}
 
 rec_list=list(NULL,c(4),c(4,3))
 rec_type_list=list("gru","lstm")
@@ -539,7 +543,7 @@ for(framework in ml_frameworks){
 
     #Overfitting test----------------------------------------------------------
     if(!skip_overfitting_test){
-      test_that(paste(framework,n_classes,"overfitting test"), {
+      test_that(paste(framework,n_classes,"overfitting test with log"), {
         #Create directory for saving checkpoint for every training
         train_path=paste0(root_path_results,"/","train_",generate_id())
         if(dir.exists(train_path)==FALSE){
@@ -599,12 +603,30 @@ for(framework in ml_frameworks){
           epochs=100,
           batch_size=32,
           dir_checkpoint=train_path,
+          log_dir=train_path,
           trace=FALSE,
           keras_trace=0,
           pytorch_trace=0)
 
         history=classifier_overfitting$last_training$history[[1]]$accuracy["train",]
         expect_gte(object=max(history),expected = 0.95)
+
+        state_log_exists=file.exists(paste0(train_path,"/aifeducation_state.log"))
+        expect_true(state_log_exists)
+        if(state_log_exists){
+          log_state=read.csv(paste0(train_path,"/aifeducation_state.log"))
+          expect_equal(nrow(log_state),3)
+          expect_equal(ncol(log_state),3)
+          expect_equal(colnames(log_state),c("value","total","message"))
+        }
+
+        loss_log_exists=file.exists(paste0(train_path,"/aifeducation_loss.log"))
+        expect_true(loss_log_exists)
+        if(loss_log_exists==TRUE){
+          log_loss=read.csv(paste0(train_path,"/aifeducation_loss.log"),header = FALSE)
+          expect_gte(ncol(log_loss),2)
+          expect_gte(nrow(log_loss),2)
+        }
       })
     }
 

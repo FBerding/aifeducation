@@ -154,7 +154,9 @@ TEFeatureExtractor<-R6::R6Class(
                    dir_checkpoint,
                    trace=TRUE,
                    keras_trace=2,
-                   pytorch_trace=1){
+                   pytorch_trace=1,
+                   log_dir=NULL,
+                   log_write_interval=10){
 
       #Checking Arguments------------------------------------------------------
       self$check_embedding_model(data_embeddings)
@@ -181,6 +183,10 @@ TEFeatureExtractor<-R6::R6Class(
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
 
+      private$log_config$log_dir=log_dir
+      private$log_config$log_state_file=paste0(private$log_config$log_dir,"/aifeducation_state.log")
+      private$log_config$log_write_interval=log_write_interval
+
       #Loading PY Scripts
       private$load_reload_python_scripts()
 
@@ -202,16 +208,20 @@ TEFeatureExtractor<-R6::R6Class(
       data=reduce_to_unique(data,"id")
 
       #Copy input as label for training
-      #extractor_dataset=extractor_dataset$add_column("labels",extractor_dataset["input"])
       extractor_dataset=data$map(py$map_input_to_labels)
 
       #Check directory for checkpoints
-      if(dir.exists(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))==FALSE){
+      if(dir.exists(self$last_training$config$dir_checkpoint)==FALSE){
         if(self$last_training$config$trace==TRUE){
           message(paste(date(),"Creating Checkpoint Directory"))
         }
-        dir.create(paste0(self$last_training$config$dir_checkpoint,"/checkpoints"))
+        dir.create(self$last_training$config$dir_checkpoint)
       }
+
+      #Set up log file
+      log_top_value=0
+      log_top_total=1
+      log_top_message="Overall"
 
       if(private$ml_framework=="pytorch"){
         #Set format
@@ -230,7 +240,11 @@ TEFeatureExtractor<-R6::R6Class(
           val_data=extractor_dataset$test,
           filepath=paste0(self$last_training$config$dir_checkpoint,"/best_weights.pt"),
           use_callback=TRUE,
-          shiny_app_active=self$gui$shiny_app_active)$loss
+          log_dir=private$log_config$log_dir,
+          log_write_interval=log_write_interval,
+          log_top_value=log_top_value,
+          log_top_total=log_top_total,
+          log_top_message=log_top_message)$loss
         #-----------------------------------------------------------------------
       } else if(private$ml_framework=="tensorflow"){
         #Set format
@@ -298,16 +312,15 @@ TEFeatureExtractor<-R6::R6Class(
     #'this method should only be used if a small number of cases should be compressed since
     #'the data is loaded completely into memory.
     #'For a high number of cases please use the method `extract_features_large`.
-    #'@param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing
+    #'@param data_embeddings Object of class [EmbeddedText],[LargeDataSetForTextEmbeddings],
+    #'`datasets.arrow_dataset.Dataset` or `array` containing
     #'the text embeddings which should be reduced in their dimensions.
     #'@param batch_size `int` batch size.
     #'@return Returns an object of class [EmbeddedText] containing the compressed
     #'embeddings.
     extract_features=function(data_embeddings,batch_size){
       #Argument checking
-      check_class(data_embeddings,c("EmbeddedText","LargeDataSetForTextEmbeddings"),FALSE)
       check_type(batch_size,"int",FALSE)
-
       #check data_embeddings object
       if("EmbeddedText"%in%class(data_embeddings)|
          "LargeDataSetForTextEmbeddings"%in%class(data_embeddings)){
@@ -414,7 +427,6 @@ TEFeatureExtractor<-R6::R6Class(
     #--------------------------------------------------------------------------
     #'@description Method for extracting features from a large number of cases. Applying this method
     #'reduces the number of dimensions of the text embeddings.
-    #'For a high number of cases please use the method `extract_features_large`.
     #'@param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing
     #'the text embeddings which should be reduced in their dimensions.
     #'@param batch_size `int` batch size.
@@ -503,6 +515,8 @@ TEFeatureExtractor<-R6::R6Class(
         reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
                                             package = "aifeducation"))
         reticulate::py_run_file(system.file("python/pytorch_autoencoder.py",
+                                            package = "aifeducation"))
+        reticulate::py_run_file(system.file("python/py_log.py",
                                             package = "aifeducation"))
 
       }

@@ -214,7 +214,8 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       return mask_long    
     
 def AutoencoderTrain_PT_with_Datasets(model,epochs, trace,batch_size,
-train_data,val_data,filepath,use_callback,shiny_app_active=False):
+train_data,val_data,filepath,use_callback,
+log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
@@ -243,23 +244,21 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
 
   best_val_loss=float('inf')
   
-  #GUI ProgressBar
-  if shiny_app_active is True:
+  #Log file
+  if not (log_dir is None):
+    log_file=log_dir+"/aifeducation_state.log"
+    log_file_loss=log_dir+"/aifeducation_loss.log"
+    last_log=None
+    last_log_loss=None
     current_step=0
     total_epochs=epochs
-    total_steps=len(trainloader)
-    r.py_update_aifeducation_progress_bar_steps(value=0,total=total_steps,title=("Batch/Step: "+str(0)+"/"+str(total_steps)))
-    r.py_update_aifeducation_progress_bar_epochs(value=0,total=epochs,title=("Epoch: "+str(0)+"/"+str(epochs)))
+    total_steps=len(trainloader)+len(valloader)
 
   for epoch in range(epochs):
     
     #Training------------------------------------------------------------------
     train_loss=0.0
 
-    #Gui ProgressBar
-    if shiny_app_active is True:
-      current_step=0
-    
     model.train(True)
     for batch in trainloader:
       inputs=batch["input"]
@@ -276,10 +275,13 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
       optimizer.step()
       train_loss +=loss.item()
       
-      #Update Progress Logger
-      if shiny_app_active is True:
+      #Update log file
+      if not (log_dir is None):
         current_step+=1
-        r.py_update_aifeducation_progress_bar_steps(value=current_step,total=total_steps,title=("Batch/Step: "+str(current_step)+"/"+str(total_steps)))
+        last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
+                  total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
+                  message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
+        last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
     
     #Validation----------------------------------------------------------------
     val_loss=0.0
@@ -297,6 +299,14 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
         
         loss=loss_fct(outputs[0],labels)+outputs[1]
         val_loss +=loss.item()
+        
+        #Update log file
+        if not (log_dir is None):
+          current_step+=1
+          last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
+                    total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
+                    message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
+          last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
     
     #Record History------------------------------------------------------------
     history_loss[0,epoch]=train_loss/len(trainloader)
@@ -310,11 +320,6 @@ train_data,val_data,filepath,use_callback,shiny_app_active=False):
         train_loss/len(trainloader),
         val_loss/len(valloader)))
           
-    #Update ProgressBar in Shiny
-    if shiny_app_active is True:
-        r.py_update_aifeducation_progress_bar_epochs(value=epoch+1,total=epochs,title=("Epoch: "+str(epoch+1)+"/"+str(epochs)))
-        
-    
     #Callback-------------------------------------------------------------------
     if use_callback==True:
       if (val_loss/len(valloader))<best_val_loss:

@@ -364,13 +364,13 @@ TEClassifierProtoNet<-R6::R6Class(
                    dir_checkpoint,
                    trace=TRUE,
                    keras_trace=2,
-                   pytorch_trace=1){
+                   pytorch_trace=1,
+                   log_dir=NULL,
+                   log_write_interval=10){
 
       #Checking Arguments------------------------------------------------------
       check_type(data_folds,type="int",FALSE)
       check_type(data_val_size,type="double",FALSE)
-      check_type(balance_class_weights,type="bool",FALSE)
-      check_type(balance_sequence_length,type="bool",FALSE)
       check_type(use_sc,type="bool",FALSE)
       check_type(sc_method,type="string",FALSE)
       check_type(sc_min_k,type="int",FALSE)
@@ -437,6 +437,10 @@ TEClassifierProtoNet<-R6::R6Class(
       self$last_training$config$trace=trace
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
+
+      private$log_config$log_dir=log_dir
+      private$log_config$log_state_file=paste0(private$log_config$log_dir,"/aifeducation_state.log")
+      private$log_config$log_write_interval=log_write_interval
 
       #Start-------------------------------------------------------------------
       if(self$last_training$config$trace==TRUE){
@@ -776,6 +780,8 @@ TEClassifierProtoNet<-R6::R6Class(
                                             package = "aifeducation"))
         reticulate::py_run_file(system.file("python/pytorch_te_protonet.py",
                                             package = "aifeducation"))
+        reticulate::py_run_file(system.file("python/py_log.py",
+                                            package = "aifeducation"))
       }
     },
     #--------------------------------------------------------------------------
@@ -978,7 +984,11 @@ TEClassifierProtoNet<-R6::R6Class(
                          test_data=NULL,
                          reset_model=FALSE,
                          use_callback=TRUE,
-                         shiny_app_active=FALSE){
+                         log_dir=NULL,
+                         log_write_interval=10,
+                         log_top_value=NULL,
+                         log_top_total=NULL,
+                         log_top_message=NULL){
 
       #Clear session to provide enough resources for computations
       if(private$ml_framework=="tensorflow"){
@@ -1149,7 +1159,11 @@ TEClassifierProtoNet<-R6::R6Class(
           epochs = as.integer(self$last_training$config$epochs),
           filepath=paste0(self$last_training$config$dir_checkpoint,"/checkpoints/best_weights.pt"),
           n_classes=as.integer(length(self$model_config$target_levels)),
-          shiny_app_active=self$gui$shiny_app_active)
+          log_dir=log_dir,
+          log_write_interval=log_write_interval,
+          log_top_value=log_top_value,
+          log_top_total=log_top_total,
+          log_top_message=log_top_message)
       }
 
       #Provide rownames for the history

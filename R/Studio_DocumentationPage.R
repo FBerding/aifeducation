@@ -1,0 +1,318 @@
+DocumentPage_UI <- function(id) {
+  bslib::page(
+    bslib::page_sidebar(
+      # Sidebar------------------------------------------------------------------
+      sidebar = bslib::sidebar(
+        position = "left",
+        tags$h3("Control Panel"),
+        shinyFiles::shinyDirButton(
+          id = shiny::NS(id, "button_select_model"),
+          label = "Choose a Model",
+          title = "Please choose a folder",
+          icon = shiny::icon("folder-open")
+        ),
+        shiny::uiOutput(outputId = shiny::NS(id, "sidebar_description"))
+      ),
+      # Main panel---------------------------------------------------------------
+      bslib::navset_card_underline(
+        bslib::nav_panel(
+          title = "Developers",
+          shiny::uiOutput(outputId = shiny::NS(id, "developers"))
+        ),
+        bslib::nav_panel(
+          title = "Modifiers",
+          shiny::uiOutput(outputId = shiny::NS(id, "modifiers"))
+        ),
+        bslib::nav_panel(
+          title = "Abstract English",
+          shiny::uiOutput(outputId = shiny::NS(id, "abstract_eng"))
+        ),
+        bslib::nav_panel(
+          title = "Description English",
+          shiny::uiOutput(outputId = shiny::NS(id, "desc_eng"))
+        ),
+        bslib::nav_panel(
+          title = "Abstract Native",
+          shiny::uiOutput(outputId = shiny::NS(id, "abstract_native"))
+        ),
+        bslib::nav_panel(
+          title = "Description Native",
+          shiny::uiOutput(outputId = shiny::NS(id, "desc_native"))
+        )
+      )
+    )
+  )
+}
+
+
+
+DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
+  moduleServer(id, function(input, output, session) {
+    # global variables-----------------------------------------------------------
+    ns <- session$ns
+
+    shinyFiles::shinyDirChoose(
+      input = input,
+      id = "button_select_model",
+      roots = volumes,
+      allowDirCreate = FALSE
+    )
+
+    # Load the model and check for errors during loading-------------------------
+    model_path <- shiny::eventReactive(input$button_select_model, {
+      model_path <- shinyFiles::parseDirPath(volumes, input$button_select_model)
+      if (length(model_path) > 0) {
+        return(model_path)
+      } else {
+        return(NULL)
+      }
+    })
+
+    model <- shiny::eventReactive(input$button_select_model, {
+      # Get model path
+      model_path <- shinyFiles::parseDirPath(volumes, input$button_select_model)
+      if (length(model_path) > 0) {
+        display_processing(
+          title = "Working. Please wait.",
+          size = "l",
+          easy_close = FALSE,
+          message = ""
+        )
+
+        # Try to load the model
+        model <- try(load_from_disk(model_path), silent = TRUE)
+
+        if ("try-error" %in% class(model) == FALSE) {
+          if ("TextEmbeddingModel" %in% class(model)) {
+            shiny::removeModal()
+            return(model)
+          } else {
+            display_errors(
+              title = "Error",
+              size = "l",
+              easy_close = TRUE,
+              error_messages = "The file does not contain an object of class TextEmbeddingModel."
+            )
+            return(NULL)
+          }
+        } else {
+          display_errors(
+            title = "Error",
+            size = "l",
+            easy_close = TRUE,
+            error_messages = model
+          )
+          return(NULL)
+        }
+      }
+    })
+
+    # Render the information at the sidebar--------------------------------------
+    output$sidebar_description <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_sidebar_information(model())
+      )
+    })
+
+    # Developed By Tab---------------------------------------------------------------
+    output$developers <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_doc_input_developers(ns = session$ns, model = model(), type = "developers")
+      )
+    })
+
+    shiny::observeEvent(input$doc_developed_by_save, {
+      tmp_model <- model()
+
+      tmp_person_list <- NULL
+      for (i in 1:10) {
+        given <- input[[paste0("doc_", "Developers", "_fist_name_", i)]]
+        family <- input[[paste0("doc_", "Developers", "_last_name_", i)]]
+        mail <- input[[paste0("doc_", "Developers", "_mail_", i)]]
+        print(i)
+        print(given)
+        print(family)
+        print(mail)
+        if (!is.null(given) & !is.null(family)) {
+          if (!(given == "") & !(family == "")) {
+            person <- person(given = given, family = family, email = mail)
+            tmp_person_list <- append(
+              x = tmp_person_list,
+              values = person
+            )
+          }
+        }
+      }
+
+      print(input[[paste0("doc_", "developed_by", "_citation")]])
+      print(input[[paste0("doc_", "developed_by", "_url")]])
+
+      tmp_model$set_publication_info(
+        type = "developer",
+        authors = tmp_person_list,
+        citation = input[[paste0("doc_", "developed_by", "_citation")]],
+        url = input[[paste0("doc_", "developed_by", "_url")]]
+      )
+      r_interface_path <- paste0(model_path(), "/r_interface.rda")
+      save(tmp_model, file = r_interface_path)
+      model <- shiny::reactive({
+        tmp_model
+      })
+    })
+
+    # Modified By Tab---------------------------------------------------------------
+    if (type == "TextEmbeddingModel") {
+      output$modifiers <- shiny::renderUI({
+        shiny::req(model())
+        return(
+          generate_doc_input_developers(ns = session$ns, model = model(), type = "modifiers")
+        )
+      })
+
+      shiny::observeEvent(input$doc_modified_by_save, {
+        tmp_model <- model()
+
+        tmp_person_list <- NULL
+        for (i in 1:10) {
+          given <- input[[paste0("doc_", "Modifiers", "_fist_name_", i)]]
+          family <- input[[paste0("doc_", "Modifiers", "_last_name_", i)]]
+          mail <- input[[paste0("doc_", "Modifiers", "_mail_", i)]]
+          if (!is.null(given) & !is.null(family)) {
+            if (!(given == "") & !(family == "")) {
+              person <- person(given = given, family = family, email = mail)
+              tmp_person_list <- append(
+                x = tmp_person_list,
+                values = person
+              )
+            }
+          }
+        }
+
+        tmp_model$set_publication_info(
+          type = "modifier",
+          authors = tmp_person_list,
+          citation = input[[paste0("doc_", "modified_by", "_citation")]],
+          url = input[[paste0("doc_", "modified_by", "_url")]]
+        )
+        r_interface_path <- paste0(model_path(), "/r_interface.rda")
+        save(tmp_model, file = r_interface_path)
+        model <- shiny::reactive({
+          tmp_model
+        })
+      })
+    }
+
+    # Abstract Eng---------------------------------------------------------------
+    output$abstract_eng <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_doc_input_text_editor(ns = session$ns, model = model(), language = "eng", type = "abstract")
+      )
+    })
+
+    shiny::observeEvent(input$doc_editor_abstract_eng_save_button, {
+      tmp_model <- model()
+      tmp_model$set_model_description(
+        abstract_eng = input$doc_editor_abstract_eng,
+        keywords_eng = input$doc_editor_abstract_eng_keywords
+      )
+      r_interface_path <- paste0(model_path(), "/r_interface.rda")
+      save(tmp_model, file = r_interface_path)
+      model <- shiny::reactive({
+        tmp_model
+      })
+    })
+
+    shiny::observeEvent(input$doc_editor_abstract_eng_preview_button, {
+      output$doc_editor_abstract_eng_preview <- shiny::renderUI({
+        return(shiny::includeMarkdown(input$doc_editor_abstract_eng))
+      })
+    })
+
+    # Description Eng---------------------------------------------------------------
+    output$desc_eng <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_doc_input_text_editor(ns = session$ns, model = model(), language = "eng", type = "desc")
+      )
+    })
+
+    shiny::observeEvent(input$doc_editor_description_eng_save_button, {
+      tmp_model <- model()
+      tmp_model$set_model_description(
+        eng = input$doc_editor_description_eng
+      )
+      r_interface_path <- paste0(model_path(), "/r_interface.rda")
+      save(tmp_model, file = r_interface_path)
+      model <- shiny::reactive({
+        tmp_model
+      })
+    })
+
+    shiny::observeEvent(input$doc_editor_description_eng_preview_button, {
+      output$doc_editor_description_eng_preview <- shiny::renderUI({
+        return(shiny::includeMarkdown(input$doc_editor_description_eng))
+      })
+    })
+
+    # Abstract Native---------------------------------------------------------------
+    output$abstract_native <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_doc_input_text_editor(ns = session$ns, model = model(), language = "native", type = "abstract")
+      )
+    })
+
+    shiny::observeEvent(input$doc_editor_abstract_native_save_button, {
+      tmp_model <- model()
+      tmp_model$set_model_description(
+        abstract_native = input$doc_editor_abstract_native,
+        keywords_native = input$doc_editor_abstract_native_keywords
+      )
+      r_interface_path <- paste0(model_path(), "/r_interface.rda")
+      save(tmp_model, file = r_interface_path)
+      model <- shiny::reactive({
+        tmp_model
+      })
+    })
+
+    shiny::observeEvent(input$doc_editor_abstract_native_preview_button, {
+      output$doc_editor_abstract_native_preview <- shiny::renderUI({
+        return(shiny::includeMarkdown(input$doc_editor_abstract_native))
+      })
+    })
+
+    # Description Native---------------------------------------------------------------
+    output$desc_eng <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_doc_input_text_editor(ns = session$ns, model = model(), language = "native", type = "desc")
+      )
+    })
+
+
+    shiny::observeEvent(input$doc_editor_description_native_save_button, {
+      tmp_model <- model()
+      tmp_model$set_model_description(
+        native = input$doc_editor_description_native
+      )
+      r_interface_path <- paste0(model_path(), "/r_interface.rda")
+      save(tmp_model, file = r_interface_path)
+      model <- shiny::reactive({
+        tmp_model
+      })
+    })
+
+    shiny::observeEvent(input$doc_editor_description_native_preview_button, {
+      output$doc_editor_description_native_preview <- shiny::renderUI({
+        return(shiny::includeMarkdown(input$doc_editor_description_native))
+      })
+    })
+
+
+
+    #--------------------------------------------------------------------------
+  })
+}

@@ -8,9 +8,7 @@ if(dir.exists(root_path_data)==FALSE){
   dir.create(root_path_data)
 }
 
-ml_frameworks<-c("tensorflow"#,
-                 #"pytorch"
-                 )
+ml_frameworks<-c("pytorch")
 
 method_list="lstm"
 
@@ -54,7 +52,7 @@ for(framework in ml_frameworks){
                 pytorch_trace=1
               )
               save_to_disk(object = extractor,
-                           model_dir = root_path_data,
+                           dir_path =  root_path_data,
                            folder_name = paste0("feature_extractor_",framework))
 
 

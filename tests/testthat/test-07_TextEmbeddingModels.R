@@ -95,7 +95,7 @@ for(framework in ml_frameworks){
             emb_layer_min = min_layer,
             emb_layer_max = max_layer,
             emb_pool_type = pooling_type,
-            dir_path=model_path)
+            model_dir=model_path)
 
         #Central methods--------------------------------------------------------
         #Check history
@@ -152,6 +152,31 @@ for(framework in ml_frameworks){
           expect_s3_class(embeddings, class="LargeDataSetForTextEmbeddings")
           expect_false(embeddings$is_compressed())
           expect_equal(embeddings$n_rows(),nrow(example_data))
+
+        })
+
+        test_that(paste(framework,base_model,pooling_type,max_layer,min_layer,"embed_large with log"), {
+          #general
+          log_dir=paste0(root_path_results,"/",generate_id())
+          if(dir.exists(log_dir)==FALSE){
+            dir.create(log_dir)
+          }
+          log_file=paste0(log_dir,"aifeducation_state.log")
+          embeddings<-text_embedding_model$embed_large(example_data_large,
+                                                       log_file = log_file,
+                                                       log_write_interval = 2)
+          expect_s3_class(embeddings, class="LargeDataSetForTextEmbeddings")
+          expect_false(embeddings$is_compressed())
+          expect_equal(embeddings$n_rows(),nrow(example_data))
+
+          state_log_exists=file.exists(log_file)
+          expect_true(state_log_exists)
+          if(state_log_exists){
+            log_state=read.csv(log_file)
+            expect_equal(nrow(log_state),3)
+            expect_equal(ncol(log_state),3)
+            expect_equal(colnames(log_state),c("value","total","message"))
+          }
 
         })
 

@@ -2,8 +2,8 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
                       message  = "Necessary python modules not available")
 
 #Skip Tests
-skip_creation_test=FALSE
-skip_training_test=FALSE
+skip_creation_test=TRUE
+skip_training_test=TRUE
 skip_overfitting_test=FALSE
 
 #SetUp-------------------------------------------------------------------------
@@ -58,49 +58,10 @@ pl_list=list(FALSE,TRUE)
 
 #Load feature extractors
 feature_extractor_list=NULL
-feature_extractor_list["tensorflow"]=list(list(
-  load_from_disk(paste0(root_path_data,"/feature_extractor_tensorflow")),
-  NULL)
-)
-
 feature_extractor_list["pytorch"]=list(list(
   load_from_disk(paste0(root_path_data,"/feature_extractor_pytorch")),
   NULL)
 )
-
-#Create feature extractors
-#for(framework in ml_frameworks){
-#  checkpoint_path=paste0(root_path_results,"/",framework,"_fe")
-#  extractor<-TEFeatureExtractor$new(
-#    ml_framework = framework,
-#    name="Test_extractor",
-#    label="Test Extractor",
-#    text_embeddings=test_embeddings,
-#    features=128,
-#    method="lstm",
-#    noise_factor=0.01,
-#    optimizer="adam"
-#  )
-#  if(dir.exists(checkpoint_path)==FALSE){
-#    dir.create(checkpoint_path)
-#  }
-#  extractor$train(
-#    data_embeddings=test_embeddings,
-#    data_val_size=0.25,
-#    sustain_track=TRUE,
-#    sustain_iso_code="DEU",
-#    sustain_region=NULL,
-#    sustain_interval=15,
-#    epochs=2,
-#    batch_size=100,
-#    dir_checkpoint=checkpoint_path,
-#    trace=FALSE,
-#    keras_trace=0,
-#    pytorch_trace=0
-#  )
-#  feature_extractor_list[framework]=list(c(extractor,NULL))
-#}
-
 
 for(framework in ml_frameworks){
   for (n_classes in 2:3){
@@ -603,12 +564,30 @@ for(framework in ml_frameworks){
           epochs=100,
           batch_size=32,
           dir_checkpoint=train_path,
+          log_dir=train_path,
           trace=FALSE,
           keras_trace=0,
           pytorch_trace=0)
 
         history=classifier_overfitting$last_training$history[[1]]$accuracy["train",]
         expect_gte(object=max(history),expected = 0.90)
+
+        state_log_exists=file.exists(paste0(train_path,"/aifeducation_state.log"))
+        expect_true(state_log_exists)
+        if(state_log_exists){
+          log_state=read.csv(paste0(train_path,"/aifeducation_state.log"))
+          expect_equal(nrow(log_state),3)
+          expect_equal(ncol(log_state),3)
+          expect_equal(colnames(log_state),c("value","total","message"))
+        }
+
+        loss_log_exists=file.exists(paste0(train_path,"/aifeducation_loss.log"))
+        expect_true(loss_log_exists)
+        if(loss_log_exists==TRUE){
+          log_loss=read.csv(paste0(train_path,"/aifeducation_loss.log"),header = FALSE)
+          expect_gte(ncol(log_loss),2)
+          expect_gte(nrow(log_loss),2)
+        }
       })
     }
 

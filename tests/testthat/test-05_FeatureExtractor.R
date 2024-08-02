@@ -32,10 +32,9 @@ dataset_list=list("EmbeddedText"=imdb_embeddings,
 #config
 ml_frameworks=c("pytorch")
 
-
 method_list=list(
-  "tensorflow"=c("lstm"),
-  "pytorch"=c("lstm","dense","conv"))
+  "pytorch"=c("lstm","dense","conv")
+  )
 
 #Start tests--------------------------------------------------------------------
 for(framework in ml_frameworks){
@@ -54,7 +53,7 @@ for(framework in ml_frameworks){
         )
 
         #Train-----------------------------------------------------------------
-        test_that(paste(framework,method, data_type,"train"),{
+        test_that(paste(framework,method, data_type,"train without log"),{
         train_path=paste0(root_path_results,"/","train_",generate_id())
         if(dir.exists(train_path)==FALSE){
           dir.create(train_path)
@@ -77,6 +76,47 @@ for(framework in ml_frameworks){
         )
         })
         gc()
+
+        test_that(paste(framework,method, data_type,"train with log"),{
+          train_path=paste0(root_path_results,"/","train_",generate_id())
+          if(dir.exists(train_path)==FALSE){
+            dir.create(train_path)
+          }
+          expect_no_error(
+            extractor$train(
+              data_embeddings=dataset_list[[data_type]],
+              data_val_size=0.25,
+              sustain_track=TRUE,
+              sustain_iso_code="DEU",
+              sustain_region=NULL,
+              sustain_interval=15,
+              epochs=2,
+              batch_size=100,
+              dir_checkpoint=train_path,
+              log_dir=train_path,
+              trace=FALSE,
+              keras_trace=0,
+              pytorch_trace=0
+            )
+          )
+
+          state_log_exists=file.exists(paste0(train_path,"/aifeducation_state.log"))
+          expect_true(state_log_exists)
+          if(state_log_exists){
+            log_state=read.csv(paste0(train_path,"/aifeducation_state.log"))
+            expect_equal(nrow(log_state),3)
+            expect_equal(ncol(log_state),3)
+            expect_equal(colnames(log_state),c("value","total","message"))
+          }
+
+          loss_log_exists=file.exists(paste0(train_path,"/aifeducation_loss.log"))
+          expect_true(loss_log_exists)
+          if(loss_log_exists==TRUE){
+            log_loss=read.csv(paste0(train_path,"/aifeducation_loss.log"),header = FALSE)
+            expect_gte(ncol(log_loss),2)
+            expect_gte(nrow(log_loss),2)
+          }
+        })
 
         #Predict---------------------------------------------------------------
         test_that(paste(framework,method, data_type,"predict - basic"),{
@@ -197,7 +237,6 @@ for(framework in ml_frameworks){
 
 
         #Function for loading and saving models-----------------------------------
-
           test_that(paste(framework,method, data_type,"function save and load"),{
 
             #Predictions before saving and loading

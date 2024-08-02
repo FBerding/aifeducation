@@ -42,6 +42,45 @@ test_that("LargeDataSetForTexts - Add txt",{
   expect_equal(ids_complete,length(true_ids))
 })
 
+test_that("LargeDataSetForTexts - Add txt - with log",{
+  log_dir=root_path_results
+  if(dir.exists(log_dir)==FALSE){
+    dir.create(log_dir)
+  }
+  log_file=paste0(log_dir,"/aifeducation_state.log")
+
+  new_dataset=LargeDataSetForText$new()
+  expect_no_error(
+    new_dataset$add_from_files_txt(
+      dir_path = root_path_data_multiple_texts,
+      trace = FALSE,
+      log_file = log_file,
+      log_write_interval = 2,
+      log_top_value = 0,
+      log_top_total = 1,
+      log_top_message = NA)
+  )
+
+  state_log_exists=file.exists(log_file)
+  expect_true(state_log_exists)
+  if(state_log_exists){
+    log_state=read.csv(log_file)
+    expect_equal(nrow(log_state),3)
+    expect_equal(ncol(log_state),3)
+    expect_equal(colnames(log_state),c("value","total","message"))
+  }
+
+  expect_equal(new_dataset$n_rows(),2)
+  expect_equal(new_dataset$n_cols(),4)
+  expect_equal(new_dataset$get_colnames(),
+               c("id","text","bib_entry","license" ))
+
+  id=new_dataset$get_ids()
+  true_ids=c("text_a","text_b")
+  ids_complete=sum(true_ids%in%id)
+  expect_equal(ids_complete,length(true_ids))
+})
+
 test_that("LargeDataSetForTexts - Add pdf",{
   new_dataset=LargeDataSetForText$new()
   expect_no_error(
@@ -60,6 +99,40 @@ test_that("LargeDataSetForTexts - Add pdf",{
   expect_equal(ids_complete,length(true_ids))
 })
 
+test_that("LargeDataSetForTexts - Add pdf with log",{
+  log_dir=root_path_results
+  if(dir.exists(log_dir)==FALSE){
+    dir.create(log_dir)
+  }
+  log_file=paste0(log_dir,"/aifeducation_state.log")
+
+  new_dataset=LargeDataSetForText$new()
+  expect_no_error(
+    new_dataset$add_from_files_pdf(
+      dir_path = root_path_data_multiple_texts,
+      trace = FALSE)
+  )
+
+  state_log_exists=file.exists(log_file)
+  expect_true(state_log_exists)
+  if(state_log_exists){
+    log_state=read.csv(log_file)
+    expect_equal(nrow(log_state),3)
+    expect_equal(ncol(log_state),3)
+    expect_equal(colnames(log_state),c("value","total","message"))
+  }
+
+  expect_equal(new_dataset$n_rows(),2)
+  expect_equal(new_dataset$n_cols(),4)
+  expect_equal(new_dataset$get_colnames(),
+               c("id","text","bib_entry","license" ))
+
+  id=new_dataset$get_ids()
+  true_ids=c("pdf_a","pdf_b")
+  ids_complete=sum(true_ids%in%id)
+  expect_equal(ids_complete,length(true_ids))
+})
+
 test_that("LargeDataSetForTexts - Add excel",{
   new_dataset=LargeDataSetForText$new()
   expect_no_error(
@@ -67,6 +140,40 @@ test_that("LargeDataSetForTexts - Add excel",{
       dir_path = root_path_data_multiple_texts,
       trace = FALSE)
   )
+  expect_equal(new_dataset$n_rows(),3)
+  expect_equal(new_dataset$n_cols(),4)
+  expect_equal(new_dataset$get_colnames(),
+               c("id","text","bib_entry","license" ))
+
+  id=new_dataset$get_ids()
+  true_ids=c("excel_a","excel_b","excel_c")
+  ids_complete=sum(true_ids%in%id)
+  expect_equal(ids_complete,length(true_ids))
+})
+
+test_that("LargeDataSetForTexts - Add excel with log",{
+  log_dir=root_path_results
+  if(dir.exists(log_dir)==FALSE){
+    dir.create(log_dir)
+  }
+  log_file=paste0(log_dir,"/aifeducation_state.log")
+
+  new_dataset=LargeDataSetForText$new()
+  expect_no_error(
+    new_dataset$add_from_files_xlsx(
+      dir_path = root_path_data_multiple_texts,
+      trace = FALSE)
+  )
+
+  state_log_exists=file.exists(log_file)
+  expect_true(state_log_exists)
+  if(state_log_exists){
+    log_state=read.csv(log_file)
+    expect_equal(nrow(log_state),3)
+    expect_equal(ncol(log_state),3)
+    expect_equal(colnames(log_state),c("value","total","message"))
+  }
+
   expect_equal(new_dataset$n_rows(),3)
   expect_equal(new_dataset$n_cols(),4)
   expect_equal(new_dataset$get_colnames(),

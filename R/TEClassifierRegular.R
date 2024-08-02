@@ -384,7 +384,9 @@ TEClassifierRegular<-R6::R6Class(
                    dir_checkpoint,
                    trace=TRUE,
                    keras_trace=2,
-                   pytorch_trace=1){
+                   pytorch_trace=1,
+                   log_dir=NULL,
+                   log_write_interval=10){
 
       #Checking Arguments------------------------------------------------------
       check_type(data_folds,type="int",FALSE)
@@ -412,10 +414,7 @@ TEClassifierRegular<-R6::R6Class(
       check_class(data_embeddings,c("EmbeddedText","LargeDataSetForTextEmbeddings"),FALSE)
       self$check_embedding_model(data_embeddings,require_compressed=FALSE)
 
-      check_class(data_embeddings,c("factor"),FALSE)
-      if(is.null(names(data_targets))){
-        stop("data_targets must be a named factor.")
-      }
+      check_class(data_targets,c("factor"),FALSE)
 
       if(pl_anchor<pl_min){
         stop("pl_anchor must be at least pl_min.")
@@ -451,6 +450,10 @@ TEClassifierRegular<-R6::R6Class(
       self$last_training$config$trace=trace
       self$last_training$config$keras_trace=keras_trace
       self$last_training$config$pytorch_trace=pytorch_trace
+
+      private$log_config$log_dir=log_dir
+      private$log_config$log_state_file=paste0(private$log_config$log_dir,"/aifeducation_state.log")
+      private$log_config$log_write_interval=log_write_interval
 
       #Start-------------------------------------------------------------------
       if(self$last_training$config$trace==TRUE){
@@ -609,6 +612,9 @@ TEClassifierRegular<-R6::R6Class(
       check_type(batch_size,"int",FALSE)
       check_type(verbose,"int",FALSE)
 
+      #Check if the embeddings must be compressed before passing to the model
+      requires_compression=self$requires_compression(newdata)
+
       #Check input for compatible text embedding models and feature extractors
       if("EmbeddedText"%in%class(newdata)|
          "LargeDataSetForTextEmbeddings"%in%class(newdata)){
@@ -620,9 +626,6 @@ TEClassifierRegular<-R6::R6Class(
                compressed form.")
         }
       }
-
-      #Check if the embeddings must be compressed before passing to the model
-      requires_compression=self$requires_compression(newdata)
 
 
       #Apply feature extractor if it is part of the model
@@ -909,7 +912,8 @@ TEClassifierRegular<-R6::R6Class(
                                             package = "aifeducation"))
         reticulate::py_run_file(system.file("python/pytorch_autoencoder.py",
                                             package = "aifeducation"))
-
+        reticulate::py_run_file(system.file("python/py_log.py",
+                                            package = "aifeducation"))
       }
     },
     #--------------------------------------------------------------------------
@@ -1410,9 +1414,13 @@ TEClassifierRegular<-R6::R6Class(
         train_data = train_data,
         val_data = val_data,
         test_data = test_data,
-        shiny_app_active = private$gui$shiny_app_active,
         reset_model = TRUE,
-        use_callback = TRUE)
+        use_callback = TRUE,
+        log_dir=private$log_config$log_dir,
+        log_write_interval=private$log_config$log_write_interval,
+        log_top_value=iteration,
+        log_top_total=self$last_training$config$n_folds+1,
+        log_top_message="Overall")
 
       #Save history
       self$last_training$history[iteration]=list(train_history)
@@ -1526,9 +1534,13 @@ TEClassifierRegular<-R6::R6Class(
           train_data = train_data,
           val_data = val_data,
           test_data = test_data,
-          shiny_app_active = private$gui$shiny_app_active,
           reset_model = TRUE,
-          use_callback = TRUE)
+          use_callback = TRUE,
+          log_dir=private$log_config$log_state_file,
+          log_write_interval=private$log_config$log_write_interval,
+          log_top_value=iteration,
+          log_top_total=self$last_training$config$n_folds+1,
+          log_top_message="Overall")
 
         #Save history
         step_histories[step]=list(train_history)
@@ -1623,7 +1635,11 @@ TEClassifierRegular<-R6::R6Class(
                          test_data=NULL,
                          reset_model=FALSE,
                          use_callback=TRUE,
-                         shiny_app_active=FALSE){
+                         log_dir=NULL,
+                         log_write_interval=10,
+                         log_top_value=NULL,
+                         log_top_total=NULL,
+                         log_top_message=NULL){
 
       #Clear session to provide enough resources for computations
       if(private$ml_framework=="tensorflow"){
@@ -1715,12 +1731,6 @@ TEClassifierRegular<-R6::R6Class(
             save_weights_only = TRUE)
         } else {
           callback=reticulate::py_none()
-        }
-
-        if(private$gui$shiny_app_active==TRUE){
-          private$load_reload_python_scripts()
-
-          callback=list(callback,py$ReportAiforeducationShiny())
         }
 
         data_set_weights=datasets$Dataset$from_dict(
@@ -1824,8 +1834,12 @@ TEClassifierRegular<-R6::R6Class(
           test_data=pytorch_test_data,
           filepath=paste0(self$last_training$config$dir_checkpoint,"/checkpoints/best_weights.pt"),
           n_classes=as.integer(length(self$model_config$target_levels)),
-          shiny_app_active=self$gui$shiny_app_active,
-          class_weights=torch$tensor(np$array(class_weights)))
+          class_weights=torch$tensor(np$array(class_weights)),
+          log_dir=log_dir,
+          log_write_interval=log_write_interval,
+          log_top_value=log_top_value,
+          log_top_total=log_top_total,
+          log_top_message=log_top_message)
       }
 
       #Provide rownames for the history

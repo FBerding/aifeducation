@@ -436,7 +436,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
 
 def TeClassifierTrain_PT_with_Datasets(model,loss_fct_name, optimizer_method, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
-shiny_app_active=False):
+log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
@@ -487,13 +487,18 @@ shiny_app_active=False):
   best_bacc=float('-inf')
   best_val_loss=float('inf')
   
-  #GUI ProgressBar
-  if shiny_app_active is True:
+  #Log file
+  if not (log_dir is None):
+    log_file=log_dir+"/aifeducation_state.log"
+    log_file_loss=log_dir+"/aifeducation_loss.log"
+    last_log=None
+    last_log_loss=None
     current_step=0
     total_epochs=epochs
-    total_steps=len(trainloader)
-    r.py_update_aifeducation_progress_bar_steps(value=0,total=total_steps,title=("Batch/Step: "+str(0)+"/"+str(total_steps)))
-    r.py_update_aifeducation_progress_bar_epochs(value=0,total=epochs,title=("Epoch: "+str(0)+"/"+str(epochs)))
+    total_steps=len(trainloader)+len(valloader)
+    if not (test_data is None):
+      total_steps=total_steps+len(testloader)
+    
 
   for epoch in range(epochs):
     
@@ -503,10 +508,6 @@ shiny_app_active=False):
     n_total_train=0
     confusion_matrix_train=torch.zeros(size=(n_classes,n_classes))
     confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
-    
-    #Gui ProgressBar
-    if shiny_app_active is True:
-      current_step=0
     
     model.train(True)
     for batch in trainloader:
@@ -540,13 +541,18 @@ shiny_app_active=False):
       #Calc Balanced Accuracy
       confusion_matrix_train+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
       
-      #Update Progress Logger
-      if shiny_app_active is True:
+      #Update log file
+      if not (log_dir is None):
         current_step+=1
-        r.py_update_aifeducation_progress_bar_steps(value=current_step,total=total_steps,title=("Batch/Step: "+str(current_step)+"/"+str(total_steps)))
-    
+        last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
+                  total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
+                  message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
+        last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
+     
+    #Calc final metrics for epoch  
     acc_train=n_matches_train/n_total_train
     bacc_train=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
+    
 
     #Validation----------------------------------------------------------------
     val_loss=0.0
@@ -579,6 +585,14 @@ shiny_app_active=False):
         
         #Calc Balanced Accuracy
         confusion_matrix_val+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
+        
+        #Update log file
+        if not (log_dir is None):
+          current_step+=1
+          last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
+                    total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
+                    message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
+          last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
 
     acc_val=n_matches_val/n_total_val
     bacc_val=torch.sum(torch.diagonal(confusion_matrix_val)/torch.sum(confusion_matrix_val,dim=1))/n_classes
@@ -615,7 +629,15 @@ shiny_app_active=False):
           
           #Calc Balanced Accuracy
           confusion_matrix_test+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
-  
+          
+          #Update log file
+          if not (log_dir is None):
+            current_step+=1
+            last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
+                      total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
+                      message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
+            last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
+     
       acc_test=n_matches_test/n_total_test
       bacc_test=torch.sum(torch.diagonal(confusion_matrix_test)/torch.sum(confusion_matrix_test,dim=1))/n_classes
     
@@ -669,11 +691,6 @@ shiny_app_active=False):
           acc_test,
           bacc_test))
           
-    #Update ProgressBar in Shiny
-    if shiny_app_active is True:
-        r.py_update_aifeducation_progress_bar_epochs(value=epoch+1,total=epochs,title=("Epoch: "+str(epoch+1)+"/"+str(epochs)))
-        
-    
     #Callback-------------------------------------------------------------------
     if use_callback==True:
       if bacc_val>best_bacc:
