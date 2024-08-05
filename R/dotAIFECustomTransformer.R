@@ -8,17 +8,17 @@
     title = "Custom Model",
     steps_for_creation = list(
       # required
-      create_tokenizer_draft = function() { },
-      calculate_vocab = function() { },
-      save_tokenizer_draft = function() { },
-      create_final_tokenizer = function() { },
-      create_transformer_model = function() { }
+      create_tokenizer_draft = function(self) { },
+      calculate_vocab = function(self) { },
+      save_tokenizer_draft = function(self) { },
+      create_final_tokenizer = function(self) { },
+      create_transformer_model = function(self) { }
       # optional
-      # check_max_pos_emb = function() { }
+      # check_max_pos_emb = function(self) { }
     ),
     steps_for_training = list(
       # required
-      load_existing_model = function() { }
+      load_existing_model = function(self) { }
       # optional
       # cuda_empty_cache = function() { }
     )
@@ -28,7 +28,7 @@
     initialize = function() {
       super$set_title(private$title)
     },
-    create = function(# --------------------------
+    create = function( # --------------------------
                       ml_framework,
                       model_dir,
                       vocab_raw_texts,
@@ -64,7 +64,7 @@
         pytorch_safetensors = pytorch_safetensors
       )
     },
-    train = function(# --------
+    train = function( # --------
                      ml_framework,
                      # ...
                      # --------

@@ -93,7 +93,7 @@ This method creates a transformer configuration based on the \code{RoBERTa} base
 vocabulary based on \verb{Byte-Pair Encoding} (BPE) tokenizer using the python \code{transformers} and \code{tokenizers}
 libraries.
 
-This method adds the following \emph{'dependent' parameters} to the base class' private \code{params} list:
+This method adds the following \emph{'dependent' parameters} to the base class' inherited \code{params} list:
 \itemize{
 \item \code{add_prefix_space}
 \item \code{trim_offsets}
@@ -166,8 +166,8 @@ embedding.}
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
 list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
 \item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
 
@@ -260,8 +260,8 @@ training process.}
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
 list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
 \item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
 

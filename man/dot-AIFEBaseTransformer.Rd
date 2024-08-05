@@ -15,91 +15,6 @@ will produce an error).
 \code{string} The title for a transformer. This title is displayed in the progress bar. Can be set with \code{set_title()}.
 }
 
-\subsection{\strong{Attribute \code{params}}}{
-
-\code{list()} containing all the transformer parameters. Can be set with \code{set_model_param()}.
-\subsection{\strong{'Static' parameters}}{
-
-Regardless of the transformer, the following parameters are always included:
-\itemize{
-\item \code{ml_framework}
-\item \code{sustain_track}
-\item \code{sustain_iso_code}
-\item \code{sustain_region}
-\item \code{sustain_interval}
-\item \code{trace}
-\item \code{pytorch_safetensors}
-}
-}
-
-\subsection{\strong{'Dynamic' parameters}}{
-
-In the case of \strong{create} it also contains (see \code{create}-method for details):
-\itemize{
-\item \code{model_dir}
-\item \code{vocab_raw_texts}
-\item \code{vocab_size}
-\item \code{max_position_embeddings}
-\item \code{hidden_size}
-\item \code{hidden_act}
-\item \code{hidden_dropout_prob}
-\item \code{attention_probs_dropout_prob}
-\item \code{intermediate_size}
-\item \code{num_attention_heads}
-}
-
-In the case of \strong{train} it also contains (see \code{train}-method for details):
-\itemize{
-\item \code{output_dir}
-\item \code{model_dir_path}
-\item \code{raw_texts}
-\item \code{p_mask}
-\item \code{whole_word}
-\item \code{val_size}
-\item \code{n_epoch}
-\item \code{batch_size}
-\item \code{chunk_size}
-\item \code{min_seq_len}
-\item \code{full_sequences_only}
-\item \code{learning_rate}
-\item \code{n_workers}
-\item \code{multi_process}
-\item \code{keras_trace}
-\item \code{pytorch_trace}
-}
-}
-
-\subsection{\strong{'Dependent' parameters}}{
-
-Depending on the transformer and the method used class may contain different parameters:
-\itemize{
-\item \code{vocab_do_lower_case}
-\item \code{num_hidden_layer}
-\item \code{add_prefix_space}
-\item etc.
-}
-
-\figure{transformer_params_list.png}
-
-Figure 1: Possible parameters in the params list
-}
-
-}
-
-\subsection{\strong{Attribute \code{temp}}}{
-
-\code{list()} containing all the temporary local variables that need to be accessed between the step functions. Can be
-set with \code{set_model_temp()}.
-
-For example, it can be a variable \code{tok_new} that stores the tokenizer from
-\code{steps_for_creation$create_tokenizer_draft}. To train the tokenizer, access the variable \code{tok_new} in
-\code{steps_for_creation$calculate_vocab} through the \code{temp} list of this class.
-
-\figure{transformer_temp_list.png}
-
-Figure 2: Possible parameters in the temp list
-}
-
 \subsection{\strong{Attribute \code{steps_for_creation}}}{
 
 \code{list()} that stores required and optional steps (functions) for creating a new transformer.
@@ -166,7 +81,7 @@ local variable outside of a function, put it in the \code{temp} list.
 The \strong{required step} in each child transformer is:
 \itemize{
 \item \code{load_existing_model}: \verb{function()} that loads the model and its tokenizer. The model and the transformer must be
-stored to the \code{model} and \code{tokenizer} parameters respectively of the private \code{temp} list. See
+stored to the \code{model} and \code{tokenizer} parameters respectively of the \code{temp} list. See
 \verb{transformers.(TF)PreTrainedModel} for details.
 }
 }
@@ -184,16 +99,16 @@ stored to the \code{model} and \code{tokenizer} parameters respectively of the p
 \strong{Required and already defined steps} are:
 \itemize{
 \item \code{check_chunk_size}: \verb{function()} that checks transformer's parameter \code{chunk_size} and adjusts it. Uses
-the \code{model} parameter of the private \code{temp} list and modifies the \code{chunk_size} parameter of the private \code{params}
+the \code{model} parameter of the \code{temp} list and modifies the \code{chunk_size} parameter of the \code{params}
 list.
 \item \code{create_chunks_for_training}: \verb{function()} that creates chunks of the sequenses for the trainining. Uses the
-\code{tokenizer} parameter and adds \code{tokenized_dataset} parameter to the private \code{temp} list.
+\code{tokenizer} parameter and adds \code{tokenized_dataset} parameter to the \code{temp} list.
 \item \code{prepare_train_tune}: \verb{function()} that prepares the data for the training. For \code{tensorflow}: uses the \code{model}
-and \code{tokenizer} parameters, adds the \code{tf_train_dataset}, \code{tf_test_dataset}, \code{callbacks} parameters to the private
-\code{temp} list. For \code{pytorch}: uses the \code{model}, \code{tokenizer} parameters, adds the \code{trainer} parameter to the private
+and \code{tokenizer} parameters, adds the \code{tf_train_dataset}, \code{tf_test_dataset}, \code{callbacks} parameters to the
+\code{temp} list. For \code{pytorch}: uses the \code{model}, \code{tokenizer} parameters, adds the \code{trainer} parameter to the
 \code{temp} list.
 \item \code{start_training}: \verb{function()} that starts the training. For \code{tensorflow}: uses the \code{model}, \code{tf_train_dataset},
-\code{tf_test_dataset}, \code{callbacks} parameters of the private \code{temp} list. For \code{pytorch}: uses the \code{trainer} parameter
+\code{tf_test_dataset}, \code{callbacks} parameters of the \code{temp} list. For \code{pytorch}: uses the \code{trainer} parameter
 of the \code{temp} list.
 \item \code{save_model}: \verb{function()} that saves the model. For \code{tensorflow}: uses the \code{model} parameter of the \code{temp} list.
 For \code{pytorch}: uses the \code{model}, \code{pt_safe_save} and \code{trainer} parameters of the \code{temp} list.
@@ -254,20 +169,20 @@ for the private attributes \strong{(3)} like \code{title}, \code{steps_for_creat
 }\if{html}{\out{</div>}}
 
 4 Define the private \code{steps_for_creation} list \strong{(1)} to implement the required steps (functions) \strong{(2)}-\strong{(6)},
-and \strong{(7)} if needed.
+and \strong{(7)} if needed. Do not forget to pass \code{self} as input parameter of the functions.
 
-\strong{Note} that local variables created inside of functions can be used through the private \code{temp} list. Put the
+\strong{Note} that local variables created inside of functions can be used through the inherited \code{temp} list. Put the
 local \code{tok_new} variable \strong{(8)} in the \code{temp} list in the \code{create_tokenizer_draft} step \strong{(2)} and use it in the
 \code{calculate_vocab} step \strong{(3)} like \strong{(9)}.
 
-Similarly, use the input parameters of the transformer such as \code{ml_framework} using the private \code{params} list like
+Similarly, use the input parameters of the transformer such as \code{ml_framework} using the inherited \code{params} list like
 \strong{(10)}.
 
 \strong{Important!}
 
-In the \code{create_final_tokenizer} step \strong{(5)} store the tokenizer in the \code{private$temp$tokenizer} variable \strong{(11)}.
+In the \code{create_final_tokenizer} step \strong{(5)} store the tokenizer in the \code{self$temp$tokenizer} variable \strong{(11)}.
 
-In the \code{create_transformer_model} step \strong{(6)} store the transformer model in the \code{private$temp$model} variable
+In the \code{create_transformer_model} step \strong{(6)} store the transformer model in the \code{self$temp$model} variable
 \strong{(12)}.
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{.AIFECustomTransformer <- R6::R6Class(
@@ -277,28 +192,28 @@ In the \code{create_transformer_model} step \strong{(6)} store the transformer m
      title = "Custom Model",
      steps_for_creation = list(                   # (1)
        # required
-       create_tokenizer_draft = function() \{      # (2)
+       create_tokenizer_draft = function(self) \{      # (2)
          # The implementation must be here
-         # private$temp$tok_new <- ...         # (8)
+         # self$temp$tok_new <- ...         # (8)
        \},
-       calculate_vocab = function() \{             # (3)
+       calculate_vocab = function(self) \{             # (3)
          # The implementation must be here
-         # ... private$temp$tok_new ...        # (9)
+         # ... self$temp$tok_new ...        # (9)
        \},
-       save_tokenizer_draft = function() \{        # (4)
+       save_tokenizer_draft = function(self) \{        # (4)
          # The implementation must be here
        \},
-       create_final_tokenizer = function() \{      # (5)
+       create_final_tokenizer = function(self) \{      # (5)
          # The implementation must be here
-         # private$temp$tokenizer <- ... # (!!!) (11)
+         # self$temp$tokenizer <- ... # (!!!) (11)
        \},
-       create_transformer_model = function() \{    # (6)
+       create_transformer_model = function(self) \{    # (6)
          # The implementation must be here
-         # ... private$params$ml_framework ... # (10)
-         # private$temp$model <- ...     # (!!!) (12)
+         # ... self$params$ml_framework ... # (10)
+         # self$temp$model <- ...     # (!!!) (12)
        \},
        # optional: omit this element if do not needed
-       check_max_pos_emb = function() \{           # (7)
+       check_max_pos_emb = function(self) \{           # (7)
          # The implementation must be here
        \}
      )
@@ -326,13 +241,13 @@ the base class using the \code{super$set_required_SFC()} and \code{super$set_SFC
      title = "Custom Model",
      steps_for_creation = list(
        # required
-       create_tokenizer_draft = function() \{ \},
-       calculate_vocab = function() \{ \},
-       save_tokenizer_draft = function() \{ \},
-       create_final_tokenizer = function() \{ \},
-       create_transformer_model = function() \{ \},
+       create_tokenizer_draft = function(self) \{ \},
+       calculate_vocab = function(self) \{ \},
+       save_tokenizer_draft = function(self) \{ \},
+       create_final_tokenizer = function(self) \{ \},
+       create_transformer_model = function(self) \{ \},
        # optional: omit this element if do not needed
-       check_max_pos_emb = function() \{ \}
+       check_max_pos_emb = function(self) \{ \}
      )
    ),
    public = list(
@@ -379,7 +294,7 @@ the base class using the \code{super$set_required_SFC()} and \code{super$set_SFC
 }\if{html}{\out{</div>}}
 
 6 Define \code{train} method \strong{(1)} similarly to the step 5. Implement steps (functions) in the private
-\code{steps_for_training} list \strong{(2)}. Set the dependent parameters \strong{(4)} in the base class using
+\code{steps_for_training} list \strong{(2)}. Do not forget to pass \code{self} as input parameter of the required function. Set the dependent parameters \strong{(4)} in the base class using
 \code{super$set_model_param()} method \strong{(5)}. Set the implemented steps for training in the base class using
 \verb{super$set_SFT_*()} methods \strong{(6)}. Finally run the basic \code{train} algorithm \strong{(7)} of the base class with all the
 (input) parameters \strong{(3)}.
@@ -391,18 +306,18 @@ the base class using the \code{super$set_required_SFC()} and \code{super$set_SFC
      title = "Custom Model",
      steps_for_creation = list(
        # required
-       create_tokenizer_draft = function() \{ \},
-       calculate_vocab = function() \{ \},
-       save_tokenizer_draft = function() \{ \},
-       create_final_tokenizer = function() \{ \},
-       create_transformer_model = function() \{ \},
+       create_tokenizer_draft = function(self) \{ \},
+       calculate_vocab = function(self) \{ \},
+       save_tokenizer_draft = function(self) \{ \},
+       create_final_tokenizer = function(self) \{ \},
+       create_transformer_model = function(self) \{ \},
        # optional: omit this element if do not needed
-       check_max_pos_emb = function() \{ \}
+       check_max_pos_emb = function(self) \{ \}
      ),
      # (2)
      steps_for_training = list(
        # required
-       load_existing_model = function() \{ \},
+       load_existing_model = function(self) \{ \},
        # optional
        cuda_empty_cache = function() \{ \}
      )
@@ -470,6 +385,93 @@ Other Transformers for developers:
 \code{\link{.AIFERobertaTransformer}}
 }
 \concept{Transformers for developers}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{params}}{A list containing transformer's parameters ('static', 'dynamic' and 'dependent' parameters)
+
+\code{list()} containing all the transformer parameters. Can be set with \code{set_model_param()}.
+\subsection{\strong{'Static' parameters}}{
+
+Regardless of the transformer, the following parameters are always included:
+\itemize{
+\item \code{ml_framework}
+\item \code{sustain_track}
+\item \code{sustain_iso_code}
+\item \code{sustain_region}
+\item \code{sustain_interval}
+\item \code{trace}
+\item \code{pytorch_safetensors}
+}
+}
+
+\subsection{\strong{'Dynamic' parameters}}{
+
+In the case of \strong{create} it also contains (see \code{create}-method for details):
+\itemize{
+\item \code{model_dir}
+\item \code{vocab_raw_texts}
+\item \code{vocab_size}
+\item \code{max_position_embeddings}
+\item \code{hidden_size}
+\item \code{hidden_act}
+\item \code{hidden_dropout_prob}
+\item \code{attention_probs_dropout_prob}
+\item \code{intermediate_size}
+\item \code{num_attention_heads}
+}
+
+In the case of \strong{train} it also contains (see \code{train}-method for details):
+\itemize{
+\item \code{output_dir}
+\item \code{model_dir_path}
+\item \code{raw_texts}
+\item \code{p_mask}
+\item \code{whole_word}
+\item \code{val_size}
+\item \code{n_epoch}
+\item \code{batch_size}
+\item \code{chunk_size}
+\item \code{min_seq_len}
+\item \code{full_sequences_only}
+\item \code{learning_rate}
+\item \code{n_workers}
+\item \code{multi_process}
+\item \code{keras_trace}
+\item \code{pytorch_trace}
+}
+}
+
+\subsection{\strong{'Dependent' parameters}}{
+
+Depending on the transformer and the method used class may contain different parameters:
+\itemize{
+\item \code{vocab_do_lower_case}
+\item \code{num_hidden_layer}
+\item \code{add_prefix_space}
+\item etc.
+}
+
+\figure{transformer_params_list.png}
+
+Figure 1: Possible parameters in the params list
+}}
+
+\item{\code{temp}}{A list containing temporary transformer's parameters
+
+\code{list()} containing all the temporary local variables that need to be accessed between the step functions. Can be
+set with \code{set_model_temp()}.
+
+For example, it can be a variable \code{tok_new} that stores the tokenizer from
+\code{steps_for_creation$create_tokenizer_draft}. To train the tokenizer, access the variable \code{tok_new} in
+\code{steps_for_creation$calculate_vocab} through the \code{temp} list of this class.
+
+\figure{transformer_temp_list.png}
+
+Figure 2: Possible parameters in the temp list}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -528,7 +530,7 @@ This method returns nothing.
 \if{html}{\out{<a id="method-.AIFEBaseTransformer-set_model_param"></a>}}
 \if{latex}{\out{\hypertarget{method-.AIFEBaseTransformer-set_model_param}{}}}
 \subsection{Method \code{set_model_param()}}{
-Setter for the parameters. Adds a new parameter and its value to the private \code{params} list.
+Setter for the parameters. Adds a new parameter and its value to the \code{params} list.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$set_model_param(param_name, param_value)}\if{html}{\out{</div>}}
 }
@@ -551,7 +553,7 @@ This method returns nothing.
 \if{latex}{\out{\hypertarget{method-.AIFEBaseTransformer-set_model_temp}{}}}
 \subsection{Method \code{set_model_temp()}}{
 Setter for the temporary model's parameters. Adds a new temporary parameter and its value to the
-private \code{temp} list.
+\code{temp} list.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$set_model_temp(temp_name, temp_value)}\if{html}{\out{</div>}}
 }
@@ -825,8 +827,8 @@ embedding.}
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
 list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
 \item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
 
@@ -929,8 +931,8 @@ training process.}
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
 list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
 \item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
 

@@ -44,7 +44,7 @@
 
     # steps_for_creation `list()` that stores required and optional steps (functions) for creation a new transformer.
     #
-    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the private `temp`
+    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the inherited `temp`
     # list.
     #
     # Use the `super$set_SFC_*()` methods to set required/optional steps for creation in the base class, where `*` is
@@ -55,63 +55,63 @@
     # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Bert_like.SFC.*` functions
     # for details.
     steps_for_creation = list(
-      create_tokenizer_draft = function() Bert_like.SFC.create_tokenizer_draft(),
-      calculate_vocab = function() Bert_like.SFC.calculate_vocab(),
-      save_tokenizer_draft = function() Bert_like.SFC.save_tokenizer_draft(),
-      create_final_tokenizer = function() Bert_like.SFC.create_final_tokenizer(),
-      create_transformer_model = function() {
+      create_tokenizer_draft = function(self) Bert_like.SFC.create_tokenizer_draft(self),
+      calculate_vocab = function(self) Bert_like.SFC.calculate_vocab(self),
+      save_tokenizer_draft = function(self) Bert_like.SFC.save_tokenizer_draft(self),
+      create_final_tokenizer = function(self) Bert_like.SFC.create_final_tokenizer(self),
+      create_transformer_model = function(self) {
         configuration <- transformers$DebertaV2Config(
-          vocab_size = as.integer(length(private$temp$tokenizer$get_vocab())),
-          max_position_embeddings = as.integer(private$params$max_position_embeddings),
-          hidden_size = as.integer(private$params$hidden_size),
-          num_hidden_layers = as.integer(private$params$num_hidden_layer),
-          num_attention_heads = as.integer(private$params$num_attention_heads),
-          intermediate_size = as.integer(private$params$intermediate_size),
-          hidden_act = private$params$hidden_act,
-          hidden_dropout_prob = private$params$hidden_dropout_prob,
-          attention_probs_dropout_prob = private$params$attention_probs_dropout_prob,
+          vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
+          max_position_embeddings = as.integer(self$params$max_position_embeddings),
+          hidden_size = as.integer(self$params$hidden_size),
+          num_hidden_layers = as.integer(self$params$num_hidden_layer),
+          num_attention_heads = as.integer(self$params$num_attention_heads),
+          intermediate_size = as.integer(self$params$intermediate_size),
+          hidden_act = self$params$hidden_act,
+          hidden_dropout_prob = self$params$hidden_dropout_prob,
+          attention_probs_dropout_prob = self$params$attention_probs_dropout_prob,
           type_vocab_size = as.integer(0),
           initializer_range = 0.02,
           layer_norm_eps = 1e-12,
           relative_attention = TRUE,
-          max_relative_positions = as.integer(private$params$max_position_embeddings),
-          pad_token_id = private$temp$tokenizer$pad_token_id,
+          max_relative_positions = as.integer(self$params$max_position_embeddings),
+          pad_token_id = self$temp$tokenizer$pad_token_id,
           position_biased_input = FALSE,
           pos_att_type = c("p2c", "c2p")
         )
 
-        private$temp$model <- ifelse(
-          private$params$ml_framework == "tensorflow",
-          transformers$TFDebertaV2ForMaskedLM(configuration),
-          transformers$DebertaV2ForMaskedLM(configuration)
-        )
+        if (self$params$ml_framework == "tensorflow") {
+          self$temp$model <- transformers$TFDebertaV2ForMaskedLM(configuration)
+        } else {
+          self$temp$model <- transformers$DebertaV2ForMaskedLM(configuration)
+        }
       }
     ),
 
     # steps_for_training `list()` that stores required and optional steps (functions) for training a new transformer.
     #
-    # `load_existing_model()` **adds** `tokenizer` and `model` temporary parameters to the private `temp` list.
+    # `load_existing_model()` **adds** `tokenizer` and `model` temporary parameters to the inherited `temp` list.
     #
     # Use the `super$set_SFT_*()` methods to set required/optional steps for training in the base class, where `*` is
     # the name of the step.
     #
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
     steps_for_training = list(
-      load_existing_model = function() {
-        if (private$params$ml_framework == "tensorflow") {
-          private$temp$model <- transformers$TFDebertaV2ForMaskedLM$from_pretrained(
-            private$params$model_dir_path,
-            from_pt = private$temp$from_pt
+      load_existing_model = function(self) {
+        if (self$params$ml_framework == "tensorflow") {
+          self$temp$model <- transformers$TFDebertaV2ForMaskedLM$from_pretrained(
+            self$params$model_dir_path,
+            from_pt = self$temp$from_pt
           )
         } else {
-          private$temp$model <- transformers$DebertaV2ForMaskedLM$from_pretrained(
-            private$params$model_dir_path,
-            from_tf = private$temp$from_tf,
-            use_safetensors = private$temp$load_safe
+          self$temp$model <- transformers$DebertaV2ForMaskedLM$from_pretrained(
+            self$params$model_dir_path,
+            from_tf = self$temp$from_tf,
+            use_safetensors = self$temp$load_safe
           )
         }
 
-        private$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(private$params$model_dir_path)
+        self$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(self$params$model_dir_path)
       },
       cuda_empty_cache = function() {
         if (torch$cuda$is_available()) {
@@ -131,7 +131,7 @@
     #' @description This method creates a transformer configuration based on the `DeBERTa-V2` base architecture and a
     #'   vocabulary based on the `SentencePiece` tokenizer using the python `transformers` and `tokenizers` libraries.
     #'
-    #'   This method adds the following *'dependent' parameters* to the base class's private `params` list:
+    #'   This method adds the following *'dependent' parameters* to the base class's inherited `params` list:
     #'   * `vocab_do_lower_case`
     #'   * `num_hidden_layer`
     #'

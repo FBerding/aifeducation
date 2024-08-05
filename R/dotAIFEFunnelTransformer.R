@@ -47,7 +47,7 @@
 
     # steps_for_creation `list()` that stores required and optional steps (functions) for creating a new transformer.
     #
-    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the private `temp`
+    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the inherited `temp`
     # list.
     #
     # Use the `super$set_SFC_*()` methods to set required/optional steps for creation in the base class, where `*` is
@@ -58,65 +58,66 @@
     # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Bert_like.SFC.*` functions
     # for details.
     steps_for_creation = list(
-      create_tokenizer_draft = function() Bert_like.SFC.create_tokenizer_draft(),
-      calculate_vocab = function() Bert_like.SFC.calculate_vocab(),
-      save_tokenizer_draft = function() Bert_like.SFC.save_tokenizer_draft(),
-      create_final_tokenizer = function() Bert_like.SFC.create_final_tokenizer(),
-      create_transformer_model = function() {
+      create_tokenizer_draft = function(self) Bert_like.SFC.create_tokenizer_draft(self),
+      calculate_vocab = function(self) Bert_like.SFC.calculate_vocab(self),
+      save_tokenizer_draft = function(self) Bert_like.SFC.save_tokenizer_draft(self),
+      create_final_tokenizer = function(self) Bert_like.SFC.create_final_tokenizer(self),
+      create_transformer_model = function(self) {
         configuration <- transformers$FunnelConfig(
-          vocab_size = as.integer(length(private$temp$tokenizer$get_vocab())),
-          block_sizes = as.integer(private$params$block_sizes),
+          vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
+          block_sizes = as.integer(self$params$block_sizes),
           block_repeats = NULL,
-          num_decoder_layers = as.integer(private$params$num_decoder_layers),
-          d_model = as.integer(private$params$hidden_size),
-          n_head = as.integer(private$params$num_attention_heads),
-          d_head = as.integer(private$params$target_hidden_size),
-          d_inner = as.integer(private$params$intermediate_size),
-          hidden_act = private$params$hidden_act,
-          hidden_dropout_prob = private$params$hidden_dropout_prob,
-          attention_probs_dropout_prob = private$params$attention_probs_dropout_prob,
-          activation_dropout = as.integer(private$params$activation_dropout),
+          num_decoder_layers = as.integer(self$params$num_decoder_layers),
+          d_model = as.integer(self$params$hidden_size),
+          n_head = as.integer(self$params$num_attention_heads),
+          d_head = as.integer(self$params$target_hidden_size),
+          d_inner = as.integer(self$params$intermediate_size),
+          hidden_act = self$params$hidden_act,
+          hidden_dropout_prob = self$params$hidden_dropout_prob,
+          attention_probs_dropout_prob = self$params$attention_probs_dropout_prob,
+          activation_dropout = as.integer(self$params$activation_dropout),
           initializer_range = 0.02,
           layer_norm_eps = 1e-12,
-          pooling_type = private$params$pooling_type,
+          pooling_type = self$params$pooling_type,
           attention_type = "relative_shift",
           separate_cls = TRUE,
           truncate_seq = TRUE,
           pool_q_only = TRUE,
-          max_position_embeddings = as.integer(private$params$max_position_embeddings),
+          max_position_embeddings = as.integer(self$params$max_position_embeddings),
         )
-        private$temp$model <- ifelse(
-          private$params$ml_framework == "tensorflow",
-          transformers$TFFunnelModel(configuration),
-          transformers$FunnelModel(configuration)
-        )
+
+        if (self$params$ml_framework == "tensorflow") {
+          self$temp$model <- transformers$TFFunnelModel(configuration)
+        } else {
+          self$temp$model <- transformers$FunnelModel(configuration)
+        }
       }
     ),
 
     # steps_for_training `list()` that stores required and optional steps (functions) for training a new transformer.
     #
-    # `load_existing_model()` **adds** `tokenizer` and `model` temporary parameters to the private `temp` list.
+    # `load_existing_model()` **adds** `tokenizer` and `model` temporary parameters to the inherited `temp` list.
     #
     # Use the `super$set_SFT_*()` methods to set required/optional steps for training in the base class, where `*` is
     # the name of the step.
     #
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
     steps_for_training = list(
-      load_existing_model = function() {
-        if (private$params$ml_framework == "tensorflow") {
-          private$temp$model <- transformers$TFFunnelForMaskedLM$from_pretrained(
-            private$params$model_dir_path,
-            from_pt = private$temp$from_pt
+      load_existing_model = function(self) {
+        if (self$params$ml_framework == "tensorflow") {
+          self$temp$model <- transformers$TFFunnelForMaskedLM$from_pretrained(
+            self$params$model_dir_path,
+            from_pt = self$temp$from_pt
           )
         } else {
-          private$temp$model <- transformers$FunnelForMaskedLM$from_pretrained(
-            private$params$model_dir_path,
-            from_tf = private$temp$from_tf,
-            use_safetensors = private$temp$load_safe
+          self$temp$model <- transformers$FunnelForMaskedLM$from_pretrained(
+            self$params$model_dir_path,
+            from_tf = self$temp$from_tf,
+            use_safetensors = self$temp$load_safe
           )
         }
 
-        private$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(private$params$model_dir_path)
+        self$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(self$params$model_dir_path)
       }
     )
   ),
@@ -131,7 +132,7 @@
     #' @description This method creates a transformer configuration based on the `Funnel` transformer base architecture
     #'   and a vocabulary based on `WordPiece` using the python `transformers` and `tokenizers` libraries.
     #'
-    #'   This method adds the following *'dependent' parameters* to the base class's private `params` list:
+    #'   This method adds the following *'dependent' parameters* to the base class's inherited `params` list:
     #'   * `vocab_do_lower_case`
     #'   * `target_hidden_size`
     #'   * `block_sizes`
@@ -151,14 +152,11 @@
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
     #'
     #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
-    #' @param target_hidden_size `int` Number of neurons in the final layer. This parameter determines the
-    #'   dimensionality of the resulting text embedding.
-    #' @param block_sizes `vector` of `int` determining the number and sizes of each block.
-    #' @param num_decoder_layers `int` Number of decoding layers.
-    #' @param pooling_type `string` Type of pooling.
-    #'   * `"mean"` for pooling with mean.
-    #'   * `"max"` for pooling with maximum values.
-    #' @param activation_dropout `float` Dropout probability between the layers of the feed-forward blocks.
+    #' @param target_hidden_size `r paramDesc.target_hidden_size()`
+    #' @param block_sizes `r paramDesc.block_sizes()`
+    #' @param num_decoder_layers `r paramDesc.num_decoder_layers()`
+    #' @param pooling_type `r paramDesc.pooling_type()`
+    #' @param activation_dropout `r paramDesc.activation_dropout()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.

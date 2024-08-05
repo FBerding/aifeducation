@@ -202,7 +202,7 @@ create_WordPiece_tokenizer <- function(vocab_do_lower_case) { # nolint
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-create_ByteLevelBPE_tokenizer <- function(#nolint
+create_ByteLevelBPE_tokenizer <- function( # nolint
     max_position_embeddings,
     add_prefix_space,
     trim_offsets) {
@@ -234,7 +234,8 @@ create_data_collator <- function(
     whole_word,
     tokenizer,
     p_mask,
-    return_tensors) {
+    return_tensors,
+    trace) {
   if (whole_word) {
     print_message("Using Whole Word Masking", trace)
     data_collator <- transformers$DataCollatorForWholeWordMask(
@@ -274,10 +275,10 @@ run_py_file <- function(py_file_name) {
 #' @title BERT-like creation step `create_tokenizer_draft`
 #' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
 #'
-#'   This function **adds** `special_tokens`, `tok_new`, `trainer` parameters into the private `temp` list.
+#'   This function **adds** `special_tokens`, `tok_new`, `trainer` parameters into the `temp` list.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -285,24 +286,24 @@ run_py_file <- function(py_file_name) {
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.create_tokenizer_draft <- function() { #nolint
-  private$temp$special_tokens <- c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")
-  private$temp$tok_new <- create_WordPiece_tokenizer(private$params$vocab_do_lower_case)
+Bert_like.SFC.create_tokenizer_draft <- function(self) { # nolint
+  self$temp$special_tokens <- c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")
+  self$temp$tok_new <- create_WordPiece_tokenizer(self$params$vocab_do_lower_case)
 
-  private$temp$trainer <- tok$trainers$WordPieceTrainer(
-    vocab_size = as.integer(private$params$vocab_size),
-    special_tokens = private$temp$special_tokens,
-    show_progress = private$params$trace
+  self$temp$trainer <- tok$trainers$WordPieceTrainer(
+    vocab_size = as.integer(self$params$vocab_size),
+    special_tokens = self$temp$special_tokens,
+    show_progress = self$params$trace
   )
 }
 
 #' @title BERT-like creation step `calculate_vocab`
 #' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
 #'
-#'   This function **uses** `tok_new`, `raw_text_dataset`, `trainer` parameters from the private `temp` list.
+#'   This function **uses** `tok_new`, `raw_text_dataset`, `trainer` parameters from the `temp` list.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -310,25 +311,25 @@ Bert_like.SFC.create_tokenizer_draft <- function() { #nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.calculate_vocab <- function() { #nolint
-  private$temp$tok_new$train_from_iterator( #nolint
+Bert_like.SFC.calculate_vocab <- function(self) { # nolint
+  self$temp$tok_new$train_from_iterator(
     py$batch_iterator(
       batch_size = as.integer(200),
-      dataset = private$temp$raw_text_dataset,
+      dataset = self$temp$raw_text_dataset,
       report_to_shiny_app = is_shinyapp_active()
     ),
-    trainer = private$temp$trainer,
-    length = length(private$temp$raw_text_dataset)
+    trainer = self$temp$trainer,
+    length = length(self$temp$raw_text_dataset)
   )
 }
 
 #' @title BERT-like creation step `save_tokenizer_draft`
 #' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
 #'
-#'   This function **uses** `special_tokens`, `tok_new` parameters from the private `temp` list.
+#'   This function **uses** `special_tokens`, `tok_new` parameters from the `temp` list.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -336,19 +337,19 @@ Bert_like.SFC.calculate_vocab <- function() { #nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.save_tokenizer_draft <- function() { # nolint
-  write(c(private$temp$special_tokens, names(private$temp$tok_new$get_vocab())), # nolint
-    file = paste0(private$params$model_dir, "/", "vocab.txt")
+Bert_like.SFC.save_tokenizer_draft <- function(self) { # nolint
+  write(c(self$temp$special_tokens, names(self$temp$tok_new$get_vocab())),
+    file = paste0(self$params$model_dir, "/", "vocab.txt")
   )
 }
 
 #' @title BERT-like creation steps
 #' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
 #'
-#'   This function **adds** `tokenizer` parameter into the private `temp` list and **uses** from it `tok_new`.
+#'   This function **adds** `tokenizer` parameter into the `temp` list and **uses** from it `tok_new`.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -356,9 +357,9 @@ Bert_like.SFC.save_tokenizer_draft <- function() { # nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.create_final_tokenizer <- function() { #nolint
-  private$temp$tokenizer <- transformers$PreTrainedTokenizerFast(
-    tokenizer_object = private$temp$tok_new,
+Bert_like.SFC.create_final_tokenizer <- function(self) { # nolint
+  self$temp$tokenizer <- transformers$PreTrainedTokenizerFast(
+    tokenizer_object = self$temp$tok_new,
     unk_token = "[UNK]",
     sep_token = "[SEP]",
     pad_token = "[PAD]",
@@ -372,10 +373,10 @@ Bert_like.SFC.create_final_tokenizer <- function() { #nolint
 #' @title Longformer-like creation step `create_tokenizer_draft`
 #' @description Relevant only for transformer classes (Longformer, RoBERTa, etc.). Do not use outside the classes.
 #'
-#'   This function **adds** `tok_new` parameter into the private `temp` list.
+#'   This function **adds** `tok_new` parameter into the `temp` list.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -383,21 +384,21 @@ Bert_like.SFC.create_final_tokenizer <- function() { #nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Longformer_like.SFC.create_tokenizer_draft <- function() { #nolint
-  private$temp$tok_new <- create_ByteLevelBPE_tokenizer(
-    private$params$max_position_embeddings,
-    private$params$add_prefix_space,
-    private$params$trim_offsets
+Longformer_like.SFC.create_tokenizer_draft <- function(self) { # nolint
+  self$temp$tok_new <- create_ByteLevelBPE_tokenizer(
+    self$params$max_position_embeddings,
+    self$params$add_prefix_space,
+    self$params$trim_offsets
   )
 }
 
 #' @title Longformer-like creation step `calculate_vocab`
 #' @description Relevant only for transformer classes (Longformer, RoBERTa, etc.). Do not use outside the classes.
 #'
-#'   This function **uses** `tok_new` parameter from the private `temp` list.
+#'   This function **uses** `tok_new` parameter from the `temp` list.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -405,15 +406,15 @@ Longformer_like.SFC.create_tokenizer_draft <- function() { #nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Longformer_like.SFC.calculate_vocab <- function() { #nolint
-  private$temp$tok_new$train_from_iterator( #nolint
+Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
+  self$temp$tok_new$train_from_iterator(
     py$batch_iterator(
       batch_size = as.integer(200),
-      dataset = private$params$raw_text_dataset,
+      dataset = self$temp$raw_text_dataset,
       report_to_shiny_app = is_shinyapp_active()
     ),
-    length = length(private$params$raw_text_dataset),
-    vocab_size = as.integer(private$params$vocab_size),
+    length = length(self$temp$raw_text_dataset),
+    vocab_size = as.integer(self$params$vocab_size),
     special_tokens = c("<s>", "<pad>", "</s>", "<unk>", "<mask>")
   )
 }
@@ -421,10 +422,10 @@ Longformer_like.SFC.calculate_vocab <- function() { #nolint
 #' @title Longformer-like creation step `save_tokenizer_draft`
 #' @description Relevant only for transformer classes (Longformer, RoBERTa, etc.). Do not use outside the classes.
 #'
-#'   This function **uses** `tok_new` parameter from the private `temp` list.
+#'   This function **uses** `tok_new` parameter from the `temp` list.
 #'
 #'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the private `temp` list of the base class
+#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   \link{.AIFEBaseTransformer} or use these temporary parameters.
 #'
 #' @return This function returns nothing.
@@ -432,6 +433,6 @@ Longformer_like.SFC.calculate_vocab <- function() { #nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Longformer_like.SFC.save_tokenizer_draft <- function() { #nolint
-  private$temp$tok_new$save_model(private$params$model_dir) #nolint
+Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
+  self$temp$tok_new$save_model(self$params$model_dir)
 }

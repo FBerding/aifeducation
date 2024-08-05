@@ -17,8 +17,8 @@ paramDesc.sustain_iso_code <- function() {
 }
 #' @keywords internal
 paramDesc.sustain_region <- function() {
-  " Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-  <https://mlco2.github.io/codecarbon/parameters.html>. "
+  " `string` Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+  information <https://mlco2.github.io/codecarbon/parameters.html>. "
 }
 #' @keywords internal
 paramDesc.sustain_interval <- function() " `integer` Interval in seconds for measuring power usage. "
@@ -26,6 +26,7 @@ paramDesc.sustain_interval <- function() " `integer` Interval in seconds for mea
 paramDesc.trace <- function() {
   " `bool` `TRUE` if information about the progress should be printed to the console. "
 }
+#' @keywords internal
 paramDesc.pytorch_safetensors <- function() {
   " `bool` Only relevant for pytorch models.
   * `TRUE`: a 'pytorch' model is saved in safetensors format.
@@ -51,32 +52,54 @@ paramDesc.hidden_size <- function() {
   embedding. "
 }
 #' @keywords internal
-paramDesc.num_attention_heads <- function() " `int` Number of attention heads. "
-#' @keywords internal
-paramDesc.intermediate_size <- function() {
-  " `int` Number of neurons in the intermediate layer of the attention mechanism. "
-}
-#' @keywords internal
 paramDesc.hidden_act <- function() " `string` Name of the activation function. "
 #' @keywords internal
 paramDesc.hidden_dropout_prob <- function() " `double` Ratio of dropout. "
 #' @keywords internal
 paramDesc.attention_probs_dropout_prob <- function() " `double` Ratio of dropout for attention probabilities. "
+#' @keywords internal
+paramDesc.intermediate_size <- function() {
+  " `int` Number of neurons in the intermediate layer of the attention mechanism. "
+}
+#' @keywords internal
+paramDesc.num_attention_heads <- function() " `int` Number of attention heads. "
 
 # Dependent parameters ----
 
 #' @keywords internal
 paramDesc.vocab_do_lower_case <- function() " `bool` `TRUE` if all words/tokens should be lower case. "
-
 #' @keywords internal
 paramDesc.num_hidden_layer <- function() " `int` Number of hidden layers. "
-
+#' @keywords internal
+paramDesc.target_hidden_size <- function() {
+  " `int` Number of neurons in the final layer. This parameter determines the dimensionality of the resulting text
+  embedding. "
+}
+#' @keywords internal
+paramDesc.block_sizes <- function() " `vector` of `int` determining the number and sizes of each block. "
+#' @keywords internal
+paramDesc.num_decoder_layers <- function() " `int` Number of decoding layers. "
+#' @keywords internal
+paramDesc.activation_dropout <- function() {
+  " `float` Dropout probability between the layers of the feed-forward blocks. "
+}
+#' @keywords internal
+paramDesc.pooling_type <- function() {
+  " `string` Type of pooling.
+  * `\"mean\"` for pooling with mean.
+  * `\"max\"` for pooling with maximum values. "
+}
 #' @keywords internal
 paramDesc.add_prefix_space <- function() {
   " `bool` `TRUE` if an additional space should be inserted to the leading words. "
 }
 #' @keywords internal
 paramDesc.trim_offsets <- function() " `bool` `TRUE` trims the whitespaces from the produced offsets. "
+#' @keywords internal
+paramDesc.attention_window <- function() {
+  " `int` Size of the window around each token for attention mechanism in every layer. "
+}
+
 
 # Train ----
 
@@ -105,14 +128,13 @@ paramDesc.batch_size <- function() " `int` Size of batches. "
 #' @keywords internal
 paramDesc.chunk_size <- function() " `int` Size of every chunk for training. "
 #' @keywords internal
-paramDesc.full_sequences_only <- function() {
-  " `bool` `TRUE` for using only chunks with a sequence length equal to `chunk_size`. "
-}
-#' @keywords internal
 paramDesc.min_seq_len <- function() {
   " `int` Only relevant if `full_sequences_only = FALSE`. Value determines the minimal sequence length included in
-  training process.
- "
+  training process. "
+}
+#' @keywords internal
+paramDesc.full_sequences_only <- function() {
+  " `bool` `TRUE` for using only chunks with a sequence length equal to `chunk_size`. "
 }
 #' @keywords internal
 paramDesc.learning_rate <- function() " `double` Learning rate for adam optimizer. "
@@ -136,5 +158,6 @@ paramDesc.pytorch_trace <- function() {
   * `pytorch_trace = 0`: does not print any information about the training process from pytorch on the console.
   * `pytorch_trace = 1`: prints a progress bar. "
 }
+
 #' @keywords internal
 get_allowed_transformer_types <- function() paste(unname(AIFETrType), collapse = ", ")

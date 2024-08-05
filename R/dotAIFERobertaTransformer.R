@@ -40,9 +40,9 @@
 
     # steps_for_creation `list()` that stores required and optional steps (functions) for creating a new transformer.
     #
-    # `create_final_tokenizer()` **adds** temporary `tokenizer` parameter to the private `temp` list.
+    # `create_final_tokenizer()` **adds** temporary `tokenizer` parameter to the inherited `temp` list.
     #
-    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the private `temp`
+    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the inherited `temp`
     # list.
     #
     # Use the `super$set_SFC_*()` methods to set required/optional steps for creation in the base class, where `*` is
@@ -53,14 +53,14 @@
     # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Longformer_like.SFC.*`
     # functions for details.
     steps_for_creation = list(
-      check_max_pos_emb = function() check.max_position_embeddings(private$params$max_position_embeddings),
-      create_tokenizer_draft = function() Longformer_like.SFC.create_tokenizer_draft(),
-      calculate_vocab = function() Longformer_like.SFC.calculate_vocab(),
-      save_tokenizer_draft = function() Longformer_like.SFC.save_tokenizer_draft(),
-      create_final_tokenizer = function() {
-        private$temp$tokenizer <- transformers$RobertaTokenizerFast(
-          vocab_file = paste0(private$params$model_dir, "/", "vocab.json"),
-          merges_file = paste0(private$params$model_dir, "/", "merges.txt"),
+      check_max_pos_emb = function(self) check.max_position_embeddings(self$params$max_position_embeddings),
+      create_tokenizer_draft = function(self) Longformer_like.SFC.create_tokenizer_draft(self),
+      calculate_vocab = function(self) Longformer_like.SFC.calculate_vocab(self),
+      save_tokenizer_draft = function(self) Longformer_like.SFC.save_tokenizer_draft(self),
+      create_final_tokenizer = function(self) {
+        self$temp$tokenizer <- transformers$RobertaTokenizerFast(
+          vocab_file = paste0(self$params$model_dir, "/", "vocab.json"),
+          merges_file = paste0(self$params$model_dir, "/", "merges.txt"),
           bos_token = "<s>",
           eos_token = "</s>",
           sep_token = "</s>",
@@ -68,21 +68,21 @@
           unk_token = "<unk>",
           pad_token = "<pad>",
           mask_token = "<mask>",
-          add_prefix_space = private$params$add_prefix_space,
-          trim_offsets = private$params$trim_offsets
+          add_prefix_space = self$params$add_prefix_space,
+          trim_offsets = self$params$trim_offsets
         )
       },
-      create_transformer_model = function() {
+      create_transformer_model = function(self) {
         configuration <- transformers$RobertaConfig(
-          vocab_size = as.integer(length(private$temp$tokenizer$get_vocab())),
-          max_position_embeddings = as.integer(private$params$max_position_embeddings),
-          hidden_size = as.integer(private$params$hidden_size),
-          num_hidden_layers = as.integer(private$params$num_hidden_layer),
-          num_attention_heads = as.integer(private$params$num_attention_heads),
-          intermediate_size = as.integer(private$params$intermediate_size),
-          hidden_act = private$params$hidden_act,
-          hidden_dropout_prob = private$params$hidden_dropout_prob,
-          attention_probs_dropout_prob = private$params$attention_probs_dropout_prob,
+          vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
+          max_position_embeddings = as.integer(self$params$max_position_embeddings),
+          hidden_size = as.integer(self$params$hidden_size),
+          num_hidden_layers = as.integer(self$params$num_hidden_layer),
+          num_attention_heads = as.integer(self$params$num_attention_heads),
+          intermediate_size = as.integer(self$params$intermediate_size),
+          hidden_act = self$params$hidden_act,
+          hidden_dropout_prob = self$params$hidden_dropout_prob,
+          attention_probs_dropout_prob = self$params$attention_probs_dropout_prob,
           type_vocab_size = as.integer(2),
           initializer_range = 0.02,
           layer_norm_eps = 1e-12,
@@ -90,38 +90,39 @@
           is_decoder = FALSE,
           use_cache = TRUE
         )
-        private$temp$model <- ifelse(
-          private$params$ml_framework == "tensorflow",
-          transformers$TFRobertaModel(configuration),
-          transformers$RobertaModel(configuration)
-        )
+
+        if (self$params$ml_framework == "tensorflow") {
+          self$temp$model <- transformers$TFRobertaModel(configuration)
+        } else {
+          self$temp$model <- transformers$RobertaModel(configuration)
+        }
       }
     ),
 
     # steps_for_training `list()` that stores required and optional steps (functions) for training a new transformer.
     #
-    # `load_existing_model()` **adds** `tokenizer` and `model` temporary parameters to the private `temp` list.
+    # `load_existing_model()` **adds** `tokenizer` and `model` temporary parameters to the inherited `temp` list.
     #
     # Use the `super$set_SFT_*()` methods to set required/optional steps for training in the base class, where `*` is
     # the name of the step.
     #
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
     steps_for_training = list(
-      load_existing_model = function() {
-        if (private$params$ml_framework == "tensorflow") {
-          private$temp$model <- transformers$TFRobertaForMaskedLM$from_pretrained(
-            private$params$model_dir_path,
-            from_pt = private$temp$from_pt
+      load_existing_model = function(self) {
+        if (self$params$ml_framework == "tensorflow") {
+          self$temp$model <- transformers$TFRobertaForMaskedLM$from_pretrained(
+            self$params$model_dir_path,
+            from_pt = self$temp$from_pt
           )
         } else {
-          private$temp$model <- transformers$RobertaForMaskedLM$from_pretrained(
-            private$params$model_dir_path,
-            from_tf = private$temp$from_tf,
-            use_safetensors = private$temp$load_safe
+          self$temp$model <- transformers$RobertaForMaskedLM$from_pretrained(
+            self$params$model_dir_path,
+            from_tf = self$temp$from_tf,
+            use_safetensors = self$temp$load_safe
           )
         }
 
-        private$temp$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(private$params$model_dir_path)
+        self$temp$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(self$params$model_dir_path)
       }
     )
   ),
@@ -137,7 +138,7 @@
     #'   vocabulary based on `Byte-Pair Encoding` (BPE) tokenizer using the python `transformers` and `tokenizers`
     #'   libraries.
     #'
-    #'   This method adds the following *'dependent' parameters* to the base class' private `params` list:
+    #'   This method adds the following *'dependent' parameters* to the base class' inherited `params` list:
     #'   * `add_prefix_space`
     #'   * `trim_offsets`
     #'   * `num_hidden_layer`
@@ -195,11 +196,8 @@
         model_dir = model_dir,
         vocab_raw_texts = vocab_raw_texts,
         vocab_size = vocab_size,
-        add_prefix_space = add_prefix_space,
-        trim_offsets = trim_offsets,
         max_position_embeddings = max_position_embeddings,
         hidden_size = hidden_size,
-        num_hidden_layer = num_hidden_layer,
         num_attention_heads = num_attention_heads,
         intermediate_size = intermediate_size,
         hidden_act = hidden_act,

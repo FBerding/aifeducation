@@ -97,7 +97,7 @@ This method returns nothing.
 This method creates a transformer configuration based on the \code{BERT} base architecture and a
 vocabulary based on \code{WordPiece} by using the python libraries \code{transformers} and \code{tokenizers}.
 
-This method adds the following \emph{'dependent' parameters} to the base class's private \code{params} list:
+This method adds the following \emph{'dependent' parameters} to the base class's inherited \code{params} list:
 \itemize{
 \item \code{vocab_do_lower_case}
 \item \code{num_hidden_layer}
@@ -166,8 +166,8 @@ embedding.}
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
 list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
 \item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
 
@@ -267,8 +267,8 @@ training process.}
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
 list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
 \item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
 
