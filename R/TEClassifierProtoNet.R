@@ -74,7 +74,7 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param optimizer `string` `"adam"` or `"rmsprop"` .
     #'@return Returns an object of class [TEClassifierProtoNet] which is ready for
     #'training.
-    initialize=function(ml_framework=aifeducation_config$get_framework(),
+    initialize=function(ml_framework="pytorch",
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -158,7 +158,7 @@ TEClassifierProtoNet<-R6::R6Class(
 
       model_info=text_embeddings$get_model_info()
       times=model_info$param_chunks
-      features=dim(text_embeddings$embeddings)[3]
+      features=text_embeddings$get_features()
 
       private$text_embedding_model["model"]=list(model_info)
       private$text_embedding_model["times"]=times

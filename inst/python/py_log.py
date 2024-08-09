@@ -17,10 +17,11 @@ message_bottom = "NA", last_log = None, write_interval = 2):
         writer.writerow({'value': value_middle, 'total': total_middle, 'message': message_middle})
         writer.writerow({'value': value_bottom, 'total': total_bottom, 'message': message_bottom})
         log_time=time.time()
+        f.close()
       except:
         log_time=last_log
-      finally:
-        f.close()
+    #  finally:
+     #   f.close()
     else:
       if not (last_log is None):
         diff=time.time()-last_log
@@ -34,10 +35,11 @@ message_bottom = "NA", last_log = None, write_interval = 2):
             writer.writerow({'value': value_middle, 'total': total_middle, 'message': message_middle})
             writer.writerow({'value': value_bottom, 'total': total_bottom, 'message': message_bottom})
             log_time=time.time()
+            f.close()
           except:
             log_time=last_log
-          finally:
-            f.close()
+          #finally:
+          #  f.close()
     return log_time
   else:
     return None
@@ -53,10 +55,11 @@ def write_log_performance_py(log_file, history, last_log = None, write_interval 
             writer = csv.writer(f, dialect='unix')
             writer.writerows(history)
             log_time=time.time()
+            f.close()
           except:
             log_time=last_log
-          finally:
-            f.close()
+          #finally:
+          #  f.close()
         else:
           log_time=last_log
       else:
@@ -65,10 +68,11 @@ def write_log_performance_py(log_file, history, last_log = None, write_interval 
           writer = csv.writer(f, dialect='unix')
           writer.writerows(history)
           log_time=time.time()
+          f.close()
         except:
           log_time=last_log
-        finally:
-          f.close()
+        #finally:
+        #  f.close()
       return log_time
   else:
       return None

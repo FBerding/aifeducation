@@ -37,6 +37,7 @@ Other Data Management:
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-LargeDataSetForTextEmbeddings-new}{\code{LargeDataSetForTextEmbeddings$new()}}
+\item \href{#method-LargeDataSetForTextEmbeddings-get_text_embedding_model_name}{\code{LargeDataSetForTextEmbeddings$get_text_embedding_model_name()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-get_model_info}{\code{LargeDataSetForTextEmbeddings$get_model_info()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-get_model_label}{\code{LargeDataSetForTextEmbeddings$get_model_label()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-add_feature_extractor_info}{\code{LargeDataSetForTextEmbeddings$add_feature_extractor_info()}}
@@ -131,6 +132,15 @@ for backward compatibility.}
 \subsection{Returns}{
 The method returns a new object of this class.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_text_embedding_model_name"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-get_text_embedding_model_name}{}}}
+\subsection{Method \code{get_text_embedding_model_name()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$get_text_embedding_model_name()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_model_info"></a>}}

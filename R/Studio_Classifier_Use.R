@@ -22,7 +22,15 @@ Classifiers_Use_UI <- function(id) {
         bslib::nav_panel(
           title = "Training",
           Training_UI(id=shiny::NS(id,"Classifiers_Training"))
-        )
+        ),
+        bslib::nav_panel(
+          title = "Reliability",
+          Reliability_UI(id=shiny::NS(id,"Classifiers_Reliability"))
+        ),
+        bslib::nav_panel(
+          title = "Prediction"#,
+          #Classifier_Prediction_UI(id=shiny::NS(id,"Classifiers_Prediction"))
+        ),
       )
     )
   )
@@ -66,7 +74,8 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
         model <- try(load_from_disk(model_path),silent = TRUE)
 
         if ("try-error"%in%class(model) == FALSE) {
-          if ("TextEmbeddingModel" %in% class(model)) {
+          if ("TEClassifierRegular" %in% class(model) |
+              "TEClassifierProtoNet" %in% class(model)) {
             shiny::removeModal()
             return(model)
             } else {
@@ -74,7 +83,7 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
                 title = "Error",
                 size = "l",
                 easy_close = TRUE,
-                error_messages = "The file does not contain an object of class TextEmbeddingModel."
+                error_messages = "The file does not contain an object of class TEClassifierRegular or TEClassifierProtoNet."
               )
             return(NULL)
           }
@@ -103,6 +112,8 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
                        model=model)
     Training_Server(id="Classifiers_Training",
                     model=model)
+    Reliability_Server(id="Classifiers_Reliability",
+                   model=model)
     #--------------------------------------------------------------------------
   })
 }

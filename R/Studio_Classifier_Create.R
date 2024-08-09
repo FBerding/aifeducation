@@ -46,6 +46,11 @@ Classifiers_Create_UI <- function(id) {
           label = "Test Data Matching",
           icon = shiny::icon("circle-question")
         ),
+        shiny::actionButton(
+          inputId = shiny::NS(id, "test_featureextractor_matching"),
+          label = "Test TEFeatureExtractor",
+          icon = shiny::icon("circle-question")
+        )
       ),
       # Main Page---------------------------------------------------------------
       # Content depends in the selected base model
@@ -53,12 +58,20 @@ Classifiers_Create_UI <- function(id) {
         bslib::card(
           bslib::card_header("Input Data"),
           bslib::card_body(
+            shiny::textInput(
+              inputId = shiny::NS(id, "embeddings_dir"),
+              label = shiny::tags$p(shiny::icon("folder"), "Path")
+            ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
           )
         ),
         bslib::card(
           bslib::card_header("Target Data"),
           bslib::card_body(
+            shiny::textInput(
+              inputId = shiny::NS(id, "target_dir"),
+              label = shiny::tags$p(shiny::icon("folder"), "Path")
+            ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_targets"))
           )
         )
@@ -73,7 +86,18 @@ Classifiers_Create_UI <- function(id) {
               bslib::card_header(
                 "Feature Extractor"
               ),
-              bslib::card_body()
+              bslib::card_body(
+                shinyFiles::shinyDirButton(
+                  id = shiny::NS(id, "button_select_feature_extractor"),
+                  label = "Choose TEFeatureExtractor",
+                  title = "Please choose a folder",
+                  icon = shiny::icon("folder-open")
+                ),
+                shiny::textInput(
+                  inputId = shiny::NS(id, "feature_extractor_dir"),
+                  label = shiny::tags$p(shiny::icon("folder"), "Path")
+                )
+              )
             ),
             bslib::card(
               bslib::card_header(
@@ -125,7 +149,7 @@ Classifiers_Create_UI <- function(id) {
                 shiny::sliderInput(
                   inputId = shiny::NS(id, "repeat_encoder"),
                   label = "Number Encoding Layers",
-                  value = 1,
+                  value = 0,
                   min = 0,
                   max = 48,
                   step = 1,
@@ -192,7 +216,8 @@ Classifiers_Create_UI <- function(id) {
                   step = 0.01
                 )
               )
-            )
+            ),
+            shiny::uiOutput(outputId = shiny::NS(id, "protonet_embedding_layer"))
           )
         )
       ),
@@ -207,18 +232,14 @@ Classifiers_Create_UI <- function(id) {
                 "General Settings"
               ),
               bslib::card_body(
-                shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id, "balance_class_weights"),
-                  label = "Balance Class Weights",
-                  value = TRUE,
-                  status = "primary"
+                shiny::selectInput(
+                  inputId = shiny::NS(id, "sustainability_country"),
+                  label = "Country for Sustainability Tracking",
+                  choices = country_alpha_3_list,
+                  # choices=NULL,
+                  selected = "DEU"
                 ),
-                shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id, "balance_sequence_length"),
-                  label = "Balance Sequnce Length",
-                  value = TRUE,
-                  status = "primary"
-                ),
+                shiny::uiOutput(outputId = shiny::NS(id, "regular_train")),
                 shiny::sliderInput(
                   inputId = shiny::NS(id, "data_folds"),
                   label = "Number of Folds",
@@ -265,7 +286,7 @@ Classifiers_Create_UI <- function(id) {
                   status = "primary"
                 ),
                 shiny::selectInput(
-                  inputId = shiny::NS(id, "sc_methods"),
+                  inputId = shiny::NS(id, "sc_method"),
                   label = "Method",
                   choices = c("dbsmote", "adas", "smote")
                 ),
@@ -310,7 +331,8 @@ Classifiers_Create_UI <- function(id) {
                 ),
                 shiny::uiOutput(outputId = shiny::NS(id, "dynamic_sample_weights"))
               )
-            )
+            ),
+            shiny::uiOutput(outputId = shiny::NS(id, "protonet_train")),
           )
         )
       )
@@ -322,6 +344,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
+    log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # File system management----------------------------------------------------
     # Embeddings
@@ -332,13 +355,24 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       # session = session,
       allowDirCreate = FALSE
     )
-    path_to_embeddings <- shiny::eventReactive(input$button_select_dataset_for_embeddings, {
+    shiny::observeEvent(input$button_select_dataset_for_embeddings, {
       path <- shinyFiles::parseDirPath(volumes, input$button_select_dataset_for_embeddings)
-      return(path)
+      shiny::updateTextInput(
+        inputId = "embeddings_dir",
+        value = path
+      )
+    })
+
+    path_to_embeddings <- shiny::eventReactive(input$embeddings_dir, {
+      if (input$embeddings_dir!="") {
+        return(input$embeddings_dir)
+      } else {
+        return(NULL)
+      }
     })
 
     data_embeddings <- shiny::reactive({
-      if (length(path_to_embeddings()) > 0) {
+      if (!is.null(path_to_embeddings())) {
         return(load_and_check_embeddings(path_to_embeddings()))
       } else {
         return(NULL)
@@ -353,26 +387,68 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       filetypes = c("csv", "rda", "rdata", "xlsx")
     )
 
-    path_to_target_data <- shiny::eventReactive(input$button_select_target_data,
+    shiny::observeEvent(input$button_select_target_data,
       {
         tmp_file_path <- shinyFiles::parseFilePaths(volumes, input$button_select_target_data)
         if (nrow(tmp_file_path) > 0) {
-          return(tmp_file_path[[1, "datapath"]])
+          shiny::updateTextInput(
+            inputId = "target_dir",
+            value = tmp_file_path[[1, "datapath"]]
+          )
         } else {
-          return(NULL)
+          shiny::updateTextInput(
+            inputId = "target_dir",
+            value = ""
+          )
         }
       },
       ignoreNULL = FALSE
     )
 
-    data_targets <- shiny::reactive({
-      return(load_and_check_target_data(path_to_target_data()))
+    path_to_target_data <- shiny::eventReactive(input$target_dir, {
+      if (input$target_dir!="") {
+        return(input$target_dir)
+      } else {
+        return(NULL)
+      }
     })
+
+    data_targets <- shiny::reactive({
+      if(!is.null(path_to_target_data())){
+        return(load_and_check_target_data(path_to_target_data()))
+      } else {
+        return(NULL)
+      }
+    })
+
+    # FeatureExtractor
+    shinyFiles::shinyDirChoose(
+      input = input,
+      id = "button_select_feature_extractor",
+      roots = volumes,
+      allowDirCreate = FALSE
+    )
+    shiny::observeEvent(input$button_select_feature_extractor, {
+      path <- shinyFiles::parseDirPath(volumes, input$button_select_feature_extractor)
+      shiny::updateTextInput(
+        inputId = "feature_extractor_dir",
+        value = path
+      )
+    })
+    path_to_feature_extractor <- shiny::eventReactive(input$feature_extractor_dir, {
+      if(input$feature_extractor_dir!="") {
+        return(input$feature_extractor_dir)
+      } else {
+        return(NULL)
+      }
+    })
+
 
     # Start screen for choosing the location for storing the data set-----------
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
+      # ns=session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"
@@ -400,11 +476,139 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
+
+
+
+
+    # Start training------------------------------------------------------------
+
+    shiny::observeEvent(input$save_modal_button_continue, {
+      # Check for errors
+      errors <- check_errors_create_classifier(
+        destination_path = input$save_modal_directory_path,
+        folder_name = input$save_modal_folder_name,
+        path_to_embeddings = path_to_embeddings(),
+        path_to_target_data = path_to_target_data(),
+        path_to_feature_extractor = path_to_feature_extractor(),
+        model_name = input$name,
+        model_label = input$label
+      )
+
+      # If there are errors display them. If not start running task.
+       if (!is.null(errors)) {
+      display_errors(
+        title = "Error",
+        size = "l",
+        easy_close = TRUE,
+        error_messages = errors
+      )
+       } else {
+         #Check vor valid arguments
+         if(identical( as.double(input$alpha),numeric(0))){
+           loss_alpha=NULL
+         } else {
+           loss_alpha=as.double(input$alpha)
+         }
+         if(identical( as.double(input$margin),numeric(0))){
+           loss_margin=NULL
+         } else {
+           loss_margin=as.double(input$margin)
+         }
+
+         if(check_for_empty_input(input$hidden)){
+           hidden=NULL
+         } else {
+           #hidden=as.numeric(stringi::stri_split_regex(input$hidden,pattern=",|[:blank:]")[[1]])
+           hidden=as.numeric(stringr::str_extract_all(input$hidden,pattern = "\\d+")[[1]])
+         }
+         if(check_for_empty_input(input$rec)){
+           rec=NULL
+         } else {
+           #rec=as.numeric(stringi::stri_split_regex(input$rec,pattern=",|[:blank:]")[[1]])
+           rec=as.numeric(stringr::str_extract_all(input$rec,pattern = "\\d+")[[1]])
+         }
+
+      # Start task and monitor
+      start_and_monitor_long_task(
+        id = id,
+        ExtendedTask_type = "classifier",
+        ExtendedTask_arguments = list(
+          classifier_type=input$classifier_type,
+          destination_path = input$save_modal_directory_path,
+          folder_name = input$save_modal_folder_name,
+          path_to_embeddings = path_to_embeddings(),
+          path_to_target_data = path_to_target_data(),
+          target_data_column=input$data_target_column,
+          path_to_feature_extractor = path_to_feature_extractor(),
+          name = input$name,
+          label = input$label,
+          # text_embeddings=NULL,
+          # feature_extractor=NULL,
+          # targets=NULL,
+          hidden = hidden,
+          rec = rec,
+          rec_type = input$rec_type,
+          rec_bidirectional = input$rec_bidirectional,
+          self_attention_heads = input$self_attention_heads,
+          intermediate_size = input$intermediate_size,
+          attention_type = input$attention_type,
+          add_pos_embedding = input$add_pos_embedding,
+          rec_dropout = input$rec_dropout,
+          repeat_encoder = input$repeat_encoder,
+          dense_dropout = input$dense_dropout,
+          recurrent_dropout = 0,
+          encoder_dropout = input$encoder_dropout,
+          optimizer = input$optimizer,
+
+          # data_embeddings,
+          # data_targets,
+
+          data_folds = input$data_folds,
+          data_val_size = as.double(input$val_size),
+          balance_class_weights = input$balance_class_weights,
+          balance_sequence_length = input$balance_sequence_length,
+          use_sc = input$use_sc,
+          sc_method = input$sc_method,
+          sc_min_k = input$sc_min_max_k[1],
+          sc_max_k = input$sc_min_max_k[2],
+          use_pl = input$use_pl,
+          pl_max_steps = input$pl_max_steps,
+          pl_max = as.double(input$pl_max),
+          pl_anchor = as.double(input$pl_anchor),
+          pl_min = as.double(input$pl_min),
+          #sustain_track = TRUE,
+          sustain_iso_code = input$sustainability_country,
+          #sustain_region = NULL,
+          #sustain_interval = 15,
+          epochs = input$epochs,
+          batch_size = input$batch_size,
+          # dir_checkpoint,
+          # trace=TRUE,
+          # keras_trace=0,
+          # pytorch_trace=0,
+          log_dir = log_dir,
+          log_write_interval = 3,
+          Ns = input$n_sample,
+          Nq = input$n_query,
+          loss_alpha = loss_alpha,
+          loss_margin = loss_margin,
+          embedding_dim = input$protonet_embedding_dim
+        ),
+        log_path = log_path,
+        pgr_use_middle = TRUE,
+        pgr_use_bottom = TRUE,
+        pgr_use_graphic = TRUE,
+        update_intervall = 2000,
+        success_type = "classifier"
+      )
+       }
+    })
+
     # Display Data Summary------------------------------------------------------
     # Embeddings
     output$summary_data_embeddings <- shiny::renderUI({
       embeddings <- data_embeddings()
-      shiny::req(embeddings)
+      # shiny::req(embeddings)
       if (!is.null(embeddings)) {
         model_info <- embeddings$get_model_info()
         info_table <- matrix(
@@ -413,11 +617,11 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
           data = ""
         )
         info_table[1, 1] <- "Model Method:"
-        info_table[2, 1] <- "Hidden State Aggregation:"
+        info_table[2, 1] <- "Pooling Type:"
         info_table[3, 1] <- "Model Language:"
 
         info_table[1, 2] <- model_info$model_method
-        info_table[2, 2] <- model_info$param_aggregation
+        info_table[2, 2] <- model_info$param_emb_pool_type
         info_table[3, 2] <- model_info$model_language
 
         info_table[1, 3] <- "Tokens per Chunk:"
@@ -451,7 +655,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     # Target data
     output$summary_data_targets <- shiny::renderUI({
       target_data <- data_targets()
-      shiny::req(target_data)
+      # shiny::req(target_data)
       if (!is.null(target_data)) {
         column_names <- colnames(target_data)
         column_names <- setdiff(x = column_names, y = c("id", "text"))
@@ -474,7 +678,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     })
 
     output$data_target_abs_freq <- shiny::renderTable({
-      shiny::req(data_targets())
+      # shiny::req(data_targets())
       relevant_data <- data_targets()
       relevant_data <- relevant_data[input$data_target_column]
       if (nrow(relevant_data) > 0) {
@@ -484,7 +688,144 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
+    #Pseudo labeling specific--------------------------------------------------
+    output$dynamic_sample_weights<-shiny::renderUI({
+      ui<-list(
+        shiny::sliderInput(inputId = session$ns("pl_max"),
+                           label = "Max Certainty Value",
+                           value = 1,
+                           max = 1,
+                           min = input$pl_anchor,
+                           step = 0.01),
+        shiny::sliderInput(inputId = session$ns("pl_min"),
+                           label = "Min Certainty Value",
+                           value = 0,
+                           max = input$pl_anchor,
+                           min = 0,
+                           step = 0.01)
+      )
+      return(ui)
+    })
+
+    #Attention specific---------------------------------------------------------
+    output$attention_layers_for_training<-shiny::renderUI({
+      if(input$attention_type=="multihead"){
+        ui<-list(
+          shiny::sliderInput(inputId = session$ns("self_attention_heads"),
+                             label = "Number of Self Attention Heads",
+                             min = 1,
+                             value = 4,
+                             max=48,
+                             step = 1,
+                             round = TRUE)
+        )
+        return(ui)
+      } else {
+        return(NULL)
+      }
+    })
+
+
+    # Regular specific elements-------------------------------------------------
+    output$regular_train <- renderUI({
+      if (input$classifier_type == "regular") {
+        ui <- shiny::tagList(
+          shinyWidgets::materialSwitch(
+            inputId = session$ns("balance_class_weights"),
+            label = "Balance Class Weights",
+            value = TRUE,
+            status = "primary"
+          ),
+          shinyWidgets::materialSwitch(
+            inputId = session$ns("balance_sequence_length"),
+            label = "Balance Sequnce Length",
+            value = TRUE,
+            status = "primary"
+          )
+        )
+      } else {
+        ui <- NULL
+      }
+      return(ui)
+    })
+
+    # ProtoNet specific elements------------------------------------------------
+    output$protonet_embedding_layer <- renderUI({
+      if (input$classifier_type == "protonet") {
+        ui <- bslib::card(
+          bslib::card_header(
+            "ProtoNet Embedding Layer"
+          ),
+          bslib::card_body(
+            shiny::sliderInput(
+              inputId = session$ns("protonet_embedding_dim"),
+              label = "Dimension",
+              value = 2,
+              min = 1,
+              max = 64,
+              step = 1
+            )
+          )
+        )
+      } else {
+        ui <- NULL
+      }
+
+      return(ui)
+    })
+
+    output$protonet_train <- renderUI({
+      if (input$classifier_type == "protonet") {
+        ui <- shiny::tagList(
+          bslib::card(
+            bslib::card_header(
+              "ProtoNet Specific"
+            ),
+            bslib::card_body(
+              shiny::sliderInput(
+                inputId = session$ns("n_sample"),
+                label = "N Sample",
+                min = 1,
+                max = 256,
+                value = 5,
+                step = 1
+              ),
+              shiny::sliderInput(
+                inputId = session$ns("n_query"),
+                label = "N Query",
+                min = 1,
+                max = 256,
+                value = 2,
+                step = 1
+              ),
+              shiny::sliderInput(
+                inputId = session$ns("alpha"),
+                label = "Alpha",
+                min = 0,
+                max = 1,
+                value = 0.5,
+                step = 0.1
+              ),
+              shiny::sliderInput(
+                inputId = session$ns("margin"),
+                label = "Margin",
+                min = 0,
+                max = 1,
+                value = 0.5,
+                step = 0.1
+              )
+            )
+          )
+        )
+      } else {
+        ui <- NULL
+      }
+      return(ui)
+    })
+
+
     # Test Data matching--------------------------------------------------------
+    # Data Sets
     shiny::observeEvent(input$test_data_matching,
       {
         cond_1 <- (!is.null(data_embeddings()))
@@ -523,6 +864,11 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
 
 
+
+
+
+
+
     # Error handling-----------------------------------------------------------
 
 
@@ -530,28 +876,93 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
   })
 }
 
-check_errors_text_embedding_model_create <- function(destination_path,
-                                                     folder_name,
-                                                     path_to_base_model,
-                                                     interface_architecture) {
+check_errors_create_classifier <- function(destination_path,
+                                           folder_name,
+                                           path_to_embeddings,
+                                           path_to_target_data,
+                                           path_to_feature_extractor,
+                                           model_name,
+                                           model_label) {
   # List for gathering errors
   error_list <- NULL
 
-  # Check if all inputs are correctly set
-  if (!dir.exists(destination_path)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p("The destination directory does not
-                                                   exist. Please check your directory path
-                                                   and/or create that directory."))
-  }
-  if (is.null(folder_name) | folder_name == "") {
-    error_list[length(error_list) + 1] <- "File name for the text dataset is missing."
+  # Destination
+  if (dir.exists(destination_path) == FALSE) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "The target directory does not exist. Please check path."
+    ))
   }
 
-  if (!identical(path_to_base_model, character(0))) {
-    if (is.null(interface_architecture[[1]]) &
-      is.null(interface_architecture[[2]])) {
-      error_list[length(error_list) + 1] <- "There is no model to load in the directory."
+  if (check_for_empty_input(folder_name)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Folder name is not set."
+    ))
+  }
+
+
+
+  # Embeddings
+  if (dir.exists(path_to_embeddings) == FALSE) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Directory which should store embeddings does not exist."
+    ))
+  } else {
+    embeddings <- try(load_from_disk(path_to_embeddings), silent = TRUE)
+    if ("try-error" %in% class(embeddings)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        embeddings
+      ))
+    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
+      "EmbeddedText" %in% class(embeddings))) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
+        or 'EmbeddedText'."
+      ))
     }
+  }
+
+  # Target Data
+
+  # FeatureExtractor
+  if (check_for_empty_input(path_to_feature_extractor)==FALSE) {
+    if (dir.exists(path_to_feature_extractor) == FALSE) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Directory which should store the TEFeatureExtractor does not exist."
+      ))
+    } else {
+      feature_extractor <- try(load_from_disk(path_to_feature_extractor), silent = TRUE)
+      if ("try-error" %in% class(feature_extractor)) {
+        error_list[length(error_list) + 1] <- list(shiny::tags$p(
+          feature_extractor
+        ))
+      } else if (!("TEFeatureExtractor" %in% class(feature_extractor))) {
+        error_list[length(error_list) + 1] <- list(shiny::tags$p(
+          "Directory which should contain a feature extractor does not contain an object of class
+          TEFeatureExtractor."
+        ))
+      } else {
+        if (feature_extractor$get_text_embedding_model_name() != embeddings$get_text_embedding_model_name()) {
+          error_list[length(error_list) + 1] <- list(shiny::tags$p(
+            "The TextEmbeddingModel of the TEFeatureExtractor and the provided embeddings
+            are not compatible."
+          ))
+        }
+      }
+    }
+  }
+
+
+  # Model Nane and Model Label
+  if (check_for_empty_input(model_name)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Name of the classifier ist not set."
+    ))
+  }
+
+  if (check_for_empty_input( model_label)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Label of the classifier ist not set."
+    ))
   }
 
   if (length(error_list) > 0) {

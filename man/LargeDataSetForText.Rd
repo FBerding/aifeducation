@@ -69,6 +69,11 @@ Id and raw texts are mandatory, bibliographic and license information are option
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_txt(
   dir_path,
   batch_size = 500,
+  log_file = NULL,
+  log_write_interval = 2,
+  log_top_value = 0,
+  log_top_total = 1,
+  log_top_message = NA,
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -113,6 +118,11 @@ Id and raw texts are mandatory, bibliographic and license information are option
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_pdf(
   dir_path,
   batch_size = 500,
+  log_file = NULL,
+  log_write_interval = 2,
+  log_top_value = 0,
+  log_top_total = 1,
+  log_top_message = NA,
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -153,7 +163,12 @@ Additional columns are dropped.
   id_column = "id",
   text_column = "text",
   bib_entry_column = "bib_entry",
-  license_column = "license"
+  license_column = "license",
+  log_file = NULL,
+  log_write_interval = 2,
+  log_top_value = 0,
+  log_top_total = 1,
+  log_top_message = NA
 )}\if{html}{\out{</div>}}
 }
 

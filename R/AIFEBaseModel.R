@@ -298,6 +298,10 @@ AIFEBaseModel<-R6::R6Class(
       return(private$ml_framework)
     },
     #--------------------------------------------------------------------------
+    get_text_embedding_model_name=function(){
+      return(private$text_embedding_model$model$model_name)
+    },
+    #--------------------------------------------------------------------------
     #Check Embedding Model compatibility of the text embedding
     #'@description Method for checking if the provided text embeddings are
     #'created with the same [TextEmbeddingModel] as the model.

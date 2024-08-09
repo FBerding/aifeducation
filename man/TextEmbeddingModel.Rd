@@ -359,7 +359,13 @@ model creating the embeddings.
 \subsection{Method \code{embed_large()}}{
 Method for creating text embeddings from raw texts.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed_large(large_datas_set, batch_size = 32, trace = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed_large(
+  large_datas_set,
+  batch_size = 32,
+  trace = FALSE,
+  log_file = NULL,
+  log_write_interval = 2
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

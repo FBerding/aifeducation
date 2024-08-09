@@ -9,30 +9,30 @@ long_add_texts_to_dataset <- function(source_path,
                                       excel_text_column,
                                       excel_license_column,
                                       excel_bib_entry_column,
-                                      log_write_interval=2) {
+                                      log_write_interval = 2) {
   promises::future_promise({
-    #Set up top level progress monitoring
-    top_total=include_txt+include_txt+include_xlsx
-    top_value=0
-    total_message="File types"
+    # Set up top level progress monitoring
+    top_total <- include_txt + include_txt + include_xlsx
+    top_value <- 0
+    total_message <- "File types"
 
 
     # Create new data set
     new_dataset <- LargeDataSetForText$new()
 
-    #Start processing different file types
+    # Start processing different file types
     if (include_txt == TRUE) {
       new_dataset$add_from_files_txt(
         dir_path = source_path,
         batch_size = 2,
         log_file = log_path,
-        log_top_value=top_value,
-        log_top_total=top_total,
-        log_top_message=total_message,
-        log_write_interval=log_write_interval,
+        log_top_value = top_value,
+        log_top_total = top_total,
+        log_top_message = total_message,
+        log_write_interval = log_write_interval,
         trace = FALSE
       )
-      top_value=top_value+1
+      top_value <- top_value + 1
     }
 
     if (include_pdf == TRUE) {
@@ -40,13 +40,13 @@ long_add_texts_to_dataset <- function(source_path,
         dir_path = source_path,
         batch_size = 2,
         log_file = log_path,
-        top_value=top_value,
-        top_total=top_total,
-        top_message=total_message,
-        log_write_interval=log_write_interval,
+        top_value = top_value,
+        top_total = top_total,
+        top_message = total_message,
+        log_write_interval = log_write_interval,
         trace = FALSE
       )
-      top_value=top_value+1
+      top_value <- top_value + 1
     }
 
     if (include_xlsx == TRUE) {
@@ -58,12 +58,12 @@ long_add_texts_to_dataset <- function(source_path,
         license_column = excel_license_column,
         bib_entry_column = excel_bib_entry_column,
         log_file = log_path,
-        top_value=top_value,
-        top_total=top_total,
-        top_message=total_message,
-        log_write_interval=log_write_interval,
+        top_value = top_value,
+        top_total = top_total,
+        top_message = total_message,
+        log_write_interval = log_write_interval,
       )
-      top_value=top_value+1
+      top_value <- top_value + 1
     }
 
     # Save
@@ -79,32 +79,32 @@ long_add_texts_to_dataset <- function(source_path,
 }
 
 long_transform_text_to_embeddings <- function(source_path,
-                                      destination_path,
-                                      destination_folder,
-                                      log_path,
-                                      batch_size,
-                                      model_path,
-                                      log_write_interval=2) {
-
+                                              destination_path,
+                                              destination_folder,
+                                              log_path,
+                                              batch_size,
+                                              model_path,
+                                              log_write_interval = 2) {
   promises::future_promise({
-    #Read the large data set for raw texts
-    raw_texts=load_from_disk(source_path)
+    # Read the large data set for raw texts
+    raw_texts <- load_from_disk(source_path)
 
-    #Set up top level progress monitoring
-    top_total=raw_texts$n_rows()
-    top_value=0
-    total_message="Documents"
+    # Set up top level progress monitoring
+    top_total <- raw_texts$n_rows()
+    top_value <- 0
+    total_message <- "Documents"
 
-    #Load the model
-    model=load_from_disk(model_path)
+    # Load the model
+    model <- load_from_disk(model_path)
 
-    #Start embedding
-    embeddings=model$embed_large(
-      large_datas_set=raw_texts,
-      batch_size=batch_size,
-      trace=FALSE,
+    # Start embedding
+    embeddings <- model$embed_large(
+      large_datas_set = raw_texts,
+      batch_size = batch_size,
+      trace = FALSE,
       log_file = log_path,
-      log_write_interval = log_write_interval)
+      log_write_interval = log_write_interval
+    )
 
     # Save
     save_to_disk(
@@ -116,5 +116,257 @@ long_transform_text_to_embeddings <- function(source_path,
     # Returns number of documents that are embedded
     return(embeddings$n_rows())
   })
+}
 
+long_classifier <- function(classifier_type,
+                            destination_path,
+                            folder_name,
+                            path_to_embeddings,
+                            path_to_target_data,
+                            path_to_feature_extractor,
+                            target_data_column,
+                            name,
+                            label,
+                            data_folds,
+                            data_val_size,
+                            balance_class_weights,
+                            balance_sequence_length,
+                            use_sc,
+                            sc_method,
+                            sc_min_k,
+                            sc_max_k,
+                            use_pl,
+                            pl_max_steps,
+                            pl_max,
+                            pl_anchor,
+                            pl_min,
+                            sustain_iso_code,
+                            epochs,
+                            batch_size,
+                            log_dir,
+                            hidden,
+                            rec,
+                            rec_type,
+                            rec_bidirectional,
+                            self_attention_heads,
+                            intermediate_size,
+                            attention_type,
+                            add_pos_embedding,
+                            rec_dropout,
+                            repeat_encoder,
+                            dense_dropout,
+                            recurrent_dropout,
+                            encoder_dropout,
+                            optimizer,
+                            log_write_interval,
+                            embedding_dim,
+                            Ns,
+                            Nq,
+                            loss_alpha,
+                            loss_margin) {
+  promises::future_promise({
+    # Load data
+    embeddings <- load_from_disk(path_to_embeddings)
+    target_data <- long_load_target_data(
+      file_path = path_to_target_data,
+      selectet_column = target_data_column
+    )
+
+    # Load feature extractor if provided
+    if (!is.null(path_to_feature_extractor)) {
+      feature_extractor <- load_from_disk(path_to_feature_extractor)
+    } else {
+      feature_extractor <- NULL
+    }
+
+    # Check for valid arguments
+    if (is.null(self_attention_heads)) {
+      self_attention_heads <- 0
+    }
+
+    # Create dir for checkpints
+    dir_destination <- paste0(
+      destination_path, "/",
+      folder_name
+    )
+    dir_checkpoints <- paste0(
+      dir_destination, "/",
+      "checkpoints"
+    )
+    if (dir.exists(dir_destination) == FALSE) {
+      dir.create(dir_destination)
+    }
+    if (dir.exists(dir_checkpoints) == FALSE) {
+      dir.create(dir_checkpoints)
+    }
+
+    if (classifier_type == "regular") {
+      # Create Classifier
+      classifier <- TEClassifierRegular$new(
+        ml_framework = "pytorch",
+        name = name,
+        label = label,
+        text_embeddings = embeddings,
+        feature_extractor = feature_extractor,
+        targets = target_data,
+        hidden = hidden,
+        rec = rec,
+        rec_type = rec_type,
+        rec_bidirectional = rec_bidirectional,
+        self_attention_heads = self_attention_heads,
+        intermediate_size = intermediate_size,
+        attention_type = attention_type,
+        add_pos_embedding = add_pos_embedding,
+        rec_dropout = rec_dropout,
+        repeat_encoder = repeat_encoder,
+        dense_dropout = dense_dropout,
+        recurrent_dropout = recurrent_dropout,
+        encoder_dropout = encoder_dropout,
+        optimizer = optimizer
+      )
+
+      # Train classifier
+      classifier$train(
+        data_embeddings = embeddings,
+        data_targets = target_data,
+        data_folds = data_folds,
+        data_val_size = data_val_size,
+        balance_class_weights = balance_class_weights,
+        balance_sequence_length = balance_sequence_length,
+        use_sc = use_sc,
+        sc_method = sc_method,
+        sc_min_k = sc_min_k,
+        sc_max_k = sc_max_k,
+        use_pl = use_pl,
+        pl_max_steps = pl_max_steps,
+        pl_max = pl_max,
+        pl_anchor = pl_anchor,
+        pl_min = pl_min,
+        sustain_track = TRUE,
+        sustain_iso_code = sustain_iso_code,
+        sustain_region = NULL,
+        sustain_interval = 15,
+        epochs = epochs,
+        batch_size = batch_size,
+        dir_checkpoint = dir_checkpoints,
+        trace = FALSE,
+        keras_trace = 0,
+        pytorch_trace = 0,
+        log_dir = log_dir,
+        log_write_interval = log_write_interval
+      )
+    } else if (classifier_type == "protonet") {
+      # Create
+      classifier <- TEClassifierProtoNet$new(
+        ml_framework="pytorch",
+        embedding_dim = embedding_dim,
+        name = name,
+        label = label,
+        text_embeddings = embeddings,
+        feature_extractor = feature_extractor,
+        targets = target_data,
+        hidden = hidden,
+        rec = rec,
+        rec_type = rec_type,
+        rec_bidirectional = rec_bidirectional,
+        self_attention_heads = self_attention_heads,
+        intermediate_size = intermediate_size,
+        attention_type = attention_type,
+        add_pos_embedding = add_pos_embedding,
+        rec_dropout = rec_dropout,
+        repeat_encoder = repeat_encoder,
+        dense_dropout = dense_dropout,
+        recurrent_dropout = recurrent_dropout,
+        encoder_dropout = encoder_dropout,
+        optimizer = optimizer
+      )
+
+      # Train
+      classifier$train(
+        data_embeddings = embeddings,
+        data_targets = target_data,
+        data_folds = data_folds,
+        data_val_size = data_val_size,
+        use_sc = use_sc,
+        sc_method = sc_method,
+        sc_min_k = sc_min_k,
+        sc_max_k = sc_max_k,
+        use_pl = use_pl,
+        pl_max_steps = pl_max_steps,
+        pl_max = pl_max,
+        pl_anchor = pl_anchor,
+        pl_min = pl_min,
+        sustain_track = TRUE,
+        sustain_iso_code = sustain_iso_code,
+        sustain_region = NULL,
+        sustain_interval = 15,
+        epochs = epochs,
+        batch_size = batch_size,
+        dir_checkpoint = dir_checkpoints,
+        trace = FALSE,
+        keras_trace = 0,
+        pytorch_trace = 0,
+        log_dir = log_dir,
+        log_write_interval = log_write_interval,
+        Ns = Ns,
+        Nq = Nq,
+        loss_alpha = loss_alpha,
+        loss_margin = loss_margin
+      )
+    }
+    # Save
+    save_to_disk(
+      object = classifier,
+      dir_path = destination_path,
+      folder_name = folder_name
+    )
+
+    # Returns number of documents that are embedded
+    return("Classifier trained.")
+  })
+}
+
+get_arguments_extended_task_TEClassifierRegular <- function() {
+  return(c(
+    "destination_path",
+    "folder_name",
+    "path_to_embeddings",
+    "path_to_target_data",
+    "path_to_feature_extractor",
+    "target_data_column",
+    "name",
+    "label",
+    "data_folds",
+    "data_val_size",
+    "balance_class_weights",
+    "balance_sequence_length",
+    "use_sc",
+    "sc_method",
+    "sc_min_k",
+    "sc_max_k",
+    "use_pl",
+    "pl_max_steps",
+    "pl_max",
+    "pl_anchor",
+    "pl_min",
+    "sustain_iso_code",
+    "epochs",
+    "batch_size",
+    "log_dir",
+    "hidden",
+    "rec",
+    "rec_type",
+    "rec_bidirectional",
+    "self_attention_heads",
+    "intermediate_size",
+    "attention_type",
+    "add_pos_embedding",
+    "rec_dropout",
+    "repeat_encoder",
+    "dense_dropout",
+    "recurrent_dropout",
+    "encoder_dropout",
+    "optimizer",
+    "log_write_interval"
+  ))
 }

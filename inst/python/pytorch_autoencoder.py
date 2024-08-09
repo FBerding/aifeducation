@@ -255,6 +255,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     total_steps=len(trainloader)+len(valloader)
 
   for epoch in range(epochs):
+    #logging
+    current_step=0
     
     #Training------------------------------------------------------------------
     train_loss=0.0

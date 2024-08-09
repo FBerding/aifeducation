@@ -116,7 +116,7 @@ TEClassifierRegular<-R6::R6Class(
     #'@param optimizer `string` `"adam"` or `"rmsprop"` .
     #'@return Returns an object of class [TEClassifierRegular] which is ready for
     #'training.
-    initialize=function(ml_framework=aifeducation_config$get_framework(),
+    initialize=function(ml_framework="pytorch",
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,

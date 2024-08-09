@@ -30,4 +30,7 @@ display_processing=function(
     shiny::tagList(message)
   )
   shiny::showModal(processing_modal)
+
+  #Give system time to display the modal
+  Sys.sleep(2)
 }

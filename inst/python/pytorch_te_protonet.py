@@ -274,6 +274,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       total_steps=total_steps+len(testloader)
 
   for epoch in range(epochs):
+    #logging
+    current_step=0
+    
     #Set Up Sampler for a new random selection---------------------------------
     ProtoNetSampler_Train=MetaLernerBatchSampler(
       targets=train_data["labels"],
@@ -330,6 +333,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       match=(pred_idx==label_idx)
       n_matches_train+=match.sum().item()
       n_total_train+=outputs[0].size(0)
+     
 
       #Calc Balanced Accuracy
       confusion_matrix_train+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=n_classes)

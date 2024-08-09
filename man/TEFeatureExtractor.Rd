@@ -62,6 +62,7 @@ Other Classification:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_software_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_software_license'><code>aifeducation::AIFEBaseModel$get_software_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_text_embedding_model"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_text_embedding_model'><code>aifeducation::AIFEBaseModel$get_text_embedding_model()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_text_embedding_model_name'><code>aifeducation::AIFEBaseModel$get_text_embedding_model_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="save"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-save'><code>aifeducation::AIFEBaseModel$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
@@ -140,7 +141,9 @@ Method for training a neural net.
   dir_checkpoint,
   trace = TRUE,
   keras_trace = 2,
-  pytorch_trace = 1
+  pytorch_trace = 1,
+  log_dir = NULL,
+  log_write_interval = 10
 )}\if{html}{\out{</div>}}
 }
 
@@ -207,7 +210,8 @@ For a high number of cases please use the method \code{extract_features_large}.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data_embeddings}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing
+\item{\code{data_embeddings}}{Object of class \link{EmbeddedText},\link{LargeDataSetForTextEmbeddings},
+\code{datasets.arrow_dataset.Dataset} or \code{array} containing
 the text embeddings which should be reduced in their dimensions.}
 
 \item{\code{batch_size}}{\code{int} batch size.}
@@ -225,7 +229,6 @@ embeddings.
 \subsection{Method \code{extract_features_large()}}{
 Method for extracting features from a large number of cases. Applying this method
 reduces the number of dimensions of the text embeddings.
-For a high number of cases please use the method \code{extract_features_large}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$extract_features_large(
   data_embeddings,

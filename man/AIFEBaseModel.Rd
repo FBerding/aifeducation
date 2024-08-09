@@ -60,6 +60,7 @@ information will be overwritten if a new training is started.
 \item \href{#method-AIFEBaseModel-get_package_versions}{\code{AIFEBaseModel$get_package_versions()}}
 \item \href{#method-AIFEBaseModel-get_sustainability_data}{\code{AIFEBaseModel$get_sustainability_data()}}
 \item \href{#method-AIFEBaseModel-get_ml_framework}{\code{AIFEBaseModel$get_ml_framework()}}
+\item \href{#method-AIFEBaseModel-get_text_embedding_model_name}{\code{AIFEBaseModel$get_text_embedding_model_name()}}
 \item \href{#method-AIFEBaseModel-check_embedding_model}{\code{AIFEBaseModel$check_embedding_model()}}
 \item \href{#method-AIFEBaseModel-count_parameter}{\code{AIFEBaseModel$count_parameter()}}
 \item \href{#method-AIFEBaseModel-clone}{\code{AIFEBaseModel$clone()}}
@@ -365,6 +366,15 @@ for the model.
 Returns a \code{string} describing the machine learning framework used
 for the classifier
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-AIFEBaseModel-get_text_embedding_model_name"></a>}}
+\if{latex}{\out{\hypertarget{method-AIFEBaseModel-get_text_embedding_model_name}{}}}
+\subsection{Method \code{get_text_embedding_model_name()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{AIFEBaseModel$get_text_embedding_model_name()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-AIFEBaseModel-check_embedding_model"></a>}}

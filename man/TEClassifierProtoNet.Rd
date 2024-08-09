@@ -68,6 +68,7 @@ Other Classification:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_software_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_software_license'><code>aifeducation::AIFEBaseModel$get_software_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_text_embedding_model"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_text_embedding_model'><code>aifeducation::AIFEBaseModel$get_text_embedding_model()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_text_embedding_model_name'><code>aifeducation::AIFEBaseModel$get_text_embedding_model_name()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="save"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-save'><code>aifeducation::AIFEBaseModel$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
@@ -88,7 +89,7 @@ Other Classification:
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$new(
-  ml_framework = aifeducation_config$get_framework(),
+  ml_framework = "pytorch",
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -215,7 +216,9 @@ Method for training a neural net.
   dir_checkpoint,
   trace = TRUE,
   keras_trace = 2,
-  pytorch_trace = 1
+  pytorch_trace = 1,
+  log_dir = NULL,
+  log_write_interval = 10
 )}\if{html}{\out{</div>}}
 }
 

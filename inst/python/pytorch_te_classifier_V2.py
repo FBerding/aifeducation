@@ -476,13 +476,13 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       
   #Tensor for Saving Training History
   if not (test_data is None):
-    history_loss=torch.zeros(size=(3,epochs),requires_grad=False)
-    history_acc=torch.zeros(size=(3,epochs),requires_grad=False)
-    history_bacc=torch.zeros(size=(3,epochs),requires_grad=False)
+    history_loss=torch.ones(size=(3,epochs),requires_grad=False)*-100
+    history_acc=torch.ones(size=(3,epochs),requires_grad=False)*-100
+    history_bacc=torch.ones(size=(3,epochs),requires_grad=False)*-100
   else:
-    history_loss=torch.zeros(size=(2,epochs),requires_grad=False)
-    history_acc=torch.zeros(size=(2,epochs),requires_grad=False)
-    history_bacc=torch.zeros(size=(2,epochs),requires_grad=False)
+    history_loss=torch.ones(size=(2,epochs),requires_grad=False)*-100
+    history_acc=torch.ones(size=(2,epochs),requires_grad=False)*-100
+    history_bacc=torch.ones(size=(2,epochs),requires_grad=False)*-100
   
   best_bacc=float('-inf')
   best_val_loss=float('inf')
@@ -501,6 +501,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     
 
   for epoch in range(epochs):
+    #logging
+    current_step=0
     
     #Training------------------------------------------------------------------
     train_loss=0.0

@@ -138,7 +138,10 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
 
       private$param_aggregation = param_aggregation
     },
-
+    #-------------------------------------------------------------------------
+    get_text_embedding_model_name=function(){
+      return( private$model_name)
+    },
     #--------------------------------------------------------------------------
     #'@description Method for retrieving information about the model that
     #'generated this embedding.

@@ -102,5 +102,53 @@ reset_log <- function(log_path) {
   if (!is.null(log_path)) {
     try(write.csv(x = log_data, file = log_path, row.names = FALSE))
   }
+}
 
+read_loss_log=function(path_loss){
+  if (file.exists(path_loss)) {
+    loss_data <- try(
+      read.table(file = path_loss,
+                 sep=",",
+               header =  FALSE),
+      silent = TRUE
+    )
+    if ("try-error" %in% class(loss_data)) {
+      logs_data <- NULL
+    } else {
+      loss_data <- t(loss_data)
+      if (ncol(loss_data) > 2) {
+        colnames(loss_data) <- c("train", "validation", "test")
+      } else {
+        colnames(loss_data) <- c("train", "validation")
+      }
+      loss_data <- as.data.frame(loss_data)
+      for(i in 1:ncol(loss_data)){
+        loss_data[,i]<-as.numeric(loss_data[,i])
+      }
+      loss_data$epoch <- seq.int(
+        from = 1,
+        to = nrow(loss_data),
+        by = 1
+      )
+    }
+  } else {
+    loss_data <- NULL
+  }
+  return(loss_data)
+}
+
+reset_loss_log <- function(log_path,epochs) {
+  log_data <- rbind(
+rep(-100,times=epochs),
+rep(-100,times=epochs),
+rep(-100,times=epochs)
+  )
+
+  if (!is.null(log_path)) {
+    try(write.table(x = log_data, file = log_path,
+                  row.names = FALSE,
+                  col.names=FALSE,
+                  sep=","),
+        silent = TRUE)
+  }
 }
