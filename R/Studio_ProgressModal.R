@@ -129,6 +129,9 @@ start_and_monitor_long_task <- function(id,
     } else if (ExtendedTask_type == "classifier") {
       CurrentTask <- shiny::ExtendedTask$new(long_classifier)
       do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
+    } else if (ExtendedTask_type=="feature_extractor"){
+      CurrentTask <- shiny::ExtendedTask$new(long_feature_extractor)
+      do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
     }
 
     # Check progress of the task

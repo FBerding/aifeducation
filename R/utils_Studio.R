@@ -675,3 +675,118 @@ prepare_training_history <- function(model, final = FALSE, use_pl = FALSE, pl_st
     )
   )
 }
+
+create_data_embeddings_description=function(embeddings){
+  model_info <- embeddings$get_model_info()
+  info_table <- matrix(
+    nrow = 3,
+    ncol = 4,
+    data = ""
+  )
+  info_table[1, 1] <- "Model Method:"
+  info_table[2, 1] <- "Pooling Type:"
+  info_table[3, 1] <- "Model Language:"
+
+  info_table[1, 2] <- model_info$model_method
+  info_table[2, 2] <- model_info$param_emb_pool_type
+  info_table[3, 2] <- model_info$model_language
+
+  info_table[1, 3] <- "Tokens per Chunk:"
+  info_table[2, 3] <- "Max Chunks:"
+  info_table[3, 3] <- "Token Overlap:"
+
+  info_table[1, 4] <- model_info$param_seq_length
+  info_table[2, 4] <- model_info$param_chunks
+  info_table[3, 4] <- model_info$param_overlap
+
+  ui <- list(
+    bslib::value_box(
+      value = embeddings$n_rows(),
+      title = "Number of Cases",
+      showcase = shiny::icon("list")
+    ),
+    shiny::tags$h3("Model:", model_info$model_label),
+    shiny::tags$p("Name:", model_info$model_name),
+    shiny::tags$p("Created", model_info$model_date),
+    shiny::renderTable(
+      expr = info_table,
+      colnames = FALSE
+    )
+  )
+
+  return(ui)
+}
+
+check_and_prepare_for_studio=function(){
+  message("Checking R Packages.")
+  r_packages=c(
+    "ggplot2",
+    "rlang",
+    "shiny",
+    "shinyFiles",
+    "shinyWidgets",
+    "bslib",
+    "future",
+    "promises",
+    "DT",
+    "readtext",
+    "readxl"
+  )
+
+  missing_r_packages=NULL
+  for(i in 1:length(r_packages)){
+    if(requireNamespace(r_packages[i],quietly = TRUE,)==FALSE){
+      missing_r_packages=append(x=missing_r_packages,
+                                values = r_packages[i] )
+    }
+  }
+
+  if(length(missing_r_packages)>0){
+    install_now<-utils::askYesNo(msg=paste("The following R packages are missing for Aifeducation Studio.",
+                                           missing_r_packages,
+                                           "Do you want to install them now?"),
+                                 default = TRUE,
+                                 prompts = getOption("askYesNo", gettext(c("Yes", "No"))))
+    if(install_now==TRUE){
+      utils::install.packages(missing_r_packages)
+    } else {
+      stop("Some necessary R Packages are missing.")
+    }
+  }
+
+  message("Setting the correct conda environment.")
+  if(reticulate::py_available(FALSE)==FALSE){
+    message("Python is not initalized.")
+    if(reticulate::condaenv_exists("aifeducation")==FALSE){
+      stop("Aifeducation studio requires a conda environment 'aifeducation' with
+      specific python libraries. Please install this. Please refer to the corresponding
+      vignette for more details.")
+    } else {
+      message("Setting conda environment to 'aifeducation'.")
+      reticulate::use_condaenv("aifeducation")
+      message("Initializing python.")
+      if(reticulate::py_available(TRUE)==FALSE){
+        stop("Python cannot be initalized. Please check your installation of python.")
+      }
+    }
+  } else {
+    message("Python is initalized. Try to start Aifeducation Studio with
+            the current environment.")
+  }
+
+  message("Checking machine learning frameworks.")
+  available_ml_frameworks=NULL
+  if(check_aif_py_modules(trace=FALSE,check="pytorch")==TRUE){
+    available_ml_frameworks=append(available_ml_frameworks,values = "pytorch")
+  }
+  if(is.null(available_ml_frameworks)){
+    stop("No available machine learning frameworks found.")
+  }
+
+  #Set Transformer Logger to Error
+  set_transformers_logger(level="ERROR")
+  #Disable tqdm progressbar
+  transformers$logging$disable_progress_bar()
+  datasets$disable_progress_bars()
+}
+

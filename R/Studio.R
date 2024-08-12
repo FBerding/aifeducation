@@ -1,73 +1,75 @@
 start_studio_new <- function() {
-  # shiny::devmode()
-  base::requireNamespace("future")
-  base::requireNamespace("shiny")
-  base::requireNamespace("bslib")
+
+  #Prepare for studio
+  check_and_prepare_for_studio()
   future::plan(future::multisession)
+
+
+  #Create ui
   ui <- bslib::page_navbar(
     title = "AI for Education - Studio",
     theme = bslib::bs_theme(bootswatch = "darkly"),
-    nav_panel(
+    bslib::nav_panel(
       title = "Data Management",
       DataManagement_RawTextsUI("DataSetRawTexts")
     ),
-    nav_panel(
+    bslib::nav_panel(
       title = "Base Models",
       navset_underline(
-        nav_panel(
+        bslib::nav_panel(
           title = "Create"
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Train"
         )
       )
     ),
-    nav_panel(
+    bslib::nav_panel(
       title = "TextEmbeddingModels",
-      navset_tab(
-        nav_panel(
+      bslib::navset_tab(
+        bslib::nav_panel(
           title = "Create",
           TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Use",
           TextEmbeddingModel_Use_UI("TextEmbeddingModel_Use")
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Document",
           DocumentPage_UI("TextEmbeddingModel_Document")
         )
       )
     ),
-    nav_panel(
+    bslib::nav_panel(
       title = "FeatureExtractors",
-      navset_tab(
-        nav_panel(
+      bslib::navset_tab(
+        bslib::nav_panel(
           title = "Create",
           FeatureExtractors_Create_UI("FeatureExtractors_Create")
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Use",
           TextEmbeddingModel_Use_UI("FeatureExtractors_Use")
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Document",
           DocumentPage_UI("FeatureExtractors_Document")
         )
       )
     ),
-    nav_panel(
+    bslib::nav_panel(
       title = "Classifiers",
-      navset_tab(
-        nav_panel(
+      bslib::navset_tab(
+        bslib::nav_panel(
           title = "Create",
           Classifiers_Create_UI("Classifiers_Create")
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Use",
           Classifiers_Use_UI("Classifiers_Use")
         ),
-        nav_panel(
+        bslib::nav_panel(
           title = "Document",
           DocumentPage_UI("Classifiers_Document")
         )
@@ -115,6 +117,10 @@ start_studio_new <- function() {
     )
 
     #FeatureExtractors
+    FeatureExtractor_Create_Server(
+      id="FeatureExtractors_Create",
+      log_dir=log_dir,
+      volumes=volumes)
     DocumentPage_Server(
       id="FeatureExtractors_Document",
       volumes=volumes,

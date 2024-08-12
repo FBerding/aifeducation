@@ -321,7 +321,7 @@ long_classifier <- function(classifier_type,
       folder_name = folder_name
     )
 
-    # Returns number of documents that are embedded
+    # Returns message
     return("Classifier trained.")
   })
 }
@@ -369,4 +369,83 @@ get_arguments_extended_task_TEClassifierRegular <- function() {
     "optimizer",
     "log_write_interval"
   ))
+}
+
+long_feature_extractor=function(name ,
+                                label ,
+                                features,
+                                method,
+                                noise_factor,
+                                optimizer,
+                                data_val_size,
+                                epochs,
+                                batch_size,
+                                sustain_iso_code ,
+                                log_dir ,
+                                log_write_interval,
+                                path_to_embeddings,
+                                destination_path,
+                                folder_name){
+
+  promises::future_promise({
+    # Load data
+    embeddings <- load_from_disk(path_to_embeddings)
+
+    # Create dir for checkpints
+    dir_destination <- paste0(
+      destination_path, "/",
+      folder_name
+    )
+    dir_checkpoints <- paste0(
+      dir_destination, "/",
+      "checkpoints"
+    )
+    if (dir.exists(dir_destination) == FALSE) {
+      dir.create(dir_destination)
+    }
+    if (dir.exists(dir_checkpoints) == FALSE) {
+      dir.create(dir_checkpoints)
+    }
+
+    #Create
+       feature_extractor=TEFeatureExtractor$new(
+     ml_framework="pytorch",
+     name=name,
+     label=label,
+     text_embeddings=embeddings,
+     features=features,
+     method=method,
+     noise_factor=noise_factor,
+     optimizer=optimizer
+   )
+
+       #Train
+       feature_extractor$train(
+         data_embeddings=embeddings,
+         data_val_size=data_val_size,
+         sustain_track=TRUE,
+         sustain_iso_code=sustain_iso_code,
+         sustain_region=NULL,
+         sustain_interval=15,
+         epochs=epochs,
+         batch_size=batch_size,
+         dir_checkpoint=dir_checkpoints,
+         trace=FALSE,
+         keras_trace=0,
+         pytorch_trace=0,
+         log_dir = log_dir,
+         log_write_interval = log_write_interval
+       )
+
+    # Save
+    save_to_disk(
+      object = feature_extractor,
+      dir_path = destination_path,
+      folder_name = folder_name
+    )
+
+    # Returns message
+    return("TEFeatureExtractor trained.")
+  })
+
 }

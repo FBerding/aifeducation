@@ -610,42 +610,8 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       embeddings <- data_embeddings()
       # shiny::req(embeddings)
       if (!is.null(embeddings)) {
-        model_info <- embeddings$get_model_info()
-        info_table <- matrix(
-          nrow = 3,
-          ncol = 4,
-          data = ""
-        )
-        info_table[1, 1] <- "Model Method:"
-        info_table[2, 1] <- "Pooling Type:"
-        info_table[3, 1] <- "Model Language:"
+        ui<-create_data_embeddings_description(embeddings)
 
-        info_table[1, 2] <- model_info$model_method
-        info_table[2, 2] <- model_info$param_emb_pool_type
-        info_table[3, 2] <- model_info$model_language
-
-        info_table[1, 3] <- "Tokens per Chunk:"
-        info_table[2, 3] <- "Max Chunks:"
-        info_table[3, 3] <- "Token Overlap:"
-
-        info_table[1, 4] <- model_info$param_seq_length
-        info_table[2, 4] <- model_info$param_chunks
-        info_table[3, 4] <- model_info$param_overlap
-
-        ui <- list(
-          bslib::value_box(
-            value = embeddings$n_rows(),
-            title = "Number of Cases",
-            showcase = shiny::icon("list")
-          ),
-          shiny::tags$h3("Model:", model_info$model_label),
-          shiny::tags$p("Name:", model_info$model_name),
-          shiny::tags$p("Created", model_info$model_date),
-          shiny::renderTable(
-            expr = info_table,
-            colnames = FALSE
-          )
-        )
         return(ui)
       } else {
         return(NULL)

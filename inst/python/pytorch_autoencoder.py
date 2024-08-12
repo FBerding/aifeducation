@@ -8,12 +8,13 @@ def calc_SquaredCovSum(x):
 
   for i in range(times):
     current_time_point=torch.squeeze(x[:,i,:])
-    current_cases_index=torch.nonzero(torch.sum(current_time_point,axis=1))
-    if current_cases_index.size(dim=0)>1:
-      current_cases=torch.squeeze(current_time_point[current_cases_index])
-      covariance=torch.cov(torch.transpose(current_cases,dim0=0,dim1=1))
-      covariance=torch.square(covariance)
-      cov_sum=cov_sum+(torch.sum(covariance)-torch.sum(torch.diag(covariance)))/current_cases.size(dim=0)
+    if current_time_point.dim()>1:
+      current_cases_index=torch.nonzero(torch.sum(current_time_point,axis=1))
+      if current_cases_index.size(dim=0)>1:
+        current_cases=torch.squeeze(current_time_point[current_cases_index])
+        covariance=torch.cov(torch.transpose(current_cases,dim0=0,dim1=1))
+        covariance=torch.square(covariance)
+        cov_sum=cov_sum+(torch.sum(covariance)-torch.sum(torch.diag(covariance)))/current_cases.size(dim=0)
   cov_sum=cov_sum/times
   return cov_sum
 

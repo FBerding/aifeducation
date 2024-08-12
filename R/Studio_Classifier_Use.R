@@ -28,8 +28,8 @@ Classifiers_Use_UI <- function(id) {
           Reliability_UI(id=shiny::NS(id,"Classifiers_Reliability"))
         ),
         bslib::nav_panel(
-          title = "Prediction"#,
-          #Classifier_Prediction_UI(id=shiny::NS(id,"Classifiers_Prediction"))
+          title = "Prediction",
+          Classifier_Prediction_UI(id=shiny::NS(id,"Classifiers_Prediction"))
         ),
       )
     )
@@ -114,6 +114,10 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
                     model=model)
     Reliability_Server(id="Classifiers_Reliability",
                    model=model)
+    Classifier_Prediction_Server(
+      id="Classifiers_Prediction",
+      model=model,
+      volumes=volumes)
     #--------------------------------------------------------------------------
   })
 }

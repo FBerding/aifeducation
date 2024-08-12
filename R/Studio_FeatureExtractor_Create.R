@@ -6,52 +6,164 @@ FeatureExtractors_Create_UI <- function(id) {
         position = "left",
         tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
-          id = shiny::NS(id, "button_select_base_model"),
-          label = "Choose a Base Model",
+          id = shiny::NS(id, "button_select_dataset_for_embeddings"),
+          label = "Choose Embeddings",
           title = "Please choose a folder",
           icon = shiny::icon("folder-open")
         ),
+        shiny::tags$hr(),
+        shiny::textInput(
+          inputId = shiny::NS(id, "name"),
+          label = "Model Name",
+          width = "100%"
+        ),
+        shiny::textInput(
+          inputId = shiny::NS(id, "label"),
+          label = "Model Label",
+          width = "100%"
+        ),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "start_SaveModal"),
-          label = "Save Model",
+          label = "Train Model",
           title = "Choose Destination",
           icon = shiny::icon("floppy-disk")
         )
       ),
       # Main Page---------------------------------------------------------------
-      # Content depends in the selected base model
-      bslib::card(
-        bslib::card_header(shiny::textOutput(outputId = shiny::NS(id, "path_to_base_model"))),
-        bslib::card_body(
-          shiny::uiOutput(outputId = shiny::NS(id, "lm_interface_setting"))
+      # Content depends in the TextEmbeddingModel of the embeddings
+      # Embeddings
+      bslib::layout_column_wrap(
+        bslib::card(
+          bslib::card_header("Input Data"),
+          bslib::card_body(
+            shiny::textInput(
+              inputId = shiny::NS(id, "embeddings_dir"),
+              label = shiny::tags$p(shiny::icon("folder"), "Path")
+            ),
+            shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
+          )
+        ),
+        bslib::card(
+          bslib::card_header(
+            "Architecture"
+          ),
+          bslib::card_body(
+            shiny::sliderInput(
+              inputId = shiny::NS(id,"features"),
+              label = "Target Features",
+              min = 1,
+              value = 128,
+              max = 1024,
+              step = 1,
+              round = TRUE
+            ),
+            shiny::selectInput(
+              inputId = shiny::NS(id, "method"),
+              label = "Optimizer",
+              choices = c("conv", "lstm", "dense")
+            ),
+            shiny::sliderInput(
+              inputId = shiny::NS(id,"noise_factor"),
+              label = "Noise Factor",
+              min = 0,
+              value = 0,
+              max = 1,
+              step = .01,
+              round = TRUE
+            ),
+            shiny::selectInput(
+              inputId = shiny::NS(id, "optimizer"),
+              label = "Optimizer",
+              choices = c("adam", "rmsprop")
+            )
+          )
+        ),
+        bslib::card(
+          bslib::card_header(
+            "Training Settings"
+          ),
+          bslib::card_body(
+            shiny::selectInput(
+              inputId = shiny::NS(id, "sustainability_country"),
+              label = "Country for Sustainability Tracking",
+              choices = country_alpha_3_list,
+              # choices=NULL,
+              selected = "DEU"
+            ),
+            shiny::sliderInput(
+              inputId = shiny::NS(id, "data_val_size"),
+              label = "Proportion for Validation Sample",
+              min = 0.02,
+              value = 0.25,
+              max = 0.5,
+              step = 0.01
+            ),
+            shiny::numericInput(
+              inputId = shiny::NS(id, "epochs"),
+              label = "Epochs",
+              min = 1,
+              value = 40,
+              step = 1
+            ),
+            shiny::sliderInput(
+              inputId = shiny::NS(id, "batch_size"),
+              label = "Batch Size",
+              min = 2,
+              max = 256,
+              value = 32,
+              step = 1
+            )
+          )
         )
       )
     )
   )
 }
 
-FeatureExtractors_Create_Create_Server <- function(id, log_dir, volumes) {
+FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    ns=session$ns
+    ns <- session$ns
+    log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # File system management----------------------------------------------------
+    # Embeddings
     shinyFiles::shinyDirChoose(
       input = input,
-      id = "button_select_base_model",
+      id = "button_select_dataset_for_embeddings",
       roots = volumes,
       # session = session,
       allowDirCreate = FALSE
     )
-    path_to_base_model <- shiny::eventReactive(input$button_select_base_model, {
-      path <- shinyFiles::parseDirPath(volumes, input$button_select_base_model)
-      return(path)
+    shiny::observeEvent(input$button_select_dataset_for_embeddings, {
+      path <- shinyFiles::parseDirPath(volumes, input$button_select_dataset_for_embeddings)
+      shiny::updateTextInput(
+        inputId = "embeddings_dir",
+        value = path
+      )
+    })
+
+    path_to_embeddings <- shiny::eventReactive(input$embeddings_dir, {
+      if (input$embeddings_dir != "") {
+        return(input$embeddings_dir)
+      } else {
+        return(NULL)
+      }
+    })
+
+    data_embeddings <- shiny::reactive({
+      if (!is.null(path_to_embeddings())) {
+        return(load_and_check_embeddings(path_to_embeddings()))
+      } else {
+        return(NULL)
+      }
     })
 
     # Start screen for choosing the location for storing the data set-----------
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
+      #ns=session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"
@@ -79,271 +191,144 @@ FeatureExtractors_Create_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    shinyFiles::shinyDirChoose(
-      input = input,
-      id = "button_model_destination_dir",
-      roots = volumes,
-      # session = session,
-      allowDirCreate = TRUE
-    )
+    # Start training------------------------------------------------------------
 
-    shiny::observeEvent(input$button_model_destination_dir, {
-      shiny::updateTextInput(
-        inputId = ns("destination_dir"),
-        value = shinyFiles::parseDirPath(volumes, input$button_model_destination_dir)
-      )
-    })
-
-
-    # Load Information on Base Model-----------------------------------------------------------
-    # Load the model and extract information
-    interface_architecture <- shiny::eventReactive(path_to_base_model(), {
-      model_path <- path_to_base_model()
-      if (file.exists(paste0(
-        model_path,
-        "/",
-        "tf_model.h5"
-      ))) {
-        model <- transformers$TFAutoModel$from_pretrained(model_path)
-        model_architecture <- model$config$architectures
-        max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "FunnelForMaskedLM") {
-          max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
-        } else {
-          max_layer <- model$config$num_hidden_layers
-        }
-      } else if (file.exists(paste0(
-        model_path,
-        "/",
-        "pytorch_model.bin"
-      ))) {
-        model <- transformers$AutoModel$from_pretrained(model_path)
-        model_architecture <- model$config$architectures
-        max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "FunnelForMaskedLM") {
-          max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
-        } else {
-          max_layer <- model$config$num_hidden_layers
-        }
-      } else if (file.exists(paste0(
-        model_path,
-        "/",
-        "model.safetensors"
-      ))) {
-        model <- transformers$AutoModel$from_pretrained(model_path)
-        model_architecture <- model$config$architectures
-        max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "FunnelForMaskedLM") {
-          max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
-        } else {
-          max_layer <- model$config$num_hidden_layers
-        }
-      } else {
-        model_architecture <- NULL
-        max_position_embeddings <- NULL
-        max_layer <- NULL
-      }
-      return(list(model_architecture, max_position_embeddings, max_layer))
-    })
-
-    # Create UI Main Page-----------------------------------------------------------------
-    # Card Header
-    output$path_to_base_model <- shiny::renderText({
-        path_to_base_model()
-    })
-
-    # Card body
-    output$lm_interface_setting <- shiny::renderUI({
-      if (length(interface_architecture()[[2]]) > 0) {
-        max_layer_transformer <- interface_architecture()[[3]]
-
-        if (interface_architecture()[[1]] == "FunnelForMaskedLM" |
-          interface_architecture()[[1]] == "FunnelModel") {
-          pool_type_choices <- c("cls")
-        } else {
-          pool_type_choices <- c("average", "cls")
-        }
-
-        ui <- bslib::layout_columns(
-          shiny::tagList(
-            shiny::textInput(
-              inputId = ns("lm_model_name"),
-              label = "Name"
-            ),
-            shiny::textInput(
-              inputId = ns("lm_model_label"),
-              label = "Label"
-            ),
-            shiny::textInput(
-              inputId = ns("lm_model_version"),
-              label = "Version"
-            ),
-            shiny::textInput(
-              inputId = ns("lm_model_language"),
-              label = "Language"
-            )
-          ),
-          shiny::tagList(
-            shiny::sliderInput(
-              inputId = ns("lm_chunks"),
-              label = "N Chunks",
-              value = 1,
-              min = 1,
-              max = 50,
-              step = 1
-            ),
-            shiny::sliderInput(
-              inputId = ns("lm_max_length"),
-              label = paste("Maximal Sequence Length", "(Max:", interface_architecture()[2], ")"),
-              value = interface_architecture()[[2]],
-              min = 20,
-              max = interface_architecture()[[2]],
-              step = 1
-            ),
-            shiny::sliderInput(
-              inputId = ns("lm_overlap"),
-              label = paste("N Token Overlap", "(Max:", interface_architecture()[2], ")"),
-              value = 0,
-              min = 0,
-              max = interface_architecture()[[2]],
-              step = 1
-            ),
-            shiny::sliderInput(
-              inputId = ns("lm_emb_layers"),
-              label = "Layers for Embeddings",
-              value = c(
-                max(1, floor(0.5 * max_layer_transformer)),
-                max(1, floor(2 / 3 * max_layer_transformer))
-              ),
-              min = 1,
-              max = max_layer_transformer,
-              step = 1
-            ),
-            shiny::selectInput(
-              inputId = ns("lm_emb_pool_type"),
-              label = paste("Pooling Type"),
-              choices = pool_type_choices,
-              multiple = FALSE
-            )
-          )
-        )
-        return(ui)
-      } else {
-        return(NULL)
-      }
-    })
-
-    # Save the model to disk----------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
-      model_architecture <- interface_architecture()[[1]]
-      if (model_architecture == "BertForMaskedLM" |
-        model_architecture == "BertModel") {
-        method <- "bert"
-      } else if (model_architecture == "FunnelForMaskedLM" |
-        model_architecture == "FunnelModel") {
-        method <- "funnel"
-      } else if (model_architecture == "LongformerForMaskedLM" |
-        model_architecture == "LongformerModel") {
-        method <- "longformer"
-      } else if (model_architecture == "RobertaForMaskedLM" |
-        model_architecture == "RobertaModel") {
-        method <- "roberta"
-      } else if (model_architecture == "DebertaV2ForMaskedLM" |
-        model_architecture == "DebertaV2Model") {
-        method <- "deberta_v2"
-      }
-
       # Check for errors
-      errors <- check_errors_text_embedding_model_create(
+      errors <- check_errors_create_feature_extractor(
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
-        path_to_base_model=path_to_base_model(),
-        interface_architecture=interface_architecture()
+        path_to_embeddings = path_to_embeddings(),
+        features = input$features,
+        model_name = input$name,
+        model_label = input$label
       )
 
-
-      if (length(errors) == 0) {
-        shinyWidgets::show_alert(
-          title = "Working",
-          text = "Please wait",
-          type = "info"
-        )
-
-        new_interface <- TextEmbeddingModel$new(
-          model_name = input$lm_model_name,
-          model_label = input$lm_model_label,
-          model_language = input$lm_model_language,
-          model_version = input$lm_model_version,
-          max_length = input$lm_max_length,
-          overlap = input$lm_overlap,
-          chunks = input$lm_chunks,
-          emb_layer_min = input$lm_emb_layers[1],
-          emb_layer_max = input$lm_emb_layers[2],
-          emb_pool_type = input$lm_emb_pool_type,
-          ml_framework = "pytorch",
-          model_dir = path_to_base_model(),
-          method = method
-        )
-
-        save_to_disk(
-          object = new_interface,
-          dir_path = input$save_modal_directory_path,
-          folder_name = input$save_modal_folder_name
-        )
-        rm(new_interface)
-        gc()
-        shinyWidgets::closeSweetAlert()
-      } else {
+      # If there are errors display them. If not start running task.
+      if (!is.null(errors)) {
         display_errors(
           title = "Error",
           size = "l",
           easy_close = TRUE,
           error_messages = errors
         )
+      } else {
+        # Start task and monitor
+        start_and_monitor_long_task(
+          id = id,
+          ExtendedTask_type = "feature_extractor",
+          ExtendedTask_arguments = list(
+            name = input$name,
+            label = input$label,
+            destination_path = input$save_modal_directory_path,
+            folder_name = input$save_modal_folder_name,
+            path_to_embeddings = path_to_embeddings(),
+            features=input$features,
+            method=input$method,
+            noise_factor=input$noise_factor,
+            optimizer=input$optimizer,
+            data_val_size=input$data_val_size,
+            epochs=input$epochs,
+            batch_size=input$batch_size,
+            sustain_iso_code = input$sustainability_country,
+            log_dir = log_dir,
+            log_write_interval = 3
+          ),
+          log_path = log_path,
+          pgr_use_middle = TRUE,
+          pgr_use_bottom = TRUE,
+          pgr_use_graphic = TRUE,
+          update_intervall = 2000,
+          success_type = "classifier"
+        )
+      }
+    })
+
+    # Display Data Summary------------------------------------------------------
+    # Embeddings
+    output$summary_data_embeddings <- shiny::renderUI({
+      embeddings <- data_embeddings()
+      # shiny::req(embeddings)
+      if (!is.null(embeddings)) {
+        ui <- create_data_embeddings_description(embeddings)
+
+        return(ui)
+      } else {
+        return(NULL)
       }
     })
 
     # Error handling-----------------------------------------------------------
-    shiny::observe({
-      if (!identical(path_to_base_model(), character(0))) {
-        if (is.null(interface_architecture()[[1]]) &
-          is.null(interface_architecture()[[2]])) {
-          display_errors(
-            title = "Error",
-            size = "l",
-            easy_close = TRUE,
-            error_messages = "There is no model to load in the directory."
-          )
-        }
-      }
-    })
+
 
     #--------------------------------------------------------------------------
   })
 }
 
-check_errors_text_embedding_model_create <- function(destination_path,
-                                                     folder_name,
-                                                     path_to_base_model,
-                                                     interface_architecture) {
+check_errors_create_feature_extractor <- function(destination_path,
+                                           folder_name,
+                                           path_to_embeddings,
+                                           features,
+                                           model_name,
+                                           model_label) {
   # List for gathering errors
   error_list <- NULL
 
-  # Check if all inputs are correctly set
-  if (!dir.exists(destination_path)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p("The destination directory does not
-                                                   exist. Please check your directory path
-                                                   and/or create that directory."))
-  }
-  if (is.null(folder_name) | folder_name == "") {
-    error_list[length(error_list) + 1] <- "File name for the text dataset is missing."
+  # Destination
+  if (dir.exists(destination_path) == FALSE) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "The target directory does not exist. Please check path."
+    ))
   }
 
-  if (!identical(path_to_base_model, character(0))) {
-    if (is.null(interface_architecture[[1]]) &
-        is.null(interface_architecture[[2]])) {
-      error_list[length(error_list) + 1] <- "There is no model to load in the directory."
+  if (check_for_empty_input(folder_name)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Folder name is not set."
+    ))
+  }
+
+
+
+  # Embeddings
+  if (dir.exists(path_to_embeddings) == FALSE) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Directory which should store embeddings does not exist."
+    ))
+  } else {
+    embeddings <- try(load_from_disk(path_to_embeddings), silent = TRUE)
+    if ("try-error" %in% class(embeddings)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        embeddings
+      ))
+    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
+      "EmbeddedText" %in% class(embeddings))) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
+        or 'EmbeddedText'."
+      ))
+    } else {
+      if(embeddings$get_original_features()<=features){
+        error_list[length(error_list) + 1] <- list(shiny::tags$p(
+          paste("Target dimension is",features,". This value must be smaller
+                as the orignal number of features which is",embeddings$get_original_features(),".")
+        ))
+      }
     }
+  }
+
+
+
+  # Model Name and Model Label
+  if (check_for_empty_input(model_name)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Name of the classifier ist not set."
+    ))
+  }
+
+  if (check_for_empty_input(model_label)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Label of the classifier ist not set."
+    ))
   }
 
   if (length(error_list) > 0) {
