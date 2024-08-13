@@ -4,11 +4,14 @@ start_studio_new <- function() {
   check_and_prepare_for_studio()
   future::plan(future::multisession)
 
-
   #Create ui
   ui <- bslib::page_navbar(
     title = "AI for Education - Studio",
     theme = bslib::bs_theme(bootswatch = "darkly"),
+    bslib::nav_panel(
+      title = "Home",
+      Studio_Home_UI("Home")
+    ),
     bslib::nav_panel(
       title = "Data Management",
       DataManagement_RawTextsUI("DataSetRawTexts")
@@ -28,12 +31,12 @@ start_studio_new <- function() {
       title = "TextEmbeddingModels",
       bslib::navset_tab(
         bslib::nav_panel(
-          title = "Create",
-          TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
-        ),
-        bslib::nav_panel(
           title = "Use",
           TextEmbeddingModel_Use_UI("TextEmbeddingModel_Use")
+        ),
+        bslib::nav_panel(
+          title = "Create",
+          TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
         ),
         bslib::nav_panel(
           title = "Document",
@@ -45,12 +48,12 @@ start_studio_new <- function() {
       title = "FeatureExtractors",
       bslib::navset_tab(
         bslib::nav_panel(
-          title = "Create",
-          FeatureExtractors_Create_UI("FeatureExtractors_Create")
-        ),
-        bslib::nav_panel(
           title = "Use",
           TextEmbeddingModel_Use_UI("FeatureExtractors_Use")
+        ),
+        bslib::nav_panel(
+          title = "Create",
+          FeatureExtractors_Create_UI("FeatureExtractors_Create")
         ),
         bslib::nav_panel(
           title = "Document",
@@ -62,12 +65,12 @@ start_studio_new <- function() {
       title = "Classifiers",
       bslib::navset_tab(
         bslib::nav_panel(
-          title = "Create",
-          Classifiers_Create_UI("Classifiers_Create")
-        ),
-        bslib::nav_panel(
           title = "Use",
           Classifiers_Use_UI("Classifiers_Use")
+        ),
+        bslib::nav_panel(
+          title = "Create",
+          Classifiers_Create_UI("Classifiers_Create")
         ),
         bslib::nav_panel(
           title = "Document",
@@ -75,18 +78,6 @@ start_studio_new <- function() {
         )
       )
     )
-
-    # DataSetUI
-    # BaseModels_CreateUI
-    # BaseModels_TrainUI
-
-    # TextEmbeddingModel_CreateUI
-    # TextEmbeddingModel_UseUI
-    # TextEmbeddingModel_DocumentUI
-
-    # TEClassifier_CreateUI
-    # TEClassifier_UseUI
-    # TEClassifier_DocumentUI
   )
 
   server <- function(input, output, session) {

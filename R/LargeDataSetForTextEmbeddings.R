@@ -348,7 +348,24 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       #add dataset
       private$add(new_dataset)
     },
+    #--------------------------------------------------------------------------
+    #'@description Method for adding new data to the data set from an [LargeDataSetForTextEmbeddings].
+    #'Please note that the method does not check if cases already exist in the data
+    #'set. To reduce the data set to unique cases call the method `reduce_to_unique_ids`.
+    #'@param dataset Object of class [LargeDataSetForTextEmbeddings].
+    #'@return The method does not return anything. It adds new data to the data set.
+    add_embeddings_from_LargeDataSetForTextEmbeddings=function(dataset){
+      #Argument Checking
+      check_class(dataset,c("LargeDataSetForTextEmbeddings",FALSE))
 
+      #Add new data
+      if(dataset$get_text_embedding_model_name()==private$model_name){
+        private$add(dataset$get_dataset())
+      } else {
+        stop("The underlying TextEmbeddingModel of the new dataset is not
+             identical to the TextEmbeddinModel underlying this data set.")
+      }
+      },
     #--------------------------------------------------------------------------
     #'@description Method for converting this object to an object of class [EmbeddedText].
     #'**Attention** This object uses memory mapping to allow the usage of data sets

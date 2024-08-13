@@ -82,7 +82,7 @@ start_and_monitor_long_task <- function(id,
                                         pgr_use_middle = FALSE,
                                         pgr_use_bottom = FALSE,
                                         pgr_use_graphic = FALSE,
-                                        update_intervall = 2000,
+                                        update_intervall = 2,
                                         success_type = "data_sets") {
   moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------
@@ -138,7 +138,7 @@ start_and_monitor_long_task <- function(id,
     progress_bar_status <- reactive({
       # Do periodical checks only if the task is actual running
       if (CurrentTask$status() == "running") {
-        shiny::invalidateLater(millis = update_intervall)
+        shiny::invalidateLater(millis = update_intervall*1000)
 
         if (!is.null(log_path)) {
           log <- read_log(log_path)

@@ -188,7 +188,7 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
           log_path = log_path,
           pgr_use_middle = TRUE,
           pgr_use_bottom = FALSE,
-          update_intervall = 2000,
+          update_intervall = 2,
           success_type = "data_sets"
         )
       }

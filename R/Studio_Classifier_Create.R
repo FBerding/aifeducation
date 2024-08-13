@@ -598,7 +598,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
         pgr_use_middle = TRUE,
         pgr_use_bottom = TRUE,
         pgr_use_graphic = TRUE,
-        update_intervall = 2000,
+        update_intervall = 2,
         success_type = "classifier"
       )
        }
