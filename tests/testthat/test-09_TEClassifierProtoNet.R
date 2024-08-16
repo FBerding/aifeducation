@@ -77,6 +77,9 @@ for(framework in ml_frameworks){
     example_data$label[c(201:300)]=NA
     if(n_classes>2){
       example_data$label[c(201:250)]<-"medium"
+      target_levels=c("neg","medium","pos")
+    } else {
+      target_levels=c("neg","pos")
     }
     example_targets<-as.factor(example_data$label)
     names(example_targets)=example_data$id
@@ -95,14 +98,15 @@ for(framework in ml_frameworks){
                   for(rec_bidirectional in rec_bidirectiona_list){
                 classifier<-NULL
                 gc()
-                classifier<-TEClassifierProtoNet$new(
+                classifier<-TEClassifierProtoNet$new()
+                classifier$configure(
                   ml_framework = framework,
                   name="movie_review_classifier",
                   label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
                   text_embeddings=test_embeddings,
                   feature_extractor=feature_extractor,
                   embedding_dim=3,
-                  targets=example_targets,
+                  target_levels=target_levels,
                   hidden=hidden,
                   rec=rec,
                   rec_type = rec_type,
@@ -299,12 +303,13 @@ for(framework in ml_frameworks){
             dir.create(train_path)
           }
 
-          classifier<-TEClassifierProtoNet$new(
+          classifier<-TEClassifierProtoNet$new()
+          classifier$configure(
             ml_framework = framework,
             name=paste0("movie_review_classifier_","classes_",n_classes),
             label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings=test_embeddings,
-            targets=example_targets,
+            target_levels=target_levels,
             feature_extractor = feature_extractor,
             embedding_dim=3,
             hidden=hidden,
@@ -383,12 +388,13 @@ for(framework in ml_frameworks){
         attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
         add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
-        classifier<-TEClassifierProtoNet$new(
+        classifier<-TEClassifierProtoNet$new()
+        classifier$configure(
           ml_framework = framework,
           name=paste0("movie_review_classifier_","classes_",n_classes),
           label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings=test_embeddings,
-          targets=example_targets,
+          target_levels=target_levels,
           feature_extractor = feature_extractor,
           hidden=hidden,
           rec=rec,
@@ -446,12 +452,13 @@ for(framework in ml_frameworks){
       attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
       add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
-      classifier<-TEClassifierProtoNet$new(
+      classifier<-TEClassifierProtoNet$new()
+      classifier$configure(
         ml_framework = framework,
         name=paste0("movie_review_classifier_","classes_",n_classes),
         label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
         text_embeddings=test_embeddings,
-        targets=example_targets,
+        target_levels=target_levels,
         feature_extractor = feature_extractor,
         embedding_dim=3,
         hidden=hidden,
@@ -518,12 +525,13 @@ for(framework in ml_frameworks){
         attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
         add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
-        classifier_overfitting<-TEClassifierProtoNet$new(
+        classifier_overfitting<-TEClassifierProtoNet$new()
+          classifier$configure(
           ml_framework = framework,
           name=paste0("movie_review_classifier_","classes_",n_classes),
           label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings=test_embeddings,
-          targets=example_targets,
+          target_levels=target_levels,
           feature_extractor = NULL,
           embedding_dim=5,
           hidden=hidden,
@@ -603,12 +611,13 @@ for(framework in ml_frameworks){
         attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
         add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
-        classifier<-TEClassifierProtoNet$new(
+        classifier<-TEClassifierProtoNet$new()
+        classifier$configure(
           ml_framework = framework,
           name=paste0("movie_review_classifier_","classes_",n_classes),
           label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings=test_embeddings,
-          targets=example_targets,
+          target_levels=target_levels,
           feature_extractor = feature_extractor,
           embedding_dim=3,
           hidden=hidden,
@@ -659,12 +668,13 @@ for(framework in ml_frameworks){
         attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
         add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
-        classifier<-TEClassifierProtoNet$new(
+        classifier<-TEClassifierProtoNet$new()
+        classifier$configure(
           ml_framework = framework,
           name=paste0("movie_review_classifier_","classes_",n_classes),
           label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings=test_embeddings,
-          targets=example_targets,
+          target_levels=target_levels,
           feature_extractor = feature_extractor,
           embedding_dim=3,
           hidden=hidden,
@@ -706,12 +716,13 @@ for(framework in ml_frameworks){
       attention_type=attention_list[[sample(x=seq.int(from = 1,to=length(attention_list)),size = 1)]]
       add_pos_embedding=pos_embedding_list[[sample(x=seq.int(from = 1,to=length(pos_embedding_list)),size = 1)]]
 
-      classifier<-TEClassifierProtoNet$new(
+      classifier<-TEClassifierProtoNet$new()
+      classifier$configure(
         ml_framework = framework,
         name=paste0("movie_review_classifier_","classes_",n_classes),
         label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
         text_embeddings=test_embeddings,
-        targets=example_targets,
+        target_levels=target_levels,
         feature_extractor = NULL,
         embedding_dim=3,
         hidden=hidden,

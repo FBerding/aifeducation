@@ -30,6 +30,13 @@ LargeDataSetForText <- R6::R6Class(
     #' @param batch_size `int` determining the number of files to process at once.
     #' @param trace `bool` If `TRUE` information on the progress is printed
     #' to the console.
+    #' @param log_top_value `int` indicating the current iteration of the process.
+    #' @param log_top_total `int` determining the maximal number of iterations.
+    #' @param log_top_message `string` providing additional information of the process.
+    #'@param log_file `string` Path to the file where the log should be saved.
+    #'If no logging is desired set this argument to `NULL`.
+    #'@param log_write_interval `int` Time in seconds determining the interval in which
+    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
     #' @return The method does not return anything. It adds new raw texts to
     #' the data set.
     add_from_files_txt = function(dir_path,
@@ -112,6 +119,13 @@ LargeDataSetForText <- R6::R6Class(
     #' @param batch_size `int` determining the number of files to process at once.
     #' @param trace `bool` If `TRUE` information on the progress is printed
     #' to the console.
+    #' @param log_top_value `int` indicating the current iteration of the process.
+    #' @param log_top_total `int` determining the maximal number of iterations.
+    #' @param log_top_message `string` providing additional information of the process.
+    #'@param log_file `string` Path to the file where the log should be saved.
+    #'If no logging is desired set this argument to `NULL`.
+    #'@param log_write_interval `int` Time in seconds determining the interval in which
+    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
     #' @return The method does not return anything. It adds new raw texts to
     #' the data set.
     add_from_files_pdf = function(dir_path,
@@ -192,6 +206,13 @@ LargeDataSetForText <- R6::R6Class(
     #' the licenses.
     #' @param trace `bool` If `TRUE` prints information on the progress to the
     #' console.
+    #' @param log_top_value `int` indicating the current iteration of the process.
+    #' @param log_top_total `int` determining the maximal number of iterations.
+    #' @param log_top_message `string` providing additional information of the process.
+    #'@param log_file `string` Path to the file where the log should be saved.
+    #'If no logging is desired set this argument to `NULL`.
+    #'@param log_write_interval `int` Time in seconds determining the interval in which
+    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
     #' @return The method does not return anything. It adds new raw texts to
     #' the data set.
     add_from_files_xlsx = function(dir_path,

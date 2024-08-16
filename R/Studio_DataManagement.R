@@ -1,5 +1,15 @@
+#'Graphical user interface for data management
+#'
+#'Functions generates the page for creating [LargeDataSetForText].
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_page_data_management
+#'@keywords internal
+#'
 DataManagement_RawTextsUI <- function(id) {
-  tagList(
+  shiny::tagList(
     bslib::page_sidebar(
       sidebar = bslib::sidebar(
         tags$h3("Control Panel"),
@@ -91,6 +101,18 @@ DataManagement_RawTextsUI <- function(id) {
   )
 }
 
+#'Server function for: graphical user interface for data management
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param log_dir `string` Path to the directory where the log files should be stored.
+#'@param volumes `vector` containing a named vector of available volumes.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_page_data_management
+#'@keywords internal
+#'
 DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # local variables------------------------------------------------------------
@@ -197,50 +219,4 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
   })
 }
 
-check_errors_create_dataset_raw_texts <- function(source_path,
-                                                  destination_path,
-                                                  folder_name,
-                                                  include_txt,
-                                                  include_pdf,
-                                                  include_xlsx,
-                                                  excel_id_column,
-                                                  excel_text_column,
-                                                  excel_license_column,
-                                                  excel_bib_entry_column) {
-  # List for gathering errors
-  error_list <- NULL
 
-  # Check if all inputs are correctly set
-  if (dir.exists(source_path) == FALSE) {
-    error_list[length(error_list) + 1] <- "Source directory does not exist. Please check
-      your directory path."
-  }
-  if (is.null(destination_path) | destination_path == "") {
-    error_list[length(error_list) + 1] <- "Path to the output directory is missing."
-  }
-  if (is.null(folder_name) | folder_name == "") {
-    error_list[length(error_list) + 1] <- "File name for the text dataset is missing."
-  }
-  if (dir.exists(dirname(destination_path)) == FALSE) {
-    error_list[length(error_list) + 1] <- "Target directory does not exist. Please check
-      if a directory exists for saving your data."
-  }
-  if (include_txt == FALSE &
-    include_pdf == FALSE &
-    include_xlsx == FALSE) {
-    error_list[length(error_list) + 1] <- "No file types selected. Please select
-      at least one file type."
-  }
-
-  if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
-      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
-        shiny::tags$p(error_list[i])
-      )
-    }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
-  }
-}

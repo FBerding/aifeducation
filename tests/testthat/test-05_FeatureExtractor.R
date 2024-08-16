@@ -41,7 +41,8 @@ for(framework in ml_frameworks){
   for(data_type in names(dataset_list)){
     for(method in method_list[[framework]]){
         #Create----------------------------------------------------------------
-        extractor<-TEFeatureExtractor$new(
+      extractor<-TEFeatureExtractor$new()
+      extractor$configure(
           ml_framework = framework,
           name="Test_extractor",
           label="Test Extractor",

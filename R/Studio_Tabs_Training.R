@@ -1,3 +1,14 @@
+#'Graphical user interface for displaying the training history of an object.
+#'
+#'Functions generates the tab within a page for displaying the training history
+#'of an object.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_training
+#'@keywords internal
+#'
 Training_UI <- function(id) {
   bslib::page(
     bslib::page_sidebar(
@@ -32,7 +43,17 @@ Training_UI <- function(id) {
   )
 }
 
-
+#'Server function for: graphical user interface for displaying the training history of an object.
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param model Model used for inference.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_training
+#'@keywords internal
+#'
 Training_Server <- function(id, model) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------

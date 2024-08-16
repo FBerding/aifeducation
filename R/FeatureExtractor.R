@@ -46,7 +46,7 @@ TEFeatureExtractor<-R6::R6Class(
     #'@param optimizer `string` `"adam"` or `"rmsprop"` .
     #'@return Returns an object of class [TEFeatureExtractor] which is ready for
     #'training.
-    initialize=function(ml_framework="pytorch",
+    configure=function(ml_framework="pytorch",
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -72,19 +72,24 @@ TEFeatureExtractor<-R6::R6Class(
       }
       private$check_embeddings_object_type(text_embeddings,strict=TRUE)
 
-      #Set ml framework
-      private$ml_framework=ml_framework
+      # Set ML framework------------------------------------------------------------------------
+      private$ml_framework <- ml_framework
 
-      #Setting Label and Name-------------------------------------------------
-      private$model_info$model_name_root=name
-      private$model_info$model_name=paste0(private$model_info$model_name_root,"_ID_",generate_id(16))
-      private$model_info$model_label=label
+      # Setting Label and Name-------------------------------------------------
+      private$set_model_info(
+        model_name_root = name,
+        model_id = generate_id(16),
+        label = label,
+        model_date = date()
+      )
 
-      #Basic Information of Input and Target Data
-      model_info=text_embeddings$get_model_info()
-      private$text_embedding_model["model"]=list(model_info)
-      private$text_embedding_model["times"]=text_embeddings$get_times()
-      private$text_embedding_model["features"]=text_embeddings$get_original_features()
+      # Set TextEmbeddingModel
+      private$set_text_embedding_model(
+        model_info = text_embeddings$get_model_info(),
+        feature_extractor_info = text_embeddings$get_feature_extractor_info(),
+        times = text_embeddings$get_times(),
+        features = text_embeddings$get_features()
+      )
 
       #Saving Configuration
       config=list(
@@ -95,22 +100,16 @@ TEFeatureExtractor<-R6::R6Class(
         optimizer=optimizer,
         require_one_hot=FALSE,
         require_matrix_map=FALSE)
-
       self$model_config=config
 
-      #Create_Model------------------------------------------------------------
-      private$load_reload_python_scripts()
+      # Set package versions
+      private$set_package_versions()
+
+      # Finalize configuration
+      private$set_configuration_to_TRUE()
+
+      #Create_Model
       private$create_reset_model()
-
-      private$model_info$model_date=date()
-
-      private$r_package_versions$aifeducation<-packageVersion("aifeducation")
-      private$r_package_versions$reticulate<-packageVersion("reticulate")
-
-      private$py_package_versions$tensorflow<-tf$version$VERSION
-      private$py_package_versions$torch<-torch["__version__"]
-      private$py_package_versions$keras<-keras["__version__"]
-      private$py_package_versions$numpy<-np$version$short_version
     },
 
     #-------------------------------------------------------------------------
@@ -133,6 +132,10 @@ TEFeatureExtractor<-R6::R6Class(
     #'@param dir_checkpoint `string` Path to the directory where
     #'the checkpoint during training should be saved. If the directory does not
     #'exist, it is created.
+    #'@param log_dir `string` Path to the directory where the log files should be saved.
+    #'If no logging is desired set this argument to `NULL`.
+    #'@param log_write_interval `int` Time in seconds determining the interval in which
+    #'the logger should try to update the log files. Only relevant if `log_dir` is not `NULL`.
     #'@param trace `bool` `TRUE`, if information about the estimation
     #'phase should be printed to the console.
     #'@param keras_trace `int` \code{keras_trace=0} does not print any
@@ -301,10 +304,29 @@ TEFeatureExtractor<-R6::R6Class(
 
       rownames(self$last_training$history)=c("train","val")
 
+      #Set training status value
       private$trained=TRUE
+
       if(self$last_training$config$trace==TRUE){
         message(paste(date(),"Training finished"))
       }
+    },
+    #--------------------------------------------------------------------------
+    #' @description loads an object from disk
+    #' and updates the object to the current version of the package.
+    #' @param dir_path Path where the object set is stored.
+    #' @return Method does not return anything. It loads an object from disk.
+    load_from_disk = function(dir_path) {
+      # Call the core method which loads data common for all models
+      super$load_from_disk(dir_path = dir_path)
+
+      #Add FeatureExtractor specific data
+      # Load R file
+      old_model <- load_R_interface(dir_path)
+
+      #Set training status
+      private$trained=old_model$is_trained()
+
     },
     #---------------------------------------------------------------------------
     #'@description Method for extracting features. Applying this method
@@ -397,7 +419,8 @@ TEFeatureExtractor<-R6::R6Class(
 
           model_info=self$get_text_embedding_model()
 
-          reduced_embeddings=EmbeddedText$new(
+          red_embedded_text=EmbeddedText$new()
+          red_embedded_text$configure(
             model_name=paste0("feature_extracted_",model_info$model_name),
             model_label=model_info$model$model_label,
             model_date=model_info$model$model_date,
@@ -414,14 +437,14 @@ TEFeatureExtractor<-R6::R6Class(
             param_aggregation=model_info$model$param_aggregation,
             embeddings=reduced_embeddings)
 
-          reduced_embeddings$add_feature_extractor_info(model_name=private$model_info$model_name,
+          red_embedded_text$add_feature_extractor_info(model_name=private$model_info$model_name,
                                                 model_label=private$model_info$model_label,
                                                 features=self$model_config$features,
                                                 method=self$model_config$method,
                                                 noise_factor=self$model_config$noise_factor,
                                                 optimizer=self$model_config$optimizer)
 
-    return(reduced_embeddings)
+    return(red_embedded_text)
 
     },
     #--------------------------------------------------------------------------
@@ -457,7 +480,8 @@ TEFeatureExtractor<-R6::R6Class(
           #Create Large Dataset
           model_info=self$get_text_embedding_model()
 
-          embedded_texts_large=LargeDataSetForTextEmbeddings$new(
+          embedded_texts_large=LargeDataSetForTextEmbeddings$new()
+          embedded_texts_large$configure(
             model_label=model_info$model_label,
             model_date=model_info$model_date,
             model_method=model_info$model_method,
@@ -523,6 +547,8 @@ TEFeatureExtractor<-R6::R6Class(
     },
     #--------------------------------------------------------------------------
     create_reset_model=function(){
+      private$load_reload_python_scripts()
+      private$check_config_for_TRUE()
       if(private$ml_framework=="pytorch"){
         if(self$model_config$method=="lstm"){
           self$model=py$LSTMAutoencoder_with_Mask_PT(

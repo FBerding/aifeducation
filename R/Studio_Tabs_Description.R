@@ -1,3 +1,13 @@
+#'Graphical user interface for displaying model's descriptions.
+#'
+#'Functions generates the tab within a page for displaying model's descriptions.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_description
+#'@keywords internal
+#'
 Description_UI<-function(id){
   bslib::page(
     bslib::card(
@@ -27,6 +37,17 @@ Description_UI<-function(id){
   )
 }
 
+#'Server function for: graphical user interface for displaying model's descriptions.
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param model Model used for inference.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_description
+#'@keywords internal
+#'
 Description_Server=function(id,model){
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------

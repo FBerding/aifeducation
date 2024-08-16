@@ -1,3 +1,14 @@
+#'Graphical user interface for transforming raw texts into numerical text embeddings.
+#'
+#'Functions generates the tab within a page for generating text embeddings with an
+#'object of class [TextEmbeddingModel].
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_text_embedding_model_embed
+#'@keywords internal
+#'
 Embed_UI <- function(id) {
   bslib::page(
     bslib::card(
@@ -35,7 +46,20 @@ Embed_UI <- function(id) {
 }
 
 
-
+#'Server function for: graphical user interface for transforming raw texts into numerical text embeddings.
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param model Model used for inference.
+#'@param model_path `string` Path to the model.
+#'@param log_dir `string` Path to the directory where the log files should be stored.
+#'@param volumes `vector` containing a named vector of available volumes.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_text_embedding_model_embed
+#'@keywords internal
+#'
 Embed_Server <- function(id, model, model_path, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
@@ -136,47 +160,4 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
   })
 }
 
-check_errors_text_embedding_model_embed <- function(destination_path,
-                                                    folder_name,
-                                                    path_to_raw_texts,
-                                                    batch_size) {
-  # List for gathering errors
-  error_list <- NULL
 
-  # Check if all inputs are correctly set
-  if (!dir.exists(destination_path)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p("The destination directory does not
-                                                   exist. Please check your directory path
-                                                   and/or create that directory."))
-  }
-  if (is.null(folder_name) | folder_name == "") {
-    error_list[length(error_list) + 1] <- "Folder name for the dataset storing the embeddings is missing."
-  }
-
-  if (!file.exists(path_to_raw_texts)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p("There is no file at the current path."))
-  } else {
-    raw_texts <- try(load_from_disk(dir_path = path_to_raw_texts), silent = TRUE)
-    if ("try-error" %in% class(raw_texts)) {
-      error_list[length(error_list) + 1] <- raw_texts
-    } else {
-      if (!"LargeDataSetForText" %in% class(raw_texts)) {
-        error_list[length(error_list) + 1] <- paste("The object is not of class LargeDataSetForText")
-      }
-    }
-  }
-
-
-  # summary
-  if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
-      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
-        shiny::tags$p(error_list[i])
-      )
-    }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
-  }
-}

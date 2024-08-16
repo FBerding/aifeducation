@@ -1,3 +1,13 @@
+#'Graphical user interface for text embedding models - create
+#'
+#'Functions generates the page for a creating a new [TextEmbeddingModel].
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_page_text_embedding_model_create
+#'@keywords internal
+#'
 TextEmbeddingModel_Create_UI <- function(id) {
   tagList(
     bslib::page_sidebar(
@@ -11,6 +21,20 @@ TextEmbeddingModel_Create_UI <- function(id) {
           title = "Please choose a folder",
           icon = shiny::icon("folder-open")
         ),
+        shiny::tags$hr(),
+        shiny::textInput(
+          inputId = shiny::NS(id, "lm_model_name"),
+          label = "Name"
+        ),
+        shiny::textInput(
+          inputId = shiny::NS(id, "lm_model_label"),
+          label = "Label"
+        ),
+        shiny::textInput(
+          inputId = shiny::NS(id, "lm_model_language"),
+          label = "Language"
+        ),
+        shiny::tags$hr(),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "start_SaveModal"),
           label = "Save Model",
@@ -30,6 +54,18 @@ TextEmbeddingModel_Create_UI <- function(id) {
   )
 }
 
+#'Server function for: graphical user interface for text embedding models - create
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param log_dir `string` Path to the directory where the log files should be stored.
+#'@param volumes `vector` containing a named vector of available volumes.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_page_text_embedding_model_create
+#'@keywords internal
+#'
 TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
@@ -164,26 +200,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           pool_type_choices <- c("average", "cls")
         }
 
-        ui <- bslib::layout_columns(
-          shiny::tagList(
-            shiny::textInput(
-              inputId = ns("lm_model_name"),
-              label = "Name"
-            ),
-            shiny::textInput(
-              inputId = ns("lm_model_label"),
-              label = "Label"
-            ),
-            shiny::textInput(
-              inputId = ns("lm_model_version"),
-              label = "Version"
-            ),
-            shiny::textInput(
-              inputId = ns("lm_model_language"),
-              label = "Language"
-            )
-          ),
-          shiny::tagList(
+        ui <- shiny::tagList(
             shiny::sliderInput(
               inputId = ns("lm_chunks"),
               label = "N Chunks",
@@ -225,7 +242,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
               choices = pool_type_choices,
               multiple = FALSE
             )
-          )
+
         )
         return(ui)
       } else {
@@ -269,11 +286,11 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           type = "info"
         )
 
-        new_interface <- TextEmbeddingModel$new(
+        new_interface <- TextEmbeddingModel$new()
+        new_interface$configure(
           model_name = input$lm_model_name,
           model_label = input$lm_model_label,
           model_language = input$lm_model_language,
-          model_version = input$lm_model_version,
           max_length = input$lm_max_length,
           overlap = input$lm_overlap,
           chunks = input$lm_chunks,
@@ -293,6 +310,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
         rm(new_interface)
         gc()
         shinyWidgets::closeSweetAlert()
+        shiny::removeModal()
       } else {
         display_errors(
           title = "Error",
@@ -322,39 +340,4 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
   })
 }
 
-check_errors_text_embedding_model_create <- function(destination_path,
-                                                     folder_name,
-                                                     path_to_base_model,
-                                                     interface_architecture) {
-  # List for gathering errors
-  error_list <- NULL
 
-  # Check if all inputs are correctly set
-  if (!dir.exists(destination_path)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p("The destination directory does not
-                                                   exist. Please check your directory path
-                                                   and/or create that directory."))
-  }
-  if (is.null(folder_name) | folder_name == "") {
-    error_list[length(error_list) + 1] <- "File name for the text dataset is missing."
-  }
-
-  if (!identical(path_to_base_model, character(0))) {
-    if (is.null(interface_architecture[[1]]) &
-        is.null(interface_architecture[[2]])) {
-      error_list[length(error_list) + 1] <- "There is no model to load in the directory."
-    }
-  }
-
-  if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
-      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
-        shiny::tags$p(error_list[i])
-      )
-    }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
-  }
-}

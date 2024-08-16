@@ -1,26 +1,26 @@
-#'@title Base class for models using neural nets.
+#' @title Base class for models using neural nets.
 #'
-#'@description Abstract class for all models that do not rely on the python library 'transformers'.
+#' @description Abstract class for all models that do not rely on the python library 'transformers'.
 #'
-#'@return Objects of this containing fields and methods used in several other classes
-#'in 'ai for education'. This class is **not** designed for a direct application and should only
-#'be used by developers.
-#'@family Classification
-#'@export
-AIFEBaseModel<-R6::R6Class(
+#' @return Objects of this containing fields and methods used in several other classes
+#' in 'ai for education'. This class is **not** designed for a direct application and should only
+#' be used by developers.
+#' @family Classification
+#' @export
+AIFEBaseModel <- R6::R6Class(
   classname = "AIFEBaseModel",
   public = list(
-    #'@field model ('tensorflow_model' or 'pytorch_model')\cr
-    #'Field for storing the 'tensorflow' or 'pytorch' model after loading.
-    model=NULL,
+    #' @field model ('tensorflow_model' or 'pytorch_model')\cr
+    #' Field for storing the 'tensorflow' or 'pytorch' model after loading.
+    model = NULL,
 
-    #'@field model_config ('list()')\cr
-    #'List for storing information about the configuration of the model.
-    model_config=list(),
+    #' @field model_config ('list()')\cr
+    #' List for storing information about the configuration of the model.
+    model_config = list(),
 
-    #'@field last_training ('list()')\cr
-    #'List for storing the history, the configuration, and the results of the last training. This
-    #'information will be overwritten if a new training is started.
+    #' @field last_training ('list()')\cr
+    #' List for storing the history, the configuration, and the results of the last training. This
+    #' information will be overwritten if a new training is started.
     #'
     #' * `last_training$start_time`: Time point when training started.
     #' * `last_training$learning_time`: Duration of the training process.
@@ -29,222 +29,300 @@ AIFEBaseModel<-R6::R6Class(
     #' * `last_training$data`: Object of class \code{table} storing the initial frequencies of the passed data.
     #' * `last_training$config`: List storing the configuration used for the last training.
     #'
-    last_training=list(
-      learning_time=NULL,
-      start_time=NA,
-      history=list(),
-      data=NULL,
-      finish_time=NULL,
-      config=list()
+    last_training = list(
+      learning_time = NULL,
+      start_time = NA,
+      history = list(),
+      data = NULL,
+      finish_time = NULL,
+      config = list()
     ),
-    #General Information set and get--------------------------------------------
-    #'@description Method for requesting the model information.
-    #'@return `list` of all relevant model information.
-    get_model_info=function(){
+    # General Information set and get--------------------------------------------
+    #' @description Method for requesting the model information.
+    #' @return `list` of all relevant model information.
+    get_model_info = function() {
       return(list(
-        model_license=private$model_info$model_license,
-        model_name=private$model_info$model_name,
-        model_name_root=private$model_info$model_name_root,
-        model_label=private$model_info$model_label,
-        model_date=private$model_info$model_date
-      )
-      )
+        model_license = private$model_info$model_license,
+        model_name = private$model_info$model_name,
+        model_id = private$model_info$model_id,
+        model_name_root = private$model_info$model_name_root,
+        model_label = private$model_info$model_label,
+        model_date = private$model_info$model_date
+      ))
     },
-    #'@description Method for requesting the text embedding model information.
-    #'@return `list` of all relevant model information on the text embedding model
-    #'underlying the model.
-    get_text_embedding_model=function(){
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting the text embedding model information.
+    #' @return `list` of all relevant model information on the text embedding model
+    #' underlying the model.
+    get_text_embedding_model = function() {
       return(private$text_embedding_model)
     },
     #---------------------------------------------------------------------------
-    #'@description Method for setting publication information of the model.
-    #'@param authors List of authors.
-    #'@param citation Free text citation.
-    #'@param url URL of a corresponding homepage.
-    #'@return Function does not return a value. It is used for setting the private
-    #'members for publication information.
-    set_publication_info=function(authors ,
-                                  citation,
-                                  url=NULL){
-
-      private$publication_info$developed_by$authors<-authors
-      private$publication_info$developed_by$citation<-citation
-      private$publication_info$developed_by$url<-url
-
+    #' @description Method for setting publication information of the model.
+    #' @param authors List of authors.
+    #' @param citation Free text citation.
+    #' @param url URL of a corresponding homepage.
+    #' @return Function does not return a value. It is used for setting the private
+    #' members for publication information.
+    set_publication_info = function(authors,
+                                    citation,
+                                    url = NULL) {
+      private$publication_info$developed_by$authors <- authors
+      private$publication_info$developed_by$citation <- citation
+      private$publication_info$developed_by$url <- url
     },
     #--------------------------------------------------------------------------
-    #'@description Method for requesting the bibliographic information of the model.
-    #'@return `list` with all saved bibliographic information.
-    get_publication_info=function(){
+    #' @description Method for requesting the bibliographic information of the model.
+    #' @return `list` with all saved bibliographic information.
+    get_publication_info = function() {
       return(private$publication_info)
     },
     #--------------------------------------------------------------------------
-    #'@description Method for setting the license of the model.
-    #'@param license `string` containing the abbreviation of the license or
-    #'the license text.
-    #'@return Function does not return a value. It is used for setting the private member for
-    #'the software license of the model.
-    set_software_license=function(license="CC BY"){
-      private$model_info$model_license<-license
+    #' @description Method for setting the license of the model.
+    #' @param license `string` containing the abbreviation of the license or
+    #' the license text.
+    #' @return Function does not return a value. It is used for setting the private member for
+    #' the software license of the model.
+    set_software_license = function(license = "CC BY") {
+      private$model_info$model_license <- license
     },
-    #'@description Method for getting the license of the model.
-    #'@param license `string` containing the abbreviation of the license or
-    #'the license text.
-    #'@return `string` representing the license for the model.
-    get_software_license=function(){
+    #' @description Method for getting the license of the model.
+    #' @param license `string` containing the abbreviation of the license or
+    #' the license text.
+    #' @return `string` representing the license for the model.
+    get_software_license = function() {
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
-    #'@description Method for setting the license of the model's documentation.
-    #'@param license `string` containing the abbreviation of the license or
-    #'the license text.
-    #'@return Function does not return a value. It is used for setting the private member for
-    #'the documentation license of the model.
-    set_documentation_license=function(license="CC BY"){
-      private$model_description$license<-license
+    #' @description Method for setting the license of the model's documentation.
+    #' @param license `string` containing the abbreviation of the license or
+    #' the license text.
+    #' @return Function does not return a value. It is used for setting the private member for
+    #' the documentation license of the model.
+    set_documentation_license = function(license = "CC BY") {
+      private$model_description$license <- license
     },
-    #'@description Method for getting the license of the model's documentation.
-    #'@param license `string` containing the abbreviation of the license or
-    #'the license text.
-    #'@return Returns the license as a `string`.
-    get_documentation_license=function(){
+    #' @description Method for getting the license of the model's documentation.
+    #' @param license `string` containing the abbreviation of the license or
+    #' the license text.
+    #' @return Returns the license as a `string`.
+    get_documentation_license = function() {
       return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
-    #'@description Method for setting a description of the model.
-    #'@param eng `string` A text describing the training,
-    #'its theoretical and empirical background, and output
-    #'in English.
-    #'@param native `string` A text describing the training ,
-    #'its theoretical and empirical background, and output
-    #'in the native language of the model.
-    #'@param abstract_eng `string` A text providing a summary of the description
-    #'in English.
-    #'@param abstract_native `string` A text providing a summary of the description
-    #'in the native language of the model.
-    #'@param keywords_eng `vector` of keyword in English.
-    #'@param keywords_native `vector` of keyword in the native language of the model.
-    #'@return Function does not return a value. It is used for setting the private members for the
-    #'description of the model.
-    set_model_description=function(eng=NULL,
-                                   native=NULL,
-                                   abstract_eng=NULL,
-                                   abstract_native=NULL,
-                                   keywords_eng=NULL,
-                                   keywords_native=NULL){
-      if(!is.null(eng)){
-        private$model_description$eng=eng
+    #' @description Method for setting a description of the model.
+    #' @param eng `string` A text describing the training,
+    #' its theoretical and empirical background, and output
+    #' in English.
+    #' @param native `string` A text describing the training ,
+    #' its theoretical and empirical background, and output
+    #' in the native language of the model.
+    #' @param abstract_eng `string` A text providing a summary of the description
+    #' in English.
+    #' @param abstract_native `string` A text providing a summary of the description
+    #' in the native language of the model.
+    #' @param keywords_eng `vector` of keyword in English.
+    #' @param keywords_native `vector` of keyword in the native language of the model.
+    #' @return Function does not return a value. It is used for setting the private members for the
+    #' description of the model.
+    set_model_description = function(eng = NULL,
+                                     native = NULL,
+                                     abstract_eng = NULL,
+                                     abstract_native = NULL,
+                                     keywords_eng = NULL,
+                                     keywords_native = NULL) {
+      if (!is.null(eng)) {
+        private$model_description$eng <- eng
       }
-      if(!is.null(native)){
-        private$model_description$native=native
-      }
-
-      if(!is.null(abstract_eng)){
-        private$model_description$abstract_eng=abstract_eng
-      }
-      if(!is.null(abstract_native)){
-        private$model_description$abstract_native=abstract_native
+      if (!is.null(native)) {
+        private$model_description$native <- native
       }
 
-      if(!is.null(keywords_eng)){
-        private$model_description$keywords_eng=keywords_eng
+      if (!is.null(abstract_eng)) {
+        private$model_description$abstract_eng <- abstract_eng
       }
-      if(!is.null(keywords_native)){
-        private$model_description$keywords_native=keywords_native
+      if (!is.null(abstract_native)) {
+        private$model_description$abstract_native <- abstract_native
       }
 
+      if (!is.null(keywords_eng)) {
+        private$model_description$keywords_eng <- keywords_eng
+      }
+      if (!is.null(keywords_native)) {
+        private$model_description$keywords_native <- keywords_native
+      }
     },
-    #'@description Method for requesting the model description.
-    #'@return `list` with the description of the classifier in English
-    #'and the native language.
-    get_model_description=function(){
+    #' @description Method for requesting the model description.
+    #' @return `list` with the description of the classifier in English
+    #' and the native language.
+    get_model_description = function() {
       return(private$model_description)
     },
     #-------------------------------------------------------------------------
-    #'@description Method for saving a model.
-    #'@param dir_path `string` Path of the directory where the model should be
-    #'saved.
-    #'@param folder_name `string` Name of the folder that should be created within
-    #'the directory.
-    #'@return Function does not return a value. It saves the model to disk.
-    #'@importFrom utils write.csv
-    save=function(dir_path,folder_name){
-      save_location=paste0(dir_path,"/",folder_name)
+    #' @description Method for saving a model.
+    #' @param dir_path `string` Path of the directory where the model should be
+    #' saved.
+    #' @param folder_name `string` Name of the folder that should be created within
+    #' the directory.
+    #' @return Function does not return a value. It saves the model to disk.
+    #' @importFrom utils write.csv
+    save = function(dir_path, folder_name) {
+      save_location <- paste0(dir_path, "/", folder_name)
 
-      if(private$ml_framework=="tensorflow"){
-          save_format="keras"
-        } else if(private$ml_framework=="pytorch"){
-          save_format="safetensors"
-        }
-
-
-      if(save_format=="safetensors" &
-         reticulate::py_module_available("safetensors")==FALSE){
-        warning("Python library 'safetensors' is not available. Using
-                 standard save format for pytorch.")
-        save_format="pt"
+      if (private$ml_framework == "tensorflow") {
+        save_format <- "keras"
+      } else if (private$ml_framework == "pytorch") {
+        save_format <- "safetensors"
       }
 
-      if(private$ml_framework=="tensorflow"){
-        if(save_format=="keras"){
-          extension=".keras"
-        } else if(save_format=="tf"){
-          extension=".tf"
+
+      if (save_format == "safetensors" &
+        reticulate::py_module_available("safetensors") == FALSE) {
+        warning("Python library 'safetensors' is not available. Using
+                 standard save format for pytorch.")
+        save_format <- "pt"
+      }
+
+      if (private$ml_framework == "tensorflow") {
+        if (save_format == "keras") {
+          extension <- ".keras"
+        } else if (save_format == "tf") {
+          extension <- ".tf"
         } else {
-          extension=".h5"
+          extension <- ".h5"
         }
-        file_path=paste0(save_location,"/","model_data",extension)
-        if(dir.exists(save_location)==FALSE){
+        file_path <- paste0(save_location, "/", "model_data", extension)
+        if (dir.exists(save_location) == FALSE) {
           dir.create(save_location)
         }
         self$model$save(file_path)
-
-      } else if(private$ml_framework=="pytorch"){
-        if(dir.exists(save_location)==FALSE){
+      } else if (private$ml_framework == "pytorch") {
+        if (dir.exists(save_location) == FALSE) {
           dir.create(save_location)
         }
-        self$model$to("cpu",dtype=torch$float)
-        if(save_format=="safetensors"){
-          file_path=paste0(save_location,"/","model_data",".safetensors")
-          safetensors$torch$save_model(model=self$model,filename=file_path)
-        } else if (save_format=="pt"){
-          file_path=paste0(save_location,"/","model_data",".pt")
-          torch$save(self$model$state_dict(),file_path)
+        self$model$to("cpu", dtype = torch$float)
+        if (save_format == "safetensors") {
+          file_path <- paste0(save_location, "/", "model_data", ".safetensors")
+          safetensors$torch$save_model(model = self$model, filename = file_path)
+        } else if (save_format == "pt") {
+          file_path <- paste0(save_location, "/", "model_data", ".pt")
+          torch$save(self$model$state_dict(), file_path)
         }
-
       }
 
-      #Saving Sustainability Data
-      sustain_matrix=t(as.matrix(unlist(private$sustainability)))
+      # Saving Sustainability Data
+      sustain_matrix <- t(as.matrix(unlist(private$sustainability)))
       write.csv(
-        x=sustain_matrix,
-        file=paste0(save_location,"/","sustainability.csv"),
+        x = sustain_matrix,
+        file = paste0(save_location, "/", "sustainability.csv"),
         row.names = FALSE
       )
     },
     #--------------------------------------------------------------------------
-    #'@description Method for importing a model.
-    #'@param dir_path `string` Path of the directory where the model is
-    #'saved.
-    #'@return Function does not return a value. It is used to load the weights
-    #'of a model.
-    load=function(dir_path){
-      #Load python scripts
+    #' @description loads an object from disk
+    #' and updates the object to the current version of the package.
+    #' @param dir_path Path where the object set is stored.
+    #' @return Method does not return anything. It loads an object from disk.
+    load_from_disk = function(dir_path) {
+      if (self$is_configured() == TRUE) {
+        stop("The object has already been configured. Please use the method
+             'load' for loading the weights of a model.")
+      }
+
+      # Load R file
+      old_model <- load_R_interface(dir_path)
+
+      #Set ML framework
+      private$ml_framework=old_model$get_ml_framework()
+
+      # Set configuration of the core model
+      self$model_config <- old_model$model_config
+
+      # Set model info
+      private$set_model_info(
+        model_name_root = old_model$get_model_info()$model_name_root,
+        model_id = old_model$get_model_info()$model_id,
+        label = old_model$get_model_info()$model_label,
+        model_date=old_model$get_model_info()$model_date
+      )
+
+      # Set TextEmbeddingModel
+      private$set_text_embedding_model(
+        model_info = old_model$get_text_embedding_model()$model,
+        feature_extractor_info = old_model$get_text_embedding_model()$feature_extractor,
+        times = old_model$get_text_embedding_model()$times,
+        features = old_model$get_text_embedding_model()$features
+      )
+
+      # Set last training
+      self$last_training$config=old_model$last_training$config
+      self$last_training$start_time=old_model$last_training$start_time
+      self$last_training$learning_time=old_model$last_training$learning_time
+      self$last_training$finish_time=old_model$last_training$finish_time
+      self$last_training$history=old_model$last_training$history
+      self$last_training$data=old_model$last_training$data
+
+      # Set license
+      self$set_software_license(old_model$get_software_license())
+      self$set_documentation_license(old_model$get_documentation_license())
+
+      # Set description and documentation
+      self$set_model_description(
+        eng = old_model$get_model_description()$eng,
+        native = old_model$get_model_description()$native,
+        abstract_eng = old_model$get_model_description()$abstract_eng,
+        abstract_native = old_model$get_model_description()$abstract_native,
+        keywords_eng = old_model$get_model_description()$keywords_eng,
+        keywords_native = old_model$get_model_description()$keywords_native
+      )
+
+      #Set publication info
+      self$set_publication_info(
+        authors = old_model$get_publication_info()$authors,
+        citation = old_model$get_publication_info()$citation,
+        url = old_model$get_publication_info()$url
+      )
+
+      #Get and set original package versions
+      private$r_package_versions$aifeducation=old_model$get_package_versions()$r_package_versions$aifeducation
+      private$r_package_versions$reticulate=old_model$get_package_versions()$r_package_versions$reticulate
+
+      private$py_package_versions$torch=old_model$get_package_versions()$py_package_versions$torch
+      private$py_package_versions$tensorflow=old_model$get_package_versions()$py_package_versions$tensorflow
+      private$py_package_versions$keras=old_model$get_package_versions()$py_package_versions$keras
+      private$py_package_versions$numpy=old_model$get_package_versions()$py_package_versions$numpy
+
+      # Finalize loading
+      private$set_configuration_to_TRUE()
+
+      # Create and load AI model
+      private$create_reset_model()
+      self$load(dir_path = dir_path)
+
+      },
+    #--------------------------------------------------------------------------
+    #' @description Method for importing a model.
+    #' @param dir_path `string` Path of the directory where the model is
+    #' saved.
+    #' @return Function does not return a value. It is used to load the weights
+    #' of a model.
+    load = function(dir_path) {
+      # Load python scripts
       private$load_reload_python_scripts()
 
-      #Load the model---------------------------------------------------------
-      if(private$ml_framework=="tensorflow"){
-        path=paste0(dir_path,"/","model_data",".keras")
-        if(file.exists(paths = path)==TRUE){
-          self$model<-keras$models$load_model(path)
+      # Load the model---------------------------------------------------------
+      if (private$ml_framework == "tensorflow") {
+        path <- paste0(dir_path, "/", "model_data", ".keras")
+        if (file.exists(paths = path) == TRUE) {
+          self$model <- keras$models$load_model(path)
         } else {
-          path=paste0(dir_path,"/","model_data",".tf")
-          if(dir.exists(paths = path)==TRUE){
-            self$model<-keras$models$load_model(path)
+          path <- paste0(dir_path, "/", "model_data", ".tf")
+          if (dir.exists(paths = path) == TRUE) {
+            self$model <- keras$models$load_model(path)
           } else {
-            path=paste0(dir_path,"/","model_data",".h5")
-            if(file.exists(paths = path)==TRUE){
-              self$model<-keras$models$load_model(paste0(dir_path,"/","model_data",".h5"))
+            path <- paste0(dir_path, "/", "model_data", ".h5")
+            if (file.exists(paths = path) == TRUE) {
+              self$model <- keras$models$load_model(paste0(dir_path, "/", "model_data", ".h5"))
             } else {
               stop("There is no compatible model file in the choosen directory.
                    Please check path. Please note that classifiers have to be loaded with
@@ -252,14 +330,14 @@ AIFEBaseModel<-R6::R6Class(
             }
           }
         }
-      } else if(private$ml_framework=="pytorch"){
-        path_pt=paste0(dir_path,"/","model_data",".pt")
-        path_safe_tensors=paste0(dir_path,"/","model_data",".safetensors")
+      } else if (private$ml_framework == "pytorch") {
+        path_pt <- paste0(dir_path, "/", "model_data", ".pt")
+        path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
         private$create_reset_model()
-        if(file.exists(path_safe_tensors)){
-          safetensors$torch$load_model(model=self$model,filename=path_safe_tensors)
+        if (file.exists(path_safe_tensors)) {
+          safetensors$torch$load_model(model = self$model, filename = path_safe_tensors)
         } else {
-          if(file.exists(paths = path_pt)==TRUE){
+          if (file.exists(paths = path_pt) == TRUE) {
             self$model$load_state_dict(torch$load(path_pt))
           } else {
             stop("There is no compatible model file in the choosen directory.
@@ -270,308 +348,365 @@ AIFEBaseModel<-R6::R6Class(
       }
     },
     #---------------------------------------------------------------------------
-    #'@description Method for requesting a summary of the R and python packages'
-    #'versions used for creating the model.
-    #'@return Returns a `list` containing the versions of the relevant
-    #'R and python packages.
-    get_package_versions=function(){
+    #' @description Method for requesting a summary of the R and python packages'
+    #' versions used for creating the model.
+    #' @return Returns a `list` containing the versions of the relevant
+    #' R and python packages.
+    get_package_versions = function() {
       return(
-        list(r_package_versions=private$r_package_versions,
-             py_package_versions=private$py_package_versions)
+        list(
+          r_package_versions = private$r_package_versions,
+          py_package_versions = private$py_package_versions
+        )
       )
     },
     #---------------------------------------------------------------------------
-    #'@description Method for requesting a summary of tracked energy consumption
-    #'during training and an estimate of the resulting CO2 equivalents in kg.
-    #'@return Returns a `list` containing the tracked energy consumption,
-    #'CO2 equivalents in kg, information on the tracker used, and technical
-    #'information on the training infrastructure.
-    get_sustainability_data=function(){
+    #' @description Method for requesting a summary of tracked energy consumption
+    #' during training and an estimate of the resulting CO2 equivalents in kg.
+    #' @return Returns a `list` containing the tracked energy consumption,
+    #' CO2 equivalents in kg, information on the tracker used, and technical
+    #' information on the training infrastructure.
+    get_sustainability_data = function() {
       return(private$sustainability)
     },
     #---------------------------------------------------------------------------
-    #'@description Method for requesting the machine learning framework used
-    #'for the model.
-    #'@return Returns a `string` describing the machine learning framework used
-    #'for the classifier
-    get_ml_framework=function(){
+    #' @description Method for requesting the machine learning framework used
+    #' for the model.
+    #' @return Returns a `string` describing the machine learning framework used
+    #' for the classifier.
+    get_ml_framework = function() {
       return(private$ml_framework)
     },
     #--------------------------------------------------------------------------
-    get_text_embedding_model_name=function(){
+    #' @description Method for requesting the name (unique id) of the underlying
+    #' text embedding model.
+    #' @return Returns a `string` describing name of the text embedding model.
+    get_text_embedding_model_name = function() {
       return(private$text_embedding_model$model$model_name)
     },
     #--------------------------------------------------------------------------
-    #Check Embedding Model compatibility of the text embedding
-    #'@description Method for checking if the provided text embeddings are
-    #'created with the same [TextEmbeddingModel] as the model.
-    #'@param text_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
-    #'@return `TRUE` if the underlying [TextEmbeddingModel] are the same.
-    #'`FALSE` if the models differ.
-    check_embedding_model=function(text_embeddings){
-      #Check object type
-      private$check_embeddings_object_type(text_embeddings,strict = TRUE)
+    # Check Embedding Model compatibility of the text embedding
+    #' @description Method for checking if the provided text embeddings are
+    #' created with the same [TextEmbeddingModel] as the model.
+    #' @param text_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
+    #' @return `TRUE` if the underlying [TextEmbeddingModel] are the same.
+    #' `FALSE` if the models differ.
+    check_embedding_model = function(text_embeddings) {
+      # Check object type
+      private$check_embeddings_object_type(text_embeddings, strict = TRUE)
 
-      #Check original text embedding model
-      embedding_model_config<-text_embeddings$get_model_info()
-      check<-c("model_name")
+      # Check original text embedding model
+      embedding_model_config <- text_embeddings$get_model_info()
+      check <- c("model_name")
 
-      if(!is.null_or_na(embedding_model_config[[check]]) &
-         !is.null_or_na(private$text_embedding_model$model[[check]])){
-        if(embedding_model_config[[check]]!=private$text_embedding_model$model[[check]]){
+      if (!is.null_or_na(embedding_model_config[[check]]) &
+        !is.null_or_na(private$text_embedding_model$model[[check]])) {
+        if (embedding_model_config[[check]] != private$text_embedding_model$model[[check]]) {
           stop("The TextEmbeddingModel that generated the data_embeddings is not
                the same as the TextEmbeddingModel when generating the classifier.")
         }
       }
     },
     #---------------------------------------------------------------------------
-    #'@description Method for counting the trainable parameters of a model.
-    #'@return Returns the number of trainable parameters of the model.
-    count_parameter=function(){
-      if(private$ml_framework=="tensorflow"){
-        count=0
-        for (i in 1:length(self$model$trainable_weights)){
-          count=count+tf$keras$backend$count_params(self$model$trainable_weights[[i]])
+    #' @description Method for counting the trainable parameters of a model.
+    #' @return Returns the number of trainable parameters of the model.
+    count_parameter = function() {
+      if (private$ml_framework == "tensorflow") {
+        count <- 0
+        for (i in 1:length(self$model$trainable_weights)) {
+          count <- count + tf$keras$backend$count_params(self$model$trainable_weights[[i]])
         }
-      } else if(private$ml_framework=="pytorch"){
-        iterator=reticulate::as_iterator(self$model$parameters())
-        iteration_finished=FALSE
-        count=0
-        while(iteration_finished==FALSE){
-          iter_results=reticulate::iter_next(it=iterator)
-          if(is.null(iter_results)){
-            iteration_finished=TRUE
+      } else if (private$ml_framework == "pytorch") {
+        iterator <- reticulate::as_iterator(self$model$parameters())
+        iteration_finished <- FALSE
+        count <- 0
+        while (iteration_finished == FALSE) {
+          iter_results <- reticulate::iter_next(it = iterator)
+          if (is.null(iter_results)) {
+            iteration_finished <- TRUE
           } else {
-            if(iter_results$requires_grad==TRUE){
-              count=count+iter_results$numel()
+            if (iter_results$requires_grad == TRUE) {
+              count <- count + iter_results$numel()
             }
           }
         }
       }
       return(count)
+    },
+    #-------------------------------------------------------------------------
+    #' @description Method for checking if the model was successfully configured.
+    #' An object can only be used if this value is `TRUE`.
+    #' @return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
+    is_configured = function() {
+      return(private$configured)
     }
   ),
   private = list(
-    ml_framework=NA,
+    ml_framework = NA,
 
-    #General Information-------------------------------------------------------
-    model_info=list(
-      model_license=NA,
-      model_name=NA,
-      name_root=NA,
-      model_label=NA,
-      model_date=NA
+    # General Information-------------------------------------------------------
+    model_info = list(
+      model_license = NA,
+      model_name = NA,
+      name_root = NA,
+      model_label = NA,
+      model_date = NA
     ),
-
-    text_embedding_model=list(
-      model=list(),
-      times=NA,
-      features=NA
+    text_embedding_model = list(
+      model = list(),
+      times = NA,
+      features = NA
     ),
-
-    publication_info=list(
-      developed_by=list(
-        authors =NULL,
-        citation=NULL,
-        url=NULL
+    publication_info = list(
+      developed_by = list(
+        authors = NULL,
+        citation = NULL,
+        url = NULL
       )
     ),
-
-    model_description=list(
-      eng=NULL,
-      native=NULL,
-      abstract_eng=NULL,
-      abstract_native=NULL,
-      keywords_eng=NULL,
-      keywords_native=NULL,
-      license=NA
+    model_description = list(
+      eng = NULL,
+      native = NULL,
+      abstract_eng = NULL,
+      abstract_native = NULL,
+      keywords_eng = NULL,
+      keywords_native = NULL,
+      license = NA
     ),
-
-    r_package_versions=list(
-      aifeducation=NA,
-      smotefamily=NA,
-      reticulate=NA
+    r_package_versions = list(
+      aifeducation = NA,
+      smotefamily = NA,
+      reticulate = NA
     ),
-
-    py_package_versions=list(
-      tensorflow=NA,
-      torch=NA,
-      keras=NA,
-      numpy=NA
+    py_package_versions = list(
+      tensorflow = NA,
+      torch = NA,
+      keras = NA,
+      numpy = NA
     ),
-
-    sustainability=list(
-      sustainability_tracked=FALSE,
-      date=NA,
-      sustainability_data=list(
-        duration_sec=NA,
-        co2eq_kg=NA,
-        cpu_energy_kwh=NA,
-        gpu_energy_kwh=NA,
-        ram_energy_kwh=NA,
-        total_energy_kwh=NA
+    sustainability = list(
+      sustainability_tracked = FALSE,
+      date = NA,
+      sustainability_data = list(
+        duration_sec = NA,
+        co2eq_kg = NA,
+        cpu_energy_kwh = NA,
+        gpu_energy_kwh = NA,
+        ram_energy_kwh = NA,
+        total_energy_kwh = NA
       ),
-      technical=list(
-        tracker=NA,
-        py_package_version=NA,
-
-        cpu_count=NA,
-        cpu_model=NA,
-
-        gpu_count=NA,
-        gpu_model=NA,
-
-        ram_total_size=NA
+      technical = list(
+        tracker = NA,
+        py_package_version = NA,
+        cpu_count = NA,
+        cpu_model = NA,
+        gpu_count = NA,
+        gpu_model = NA,
+        ram_total_size = NA
       ),
-      region=list(
-        country_name=NA,
-        country_iso_code=NA,
-        region=NA
+      region = list(
+        country_name = NA,
+        country_iso_code = NA,
+        region = NA
       )
     ),
-
-    gui=list(
-      shiny_app_active=NA,
-      pgr_value=0,
-      pgr_max_value=0
+    gui = list(
+      shiny_app_active = NA,
+      pgr_value = 0,
+      pgr_max_value = 0
+    ),
+    log_config = list(
+      log_dir = NULL,
+      log_state_file = NULL,
+      log_write_intervall = 10
     ),
 
-    log_config=list(
-      log_dir=NULL,
-      log_state_file=NULL,
-      log_write_intervall=10
-    ),
+    # Variable for checking if the object is successfully configured. Only is
+    # this is TRUE the object can be used
+    configured = FALSE,
 
     #--------------------------------------------------------------------------
-    #Method for summarizing sustainability data for this classifier
-    #List for results must correspond to the private fields of the classifier
-    summarize_tracked_sustainability=function(sustainability_tracker){
-      results<-list(
-        sustainability_tracked=TRUE,
-        sustainability_data=list(
-          co2eq_kg=sustainability_tracker$final_emissions_data$emissions,
-          cpu_energy_kwh=sustainability_tracker$final_emissions_data$cpu_energy,
-          gpu_energy_kwh=sustainability_tracker$final_emissions_data$gpu_energy,
-          ram_energy_kwh=sustainability_tracker$final_emissions_data$ram_energy,
-          total_energy_kwh=sustainability_tracker$final_emissions_data$energy_consumed
+    # Method for setting the model info
+    set_model_info = function(model_name_root, model_id, label,model_date) {
+      private$model_info$model_name_root <- model_name_root
+      private$model_info$model_id <- model_id
+      private$model_info$model_name <- paste0(model_name_root, "_ID_", model_id)
+      private$model_info$model_label <- label
+      private$model_info$model_date=model_date
+    },
+    #--------------------------------------------------------------------------
+    # Method for summarizing sustainability data for this classifier
+    # List for results must correspond to the private fields of the classifier
+    summarize_tracked_sustainability = function(sustainability_tracker) {
+      results <- list(
+        sustainability_tracked = TRUE,
+        sustainability_data = list(
+          co2eq_kg = sustainability_tracker$final_emissions_data$emissions,
+          cpu_energy_kwh = sustainability_tracker$final_emissions_data$cpu_energy,
+          gpu_energy_kwh = sustainability_tracker$final_emissions_data$gpu_energy,
+          ram_energy_kwh = sustainability_tracker$final_emissions_data$ram_energy,
+          total_energy_kwh = sustainability_tracker$final_emissions_data$energy_consumed
         ),
-        technical=list(
-          tracker="codecarbon",
-          py_package_version=codecarbon$"__version__",
-
-          cpu_count=sustainability_tracker$final_emissions_data$cpu_count,
-          cpu_model=sustainability_tracker$final_emissions_data$cpu_model,
-
-          gpu_count=sustainability_tracker$final_emissions_data$gpu_count,
-          gpu_model=sustainability_tracker$final_emissions_data$gpu_model,
-
-          ram_total_size=sustainability_tracker$final_emissions_data$ram_total_size
+        technical = list(
+          tracker = "codecarbon",
+          py_package_version = codecarbon$"__version__",
+          cpu_count = sustainability_tracker$final_emissions_data$cpu_count,
+          cpu_model = sustainability_tracker$final_emissions_data$cpu_model,
+          gpu_count = sustainability_tracker$final_emissions_data$gpu_count,
+          gpu_model = sustainability_tracker$final_emissions_data$gpu_model,
+          ram_total_size = sustainability_tracker$final_emissions_data$ram_total_size
         ),
-        region=list(
-          country_name=sustainability_tracker$final_emissions_data$country_name,
-          country_iso_code=sustainability_tracker$final_emissions_data$country_iso_code,
-          region=sustainability_tracker$final_emissions_data$region
+        region = list(
+          country_name = sustainability_tracker$final_emissions_data$country_name,
+          country_iso_code = sustainability_tracker$final_emissions_data$country_iso_code,
+          region = sustainability_tracker$final_emissions_data$region
         )
       )
       return(results)
     },
-    check_embeddings_object_type=function(embeddings,strict=TRUE){
-      if(strict==TRUE){
-        if(!("EmbeddedText" %in% class(embeddings))&
-           !("LargeDataSetForTextEmbeddings" %in% class(embeddings))){
+    check_embeddings_object_type = function(embeddings, strict = TRUE) {
+      if (strict == TRUE) {
+        if (!("EmbeddedText" %in% class(embeddings)) &
+          !("LargeDataSetForTextEmbeddings" %in% class(embeddings))) {
           stop("text_embeddings must be of class EmbeddedText or LargeDataSetForTextEmbeddings.")
         }
       } else {
-        if(!("EmbeddedText" %in% class(embeddings))&
-           !("LargeDataSetForTextEmbeddings" %in% class(embeddings))&
-           !("array" %in% class(embeddings))&
-           !("datasets.arrow_dataset.Dataset" %in% class(embeddings))){
+        if (!("EmbeddedText" %in% class(embeddings)) &
+          !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
+          !("array" %in% class(embeddings)) &
+          !("datasets.arrow_dataset.Dataset" %in% class(embeddings))) {
           stop("text_embeddings must be of class EmbeddedText, LargeDataSetForTextEmbeddings,
                datasets.arrow_dataset.Dataset or array.")
         }
       }
     },
     #------------------------------------------------------------------------
-    detach_tensors=function(tensors){
-      if(torch$cuda$is_available()){
+    detach_tensors = function(tensors) {
+      if (torch$cuda$is_available()) {
         return(tensors$detach()$cpu()$numpy())
       } else {
         return(tensors$detach()$numpy())
       }
     },
     #-------------------------------------------------------------------------
-    check_single_prediction=function(embeddings){
-      if("EmbeddedText" %in% class(embeddings)|
-         "LargeDataSetForTextEmbeddings" %in% class(embeddings)){
-        if(embeddings$n_rows()>1){
-          single_prediction=FALSE
+    check_single_prediction = function(embeddings) {
+      if ("EmbeddedText" %in% class(embeddings) |
+        "LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+        if (embeddings$n_rows() > 1) {
+          single_prediction <- FALSE
         } else {
-          single_prediction=TRUE
+          single_prediction <- TRUE
         }
-      }else if("array" %in% class(embeddings)){
-        if(nrow(embeddings)>1){
-          single_prediction=FALSE
+      } else if ("array" %in% class(embeddings)) {
+        if (nrow(embeddings) > 1) {
+          single_prediction <- FALSE
         } else {
-          single_prediction=TRUE
+          single_prediction <- TRUE
         }
-      } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
-        single_prediction=FALSE
+      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+        single_prediction <- FALSE
       }
       return(single_prediction)
     },
     #--------------------------------------------------------------------------
-    prepare_embeddings_as_dataset=function(embeddings){
-      if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
-        prepared_dataset=embeddings
-      } else if("EmbeddedText" %in% class(embeddings)){
-          prepared_dataset=datasets$Dataset$from_dict(
-            reticulate::dict(
-              list(id=rownames(embeddings$embeddings),
-                   input=np$squeeze(np$split(reticulate::np_array(embeddings$embeddings),as.integer(nrow(embeddings$embeddings)),axis=0L))),
-              convert = FALSE))
-      } else if("array" %in% class(embeddings)){
-        prepared_dataset=datasets$Dataset$from_dict(
+    prepare_embeddings_as_dataset = function(embeddings) {
+      if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+        prepared_dataset <- embeddings
+      } else if ("EmbeddedText" %in% class(embeddings)) {
+        prepared_dataset <- datasets$Dataset$from_dict(
           reticulate::dict(
-            list(id=rownames(embeddings),
-                 input=np$squeeze(np$split(reticulate::np_array(embeddings),as.integer(nrow(embeddings)),axis=0L))),
-            convert = FALSE))
-      } else if("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
-        prepared_dataset=embeddings$get_dataset()
+            list(
+              id = rownames(embeddings$embeddings),
+              input = np$squeeze(np$split(reticulate::np_array(embeddings$embeddings), as.integer(nrow(embeddings$embeddings)), axis = 0L))
+            ),
+            convert = FALSE
+          )
+        )
+      } else if ("array" %in% class(embeddings)) {
+        prepared_dataset <- datasets$Dataset$from_dict(
+          reticulate::dict(
+            list(
+              id = rownames(embeddings),
+              input = np$squeeze(np$split(reticulate::np_array(embeddings), as.integer(nrow(embeddings)), axis = 0L))
+            ),
+            convert = FALSE
+          )
+        )
+      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+        prepared_dataset <- embeddings$get_dataset()
       }
       return(prepared_dataset)
     },
     #-------------------------------------------------------------------------
-    prepare_embeddings_as_np_array=function(embeddings){
-      if("EmbeddedText" %in% class(embeddings)){
-        prepared_dataset=embeddings$embeddings
+    prepare_embeddings_as_np_array = function(embeddings) {
+      if ("EmbeddedText" %in% class(embeddings)) {
+        prepared_dataset <- embeddings$embeddings
         return(np$array(prepared_dataset))
-      } else if("array" %in% class(embeddings)){
-        prepared_dataset=embeddings
+      } else if ("array" %in% class(embeddings)) {
+        prepared_dataset <- embeddings
         return(np$array(prepared_dataset))
-      } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
-        prepared_dataset=embeddings$set_format("np")
+      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+        prepared_dataset <- embeddings$set_format("np")
         return(prepared_dataset["input"])
-      }else if("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
-        prepared_dataset=embeddings$get_dataset()
+      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+        prepared_dataset <- embeddings$get_dataset()
         prepared_dataset$set_format("np")
         return(prepared_dataset["input"])
       }
     },
     #--------------------------------------------------------------------------
-    get_rownames_from_embeddings=function(embeddings){
-      if("EmbeddedText" %in% class(embeddings)){
+    get_rownames_from_embeddings = function(embeddings) {
+      if ("EmbeddedText" %in% class(embeddings)) {
         return(rownames(embeddings$embeddings))
-      } else if("array" %in% class(embeddings)){
+      } else if ("array" %in% class(embeddings)) {
         return(rownames(embeddings))
-      } else if("datasets.arrow_dataset.Dataset"%in%class(embeddings)){
+      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
         return(embeddings["id"])
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)){
+      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
         embeddings$get_ids()
       }
     },
     #-----------------------------------------------------------------------
-    load_reload_python_scripts=function(){
+    load_reload_python_scripts = function() {
       return(NULL)
+    },
+    #-------------------------------------------------------------------------
+    # Method for setting configured to TRUE
+    set_configuration_to_TRUE = function() {
+      private$configured <- TRUE
+    },
+    #-------------------------------------------------------------------------
+    # Method for checking if the configuration is done successfully
+    check_config_for_TRUE = function() {
+      if (private$configured == FALSE) {
+        stop("The object is not configured. Please call the method configure.")
+      }
+    },
+    #--------------------------------------------------------------------------
+    set_text_embedding_model = function(model_info,
+                                        feature_extractor_info,
+                                        times,
+                                        features) {
+      private$text_embedding_model["model"] <- list(model_info)
+      private$text_embedding_model["feature_extractor"] <- feature_extractor_info
+      private$text_embedding_model["times"] <- times
+      private$text_embedding_model["features"] <- features
+    },
+    #--------------------------------------------------------------------------
+    set_package_versions=function(){
+      private$r_package_versions$aifeducation<-packageVersion("aifeducation")
+      private$r_package_versions$reticulate<-packageVersion("reticulate")
+
+      if(private$ml_framework=="pytorch"){
+        private$py_package_versions$torch<-torch["__version__"]
+        private$py_package_versions$tensorflow<-NULL
+        private$py_package_versions$keras<-NULL
+      } else {
+        private$py_package_versions$torch<-NULL
+        private$py_package_versions$tensorflow<-tf$version$VERSION
+        private$py_package_versions$keras<-keras["__version__"]
+      }
+      private$py_package_versions$numpy<-np$version$short_version
     }
   )
 )

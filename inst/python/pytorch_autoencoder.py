@@ -241,7 +241,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     shuffle=False)
     
   #Tensor for Saving Training History
-  history_loss=torch.zeros(size=(2,epochs),requires_grad=False)
+  history_loss=torch.ones(size=(2,epochs),requires_grad=False)*-100
 
   best_val_loss=float('inf')
   

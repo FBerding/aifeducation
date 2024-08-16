@@ -24,14 +24,15 @@ for(framework in ml_frameworks){
   for(method in method_list){
 
     train_path=paste0(root_path_data)
-          extractor<-TEFeatureExtractor$new(
+          extractor<-TEFeatureExtractor$new()
+          extractor$configure(
             ml_framework = framework,
             name="Test_extractor",
             label="Test Extractor",
             text_embeddings=dataset_list[["LargeDataSetForTextEmbeddings"]],
             features=128,
             method=method,
-            noise_factor=0.2,
+            noise_factor=0.02,
             optimizer="adam"
           )
 

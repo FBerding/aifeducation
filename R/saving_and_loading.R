@@ -56,17 +56,6 @@ save_to_disk <- function(object,
     folder_name = folder_name
   )
 
-  # Save additional files
-  if (methods::is(object, "TEClassifierRegular") |
-    methods::is(object, "TEClassifierProtoNet")) {
-    # save feature extractor if part of the model
-    if (object$model_config$use_fe == TRUE) {
-      object$feature_extractor$save(
-        dir_path = save_location,
-        folder_name = "feature_extractor"
-      )
-    }
-  }
 }
 
 
@@ -83,6 +72,27 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
+  loaded_object <- load_R_interface(dir_path)
+
+  if(methods::is(loaded_object, "TEClassifierRegular")){
+    model=TEClassifierRegular$new()
+  } else if(methods::is(loaded_object, "TEClassifierProtoNet")){
+    model=TEClassifierProtoNet$new()
+  }  else if(methods::is(loaded_object, "TEFeatureExtractor")){
+    model=TEFeatureExtractor$new()
+  }  else if(methods::is(loaded_object, "TextEmbeddingModel")){
+    model=TextEmbeddingModel$new()
+  }  else if(methods::is(loaded_object, "LargeDataSetForTextEmbeddings")){
+    model=LargeDataSetForTextEmbeddings$new()
+  }
+
+  # load and update model
+  model$load_from_disk(dir_path=dir_path)
+  return(model)
+}
+
+
+load_R_interface=function(dir_path){
   # Load the Interface to R
   interface_path <- paste0(dir_path, "/r_interface.rda")
 
@@ -94,28 +104,5 @@ load_from_disk <- function(dir_path) {
   # Load interface
   name_interface <- load(interface_path)
   loaded_object <- get(x = name_interface)
-
-  if (methods::is(loaded_object, "TEClassifierRegular") |
-    methods::is(loaded_object, "TEClassifierProtoNet")) {
-    # Call load method
-    loaded_object$load(dir_path)
-
-    # Load feature extractor if part of the model
-    if (loaded_object$model_config$use_fe == TRUE) {
-      loaded_object$feature_extractor$load(
-        dir_path = paste0(dir_path, "/feature_extractor")
-      )
-    }
-  } else if (methods::is(loaded_object, "TEFeatureExtractor")) {
-    loaded_object$load(dir_path)
-  } else if (methods::is(loaded_object, "TextEmbeddingModel")) {
-    if (loaded_object$get_model_info()$model_method %in% c("glove_cluster", "lda") == FALSE) {
-      loaded_object$load(dir_path)
-    }
-  } else if (methods::is(loaded_object, "LargeDataSetForTextEmbeddings") |
-    methods::is(loaded_object, "LargeDataSetForText")) {
-    loaded_object$load(dir_path)
-  }
-
   return(loaded_object)
 }

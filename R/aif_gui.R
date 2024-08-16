@@ -19,7 +19,7 @@
 #'@importFrom methods is
 #'
 #'@export
-start_aifeducation_studio<-function(){
+start_aifeducation_studio_old<-function(){
 
   #Checking Requirements-------------------------------------------------------
   #Check necessary R packages

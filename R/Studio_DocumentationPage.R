@@ -1,3 +1,13 @@
+#'Graphical user interface for documenting objects
+#'
+#'Functions generates the page for documenting objects.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_page_document
+#'@keywords internal
+#'
 DocumentPage_UI <- function(id) {
   bslib::page(
     bslib::page_sidebar(
@@ -45,7 +55,20 @@ DocumentPage_UI <- function(id) {
 }
 
 
-
+#'Server function for: graphical user interface for classifiers - create
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param log_dir `string` Path to the directory where the log files should be stored.
+#'@param type `string` determing the type of documentation page. `"TextEmbeddigModel"` for
+#'objects of class [TextEmbeddingModel] and `"Classifiers"` for objects of class [TEClassifierReguluar] and
+#'[TEClassifierProtoNet].
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_page_document
+#'@keywords internal
+#'
 DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------

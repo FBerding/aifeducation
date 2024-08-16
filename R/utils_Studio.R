@@ -1,3 +1,16 @@
+#' Generate sidebar
+#'
+#' Function for generating a sidebar containing information on a model.
+#'
+#' @param model Model for which the sidebar should be generated.
+#'
+#' @return Returns a `shiny::tagList` containing the html elements for the
+#' user interface. The content of the list depends on the kind of model passed
+#' to this function.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 generate_sidebar_information <- function(model) {
   if ("TextEmbeddingModel" %in% class(model)) {
     # Prepare output
@@ -98,7 +111,21 @@ generate_sidebar_information <- function(model) {
 }
 
 
-
+#' Generate model description
+#'
+#' Function for generating the html elements describing a model.
+#'
+#' @param model Model for which the description should be generated.
+#' @param eng `bool` If `TRUE` the generation assumes the description to be in
+#' English. If `FALSE` it assumes native language.
+#'
+#' @return Returns a `shiny::tagList` containing the html elements for the
+#' user interface. The content of the list depends on the kind of model passed
+#' to this function. If the `model` is `NULL` function returns `NULL`.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 generate_model_description <- function(model, eng) {
   if (!is.null(model)) {
     if (eng == TRUE) {
@@ -130,6 +157,18 @@ generate_model_description <- function(model, eng) {
   }
 }
 
+#' Generate description of bibliographic information
+#'
+#' Function for generating the html elements reporting a model's bibliographic information.
+#'
+#' @param model Model for which the description should be generated.
+#'
+#' @return Returns a `shiny::tagList` containing the html elements for the
+#' user interface.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 generate_model_bib_description <- function(model) {
   pub_info <- model$get_publication_info()
   ui <- shiny::tagList(
@@ -165,6 +204,24 @@ generate_model_bib_description <- function(model) {
   return(ui)
 }
 
+#' Generate widgets for documenting the bibliographic information of a model
+#'
+#' Function generates the input widgets for documenting the bibliographic information of  a model.
+#' This includes the names of the involved persons, mail e-mail addresses, urls, and
+#' citation.
+#'
+#' @param ns `function` for setting the namespace of the input elements. This should
+#' be `session$ns`.
+#' @param model Model for which the description should be generated.
+#' @param type `string` determining if the widgets should be generated for
+#' documenting the developers (`type = "developers"`) or the modifiers (`type = "modifiers"`).
+#'
+#' @return Returns a `shiny::tagList` containing the html elements for the
+#' user interface.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 generate_doc_input_developers <- function(ns, model, type = "developers") {
   if (type == "developers") {
     pup_info_for <- "developed_by"
@@ -234,7 +291,24 @@ generate_doc_input_developers <- function(ns, model, type = "developers") {
   return(ui)
 }
 
-
+#' Generate widgets for documenting a model
+#'
+#' Function generates the input widgets for documenting a model.
+#'
+#' @param ns `function` for setting the namespace of the input elements. This should
+#' be `session$ns`.
+#' @param model Model for which the description should be generated.
+#' @param language `string` determining if the documentation should be saved in English
+#' (`language = "eng"`) or in the model's native language (`language = "native"`).
+#' @param type `string` determining if the input refers to the abstract (`type = "abstract"`) or the main
+#' documentation (`type = "documentation"`).
+#'
+#' @return Returns a `shiny::tagList` containing the html elements for the
+#' user interface.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "abstract") {
   if (language == "eng") {
     if (type == "abstract") {
@@ -303,6 +377,20 @@ generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "
   return(ui)
 }
 
+#' Load and check embeddings
+#'
+#' Function for checking and loading text embeddings in AI for Education - Studio.
+#'
+#' @param dir_path `string` path to the directory containing the embeddings.
+#'
+#' @return If there are any errors an error modal is displayed by calling the
+#' function [display_errors]. If there are no errors the function returns
+#' embeddings as an object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText].
+#' In the case of erros the function returns `NULL`.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 load_and_check_embeddings <- function(dir_path) {
   if (!is.null(dir_path)) {
     if (file.exists(dir_path) == TRUE) {
@@ -350,7 +438,20 @@ load_and_check_embeddings <- function(dir_path) {
   }
 }
 
-#' @export
+#' Load and check target data
+#'
+#' Function for checking and loading target data in AI for Education - Studio.
+#'
+#' @param file_path `string` path to the file containing the target data.
+#'
+#' @return If there are any errors an error modal is displayed by calling the
+#' function [display_errors]. If there are no errors the function returns
+#' a `data.frame` containing the target data. In the case of erros the function returns
+#' `NULL`.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 load_and_check_target_data <- function(file_path) {
   if (!is.null(file_path)) {
     if (file.exists(file_path) == TRUE) {
@@ -442,6 +543,19 @@ load_and_check_target_data <- function(file_path) {
   }
 }
 
+#' Check and ensure a valid empty argument
+#'
+#' Function replaces empty input from an input widget into a valid empty argument for
+#' long running tasks. The valid empty argument is `NULL`.
+#'
+#' @param object Object to be transformed.
+#'
+#' @return Returns the object. Only in the case that the object is `NULL` or
+#' `object == ""` the function returns `NULL`
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 transform_input <- function(object) {
   if (!is.null(object)) {
     if (object == "") {
@@ -454,6 +568,18 @@ transform_input <- function(object) {
   }
 }
 
+#' Checks for an empty input from an input widget
+#'
+#' Function replaces checks for empty input produced by an input widget. These
+#' empty values are `NULL` and `""`.
+#'
+#' @param input Object to be transformed.
+#'
+#' @return Returns `TRUE` if input is `NULL` or `""`.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 check_for_empty_input <- function(input) {
   if (is.null(input)) {
     return(TRUE)
@@ -466,6 +592,18 @@ check_for_empty_input <- function(input) {
   }
 }
 
+#' Checks and transforms an numeric input
+#'
+#' Function ensured that a numeric input is returned or an empty value (`NULL`). This
+#' function should only be applied if a numeric input is expected.
+#'
+#' @param input Object to be transformed.
+#'
+#' @return Returns the input as a numeric input or `NULL` if input is `NULL` or `""`.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 check_numeric_input <- function(input) {
   if (is.null(input)) {
     return(NULL)
@@ -476,6 +614,21 @@ check_numeric_input <- function(input) {
   }
 }
 
+#' Load target data for long running tasks
+#'
+#' Function loads the target data for a long running task.
+#'
+#' @param file_path `string` Path to the file storing the target data.
+#' @param selectet_column `string` Name of the column containing the target data.
+#'
+#' @details
+#' This function assumes that the target data is stored as a columns with the
+#' cases in the rows and the categories in the columns. The ids of the cases must
+#' be stored in a column called "id".
+#'
+#' @return Returns a named factor containing the target data.
+#'
+#' @family studio_utils
 #' @export
 long_load_target_data <- function(file_path, selectet_column) {
   # extension=stringr::str_split_fixed(file_path,pattern="\\.",n=Inf)
@@ -535,7 +688,29 @@ long_load_target_data <- function(file_path, selectet_column) {
   return(target_factor)
 }
 
-prepare_training_history <- function(model, final = FALSE, use_pl = FALSE, pl_step = NULL) {
+#' Prepare history data of classifiers
+#'
+#' Function for preparing the history data of a model in order to be plotted in
+#' AI for Education - Studio.
+#'
+#' @param model Model for which the data should be prepared. The model must be a classifier.
+#' @param final `bool` If `TRUE` the history data of the final training is used
+#' for the data set.
+#' @param use_pl `bool` If `TRUE` data preparation assumes that pseudo labeling was applied
+#' during the training of the model.
+#' @param pl_step `int` If `use_pl=TRUE` select the step within pseudo labeling for which the
+#' data should be prepared.
+
+#' @return Returns a names `list` with the history data of the model for the loss
+#' (`loss`), the accuracy (`acc`), and the balanced accuracy (`bacc`).
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
+prepare_training_history <- function(model,
+                                     final = FALSE,
+                                     use_pl = FALSE,
+                                     pl_step = NULL) {
   classifier <- model
   plot_data <- classifier$last_training$history
   if (is.null(final)) {
@@ -676,6 +851,17 @@ prepare_training_history <- function(model, final = FALSE, use_pl = FALSE, pl_st
   )
 }
 
+#' Generate description for text embeddings
+#'
+#' Function generates a description for the underling [TextEmbeddingModel] of
+#' give text embeddings.
+#'
+#' @param embeddings Object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText].
+#' @return Returns a `shiny::tagList` containing the html elements for the user interface.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 create_data_embeddings_description <- function(embeddings) {
   model_info <- embeddings$get_model_info()
   info_table <- matrix(
@@ -717,6 +903,20 @@ create_data_embeddings_description <- function(embeddings) {
   return(ui)
 }
 
+#' Function for setting up AI for Education - Studio
+#'
+#' This functions checks if all nevessary R packages and python packages are
+#' available for using AI for Education - Studio. In the case python is not initialized
+#' it will set the conda environment to `"aifeducation"`. In the case python is already initialized
+#' it checks if the app can be run within the current environment.
+#'
+
+#' @return Function does not return anything. It is used for preparing python and R
+#' in order to run AI for Education - Studio.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
 check_and_prepare_for_studio <- function() {
   message("Checking R Packages.")
   r_packages <- c(
@@ -725,6 +925,7 @@ check_and_prepare_for_studio <- function() {
     "shiny",
     "shinyFiles",
     "shinyWidgets",
+    "sortable",
     "bslib",
     "future",
     "promises",

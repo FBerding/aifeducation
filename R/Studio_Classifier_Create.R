@@ -1,3 +1,13 @@
+#' Graphical user interface for classifiers - create
+#'
+#' Functions generates the page for a creating new classifiers.
+#'
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#' @family studio_gui_page_classifier_create
+#' @keywords internal
+#'
 Classifiers_Create_UI <- function(id) {
   tagList(
     bslib::page_sidebar(
@@ -72,7 +82,10 @@ Classifiers_Create_UI <- function(id) {
               inputId = shiny::NS(id, "target_dir"),
               label = shiny::tags$p(shiny::icon("folder"), "Path")
             ),
-            shiny::uiOutput(outputId = shiny::NS(id, "summary_data_targets"))
+            bslib::layout_column_wrap(
+              shiny::uiOutput(outputId = shiny::NS(id, "summary_data_targets")),
+              shiny::uiOutput(outputId = shiny::NS(id, "output_target_levels"))
+            )
           )
         )
       ),
@@ -340,6 +353,19 @@ Classifiers_Create_UI <- function(id) {
   )
 }
 
+#' Server function for: graphical user interface for classifiers - create
+#'
+#' Functions generates the functionality of a page on the server.
+#'
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @param model Model used for inference.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#' @family studio_gui_page_classifier_create
+#' @keywords internal
+#'
 Classifiers_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
@@ -364,7 +390,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     })
 
     path_to_embeddings <- shiny::eventReactive(input$embeddings_dir, {
-      if (input$embeddings_dir!="") {
+      if (input$embeddings_dir != "") {
         return(input$embeddings_dir)
       } else {
         return(NULL)
@@ -406,7 +432,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     )
 
     path_to_target_data <- shiny::eventReactive(input$target_dir, {
-      if (input$target_dir!="") {
+      if (input$target_dir != "") {
         return(input$target_dir)
       } else {
         return(NULL)
@@ -414,7 +440,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     })
 
     data_targets <- shiny::reactive({
-      if(!is.null(path_to_target_data())){
+      if (!is.null(path_to_target_data())) {
         return(load_and_check_target_data(path_to_target_data()))
       } else {
         return(NULL)
@@ -436,7 +462,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       )
     })
     path_to_feature_extractor <- shiny::eventReactive(input$feature_extractor_dir, {
-      if(input$feature_extractor_dir!="") {
+      if (input$feature_extractor_dir != "") {
         return(input$feature_extractor_dir)
       } else {
         return(NULL)
@@ -495,113 +521,114 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       )
 
       # If there are errors display them. If not start running task.
-       if (!is.null(errors)) {
-      display_errors(
-        title = "Error",
-        size = "l",
-        easy_close = TRUE,
-        error_messages = errors
-      )
-       } else {
-         #Check vor valid arguments
-         if(identical( as.double(input$alpha),numeric(0))){
-           loss_alpha=NULL
-         } else {
-           loss_alpha=as.double(input$alpha)
-         }
-         if(identical( as.double(input$margin),numeric(0))){
-           loss_margin=NULL
-         } else {
-           loss_margin=as.double(input$margin)
-         }
+      if (!is.null(errors)) {
+        display_errors(
+          title = "Error",
+          size = "l",
+          easy_close = TRUE,
+          error_messages = errors
+        )
+      } else {
+        # Check vor valid arguments
+        if (identical(as.double(input$alpha), numeric(0))) {
+          loss_alpha <- NULL
+        } else {
+          loss_alpha <- as.double(input$alpha)
+        }
+        if (identical(as.double(input$margin), numeric(0))) {
+          loss_margin <- NULL
+        } else {
+          loss_margin <- as.double(input$margin)
+        }
 
-         if(check_for_empty_input(input$hidden)){
-           hidden=NULL
-         } else {
-           #hidden=as.numeric(stringi::stri_split_regex(input$hidden,pattern=",|[:blank:]")[[1]])
-           hidden=as.numeric(stringr::str_extract_all(input$hidden,pattern = "\\d+")[[1]])
-         }
-         if(check_for_empty_input(input$rec)){
-           rec=NULL
-         } else {
-           #rec=as.numeric(stringi::stri_split_regex(input$rec,pattern=",|[:blank:]")[[1]])
-           rec=as.numeric(stringr::str_extract_all(input$rec,pattern = "\\d+")[[1]])
-         }
+        if (check_for_empty_input(input$hidden)) {
+          hidden <- NULL
+        } else {
+          # hidden=as.numeric(stringi::stri_split_regex(input$hidden,pattern=",|[:blank:]")[[1]])
+          hidden <- as.numeric(stringr::str_extract_all(input$hidden, pattern = "\\d+")[[1]])
+        }
+        if (check_for_empty_input(input$rec)) {
+          rec <- NULL
+        } else {
+          # rec=as.numeric(stringi::stri_split_regex(input$rec,pattern=",|[:blank:]")[[1]])
+          rec <- as.numeric(stringr::str_extract_all(input$rec, pattern = "\\d+")[[1]])
+        }
 
-      # Start task and monitor
-      start_and_monitor_long_task(
-        id = id,
-        ExtendedTask_type = "classifier",
-        ExtendedTask_arguments = list(
-          classifier_type=input$classifier_type,
-          destination_path = input$save_modal_directory_path,
-          folder_name = input$save_modal_folder_name,
-          path_to_embeddings = path_to_embeddings(),
-          path_to_target_data = path_to_target_data(),
-          target_data_column=input$data_target_column,
-          path_to_feature_extractor = path_to_feature_extractor(),
-          name = input$name,
-          label = input$label,
-          # text_embeddings=NULL,
-          # feature_extractor=NULL,
-          # targets=NULL,
-          hidden = hidden,
-          rec = rec,
-          rec_type = input$rec_type,
-          rec_bidirectional = input$rec_bidirectional,
-          self_attention_heads = input$self_attention_heads,
-          intermediate_size = input$intermediate_size,
-          attention_type = input$attention_type,
-          add_pos_embedding = input$add_pos_embedding,
-          rec_dropout = input$rec_dropout,
-          repeat_encoder = input$repeat_encoder,
-          dense_dropout = input$dense_dropout,
-          recurrent_dropout = 0,
-          encoder_dropout = input$encoder_dropout,
-          optimizer = input$optimizer,
+        # Start task and monitor
+        start_and_monitor_long_task(
+          id = id,
+          ExtendedTask_type = "classifier",
+          ExtendedTask_arguments = list(
+            classifier_type = input$classifier_type,
+            destination_path = input$save_modal_directory_path,
+            folder_name = input$save_modal_folder_name,
+            path_to_embeddings = path_to_embeddings(),
+            path_to_target_data = path_to_target_data(),
+            target_levels=input$target_levels,
+            target_data_column = input$data_target_column,
+            path_to_feature_extractor = path_to_feature_extractor(),
+            name = input$name,
+            label = input$label,
+            # text_embeddings=NULL,
+            # feature_extractor=NULL,
+            # targets=NULL,
+            hidden = hidden,
+            rec = rec,
+            rec_type = input$rec_type,
+            rec_bidirectional = input$rec_bidirectional,
+            self_attention_heads = input$self_attention_heads,
+            intermediate_size = input$intermediate_size,
+            attention_type = input$attention_type,
+            add_pos_embedding = input$add_pos_embedding,
+            rec_dropout = input$rec_dropout,
+            repeat_encoder = input$repeat_encoder,
+            dense_dropout = input$dense_dropout,
+            recurrent_dropout = 0,
+            encoder_dropout = input$encoder_dropout,
+            optimizer = input$optimizer,
 
-          # data_embeddings,
-          # data_targets,
+            # data_embeddings,
+            # data_targets,
 
-          data_folds = input$data_folds,
-          data_val_size = as.double(input$val_size),
-          balance_class_weights = input$balance_class_weights,
-          balance_sequence_length = input$balance_sequence_length,
-          use_sc = input$use_sc,
-          sc_method = input$sc_method,
-          sc_min_k = input$sc_min_max_k[1],
-          sc_max_k = input$sc_min_max_k[2],
-          use_pl = input$use_pl,
-          pl_max_steps = input$pl_max_steps,
-          pl_max = as.double(input$pl_max),
-          pl_anchor = as.double(input$pl_anchor),
-          pl_min = as.double(input$pl_min),
-          #sustain_track = TRUE,
-          sustain_iso_code = input$sustainability_country,
-          #sustain_region = NULL,
-          #sustain_interval = 15,
-          epochs = input$epochs,
-          batch_size = input$batch_size,
-          # dir_checkpoint,
-          # trace=TRUE,
-          # keras_trace=0,
-          # pytorch_trace=0,
-          log_dir = log_dir,
-          log_write_interval = 3,
-          Ns = input$n_sample,
-          Nq = input$n_query,
-          loss_alpha = loss_alpha,
-          loss_margin = loss_margin,
-          embedding_dim = input$protonet_embedding_dim
-        ),
-        log_path = log_path,
-        pgr_use_middle = TRUE,
-        pgr_use_bottom = TRUE,
-        pgr_use_graphic = TRUE,
-        update_intervall = 2,
-        success_type = "classifier"
-      )
-       }
+            data_folds = input$data_folds,
+            data_val_size = as.double(input$val_size),
+            balance_class_weights = input$balance_class_weights,
+            balance_sequence_length = input$balance_sequence_length,
+            use_sc = input$use_sc,
+            sc_method = input$sc_method,
+            sc_min_k = input$sc_min_max_k[1],
+            sc_max_k = input$sc_min_max_k[2],
+            use_pl = input$use_pl,
+            pl_max_steps = input$pl_max_steps,
+            pl_max = as.double(input$pl_max),
+            pl_anchor = as.double(input$pl_anchor),
+            pl_min = as.double(input$pl_min),
+            # sustain_track = TRUE,
+            sustain_iso_code = input$sustainability_country,
+            # sustain_region = NULL,
+            # sustain_interval = 15,
+            epochs = input$epochs,
+            batch_size = input$batch_size,
+            # dir_checkpoint,
+            # trace=TRUE,
+            # keras_trace=0,
+            # pytorch_trace=0,
+            log_dir = log_dir,
+            log_write_interval = 3,
+            Ns = input$n_sample,
+            Nq = input$n_query,
+            loss_alpha = loss_alpha,
+            loss_margin = loss_margin,
+            embedding_dim = input$protonet_embedding_dim
+          ),
+          log_path = log_path,
+          pgr_use_middle = TRUE,
+          pgr_use_bottom = TRUE,
+          pgr_use_graphic = TRUE,
+          update_intervall = 2,
+          success_type = "classifier"
+        )
+      }
     })
 
     # Display Data Summary------------------------------------------------------
@@ -610,7 +637,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       embeddings <- data_embeddings()
       # shiny::req(embeddings)
       if (!is.null(embeddings)) {
-        ui<-create_data_embeddings_description(embeddings)
+        ui <- create_data_embeddings_description(embeddings)
 
         return(ui)
       } else {
@@ -654,36 +681,72 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Pseudo labeling specific--------------------------------------------------
-    output$dynamic_sample_weights<-shiny::renderUI({
-      ui<-list(
-        shiny::sliderInput(inputId = session$ns("pl_max"),
-                           label = "Max Certainty Value",
-                           value = 1,
-                           max = 1,
-                           min = input$pl_anchor,
-                           step = 0.01),
-        shiny::sliderInput(inputId = session$ns("pl_min"),
-                           label = "Min Certainty Value",
-                           value = 0,
-                           max = input$pl_anchor,
-                           min = 0,
-                           step = 0.01)
+    target_levels_unsorted <- shiny::reactive({
+      if (!is.null(data_targets())) {
+      relevant_data <- data_targets()
+      relevant_data <-relevant_data[input$data_target_column]
+      if (nrow(relevant_data) > 0) {
+        target_levels <- names(table(relevant_data, useNA = "no"))
+        return(target_levels)
+      }else {
+        return(NULL)
+      }
+      } else {
+        return(NULL)
+      }
+    })
+
+    output$output_target_levels <- shiny::renderUI({
+      if (!is.null(target_levels_unsorted())) {
+        return(
+          sortable::rank_list(
+          text = "Please select the order of categories/classes.",
+          labels = target_levels_unsorted(),
+          input_id = session$ns("target_levels"),
+          class=c("default-sortable", "sortable_aifeducation")
+        )
+        )
+      } else {
+        return(NULL)
+      }
+    })
+
+    # Pseudo labeling specific--------------------------------------------------
+    output$dynamic_sample_weights <- shiny::renderUI({
+      ui <- list(
+        shiny::sliderInput(
+          inputId = session$ns("pl_max"),
+          label = "Max Certainty Value",
+          value = 1,
+          max = 1,
+          min = input$pl_anchor,
+          step = 0.01
+        ),
+        shiny::sliderInput(
+          inputId = session$ns("pl_min"),
+          label = "Min Certainty Value",
+          value = 0,
+          max = input$pl_anchor,
+          min = 0,
+          step = 0.01
+        )
       )
       return(ui)
     })
 
-    #Attention specific---------------------------------------------------------
-    output$attention_layers_for_training<-shiny::renderUI({
-      if(input$attention_type=="multihead"){
-        ui<-list(
-          shiny::sliderInput(inputId = session$ns("self_attention_heads"),
-                             label = "Number of Self Attention Heads",
-                             min = 1,
-                             value = 4,
-                             max=48,
-                             step = 1,
-                             round = TRUE)
+    # Attention specific---------------------------------------------------------
+    output$attention_layers_for_training <- shiny::renderUI({
+      if (input$attention_type == "multihead") {
+        ui <- list(
+          shiny::sliderInput(
+            inputId = session$ns("self_attention_heads"),
+            label = "Number of Self Attention Heads",
+            min = 1,
+            value = 4,
+            max = 48,
+            step = 1,
+            round = TRUE
+          )
         )
         return(ui)
       } else {
@@ -840,106 +903,4 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
     #--------------------------------------------------------------------------
   })
-}
-
-check_errors_create_classifier <- function(destination_path,
-                                           folder_name,
-                                           path_to_embeddings,
-                                           path_to_target_data,
-                                           path_to_feature_extractor,
-                                           model_name,
-                                           model_label) {
-  # List for gathering errors
-  error_list <- NULL
-
-  # Destination
-  if (dir.exists(destination_path) == FALSE) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "The target directory does not exist. Please check path."
-    ))
-  }
-
-  if (check_for_empty_input(folder_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Folder name is not set."
-    ))
-  }
-
-
-
-  # Embeddings
-  if (dir.exists(path_to_embeddings) == FALSE) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Directory which should store embeddings does not exist."
-    ))
-  } else {
-    embeddings <- try(load_from_disk(path_to_embeddings), silent = TRUE)
-    if ("try-error" %in% class(embeddings)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        embeddings
-      ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
-      "EmbeddedText" %in% class(embeddings))) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
-        or 'EmbeddedText'."
-      ))
-    }
-  }
-
-  # Target Data
-
-  # FeatureExtractor
-  if (check_for_empty_input(path_to_feature_extractor)==FALSE) {
-    if (dir.exists(path_to_feature_extractor) == FALSE) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Directory which should store the TEFeatureExtractor does not exist."
-      ))
-    } else {
-      feature_extractor <- try(load_from_disk(path_to_feature_extractor), silent = TRUE)
-      if ("try-error" %in% class(feature_extractor)) {
-        error_list[length(error_list) + 1] <- list(shiny::tags$p(
-          feature_extractor
-        ))
-      } else if (!("TEFeatureExtractor" %in% class(feature_extractor))) {
-        error_list[length(error_list) + 1] <- list(shiny::tags$p(
-          "Directory which should contain a feature extractor does not contain an object of class
-          TEFeatureExtractor."
-        ))
-      } else {
-        if (feature_extractor$get_text_embedding_model_name() != embeddings$get_text_embedding_model_name()) {
-          error_list[length(error_list) + 1] <- list(shiny::tags$p(
-            "The TextEmbeddingModel of the TEFeatureExtractor and the provided embeddings
-            are not compatible."
-          ))
-        }
-      }
-    }
-  }
-
-
-  # Model Nane and Model Label
-  if (check_for_empty_input(model_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Name of the classifier ist not set."
-    ))
-  }
-
-  if (check_for_empty_input( model_label)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Label of the classifier ist not set."
-    ))
-  }
-
-  if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
-      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
-        shiny::tags$p(error_list[i])
-      )
-    }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
-  }
 }

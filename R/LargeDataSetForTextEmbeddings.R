@@ -23,9 +23,6 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
   classname = "LargeDataSetForTextEmbeddings",
   inherit = LargeDataSetBase,
   private = list(
-    #dataset based on pyarrow containing the text embeddings for all chunks.
-    embeddings=NA,
-
     #model_name \code{string} Name of the model that generates this embedding.
     model_name=NA,
 
@@ -80,7 +77,23 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
 
     #List containing information on the feature extractor if the embeddings
     #are compressed.
-    feature_extractor=list()
+    feature_extractor=list(),
+
+    #Variable for checking if the object is successfully configured. Only is
+    #this is TRUE the object can be used
+    configured=FALSE,
+
+    #Method for setting configured to TRUE
+    set_configuration_to_TRUE=function(){
+      private$configured=TRUE
+    },
+
+    #Method for checking if the configuration is done successfully
+    check_config_for_TRUE=function(){
+      if(private$configured==FALSE){
+        stop("The object is not configured. Please call the method configure.")
+      }
+    }
   ),
   public = list(
     #'@description Creates a new object representing text embeddings.
@@ -106,7 +119,7 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
     #'@param param_aggregation `string` Aggregation method of the hidden states. Deprecated. Only included
     #'for backward compatibility.
     #'@return The method returns a new object of this class.
-    initialize=function(model_name=NA,
+    configure=function(model_name=NA,
                         model_label=NA,
                         model_date=NA,
                         model_method=NA,
@@ -137,10 +150,23 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       private$param_emb_pool_type=param_emb_pool_type
 
       private$param_aggregation = param_aggregation
+
+      #Finalize configuration
+      private$set_configuration_to_TRUE()
     },
     #-------------------------------------------------------------------------
+    #'@description Method for checking if the model was successfully configured.
+    #'An object can only be used if this value is `TRUE`.
+    #'@return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
+    is_configured=function(){
+      return(private$configured)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting the name (unique id) of the underlying
+    #' text embedding model.
+    #' @return Returns a `string` describing name of the text embedding model.
     get_text_embedding_model_name=function(){
-      return( private$model_name)
+      return(private$model_name)
     },
     #--------------------------------------------------------------------------
     #'@description Method for retrieving information about the model that
@@ -165,10 +191,42 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       return(tmp)
     },
     #--------------------------------------------------------------------------
+    #'@description loads an object of class [LargeDataSetForTextEmbeddings] from disk
+    #'and updates the object to the current version of the package.
+    #'@param dir_path Path where the data set set is stored.
+    #'@return Method does not return anything. It loads an object from disk.
+    load_from_disk=function(dir_path){
+      if(self$is_configured()==TRUE){
+        stop("The object has already been configured. If you would like to add
+             data please create a new object or use one of the following methods:
+             'load', 'add_embeddings_from_array', 'add_embeddings_from_EmbeddedText' or
+             'add_embeddings_from_LargeDataSetForTextEmbeddings'.")
+      }
+
+      #Load R file
+      old_model=load_R_interface(dir_path)
+
+      #Set configuration
+      do.call(
+        what=self$configure,
+        args=old_model$get_model_info())
+
+      #Check for feature extractor and add information
+      if(old_model$is_compressed()==TRUE){
+        do.call(
+          what=self$add_feature_extractor_info,
+          args=old_model$get_feature_extractor_info)
+      }
+
+      #Load data set
+      self$load(dir_path)
+    },
+    #--------------------------------------------------------------------------
     #'@description Method for retrieving the label of the model that
     #'generated this embedding.
     #'@return `string` Label of the corresponding text embedding model
     get_model_label=function(){
+      private$check_config_for_TRUE()
       return(private$transformer_components$ml_framework)
     },
 
@@ -265,6 +323,8 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
     #'@param embedding_array `array` containing the text embeddings.
     #'@return The method does not return anything. It adds new data to the data set.
     add_embeddings_from_array=function(embedding_array){
+      private$check_config_for_TRUE()
+
       if(is.array(embedding_array)==FALSE){
         stop("Input must be an array.")
       }
@@ -308,6 +368,8 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
     #'@param EmbeddedText Object of class [EmbeddedText].
     #'@return The method does not return anything. It adds new data to the data set.
     add_embeddings_from_EmbeddedText=function(EmbeddedText){
+      private$check_config_for_TRUE()
+
       if("EmbeddedText"%in%class(EmbeddedText)==FALSE){
         stop("Input must be an object of class EmbeddedText.")
       }
@@ -355,6 +417,8 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
     #'@param dataset Object of class [LargeDataSetForTextEmbeddings].
     #'@return The method does not return anything. It adds new data to the data set.
     add_embeddings_from_LargeDataSetForTextEmbeddings=function(dataset){
+      private$check_config_for_TRUE()
+
       #Argument Checking
       check_class(dataset,c("LargeDataSetForTextEmbeddings",FALSE))
 
@@ -374,7 +438,10 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
     #'@return LargeDataSetForTextEmbeddings an object of class [EmbeddedText] which is stored in the
     #'memory/RAM.
     convert_to_EmbeddedText=function(){
-      new_data_set=EmbeddedText$new(
+      private$check_config_for_TRUE()
+
+      new_data_set=EmbeddedText$new()
+      new_data_set$configure(
         model_name=private$model_name,
         model_label=private$model_label,
         model_date=private$model_date,

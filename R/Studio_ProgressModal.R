@@ -1,3 +1,24 @@
+#' Create process modal for long running tasks
+#'
+#' Function creates a shiny modal which is used to report the current status of
+#' all long running tasks.
+#'
+#' @param ns `function` for setting the namespace of the input and output elements.
+#' @param title `string` Title of the modal.
+#' @param inc_middle `bool` If `TRUE` includes the middle progress bar.
+#' @param inc_bottom `bool` If `TRUE` includes the bottom progress bar.
+#' @param inc_graphic `bool` If `TRUE` includes a graphic display the development of the loss.
+#' @param easy_close `bool` If `TRUE`, the modal dialog can be dismissed by clicking
+#' outside the dialog box, or be pressing the Escape key. If `FALSE` the modal
+#' must be dismissed by clicking on a modalButton or from a call removeModal on the server.
+#' @param size `string` Size of the modal. Possible are `"m"`, `"s"`, `"l"`, and `"xl"`.
+#' @param message `shiny::tagList` containing the html elements to display on the modal.
+#
+#' @return Returns a shiny modal.
+#'
+#' @family studio_long_tasks
+#' @keywords internal
+#'
 create_process_modal <- function(ns = session$ns,
                                  title = "In progress. Please wait.",
                                  inc_middle = TRUE,
@@ -74,7 +95,26 @@ create_process_modal <- function(ns = session$ns,
 
 
 
-
+#' Starts and monitors a long running task
+#'
+#' This function is supposed to be used as a server function. It contains the
+#' set up of a long running tasks, the creation of a modal, and the reporting of the current
+#' status of the long running task.
+#'
+#' @param id `string` Namespace id for the input and output elements of the modal.
+#' @param ExtendedTask_type `string` Type of the long running task.
+#' @param ExtendedTask_arguments `string` Arguments to set up the long running task.
+#' @param inc_middle `bool` If `TRUE` includes the middle progress bar.
+#' @param inc_bottom `bool` If `TRUE` includes the bottom progress bar.
+#' @param inc_graphic `bool` If `TRUE` includes a graphic display the development of the loss.
+#' @param update_intervall `double` Value greater 0 indicating in which interval the report should be updated. Values in seconds.
+#' @param success_type `string` indicating which type of message should be displayed if the tasks successfully finishes.
+#
+#' @return Return value depends in the `ExtendedTask_type` and `success_type`.
+#'
+#' @family studio_long_tasks
+#' @keywords internal
+#'
 start_and_monitor_long_task <- function(id,
                                         ExtendedTask_type,
                                         ExtendedTask_arguments,
@@ -191,34 +231,36 @@ start_and_monitor_long_task <- function(id,
       {
         plot_data <- progress_bar_status()$loss_data
         if (!is.null(plot_data)) {
-          if (ncol(plot_data) == 4) {
-            data_columns <- c("train", "validation", "test")
-          } else {
-            data_columns <- c("epoch", "validation")
+          if(nrow(plot_data>0)){
+            if (ncol(plot_data) == 4) {
+              data_columns <- c("train", "validation", "test")
+            } else {
+              data_columns <- c("train", "validation")
+            }
+            y_max <- max(plot_data[data_columns])
+            y_min <- min(plot_data[data_columns])
+            plot <- ggplot2::ggplot(data = plot_data) +
+              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +
+              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation, color = "validation"))
+            if (ncol(plot_data) == 4) {
+              plot <- plot + ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test, color = "test"))
+            }
+            plot <- plot +
+              ggplot2::theme_classic() +
+              ggplot2::ylab("loss") +
+              ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
+              ggplot2::xlab("epoch") +
+              ggplot2::scale_color_manual(values = c(
+                "train" = "red",
+                "validation" = "blue",
+                "test" = "darkgreen"
+              )) +
+              ggplot2::theme(
+                text = ggplot2::element_text(size = 12),
+                legend.position = "bottom"
+              )
+            return(plot)
           }
-          y_max <- max(plot_data[data_columns])
-          plot <- ggplot2::ggplot(data = plot_data) +
-            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +
-            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation, color = "validation"))
-          if (ncol(plot_data) == 4) {
-            plot <- plot + ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test, color = "test"))
-          }
-          plot <- plot +
-            ggplot2::theme_classic() +
-            ggplot2::ylab("loss") +
-            ggplot2::coord_cartesian(ylim = c(0, y_max)) +
-            ggplot2::xlab("epoch") +
-            ggplot2::scale_color_manual(values = c(
-              "train" = "red",
-              "validation" = "blue",
-              "test" = "darkgreen"
-            )) +
-            ggplot2::theme(
-              text = ggplot2::element_text(size = 12),
-              legend.position = "bottom"
-            )
-
-          return(plot)
         }
       },
       res = 2 * 72

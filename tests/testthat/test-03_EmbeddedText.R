@@ -22,9 +22,10 @@ load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))
 
 #Start test---------------------------------------------------------------------
 test_that("EmbeddedText - Create",{
-  expect_no_error(EmbeddedText$new(embeddings=imdb_embeddings$embeddings))
+  expect_no_error(EmbeddedText$new())
 
-  expect_no_error(EmbeddedText$new(
+  new_data_set=EmbeddedText$new()
+  expect_no_error(new_data_set$configure(
     model_name=imdb_embeddings$get_model_info()$model_name,
     model_label=imdb_embeddings$get_model_info()$model_label,
     model_date=imdb_embeddings$get_model_info()$model_date,
@@ -45,7 +46,8 @@ test_that("EmbeddedText - Create",{
 
 #Test basic parameters--------------------------------------------------------
 test_that("EmbeddedText - No FeatureExtractor",{
-  new_embedded_text=EmbeddedText$new(
+  new_embedded_text=EmbeddedText$new()
+  new_embedded_text$configure(
     model_name=imdb_embeddings$get_model_info()$model_name,
     model_label=imdb_embeddings$get_model_info()$model_label,
     model_date=imdb_embeddings$get_model_info()$model_date,

@@ -1,4 +1,25 @@
-start_studio_new <- function() {
+#'Aifeducation Studio
+#'
+#'Functions starts a shiny app that represents Aifeducation Studio
+#'
+#'@return This function does nothing return. It is used to start a shiny app.
+#'
+#'@family Graphical User Interface
+#'
+#'@import iotarelr
+#'@importFrom rlang .data
+#'@importFrom stringr str_extract_all
+#'@importFrom stringr str_split_fixed
+#'@importFrom stringr str_to_lower
+#'@importFrom utils packageVersion
+#'@importFrom utils read.csv2
+#'@importFrom utils write.csv2
+#'@importFrom utils askYesNo
+#'@importFrom utils install.packages
+#'@importFrom methods is
+#'
+#'@export
+start_aifeducation_studio <- function() {
 
   #Prepare for studio
   check_and_prepare_for_studio()

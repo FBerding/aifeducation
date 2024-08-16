@@ -1,3 +1,14 @@
+#'Graphical user interface for making predictions with a classifier.
+#'
+#'Functions generates the tab within a page for making predictions with an object of class
+#'[TEClassifierRegular] and [TEClassifierProtoNet].
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_page_classifier_predict
+#'@keywords internal
+#'
 Classifier_Prediction_UI <- function(id) {
   bslib::page_sidebar(
     # Sidebar------------------------------------------------------------------
@@ -57,6 +68,19 @@ bslib::card(
   bslib::card_body()
 )
 
+
+#'Server function for: graphical user interface for making predictions with a classifier.
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param model Model used for inference.
+#'@param volumes `vector` containing a named vector of available volumes.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_page_classifier_predict
+#'@keywords internal
+#'
 Classifier_Prediction_Server <- function(id, model, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
@@ -209,39 +233,4 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
   })
 }
 
-check_errors_predict_classifier <- function(embeddings,
-                                            model) {
-  # List for gathering errors
-  error_list <- NULL
 
-  # Embeddings
-  if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
-    "EmbeddedText" %in% class(embeddings))) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
-        or 'EmbeddedText'."
-    ))
-  }
-
-  # Embeddings compatibilty
-  if (model$get_text_embedding_model_name() != embeddings$get_text_embedding_model_name()) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "The TextEmbeddingModel of the classifier and the TextEmbeddingModel of the provided
-      data are not the same."
-    ))
-  }
-
-
-
-  if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
-      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
-        shiny::tags$p(error_list[i])
-      )
-    }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
-  }
-}

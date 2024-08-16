@@ -39,7 +39,9 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param label `string` Label for the new classifier. Here you can use
     #'free text.
     #'@param text_embeddings An object of class [TextEmbeddingModel] or [LargeDataSetForTextEmbeddings].
-    #'@param targets `factor` containing the target values of the classifier.
+    #' @param target_levels `vector` containing the levels (categories or classes) within the target data.
+    #' Please not that order matters. For ordinal data please ensure that the levels are sorted correctly with
+    #' later levels indicating a higher category/class. For nominal data the order does not matter.
     #'@param feature_extractor Object of class [TEFeatureExtractor] which should be used in
     #'order to reduce the number of dimensions of the text embeddings. If no feature extractor should be
     #'applied set `NULL`.
@@ -74,12 +76,12 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param optimizer `string` `"adam"` or `"rmsprop"` .
     #'@return Returns an object of class [TEClassifierProtoNet] which is ready for
     #'training.
-    initialize=function(ml_framework="pytorch",
+    configure=function(ml_framework="pytorch",
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
                         feature_extractor=NULL,
-                        targets=NULL,
+                       target_levels=NULL,
                         hidden=c(128),
                         rec=c(128),
                         rec_type="gru",
@@ -103,7 +105,7 @@ TEClassifierProtoNet<-R6::R6Class(
       private$check_embeddings_object_type(text_embeddings,strict=TRUE)
       check_type(name,type="string",FALSE)
       check_type(label,type="string",FALSE)
-      check_class(targets,c("factor"),FALSE)
+      check_type(target_levels,c("vector"),FALSE)
       check_type(hidden,"vector",TRUE)
       check_type(rec,"vector",TRUE)
       check_type(self_attention_heads,type="int",FALSE)
@@ -125,76 +127,26 @@ TEClassifierProtoNet<-R6::R6Class(
       #Setting ML Framework
       private$ml_framework=ml_framework
 
-      #Check feature extractor
-      use_fe=FALSE
-      if(!is.null(feature_extractor)){
-        if("TEFeatureExtractor"%in% class(feature_extractor)==FALSE){
-          stop("Object passed to feature_extractor must be an object of class
-               TEFeatureExtractor.")
-        } else {
-          if(feature_extractor$get_ml_framework()!= private$ml_framework){
-            stop("The machine learning framework of the feature extractior and
-                 classifier do not match. Please provide a feature extractor
-                 with the same machine learning framework as the classifier.")
-          } else {
-            if(feature_extractor$is_trained()==TRUE){
-              use_fe=TRUE
-            } else {
-              stop("The supplied feature extractor is not trained. Please
-                provide train and try again.")
-            }
-          }
-        }
-      }
+      # Setting Label and Name
+      private$set_model_info(
+        model_name_root = name,
+        model_id = generate_id(16),
+        label = label,
+        model_date = date()
+      )
 
-      #Setting Label and Name-------------------------------------------------
-      private$model_info$model_name_root=name
-      private$model_info$model_name=paste0(private$model_info$model_name_root,"_ID_",generate_id(16))
-      private$model_info$model_label=label
-
-      #Basic Information of Input and Target Data
-      variable_name_order<-dimnames(text_embeddings$embeddings)[[3]]
-      target_levels_order<-levels(targets)
-
-      model_info=text_embeddings$get_model_info()
-      times=model_info$param_chunks
-      features=text_embeddings$get_features()
-
-      private$text_embedding_model["model"]=list(model_info)
-      private$text_embedding_model["times"]=times
-      private$text_embedding_model["features"]=features
-
-      if(is.null(rec) & self_attention_heads>0){
-        if(features %% 2 !=0){
-          stop("The number of features of the TextEmbeddingmodel is
-               not a multiple of 2.")
-        }
-      }
-
-      if(is.null(intermediate_size)==TRUE){
-        if(attention_type=="fourier" & length(rec)>0){
-          intermediate_size=2*rec[length(rec)]
-        } else if(attention_type=="fourier" & length(rec)==0){
-          intermediate_size=2*features
-        } else if(attention_type=="multihead" & length(rec)>0 & self_attention_heads>0){
-          intermediate_size=2*features
-        } else if(attention_type=="multihead" & length(rec)==0 & self_attention_heads>0){
-          intermediate_size=2*features
-        } else {
-          intermediate_size=NULL
-        }
-      }
-
-      if(use_fe==TRUE){
-        features=feature_extractor$model_config$features
-      } else {
-        features=private$text_embedding_model[["features"]]
-      }
+      # Set TextEmbeddingModel
+      private$set_text_embedding_model(
+        model_info = text_embeddings$get_model_info(),
+        feature_extractor_info = text_embeddings$get_feature_extractor_info(),
+        times = text_embeddings$get_times(),
+        features = text_embeddings$get_features()
+      )
 
       #Saving Configuration
       config=list(
-        use_fe=use_fe,
-        features=features,
+        use_fe=FALSE,
+        features=private$text_embedding_model[["features"]],
         times=private$text_embedding_model[["times"]],
         hidden=hidden,
         rec=rec,
@@ -214,7 +166,12 @@ TEClassifierProtoNet<-R6::R6Class(
         embedding_dim=embedding_dim,
         self_attention_heads=self_attention_heads)
 
-      if(length(target_levels_order)>2){
+      #Basic Information of Input and Target Data
+      variable_name_order<-dimnames(text_embeddings$embeddings)[[3]]
+      config["target_levels"]=list(target_levels)
+      config["n_categories"]=list(length(target_levels))
+      config["input_variables"]=list(variable_name_order)
+      if(length(target_levels)>2){
         #Multi Class
         config["act_fct_last"]="softmax"
         config["err_fct"]="categorical_crossentropy"
@@ -228,37 +185,30 @@ TEClassifierProtoNet<-R6::R6Class(
         config["balanced_metric"]="balanced_accuracy"
       }
 
-      config["target_levels"]=list(target_levels_order)
-      config["n_categories"]=list(length(target_levels_order))
-
       config["require_one_hot"]=list(FALSE)
-
       if(times>1|length(rec)>0|repeat_encoder>0){
         config["require_matrix_map"]=list(FALSE)
       } else {
         config["require_matrix_map"]=list(TRUE)
       }
 
-      config["input_variables"]=list(variable_name_order)
-
       self$model_config=config
 
-      #Create_Model------------------------------------------------------------
+      #Adjust configuration
+      private$adjust_configuration()
+
+      # Set FeatureExtractor and adapt config
+      self$check_feature_extractor_object_type(feature_extractor)
+      private$set_feature_extractor(feature_extractor)
+
+      # Set package versions
+      private$set_package_versions()
+
+      # Finalize configuration
+      private$set_configuration_to_TRUE()
+
+      # Create_Model
       private$create_reset_model()
-      if(self$model_config$use_fe==TRUE){
-        self$feature_extractor=feature_extractor$clone(deep=TRUE)
-        #private$check_feature_extractor()
-      }
-
-      private$model_info$model_date=date()
-
-      private$r_package_versions$aifeducation<-packageVersion("aifeducation")
-      private$r_package_versions$reticulate<-packageVersion("reticulate")
-
-      private$py_package_versions$tensorflow<-tf$version$VERSION
-      private$py_package_versions$torch<-torch["__version__"]
-      private$py_package_versions$keras<-keras["__version__"]
-      private$py_package_versions$numpy<-np$version$short_version
     },
 
     #-------------------------------------------------------------------------
@@ -320,6 +270,10 @@ TEClassifierProtoNet<-R6::R6Class(
     #'@param dir_checkpoint `string` Path to the directory where
     #'the checkpoint during training should be saved. If the directory does not
     #'exist, it is created.
+    #'@param log_dir `string` Path to the directory where the log files should be saved.
+    #'If no logging is desired set this argument to `NULL`.
+    #'@param log_write_interval `int` Time in seconds determining the interval in which
+    #'the logger should try to update the log files. Only relevant if `log_dir` is not `NULL`.
     #'@param trace `bool` `TRUE`, if information about the estimation
     #'phase should be printed to the console.
     #'@param keras_trace `int` `keras_trace=0` does not print any
@@ -400,6 +354,7 @@ TEClassifierProtoNet<-R6::R6Class(
       if(is.null(names(data_targets))){
         stop("data_targets must be a named factor.")
       }
+      data_targets=private$check_and_adjust_target_levels(data_targets)
 
       if(pl_anchor<pl_min){
         stop("pl_anchor must be at least pl_min.")
@@ -786,6 +741,7 @@ TEClassifierProtoNet<-R6::R6Class(
     },
     #--------------------------------------------------------------------------
     create_reset_model=function(){
+      private$check_config_for_TRUE()
       if(private$ml_framework=="tensorflow"){
 
         #Load custom layers

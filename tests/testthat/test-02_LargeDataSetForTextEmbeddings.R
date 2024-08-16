@@ -19,7 +19,9 @@ load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))
 test_that("LargeDataSetForTextEmbeddings - Create",{
   expect_no_error(LargeDataSetForTextEmbeddings$new())
 
-  expect_no_error(LargeDataSetForTextEmbeddings$new(
+  data_set=LargeDataSetForTextEmbeddings$new()
+
+  expect_no_error(data_set$configure(
     model_name=imdb_embeddings$get_model_info()$model_name,
     model_label=imdb_embeddings$get_model_info()$model_label,
     model_date=imdb_embeddings$get_model_info()$model_date,
@@ -39,7 +41,8 @@ test_that("LargeDataSetForTextEmbeddings - Create",{
 
 #Test basic parameters--------------------------------------------------------
 test_that("LargeDataSetForTextEmbeddings - No FeatureExtractor",{
-  new_dataset=LargeDataSetForTextEmbeddings$new(
+  new_dataset=LargeDataSetForTextEmbeddings$new()
+  new_dataset$configure(
     model_name=imdb_embeddings$get_model_info()$model_name,
     model_label=imdb_embeddings$get_model_info()$model_label,
     model_date=imdb_embeddings$get_model_info()$model_date,
@@ -108,7 +111,8 @@ test_that("LargeDataSetForTextEmbeddings - Method Save and Load",{
   folder_name=generate_id()
   load_path=paste0(save_path,"/",folder_name)
 
-  new_dataset=LargeDataSetForTextEmbeddings$new(
+  new_dataset=LargeDataSetForTextEmbeddings$new()
+  new_dataset$configure(
     model_name=imdb_embeddings$get_model_info()$model_name,
     model_label=imdb_embeddings$get_model_info()$model_label,
     model_date=imdb_embeddings$get_model_info()$model_date,
@@ -140,7 +144,8 @@ test_that("LargeDataSetForTextEmbeddings - Function Save and Load",{
   folder_name=generate_id()
   load_path=paste0(save_path,"/",folder_name)
 
-  new_dataset=LargeDataSetForTextEmbeddings$new(
+  new_dataset=LargeDataSetForTextEmbeddings$new()
+  new_dataset$configure(
     model_name=imdb_embeddings$get_model_info()$model_name,
     model_label=imdb_embeddings$get_model_info()$model_label,
     model_date=imdb_embeddings$get_model_info()$model_date,

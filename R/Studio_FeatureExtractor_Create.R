@@ -1,3 +1,13 @@
+#'Graphical user interface for feature extractors - create
+#'
+#'Functions generates the page for a creating a new [TEFeatureExtractor].
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_page_feature_extractor_create
+#'@keywords internal
+#'
 FeatureExtractors_Create_UI <- function(id) {
   tagList(
     bslib::page_sidebar(
@@ -120,6 +130,19 @@ FeatureExtractors_Create_UI <- function(id) {
   )
 }
 
+
+#'Server function for: graphical user interface for feature extractors - create
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param log_dir `string` Path to the directory where the log files should be stored.
+#'@param volumes `vector` containing a named vector of available volumes.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_page_feature_extractor_create
+#'@keywords internal
+#'
 FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
@@ -265,81 +288,4 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   })
 }
 
-check_errors_create_feature_extractor <- function(destination_path,
-                                           folder_name,
-                                           path_to_embeddings,
-                                           features,
-                                           model_name,
-                                           model_label) {
-  # List for gathering errors
-  error_list <- NULL
 
-  # Destination
-  if (dir.exists(destination_path) == FALSE) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "The target directory does not exist. Please check path."
-    ))
-  }
-
-  if (check_for_empty_input(folder_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Folder name is not set."
-    ))
-  }
-
-
-
-  # Embeddings
-  if (dir.exists(path_to_embeddings) == FALSE) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Directory which should store embeddings does not exist."
-    ))
-  } else {
-    embeddings <- try(load_from_disk(path_to_embeddings), silent = TRUE)
-    if ("try-error" %in% class(embeddings)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        embeddings
-      ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
-      "EmbeddedText" %in% class(embeddings))) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
-        or 'EmbeddedText'."
-      ))
-    } else {
-      if(embeddings$get_original_features()<=features){
-        error_list[length(error_list) + 1] <- list(shiny::tags$p(
-          paste("Target dimension is",features,". This value must be smaller
-                as the orignal number of features which is",embeddings$get_original_features(),".")
-        ))
-      }
-    }
-  }
-
-
-
-  # Model Name and Model Label
-  if (check_for_empty_input(model_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Name of the classifier ist not set."
-    ))
-  }
-
-  if (check_for_empty_input(model_label)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Label of the classifier ist not set."
-    ))
-  }
-
-  if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
-      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
-        shiny::tags$p(error_list[i])
-      )
-    }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
-  }
-}

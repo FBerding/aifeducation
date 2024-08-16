@@ -1,3 +1,13 @@
+#'Graphical user interface for text embedding models - use
+#'
+#'Functions generates the page for using a [TextEmbeddingModel].
+#'
+#'@param id `string` determining the id for the namespace.
+#'@return This function does nothing return. It is used to build a page for a shiny app.
+#'
+#'@family studio_gui_page_text_embedding_model_use
+#'@keywords internal
+#'
 TextEmbeddingModel_Use_UI <- function(id) {
   tagList(
     bslib::page_sidebar(
@@ -40,6 +50,18 @@ TextEmbeddingModel_Use_UI <- function(id) {
   )
 }
 
+#'Server function for: graphical user interface for text embedding models - use
+#'
+#'Functions generates the functionality of a page on the server.
+#'
+#'@param id `string` determining the id for the namespace.
+#'@param log_dir `string` Path to the directory where the log files should be stored.
+#'@param volumes `vector` containing a named vector of available volumes.
+#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#'
+#'@family studio_gui_page_text_embedding_model_use
+#'@keywords internal
+#'
 TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------

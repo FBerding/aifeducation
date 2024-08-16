@@ -76,7 +76,23 @@ EmbeddedText<-R6::R6Class(
 
     #List containing information on the feature extractor if the embeddings
     #are compressed.
-    feature_extractor=list()
+    feature_extractor=list(),
+
+    #Variable for checking if the object is successfully configured. Only is
+    #this is TRUE the object can be used
+    configured=FALSE,
+
+    #Method for setting configured to TRUE
+    set_configuration_to_TRUE=function(){
+      private$configured=TRUE
+    },
+
+    #Method for checking if the configuration is done successfully
+    check_config_for_TRUE=function(){
+      if(private$configured==FALSE){
+        stop("The object is not configured. Please call the method configure.")
+      }
+    }
   ),
   public = list(
     #'@field embeddings ('data.frame()')\cr
@@ -107,7 +123,7 @@ EmbeddedText<-R6::R6Class(
     #'@param embeddings `data.frame` containing the text embeddings.
     #'@return Returns an object of class [EmbeddedText] which stores the
     #'text embeddings produced by an objects of class [TextEmbeddingModel].
-    initialize=function(model_name=NA,
+    configure=function(model_name=NA,
                         model_label=NA,
                         model_date=NA,
                         model_method=NA,
@@ -141,6 +157,35 @@ EmbeddedText<-R6::R6Class(
       private$param_aggregation = param_aggregation
 
       self$embeddings=embeddings
+    },
+    #--------------------------------------------------------------------------
+    #'@description loads an object of class [EmbeddedText] from disk
+    #'and updates the object to the current version of the package.
+    #'@param dir_path Path where the data set set is stored.
+    #'@return Method does not return anything. It loads an object from disk.
+    load_from_disk=function(dir_path){
+      if(self$is_configured()==TRUE){
+        stop("The object has already been configured.")
+      }
+
+      #Load R file
+      old_model=load_R_interface(dir_path)
+
+      #Set arguments
+      args=old_model$get_model_info()
+      args$embeddings=old_model$embeddings
+
+      #Set configuration
+      do.call(
+        what=self$configure,
+        args=old_model$get_model_info())
+
+      #Check for feature extractor and add information
+      if(old_model$is_compressed==TRUE){
+        do.call(
+          what=self$add_feature_extractor_info,
+          args=old_model$get_feature_extractor_info)
+      }
     },
     #--------------------------------------------------------------------------
     #'@description Method for retrieving information about the model that
@@ -245,7 +290,6 @@ EmbeddedText<-R6::R6Class(
         optimizer=optimizer
       )
     },
-
     #--------------------------------------------------------------------------
     #'@description Method for receiving information on the [feature extractor][TEFeatureExtractor] that
     #'was used to reduce the number of dimensions of the text embeddings.
@@ -264,7 +308,8 @@ EmbeddedText<-R6::R6Class(
     #'@return Returns an object of class [LargeDataSetForTextEmbeddings] which uses memory mapping
     #'allowing to work with large data sets.
     convert_to_LargeDataSetForTextEmbeddings=function(){
-      new_data_set=LargeDataSetForTextEmbeddings$new(
+      new_data_set=LargeDataSetForTextEmbeddings$new()
+      new_data_set$configure(
         model_name=private$model_name,
         model_label=private$model_label,
         model_date=private$model_date,

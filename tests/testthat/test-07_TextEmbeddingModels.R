@@ -82,7 +82,8 @@ for(framework in ml_frameworks){
         for(min_layer in 1:max_layer){
 
           #Create Model
-          text_embedding_model<-TextEmbeddingModel$new(
+          text_embedding_model<-TextEmbeddingModel$new()
+          text_embedding_model$configure(
             model_name=paste0(base_model,"_embedding"),
             model_label=paste0("Text Embedding via",base_model),
             model_version="0.0.1",

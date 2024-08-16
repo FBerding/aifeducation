@@ -12,12 +12,11 @@ write_log <- function(log_file,
                       write_interval = 2) {
   if (!is.null(log_file)) {
     if (value_top == total_top |
-        value_middle == total_middle |
-        value_bottom == total_bottom |
-        value_top == 1 |
-        value_middle == 1 |
-        value_bottom == 1) {
-
+      value_middle == total_middle |
+      value_bottom == total_bottom |
+      value_top == 1 |
+      value_middle == 1 |
+      value_bottom == 1) {
       log_data <- rbind(
         c(value_top, total_top, message_top),
         c(value_middle, total_middle, message_middle),
@@ -104,12 +103,14 @@ reset_log <- function(log_path) {
   }
 }
 
-read_loss_log=function(path_loss){
+read_loss_log <- function(path_loss) {
   if (file.exists(path_loss)) {
     loss_data <- try(
-      read.table(file = path_loss,
-                 sep=",",
-               header =  FALSE),
+      read.table(
+        file = path_loss,
+        sep = ",",
+        header = FALSE
+      ),
       silent = TRUE
     )
     if ("try-error" %in% class(loss_data)) {
@@ -122,8 +123,13 @@ read_loss_log=function(path_loss){
         colnames(loss_data) <- c("train", "validation")
       }
       loss_data <- as.data.frame(loss_data)
-      for(i in 1:ncol(loss_data)){
-        loss_data[,i]<-as.numeric(loss_data[,i])
+      for (i in 1:ncol(loss_data)) {
+        loss_data[, i] <- as.numeric(loss_data[, i])
+        loss_data[, i] <- replace(
+          x = loss_data[, i],
+          list = (loss_data[, i] == -100),
+          values = NA
+        )
       }
       loss_data$epoch <- seq.int(
         from = 1,
@@ -137,18 +143,22 @@ read_loss_log=function(path_loss){
   return(loss_data)
 }
 
-reset_loss_log <- function(log_path,epochs) {
+reset_loss_log <- function(log_path, epochs) {
   log_data <- rbind(
-rep(-100,times=epochs),
-rep(-100,times=epochs),
-rep(-100,times=epochs)
+    rep(-100, times = epochs),
+    rep(-100, times = epochs),
+    rep(-100, times = epochs)
   )
 
   if (!is.null(log_path)) {
-    try(write.table(x = log_data, file = log_path,
-                  row.names = FALSE,
-                  col.names=FALSE,
-                  sep=","),
-        silent = TRUE)
+    try(
+      write.table(
+        x = log_data, file = log_path,
+        row.names = FALSE,
+        col.names = FALSE,
+        sep = ","
+      ),
+      silent = TRUE
+    )
   }
 }

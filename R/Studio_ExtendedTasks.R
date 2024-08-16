@@ -123,6 +123,7 @@ long_classifier <- function(classifier_type,
                             folder_name,
                             path_to_embeddings,
                             path_to_target_data,
+                            target_levels,
                             path_to_feature_extractor,
                             target_data_column,
                             name,
@@ -202,13 +203,14 @@ long_classifier <- function(classifier_type,
 
     if (classifier_type == "regular") {
       # Create Classifier
-      classifier <- TEClassifierRegular$new(
+      classifier <- TEClassifierRegular$new()
+      classifier$configure(
         ml_framework = "pytorch",
         name = name,
         label = label,
         text_embeddings = embeddings,
         feature_extractor = feature_extractor,
-        targets = target_data,
+        target_levels = target_levels,
         hidden = hidden,
         rec = rec,
         rec_type = rec_type,
@@ -257,14 +259,15 @@ long_classifier <- function(classifier_type,
       )
     } else if (classifier_type == "protonet") {
       # Create
-      classifier <- TEClassifierProtoNet$new(
-        ml_framework="pytorch",
+      classifier <- TEClassifierProtoNet$new()
+      classifier$configure(
+        ml_framework = "pytorch",
         embedding_dim = embedding_dim,
         name = name,
         label = label,
         text_embeddings = embeddings,
         feature_extractor = feature_extractor,
-        targets = target_data,
+        target_levels = target_levels,
         hidden = hidden,
         rec = rec,
         rec_type = rec_type,
@@ -371,22 +374,21 @@ get_arguments_extended_task_TEClassifierRegular <- function() {
   ))
 }
 
-long_feature_extractor=function(name ,
-                                label ,
-                                features,
-                                method,
-                                noise_factor,
-                                optimizer,
-                                data_val_size,
-                                epochs,
-                                batch_size,
-                                sustain_iso_code ,
-                                log_dir ,
-                                log_write_interval,
-                                path_to_embeddings,
-                                destination_path,
-                                folder_name){
-
+long_feature_extractor <- function(name,
+                                   label,
+                                   features,
+                                   method,
+                                   noise_factor,
+                                   optimizer,
+                                   data_val_size,
+                                   epochs,
+                                   batch_size,
+                                   sustain_iso_code,
+                                   log_dir,
+                                   log_write_interval,
+                                   path_to_embeddings,
+                                   destination_path,
+                                   folder_name) {
   promises::future_promise({
     # Load data
     embeddings <- load_from_disk(path_to_embeddings)
@@ -407,35 +409,36 @@ long_feature_extractor=function(name ,
       dir.create(dir_checkpoints)
     }
 
-    #Create
-       feature_extractor=TEFeatureExtractor$new(
-     ml_framework="pytorch",
-     name=name,
-     label=label,
-     text_embeddings=embeddings,
-     features=features,
-     method=method,
-     noise_factor=noise_factor,
-     optimizer=optimizer
-   )
+    # Create
+    feature_extractor <- TEFeatureExtractor$new()
+    feature_extractor$configure(
+      ml_framework = "pytorch",
+      name = name,
+      label = label,
+      text_embeddings = embeddings,
+      features = features,
+      method = method,
+      noise_factor = noise_factor,
+      optimizer = optimizer
+    )
 
-       #Train
-       feature_extractor$train(
-         data_embeddings=embeddings,
-         data_val_size=data_val_size,
-         sustain_track=TRUE,
-         sustain_iso_code=sustain_iso_code,
-         sustain_region=NULL,
-         sustain_interval=15,
-         epochs=epochs,
-         batch_size=batch_size,
-         dir_checkpoint=dir_checkpoints,
-         trace=FALSE,
-         keras_trace=0,
-         pytorch_trace=0,
-         log_dir = log_dir,
-         log_write_interval = log_write_interval
-       )
+    # Train
+    feature_extractor$train(
+      data_embeddings = embeddings,
+      data_val_size = data_val_size,
+      sustain_track = TRUE,
+      sustain_iso_code = sustain_iso_code,
+      sustain_region = NULL,
+      sustain_interval = 15,
+      epochs = epochs,
+      batch_size = batch_size,
+      dir_checkpoint = dir_checkpoints,
+      trace = FALSE,
+      keras_trace = 0,
+      pytorch_trace = 0,
+      log_dir = log_dir,
+      log_write_interval = log_write_interval
+    )
 
     # Save
     save_to_disk(
@@ -447,5 +450,4 @@ long_feature_extractor=function(name ,
     # Returns message
     return("TEFeatureExtractor trained.")
   })
-
 }
