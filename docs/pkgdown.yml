@@ -1,10 +1,12 @@
-pandoc: 3.1.1
-pkgdown: 2.0.7
+pandoc: 3.1.11
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   aifeducation: aifeducation.html
   classification_tasks: classification_tasks.html
   gui_aife_studio: gui_aife_studio.html
   sharing_and_publishing: sharing_and_publishing.html
-last_built: 2024-04-12T07:22Z
-
+last_built: 2024-08-16T08:18Z
+urls:
+  reference: https://fberding.github.io/aifeducation/reference
+  article: https://fberding.github.io/aifeducation/articles

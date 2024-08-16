@@ -1,189 +1,106 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/articles/aifeducation.html</loc>
-  </url>
-  <url>
-    <loc>/articles/classification_tasks.html</loc>
-  </url>
-  <url>
-    <loc>/articles/gui_aife_studio.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/sharing_and_publishing.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/AifeducationConfiguration.html</loc>
-  </url>
-  <url>
-    <loc>/reference/aifeducation_config.html</loc>
-  </url>
-  <url>
-    <loc>/reference/array_to_matrix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bow_pp_create_basic_text_rep.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bow_pp_create_vocab_draft.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calc_standard_classification_measures.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_aif_py_modules.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_embedding_models.html</loc>
-  </url>
-  <url>
-    <loc>/reference/clean_pytorch_log_transformers.html</loc>
-  </url>
-  <url>
-    <loc>/reference/combine_embeddings.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_bert_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_deberta_v2_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_funnel_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_iota2_mean_object.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_longformer_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_roberta_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_synthetic_units.html</loc>
-  </url>
-  <url>
-    <loc>/reference/EmbeddedText.html</loc>
-  </url>
-  <url>
-    <loc>/reference/generate_id.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_coder_metrics.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_folds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_n_chunks.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_stratified_train_test_split.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_synthetic_cases.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_train_test_split.html</loc>
-  </url>
-  <url>
-    <loc>/reference/imdb_movie_reviews.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/install_py_modules.html</loc>
-  </url>
-  <url>
-    <loc>/reference/is.null_or_na.html</loc>
-  </url>
-  <url>
-    <loc>/reference/load_ai_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/matrix_to_array_c.html</loc>
-  </url>
-  <url>
-    <loc>/reference/save_ai_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/set_config_cpu_only.html</loc>
-  </url>
-  <url>
-    <loc>/reference/set_config_gpu_low_memory.html</loc>
-  </url>
-  <url>
-    <loc>/reference/set_config_os_environ_logger.html</loc>
-  </url>
-  <url>
-    <loc>/reference/set_config_tf_logger.html</loc>
-  </url>
-  <url>
-    <loc>/reference/set_transformers_logger.html</loc>
-  </url>
-  <url>
-    <loc>/reference/split_labeled_unlabeled.html</loc>
-  </url>
-  <url>
-    <loc>/reference/start_aifeducation_studio.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summarize_tracked_sustainability.html</loc>
-  </url>
-  <url>
-    <loc>/reference/test_classifier_sustainability.html</loc>
-  </url>
-  <url>
-    <loc>/reference/test_metric_mean.html</loc>
-  </url>
-  <url>
-    <loc>/reference/TextEmbeddingClassifierNeuralNet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/TextEmbeddingModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/to_categorical_c.html</loc>
-  </url>
-  <url>
-    <loc>/reference/train_tune_bert_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/train_tune_deberta_v2_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/train_tune_funnel_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/train_tune_longformer_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/train_tune_roberta_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update_aifeducation_progress_bar.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update_aifeducation_progress_bar_epochs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/update_aifeducation_progress_bar_steps.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://fberding.github.io/aifeducation/404.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/articles/aifeducation.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/articles/classification_tasks.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/articles/gui_aife_studio.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/articles/index.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/authors.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/index.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/news/index.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/AifeducationConfiguration.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/aifeducation_config.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/AIFETrType.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/aife_transformer_maker.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/array_to_matrix.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Bert_like.SFC.calculate_vocab.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Bert_like.SFC.create_final_tokenizer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Bert_like.SFC.create_tokenizer_draft.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Bert_like.SFC.save_tokenizer_draft.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/bow_pp_create_basic_text_rep.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/bow_pp_create_vocab_draft.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/calc_standard_classification_measures.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.hidden_act.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.max_position_embeddings.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.ml_framework.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.model_files.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.possible_save_formats.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.sustain_iso_code.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check.vocab_raw_texts.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check_aif_py_modules.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/check_embedding_models.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/clean_pytorch_log_transformers.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/combine_embeddings.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_bert_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_ByteLevelBPE_tokenizer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_data_collator.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_deberta_v2_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_dir.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_funnel_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_iota2_mean_object.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_longformer_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_roberta_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_synthetic_units.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/create_WordPiece_tokenizer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/dot-AIFEBaseTransformer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/dot-AIFEBertTransformer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/dot-AIFEDebertaTransformer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/dot-AIFEFunnelTransformer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/dot-AIFELongformerTransformer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/dot-AIFERobertaTransformer.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/EmbeddedText.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/generate_id.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/get_coder_metrics.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/get_folds.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/get_n_chunks.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/get_stratified_train_test_split.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/get_synthetic_cases.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/get_train_test_split.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/imdb_movie_reviews.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/increment_aife_progress_bar.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/index.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/install_py_modules.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/is.null_or_na.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/is_shinyapp_active.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/load_ai_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Longformer_like.SFC.calculate_vocab.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Longformer_like.SFC.create_tokenizer_draft.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/Longformer_like.SFC.save_tokenizer_draft.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/matrix_to_array_c.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_create_bert_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_create_deberta_v2_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_create_funnel_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_create_longformer_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_create_roberta_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_train_tune_bert_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_train_tune_deberta_v2_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_train_tune_funnel_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_train_tune_longformer_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/o_train_tune_roberta_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/print_message.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/run_py_file.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/save_ai_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/set_config_cpu_only.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/set_config_gpu_low_memory.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/set_config_os_environ_logger.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/set_config_tf_logger.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/set_transformers_logger.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/split_labeled_unlabeled.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/start_aifeducation_studio.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/summarize_tracked_sustainability.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/test_classifier_sustainability.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/test_metric_mean.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/TextEmbeddingClassifierNeuralNet.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/TextEmbeddingModel.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/to_categorical_c.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/train_tune_bert_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/train_tune_deberta_v2_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/train_tune_funnel_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/train_tune_longformer_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/train_tune_roberta_model.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/update_aifeducation_progress_bar.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/update_aifeducation_progress_bar_epochs.html</loc></url>
+<url><loc>https://fberding.github.io/aifeducation/reference/update_aifeducation_progress_bar_steps.html</loc></url>
 </urlset>
+
