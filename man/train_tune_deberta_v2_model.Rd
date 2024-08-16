@@ -5,7 +5,7 @@
 \title{Function for training and fine-tuning a DeBERTa-V2 model}
 \usage{
 train_tune_deberta_v2_model(
-  ml_framework = aifeducation_config$get_framework(),
+  ml_framework = aifeducation_config$get_framework()[1],
   output_dir,
   model_dir_path,
   raw_texts,
@@ -32,24 +32,26 @@ train_tune_deberta_v2_model(
 }
 \arguments{
 \item{ml_framework}{\code{string} Framework to use for training and inference.
-\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
-for 'pytorch'.}
+\itemize{
+\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
+\item \code{ml_framework = "pytorch"}: for 'pytorch'.
+}}
 
-\item{output_dir}{\code{string} Path to the directory where the final model
-should be saved. If the directory does not exist, it will be created.}
+\item{output_dir}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be created.}
 
-\item{model_dir_path}{\code{string} Path to the directory where the original
-model is stored.}
+\item{model_dir_path}{\code{string} Path to the directory where the original model is stored.}
 
 \item{raw_texts}{\code{vector} containing the raw texts for training.}
 
-\item{p_mask}{\code{double} Ratio determining the number of words/tokens for masking.}
+\item{p_mask}{\code{double} Ratio that determines the number of words/tokens used for masking.}
 
-\item{whole_word}{\code{bool} \code{TRUE} if whole word masking should be applied.
-If \code{FALSE} token masking is used.}
+\item{whole_word}{\code{bool}
+\itemize{
+\item \code{TRUE}: whole word masking should be applied.
+\item \code{FALSE}: token masking is used.
+}}
 
-\item{val_size}{\code{double} Ratio determining the amount of token chunks used for
-validation.}
+\item{val_size}{\code{double} Ratio that determines the amount of token chunks used for validation.}
 
 \item{n_epoch}{\code{int} Number of epochs for training.}
 
@@ -57,74 +59,59 @@ validation.}
 
 \item{chunk_size}{\code{int} Size of every chunk for training.}
 
-\item{full_sequences_only}{\code{bool} \code{TRUE} for using only chunks
-with a sequence length equal to \code{chunk_size}.}
+\item{full_sequences_only}{\code{bool} \code{TRUE} for using only chunks with a sequence length equal to \code{chunk_size}.}
 
-\item{min_seq_len}{\code{int} Only relevant if \code{full_sequences_only=FALSE}.
-Value determines the minimal sequence length for inclusion in training process.}
+\item{min_seq_len}{\code{int} Only relevant if \code{full_sequences_only = FALSE}. Value determines the minimal sequence length included in
+training process.}
 
-\item{learning_rate}{\code{bool} Learning rate for adam optimizer.}
+\item{learning_rate}{\code{double} Learning rate for adam optimizer.}
 
-\item{n_workers}{\code{int} Number of workers. Only relevant if \code{ml_framework="tensorflow"}.}
+\item{n_workers}{\code{int} Number of workers. Only relevant if \code{ml_framework = "tensorflow"}.}
 
-\item{multi_process}{\code{bool} \code{TRUE} if multiple processes should be activated.
-Only relevant if \code{ml_framework="tensorflow"}.}
+\item{multi_process}{\code{bool} \code{TRUE} if multiple processes should be activated. Only relevant if \code{ml_framework = "tensorflow"}.}
 
-\item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked
-during training via the python library codecarbon.}
+\item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library codecarbon.}
 
-\item{sustain_iso_code}{\code{string} ISO code (Alpha-3-Code) for the country. This variable
-must be set if sustainability should be tracked. A list can be found on
-Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+\item{sustain_iso_code}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
+list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{sustain_region}{Region within a country. Only available for USA and
-Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}}
+\item{sustain_region}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
-\item{sustain_interval}{\code{integer} Interval in seconds for measuring power
-usage.}
+\item{sustain_interval}{\code{integer} Interval in seconds for measuring power usage.}
 
-\item{trace}{\code{bool} \code{TRUE} if information on the progress should be printed
-to the console.}
+\item{trace}{\code{bool} \code{TRUE} if information about the progress should be printed to the console.}
 
-\item{keras_trace}{\code{int} \code{keras_trace=0} does not print any
-information about the training process from keras on the console.
-\code{keras_trace=1} prints a progress bar. \code{keras_trace=2} prints
-one line of information for every epoch. Only relevant if \code{ml_framework="tensorflow"}.}
+\item{keras_trace}{\code{int}
+\itemize{
+\item \code{keras_trace = 0}: does not print any information about the training process from keras on the console.
+\item \code{keras_trace = 1}: prints a progress bar.
+\item \code{keras_trace = 2}: prints one line of information for every epoch. Only relevant if \code{ml_framework = "tensorflow"}.
+}}
 
-\item{pytorch_trace}{\code{int} \code{pytorch_trace=0} does not print any
-information about the training process from pytorch on the console.
-\code{pytorch_trace=1} prints a progress bar.}
+\item{pytorch_trace}{\code{int}
+\itemize{
+\item \code{pytorch_trace = 0}: does not print any information about the training process from pytorch on the console.
+\item \code{pytorch_trace = 1}: prints a progress bar.
+}}
 
-\item{pytorch_safetensors}{\code{bool} If \code{TRUE} a 'pytorch' model
-is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
-it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.}
+\item{pytorch_safetensors}{\code{bool} Only relevant for pytorch models.
+\itemize{
+\item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
+\item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
+}}
 }
 \value{
-This function does not return an object. Instead the trained or fine-tuned
-model is saved to disk.
+This function does not return an object. Instead the trained or fine-tuned model is saved to disk.
 }
 \description{
-This function can be used to train or fine-tune a transformer
-based on DeBERTa-V2 architecture with the help of the python libraries 'transformers',
-'datasets', and 'tokenizers'.
-}
-\note{
-Pre-Trained models which can be fine-tuned with this function are available
-at \url{https://huggingface.co/}. New models can be created via the function
-\link{create_deberta_v2_model}.
+This function is deprecated. Please use instead \code{aife_transformer_maker$make("deberta_v2")$train()}.
 
-Training of this model makes use of dynamic masking.
-}
-\references{
-He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT
-with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
-
-Hugging Face Documentation
-\url{https://huggingface.co/docs/transformers/model_doc/deberta-v2#debertav2}
+See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFEDebertaTransformer} classes for
+details.
 }
 \seealso{
-Other Transformer: 
+Other Deprecated transformer: 
 \code{\link{create_bert_model}()},
 \code{\link{create_deberta_v2_model}()},
 \code{\link{create_funnel_model}()},
@@ -135,4 +122,4 @@ Other Transformer:
 \code{\link{train_tune_longformer_model}()},
 \code{\link{train_tune_roberta_model}()}
 }
-\concept{Transformer}
+\concept{Deprecated transformer}

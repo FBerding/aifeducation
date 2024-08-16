@@ -1,4 +1,4 @@
-url: ~
+url: https://fberding.github.io/aifeducation/
 template:
   bootstrap: 5
 
@@ -39,6 +39,9 @@ reference:
 - title: Transformer
 - contents:
   - has_concept("Transformer")
+- subtitle: Deprecated transformer
+- contents:
+  - has_concept("Deprecated transformer")
 
 - title: Text Embedding
 - contents:
@@ -56,5 +59,9 @@ reference:
 - contents:
   - has_concept("Auxiliary GUI Functions")
 
+- title: For developers
 
+- subtitle: Transformers
+- contents:
+  - has_concept("Transformers for developers")
 

@@ -5,7 +5,7 @@
 \title{Function for creating a new transformer based on DeBERTa-V2}
 \usage{
 create_deberta_v2_model(
-  ml_framework = aifeducation_config$get_framework(),
+  ml_framework = aifeducation_config$get_framework()[1],
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 128100,
@@ -28,85 +28,67 @@ create_deberta_v2_model(
 }
 \arguments{
 \item{ml_framework}{\code{string} Framework to use for training and inference.
-\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
-for 'pytorch'.}
+\itemize{
+\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
+\item \code{ml_framework = "pytorch"}: for 'pytorch'.
+}}
 
 \item{model_dir}{\code{string} Path to the directory where the model should be saved.}
 
-\item{vocab_raw_texts}{\code{vector} containing the raw texts for creating the
-vocabulary.}
+\item{vocab_raw_texts}{\code{vector} containing the raw texts for creating the vocabulary.}
 
 \item{vocab_size}{\code{int} Size of the vocabulary.}
 
-\item{do_lower_case}{\code{bool} If \code{TRUE} all characters are transformed to lower case.}
+\item{do_lower_case}{\code{bool} \code{TRUE} if all words/tokens should be lower case.}
 
-\item{max_position_embeddings}{\code{int} Number of maximal position embeddings. This parameter
-also determines the maximum length of a sequence which can be processed with the model.}
+\item{max_position_embeddings}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
+can be processed with the model.}
 
-\item{hidden_size}{\code{int} Number of neurons in each layer. This parameter determines the
-dimensionality of the resulting text embedding.}
+\item{hidden_size}{\code{int} Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
+embedding.}
 
 \item{num_hidden_layer}{\code{int} Number of hidden layers.}
 
 \item{num_attention_heads}{\code{int} Number of attention heads.}
 
-\item{intermediate_size}{\code{int} Number of neurons in the intermediate layer of
-the attention mechanism.}
+\item{intermediate_size}{\code{int} Number of neurons in the intermediate layer of the attention mechanism.}
 
-\item{hidden_act}{\code{string} name of the activation function.}
+\item{hidden_act}{\code{string} Name of the activation function.}
 
 \item{hidden_dropout_prob}{\code{double} Ratio of dropout.}
 
-\item{attention_probs_dropout_prob}{\code{double} Ratio of dropout for attention
-probabilities.}
+\item{attention_probs_dropout_prob}{\code{double} Ratio of dropout for attention probabilities.}
 
-\item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked
-during training via the python library codecarbon.}
+\item{sustain_track}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library codecarbon.}
 
-\item{sustain_iso_code}{\code{string} ISO code (Alpha-3-Code) for the country. This variable
-must be set if sustainability should be tracked. A list can be found on
-Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+\item{sustain_iso_code}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
+list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
 
-\item{sustain_region}{Region within a country. Only available for USA and
-Canada See the documentation of codecarbon for more information.
-\url{https://mlco2.github.io/codecarbon/parameters.html}}
+\item{sustain_region}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
+information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 
-\item{sustain_interval}{\code{integer} Interval in seconds for measuring power
-usage.}
+\item{sustain_interval}{\code{integer} Interval in seconds for measuring power usage.}
 
-\item{trace}{\code{bool} \code{TRUE} if information about the progress should be
-printed to the console.}
+\item{trace}{\code{bool} \code{TRUE} if information about the progress should be printed to the console.}
 
-\item{pytorch_safetensors}{\code{bool} If \code{TRUE} a 'pytorch' model
-is saved in safetensors format. If \code{FALSE} or 'safetensors' not available
-it is saved in the standard pytorch format (.bin). Only relevant for pytorch models.}
+\item{pytorch_safetensors}{\code{bool} Only relevant for pytorch models.
+\itemize{
+\item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
+\item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
+}}
 }
 \value{
-This function does not return an object. Instead the configuration
-and the vocabulary of the new model are saved on disk.
+This function does not return an object. Instead the configuration and the vocabulary of the new model are
+saved on disk.
 }
 \description{
-This function creates a transformer configuration based on the DeBERTa-V2 base architecture
-and a vocabulary based on SentencePiece tokenizer by using
-the python libraries 'transformers' and 'tokenizers'.
-}
-\note{
-To train the model, pass the directory of the model to the function
-\link{train_tune_deberta_v2_model}.
+This function is deprecated. Please use instead \code{aife_transformer_maker$make("deberta_v2")$create()}.
 
-For this model a WordPiece tokenizer is created. The standard implementation
-of DeBERTa version 2 from HuggingFace uses a SentencePiece tokenizer. Thus, please
-use \code{AutoTokenizer} from the 'transformers' library to use this model.
-}
-\references{
-He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced BERT
-with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
-
-Hugging Face Documentation
-\url{https://huggingface.co/docs/transformers/model_doc/deberta-v2#debertav2}
+See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFEDebertaTransformer} classes for
+details.
 }
 \seealso{
-Other Transformer: 
+Other Deprecated transformer: 
 \code{\link{create_bert_model}()},
 \code{\link{create_funnel_model}()},
 \code{\link{create_longformer_model}()},
@@ -117,4 +99,4 @@ Other Transformer:
 \code{\link{train_tune_longformer_model}()},
 \code{\link{train_tune_roberta_model}()}
 }
-\concept{Transformer}
+\concept{Deprecated transformer}
