@@ -135,7 +135,7 @@ start_and_monitor_long_task <- function(id,
 
     # Reset log
     reset_log(log_path = log_path)
-    if (ExtendedTask_type %in% c("classifier")) {
+    if (ExtendedTask_type %in% c("classifier","feature_extractor")) {
       reset_loss_log(
         log_path = paste0(dirname(log_path), "/aifeducation_loss.log"),
         epochs = ExtendedTask_arguments$epochs
@@ -179,6 +179,7 @@ start_and_monitor_long_task <- function(id,
       # Do periodical checks only if the task is actual running
       if (CurrentTask$status() == "running") {
         shiny::invalidateLater(millis = update_intervall*1000)
+        print(date())
 
         if (!is.null(log_path)) {
           log <- read_log(log_path)
@@ -231,14 +232,13 @@ start_and_monitor_long_task <- function(id,
       {
         plot_data <- progress_bar_status()$loss_data
         if (!is.null(plot_data)) {
-          if(nrow(plot_data>0)){
             if (ncol(plot_data) == 4) {
               data_columns <- c("train", "validation", "test")
             } else {
               data_columns <- c("train", "validation")
             }
             y_max <- max(plot_data[data_columns])
-            y_min <- min(plot_data[data_columns])
+            y_min <- 0
             plot <- ggplot2::ggplot(data = plot_data) +
               ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +
               ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation, color = "validation"))
@@ -261,7 +261,6 @@ start_and_monitor_long_task <- function(id,
               )
             return(plot)
           }
-        }
       },
       res = 2 * 72
     )

@@ -5,7 +5,7 @@
 #' @return Objects of this containing fields and methods used in several other classes
 #' in 'ai for education'. This class is **not** designed for a direct application and should only
 #' be used by developers.
-#' @family Classification
+#' @family Classifiers for developers
 #' @export
 AIFEBaseModel <- R6::R6Class(
   classname = "AIFEBaseModel",
@@ -219,88 +219,6 @@ AIFEBaseModel <- R6::R6Class(
       )
     },
     #--------------------------------------------------------------------------
-    #' @description loads an object from disk
-    #' and updates the object to the current version of the package.
-    #' @param dir_path Path where the object set is stored.
-    #' @return Method does not return anything. It loads an object from disk.
-    load_from_disk = function(dir_path) {
-      if (self$is_configured() == TRUE) {
-        stop("The object has already been configured. Please use the method
-             'load' for loading the weights of a model.")
-      }
-
-      # Load R file
-      old_model <- load_R_interface(dir_path)
-
-      #Set ML framework
-      private$ml_framework=old_model$get_ml_framework()
-
-      # Set configuration of the core model
-      self$model_config <- old_model$model_config
-
-      # Set model info
-      private$set_model_info(
-        model_name_root = old_model$get_model_info()$model_name_root,
-        model_id = old_model$get_model_info()$model_id,
-        label = old_model$get_model_info()$model_label,
-        model_date=old_model$get_model_info()$model_date
-      )
-
-      # Set TextEmbeddingModel
-      private$set_text_embedding_model(
-        model_info = old_model$get_text_embedding_model()$model,
-        feature_extractor_info = old_model$get_text_embedding_model()$feature_extractor,
-        times = old_model$get_text_embedding_model()$times,
-        features = old_model$get_text_embedding_model()$features
-      )
-
-      # Set last training
-      self$last_training$config=old_model$last_training$config
-      self$last_training$start_time=old_model$last_training$start_time
-      self$last_training$learning_time=old_model$last_training$learning_time
-      self$last_training$finish_time=old_model$last_training$finish_time
-      self$last_training$history=old_model$last_training$history
-      self$last_training$data=old_model$last_training$data
-
-      # Set license
-      self$set_software_license(old_model$get_software_license())
-      self$set_documentation_license(old_model$get_documentation_license())
-
-      # Set description and documentation
-      self$set_model_description(
-        eng = old_model$get_model_description()$eng,
-        native = old_model$get_model_description()$native,
-        abstract_eng = old_model$get_model_description()$abstract_eng,
-        abstract_native = old_model$get_model_description()$abstract_native,
-        keywords_eng = old_model$get_model_description()$keywords_eng,
-        keywords_native = old_model$get_model_description()$keywords_native
-      )
-
-      #Set publication info
-      self$set_publication_info(
-        authors = old_model$get_publication_info()$authors,
-        citation = old_model$get_publication_info()$citation,
-        url = old_model$get_publication_info()$url
-      )
-
-      #Get and set original package versions
-      private$r_package_versions$aifeducation=old_model$get_package_versions()$r_package_versions$aifeducation
-      private$r_package_versions$reticulate=old_model$get_package_versions()$r_package_versions$reticulate
-
-      private$py_package_versions$torch=old_model$get_package_versions()$py_package_versions$torch
-      private$py_package_versions$tensorflow=old_model$get_package_versions()$py_package_versions$tensorflow
-      private$py_package_versions$keras=old_model$get_package_versions()$py_package_versions$keras
-      private$py_package_versions$numpy=old_model$get_package_versions()$py_package_versions$numpy
-
-      # Finalize loading
-      private$set_configuration_to_TRUE()
-
-      # Create and load AI model
-      private$create_reset_model()
-      self$load(dir_path = dir_path)
-
-      },
-    #--------------------------------------------------------------------------
     #' @description Method for importing a model.
     #' @param dir_path `string` Path of the directory where the model is
     #' saved.
@@ -345,6 +263,25 @@ AIFEBaseModel <- R6::R6Class(
                      the same framework as during creation.")
           }
         }
+      }
+
+      #Load sustainability_data
+      sustain_path=paste0(dir_path,"/sustainability.csv")
+      if(file.exists(sustain_path)){
+        sustain_data=read.csv(sustain_path)
+
+        private$sustainability = list(
+          sustainability_tracked = TRUE,
+          date = sustain_data$date,
+          sustainability_data = list(
+            duration_sec = sustain_data$sustainability_data.duration_sec,
+            co2eq_kg = sustain_data$sustainability_data.co2eq_kg,
+            cpu_energy_kwh = sustain_data$sustainability_data.cpu_energy_kwh,
+            gpu_energy_kwh = sustain_data$sustainability_data.gpu_energy_kwh,
+            ram_energy_kwh = sustain_data$sustainability_data.ram_energy_kwh,
+            total_energy_kwh = sustain_data$sustainability_data.total_energy_kwh
+          )
+        )
       }
     },
     #---------------------------------------------------------------------------
@@ -439,6 +376,13 @@ AIFEBaseModel <- R6::R6Class(
     #' @return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
     is_configured = function() {
       return(private$configured)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting all private fields and methods. Used
+    #' for loading and updating an object.
+    #' @return Returns a `list` with all private fields and methods.
+    get_private = function() {
+      return(private)
     }
   ),
   private = list(
@@ -448,6 +392,8 @@ AIFEBaseModel <- R6::R6Class(
     model_info = list(
       model_license = NA,
       model_name = NA,
+      model_name_root = NA,
+      model_id = NA,
       name_root = NA,
       model_label = NA,
       model_date = NA
@@ -475,7 +421,6 @@ AIFEBaseModel <- R6::R6Class(
     ),
     r_package_versions = list(
       aifeducation = NA,
-      smotefamily = NA,
       reticulate = NA
     ),
     py_package_versions = list(
@@ -527,12 +472,12 @@ AIFEBaseModel <- R6::R6Class(
 
     #--------------------------------------------------------------------------
     # Method for setting the model info
-    set_model_info = function(model_name_root, model_id, label,model_date) {
+    set_model_info = function(model_name_root, model_id, label, model_date) {
       private$model_info$model_name_root <- model_name_root
       private$model_info$model_id <- model_id
       private$model_info$model_name <- paste0(model_name_root, "_ID_", model_id)
       private$model_info$model_label <- label
-      private$model_info$model_date=model_date
+      private$model_info$model_date <- model_date
     },
     #--------------------------------------------------------------------------
     # Method for summarizing sustainability data for this classifier
@@ -693,20 +638,101 @@ AIFEBaseModel <- R6::R6Class(
       private$text_embedding_model["features"] <- features
     },
     #--------------------------------------------------------------------------
-    set_package_versions=function(){
-      private$r_package_versions$aifeducation<-packageVersion("aifeducation")
-      private$r_package_versions$reticulate<-packageVersion("reticulate")
+    set_package_versions = function() {
+      private$r_package_versions$aifeducation <- packageVersion("aifeducation")
+      private$r_package_versions$reticulate <- packageVersion("reticulate")
 
-      if(private$ml_framework=="pytorch"){
-        private$py_package_versions$torch<-torch["__version__"]
-        private$py_package_versions$tensorflow<-NULL
-        private$py_package_versions$keras<-NULL
+      if (private$ml_framework == "pytorch") {
+        private$py_package_versions$torch <- torch["__version__"]
+        private$py_package_versions$tensorflow <- NULL
+        private$py_package_versions$keras <- NULL
       } else {
-        private$py_package_versions$torch<-NULL
-        private$py_package_versions$tensorflow<-tf$version$VERSION
-        private$py_package_versions$keras<-keras["__version__"]
+        private$py_package_versions$torch <- NULL
+        private$py_package_versions$tensorflow <- tf$version$VERSION
+        private$py_package_versions$keras <- keras["__version__"]
       }
-      private$py_package_versions$numpy<-np$version$short_version
+      private$py_package_versions$numpy <- np$version$short_version
+    },
+
+    #--------------------------------------------------------------------------
+    #' description Loads configuration and documentation of an object from disk.
+    #' param dir_path Path where the object set is stored.
+    #' return Method does not return anything. It loads an object from disk.
+    load_config_and_docs = function(dir_path) {
+      if (self$is_configured() == TRUE) {
+        stop("The object has already been configured. Please use the method
+             'load' for loading the weights of a model.")
+      }
+
+      # Load R file
+      old_model <- load_R_interface(dir_path)
+
+      # Old private states
+      old_private <- old_model$get_private()
+
+      # Set ML framework
+      private$ml_framework <- old_private$ml_framework
+
+      # Set configuration of the core model
+      self$model_config <- old_model$model_config
+
+      # Set model info
+      private$set_model_info(
+        model_name_root = old_private$model_info$model_name_root,
+        model_id = old_private$model_info$model_id,
+        label = old_private$model_info$model_date,
+        model_date = old_private$model_info$model_date
+      )
+
+      # Set TextEmbeddingModel
+      private$set_text_embedding_model(
+        model_info = old_private$text_embedding_model$model,
+        feature_extractor_info = old_private$text_embedding_model$feature_extractor,
+        times = old_private$text_embedding_model$times,
+        features = old_private$text_embedding_model$features
+      )
+
+      # Set last training
+      self$last_training$config <- old_model$last_training$config
+      self$last_training$start_time <- old_model$last_training$start_time
+      self$last_training$learning_time <- old_model$last_training$learning_time
+      self$last_training$finish_time <- old_model$last_training$finish_time
+      self$last_training$history <- old_model$last_training$history
+      self$last_training$data <- old_model$last_training$data
+
+      # Set license
+      self$set_software_license(old_private$model_info$model_license)
+      self$set_documentation_license(old_private$model_description$license)
+
+      # Set description and documentation
+      self$set_model_description(
+        eng = old_private$model_description$eng,
+        native = old_private$model_description$native,
+        abstract_eng = old_private$model_description$abstract_eng,
+        abstract_native = old_private$model_description$abstract_native,
+        keywords_eng = old_private$model_description$keywords_eng,
+        keywords_native = old_private$model_description$keywords_native
+      )
+
+      # Set publication info
+      self$set_publication_info(
+        authors = old_private$publication_info$developed_by$authors,
+        citation = old_private$publication_info$developed_by$citation,
+        url = old_private$publication_info$developed_by$url
+      )
+
+      # Get and set original package versions
+      private$r_package_versions$aifeducation <- old_private$r_package_versions$aifeducation
+      private$r_package_versions$reticulate <- old_private$r_package_versions$reticulate
+
+      private$py_package_versions$torch <- old_private$py_package_versions$torch
+      private$py_package_versions$tensorflow <- old_private$py_package_versions$tensorflow
+      private$py_package_versions$keras <- old_private$py_package_versions$keras
+      private$py_package_versions$numpy <- old_private$py_package_versions$numpy
+
+      # Finalize config
+      private$set_configuration_to_TRUE()
+
     }
   )
 )

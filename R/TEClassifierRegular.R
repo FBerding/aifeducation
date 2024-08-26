@@ -314,9 +314,7 @@ TEClassifierRegular <- R6::R6Class(
     #'the logger should try to update the log files. Only relevant if `log_dir` is not `NULL`.
     #' @param trace `bool` `TRUE`, if information about the estimation
     #' phase should be printed to the console.
-    #' @param keras_trace `int` `keras_trace=0` does not print any
-    #' information about the training process from keras on the console.
-    #' @param pytorch_trace `int` `pytorch_trace=0` does not print any
+    #' @param ml_trace `int` `ml_trace=0` does not print any
     #' information about the training process from pytorch on the console.
     #' @return Function does not return a value. It changes the object into a trained
     #' classifier.
@@ -329,7 +327,6 @@ TEClassifierRegular <- R6::R6Class(
     #' this aim, the distance from the anchor is calculated and all cases are arranged
     #' into an ascending order.
     #'
-    #' @importFrom abind abind
     train = function(data_embeddings,
                      data_targets,
                      data_folds = 5,
@@ -353,8 +350,7 @@ TEClassifierRegular <- R6::R6Class(
                      batch_size = 32,
                      dir_checkpoint,
                      trace = TRUE,
-                     keras_trace = 2,
-                     pytorch_trace = 1,
+                     ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10) {
       # Checking Arguments------------------------------------------------------
@@ -418,8 +414,7 @@ TEClassifierRegular <- R6::R6Class(
       self$last_training$config$batch_size <- batch_size
       self$last_training$config$dir_checkpoint <- dir_checkpoint
       self$last_training$config$trace <- trace
-      self$last_training$config$keras_trace <- keras_trace
-      self$last_training$config$pytorch_trace <- pytorch_trace
+      self$last_training$config$ml_trace <- ml_trace
 
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
@@ -588,19 +583,17 @@ TEClassifierRegular <- R6::R6Class(
     #' for which predictions should be made. In addition, this method allows to use objects
     #' of class `array` and `datasets.arrow_dataset.Dataset`. However, these should be
     #' used only by developers.
-    #' @param verbose `int` `verbose=0` does not cat any
-    #' information about the inference process from keras on the console.
-    #' `verbose=1` prints a progress bar. `verbose=2` prints
-    #' one line of information for every epoch.
+    #' @param ml_trace `int` `ml_trace=0` does not print any information on the process
+    #' from the machine learning framework.
     #' @param batch_size `int` Size of batches.
     #' @return Returns a `data.frame` containing the predictions and
     #' the probabilities of the different labels for each case.
     predict = function(newdata,
                        batch_size = 32,
-                       verbose = 1) {
+                       ml_trace = 1) {
       # Check arguments
       check_type(batch_size, "int", FALSE)
-      check_type(verbose, "int", FALSE)
+      check_type(ml_trace, "int", FALSE)
 
       # Check if the embeddings must be compressed before passing to the model
       requires_compression <- self$requires_compression(newdata)
@@ -666,13 +659,13 @@ TEClassifierRegular <- R6::R6Class(
             # Multi Class
             predictions_prob <- self$model$predict(
               x = tf_dataset_predict,
-              verbose = as.integer(verbose)
+              ml_trace = as.integer(ml_trace)
             )
             predictions <- max.col(predictions_prob) - 1
           } else {
             predictions_prob <- self$model$predict(
               x = tf_dataset_predict,
-              verbose = as.integer(verbose)
+              ml_trace = as.integer(ml_trace)
             )
 
             # Add Column for the second characteristic
@@ -718,14 +711,14 @@ TEClassifierRegular <- R6::R6Class(
             predictions_prob <- self$model$predict(
               x = prediction_data,
               batch_size = as.integer(batch_size),
-              verbose = as.integer(verbose)
+              ml_trace = as.integer(ml_trace)
             )
             predictions <- max.col(predictions_prob) - 1
           } else {
             predictions_prob <- self$model$predict(
               x = prediction_data,
               batch_size = as.integer(batch_size),
-              verbose = as.integer(verbose)
+              ml_trace = as.integer(ml_trace)
             )
 
             # Add Column for the second characteristic
@@ -929,8 +922,9 @@ TEClassifierRegular <- R6::R6Class(
     #' @param dir_path Path where the object set is stored.
     #' @return Method does not return anything. It loads an object from disk.
     load_from_disk = function(dir_path) {
+
       # Call the core method which loads data common for all models
-      super$load_from_disk(dir_path = dir_path)
+      private$load_config_and_docs(dir_path = dir_path)
 
       # Add classifier specific data
       # Load R file
@@ -956,6 +950,10 @@ TEClassifierRegular <- R6::R6Class(
         feature_extractor$load_from_disk(paste0(dir_path, "/feature_extractor"))
         self$feature_extractor <- feature_extractor
       }
+
+      # Create and load AI model
+      private$create_reset_model()
+      self$load(dir_path = dir_path)
     }
   ),
   private = list(
@@ -1309,7 +1307,7 @@ TEClassifierRegular <- R6::R6Class(
     calculate_test_metric = function(test_data, iteration, type) {
       test_predictions <- self$predict(
         newdata = test_data,
-        verbose = self$last_training$config$keras_trace,
+        ml_trace = self$last_training$config$ml_trace,
         batch_size = self$last_training$config$batch_size
       )
       test_pred_cat <- test_predictions$expected_category
@@ -1346,7 +1344,7 @@ TEClassifierRegular <- R6::R6Class(
         # Predict labels
         test_predictions <- self$predict(
           newdata = test_data,
-          verbose = self$last_training$config$keras_trace,
+          ml_trace = self$last_training$config$ml_trace,
           batch_size = self$last_training$config$batch_size
         )
         test_pred_cat <- test_predictions$expected_category
@@ -1723,7 +1721,7 @@ TEClassifierRegular <- R6::R6Class(
       # Predict pseudo labels for unlabeled data
       predicted_labels <- self$predict(
         newdata = unlabeled_data,
-        verbose = self$last_training$config$keras_trace,
+        ml_trace = self$last_training$config$ml_trace,
         batch_size = self$last_training$config$batch_size
       )
 
@@ -1889,7 +1887,7 @@ TEClassifierRegular <- R6::R6Class(
           callback <- keras$callbacks$ModelCheckpoint(
             filepath = paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.h5"),
             monitor = paste0("val_", self$model_config$balanced_metric),
-            verbose = as.integer(min(self$last_training$config$keras_trace, 1)),
+            ml_trace = as.integer(min(self$last_training$config$ml_trace, 1)),
             mode = "auto",
             save_best_only = TRUE,
             save_weights_only = TRUE
@@ -1932,7 +1930,7 @@ TEClassifierRegular <- R6::R6Class(
         )
 
         history <- self$model$fit(
-          verbose = as.integer(self$last_training$config$keras_trace),
+          verbose = as.integer(self$last_training$config$ml_trace),
           x = tf_dataset_train,
           validation_data = tf_dataset_val,
           epochs = as.integer(self$last_training$config$epochs),
@@ -1995,7 +1993,7 @@ TEClassifierRegular <- R6::R6Class(
           loss_fct_name = loss_fct_name,
           optimizer_method = self$model_config$optimizer,
           epochs = as.integer(self$last_training$config$epochs),
-          trace = as.integer(self$last_training$config$pytorch_trace),
+          trace = as.integer(self$last_training$config$ml_trace),
           use_callback = use_callback,
           batch_size = as.integer(self$last_training$config$batch_size),
           train_data = pytorch_train_data,

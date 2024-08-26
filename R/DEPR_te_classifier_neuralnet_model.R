@@ -11,7 +11,7 @@
 #'text. Missing values (unlabeled cases) are supported. For predictions an object of class
 #'\link{EmbeddedText} has to be used which was created with the same text embedding model as
 #'for training.
-#'@family Classification
+#'@family Classification Deprecated
 #'@export
 TextEmbeddingClassifierNeuralNet<-R6::R6Class(
   classname = "TextEmbeddingClassifierNeuralNet",
@@ -907,10 +907,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                         "Creating Train Dataset"))
           }
 
-          embeddings_all_and_synthetic=abind::abind(
+          embeddings_all_and_synthetic=array_form_bind(
             embeddings_all,
-            embeddings_syntehtic_all,
-            along = 1)
+            embeddings_syntehtic_all)
 
           targets_all_and_synthetic=c(
             targets_labeleld_all,
@@ -1424,10 +1423,9 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
                       "Creating Train Dataset"))
         }
 
-        embeddings_all_and_synthetic=abind::abind(
+        embeddings_all_and_synthetic=array_form_bind(
           embeddings_all,
-          embeddings_syntehtic_all,
-          along = 1)
+          embeddings_syntehtic_all)
 
         targets_all_and_synthetic=c(
           targets_labeleld_all,

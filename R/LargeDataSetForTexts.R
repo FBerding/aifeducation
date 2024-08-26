@@ -344,6 +344,13 @@ LargeDataSetForText <- R6::R6Class(
 
       # Add new dataset
       private$add(new_dataset)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting all private fields and methods. Used
+    #' for loading and updating an object.
+    #' @return Returns a `list` with all private fields and methods.
+    get_private = function() {
+      return(private)
     }
   ),
   private = list(

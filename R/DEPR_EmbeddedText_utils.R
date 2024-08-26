@@ -5,7 +5,7 @@
 #'@param embeddings_list `list` of objects of class \link{EmbeddedText}.
 #'@return Returns an object of class \link{EmbeddedText} which contains all
 #'unique cases of the input objects.
-#'@family Text Embedding
+#'@family combine_embeddings
 #'@export
 #'@importFrom methods isClass
 #'@importFrom abind abind

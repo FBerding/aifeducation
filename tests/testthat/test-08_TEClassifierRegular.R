@@ -5,7 +5,9 @@ testthat::skip_if_not(condition=check_aif_py_modules(trace = FALSE),
 skip_creation_test=TRUE
 skip_training_test=TRUE
 skip_overfitting_test=FALSE
+skip_3_classes=FALSE
 include_tensorflow=FALSE
+
 
 #SetUp-------------------------------------------------------------------------
 #Set paths
@@ -97,15 +99,21 @@ feature_extractor_list["pytorch"]=list(list(
 #    batch_size=100,
 #    dir_checkpoint=checkpoint_path,
 #    trace=FALSE,
-#    keras_trace=0,
-#    pytorch_trace=0
+#
+#    ml_trace=0
 #  )
 #  feature_extractor_list[framework]=list(c(extractor,NULL))
 #}
 
+if(skip_3_classes==TRUE){
+  max_classes=2
+} else {
+  max_classes=3
+}
+
 
 for(framework in ml_frameworks){
-  for (n_classes in 2:3){
+  for (n_classes in 2:max_classes){
     #Prepare data for different classification types---------------------------
     example_data<-imdb_movie_reviews
 
@@ -189,7 +197,7 @@ for(framework in ml_frameworks){
                             predictions=classifier$predict(
                               newdata = test_embeddings_reduced,
                               batch_size = 2,
-                              verbose = 0)
+                              ml_trace = 0)
                             expect_equal(object = length(predictions$expected_category),
                                          expected = nrow(test_embeddings_reduced$embeddings))
                           })
@@ -207,13 +215,13 @@ for(framework in ml_frameworks){
 
                                   prediction<-classifier$predict(newdata = test_embeddings_single_case,
                                                                  batch_size = 2,
-                                                                 verbose = 0)
+                                                                 ml_trace = 0)
                                   expect_equal(object=nrow(prediction),
                                                expected = 1)
 
                                   prediction_LD<-classifier$predict(newdata = test_embeddings_single_case_LD,
                                                                     batch_size = 2,
-                                                                    verbose = 0)
+                                                                    ml_trace = 0)
                                   expect_equal(object=nrow(prediction_LD),
                                                expected = 1)
                                 })
@@ -233,22 +241,22 @@ for(framework in ml_frameworks){
                             predictions=classifier$predict(
                               newdata = test_embeddings_reduced,
                               batch_size = 2,
-                              verbose = 0)
+                              ml_trace = 0)
                             predictions_2=classifier$predict(
                               newdata = test_embeddings_reduced,
                               batch_size = 2,
-                              verbose = 0)
+                              ml_trace = 0)
                             expect_equal(predictions,predictions_2)
 
                             #LargeDataSetForTextEmbeddings
                             predictions=classifier$predict(
                               newdata = test_embeddings_reduced_LD,
                               batch_size = 2,
-                              verbose = 0)
+                              ml_trace = 0)
                             predictions_2=classifier$predict(
                               newdata = test_embeddings_reduced_LD,
                               batch_size = 2,
-                              verbose = 0)
+                              ml_trace = 0)
                             expect_equal(predictions,predictions_2)
                           })
 
@@ -271,10 +279,10 @@ for(framework in ml_frameworks){
                             #EmbeddedText
                             predictions=classifier$predict(newdata = test_embeddings_reduced,
                                                            batch_size = 50,
-                                                           verbose = 0)
+                                                           ml_trace = 0)
                             predictions_Perm<-classifier$predict(newdata = embeddings_ET_perm,
                                                                  batch_size = 50,
-                                                                 verbose = 0)
+                                                                 ml_trace = 0)
 
                             predictions_Perm=predictions_Perm[rownames(predictions),]
                             expect_equal(predictions$expected_category, predictions_Perm$expected_category)
@@ -282,10 +290,10 @@ for(framework in ml_frameworks){
                             #LargeDataSetForTextEmbeddings
                             predictions=classifier$predict(newdata = test_embeddings_reduced_LD,
                                                            batch_size = 50,
-                                                           verbose = 0)
+                                                           ml_trace = 0)
                             predictions_Perm=classifier$predict(newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
                                                                 batch_size = 50,
-                                                                verbose = 0)
+                                                                ml_trace = 0)
 
                             predictions_Perm=predictions_Perm[rownames(predictions),]
                             expect_equal(predictions$expected_category, predictions_Perm$expected_category)
@@ -304,11 +312,11 @@ for(framework in ml_frameworks){
                                   predictions_ET=classifier$predict(
                                     newdata = test_embeddings_reduced,
                                     batch_size = 2,
-                                    verbose = 0)
+                                    ml_trace = 0)
                                   predictions_LD=classifier$predict(
                                     newdata = test_embeddings_reduced_LD,
                                     batch_size = 2,
-                                    verbose = 0)
+                                    ml_trace = 0)
                                   i=sample(seq.int(from = 1,to=nrow(predictions_ET)),size = 1)
                                   expect_equal(predictions_ET$expected_category,predictions_LD$expected_category)
                                 })
@@ -404,8 +412,8 @@ for(framework in ml_frameworks){
                                 batch_size=32,
                                 dir_checkpoint=train_path,
                                 trace=FALSE,
-                                keras_trace=0,
-                                pytorch_trace=0)
+
+                                ml_trace=0)
                             )
                             expect_true(classifier$get_sustainability_data()$sustainability_tracked)
                           })
@@ -456,7 +464,7 @@ for(framework in ml_frameworks){
           predictions=classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 2,
-            verbose = 0)
+            ml_trace = 0)
 
         #Save and load
         folder_name=paste0("method_save_load_",generate_id())
@@ -469,7 +477,7 @@ for(framework in ml_frameworks){
           predictions_2=classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 2,
-            verbose = 0)
+            ml_trace = 0)
 
         #Compare predictions
         i=sample(x=seq.int(from=1,to=nrow(predictions)),size = 1)
@@ -520,7 +528,7 @@ for(framework in ml_frameworks){
       predictions=classifier$predict(
         newdata = test_embeddings_reduced,
         batch_size = 2,
-        verbose = 0)
+        ml_trace = 0)
 
       #Save and load
       folder_name=paste0("function_save_load_",generate_id())
@@ -535,7 +543,7 @@ for(framework in ml_frameworks){
       predictions_2=classifier$predict(
         newdata = test_embeddings_reduced,
         batch_size = 2,
-        verbose = 0)
+        ml_trace = 0)
 
       #Compare predictions
       i=sample(x=seq.int(from=1,to=nrow(predictions)),size = 1)
@@ -588,6 +596,12 @@ for(framework in ml_frameworks){
           encoder_dropout=0.1,
           optimizer="adam")
 
+        if(n_classes<3){
+          epochs=100
+        } else {
+          epochs=300
+        }
+
         classifier_overfitting$train(
           data_embeddings = test_embeddings,
           data_targets = example_targets,
@@ -607,13 +621,13 @@ for(framework in ml_frameworks){
           sustain_iso_code="DEU",
           sustain_region=NULL,
           sustain_interval=15,
-          epochs=100,
+          epochs=epochs,
           batch_size=32,
           dir_checkpoint=train_path,
           log_dir=train_path,
           trace=FALSE,
-          keras_trace=0,
-          pytorch_trace=0)
+
+          ml_trace=0)
 
         history=classifier_overfitting$last_training$history[[1]]$accuracy["train",]
         expect_gte(object=max(history),expected = 0.95)

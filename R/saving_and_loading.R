@@ -74,7 +74,8 @@ save_to_disk <- function(object,
 load_from_disk <- function(dir_path) {
   loaded_object <- load_R_interface(dir_path)
 
-  if(methods::is(loaded_object, "TEClassifierRegular")){
+  if(methods::is(loaded_object, "TEClassifierRegular")&
+     !methods::is(loaded_object, "TEClassifierProtoNet")){
     model=TEClassifierRegular$new()
   } else if(methods::is(loaded_object, "TEClassifierProtoNet")){
     model=TEClassifierProtoNet$new()
@@ -84,6 +85,8 @@ load_from_disk <- function(dir_path) {
     model=TextEmbeddingModel$new()
   }  else if(methods::is(loaded_object, "LargeDataSetForTextEmbeddings")){
     model=LargeDataSetForTextEmbeddings$new()
+  } else {
+    stop("Class type not supported.")
   }
 
   # load and update model

@@ -25,7 +25,7 @@
 #'label/category.}
 #'}
 #'
-#'@family Auxiliary Functions
+#' @family data_management_utils
 #'
 #'@export
 #'@import foreach
@@ -195,7 +195,7 @@ get_synthetic_cases_from_matrix<-function(matrix_form,
 #'new synthetic cases as a named \code{data.frame} and their labels as a named
 #'\code{factor}.
 #'
-#'@family Auxiliary Functions
+#' @family data_management_utils
 #'
 #'@export
 create_synthetic_units_from_matrix<-function(matrix_form,
@@ -284,7 +284,7 @@ create_synthetic_units_from_matrix<-function(matrix_form,
 #'
 #'\item{\code{embeddings_test: }Object of class \link{EmbeddedText} containing the text embeddings for the validation sample}
 #'}
-#'@family Auxiliary Functions
+#' @family data_management_utils
 #'@keywords internal
 get_train_test_split<-function(embedding=NULL,
                                target,
@@ -353,7 +353,7 @@ get_train_test_split<-function(embedding=NULL,
 #'the number of folds is adjusted. In these cases, a warning is printed to the console.
 #'At least four cases per fold are necessary to ensure that the training of
 #'\link{TextEmbeddingClassifierNeuralNet} works well with all options turned on.
-#'@family Auxiliary Functions
+#' @family data_management_utils
 #'@keywords internal
 get_folds<-function(target,
                     k_folds){
@@ -443,7 +443,7 @@ get_folds<-function(target,
 #'each label/category should be part of the validation sample.
 #'@return \code{list} which contains the names of the cases belonging to the train
 #'sample and to the validation sample.
-#'@family Auxiliary Functions
+#' @family data_management_utils
 #'@keywords internal
 get_stratified_train_test_split<-function(targets, val_size=0.25){
   test_sample=NULL
@@ -476,7 +476,7 @@ get_stratified_train_test_split<-function(targets, val_size=0.25){
 #'@return Named\code{vector} of integers representing the number of chunks/sequences
 #'for every case.
 #'
-#'@family Auxiliary Functions
+#' @family data_management_utils
 #'
 #'@export
 get_n_chunks<-function(text_embeddings,features,times){

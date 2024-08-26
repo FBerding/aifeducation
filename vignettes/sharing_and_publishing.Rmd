@@ -34,20 +34,56 @@ educational and social science researchers and to support the
 application of AI for educational purposes. Thus, *aifeducation* aims to
 make the sharing process as easy as possible.
 
-For this aim, every object generated with *aifeducation* can be prepared
+For this aim, every model generated with *aifeducation* can be prepared
 for publication in a few basic steps. In this vignette, we would like to
 show you how to make your AI ready for publication and how to use models
-from other persons.
+from other persons. How to save, load, and apply the models is described in
+[02 Using the graphical user interface Aifeducation - Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
+and [03 Using R syntax](classification_tasks.html).
 
-Now we will start with a guide on preparing text embedding models.
+# 2 Creating Documentation with AI for Education - Studio
 
-# 2 Text Embedding Models
+The most convenience way for documenting your work is to use *AI for Education - Studio*.
+In a first step you have to start the user interface by calling `start_aifeducation_studio`:
+```{r, include = TRUE, eval=FALSE}
+start_aifeducation_studio()
+```
 
-## 2.1 Adding Model Descriptions
+The next steps depend on the model you would like to document. In the case you would
+like to document a `TextEmbeddingModel` you first have to select *TextEmbeddingModels*
+at the top of the app. In the next window, please select the tab *Document*. Now you can
+load the model you would like to document by clicking on the button "Choose a Model".
 
-Every object of class `TextEmbeddingModel` comes with several methods
-allowing you to provide important information for potential users of
-your model.
+After loading the model you can see different tabs for different parts of the documentation.
+The first tab is *Developer*. Here you can add the names and e-mail address of the persons
+who developed the model. In addition, you can add a suggestion for the citation and an url as a link to relevant sites
+of the model.
+
+With help of the other tabs you can write an abstract in English, an abstract in the native language of the model
+such as French or German, and you can add a detailed description in both languages. The
+tab for the abstracts allows you to set keywords for your work. which help to find your work with search
+engines.
+
+Your documentation goes into the corresponding text field on the left side within
+a tab. If you click on the button "Preview" you will see a preview of the documentation on the rights side. When you finished 
+documenting a part of your model please click on the "Save" button to save your changes.
+
+The last tab allows you to set the license for your model and for your documentation.
+
+The documentation for all other models such as `TEFeautreExtractor`s, `TEClassifierRegular`, and
+`TEClassifierProtoNet` works exactly the same. The only difference is that you have to select the 
+corresponding tab at the top of the app.
+
+For `TextEmbeddingModels` there is an additional tab "Modifiers". This tab is relevant
+if you do not develop your own base model but if you modify a base model created by other persons.
+Such a modification can be an adaption to specific tasks or specific domains.
+In this case we recommend to add the persons who developed the base model with the tab "Developers"
+and your research group within the tab "Modifiers".  
+
+# 3 Creating Documentation with *R* Syntax
+
+The process for documenting a model is similar for all models in *aifeducation* since
+all models use the same methods. We illustrate the process for a `TextEmbeddingModel`.
 
 First, every model needs a clear description how it was developed,
 modified and how it can be used. You can add a description via the
@@ -55,35 +91,24 @@ method `set_model_description`.
 
 ```{r, include = TRUE, eval=FALSE}
 example_model$set_model_description(
-  eng=NULL,
-  native=NULL,
-  abstract_eng=NULL,
-  abstract_native=NULL,
-  keywords_eng=NULL,
-  keywords_native=NULL)
+  eng = NULL,
+  native = NULL,
+  abstract_eng = NULL,
+  abstract_native = NULL,
+  keywords_eng = NULL,
+  keywords_native = NULL
+)
 ```
 
 This method allows you to provide a description in English and in the
 native language of your model to make the distribution of your model
-easier. You can write your description in HTML which allows you to
-add links to other sources or publications, to add tables or to
-highlight important aspects of your model.
-
-**We would like to recommend that you write at least an English
-description to allow a wider community to recognize your work**.
-Furthermore, your description should include:
-
--   Which kind of data was used to create the model.
--   How much data was used to create the model.
--   Which steps were performed and which method was used.
--   For which kinds of tasks or materials the model can be used.
+easier. 
 
 With `abstract_eng` and `abstract_native` you can provide a summary of
 your description. This is very important if you would like to share your
 work on a repository. With `keywords_eng` and `keywords_native` you can
 set a vector of keywords which help to find your work with search
-engines. We would like to recommend that you at least provide this
-information in English.
+engines. 
 
 You can access a model's description by using the method
 `get_model_description`
@@ -101,29 +126,30 @@ example_model$set_publication_info(
   type,
   authors,
   citation,
-  url=NULL)
+  url = NULL
+)
 ```
 
 First of all you have to decide the type of information you would like
 to add. You have two choices: "developer", and "modifier",
 which you set with `type`.
 
-`type="developer"` stores all information about the people involved and
-the process of developing the model. If you use a transformer model from
-[Hugging Face](https://huggingface.co/), the people and their description
-of the model should be entered as developers. In all other cases you can
-use this type for providing a description of how you developed the
-model.
+- `type="developer"` stores all information about the people involved in
+  the process of developing the model. If you use a transformer model from
+  [Hugging Face](https://huggingface.co/), the people and their description
+  of the model should be entered as developers. In all other cases you can
+  use this type for providing a description of how you developed the
+  model.
 
-In some cases you might wish to modify an existing model. This might be
-the case if you use a transformer model and you adapt the model to a
-specific domain or task. In this case you rely on the work of other
-people and modify their work. In these cases you can describe your
-modifications by setting `type=modifier`.
+- In some cases you might wish to modify an existing model. This might be
+  the case if you use a transformer model and you adapt the model to a
+  specific domain or task. In this case you rely on the work of other
+  people and modify their work. In these cases you can describe your
+  modifications by setting `type=modifier`.
 
 For every type of person you can add the relevant individuals via
 `authors`. Please use the *R*'s function `personList()` for this. With
-`citation`you can provide a free text how to cite the work of the
+`citation` you can provide a free text how to cite the work of the
 different persons. With `url` you can provide a link to relevant sites
 of the model.
 
@@ -140,191 +166,57 @@ done with `set_software_license` and `get_software_license`.
 example_model$set_software_license("GPL-3")
 ```
 
-Please note, that in most cases the license for your model must be "GPL-3" since
-some of the software used to create your model are licensed under "GPL-3". Thus,
-derivative work must also be licensed under "GPL-3".
-
 The documentation of your work is not part of the software. Here you can set
-other licenses such as Creative Common (CC) or Free Documentation License (FDL).
+another as for your software. 
 You can set the license for your documentation by using the method 
-'set_documentation_license'.
+`set_documentation_license`.
 
 ```{r, include = TRUE, eval=FALSE}
 example_model$set_documentation_license("CC BY-SA")
 ```
 
 Now you are able to share your work. Please remember to save your now
-fully described object as described in the following section 2.2.
+fully described object as described in the vignette [03 Using R syntax](classification_tasks.html).
 
-## 2.2 Saving and Loading
-
-Saving a created text embedding model is very easy by using the
-function `save_ai_model`. This function provides a unique interface for all
-text embedding models. For saving your work you can pass your model to `model` and
-the directory where to save the model to `model_dir`. Please do only pass 
-the path of a directory and not the path of a file to this function. Internally
-the function creates a new folder in the directory where all files belonging
-to a model are stored.
-
+The documentation process is the same for all other models such as 
+`TEFeautreExtractor`s, `TEClassifierRegular`, and
+`TEClassifierProtoNet`. There is only one difference. For `TextEmbeddingModels`you can
+differentiate between "developers" and "modifiers". This is not possible for the other models.
+For these models you do not need the argument `type`. Calling this method would look like:
 ```{r, include = TRUE, eval=FALSE}
-save_ai_model(
-  model=topic_modeling, 
-  model_dir="text_embedding_models",
-  append_ID=FALSE)
-
-save_ai_model(
-  model=global_vector_clusters_modeling, 
-  model_dir="text_embedding_models",
-  append_ID=FALSE)
-
-save_ai_model(
-  model=bert_modeling, 
-  model_dir="text_embedding_models",
-  append_ID=FALSE)
+example_model$set_publication_info(
+  authors,
+  citation,
+  url = NULL
+)
 ```
 
-As you can see all three text embedding models are saved within the same
-directory named "text_embedding_models". Within this directory the function
-creates a unique folder for every model. The name of this folder is
-specified with `dir_name`.
+# 4 Content and Style of a Documentation
 
-If you set `dir_name=NULL` and `append_ID=FALSE` the the name of the folder is created 
-by using the models' names. 
-If you change the argument `append_ID` to `append_ID=TRUE` and set `dir_name=NULL`
-the unique ID of the model is added to the directory. The ID is added automatically to ensure
-that every model has a unique name. This is important if you would like to share your 
-work with other persons.
+The necessary structure and content of a documentation depends on the kind of 
+model you would like to document, national laws (such as the European AI Act), 
+and the research standards of a discipline.
 
-If you want to load your model, just call the function `load_ai_model` and you can continue
-using your model. The following code assumes that you have specified `dir_name` manually.
+From a scientific point of view we recommend that every model has an abstract, keywords,
+and a detailed description in English. An additional abstract, keywords, and a description in
+the native language of the model may be helpful for reaching a broad audience in the
+corresponding language community.
 
-```{r, include = TRUE, eval=FALSE}
-topic_modeling<-load_ai_model(
-  model_dir="text_embedding_models/model_topic_modeling",
-  ml_framework=aifeducation_config$get_framework())
+You can write your abstracts and descriptions in HTML and R Markdown which allow you to
+add links to other sources or publications, to add tables or to
+highlight important aspects of your model.
 
-global_vector_clusters_modeling<-load_ai_model(
-  model_dir="text_embedding_models/model_global_vectors",
-  ml_framework=aifeducation_config$get_framework())
+For all models we recommend that your description provides at least answers to
+the following questions:
 
-bert_modeling<-load_ai_model(
-  model_dir="text_embedding_models/model_transformer_bert",
-  ml_framework=aifeducation_config$get_framework())
-```
+-   Which kind of data was used to create the model?
+-   How much data was used to create the model?
+-   Which steps were performed and which method was used?
+-   For which kinds of tasks or materials the model can be used?
 
-In the case you set `dir_name=NULL` and `append_ID=TRUE` loading the models may
-look as shown in the following code snippet:
+This kind of information is necessary for others to to conceive an opinion about the model.
 
-```{r, include = TRUE, eval=FALSE}
-topic_modeling<-load_ai_model(
-  model_dir="text_embedding_models/topic_model_embedding_ID_DfO25E1Guuaqw7tM")
-
-global_vector_clusters_modeling<-load_ai_model(
-  model_dir="text_embedding_models/global_vector_clusters_embedding_ID_5Tu8HFHegIuoW14l")
-
-bert_modeling<-load_ai_model(
-  model_dir="text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS")
-```
-
-**Please note that you have to add the name of the model to the directory path.**
-In our example we have stored three models in the directory "text_embedding_models". Each
-model is saved within its own folder. The folder's name is created automatically
-with the help of the name of the model. Thus, for loading a model you must specify
-which model you want to load by adding the model's name to the directory path as
-shown above. 
-
-At this point you may wonder why there is an ID in model's name although you
-did not enter an ID on model's creation. The ID is added automatically to ensure
-that every model has a unique name. This is important if you would like to share your 
-work with other persons. During saving the ID is appended automatically by 
-setting `append_ID=TRUE`.
-
-Now you are ready to share your work. Just provide all files within your model
-folder. For the BERT model in the example above this would be the folder 
-`"text_embedding_models/model_transformer_bert"` or
-`"text_embedding_models/bert_embedding_ID_CmyAQKtts5RdlLaS"` depending on how 
-you saved the model.
-
-# 3 Classifiers
-
-## 3.1 Adding Model Descriptions
-
-Adding the model description of a classifier is similar to
-`TextEmbeddingModel`s. With the methods `set_model_description` and
-`get_model_description` you can provide a detailed description
-(parameter `eng` and `native`) of your classifier in English and the
-native language of your classifier. With `abstract_eng` and
-`abstract_native` you can provide the corresponding abstract of your
-descriptions while `keywords_eng` and `keywords_native` take a vector
-with the corresponding keywords.
-
-```{r, include = TRUE, eval=FALSE}
-example_classifier$set_model_description(
-eng="This classifier targets the realization of the need for competence from 
-  the self-determination theory of motivation by Deci and Ryan in lesson plans 
-  and materials. It describes a learner’s need to perceive themselves as capable. 
-  In this classifier, the need for competence can take on the values 0 to 2. 
-  A value of 0 indicates that the learners have no space in the lesson plan to 
-  perceive their own learning progress and that there is no possibility for 
-  self-comparison. At level 1, competence growth is made visible implicitly, 
-  e.g. by demonstrating the ability to carry out complex exercises or peer 
-  control. At level 2, the increase in competence is made explicit by giving 
-  each learner insights into their progress towards the competence goal. For 
-  example, a comparison between the target vs. actual development towards the 
-  learning objectives of the lesson can be made, or the learners receive 
-  explicit feedback on their competence growth from the teacher. Self-assessment 
-  is also possible. The classifier was trained using 790 lesson plans, 298 
-  materials and up to 1,400 textbook tasks. Two people who received coding 
-  training were involved in the coding and the inter-coder reliability for the 
-  need for competence increased from a dynamic iota value of 0.615 to 0.646 over 
-  two rounds of training. The Krippendorffs alpha value, on the other hand, 
-  decreased from 0.516 to 0.484. The classifier is suitable for use in all 
-  settings in which lesson plans and materials are to be reviewed with regard 
-  to their implementation of the need for competence.",
-native="Dieser Classifier bewertet Unterrichtsentwürfe und Lernmaterial danach, 
-  ob sie das Bedürfnis nach Kompetenzerleben aus der Selbstbestimmungstheorie 
-  der Motivation nach Deci und Ryan unterstützen. Das Kompetenzerleben stellt 
-  das Bedürfnis dar, sich als wirksam zu erleben. Der Classifer unterteilt es 
-  in drei Stufen, wobei 0 bedeutet, dass die Lernenden im Unterrichtsentwurf 
-  bzw. Material keinen Raum haben, ihren eigenen Lernfortschritt wahrzunehmen 
-  und auch keine Möglichkeit zum Selbstvergleich besteht. Bei einer Ausprägung 
-  von 1 wird der Kompetenzzuwachs implizit, also z.B. durch die Durchführung 
-  komplexer Übungen oder einer Peer-Kontrolle ermöglicht. Auf Stufe 2 wird der 
-  Kompetenzzuwachs explizit aufgezeigt, indem jede:r Lernende einen objektiven 
-  Einblick erhält. So kann hier bspw. ein Soll-Ist-Vergleich mit den Lernzielen 
-  der Stunde erfolgen oder die Lernenden erhalten dezidiertes Feedback zu ihrem 
-  Kompetenzzuwachs durch die Lehrkraft. Auch eine Selbstbewertung ist möglich.
-  Der Classifier wurde anhand von 790 Unterrichtsentwürfen, 298 Materialien und 
-  bis zu 1400 Schulbuchaufgaben traniert. Es waren an der Kodierung zwei Personen 
-  beteiligt, die eine Kodierschulung erhalten haben und die 
-  Inter-Coder-Reliabilität für das Kompetenzerleben würde über zwei 
-  Trainingsrunden von einem dynamischen Iota-Wert von 0,615 auf 0,646 gesteigert. 
-  Der Krippendorffs Alpha-Wert sank hingegen von 0,516 auf 0,484. Er eignet sich 
-  zum Einsatz in allen Settings, in denen Unterrichtsentwürfe und Lernmaterial 
-  hinsichtlich ihrer Umsetzung des Kompetenzerlebens überprüft werden sollen.",
-abstract_eng="This classifier targets the realization of the need for 
-  competence from Deci and Ryan’s self-determination theory of motivation in l
-  esson plans and materials. It describes a learner’s need to perceive themselves 
-  as capable. The variable need for competence is assessed by a scale of 0-2. 
-  The classifier was developed using 790 lesson plans, 298 materials and up to 
-  1,400 textbook tasks. A coding training was conducted and the inter-coder 
-  reliabilities of different measures 
-  (i.e. Krippendorff’s Alpha and Dynamic Iota Index) of the individual categories 
-  were calculated at different points in time.",
-abstract_native="Dieser Classifier bewertet Unterrichtsentwürfe und 
-  Lernmaterial danach, ob sie das Bedürfnis nach Kompetenzerleben aus der 
-  Selbstbestimmungstheorie der Motivation nach Deci & Ryan unterstützen. Das 
-  Kompetenzerleben stellt das Bedürfnis dar, sich als wirksam zu erleben. Der 
-  Classifer unterteilt es in drei Stufen und wurde anhand von 790 
-  Unterrichtsentwürfen, 298 Materialien und bis zu 1400 Schulbuchaufgaben 
-  entwickelt. Es wurden stets Kodierschulungen durchgeführt und die 
-  Inter-Coder-Reliabilitäten der einzelnen Kategorien zu verschiedenen 
-  Zeitpunkten berechnet.",
-keywords_eng=c("Self-determination theory", "motivation", "lesson planning", "business didactics"),
-keywords_native=c("Selbstbestimmungstheorie", "Motivation", "Unterrichtsplanung", "Wirtschaftsdidaktik")
-```
-
-In the case of a classifier, the description should include:
+In the case of classifiers we recommend to add some further description:
 
 -   A short reference to the theoretical models that guided the
     development.
@@ -335,113 +227,133 @@ In the case of a classifier, the description should include:
 -   If possible, information about the inter-coder-reliability of the
     coding process providing the data.
 -   If possible, provide a link to the corresponding text embedding
-    model.
+    model or at least state where potential users can get the text embedding model.
+    
+The statement where to get the text embedding model is important since a classifier
+can only be used with the corresponding text embedding model.
 
-Again, you can provide your description in HTML to include tables (e.g.
-for reporting the reliability of the initial coding process) or links to
-other sources and publications.
+> Please do not report the performance values of your classifier in the
+  description.** These are displayed automaticalls in *AI for Education - Studio* or 
+  can be accessed directly via
+  `example_classifier$reliability$test_metric_mean`.    
+    
+An example documentation for a classifier could look like:
+```{r, include = FALSE, eval=FALSE}
+abstract_native<-("Dieser Klassifizierer kann dazu verwendet werden, um Unterrichtsentwürfe,
+Unterrichtsmaterial und Aufgaben in Bezug auf die Erfüllung des Bedürfnisses nach
+Kompetenzerleben einzuschätzen.
+Das Trainingsmaterial stellen 1.069 Unterrichtsentwürfe und das dazugehörige Material dar, die von Studierenden für das
+Lehramt an berufsbildenden Schulen in der Fachrichtung Wirtschaftswissenschaften entwickelt wurden.
+Zudem wurde frei um die anonyme Zusendung weiterer
+Unterrichtsentwürfe und Unterrichtsmaterialien geworben.")
 
-**Please do not report the performance values of your classifier in the
-description.** These can be accessed directly via
-`example_classifier$reliability$test_metric_mean`.
+native<-("
+## Theoretischer Hintergrund
 
-With the methods `set_publication_info` and `get_publication_info` you
-can provide the bibliographic information of your classifier.
+Dieser Klassifizierer erlaubt die Kodierung von Unterrichtsentwürfen sowie
+von Unterrichtsmaterialien und Aufgaben in Bezug auf Erfüllung des Bedürfnisses nach
+Komptenzerleben aus der Selbstbestimmungstheorie der Motivation von Deci und Ryan (2002).
+Das Kompetenzerleben wird in dieser Theorie verstanden als das Bedürfnis, sich bei
+der Durchführung von Aktivität als wirksam wahrzunehmen. Der Kodierleitfaden
+wurde neu für diesen Klassifizierer entwickelt.
 
-```{r, include = TRUE, eval=FALSE}
-example_classifier$set_publication_info(
-  authors,
-  citation,
-  url=NULL)
+## Kategorien
+
+<div class='documentation_table'>
+
+|Wert|Bezeichnung|Definition|
+|----|----|----|
+|0|Keine Möglichkeit, sich selbst als kompetent zu erleben.|Der Unterricht gibt den Lernenden keinen Raum, sich selbst kompetent zu fühlen.|
+|1|Der Kompetenzzuwachs wird jedem Lernenden implizit aufgezeigt.|Kompetenzzuwachs wird lediglich dadurch aufgezeigt, dass die Problemstellung bzw. die Aufgabe gelöst werden kann.|
+|2|Der Kompetenzzuwachs wird jedem Lernenden explizit aufgezeigt.|Die Lernenden erhalten einen objektiven, expliziten Überblick über ihren individuellen Kompetenzzuwachs.|
+
+</div>
+
+## Generierung des Datenmaterials
+
+Bei dem Datenmaterial handelt es sich um Unterrichtsentwürfe sowie die dazugehörigen Unterrichtsmaterialien
+von Studierenden aus Bachelor- bzw. Masterstudiengängen für das Lehramt an berufsbildenden Schulen.
+Darüber hinaus wurde öffentlich für die Bereitsstellung weiterer, anonymisierter Unterrichtsentwürfe und
+Unterrichtsmaterialien geworben, die über eine Plattform bereitgestellt werden konnten.
+Ein Teil der Unterichtsentwürfe stammt aus der Studie von Riebenbauer (2022). Unterrichtsentwürfe
+und Materialien wurden getrennt ausgewertet.
+Insgesamt konnten
+auf diese Weise 1.069 Datensätze gesammelt werden.
+
+<div class='documentation_table'>
+
+|Quelle | Entwürfe | Material|
+|:---|:---|:---|
+|Riebenbauer (2022) | 456 | 0|
+|Neu | 311 | 304|
+
+</div>
+
+Für die Generierung der Klassen/Kategorien wurden zwei Personen geschult, die
+sich in einem Studiengang für das Lehramt an berufsbildenden Schulen befanden.
+Das Kodierteam hat zunächst 25 Unterrichtsentwurfe und 25 Unterrichtsmaterialien
+unabhhängig voneinander anhand des Kategoriensystems bewertet. Auf dieser
+Datengrundlage wurden Reliabilitätswerte ermittelt und Abweichungen
+besprochen. Der Prozess wurde an 12 Unterrichtsentwürfen und 12 Unterrichtsmaterialien
+wiederholt. Nach dieser Schulung wurden die restlichen Entwürfe und Materialien
+aufgeteilt und jeweils nur von einer einzigen Person kodiert. Die Reliabilitätswerte
+können der nachfolgenden Tabelle entnommen werden.
+
+**Ebene der einzelnen Kategorien**
+
+Die Werte in der Tabelle stellen die Alpha-Werte aus dem Iota-Konzept
+von Berding und Pargmann (2022) dar.
+
+<div class='documentation_table'>
+
+|Kat. 0|Kat. 1| Kat. 2|
+|------|------|------|
+|.69|.88|.67|
+|.87|.94|n.b.|
+
+</div>
+
+**Ebene der Skala**
+
+<div class='documentation_table'>
+
+|Dyn. Iota Index|Prozentuale Übereinstimmung|Krippendorffs Alpha|Gwets AC|
+|---------|---------|---------|---------|
+|.62|.66|.52|.53|
+|.65|.80|.48|.66|
+
+</div>
+
+## Text Embedding Model
+
+Das dazugehörige Model zur Transformation von Text in eine numerische Darstellung
+kann per Mail an die Autoren angefordert werden. 
+
+## Potentielle Verzerrungen
+
+Das Ausmaß potentieller Verzerrungen kann aktuell für das Trainingsmaterial nicht
+genau abgeschätzt werden, da alle Dokumente vollständig anonym in die Bewertung
+und das Training der KI eingeflossen sind.
+
+## Literatur
+
+Berding, F. & Pargmann, J. (2022). Iota Reliability Concept of the
+Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
+
+Deci, E. L. & Ryan, R. M. (Hrsg.) (2002). Handbook of self-determination research. Rochester: University of Rochester Press.
+
+Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädagogik. Bielefeld: wbv. <https://doi.org/10.3278/9783763970216>
+")
+
+keywords_native<-c("Motivation", "Erfolgserleben", "Psychologische Bedürfnisse", "Feedback",
+                                             "Evaluation", "Selbstbestimmungstheorie")
+
 ```
 
-In contrast to TextEmbeddingModels there are not different types of
-author groups.
 
-Finally, you can manage the license for using your classifier via
-`set_software_license` and `get_software_license`.
 
-```{r, include = TRUE, eval=FALSE}
-example_classifier$set_software_license("GPL-3")
-```
 
-Similar to TextEmbeddingModels your classifier has to be licensed via "GPL-3" since
-some of the software used for creating a classifier applies this license. For the
-documentation you can choose between further license since the documentation is 
-not part of the software. For setting and receivinf the license you can call
-the methods 'set_documentation_license' and 'get_documentation_license'
 
-```{r, include = TRUE, eval=FALSE}
-example_classifier$set_documentation_license("CC BY-SA")
-```
 
-Now you are ready for sharing your classifier. Please remember to save
-your changes as described in the following section 3.2.
 
-## 3.2 Saving and Loading
 
-If you have created a classifier, saving and loading is very easy due to
-the functions `save_ai_model` and `load_ai_model`. The process
-for saving a model is similar to the process for text embedding models. You only have 
-to pass the model and a directory path to the function `save_ai_model`. The folder
-name is set with `dir_name`.
-
-```{r, include = TRUE, eval=FALSE}
-save_ai_model(
-  model=classifier,
-  model_dir="classifiers",
-  dir_name="movie_review_classifier",
-  save_format = "default",
-  append_ID = FALSE)
-```
-
-In contrast to text embedding models you can specify the additional argument `save_format`.
-In the case of pytorch models this arguments allows you to choose between
-`save_format = "safetensors"` and `save_format = "pt"`.
-We recommend to chose `save_format = "safetensors"` since this is a safer method
-to save your models.
-In the case of tensorflow models this arguments allows you to choose between
-`save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
-We recommend to chose `save_format = "keras"` since this is the recommended format
-by keras. 
-If you set `save_format = "default"` .safetensors is used for pytorch models and
-.keras is used for tensorflow models.
-
-If you would like to load a model you can call the function `load_ai_model`.
-```{r, include = TRUE, eval=FALSE}
-classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier")
-```
-
-> **Note:** Classifiers depend on the framework which was used during creation. 
-Thus, a classifier is always initalized with its original framework. The argument
-`ml_framework` has no effect. 
-
-In the case you would like to share your classifier with a broader audience we recommend
-to set `dir_name=NULL` and `append_ID = TRUE`. This will create a folder name
-automatically using the classifier's name and unique ID. 
-Similar to text embedding models ID is added to the name during the creation
-of the classifier ensuring a unique name for your model. With this options
-the folder name may look like `"movie_review_classifier_ID_oWsaNEB7b09A1pPB"`.
-
-If you would like to share your classifier with other persons you have to 
-provide all files within this folder `"classifiers/movie_review_classifier_ID_oWsaNEB7b09A1pPB"`.
-Since all files are stored with a specific structure do **not** change or
-edit the files manually.
-
-Please note that you need the `TextEmbeddingModel` that was used for
-training in order to predict new data with the classifier. You can
-request the name, label, and configuration of that model with
-`example_classifier$get_text_embedding_model()$model`. Thus, if you would like to
-share your classifier, ensure that you also share the corresponding text
-embedding model.
-
-If you would like to apply your classifier to new data, two steps are
-necessary. First, you must transform the raw text into a numerical
-expression by using *exactly* the same text embedding model that was
-used to train your classifier. The resulting object can be passed to the
-method `predict` and you will receive the predictions together with an
-estimate of certainty for each class/category.
-
-More information can be found in the vignette [02a Using Aifeducation Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html) or in
-[02 classification tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).

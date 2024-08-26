@@ -11,6 +11,11 @@
 #'no [TEFeatureExtractor] should be used this arugment must be `NULL`.
 #'@param model_name `string` Name for the model.
 #'@param model_label `string` Label of the model.
+#'@param Ns `int` Value for the sample. Only relevant for ProtoNet.
+#'@param Nq `int` value for the query. Only relevant for ProtoNet.
+#'@param loss_alpha `double` Value for alpha in the loss. Only relevant for ProtoNet.
+#'@param loss_maring `double` Value for the margin. Only relevant for ProtoNet.
+#'@param embedding_dim `int` Number of dimensions for the embedding. Only relevant for ProtoNet.
 #'
 #'@return Returns a `list` containing the elements of a user interface for
 #'displaying the errors. If no errors ware found function returns `NULL`.
@@ -24,7 +29,12 @@ check_errors_create_classifier <- function(destination_path,
                                            path_to_target_data,
                                            path_to_feature_extractor,
                                            model_name,
-                                           model_label) {
+                                           model_label,
+                                           Ns,
+                                           Nq,
+                                           loss_alpha,
+                                           loss_margin,
+                                           embedding_dim) {
   # List for gathering errors
   error_list <- NULL
 
@@ -101,10 +111,46 @@ check_errors_create_classifier <- function(destination_path,
     ))
   }
 
-  if (check_for_empty_input( model_label)) {
+  if (check_for_empty_input(model_label)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Label of the classifier ist not set."
     ))
+  }
+
+  #ProtoNet specific-----------------------------------------------------------
+  if(classifier_type=="protonet"){
+    if (check_for_empty_input(Ns)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "No value set for the sample. Please add a number."
+      ))
+    }
+
+    if (check_for_empty_input(Nq)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "No value set for the query. Please add a number."
+      ))
+    }
+
+    if (check_for_empty_input(loss_alpha)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Value for alpha in the loss is missing."
+      ))
+    }
+
+    if (check_for_empty_input(loss_margin)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Value for the margin in the loss is missing."
+      ))
+    }
+
+    if (check_for_empty_input(embedding_dim)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Value for the number of dimensions of the embedding is missing."
+      ))
+    }
+
+
+
   }
 
   if (length(error_list) > 0) {

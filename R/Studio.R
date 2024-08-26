@@ -1,162 +1,23 @@
-#'Aifeducation Studio
+#' Aifeducation Studio
 #'
-#'Functions starts a shiny app that represents Aifeducation Studio
+#' Functions starts a shiny app that represents Aifeducation Studio
 #'
-#'@return This function does nothing return. It is used to start a shiny app.
+#' @return This function does nothing return. It is used to start a shiny app.
 #'
-#'@family Graphical User Interface
+#' @family Graphical User Interface
 #'
-#'@import iotarelr
-#'@importFrom rlang .data
-#'@importFrom stringr str_extract_all
-#'@importFrom stringr str_split_fixed
-#'@importFrom stringr str_to_lower
-#'@importFrom utils packageVersion
-#'@importFrom utils read.csv2
-#'@importFrom utils write.csv2
-#'@importFrom utils askYesNo
-#'@importFrom utils install.packages
-#'@importFrom methods is
-#'
-#'@export
+#' @export
 start_aifeducation_studio <- function() {
-
-  #Prepare for studio
+  # Prepare for studio
   check_and_prepare_for_studio()
+
+  # Set up for long running tasks
   future::plan(future::multisession)
 
-  #Create ui
-  ui <- bslib::page_navbar(
-    title = "AI for Education - Studio",
-    theme = bslib::bs_theme(bootswatch = "darkly"),
-    bslib::nav_panel(
-      title = "Home",
-      Studio_Home_UI("Home")
-    ),
-    bslib::nav_panel(
-      title = "Data Management",
-      DataManagement_RawTextsUI("DataSetRawTexts")
-    ),
-    bslib::nav_panel(
-      title = "Base Models",
-      navset_underline(
-        bslib::nav_panel(
-          title = "Create"
-        ),
-        bslib::nav_panel(
-          title = "Train"
-        )
-      )
-    ),
-    bslib::nav_panel(
-      title = "TextEmbeddingModels",
-      bslib::navset_tab(
-        bslib::nav_panel(
-          title = "Use",
-          TextEmbeddingModel_Use_UI("TextEmbeddingModel_Use")
-        ),
-        bslib::nav_panel(
-          title = "Create",
-          TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
-        ),
-        bslib::nav_panel(
-          title = "Document",
-          DocumentPage_UI("TextEmbeddingModel_Document")
-        )
-      )
-    ),
-    bslib::nav_panel(
-      title = "FeatureExtractors",
-      bslib::navset_tab(
-        bslib::nav_panel(
-          title = "Use",
-          TextEmbeddingModel_Use_UI("FeatureExtractors_Use")
-        ),
-        bslib::nav_panel(
-          title = "Create",
-          FeatureExtractors_Create_UI("FeatureExtractors_Create")
-        ),
-        bslib::nav_panel(
-          title = "Document",
-          DocumentPage_UI("FeatureExtractors_Document")
-        )
-      )
-    ),
-    bslib::nav_panel(
-      title = "Classifiers",
-      bslib::navset_tab(
-        bslib::nav_panel(
-          title = "Use",
-          Classifiers_Use_UI("Classifiers_Use")
-        ),
-        bslib::nav_panel(
-          title = "Create",
-          Classifiers_Create_UI("Classifiers_Create")
-        ),
-        bslib::nav_panel(
-          title = "Document",
-          DocumentPage_UI("Classifiers_Document")
-        )
-      )
+  # Create App------------------------------------------------------------------
+  shiny::shinyAppDir(
+    appDir = system.file("studio_app",
+      package = "aifeducation"
     )
   )
-
-  server <- function(input, output, session) {
-    #Set up global variables----------------------------------------------------
-    log_dir=getwd()
-    volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
-
-    #Functions
-    DataManagement_RawTextsServer(
-      id="DataSetRawTexts",
-      log_dir=log_dir,
-      volumes=volumes)
-
-    #TextEmbeddingModels
-    TextEmbeddingModel_Create_Server(
-      id="TextEmbeddingModel_Create",
-      log_dir=log_dir,
-      volumes=volumes)
-    TextEmbeddingModel_Use_Server(
-      id="TextEmbeddingModel_Use",
-      log_dir=log_dir,
-      volumes=volumes
-      )
-    DocumentPage_Server(
-      id="TextEmbeddingModel_Document",
-      volumes=volumes,
-      type = "TextEmbeddingModel"
-    )
-
-    #FeatureExtractors
-    FeatureExtractor_Create_Server(
-      id="FeatureExtractors_Create",
-      log_dir=log_dir,
-      volumes=volumes)
-    DocumentPage_Server(
-      id="FeatureExtractors_Document",
-      volumes=volumes,
-      type = "FeatureExtractors"
-    )
-
-    #Classifiers
-    Classifiers_Create_Server(
-      id="Classifiers_Create",
-      log_dir=log_dir,
-      volumes=volumes)
-
-    Classifiers_Use_Server(
-      id="Classifiers_Use",
-      log_dir=log_dir,
-      volumes=volumes
-      )
-    DocumentPage_Server(
-      id="Classifiers_Document",
-      volumes=volumes,
-      type = "FeatureExtractors"
-    )
-
-
-  }
-  shinyApp(ui = ui, server = server)
 }

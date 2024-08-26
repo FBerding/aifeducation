@@ -9,5 +9,35 @@
 #'@keywords internal
 #'
 Studio_Home_UI=function(id){
-
+  shiny::tagList(
+    bslib::page(
+      bslib::layout_column_wrap(
+        bslib::card(
+          bslib::card_header(
+            "AI for Education - Studio"
+          ),
+          bslib::card_body(
+            shiny::tags$img(
+              src= "studio_logo.jpg",
+              align = "center",
+              width="100%"
+            )
+          )
+        ),
+        bslib::card(
+          bslib::card_header(
+            "Support"
+          ),
+          bslib::card_body(
+            shiny::tags$a("Package's Home Page",
+                          href="https://fberding.github.io/aifeducation/index.html",
+                          target="_blank"),
+            shiny::tags$a("Introducation to AI for Education - Studio",
+                          href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html",
+                          target="_blank")
+          )
+        )
+      )
+    )
+  )
 }

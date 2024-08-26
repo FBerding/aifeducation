@@ -151,7 +151,6 @@ TextEmbeddingModel <- R6::R6Class(
     #' @description Method for creating a new text embedding model
     #' @param model_name `string` containing the name of the new model.
     #' @param model_label `string` containing the label/title of the new model.
-    #' @param model_version `string` version of the model.
     #' @param model_language `string` containing the language which the model
     #' represents (e.g., English).
     #' @param ml_framework `string` Framework to use for the model.
@@ -221,7 +220,6 @@ TextEmbeddingModel <- R6::R6Class(
     #' @import reshape2
     configure = function(model_name = NULL,
                          model_label = NULL,
-                         model_version = NULL,
                          model_language = NULL,
                          method = NULL,
                          ml_framework = "pytorch",
@@ -243,7 +241,6 @@ TextEmbeddingModel <- R6::R6Class(
       # Parameter check---------------------------------------------------------
       check_type(model_name, "string", FALSE)
       check_type(model_label, "string", FALSE)
-      check_type(model_version, "string", TRUE)
       check_type(model_language, "string", FALSE)
       check_type(method, "string", FALSE)
       if (method %in% c(private$supported_transformers, "lda", "glove_cluster") == FALSE) {
@@ -741,25 +738,28 @@ TextEmbeddingModel <- R6::R6Class(
       # Load R file
       old_model <- load_R_interface(dir_path)
 
+      #Old private states
+      old_private=old_model$get_private()
+
       # Set basic configuration
       private$basic_components <- list(
-        method = old_model$get_basic_components()$method,
-        max_length = old_model$get_basic_components()$max_length
+        method = old_private$basic_components$method,
+        max_length = old_private$basic_components$max_length
       )
 
       # Set bow configuration
       private$bow_components <- list(
-        model = old_model$get_bow_components()$model,
-        vocab = old_model$get_bow_components()$vocab,
+        model = old_private$bow_components$model,
+        vocab = old_private$bow_components$vocab,
         configuration = list(
-          to_lower = old_model$get_bow_components()$configuration$to_lower,
-          use_lemmata = old_model$get_bow_components()$configuration$use_lemmata,
-          bow_n_dim = old_model$get_bow_components()$configuration$bow_n_dim,
-          bow_n_cluster = old_model$get_bow_components()$configuration$bow_n_cluster,
-          bow_max_iter = old_model$get_bow_components()$configuration$bow_max_iter,
-          bow_max_iter_cluster = old_model$get_bow_components()$configuration$bow_max_iter_cluster,
-          bow_cr_criterion = old_model$get_bow_components()$configuration$bow_cr_criterion,
-          bow_learning_rate = old_model$get_bow_components()$configuration$bow_learning_rate
+          to_lower = old_private$bow_components$configuration$to_lower,
+          use_lemmata = old_private$bow_components$configuration$use_lemmata,
+          bow_n_dim = old_private$bow_components$configuration$bow_n_dim,
+          bow_n_cluster = old_private$bow_components$configuration$bow_n_cluster,
+          bow_max_iter = old_private$bow_components$configuration$bow_max_iter,
+          bow_max_iter_cluster = old_private$bow_components$configuration$bow_max_iter_cluster,
+          bow_cr_criterion = old_private$bow_components$configuration$bow_cr_criterion,
+          bow_learning_rate = old_private$bow_components$configuration$bow_learning_rate
         )
       )
 
@@ -768,60 +768,61 @@ TextEmbeddingModel <- R6::R6Class(
         model = NULL,
         model_mlm = NULL,
         tokenizer = NULL,
-        emb_layer_min = old_model$get_transformer_components()$emb_layer_min,
-        emb_layer_max = old_model$get_transformer_components()$emb_layer_max,
-        emb_pool_type = old_model$get_transformer_components()$emb_pool_type,
-        chunks = old_model$get_transformer_components()$chunks,
-        features = old_model$get_transformer_components()$features,
-        overlap = old_model$get_transformer_components()$overlap,
-        ml_framework = old_model$get_transformer_components()$ml_framework
+        emb_layer_min = old_private$transformer_components$emb_layer_min,
+        emb_layer_max = old_private$transformer_components$emb_layer_max,
+        emb_pool_type = old_private$transformer_components$emb_pool_type,
+        chunks = old_private$transformer_components$chunks,
+        features = old_private$transformer_components$features,
+        overlap = old_private$transformer_components$overlap,
+        ml_framework = old_private$transformer_components$ml_framework
       )
 
       # Set model info
       private$set_model_info(
-        model_name_root = old_model$get_model_info()$model_name_root,
-        model_id = old_model$get_model_info()$model_id,
-        label = old_model$get_model_info()$model_label,
-        model_date = old_model$get_model_info()$model_date,
-        model_language = old_model$get_model_info()$model_language
+        model_name_root = old_private$model_info$model_name_root,
+        model_id = old_private$model_info$model_id,
+        label = old_private$model_info$model_label,
+        model_date = old_private$model_info$model_date,
+        model_language = old_private$model_info$model_language
       )
 
       # Set license
-      self$set_software_license(old_model$get_software_license())
-      self$set_documentation_license(old_model$get_documentation_license())
+      self$set_software_license(old_private$model_info$model_license)
+      self$set_documentation_license(old_private$model_description$license)
 
       # Set description and documentation
       self$set_model_description(
-        eng = old_model$get_model_description()$eng,
-        native = old_model$get_model_description()$native,
-        abstract_eng = old_model$get_model_description()$abstract_eng,
-        abstract_native = old_model$get_model_description()$abstract_native,
-        keywords_eng = old_model$get_model_description()$keywords_eng,
-        keywords_native = old_model$get_model_description()$keywords_native
+        eng = old_private$model_description$eng,
+        native = old_private$model_description$native,
+        abstract_eng = old_private$model_description$abstract_eng,
+        abstract_native = old_private$model_description$abstract_native,
+        keywords_eng = old_private$model_description$keywords_eng,
+        keywords_native = old_private$model_description$keywords_native
       )
 
       # Set publication info
       self$set_publication_info(
         type = "developer",
-        authors = old_model$get_publication_info()$developer$authors,
-        citation = old_model$get_publication_info()$developer$citation,
-        url = old_model$get_publication_info()$developer$url
+        authors = old_private$publication_info$developed_by$authors,
+        citation = old_private$publication_info$developed_by$citation,
+        url = old_private$publication_info$developed_by$url
       )
       self$set_publication_info(
         type = "modifier",
-        authors = old_model$get_publication_info()$modifier$authors,
-        citation = old_model$get_publication_info()$modifier$citation,
-        url = old_model$get_publication_info()$modifier$url
+        authors = old_private$publication_info$modified_by$authors,
+        citation = old_private$publication_info$modified_by$citation,
+        url = old_private$publication_info$modified_by$modifier$url
       )
 
       # Get and set original package versions
-      private$r_package_versions$aifeducation <- old_model$get_package_versions()$r_package_versions$aifeducation
-      private$r_package_versions$reticulate <- old_model$get_package_versions()$r_package_versions$reticulate
+      private$r_package_versions$aifeducation=old_private$r_package_versions$aifeducation
+      private$r_package_versions$reticulate=old_private$r_package_versions$reticulate
 
-      private$py_package_versions$torch <- old_model$get_package_versions()$py_package_versions$torch
-      private$py_package_versions$tensorflow <- old_model$get_package_versions()$py_package_versions$tensorflow
-      private$py_package_versions$keras <- old_model$get_package_versions()$py_package_versions$keras
-      private$py_package_versions$numpy <- old_model$get_package_versions()$py_package_versions$numpy
+
+      private$py_package_versions$torch <-  old_private$py_package_versions$torch
+      private$py_package_versions$tensorflow <-  old_private$py_package_versions$tensorflow
+      private$py_package_versions$keras <-  old_private$py_package_versions$keras
+      private$py_package_versions$numpy <-  old_private$py_package_versions$numpy
 
       # Finalize config
       private$set_configuration_to_TRUE()
@@ -1625,7 +1626,7 @@ TextEmbeddingModel <- R6::R6Class(
         }
 
         # Summarizing the results over all batches
-        text_embedding <- abind::abind(batch_results, along = 1)
+        text_embedding <- array_form_bind(batch_results)
         # Glove Cluster----------------------------------------------------------
       } else if (private$basic_components$method == "glove_cluster") {
         tokens <- self$encode(
@@ -1722,7 +1723,6 @@ TextEmbeddingModel <- R6::R6Class(
           model_label = private$model_info$model_label,
           model_date = private$model_info$model_date,
           model_method = private$basic_components$method,
-          model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
           param_seq_length = private$basic_components$max_length,
           param_features = dim(text_embedding)[3],
@@ -1742,7 +1742,6 @@ TextEmbeddingModel <- R6::R6Class(
           model_date = private$model_info$model_date,
           model_label = private$model_info$model_label,
           model_method = private$basic_components$method,
-          model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
           param_seq_length = private$basic_components$max_length,
           param_features = dim(text_embedding)[2],
@@ -1762,7 +1761,6 @@ TextEmbeddingModel <- R6::R6Class(
           model_label = private$model_info$model_label,
           model_date = private$model_info$model_date,
           model_method = private$basic_components$method,
-          model_version = private$model_info$model_version,
           model_language = private$model_info$model_language,
           param_seq_length = private$basic_components$max_length,
           param_features = dim(embeddings$embeddings)[length(dim(embeddings$embeddings))],
@@ -1827,7 +1825,6 @@ TextEmbeddingModel <- R6::R6Class(
             model_label = private$model_info$model_label,
             model_date = private$model_info$model_date,
             model_method = private$basic_components$method,
-            model_version = private$model_info$model_version,
             model_language = private$model_info$model_language,
             param_seq_length = private$basic_components$max_length,
             param_features = dim(embeddings$embeddings)[3],
@@ -2182,6 +2179,13 @@ TextEmbeddingModel <- R6::R6Class(
     #' @return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
     is_configured = function() {
       return(private$configured)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting all private fields and methods. Used
+    #' for loading and updating an object.
+    #' @return Returns a `list` with all private fields and methods.
+    get_private=function(){
+      return(private)
     }
   )
 )

@@ -9,12 +9,12 @@
 #'@keywords internal
 #'
 TextEmbeddingModel_Create_UI <- function(id) {
-  tagList(
+  shiny::tagList(
     bslib::page_sidebar(
       # Sidebar------------------------------------------------------------------
       sidebar = bslib::sidebar(
         position = "left",
-        tags$h3("Control Panel"),
+        shiny::tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "button_select_base_model"),
           label = "Choose a Base Model",

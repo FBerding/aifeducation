@@ -21,4 +21,6 @@ cran-comments.md
 /doc/
 /Meta/
 intel_power_gadget_log.csv
-
+aifeducation_loss.log
+aifeducation_state.log
+arguments.rda

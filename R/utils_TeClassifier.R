@@ -33,7 +33,8 @@
 #'
 #'@return If \code{return_names_only=TRUE} returns only the names of the vector elements.
 #'
-#'@family Auxiliary Functions
+#'@family classifier_utils
+#'
 #'
 #'@export
 get_coder_metrics<-function(true_values=NULL,
@@ -151,7 +152,7 @@ get_coder_metrics<-function(true_values=NULL,
 #'category.
 #'@return Returns an object of class \code{iotarelr_iota2} which is the mean
 #'iota2 object.
-#'@family Auxiliary Functions
+#'@family classifier_utils
 #'@keywords internal
 create_iota2_mean_object<-function(iota2_list,
                                    free_aem=FALSE,
@@ -221,8 +222,7 @@ create_iota2_mean_object<-function(iota2_list,
 #'@return Returns a matrix which contains the cases categories in the rows and
 #'the measures (precision, recall, f1) in the columns.
 #'
-#'@family Auxiliary Functions
-#'
+#'@family classifier_utils
 #'@export
 calc_standard_classification_measures<-function(true_values,predicted_values){
   categories=levels(true_values)

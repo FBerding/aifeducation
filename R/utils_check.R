@@ -8,7 +8,7 @@
 #'@return Function does nothing return. It raises an error if the object is not
 #'of the specified class.
 #'
-#'@family Auxiliary Functions
+#' @family Utils
 #'@keywords internal
 #'
 check_class=function(object,classes,allow_NULL=FALSE){
@@ -52,7 +52,7 @@ check_class=function(object,classes,allow_NULL=FALSE){
 #'@return Function does nothing return. It raises an error if the object is not
 #'of the specified type.
 #'
-#'@family Auxiliary Functions
+#' @family Data Management
 #'@keywords internal
 #'
 check_type=function(object,type="bool",allow_NULL=FALSE){

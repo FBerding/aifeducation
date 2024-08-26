@@ -1,20 +1,20 @@
-#'Graphical user interface for documenting objects
+#' Graphical user interface for documenting objects
 #'
-#'Functions generates the page for documenting objects.
+#' Functions generates the page for documenting objects.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@family studio_gui_page_document
-#'@keywords internal
+#' @family studio_gui_page_document
+#' @keywords internal
 #'
-DocumentPage_UI <- function(id) {
+DocumentPage_UI <- function(id, type = "TextEmbeddingModel") {
   bslib::page(
     bslib::page_sidebar(
       # Sidebar------------------------------------------------------------------
       sidebar = bslib::sidebar(
         position = "left",
-        tags$h3("Control Panel"),
+        shiny::tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "button_select_model"),
           label = "Choose a Model",
@@ -29,10 +29,12 @@ DocumentPage_UI <- function(id) {
           title = "Developers",
           shiny::uiOutput(outputId = shiny::NS(id, "developers"))
         ),
-        bslib::nav_panel(
-          title = "Modifiers",
-          shiny::uiOutput(outputId = shiny::NS(id, "modifiers"))
-        ),
+        if (type == "TextEmbeddingModel") {
+          bslib::nav_panel(
+            title = "Modifiers",
+            shiny::uiOutput(outputId = shiny::NS(id, "modifiers"))
+          )
+        },
         bslib::nav_panel(
           title = "Abstract English",
           shiny::uiOutput(outputId = shiny::NS(id, "abstract_eng"))
@@ -48,6 +50,10 @@ DocumentPage_UI <- function(id) {
         bslib::nav_panel(
           title = "Description Native",
           shiny::uiOutput(outputId = shiny::NS(id, "desc_native"))
+        ),
+        bslib::nav_panel(
+          title = "Licensing",
+          shiny::uiOutput(outputId = shiny::NS(id, "licensing"))
         )
       )
     )
@@ -55,19 +61,19 @@ DocumentPage_UI <- function(id) {
 }
 
 
-#'Server function for: graphical user interface for classifiers - create
+#' Server function for: graphical user interface for classifiers - create
 #'
-#'Functions generates the functionality of a page on the server.
+#' Functions generates the functionality of a page on the server.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param type `string` determing the type of documentation page. `"TextEmbeddigModel"` for
-#'objects of class [TextEmbeddingModel] and `"Classifiers"` for objects of class [TEClassifierReguluar] and
-#'[TEClassifierProtoNet].
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param type `string` determing the type of documentation page. `"TextEmbeddigModel"` for
+#' objects of class [TextEmbeddingModel] and `"Classifiers"` for objects of class [TEClassifierReguluar] and
+#' [TEClassifierProtoNet].
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@family studio_gui_page_document
-#'@keywords internal
+#' @family studio_gui_page_document
+#' @keywords internal
 #'
 DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
   moduleServer(id, function(input, output, session) {
@@ -106,17 +112,46 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         model <- try(load_from_disk(model_path), silent = TRUE)
 
         if ("try-error" %in% class(model) == FALSE) {
-          if ("TextEmbeddingModel" %in% class(model)) {
-            shiny::removeModal()
-            return(model)
-          } else {
-            display_errors(
-              title = "Error",
-              size = "l",
-              easy_close = TRUE,
-              error_messages = "The file does not contain an object of class TextEmbeddingModel."
-            )
-            return(NULL)
+          if (type == "TextEmbeddingModel") {
+            if ("TextEmbeddingModel" %in% class(model)) {
+              shiny::removeModal()
+              return(model)
+            } else {
+              display_errors(
+                title = "Error",
+                size = "l",
+                easy_close = TRUE,
+                error_messages = "The file does not contain an object of class TextEmbeddingModel."
+              )
+              return(NULL)
+            }
+          } else if (type == "Classifier") {
+            if ("TEClassifierRegular" %in% class(model) |
+              "TEClassifierProtoNet" %in% class(model)) {
+              shiny::removeModal()
+              return(model)
+            } else {
+              display_errors(
+                title = "Error",
+                size = "l",
+                easy_close = TRUE,
+                error_messages = "The file does not contain an object of class TEClassifierRegular or TEClassifierProtoNet."
+              )
+              return(NULL)
+            }
+          } else if (type == "FeatureExtractors") {
+            if ("TEFeatureExtractor" %in% class(model)) {
+              shiny::removeModal()
+              return(model)
+            } else {
+              display_errors(
+                title = "Error",
+                size = "l",
+                easy_close = TRUE,
+                error_messages = "The file does not contain an object of class TEFeatureExtractor."
+              )
+              return(NULL)
+            }
           }
         } else {
           display_errors(
@@ -225,6 +260,8 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
           tmp_model
         })
       })
+    } else {
+      output$modifiers <- NULL
     }
 
     # Abstract Eng---------------------------------------------------------------
@@ -334,6 +371,32 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
       })
     })
 
+    # Licensing-----------------------------------------------------------------
+    output$licensing <- shiny::renderUI({
+      shiny::req(model())
+      return(
+        generate_doc_input_licensing_editor(ns = session$ns, model = model())
+      )
+    })
+
+    shiny::observeEvent(input$doc_editor_licensing_save_button, {
+      tmp_model <- model()
+
+      tmp_model$set_documentation_license(input$doc_editor_documentation_license)
+      tmp_model$set_software_license(input$doc_editor_software_license)
+
+      r_interface_path <- paste0(model_path(), "/r_interface.rda")
+      save(tmp_model, file = r_interface_path)
+      model <- shiny::reactive({
+        tmp_model
+      })
+    })
+
+    shiny::observeEvent(input$doc_editor_description_native_preview_button, {
+      output$doc_editor_description_native_preview <- shiny::renderUI({
+        return(shiny::includeMarkdown(input$doc_editor_description_native))
+      })
+    })
 
 
     #--------------------------------------------------------------------------

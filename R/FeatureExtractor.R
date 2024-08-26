@@ -21,7 +21,7 @@
 #'Objects of class [TEFeatureExtractor] are designed to be used with classifiers
 #'such as [TEClassifierRegular] and [TEClassifierProtoNet].
 #'
-#'@family Classification
+#'@family Text Embedding
 #'@export
 TEFeatureExtractor<-R6::R6Class(
   classname = "TEFeatureExtractor",
@@ -138,11 +138,9 @@ TEFeatureExtractor<-R6::R6Class(
     #'the logger should try to update the log files. Only relevant if `log_dir` is not `NULL`.
     #'@param trace `bool` `TRUE`, if information about the estimation
     #'phase should be printed to the console.
-    #'@param keras_trace `int` \code{keras_trace=0} does not print any
-    #'information about the training process from keras on the console.
-    #'@param pytorch_trace `int` \code{pytorch_trace=0} does not print any
+    #'@param ml_trace `int` \code{ml_trace=0} does not print any
     #'information about the training process from pytorch on the console.
-    #'\code{pytorch_trace=1} prints a progress bar.
+    #'\code{ml_trace=1} prints a progress bar.
     #'@return Function does not return a value. It changes the object into a trained
     #'classifier.
     #'@importFrom abind abind
@@ -156,8 +154,7 @@ TEFeatureExtractor<-R6::R6Class(
                    batch_size=32,
                    dir_checkpoint,
                    trace=TRUE,
-                   keras_trace=2,
-                   pytorch_trace=1,
+                   ml_trace=1,
                    log_dir=NULL,
                    log_write_interval=10){
 
@@ -183,8 +180,7 @@ TEFeatureExtractor<-R6::R6Class(
       self$last_training$config$batch_size=batch_size
       self$last_training$config$dir_checkpoint=dir_checkpoint
       self$last_training$config$trace=trace
-      self$last_training$config$keras_trace=keras_trace
-      self$last_training$config$pytorch_trace=pytorch_trace
+      self$last_training$config$ml_trace=ml_trace
 
       private$log_config$log_dir=log_dir
       private$log_config$log_state_file=paste0(private$log_config$log_dir,"/aifeducation_state.log")
@@ -237,7 +233,7 @@ TEFeatureExtractor<-R6::R6Class(
         self$last_training$history=py$AutoencoderTrain_PT_with_Datasets(
           model=self$model,
           epochs=as.integer(self$last_training$config$epochs),
-          trace=as.integer(self$last_training$config$pytorch_trace),
+          trace=as.integer(self$last_training$config$ml_trace),
           batch_size=as.integer(self$last_training$config$batch_size),
           train_data=extractor_dataset$train,
           val_data=extractor_dataset$test,
@@ -247,7 +243,7 @@ TEFeatureExtractor<-R6::R6Class(
           log_write_interval=log_write_interval,
           log_top_value=log_top_value,
           log_top_total=log_top_total,
-          log_top_message=log_top_message)$loss
+          log_top_message=log_top_message)
         #-----------------------------------------------------------------------
       } else if(private$ml_framework=="tensorflow"){
         #Set format
@@ -260,7 +256,7 @@ TEFeatureExtractor<-R6::R6Class(
         callback=keras$callbacks$ModelCheckpoint(
           filepath = paste0(self$last_training$config$dir_checkpoint,"/best_weights.keras"),
           monitor = "val_loss",
-          verbose = as.integer(min(self$last_training$config$keras_trace,1)),
+          verbose = as.integer(min(self$last_training$config$ml_trace,1)),
           mode = "auto",
           save_best_only = TRUE,
           save_weights_only = TRUE)
@@ -289,7 +285,7 @@ TEFeatureExtractor<-R6::R6Class(
             label_cols="labels")
 
           history<-self$model$fit(
-            verbose=as.integer(self$last_training$config$keras_trace),
+            verbose=as.integer(self$last_training$config$ml_trace),
             x=tf_dataset_train,
             validation_data=tf_dataset_val,
             epochs = as.integer(self$last_training$config$epochs),
@@ -302,7 +298,7 @@ TEFeatureExtractor<-R6::R6Class(
 
       }
 
-      rownames(self$last_training$history)=c("train","val")
+      rownames(self$last_training$history$loss)=c("train","val")
 
       #Set training status value
       private$trained=TRUE
@@ -318,7 +314,11 @@ TEFeatureExtractor<-R6::R6Class(
     #' @return Method does not return anything. It loads an object from disk.
     load_from_disk = function(dir_path) {
       # Call the core method which loads data common for all models
-      super$load_from_disk(dir_path = dir_path)
+      private$load_config_and_docs(dir_path = dir_path)
+
+      # Create and load AI model
+      private$create_reset_model()
+      self$load(dir_path = dir_path)
 
       #Add FeatureExtractor specific data
       # Load R file

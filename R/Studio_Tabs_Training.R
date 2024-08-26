@@ -1,13 +1,13 @@
-#'Graphical user interface for displaying the training history of an object.
+#' Graphical user interface for displaying the training history of an object.
 #'
-#'Functions generates the tab within a page for displaying the training history
-#'of an object.
+#' Functions generates the tab within a page for displaying the training history
+#' of an object.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@family studio_gui_training
-#'@keywords internal
+#' @family studio_gui_training
+#' @keywords internal
 #'
 Training_UI <- function(id) {
   bslib::page(
@@ -43,16 +43,16 @@ Training_UI <- function(id) {
   )
 }
 
-#'Server function for: graphical user interface for displaying the training history of an object.
+#' Server function for: graphical user interface for displaying the training history of an object.
 #'
-#'Functions generates the functionality of a page on the server.
+#' Functions generates the functionality of a page on the server.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param model Model used for inference.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#' @param id `string` determining the id for the namespace.
+#' @param model Model used for inference.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@family studio_gui_training
-#'@keywords internal
+#' @family studio_gui_training
+#' @keywords internal
 #'
 Training_Server <- function(id, model) {
   moduleServer(id, function(input, output, session) {
@@ -62,7 +62,7 @@ Training_Server <- function(id, model) {
     # Control widgets for classifiers--------------------------------------------
     output$classifier_specific <- shiny::renderUI({
       if ("TEClassifierRegular" %in% class(model()) |
-          "TEClassifierProtoNet" %in% class(model())){
+        "TEClassifierProtoNet" %in% class(model())) {
         ui <- shiny::tagList(
           shinyWidgets::radioGroupButtons(
             inputId = ns("training_phase"),
@@ -77,8 +77,8 @@ Training_Server <- function(id, model) {
             label = "Measures",
             choices = list(
               "Loss" = "loss",
-              "Accuracy" = "acc",
-              "Balanced Accuracy" = "bacc"
+              "Accuracy" = "accuracy",
+              "Balanced Accuracy" = "balanced_accuracy"
             )
           ),
           shinyWidgets::materialSwitch(
@@ -92,6 +92,22 @@ Training_Server <- function(id, model) {
           )
         )
         return(ui)
+      } else if ("TEFeatureExtractor" %in% class(model())) {
+        ui <- shiny::tagList(
+          shinyWidgets::radioGroupButtons(
+            inputId = ns("measure"),
+            label = "Measures",
+            choices = list(
+              "Loss" = "loss"
+            )
+          ),
+          shinyWidgets::materialSwitch(
+            inputId = ns("training_min_max"),
+            label = "Add Min/Max",
+            value = TRUE,
+            status = "primary"
+          )
+        )
       } else {
         return(NULL)
       }
@@ -157,18 +173,28 @@ Training_Server <- function(id, model) {
 
           # Plot for classifiers-----------------------------------------------
         } else if ("TEClassifierRegular" %in% class(model()) |
-          "TEClassifierProtoNet" %in% class(model())) {
-
-          #Necessary input
+          "TEClassifierProtoNet" %in% class(model()) |
+          "TEFeatureExtractor" %in% class(model())) {
+          # Necessary input
           shiny::req(input$measure)
 
           # Get data for plotting
-          plot_data <- prepare_training_history(
-            model = model(),
-            final = input$training_phase,
-            use_pl = model()$last_training$config$use_pl,
-            pl_step = input$classifier_pl_step
-          )
+          if ("TEClassifierRegular" %in% class(model()) |
+            "TEClassifierProtoNet" %in% class(model())) {
+            plot_data <- prepare_training_history(
+              model = model(),
+              final = input$training_phase,
+              use_pl = model()$last_training$config$use_pl,
+              pl_step = input$classifier_pl_step
+            )
+          } else if ("TEFeatureExtractor" %in% class(model())) {
+            plot_data <- prepare_training_history(
+              model = model(),
+              final = FALSE,
+              use_pl = FALSE,
+              pl_step = NULL
+            )
+          }
 
           # Select the performance measure to display
           plot_data <- plot_data[[input$measure]]
@@ -178,9 +204,9 @@ Training_Server <- function(id, model) {
           y_max <- input$y_max
           if (input$measure == "loss") {
             y_label <- "loss"
-          } else if (input$measure == "acc") {
+          } else if (input$measure == "accuracy") {
             y_label <- "Accuracy"
-          } else if (input$measure == "bacc") {
+          } else if (input$measure == "balanced_accuracy") {
             y_label <- "Balanced Accuracy"
           }
 

@@ -688,12 +688,12 @@ long_load_target_data <- function(file_path, selectet_column) {
   return(target_factor)
 }
 
-#' Prepare history data of classifiers
+#' Prepare history data of objects
 #'
 #' Function for preparing the history data of a model in order to be plotted in
 #' AI for Education - Studio.
 #'
-#' @param model Model for which the data should be prepared. The model must be a classifier.
+#' @param model Model for which the data should be prepared.
 #' @param final `bool` If `TRUE` the history data of the final training is used
 #' for the data set.
 #' @param use_pl `bool` If `TRUE` data preparation assumes that pseudo labeling was applied
@@ -701,8 +701,8 @@ long_load_target_data <- function(file_path, selectet_column) {
 #' @param pl_step `int` If `use_pl=TRUE` select the step within pseudo labeling for which the
 #' data should be prepared.
 
-#' @return Returns a names `list` with the history data of the model for the loss
-#' (`loss`), the accuracy (`acc`), and the balanced accuracy (`bacc`).
+#' @return Returns a named `list` with the training history data of the model. The
+#' reported measures depend on the provided model.
 #'
 #' @family studio_utils
 #' @keywords internal
@@ -711,32 +711,36 @@ prepare_training_history <- function(model,
                                      final = FALSE,
                                      use_pl = FALSE,
                                      pl_step = NULL) {
-  classifier <- model
-  plot_data <- classifier$last_training$history
+  plot_data <- model$last_training$history
+
   if (is.null(final)) {
     final <- FALSE
   }
 
   # Get standard statistics
-  n_epochs <- classifier$last_training$config$epochs
-  index_final <- length(classifier$last_training$history)
+  n_epochs <- model$last_training$config$epochs
+  index_final <- length(model$last_training$history)
 
 
   # Get information about the existence of a training, validation, and test data set
   # Get Number of folds for the request
   if (final == FALSE) {
-    n_folds <- length(classifier$last_training$history) - 1
+    n_folds <- length(model$last_training$history) - 1
     if (use_pl == FALSE) {
-      n_sample_type <- nrow(plot_data[[1]]$loss)
+      measures <- names(plot_data[[1]])
+      n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
     } else {
-      n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]]$loss)
+      measures <- names(plot_data[[1]])
+      n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]][[measures[1]]])
     }
   } else {
     n_folds <- 1
     if (use_pl == FALSE) {
-      n_sample_type <- nrow(plot_data[[index_final]]$loss)
+      measures <- names(plot_data[[index_final]])
+      n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
     } else {
-      n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]]$loss)
+      measures <- names(plot_data[[index_final]])
+      n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
     }
   }
 
@@ -747,108 +751,74 @@ prepare_training_history <- function(model,
     sample_type_name <- c("train", "validation")
   }
 
-  # Create array for saving the data
-  loss_array <- array(
-    dim = c(
-      n_folds,
-      n_sample_type,
-      n_epochs
-    ),
-    dimnames = list(fold = NULL, sample_type = sample_type_name, epoch = NULL)
-  )
-  bacc_array <- loss_array
-  acc_array <- loss_array
+  # Create array for saving the data-------------------------------------------
+  result_list <- NULL
+  for (j in 1:length(measures)) {
+    measure <- measures[j]
+    measure_array <- array(
+      dim = c(
+        n_folds,
+        n_sample_type,
+        n_epochs
+      ),
+      dimnames = list(fold = NULL, sample_type = sample_type_name, epoch = NULL)
+    )
 
-  final_data_loss <- matrix(
-    data = NA,
-    nrow = n_epochs,
-    ncol = 3 * n_sample_type + 1
-  )
-  colnames(final_data_loss) <- c(
-    "epoch",
-    paste0(
-      sample_type_name,
-      c(
-        rep("_min", times = n_sample_type),
-        rep("_mean", times = n_sample_type),
-        rep("_max", times = n_sample_type)
+    final_data_measure <- matrix(
+      data = NA,
+      nrow = n_epochs,
+      ncol = 3 * n_sample_type + 1
+    )
+    colnames(final_data_measure) <- c(
+      "epoch",
+      paste0(
+        sample_type_name,
+        c(
+          rep("_min", times = n_sample_type),
+          rep("_mean", times = n_sample_type),
+          rep("_max", times = n_sample_type)
+        )
       )
     )
-  )
-  final_data_loss[, "epoch"] <- seq.int(from = 1, to = n_epochs)
-  final_data_bacc <- final_data_loss
-  final_data_acc <- final_data_loss
+    final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
 
-  # Create data set for plot
-  if (final == FALSE) {
-    for (i in 1:n_folds) {
+    if (final == FALSE) {
+      for (i in 1:n_folds) {
+        if (use_pl == FALSE) {
+          measure_array[i, , ] <- plot_data[[i]][[measure]]
+        } else {
+          measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
+        }
+      }
+    } else if (final == TRUE) {
       if (use_pl == FALSE) {
-        loss_array[i, , ] <- plot_data[[i]]$loss
-        bacc_array[i, , ] <- plot_data[[i]]$balanced_accuracy
-        acc_array[i, , ] <- plot_data[[i]]$accuracy
+        measure_array[1, , ] <- plot_data[[index_final]][[measure]]
       } else {
-        loss_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]]$loss
-        bacc_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]]$balanced_accuracy
-        acc_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]]$accuracy
+        measure_arraymeasure_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
       }
     }
-  } else if (final == TRUE) {
-    if (use_pl == FALSE) {
-      loss_array[1, , ] <- plot_data[[index_final]]$loss
-      bacc_array[1, , ] <- plot_data[[index_final]]$balanced_accuracy
-      acc_array[1, , ] <- plot_data[[index_final]]$accuracy
-    } else {
-      loss_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]]$loss
-      bacc_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]]$balanced_accuracy
-      acc_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]]$accuracy
+
+    for (i in 1:n_epochs) {
+      final_data_measure[i, "train_min"] <- min(measure_array[, "train", i])
+      final_data_measure[i, "train_mean"] <- mean(measure_array[, "train", i])
+      final_data_measure[i, "train_max"] <- max(measure_array[, "train", i])
+
+      final_data_measure[i, "validation_min"] <- min(measure_array[, "validation", i])
+      final_data_measure[i, "validation_mean"] <- mean(measure_array[, "validation", i])
+      final_data_measure[i, "validation_max"] <- max(measure_array[, "validation", i])
+
+      if (n_sample_type == 3) {
+        final_data_measure[i, "test_min"] <- min(measure_array[, "test", i])
+        final_data_measure[i, "test_mean"] <- mean(measure_array[, "test", i])
+        final_data_measure[i, "test_max"] <- max(measure_array[, "test", i])
+      }
     }
+    result_list[j] <- list(final_data_measure)
   }
 
-  for (i in 1:n_epochs) {
-    final_data_loss[i, "train_min"] <- min(loss_array[, "train", i])
-    final_data_loss[i, "train_mean"] <- mean(loss_array[, "train", i])
-    final_data_loss[i, "train_max"] <- max(loss_array[, "train", i])
-
-    final_data_bacc[i, "train_min"] <- min(bacc_array[, "train", i])
-    final_data_bacc[i, "train_mean"] <- mean(bacc_array[, "train", i])
-    final_data_bacc[i, "train_max"] <- max(bacc_array[, "train", i])
-
-    final_data_acc[i, "train_min"] <- min(acc_array[, "train", i])
-    final_data_acc[i, "train_mean"] <- mean(acc_array[, "train", i])
-    final_data_acc[i, "train_max"] <- max(acc_array[, "train", i])
-
-    final_data_loss[i, "validation_min"] <- min(loss_array[, "validation", i])
-    final_data_loss[i, "validation_mean"] <- mean(loss_array[, "validation", i])
-    final_data_loss[i, "validation_max"] <- max(loss_array[, "validation", i])
-
-    final_data_bacc[i, "validation_min"] <- min(bacc_array[, "validation", i])
-    final_data_bacc[i, "validation_mean"] <- mean(bacc_array[, "validation", i])
-    final_data_bacc[i, "validation_max"] <- max(bacc_array[, "validation", i])
-
-    final_data_acc[i, "validation_min"] <- min(acc_array[, "validation", i])
-    final_data_acc[i, "validation_mean"] <- mean(acc_array[, "validation", i])
-    final_data_acc[i, "validation_max"] <- max(acc_array[, "validation", i])
-    if (n_sample_type == 3) {
-      final_data_loss[i, "test_min"] <- min(loss_array[, "test", i])
-      final_data_loss[i, "test_mean"] <- mean(loss_array[, "test", i])
-      final_data_loss[i, "test_max"] <- max(loss_array[, "test", i])
-
-      final_data_bacc[i, "test_min"] <- min(bacc_array[, "test", i])
-      final_data_bacc[i, "test_mean"] <- mean(bacc_array[, "test", i])
-      final_data_bacc[i, "test_max"] <- max(bacc_array[, "test", i])
-
-      final_data_acc[i, "test_min"] <- min(acc_array[, "test", i])
-      final_data_acc[i, "test_mean"] <- mean(acc_array[, "test", i])
-      final_data_acc[i, "test_max"] <- max(acc_array[, "test", i])
-    }
-  }
-  return(
-    list(
-      loss = as.data.frame(final_data_loss),
-      bacc = as.data.frame(final_data_bacc),
-      acc = as.data.frame(final_data_acc)
-    )
-  )
+  # Finalize data---------------------------------------------------------------
+  names(result_list) <- measures
+  return(result_list)
 }
 
 #' Generate description for text embeddings
@@ -994,4 +964,46 @@ check_and_prepare_for_studio <- function() {
   # Disable tqdm progressbar
   transformers$logging$disable_progress_bar()
   datasets$disable_progress_bars()
+}
+
+#' Generate widgets for licensing a model
+#'
+#' Function generates the input widgets for licensing a model.
+#'
+#' @param ns `function` for setting the namespace of the input elements. This should
+#' be `session$ns`.
+#' @param model Model for which the description should be generated.
+#'
+#' @return Returns a `shiny::tagList` containing the html elements for the
+#' user interface.
+#'
+#' @family studio_utils
+#' @keywords internal
+#'
+generate_doc_input_licensing_editor <- function(ns, model) {
+  ui <- shiny::tagList(
+    bslib::card(
+      bslib::card_header("Editor"),
+      bslib::card_body(
+        shiny::textInput(
+          inputId = ns(paste0("doc_editor_", "documentation_license")),
+          label = "Model License",
+          width = "100%",
+          value = model$get_software_license()
+        ),
+        shiny::textInput(
+          inputId = ns(paste0("doc_editor_", "software_license")),
+          label = "Documentation License",
+          width = "100%",
+          value = model$get_documentation_license()
+        ),
+        shiny::actionButton(
+          inputId = ns(paste0("doc_editor_", "licensing", "_save_button")),
+          label = "Save",
+          icon = shiny::icon("floppy-disk")
+        )
+      )
+    )
+  )
+  return(ui)
 }

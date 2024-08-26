@@ -71,8 +71,8 @@ for(framework in ml_frameworks){
             batch_size=100,
             dir_checkpoint=train_path,
             trace=FALSE,
-            keras_trace=0,
-            pytorch_trace=0
+
+            ml_trace=0
           )
         )
         })
@@ -96,8 +96,8 @@ for(framework in ml_frameworks){
               dir_checkpoint=train_path,
               log_dir=train_path,
               trace=FALSE,
-              keras_trace=0,
-              pytorch_trace=0
+
+              ml_trace=0
             )
           )
 

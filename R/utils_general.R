@@ -7,7 +7,7 @@
 #'
 #'@return Returns a \code{data.frame} containing epochs, loss, and val_loss.
 #'
-#'@family Auxiliary Functions
+#' @family Utils
 #'@keywords internal
 #'
 #'@export
@@ -44,7 +44,7 @@ clean_pytorch_log_transformers<-function(log){
 #'@return Returns \code{FALSE} if the object is not \code{NULL} and not \code{NA}.
 #'Returns \code{TRUE} in all other cases.
 #'
-#'@family Auxiliary Functions
+#' @family Utils
 #'@keywords internal
 #'
 #'@export
@@ -68,7 +68,7 @@ is.null_or_na<-function(object){
 #'
 #'@param length \code{int} determining the length of the id suffix.
 #'@return Returns a \code{string} of the requested length
-#'@family Auxiliary Functions
+#' @family Utils
 #'@keywords internal
 generate_id<-function(length=16){
   id_suffix=NULL

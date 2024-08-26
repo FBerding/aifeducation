@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 **GitHub**
-[![](https://img.shields.io/badge/devel%20version-0.3.3-green.svg)](https://github.com/fberding/iotarelr)
+[![](https://img.shields.io/badge/devel%20version-1.0.0-green.svg)](https://github.com/fberding/iotarelr)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 **CRAN** [![CRAN
 status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-project.org/package=aifeducation)
@@ -34,16 +34,14 @@ special conditions of the educational and social sciences.
   educational science.
 - Provides a graphical user interface (Aifeducation Studio), allowing
   people to work with AI without any coding skills.
-- Supports both ‘PyTorch’ and ‘Tensorflow’ as machine learning
-  frameworks.
+- Supports ‘PyTorch’ as the core machine learning framework which is
+  widely used in research.
 - Implements the advantages of the python library ‘datasets’ increasing
-  computational speed and allowing the use of large datasets.
+  computational speed and allowing the use of large data sets.
 - Uses safetensors for saving models in ‘PyTorch’.
-- Supports the usage of trained models on both frameworks, providing a
-  high level of flexibility.
 - Supports pre-trained language models from Hugging Face.
-- Supports BERT, RoBERTa, DeBERTa, Longformer, and Funnel Transformer
-  for creating context-sensitive text embedding.
+- Supports MPNet, BERT, RoBERTa, DeBERTa, Longformer, and Funnel
+  Transformer for creating context-sensitive text embedding.
 - Makes sharing pre-trained models very easy.
 - Integrates sustainability tracking.
 - Integrates special statistical techniques for dealing with data
@@ -60,34 +58,18 @@ future, more tasks will be implemented.
 You can install the latest stable version of the package from CRAN with:
 
 ``` r
-#Minimal version
 install.packages("aifeducation")
-
-#Full version
-install.packages("aifeducation",dependencies=TRUE)
 ```
 
 You can install the development version of *aifeducation* from
 [GitHub](https://github.com/) with:
 
 ``` r
-#Minimal version
 install.packages("devtools")
 devtools::install_github(repo="FBerding/aifeducation",
                          ref="master",
                          dependencies = "Imports")
-                         
-#Maximal version
-install.packages("devtools")
-devtools::install_github(repo="FBerding/aifeducation",
-                         ref="master",
-                         dependencies = TRUE)
 ```
-
-The minimal version includes all functions but is limited to the use of
-transformers. The full version additionally includes Aifeducation Studio
-(graphical user interface) and older approaches (GlobalVectors, Topic
-Modeling).
 
 Further instructions for installation can be found in vignette [01 Get
 Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
@@ -97,7 +79,10 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 > Started](https://fberding.github.io/aifeducation/articles/aifeducation.html)
 > for more details.
 
-## Graphical User Interface *Aifeducation Studio*
+Using the package with *R* syntax is described in the vignette [03 Using
+R syntax](classification_tasks.html).
+
+## Graphical User Interface *AI for Education - Studio*
 
 The package ships with a shiny app that serves as a graphical user
 interface.
@@ -109,9 +94,10 @@ alt="Figure 1: Aifeducation Studio" />
 Studio</figcaption>
 </figure>
 
-*Aifeducation Studio* allows users to easily develop, train, apply,
-document, and analyse AI models without any coding skills. See the
-corresponding vignette for more details: [02a Using Aifeducation
+*AI for Education - Studio* allows users to easily develop, train,
+apply, document, and analyse AI models without any coding skills. See
+the corresponding vignette for more details: [02 Using the graphical
+user interface Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 
 ## Sustainability
@@ -126,24 +112,16 @@ computer is located.
 
 ## PyTorch and Tensorflow Compatibility
 
-This package allows all supported models either based on ‘PyTorch’ or
-‘tensorflow’, thus providing a high level of flexibility. Even
-pre-trained models can be used with both frameworks in some cases. The
-following table provides more details:
+The core machine learning framework of this package is ‘PyTorch’
+providing a broad support of graphical devices to accelerate
+computations, access to new and unique model architectures, and a high
+compatibility of models across different versions of this machine
+learning framework.
 
-*Table: Framework compatibility*
-
-| Model                     | PyTorch | tensorflow | Weight Sharing |
-|---------------------------|---------|------------|----------------|
-| BERT                      | Yes     | Yes        | Yes            |
-| RoBERTa                   | Yes     | Yes        | Yes            |
-| DeBERTa                   | Yes     | Yes        | Yes            |
-| Funnel Transformer        | Yes     | Yes        | Yes            |
-| Longformer                | Yes     | Yes        | Yes            |
-| Text Embedding Classifier | Yes     | Yes        | No             |
-
-Please not that tensorflow is currently supported for the following
-versions: 2.13-2.15.
+‘Tensorflow’ is also supported but only for version 2.15 and not for all
+models. Please refer to appendix [A01 Supported Machine Learning
+Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
+for a detailed overview.
 
 ## Classification Tasks
 
@@ -151,16 +129,19 @@ versions: 2.13-2.15.
 
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports both
-newer approaches such as BERT (Devlin et al. 2019), RoBERTa (Liu et al.
-2019), DeBERTa version 2 (He et al. 2020), Funnel-Transformer (Dai et
-al. 2020), and Longformer (Beltagy, Peters & Cohan 2020) and older
-approaches such as GlobalVectors (Pennington, Socher & Manning 2014) or
-Latent Dirichlet Allocation/Topic Modeling in classification tasks.
+newer approaches such as MPNet (Song et al. 2020), BERT (Devlin et
+al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et
+al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer
+(Beltagy, Peters & Cohan 2020) and older approaches such as
+GlobalVectors (Pennington, Socher & Manning 2014) or Latent Dirichlet
+Allocation/Topic Modeling in classification tasks.
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
 new transformers, allowing educators and researchers to develop
-specialized and domain-specific models.
+specialized and domain-specific models. See [04 Model
+configuration](model_configuration.html) for details about the
+configuration of a new model.
 
 The package supports the analysis of long texts. Depending on the
 method, long texts are transformed into vectors at once or, if too long,
@@ -265,21 +246,19 @@ literature are also available:
 
 ## Sharing Trained AI
 
-Since the package is based on keras, tensorflow, and the transformer
-libraries, every trained AI can be shared with other educators and
-researchers. The package supports an easy use of pre-trained AI within
-*R*, but also provides the possibility to export trained AI to other
-environments.
+Since the package is based on ‘PyTorch’ and the transformer library,
+every trained AI can be shared with other educators and researchers. The
+package supports an easy use of pre-trained AI within *R*, but also
+provides the possibility to export trained AI to other environments.
 
 Using a pre-trained AI for classification only requires the classifier
-and the corresponding text embedding model. Use *Aifeducation Studio* or
-just load both to *R* and start predictions. Vignette [02a Using
-Aifeducation
+and the corresponding text embedding model. Use *AI for Education
+Studio* or just load both to *R* and start predictions. Vignette [02
+Using the graphical user interface Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
-describes how to use the user interface. Vignette [02b Classification
-Tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
-describes how to save and load the objects with *R* syntax. In vignette
-[03 Sharing and Using Trained
+describes how to use the user interface. Vignette [03 Using R
+syntax](classification_tasks.html) describes how to save and load the
+objects with *R* syntax. In vignette [05 Sharing and Using Trained
 AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
 you can find a detailed guide on how to document and share your models.
 
@@ -287,13 +266,15 @@ you can find a detailed guide on how to document and share your models.
 
 - Installation and configuration of the package: [01 Get
   Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
-- Introduction graphical user interface *Aifeducation Studio*: [02a
-  Using Aifeducation
+- Introduction graphical user interface *Aifeducation Studio*: [02 Using
+  the graphical user interface Aifeducation -
   Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
-- A short introduction into the package with examples for classification
-  tasks: [02b Classification
-  Tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
-- A description for sharing models: [03 Sharing and Using Trained
+- A short introduction into using the package with *R* syntax with
+  examples for classification tasks: [03 Using R
+  syntax](classification_tasks.html).
+- Summary of some studies for finding a good configuration for a model:
+  [04 Model configuration](model_configuration.html)
+- A description for sharing models: [05 Sharing and Using Trained
   AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
 
 ## References
@@ -383,6 +364,10 @@ Pennington, J., Socher, R., & Manning, C. D. (2014). GloVe: Global
 Vectors for Word Representation. Proceedings of the 2014 Conference on
 Empirical Methods in Natural Language Processing.
 <https://aclanthology.org/D14-1162.pdf>
+
+Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked
+and Permuted Pre-training for Language Understanding.
+<https://doi.org/10.48550/arXiv.2004.09297>
 
 Stütz, S., Berding, F., Reincke, S., & Scheper, L. (2022).
 Characteristics of learning tasks in accounting textbooks: an AI

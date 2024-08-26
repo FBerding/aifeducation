@@ -1,6 +1,6 @@
 ---
 title: "03 Using R syntax"
-author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
+author: "Florian Berding, Yuliia Tykhonova, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{03 Using R syntax}
@@ -166,9 +166,11 @@ models, as shown in Figure 3.
 
 # 2 Start Working
 ## 2.1 Starting a New Session
+
 Before you can work with *aifeducation* you must set up a new *R*
-session. First, it is necessary that you load the library. Second, you
-must set up python via reticulate. In case you installed python as
+session. First, it is necessary that you set up python via 'reticulate' and
+chose the conda environment where all necessary python libraries are available.
+Second, you can load `aifeducation`. In case you installed python as
 suggested in vignette [01 Get started](aifeducation.html) you
 may start a new session like this:
 
@@ -177,97 +179,216 @@ reticulate::use_condaenv(condaenv = "aifeducation")
 library(aifeducation)
 ```
 
-Next you have to choose the machine learning framework you would like to use.
-You can set the framework for the complete session with
-
-```{r, include = TRUE, eval=FALSE}
-#For tensorflow
-aifeducation_config$set_global_ml_backend("tensorflow")
-set_transformers_logger("ERROR")
-
-#For PyTorch
-aifeducation_config$set_global_ml_backend("pytorch")
-```
-
-Setting the global machine learning framework is only for convenience. You can
-change the framework at any time during a session by calling this method again or
-by setting the argument 'ml_framework' of methods and functions manually.
-
-In the case that you would like to use *tensorflow* now is a good time to 
-configure that backend, since some configurations
-can only be done **before** *tensorflow* is used the first time.
-
-```{r, include = TRUE, eval=FALSE}
-#if you would like to use only cpus
-set_config_cpu_only()
-
-#if you have a graphic device with low memory
-set_config_gpu_low_memory()
-
-#if you would like to reduce the tensorflow output to errors
-set_config_os_environ_logger(level = "ERROR")
-```
-
 > **Note:** Please remember: Every time you start a new session in *R* you have to
-to set the correct conda environment, to load the library *aifeducation*, and
-to chose your machine learning framework.
+to set the correct conda environment and to load the library `aifeducation`.
 
-## 2.2  Reading Texts into *R*
+## 2.2  Data Management
+### 2.2.1 Introducation
 
-For most applications of  *aifeducation* it's necessary to read the text you would like to use into
-*R*. For this task, several packages are available on CRAN. Our experience has been good
-with the package [readtext](https://cran.r-project.org/package=readtext)
-since it allows you to process different kind of sources for textual data.
-Please refer to readtext's documentation for more details. If you have not installed
-this package on your machine, you can request it by
+In the context of use cases of *aifeducation* three different types of data are necessary:
+raw texts, text embeddings, and target data which represent the categories/classes of a text.
+
+To deal with the first two types and to allow the use of large data sets that may not 
+fit into the memory of your machine the packages ships with two specialized objects.
+
+The first is `LargeDataSetForText`. Objects of this class are used to read raw texts
+from .txt, .pdf, and .xlsx files and store them for further computations.
+The second is `LargeDataSetForTextEmbeddings` which are used to store the text embeddings
+of raw texts which are generated with `TextEmbeddingModel`s. We will describe the transformation
+of raw texts into text embeddings later.
+
+### 2.2.2 Raw Texts
+
+The creation of a `LargeDataSetForText` is necessary if you would like to create
+or train a base model or to generate text embeddings. In the case you would like to
+create such a data set for the first time you have to call the method new:
 ```{r, include = TRUE, eval=FALSE}
-install.packages("readtext")
+raw_texts <- LargeDataSetForText$new()
 ```
+Now you have an empty data set. To fill this object with raw texts different methods
+are available depending on the file type you use for storing raw texts.
 
-For example, if you have stored your texts in an excel sheet with two columns
-(*texts* for the texts and *id* for the texts' id) you can read the data by
+**.txt files**
+
+The first alternative is to store raw texts in .txt files. To use these
+you have to structure your data in a specific way:
+
+- Create a main folder for storing your data.
+- Store every raw text/document into a *single* .txt file into its *own* folder within the main folder. In
+  every folder there should be only one file for a raw text/document.
+- Add an additional .txt file to the folder named `bib_entry.txt`. This file contains
+  bibliographic information for the raw text.
+- Add an additional .txt file to the folder named `license.txt` which contains 
+  a short statement for the license of the text such as "CC-BY".
+  
+Applying these rules may result in a data structure as follows:
+
+- Folder "main folder"
+  - Folder Text A
+    - text_a.txt
+    - bib_entry.txt
+    - license.txt
+  - Folder Text B
+    - text_b.txt
+    - bib_entry.txt
+    - license.txt
+  - Folder Text C
+    - text_C.txt
+    - bib_entry.txt
+    - license.txt
+
+Now you can call the method `add_from_files_txt` by passing the path to the
+directory of the main folder to `dir_path`.
 ```{r, include = TRUE, eval=FALSE}
-#for excel files
-textual_data<-readtext::readtext(
-  file="text_data.xlsx",
-  text_field = "texts",
-  docid_field = "id"
+raw_texts$add_from_files_txt(
+  dir_path = "main folder"
 )
 ```
-Here it is crucial that you pass the file path to `file` and the name of
-the column for the texts to `text_field` and the name of the column for the id
-to `docid_field`.
+The data set will now read all the raw texts in the main folder an will assign
+every text the corresponding bib entry and license. Please note, that adding
+a `bib_entry.txt` and `license.txt` to every folder is optional. If there is no 
+such a file in the corresponding folder there will be an empty entry in the data set.
+However, against the backdrop of the European AI Act we recommend to provide
+license  and bibliographic information to make the documentation of your models
+more straightforward.
 
-In other cases you may have stored each text in a separate file (e.g., .txt or .pdf).
-For these cases you can pass the directory of the files and read the data. In the following 
-example the files are stored in the directory "data".
+**.pdf files**
+
+The second alternative is to use .pdf files as source for raw texts. Here the 
+necessary structure is similar to .txt files:
+
+- Create a main folder for storing your data.
+- Store every raw text/document into a *single* .pdf file into its *own* folder within the main folder. In
+  every folder there should be only one file for a raw text/document.
+- Add an additional .txt file to the folder named `bib_entry.txt`. This file contains
+  bibliographic information for the raw text.
+- Add an additional .txt file to the folder named `license.txt` which contains 
+  a short statement for the license of the text such as "CC-BY".
+
+Applying these rules may result in a data structure as follows:
+
+- Folder "main folder"
+  - Folder Text A
+    - text_a.pdf
+    - bib_entry.txt
+    - license.txt
+  - Folder Text B
+    - text_b.pdf
+    - bib_entry.txt
+    - license.txt
+  - Folder Text C
+    - text_C.pdf
+    - bib_entry.txt
+    - license.txt
+    
+Please not that the file for the bib_entry and the license must be a .txt file 
+not a .pdf file.
+
+Now you can call the method `add_from_files_pdf` by passing the path to the
+directory of the main folder to `dir_path`.
 ```{r, include = TRUE, eval=FALSE}
-#read all files with the extension .txt in the directory data
-textual_data<-readtext::readtext(
-  file="data/*.txt"
-)
-
-#read all files with the extension .pdf in the directory data
-textual_data<-readtext::readtext(
-  file="data/*.pdf"
+raw_texts$add_from_files_pdf(
+  dir_path = "main folder"
 )
 ```
-If you read texts for several files you do not need to specify the arguments
-`docid_field` and `text_field`. The id of the texts is automatically set to
-the file names. 
 
-After the text is read we recommend to do some text cleaning.
+As stated above ``bib_entry.txt` and `license.txt` are optional.
+
+**.xlsx files**
+
+The third alternative is to store the raw texts into .xlsx files. This alternative
+is practicable if you have many small raw texts. For raw texts that are very large such
+as books or papers we recommend to store them as .txt or .pdf files.
+
+In order to add raw texts from .xlsx files the files need a special structure:
+
+- Create a main folder for storing all .xlsx files you would like to read.
+- All .xlsx files must contain the names of the columns in the first row and
+  the names must be identical for each column across all .xslx files you would like
+  to read. 
+- Every .xslx files must contain a column storing the text id and must contain
+  a column storing the raw text. Every text must have a unique id across all
+  .xlsx files.
+- Every .xslx file can contain an additional column for the bib entry.
+- Every .xslx file can contain an additional column for the license.
+
+Your .xlsx file may look like
+
+|id |text|bib|license|
+|---|---|---|---|
+|z3   |This is an example.   |Autor (2019)   |CC BY   |
+|a3   |This is a second example.   |Author (2022)   |CC BY   |
+|...   |...   |...   |...   | 
+
+Now you can call the method `add_from_files_xlsx` by passing the path to the
+directory of the main folder to `dir_path`. Please do not forget to specify the 
+column names for id, text, bibliographic, and license information.
 ```{r, include = TRUE, eval=FALSE}
-#remove multiple spaces and new lines
-textual_data$text=stringr::str_replace_all(textual_data$text,pattern = "[:space:]{1,}",replacement = " ")
-
-#remove hyphenation
-textual_data$text=stringr::str_replace_all(textual_data$text,pattern = "-(?=[:space:])",replacement = "")
+raw_texts$add_from_files_xlsx(
+  dir_path = "main folder",
+  id_column = "id",
+  text_column = "text",
+  bib_entry_column = "bib_entry",
+  license_column = "license"
+)
 ```
 
+**Saving and loading a data set**
 
-Please refer to the documentation of the function readtext within the readtext
-library for more information.
+Once you have create a `LargeDataSetForText` you can save your data to disk by
+calling the function `save_to_disk`. In our example the code would be:
+```{r, include = TRUE, eval=FALSE}
+save_to_disk(
+  object = raw_texts,
+  dir_path = "C:/",
+  folder_name = "raw_texts"
+)
+```
+
+The argument `object` always takes the object you would like to save. In our case
+this is `raw_texts`. With `dir_path` you specific the location where to save the 
+object and with `folder_name` you define the name of the folder that will be created
+within that directory. In this folder the data set is saved.
+
+To load an existing data set you can call the function `load_from_disk` with the
+directory path where you stored the data. In our case this would be.
+```{r, include = TRUE, eval=FALSE}
+raw_text_dataset <- load_from_disk("C:/raw_texts")
+```
+Now you can work with your data.
+
+### 2.2.3 Text Embeddings
+
+The numerical representation of raw texts (called text embeddings) are stored
+with objects of class `LargeDataSetForTextEmbeddings`. The kind of data sets are generated
+by some models such as `TextEmbeddingModel`s. Thus, you will never need to create such an
+data set manually.
+
+However, you will need this kind of data set to train a classifier or to predict
+the categories/classes of a raw texts. Thus, it may be advantageous to save already transformed
+data. You can save and load an object of this class with the functions `save_to_disk` and `load_from_disk`.
+
+Let us assume that we have a `LargeDataSetForTextEmbeddings` *text_embeddings*. Saving this object may look like:
+```{r, include = TRUE, eval=FALSE}
+save_to_disk(
+  object = text_embeddings,
+  dir_path = "C:/",
+  folder_name = "text_embeddings"
+)
+```
+The data set will be saved at `C:/text_embeddings`. Loading this data set may look like:
+```{r, include = TRUE, eval=FALSE}
+new_text_embeddings <- load_from_disk("C:/text_embeddings")
+```
+
+### 2.2.4 Target Data
+The last data type necessary for working with `aifeducation` are the categories/classes
+of given raw texts. For this kind of data we do currently not provide a special object.
+You just need a *named* `factor` storing the classes/categories for a dimension.
+It is also important that the names equal the id of the corresponding raw texts/text embeddings
+since matching the classes/categories to texts is done with the help of these names.
+
+Saving and loading can be done with *R*'s functions `save` and `load`.
 
 ## 2.3 Example Data for this Vignette
 
@@ -287,11 +408,35 @@ For this tutorial, we modify this data set by setting about 100 positive reviews
 indicating that these reviews are not labeled.
 
 ```{r, include = TRUE, eval=TRUE}
-example_data=imdb_movie_reviews
-example_data$label<-as.character(example_data$label)
-example_data$label[c(201:300)]=NA
-example_targets<-as.factor(example_data$label)
+example_data <- imdb_movie_reviews
+example_data$label <- as.character(example_data$label)
+example_data$label[c(201:300)] <- NA
+example_targets <- as.factor(example_data$label)
 table(example_data$label)
+```
+
+We will now create a `LargeDataSetForText` from this `data.frame`. Before we can do this
+we must ensure that the `data.set` has all necessary columns:
+```{r, include = TRUE, eval=TRUE}
+colnames(example_data)
+```
+Now we have to add to columns. For this tutorial we do not add any bibliographic or license information
+although this is recommended in practice. 
+```{r, include = TRUE, eval=TRUE}
+example_data$bib_entry <- NA
+example_data$license <- NA
+colnames(example_data)
+```
+Now the `data.frame` is ready as input for our data set. The "label" column will
+not be included in this data set.
+```{r, include = TRUE, eval=FALSE}
+data_set_reviews_text <- LargeDataSetForText$new()
+data_set_reviews_text$add_from_data.frame(example_data)
+```
+We save the categories/labels within a separate factor.
+```{r, include = TRUE, eval=TRUE}
+review_labels <- example_data$label
+names(review_labels) <- example_data$id
 ```
 
 We will now use this data to show you how to use the different objects
@@ -300,7 +445,7 @@ and functions in *aifeducation*.
 # 3 Base Models
 ## 3.1 Overview
 Base models are the foundation of all further models in *aifeducation*.
-At the moment, these are transformer models such as BERT (Devlin et al.
+At the moment, these are transformer models such as MPNet(), BERT (Devlin et al.
 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
 Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
 Cohan 2020). In general, these models are trained on a large corpus of
@@ -311,7 +456,7 @@ resulting in high computational time, it is recommended to use
 pre-trained models. These can be found on
 [Huggingface](https://huggingface.co/). Sometimes, however, it is more
 straightforward to create a new model to fit a specific purpose.
-Aifeducation Studio supports the opportunity to both create and
+*aifeducation* supports the opportunity to both create and
 train/fine-tune base models.
 
 ## 3.2 Creation of Base Models
@@ -329,23 +474,24 @@ with the function `create_bert_model`.
 
 ```{r, include = TRUE, eval=FALSE}
 create_bert_model(
-    ml_framework=aifeducation_config$get_framework(),
-    model_dir = "my_own_transformer",
-    vocab_raw_texts=example_data$text,
-    vocab_size=30522,
-    vocab_do_lower_case=FALSE,
-    max_position_embeddings=512,
-    hidden_size=768,
-    num_hidden_layer=12,
-    num_attention_heads=12,
-    intermediate_size=3072,
-    hidden_act="gelu",
-    hidden_dropout_prob=0.1,
-    sustain_track=TRUE,
-    sustain_iso_code="DEU",
-    sustain_region=NULL,
-    sustain_interval=15,
-    trace=TRUE)
+  ml_framework = aifeducation_config$get_framework(),
+  model_dir = "my_own_transformer",
+  vocab_raw_texts = example_data$text,
+  vocab_size = 30522,
+  vocab_do_lower_case = FALSE,
+  max_position_embeddings = 512,
+  hidden_size = 768,
+  num_hidden_layer = 12,
+  num_attention_heads = 12,
+  intermediate_size = 3072,
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE
+)
 ```
 
 First, the function receives the machine learning framework you chose at the 
@@ -367,7 +513,7 @@ example, you could increase the number of hidden layers from 12 to 24 or
 reduce the hidden size from 768 to 256, allowing you to build and to
 test larger or smaller models.
 
-> The vignette [Optimal model configuration](model_configuration.html) provides
+> The vignette [04 Model configuration](model_configuration.html) provides
 details on how to configurate a base model.
 
 Please note that with `max_position_embeddings` you determine how many
@@ -404,23 +550,24 @@ of a BERT model this is `train_tune_bert_model()`.
 
 ```{r, include = TRUE, eval=FALSE}
 train_tune_bert_model(
-  ml_framework=aifeducation_config$get_framework(),
+  ml_framework = aifeducation_config$get_framework(),
   output_dir = "my_own_transformer_trained",
   model_dir_path = "my_own_transformer",
   raw_texts = example_data$text,
-  p_mask=0.15,
-  whole_word=TRUE,
-  val_size=0.1,
-  n_epoch=1,
-  batch_size=12,
-  chunk_size=250,
-  n_workers=1,
-  multi_process=FALSE,
-  sustain_track=TRUE,
-  sustain_iso_code="DEU",
-  sustain_region=NULL,
-  sustain_interval=15,
-  trace=TRUE)
+  p_mask = 0.15,
+  whole_word = TRUE,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE
+)
 ```
 
 Here it is important that you provide the path to the directory where
@@ -482,25 +629,24 @@ the same.
 
 ## 4.2 Create a Text Embedding Model
 First you have to choose the base model that should form the foundation
-of your new text embedding model.Since we use a BERT model in our example, 
+of your new text embedding model. Since we use a BERT model in our example, 
 we have to set `method = "bert"`.
 
 ```{r, include = TRUE, eval=FALSE}
-bert_modeling<-TextEmbeddingModel$new(
-  ml_framework=aifeducation_config$get_framework(),
-  model_name="bert_embedding",
-  model_label="Text Embedding via BERT",
-  model_version="0.0.1",
-  model_language="english",
+bert_modeling <- TextEmbeddingModel$new()
+bert_modeling$configure(
+  model_name = "bert_embedding",
+  model_label = "Text Embedding via BERT",
+  model_language = "english",
   method = "bert",
   max_length = 512,
-  chunks=4,
-  overlap=30,
-  emb_layer_min="middle",
-  emb_layer_max="2_3_layer",
-  emb_pool_type="average",
-  model_dir="my_own_transformer_trained"
-  )
+  chunks = 4,
+  overlap = 30,
+  emb_layer_min = "middle",
+  emb_layer_max = "2_3_layer",
+  emb_pool_type = "average",
+  model_dir = "my_own_transformer_trained"
+)
 ```
 
 Next, you have to provide the directory where your base
@@ -534,8 +680,8 @@ can be done with `overlap` to determine how many tokens of the end of a
 prior chunk should be added to the next. In our example the last 30 tokens of the prior 
 chunks are added at the beginning of the following chunk. This can help to
 add the correct context of the text sections into the analysis. Altogether,
-this example model can analyse a maximum of 512+(4-1)*(512-30)=1958 tokens of a 
-text.
+this example model can analyse a maximum of 
+$$512+(4-1)*(512-30)=1958$$ tokens of a text.
 
 Finally, you have to decide from which hidden layer or layers the embeddings 
 should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide over which layers
@@ -548,34 +694,28 @@ With `emb_pool_type` you decide which tokens are used for pooling within every l
 In the case of `emb_pool_type="cls"` only the cls token is used. In the case of
 `emb_pool_type="average"` all tokens within a layer are averaged except padding tokens.
 
-> The vignette [Optimal model configuration](model_configuration.html) provides
+> The vignette [04 Model configuration](model_configuration.html) provides
 details on how to configurate a text embedding model.
 
 After deciding about the configuration, you can use your model.
 
-> **Note:** With version 0.3.1 of aifeducation every transformer can be used with both
-machine learning frameworks. Even the pre-trained weights can be used across
-backends. However, in the future models my be implemented that are available only
-for a specific framework. 
-
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
 To transform raw text into a numeric
-representation you only have to use the `embed` method of your model. To
-do this, you must provide the raw texts to `raw_text`. In addition, it
-is necessary that you provide a character vector containing the ID of
-every text. The IDs must be unique.
+representation you only have to use the `embed_large` method of your model. To
+do this, you must provide a `LargeDataSetForText` to `large_datas_set`. Relying
+on the example data from section 2.3 we can use the movie reviews as raw texts.
 
 ```{r, include = TRUE, eval=FALSE}
-bert_embeddings<-bert_modeling$embed(
-  raw_text=example_data$text,
-  doc_id=example_data$id, 
-  trace = TRUE)
+review_embeddings <- bert_modeling$embed_large(
+  large_datas_set = data_set_reviews_text,
+  trace = TRUE
+)
 ```
 
-The method `embed`creates an object of class `EmbeddedText`. This is
-just a array consisting the embedding of every text. The first dimension of 
-the array refers to specific texts, the second dimension refers to chunks/sequences, 
+The method `embed_large`creates an object of class `LargeDataSetForTextEmbeddings`. This is
+just a data set consisting the embedding of every text. The embeddings are array where the first dimension of 
+refers to specific texts, the second dimension refers to chunks/sequences, 
 and the third dimension refers to the features. 
 
 With the embedded texts you now have the input to train a new classifier
@@ -586,51 +726,24 @@ before we start, we will show you how to save and load your model.
 ## 4.4 Saving and Loading Text Embedding Models
 
 Saving a created text embedding model is very easy in *aifeducation* by using the
-function `save_ai_model`. This function provides a unique interface for all
-text embedding models. For saving your work you can pass your model to `model` and
-the directory where to save the model to `model_dir`. Please do only pass 
-the path of a directory and not the path of a file to this function. Internally
-the function creates a new folder in the directory where all files belonging
-to a model are stored.
+function `save_to_disk`. This function provides a unique interface for all
+text embedding models. For saving your work you can pass your model to `object` and
+the directory where to save the model to `dir_path`. With `folder_name` you can determine
+the name of the folder that should be created at that directory to store the model.
 
 ```{r, include = TRUE, eval=FALSE}
 save_ai_model(
-  model=bert_modeling, 
-  model_dir="text_embedding_models",
-  dir_name="model_transformer_bert",
-  save_format="default",
-  append_ID=FALSE)
+  object = bert_modeling,
+  dir_path = "C:/text_embedding_models",
+  folder_name = "bert_model"
+)
 ```
-
-As you can see the text embedding model is saved within a
-directory named "text_embedding_models". Within this directory the function
-creates a unique folder for every model if it does not exist. The name of this folder is
-specified with `dir_name`.
-
-If you set `dir_name=NULL` and `append_ID=FALSE` the the name of the folder is created 
-by using the models' name. 
-If you change the argument `append_ID` to `append_ID=TRUE` and set `dir_name=NULL`
-the unique ID of the model is added to the directory. The ID is added automatically to ensure
-that every model has a unique name. This is important if you would like to share your 
-work with other persons. 
-
-> Since the files are stored with
-a special structure please do **not** change the files manually.
-
-If you want to load your model, just call the function `load_ai_model` and you can continue
-using your model.
+In this example the model is save in a folder at the location `C:/text_embedding_models/bert_model`.
+If you want to load your model you can call `load_from_disk`.
 
 ```{r, include = TRUE, eval=FALSE}
-bert_modeling<-load_ai_model(
-  model_dir="text_embedding_models/model_transformer_bert",
-  ml_framework=aifeducation_config$get_framework())
+bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
 ```
-
-With `ml_framework` you can decide which framework the model should use. 
-If you set `ml_framework="auto"` the models will be initialized with the same framework
-during saving the model. Please note
-that at the moment all implemented text embedding models can be used with both frameworks.
-However, this may change in the future. 
 
 ## 4.5 Sustainability
 
@@ -641,64 +754,56 @@ For our example this would be `bert_modeling$get_sustainability_data()`.
 
 # 5 Classifiers
 ## 5.1 Create a Classifier
-Classifiers are built on top of a text embedding model. You can create
+Classifiers are built on top of a `TextEmbeddingModel`. You can create
 a new classifier by calling `TEClassifierRegular$new()`. The `TE` in the object class
 refers to the idea that the classifiers uses text embeddings instead of raw texts.
 
-```{r, include = TRUE, eval=FALSE}
-example_targets<-as.factor(example_data$label)
-names(example_targets)=example_data$id
+With the example data from section 2.3 and the text embeddings from section 4.3 
+the creation of a new classifier may look like:
 
-classifier<-TEClassifierRegular$new(
-  ml_framework=aifeducation_config$get_framework(),
-  name="movie_review_classifier",
-  label="Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-  text_embeddings=bert_embeddings,
-  targets=example_targets,
-  use_fe=TRUE,
-  fe_features=128,
-  fe_method="lstm",
-  fe_noise_factor=0.2,
-  hidden=c(40,20),
-  rec=c(40,40),
-  rec_type="gru",
-  self_attention_heads=1,
-  intermediate_size=NULL,
-  attention_type="fourier",
-  add_pos_embedding=FALSE,
-  rec_dropout=0.3,
-  repeat_encoder=0,
-  dense_dropout=0.3,
-  recurrent_dropout=0.1,
-  encoder_dropout=0.3,
-  optimizer="adam")
+```{r, include = TRUE, eval=FALSE}
+classifier <- TEClassifierRegular$new()
+classifier$configure(
+  name = "movie_review_classifier",
+  label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = review_embeddings,
+  feature_extractor = NULL,
+  target_levels = c("neg", "pos"),
+  hidden = c(5),
+  rec = c(6, 6),
+  rec_type = "gru",
+  rec_bidirectional = FALSE,
+  self_attention_heads = 0,
+  intermediate_size = NULL,
+  attention_type = "fourier",
+  add_pos_embedding = TRUE,
+  rec_dropout = 0.1,
+  repeat_encoder = 0,
+  dense_dropout = 0.4,
+  recurrent_dropout = 0.4,
+  encoder_dropout = 0.1,
+  optimizer = "adam"
+)
 ```
 
 Similar to the text embedding model you should provide a name (`name`)
 and a label (`label`) for your new classifier. With `text_embeddings`
-you have to provide an embedded text. The embedded texts is created with a text
-embedding model as described in section 4. We here
+you have to provide a `LargeDataSetForTextEmbeddings`. The data set is created with a 
+`TextEmbeddingModel` as described in section 4. We here
 continue our example and use the embedding produced by our BERT model.
 
-`targets` takes the target data for the supervised learning. Please do
-not omit cases which have no category/class since they can be used with
-a special training technique we will show you later. It is very
-important that you provide the target data as factors. Otherwise an
-error will occur. It is also important that you name your elements of the factor. That
-is, the entries of the factor mus have names that correspond to the IDs
-of the corresponding texts. Without these names the method cannot match
-the input data (text embeddings) to the target data.
+`target_levels` take the categories/classes you classifier should predict. This can
+be number or even words.
 
-With `use_fe` you can request a feature extractor. The aim of the feature extractor
-is to reduce the number of dimensions of the text embeddings and saving as much
-information as possible. Reducing the number of dimensions can speed up training
-and inference and at the same time increase the performance of your classifier.
-For more details please refer to vignette [Optimal model configuration](model_configuration.html).
-With `fe_features` you can decide to which number of dimensions the text embeddings
-should be compressed. `fe_method` allows you to select a model for the reduction
-("lstm" or "dense"). Sine all feature extractors in *aifeducation* are based
-on denoising autoencoder you can decide how many noise should be added during 
-training the extractor (`fe_noise_factor`).
+> In the case you would like to use
+ordinal data it is very important that you provide the classes/categories in the correct order.
+That is, classes/categories representing a "higher" level must be stated before categories/classes
+with a lower level. If you provide the wrong order the performance indices are not valid.
+In the case of nominal data the order does not matter.
+
+With `feature_extractor` you can add a feature extractor that tries to reduce
+the number of features of your text embedding before passing the embeddings to the classifier.
+This option is explained in detail in section XY.
 
 With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.
@@ -707,13 +812,13 @@ classifier. Figure 4 illustrates this.
 Classifier](img_articles/classif_fig_04.png){width="100%"}
 
 `hidden` takes a vector of integers, determining the number of layers
-and the number of neurons. In our example, there two dense layers. The first
-with 40 and the second with 20 neurons.
+and the number of neurons. In our example, there is one dense layers with 5 neurons.
 `rec` also takes a vector of integers determining the number and size of
 the recurrent layers. In this example, we use two layer with
-40 neurons each. With `rec_type` you can choose between two types of recurrent layers.
+6 neurons each. With `rec_type` you can choose between two types of recurrent layers.
 `rec_type="gru"` implements a Gated Recurrent Unit (GRU) network and 
-`rec_type="lstm"` implements a Long Short-Term Memory layer.
+`rec_type="lstm"` implements a Long Short-Term Memory layer. With `rec_bidirectional` you can
+decide whether the recurrent layer should be unidirectional or bidirectional.
 
 Since the classifiers in *aifeducation* use a standardized scheme for
 their creation, dense layers are used after the gru layers. If you want
@@ -725,7 +830,7 @@ would like to recommend to use recurrent layers since they are able to
 use the sequential structure of your data. In all other cases you can
 rely on dense layers only.
 
-If you use text embeddings with more than one chunk, it is a good idea to try self-attention
+If you use text embeddings with more than one chunk, you can try self-attention
 layering in order to take the context of all chunks into account. To add self-attention
 you have two choices:
 
@@ -750,17 +855,13 @@ layer may increase performance if the order of information is important. You can
 add this layer by setting `add_pos_embedding=TRUE`. The layer is created as
 described by Chollet, Kalinowski, and Allaire (2022, pp. 378).
 
-> The vignette [Optimal model configuration](model_configuration.html) provides
+> The vignette [04 Model configuration](model_configuration.html) provides
 details on how to configurate a classifier.
 
 Masking, normalization, and the creation of the input layer as well as
 the output layer are done automatically.
 
 After you have created a new classifier, you can begin training.
-
-> **Note:** In contrast to the text embedding models your decision about the 
-machine learning framework is more important since the classifier can only be used
-with the framework you created and trained the model. 
 
 ## 5.2 Training a Classifier
 To start the training of your classifier, you have to call the `train`
@@ -788,40 +889,36 @@ been used during training and provides a more realistic estimation of a
 classifier`s performance.
 
 ```{r, include = TRUE, eval=FALSE}
-example_targets<-as.factor(example_data$label)
-names(example_targets)=example_data$id
-
 classifier$train(
-   data_embeddings = bert_embeddings,
-   data_targets = example_targets,
-   data_folds=5,
-   data_val_size=0.25,
-   fe_epochs=1000,
-   fe_val_size=0.25,
-   balance_class_weights=TRUE,
-   balance_sequence_length=TRUE,
-   use_sc=TRUE,
-   sc_method="dbsmote",
-   sc_min_k=1,
-   sc_max_k=10,
-   use_pl=TRUE,
-   pl_max_steps=5,
-   pl_max=1.00,
-   pl_anchor=1.00,
-   pl_min=0.00,
-   sustain_track=TRUE,
-   sustain_iso_code="DEU",
-   sustain_region=NULL,
-   sustain_interval=15,
-   epochs=60,
-   batch_size=32,
-   dir_checkpoint="training/classifier",
-   trace=TRUE,
-   keras_trace=2,
-   pytorch_trace=1)
+  data_embeddings = review_embeddings,
+  data_targets = review_labels,
+  data_folds = 5,
+  data_val_size = 0.25,
+  balance_class_weights = TRUE,
+  balance_sequence_length = TRUE,
+  use_sc = TRUE,
+  sc_method = "dbsmote",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = TRUE,
+  pl_max_steps = 5,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  epochs = 60,
+  batch_size = 32,
+  dir_checkpoint = "training/classifier",
+  trace = TRUE,
+  ml_trace=1
+)
 ```
+
 ```{r, include = FALSE, eval=TRUE}
-classifier=vignette_classifier
+classifier <- vignette_classifier
 ```
 
 You can further modify the training process with different arguments. 
@@ -859,7 +956,6 @@ method.
     can configure the data generation with `sc_min_k` and `sc_max_k`. 
     The synthetic cases for every class a generated for all *k* between `sc_min_k` and
     `sc_max_k`. Every *k* contributes proportional to the synthetic cases.
-    To apply the addition of synthetic data, you have to set `use_sc=TRUE`
 
 -   **Pseudo-Labeling:** This technique is relevant if you have
     labeled target data and a large number of unlabeled target data.
@@ -905,13 +1001,6 @@ the maximal amount of data for the best performance in final training.
 In the case options like the generation of synthetic cases (`use_sc`) or 
 pseudo-labeling (`use_pl`) are disabled the training process is shorter.
 
-In the case your classifier uses a feature extractor you can configure the
-training process with `fe_epochs` and `fe_val_size`. The first argument 
-determines the maximal number of training steps while the last determines
-the number of text embeddings used as a validation sample. The model
-with the lowest loss on the validation sample is applied for compressing
-the text embeddings.
-
 Since training a neural net is energy consuming *aifeducation* allows 
 you to estimate its ecological impact with help of the python library
 `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default. If you
@@ -924,7 +1013,7 @@ generating their energy resulting in a specific impact on CO2 emissions. For USA
 and Canada you can additionally specify a region by setting `sustain_region`. 
 Please refer to the documentation of codecarbon for more information.
 
-Finally, `trace`, `pytorch_trace`, and `keras_trace` allow you to control
+Finally, `trace`, and `ml_trace` allow you to control
 how much information about the training progress is printed to the
 console. Please note that training the classifier can take some time.
 
@@ -1019,41 +1108,21 @@ classifier$get_sustainability_data()
 ```
 
 ## 5.5 Saving and Loading a Classifier
-
-If you have created a classifier, saving and loading is very easy. The process
-for saving a model is similar to the process for text embedding models. You only have 
-to pass the model and a directory path to the function `save_ai_model`.
+Saving and loading follows the same pattern as for the other objects in *aifeducation*.
+You can save the classifier by calling `save_to_disk`. In our example this may be:
 
 ```{r, include = TRUE, eval=FALSE}
-save_ai_model(
-  model=classifier,
-  model_dir="classifiers",
-  dir_name="movie_classifier",
-  save_format = "default",
-  append_ID=FALSE)
+save_to_disk(
+  object = classifier,
+  dir_path = "C:/classifiers",
+  folder_name = "imdb_movie_reviews"
+)
 ```
-
-In contrast to text embedding models you can specify the additional argument `save_format`.
-In the case of pytorch models this arguments allows you to choose between
-`save_format = "safetensors"` and `save_format = "pt"`.
-We recommend to chose `save_format = "safetensors"` since this is a safer method
-to save your models.
-In the case of tensorflow models this argument allows you to choose between
-`save_format = "keras"`, `save_format = "tf"` and  `save_format = "h5"`.
-We recommend to chose `save_format = "keras"` since this is the recommended format
-by keras. 
-If you set `save_format = "default"` .safetensors is used for pytorch models and
-.keras is used for tensorflow models.
-
-If you would like to load a model you can call the function `load_ai_model`.
+The classifier is saved to `C:/classifiers/imdb_movie_reviews`. To load the model
+call `load_from_disk`.
 ```{r, include = TRUE, eval=FALSE}
-classifier<-load_ai_model(
-  model_dir="classifiers/movie_classifier")
+classifier<-load_from_disk("C:/classifiers/imdb_movie_reviews")
 ```
-
-> **Note:** Classifiers depend on the framework which was used during creation. 
-Thus, a classifier is always initalized with its original framework. The argument
-`ml_framework` has no effect. 
 
 ## 5.6 Predicting New Data
 
@@ -1065,33 +1134,23 @@ use our BERT model.
 
 ```{r, include = TRUE, eval=FALSE}
 # If our mode is not loaded
-bert_modeling<-load_ai_model(
-  model_dir="text_embedding_models/bert_embedding")
+bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
 
 # Create a numerical representation of the text
-text_embeddings<-bert_modeling$embed(
-  raw_text = textual_data$texts,
-  doc_id = textual_data$doc_id,
-  batch_size=8,
-  trace=TRUE)
+review_embeddings <- bert_modeling$embed_large(
+  large_datas_set = data_set_reviews_text,
+  trace = TRUE
+)
 ```
 
 To transform raw texts into a numeric representation 
-just pass the raw texts and the IDs of every text to the method `embed` of the loaded model.
-This is very easy if you used the package [readtext](https://cran.r-project.org/package=readtext)
-to read raw text from disk, since the object resulting from `readtext` always 
-stores the texts in the column "texts" and the IDs in the column "doc_id".
+just pass the raw texts to the method `embed_large` of the loaded model. The raw texts
+should be an object of class `LargeDataSetForText`. To create such a data set 
+please refer to section 2.
 
-Depending on your machine, embedding raw texts may take some time. In case
-you use a machine with a graphic device, it is possible that an "out of memory"
-error occurs. In this case reduce the batch size. If the error still occurs,
-restart the *R* session, switch to cpu-only mode *directly* after
-loading the libraries with `aifeducation::set_config_cpu_only()` and request the 
-embedding again.
-
-In the example above, the text embeddings are stored in `text_embedding`. Since
+In the example above, the text embeddings are stored in `review_embeddings`. Since
 embedding texts may take some time, it is a good idea to save the embeddings 
-for future analysis (use the `save` function of *R*). This allows you to load
+for future analysis (see section 2 for more details). This allows you to load
 the embeddings without the need to apply the text embedding model on the same 
 raw texts again.
 
@@ -1101,14 +1160,13 @@ estimate of certainty for each class/category.
 
 ```{r, include = TRUE, eval=FALSE}
 # If your classifier is not loaded
-classifier<-load_ai_model(
-  model_dir="classifiers/movie_review_classifier")
+classifier<-load_from_disk("C:/classifiers/imdb_movie_reviews")
 
 # Predict the classes of new texts
-predicted_categories<-classifier$predict(
-  newdata = text_embeddings,
-  batch_size=8,
-  verbose=0)
+predicted_categories <- classifier$predict(
+  newdata = review_embeddings,
+  batch_size = 8
+)
 ```
 
 After the classifier finishes the prediction, the estimated categories/classes
@@ -1212,6 +1270,9 @@ Empirical Methods in Natural Language Processing.
 <https://aclanthology.org/D14-1162.pdf>
 
 Schreier, M. (2012). Qualitative Content Analysis in Practice. Los Angeles: SAGE.
+
+Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked and Permuted
+Pre-training for Language Understanding. <https://doi.org/10.48550/arXiv.2004.09297>
 
 Tunstall, L., Werra, L. von, Wolf, T., & Géron, A. (2022). Natural
 language processing with transformers: Building language applications

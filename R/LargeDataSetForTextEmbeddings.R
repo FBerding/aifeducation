@@ -341,8 +341,7 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
       #Check the number of rows and duplicate if necessary
       n_cases=dim(embedding_array)[1]
       if(n_cases==1){
-        embedding_array=abind::abind(embedding_array,embedding_array,
-                                     along = 1)
+        embedding_array=array_form_bind(embedding_array,embedding_array)
       }
       #Transform to a python dict
       new_dataset_dict=reticulate::dict(
@@ -390,8 +389,7 @@ LargeDataSetForTextEmbeddings<-R6::R6Class(
 
       #Check the number of rows and duplicate if necessary
       if(n_cases==1){
-        embedding_array=abind::abind(embedding_array,embedding_array,
-                                     along = 1)
+        embedding_array=array_form_bind(embedding_array,embedding_array)
       }
       #Transform to a python dict
       new_dataset_dict=reticulate::dict(

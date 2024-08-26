@@ -6,7 +6,7 @@
 #'
 #'@return Returns a new object of this class.
 #'@export
-#'@family Developers
+#'@family LargeDataSets for developers
 LargeDataSetBase<-R6::R6Class(
   classname = "LargeDataSetBase",
   public = list(

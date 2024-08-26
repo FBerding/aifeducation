@@ -3,6 +3,89 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+# aifeducation 1.0.0
+
+First complete release of the package including major changes, bug fixes, new
+features, and objects. The following changes have been made:
+
+**Major Changes**
+
+- The core machine learning framework is now 'pytorch'. 'Tensorflow' is still supported
+  but only for some models and limited to version 2.15. Further implementation and 
+  support for 'tensorflow' models is currently not planed. We decided to found the package
+  on 'pytorch' because this framework is widely used in research, is very flexible, 
+  provides a broad gpu support, and offers more stable code across versions.
+- Implemented a method for all objects allowing objects that were created with
+  an older version of the package to update to the current version during loading.
+  
+**Installation and Configuration**
+
+- Added a new function for a convenient installation of 'python' and 'pytorch'.
+  
+**Transformer Models**
+
+- Complete rewrite of all transformer functions into a modern object orientated
+  approach with R6 classes (AIFETransformerMaker).
+- Functions of type create_xxx_model and train_xxx_model are now deprecated.
+- Added support for MPNet with 'pytorch' and 'tensorflow'.
+
+**TEFeatureExtractor**
+
+- Adding TEFeatureExtractor as a new class for 'pytorch' only.
+- TEFeatureExtractor are auto encoders that can be used to reduce the number of
+  features of text embeddings before passing them into classifiers. Their aim
+  is to reduce computational time and/or increase performance of classifiers.
+
+**TextEmbeddingClassifiers**
+
+- TEClassifierRegular replaces TextEmbeddingClassifierNeuralNet. This new class
+  provides additional methods and fixes a bug for pytorch models used to predict
+  two classes.
+- TextEmbeddingClassifierNeuralNet is now deprecated.  
+- Added TEClassifierProtoNet which is a classifier applying methods of meta-learning
+  based on ProtoNets.
+- In comparison to TextEmbeddingClassifierNeuralNet the training loop for the new classes was altered
+  and reduced in its complexity for users. For example, only the type of pseudo labeling
+  described by Cascante-Bonilla et al. (2020) is now implemented and at the same type
+  the technique described by Lee (2013) was removed. In addition, it is now possible
+  to add synthetic cases within every step of pseudo labeling. See the vignettes 
+  for more details.
+  
+**Graphical User Interface Aifeducation Studio**
+
+- Complete rewrite of the user interface based on bslib while removing the
+  dependencies to shinydashboard.
+- User interface does only support pytorch and not longer tensorflow.
+- Implemented long running tasks such as training a transformer as
+  a shiny ExtendedTask. This allows the computation of the task in the background
+  and the shiny app to stay responsive. This, in turn avoids "greying out" of the app.
+- Implemented a new reporting system for providing a feedback to the user during computations.
+
+**Data Management**
+
+- Introduced two new classes LargeDataSetForTextEmbeddings and LargeDataSetForText
+  based on the python libraries 'arrow' and 'datasets' allowing to store and use data that would not
+  fit into memory. LargeDataSetForText stores raw texts while LargeDataSetForTextEmbeddings contain
+  text embeddings.
+- Added support to all AI models for these new kind of objects to allow training
+  with large data sets.
+- Added new methods to objects of class EmbeddedTexts (e.g. for converting EmbeddedTexts into
+  a LargeDataSetForTextEmbeddings). See the corresponding documentation for more details.
+- The function combine_embeddings is now deprecated. Please use the corresponding mehtod
+  of EmbeddedTexts.
+  
+**Saving and Loading**
+
+- Introduced save_to_disk and load_from_disk as the new core functions for 
+  saving and loading objects and models of this package.
+- Functions load_ai_model and save_ai_model are now deprecated. Please use this
+  functions only for model created with version 0.3.3 or lower.
+  
+**Further Changes**
+
+- Removed the dependencies to package abind.
+- Updated vignettes. 
+
 # aifeducation 0.3.3
 
 **Graphical User Interface Aifeducation Studio**

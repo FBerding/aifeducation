@@ -41,7 +41,10 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1,])
 
 
 #config
-ml_frameworks=c("tensorflow","pytorch")
+ml_frameworks=c(
+  "tensorflow",
+  "pytorch"
+                )
 base_model_list=list(
   "tensorflow"=c("bert",
                  "roberta",
@@ -53,7 +56,9 @@ base_model_list=list(
               "roberta",
               "longformer",
               "funnel",
-              "deberta_v2"))
+              "deberta_v2"
+              )
+  )
 save_format_list=list(
   "tensorflow"=c("auto"),
   "pytorch"=c("auto","pt","safetensors")

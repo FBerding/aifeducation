@@ -10,7 +10,7 @@
 #'@return Returns an object of class \link{TextEmbeddingClassifierNeuralNet} or
 #'\link{TextEmbeddingModel}.
 #'
-#'@family Saving and Loading
+#'@family Saving and Loading Deprecated
 #'
 #'@importFrom utils compareVersion
 #'
@@ -110,7 +110,7 @@ load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework
 #'the model directory for saving purposes. \code{FALSE} if not.
 #'@return No return value, called for side effects.
 #'
-#'@family Saving and Loading
+#'@family Saving and Loading Deprecated
 #'
 #'@export
 save_ai_model<-function(model,

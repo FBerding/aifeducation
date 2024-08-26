@@ -12,7 +12,7 @@ DataManagement_RawTextsUI <- function(id) {
   shiny::tagList(
     bslib::page_sidebar(
       sidebar = bslib::sidebar(
-        tags$h3("Control Panel"),
+        shiny::tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "start_SaveModal"),
           label = "Create Data Set",

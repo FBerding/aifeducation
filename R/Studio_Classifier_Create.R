@@ -9,12 +9,12 @@
 #' @keywords internal
 #'
 Classifiers_Create_UI <- function(id) {
-  tagList(
+  shiny::tagList(
     bslib::page_sidebar(
       # Sidebar------------------------------------------------------------------
       sidebar = bslib::sidebar(
         position = "left",
-        tags$h3("Control Panel"),
+        shiny::tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "button_select_dataset_for_embeddings"),
           label = "Choose Embeddings",
@@ -120,7 +120,7 @@ Classifiers_Create_UI <- function(id) {
                 shinyWidgets::materialSwitch(
                   inputId = shiny::NS(id, "add_pos_embedding"),
                   label = "Add Positional Embedding",
-                  value = TRUE,
+                  value = FALSE,
                   status = "primary"
                 )
               )
@@ -511,13 +511,19 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     shiny::observeEvent(input$save_modal_button_continue, {
       # Check for errors
       errors <- check_errors_create_classifier(
+        classifier_type = input$classifier_type,
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
         path_to_target_data = path_to_target_data(),
         path_to_feature_extractor = path_to_feature_extractor(),
         model_name = input$name,
-        model_label = input$label
+        model_label = input$label,
+        Ns = input$n_sample,
+        Nq = input$n_query,
+        loss_alpha = loss_alpha,
+        loss_margin = loss_margin,
+        embedding_dim = input$protonet_embedding_dim
       )
 
       # If there are errors display them. If not start running task.
@@ -703,7 +709,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
           text = "Please select the order of categories/classes.",
           labels = target_levels_unsorted(),
           input_id = session$ns("target_levels"),
-          class=c("default-sortable", "sortable_aifeducation")
+          class=c("default-sortable", "aifeducation-sortable")
         )
         )
       } else {
