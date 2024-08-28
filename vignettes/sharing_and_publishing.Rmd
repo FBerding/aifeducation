@@ -3,7 +3,7 @@ title: "05 Sharing and Using Trained AI/Models"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{05 sharing and using trained ai/models}
+  %\VignetteIndexEntry{05 Sharing and Using Trained AI/Models}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

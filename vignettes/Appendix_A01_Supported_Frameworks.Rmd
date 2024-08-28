@@ -3,7 +3,7 @@ title: "A01 Supported Machine Learning Frameworks"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a01 supported_frameworks}
+  %\VignetteIndexEntry{A01 Supported Machine Learning Frameworks}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
