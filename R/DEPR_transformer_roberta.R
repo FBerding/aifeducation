@@ -1,8 +1,7 @@
 #' @title Function for creating a new transformer based on RoBERTa
 #' @description This function is deprecated. Please use instead `aife_transformer_maker$make("roberta")$create()`.
 #'
-#'   See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFERobertaTransformer} classes for
-#'   details.
+#'   See [AIFETransformerMaker], ([aife_transformer_maker]), [.AIFERobertaTransformer] classes for details.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -82,8 +81,7 @@ create_roberta_model <- function(
 #' @title Function for creating a new transformer based on RoBERTa
 #' @description This function is deprecated. Please use instead `aife_transformer_maker$make("roberta")$train()`.
 #'
-#'   See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFERobertaTransformer} classes for
-#'   details.
+#'   See [AIFETransformerMaker], ([aife_transformer_maker]), [.AIFERobertaTransformer] classes for details.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`

@@ -1,7 +1,7 @@
-#' @title Function for creating a new transformer based on Funnel Transformer
-#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("funnel")$create()`.
+#' @title Function for creating a new transformer based on DeBERTa-V2
+#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("deberta_v2")$create()`.
 #'
-#'   See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFEFunnelTransformer} classes for details.
+#'   See [AIFETransformerMaker], ([aife_transformer_maker]), [.AIFEDebertaTransformer] classes for details.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -22,65 +22,50 @@
 #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
 #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
 #'
-#' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
-#' @param target_hidden_size `int` Number of neurons in the final layer. This parameter determines the dimensionality of
-#'   the resulting text embedding.
-#' @param block_sizes `vector` of `int` determining the number and sizes of each block.
-#' @param num_decoder_layers `int` Number of decoding layers.
-#' @param pooling_type `string` Type of pooling.
-#'   * `"mean"` for pooling with mean.
-#'   * `"max"` for pooling with maximum values.
-#' @param activation_dropout `float` Dropout probability between the layers of the feed-forward blocks.
+#' @param do_lower_case `r paramDesc.vocab_do_lower_case()`
+#' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
 #'
 #' @return This function does not return an object. Instead the configuration and the vocabulary of the new model are
 #'   saved on disk.
 #'
 #' @family Deprecated transformer
 #' @export
-create_funnel_model <- function(
+create_deberta_v2_model <- function(
     ml_framework = aifeducation_config$get_framework()[1],
     model_dir,
     vocab_raw_texts = NULL,
-    vocab_size = 30522,
-    vocab_do_lower_case = FALSE,
+    vocab_size = 128100,
+    do_lower_case = FALSE,
     max_position_embeddings = 512,
-    hidden_size = 768,
-    target_hidden_size = 64,
-    block_sizes = c(4, 4, 4),
-    num_attention_heads = 12,
-    intermediate_size = 3072,
-    num_decoder_layers = 2,
-    pooling_type = "mean",
+    hidden_size = 1536,
+    num_hidden_layer = 24,
+    num_attention_heads = 24,
+    intermediate_size = 6144,
     hidden_act = "gelu",
     hidden_dropout_prob = 0.1,
     attention_probs_dropout_prob = 0.1,
-    activation_dropout = 0.0,
     sustain_track = TRUE,
     sustain_iso_code = NULL,
     sustain_region = NULL,
     sustain_interval = 15,
     trace = TRUE,
     pytorch_safetensors = TRUE) {
-  .Deprecated("aife_transformer_maker$make(\"funnel\")$create()")
+  .Deprecated("aife_transformer_maker$make(\"deberta_v2\")$create()")
 
-  aife_transformer_maker$make("funnel")$create(
+  aife_transformer_maker$make("deberta_v2")$create(
     ml_framework = ml_framework,
     model_dir = model_dir,
     vocab_raw_texts = vocab_raw_texts,
     vocab_size = vocab_size,
-    vocab_do_lower_case = vocab_do_lower_case,
+    vocab_do_lower_case = do_lower_case,
     max_position_embeddings = max_position_embeddings,
     hidden_size = hidden_size,
-    target_hidden_size = target_hidden_size,
-    block_sizes = block_sizes,
+    num_hidden_layer = num_hidden_layer,
     num_attention_heads = num_attention_heads,
     intermediate_size = intermediate_size,
-    num_decoder_layers = num_decoder_layers,
-    pooling_type = pooling_type,
     hidden_act = hidden_act,
     hidden_dropout_prob = hidden_dropout_prob,
     attention_probs_dropout_prob = attention_probs_dropout_prob,
-    activation_dropout = 0.0,
     sustain_track = sustain_track,
     sustain_iso_code = sustain_iso_code,
     sustain_region = sustain_region,
@@ -90,10 +75,10 @@ create_funnel_model <- function(
   )
 }
 
-#' @title Function for training and fine-tuning a Funnel Transformer model
-#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("funnel")$train()`.
+#' @title Function for training and fine-tuning a DeBERTa-V2 model
+#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("deberta_v2")$train()`.
 #'
-#'   See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFEFunnelTransformer} classes for details.
+#'   See [AIFETransformerMaker], ([aife_transformer_maker]), [.AIFEDebertaTransformer] classes for details.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -124,7 +109,7 @@ create_funnel_model <- function(
 #'
 #' @family Deprecated transformer
 #' @export
-train_tune_funnel_model <- function(
+train_tune_deberta_v2_model <- function(
     ml_framework = aifeducation_config$get_framework()[1],
     output_dir,
     model_dir_path,
@@ -135,9 +120,9 @@ train_tune_funnel_model <- function(
     n_epoch = 1,
     batch_size = 12,
     chunk_size = 250,
-    min_seq_len = 50,
     full_sequences_only = FALSE,
-    learning_rate = 3e-3,
+    min_seq_len = 50,
+    learning_rate = 3e-2,
     n_workers = 1,
     multi_process = FALSE,
     sustain_track = TRUE,
@@ -148,9 +133,9 @@ train_tune_funnel_model <- function(
     keras_trace = 1,
     pytorch_trace = 1,
     pytorch_safetensors = TRUE) {
-  .Deprecated("aife_transformer_maker$make(\"funnel\")$train()")
+  .Deprecated("aife_transformer_maker$make(\"deberta_v2\")$train()")
 
-  aife_transformer_maker$make("funnel")$train(
+  aife_transformer_maker$make("deberta_v2")$train(
     ml_framework = ml_framework,
     output_dir = output_dir,
     model_dir_path = model_dir_path,
@@ -161,8 +146,8 @@ train_tune_funnel_model <- function(
     n_epoch = n_epoch,
     batch_size = batch_size,
     chunk_size = chunk_size,
-    min_seq_len = min_seq_len,
     full_sequences_only = full_sequences_only,
+    min_seq_len = min_seq_len,
     learning_rate = learning_rate,
     n_workers = n_workers,
     multi_process = multi_process,

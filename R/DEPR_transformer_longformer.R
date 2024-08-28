@@ -1,7 +1,7 @@
-#' @title Function for creating a new transformer based on BERT
-#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("bert")$create()`.
+#' @title Function for creating a new transformer based on Longformer
+#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("longformer")$create()`.
 #'
-#'   See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFEBertTransformer} classes for details.
+#'   See [AIFETransformerMaker], ([aife_transformer_maker]), [.AIFELongformerTransformer] classes for details.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -22,20 +22,23 @@
 #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
 #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
 #'
-#' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
+#' @param add_prefix_space `r paramDesc.add_prefix_space()`
+#' @param trim_offsets `r paramDesc.trim_offsets()`
 #' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
+#' @param attention_window `int` Size of the window around each token for attention mechanism in every layer.
 #'
 #' @return This function does not return an object. Instead the configuration and the vocabulary of the new model are
 #'   saved on disk.
 #'
 #' @family Deprecated transformer
 #' @export
-create_bert_model <- function(
-    ml_framework = aifeducation_config$get_framework(),
+create_longformer_model <- function(
+    ml_framework = aifeducation_config$get_framework()[1],
     model_dir,
     vocab_raw_texts = NULL,
     vocab_size = 30522,
-    vocab_do_lower_case = FALSE,
+    add_prefix_space = FALSE,
+    trim_offsets = TRUE,
     max_position_embeddings = 512,
     hidden_size = 768,
     num_hidden_layer = 12,
@@ -44,20 +47,22 @@ create_bert_model <- function(
     hidden_act = "gelu",
     hidden_dropout_prob = 0.1,
     attention_probs_dropout_prob = 0.1,
+    attention_window = 512,
     sustain_track = TRUE,
     sustain_iso_code = NULL,
     sustain_region = NULL,
     sustain_interval = 15,
     trace = TRUE,
     pytorch_safetensors = TRUE) {
-  .Deprecated("aife_transformer_maker$make(\"bert\")$create()")
+  .Deprecated("aife_transformer_maker$make(\"longformer\")$create()")
 
-  aife_transformer_maker$make("bert")$create(
+  aife_transformer_maker$make("longformer")$create(
     ml_framework = ml_framework,
     model_dir = model_dir,
     vocab_raw_texts = vocab_raw_texts,
     vocab_size = vocab_size,
-    vocab_do_lower_case = vocab_do_lower_case,
+    add_prefix_space = add_prefix_space,
+    trim_offsets = trim_offsets,
     max_position_embeddings = max_position_embeddings,
     hidden_size = hidden_size,
     num_hidden_layer = num_hidden_layer,
@@ -66,6 +71,7 @@ create_bert_model <- function(
     hidden_act = hidden_act,
     hidden_dropout_prob = hidden_dropout_prob,
     attention_probs_dropout_prob = attention_probs_dropout_prob,
+    attention_window = attention_window,
     sustain_track = sustain_track,
     sustain_iso_code = sustain_iso_code,
     sustain_region = sustain_region,
@@ -75,10 +81,10 @@ create_bert_model <- function(
   )
 }
 
-#' @title Function for training and fine-tuning a BERT model
-#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("bert")$train()`.
+#' @title Function for training and fine-tuning a Longformer model
+#' @description This function is deprecated. Please use instead `aife_transformer_maker$make("longformer")$train()`.
 #'
-#'   See \link{AIFETransformerMaker} (\link{aife_transformer_maker}), \link{.AIFEBertTransformer} classes for details.
+#'   See [AIFETransformerMaker], ([aife_transformer_maker]), [.AIFELongformerTransformer] classes for details.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -92,7 +98,6 @@ create_bert_model <- function(
 #' @param model_dir_path `r paramDesc.model_dir_path()`
 #' @param raw_texts `r paramDesc.raw_texts()`
 #' @param p_mask `r paramDesc.p_mask()`
-#' @param whole_word `r paramDesc.whole_word()`
 #' @param val_size `r paramDesc.val_size()`
 #' @param n_epoch `r paramDesc.n_epoch()`
 #' @param batch_size `r paramDesc.batch_size()`
@@ -109,20 +114,19 @@ create_bert_model <- function(
 #'
 #' @family Deprecated transformer
 #' @export
-train_tune_bert_model <- function(
+train_tune_longformer_model <- function(
     ml_framework = aifeducation_config$get_framework()[1],
     output_dir,
     model_dir_path,
     raw_texts,
     p_mask = 0.15,
-    whole_word = TRUE,
     val_size = 0.1,
     n_epoch = 1,
     batch_size = 12,
     chunk_size = 250,
     full_sequences_only = FALSE,
     min_seq_len = 50,
-    learning_rate = 3e-3,
+    learning_rate = 3e-2,
     n_workers = 1,
     multi_process = FALSE,
     sustain_track = TRUE,
@@ -133,15 +137,14 @@ train_tune_bert_model <- function(
     keras_trace = 1,
     pytorch_trace = 1,
     pytorch_safetensors = TRUE) {
-  .Deprecated("aife_transformer_maker$make(\"bert\")$train()")
+  .Deprecated("aife_transformer_maker$make(\"longformer\")$train()")
 
-  aife_transformer_maker$make("bert")$train(
+  aife_transformer_maker$make("longformer")$train(
     ml_framework = ml_framework,
     output_dir = output_dir,
     model_dir_path = model_dir_path,
     raw_texts = raw_texts,
     p_mask = p_mask,
-    whole_word = whole_word,
     val_size = val_size,
     n_epoch = n_epoch,
     batch_size = batch_size,
