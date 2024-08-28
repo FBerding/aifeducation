@@ -130,3 +130,19 @@ create_dir <- function(dir_path, trace, msg = "") {
     dir.create(dir_path)
   }
 }
+
+#' @title Run python file
+#' @description Used to run python files with `reticulate::py_run_file()` from folder `python`.
+#'
+#' @param py_file_name `string` Name of a python file to run. The file must be in the `python` folder of `aifeducation`
+#'   package.
+#' @return This function returns nothing.
+#'
+#' @importFrom reticulate py_run_file
+#'
+#' @family Utils
+#' @keywords internal
+#' @noRd
+run_py_file <- function(py_file_name) {
+  reticulate::py_run_file(system.file("python", py_file_name, package = "aifeducation"))
+}

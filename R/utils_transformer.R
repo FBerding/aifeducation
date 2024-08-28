@@ -256,30 +256,14 @@ create_data_collator <- function(
   return(data_collator)
 }
 
-#' @title Run python file
-#' @description Used to run python files with `reticulate::py_run_file()` from folder `python`.
-#'
-#' @param py_file_name `string` Name of a python file to run. The file must be in the `python` folder of `aifeducation`
-#'   package.
-#' @return This function returns nothing.
-#'
-#' @importFrom reticulate py_run_file
-#'
-#' @family Transformer utils
-#' @keywords internal
-#' @noRd
-run_py_file <- function(py_file_name) {
-  reticulate::py_run_file(system.file("python", py_file_name, package = "aifeducation"))
-}
-
 #' @title BERT-like creation step `create_tokenizer_draft`
 #' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
 #'
 #'   This function **adds** `special_tokens`, `tok_new`, `trainer` parameters into the `temp` list.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
@@ -302,9 +286,9 @@ Bert_like.SFC.create_tokenizer_draft <- function(self) { # nolint
 #'
 #'   This function **uses** `tok_new`, `raw_text_dataset`, `trainer` parameters from the `temp` list.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
@@ -328,9 +312,9 @@ Bert_like.SFC.calculate_vocab <- function(self) { # nolint
 #'
 #'   This function **uses** `special_tokens`, `tok_new` parameters from the `temp` list.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
@@ -348,9 +332,9 @@ Bert_like.SFC.save_tokenizer_draft <- function(self) { # nolint
 #'
 #'   This function **adds** `tokenizer` parameter into the `temp` list and **uses** from it `tok_new`.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
@@ -375,9 +359,9 @@ Bert_like.SFC.create_final_tokenizer <- function(self) { # nolint
 #'
 #'   This function **adds** `tok_new` parameter into the `temp` list.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
@@ -397,9 +381,9 @@ Longformer_like.SFC.create_tokenizer_draft <- function(self) { # nolint
 #'
 #'   This function **uses** `tok_new` parameter from the `temp` list.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
@@ -424,9 +408,9 @@ Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
 #'
 #'   This function **uses** `tok_new` parameter from the `temp` list.
 #'
-#'   See private list `steps_for_creation` of \link{.AIFEBaseTransformer} class for details. This list has the elements
+#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   \link{.AIFEBaseTransformer} or use these temporary parameters.
+#'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
 #' @return This function returns nothing.
 #'
