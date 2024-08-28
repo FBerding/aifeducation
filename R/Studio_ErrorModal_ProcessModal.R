@@ -1,14 +1,13 @@
-#' Show error modal
-#'
-#' Function for displaying a modal that reports errors to the user.
+#' @title Show error modal
+#' @description Function for displaying a modal that reports errors to the user.
 #'
 #' @param title `string` Title of the modal.
 #' @param size `string` Size of the modal. Possible are `"m"`, `"s"`, `"l"`, and `"xl"`.
-#' @param easy_close `bool` If `TRUE`, the modal dialog can be dismissed by clicking
-#' outside the dialog box, or be pressing the Escape key. If `FALSE` the modal
-#' must be dismissed by clicking on a modalButton or from a call removeModal on the server.
+#' @param easy_close `bool` If `TRUE`, the modal dialog can be dismissed by clicking outside the dialog box, or be
+#'   pressing the Escape key. If `FALSE` the modal must be dismissed by clicking on a modalButton or from a call
+#'   removeModal on the server.
 #' @param error_messages `shiny::tagList` containing the html elements to display on the modal.
-#
+#'
 #' @return Function does nothing return. It displays a modal.
 #'
 #' @family studio_modals
@@ -29,17 +28,16 @@ display_errors <- function(
   shiny::showModal(error_modal)
 }
 
-#' Show processing modal
-#'
-#' Function for displaying a modal that reports to the user that the app is currently working.
+#' @title Show processing modal
+#' @description Function for displaying a modal that reports to the user that the app is currently working.
 #'
 #' @param title `string` Title of the modal.
 #' @param size `string` Size of the modal. Possible are `"m"`, `"s"`, `"l"`, and `"xl"`.
-#' @param easy_close `bool` If `TRUE`, the modal dialog can be dismissed by clicking
-#' outside the dialog box, or be pressing the Escape key. If `FALSE` the modal
-#' must be dismissed by clicking on a modalButton or from a call removeModal on the server.
+#' @param easy_close `bool` If `TRUE`, the modal dialog can be dismissed by clicking outside the dialog box, or be
+#'   pressing the Escape key. If `FALSE` the modal must be dismissed by clicking on a modalButton or from a call
+#'   removeModal on the server.
 #' @param message `shiny::tagList` containing the html elements to display on the modal.
-#
+#'
 #' @return Function does nothing return. It displays a modal.
 #'
 #' @family studio_modals

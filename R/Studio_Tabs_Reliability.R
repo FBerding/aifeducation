@@ -1,13 +1,11 @@
-#'Graphical user interface for displaying the reliability of classifiers.
+#' @title Graphical user interface for displaying the reliability of classifiers.
+#' @description Functions generates the tab within a page for displaying infomration on the reliability of classifiers.
 #'
-#'Functions generates the tab within a page for displaying infomration on the
-#'reliability of classifiers.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_classifier_reliability
-#'@keywords internal
+#' @family studio_gui_page_classifier_reliability
+#' @keywords internal
 #'
 Reliability_UI <- function(id) {
   bslib::page(
@@ -22,44 +20,42 @@ bslib::card(
   bslib::card_body()
 )
 
-
-#'Server function for: graphical user interface for displaying the reliability of classifiers.
+#' @title Server function for: graphical user interface for displaying the reliability of classifiers.
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param model Model used for inference.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param model Model used for inference.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_classifier_reliability
-#'@keywords internal
+#' @family studio_gui_page_classifier_reliability
+#' @keywords internal
 #'
 Reliability_Server <- function(id, model) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
-    measure_labels=list(
-      iota_index="Iota Index",
-      min_iota2="Minimum Iota",
-      avg_iota2="Average Iota",
-      max_iota2="Maximum Iota",
-      min_alpha="Minimum Alpha",
-      avg_alpha="Average Alpha",
-      max_alpha= "Maximum Alpha",
-      static_iota_index= "Static Iota Index",
-      dynamic_iota_index= "Dynamic Iota Index",
-      kalpha_nominal= "Krippendorff's Alpha (Nominal)",
-      kalpha_ordinal=   "Krippendorff's Alpha (ordinal)",
-      kendall="Kendall's W",
-      kappa2_unweighted= "Cohen's Kappa (Unweighted)",
-      kappa2_equal_weighted="Weighted Cohen's Kappa (Equal Weights)",
-      kappa2_squared_weighted= "Weighted Cohen's Kappa (Squared Weights)",
-      kappa_fleiss= "Fleiss' Kappa for Multiple Raters (Without Exact Estimation)",
-      percentage_agreement= "Percentage Agreement",
-      balanced_accuracy="Average Accuracy within each Class",
-      gwet_ac="Gwet's AC1/AC2 Agreement Coefficient"
+    measure_labels <- list(
+      iota_index = "Iota Index",
+      min_iota2 = "Minimum Iota",
+      avg_iota2 = "Average Iota",
+      max_iota2 = "Maximum Iota",
+      min_alpha = "Minimum Alpha",
+      avg_alpha = "Average Alpha",
+      max_alpha = "Maximum Alpha",
+      static_iota_index = "Static Iota Index",
+      dynamic_iota_index = "Dynamic Iota Index",
+      kalpha_nominal = "Krippendorff's Alpha (Nominal)",
+      kalpha_ordinal = "Krippendorff's Alpha (ordinal)",
+      kendall = "Kendall's W",
+      kappa2_unweighted = "Cohen's Kappa (Unweighted)",
+      kappa2_equal_weighted = "Weighted Cohen's Kappa (Equal Weights)",
+      kappa2_squared_weighted = "Weighted Cohen's Kappa (Squared Weights)",
+      kappa_fleiss = "Fleiss' Kappa for Multiple Raters (Without Exact Estimation)",
+      percentage_agreement = "Percentage Agreement",
+      balanced_accuracy = "Average Accuracy within each Class",
+      gwet_ac = "Gwet's AC1/AC2 Agreement Coefficient"
     )
-    measures_scale_level=c(
+    measures_scale_level <- c(
       "dynamic_iota_index",
       "kalpha_nominal",
       "kalpha_ordinal",
@@ -180,8 +176,8 @@ Reliability_Server <- function(id, model) {
                   ),
                   bslib::card_body(
                     shiny::renderTable(t(reliability_scale),
-                                       rownames = TRUE,
-                                       colnames = FALSE
+                      rownames = TRUE,
+                      colnames = FALSE
                     ),
                     shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
                   )
@@ -193,8 +189,8 @@ Reliability_Server <- function(id, model) {
                   bslib::card_body(
                     shiny::tags$p(shiny::tags$b("Assignment-Error-Matrix")),
                     shiny::renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
-                                       rownames = TRUE,
-                                       colnames = TRUE
+                      rownames = TRUE,
+                      colnames = TRUE
                     ),
                     shiny::tags$p(shiny::tags$b("Iota")),
                     shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
@@ -254,4 +250,3 @@ Reliability_Server <- function(id, model) {
     #--------------------------------------------------------------------------
   })
 }
-

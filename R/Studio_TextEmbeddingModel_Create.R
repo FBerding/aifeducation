@@ -1,12 +1,11 @@
-#'Graphical user interface for text embedding models - create
+#' @title Graphical user interface for text embedding models - create
+#' @description Functions generates the page for a creating a new [TextEmbeddingModel].
 #'
-#'Functions generates the page for a creating a new [TextEmbeddingModel].
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_text_embedding_model_create
-#'@keywords internal
+#' @family studio_gui_page_text_embedding_model_create
+#' @keywords internal
 #'
 TextEmbeddingModel_Create_UI <- function(id) {
   shiny::tagList(
@@ -54,22 +53,21 @@ TextEmbeddingModel_Create_UI <- function(id) {
   )
 }
 
-#'Server function for: graphical user interface for text embedding models - create
+#' @title Server function for: graphical user interface for text embedding models - create
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_text_embedding_model_create
-#'@keywords internal
+#' @family studio_gui_page_text_embedding_model_create
+#' @keywords internal
 #'
 TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    ns=session$ns
+    ns <- session$ns
 
     # File system management----------------------------------------------------
     shinyFiles::shinyDirChoose(
@@ -185,7 +183,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     # Create UI Main Page-----------------------------------------------------------------
     # Card Header
     output$path_to_base_model <- shiny::renderText({
-        path_to_base_model()
+      path_to_base_model()
     })
 
     # Card body
@@ -201,48 +199,47 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
         }
 
         ui <- shiny::tagList(
-            shiny::sliderInput(
-              inputId = ns("lm_chunks"),
-              label = "N Chunks",
-              value = 1,
-              min = 1,
-              max = 50,
-              step = 1
+          shiny::sliderInput(
+            inputId = ns("lm_chunks"),
+            label = "N Chunks",
+            value = 1,
+            min = 1,
+            max = 50,
+            step = 1
+          ),
+          shiny::sliderInput(
+            inputId = ns("lm_max_length"),
+            label = paste("Maximal Sequence Length", "(Max:", interface_architecture()[2], ")"),
+            value = interface_architecture()[[2]],
+            min = 20,
+            max = interface_architecture()[[2]],
+            step = 1
+          ),
+          shiny::sliderInput(
+            inputId = ns("lm_overlap"),
+            label = paste("N Token Overlap", "(Max:", interface_architecture()[2], ")"),
+            value = 0,
+            min = 0,
+            max = interface_architecture()[[2]],
+            step = 1
+          ),
+          shiny::sliderInput(
+            inputId = ns("lm_emb_layers"),
+            label = "Layers for Embeddings",
+            value = c(
+              max(1, floor(0.5 * max_layer_transformer)),
+              max(1, floor(2 / 3 * max_layer_transformer))
             ),
-            shiny::sliderInput(
-              inputId = ns("lm_max_length"),
-              label = paste("Maximal Sequence Length", "(Max:", interface_architecture()[2], ")"),
-              value = interface_architecture()[[2]],
-              min = 20,
-              max = interface_architecture()[[2]],
-              step = 1
-            ),
-            shiny::sliderInput(
-              inputId = ns("lm_overlap"),
-              label = paste("N Token Overlap", "(Max:", interface_architecture()[2], ")"),
-              value = 0,
-              min = 0,
-              max = interface_architecture()[[2]],
-              step = 1
-            ),
-            shiny::sliderInput(
-              inputId = ns("lm_emb_layers"),
-              label = "Layers for Embeddings",
-              value = c(
-                max(1, floor(0.5 * max_layer_transformer)),
-                max(1, floor(2 / 3 * max_layer_transformer))
-              ),
-              min = 1,
-              max = max_layer_transformer,
-              step = 1
-            ),
-            shiny::selectInput(
-              inputId = ns("lm_emb_pool_type"),
-              label = paste("Pooling Type"),
-              choices = pool_type_choices,
-              multiple = FALSE
-            )
-
+            min = 1,
+            max = max_layer_transformer,
+            step = 1
+          ),
+          shiny::selectInput(
+            inputId = ns("lm_emb_pool_type"),
+            label = paste("Pooling Type"),
+            choices = pool_type_choices,
+            multiple = FALSE
+          )
         )
         return(ui)
       } else {
@@ -274,8 +271,8 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
       errors <- check_errors_text_embedding_model_create(
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
-        path_to_base_model=path_to_base_model(),
-        interface_architecture=interface_architecture()
+        path_to_base_model = path_to_base_model(),
+        interface_architecture = interface_architecture()
       )
 
 
@@ -339,5 +336,3 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     #--------------------------------------------------------------------------
   })
 }
-
-

@@ -1,14 +1,13 @@
-#'Graphical user interface for the start page of AI for Education - Studio
+#' @title Graphical user interface for the start page of AI for Education - Studio
+#' @description Functions generates the page for the "home" page of the shiny app.
 #'
-#'Functions generates the page for the "home" page of the shiny app.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
+#' @family studio_gui_pages_and_tabs
+#' @keywords internal
 #'
-#'@family studio_gui_pages_and_tabs
-#'@keywords internal
-#'
-Studio_Home_UI=function(id){
+Studio_Home_UI <- function(id) {
   shiny::tagList(
     bslib::page(
       bslib::layout_column_wrap(
@@ -18,9 +17,9 @@ Studio_Home_UI=function(id){
           ),
           bslib::card_body(
             shiny::tags$img(
-              src= "studio_logo.jpg",
+              src = "studio_logo.jpg",
               align = "center",
-              width="100%"
+              width = "100%"
             )
           )
         ),
@@ -30,11 +29,13 @@ Studio_Home_UI=function(id){
           ),
           bslib::card_body(
             shiny::tags$a("Package's Home Page",
-                          href="https://fberding.github.io/aifeducation/index.html",
-                          target="_blank"),
+              href = "https://fberding.github.io/aifeducation/index.html",
+              target = "_blank"
+            ),
             shiny::tags$a("Introducation to AI for Education - Studio",
-                          href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html",
-                          target="_blank")
+              href = "https://fberding.github.io/aifeducation/articles/gui_aife_studio.html",
+              target = "_blank"
+            )
           )
         )
       )

@@ -1,13 +1,12 @@
-#'Graphical user interface for transforming raw texts into numerical text embeddings.
+#' @title Graphical user interface for transforming raw texts into numerical text embeddings.
+#' @description Functions generates the tab within a page for generating text embeddings with an object of class
+#'   [TextEmbeddingModel].
 #'
-#'Functions generates the tab within a page for generating text embeddings with an
-#'object of class [TextEmbeddingModel].
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_text_embedding_model_embed
-#'@keywords internal
+#' @family studio_gui_text_embedding_model_embed
+#' @keywords internal
 #'
 Embed_UI <- function(id) {
   bslib::page(
@@ -46,19 +45,18 @@ Embed_UI <- function(id) {
 }
 
 
-#'Server function for: graphical user interface for transforming raw texts into numerical text embeddings.
+#' @title Server function for: graphical user interface for transforming raw texts into numerical text embeddings.
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param model Model used for inference.
+#' @param model_path `string` Path to the model.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param model Model used for inference.
-#'@param model_path `string` Path to the model.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_text_embedding_model_embed
-#'@keywords internal
+#' @family studio_gui_text_embedding_model_embed
+#' @keywords internal
 #'
 Embed_Server <- function(id, model, model_path, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
@@ -75,7 +73,6 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
     )
 
     shiny::observeEvent(input$choose_file_raw_texts, {
-
       tmp_file_path <- shinyFiles::parseDirPath(volumes, input$choose_file_raw_texts)
       if (length(tmp_file_path) > 0) {
         shiny::updateTextInput(
@@ -90,7 +87,7 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
-      ns=session$ns,
+      ns = session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"
@@ -159,5 +156,3 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
     #--------------------------------------------------------------------------
   })
 }
-
-

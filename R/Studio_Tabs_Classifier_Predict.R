@@ -1,13 +1,12 @@
-#'Graphical user interface for making predictions with a classifier.
+#' @title Graphical user interface for making predictions with a classifier.
+#' @description Functions generates the tab within a page for making predictions with an object of class
+#'   [TEClassifierRegular] and [TEClassifierProtoNet].
 #'
-#'Functions generates the tab within a page for making predictions with an object of class
-#'[TEClassifierRegular] and [TEClassifierProtoNet].
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_classifier_predict
-#'@keywords internal
+#' @family studio_gui_page_classifier_predict
+#' @keywords internal
 #'
 Classifier_Prediction_UI <- function(id) {
   bslib::page_sidebar(
@@ -69,17 +68,16 @@ bslib::card(
 )
 
 
-#'Server function for: graphical user interface for making predictions with a classifier.
+#' @title Server function for: graphical user interface for making predictions with a classifier.
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param model Model used for inference.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param model Model used for inference.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_classifier_predict
-#'@keywords internal
+#' @family studio_gui_page_classifier_predict
+#' @keywords internal
 #'
 Classifier_Prediction_Server <- function(id, model, volumes) {
   moduleServer(id, function(input, output, session) {
@@ -232,5 +230,3 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     #--------------------------------------------------------------------------
   })
 }
-
-

@@ -105,7 +105,8 @@ paramDesc.attention_window <- function() {
 
 #' @keywords internal
 paramDesc.output_dir <- function() {
-  " `string` Path to the directory where the final model should be saved. If the directory does not exist, it will be created. "
+  " `string` Path to the directory where the final model should be saved. If the directory does not exist, it will be
+  created. "
 }
 #' @keywords internal
 paramDesc.model_dir_path <- function() " `string` Path to the directory where the original model is stored. "

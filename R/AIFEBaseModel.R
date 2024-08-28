@@ -1,40 +1,38 @@
-#' @title Base class for models using neural nets.
-#'
+#' @title Base class for models using neural nets
 #' @description Abstract class for all models that do not rely on the python library 'transformers'.
 #'
-#' @return Objects of this containing fields and methods used in several other classes
-#' in 'ai for education'. This class is **not** designed for a direct application and should only
-#' be used by developers.
+#' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
+#'   is **not** designed for a direct application and should only be used by developers.
 #' @family Classifiers for developers
 #' @export
 AIFEBaseModel <- R6::R6Class(
   classname = "AIFEBaseModel",
   public = list(
     #' @field model ('tensorflow_model' or 'pytorch_model')\cr
-    #' Field for storing the 'tensorflow' or 'pytorch' model after loading.
+    #'   Field for storing the 'tensorflow' or 'pytorch' model after loading.
     model = NULL,
 
     #' @field model_config ('list()')\cr
-    #' List for storing information about the configuration of the model.
+    #'   List for storing information about the configuration of the model.
     model_config = list(),
 
     #' @field last_training ('list()')\cr
-    #' List for storing the history, the configuration, and the results of the last training. This
-    #' information will be overwritten if a new training is started.
+    #'   List for storing the history, the configuration, and the results of the last
+    #'   training. This information will be overwritten if a new training is started.
     #'
     #' * `last_training$start_time`: Time point when training started.
     #' * `last_training$learning_time`: Duration of the training process.
     #' * `last_training$finish_time`: Time when the last training finished.
     #' * `last_training$history`: History of the last training.
-    #' * `last_training$data`: Object of class \code{table} storing the initial frequencies of the passed data.
+    #' * `last_training$data`: Object of class `table` storing the initial frequencies of the passed data.
     #' * `last_training$config`: List storing the configuration used for the last training.
     #'
     last_training = list(
-      learning_time = NULL,
       start_time = NA,
+      learning_time = NULL,
+      finish_time = NULL,
       history = list(),
       data = NULL,
-      finish_time = NULL,
       config = list()
     ),
     # General Information set and get--------------------------------------------
@@ -52,8 +50,7 @@ AIFEBaseModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for requesting the text embedding model information.
-    #' @return `list` of all relevant model information on the text embedding model
-    #' underlying the model.
+    #' @return `list` of all relevant model information on the text embedding model underlying the model.
     get_text_embedding_model = function() {
       return(private$text_embedding_model)
     },
@@ -62,8 +59,7 @@ AIFEBaseModel <- R6::R6Class(
     #' @param authors List of authors.
     #' @param citation Free text citation.
     #' @param url URL of a corresponding homepage.
-    #' @return Function does not return a value. It is used for setting the private
-    #' members for publication information.
+    #' @return Function does not return a value. It is used for setting the private members for publication information.
     set_publication_info = function(authors,
                                     citation,
                                     url = NULL) {
@@ -79,52 +75,45 @@ AIFEBaseModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for setting the license of the model.
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
-    #' @return Function does not return a value. It is used for setting the private member for
-    #' the software license of the model.
+    #' @param license `string` containing the abbreviation of the license or the license text.
+    #' @return Function does not return a value. It is used for setting the private member for the software license of
+    #'   the model.
     set_software_license = function(license = "CC BY") {
       private$model_info$model_license <- license
     },
     #' @description Method for getting the license of the model.
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
+    #' @param license `string` containing the abbreviation of the license or the license text.
     #' @return `string` representing the license for the model.
     get_software_license = function() {
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
     #' @description Method for setting the license of the model's documentation.
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
-    #' @return Function does not return a value. It is used for setting the private member for
-    #' the documentation license of the model.
+    #' @param license `string` containing the abbreviation of the license or the license text.
+    #' @return Function does not return a value. It is used for setting the private member for the documentation license
+    #'   of the model.
     set_documentation_license = function(license = "CC BY") {
       private$model_description$license <- license
     },
     #' @description Method for getting the license of the model's documentation.
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
+    #' @param license `string` containing the abbreviation of the license or the license text.
     #' @return Returns the license as a `string`.
     get_documentation_license = function() {
       return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
     #' @description Method for setting a description of the model.
-    #' @param eng `string` A text describing the training,
-    #' its theoretical and empirical background, and output
-    #' in English.
-    #' @param native `string` A text describing the training ,
-    #' its theoretical and empirical background, and output
-    #' in the native language of the model.
-    #' @param abstract_eng `string` A text providing a summary of the description
-    #' in English.
-    #' @param abstract_native `string` A text providing a summary of the description
-    #' in the native language of the model.
+    #' @param eng `string` A text describing the training, its theoretical and empirical background, and output in
+    #'   English.
+    #' @param native `string` A text describing the training , its theoretical and empirical background, and output in
+    #'   the native language of the model.
+    #' @param abstract_eng `string` A text providing a summary of the description in English.
+    #' @param abstract_native `string` A text providing a summary of the description in the native language of the
+    #'   model.
     #' @param keywords_eng `vector` of keyword in English.
     #' @param keywords_native `vector` of keyword in the native language of the model.
-    #' @return Function does not return a value. It is used for setting the private members for the
-    #' description of the model.
+    #' @return Function does not return a value. It is used for setting the private members for the description of the
+    #'   model.
     set_model_description = function(eng = NULL,
                                      native = NULL,
                                      abstract_eng = NULL,
@@ -153,17 +142,14 @@ AIFEBaseModel <- R6::R6Class(
       }
     },
     #' @description Method for requesting the model description.
-    #' @return `list` with the description of the classifier in English
-    #' and the native language.
+    #' @return `list` with the description of the classifier in English and the native language.
     get_model_description = function() {
       return(private$model_description)
     },
     #-------------------------------------------------------------------------
     #' @description Method for saving a model.
-    #' @param dir_path `string` Path of the directory where the model should be
-    #' saved.
-    #' @param folder_name `string` Name of the folder that should be created within
-    #' the directory.
+    #' @param dir_path `string` Path of the directory where the model should be saved.
+    #' @param folder_name `string` Name of the folder that should be created within the directory.
     #' @return Function does not return a value. It saves the model to disk.
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
@@ -220,10 +206,8 @@ AIFEBaseModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for importing a model.
-    #' @param dir_path `string` Path of the directory where the model is
-    #' saved.
-    #' @return Function does not return a value. It is used to load the weights
-    #' of a model.
+    #' @param dir_path `string` Path of the directory where the model is saved.
+    #' @return Function does not return a value. It is used to load the weights of a model.
     load = function(dir_path) {
       # Load python scripts
       private$load_reload_python_scripts()
@@ -265,12 +249,12 @@ AIFEBaseModel <- R6::R6Class(
         }
       }
 
-      #Load sustainability_data
-      sustain_path=paste0(dir_path,"/sustainability.csv")
-      if(file.exists(sustain_path)){
-        sustain_data=read.csv(sustain_path)
+      # Load sustainability_data
+      sustain_path <- paste0(dir_path, "/sustainability.csv")
+      if (file.exists(sustain_path)) {
+        sustain_data <- read.csv(sustain_path)
 
-        private$sustainability = list(
+        private$sustainability <- list(
           sustainability_tracked = TRUE,
           date = sustain_data$date,
           sustainability_data = list(
@@ -285,10 +269,8 @@ AIFEBaseModel <- R6::R6Class(
       }
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting a summary of the R and python packages'
-    #' versions used for creating the model.
-    #' @return Returns a `list` containing the versions of the relevant
-    #' R and python packages.
+    #' @description Method for requesting a summary of the R and python packages' versions used for creating the model.
+    #' @return Returns a `list` containing the versions of the relevant R and python packages.
     get_package_versions = function() {
       return(
         list(
@@ -298,36 +280,31 @@ AIFEBaseModel <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting a summary of tracked energy consumption
-    #' during training and an estimate of the resulting CO2 equivalents in kg.
-    #' @return Returns a `list` containing the tracked energy consumption,
-    #' CO2 equivalents in kg, information on the tracker used, and technical
-    #' information on the training infrastructure.
+    #' @description Method for requesting a summary of tracked energy consumption during training and an estimate of the
+    #'   resulting CO2 equivalents in kg.
+    #' @return Returns a `list` containing the tracked energy consumption, CO2 equivalents in kg, information on the
+    #'   tracker used, and technical information on the training infrastructure.
     get_sustainability_data = function() {
       return(private$sustainability)
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting the machine learning framework used
-    #' for the model.
-    #' @return Returns a `string` describing the machine learning framework used
-    #' for the classifier.
+    #' @description Method for requesting the machine learning framework used for the model.
+    #' @return Returns a `string` describing the machine learning framework used for the classifier.
     get_ml_framework = function() {
       return(private$ml_framework)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for requesting the name (unique id) of the underlying
-    #' text embedding model.
+    #' @description Method for requesting the name (unique id) of the underlying text embedding model.
     #' @return Returns a `string` describing name of the text embedding model.
     get_text_embedding_model_name = function() {
       return(private$text_embedding_model$model$model_name)
     },
     #--------------------------------------------------------------------------
     # Check Embedding Model compatibility of the text embedding
-    #' @description Method for checking if the provided text embeddings are
-    #' created with the same [TextEmbeddingModel] as the model.
+    #' @description Method for checking if the provided text embeddings are created with the same [TextEmbeddingModel]
+    #'   as the model.
     #' @param text_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
-    #' @return `TRUE` if the underlying [TextEmbeddingModel] are the same.
-    #' `FALSE` if the models differ.
+    #' @return `TRUE` if the underlying [TextEmbeddingModel] are the same. `FALSE` if the models differ.
     check_embedding_model = function(text_embeddings) {
       # Check object type
       private$check_embeddings_object_type(text_embeddings, strict = TRUE)
@@ -371,15 +348,14 @@ AIFEBaseModel <- R6::R6Class(
       return(count)
     },
     #-------------------------------------------------------------------------
-    #' @description Method for checking if the model was successfully configured.
-    #' An object can only be used if this value is `TRUE`.
+    #' @description Method for checking if the model was successfully configured. An object can only be used if this
+    #'   value is `TRUE`.
     #' @return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
     is_configured = function() {
       return(private$configured)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for requesting all private fields and methods. Used
-    #' for loading and updating an object.
+    #' @description Method for requesting all private fields and methods. Used for loading and updating an object.
     #' @return Returns a `list` with all private fields and methods.
     get_private = function() {
       return(private)
@@ -562,7 +538,13 @@ AIFEBaseModel <- R6::R6Class(
           reticulate::dict(
             list(
               id = rownames(embeddings$embeddings),
-              input = np$squeeze(np$split(reticulate::np_array(embeddings$embeddings), as.integer(nrow(embeddings$embeddings)), axis = 0L))
+              input = np$squeeze(
+                np$split(
+                  reticulate::np_array(embeddings$embeddings),
+                  as.integer(nrow(embeddings$embeddings)),
+                  axis = 0L
+                )
+              )
             ),
             convert = FALSE
           )
@@ -655,9 +637,9 @@ AIFEBaseModel <- R6::R6Class(
     },
 
     #--------------------------------------------------------------------------
-    #' description Loads configuration and documentation of an object from disk.
-    #' param dir_path Path where the object set is stored.
-    #' return Method does not return anything. It loads an object from disk.
+    # description Loads configuration and documentation of an object from disk.
+    # param dir_path Path where the object set is stored.
+    # return Method does not return anything. It loads an object from disk.
     load_config_and_docs = function(dir_path) {
       if (self$is_configured() == TRUE) {
         stop("The object has already been configured. Please use the method
@@ -732,7 +714,6 @@ AIFEBaseModel <- R6::R6Class(
 
       # Finalize config
       private$set_configuration_to_TRUE()
-
     }
   )
 )

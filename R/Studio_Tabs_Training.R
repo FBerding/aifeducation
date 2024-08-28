@@ -1,7 +1,5 @@
-#' Graphical user interface for displaying the training history of an object.
-#'
-#' Functions generates the tab within a page for displaying the training history
-#' of an object.
+#' @title Graphical user interface for displaying the training history of an object.
+#' @description Functions generates the tab within a page for displaying the training history of an object.
 #'
 #' @param id `string` determining the id for the namespace.
 #' @return This function does nothing return. It is used to build a page for a shiny app.
@@ -43,9 +41,8 @@ Training_UI <- function(id) {
   )
 }
 
-#' Server function for: graphical user interface for displaying the training history of an object.
-#'
-#' Functions generates the functionality of a page on the server.
+#' @title Server function for: graphical user interface for displaying the training history of an object.
+#' @description Functions generates the functionality of a page on the server.
 #'
 #' @param id `string` determining the id for the namespace.
 #' @param model Model used for inference.

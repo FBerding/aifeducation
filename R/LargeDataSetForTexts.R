@@ -1,8 +1,6 @@
-#' @title Abstract class for large data sets containing raw texts.
-#'
-#' @description This object stores raw texts. The data of this objects is not
-#' stored in memory directly. By using memory mapping these objects allow to work
-#' with data sets which do not fit into memory/RAM.
+#' @title Abstract class for large data sets containing raw texts
+#' @description This object stores raw texts. The data of this objects is not stored in memory directly. By using memory
+#'   mapping these objects allow to work with data sets which do not fit into memory/RAM.
 #'
 #' @return Returns a new object of this class.
 #' @export
@@ -12,33 +10,26 @@ LargeDataSetForText <- R6::R6Class(
   inherit = LargeDataSetBase,
   public = list(
     #--------------------------------------------------------------------------
-    #' @description Method for adding raw texts saved within .txt files to the
-    #' data set. Please note
-    #' the the directory should contain one folder for each .txt file. In order to
-    #' create an informative data set every folder should contain the following
-    #' additional files:
+    #' @description Method for adding raw texts saved within .txt files to the data set. Please note the the directory
+    #'   should contain one folder for each .txt file. In order to create an informative data set every folder should
+    #'   contain the following additional files:
     #'
-    #' * bib_entry.txt: containing a text version of the bibliographic information
-    #' of the raw text.
-    #' * license.txt: containing a statement about the license to use the raw text
-    #' such as CC BY.
+    #'   * bib_entry.txt: containing a text version of the bibliographic information of the raw text.
+    #'   * license.txt: containing a statement about the license to use the raw text such as CC BY.
     #'
-    #' The id of every .txt file is the file name without file extension. Please
-    #' be aware to provide unique file names.
-    #' Id and raw texts are mandatory, bibliographic and license information are optional.
+    #'   The id of every .txt file is the file name without file extension. Please be aware to provide unique file
+    #'   names. Id and raw texts are mandatory, bibliographic and license information are optional.
     #' @param dir_path Path to the directory where the files are stored.
     #' @param batch_size `int` determining the number of files to process at once.
-    #' @param trace `bool` If `TRUE` information on the progress is printed
-    #' to the console.
+    #' @param trace `bool` If `TRUE` information on the progress is printed to the console.
     #' @param log_top_value `int` indicating the current iteration of the process.
     #' @param log_top_total `int` determining the maximal number of iterations.
     #' @param log_top_message `string` providing additional information of the process.
-    #'@param log_file `string` Path to the file where the log should be saved.
-    #'If no logging is desired set this argument to `NULL`.
-    #'@param log_write_interval `int` Time in seconds determining the interval in which
-    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
-    #' @return The method does not return anything. It adds new raw texts to
-    #' the data set.
+    #' @param log_file `string` Path to the file where the log should be saved. If no logging is desired set this
+    #'   argument to `NULL`.
+    #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
+    #'   the log files. Only relevant if `log_file` is not `NULL`.
+    #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_txt = function(dir_path,
                                   batch_size = 500,
                                   log_file = NULL,
@@ -101,33 +92,26 @@ LargeDataSetForText <- R6::R6Class(
     },
 
     #--------------------------------------------------------------------------
-    #' @description Method for adding raw texts saved within .pdf files to the
-    #' data set. Please note
-    #' the the directory should contain one folder for each .pdf file. In order to
-    #' create an informative data set every folder should contain the following
-    #' additional files:
+    #' @description Method for adding raw texts saved within .pdf files to the data set. Please note the the directory
+    #'   should contain one folder for each .pdf file. In order to create an informative data set every folder should
+    #'   contain the following additional files:
     #'
-    #' * bib_entry.txt: containing a text version of the bibliographic information
-    #' of the raw text.
-    #' * license.txt: containing a statement about the license to use the raw text
-    #' such as CC BY.
+    #'   * bib_entry.txt: containing a text version of the bibliographic information of the raw text.
+    #'   * license.txt: containing a statement about the license to use the raw text such as CC BY.
     #'
-    #' The id of every .pdf file is the file name without file extension. Please
-    #' be aware to provide unique file names.
-    #' Id and raw texts are mandatory, bibliographic and license information are optional.
+    #'   The id of every .pdf file is the file name without file extension. Please be aware to provide unique file
+    #'   names. Id and raw texts are mandatory, bibliographic and license information are optional.
     #' @param dir_path Path to the directory where the files are stored.
     #' @param batch_size `int` determining the number of files to process at once.
-    #' @param trace `bool` If `TRUE` information on the progress is printed
-    #' to the console.
+    #' @param trace `bool` If `TRUE` information on the progress is printed to the console.
     #' @param log_top_value `int` indicating the current iteration of the process.
     #' @param log_top_total `int` determining the maximal number of iterations.
     #' @param log_top_message `string` providing additional information of the process.
-    #'@param log_file `string` Path to the file where the log should be saved.
-    #'If no logging is desired set this argument to `NULL`.
-    #'@param log_write_interval `int` Time in seconds determining the interval in which
-    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
-    #' @return The method does not return anything. It adds new raw texts to
-    #' the data set.
+    #' @param log_file `string` Path to the file where the log should be saved. If no logging is desired set this
+    #'   argument to `NULL`.
+    #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
+    #'   the log files. Only relevant if `log_file` is not `NULL`.
+    #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_pdf = function(dir_path,
                                   batch_size = 500,
                                   log_file = NULL,
@@ -189,32 +173,26 @@ LargeDataSetForText <- R6::R6Class(
     },
 
     #--------------------------------------------------------------------------
-    #' @description Method for adding raw texts saved within .xlsx files to the
-    #' data set. The method assumes that the texts are saved in the rows and that the columns
-    #' store the id and the raw texts in the columns. In addition, a column for the
-    #' bibliography information and the license can be added. The column names
-    #' for these rows must be specified with the following arguments. They must be
-    #' the same for all .xlsx files in the chosen directory.
-    #' Id and raw texts are mandatory, bibliographic and license information are optional.
-    #' Additional columns are dropped.
+    #' @description Method for adding raw texts saved within .xlsx files to the data set. The method assumes that the
+    #'   texts are saved in the rows and that the columns store the id and the raw texts in the columns. In addition, a
+    #'   column for the bibliography information and the license can be added. The column names for these rows must be
+    #'   specified with the following arguments. They must be the same for all .xlsx files in the chosen directory. Id
+    #'   and raw texts are mandatory, bibliographic and license information are optional. Additional columns are
+    #'   dropped.
     #' @param dir_path Path to the directory where the files are stored.
     #' @param id_column `string` Name of the column storing the ids for the texts.
     #' @param text_column `string` Name of the column storing the raw text.
-    #' @param bib_entry_column `string` Name of the column storing the bibliographic
-    #' information of the texts.
-    #' @param license_column `string` Name of the column storing information about
-    #' the licenses.
-    #' @param trace `bool` If `TRUE` prints information on the progress to the
-    #' console.
+    #' @param bib_entry_column `string` Name of the column storing the bibliographic information of the texts.
+    #' @param license_column `string` Name of the column storing information about the licenses.
+    #' @param trace `bool` If `TRUE` prints information on the progress to the console.
     #' @param log_top_value `int` indicating the current iteration of the process.
     #' @param log_top_total `int` determining the maximal number of iterations.
     #' @param log_top_message `string` providing additional information of the process.
-    #'@param log_file `string` Path to the file where the log should be saved.
-    #'If no logging is desired set this argument to `NULL`.
-    #'@param log_write_interval `int` Time in seconds determining the interval in which
-    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
-    #' @return The method does not return anything. It adds new raw texts to
-    #' the data set.
+    #' @param log_file `string` Path to the file where the log should be saved. If no logging is desired set this
+    #'   argument to `NULL`.
+    #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
+    #'   the log files. Only relevant if `log_file` is not `NULL`.
+    #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_xlsx = function(dir_path,
                                    trace = TRUE,
                                    id_column = "id",
@@ -317,11 +295,9 @@ LargeDataSetForText <- R6::R6Class(
 
     #--------------------------------------------------------------------------
     #' @description Method for adding raw texts from a `data.frame`
-    #' @param data_frame Object of class `data.frame` with at least the following
-    #' columns "id","text","bib_entry", and "license". If a column is missing
-    #' an error occurs. Additional columns are dropped.
-    #' @return The method does not return anything. It adds new raw texts to
-    #' the data set.
+    #' @param data_frame Object of class `data.frame` with at least the following columns "id","text","bib_entry", and
+    #'   "license". If a column is missing an error occurs. Additional columns are dropped.
+    #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_data.frame = function(data_frame) {
       if (is.data.frame(data_frame) == FALSE) {
         stop("Input must be of type data.frame")
@@ -346,8 +322,7 @@ LargeDataSetForText <- R6::R6Class(
       private$add(new_dataset)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for requesting all private fields and methods. Used
-    #' for loading and updating an object.
+    #' @description Method for requesting all private fields and methods. Used for loading and updating an object.
     #' @return Returns a `list` with all private fields and methods.
     get_private = function() {
       return(private)

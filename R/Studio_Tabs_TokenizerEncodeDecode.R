@@ -1,13 +1,12 @@
-#'Graphical user interface for encode, decode and tokenize raw texts.
+#' @title Graphical user interface for encode, decode and tokenize raw texts.
+#' @description Functions generates the tab within a page for using an object of class [TextEmbeddingModel] for encode,
+#'   decode and tokenize a raw text.
 #'
-#'Functions generates the tab within a page for using an
-#'object of class [TextEmbeddingModel] for encode, decode and tokenize a raw text.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_text_embedding_model_tokenize_encode_decode
-#'@keywords internal
+#' @family studio_gui_text_embedding_model_tokenize_encode_decode
+#' @keywords internal
 #'
 Tokenize_Encode_Decode_UI <- function(id) {
   bslib::page(
@@ -114,23 +113,15 @@ Tokenize_Encode_Decode_UI <- function(id) {
   )
 }
 
-
-
-
-
-
-
-
-#'Server function for: graphical user interface for encode, decode and tokenize raw texts.
+#' @title Server function for: graphical user interface for encode, decode and tokenize raw texts.
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param model Model used for inference.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param model Model used for inference.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_text_embedding_model_tokenize_encode_decode
-#'@keywords internal
+#' @family studio_gui_text_embedding_model_tokenize_encode_decode
+#' @keywords internal
 #'
 Tokenize_Encode_Decode_Server <- function(id, model) {
   moduleServer(id, function(input, output, session) {

@@ -1,12 +1,11 @@
-#'Graphical user interface for feature extractors - create
+#' @title Graphical user interface for feature extractors - create
+#' @description Functions generates the page for a creating a new [TEFeatureExtractor].
 #'
-#'Functions generates the page for a creating a new [TEFeatureExtractor].
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_feature_extractor_create
-#'@keywords internal
+#' @family studio_gui_page_feature_extractor_create
+#' @keywords internal
 #'
 FeatureExtractors_Create_UI <- function(id) {
   shiny::tagList(
@@ -59,7 +58,7 @@ FeatureExtractors_Create_UI <- function(id) {
           ),
           bslib::card_body(
             shiny::sliderInput(
-              inputId = shiny::NS(id,"features"),
+              inputId = shiny::NS(id, "features"),
               label = "Target Features",
               min = 1,
               value = 128,
@@ -73,7 +72,7 @@ FeatureExtractors_Create_UI <- function(id) {
               choices = c("conv", "lstm", "dense")
             ),
             shiny::sliderInput(
-              inputId = shiny::NS(id,"noise_factor"),
+              inputId = shiny::NS(id, "noise_factor"),
               label = "Noise Factor",
               min = 0,
               value = 0,
@@ -131,17 +130,16 @@ FeatureExtractors_Create_UI <- function(id) {
 }
 
 
-#'Server function for: graphical user interface for feature extractors - create
+#' @title Server function for: graphical user interface for feature extractors - create
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_feature_extractor_create
-#'@keywords internal
+#' @family studio_gui_page_feature_extractor_create
+#' @keywords internal
 #'
 FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
@@ -186,7 +184,7 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
-      #ns=session$ns,
+      # ns=session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"
@@ -246,13 +244,13 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
             destination_path = input$save_modal_directory_path,
             folder_name = input$save_modal_folder_name,
             path_to_embeddings = path_to_embeddings(),
-            features=input$features,
-            method=input$method,
-            noise_factor=input$noise_factor,
-            optimizer=input$optimizer,
-            data_val_size=input$data_val_size,
-            epochs=input$epochs,
-            batch_size=input$batch_size,
+            features = input$features,
+            method = input$method,
+            noise_factor = input$noise_factor,
+            optimizer = input$optimizer,
+            data_val_size = input$data_val_size,
+            epochs = input$epochs,
+            batch_size = input$batch_size,
             sustain_iso_code = input$sustainability_country,
             log_dir = log_dir,
             log_write_interval = 3
@@ -287,5 +285,3 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     #--------------------------------------------------------------------------
   })
 }
-
-

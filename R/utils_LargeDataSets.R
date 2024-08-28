@@ -1,6 +1,5 @@
-#' Convert data.frame to arrow data set
-#'
-#' Function for converting a data.frame into a pyarrow data set.
+#' @title Convert data.frame to arrow data set
+#' @description Function for converting a data.frame into a pyarrow data set.
 #'
 #' @param data_frame Object of class `data.frame`.
 #' @return Returns the `data.frame` as a pyarrow data set of class `datasets.arrow_dataset.Dataset`.
@@ -22,15 +21,13 @@ data.frame_to_py_dataset <- function(data_frame) {
   return(dataset)
 }
 
-#' Convert arrow data set to an arrow data set
-#'
-#' Function for converting an arrow data set into a data set that can be used
-#' to store and process embeddings.
+#' @title Convert arrow data set to an arrow data set
+#' @description Function for converting an arrow data set into a data set that can be used to store and process
+#'   embeddings.
 #'
 #' @param py_dataset Object of class `datasets.arrow_dataset.Dataset`.
-#' @return Returns the data set of class `datasets.arrow_dataset.Dataset` with only
-#' two columns ("id","input"). "id" stores the name of the cases while "input" stores
-#' the embeddings.
+#' @return Returns the data set of class `datasets.arrow_dataset.Dataset` with only two columns ("id","input"). "id"
+#'   stores the name of the cases while "input" stores the embeddings.
 #'
 #' @family Data Management
 #' @keywords internal
@@ -41,10 +38,9 @@ py_dataset_to_embeddings <- function(py_dataset) {
   return(embeddings)
 }
 
-#' Convert R array for arrow data set
-#'
-#' Function converts a R array into a numpy array that can be added to
-#' an arrow data set. The array should represent embeddings.
+#' @title Convert R array for arrow data set
+#' @description Function converts a R array into a numpy array that can be added to an arrow data set. The array should
+#'   represent embeddings.
 #'
 #' @param r_array `array` representing embeddings.
 #' @return Returns a numpy array.
@@ -55,16 +51,14 @@ prepare_r_array_for_dataset <- function(r_array) {
   return(np$squeeze(np$split(reticulate::np_array(r_array), as.integer(nrow(r_array)), axis = 0L)))
 }
 
-#' Assign cases to batches
-#'
-#' Function groups cases into batches.
+#' @title Assign cases to batches
+#' @description Function groups cases into batches.
 #'
 #' @param number_rows `int` representing the number of cases or rows of a matrix or array.
 #' @param batch_size `int` size of a batch.
-#' @param zero_based `bool` If `TRUE` the indices of the cases within each batch
-#' are zero based. One based if `FALSE`.
-#' @return Returns a `list` of batches. Each entry in the list contains a `vector`
-#' of `int` representing the cases belonging to that batch.
+#' @param zero_based `bool` If `TRUE` the indices of the cases within each batch are zero based. One based if `FALSE`.
+#' @return Returns a `list` of batches. Each entry in the list contains a `vector` of `int` representing the cases
+#'   belonging to that batch.
 #'
 #' @family Data Management
 #' @keywords internal
@@ -83,15 +77,13 @@ get_batches_index <- function(number_rows, batch_size, zero_based = FALSE) {
   return(index_list)
 }
 
-#' Reduce to unique cases
-#'
-#' Function creates an arrow data set that contains only unique cases. That is,
-#' duplicates are removed.
+#' @title Reduce to unique cases
+#' @description Function creates an arrow data set that contains only unique cases. That is, duplicates are removed.
 #'
 #' @param dataset_to_reduce Object of class `datasets.arrow_dataset.Dataset`.
 #' @param column_name `string` Name of the column whose values should be unique.
-#' @return Returns a data set of class `datasets.arrow_dataset.Dataset` where
-#' the duplicates are removed according to the given column.
+#' @return Returns a data set of class `datasets.arrow_dataset.Dataset` where the duplicates are removed according to
+#'   the given column.
 #'
 #' @family Data Management
 #' @keywords internal
@@ -103,13 +95,11 @@ reduce_to_unique <- function(dataset_to_reduce, column_name) {
   return(reduced_dataset)
 }
 
-#' Convert class vector to arrow data set
-#'
-#' Function converts a vector of class indices into an arrow data set.
+#' @title Convert class vector to arrow data set
+#' @description Function converts a vector of class indices into an arrow data set.
 #'
 #' @param vector `vector` of class indices.
-#' @return Returns a data set of class `datasets.arrow_dataset.Dataset`
-#' containing the class indices.
+#' @return Returns a data set of class `datasets.arrow_dataset.Dataset` containing the class indices.
 #'
 #' @family Data Management
 #' @keywords internal
@@ -131,9 +121,8 @@ class_vector_to_py_dataset <- function(vector) {
   return(dataset)
 }
 
-#' Combine embeddings in array form
-#'
-#' Function combines two array by adding an array to another array along the
+#' @title Combine embeddings in array form
+#' @description Function combines two array by adding an array to another array along the
 #' first dimension.
 #'
 #' @param ... `array` or `list` of `array`s. Arrays to be combined. All array must have row names.
@@ -143,20 +132,20 @@ class_vector_to_py_dataset <- function(vector) {
 #' @family Data Management
 #' @keywords internal
 array_form_bind <- function(...) {
-objects=list(...)
-  arrays=NULL
+  objects <- list(...)
+  arrays <- NULL
 
-  for(object in objects){
-    if(is.list(object)){
-      for(j in 1:length(object)){
-        arrays[length(arrays)+1]=list(object[[j]])
+  for (object in objects) {
+    if (is.list(object)) {
+      for (j in 1:length(object)) {
+        arrays[length(arrays) + 1] <- list(object[[j]])
       }
     } else {
-      arrays[length(arrays)+1]=list(object)
+      arrays[length(arrays) + 1] <- list(object)
     }
   }
 
-  #arrays <- list(...)
+  # arrays <- list(...)
   if (length(arrays) > 1) {
     total_rows <- 0
 

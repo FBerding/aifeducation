@@ -1,12 +1,11 @@
-#'Graphical user interface for text embedding models - use
+#' @title Graphical user interface for text embedding models - use
+#' @description Functions generates the page for using a [TextEmbeddingModel].
 #'
-#'Functions generates the page for using a [TextEmbeddingModel].
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_text_embedding_model_use
-#'@keywords internal
+#' @family studio_gui_page_text_embedding_model_use
+#' @keywords internal
 #'
 TextEmbeddingModel_Use_UI <- function(id) {
   shiny::tagList(
@@ -27,40 +26,39 @@ TextEmbeddingModel_Use_UI <- function(id) {
       bslib::navset_card_underline(
         bslib::nav_panel(
           title = "Description",
-          Description_UI(id=shiny::NS(id,"TextEmbeddingModel_Desc"))
+          Description_UI(id = shiny::NS(id, "TextEmbeddingModel_Desc"))
         ),
         bslib::nav_panel(
           title = "Training",
-          Training_UI(id=shiny::NS(id,"TextEmbeddingModel_Training"))
+          Training_UI(id = shiny::NS(id, "TextEmbeddingModel_Training"))
         ),
         bslib::nav_panel(
           title = "Fill-Mask",
-          Fill_Mask_UI(id=shiny::NS(id,"TextEmbeddingModel_Fill_Mask"))
+          Fill_Mask_UI(id = shiny::NS(id, "TextEmbeddingModel_Fill_Mask"))
         ),
         bslib::nav_panel(
           title = "Tokenize/Encode/Decode",
-          Tokenize_Encode_Decode_UI(id=shiny::NS(id,"TextEmbeddingModel_TokEnDe"))
+          Tokenize_Encode_Decode_UI(id = shiny::NS(id, "TextEmbeddingModel_TokEnDe"))
         ),
         bslib::nav_panel(
           title = "Embedd Text",
-          Embed_UI(id=shiny::NS(id,"TextEmbeddingModel_Embed"))
+          Embed_UI(id = shiny::NS(id, "TextEmbeddingModel_Embed"))
         )
       )
     )
   )
 }
 
-#'Server function for: graphical user interface for text embedding models - use
+#' @title Server function for: graphical user interface for text embedding models - use
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_text_embedding_model_use
-#'@keywords internal
+#' @family studio_gui_page_text_embedding_model_use
+#' @keywords internal
 #'
 TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
@@ -75,8 +73,8 @@ TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
       allowDirCreate = FALSE
     )
 
-    #Load the model and check for errors during loading-------------------------
-    model_path=shiny::eventReactive(input$button_select_model, {
+    # Load the model and check for errors during loading-------------------------
+    model_path <- shiny::eventReactive(input$button_select_model, {
       model_path <- shinyFiles::parseDirPath(volumes, input$button_select_model)
       if (length(model_path) > 0) {
         return(model_path)
@@ -90,26 +88,26 @@ TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
       model_path <- shinyFiles::parseDirPath(volumes, input$button_select_model)
       if (length(model_path) > 0) {
         display_processing(
-          title="Working. Please wait.",
-          size="l",
-          easy_close=FALSE,
-          message=""
+          title = "Working. Please wait.",
+          size = "l",
+          easy_close = FALSE,
+          message = ""
         )
 
-        #Try to load the model
-        model <- try(load_from_disk(model_path),silent = TRUE)
+        # Try to load the model
+        model <- try(load_from_disk(model_path), silent = TRUE)
 
-        if ("try-error"%in%class(model) == FALSE) {
+        if ("try-error" %in% class(model) == FALSE) {
           if ("TextEmbeddingModel" %in% class(model)) {
             shiny::removeModal()
             return(model)
-            } else {
-              display_errors(
-                title = "Error",
-                size = "l",
-                easy_close = TRUE,
-                error_messages = "The file does not contain an object of class TextEmbeddingModel."
-              )
+          } else {
+            display_errors(
+              title = "Error",
+              size = "l",
+              easy_close = TRUE,
+              error_messages = "The file does not contain an object of class TextEmbeddingModel."
+            )
             return(NULL)
           }
         } else {
@@ -124,28 +122,38 @@ TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Render the information at the sidebar--------------------------------------
-    output$sidebar_description<-shiny::renderUI({
+    # Render the information at the sidebar--------------------------------------
+    output$sidebar_description <- shiny::renderUI({
       shiny::req(model())
       return(
         generate_sidebar_information(model())
       )
     })
 
-    #Server functions for the different tabs------------------------------------
-    Description_Server(id="TextEmbeddingModel_Desc",
-                       model=model)
-    Training_Server(id="TextEmbeddingModel_Training",
-                    model=model)
-    Fill_Mask_Server(id="TextEmbeddingModel_Fill_Mask",
-                    model=model)
-    Tokenize_Encode_Decode_Server(id="TextEmbeddingModel_TokEnDe",
-                                  model=model)
-    Embed_Server(id="TextEmbeddingModel_Embed",
-                 model=model,
-                 volumes=volumes,
-                 model_path = model_path(),
-                 log_dir = log_dir)
+    # Server functions for the different tabs------------------------------------
+    Description_Server(
+      id = "TextEmbeddingModel_Desc",
+      model = model
+    )
+    Training_Server(
+      id = "TextEmbeddingModel_Training",
+      model = model
+    )
+    Fill_Mask_Server(
+      id = "TextEmbeddingModel_Fill_Mask",
+      model = model
+    )
+    Tokenize_Encode_Decode_Server(
+      id = "TextEmbeddingModel_TokEnDe",
+      model = model
+    )
+    Embed_Server(
+      id = "TextEmbeddingModel_Embed",
+      model = model,
+      volumes = volumes,
+      model_path = model_path(),
+      log_dir = log_dir
+    )
     #--------------------------------------------------------------------------
   })
 }

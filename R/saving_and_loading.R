@@ -1,11 +1,10 @@
-#' Saving objects created with 'aifeducation'
+#' @title Saving objects created with 'aifeducation'
+#' @description Function for saving objects created with 'aifeducation'.
 #'
-#' Function for saving objects created with 'aifeducation'.
-#'
-#' @param object Object of class [TEClassifierRegular],
-#' [TEClassifierProtoNet],  [TEFeatureExtractor], [TextEmbeddingModel], [LargeDataSetForTextEmbeddings],
-#' [LargeDataSetForText] or [EmbeddedText] which should be saved.
-#' @param dir_path Path to the directory where the should model is stored.
+#' @param object Object of class [TEClassifierRegular], [TEClassifierProtoNet],  [TEFeatureExtractor],
+#'   [TextEmbeddingModel], [LargeDataSetForTextEmbeddings], [LargeDataSetForText] or [EmbeddedText] which should be
+#'   saved.
+#' @param dir_path `string` Path to the directory where the should model is stored.
 #' @param folder_name `string` Name of the folder where the files should be stored.
 #' @return Function does not return a value. It saves the model to disk.
 #' @return No return value, called for side effects.
@@ -55,18 +54,15 @@ save_to_disk <- function(object,
     dir_path = dir_path,
     folder_name = folder_name
   )
-
 }
 
 
-#' Loading objects created with 'aifeducation'
+#' @title Loading objects created with 'aifeducation'
+#' @description Function for loading objects created with 'aifeducation'.
 #'
-#' Function for loading objects created with 'aifeducation'.
-#'
-#' @param dir_path Path to the directory where the model is stored.
-#' @return Returns an object of class [TEClassifierRegular],
-#' [TEClassifierProtoNet],  [TEFeatureExtractor], [TextEmbeddingModel], [LargeDataSetForTextEmbeddings],
-#' [LargeDataSetForText] or [EmbeddedText].
+#' @param dir_path `string` Path to the directory where the model is stored.
+#' @return Returns an object of class [TEClassifierRegular], [TEClassifierProtoNet],  [TEFeatureExtractor],
+#'   [TextEmbeddingModel], [LargeDataSetForTextEmbeddings], [LargeDataSetForText] or [EmbeddedText].
 #'
 #' @family Saving and Loading
 #'
@@ -74,28 +70,28 @@ save_to_disk <- function(object,
 load_from_disk <- function(dir_path) {
   loaded_object <- load_R_interface(dir_path)
 
-  if(methods::is(loaded_object, "TEClassifierRegular")&
-     !methods::is(loaded_object, "TEClassifierProtoNet")){
-    model=TEClassifierRegular$new()
-  } else if(methods::is(loaded_object, "TEClassifierProtoNet")){
-    model=TEClassifierProtoNet$new()
-  }  else if(methods::is(loaded_object, "TEFeatureExtractor")){
-    model=TEFeatureExtractor$new()
-  }  else if(methods::is(loaded_object, "TextEmbeddingModel")){
-    model=TextEmbeddingModel$new()
-  }  else if(methods::is(loaded_object, "LargeDataSetForTextEmbeddings")){
-    model=LargeDataSetForTextEmbeddings$new()
+  if (methods::is(loaded_object, "TEClassifierRegular") &
+    !methods::is(loaded_object, "TEClassifierProtoNet")) {
+    model <- TEClassifierRegular$new()
+  } else if (methods::is(loaded_object, "TEClassifierProtoNet")) {
+    model <- TEClassifierProtoNet$new()
+  } else if (methods::is(loaded_object, "TEFeatureExtractor")) {
+    model <- TEFeatureExtractor$new()
+  } else if (methods::is(loaded_object, "TextEmbeddingModel")) {
+    model <- TextEmbeddingModel$new()
+  } else if (methods::is(loaded_object, "LargeDataSetForTextEmbeddings")) {
+    model <- LargeDataSetForTextEmbeddings$new()
   } else {
     stop("Class type not supported.")
   }
 
   # load and update model
-  model$load_from_disk(dir_path=dir_path)
+  model$load_from_disk(dir_path = dir_path)
   return(model)
 }
 
 
-load_R_interface=function(dir_path){
+load_R_interface <- function(dir_path) {
   # Load the Interface to R
   interface_path <- paste0(dir_path, "/r_interface.rda")
 

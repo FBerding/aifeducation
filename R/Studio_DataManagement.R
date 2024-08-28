@@ -1,12 +1,11 @@
-#'Graphical user interface for data management
+#' @title Graphical user interface for data management
+#' @description Functions generates the page for creating [LargeDataSetForText].
 #'
-#'Functions generates the page for creating [LargeDataSetForText].
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_data_management
-#'@keywords internal
+#' @family studio_gui_page_data_management
+#' @keywords internal
 #'
 DataManagement_RawTextsUI <- function(id) {
   shiny::tagList(
@@ -101,17 +100,16 @@ DataManagement_RawTextsUI <- function(id) {
   )
 }
 
-#'Server function for: graphical user interface for data management
+#' @title Server function for: graphical user interface for data management
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_data_management
-#'@keywords internal
+#' @family studio_gui_page_data_management
+#' @keywords internal
 #'
 DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
@@ -195,7 +193,7 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
           ExtendedTask_type = "raw_texts",
           ExtendedTask_arguments = list(
             source_path = input$text_source_dir,
-            destination_path =  input$save_modal_directory_path,
+            destination_path = input$save_modal_directory_path,
             destination_folder = input$save_modal_folder_name,
             log_path = log_path,
             include_txt = input$include_txt,
@@ -205,7 +203,7 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
             excel_text_column = input$excel_text_column,
             excel_license_column = input$excel_license_column,
             excel_bib_entry_column = input$excel_bib_entry_column,
-            log_write_interval=2
+            log_write_interval = 2
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,
@@ -218,5 +216,3 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
     #--------------------------------------------------------------------------
   })
 }
-
-

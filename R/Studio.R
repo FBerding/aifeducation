@@ -1,6 +1,5 @@
-#' Aifeducation Studio
-#'
-#' Functions starts a shiny app that represents Aifeducation Studio
+#' @title Aifeducation Studio
+#' @description Functions starts a shiny app that represents Aifeducation Studio.
 #'
 #' @return This function does nothing return. It is used to start a shiny app.
 #'

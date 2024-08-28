@@ -1,13 +1,12 @@
-#'Graphical user interface for fill-mask tasks.
+#' @title Graphical user interface for fill-mask tasks.
+#' @description Functions generates the tab within a page for using an object of class [TextEmbeddingModel] for
+#'   fill-mask tasks.
 #'
-#'Functions generates the tab within a page for using an
-#'object of class [TextEmbeddingModel] for fill-mask tasks.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_text_embedding_model_fill_mask
-#'@keywords internal
+#' @family studio_gui_text_embedding_model_fill_mask
+#' @keywords internal
 #'
 Fill_Mask_UI <- function(id) {
   bslib::page(
@@ -68,16 +67,15 @@ Fill_Mask_UI <- function(id) {
   )
 }
 
-#'Server function for: graphical user interface for fill-mask tasks.
+#' @title Server function for: graphical user interface for fill-mask tasks.
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param model Model used for inference.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param model Model used for inference.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_text_embedding_model_fill_mask
-#'@keywords internal
+#' @family studio_gui_text_embedding_model_fill_mask
+#' @keywords internal
 #'
 Fill_Mask_Server <- function(id, model) {
   moduleServer(id, function(input, output, session) {

@@ -1,6 +1,5 @@
-#' Graphical user interface for classifiers - create
-#'
-#' Functions generates the page for a creating new classifiers.
+#' @title Graphical user interface for classifiers - create
+#' @description Functions generates the page for a creating new classifiers.
 #'
 #' @param id `string` determining the id for the namespace.
 #' @return This function does nothing return. It is used to build a page for a shiny app.
@@ -353,9 +352,8 @@ Classifiers_Create_UI <- function(id) {
   )
 }
 
-#' Server function for: graphical user interface for classifiers - create
-#'
-#' Functions generates the functionality of a page on the server.
+#' @title Server function for: graphical user interface for classifiers - create
+#' @description Functions generates the functionality of a page on the server.
 #'
 #' @param id `string` determining the id for the namespace.
 #' @param log_dir `string` Path to the directory where the log files should be stored.

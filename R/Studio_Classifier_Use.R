@@ -1,12 +1,11 @@
-#'Graphical user interface for classifiers - use
+#' @title Graphical user interface for classifiers - use
+#' @description Functions generates the page for using a classifiers.
 #'
-#'Functions generates the page for using a classifiers.
+#' @param id `string` determining the id for the namespace.
+#' @return This function does nothing return. It is used to build a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@return This function does nothing return. It is used to build a page for a shiny app.
-#'
-#'@family studio_gui_page_classifier_use
-#'@keywords internal
+#' @family studio_gui_page_classifier_use
+#' @keywords internal
 #'
 Classifiers_Use_UI <- function(id) {
   shiny::tagList(
@@ -27,36 +26,35 @@ Classifiers_Use_UI <- function(id) {
       bslib::navset_card_underline(
         bslib::nav_panel(
           title = "Description",
-          Description_UI(id=shiny::NS(id,"Classifiers_Desc"))
+          Description_UI(id = shiny::NS(id, "Classifiers_Desc"))
         ),
         bslib::nav_panel(
           title = "Training",
-          Training_UI(id=shiny::NS(id,"Classifiers_Training"))
+          Training_UI(id = shiny::NS(id, "Classifiers_Training"))
         ),
         bslib::nav_panel(
           title = "Reliability",
-          Reliability_UI(id=shiny::NS(id,"Classifiers_Reliability"))
+          Reliability_UI(id = shiny::NS(id, "Classifiers_Reliability"))
         ),
         bslib::nav_panel(
           title = "Prediction",
-          Classifier_Prediction_UI(id=shiny::NS(id,"Classifiers_Prediction"))
+          Classifier_Prediction_UI(id = shiny::NS(id, "Classifiers_Prediction"))
         ),
       )
     )
   )
 }
 
-#'Server function for: graphical user interface for classifiers - use
+#' @title Server function for: graphical user interface for classifiers - use
+#' @description Functions generates the functionality of a page on the server.
 #'
-#'Functions generates the functionality of a page on the server.
+#' @param id `string` determining the id for the namespace.
+#' @param log_dir `string` Path to the directory where the log files should be stored.
+#' @param volumes `vector` containing a named vector of available volumes.
+#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
-#'@param id `string` determining the id for the namespace.
-#'@param log_dir `string` Path to the directory where the log files should be stored.
-#'@param volumes `vector` containing a named vector of available volumes.
-#'@return This function does nothing return. It is used to create the functionality of a page for a shiny app.
-#'
-#'@family studio_gui_page_classifier_use
-#'@keywords internal
+#' @family studio_gui_page_classifier_use
+#' @keywords internal
 #'
 Classifiers_Use_Server <- function(id, log_dir, volumes) {
   moduleServer(id, function(input, output, session) {
@@ -71,8 +69,8 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
       allowDirCreate = FALSE
     )
 
-    #Load the model and check for errors during loading-------------------------
-    model_path=shiny::eventReactive(input$button_select_model, {
+    # Load the model and check for errors during loading-------------------------
+    model_path <- shiny::eventReactive(input$button_select_model, {
       model_path <- shinyFiles::parseDirPath(volumes, input$button_select_model)
       if (length(model_path) > 0) {
         return(model_path)
@@ -86,27 +84,27 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
       model_path <- shinyFiles::parseDirPath(volumes, input$button_select_model)
       if (length(model_path) > 0) {
         display_processing(
-          title="Working. Please wait.",
-          size="l",
-          easy_close=FALSE,
-          message=""
+          title = "Working. Please wait.",
+          size = "l",
+          easy_close = FALSE,
+          message = ""
         )
 
-        #Try to load the model
-        model <- try(load_from_disk(model_path),silent = TRUE)
+        # Try to load the model
+        model <- try(load_from_disk(model_path), silent = TRUE)
 
-        if ("try-error"%in%class(model) == FALSE) {
+        if ("try-error" %in% class(model) == FALSE) {
           if ("TEClassifierRegular" %in% class(model) |
-              "TEClassifierProtoNet" %in% class(model)) {
+            "TEClassifierProtoNet" %in% class(model)) {
             shiny::removeModal()
             return(model)
-            } else {
-              display_errors(
-                title = "Error",
-                size = "l",
-                easy_close = TRUE,
-                error_messages = "The file does not contain an object of class TEClassifierRegular or TEClassifierProtoNet."
-              )
+          } else {
+            display_errors(
+              title = "Error",
+              size = "l",
+              easy_close = TRUE,
+              error_messages = "The file does not contain an object of class TEClassifierRegular or TEClassifierProtoNet."
+            )
             return(NULL)
           }
         } else {
@@ -121,25 +119,32 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Render the information at the sidebar--------------------------------------
-    output$sidebar_description<-shiny::renderUI({
+    # Render the information at the sidebar--------------------------------------
+    output$sidebar_description <- shiny::renderUI({
       shiny::req(model())
       return(
         generate_sidebar_information(model())
       )
     })
 
-    #Server functions for the different tabs------------------------------------
-    Description_Server(id="Classifiers_Desc",
-                       model=model)
-    Training_Server(id="Classifiers_Training",
-                    model=model)
-    Reliability_Server(id="Classifiers_Reliability",
-                   model=model)
+    # Server functions for the different tabs------------------------------------
+    Description_Server(
+      id = "Classifiers_Desc",
+      model = model
+    )
+    Training_Server(
+      id = "Classifiers_Training",
+      model = model
+    )
+    Reliability_Server(
+      id = "Classifiers_Reliability",
+      model = model
+    )
     Classifier_Prediction_Server(
-      id="Classifiers_Prediction",
-      model=model,
-      volumes=volumes)
+      id = "Classifiers_Prediction",
+      model = model,
+      volumes = volumes
+    )
     #--------------------------------------------------------------------------
   })
 }

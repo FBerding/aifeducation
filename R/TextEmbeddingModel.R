@@ -1,11 +1,10 @@
 #' @title Text embedding model
-#' @description This `R6` class stores a text embedding model which can be
-#' used to tokenize, encode, decode, and embed raw texts. The object provides a
-#' unique interface for different text processing methods.
-#' @return Objects of class [TextEmbeddingModel] transform raw texts into numerical
-#' representations which can be used for downstream tasks. For this aim objects of this class
-#' allow to tokenize raw texts, to encode tokens to sequences of integers, and to decode sequences
-#' of integers back to tokens.
+#' @description This `R6` class stores a text embedding model which can be used to tokenize, encode, decode, and embed
+#'   raw texts. The object provides a unique interface for different text processing methods.
+#'
+#' @return Objects of class [TextEmbeddingModel] transform raw texts into numerical representations which can be used
+#'   for downstream tasks. For this aim objects of this class allow to tokenize raw texts, to encode tokens to sequences
+#'   of integers, and to decode sequences of integers back to tokens.
 #' @family Text Embedding
 #' @export
 TextEmbeddingModel <- R6::R6Class(
@@ -141,8 +140,8 @@ TextEmbeddingModel <- R6::R6Class(
   public = list(
 
     #' @field last_training ('list()')\cr
-    #' List for storing the history and the results of the last training. This
-    #' information will be overwritten if a new training is started.
+    #'   List for storing the history and the results of the last training. This information will be overwritten if a
+    #'   new training is started.
     last_training = list(
       history = NULL
     ),
@@ -151,69 +150,51 @@ TextEmbeddingModel <- R6::R6Class(
     #' @description Method for creating a new text embedding model
     #' @param model_name `string` containing the name of the new model.
     #' @param model_label `string` containing the label/title of the new model.
-    #' @param model_language `string` containing the language which the model
-    #' represents (e.g., English).
-    #' @param ml_framework `string` Framework to use for the model.
-    #' `ml_framework="tensorflow"` for 'tensorflow' and `ml_framework="pytorch"`
-    #' for 'pytorch'. Only relevant for transformer models.
-    #' @param method `string` determining the kind of embedding model. Currently
-    #' the following models are supported:
-    #' `method="bert"` for Bidirectional Encoder Representations from Transformers (BERT),
-    #' `method="roberta"` for A Robustly Optimized BERT Pretraining Approach (RoBERTa),
-    #' `method="longformer"` for Long-Document Transformer,
-    #' `method="funnel"` for Funnel-Transformer,
-    #' `method="deberta_v2"` for Decoding-enhanced BERT with Disentangled Attention (DeBERTa V2),
-    #' `method="glove"`` for GlobalVector Clusters, and `method="lda"` for topic modeling. See
-    #' details for more information.
-    #' @param max_length `int` determining the maximum length of token
-    #' sequences used in transformer models. Not relevant for the other methods.
-    #' @param chunks `int` Maximum number of chunks. Only relevant for
-    #' transformer models.
-    #' @param overlap `int` determining the number of tokens which should be added
-    #' at the beginning of the next chunk. Only relevant for transformer models.
-    #' @param emb_layer_min `int` or `string` determining the first layer to be included
-    #' in the creation of embeddings. An integer correspondents to the layer number. The first
-    #' layer has the number 1. Instead of an integer the following strings are possible:
-    #' `"start"` for the first layer, `"middle"` for the middle layer,
-    #' `"2_3_layer"` for the layer two-third layer, and `"last"` for the last layer.
-    #' @param emb_layer_max `int` or `string` determining the last layer to be included
-    #' in the creation of embeddings. An integer correspondents to the layer number. The first
-    #' layer has the number 1. Instead of an integer the following strings are possible:
-    #' `"start"` for the first layer, `"middle"` for the middle layer,
-    #' `"2_3_layer"` for the layer two-third layer, and `"last"` for the last layer.
-    #' @param emb_pool_type `string` determining the method for pooling the token embeddings
-    #' within each layer. If `"cls"` only the embedding of the CLS token is used. If
-    #' `"average"` the token embedding of all tokens are averaged (excluding padding tokens).
-    #' `"cls` is not supported for `method="funnel"`.
-    #' @param model_dir `string` path to the directory where the
-    #' BERT model is stored.
-    #' @param bow_basic_text_rep object of class `basic_text_rep` created via
-    #' the function [bow_pp_create_basic_text_rep]. Only relevant for `method="glove_cluster"`
-    #' and `method="lda"`.
-    #' @param bow_n_dim `int` Number of dimensions of the GlobalVector or
-    #' number of topics for LDA.
-    #' @param bow_n_cluster `int` Number of clusters created on the basis
-    #' of GlobalVectors. Parameter is not relevant for `method="lda"` and
-    #' any transformer.
-    #' @param bow_max_iter `int` Maximum number of iterations for fitting
-    #' GlobalVectors and Topic Models.
-    #' @param bow_max_iter_cluster `int` Maximum number of iterations for
-    #' fitting cluster if `method="glove"`.
+    #' @param model_language `string` containing the language which the model represents (e.g., English).
+    #' @param ml_framework `string` Framework to use for the model. `ml_framework="tensorflow"` for 'tensorflow' and
+    #'   `ml_framework="pytorch"` for 'pytorch'. Only relevant for transformer models.
+    #' @param method `string` determining the kind of embedding model. Currently the following models are supported:
+    #'   `method="bert"` for Bidirectional Encoder Representations from Transformers (BERT), `method="roberta"` for A
+    #'   Robustly Optimized BERT Pretraining Approach (RoBERTa), `method="longformer"` for Long-Document Transformer,
+    #'   `method="funnel"` for Funnel-Transformer, `method="deberta_v2"` for Decoding-enhanced BERT with Disentangled
+    #'   Attention (DeBERTa V2), `method="glove"`` for GlobalVector Clusters, and `method="lda"` for topic modeling. See
+    #'   details for more information.
+    #' @param max_length `int` determining the maximum length of token sequences used in transformer models. Not
+    #'   relevant for the other methods.
+    #' @param chunks `int` Maximum number of chunks. Only relevant for transformer models.
+    #' @param overlap `int` determining the number of tokens which should be added at the beginning of the next chunk.
+    #'   Only relevant for transformer models.
+    #' @param emb_layer_min `int` or `string` determining the first layer to be included in the creation of embeddings.
+    #'   An integer correspondents to the layer number. The first layer has the number 1. Instead of an integer the
+    #'   following strings are possible: `"start"` for the first layer, `"middle"` for the middle layer, `"2_3_layer"`
+    #'   for the layer two-third layer, and `"last"` for the last layer.
+    #' @param emb_layer_max `int` or `string` determining the last layer to be included in the creation of embeddings.
+    #'   An integer correspondents to the layer number. The first layer has the number 1. Instead of an integer the
+    #'   following strings are possible: `"start"` for the first layer, `"middle"` for the middle layer, `"2_3_layer"`
+    #'   for the layer two-third layer, and `"last"` for the last layer.
+    #' @param emb_pool_type `string` determining the method for pooling the token embeddings within each layer. If
+    #'   `"cls"` only the embedding of the CLS token is used. If `"average"` the token embedding of all tokens are
+    #'   averaged (excluding padding tokens). `"cls` is not supported for `method="funnel"`.
+    #' @param model_dir `string` path to the directory where the BERT model is stored.
+    #' @param bow_basic_text_rep object of class `basic_text_rep` created via the function
+    #'   [bow_pp_create_basic_text_rep]. Only relevant for `method="glove_cluster"` and `method="lda"`.
+    #' @param bow_n_dim `int` Number of dimensions of the GlobalVector or number of topics for LDA.
+    #' @param bow_n_cluster `int` Number of clusters created on the basis of GlobalVectors. Parameter is not relevant
+    #'   for `method="lda"` and any transformer.
+    #' @param bow_max_iter `int` Maximum number of iterations for fitting GlobalVectors and Topic Models.
+    #' @param bow_max_iter_cluster `int` Maximum number of iterations for fitting cluster if `method="glove"`.
     #' @param bow_cr_criterion `double` convergence criterion for GlobalVectors.
     #' @param bow_learning_rate `double` initial learning rate for GlobalVectors.
-    #' @param trace `bool` `TRUE` prints information about the progress.
-    #' `FALSE` does not.
+    #' @param trace `bool` `TRUE` prints information about the progress. `FALSE` does not.
     #' @return Returns an object of class [TextEmbeddingModel].
     #' @details
     #'
-    #' In the case of any transformer (e.g.`method="bert"`, `method="roberta"`, and `method="longformer"`),
-    #' a pretrained transformer model must be supplied via `model_dir`. For `method="glove"`
-    #' and `method="lda"` a new model will be created based on the data provided
-    #' via `bow_basic_text_rep`.
+    #' In the case of any transformer (e.g.`method="bert"`, `method="roberta"`, and `method="longformer"`), a pretrained
+    #' transformer model must be supplied via `model_dir`. For `method="glove"` and `method="lda"` a new model will be
+    #' created based on the data provided via `bow_basic_text_rep`.
     #'
-    #' The original algorithm for GlobalVectors provides
-    #' only word embeddings, not text embeddings. To achieve text embeddings the words
-    #' are clustered based on their word embeddings with kmeans.
+    #' The original algorithm for GlobalVectors provides only word embeddings, not text embeddings. To achieve text
+    #' embeddings the words are clustered based on their word embeddings with kmeans.
     #'
     #' @import reticulate
     #' @import stats
@@ -725,8 +706,7 @@ TextEmbeddingModel <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    #' @description loads an object from disk
-    #' and updates the object to the current version of the package.
+    #' @description loads an object from disk and updates the object to the current version of the package.
     #' @param dir_path Path where the object set is stored.
     #' @return Method does not return anything. It loads an object from disk.
     load_from_disk = function(dir_path) {
@@ -738,8 +718,8 @@ TextEmbeddingModel <- R6::R6Class(
       # Load R file
       old_model <- load_R_interface(dir_path)
 
-      #Old private states
-      old_private=old_model$get_private()
+      # Old private states
+      old_private <- old_model$get_private()
 
       # Set basic configuration
       private$basic_components <- list(
@@ -815,14 +795,14 @@ TextEmbeddingModel <- R6::R6Class(
       )
 
       # Get and set original package versions
-      private$r_package_versions$aifeducation=old_private$r_package_versions$aifeducation
-      private$r_package_versions$reticulate=old_private$r_package_versions$reticulate
+      private$r_package_versions$aifeducation <- old_private$r_package_versions$aifeducation
+      private$r_package_versions$reticulate <- old_private$r_package_versions$reticulate
 
 
-      private$py_package_versions$torch <-  old_private$py_package_versions$torch
-      private$py_package_versions$tensorflow <-  old_private$py_package_versions$tensorflow
-      private$py_package_versions$keras <-  old_private$py_package_versions$keras
-      private$py_package_versions$numpy <-  old_private$py_package_versions$numpy
+      private$py_package_versions$torch <- old_private$py_package_versions$torch
+      private$py_package_versions$tensorflow <- old_private$py_package_versions$tensorflow
+      private$py_package_versions$keras <- old_private$py_package_versions$keras
+      private$py_package_versions$numpy <- old_private$py_package_versions$numpy
 
       # Finalize config
       private$set_configuration_to_TRUE()
@@ -832,10 +812,8 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for loading a transformers model into R.
-    #' @param dir_path `string` containing the path to the relevant
-    #' model directory.
-    #' @return Function does not return a value. It is used for loading a saved
-    #' transformer model into the R interface.
+    #' @param dir_path `string` containing the path to the relevant model directory.
+    #' @return Function does not return a value. It is used for loading a saved transformer model into the R interface.
     #'
     #' @importFrom utils read.csv
     load = function(dir_path) {
@@ -993,14 +971,11 @@ TextEmbeddingModel <- R6::R6Class(
         message("Method only relevant for transformer models.")
       }
     },
-    #' @description Method for saving a transformer model on disk.Relevant
-    #' only for transformer models.
-    #' @param dir_path `string` containing the path to the relevant
-    #' model directory.
-    #' @param folder_name `string` Name for the folder created within the directory.
-    #' This folder contains all model files.
-    #' @return Function does not return a value. It is used for saving a transformer model
-    #' to disk.
+    #' @description Method for saving a transformer model on disk.Relevant only for transformer models.
+    #' @param dir_path `string` containing the path to the relevant model directory.
+    #' @param folder_name `string` Name for the folder created within the directory. This folder contains all model
+    #'   files.
+    #' @return Function does not return a value. It is used for saving a transformer model to disk.
     #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
@@ -1077,16 +1052,12 @@ TextEmbeddingModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     #' @description Method for encoding words of raw texts into integers.
     #' @param raw_text `vector`containing the raw texts.
-    #' @param token_encodings_only `bool` If `TRUE`, only the token
-    #' encodings are returned. If `FALSE`, the complete encoding is returned
-    #' which is important for BERT models.
-    #' @param to_int `bool` If `TRUE` the integer ids of the tokens are
-    #' returned. If `FALSE` the tokens are returned. Argument only applies
-    #' for transformer models and if `token_encodings_only=TRUE`.
-    #' @param trace `bool` If `TRUE`, information of the progress
-    #' is printed. `FALSE` if not requested.
-    #' @return `list` containing the integer or token sequences of the raw texts with
-    #' special tokens.
+    #' @param token_encodings_only `bool` If `TRUE`, only the token encodings are returned. If `FALSE`, the complete
+    #'   encoding is returned which is important for BERT models.
+    #' @param to_int `bool` If `TRUE` the integer ids of the tokens are returned. If `FALSE` the tokens are returned.
+    #'   Argument only applies for transformer models and if `token_encodings_only=TRUE`.
+    #' @param trace `bool` If `TRUE`, information of the progress is printed. `FALSE` if not requested.
+    #' @return `list` containing the integer or token sequences of the raw texts with special tokens.
     encode = function(raw_text,
                       token_encodings_only = FALSE,
                       to_int = TRUE,
@@ -1277,11 +1248,9 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for decoding a sequence of integers into tokens
-    #' @param int_seqence `list` containing the integer sequences which
-    #' should be transformed to tokens or plain text.
-    #' @param to_token `bool` If `FALSE` plain text is returned.
-    #' If `TRUE` a sequence of tokens is returned. Argument only relevant
-    #' if the model is based on a transformer.
+    #' @param int_seqence `list` containing the integer sequences which should be transformed to tokens or plain text.
+    #' @param to_token `bool` If `FALSE` plain text is returned. If `TRUE` a sequence of tokens is returned. Argument
+    #'   only relevant if the model is based on a transformer.
     #'
     #' @return `list` of token sequences
     decode = function(int_seqence, to_token = FALSE) {
@@ -1356,8 +1325,8 @@ TextEmbeddingModel <- R6::R6Class(
       }
     },
     #' @description Method for receiving the special tokens of the model
-    #' @return Returns a `matrix` containing the special tokens in the rows
-    #' and their type, token, and id in the columns.
+    #' @return Returns a `matrix` containing the special tokens in the rows and their type, token, and id in the
+    #'   columns.
     get_special_tokens = function() {
       special_tokens <- c(
         "bos_token",
@@ -1401,22 +1370,19 @@ TextEmbeddingModel <- R6::R6Class(
       return(tokens_map)
     },
     # Embedding------------------------------------------------------------------
-    #' @description Method for creating text embeddings from raw texts.
-    #' This method should only be used if a small number of texts should be transformed
-    #' into text embeddings. For a large number of texts please use the method `embed_large`.
-    #' In the case of using a GPU and running out of memory while using 'tensorflow'  reduce the
-    #' batch size or restart R and switch to use cpu only via `set_config_cpu_only`. In general,
-    #' not relevant for 'pytorch'.       #'
+    #' @description Method for creating text embeddings from raw texts. This method should only be used if a small
+    #'   number of texts should be transformed into text embeddings. For a large number of texts please use the method
+    #'   `embed_large`. In the case of using a GPU and running out of memory while using 'tensorflow'  reduce the batch
+    #'   size or restart R and switch to use cpu only via `set_config_cpu_only`. In general, not relevant for 'pytorch'.
+    #'
     #' @param raw_text `vector` containing the raw texts.
     #' @param doc_id `vector` containing the corresponding IDs for every text.
     #' @param batch_size `int` determining the maximal size of every batch.
-    #' @param trace `bool` `TRUE`, if information about the progression
-    #' should be printed on console.
-    #' @param return_large_dataset 'bool' If `TRUE` the retuned object is of class
-    #' [LargeDataSetForTextEmbeddings]. If `FALSE` it is of class [EmbeddedText]
-    #' @return Method returns an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]. This object
-    #' contains the embeddings as a [data.frame] and information about the
-    #' model creating the embeddings.
+    #' @param trace `bool` `TRUE`, if information about the progression should be printed on console.
+    #' @param return_large_dataset 'bool' If `TRUE` the retuned object is of class [LargeDataSetForTextEmbeddings]. If
+    #'   `FALSE` it is of class [EmbeddedText]
+    #' @return Method returns an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]. This object contains
+    #'   the embeddings as a [data.frame] and information about the model creating the embeddings.
     embed = function(raw_text = NULL, doc_id = NULL, batch_size = 8, trace = FALSE, return_large_dataset = FALSE) {
       # check arguments
       check_type(raw_text, "vector", FALSE)
@@ -1778,15 +1744,13 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for creating text embeddings from raw texts.
-    #' @param large_datas_set Object of class [LargeDataSetForText] containing the
-    #' raw texts.
+    #' @param large_datas_set Object of class [LargeDataSetForText] containing the raw texts.
     #' @param batch_size `int` determining the maximal size of every batch.
-    #' @param trace `bool` `TRUE`, if information about the progression
-    #' should be printed on console.
-    #'@param log_file `string` Path to the file where the log should be saved.
-    #'If no logging is desired set this argument to `NULL`.
-    #'@param log_write_interval `int` Time in seconds determining the interval in which
-    #'the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
+    #' @param trace `bool` `TRUE`, if information about the progression should be printed on console.
+    #' @param log_file `string` Path to the file where the log should be saved. If no logging is desired set this
+    #'   argument to `NULL`.
+    #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
+    #'   the log files. Only relevant if `log_file` is not `NULL`.
     #' @return Method returns an object of class [LargeDataSetForTextEmbeddings].
     embed_large = function(large_datas_set, batch_size = 32, trace = FALSE,
                            log_file = NULL,
@@ -1871,9 +1835,8 @@ TextEmbeddingModel <- R6::R6Class(
     #' @description Method for calculating tokens behind mask tokens.
     #' @param text `string` Text containing mask tokens.
     #' @param n_solutions `int` Number estimated tokens for every mask.
-    #' @return Returns a `list` containing a `data.frame` for every
-    #' mask. The `data.frame` contains the solutions in the rows and reports
-    #' the score, token id, and token string in the columns.
+    #' @return Returns a `list` containing a `data.frame` for every mask. The `data.frame` contains the solutions in the
+    #'   rows and reports the score, token id, and token string in the columns.
     fill_mask = function(text, n_solutions = 5) {
       # Arugment checking
       check_type(text, "string", FALSE)
@@ -1955,13 +1918,12 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for setting the bibliographic information of the model.
-    #' @param type `string` Type of information which should be changed/added.
-    #' `developer`, and `modifier` are possible.
+    #' @param type `string` Type of information which should be changed/added. `developer`, and `modifier` are possible.
     #' @param authors List of people.
     #' @param citation `string` Citation in free text.
     #' @param url `string` Corresponding URL if applicable.
-    #' @return Function does not return a value. It is used to set the private
-    #' members for publication information of the model.
+    #' @return Function does not return a value. It is used to set the private members for publication information of
+    #'   the model.
     set_publication_info = function(type,
                                     authors,
                                     citation,
@@ -1983,50 +1945,43 @@ TextEmbeddingModel <- R6::R6Class(
       return(private$publication_info)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for setting the license of the model
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
-    #' @return Function does not return a value. It is used for setting the private
-    #' member for the software license of the model.
+    #' @description Method for setting the license of the model.
+    #' @param license `string` containing the abbreviation of the license or the license text.
+    #' @return Function does not return a value. It is used for setting the private member for the software license of
+    #'   the model.
     set_software_license = function(license = "CC BY") {
       private$model_info$model_license <- license
     },
-    #' @description Method for requesting the license of the model
+    #' @description Method for requesting the license of the model.
     #' @return `string` License of the model
     get_software_license = function() {
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
     #' @description Method for setting the license of models' documentation.
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
-    #' @return Function does not return a value. It is used to set the private member for the
-    #' documentation license of the model.
+    #' @param license `string` containing the abbreviation of the license or the license text.
+    #' @return Function does not return a value. It is used to set the private member for the documentation license of
+    #'   the model.
     set_documentation_license = function(license = "CC BY") {
       private$model_description$license <- license
     },
     #' @description Method for getting the license of the models' documentation.
-    #' @param license `string` containing the abbreviation of the license or
-    #' the license text.
+    #' @param license `string` containing the abbreviation of the license or the license text.
     get_documentation_license = function() {
       return(private$model_description$license)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for setting a description of the model
-    #' @param eng `string` A text describing the training of the classifier,
-    #' its theoretical and empirical background, and the different output labels
-    #' in English.
-    #' @param native `string` A text describing the training of the classifier,
-    #' its theoretical and empirical background, and the different output labels
-    #' in the native language of the model.
-    #' @param abstract_eng `string` A text providing a summary of the description
-    #' in English.
-    #' @param abstract_native `string` A text providing a summary of the description
-    #' in the native language of the classifier.
+    #' @description Method for setting a description of the model.
+    #' @param eng `string` A text describing the training of the classifier, its theoretical and empirical background,
+    #'   and the different output labels in English.
+    #' @param native `string` A text describing the training of the classifier, its theoretical and empirical
+    #'   background, and the different output labels in the native language of the model.
+    #' @param abstract_eng `string` A text providing a summary of the description in English.
+    #' @param abstract_native `string` A text providing a summary of the description in the native language of the
+    #'   classifier.
     #' @param keywords_eng `vector`of keywords in English.
     #' @param keywords_native `vector`of keywords in the native language of the classifier.
-    #' @return Function does not return a value. It is used to set the private members for the
-    #' description of the model.
+    #' @return Function does not return a value. It is used to set the private members for the description of the model.
     set_model_description = function(eng = NULL,
                                      native = NULL,
                                      abstract_eng = NULL,
@@ -2055,13 +2010,12 @@ TextEmbeddingModel <- R6::R6Class(
       }
     },
     #' @description Method for requesting the model description.
-    #' @return `list` with the description of the model in English
-    #' and the native language.
+    #' @return `list` with the description of the model in English and the native language.
     get_model_description = function() {
       return(private$model_description)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for requesting the model information
+    #' @description Method for requesting the model information.
     #' @return `list` of all relevant model information
     get_model_info = function() {
       return(list(
@@ -2075,10 +2029,8 @@ TextEmbeddingModel <- R6::R6Class(
       ))
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting a summary of the R and python packages'
-    #' versions used for creating the model.
-    #' @return Returns a `list` containing the versions of the relevant
-    #' R and python packages.
+    #' @description Method for requesting a summary of the R and python packages' versions used for creating the model.
+    #' @return Returns a `list` containing the versions of the relevant R and python packages.
     get_package_versions = function() {
       return(
         list(
@@ -2088,8 +2040,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting the part of interface's configuration that is
-    #' necessary for all models.
+    #' @description Method for requesting the part of interface's configuration that is necessary for all models.
     #' @return Returns a `list`.
     get_basic_components = function() {
       return(
@@ -2097,8 +2048,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting the part of interface's configuration that is
-    #' necessary bag-of-words models.
+    #' @description Method for requesting the part of interface's configuration that is necessary bag-of-words models.
     #' @return Returns a `list`.
     get_bow_components = function() {
       return(
@@ -2106,8 +2056,8 @@ TextEmbeddingModel <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting the part of interface's configuration that is
-    #' necessary for transformer models.
+    #' @description Method for requesting the part of interface's configuration that is necessary for transformer
+    #'   models.
     #' @return Returns a `list`.
     get_transformer_components = function() {
       return(
@@ -2122,27 +2072,23 @@ TextEmbeddingModel <- R6::R6Class(
         )
       )
     },
-    #' @description Method for requesting a log of tracked energy consumption
-    #' during training and an estimate of the resulting CO2 equivalents in kg.
-    #' @return Returns a `matrix` containing the tracked energy consumption,
-    #' CO2 equivalents in kg, information on the tracker used, and technical
-    #' information on the training infrastructure for every training run.
+    #' @description Method for requesting a log of tracked energy consumption during training and an estimate of the
+    #'   resulting CO2 equivalents in kg.
+    #' @return Returns a `matrix` containing the tracked energy consumption, CO2 equivalents in kg, information on the
+    #'   tracker used, and technical information on the training infrastructure for every training run.
     get_sustainability_data = function() {
       return(private$sustainability$track_log)
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting the machine learning framework used
-    #' for the classifier.
-    #' @return Returns a `string` describing the machine learning framework used
-    #' for the classifier.
+    #' @description Method for requesting the machine learning framework used for the classifier.
+    #' @return Returns a `string` describing the machine learning framework used for the classifier.
     get_ml_framework = function() {
       return(private$transformer_components$ml_framework)
     },
     #---------------------------------------------------------------------------
     #' @description Method for counting the trainable parameters of a model.
-    #' @param with_head `bool` If `TRUE` the number of parameters is returned including
-    #' the language modeling head of the model. If `FALSE` only the number of parameters of
-    #' the core model is returned.
+    #' @param with_head `bool` If `TRUE` the number of parameters is returned including the language modeling head of
+    #'   the model. If `FALSE` only the number of parameters of the core model is returned.
     #' @return Returns the number of trainable parameters of the model.
     count_parameter = function() {
       if (with_head == FALSE) {
@@ -2174,17 +2120,16 @@ TextEmbeddingModel <- R6::R6Class(
       return(count)
     },
     #-------------------------------------------------------------------------
-    #' @description Method for checking if the model was successfully configured.
-    #' An object can only be used if this value is `TRUE`.
+    #' @description Method for checking if the model was successfully configured. An object can only be used if this
+    #'   value is `TRUE`.
     #' @return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
     is_configured = function() {
       return(private$configured)
     },
     #--------------------------------------------------------------------------
-    #' @description Method for requesting all private fields and methods. Used
-    #' for loading and updating an object.
+    #' @description Method for requesting all private fields and methods. Used for loading and updating an object.
     #' @return Returns a `list` with all private fields and methods.
-    get_private=function(){
+    get_private = function() {
       return(private)
     }
   )
