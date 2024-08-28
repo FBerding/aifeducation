@@ -1,112 +1,132 @@
-#'Clean pytorch log of transformers
+#' @title Check if NULL or NA
+#' @description Function for checking if an object is `NULL` or .
 #'
-#'Function for preparing and cleaning the log created by an object of class Trainer
-#'from the python library 'transformer's
-#'
-#'@param log \code{data.frame} containing the log.
-#'
-#'@return Returns a \code{data.frame} containing epochs, loss, and val_loss.
+#' @param object An object to test.
+#' @return Returns `FALSE` if the object is not `NULL` and not `NA`. Returns `TRUE` in all other cases.
 #'
 #' @family Utils
-#'@keywords internal
+#' @keywords internal
 #'
-#'@export
-clean_pytorch_log_transformers<-function(log){
-  max_epochs<-max(log$epoch)
+#' @export
+is.null_or_na <- function(object) {
+  return(is.null(object) || anyNA(object))
+}
 
-  cols=c("epoch","loss","val_loss")
+#' @title Clean pytorch log of transformers
+#' @description Function for preparing and cleaning the log created by an object of class Trainer from the python
+#'   library 'transformer's.
+#'
+#' @param log `data.frame` containing the log.
+#' @return Returns a `data.frame` containing epochs, loss, and val_loss.
+#'
+#' @family Utils
+#' @keywords internal
+#'
+#' @export
+clean_pytorch_log_transformers <- function(log) {
+  max_epochs <- max(log$epoch)
 
-  cleaned_log<-matrix(data = NA,
-                      nrow = max_epochs,
-                      ncol = length(cols))
-  colnames(cleaned_log)=cols
-  for(i in 1:max_epochs){
-    cleaned_log[i,"epoch"]=i
+  cols <- c("epoch", "loss", "val_loss")
 
-    tmp_loss=subset(log,log$epoch==i & is.na(log$loss)==FALSE)
-    tmp_loss=tmp_loss[1,"loss"]
-    cleaned_log[i,"loss"]=tmp_loss
+  cleaned_log <- matrix(
+    data = NA,
+    nrow = max_epochs,
+    ncol = length(cols)
+  )
+  colnames(cleaned_log) <- cols
+  for (i in 1:max_epochs) {
+    cleaned_log[i, "epoch"] <- i
 
-    tmp_val_loss=subset(log,log$epoch==i & is.na(log$eval_loss)==FALSE)
-    tmp_val_loss=tmp_val_loss[1,"eval_loss"]
-    cleaned_log[i,"val_loss"]=tmp_val_loss
+    tmp_loss <- subset(log, log$epoch == i & is.na(log$loss) == FALSE)
+    tmp_loss <- tmp_loss[1, "loss"]
+    cleaned_log[i, "loss"] <- tmp_loss
 
+    tmp_val_loss <- subset(log, log$epoch == i & is.na(log$eval_loss) == FALSE)
+    tmp_val_loss <- tmp_val_loss[1, "eval_loss"]
+    cleaned_log[i, "val_loss"] <- tmp_val_loss
   }
   return(as.data.frame(cleaned_log))
 }
 
-#'Check if NULL or NA
+#' @title Generate ID suffix for objects
+#' @description Function for generating an ID suffix for objects of class [TextEmbeddingModel] and
+#'   [TextEmbeddingClassifierNeuralNet].
 #'
-#'Function for checking if an object is \code{NULL} or \code{NA}
-#'
-#'@param object An object to test.
-#'
-#'@return Returns \code{FALSE} if the object is not \code{NULL} and not \code{NA}.
-#'Returns \code{TRUE} in all other cases.
-#'
+#' @param length `int` determining the length of the id suffix.
+#' @return Returns a `string` of the requested length.
 #' @family Utils
-#'@keywords internal
-#'
-#'@export
-is.null_or_na<-function(object){
-  if(is.null(object)==FALSE){
-    if(anyNA(object)==FALSE){
-      return(FALSE)
-    } else {
-      return(TRUE)
-    }
-  } else {
-    return(TRUE)
-  }
-}
-
-#------------------------------------------------------------------------------
-#'Generate ID suffix for objects
-#'
-#'Function for generating an ID suffix for objects of class
-#'\link{TextEmbeddingModel} and \link{TextEmbeddingClassifierNeuralNet}.
-#'
-#'@param length \code{int} determining the length of the id suffix.
-#'@return Returns a \code{string} of the requested length
-#' @family Utils
-#'@keywords internal
-generate_id<-function(length=16){
-  id_suffix=NULL
-  sample_values=c(
-    "a","A",
-    "b","B",
-    "c","C",
-    "d","D",
-    "e","E",
-    "f","F",
-    "g","G",
-    "h","H",
-    "i","I",
-    "j","J",
-    "k","K",
-    "l","L",
-    "m","M",
-    "n","N",
-    "o","O",
-    "p","P",
-    "q","Q",
-    "r","R",
-    "s","S",
-    "t","T",
-    "u","U",
-    "v","V",
-    "w","W",
-    "x","X",
-    "y","Y",
-    "z","Z",
-    seq(from=0,to=9,by=1)
+#' @keywords internal
+generate_id <- function(length = 16) {
+  id_suffix <- NULL
+  sample_values <- c(
+    "a", "A",
+    "b", "B",
+    "c", "C",
+    "d", "D",
+    "e", "E",
+    "f", "F",
+    "g", "G",
+    "h", "H",
+    "i", "I",
+    "j", "J",
+    "k", "K",
+    "l", "L",
+    "m", "M",
+    "n", "N",
+    "o", "O",
+    "p", "P",
+    "q", "Q",
+    "r", "R",
+    "s", "S",
+    "t", "T",
+    "u", "U",
+    "v", "V",
+    "w", "W",
+    "x", "X",
+    "y", "Y",
+    "z", "Z",
+    seq(from = 0, to = 9, by = 1)
   )
 
 
-  id_suffix=sample(
-    x=sample_values,
+  id_suffix <- sample(
+    x = sample_values,
     size = length,
-    replace = TRUE)
-  id_suffix=paste(id_suffix,collapse = "")
+    replace = TRUE
+  )
+  id_suffix <- paste(id_suffix, collapse = "")
   return(id_suffix)
+}
+
+#' @title Print message
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date.
+#'
+#' @param msg `string` Message that should be printed.
+#' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
+#'
+#' @return This function returns nothing.
+#' @family Utils
+#' @keywords internal
+#' @noRd
+print_message <- function(msg, trace) {
+  if (trace) message(paste(date(), msg))
+}
+
+#' @title Create directory if not exists
+#' @description Check whether the passed `dir_path` directory exists. If not, creates a new directory and prints a `msg`
+#'   message if `trace` is `TRUE`.
+#'
+#' @param dir_path `string` A new directory path that should be created.
+#' @param trace `bool` Whether a `msg` message should be printed.
+#' @param msg `string` A message that should be printed if `trace` is `TRUE`.
+#'
+#' @return `TRUE` or `FALSE` depending on whether the shiny app is active.
+#' @family Utils
+#' @keywords internal
+#' @noRd
+create_dir <- function(dir_path, trace, msg = "") {
+  if (!dir.exists(dir_path)) {
+    print_message(msg, trace)
+    dir.create(dir_path)
+  }
 }
