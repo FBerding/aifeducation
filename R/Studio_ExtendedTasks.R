@@ -12,7 +12,7 @@ long_add_texts_to_dataset <- function(source_path,
                                       log_write_interval = 2) {
   promises::future_promise({
     # Set up top level progress monitoring
-    top_total <- include_txt + include_txt + include_xlsx
+    top_total <- include_txt + include_pdf + include_xlsx
     top_value <- 0
     total_message <- "File types"
 
@@ -40,9 +40,9 @@ long_add_texts_to_dataset <- function(source_path,
         dir_path = source_path,
         batch_size = 2,
         log_file = log_path,
-        top_value = top_value,
-        top_total = top_total,
-        top_message = total_message,
+        log_top_value = top_value,
+        log_top_total = top_total,
+        log_top_message = total_message,
         log_write_interval = log_write_interval,
         trace = FALSE
       )
@@ -58,9 +58,9 @@ long_add_texts_to_dataset <- function(source_path,
         license_column = excel_license_column,
         bib_entry_column = excel_bib_entry_column,
         log_file = log_path,
-        top_value = top_value,
-        top_total = top_total,
-        top_message = total_message,
+        log_top_value = top_value,
+        log_top_total = top_total,
+        log_top_message = total_message,
         log_write_interval = log_write_interval,
       )
       top_value <- top_value + 1
