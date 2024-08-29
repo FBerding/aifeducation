@@ -73,7 +73,7 @@ DocumentPage_UI <- function(id, type = "TextEmbeddingModel") {
 #' @keywords internal
 #'
 DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 

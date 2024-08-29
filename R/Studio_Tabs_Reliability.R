@@ -9,16 +9,16 @@
 #'
 Reliability_UI <- function(id) {
   bslib::page(
-    shiny::uiOutput(
-      outputId = shiny::NS(id, "ui_relability")
+    bslib::card(
+      bslib::card_header(),
+      bslib::card_body(
+        shiny::uiOutput(
+          outputId = shiny::NS(id, "ui_relability")
+        )
+      )
     )
   )
 }
-
-bslib::card(
-  bslib::card_header(),
-  bslib::card_body()
-)
 
 #' @title Server function for: graphical user interface for displaying the reliability of classifiers.
 #' @description Functions generates the functionality of a page on the server.
@@ -31,7 +31,7 @@ bslib::card(
 #' @keywords internal
 #'
 Reliability_Server <- function(id, model) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
     measure_labels <- list(

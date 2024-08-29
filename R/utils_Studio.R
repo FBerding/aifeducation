@@ -538,15 +538,9 @@ load_and_check_target_data <- function(file_path) {
 #' @keywords internal
 #'
 transform_input <- function(object) {
-  if (!is.null(object)) {
-    if (object == "") {
-      return(NULL)
-    } else {
-      return(object)
-    }
-  } else {
-    return(NULL)
-  }
+  res <- NULL
+  if (!is.null(object) && object != "") res <- object
+  return(res)
 }
 
 #' @title Checks for an empty input from an input widget
@@ -561,15 +555,7 @@ transform_input <- function(object) {
 #' @keywords internal
 #'
 check_for_empty_input <- function(input) {
-  if (is.null(input)) {
-    return(TRUE)
-  } else {
-    if (input == "") {
-      return(TRUE)
-    } else {
-      return(FALSE)
-    }
-  }
+  return(is.null(input) || input == "")
 }
 
 #' @title Checks and transforms an numeric input
@@ -584,13 +570,9 @@ check_for_empty_input <- function(input) {
 #' @keywords internal
 #'
 check_numeric_input <- function(input) {
-  if (is.null(input)) {
-    return(NULL)
-  } else if (input == "") {
-    return(NULL)
-  } else {
-    return(as.numeric(input))
-  }
+  res <- NULL
+  if (!is.null(input) && input != "") res <- as.numeric(input)
+  return(res)
 }
 
 #' @title Load target data for long running tasks
@@ -607,13 +589,10 @@ check_numeric_input <- function(input) {
 #' @family studio_utils
 #' @export
 long_load_target_data <- function(file_path, selectet_column) {
-  # extension=stringr::str_split_fixed(file_path,pattern="\\.",n=Inf)
-  # extension=extension[1,ncol(extension)]
-  # extension=stringr::str_to_lower(extension)
   extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
   extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
 
-  if (extension == "csv" | extension == "txt") {
+  if (extension == "csv" || extension == "txt") {
     target_data <- try(
       as.data.frame(
         utils::read.csv(
@@ -648,14 +627,13 @@ long_load_target_data <- function(file_path, selectet_column) {
   # Final Check
   if (is.character(target_data)) {
     stop("Data can not be loaded as data frame. Please check your data.")
+  }
+  if ("id" %in% colnames(target_data)) {
+    rownames(target_data) <- target_data$id
   } else {
-    if ("id" %in% colnames(target_data)) {
-      rownames(target_data) <- target_data$id
-    } else {
-      stop("Data does not contain a column named 'id'. This
+    stop("Data does not contain a column named 'id'. This
                        column is necessary to match the text embeddings to their
                        corresponding targets. Please check your data.")
-    }
   }
 
   target_factor <- as.factor(target_data[[selectet_column]])
@@ -685,9 +663,7 @@ prepare_training_history <- function(model,
                                      pl_step = NULL) {
   plot_data <- model$last_training$history
 
-  if (is.null(final)) {
-    final <- FALSE
-  }
+  if (is.null(final)) final <- FALSE
 
   # Get standard statistics
   n_epochs <- model$last_training$config$epochs
@@ -696,22 +672,20 @@ prepare_training_history <- function(model,
 
   # Get information about the existence of a training, validation, and test data set
   # Get Number of folds for the request
-  if (final == FALSE) {
+  if (!final) {
     n_folds <- length(model$last_training$history) - 1
-    if (use_pl == FALSE) {
-      measures <- names(plot_data[[1]])
+    measures <- names(plot_data[[1]])
+    if (!use_pl) {
       n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
     } else {
-      measures <- names(plot_data[[1]])
       n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]][[measures[1]]])
     }
   } else {
     n_folds <- 1
-    if (use_pl == FALSE) {
-      measures <- names(plot_data[[index_final]])
+    measures <- names(plot_data[[index_final]])
+    if (!use_pl) {
       n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
     } else {
-      measures <- names(plot_data[[index_final]])
       n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
     }
   }
@@ -754,19 +728,19 @@ prepare_training_history <- function(model,
     )
     final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
 
-    if (final == FALSE) {
+    if (!final) {
       for (i in 1:n_folds) {
-        if (use_pl == FALSE) {
+        if (!use_pl) {
           measure_array[i, , ] <- plot_data[[i]][[measure]]
         } else {
           measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
         }
       }
-    } else if (final == TRUE) {
-      if (use_pl == FALSE) {
+    } else {
+      if (!use_pl) {
         measure_array[1, , ] <- plot_data[[index_final]][[measure]]
       } else {
-        measure_arraymeasure_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
+        measure_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
       }
     }
 
@@ -874,7 +848,7 @@ check_and_prepare_for_studio <- function() {
 
   missing_r_packages <- NULL
   for (i in 1:length(r_packages)) {
-    if (requireNamespace(r_packages[i], quietly = TRUE, ) == FALSE) {
+    if (!requireNamespace(r_packages[i], quietly = TRUE, )) {
       missing_r_packages <- append(
         x = missing_r_packages,
         values = r_packages[i]
@@ -892,7 +866,7 @@ check_and_prepare_for_studio <- function() {
       default = TRUE,
       prompts = getOption("askYesNo", gettext(c("Yes", "No")))
     )
-    if (install_now == TRUE) {
+    if (install_now) {
       utils::install.packages(missing_r_packages)
     } else {
       stop("Some necessary R Packages are missing.")
@@ -900,9 +874,9 @@ check_and_prepare_for_studio <- function() {
   }
 
   message("Setting the correct conda environment.")
-  if (reticulate::py_available(FALSE) == FALSE) {
+  if (!reticulate::py_available(FALSE)) {
     message("Python is not initalized.")
-    if (reticulate::condaenv_exists("aifeducation") == FALSE) {
+    if (!reticulate::condaenv_exists("aifeducation")) {
       stop("Aifeducation studio requires a conda environment 'aifeducation' with
       specific python libraries. Please install this. Please refer to the corresponding
       vignette for more details.")
@@ -910,7 +884,7 @@ check_and_prepare_for_studio <- function() {
       message("Setting conda environment to 'aifeducation'.")
       reticulate::use_condaenv("aifeducation")
       message("Initializing python.")
-      if (reticulate::py_available(TRUE) == FALSE) {
+      if (!reticulate::py_available(TRUE)) {
         stop("Python cannot be initalized. Please check your installation of python.")
       }
     }
@@ -920,7 +894,7 @@ check_and_prepare_for_studio <- function() {
 
   message("Checking machine learning frameworks.")
   available_ml_frameworks <- NULL
-  if (check_aif_py_modules(trace = FALSE, check = "pytorch") == TRUE) {
+  if (check_aif_py_modules(trace = FALSE, check = "pytorch")) {
     available_ml_frameworks <- append(available_ml_frameworks, values = "pytorch")
   }
   if (is.null(available_ml_frameworks)) {

@@ -21,14 +21,14 @@ LargeDataSetForText <- R6::R6Class(
     #'   names. Id and raw texts are mandatory, bibliographic and license information are optional.
     #' @param dir_path Path to the directory where the files are stored.
     #' @param batch_size `int` determining the number of files to process at once.
-    #' @param trace `bool` If `TRUE` information on the progress is printed to the console.
-    #' @param log_top_value `int` indicating the current iteration of the process.
-    #' @param log_top_total `int` determining the maximal number of iterations.
-    #' @param log_top_message `string` providing additional information of the process.
     #' @param log_file `string` Path to the file where the log should be saved. If no logging is desired set this
     #'   argument to `NULL`.
     #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
     #'   the log files. Only relevant if `log_file` is not `NULL`.
+    #' @param log_top_value `int` indicating the current iteration of the process.
+    #' @param log_top_total `int` determining the maximal number of iterations.
+    #' @param log_top_message `string` providing additional information of the process.
+    #' @param trace `bool` If `TRUE` information on the progress is printed to the console.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_txt = function(dir_path,
                                   batch_size = 500,
@@ -354,7 +354,7 @@ LargeDataSetForText <- R6::R6Class(
         licence_path <- paste0(
           dirname(path), "/license.txt"
         )
-        if (path != bib_entry_path & path != licence_path) {
+        if (path != bib_entry_path && path != licence_path) {
           new_paths[i] <- path
         }
       }

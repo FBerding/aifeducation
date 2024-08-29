@@ -80,7 +80,7 @@ bslib::card(
 #' @keywords internal
 #'
 Classifier_Prediction_Server <- function(id, model, volumes) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 
@@ -189,7 +189,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     )
 
     # show save_modal
-    observeEvent(input$start_SaveModal, {
+    shiny::observeEvent(input$start_SaveModal, {
       path <- shinyFiles::parseDirPath(volumes, input$start_SaveModal)
       if (!is.null(path) & !identical(path, character(0))) {
         if (path != "") {

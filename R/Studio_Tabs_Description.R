@@ -47,7 +47,7 @@ Description_UI <- function(id) {
 #' @keywords internal
 #'
 Description_Server <- function(id, model) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 

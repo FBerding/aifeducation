@@ -78,16 +78,12 @@ write_log <- function(log_file,
 }
 
 read_log <- function(file_path) {
+  res <- NULL
   if (!is.null_or_na(file_path)) {
     log_file <- try(read.csv(file_path))
-    if (class(log_file) != "try-error") {
-      return(log_file)
-    } else {
-      return(NULL)
-    }
-  } else {
-    return(NULL)
+    if (class(log_file) != "try-error") res <- log_file
   }
+  return(res)
 }
 
 reset_log <- function(log_path) {
@@ -104,6 +100,7 @@ reset_log <- function(log_path) {
 }
 
 read_loss_log <- function(path_loss) {
+  loss_data <- NULL
   if (file.exists(path_loss)) {
     loss_data <- try(
       read.table(
@@ -113,9 +110,8 @@ read_loss_log <- function(path_loss) {
       ),
       silent = TRUE
     )
-    if ("try-error" %in% class(loss_data)) {
-      logs_data <- NULL
-    } else {
+
+    if (!("try-error" %in% class(loss_data))) {
       loss_data <- t(loss_data)
       if (ncol(loss_data) > 2) {
         colnames(loss_data) <- c("train", "validation", "test")
@@ -125,11 +121,6 @@ read_loss_log <- function(path_loss) {
       loss_data <- as.data.frame(loss_data)
       for (i in 1:ncol(loss_data)) {
         loss_data[, i] <- as.numeric(loss_data[, i])
-        # loss_data[, i] <- replace(
-        #  x = loss_data[, i],
-        #  list = (loss_data[, i] == -100),
-        #  values = NA
-        # )
       }
       loss_data$epoch <- seq.int(
         from = 1,
@@ -137,8 +128,6 @@ read_loss_log <- function(path_loss) {
         by = 1
       )
     }
-  } else {
-    loss_data <- NULL
   }
   return(loss_data)
 }

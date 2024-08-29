@@ -52,7 +52,7 @@ Training_UI <- function(id) {
 #' @keywords internal
 #'
 Training_Server <- function(id, model) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 

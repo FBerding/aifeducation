@@ -10,7 +10,6 @@
 #'   pressing the Escape key. If `FALSE` the modal must be dismissed by clicking on a modalButton or from a call
 #'   removeModal on the server.
 #' @param size `string` Size of the modal. Possible are `"m"`, `"s"`, `"l"`, and `"xl"`.
-#' @param message `shiny::tagList` containing the html elements to display on the modal.
 #'
 #' @return Returns a shiny modal.
 #'
@@ -100,9 +99,10 @@ create_process_modal <- function(ns = session$ns,
 #' @param id `string` Namespace id for the input and output elements of the modal.
 #' @param ExtendedTask_type `string` Type of the long running task.
 #' @param ExtendedTask_arguments `string` Arguments to set up the long running task.
-#' @param inc_middle `bool` If `TRUE` includes the middle progress bar.
-#' @param inc_bottom `bool` If `TRUE` includes the bottom progress bar.
-#' @param inc_graphic `bool` If `TRUE` includes a graphic display the development of the loss.
+#' @param log_path `string` Path to the log file.
+#' @param pgr_use_middle `bool` If `TRUE` includes the middle progress bar.
+#' @param pgr_use_bottom `bool` If `TRUE` includes the bottom progress bar.
+#' @param pgr_use_graphic `bool` If `TRUE` includes a graphic display the development of the loss.
 #' @param update_intervall `double` Value greater 0 indicating in which interval the report should be updated. Values in
 #'   seconds.
 #' @param success_type `string` indicating which type of message should be displayed if the tasks successfully finishes.
@@ -121,7 +121,7 @@ start_and_monitor_long_task <- function(id,
                                         pgr_use_graphic = FALSE,
                                         update_intervall = 2,
                                         success_type = "data_sets") {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------
 
     print("log_path")
@@ -157,62 +157,42 @@ start_and_monitor_long_task <- function(id,
     )
 
     # Start ExtendedTask
+    CurrentTask <- NULL
     if (ExtendedTask_type == "raw_texts") {
       CurrentTask <- shiny::ExtendedTask$new(long_add_texts_to_dataset)
-      do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
     } else if (ExtendedTask_type == "embed_raw_text") {
       CurrentTask <- shiny::ExtendedTask$new(long_transform_text_to_embeddings)
-      do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
     } else if (ExtendedTask_type == "classifier") {
       CurrentTask <- shiny::ExtendedTask$new(long_classifier)
-      do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
     } else if (ExtendedTask_type == "feature_extractor") {
       CurrentTask <- shiny::ExtendedTask$new(long_feature_extractor)
-      do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
     }
+    if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
 
     # Check progress of the task
-    progress_bar_status <- reactive({
+    progress_bar_status <- shiny::reactive({
       # Do periodical checks only if the task is actual running
       if (CurrentTask$status() == "running") {
         shiny::invalidateLater(millis = update_intervall * 1000)
         print(date())
 
-        if (!is.null(log_path)) {
-          log <- read_log(log_path)
-        } else {
-          log <- NULL
+        log <- NULL
+        if (!is.null(log_path)) log <- read_log(log_path)
+
+        top <- NULL
+        middle <- NULL
+        bottom <- NULL
+
+        if (!is.null(log)) {
+          if (!is.na(log[1, 3]) && log[1, 3] != "NA") top <- log[1, ]
+          if (!is.na(log[2, 3]) && log[2, 3] != "NA") middle <- log[2, ]
+          if (!is.na(log[3, 3]) && log[3, 3] != "NA") bottom <- log[3, ]
         }
 
-        if (is.null(log)) {
-          top <- NULL
-          middle <- NULL
-          bottom <- NULL
-        } else {
-          if (is.na(log[1, 3]) | log[1, 3] == "NA") {
-            top <- NULL
-          } else {
-            top <- log[1, ]
-          }
-
-          if (is.na(log[2, 3]) | log[2, 3] == "NA") {
-            middle <- NULL
-          } else {
-            middle <- log[2, ]
-          }
-
-          if (is.na(log[3, 3]) | log[3, 3] == "NA") {
-            bottom <- NULL
-          } else {
-            bottom <- log[3, ]
-          }
-        }
-
+        loss_data <- NULL
         if (pgr_use_graphic == TRUE) {
           path_loss <- paste0(dirname(log_path), "/aifeducation_loss.log")
           loss_data <- read_loss_log(path_loss)
-        } else {
-          loss_data <- NULL
         }
 
         log_list <- list(
@@ -234,6 +214,7 @@ start_and_monitor_long_task <- function(id,
           } else {
             data_columns <- c("train", "validation")
           }
+
           y_max <- max(plot_data[data_columns])
           y_min <- 0
           plot <- ggplot2::ggplot(data = plot_data) +
@@ -243,7 +224,7 @@ start_and_monitor_long_task <- function(id,
             plot <- plot + ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test, color = "test"))
           }
           plot <- plot +
-            ggplot2::theme_classic() +
+            ggplot2::theme_dark() +
             ggplot2::ylab("loss") +
             ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
             ggplot2::xlab("epoch") +
@@ -264,49 +245,35 @@ start_and_monitor_long_task <- function(id,
 
 
     # Display progress on the progress modal
-    observe({
-      if (!is.null(progress_bar_status()$top)) {
-        shinyWidgets::updateProgressBar(
-          id = "pgr_top",
-          value = as.numeric(progress_bar_status()$top$value),
-          total = as.numeric(progress_bar_status()$top$total),
-          title = progress_bar_status()$top$message
-        )
-      }
+    shiny::observe({
+      ids <- c("pgr_top", "pgr_middle", "pgr_bottom")
+      prgbars <- c(progress_bar_status()$top, progress_bar_status()$middle, progress_bar_status()$bottom)
 
-      if (!is.null(progress_bar_status()$middle)) {
-        shinyWidgets::updateProgressBar(
-          id = "pgr_middle",
-          value = as.numeric(progress_bar_status()$middle$value),
-          total = as.numeric(progress_bar_status()$middle$total),
-          title = progress_bar_status()$middle$message
-        )
-      }
-
-      if (!is.null(progress_bar_status()$bottom)) {
-        shinyWidgets::updateProgressBar(
-          id = "pgr_bottom",
-          value = as.numeric(progress_bar_status()$bottom$value),
-          total = as.numeric(progress_bar_status()$bottom$total),
-          title = progress_bar_status()$bottom$message
-        )
+      for (i in 1:length(ids)) {
+        if (!is.null(prgbars[i])) {
+          shinyWidgets::updateProgressBar(
+            id = ids[i],
+            value = as.numeric(prgbars[i]$value),
+            total = as.numeric(prgbars[i]$total),
+            title = prgbars[i]$message
+          )
+        }
       }
     })
 
     # Show message if the progress finishes
-    observeEvent(CurrentTask$status(), {
+    shiny::observeEvent(CurrentTask$status(), {
       if (CurrentTask$status() == "success") {
         # Remove process modal
         shiny::removeModal()
 
+        success_message <- ""
         if (success_type == "data_sets") {
           success_message <- paste(
             "Created data set with",
             CurrentTask$result(),
             "documents."
           )
-        } else {
-          success_message <- ""
         }
 
         # Show success
@@ -319,12 +286,10 @@ start_and_monitor_long_task <- function(id,
     })
 
     # Error display--------------------------------------------------------------
-    output$error_messages <- renderText({
-      if (CurrentTask$status() == "error") {
-        return(CurrentTask$result())
-      } else {
-        return(NULL)
-      }
+    output$error_messages <- shiny::renderText({
+      res <- NULL
+      if (CurrentTask$status() == "error") res <- CurrentTask$result()
+      return(res)
     })
 
     # Cancel process------------------------------------------------------------

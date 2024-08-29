@@ -196,38 +196,34 @@ check_errors_create_dataset_raw_texts <- function(source_path,
   error_list <- NULL
 
   # Check if all inputs are correctly set
-  if (dir.exists(source_path) == FALSE) {
+  if (!dir.exists(source_path)) {
     error_list[length(error_list) + 1] <- "Source directory does not exist. Please check
       your directory path."
   }
-  if (is.null(destination_path) | destination_path == "") {
+  if (is.null(destination_path) || destination_path == "") {
     error_list[length(error_list) + 1] <- "Path to the output directory is missing."
   }
-  if (is.null(folder_name) | folder_name == "") {
+  if (is.null(folder_name) || folder_name == "") {
     error_list[length(error_list) + 1] <- "File name for the text dataset is missing."
   }
-  if (dir.exists(dirname(destination_path)) == FALSE) {
+  if (!dir.exists(dirname(destination_path))) {
     error_list[length(error_list) + 1] <- "Target directory does not exist. Please check
       if a directory exists for saving your data."
   }
-  if (include_txt == FALSE &
-    include_pdf == FALSE &
-    include_xlsx == FALSE) {
+  if (!include_txt && !include_pdf && !include_xlsx) {
     error_list[length(error_list) + 1] <- "No file types selected. Please select
       at least one file type."
   }
 
+  tmp_ui_error <- NULL
   if (length(error_list) > 0) {
-    tmp_ui_error <- NULL
     for (i in 1:length(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
     }
-    return(tmp_ui_error)
-  } else {
-    return(NULL)
   }
+  return(tmp_ui_error)
 }
 
 
@@ -239,9 +235,9 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 #' @param destination_path `string` Path to the destination directory.
 #' @param folder_name `string` Name of the folder to be created within the destination directory.
 #' @param path_to_embeddings `vector` Path to the folder where the embeddings are stored.
+#' @param features `int` Number of dimensions the text embeddings should be reduced to.
 #' @param model_name `string` Name for the model.
 #' @param model_label `string` Label of the model.
-#' @param features `int` Number of dimensions the text embeddings should be reduced to.
 #'
 #' @return Returns a `list` containing the elements of a user interface for displaying the errors. If no errors ware
 #'   found function returns `NULL`.
@@ -259,7 +255,7 @@ check_errors_create_feature_extractor <- function(destination_path,
   error_list <- NULL
 
   # Destination
-  if (dir.exists(destination_path) == FALSE) {
+  if (!dir.exists(destination_path)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "The target directory does not exist. Please check path."
     ))

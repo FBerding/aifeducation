@@ -365,7 +365,7 @@ Classifiers_Create_UI <- function(id) {
 #' @keywords internal
 #'
 Classifiers_Create_Server <- function(id, log_dir, volumes) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
     log_path <- paste0(log_dir, "/aifeducation_state.log")
@@ -487,7 +487,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     )
 
     # show save_modal
-    observeEvent(input$start_SaveModal, {
+    shiny::observeEvent(input$start_SaveModal, {
       path <- shinyFiles::parseDirPath(volumes, input$start_SaveModal)
       if (!is.null(path) & !identical(path, character(0))) {
         if (path != "") {

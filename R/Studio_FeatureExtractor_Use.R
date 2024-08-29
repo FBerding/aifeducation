@@ -49,7 +49,7 @@ FeatureExtractors_Use_UI <- function(id) {
 #' @keywords internal
 #'
 FeatureExtractors_Use_Server <- function(id, log_dir, volumes) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 

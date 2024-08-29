@@ -7,6 +7,7 @@
 #' @family studio_gui_page_data_management
 #' @keywords internal
 #'
+
 DataManagement_RawTextsUI <- function(id) {
   shiny::tagList(
     bslib::page_sidebar(
@@ -112,7 +113,7 @@ DataManagement_RawTextsUI <- function(id) {
 #' @keywords internal
 #'
 DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # local variables------------------------------------------------------------
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
@@ -148,16 +149,14 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
     )
 
     # show save_modal
-    observeEvent(input$start_SaveModal, {
+    shiny::observeEvent(input$start_SaveModal, {
       path <- shinyFiles::parseDirPath(volumes, input$start_SaveModal)
-      if (!is.null(path) & !identical(path, character(0))) {
-        if (path != "") {
-          shiny::showModal(save_modal)
-          shiny::updateTextInput(
-            inputId = "save_modal_directory_path",
-            value = path
-          )
-        }
+      if (!is.null(path) && !identical(path, character(0)) && path != "") {
+        shiny::showModal(save_modal)
+        shiny::updateTextInput(
+          inputId = "save_modal_directory_path",
+          value = path
+        )
       }
     })
 

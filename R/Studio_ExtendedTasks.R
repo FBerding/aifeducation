@@ -16,12 +16,11 @@ long_add_texts_to_dataset <- function(source_path,
     top_value <- 0
     total_message <- "File types"
 
-
     # Create new data set
     new_dataset <- LargeDataSetForText$new()
 
     # Start processing different file types
-    if (include_txt == TRUE) {
+    if (include_txt) {
       new_dataset$add_from_files_txt(
         dir_path = source_path,
         batch_size = 2,
@@ -35,7 +34,7 @@ long_add_texts_to_dataset <- function(source_path,
       top_value <- top_value + 1
     }
 
-    if (include_pdf == TRUE) {
+    if (include_pdf) {
       new_dataset$add_from_files_pdf(
         dir_path = source_path,
         batch_size = 2,
@@ -49,7 +48,7 @@ long_add_texts_to_dataset <- function(source_path,
       top_value <- top_value + 1
     }
 
-    if (include_xlsx == TRUE) {
+    if (include_xlsx) {
       new_dataset$add_from_files_xlsx(
         dir_path = source_path,
         trace = FALSE,
