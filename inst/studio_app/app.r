@@ -1,4 +1,4 @@
-#Create ui-------------------------------------------------------------------
+# Create ui-------------------------------------------------------------------
 ui <- bslib::page_navbar(
   title = "AI for Education - Studio",
   theme = bslib::bs_theme(bootswatch = "darkly"),
@@ -34,7 +34,7 @@ ui <- bslib::page_navbar(
       ),
       bslib::nav_panel(
         title = "Document",
-        DocumentPage_UI("TextEmbeddingModel_Document",type = "TextEmbeddingModel")
+        DocumentPage_UI("TextEmbeddingModel_Document", type = "TextEmbeddingModel")
       )
     )
   ),
@@ -51,7 +51,7 @@ ui <- bslib::page_navbar(
       ),
       bslib::nav_panel(
         title = "Document",
-        DocumentPage_UI("FeatureExtractors_Document",type = "FeatureExtractors")
+        DocumentPage_UI("FeatureExtractors_Document", type = "FeatureExtractors")
       )
     )
   ),
@@ -68,71 +68,76 @@ ui <- bslib::page_navbar(
       ),
       bslib::nav_panel(
         title = "Document",
-        DocumentPage_UI("Classifiers_Document",type = "Classifiers")
+        DocumentPage_UI("Classifiers_Document", type = "Classifiers")
       )
     )
   )
 )
 
-#Server----------------------------------------------------------------------
+# Server----------------------------------------------------------------------
 server <- function(input, output, session) {
-  #Set up global variables----------------------------------------------------
-  log_dir=getwd()
+  # Set up global variables----------------------------------------------------
+  log_dir <- getwd()
   volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
 
-  #Functions
+  # Functions
   DataManagement_RawTextsServer(
-    id="DataSetRawTexts",
-    log_dir=log_dir,
-    volumes=volumes)
+    id = "DataSetRawTexts",
+    log_dir = log_dir,
+    volumes = volumes
+  )
 
-  #TextEmbeddingModels
+  # TextEmbeddingModels
   TextEmbeddingModel_Create_Server(
-    id="TextEmbeddingModel_Create",
-    log_dir=log_dir,
-    volumes=volumes)
+    id = "TextEmbeddingModel_Create",
+    log_dir = log_dir,
+    volumes = volumes
+  )
   TextEmbeddingModel_Use_Server(
-    id="TextEmbeddingModel_Use",
-    log_dir=log_dir,
-    volumes=volumes
+    id = "TextEmbeddingModel_Use",
+    log_dir = log_dir,
+    volumes = volumes
   )
   DocumentPage_Server(
-    id="TextEmbeddingModel_Document",
-    volumes=volumes,
+    id = "TextEmbeddingModel_Document",
+    volumes = volumes,
     type = "TextEmbeddingModel"
   )
 
-  #FeatureExtractors
+  # FeatureExtractors
   FeatureExtractor_Create_Server(
-    id="FeatureExtractors_Create",
-    log_dir=log_dir,
-    volumes=volumes)
+    id = "FeatureExtractors_Create",
+    log_dir = log_dir,
+    volumes = volumes
+  )
   FeatureExtractors_Use_Server(
-    id="FeatureExtractors_Use",
-    log_dir=log_dir,
-    volumes=volumes)
+    id = "FeatureExtractors_Use",
+    log_dir = log_dir,
+    volumes = volumes
+  )
   DocumentPage_Server(
-    id="FeatureExtractors_Document",
-    volumes=volumes,
+    id = "FeatureExtractors_Document",
+    volumes = volumes,
     type = "FeatureExtractors"
   )
 
-  #Classifiers
+  # Classifiers
   Classifiers_Create_Server(
-    id="Classifiers_Create",
-    log_dir=log_dir,
-    volumes=volumes)
+    id = "Classifiers_Create",
+    log_dir = log_dir,
+    volumes = volumes
+  )
 
   Classifiers_Use_Server(
-    id="Classifiers_Use",
-    log_dir=log_dir,
-    volumes=volumes
+    id = "Classifiers_Use",
+    log_dir = log_dir,
+    volumes = volumes
   )
   DocumentPage_Server(
-    id="Classifiers_Document",
-    volumes=volumes,
+    id = "Classifiers_Document",
+    volumes = volumes,
     type = "Classifier"
   )
 }
 
-shiny::shinyApp(ui=ui,server = server)
+shiny::shinyApp(ui = ui, server = server)
