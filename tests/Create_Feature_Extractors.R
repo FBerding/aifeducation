@@ -49,8 +49,7 @@ for(framework in ml_frameworks){
                 batch_size=100,
                 dir_checkpoint=train_path,
                 trace=trace,
-                keras_trace=1,
-                pytorch_trace=1
+                ml_trace=1
               )
               save_to_disk(object = extractor,
                            dir_path =  root_path_data,

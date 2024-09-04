@@ -383,6 +383,33 @@ AIFEBaseModel <- R6::R6Class(
     #' @return Returns a `list` with all private fields and methods.
     get_private = function() {
       return(private)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Return all fields.
+    #' @return Method returns a `list` containing all public and private fields
+    #' of the object.
+    get_all_fields = function() {
+      public_list <- NULL
+      private_list <- NULL
+
+      for (entry in names(self)) {
+        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+          public_list[entry] <- list(self[[entry]])
+        }
+      }
+
+      for (entry in names(private)) {
+        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+          private_list[entry] <- list(private[[entry]])
+        }
+      }
+
+      return(
+        list(
+          public = public_list,
+          private = private_list
+        )
+      )
     }
   ),
   private = list(
@@ -665,70 +692,73 @@ AIFEBaseModel <- R6::R6Class(
       }
 
       # Load R file
-      old_model <- load_R_interface(dir_path)
+      config_file <- load_R_interface(dir_path)
+
+      # Old public state
+      config_public=config_file$public
 
       # Old private states
-      old_private <- old_model$get_private()
+      config_private <- config_file$private
 
       # Set ML framework
-      private$ml_framework <- old_private$ml_framework
+      private$ml_framework <- config_private$ml_framework
 
       # Set configuration of the core model
-      self$model_config <- old_model$model_config
+      self$model_config <- config_public$model_config
 
       # Set model info
       private$set_model_info(
-        model_name_root = old_private$model_info$model_name_root,
-        model_id = old_private$model_info$model_id,
-        label = old_private$model_info$model_date,
-        model_date = old_private$model_info$model_date
+        model_name_root = config_private$model_info$model_name_root,
+        model_id = config_private$model_info$model_id,
+        label = config_private$model_info$model_date,
+        model_date = config_private$model_info$model_date
       )
 
       # Set TextEmbeddingModel
       private$set_text_embedding_model(
-        model_info = old_private$text_embedding_model$model,
-        feature_extractor_info = old_private$text_embedding_model$feature_extractor,
-        times = old_private$text_embedding_model$times,
-        features = old_private$text_embedding_model$features
+        model_info = config_private$text_embedding_model$model,
+        feature_extractor_info = config_private$text_embedding_model$feature_extractor,
+        times = config_private$text_embedding_model$times,
+        features = config_private$text_embedding_model$features
       )
 
       # Set last training
-      self$last_training$config <- old_model$last_training$config
-      self$last_training$start_time <- old_model$last_training$start_time
-      self$last_training$learning_time <- old_model$last_training$learning_time
-      self$last_training$finish_time <- old_model$last_training$finish_time
-      self$last_training$history <- old_model$last_training$history
-      self$last_training$data <- old_model$last_training$data
+      self$last_training$config <- config_public$last_training$config
+      self$last_training$start_time <- config_public$last_training$start_time
+      self$last_training$learning_time <- config_public$last_training$learning_time
+      self$last_training$finish_time <- config_public$last_training$finish_time
+      self$last_training$history <- config_public$last_training$history
+      self$last_training$data <- config_public$last_training$data
 
       # Set license
-      self$set_software_license(old_private$model_info$model_license)
-      self$set_documentation_license(old_private$model_description$license)
+      self$set_software_license(config_private$model_info$model_license)
+      self$set_documentation_license(config_private$model_description$license)
 
       # Set description and documentation
       self$set_model_description(
-        eng = old_private$model_description$eng,
-        native = old_private$model_description$native,
-        abstract_eng = old_private$model_description$abstract_eng,
-        abstract_native = old_private$model_description$abstract_native,
-        keywords_eng = old_private$model_description$keywords_eng,
-        keywords_native = old_private$model_description$keywords_native
+        eng = config_private$model_description$eng,
+        native = config_private$model_description$native,
+        abstract_eng = config_private$model_description$abstract_eng,
+        abstract_native = config_private$model_description$abstract_native,
+        keywords_eng = config_private$model_description$keywords_eng,
+        keywords_native = config_private$model_description$keywords_native
       )
 
       # Set publication info
       self$set_publication_info(
-        authors = old_private$publication_info$developed_by$authors,
-        citation = old_private$publication_info$developed_by$citation,
-        url = old_private$publication_info$developed_by$url
+        authors = config_private$publication_info$developed_by$authors,
+        citation = config_private$publication_info$developed_by$citation,
+        url = config_private$publication_info$developed_by$url
       )
 
       # Get and set original package versions
-      private$r_package_versions$aifeducation <- old_private$r_package_versions$aifeducation
-      private$r_package_versions$reticulate <- old_private$r_package_versions$reticulate
+      private$r_package_versions$aifeducation <- config_private$r_package_versions$aifeducation
+      private$r_package_versions$reticulate <- config_private$r_package_versions$reticulate
 
-      private$py_package_versions$torch <- old_private$py_package_versions$torch
-      private$py_package_versions$tensorflow <- old_private$py_package_versions$tensorflow
-      private$py_package_versions$keras <- old_private$py_package_versions$keras
-      private$py_package_versions$numpy <- old_private$py_package_versions$numpy
+      private$py_package_versions$torch <- config_private$py_package_versions$torch
+      private$py_package_versions$tensorflow <- config_private$py_package_versions$tensorflow
+      private$py_package_versions$keras <- config_private$py_package_versions$keras
+      private$py_package_versions$numpy <- config_private$py_package_versions$numpy
 
       # Finalize config
       private$set_configuration_to_TRUE()

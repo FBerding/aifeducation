@@ -928,20 +928,20 @@ TEClassifierRegular <- R6::R6Class(
 
       # Add classifier specific data
       # Load R file
-      old_model <- load_R_interface(dir_path)
+      config_file <- load_R_interface(dir_path)
 
       # Set Reliability measures
       self$reliability <- list(
-        test_metric = old_model$reliability$test_metric,
-        test_metric_mean = old_model$reliability$test_metric_mean,
+        test_metric = config_file$public$reliability$test_metric,
+        test_metric_mean = config_file$public$reliability$test_metric_mean,
         raw_iota_objects = list(
-          iota_objects_end = old_model$reliability$raw_iota_objects$iota_objects_end,
-          iota_objects_end_free = old_model$reliability$raw_iota_objects$iota_objects_end_free
+          iota_objects_end = config_file$public$reliability$raw_iota_objects$iota_objects_end,
+          iota_objects_end_free = config_file$public$reliability$raw_iota_objects$iota_objects_end_free
         ),
-        iota_object_end = old_model$reliability$iota_object_end,
-        iota_object_end_free = old_model$reliability$iota_object_end_free,
-        standard_measures_end = old_model$reliability$standard_measures_end,
-        standard_measures_mean = old_model$reliability$standard_measures_mean
+        iota_object_end = config_file$public$reliability$iota_object_end,
+        iota_object_end_free = config_file$public$reliability$iota_object_end_free,
+        standard_measures_end = config_file$public$reliability$standard_measures_end,
+        standard_measures_mean = config_file$public$reliability$standard_measures_mean
       )
 
       # Set FeatureExtractor
