@@ -35,6 +35,8 @@
   classname = ".AIFERobertaTransformer",
   inherit = .AIFEBaseTransformer,
   private = list(
+    # == Attributes ====================================================================================================
+
     # Transformer's title
     title = "RoBERTa Model",
 
@@ -53,10 +55,20 @@
     # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Longformer_like.SFC.*`
     # functions for details.
     steps_for_creation = list(
+
+      # SFC: check_max_pos_emb ----
       check_max_pos_emb = function(self) check.max_position_embeddings(self$params$max_position_embeddings),
+
+      # SFC: create_tokenizer_draft ----
       create_tokenizer_draft = function(self) Longformer_like.SFC.create_tokenizer_draft(self),
+
+      # SFC: calculate_vocab ----
       calculate_vocab = function(self) Longformer_like.SFC.calculate_vocab(self),
+
+      # SFC: save_tokenizer_draft ----
       save_tokenizer_draft = function(self) Longformer_like.SFC.save_tokenizer_draft(self),
+
+      # SFC: create_final_tokenizer ----
       create_final_tokenizer = function(self) {
         self$temp$tokenizer <- transformers$RobertaTokenizerFast(
           vocab_file = paste0(self$params$model_dir, "/", "vocab.json"),
@@ -72,6 +84,8 @@
           trim_offsets = self$params$trim_offsets
         )
       },
+
+      # SFC: create_transformer_model ----
       create_transformer_model = function(self) {
         configuration <- transformers$RobertaConfig(
           vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
@@ -108,6 +122,8 @@
     #
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
     steps_for_training = list(
+
+      # SFT: load_existing_model ----
       load_existing_model = function(self) {
         if (self$params$ml_framework == "tensorflow") {
           self$temp$model <- transformers$TFRobertaForMaskedLM$from_pretrained(
@@ -127,12 +143,19 @@
     )
   ),
   public = list(
+    # == Methods =======================================================================================================
+
+    # New ----
+
     #' @description Creates a new transformer based on `RoBERTa` and sets the title.
     #' @return This method returns nothing.
     initialize = function() {
       super$set_title(private$title)
       print(paste(private$title, "has been inizialized."))
     },
+
+
+    # Create ----
 
     #' @description This method creates a transformer configuration based on the `RoBERTa` base architecture and a
     #'   vocabulary based on `Byte-Pair Encoding` (BPE) tokenizer using the python `transformers` and `tokenizers`
@@ -211,6 +234,9 @@
         pytorch_safetensors = pytorch_safetensors
       )
     },
+
+
+    # Train ----
 
     #' @description This method can be used to train or fine-tune a transformer based on `RoBERTa` Transformer
     #'   architecture with the help of the python libraries `transformers`, `datasets`, and `tokenizers`.

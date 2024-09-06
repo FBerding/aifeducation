@@ -39,6 +39,8 @@
   classname = ".AIFEBertTransformer",
   inherit = .AIFEBaseTransformer,
   private = list(
+    # == Attributes ====================================================================================================
+
     # Transformer's title
     title = "BERT Model",
 
@@ -55,11 +57,23 @@
     # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Bert_like.SFC.*` functions
     # for details.
     steps_for_creation = list(
+
+      # SFC: check_max_pos_emb ----
       check_max_pos_emb = function(self) check.max_position_embeddings(self$params$max_position_embeddings),
+
+      # SFC: create_tokenizer_draft ----
       create_tokenizer_draft = function(self) Bert_like.SFC.create_tokenizer_draft(self),
+
+      # SFC: calculate_vocab ----
       calculate_vocab = function(self) Bert_like.SFC.calculate_vocab(self),
+
+      # SFC: save_tokenizer_draft ----
       save_tokenizer_draft = function(self) Bert_like.SFC.save_tokenizer_draft(self),
+
+      # SFC: create_final_tokenizer ----
       create_final_tokenizer = function(self) Bert_like.SFC.create_final_tokenizer(self),
+
+      # SFC: create_transformer_model ----
       create_transformer_model = function(self) {
         configuration <- transformers$BertConfig(
           vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
@@ -96,6 +110,8 @@
     #
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
     steps_for_training = list(
+
+      # SFT: load_existing_model ----
       load_existing_model = function(self) {
         if (self$params$ml_framework == "tensorflow") {
           self$temp$model <- transformers$TFBertForMaskedLM$from_pretrained(
@@ -115,12 +131,19 @@
     )
   ),
   public = list(
+    # == Methods =======================================================================================================
+
+    # New ----
+
     #' @description Creates a new transformer based on `BERT` and sets the title.
     #' @return This method returns nothing.
     initialize = function() {
       super$set_title(private$title)
       print(paste(private$title, "has been inizialized."))
     },
+
+
+    # Create ----
 
     #' @description This method creates a transformer configuration based on the `BERT` base architecture and a
     #'   vocabulary based on `WordPiece` by using the python libraries `transformers` and `tokenizers`.
@@ -158,7 +181,7 @@
                       hidden_act = "gelu",
                       hidden_dropout_prob = 0.1,
                       attention_probs_dropout_prob = 0.1,
-                      sustain_track = TRUE,
+                      sustain_track = FALSE,
                       sustain_iso_code = NULL,
                       sustain_region = NULL,
                       sustain_interval = 15,
@@ -196,6 +219,9 @@
       )
     },
 
+
+    # Train ----
+
     #' @description This method can be used to train or fine-tune a transformer based on `BERT` architecture with the
     #'   help of the python libraries `transformers`, `datasets`, and `tokenizers`.
     #'
@@ -232,7 +258,7 @@
                      learning_rate = 3e-3,
                      n_workers = 1,
                      multi_process = FALSE,
-                     sustain_track = TRUE,
+                     sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15,
