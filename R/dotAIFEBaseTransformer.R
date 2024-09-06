@@ -367,7 +367,7 @@
 .AIFEBaseTransformer <- R6::R6Class( # nolint
   classname = ".AIFEBaseTransformer",
   private = list(
-    # Variables ----
+    # == Attributes ====================================================================================================
 
     # Transformer's title
     title = "Transformer Model",
@@ -401,11 +401,15 @@
       create_chunks_for_training = NULL,
       prepare_train_tune = NULL,
       start_training = NULL,
-      save_model = NULL
+      save_model = NULL,
+      # required, already defined steps. Can be overwritten for custom version
+      create_data_collator = NULL
     ),
 
-    # Methods ----
+    # == Methods =======================================================================================================
+
     # Clear methods ----
+
     # Clears the variables of the class: `sustainability_tracker`, `params` and `temp`
     clear_variables = function() {
       private$sustainability_tracker <- NULL
@@ -413,20 +417,9 @@
       self$temp <- list()
     },
 
-    # Clears required steps for creation (`steps_for_creation`) the transformer
-    clear_required_SFC = function() {
-      private$steps_for_creation$create_tokenizer_draft <- NULL
-      private$steps_for_creation$calculate_vocab <- NULL
-      private$steps_for_creation$save_tokenizer_draft <- NULL
-      private$steps_for_creation$create_final_tokenizer <- NULL
-      private$steps_for_creation$create_transformer_model <- NULL
-    },
 
-    # Clears required steps for training (`steps_for_training`) the transformer
-    clear_required_SFT = function() {
-      private$steps_for_training$load_existing_model <- NULL
-    },
     # Check methods ----
+
     # Checks whether a required creation step is missing
     check_required_SFC = function() {
       if (!is.function(private$steps_for_creation$create_tokenizer_draft)) {
@@ -446,13 +439,17 @@
       }
     },
 
+
     # Checks whether a required training step is missing
     check_required_SFT = function() {
       if (!is.function(private$steps_for_training$load_existing_model)) {
         stop("'steps_for_training$load_existing_model' is not a function")
       }
     },
+
+
     # Other ----
+
     # Initializes the 'static' parameters of the transformer in the `param` list
     init_common_model_params = function(ml_framework,
                                         sustain_track,
@@ -469,6 +466,9 @@
       self$set_model_param("trace", trace)
       self$set_model_param("pytorch_safetensors", pytorch_safetensors)
     },
+
+
+    # -------------------------------------------------------------------------------
     define_required_SFC_functions = function() {
       if (!is.function(private$steps_for_creation$save_transformer_model)) {
         private$steps_for_creation$save_transformer_model <- function(self) {
@@ -484,7 +484,11 @@
         }
       }
     },
+
+
+    # -------------------------------------------------------------------------------
     define_required_SFT_functions = function() {
+      # SFT: check_chunk_size -------------------------------------------------------
       if (!is.function(private$steps_for_training$check_chunk_size)) {
         private$steps_for_training$check_chunk_size <- function(self) {
           if (self$params$chunk_size > (self$temp$model$config$max_position_embeddings)) {
@@ -502,6 +506,9 @@
           self$params$chunk_size <- self$params$chunk_size - 2
         }
       }
+
+
+      # SFT: create_chunks_for_training ---------------------------------------------
       if (!is.function(private$steps_for_training$create_chunks_for_training)) {
         private$steps_for_training$create_chunks_for_training <- function(self) {
           run_py_file("datasets_transformer_prepare_data.py")
@@ -514,7 +521,6 @@
           } else {
             raw_text_dataset <- self$params$raw_texts
           }
-
           # Preparing Data
           tokenized_texts_raw <- raw_text_dataset$map(
             py$tokenize_raw_text,
@@ -550,29 +556,66 @@
           self$temp$tokenized_dataset <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
         }
       }
+
+
+      # SFT: create_data_collator ---------------------------------------------------
+      if (!is.function(private$steps_for_training$create_data_collator)) {
+        # Create default data collator
+        # For mpnet transformer see AIFEMpnetTransformer -> SFT -> create_data_collator
+        private$steps_for_training$create_data_collator <- function(self) {
+          if (self$params$whole_word) {
+            self$temp$data_collator <- transformers$DataCollatorForWholeWordMask(
+              tokenizer = self$temp$tokenizer,
+              mlm = TRUE,
+              mlm_probability = self$params$p_mask,
+              return_tensors = self$temp$return_tensors
+            )
+          } else {
+            self$temp$data_collator <- transformers$DataCollatorForLanguageModeling(
+              tokenizer = self$temp$tokenizer,
+              mlm = TRUE,
+              mlm_probability = self$params$p_mask,
+              return_tensors = self$temp$return_tensors
+            )
+          }
+        }
+      }
+
+
+      # SFT: prepare_train_tune -----------------------------------------------------
       if (!is.function(private$steps_for_training$prepare_train_tune)) {
         private$steps_for_training$prepare_train_tune <- function(self) {
-          if (self$params$ml_framework == "tensorflow") {
-            data_collator <- create_data_collator(
-              self$params$whole_word, self$temp$tokenizer, self$params$p_mask, "tf", self$params$trace
-            )
+          msg <- ifelse(self$params$whole_word, "Using Whole Word Masking", "Using Token Masking")
+          print_message(msg, self$params$trace)
 
-            self$temp$tokenized_dataset$set_format(type = "tensorflow")
-            self$temp$tokenized_dataset <- self$temp$tokenized_dataset$train_test_split(test_size = self$params$val_size)
+          self$temp$return_tensors <- ifelse(self$params$ml_framework == "tensorflow", "tf", "pt")
+
+          # Create data collator
+          private$steps_for_training$create_data_collator(self)
+
+          # ----
+          format_type <- ifelse(self$params$ml_framework == "tensorflow", "tensorflow", "torch")
+          self$temp$tokenized_dataset$set_format(type = format_type)
+          self$temp$tokenized_dataset <- self$temp$tokenized_dataset$train_test_split(
+            test_size = self$params$val_size
+          )
+
+          print_message("Preparing Training of the Model", self$params$trace)
+
+          if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
             self$temp$tf_train_dataset <- self$temp$model$prepare_tf_dataset(
               dataset = self$temp$tokenized_dataset$train,
               batch_size = as.integer(self$params$batch_size),
-              collate_fn = data_collator,
+              collate_fn = self$temp$data_collator,
               shuffle = TRUE
             )
             self$temp$tf_test_dataset <- self$temp$model$prepare_tf_dataset(
               dataset = self$temp$tokenized_dataset$test,
               batch_size = as.integer(self$params$batch_size),
-              collate_fn = data_collator,
+              collate_fn = self$temp$data_collator,
               shuffle = TRUE
             )
 
-            print_message("Preparing Training of the Model", self$params$trace)
             adam <- tf$keras$optimizers$Adam
 
             # Create Callbacks ---------------------------------------------------------
@@ -605,18 +648,7 @@
 
             # Clear session to provide enough resources for computations ---------------
             tf$keras$backend$clear_session()
-          } else {
-            data_collator <- create_data_collator(
-              self$params$whole_word, self$temp$tokenizer, self$params$p_mask, "pt", self$params$trace
-            )
-
-            self$temp$tokenized_dataset$set_format(type = "torch")
-            self$temp$tokenized_dataset <- self$temp$tokenized_dataset$train_test_split(
-              test_size = self$params$val_size
-            )
-
-            print_message("Preparing Training of the Model", self$params$trace)
-
+          } else { # PYTORCH ------------------
             training_args <- transformers$TrainingArguments(
               output_dir = paste0(self$params$output_dir, "/checkpoints"),
               overwrite_output_dir = TRUE,
@@ -642,9 +674,10 @@
               train_dataset = self$temp$tokenized_dataset$train,
               eval_dataset = self$temp$tokenized_dataset$test,
               args = training_args,
-              data_collator = data_collator,
+              data_collator = self$temp$data_collator,
               tokenizer = self$temp$tokenizer
             )
+
             self$temp$trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
             if (!as.logical(self$params$pytorch_trace)) {
               self$temp$trainer$remove_callback(transformers$PrinterCallback)
@@ -659,9 +692,12 @@
           }
         }
       }
+
+
+      # SFT: start_training ---------------------------------------------------------
       if (!is.function(private$steps_for_training$start_training)) {
         private$steps_for_training$start_training <- function(self) {
-          if (self$params$ml_framework == "tensorflow") {
+          if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
             self$temp$model$fit(
               x = self$temp$tf_train_dataset,
               validation_data = self$temp$tf_test_dataset,
@@ -674,7 +710,7 @@
 
             print_message("Load Weights From Best Checkpoint", self$params$trace)
             self$temp$model$load_weights(paste0(self$params$output_dir, "/checkpoints/best_weights.h5"))
-          } else {
+          } else { # PYTORCH -----------------
             if (is.function(private$steps_for_training$cuda_empty_cache)) {
               private$steps_for_training$cuda_empty_cache()
             }
@@ -682,14 +718,17 @@
           }
         }
       }
+
+
+      # SFT: save_model -------------------------------------------------------------
       if (!is.function(private$steps_for_training$save_model)) {
         private$steps_for_training$save_model <- function(self) {
-          if (self$params$ml_framework == "tensorflow") {
+          if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
             self$temp$model$save_pretrained(
               save_directory = self$params$output_dir
             )
             history_log <- read.csv(file = paste0(self$params$output_dir, "/checkpoints/history.log"))
-          } else {
+          } else { # PYTORCH -----------------
             self$temp$model$save_pretrained(
               save_directory = self$params$output_dir,
               safe_serilization = self$temp$pt_safe_save
@@ -708,6 +747,7 @@
       }
     },
 
+
     # Creates a sustainability tracker and stores it in the private `sustainability_tracker` attribute
     create_sustain_tracker = function() {
       private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
@@ -722,7 +762,8 @@
     }
   ),
   public = list(
-    # Attributes ----
+    # == Attributes ====================================================================================================
+
     #' @field params A list containing transformer's parameters ('static', 'dynamic' and 'dependent' parameters)
     #'
     #'   `list()` containing all the transformer parameters. Can be set with `set_model_param()`.
@@ -797,12 +838,16 @@
     #'   Figure 2: Possible parameters in the temp list
     temp = list(),
 
-    # Constructor ----
+    # == Methods =======================================================================================================
+
+    # New ----
+
     #' @description An object of this class cannot be created. Thus, method's call will produce an error.
     #' @return This method returns an error.
     initialize = function() {
       stop("Cannot create .AIFEBaseTransformer objects.")
     },
+
 
     # Setters ----
 
@@ -823,6 +868,7 @@
     #' @param temp_value `any` Parameter's value.
     #' @return This method returns nothing.
     set_model_temp = function(temp_name, temp_value) self$temp[[temp_name]] <- temp_value,
+
 
     # Setters for SFC ----
 
@@ -862,6 +908,7 @@
     #' @return This method returns nothing.
     set_SFC_create_transformer_model = function(fun) private$steps_for_creation$create_transformer_model <- fun,
 
+
     #' @description Setter for all required elements of the private `steps_for_creation` list. Executes setters for all
     #'   required creation steps.
     #' @param required_SFC `list()` A list of all new required steps.
@@ -873,6 +920,7 @@
       self$set_SFC_create_final_tokenizer(required_SFC$create_final_tokenizer)
       self$set_SFC_create_transformer_model(required_SFC$create_transformer_model)
     },
+
 
     # Setters for SFT ----
 
@@ -888,7 +936,17 @@
     #' @return This method returns nothing.
     set_SFT_cuda_empty_cache = function(fun) private$steps_for_training$cuda_empty_cache <- fun,
 
+    #' @description Setter for the `create_data_collator` element of the private `steps_for_training` list. Sets a new
+    #'   `fun` function as the `create_data_collator` step. Use this method to make a custom data collator for a
+    #'   transformer.
+    #' @param fun `function()` A new function.
+    #' @return This method returns nothing.
+    set_SFT_create_data_collator = function(fun) private$steps_for_training$create_data_collator <- fun,
+
+
     # Main methods ----
+
+    # Create ----
 
     #' @description This method creates a transformer configuration based on the child-transformer architecture and a
     #'   vocabulary using the python libraries `transformers` and `tokenizers`.
@@ -1045,8 +1103,6 @@
 
         # Finish --------------------------------------------------------------------
         print_message("Done", trace)
-        # Clear required steps ------------------------------------------------------
-        private$clear_required_SFC()
         # Clear variables -----------------------------------------------------------
         private$clear_variables()
       }, finally = {
@@ -1055,6 +1111,9 @@
         }
       })
     },
+
+
+    # Train ----
 
     #' @description This method can be used to train or fine-tune a transformer based on `BERT` architecture with the
     #'   help of the python libraries `transformers`, `datasets`, and `tokenizers`.
@@ -1248,8 +1307,6 @@
 
         # Finish --------------------------------------------------------------------
         print_message("Done", trace)
-        # Clear required steps ------------------------------------------------------
-        private$clear_required_SFT()
         # Clear variables -----------------------------------------------------------
         private$clear_variables()
       }, finally = {

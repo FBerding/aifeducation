@@ -5,9 +5,10 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-if (!aifeducation_config$global_framework_set()) {
-  aifeducation_config$set_global_ml_backend("tensorflow")
-}
+# TODO (Yuliia): Alternative to aifeducation_config
+# if (!aifeducation_config$global_framework_set()) {
+#   aifeducation_config$set_global_ml_backend("tensorflow")
+# }
 
 set_config_gpu_low_memory()
 transformers$utils$logging$set_verbosity_error()
@@ -287,8 +288,30 @@ for (framework in ml_frameworks) {
               trace = FALSE
             )
           )
+        } else if (ai_method == AIFETrType$mpnet) {
+          expect_no_error(
+            aife_transformer_maker$make(ai_method)$create(
+              ml_framework = framework,
+              model_dir = model_dir_path,
+              vocab_raw_texts = example_data$text,
+              vocab_size = 50000,
+              vocab_do_lower_case = FALSE,
+              max_position_embeddings = 512,
+              hidden_size = 256,
+              num_hidden_layer = 2,
+              num_attention_heads = 2,
+              intermediate_size = 256,
+              hidden_act = "gelu",
+              hidden_dropout_prob = 0.1,
+              sustain_track = TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              trace = FALSE
+            )
+          )
         } else {
-          cat("Creation of the Model: unknown transformer\n")
+          cat(paste("Creation of the Model: unknown transformer '", ai_method,"'\n"))
         }
       })
 
@@ -486,8 +509,36 @@ for (framework in ml_frameworks) {
               trace = FALSE
             )
           )
+        } else if (ai_method == AIFETrType$mpnet) {
+          # TODO (Yuliia): Training with tensorflow
+          if (framework == "pytorch") {
+            expect_no_error(
+              aife_transformer_maker$make(ai_method)$train(
+                ml_framework = framework,
+                output_dir = model_dir_path,
+                model_dir_path = model_dir_path,
+                raw_texts = example_data$text[1:10],
+                p_mask = 0.15,
+                p_perm = 0.15,
+                whole_word = TRUE,
+                full_sequences_only = TRUE,
+                val_size = 0.25,
+                n_epoch = 2,
+                batch_size = 20,
+                chunk_size = 100,
+                n_workers = 1,
+                multi_process = FALSE,
+                sustain_track = TRUE,
+                sustain_iso_code = "DEU",
+                sustain_region = NULL,
+                sustain_interval = 15,
+                trace = FALSE,
+                keras_trace = 0
+              )
+            )
+          }
         } else {
-          cat("Training of the Model: unknown transformer\n")
+          cat(paste("Training of the Model: unknown transformer '", ai_method,"'\n"))
         }
       })
     } else {

@@ -1,13 +1,9 @@
 #' @title Transformer types
 #' @description This list contains transformer types. Elements of the list can be used in the public `make` of the
-#'   \link{AIFETransformerMaker} `R6` class as input parameter `type`.
+#'   [AIFETransformerMaker] `R6` class as input parameter `type`.
 #'
 #'   It has the following elements:
-#'   * `bert` = "bert"
-#'   * `roberta` = "roberta"
-#'   * `deberta` = "deberta_v2"
-#'   * `funnel` = "funnel"
-#'   * `longformer` = "longformer"
+#'   `r get_tr_types_list_decsription()`
 #'
 #'   Elements can be used like `AIFETrType$bert`, `AIFETrType$deberta_v2`, `AIFETrType$funnel`, etc.
 #'
@@ -18,7 +14,8 @@ AIFETrType <- list(
   roberta = "roberta",
   deberta_v2 = "deberta_v2",
   funnel = "funnel",
-  longformer = "longformer"
+  longformer = "longformer",
+  mpnet = "mpnet"
 )
 
 #' @title `R6` class for transformer creation
@@ -26,9 +23,9 @@ AIFETrType <- list(
 #'   type to the `make` method and get desired transformer. Now run the `create` or/and `train` methods of the new
 #'   transformer.
 #'
-#'   The already created \link{aife_transformer_maker} object of this class can be used.
+#'   The already created [aife_transformer_maker] object of this class can be used.
 #'
-#'   See \link{.AIFEBaseTransformer} class for details.
+#'   See [.AIFEBaseTransformer] class for details.
 #'
 #' @section Transformer parameters:
 #'
@@ -397,7 +394,7 @@ AIFETrType <- list(
 #'
 #' # Use 'make' method of the 'tr_maker' object
 #' # Pass string with the type of transformers
-#' # Allowed types are "bert", "deberta_v2", "funnel", "longformer", "roberta"
+#' # Allowed types are "bert", "deberta_v2", "funnel", etc. See aifeducation::AIFETrType list
 #' my_bert <- tr_maker$make("bert")
 #'
 #' # Or use elements of the 'aifeducation::AIFETrType' list
@@ -418,7 +415,7 @@ AIFETransformerMaker <- R6::R6Class(
   public = list(
     #' @description Creates a new transformer with the passed type.
     #' @param type `string` A type of the new transformer. Allowed types are `r get_allowed_transformer_types()`. See
-    #'   \link{AIFETrType} list.
+    #'   [AIFETrType] list.
     #' @return If success - a new transformer, otherwise - an error (passed type is invalid).
     make = function(type) {
       transformer <- NULL
@@ -432,6 +429,8 @@ AIFETransformerMaker <- R6::R6Class(
         transformer <- .AIFELongformerTransformer$new()
       } else if (type == AIFETrType$roberta) {
         transformer <- .AIFERobertaTransformer$new()
+      } else if (type == AIFETrType$mpnet) {
+        transformer <- .AIFEMpnetTransformer$new()
       } else {
         stop(
           paste0(
@@ -446,7 +445,7 @@ AIFETransformerMaker <- R6::R6Class(
 )
 
 #' @title `R6` object of the `AIFETransformerMaker` class
-#' @description Object for creating the transformers with different types. See \link{AIFETransformerMaker} class for
+#' @description Object for creating the transformers with different types. See [AIFETransformerMaker] class for
 #'   details.
 #'
 #' @inheritSection AIFETransformerMaker Transformer parameters
@@ -456,7 +455,7 @@ AIFETransformerMaker <- R6::R6Class(
 #' @examples
 #' # Use 'make' method of the 'aifeducation::aife_transformer_maker' object
 #' # Pass string with the type of transformers
-#' # Allowed types are "bert", "deberta_v2", "funnel", "longformer", "roberta"
+#' # Allowed types are "bert", "deberta_v2", "funnel", etc. See aifeducation::AIFETrType list
 #' my_bert <- aife_transformer_maker$make("bert")
 #'
 #' # Or use elements of the 'aifeducation::AIFETrType' list

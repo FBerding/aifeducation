@@ -167,6 +167,11 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
 #' @description Used when creating transformers.
 #'
 #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
+#' @param sep_token `string` Representation of the SEP token.
+#' @param sep_id `int` ID of the SEP token.
+#' @param cls_token `string` Representation of the CLS token.
+#' @param cls_id `int` ID of the CLS token.
+#' @param unk_token `string` Representation of the UNK token.
 #' @return A new tokenizer object (`tokenizers.Tokenizer`) based on `tokenizers.models.WordPiece` model.
 #'
 #' @importFrom reticulate tuple
@@ -174,8 +179,14 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-create_WordPiece_tokenizer <- function(vocab_do_lower_case) { # nolint
-  tok_new <- tok$Tokenizer(tok$models$WordPiece())
+create_WordPiece_tokenizer <- function(# nolint
+    vocab_do_lower_case,
+    sep_token = "[SEP]",
+    sep_id = 1,
+    cls_token = "[CLS]",
+    cls_id = 0,
+    unk_token = "[UNK]") {
+  tok_new <- tok$Tokenizer(tok$models$WordPiece(unk_token = unk_token))
   tok_new$normalizer <- tok$normalizers$BertNormalizer(
     lowercase = vocab_do_lower_case,
     clean_text = TRUE,
@@ -184,8 +195,8 @@ create_WordPiece_tokenizer <- function(vocab_do_lower_case) { # nolint
   )
   tok_new$pre_tokenizer <- tok$pre_tokenizers$BertPreTokenizer()
   tok_new$post_processor <- tok$processors$BertProcessing(
-    sep = reticulate::tuple(list("[SEP]", as.integer(1))),
-    cls = reticulate::tuple(list("[CLS]", as.integer(0)))
+    sep = reticulate::tuple(list(sep_token, as.integer(sep_id))),
+    cls = reticulate::tuple(list(cls_token, as.integer(cls_id)))
   )
   tok_new$decode <- tok$decoders$WordPiece()
   return(tok_new)
@@ -202,7 +213,8 @@ create_WordPiece_tokenizer <- function(vocab_do_lower_case) { # nolint
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-create_ByteLevelBPE_tokenizer <- function( # nolint
+create_ByteLevelBPE_tokenizer <- function(
+    # nolint
     max_position_embeddings,
     add_prefix_space,
     trim_offsets) {
@@ -217,45 +229,6 @@ create_ByteLevelBPE_tokenizer <- function( # nolint
   return(tok_new)
 }
 
-#' @title Create data collator
-#' @description Used when creating transformers.
-#'
-#' @param whole_word `r paramDesc.whole_word()`
-#' @param tokenizer `tokenizers.Tokenizer` A tokenizer object
-#' @param p_mask `r paramDesc.p_mask()`
-#' @param return_tensors `string` The type of tensor to return. Allowed values are "np", "pt" and "tf".
-#' @return A new data collator object (`transformers.DataCollatorForWholeWordMask` or
-#'   `transformers.DataCollatorForLanguageModeling`).
-#'
-#' @family Transformer utils
-#' @keywords internal
-#' @noRd
-create_data_collator <- function(
-    whole_word,
-    tokenizer,
-    p_mask,
-    return_tensors,
-    trace) {
-  if (whole_word) {
-    print_message("Using Whole Word Masking", trace)
-    data_collator <- transformers$DataCollatorForWholeWordMask(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = return_tensors
-    )
-  } else {
-    print_message("Using Token Masking", trace)
-    data_collator <- transformers$DataCollatorForLanguageModeling(
-      tokenizer = tokenizer,
-      mlm = TRUE,
-      mlm_probability = p_mask,
-      return_tensors = return_tensors
-    )
-  }
-  return(data_collator)
-}
-
 #' @title BERT-like creation step `create_tokenizer_draft`
 #' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
 #'
@@ -265,14 +238,36 @@ create_data_collator <- function(
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
+#' @param sep_token `string` Representation of the SEP token.
+#' @param sep_id `int` ID of the SEP token.
+#' @param cls_token `string` Representation of the CLS token.
+#' @param cls_id `int` ID of the CLS token.
+#' @param unk_token `string` Representation of the UNK token.
+#' @param special_tokens `list` Special tokens for a trainer (`tokenizers.trainers.WordPieceTrainer`).
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.create_tokenizer_draft <- function(self) { # nolint
-  self$temp$special_tokens <- c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")
-  self$temp$tok_new <- create_WordPiece_tokenizer(self$params$vocab_do_lower_case)
+Bert_like.SFC.create_tokenizer_draft <- function(
+    self,
+    sep_token = "[SEP]",
+    sep_id = 1,
+    cls_token = "[CLS]",
+    cls_id = 0,
+    unk_token = "[UNK]",
+    special_tokens = c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")) { # nolint
+
+  self$temp$special_tokens <- special_tokens
+  self$temp$tok_new <- create_WordPiece_tokenizer(
+    self$params$vocab_do_lower_case,
+    sep_token = sep_token,
+    sep_id = sep_id,
+    cls_token = cls_token,
+    cls_id = cls_id,
+    unk_token = unk_token
+  )
 
   self$temp$trainer <- tok$trainers$WordPieceTrainer(
     vocab_size = as.integer(self$params$vocab_size),
@@ -290,6 +285,7 @@ Bert_like.SFC.create_tokenizer_draft <- function(self) { # nolint
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
@@ -316,6 +312,7 @@ Bert_like.SFC.calculate_vocab <- function(self) { # nolint
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
@@ -336,6 +333,7 @@ Bert_like.SFC.save_tokenizer_draft <- function(self) { # nolint
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
@@ -363,6 +361,7 @@ Bert_like.SFC.create_final_tokenizer <- function(self) { # nolint
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
@@ -385,6 +384,7 @@ Longformer_like.SFC.create_tokenizer_draft <- function(self) { # nolint
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
@@ -412,6 +412,7 @@ Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
 #'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
 #'   [.AIFEBaseTransformer] or use these temporary parameters.
 #'
+#' @param self Transformer `self`-object.
 #' @return This function returns nothing.
 #'
 #' @family Defined steps for creation
