@@ -75,6 +75,12 @@ ui <- bslib::page_navbar(
   bslib::nav_panel(
     title = "License",
     License_UI("GPL_3_License")
+  ),
+  bslib::nav_menu(
+    title = "Other",
+    bslib::nav_item(
+      shiny::uiOutput(outputId="ui_gpu_acceleration")
+    )
   )
 )
 
@@ -142,6 +148,22 @@ server <- function(input, output, session) {
   License_Server(
     "GPL_3_License"
   )
+
+  #GPU Acceleration
+  output$ui_gpu_acceleration<-shiny::renderUI({
+    if(torch$cuda$is_available()){
+      ui<-tagList(
+        shiny::icon("bolt-lightning"),
+        "GPU acceleration available."
+      )
+    } else {
+      ui<-tagList(
+        shiny::icon("xmark"),
+        "GPU acceleration not available."
+      )
+    }
+  return(ui)
+  })
 }
 
 shiny::shinyApp(ui=ui,server = server)
