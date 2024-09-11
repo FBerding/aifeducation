@@ -71,6 +71,10 @@ ui <- bslib::page_navbar(
         DocumentPage_UI("Classifiers_Document",type = "Classifiers")
       )
     )
+  ),
+  bslib::nav_panel(
+    title = "License",
+    License_UI("GPL_3_License")
   )
 )
 
@@ -132,6 +136,11 @@ server <- function(input, output, session) {
     id="Classifiers_Document",
     volumes=volumes,
     type = "Classifier"
+  )
+
+  #License
+  License_Server(
+    "GPL_3_License"
   )
 }
 

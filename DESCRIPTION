@@ -40,7 +40,7 @@ Description: In social and educational settings, the use of Artificial
     emissions during model training is done with the 'python' library
     'codecarbon'.  Finally, all objects created with this package allow to
     share trained AI models with other people.
-License: GPL-3
+License: GPL (>= 3)
 URL: https://fberding.github.io/aifeducation/
 BugReports: https://github.com/cran/aifeducation/issues
 Depends:
