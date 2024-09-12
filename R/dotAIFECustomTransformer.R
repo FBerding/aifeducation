@@ -20,7 +20,8 @@
       # required
       load_existing_model = function(self) { }
       # optional
-      # cuda_empty_cache = function() { }
+      # cuda_empty_cache = function() { },
+      # create_data_collator = function() { }
     )
   ),
   # public methods
@@ -80,6 +81,7 @@
       super$set_SFT_load_existing_model(private$steps_for_training$load_existing_model)
       # optional
       # super$set_SFT_cuda_empty_cache(private$steps_for_training$cuda_empty_cache)
+      # super$set_SFT_create_data_collator(private$steps_for_training$create_data_collator)
 
       # -----------------------------------------
       super$train(

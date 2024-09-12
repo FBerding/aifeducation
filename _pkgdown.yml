@@ -21,6 +21,10 @@ navbar:
       - text: "05 Sharing and Using Trained AI/Models"
         href: "articles/sharing_and_publishing.html"
       - text: -------
+      - text: "For developers"
+      - text: "01 Transformers"
+        href: "articles/transformers.html"
+      - text: -------
       - text: "Appendix"
       - text: "A01 Supported Machine Learning Frameworks"
         href: "articles/Appendix_A01_Supported_Frameworks.html"

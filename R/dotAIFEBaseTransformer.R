@@ -4,103 +4,8 @@
 #'   for a future concrete transformer and cannot be used to create an object of itself (an attempt to call `new`-method
 #'   will produce an error).
 #'
-#' @section Private attributes: Developers should know the purpose of all the private attributes.
-#'
-#'   ## **Attribute `title`**
-#'
-#'   `string` The title for a transformer. This title is displayed in the progress bar. Can be set with `set_title()`.
-#'
-#'   ## **Attribute `steps_for_creation`**
-#'
-#'   `list()` that stores required and optional steps (functions) for creating a new transformer.
-#'
-#'   To access (input) parameters of the transformer, use the `params` list (e.g. `params$ml_framework`). To access a
-#'   local variable outside of a function, put it in the `temp` list.
-#'
-#'   ### Required
-#'
-#'   The **required steps** to be defined in each child transformer are:
-#'   * `create_tokenizer_draft`: `function()` that creates a tokenizer draft. In this function a new tokenizer must
-#'   be created and stored as an element of a list `temp` (e.g. `temp$tok_new`). This function can include the
-#'   definition of special tokens and/or trainers (`tokenizers.trainers.WordPieceTrainer`). See the
-#'   `create_WordPiece_tokenizer()` and `create_ByteLevelBPE_tokenizer()` functions to create a new tokenizer object
-#'   (`tokenizers.Tokenizer`) based on the `tokenizers.models.WordPiece` and `tokenizers.models.ByteLevel` models
-#'   respectively.
-#'
-#'   * `calculate_vocab`: `function()` for calculating a vocabulary. The tokenizer created in the
-#'   `create_tokenizer_draft()` function is trained. See `tokenizers.Tokenizer.train_from_iterator()` for details.
-#'
-#'   * `save_tokenizer_draft`: `function()` that saves a tokenizer draft to a model directory (e.g. to a `vocab.txt` file).
-#'   See `tokenizers.Tokenizer.save_model()` for details.
-#'
-#'   * `create_final_tokenizer`: `function()` that creates a new transformer tokenizer object. The tokenizer must be stored
-#'   in the `tokenizer` parameter of the `temp` list. See `transformers.PreTrainedTokenizerFast`,
-#'   `transformers.LongformerTokenizerFast` and `transformers.RobertaTokenizerFast` for details.
-#'
-#'   * `create_transformer_model`: `function()` that creates a transformer model. The model must be passed to the `model`
-#'   parameter of the `temp` list. See `transformers.(TF)BertModel`, `transformers.(TF)DebertaV2ForMaskedLM`,
-#'   `transformers.(TF)FunnelModel`, `transformers.(TF)LongformerModel`, `transformers.(TF)RobertaModel`, etc. for
-#'   details.
-#'
-#'   ### Optional
-#'
-#'   **Optional step** is:
-#'   * `check_max_pos_emb`: `function()` that checks transformer parameter `max_position_embeddings`.
-#'   Leave `NULL` to skip the check.
-#'
-#'   ### Other
-#'
-#'   **Required and already defined step** is:
-#'   * `save_transformer_model`: `function()` that saves a newly created transformer. Uses the temporary `model`
-#'   and `pt_safe_save` parameters of the `temp` list. See `transformers.(TF)PreTrainedModel.save_pretrained()` for
-#'   details.
-#'
-#'   Use the `set_SFC_*()` methods to set required/optional steps for creation, where * is the name of the step.
-#'
-#'   Use the `set_required_SFC()` method to set all required steps at once.
-#'
-#'   ## **Attribute `steps_for_training`**
-#'
-#'   `list()` that stores required and optional steps (functions) for training the transformer.
-#'
-#'   To access (input) parameters of the transformer, use the `params` list (e.g. `params$ml_framework`). To access a
-#'   local variable outside of a function, put it in the `temp` list.
-#'
-#'   ### Required
-#'
-#'   The **required step** in each child transformer is:
-#'   * `load_existing_model`: `function()` that loads the model and its tokenizer. The model and the transformer must be
-#'   stored to the `model` and `tokenizer` parameters respectively of the `temp` list. See
-#'   `transformers.(TF)PreTrainedModel` for details.
-#'
-#'   ### Optional
-#'
-#'   **Optional step** is:
-#'   * `cuda_empty_cache`: `function()` to empty the cache if `torch.cuda` is available.
-#'
-#'   ### Other
-#'
-#'   **Required and already defined steps** are:
-#'   * `check_chunk_size`: `function()` that checks transformer's parameter `chunk_size` and adjusts it. Uses
-#'   the `model` parameter of the `temp` list and modifies the `chunk_size` parameter of the `params`
-#'   list.
-#'
-#'   * `create_chunks_for_training`: `function()` that creates chunks of the sequenses for the trainining. Uses the
-#'   `tokenizer` parameter and adds `tokenized_dataset` parameter to the `temp` list.
-#'
-#'   * `prepare_train_tune`: `function()` that prepares the data for the training. For `tensorflow`: uses the `model`
-#'   and `tokenizer` parameters, adds the `tf_train_dataset`, `tf_test_dataset`, `callbacks` parameters to the
-#'   `temp` list. For `pytorch`: uses the `model`, `tokenizer` parameters, adds the `trainer` parameter to the
-#'   `temp` list.
-#'
-#'   * `start_training`: `function()` that starts the training. For `tensorflow`: uses the `model`, `tf_train_dataset`,
-#'   `tf_test_dataset`, `callbacks` parameters of the `temp` list. For `pytorch`: uses the `trainer` parameter
-#'   of the `temp` list.
-#'
-#'   * `save_model`: `function()` that saves the model. For `tensorflow`: uses the `model` parameter of the `temp` list.
-#'   For `pytorch`: uses the `model`, `pt_safe_save` and `trainer` parameters of the `temp` list.
-#'
-#'   Use the `set_SFT_*()` methods to set required/optional steps for creation, where * is the name of the step.
+#'   See p.1 Base Transformer Class in
+#'   [Transformers for Developers](https://fberding.github.io/aifeducation/articles/transformers.html) for details.
 #'
 #' @section Create: The `create`-method is a basic algorithm that is used to create a new transformer, but cannot be
 #'   called directly. It has some required and optional steps stored in a private `steps_for_creation` list.
@@ -110,242 +15,6 @@
 #'
 #' @section Concrete transformer implementation: There are already implemented concrete (child) transformers (e.g.
 #'   `BERT`, `DeBERTa-V2`, etc.).
-#'
-#'   To implement a new one, do the following steps:
-#'
-#'   1 Create a new `R`-file with a name like `dotAIFECustomTransformer`.
-#'
-#'   2 Open the file and write the creation of a new `R6::R6Class()` inside of it (see the code below). The name of the
-#'   class must be defined here **(1)**. Remember to inherit the base transformer class **(2)**. Use the `private` list
-#'   for the private attributes **(3)** like `title`, `steps_for_creation`, etc. (which will be explained later) and the
-#'   `public` list **(4)** for the `initialize`, `create`, `train` methods.
-#'
-#'   ```r
-#'   .AIFECustomTransformer <- R6::R6Class(
-#'      classname = ".AIFECustomTransformer", # (1)
-#'      inherit = .AIFEBaseTransformer,       # (2)
-#'      private = list(),                     # (3)
-#'      public = list()                       # (4)
-#'   )
-#'   ```
-#'
-#'   3 Define the private `title` attribute **(1)** and set it in the `initialize` method **(2)** using the inherited
-#'   `super$set_title()` base method **(3)** in the base class.
-#'
-#'   ```r
-#'   .AIFECustomTransformer <- R6::R6Class(
-#'      classname = ".AIFECustomTransformer",
-#'      inherit = .AIFEBaseTransformer,
-#'      private = list(
-#'        title = "Custom Model"           # (1)
-#'      ),
-#'      public = list(
-#'        initialize = function() {        # (2)
-#'          super$set_title(private$title) # (3)
-#'        }
-#'      )
-#'   )
-#'   ```
-#'
-#'   4 Define the private `steps_for_creation` list **(1)** to implement the required steps (functions) **(2)**-**(6)**,
-#'   and **(7)** if needed. Do not forget to pass `self` as input parameter of the functions.
-#'
-#'   **Note** that local variables created inside of functions can be used through the inherited `temp` list. Put the
-#'   local `tok_new` variable **(8)** in the `temp` list in the `create_tokenizer_draft` step **(2)** and use it in the
-#'   `calculate_vocab` step **(3)** like **(9)**.
-#'
-#'   Similarly, use the input parameters of the transformer such as `ml_framework` using the inherited `params` list like
-#'   **(10)**.
-#'
-#'   **Important!**
-#'
-#'   In the `create_final_tokenizer` step **(5)** store the tokenizer in the `self$temp$tokenizer` variable **(11)**.
-#'
-#'   In the `create_transformer_model` step **(6)** store the transformer model in the `self$temp$model` variable
-#'   **(12)**.
-#'
-#'   ```r
-#'   .AIFECustomTransformer <- R6::R6Class(
-#'      classname = ".AIFECustomTransformer",
-#'      inherit = .AIFEBaseTransformer,
-#'      private = list(
-#'        title = "Custom Model",
-#'        steps_for_creation = list(                   # (1)
-#'          # required
-#'          create_tokenizer_draft = function(self) {      # (2)
-#'            # The implementation must be here
-#'            # self$temp$tok_new <- ...         # (8)
-#'          },
-#'          calculate_vocab = function(self) {             # (3)
-#'            # The implementation must be here
-#'            # ... self$temp$tok_new ...        # (9)
-#'          },
-#'          save_tokenizer_draft = function(self) {        # (4)
-#'            # The implementation must be here
-#'          },
-#'          create_final_tokenizer = function(self) {      # (5)
-#'            # The implementation must be here
-#'            # self$temp$tokenizer <- ... # (!!!) (11)
-#'          },
-#'          create_transformer_model = function(self) {    # (6)
-#'            # The implementation must be here
-#'            # ... self$params$ml_framework ... # (10)
-#'            # self$temp$model <- ...     # (!!!) (12)
-#'          },
-#'          # optional: omit this element if do not needed
-#'          check_max_pos_emb = function(self) {           # (7)
-#'            # The implementation must be here
-#'          }
-#'        )
-#'      ),
-#'      public = list(
-#'        initialize = function() {
-#'          super$set_title(private$title)
-#'        }
-#'      )
-#'   )
-#'   ```
-#'
-#'   5 Define the `create` method **(1)** with all the input parameters **(2)** of the `create` method of the base
-#'   class. Add all the dependent parameters of the custom transformer to the input parameters **(3)**. Dependent
-#'   parameters are parameters that depend on the transformer and are not present in the base class. Set these dependent
-#'   parameters to the base class using the `super$set_model_param()` method **(4)**. Set required and optional steps to
-#'   the base class using the `super$set_required_SFC()` and `super$set_SFC_check_max_pos_emb()` methods respectively
-#'   **(5)**. Finally run the basic `create` algorithm using `super$create()` **(6)** with all the input parameters
-#'   **(2)**.
-#'
-#'   ```r
-#'   .AIFECustomTransformer <- R6::R6Class(
-#'      classname = ".AIFECustomTransformer",
-#'      inherit = .AIFEBaseTransformer,
-#'      private = list(
-#'        title = "Custom Model",
-#'        steps_for_creation = list(
-#'          # required
-#'          create_tokenizer_draft = function(self) { },
-#'          calculate_vocab = function(self) { },
-#'          save_tokenizer_draft = function(self) { },
-#'          create_final_tokenizer = function(self) { },
-#'          create_transformer_model = function(self) { },
-#'          # optional: omit this element if do not needed
-#'          check_max_pos_emb = function(self) { }
-#'        )
-#'      ),
-#'      public = list(
-#'        initialize = function() { },
-#'        # (1)
-#'        create = function(# (2) --------------------------
-#'                          ml_framework,
-#'                          model_dir,
-#'                          vocab_raw_texts,
-#'                          vocab_size,
-#'                          # ...
-#'                          trace,
-#'                          pytorch_safetensors,
-#'
-#'                          # (3) --------------------------
-#'                          dep_param1,
-#'                          dep_param2,
-#'                          # ...
-#'                          dep_paramN) {
-#'          # (4) -----------------------------------------
-#'          super$set_model_param("dep_param1", dep_param1)
-#'          super$set_model_param("dep_param2", dep_param2)
-#'          # ...
-#'          super$set_model_param("dep_paramN", dep_paramN)
-#'
-#'          # (5) -----------------------------------------
-#'          super$set_required_SFC(private$steps_for_creation)
-#'
-#'          # optional, can be omitted if do not needed
-#'          super$set_SFC_check_max_pos_emb(private$steps_for_creation$check_max_pos_emb)
-#'
-#'          # (6) -----------------------------------------
-#'          super$create(
-#'            ml_framework = ml_framework,
-#'            model_dir = model_dir,
-#'            vocab_raw_texts = vocab_raw_texts,
-#'            vocab_size = vocab_size,
-#'            # ...
-#'            trace = trace,
-#'            pytorch_safetensors = pytorch_safetensors)
-#'        }
-#'      )
-#'   )
-#'   ```
-#'
-#'   6 Define `train` method **(1)** similarly to the step 5. Implement steps (functions) in the private
-#'   `steps_for_training` list **(2)**. Do not forget to pass `self` as input parameter of the required function. Set the dependent parameters **(4)** in the base class using
-#'   `super$set_model_param()` method **(5)**. Set the implemented steps for training in the base class using
-#'   `super$set_SFT_*()` methods **(6)**. Finally run the basic `train` algorithm **(7)** of the base class with all the
-#'   (input) parameters **(3)**.
-#'
-#'   ```r
-#'   .AIFECustomTransformer <- R6::R6Class(
-#'      classname = ".AIFECustomTransformer",
-#'      inherit = .AIFEBaseTransformer,
-#'      private = list(
-#'        title = "Custom Model",
-#'        steps_for_creation = list(
-#'          # required
-#'          create_tokenizer_draft = function(self) { },
-#'          calculate_vocab = function(self) { },
-#'          save_tokenizer_draft = function(self) { },
-#'          create_final_tokenizer = function(self) { },
-#'          create_transformer_model = function(self) { },
-#'          # optional: omit this element if do not needed
-#'          check_max_pos_emb = function(self) { }
-#'        ),
-#'        # (2)
-#'        steps_for_training = list(
-#'          # required
-#'          load_existing_model = function(self) { },
-#'          # optional
-#'          cuda_empty_cache = function() { }
-#'        )
-#'      ),
-#'      public = list(
-#'        initialize = function() { },
-#'        create = function( ) {
-#'          # ---------------------------
-#'          # super$set_model_param(...)
-#'          # ...
-#'          # ---------------------------
-#'          # super$set_required_SFC(...)
-#'          # super$set_SFC_*(...)
-#'          # ...
-#'          # ---------------------------
-#'          # super$create(...)
-#'        },
-#'
-#'        # (1)
-#'        train = function(# (3) --------
-#'                         ml_framework,
-#'                         # ...
-#'
-#'                         # (4) --------
-#'                         dep_param1,
-#'                         # ...
-#'                         dep_paramN) {
-#'          # (5) -----------------------------------------
-#'          super$set_model_param("dep_param1", dep_param1)
-#'          # ...
-#'          super$set_model_param("dep_paramN", dep_paramN)
-#'
-#'          # (6) -----------------------------------------
-#'          super$set_SFT_load_existing_model(private$steps_for_creation$load_existing_model)
-#'          # optional
-#'          super$set_SFT_cuda_empty_cache(private$steps_for_creation$cuda_empty_cache)
-#'
-#'          # (7) -----------------------------------------
-#'          super$train(
-#'            ml_framework = ml_framework,
-#'            # ...
-#'          )
-#'        }
-#'      )
-#'   )
-#'   ```
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -402,7 +71,7 @@
       prepare_train_tune = NULL,
       start_training = NULL,
       save_model = NULL,
-      # required, already defined steps. Can be overwritten for custom version
+      # required, already defined steps. Can be overwritten with a custom version
       create_data_collator = NULL
     ),
 
@@ -819,9 +488,6 @@
     #'   * `add_prefix_space`
     #'   * etc.
     #'
-    #'   ![](transformer_params_list.png)
-    #'
-    #'   Figure 1: Possible parameters in the params list
     params = list(),
 
     #' @field temp A list containing temporary transformer's parameters
@@ -832,10 +498,7 @@
     #'   For example, it can be a variable `tok_new` that stores the tokenizer from
     #'   `steps_for_creation$create_tokenizer_draft`. To train the tokenizer, access the variable `tok_new` in
     #'   `steps_for_creation$calculate_vocab` through the `temp` list of this class.
-    #'
-    #'   ![](transformer_temp_list.png)
-    #'
-    #'   Figure 2: Possible parameters in the temp list
+    #
     temp = list(),
 
     # == Methods =======================================================================================================
