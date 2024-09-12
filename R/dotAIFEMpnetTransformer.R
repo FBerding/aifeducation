@@ -346,3 +346,5 @@
     }
   )
 )
+
+.AIFETrObj[[AIFETrType$mpnet]] <- .AIFEMpnetTransformer$new

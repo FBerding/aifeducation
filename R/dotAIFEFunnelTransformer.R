@@ -318,3 +318,5 @@
     }
   )
 )
+
+.AIFETrObj[[AIFETrType$funnel]] <- .AIFEFunnelTransformer$new

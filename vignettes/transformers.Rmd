@@ -554,7 +554,7 @@ bert_transformer$train(...)                    # (3)
 
 ## 3.1 Overview
 
-See [Transformer Maker Class for Developers](https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html) for details.
+See [Transformer Maker Class](https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html) for details.
 
 Transformer Maker Class has a `make`-method to create a Transformer object.
 
@@ -632,9 +632,9 @@ transformer$train(ml_framework = ml_framework,
 See [DeBERTa-v2 Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEDebertaTransformer.html) for details.
 
 ```{r, eval = FALSE}
-transformer <- aife_transformer_maker$make(AIFETrType$deberta)
+transformer <- aife_transformer_maker$make(AIFETrType$deberta_v2)
 # or
-# transformer <- aife_transformer_maker$make("deberta")
+# transformer <- aife_transformer_maker$make("deberta_v2")
 ```
 
 #### Create
@@ -1207,45 +1207,27 @@ To implement a new transformer, do the following steps:
       )
     )
     ```
-
-## 4.3 Using A New Transformer
-
-Now use the transformer (created in p. 4.2) like in the code example 
-from p. 2.1.
-
-To implement the transformer in [AIFETransformerMaker](https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html), add the type
-of the transformer to the [AIFETrType](https://fberding.github.io/aifeducation/reference/AIFETrType.html) and a case into `make`-method:
-
-```{r, eval = FALSE}
-AIFETrType <- list(
-  bert = "bert",
-  roberta = # ...
-  # ...
-  custom = "custom"                              # (1) new type
-)
-
-# make-method in the TransformerMaker class
-make = function(type) {
-  transformer <- NULL
-  if (type == AIFETrType$bert) {
-    # ...
-  } else if (type == AIFETrType$deberta_v2) {
-    # ...
-  }
-  # ...
-  # implemented transformer cases
-  # ...
-   else if (type == AIFETrType$custom) {         # (2) New custom case
-    transformer <- .AIFECustomTransformer$new()
-  } else {
-    # ...
-    # stop(...)
-  }
-  return(transformer)
-}
-```
-
-[AIFETrType](https://fberding.github.io/aifeducation/reference/AIFETrType.html) list and [AIFETransformerMaker](https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html) class is located in 
-"R/AIFETransformerMaker.R" file.
-
-Use the Transformer Maker class to create a custom transformer like in p. 3.2.
+    
+    > Now use the transformer (created in p. 4.2) like in the code example from p. 2.1.
+    
+7.  In the file "R/AIFETransformerMaker.R" find the definition of the `AIFETrType` list
+    and add a new element to the end of it **(1)**:
+    
+    ```{r, eval = FALSE}
+    AIFETrType <- list(
+      bert = "bert",
+      roberta = "roberta",
+      # ...
+      mpnet = "mpnet",
+      custom = "custom"   # (1)
+    )
+    ```
+    
+    In the end of the file "R/dotAIFECustomTransformer.R" put the following line to use
+    this transformer with Transformer Maker:
+    
+    ```{r, eval = FALSE}
+    .AIFETrObj[[AIFETrType$custom]] <- .AIFECustomTransformer$new
+    ```
+    
+    > Now use the Transformer Maker class to create a custom transformer like in p. 3.2.

@@ -91,3 +91,5 @@
     }
   )
 )
+
+# .AIFETrObj[[AIFETrType$custom]] <- .AIFECustomTransformer$new

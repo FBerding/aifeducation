@@ -305,3 +305,5 @@
     }
   )
 )
+
+.AIFETrObj[[AIFETrType$deberta_v2]] <- .AIFEDebertaTransformer$new

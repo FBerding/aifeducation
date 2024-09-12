@@ -18,6 +18,16 @@ AIFETrType <- list(
   mpnet = "mpnet"
 )
 
+#' @title Transformer objects
+#' @description This list contains transformer objects. Elements of the list are used in the public `make` of the
+#'   [AIFETransformerMaker] `R6` class. This list is not designed to be used directly.
+#'
+#'   It has the following elements: `r get_allowed_transformer_types()`
+#'
+#' @family Transformers for developers
+#' @keywords internal
+.AIFETrObj <- list()
+
 #' @title `R6` class for transformer creation
 #' @description This class was developed to make the creation of transformers easier for users. Pass the transformer's
 #'   type to the `make` method and get desired transformer. Now run the `create` or/and `train` methods of the new
@@ -61,18 +71,8 @@ AIFETransformerMaker <- R6::R6Class(
     #' @return If success - a new transformer, otherwise - an error (passed type is invalid).
     make = function(type) {
       transformer <- NULL
-      if (type == AIFETrType$bert) {
-        transformer <- .AIFEBertTransformer$new()
-      } else if (type == AIFETrType$deberta_v2) {
-        transformer <- .AIFEDebertaTransformer$new()
-      } else if (type == AIFETrType$funnel) {
-        transformer <- .AIFEFunnelTransformer$new()
-      } else if (type == AIFETrType$longformer) {
-        transformer <- .AIFELongformerTransformer$new()
-      } else if (type == AIFETrType$roberta) {
-        transformer <- .AIFERobertaTransformer$new()
-      } else if (type == AIFETrType$mpnet) {
-        transformer <- .AIFEMpnetTransformer$new()
+      if (type %in% names(.AIFETrObj)) {
+        transformer <- .AIFETrObj[[type]]()
       } else {
         stop(
           paste0(

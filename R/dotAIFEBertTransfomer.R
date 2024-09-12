@@ -299,3 +299,5 @@
     }
   )
 )
+
+.AIFETrObj[[AIFETrType$bert]] <- .AIFEBertTransformer$new

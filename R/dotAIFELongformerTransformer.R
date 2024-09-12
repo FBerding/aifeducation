@@ -313,3 +313,5 @@
     }
   )
 )
+
+.AIFETrObj[[AIFETrType$longformer]] <- .AIFELongformerTransformer$new

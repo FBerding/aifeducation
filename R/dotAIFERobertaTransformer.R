@@ -313,3 +313,5 @@
     }
   )
 )
+
+.AIFETrObj[[AIFETrType$roberta]] <- .AIFERobertaTransformer$new

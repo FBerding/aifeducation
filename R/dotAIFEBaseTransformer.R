@@ -8,13 +8,14 @@
 #'   [Transformers for Developers](https://fberding.github.io/aifeducation/articles/transformers.html) for details.
 #'
 #' @section Create: The `create`-method is a basic algorithm that is used to create a new transformer, but cannot be
-#'   called directly. It has some required and optional steps stored in a private `steps_for_creation` list.
+#'   called directly.
 #'
 #' @section Train: The `train`-method is a basic algorithm that is used to train and tune the transformer but cannot be
-#'   called directly. It has some required and optional steps stored in a private `steps_for_training` list.
+#'   called directly.
 #'
 #' @section Concrete transformer implementation: There are already implemented concrete (child) transformers (e.g.
-#'   `BERT`, `DeBERTa-V2`, etc.).
+#'   `BERT`, `DeBERTa-V2`, etc.), to implement a new one see p.4 Implement A Custom Transformer in
+#'   [Transformers for Developers](https://fberding.github.io/aifeducation/articles/transformers.html)
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -30,6 +31,7 @@
 #'   * [Funnel](https://huggingface.co/docs/transformers/model_doc/funnel)
 #'   * [Longformer](https://huggingface.co/docs/transformers/model_doc/longformer)
 #'   * [RoBERTa](https://huggingface.co/docs/transformers/model_doc/roberta)
+#'   * [MPNet](https://huggingface.co/docs/transformers/model_doc/mpnet)
 #'
 #' @family Transformers for developers
 #' @export
