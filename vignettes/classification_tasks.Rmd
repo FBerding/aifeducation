@@ -219,7 +219,13 @@ you have to structure your data in a specific way:
 - Add an additional .txt file to the folder named `bib_entry.txt`. This file contains
   bibliographic information for the raw text.
 - Add an additional .txt file to the folder named `license.txt` which contains 
-  a short statement for the license of the text such as "CC-BY".
+  a short statement for the license of the text such as "CC BY".
+- Add an additional .txt file to the folder named `url_license.txt` which contains 
+  the url/link to the license' text such as "https://creativecommons.org/licenses/by/4.0/".
+- Add an additional .txt file to the folder named `text_license.txt` which contains 
+  the full license in raw texts.
+- Add an additional .txt file to the folder named `url_source.txt` which contains 
+  the url/link to the text file in the internet.
   
 Applying these rules may result in a data structure as follows:
 
@@ -228,14 +234,23 @@ Applying these rules may result in a data structure as follows:
     - text_a.txt
     - bib_entry.txt
     - license.txt
+    - url_license.txt
+    - text_license.txt
+    - url_source.txt
   - Folder Text B
     - text_b.txt
     - bib_entry.txt
     - license.txt
+    - url_license.txt
+    - text_license.txt
+    - url_source.txt
   - Folder Text C
     - text_C.txt
     - bib_entry.txt
     - license.txt
+    - url_license.txt
+    - text_license.txt
+    - url_source.txt
 
 Now you can call the method `add_from_files_txt` by passing the path to the
 directory of the main folder to `dir_path`.
@@ -246,11 +261,16 @@ raw_texts$add_from_files_txt(
 ```
 The data set will now read all the raw texts in the main folder an will assign
 every text the corresponding bib entry and license. Please note, that adding
-a `bib_entry.txt` and `license.txt` to every folder is optional. If there is no 
+a `bib_entry.txt`, `license.txt`, `url_license.txt`, `text_license.txt`, and `url_soruce.text` 
+to every folder is optional. If there is no 
 such a file in the corresponding folder there will be an empty entry in the data set.
 However, against the backdrop of the European AI Act we recommend to provide
 license  and bibliographic information to make the documentation of your models
-more straightforward.
+more straightforward. Furthermore, some license such as the licenses provides by
+Creative Commons require statements about the creators, a copyright notice, an url or link
+to the source material (if possible), the license of the material and an url or link
+to the license's text in the internet or the license text itself. Please check the licenses 
+of the material your are using for the requirements. 
 
 **.pdf files**
 
@@ -263,7 +283,13 @@ necessary structure is similar to .txt files:
 - Add an additional .txt file to the folder named `bib_entry.txt`. This file contains
   bibliographic information for the raw text.
 - Add an additional .txt file to the folder named `license.txt` which contains 
-  a short statement for the license of the text such as "CC-BY".
+  a short statement for the license of the text such as "CC BY".
+- Add an additional .txt file to the folder named `url_license.txt` which contains 
+  the url/link to the license' text such as "https://creativecommons.org/licenses/by/4.0/".
+- Add an additional .txt file to the folder named `text_license.txt` which contains 
+  the full license in raw texts.
+- Add an additional .txt file to the folder named `url_source.txt` which contains 
+  the url/link to the text file in the internet.
 
 Applying these rules may result in a data structure as follows:
 
@@ -272,17 +298,25 @@ Applying these rules may result in a data structure as follows:
     - text_a.pdf
     - bib_entry.txt
     - license.txt
+    - url_license.txt
+    - text_license.txt
+    - url_source.txt
   - Folder Text B
     - text_b.pdf
     - bib_entry.txt
     - license.txt
+    - url_license.txt
+    - text_license.txt
+    - url_source.txt
   - Folder Text C
     - text_C.pdf
     - bib_entry.txt
     - license.txt
+    - url_license.txt
+    - text_license.txt
+    - url_source.txt
     
-Please not that the file for the bib_entry and the license must be a .txt file 
-not a .pdf file.
+Please not that all files except the text file must be .txt, not .pdf.
 
 Now you can call the method `add_from_files_pdf` by passing the path to the
 directory of the main folder to `dir_path`.
@@ -292,7 +326,7 @@ raw_texts$add_from_files_pdf(
 )
 ```
 
-As stated above ``bib_entry.txt` and `license.txt` are optional.
+As stated above `bib_entry.txt`, `license.txt`, `url_license.txt`, `text_license.txt`, and `url_soruce.text` are optional.
 
 **.xlsx files**
 
@@ -311,14 +345,17 @@ In order to add raw texts from .xlsx files the files need a special structure:
   .xlsx files.
 - Every .xslx file can contain an additional column for the bib entry.
 - Every .xslx file can contain an additional column for the license.
+- Every .xslx file can contain an additional column for the license's url.
+- Every .xslx file can contain an additional column for the license's text.
+- Every .xslx file can contain an additional column for the source's url.
 
 Your .xlsx file may look like
 
-|id |text|bib|license|
-|---|---|---|---|
-|z3   |This is an example.   |Autor (2019)   |CC BY   |
-|a3   |This is a second example.   |Author (2022)   |CC BY   |
-|...   |...   |...   |...   | 
+|id |text|bib|license|url_license|text_license|url_source|
+|---|---|---|---|---|---|---|
+|z3   |This is an example.   |Author (2019)   |CC BY   |Example url  |Text | Example url|
+|a3   |This is a second example.   |Author (2022)   |CC BY   |Example url| Text | Example url|
+|...   |...   |...   |...   |   | | |
 
 Now you can call the method `add_from_files_xlsx` by passing the path to the
 directory of the main folder to `dir_path`. Please do not forget to specify the 
@@ -329,7 +366,10 @@ raw_texts$add_from_files_xlsx(
   id_column = "id",
   text_column = "text",
   bib_entry_column = "bib_entry",
-  license_column = "license"
+  license_column = "license",
+  url_license_column = "url_license",
+  text_license_column = "text_license",
+  url_source_column = "url_source"
 )
 ```
 

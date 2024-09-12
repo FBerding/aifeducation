@@ -81,7 +81,6 @@ The most straightforward method for getting started is to call the function
 ```{r, include = TRUE, eval=FALSE}
 install_aifeducation(
   install_aifeducation_studio = TRUE,
-  install_bag_of_words = FALSE,
   cpu_only = FALSE
 )
 ```
@@ -95,10 +94,6 @@ install the optional *R* packages necessary to use *AI for Education - Studio*.
 We recommend to use it for all persons who are unfamiliar with *R* or machine learning.
 If you do not want use studio you can set the argument to `FALSE`. In this case
 you have to use the package with *R* syntax.
-
-For the case you would like to use older approaches you can set `install_bag_of_words=TRUE`.
-With this option enabled *R* packages are installed allowing you to use a bag-of-word approach
-to transform texts into text embeddings (GlobalVectors, Topic Modeling).
 
 If you have a suitable machine and would like to use a graphic card for computations you need to install
 some further software. You can find further

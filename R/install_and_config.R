@@ -5,8 +5,6 @@
 #'
 #' @param install_aifeducation_studio `bool` If `TRUE` all necessary R packages are
 #' installed for using AI for Education - Studio.
-#' @param install_bag_of_words `bool` If `TRUE` all necessary R packages for using
-#' implemented bag-of-words approaches are installed.
 #' @param cpu_only \code{bool} \code{TRUE} installs the cpu only version of the
 #'machine learning frameworks.
 #'
@@ -20,7 +18,6 @@
 #'
 #' @export
 install_aifeducation=function(install_aifeducation_studio=TRUE,
-                              install_bag_of_words=FALSE,
                               cpu_only=FALSE){
 
   reticulate::install_python()
@@ -48,16 +45,6 @@ install_aifeducation=function(install_aifeducation_studio=TRUE,
         "readtext",
         "readxl"
       )
-  }
-
-  if(install_bag_of_words==TRUE){
-    install.packages(
-      "quanteda",
-      "udpipe",
-      "topicmodels",
-      "text2vec",
-      "tidytext"
-    )
   }
 }
 
