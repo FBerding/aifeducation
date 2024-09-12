@@ -42,14 +42,8 @@ check.hidden_act <- function(hidden_act) { # nolint
 #' @keywords internal
 #' @noRd
 check.ml_framework <- function(ml_framework) { # nolint
-  if ((ml_framework %in% c("pytorch", "tensorflow", "not_specified")) == FALSE) {
+  if ((ml_framework %in% c("pytorch", "tensorflow")) == FALSE) {
     stop("ml_framework must be 'tensorflow' or 'pytorch'.")
-  }
-
-  if (ml_framework == "not_specified") {
-    stop("The global machine learning framework is not set. Please use
-         aifeducation_config$set_global_ml_backend() directly after loading
-         the library to set the global framework. ")
   }
 }
 

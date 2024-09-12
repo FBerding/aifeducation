@@ -201,7 +201,7 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'@param optimizer Object of class \code{keras.optimizers}.
     #'@return Returns an object of class \link{TextEmbeddingClassifierNeuralNet} which is ready for
     #'training.
-    initialize=function(ml_framework=aifeducation_config$get_framework(),
+    initialize=function(ml_framework="pytorch",
                         name=NULL,
                         label=NULL,
                         text_embeddings=NULL,
@@ -2157,14 +2157,8 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
 
       # Set the correct ml framework
 
-      if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
+      if((ml_framework %in%c("pytorch","tensorflow","auto"))==FALSE){
         stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
-      }
-
-      if(ml_framework=="not_specified"){
-        stop("The global machine learning framework is not set. Please use
-             aifeducation_config$set_global_ml_backend() directly after loading
-             the library to set the global framework. ")
       }
 
       if(ml_framework!="auto"){

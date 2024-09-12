@@ -15,16 +15,10 @@
 #'@importFrom utils compareVersion
 #'
 #'@export
-load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework()){
+load_ai_model<-function(model_dir,ml_framework="pytorch"){
 
-  if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
+  if((ml_framework %in%c("pytorch","tensorflow","auto"))==FALSE){
     stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
-  }
-
-  if(ml_framework=="not_specified"){
-    stop("The global machine learning framework is not set. Please use
-             aifeducation_config$set_global_ml_backend() directly after loading
-             the library to set the global framework. ")
   }
 
   #Load the Interface to R

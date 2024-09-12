@@ -168,7 +168,7 @@
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
-    create = function(ml_framework = aifeducation_config$get_framework()[1],
+    create = function(ml_framework = "pytorch",
                       model_dir,
                       vocab_raw_texts = NULL,
                       vocab_size = 30522,
@@ -243,7 +243,7 @@
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
-    train = function(ml_framework = aifeducation_config$get_framework()[1],
+    train = function(ml_framework = "pytorch",
                      output_dir,
                      model_dir_path,
                      raw_texts,

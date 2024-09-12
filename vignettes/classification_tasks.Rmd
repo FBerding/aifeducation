@@ -474,7 +474,7 @@ with the function `create_bert_model`.
 
 ```{r, include = TRUE, eval=FALSE}
 create_bert_model(
-  ml_framework = aifeducation_config$get_framework(),
+  ml_framework = "pytorch",
   model_dir = "my_own_transformer",
   vocab_raw_texts = example_data$text,
   vocab_size = 30522,
@@ -550,7 +550,7 @@ of a BERT model this is `train_tune_bert_model()`.
 
 ```{r, include = TRUE, eval=FALSE}
 train_tune_bert_model(
-  ml_framework = aifeducation_config$get_framework(),
+  ml_framework = "pytorch",
   output_dir = "my_own_transformer_trained",
   model_dir_path = "my_own_transformer",
   raw_texts = example_data$text,

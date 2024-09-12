@@ -5,11 +5,6 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-# TODO (Yuliia): Alternative to aifeducation_config
-# if (!aifeducation_config$global_framework_set()) {
-#   aifeducation_config$set_global_ml_backend("tensorflow")
-# }
-
 set_config_gpu_low_memory()
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")

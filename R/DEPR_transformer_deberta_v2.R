@@ -31,7 +31,7 @@
 #' @family Deprecated transformer
 #' @export
 create_deberta_v2_model <- function(
-    ml_framework = aifeducation_config$get_framework()[1],
+    ml_framework = "pytorch",
     model_dir,
     vocab_raw_texts = NULL,
     vocab_size = 128100,
@@ -110,7 +110,7 @@ create_deberta_v2_model <- function(
 #' @family Deprecated transformer
 #' @export
 train_tune_deberta_v2_model <- function(
-    ml_framework = aifeducation_config$get_framework()[1],
+    ml_framework = "pytorch",
     output_dir,
     model_dir_path,
     raw_texts,
