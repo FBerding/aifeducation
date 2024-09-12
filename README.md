@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# aifeducation
+# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" align="right" height="120" alt="aifeducation website" /></a>
 
 <!-- badges: start -->
 
