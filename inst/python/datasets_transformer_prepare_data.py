@@ -54,22 +54,18 @@ def tokenize_raw_text(
             special_tokens_mask_batch.append(special_tokens_mask)
         length_batch.append(length)
         
-        if request_word_ids==True:
+        results = { "input_ids": input_batch,
+                    "attention_mask": attention_masks_batch,
+                    "special_tokens_mask": special_tokens_mask_batch,
+                    "labels": input_batch.copy(),
+                    "length": length_batch }
+                        
+        if request_word_ids == True:
             word_ids_batch=[]
             for i in range(len(outputs["input_ids"])):
                 word_ids_batch.append(outputs.word_ids(i)) 
-            results = { "input_ids": input_batch,
-                        "attention_mask": attention_masks_batch,
-                        "special_tokens_mask": special_tokens_mask_batch,
-                        "word_ids": word_ids_batch,
-                        "labels": input_batch.copy(),
-                        "length": length_batch }
-        else:
-            results = { "input_ids": input_batch,
-                        "attention_mask": attention_masks_batch,
-                        "special_tokens_mask": special_tokens_mask_batch,
-                        "labels": input_batch.copy(),
-                        "length": length_batch }
+            results["word_ids"] = word_ids_batch
+            
     
     if report_to_aifeducation_studio == True:
         report_time = datetime.datetime.now()
