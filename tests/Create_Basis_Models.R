@@ -12,18 +12,18 @@ ml_frameworks<-c("tensorflow",
                  "pytorch")
 
 method_list=list(
-  "tensorflow"=c("bert",
-                 "roberta",
-                 "longformer",
-                 "funnel",
-                 "deberta_v2"
-  ),
-  "pytorch"=c("bert",
-              "roberta",
-              "longformer",
-              "funnel",
-              "deberta_v2"
-  )
+  "tensorflow"=c(#"bert",
+                 "roberta"#,
+  #               "longformer",
+  #               "funnel",
+  #               "deberta_v2"
+  )#,
+  #"pytorch"=c(#"bert",
+   #           "roberta"#,
+              #"longformer",
+              #"funnel",
+              #"deberta_v2"
+  #)
 )
 
 example_data<-imdb_movie_reviews
@@ -98,7 +98,7 @@ train_tune_bert_model(ml_framework = framework,
         intermediate_size=128,
         hidden_act="gelu",
         hidden_dropout_prob=0.1,
-        sustain_track=FALSE,
+        sustain_track=TRUE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,

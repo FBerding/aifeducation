@@ -1,7 +1,7 @@
 Type: Package
 Package: aifeducation
 Title: Artificial Intelligence for Education
-Version: 0.3.4
+Version: 1.0.0
 Authors@R: c(
     person("Berding", "Florian", , "florian.berding@uni-hamburg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3593-1695")),
@@ -63,7 +63,6 @@ Suggests:
     fs,
     ggplot2,
     knitr,
-    quanteda,
     readtext,
     readxl,
     rmarkdown,
@@ -73,11 +72,7 @@ Suggests:
     shinyjs,
     shinyWidgets,
     sortable,
-    testthat (>= 3.0.0),
-    text2vec,
-    tidytext,
-    topicmodels,
-    udpipe
+    testthat (>= 3.0.0)
 LinkingTo: 
     Rcpp,
     RcppArmadillo

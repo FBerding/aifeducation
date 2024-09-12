@@ -32,6 +32,9 @@ empty_vector[]=NA
 example_data_for_large$citation=empty_vector
 example_data_for_large$bib_entry=empty_vector
 example_data_for_large$license=empty_vector
+example_data_for_large$url_license=empty_vector
+example_data_for_large$text_license=empty_vector
+example_data_for_large$url_source=empty_vector
 
 example_data_large=LargeDataSetForText$new()
 example_data_large$add_from_data.frame(example_data_for_large)
@@ -91,7 +94,6 @@ for(framework in ml_frameworks){
           text_embedding_model$configure(
             model_name=paste0(base_model,"_embedding"),
             model_label=paste0("Text Embedding via",base_model),
-            model_version="0.0.1",
             model_language="english",
             method = base_model,
             ml_framework=framework,
@@ -333,7 +335,6 @@ for(framework in ml_frameworks){
                        embeddings_2$embeddings[i,,,drop=FALSE],
                        tolerance = 1e-6)
 
-
           #Check loaded history
           expect_s3_class(text_embedding_model_reloaded,
                           class="TextEmbeddingModel")
@@ -346,6 +347,7 @@ for(framework in ml_frameworks){
 
           #Check loaded sustainability data
           sustain_data<-text_embedding_model_reloaded$get_sustainability_data()
+
           #One row for creation and one row for training
           expect_equal(nrow(sustain_data),2)
         })
@@ -464,7 +466,6 @@ for(framework in ml_frameworks){
         test_that(paste(framework,base_model,pooling_type,max_layer,min_layer,"get_components"), {
           expect_no_error(text_embedding_model$get_transformer_components())
           expect_no_error(text_embedding_model$get_basic_components())
-          expect_no_error(text_embedding_model$get_bow_components())
         })
 
 
