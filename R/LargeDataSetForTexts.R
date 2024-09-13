@@ -11,11 +11,14 @@ LargeDataSetForText <- R6::R6Class(
   public = list(
     #--------------------------------------------------------------------------
     #' @description Method for adding raw texts saved within .txt files to the data set. Please note the the directory
-    #'   should contain one folder for each .txt file. In order to create an informative data set every folder should
+    #'   should contain one folder for each .txt file. In order to create an informative data set every folder can
     #'   contain the following additional files:
     #'
-    #'   * bib_entry.txt: containing a text version of the bibliographic information of the raw text.
-    #'   * license.txt: containing a statement about the license to use the raw text such as CC BY.
+    #' * bib_entry.txt: containing a text version of the bibliographic information of the raw text.
+    #' * license.txt: containing a statement about the license to use the raw text such as "CC BY".
+    #' * url_license.txt: containing the url/link to the license in the internet.
+    #' * text_license.txt: containing the license in raw text.
+    #' * url_source.txt: containing the url/link to the source in the internet.
     #'
     #'   The id of every .txt file is the file name without file extension. Please be aware to provide unique file
     #'   names. Id and raw texts are mandatory, bibliographic and license information are optional.
@@ -93,11 +96,16 @@ LargeDataSetForText <- R6::R6Class(
 
     #--------------------------------------------------------------------------
     #' @description Method for adding raw texts saved within .pdf files to the data set. Please note the the directory
-    #'   should contain one folder for each .pdf file. In order to create an informative data set every folder should
+    #'   should contain one folder for each .pdf file. In order to create an informative data set every folder can
     #'   contain the following additional files:
     #'
-    #'   * bib_entry.txt: containing a text version of the bibliographic information of the raw text.
-    #'   * license.txt: containing a statement about the license to use the raw text such as CC BY.
+    #' * bib_entry.txt: containing a text version of the bibliographic information
+    #'   of the raw text.
+    #' * license.txt: containing a statement about the license to use the raw text
+    #'   such as "CC BY".
+    #' * url_license.txt: containing the url/link to the license in the internet.
+    #' * text_license.txt: containing the license in raw text.
+    #' * url_source.txt: containing the url/link to the source in the internet.
     #'
     #'   The id of every .pdf file is the file name without file extension. Please be aware to provide unique file
     #'   names. Id and raw texts are mandatory, bibliographic and license information are optional.
@@ -177,13 +185,18 @@ LargeDataSetForText <- R6::R6Class(
     #'   texts are saved in the rows and that the columns store the id and the raw texts in the columns. In addition, a
     #'   column for the bibliography information and the license can be added. The column names for these rows must be
     #'   specified with the following arguments. They must be the same for all .xlsx files in the chosen directory. Id
-    #'   and raw texts are mandatory, bibliographic and license information are optional. Additional columns are
-    #'   dropped.
+    #'   and raw texts are mandatory, bibliographic, license, license's url, license's text, and source's url are
+    #'   optional. Additional columns are dropped.
     #' @param dir_path Path to the directory where the files are stored.
     #' @param id_column `string` Name of the column storing the ids for the texts.
     #' @param text_column `string` Name of the column storing the raw text.
     #' @param bib_entry_column `string` Name of the column storing the bibliographic information of the texts.
     #' @param license_column `string` Name of the column storing information about the licenses.
+    #' @param url_license_column `string` Name of the column storing information about the url to the license in the
+    #'   internet.
+    #' @param text_license_column `string` Name of the column storing the license as text.
+    #' @param url_source_column `string` Name of the column storing information about about the url to the source in the
+    #'   internet.
     #' @param trace `bool` If `TRUE` prints information on the progress to the console.
     #' @param log_top_value `int` indicating the current iteration of the process.
     #' @param log_top_total `int` determining the maximal number of iterations.
@@ -199,6 +212,9 @@ LargeDataSetForText <- R6::R6Class(
                                    text_column = "text",
                                    bib_entry_column = "bib_entry",
                                    license_column = "license",
+                                   url_license_column = "url_license",
+                                   text_license_column = "text_license",
+                                   url_source_column = "url_source",
                                    log_file = NULL,
                                    log_write_interval = 2,
                                    log_top_value = 0,
@@ -209,6 +225,9 @@ LargeDataSetForText <- R6::R6Class(
       check_type(text_column, "string", FALSE)
       check_type(bib_entry_column, "string", TRUE)
       check_type(license_column, "string", TRUE)
+      check_type(url_license_column, "string", TRUE)
+      check_type(text_license_column, "string", TRUE)
+      check_type(url_source_column, "string", TRUE)
       check_type(trace, "bool", FALSE)
       check_type(dir_path, "string", FALSE)
 
@@ -259,8 +278,46 @@ LargeDataSetForText <- R6::R6Class(
           colnames(chunk)[index] <- "license"
         }
 
+        # URL License column
+        index <- which(colnames(chunk) %in% url_license_column)
+        if (length(index) == 0) {
+          url_license <- vector(length = nrow(chunk))
+          url_license[] <- NA
+          chunk$url_license <- url_license
+        } else {
+          colnames(chunk)[index] <- "url_license"
+        }
+
+        # Text License column
+        index <- which(colnames(chunk) %in% text_license_column)
+        if (length(index) == 0) {
+          text_license <- vector(length = nrow(chunk))
+          text_license[] <- NA
+          chunk$text_license <- text_license
+        } else {
+          colnames(chunk)[index] <- "text_license"
+        }
+
+        # URL source column
+        index <- which(colnames(chunk) %in% url_source_column)
+        if (length(index) == 0) {
+          url_source <- vector(length = nrow(chunk))
+          url_source[] <- NA
+          chunk$url_source <- url_source
+        } else {
+          colnames(chunk)[index] <- "url_source"
+        }
+
         # Select only the necessary columns
-        chunk <- chunk[c("id", "text", "bib_entry", "license")]
+        chunk <- chunk[c(
+          "id",
+          "text",
+          "bib_entry",
+          "license",
+          "url_license",
+          "text_license",
+          "url_source"
+        )]
 
         chunk_dataset <- data.frame_to_py_dataset(chunk)
         list_datasets[i] <- list(chunk_dataset)
@@ -295,8 +352,9 @@ LargeDataSetForText <- R6::R6Class(
 
     #--------------------------------------------------------------------------
     #' @description Method for adding raw texts from a `data.frame`
-    #' @param data_frame Object of class `data.frame` with at least the following columns "id","text","bib_entry", and
-    #'   "license". If a column is missing an error occurs. Additional columns are dropped.
+    #' @param data_frame Object of class `data.frame` with at least the following columns "id","text","bib_entry",
+    #'   "license", "url_license", "text_license", and "url_source". If a column is missing an error occurs. Additional
+    #'   columns are dropped.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_data.frame = function(data_frame) {
       if (is.data.frame(data_frame) == FALSE) {
@@ -314,9 +372,26 @@ LargeDataSetForText <- R6::R6Class(
       if ("license" %in% colnames(data_frame) == FALSE) {
         stop("data.frame must contain a column license.")
       }
+      if ("url_license" %in% colnames(data_frame) == FALSE) {
+        stop("data.frame must contain a column url_license")
+      }
+      if ("text_license" %in% colnames(data_frame) == FALSE) {
+        stop("data.frame must contain a column text_license")
+      }
+      if ("url_source" %in% colnames(data_frame) == FALSE) {
+        stop("data.frame must contain a column url_source")
+      }
 
       # Transform to a python dataset
-      new_dataset <- data.frame_to_py_dataset(data_frame[c("id", "text", "bib_entry", "license")])
+      new_dataset <- data.frame_to_py_dataset(data_frame[c(
+        "id",
+        "text",
+        "bib_entry",
+        "license",
+        "url_license",
+        "text_license",
+        "url_source"
+      )])
 
       # Add new dataset
       private$add(new_dataset)
@@ -354,19 +429,41 @@ LargeDataSetForText <- R6::R6Class(
         licence_path <- paste0(
           dirname(path), "/license.txt"
         )
-        if (path != bib_entry_path && path != licence_path) {
+        license_text_path <- paste0(
+          dirname(path), "/text_license.txt"
+        )
+        url_licence_path <- paste0(
+          dirname(path), "/url_license.txt"
+        )
+        url_source_path <- paste0(
+          dirname(path), "/url_source.txt"
+        )
+        if (path != bib_entry_path &
+          path != licence_path &
+          path != license_text_path &
+          path != url_licence_path &
+          path != url_source_path) {
           new_paths[i] <- path
         }
       }
       return(na.omit(new_paths))
     },
     get_batch = function(batch, file_paths, clean_text = TRUE) {
+      col_names <- c(
+        "id",
+        "text",
+        "bib_entry",
+        "license",
+        "url_license",
+        "text_license",
+        "url_source"
+      )
       data <- matrix(
         data = NA,
         nrow = length(batch),
-        ncol = 4
+        ncol = length(col_names)
       )
-      colnames(data) <- c("id", "text", "bib_entry", "license")
+      colnames(data) <- col_names
 
       for (i in 1:length(batch)) {
         index <- batch[i]
@@ -384,19 +481,43 @@ LargeDataSetForText <- R6::R6Class(
         data[i, 2] <- text
 
         # Bib_entry
-        file_path <- paste0(dir(file_paths[index]), "/bib_entry.txt")
+        file_path <- paste0(dirname(file_paths[index]), "/bib_entry.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 3] <- read.csv(file = (file_path))
+          data[i, 3] <- readLines(con = file_path,warn=FALSE)
         } else {
           data[i, 3] <- NA
         }
 
         # License
-        file_path <- paste0(dir(file_paths[index]), "/license.txt")
+        file_path <- paste0(dirname(file_paths[index]), "/license.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 4] <- read.csv(file = (file_path))
+          data[i, 4] <- readLines(con = file_path,warn=FALSE)
         } else {
           data[i, 4] <- NA
+        }
+
+        # URL License
+        file_path <- paste0(dirname(file_paths[index]), "/url_license.txt")
+        if (file.exists(file_path) == TRUE) {
+          data[i, 5] <- readLines(con = file_path,warn=FALSE)
+        } else {
+          data[i, 5] <- NA
+        }
+
+        # Text License
+        file_path <- paste0(dirname(file_paths[index]), "/text_license.txt")
+        if (file.exists(file_path) == TRUE) {
+          data[i, 6] <- readLines(con = file_path,warn=FALSE)
+        } else {
+          data[i, 6] <- NA
+        }
+
+        # URL Source
+        file_path <- paste0(dirname(file_paths[index]), "/url_source.txt")
+        if (file.exists(file_path) == TRUE) {
+          data[i, 7] <- readLines(con = file_path,warn=FALSE)
+        } else {
+          data[i, 7] <- NA
         }
       }
       return(as.data.frame(data))

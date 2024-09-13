@@ -4,8 +4,6 @@
 #'
 #' @param install_aifeducation_studio `bool` If `TRUE` all necessary R packages are installed for using AI for Education
 #'   Studio.
-#' @param install_bag_of_words `bool` If `TRUE` all necessary R packages for using implemented bag-of-words approaches
-#'   are installed.
 #' @param cpu_only `bool` `TRUE` installs the cpu only version of the machine learning frameworks.
 #'
 #' @return Function does nothing return. It installes python, optional R packages, and necessary 'python' packages on a
@@ -17,9 +15,9 @@
 #' @family Installation and Configuration
 #'
 #' @export
-install_aifeducation <- function(install_aifeducation_studio = TRUE,
-                                 install_bag_of_words = FALSE,
-                                 cpu_only = FALSE) {
+install_aifeducation=function(install_aifeducation_studio = TRUE,
+                              cpu_only = FALSE){
+
   reticulate::install_python()
   reticulate::install_miniconda()
   install_py_modules(
@@ -46,16 +44,6 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
       "DT",
       "readtext",
       "readxl"
-    )
-  }
-
-  if (install_bag_of_words == TRUE) {
-    install.packages(
-      "quanteda",
-      "udpipe",
-      "topicmodels",
-      "text2vec",
-      "tidytext"
     )
   }
 }
@@ -338,7 +326,7 @@ set_config_os_environ_logger <- function(level = "ERROR") {
     level_int <- "3"
   }
 
-  os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+  os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL", level_int)
 }
 
 #' @title Sets the level for logging information of the 'transformers' library

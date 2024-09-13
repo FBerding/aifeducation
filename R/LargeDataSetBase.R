@@ -93,13 +93,46 @@ LargeDataSetBase <- R6::R6Class(
       # Save
       private$data$save_to_disk(dataset_path = save_location)
     },
-
     #--------------------------------------------------------------------------
-    #' @description loads a data set from disk.
+    #' @description loads an object of class [LargeDataSetBase] from disk 'and updates the object to the current version
+    #'   of the package.
+    #' @param dir_path Path where the data set set is stored.
+    #' @return Method does not return anything. It loads an object from disk.
+    load_from_disk = function(dir_path) {
+      self$load(dir_path)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Loads a data set from disk.
     #' @param dir_path Path where the data set is stored.
     #' @return Method does not return anything. It loads a data set from disk.
     load = function(dir_path) {
       private$data <- datasets$Dataset$load_from_disk(dataset_path = dir_path)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Return all fields.
+    #' @return Method returns a `list` containing all public and private fields of the object.
+    get_all_fields = function() {
+      public_list <- NULL
+      private_list <- NULL
+
+      for (entry in names(self)) {
+        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+          public_list[entry] <- list(self[[entry]])
+        }
+      }
+
+      for (entry in names(private)) {
+        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+          private_list[entry] <- list(private[[entry]])
+        }
+      }
+
+      return(
+        list(
+          public = public_list,
+          private = private_list
+        )
+      )
     }
   ),
   private = list(

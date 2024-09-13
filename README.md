@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# aifeducation
+# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" align="right" height="120" alt="aifeducation website" /></a>
 
 <!-- badges: start -->
 
@@ -264,18 +264,20 @@ you can find a detailed guide on how to document and share your models.
 
 ## Tutorial and Guides
 
-- Installation and configuration of the package: [01 Get
-  Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
-- Introduction graphical user interface *Aifeducation Studio*: [02 Using
-  the graphical user interface Aifeducation -
-  Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
-- A short introduction into using the package with *R* syntax with
-  examples for classification tasks: [03 Using R
-  syntax](classification_tasks.html).
-- Summary of some studies for finding a good configuration for a model:
-  [04 Model configuration](model_configuration.html)
-- A description for sharing models: [05 Sharing and Using Trained
-  AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
+- [01 Get
+  Started](https://fberding.github.io/aifeducation/articles/aifeducation.html):
+  Installation and configuration of the package.
+- [02 Using the graphical user interface Aifeducation -
+  Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html):
+  Introduction graphical user interface *Aifeducation Studio*.
+- [03 Using R syntax](classification_tasks.html): A short introduction
+  into using the package with *R* syntax with examples for
+  classification tasks.
+- [04 Model configuration](model_configuration.html): Summary of some
+  studies for finding a good configuration for a model.
+- [05 Sharing and Using Trained
+  AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):
+  A description for sharing models.
 
 ## References
 

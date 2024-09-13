@@ -46,8 +46,9 @@ save_to_disk <- function(object,
     dir.create(save_location)
   }
 
-  # Save R object
-  save(object, file = path_r_interface)
+  # Create config and save to disk
+  config_file <- create_config(object)
+  save(config_file, file = path_r_interface)
 
   # Save Python objects and additional files
   object$save(
@@ -68,19 +69,20 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
-  loaded_object <- load_R_interface(dir_path)
+  loaded_config <- load_R_interface(dir_path)
 
-  if (methods::is(loaded_object, "TEClassifierRegular") &
-    !methods::is(loaded_object, "TEClassifierProtoNet")) {
+  if (loaded_config$class == "TEClassifierRegular") {
     model <- TEClassifierRegular$new()
-  } else if (methods::is(loaded_object, "TEClassifierProtoNet")) {
+  } else if (loaded_config$class == "TEClassifierProtoNet") {
     model <- TEClassifierProtoNet$new()
-  } else if (methods::is(loaded_object, "TEFeatureExtractor")) {
+  } else if (loaded_config$class == "TEFeatureExtractor") {
     model <- TEFeatureExtractor$new()
-  } else if (methods::is(loaded_object, "TextEmbeddingModel")) {
+  } else if (loaded_config$class == "TextEmbeddingModel") {
     model <- TextEmbeddingModel$new()
-  } else if (methods::is(loaded_object, "LargeDataSetForTextEmbeddings")) {
+  } else if (loaded_config$class == "LargeDataSetForTextEmbeddings") {
     model <- LargeDataSetForTextEmbeddings$new()
+  } else if (loaded_config$class == "LargeDataSetForText") {
+    model <- LargeDataSetForText$new()
   } else {
     stop("Class type not supported.")
   }
@@ -104,4 +106,21 @@ load_R_interface <- function(dir_path) {
   name_interface <- load(interface_path)
   loaded_object <- get(x = name_interface)
   return(loaded_object)
+}
+
+#' Create config for R interfaces
+#'
+#' Function creates a config that can be saved to disk. It is used during loading
+#' an object from disk in order to set the correct configuration.
+#'
+#' @return Returns a `list` that contains the class of the object, the public, and
+#' private fields.
+#'
+#' @family Saving and Loading
+#'
+#' @export
+create_config <- function(object) {
+  config <- object$get_all_fields()
+  config["class"] <- class(object)[1]
+  return(config)
 }

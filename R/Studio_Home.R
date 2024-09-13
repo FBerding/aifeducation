@@ -24,6 +24,31 @@ Studio_Home_UI <- function(id) {
           )
         ),
         bslib::card(
+          bslib::card_header("License"),
+          bslib::card_body(
+            shiny::tags$p(
+              "aifeducation is free software: you can redistribute it and/or modify
+              it under the terms of the GNU General Public License version 3 as published by
+              the Free Software Foundation."
+            ),
+            shiny::tags$p(
+              "aifeducation is distributed in the hope that it will be useful,
+              but WITHOUT ANY WARRANTY; without even the implied warranty of
+              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+              GNU General Public License for more details."
+            ),
+            shiny::tags$p(
+              "You find a copy of this license by clicking on `License`
+            on the navbar at the top."
+            ),
+            shiny::tags$p(
+              "According to section 2 of GPL-3 output generated with
+                          aifeducation is not covered by this license. Please
+                          select an adequate license for output if necessary."
+            )
+          )
+        ),
+        bslib::card(
           bslib::card_header(
             "Support"
           ),

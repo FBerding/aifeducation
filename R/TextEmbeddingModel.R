@@ -47,20 +47,6 @@ TextEmbeddingModel <- R6::R6Class(
       overlap = NULL,
       ml_framework = NULL
     ),
-    bow_components = list(
-      model = NULL,
-      vocab = NULL,
-      configuration = list(
-        to_lower = NA,
-        use_lemmata = NA,
-        bow_n_dim = NA,
-        bow_n_cluster = NA,
-        bow_max_iter = NA,
-        bow_max_iter_cluster = NA,
-        bow_cr_criterion = NA,
-        bow_learning_rate = NA
-      )
-    ),
     model_info = list(
       model_license = NA,
       model_name_root = NA,
@@ -152,7 +138,8 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param model_label `string` containing the label/title of the new model.
     #' @param model_language `string` containing the language which the model represents (e.g., English).
     #' @param ml_framework `string` Framework to use for the model. `ml_framework="tensorflow"` for 'tensorflow' and
-    #'   `ml_framework="pytorch"` for 'pytorch'. Only relevant for transformer models.
+    #'   `ml_framework="pytorch"` for 'pytorch'. Only relevant for transformer models. To request bag-of-words model set
+    #'   `ml_framework=NULL`.
     #' @param method `string` determining the kind of embedding model. Currently the following models are supported:
     #'   `method="bert"` for Bidirectional Encoder Representations from Transformers (BERT), `method="roberta"` for A
     #'   Robustly Optimized BERT Pretraining Approach (RoBERTa), `method="longformer"` for Long-Document Transformer,
@@ -176,25 +163,12 @@ TextEmbeddingModel <- R6::R6Class(
     #'   `"cls"` only the embedding of the CLS token is used. If `"average"` the token embedding of all tokens are
     #'   averaged (excluding padding tokens). `"cls` is not supported for `method="funnel"`.
     #' @param model_dir `string` path to the directory where the BERT model is stored.
-    #' @param bow_basic_text_rep object of class `basic_text_rep` created via the function
-    #'   [bow_pp_create_basic_text_rep]. Only relevant for `method="glove_cluster"` and `method="lda"`.
-    #' @param bow_n_dim `int` Number of dimensions of the GlobalVector or number of topics for LDA.
-    #' @param bow_n_cluster `int` Number of clusters created on the basis of GlobalVectors. Parameter is not relevant
-    #'   for `method="lda"` and any transformer.
-    #' @param bow_max_iter `int` Maximum number of iterations for fitting GlobalVectors and Topic Models.
-    #' @param bow_max_iter_cluster `int` Maximum number of iterations for fitting cluster if `method="glove"`.
-    #' @param bow_cr_criterion `double` convergence criterion for GlobalVectors.
-    #' @param bow_learning_rate `double` initial learning rate for GlobalVectors.
     #' @param trace `bool` `TRUE` prints information about the progress. `FALSE` does not.
     #' @return Returns an object of class [TextEmbeddingModel].
     #' @details
     #'
     #' In the case of any transformer (e.g.`method="bert"`, `method="roberta"`, and `method="longformer"`), a pretrained
-    #' transformer model must be supplied via `model_dir`. For `method="glove"` and `method="lda"` a new model will be
-    #' created based on the data provided via `bow_basic_text_rep`.
-    #'
-    #' The original algorithm for GlobalVectors provides only word embeddings, not text embeddings. To achieve text
-    #' embeddings the words are clustered based on their word embeddings with kmeans.
+    #' transformer model must be supplied via `model_dir`.
     #'
     #' @import reticulate
     #' @import stats
@@ -210,54 +184,30 @@ TextEmbeddingModel <- R6::R6Class(
                          emb_layer_min = "middle",
                          emb_layer_max = "2_3_layer",
                          emb_pool_type = "average",
-                         model_dir,
-                         bow_basic_text_rep,
-                         bow_n_dim = 10,
-                         bow_n_cluster = 100,
-                         bow_max_iter = 500,
-                         bow_max_iter_cluster = 500,
-                         bow_cr_criterion = 1e-8,
-                         bow_learning_rate = 1e-8,
+                         model_dir = NULL,
                          trace = FALSE) {
       # Parameter check---------------------------------------------------------
       check_type(model_name, "string", FALSE)
       check_type(model_label, "string", FALSE)
       check_type(model_language, "string", FALSE)
       check_type(method, "string", FALSE)
-      if (method %in% c(private$supported_transformers, "lda", "glove_cluster") == FALSE) {
-        stop(paste0("Method must be", paste(private$supported_transformers, collapse = ", "), "lda or glove_cluster."))
+      if (method %in% c(private$supported_transformers) == FALSE) {
+        stop(paste0("Method must be", paste(private$supported_transformers, collapse = ", ")))
       }
       check_type(ml_framework, "string", TRUE)
-      if ((method %in% c("glove_cluster", "lda")) == FALSE) {
-        if ((ml_framework %in% c("tensorflow", "pytorch")) == FALSE) {
-          stop("ml_framework must be 'tensorflow' or 'pytorch'.")
-        }
+      if ((ml_framework %in% c("tensorflow", "pytorch")) == FALSE) {
+        stop("ml_framework must be 'tensorflow' or 'pytorch'.")
       }
-      if (ml_framework %in% c("pytorch", "tensorflow")) {
-        check_type(max_length, "int", FALSE)
-        check_type(chunks, "int", FALSE)
-        check_type(overlap, "int", FALSE)
-        # emb_layer_min
-        # emb_layer_max
-        # emb_pool_type
-        check_type(model_dir, "string", FALSE)
-        if (method == "funnel" & emb_pool_type != "cls") {
-          stop("Funnel currently supports only cls as pooling type.")
-        }
-      } else {
-        if (method == "lda") {
-          check_class(bow_basic_text_rep, "basic_text_rep", FALSE)
-          check_type(bow_n_dim, "int", FALSE)
-          check_type(bow_max_iter, "int", FALSE)
-        } else if (method == "glove_cluster") {
-          check_class(bow_basic_text_rep, "basic_text_rep", FALSE)
-          check_type(bow_n_dim, "int", FALSE)
-          check_type(bow_n_cluster, "int", FALSE)
-          check_type(bow_max_iter, "int", FALSE)
-          check_type(bow_max_iter_cluster, "int", FALSE)
-          check_type(bow_cr_criterion, "double", FALSE)
-          check_type(bow_learning_rate, "double", FALSE)
-        }
+
+      check_type(max_length, "int", FALSE)
+      check_type(chunks, "int", FALSE)
+      check_type(overlap, "int", FALSE)
+      # emb_layer_min
+      # emb_layer_max
+      # emb_pool_type
+      check_type(model_dir, "string", FALSE)
+      if (method == "funnel" & emb_pool_type != "cls") {
+        stop("Funnel currently supports only cls as pooling type.")
       }
 
       # Set model info
@@ -288,422 +238,245 @@ TextEmbeddingModel <- R6::R6Class(
       # basic_components-------------------------------------------------------
       private$basic_components$method <- method
       private$basic_components$max_length <- as.integer(max_length)
+
       #------------------------------------------------------------------------
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        private$transformer_components$ml_framework <- ml_framework
-        private$transformer_components$chunks <- chunks
-        private$transformer_components$overlap <- overlap
+      private$transformer_components$ml_framework <- ml_framework
+      private$transformer_components$chunks <- chunks
+      private$transformer_components$overlap <- overlap
 
-        if (emb_pool_type %in% c("cls", "average") == FALSE) {
-          stop("emb_pool_type must be 'cls' or 'average'.")
-        }
-
-        # Search for the corresponding files
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
-            from_pt <- FALSE
-          } else if (file.exists(paste0(model_dir, "/pytorch_model.bin")) |
-            file.exists(paste0(model_dir, "/model.safetensors"))) {
-            from_pt <- TRUE
-          } else {
-            stop("Directory does not contain a tf_model.h5, pytorch_model.bin
-                 or a model.saftensors file.")
-          }
-        } else {
-          if (file.exists(paste0(model_dir, "/pytorch_model.bin")) |
-            file.exists(paste0(model_dir, "/model.safetensors"))) {
-            from_tf <- FALSE
-          } else if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
-            from_tf <- TRUE
-          } else {
-            stop("Directory does not contain a tf_model.h5,pytorch_model.bin
-                 or a model.saftensors file.")
-          }
-        }
-
-        # In the case of pytorch
-        # Check to load from pt/bin or safetensors
-        # Use safetensors as preferred method
-        if (ml_framework == "pytorch") {
-          if ((file.exists(paste0(model_dir, "/model.safetensors")) == FALSE &
-            from_tf == FALSE) |
-            reticulate::py_module_available("safetensors") == FALSE) {
-            load_safe <- FALSE
-          } else {
-            load_safe <- TRUE
-          }
-        }
-
-        if (private$basic_components$method == "bert") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-          if (ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFBertModel$from_pretrained(model_dir, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFBertForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$BertModel$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "roberta") {
-          private$transformer_components$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(model_dir)
-          if (ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFRobertaModel$from_pretrained(model_dir, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFRobertaForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$RobertaModel$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "longformer") {
-          private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(model_dir)
-          if (ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFLongformerModel$from_pretrained(model_dir, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFLongformerForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$LongformerModel$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "funnel") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-          if (ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFFunnelBaseModel$from_pretrained(model_dir, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFFunnelForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "deberta_v2") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-          if (ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFDebertaV2Model$from_pretrained(model_dir, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFDebertaForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$DebertaForMaskedLM$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "rwkv") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-          if (ml_framework == "tensorflow") {
-            # private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
-          } else {
-            private$transformer_components$model <- transformers$RwkvForCausalLM$from_pretrained(model_dir,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        }
-
-        if (private$basic_components$method == "longformer" |
-          private$basic_components$method == "roberta") {
-          if (max_length > (private$transformer_components$model$config$max_position_embeddings)) {
-            stop(paste(
-              "max_length is", max_length, ". This value is not allowed to exceed",
-              private$transformer_components$model$config$max_position_embeddings
-            ))
-          }
-        }
-
-        # Sustainability tracking
-        sustainability_datalog_path <- paste0(model_dir, "/", "sustainability.csv")
-        if (file.exists(sustainability_datalog_path)) {
-          tmp_sustainability_data <- read.csv(sustainability_datalog_path)
-          private$sustainability$sustainability_tracked <- TRUE
-          private$sustainability$track_log <- tmp_sustainability_data
-        } else {
-          private$sustainability$sustainability_tracked <- FALSE
-          private$sustainability$track_log <- NA
-        }
-
-        # Training history
-        training_datalog_path <- paste0(model_dir, "/", "history.log")
-        if (file.exists(training_datalog_path) == TRUE) {
-          self$last_training$history <- read.csv2(file = training_datalog_path)
-        } else {
-          self$last_training$history <- NA
-        }
-
-
-        # Check Embedding Configuration
-        if (method == "funnel") {
-          max_layers_funnel <- sum(private$transformer_components$model$config$block_repeats *
-            private$transformer_components$model$config$block_sizes)
-
-          if (emb_layer_min == "first") {
-            emb_layer_min <- 1
-          } else if (emb_layer_min == "middle") {
-            emb_layer_min <- floor(0.5 * max_layers_funnel)
-          } else if (emb_layer_min == "2_3_layer") {
-            emb_layer_min <- floor(2 / 3 * max_layers_funnel)
-          } else if (emb_layer_min == "last") {
-            emb_layer_min <- max_layers_funnel
-          }
-
-          if (emb_layer_max == "first") {
-            emb_layer_max <- 1
-          } else if (emb_layer_max == "middle") {
-            emb_layer_max <- floor(0.5 * max_layers_funnel)
-          } else if (emb_layer_max == "2_3_layer") {
-            emb_layer_max <- floor(2 / 3 * max_layers_funnel)
-          } else if (emb_layer_max == "last") {
-            emb_layer_max <- max_layers_funnel
-          }
-        } else {
-          if (emb_layer_min == "first") {
-            emb_layer_min <- 1
-          } else if (emb_layer_min == "middle") {
-            emb_layer_min <- floor(0.5 * private$transformer_components$model$config$num_hidden_layers)
-          } else if (emb_layer_min == "2_3_layer") {
-            emb_layer_min <- floor(2 / 3 * private$transformer_components$model$config$num_hidden_layers)
-          } else if (emb_layer_min == "last") {
-            emb_layer_min <- private$transformer_components$model$config$num_hidden_layers
-          }
-
-          if (emb_layer_max == "first") {
-            emb_layer_max <- 1
-          } else if (emb_layer_max == "middle") {
-            emb_layer_max <- floor(0.5 * private$transformer_components$model$config$num_hidden_layers)
-          } else if (emb_layer_max == "2_3_layer") {
-            emb_layer_max <- floor(2 / 3 * private$transformer_components$model$config$num_hidden_layers)
-          } else if (emb_layer_max == "last") {
-            emb_layer_max <- private$transformer_components$model$config$num_hidden_layers
-          }
-        }
-
-        if (emb_layer_min > emb_layer_max) {
-          stop("emb_layer_min layer must be smaller or equal emb_layer_max.")
-        }
-        if (emb_layer_min < 1) {
-          stop("emb_laser_min must be at least 1.")
-        }
-        if (method == "funnel") {
-          if (emb_layer_max > private$transformer_components$model$config$num_hidden_layers) {
-            stop(paste0(
-              "emb_layer_max can not exceed the number of layers. The transformer has",
-              max_layers_funnel, "layers."
-            ))
-          }
-        } else {
-          if (emb_layer_max > private$transformer_components$model$config$num_hidden_layers) {
-            stop(paste0(
-              "emb_layer_max can not exceed the number of layers. The transformer has",
-              private$transformer_components$model$config$num_hidden_layers, "layers."
-            ))
-          }
-        }
-
-        if (is.integer(as.integer(emb_layer_min)) == FALSE | is.integer(as.integer(emb_layer_max)) == FALSE) {
-          stop("emb_layer_min and emb_layer_max must be integers or the following string:
-               'first','last','middle','2_3_layer'")
-        }
-
-        private$transformer_components$emb_layer_min <- emb_layer_min
-        private$transformer_components$emb_layer_max <- emb_layer_max
-        private$transformer_components$emb_pool_type <- emb_pool_type
-
-        #------------------------------------------------------------------------
-      } else if (private$basic_components$method == "glove_cluster") {
-        requireNamespace(package = "text2vec")
-
-        glove <- text2vec::GlobalVectors$new(
-          rank = bow_n_dim,
-          x_max = 10
-        )
-        wv_main <- glove$fit_transform(bow_basic_text_rep$fcm,
-          n_iter = bow_max_iter,
-          convergence_tol = bow_cr_criterion,
-          n_threads = 8,
-          progressbar = trace,
-          learning_rate = bow_learning_rate
-        )
-        wv_context <- glove$components
-        transformation_matrix <- wv_main + t(wv_context)
-
-        embedding <- matrix(
-          data = NA,
-          nrow = nrow(transformation_matrix),
-          ncol = ncol(transformation_matrix) + 1
-        )
-        tmp_row_names <- rownames(transformation_matrix)
-
-        for (i in 1:nrow(transformation_matrix)) {
-          if (bow_basic_text_rep$configuration$use_lemmata == TRUE) {
-            if (bow_basic_text_rep$configuration$to_lower == TRUE) {
-              tmp <- bow_basic_text_rep$language_model$vocab$lemma_tolower
-              index <- match(x = tmp_row_names[i], table = tmp)
-              embedding[i, 1] <- bow_basic_text_rep$language_model$vocab$index_lemma_lower[index]
-              embedding[i, 2:ncol(embedding)] <- transformation_matrix[i, ]
-            } else {
-              tmp <- bow_basic_text_rep$language_model$vocab$lemma
-              index <- match(x = tmp_row_names[i], table = tmp)
-              embedding[i, 1] <- bow_basic_text_rep$language_model$vocab$index_lemma[index]
-              embedding[i, 2:ncol(embedding)] <- transformation_matrix[i, ]
-            }
-          } else {
-            if (bow_basic_text_rep$configuration$to_lower == TRUE) {
-              tmp <- bow_basic_text_rep$language_model$vocab$token_tolower
-              index <- match(x = tmp_row_names[i], table = tmp)
-              embedding[i, 1] <- bow_basic_text_rep$language_model$vocab$index_token_lower[index]
-              embedding[i, 2:ncol(embedding)] <- transformation_matrix[i, ]
-            } else {
-              tmp <- bow_basic_text_rep$language_model$vocab$token
-              index <- match(x = tmp_row_names[i], table = tmp)
-              embedding[i, 1] <- bow_basic_text_rep$language_model$vocab$index_token[index]
-              embedding[i, 2:ncol(embedding)] <- transformation_matrix[i, ]
-            }
-          }
-        }
-        embedding <- embedding[order(embedding[, 1]), ]
-        rownames(embedding) <- embedding[, 1]
-        embedding <- embedding[, -1]
-        # Creating Clusters-----------------------------------------------------
-        cluster_structure <- stats::kmeans(
-          x = embedding,
-          centers = bow_n_cluster,
-          iter.max = bow_max_iter_cluster,
-          nstart = 5,
-          trace = trace,
-          algorithm = "Lloyd"
-        )
-        token_cluster_assignments <- stats::fitted(
-          object = cluster_structure,
-          method = "classes"
-        )
-        model <- data.frame(
-          index = names(token_cluster_assignments),
-          cluster = token_cluster_assignments
-        )
-        private$bow_components$model <- model
-        private$bow_components$vocab <- bow_basic_text_rep$language_model$vocab
-        private$bow_components$configuration$to_lower <- bow_basic_text_rep$configuration$to_lower
-        private$bow_components$configuration$use_lemmata <- bow_basic_text_rep$configuration$use_lemmata
-        private$bow_components$configuration$bow_n_dim <- bow_n_dim
-        private$bow_components$configuration$bow_n_cluster <- bow_n_cluster
-        private$bow_components$configuration$bow_max_iter <- bow_max_iter
-        private$bow_components$configuration$bow_max_iter_cluster <- bow_max_iter_cluster
-        private$bow_components$configuration$bow_cr_criterion <- bow_cr_criterion
-        private$bow_components$configuration$bow_learning_rate <- bow_learning_rate
-        private$bow_components$chunks <- 1
-        private$bow_components$overlap <- 0
-
-        # Topic Modeling--------------------------------------------------------
-      } else if (private$basic_components$method == "lda") {
-        requireNamespace(package = "quanteda")
-        requireNamespace(package = "topicmodels")
-        requireNamespace(package = "tidytext")
-
-        selection <- (rowSums(as.matrix(bow_basic_text_rep$dfm)) > 0)
-        corrected_dfm <- quanteda::dfm_subset(
-          x = bow_basic_text_rep$dfm,
-          selection
-        )
-
-        lda <- topicmodels::LDA(
-          x = corrected_dfm,
-          k = bow_n_dim,
-          control = list(
-            verbose = as.integer(trace),
-            best = 1,
-            initialize = "random"
-          )
-        )
-
-        lda <- tidytext::tidy(lda)
-
-        # Transforming tibble into a matrix
-        term_topic_beta <- matrix(
-          ncol = bow_n_dim,
-          nrow = corrected_dfm@Dim[2],
-          data = NA
-        )
-        tmp_features <- colnames(corrected_dfm)
-        for (i in 1:corrected_dfm@Dim[2]) {
-          tmp <- subset(lda, lda$term == tmp_features[i])
-          term_topic_beta[i, ] <- as.numeric(tmp$beta)
-        }
-
-        # Adding token indices
-        tmp_index <- vector(length = corrected_dfm@Dim[2])
-        for (i in 1:nrow(term_topic_beta)) {
-          if (bow_basic_text_rep$configuration$use_lemmata == TRUE) {
-            if (bow_basic_text_rep$configuration$to_lower == TRUE) {
-              tmp <- bow_basic_text_rep$language_model$vocab$lemma_tolower
-              index <- match(x = tmp_features[i], table = tmp)
-              tmp_index[i] <- bow_basic_text_rep$language_model$vocab$index_lemma_lower[index]
-            } else {
-              tmp <- bow_basic_text_rep$language_model$vocab$lemma
-              index <- match(x = tmp_features[i], table = tmp)
-              tmp_index[i] <- bow_basic_text_rep$language_model$vocab$index_lemma[index]
-            }
-          } else {
-            if (bow_basic_text_rep$configuration$to_lower == TRUE) {
-              tmp <- bow_basic_text_rep$language_model$vocab$token_tolower
-              index <- match(x = tmp_features[i], table = tmp)
-              tmp_index[i] <- bow_basic_text_rep$language_model$vocab$index_token_lower[index]
-            } else {
-              tmp <- bow_basic_text_rep$language_model$vocab$token
-              index <- match(x = tmp_features[i], table = tmp)
-              tmp_index[i] <- bow_basic_text_rep$language_model$vocab$index_token[index]
-            }
-          }
-        }
-
-        term_topic_beta <- matrix(mapply(term_topic_beta, FUN = as.numeric),
-          nrow = nrow(term_topic_beta),
-          ncol = ncol(term_topic_beta),
-          byrow = FALSE
-        )
-        colnames(term_topic_beta) <- colnames(term_topic_beta,
-          do.NULL = FALSE,
-          prefix = "topic_"
-        )
-        model <- data.frame(
-          index = tmp_index,
-          topic = term_topic_beta
-        )
-        model <- model[order(model$index), ]
-        rownames(model) <- model$index
-
-        private$bow_components$model <- model
-        private$bow_components$vocab <- bow_basic_text_rep$language_model$vocab
-        private$bow_components$configuration$to_lower <- bow_basic_text_rep$configuration$to_lower
-        private$bow_components$configuration$use_lemmata <- bow_basic_text_rep$configuration$use_lemmata
-        private$bow_components$configuration$bow_n_dim <- bow_n_dim
-        private$bow_components$configuration$bow_n_cluster <- bow_n_cluster
-        private$bow_components$configuration$bow_max_iter <- bow_max_iter
-        private$bow_components$configuration$bow_max_iter_cluster <- bow_max_iter_cluster
-        private$bow_components$configuration$bow_cr_criterion <- bow_cr_criterion
-        private$bow_components$configuration$bow_learning_rate <- bow_learning_rate
-        private$bow_components$chunks <- 1
-        private$bow_components$overlap <- 0
+      if (emb_pool_type %in% c("cls", "average") == FALSE) {
+        stop("emb_pool_type must be 'cls' or 'average'.")
       }
+
+      # Search for the corresponding files
+      if (private$transformer_components$ml_framework == "tensorflow") {
+        if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
+          from_pt <- FALSE
+        } else if (file.exists(paste0(model_dir, "/pytorch_model.bin")) |
+          file.exists(paste0(model_dir, "/model.safetensors"))) {
+          from_pt <- TRUE
+        } else {
+          stop("Directory does not contain a tf_model.h5, pytorch_model.bin
+                 or a model.saftensors file.")
+        }
+      } else {
+        if (file.exists(paste0(model_dir, "/pytorch_model.bin")) |
+          file.exists(paste0(model_dir, "/model.safetensors"))) {
+          from_tf <- FALSE
+        } else if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
+          from_tf <- TRUE
+        } else {
+          stop("Directory does not contain a tf_model.h5,pytorch_model.bin
+                 or a model.saftensors file.")
+        }
+      }
+
+      # In the case of pytorch
+      # Check to load from pt/bin or safetensors
+      # Use safetensors as preferred method
+      if (ml_framework == "pytorch") {
+        if ((file.exists(paste0(model_dir, "/model.safetensors")) == FALSE &
+          from_tf == FALSE) |
+          reticulate::py_module_available("safetensors") == FALSE) {
+          load_safe <- FALSE
+        } else {
+          load_safe <- TRUE
+        }
+      }
+
+      if (private$basic_components$method == "bert") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
+        if (ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFBertModel$from_pretrained(model_dir, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFBertForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$BertModel$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "roberta") {
+        private$transformer_components$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(model_dir)
+        if (ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFRobertaModel$from_pretrained(model_dir, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFRobertaForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$RobertaModel$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "longformer") {
+        private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(model_dir)
+        if (ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFLongformerModel$from_pretrained(model_dir, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFLongformerForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$LongformerModel$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "funnel") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
+        if (ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFFunnelBaseModel$from_pretrained(model_dir, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFFunnelForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "deberta_v2") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
+        if (ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFDebertaV2Model$from_pretrained(model_dir, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFDebertaForMaskedLM$from_pretrained(model_dir, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$DebertaForMaskedLM$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "rwkv") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
+        if (ml_framework == "tensorflow") {
+          # private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir,from_pt=from_pt)
+        } else {
+          private$transformer_components$model <- transformers$RwkvForCausalLM$from_pretrained(model_dir,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      }
+
+      if (private$basic_components$method == "longformer" |
+        private$basic_components$method == "roberta") {
+        if (max_length > (private$transformer_components$model$config$max_position_embeddings)) {
+          stop(paste(
+            "max_length is", max_length, ". This value is not allowed to exceed",
+            private$transformer_components$model$config$max_position_embeddings
+          ))
+        }
+      }
+
+      # Sustainability tracking
+      sustainability_datalog_path <- paste0(model_dir, "/", "sustainability.csv")
+      if (file.exists(sustainability_datalog_path)) {
+        tmp_sustainability_data <- read.csv(sustainability_datalog_path)
+        private$sustainability$sustainability_tracked <- TRUE
+        private$sustainability$track_log <- tmp_sustainability_data
+      } else {
+        private$sustainability$sustainability_tracked <- FALSE
+        private$sustainability$track_log <- NA
+      }
+
+      # Training history
+      training_datalog_path <- paste0(model_dir, "/", "history.log")
+      if (file.exists(training_datalog_path) == TRUE) {
+        self$last_training$history <- read.csv2(file = training_datalog_path)
+      } else {
+        self$last_training$history <- NA
+      }
+
+
+      # Check Embedding Configuration
+      if (method == "funnel") {
+        max_layers_funnel <- sum(private$transformer_components$model$config$block_repeats *
+          private$transformer_components$model$config$block_sizes)
+
+        if (emb_layer_min == "first") {
+          emb_layer_min <- 1
+        } else if (emb_layer_min == "middle") {
+          emb_layer_min <- floor(0.5 * max_layers_funnel)
+        } else if (emb_layer_min == "2_3_layer") {
+          emb_layer_min <- floor(2 / 3 * max_layers_funnel)
+        } else if (emb_layer_min == "last") {
+          emb_layer_min <- max_layers_funnel
+        }
+
+        if (emb_layer_max == "first") {
+          emb_layer_max <- 1
+        } else if (emb_layer_max == "middle") {
+          emb_layer_max <- floor(0.5 * max_layers_funnel)
+        } else if (emb_layer_max == "2_3_layer") {
+          emb_layer_max <- floor(2 / 3 * max_layers_funnel)
+        } else if (emb_layer_max == "last") {
+          emb_layer_max <- max_layers_funnel
+        }
+      } else {
+        if (emb_layer_min == "first") {
+          emb_layer_min <- 1
+        } else if (emb_layer_min == "middle") {
+          emb_layer_min <- floor(0.5 * private$transformer_components$model$config$num_hidden_layers)
+        } else if (emb_layer_min == "2_3_layer") {
+          emb_layer_min <- floor(2 / 3 * private$transformer_components$model$config$num_hidden_layers)
+        } else if (emb_layer_min == "last") {
+          emb_layer_min <- private$transformer_components$model$config$num_hidden_layers
+        }
+
+        if (emb_layer_max == "first") {
+          emb_layer_max <- 1
+        } else if (emb_layer_max == "middle") {
+          emb_layer_max <- floor(0.5 * private$transformer_components$model$config$num_hidden_layers)
+        } else if (emb_layer_max == "2_3_layer") {
+          emb_layer_max <- floor(2 / 3 * private$transformer_components$model$config$num_hidden_layers)
+        } else if (emb_layer_max == "last") {
+          emb_layer_max <- private$transformer_components$model$config$num_hidden_layers
+        }
+      }
+
+      if (emb_layer_min > emb_layer_max) {
+        stop("emb_layer_min layer must be smaller or equal emb_layer_max.")
+      }
+      if (emb_layer_min < 1) {
+        stop("emb_laser_min must be at least 1.")
+      }
+      if (method == "funnel") {
+        if (emb_layer_max > private$transformer_components$model$config$num_hidden_layers) {
+          stop(paste0(
+            "emb_layer_max can not exceed the number of layers. The transformer has",
+            max_layers_funnel, "layers."
+          ))
+        }
+      } else {
+        if (emb_layer_max > private$transformer_components$model$config$num_hidden_layers) {
+          stop(paste0(
+            "emb_layer_max can not exceed the number of layers. The transformer has",
+            private$transformer_components$model$config$num_hidden_layers, "layers."
+          ))
+        }
+      }
+
+      if (is.integer(as.integer(emb_layer_min)) == FALSE | is.integer(as.integer(emb_layer_max)) == FALSE) {
+        stop("emb_layer_min and emb_layer_max must be integers or the following string:
+               'first','last','middle','2_3_layer'")
+      }
+
+      private$transformer_components$emb_layer_min <- emb_layer_min
+      private$transformer_components$emb_layer_max <- emb_layer_max
+      private$transformer_components$emb_pool_type <- emb_pool_type
     },
     #--------------------------------------------------------------------------
     #' @description loads an object from disk and updates the object to the current version of the package.
@@ -716,31 +489,12 @@ TextEmbeddingModel <- R6::R6Class(
       }
 
       # Load R file
-      old_model <- load_R_interface(dir_path)
-
-      # Old private states
-      old_private <- old_model$get_private()
+      config_file <- load_R_interface(dir_path)
 
       # Set basic configuration
       private$basic_components <- list(
-        method = old_private$basic_components$method,
-        max_length = old_private$basic_components$max_length
-      )
-
-      # Set bow configuration
-      private$bow_components <- list(
-        model = old_private$bow_components$model,
-        vocab = old_private$bow_components$vocab,
-        configuration = list(
-          to_lower = old_private$bow_components$configuration$to_lower,
-          use_lemmata = old_private$bow_components$configuration$use_lemmata,
-          bow_n_dim = old_private$bow_components$configuration$bow_n_dim,
-          bow_n_cluster = old_private$bow_components$configuration$bow_n_cluster,
-          bow_max_iter = old_private$bow_components$configuration$bow_max_iter,
-          bow_max_iter_cluster = old_private$bow_components$configuration$bow_max_iter_cluster,
-          bow_cr_criterion = old_private$bow_components$configuration$bow_cr_criterion,
-          bow_learning_rate = old_private$bow_components$configuration$bow_learning_rate
-        )
+        method = config_file$private$basic_components$method,
+        max_length = config_file$private$basic_components$max_length
       )
 
       # Set transformer configuration
@@ -748,61 +502,61 @@ TextEmbeddingModel <- R6::R6Class(
         model = NULL,
         model_mlm = NULL,
         tokenizer = NULL,
-        emb_layer_min = old_private$transformer_components$emb_layer_min,
-        emb_layer_max = old_private$transformer_components$emb_layer_max,
-        emb_pool_type = old_private$transformer_components$emb_pool_type,
-        chunks = old_private$transformer_components$chunks,
-        features = old_private$transformer_components$features,
-        overlap = old_private$transformer_components$overlap,
-        ml_framework = old_private$transformer_components$ml_framework
+        emb_layer_min = config_file$private$transformer_components$emb_layer_min,
+        emb_layer_max = config_file$private$transformer_components$emb_layer_max,
+        emb_pool_type = config_file$private$transformer_components$emb_pool_type,
+        chunks = config_file$private$transformer_components$chunks,
+        features = config_file$private$transformer_components$features,
+        overlap = config_file$private$transformer_components$overlap,
+        ml_framework = config_file$private$transformer_components$ml_framework
       )
 
       # Set model info
       private$set_model_info(
-        model_name_root = old_private$model_info$model_name_root,
-        model_id = old_private$model_info$model_id,
-        label = old_private$model_info$model_label,
-        model_date = old_private$model_info$model_date,
-        model_language = old_private$model_info$model_language
+        model_name_root = config_file$private$model_info$model_name_root,
+        model_id = config_file$private$model_info$model_id,
+        label = config_file$private$model_info$model_label,
+        model_date = config_file$private$model_info$model_date,
+        model_language = config_file$private$model_info$model_language
       )
 
       # Set license
-      self$set_software_license(old_private$model_info$model_license)
-      self$set_documentation_license(old_private$model_description$license)
+      self$set_software_license(config_file$private$model_info$model_license)
+      self$set_documentation_license(config_file$private$model_description$license)
 
       # Set description and documentation
       self$set_model_description(
-        eng = old_private$model_description$eng,
-        native = old_private$model_description$native,
-        abstract_eng = old_private$model_description$abstract_eng,
-        abstract_native = old_private$model_description$abstract_native,
-        keywords_eng = old_private$model_description$keywords_eng,
-        keywords_native = old_private$model_description$keywords_native
+        eng = config_file$private$model_description$eng,
+        native = config_file$private$model_description$native,
+        abstract_eng = config_file$private$model_description$abstract_eng,
+        abstract_native = config_file$private$model_description$abstract_native,
+        keywords_eng = config_file$private$model_description$keywords_eng,
+        keywords_native = config_file$private$model_description$keywords_native
       )
 
       # Set publication info
       self$set_publication_info(
         type = "developer",
-        authors = old_private$publication_info$developed_by$authors,
-        citation = old_private$publication_info$developed_by$citation,
-        url = old_private$publication_info$developed_by$url
+        authors = config_file$private$publication_info$developed_by$authors,
+        citation = config_file$private$publication_info$developed_by$citation,
+        url = config_file$private$publication_info$developed_by$url
       )
       self$set_publication_info(
         type = "modifier",
-        authors = old_private$publication_info$modified_by$authors,
-        citation = old_private$publication_info$modified_by$citation,
-        url = old_private$publication_info$modified_by$modifier$url
+        authors = config_file$private$publication_info$modified_by$authors,
+        citation = config_file$private$publication_info$modified_by$citation,
+        url = config_file$private$publication_info$modified_by$modifier$url
       )
 
       # Get and set original package versions
-      private$r_package_versions$aifeducation <- old_private$r_package_versions$aifeducation
-      private$r_package_versions$reticulate <- old_private$r_package_versions$reticulate
+      private$r_package_versions$aifeducation <- config_file$private$r_package_versions$aifeducation
+      private$r_package_versions$reticulate <- config_file$private$r_package_versions$reticulate
 
 
-      private$py_package_versions$torch <- old_private$py_package_versions$torch
-      private$py_package_versions$tensorflow <- old_private$py_package_versions$tensorflow
-      private$py_package_versions$keras <- old_private$py_package_versions$keras
-      private$py_package_versions$numpy <- old_private$py_package_versions$numpy
+      private$py_package_versions$torch <- config_file$private$py_package_versions$torch
+      private$py_package_versions$tensorflow <- config_file$private$py_package_versions$tensorflow
+      private$py_package_versions$keras <- config_file$private$py_package_versions$keras
+      private$py_package_versions$numpy <- config_file$private$py_package_versions$numpy
 
       # Finalize config
       private$set_configuration_to_TRUE()
@@ -847,6 +601,7 @@ TextEmbeddingModel <- R6::R6Class(
         from_tf <- FALSE
       }
 
+
       # In the case of pytorch
       # Check to load from pt/bin or safetensors
       # Use safetensors as preferred method
@@ -860,117 +615,113 @@ TextEmbeddingModel <- R6::R6Class(
         }
       }
 
-
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        if (private$basic_components$method == "bert") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFBertModel$from_pretrained(model_dir_main, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFBertForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$BertModel$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "roberta") {
-          private$transformer_components$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(model_dir_main)
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFRobertaModel$from_pretrained(model_dir_main, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$RobertaModel$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "longformer") {
-          private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(model_dir_main)
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFLongformerModel$from_pretrained(model_dir_main, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFLongformerForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$LongformerModel$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "funnel") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFFunnelBaseModel$from_pretrained(model_dir_main, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFFunnelForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "deberta_v2") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            private$transformer_components$model <- transformers$TFDebertaV2Model$from_pretrained(model_dir_main, from_pt = from_pt)
-            private$transformer_components$model_mlm <- transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
-          } else {
-            private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-            private$transformer_components$model_mlm <- transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        } else if (private$basic_components$method == "rwkv") {
-          private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            # private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
-          } else {
-            private$transformer_components$model <- transformers$RwkvForCausalLM$from_pretrained(model_dir_main,
-              from_tf = from_tf,
-              use_safetensors = load_safe
-            )
-          }
-        }
-
-        # Sustainability Data
-        sustainability_datalog_path <- paste0(dir_path, "/", "sustainability.csv")
-        if (file.exists(sustainability_datalog_path)) {
-          tmp_sustainability_data <- read.csv(sustainability_datalog_path)
-          private$sustainability$sustainability_tracked <- TRUE
-          private$sustainability$track_log <- tmp_sustainability_data
+      if (private$basic_components$method == "bert") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFBertModel$from_pretrained(model_dir_main, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFBertForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
         } else {
-          private$sustainability$sustainability_tracked <- FALSE
-          private$sustainability$track_log <- NA
+          private$transformer_components$model <- transformers$BertModel$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
         }
-
-        # Training History
-        training_datalog_path <- paste0(dir_path, "/", "history.log")
-        if (file.exists(training_datalog_path)) {
-          self$last_training$history <- read.csv2(file = training_datalog_path)
+      } else if (private$basic_components$method == "roberta") {
+        private$transformer_components$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(model_dir_main)
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFRobertaModel$from_pretrained(model_dir_main, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFRobertaForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
         } else {
-          self$last_training$history <- NULL
+          private$transformer_components$model <- transformers$RobertaModel$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
         }
+      } else if (private$basic_components$method == "longformer") {
+        private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(model_dir_main)
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFLongformerModel$from_pretrained(model_dir_main, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFLongformerForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$LongformerModel$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "funnel") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFFunnelBaseModel$from_pretrained(model_dir_main, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFFunnelForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "deberta_v2") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          private$transformer_components$model <- transformers$TFDebertaV2Model$from_pretrained(model_dir_main, from_pt = from_pt)
+          private$transformer_components$model_mlm <- transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main, from_pt = from_pt)
+        } else {
+          private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+          private$transformer_components$model_mlm <- transformers$DebertaV2ForMaskedLM$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      } else if (private$basic_components$method == "rwkv") {
+        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir_main)
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          # private$transformer_components$model<-transformers$TFDebertaV2ForMaskedLM$from_pretrained(model_dir_main,from_pt=from_pt)
+        } else {
+          private$transformer_components$model <- transformers$RwkvForCausalLM$from_pretrained(model_dir_main,
+            from_tf = from_tf,
+            use_safetensors = load_safe
+          )
+        }
+      }
+
+      # Sustainability Data
+      sustainability_datalog_path <- paste0(dir_path, "/", "sustainability.csv")
+      if (file.exists(sustainability_datalog_path)) {
+        tmp_sustainability_data <- read.csv(sustainability_datalog_path)
+        private$sustainability$sustainability_tracked <- TRUE
+        private$sustainability$track_log <- tmp_sustainability_data
       } else {
-        message("Method only relevant for transformer models.")
+        private$sustainability$sustainability_tracked <- FALSE
+        private$sustainability$track_log <- NA
+      }
+
+      # Training History
+      training_datalog_path <- paste0(dir_path, "/", "history.log")
+      if (file.exists(training_datalog_path)) {
+        self$last_training$history <- read.csv2(file = training_datalog_path)
+      } else {
+        self$last_training$history <- NULL
       }
     },
+    #--------------------------------------------------------------------------
     #' @description Method for saving a transformer model on disk.Relevant only for transformer models.
     #' @param dir_path `string` containing the path to the relevant model directory.
     #' @param folder_name `string` Name for the folder created within the directory. This folder contains all model
@@ -982,71 +733,68 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(dir_path, "string", FALSE)
       check_type(folder_name, "string", FALSE)
 
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          save_format <- "h5"
-        } else if (private$transformer_components$ml_framework == "pytorch") {
-          save_format <- "safetensors"
-        }
 
-        save_location <- paste0(dir_path, "/", folder_name)
-        if (dir.exists(dir_path) == FALSE) {
-          dir.create(dir_path)
-          cat("Creating Directory\n")
-        }
-        if (dir.exists(save_location) == FALSE) {
-          dir.create(save_location)
-          cat("Creating Directory\n")
-        }
+      if (private$transformer_components$ml_framework == "tensorflow") {
+        save_format <- "h5"
+      } else if (private$transformer_components$ml_framework == "pytorch") {
+        save_format <- "safetensors"
+      }
 
-        model_dir_data_path <- paste0(save_location, "/", "model_data")
+      save_location <- paste0(dir_path, "/", folder_name)
+      if (dir.exists(dir_path) == FALSE) {
+        dir.create(dir_path)
+        cat("Creating Directory\n")
+      }
+      if (dir.exists(save_location) == FALSE) {
+        dir.create(save_location)
+        cat("Creating Directory\n")
+      }
 
-        if (private$transformer_components$ml_framework == "pytorch") {
-          if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == TRUE) {
-            private$transformer_components$model$save_pretrained(
-              save_directory = model_dir_data_path,
-              safe_serilization = TRUE
-            )
-            private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
-          } else if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
-            private$transformer_components$model$save_pretrained(
-              save_directory = model_dir_data_path,
-              safe_serilization = FALSE
-            )
-            private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
-            warning("Python library 'safetensors' is not available. Saving model in standard
+      model_dir_data_path <- paste0(save_location, "/", "model_data")
+
+      if (private$transformer_components$ml_framework == "pytorch") {
+        if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == TRUE) {
+          private$transformer_components$model$save_pretrained(
+            save_directory = model_dir_data_path,
+            safe_serilization = TRUE
+          )
+          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+        } else if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
+          private$transformer_components$model$save_pretrained(
+            save_directory = model_dir_data_path,
+            safe_serilization = FALSE
+          )
+          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+          warning("Python library 'safetensors' is not available. Saving model in standard
                   pytorch format.")
-          } else if (save_format == "pt") {
-            private$transformer_components$model$save_pretrained(
-              save_directory = model_dir_data_path,
-              safe_serilization = FALSE
-            )
-            private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
-          }
-        } else {
-          private$transformer_components$model$save_pretrained(save_directory = model_dir_data_path)
+        } else if (save_format == "pt") {
+          private$transformer_components$model$save_pretrained(
+            save_directory = model_dir_data_path,
+            safe_serilization = FALSE
+          )
           private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
         }
-
-        # Saving Sustainability Data
-        sustain_matrix <- private$sustainability$track_log
-        write.csv(
-          x = sustain_matrix,
-          file = paste0(save_location, "/", "sustainability.csv"),
-          row.names = FALSE
-        )
-
-        # Saving training history
-        if (is.null_or_na(self$last_training$history) == FALSE) {
-          write.csv2(
-            x = self$last_training$history,
-            file = paste0(save_location, "/", "history.log"),
-            row.names = FALSE,
-            quote = FALSE
-          )
-        }
       } else {
-        message("Method only relevant for transformer models.")
+        private$transformer_components$model$save_pretrained(save_directory = model_dir_data_path)
+        private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+      }
+
+      # Saving Sustainability Data
+      sustain_matrix <- private$sustainability$track_log
+      write.csv(
+        x = sustain_matrix,
+        file = paste0(save_location, "/", "sustainability.csv"),
+        row.names = FALSE
+      )
+
+      # Saving training history
+      if (is.null_or_na(self$last_training$history) == FALSE) {
+        write.csv2(
+          x = self$last_training$history,
+          file = paste0(save_location, "/", "history.log"),
+          row.names = FALSE,
+          quote = FALSE
+        )
       }
     },
     #-------------------------------------------------------------------------
@@ -1071,179 +819,113 @@ TextEmbeddingModel <- R6::R6Class(
       # Start
       n_units <- length(raw_text)
 
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        chunk_list <- vector(length = n_units)
-        encodings <- NULL
-        #---------------------------------------------------------------------
-        if (token_encodings_only == TRUE) {
-          encodings_only <- NULL
-          for (i in 1:n_units) {
-            tokens_unit <- NULL
+      chunk_list <- vector(length = n_units)
+      encodings <- NULL
+      #---------------------------------------------------------------------
+      if (token_encodings_only == TRUE) {
+        encodings_only <- NULL
+        for (i in 1:n_units) {
+          tokens_unit <- NULL
 
+          tokens <- private$transformer_components$tokenizer(
+            raw_text[i],
+            stride = as.integer(private$transformer_components$overlap),
+            padding = "max_length",
+            truncation = TRUE,
+            return_overflowing_tokens = TRUE,
+            return_length = FALSE,
+            return_offsets_mapping = FALSE,
+            return_attention_mask = FALSE,
+            max_length = as.integer(private$basic_components$max_length),
+            return_tensors = "np"
+          )
+
+          seq_len <- nrow(tokens[["input_ids"]])
+
+          chunks <- min(seq_len, private$transformer_components$chunks)
+
+          for (j in 1:chunks) {
+            tokens_unit[j] <- list(tokens["input_ids"][j, ])
+            if (trace == TRUE) {
+              cat(paste(date(), i, "/", n_units, "block", j, "/", chunks, "\n"))
+            }
+          }
+          encodings_only[i] <- list(tokens_unit)
+        }
+        if (to_int == TRUE) {
+          return(encodings_only)
+        } else {
+          # Convert ids to tokens
+          if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
+            token_seq_list <- NULL
+            for (i in 1:length(encodings_only)) {
+              tmp_sequence <- encodings_only[[i]]
+              tmp_seqeunce_tok <- NULL
+              for (j in 1:length(tmp_sequence)) {
+                tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
+                  private$transformer_components$tokenizer$convert_ids_to_tokens(
+                    ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
+                  )
+                )
+              }
+              token_seq_list[length(token_seq_list) + 1] <- list(tmp_seqeunce_tok)
+            }
+            return(token_seq_list)
+          }
+        }
+
+        #--------------------------------------------------------------------
+      } else {
+        # text_chunks<-NULL
+        encodings <- NULL
+        for (i in 1:n_units) {
+          if (private$transformer_components$ml_framework == "tensorflow") {
             tokens <- private$transformer_components$tokenizer(
               raw_text[i],
               stride = as.integer(private$transformer_components$overlap),
               padding = "max_length",
               truncation = TRUE,
+              max_length = as.integer(private$basic_components$max_length),
               return_overflowing_tokens = TRUE,
               return_length = FALSE,
               return_offsets_mapping = FALSE,
-              return_attention_mask = FALSE,
+              return_attention_mask = TRUE,
+              return_token_type_ids = TRUE,
+              return_tensors = "tf"
+            )
+          } else {
+            tokens <- private$transformer_components$tokenizer(
+              raw_text[i],
+              stride = as.integer(private$transformer_components$overlap),
+              padding = "max_length",
+              truncation = TRUE,
               max_length = as.integer(private$basic_components$max_length),
-              return_tensors = "np"
+              return_overflowing_tokens = TRUE,
+              return_length = FALSE,
+              return_offsets_mapping = FALSE,
+              return_attention_mask = TRUE,
+              return_token_type_ids = TRUE,
+              return_tensors = "pt"
             )
-
-            seq_len <- nrow(tokens[["input_ids"]])
-
-            chunks <- min(seq_len, private$transformer_components$chunks)
-
-            for (j in 1:chunks) {
-              tokens_unit[j] <- list(tokens["input_ids"][j, ])
-              if (trace == TRUE) {
-                cat(paste(date(), i, "/", n_units, "block", j, "/", chunks, "\n"))
-              }
-            }
-            encodings_only[i] <- list(tokens_unit)
           }
-          if (to_int == TRUE) {
-            return(encodings_only)
+
+          tmp_dataset <- datasets$Dataset$from_dict(tokens)
+
+          seq_len <- tmp_dataset$num_rows
+          chunk_list[i] <- min(seq_len, private$transformer_components$chunks)
+
+          if (chunk_list[i] == 1) {
+            encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
           } else {
-            # Convert ids to tokens
-            if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-              token_seq_list <- NULL
-              for (i in 1:length(encodings_only)) {
-                tmp_sequence <- encodings_only[[i]]
-                tmp_seqeunce_tok <- NULL
-                for (j in 1:length(tmp_sequence)) {
-                  tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
-                    private$transformer_components$tokenizer$convert_ids_to_tokens(
-                      ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
-                    )
-                  )
-                }
-                token_seq_list[length(token_seq_list) + 1] <- list(tmp_seqeunce_tok)
-              }
-              return(token_seq_list)
-            }
-          }
-
-          #--------------------------------------------------------------------
-        } else {
-          # text_chunks<-NULL
-          encodings <- NULL
-          for (i in 1:n_units) {
-            if (private$transformer_components$ml_framework == "tensorflow") {
-              tokens <- private$transformer_components$tokenizer(
-                raw_text[i],
-                stride = as.integer(private$transformer_components$overlap),
-                padding = "max_length",
-                truncation = TRUE,
-                max_length = as.integer(private$basic_components$max_length),
-                return_overflowing_tokens = TRUE,
-                return_length = FALSE,
-                return_offsets_mapping = FALSE,
-                return_attention_mask = TRUE,
-                return_token_type_ids = TRUE,
-                return_tensors = "tf"
-              )
-            } else {
-              tokens <- private$transformer_components$tokenizer(
-                raw_text[i],
-                stride = as.integer(private$transformer_components$overlap),
-                padding = "max_length",
-                truncation = TRUE,
-                max_length = as.integer(private$basic_components$max_length),
-                return_overflowing_tokens = TRUE,
-                return_length = FALSE,
-                return_offsets_mapping = FALSE,
-                return_attention_mask = TRUE,
-                return_token_type_ids = TRUE,
-                return_tensors = "pt"
-              )
-            }
-
-            tmp_dataset <- datasets$Dataset$from_dict(tokens)
-
-            seq_len <- tmp_dataset$num_rows
-            chunk_list[i] <- min(seq_len, private$transformer_components$chunks)
-
-            if (chunk_list[i] == 1) {
-              encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
-            } else {
-              tmp_dataset <- tmp_dataset$select(as.integer((1:chunk_list[[i]]) - 1))
-              encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
-            }
-          }
-          # print(encodings["input_ids"])
-          return(encodings_list = list(
-            encodings = encodings,
-            chunks = chunk_list
-          ))
-        }
-      } else if (private$basic_components$method == "glove_cluster" |
-        private$basic_components$method == "lda") {
-        requireNamespace(package = "quanteda")
-
-        textual_corpus <- quanteda::corpus(raw_text)
-        token <- quanteda::tokens(textual_corpus)
-        if (private$bow_components$configuration$use_lemmata == TRUE) {
-          if (private$bow_components$configuration$to_lower == TRUE) {
-            token <- quanteda::tokens_keep(
-              x = token,
-              pattern = private$bow_components$vocab$token
-            )
-            token <- quanteda::tokens_replace(
-              x = token,
-              pattern = private$bow_components$vocab$token,
-              replacement = as.character(private$bow_components$vocab$index_lemma_lower),
-              valuetype = "fixed",
-              verbose = verbose
-            )
-          } else {
-            token <- quanteda::tokens_keep(
-              x = token,
-              pattern = private$bow_components$vocab$token
-            )
-            token <- quanteda::tokens_replace(
-              x = token,
-              pattern = private$bow_components$vocab$token,
-              replacement = as.character(private$bow_components$vocab$index_lemma),
-              valuetype = "fixed",
-              verbose = verbose
-            )
-          }
-        } else {
-          if (private$bow_components$configuration$to_lower == TRUE) {
-            token <- quanteda::tokens_keep(
-              x = token,
-              pattern = private$bow_components$vocab$token
-            )
-            token <- quanteda::tokens_replace(
-              x = token,
-              pattern = private$bow_components$vocab$token,
-              replacement = as.character(private$bow_components$vocab$index_token_lower),
-              valuetype = "fixed",
-              verbose = verbose
-            )
-          } else {
-            token <- quanteda::tokens_keep(
-              x = token,
-              pattern = private$bow_components$vocab$token
-            )
-            token <- quanteda::tokens_replace(
-              x = token,
-              pattern = private$bow_components$vocab$token,
-              replacement = as.character(private$bow_components$vocab$index_token),
-              valuetype = "fixed",
-              verbose = verbose
-            )
+            tmp_dataset <- tmp_dataset$select(as.integer((1:chunk_list[[i]]) - 1))
+            encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
           }
         }
-        encodings <- NULL
-        for (i in 1:length(token)) {
-          encodings[i] <- list(as.integer(as.vector(token[[i]])))
-        }
-        return(encodings)
+        # print(encodings["input_ids"])
+        return(encodings_list = list(
+          encodings = encodings,
+          chunks = chunk_list
+        ))
       }
     },
     #--------------------------------------------------------------------------
@@ -1264,66 +946,28 @@ TextEmbeddingModel <- R6::R6Class(
         tmp[1] <- list(int_seqence)
         int_seqence <- tmp[1]
       }
-      #-------------------------------------------------------------------------
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        tmp_token_list <- NULL
-        for (i in 1:length(int_seqence)) {
-          tmp_seq_token_list <- NULL
-          for (j in 1:length(int_seqence[[i]])) {
-            tmp_vector <- int_seqence[[i]][[j]]
-            mode(tmp_vector) <- "integer"
-            if (to_token == FALSE) {
-              tmp_seq_token_list[j] <- list(private$transformer_components$tokenizer$decode(
-                token_ids = tmp_vector,
-                skip_special_tokens = TRUE
-              ))
-            } else {
-              tmp_seq_token_list[j] <- list(private$transformer_components$tokenizer$convert_ids_to_tokens(tmp_vector))
-            }
-          }
-          tmp_token_list[i] <- list(tmp_seq_token_list)
-        }
-        return(tmp_token_list)
 
-        #-------------------------------------------------------------------------
-      } else if (private$basic_components$method == "glove_cluster" |
-        private$basic_components$method == "lda") {
-        if (private$bow_components$configuration$to_lower == TRUE) {
-          if (private$bow_components$configuration$use_lemmata == FALSE) {
-            input_column <- "index_token_lower"
-            target_coumn <- "token_tolower"
-          } else {
-            input_column <- "index_lemma_lower"
-            target_coumn <- "lemma_tolower"
-          }
-        } else {
-          if (private$bow_components$configuration$use_lemmata == FALSE) {
-            input_column <- "index_token"
-            target_coumn <- "token"
-          } else {
-            input_column <- "index_lemma"
-            target_coumn <- "lemma "
-          }
-        }
 
-        tmp_token_list <- NULL
-        for (i in 1:length(int_seqence)) {
-          tmp_int_seq <- int_seqence[[i]]
-          tmp_token_seq <- vector(length = length(tmp_int_seq))
-          for (j in 1:length(tmp_int_seq)) {
-            index <- match(
-              x = tmp_int_seq[j],
-              table = private$bow_components$vocab[, input_column]
-            )
-            # table=global_vector_clusters_modeling$bow_components$vocab[,input_column])
-            tmp_token_seq[j] <- private$bow_components$vocab[index, target_coumn]
-            # tmp_token_seq[j]=global_vector_clusters_modeling$bow_components$vocab[index,target_coumn]
+      tmp_token_list <- NULL
+      for (i in 1:length(int_seqence)) {
+        tmp_seq_token_list <- NULL
+        for (j in 1:length(int_seqence[[i]])) {
+          tmp_vector <- int_seqence[[i]][[j]]
+          mode(tmp_vector) <- "integer"
+          if (to_token == FALSE) {
+            tmp_seq_token_list[j] <- list(private$transformer_components$tokenizer$decode(
+              token_ids = tmp_vector,
+              skip_special_tokens = TRUE
+            ))
+          } else {
+            tmp_seq_token_list[j] <- list(private$transformer_components$tokenizer$convert_ids_to_tokens(tmp_vector))
           }
-          tmp_token_list[i] <- list(tmp_token_seq)
         }
-        return(tmp_token_list)
+        tmp_token_list[i] <- list(tmp_seq_token_list)
       }
+      return(tmp_token_list)
     },
+    #---------------------------------------------------------------------------
     #' @description Method for receiving the special tokens of the model
     #' @return Returns a `matrix` containing the special tokens in the rows and their type, token, and id in the
     #'   columns.
@@ -1392,331 +1036,227 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(return_large_dataset, "bool", FALSE)
 
       # transformer---------------------------------------------------------------------
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        n_units <- length(raw_text)
-        n_layer <- private$transformer_components$model$config$num_hidden_layers
-        n_layer_size <- private$transformer_components$model$config$hidden_size
+      n_units <- length(raw_text)
+      n_layer <- private$transformer_components$model$config$num_hidden_layers
+      n_layer_size <- private$transformer_components$model$config$hidden_size
 
-        # Batch refers to the number of cases
-        n_batches <- ceiling(n_units / batch_size)
-        batch_results <- NULL
+      # Batch refers to the number of cases
+      n_batches <- ceiling(n_units / batch_size)
+      batch_results <- NULL
 
-        update_aifeducation_progress_bar(value = 0, total = n_batches, title = "Embedding")
+      update_aifeducation_progress_bar(value = 0, total = n_batches, title = "Embedding")
 
-        if (private$transformer_components$emb_pool_type == "average") {
-          if (private$transformer_components$ml_framework == "pytorch") {
-            reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
-              package = "aifeducation"
-            ))
-            pooling <- py$GlobalAveragePooling1D_PT()
-          } else if (private$transformer_components$ml_framework == "tensorflow") {
-            pooling <- keras$layers$GlobalAveragePooling1D()
+      if (private$transformer_components$emb_pool_type == "average") {
+        if (private$transformer_components$ml_framework == "pytorch") {
+          reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+            package = "aifeducation"
+          ))
+          pooling <- py$GlobalAveragePooling1D_PT()
+        } else if (private$transformer_components$ml_framework == "tensorflow") {
+          pooling <- keras$layers$GlobalAveragePooling1D()
+        }
+      }
+
+      for (b in 1:n_batches) {
+        if (private$transformer_components$ml_framework == "pytorch") {
+          # Set model to evaluation mode
+          private$transformer_components$model$eval()
+          if (torch$cuda$is_available()) {
+            pytorch_device <- "cuda"
+          } else {
+            pytorch_device <- "cpu"
+          }
+          private$transformer_components$model$to(pytorch_device)
+          if (private$transformer_components$emb_pool_type == "average") {
+            pooling$to(pytorch_device)
           }
         }
 
-        for (b in 1:n_batches) {
-          if (private$transformer_components$ml_framework == "pytorch") {
-            # Set model to evaluation mode
-            private$transformer_components$model$eval()
-            if (torch$cuda$is_available()) {
-              pytorch_device <- "cuda"
-            } else {
-              pytorch_device <- "cpu"
-            }
-            private$transformer_components$model$to(pytorch_device)
-            if (private$transformer_components$emb_pool_type == "average") {
-              pooling$to(pytorch_device)
+        # tokens<-self$encode(raw_text = raw_text,
+        #                    trace = trace,
+        #                    token_encodings_only=FALSE)
+
+        index_min <- 1 + (b - 1) * batch_size
+        index_max <- min(b * batch_size, n_units)
+        batch <- index_min:index_max
+        # cat(batch)
+
+        tokens <- self$encode(
+          raw_text = raw_text[batch],
+          trace = trace,
+          token_encodings_only = FALSE
+        )
+
+        text_embedding <- array(
+          data = 0,
+          dim = c(
+            length(batch),
+            private$transformer_components$chunks,
+            n_layer_size
+          )
+        )
+
+        # Selecting the relevant layers
+        selected_layer <- private$transformer_components$emb_layer_min:private$transformer_components$emb_layer_max
+        tmp_selected_layer <- 1 + selected_layer
+
+        if (private$transformer_components$ml_framework == "tensorflow") {
+          # Clear session to ensure enough memory
+          tf$keras$backend$clear_session()
+
+          # Calculate tensors
+          tokens$encodings$set_format(type = "tensorflow")
+
+          tensor_embeddings <- private$transformer_components$model(
+            input_ids = tokens$encodings["input_ids"],
+            attention_mask = tokens$encodings["attention_mask"],
+            token_type_ids = tokens$encodings["token_type_ids"],
+            output_hidden_states = TRUE
+          )$hidden_states
+          if (private$transformer_components$emb_pool_type == "average") {
+            # Average Pooling over all tokens
+            for (i in tmp_selected_layer) {
+              tensor_embeddings[i] <- list(pooling(
+                inputs = tensor_embeddings[[as.integer(i)]],
+                mask = tokens$encodings["attention_mask"]
+              ))
             }
           }
+        } else {
+          # Clear memory
+          if (torch$cuda$is_available()) {
+            torch$cuda$empty_cache()
+          }
 
-          # tokens<-self$encode(raw_text = raw_text,
-          #                    trace = trace,
-          #                    token_encodings_only=FALSE)
+          # Calculate tensors
+          tokens$encodings$set_format(type = "torch")
 
-          index_min <- 1 + (b - 1) * batch_size
-          index_max <- min(b * batch_size, n_units)
-          batch <- index_min:index_max
-          # cat(batch)
-
-          tokens <- self$encode(
-            raw_text = raw_text[batch],
-            trace = trace,
-            token_encodings_only = FALSE
-          )
-
-          text_embedding <- array(
-            data = 0,
-            dim = c(
-              length(batch),
-              private$transformer_components$chunks,
-              n_layer_size
-            )
-          )
-
-          # Selecting the relevant layers
-          selected_layer <- private$transformer_components$emb_layer_min:private$transformer_components$emb_layer_max
-          tmp_selected_layer <- 1 + selected_layer
-
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            # Clear session to ensure enough memory
-            tf$keras$backend$clear_session()
-
-            # Calculate tensors
-            tokens$encodings$set_format(type = "tensorflow")
-
-            tensor_embeddings <- private$transformer_components$model(
-              input_ids = tokens$encodings["input_ids"],
-              attention_mask = tokens$encodings["attention_mask"],
-              token_type_ids = tokens$encodings["token_type_ids"],
+          with(
+            data = torch$no_grad(),
+            tensor_embeddings = private$transformer_components$model(
+              input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
+              attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
+              token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
               output_hidden_states = TRUE
             )$hidden_states
-            if (private$transformer_components$emb_pool_type == "average") {
-              # Average Pooling over all tokens
-              for (i in tmp_selected_layer) {
-                tensor_embeddings[i] <- list(pooling(
-                  inputs = tensor_embeddings[[as.integer(i)]],
-                  mask = tokens$encodings["attention_mask"]
-                ))
-              }
+          )
+          # print(tensor_embeddings)
+          if (private$transformer_components$emb_pool_type == "average") {
+            # Average Pooling over all tokens
+            for (i in tmp_selected_layer) {
+              tensor_embeddings[i] <- list(pooling(
+                x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
+                mask = tokens$encodings["attention_mask"]$to(pytorch_device)
+              ))
             }
-          } else {
-            # Clear memory
-            if (torch$cuda$is_available()) {
-              torch$cuda$empty_cache()
-            }
-
-            # Calculate tensors
-            tokens$encodings$set_format(type = "torch")
-
-            with(
-              data = torch$no_grad(),
-              tensor_embeddings <- private$transformer_components$model(
-                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
-                output_hidden_states = TRUE
-              )$hidden_states
-            )
-            # print(tensor_embeddings)
-            if (private$transformer_components$emb_pool_type == "average") {
-              # Average Pooling over all tokens
-              for (i in tmp_selected_layer) {
-                tensor_embeddings[i] <- list(pooling(
-                  x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
-                  mask = tokens$encodings["attention_mask"]$to(pytorch_device)
-                ))
-              }
-            }
-
-            # print(tensor_embeddings)
-            # print(tensor_embeddings[[as.integer(2)]])
-            # print(tokens$encodings["attention_mask"])
           }
 
+          # print(tensor_embeddings)
+          # print(tensor_embeddings[[as.integer(2)]])
+          # print(tokens$encodings["attention_mask"])
+        }
 
 
 
-          # if(private$transformer_components$aggregation=="last"){
-          #  selected_layer=private$transformer_components$model$config$num_hidden_layers
-          # } else if (private$transformer_components$aggregation=="second_to_last") {
-          #  selected_layer=private$transformer_components$model$config$num_hidden_layers-2
-          # } else if (private$transformer_components$aggregation=="fourth_to_last") {
-          #  selected_layer=private$transformer_components$model$config$num_hidden_layers-4
-          # } else if (private$transformer_components$aggregation=="all") {
-          #  selected_layer=2:private$transformer_components$model$config$num_hidden_layers
-          # } else if (private$transformer_components$aggregation=="last_four") {
-          #  selected_layer=(private$transformer_components$model$config$num_hidden_layers-4):private$transformer_components$model$config$num_hidden_layers
-          # }
 
-          # Sorting the hidden states to the corresponding cases and times
-          # If more than one layer is selected the mean is calculated
-          index <- 0
-          for (i in 1:length(batch)) {
-            for (j in 1:tokens$chunks[i]) {
-              for (layer in tmp_selected_layer) {
-                if (private$transformer_components$ml_framework == "tensorflow") {
+        # if(private$transformer_components$aggregation=="last"){
+        #  selected_layer=private$transformer_components$model$config$num_hidden_layers
+        # } else if (private$transformer_components$aggregation=="second_to_last") {
+        #  selected_layer=private$transformer_components$model$config$num_hidden_layers-2
+        # } else if (private$transformer_components$aggregation=="fourth_to_last") {
+        #  selected_layer=private$transformer_components$model$config$num_hidden_layers-4
+        # } else if (private$transformer_components$aggregation=="all") {
+        #  selected_layer=2:private$transformer_components$model$config$num_hidden_layers
+        # } else if (private$transformer_components$aggregation=="last_four") {
+        #  selected_layer=(private$transformer_components$model$config$num_hidden_layers-4):private$transformer_components$model$config$num_hidden_layers
+        # }
+
+        # Sorting the hidden states to the corresponding cases and times
+        # If more than one layer is selected the mean is calculated
+        index <- 0
+        for (i in 1:length(batch)) {
+          for (j in 1:tokens$chunks[i]) {
+            for (layer in tmp_selected_layer) {
+              if (private$transformer_components$ml_framework == "tensorflow") {
+                if (private$transformer_components$emb_pool_type == "cls") {
+                  # CLS Token is always the first token
+                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
+                    tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy()
+                  )
+                } else if (private$transformer_components$emb_pool_type == "average") {
+                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
+                    tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$numpy()
+                  )
+                }
+              } else {
+                if (torch$cuda$is_available() == FALSE) {
                   if (private$transformer_components$emb_pool_type == "cls") {
                     # CLS Token is always the first token
                     text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$numpy()
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$numpy()
                     )
                   } else if (private$transformer_components$emb_pool_type == "average") {
                     text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$numpy()
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$detach()$numpy()
                     )
                   }
                 } else {
-                  if (torch$cuda$is_available() == FALSE) {
-                    if (private$transformer_components$emb_pool_type == "cls") {
-                      # CLS Token is always the first token
-                      text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$numpy()
-                      )
-                    } else if (private$transformer_components$emb_pool_type == "average") {
-                      text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$detach()$numpy()
-                      )
-                    }
-                  } else {
-                    if (private$transformer_components$emb_pool_type == "cls") {
-                      # CLS Token is always the first token
-                      text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$cpu()$numpy()
-                      )
-                    } else if (private$transformer_components$emb_pool_type == "average") {
-                      text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                        tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$detach()$cpu()$numpy()
-                      )
-                    }
+                  if (private$transformer_components$emb_pool_type == "cls") {
+                    # CLS Token is always the first token
+                    text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]][[as.integer(0)]]$detach()$cpu()$numpy()
+                    )
+                  } else if (private$transformer_components$emb_pool_type == "average") {
+                    text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
+                      tensor_embeddings[[as.integer(layer)]][[as.integer(index)]]$detach()$cpu()$numpy()
+                    )
                   }
                 }
               }
-              text_embedding[i, j, ] <- text_embedding[i, j, ] / length(tmp_selected_layer)
-              index <- index + 1
             }
-          }
-          dimnames(text_embedding)[[3]] <- paste0(private$basic_components$method, "_", seq(from = 1, to = n_layer_size, by = 1))
-
-          # Add ID of every case
-          dimnames(text_embedding)[[1]] <- doc_id[batch]
-          batch_results[b] <- list(text_embedding)
-          if (trace == TRUE) {
-            cat(paste(
-              date(),
-              "Batch", b, "/", n_batches, "Done", "\n"
-            ))
-          }
-          base::gc(verbose = FALSE, full = TRUE)
-
-          update_aifeducation_progress_bar(value = b, total = n_batches, title = "Embedding")
-        }
-
-        # Summarizing the results over all batches
-        text_embedding <- array_form_bind(batch_results)
-        # Glove Cluster----------------------------------------------------------
-      } else if (private$basic_components$method == "glove_cluster") {
-        tokens <- self$encode(
-          raw_text = raw_text,
-          trace = trace,
-          token_encodings_only = FALSE
-        )
-
-
-        text_embedding <- array(
-          data = 0,
-          dim = c(
-            length(tokens),
-            1,
-            private$bow_components$configuration$bow_n_cluster
-          )
-        )
-        # text_embedding<-matrix(nrow = length(tokens),
-        #                       ncol =  private$bow_components$configuration$bow_n_cluster,
-        #                       data = 0)
-        for (i in 1:length(tokens)) {
-          token_freq <- table(tokens[[i]])
-          tmp_tokens <- names(token_freq)
-          for (j in 1:length(token_freq)) {
-            index <- match(
-              x = as.integer(tmp_tokens[j]),
-              table = private$bow_components$model$index
-            )
-            text_embedding[i, 1, private$bow_components$model$cluster[index]] <- token_freq[j] +
-              text_embedding[i, 1, private$bow_components$model$cluster[index]]
+            text_embedding[i, j, ] <- text_embedding[i, j, ] / length(tmp_selected_layer)
+            index <- index + 1
           }
         }
+        dimnames(text_embedding)[[3]] <- paste0(private$basic_components$method, "_", seq(from = 1, to = n_layer_size, by = 1))
 
-        # text_embedding=text_embedding/rowSums(text_embedding)
-        # text_embedding[is.nan(text_embedding)]<-0
-
-        dimnames(text_embedding)[[3]] <- paste0(private$basic_components$method, "_", seq(from = 1, to = private$bow_components$configuration$bow_n_cluster, by = 1))
         # Add ID of every case
-        dimnames(text_embedding)[[1]] <- doc_id
-
-        # text_embedding<-as.data.frame(text_embedding)
-        # Topic Modeling---------------------------------------------------------
-      } else if (private$basic_components$method == "lda") {
-        tokens <- self$encode(
-          raw_text = raw_text,
-          trace = trace,
-          token_encodings_only = FALSE
-        )
-
-        text_embedding <- array(
-          data = 0,
-          dim = c(
-            length(tokens),
-            1,
-            private$bow_components$configuration$bow_n_dim
-          )
-        )
-        # text_embedding<-matrix(nrow = length(tokens),
-        #                       ncol =  private$bow_components$configuration$bow_n_dim,
-        #                       data = 0)
-        for (i in 1:length(tokens)) {
-          token_freq <- table(tokens[[i]])
-          tmp_tokens <- names(token_freq)
-          if (length(tmp_tokens) > 0) {
-            for (j in 1:length(token_freq)) {
-              index <- match(
-                x = as.integer(tmp_tokens[j]),
-                table = private$bow_components$model$index
-              )
-              if (is.na(index) == FALSE) {
-                text_embedding[i, 1, ] <- text_embedding[i, 1, ] + token_freq[j] * as.matrix(private$bow_components$model[index, -1])
-              }
-            }
-          }
+        dimnames(text_embedding)[[1]] <- doc_id[batch]
+        batch_results[b] <- list(text_embedding)
+        if (trace == TRUE) {
+          cat(paste(
+            date(),
+            "Batch", b, "/", n_batches, "Done", "\n"
+          ))
         }
-        # text_embedding<-text_embedding/rowSums(private$bow_components$model[,-1])
-        text_embedding <- text_embedding / rowSums(text_embedding)
-        # Replace NaN with 0 which indicate that the rowsum is 0 and division ist not
-        # possible
-        text_embedding[is.nan(text_embedding)] <- 0
+        base::gc(verbose = FALSE, full = TRUE)
 
-        dimnames(text_embedding)[[3]] <- paste0(private$basic_components$method, "_", seq(from = 1, to = private$bow_components$configuration$bow_n_dim, by = 1))
-        # Add ID of every case
-        dimnames(text_embedding)[[1]] <- doc_id
-
-        # text_embedding<-as.data.frame(text_embedding)
+        update_aifeducation_progress_bar(value = b, total = n_batches, title = "Embedding")
       }
-      #------------------------------------------------------------------------
 
-      if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-        embeddings <- EmbeddedText$new()
-        embeddings$configure(
-          model_name = private$model_info$model_name,
-          model_label = private$model_info$model_label,
-          model_date = private$model_info$model_date,
-          model_method = private$basic_components$method,
-          model_language = private$model_info$model_language,
-          param_seq_length = private$basic_components$max_length,
-          param_features = dim(text_embedding)[3],
-          param_chunks = private$transformer_components$chunks,
-          param_overlap = private$transformer_components$overlap,
-          param_emb_layer_min = private$transformer_components$emb_layer_min,
-          param_emb_layer_max = private$transformer_components$emb_layer_max,
-          param_emb_pool_type = private$transformer_components$emb_pool_type,
-          param_aggregation = NA,
-          embeddings = text_embedding
-        )
-      } else if (private$basic_components$method == "glove_cluster" |
-        private$basic_components$method == "lda") {
-        embeddings <- EmbeddedText$new()
-        embeddings$configure(
-          model_name = private$model_info$model_name,
-          model_date = private$model_info$model_date,
-          model_label = private$model_info$model_label,
-          model_method = private$basic_components$method,
-          model_language = private$model_info$model_language,
-          param_seq_length = private$basic_components$max_length,
-          param_features = dim(text_embedding)[2],
-          param_chunks = private$bow_components$chunks,
-          param_overlap = private$bow_components$overlap,
-          param_aggregation = private$bow_components$aggregation,
-          embeddings = text_embedding
-        )
-      }
+      # Summarizing the results over all batches
+      text_embedding <- array_form_bind(batch_results)
+
+
+
+      embeddings <- EmbeddedText$new()
+      embeddings$configure(
+        model_name = private$model_info$model_name,
+        model_label = private$model_info$model_label,
+        model_date = private$model_info$model_date,
+        model_method = private$basic_components$method,
+        model_language = private$model_info$model_language,
+        param_seq_length = private$basic_components$max_length,
+        param_features = dim(text_embedding)[3],
+        param_chunks = private$transformer_components$chunks,
+        param_overlap = private$transformer_components$overlap,
+        param_emb_layer_min = private$transformer_components$emb_layer_min,
+        param_emb_layer_max = private$transformer_components$emb_layer_max,
+        param_emb_pool_type = private$transformer_components$emb_pool_type,
+        param_aggregation = NA,
+        embeddings = text_embedding
+      )
+
 
       if (return_large_dataset == FALSE) {
         return(embeddings)
@@ -2048,14 +1588,6 @@ TextEmbeddingModel <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    #' @description Method for requesting the part of interface's configuration that is necessary bag-of-words models.
-    #' @return Returns a `list`.
-    get_bow_components = function() {
-      return(
-        private$bow_components
-      )
-    },
-    #---------------------------------------------------------------------------
     #' @description Method for requesting the part of interface's configuration that is necessary for transformer
     #'   models.
     #' @return Returns a `list`.
@@ -2131,6 +1663,33 @@ TextEmbeddingModel <- R6::R6Class(
     #' @return Returns a `list` with all private fields and methods.
     get_private = function() {
       return(private)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Return all fields.
+    #' @return Method returns a `list` containing all public and private fields
+    #' of the object.
+    get_all_fields = function() {
+      public_list <- NULL
+      private_list <- NULL
+
+      for (entry in names(self)) {
+        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+          public_list[entry] <- list(self[[entry]])
+        }
+      }
+
+      for (entry in names(private)) {
+        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+          private_list[entry] <- list(private[[entry]])
+        }
+      }
+
+      return(
+        list(
+          public = public_list,
+          private = private_list
+        )
+      )
     }
   )
 )

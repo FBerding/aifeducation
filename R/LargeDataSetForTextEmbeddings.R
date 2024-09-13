@@ -194,19 +194,35 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       }
 
       # Load R file
-      old_model <- load_R_interface(dir_path)
+      config_file <- load_R_interface(dir_path)
 
       # Set configuration
-      do.call(
-        what = self$configure,
-        args = old_model$get_model_info()
+      self$configure(
+        model_name = config_file$private$model_name,
+        model_label = config_file$private$model_label,
+        model_date = config_file$private$model_date,
+        model_method = config_file$private$model_method,
+        model_version = config_file$private$model_version,
+        model_language = config_file$private$model_language,
+        param_seq_length = config_file$private$param_seq_length,
+        param_chunks = config_file$private$param_chunks,
+        param_features = config_file$private$param_features,
+        param_overlap = config_file$private$param_overlap,
+        param_emb_layer_min = config_file$private$param_emb_layer_min,
+        param_emb_layer_max = config_file$private$param_emb_layer_max,
+        param_emb_pool_type = config_file$private$param_emb_pool_type,
+        param_aggregation = config_file$private$param_aggregation
       )
 
       # Check for feature extractor and add information
-      if (old_model$is_compressed() == TRUE) {
-        do.call(
-          what = self$add_feature_extractor_info,
-          args = old_model$get_feature_extractor_info
+      if (is.null_or_na(config_file$private$feature_extractor$model_name) == FALSE) {
+        self$add_feature_extractor_info(
+          model_name = config_file$private$feature_extractor$model_name,
+          model_label = config_file$private$feature_extractor$model_label,
+          features = config_file$private$feature_extractor$features,
+          method = config_file$private$feature_extractor$method,
+          noise_factor = config_file$private$feature_extractor$noise_factor,
+          optimizer = config_file$private$feature_extractor$optimizer
         )
       }
 
@@ -265,11 +281,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     #' @description Checks if the text embedding were reduced by a [TEFeatureExtractor].
     #' @return Returns `TRUE` if the number of dimensions was reduced by a [TEFeatureExtractor]. If not return `FALSE`.
     is_compressed = function() {
-      if (is.null_or_na(private$feature_extractor$model_name)) {
-        return(FALSE)
-      } else {
-        return(TRUE)
-      }
+      return(!is.null_or_na(private$feature_extractor$model_name))
     },
 
     #--------------------------------------------------------------------------

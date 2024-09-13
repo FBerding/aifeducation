@@ -29,15 +29,4 @@ pyarrow <- NULL
   pyarrow <<- reticulate::import("pyarrow", delay_load = TRUE)
   codecarbon <<- reticulate::import("codecarbon", delay_load = TRUE)
   keras <<- reticulate::import("keras", delay_load = TRUE)
-
-  delayedAssign(
-    x = "py_update_aifeducation_progress_bar_epochs",
-    value = reticulate::py_func(update_aifeducation_progress_bar_epochs),
-    assign.env = globalenv()
-  )
-  delayedAssign(
-    x = "py_update_aifeducation_progress_bar_steps",
-    value = reticulate::py_func(update_aifeducation_progress_bar_steps),
-    assign.env = globalenv()
-  )
 }

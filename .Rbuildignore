@@ -31,3 +31,4 @@ reference
 aifeducation_state.log
 aifeducation_loss.log
 arguments.rda
+^LICENSE\.md$

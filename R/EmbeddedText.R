@@ -337,6 +337,33 @@ EmbeddedText <- R6::R6Class(
     #' @return Returns the number of rows of the text embeddings which represent the number of cases.
     n_rows = function() {
       return(dim(self$embeddings)[1])
+    },
+    #--------------------------------------------------------------------------
+    #' @description Return all fields.
+    #' @return Method returns a `list` containing all public and private fields
+    #' of the object.
+    get_all_fields = function() {
+      public_list <- NULL
+      private_list <- NULL
+
+      for (entry in names(self)) {
+        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+          public_list[entry] <- list(self[[entry]])
+        }
+      }
+
+      for (entry in names(private)) {
+        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+          private_list[entry] <- list(private[[entry]])
+        }
+      }
+
+      return(
+        list(
+          public = public_list,
+          private = private_list
+        )
+      )
     }
   )
 )

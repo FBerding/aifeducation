@@ -17,6 +17,8 @@ features, and objects. The following changes have been made:
   provides a broad gpu support, and offers more stable code across versions.
 - Implemented a method for all objects allowing objects that were created with
   an older version of the package to update to the current version during loading.
+- Removed the bag-of-words models from the package in order to focus the package
+  on approaches which use AI.
   
 **Installation and Configuration**
 
@@ -79,7 +81,7 @@ features, and objects. The following changes have been made:
 - Introduced save_to_disk and load_from_disk as the new core functions for 
   saving and loading objects and models of this package.
 - Functions load_ai_model and save_ai_model are now deprecated. Please use this
-  functions only for model created with version 0.3.3 or lower.
+  functions only for models created with version 0.3.3 or lower.
   
 **Further Changes**
 
