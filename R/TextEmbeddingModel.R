@@ -608,7 +608,7 @@ TextEmbeddingModel <- R6::R6Class(
         max_length = config_file$private$basic_components$max_length
       )
 
-      #Load python scripts
+      # Load python scripts
       # Must be called after setting private$basic_components$method
       private$load_reload_python_scripts()
 
@@ -835,22 +835,21 @@ TextEmbeddingModel <- R6::R6Class(
           return(encodings_only)
         } else {
           # Convert ids to tokens
-          if ((private$basic_components$method %in% private$supported_transformers) == TRUE) {
-            token_seq_list <- NULL
-            for (i in 1:length(encodings_only)) {
-              tmp_sequence <- encodings_only[[i]]
-              tmp_seqeunce_tok <- NULL
-              for (j in 1:length(tmp_sequence)) {
-                tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
-                  private$transformer_components$tokenizer$convert_ids_to_tokens(
-                    ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
-                  )
+
+          token_seq_list <- NULL
+          for (i in 1:length(encodings_only)) {
+            tmp_sequence <- encodings_only[[i]]
+            tmp_seqeunce_tok <- NULL
+            for (j in 1:length(tmp_sequence)) {
+              tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
+                private$transformer_components$tokenizer$convert_ids_to_tokens(
+                  ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
                 )
-              }
-              token_seq_list[length(token_seq_list) + 1] <- list(tmp_seqeunce_tok)
+              )
             }
-            return(token_seq_list)
+            token_seq_list[length(token_seq_list) + 1] <- list(tmp_seqeunce_tok)
           }
+          return(token_seq_list)
         }
 
         #--------------------------------------------------------------------
