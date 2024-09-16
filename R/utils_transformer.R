@@ -5,6 +5,11 @@
 #' @param dataset Object of class datasets.arrow_dataset.Dataset. The data set must contain
 #' a column `"length"` containing the number of tokens for every sequence and a column `"word_ids"`
 #' containing the word ids within every sequence.
+#' @param step `string` indicating to which step the statistics belong. Recommended values are
+#' * `"creation"` for the creation of the tokenizer.
+#' * `"initial_training"` for the first training of the transformer.
+#' * `"fine_tuning"` for all following trainings of the transformer.
+#' * `"training"` for a training run of the transformer.
 #' @return Returns a `list` with the following entries:
 #' * n_sequences: Number of sequences
 #' * n_words: Number for words in whole corpus
@@ -21,7 +26,7 @@
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-calc_tokenizer_statistics=function(dataset){
+calc_tokenizer_statistics=function(dataset,step="creation"){
   #Argument Checking
   check_class(dataset,"datasets.arrow_dataset.Dataset",FALSE)
   if("word_ids"%in%dataset$column_names==FALSE){
@@ -45,6 +50,8 @@ calc_tokenizer_statistics=function(dataset){
 
   return(
     list(
+      step=step,
+      date=date(),
       n_sequences=n_sequences,
       n_words=n_words,
       n_tokens=n_tokens,

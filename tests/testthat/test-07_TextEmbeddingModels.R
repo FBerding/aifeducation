@@ -352,6 +352,9 @@ for(framework in ml_frameworks){
 
           #One row for creation and one row for training
           expect_equal(nrow(sustain_data),2)
+
+          #Check tokenizer statistics
+          expect_equal(nrow(text_embedding_model_reloaded$tokenizer_statistics),2)
         })
 
         #Documentation----------------------------------------------------------

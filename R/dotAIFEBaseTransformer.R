@@ -215,8 +215,6 @@
             ),
             remove_columns = raw_text_dataset$column_names
           )
-          #Calculate tokenizer statistics
-          tokenizer_statistics<- calc_tokenizer_statistics(tokenized_texts_raw)
 
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
@@ -227,7 +225,14 @@
                 length_vector >= self$params$min_seq_len
             )
           }
+
           self$temp$tokenized_dataset <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
+          self$temp$tokenizer_statistics[length(self$tmp$tokenizer_statistics) + 1] <- list(
+            calc_tokenizer_statistics(
+              dataset = self$temp$tokenized_dataset,
+              step = "training"
+            )
+          )
         }
       }
 
@@ -411,7 +416,7 @@
             history_log <- clean_pytorch_log_transformers(history_log)
           }
 
-          #Write history log
+          # Write history log
           write.csv2(
             history_log,
             file = paste0(self$params$output_dir, "/history.log"),
@@ -419,10 +424,19 @@
             quote = FALSE
           )
 
-          #write tokenizer statistics
+          # write tokenizer statistics
+          if (file.exists(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))) {
+            tmp_tok_statistics=read.csv(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))
+            final_tok_statistics=rbind(
+              tmp_tok_statistics,
+              unlist(self$temp$tokenizer_statistics)
+            )
+          } else {
+            final_tok_statistics=self$temp$tokenizer_statistics
+          }
           write.csv(
-            tokenizer_statistics,
-            file = paste0(self$params$output_dir, "/tokenizer_statistics.csv",row.names=FALSE),
+            final_tok_statistics,
+            file = paste0(self$params$output_dir, "/tokenizer_statistics.csv"),
             row.names = FALSE,
             quote = FALSE
           )

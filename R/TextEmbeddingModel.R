@@ -196,6 +196,33 @@ TextEmbeddingModel <- R6::R6Class(
         )
       }
     },
+    #------------------------------------------------------------------------
+    # Method for loading tokenizer statistics
+    load_tokenizer_statistics=function(model_dir){
+      path <- paste0(model_dir, "/", "history.log")
+      if (file.exists(path) == TRUE) {
+        self$tokenizer_statistics <- read.csv(file = path,row.names=FALSE)
+      } else {
+        self$tokenizer_statistics <- NA
+      }
+    },
+    #------------------------------------------------------------------------
+    #Method for saving tokenizer statistics
+    save_tokenizer_statistics=function(dir_path, folder_name) {
+      if (is.null_or_na(self$tokenizer_statistics) == FALSE) {
+        save_location <- paste0(dir_path, "/", folder_name)
+        if (dir.exists(dir_path) == FALSE) {
+          dir.create(dir_path)
+          cat("Creating Directory\n")
+        }
+        write.csv(
+          x = self$tokenizer_statistics,
+          file = paste0(save_location, "/", "tokenizer_statistics.csv"),
+          row.names = FALSE,
+          quote = FALSE
+        )
+      }
+    },
     #-------------------------------------------------------------------------
     # Method for checking and setting the embedding configuration
     check_and_set_embedding_layers = function(emb_layer_min,
@@ -448,6 +475,15 @@ TextEmbeddingModel <- R6::R6Class(
       history = NULL
     ),
 
+    #' @field tokenizer_statistics ('matrix()')\cr
+    #' Matrix containing the tokenizer statistics for the creation of the tokenizer
+    #' and all training runs according to Kaya & Tantuğ (2024).
+    #'
+    #'Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish
+    #'large language models. Intelligent Systems with Applications, 21, 200335.
+    #' https://doi.org/10.1016/j.iswa.2024.200335
+    tokenizer_statistics=NULL,
+
     #--------------------------------------------------------------------------
     #' @description Method for creating a new text embedding model
     #' @param model_name `string` containing the name of the new model.
@@ -698,6 +734,9 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Load Training history
       private$load_training_history(model_dir = dir_path)
+
+      #Load Tokenizer statistics
+      load_tokenizer_statistics(model_dir = dir_path)
     },
     #--------------------------------------------------------------------------
     #' @description Method for saving a transformer model on disk.Relevant
@@ -768,6 +807,12 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Save training history
       private$save_training_history(
+        dir_path = dir_path,
+        folder_name = folder_name
+      )
+
+      # Save tokenizer statistics
+      private$save_tokenizer_statistics(
         dir_path = dir_path,
         folder_name = folder_name
       )
