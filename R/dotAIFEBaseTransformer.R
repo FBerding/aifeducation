@@ -209,12 +209,15 @@
                 return_offsets_mapping = FALSE,
                 return_attention_mask = TRUE,
                 return_tensors = "np",
-                request_word_ids = self$params$whole_word,
+                request_word_ids = TRUE,
                 report_to_aifeducation_studio = is_shinyapp_active()
               )
             ),
             remove_columns = raw_text_dataset$column_names
           )
+          #Calculate tokenizer statistics
+          tokenizer_statistics<- calc_tokenizer_statistics(tokenized_texts_raw)
+
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
             relevant_indices <- which(length_vector == self$params$chunk_size)
@@ -408,9 +411,18 @@
             history_log <- clean_pytorch_log_transformers(history_log)
           }
 
+          #Write history log
           write.csv2(
             history_log,
             file = paste0(self$params$output_dir, "/history.log"),
+            row.names = FALSE,
+            quote = FALSE
+          )
+
+          #write tokenizer statistics
+          write.csv(
+            tokenizer_statistics,
+            file = paste0(self$params$output_dir, "/tokenizer_statistics.csv",row.names=FALSE),
             row.names = FALSE,
             quote = FALSE
           )
