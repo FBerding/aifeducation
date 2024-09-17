@@ -1720,7 +1720,8 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
           new_categories <- as.data.frame(new_categories)
 
           # Transforming the probabilities to a information index
-          new_categories[, 2] <- abs(bpl_anchor - (as.numeric(new_categories[, 2]) - 1 / length(categories)) / (1 - 1 / length(categories)))
+          new_categories[, 2] <- abs(bpl_anchor - (as.numeric(new_categories[, 2]) - 1 / length(categories)) /
+            (1 - 1 / length(categories)))
           new_categories <- as.data.frame(new_categories)
 
           # Reducing the new categories to the desired range

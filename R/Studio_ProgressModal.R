@@ -219,6 +219,7 @@ start_and_monitor_long_task <- function(id,
 
           y_max <- max(plot_data[data_columns])
           y_min <- 0
+          # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation, color = "validation"))

@@ -80,6 +80,7 @@ Fill_Mask_UI <- function(id) {
 Fill_Mask_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
+    # TODO (Yuliia): Remove? Variable is not used
     ns <- session$ns
 
     # Render Token table--------------------------------------------------------
@@ -126,6 +127,7 @@ Fill_Mask_Server <- function(id, model) {
         plot_data <- plot_data[order(plot_data$score, decreasing = FALSE), ]
         plot_data$token_str <- factor(plot_data$token_str, levels = (plot_data$token_str))
         plot_data <- as.data.frame(plot_data)
+        # TODO (Yuliia): .data has no visible binding
         plot <- ggplot2::ggplot(data = plot_data) +
           ggplot2::geom_col(
             ggplot2::aes(
