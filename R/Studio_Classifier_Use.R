@@ -59,6 +59,7 @@ Classifiers_Use_UI <- function(id) {
 Classifiers_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
+    # TODO (Yuliia): Remove? Variable is not used
     ns <- session$ns
 
     # File system management----------------------------------------------------
@@ -103,7 +104,8 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
               title = "Error",
               size = "l",
               easy_close = TRUE,
-              error_messages = "The file does not contain an object of class TEClassifierRegular or TEClassifierProtoNet."
+              error_messages = "The file does not contain an object of
+                                class TEClassifierRegular or TEClassifierProtoNet."
             )
             return(NULL)
           }

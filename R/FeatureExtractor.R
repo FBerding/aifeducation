@@ -318,7 +318,7 @@ TEFeatureExtractor <- R6::R6Class(
       config_file <- load_R_interface(dir_path)
 
       # Set training status
-      private$trained = config_file$private$trained
+      private$trained <- config_file$private$trained
     },
     #---------------------------------------------------------------------------
     #' @description Method for extracting features. Applying this method reduces the number of dimensions of the text

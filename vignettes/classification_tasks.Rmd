@@ -961,7 +961,7 @@ classifier$train(
   batch_size = 32,
   dir_checkpoint = "training/classifier",
   trace = TRUE,
-  ml_trace=1
+  ml_trace = 1
 )
 ```
 
@@ -1169,7 +1169,7 @@ save_to_disk(
 The classifier is saved to `C:/classifiers/imdb_movie_reviews`. To load the model
 call `load_from_disk`.
 ```{r, include = TRUE, eval = FALSE}
-classifier<-load_from_disk("C:/classifiers/imdb_movie_reviews")
+classifier <- load_from_disk("C:/classifiers/imdb_movie_reviews")
 ```
 
 ## 5.6 Predicting New Data
@@ -1208,7 +1208,7 @@ estimate of certainty for each class/category.
 
 ```{r, include = TRUE, eval = FALSE}
 # If your classifier is not loaded
-classifier<-load_from_disk("C:/classifiers/imdb_movie_reviews")
+classifier <- load_from_disk("C:/classifiers/imdb_movie_reviews")
 
 # Predict the classes of new texts
 predicted_categories <- classifier$predict(

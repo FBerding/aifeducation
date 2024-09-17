@@ -509,7 +509,6 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     shiny::observeEvent(input$save_modal_button_continue, {
       # Check for errors
       errors <- check_errors_create_classifier(
-        classifier_type = input$classifier_type,
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
@@ -568,7 +567,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             folder_name = input$save_modal_folder_name,
             path_to_embeddings = path_to_embeddings(),
             path_to_target_data = path_to_target_data(),
-            target_levels=input$target_levels,
+            target_levels = input$target_levels,
             target_data_column = input$data_target_column,
             path_to_feature_extractor = path_to_feature_extractor(),
             name = input$name,
@@ -687,14 +686,14 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
     target_levels_unsorted <- shiny::reactive({
       if (!is.null(data_targets())) {
-      relevant_data <- data_targets()
-      relevant_data <-relevant_data[input$data_target_column]
-      if (nrow(relevant_data) > 0) {
-        target_levels <- names(table(relevant_data, useNA = "no"))
-        return(target_levels)
-      }else {
-        return(NULL)
-      }
+        relevant_data <- data_targets()
+        relevant_data <- relevant_data[input$data_target_column]
+        if (nrow(relevant_data) > 0) {
+          target_levels <- names(table(relevant_data, useNA = "no"))
+          return(target_levels)
+        } else {
+          return(NULL)
+        }
       } else {
         return(NULL)
       }
@@ -704,11 +703,11 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       if (!is.null(target_levels_unsorted())) {
         return(
           sortable::rank_list(
-          text = "Please select the order of categories/classes.",
-          labels = target_levels_unsorted(),
-          input_id = session$ns("target_levels"),
-          class=c("default-sortable", "aifeducation-sortable")
-        )
+            text = "Please select the order of categories/classes.",
+            labels = target_levels_unsorted(),
+            input_id = session$ns("target_levels"),
+            class = c("default-sortable", "aifeducation-sortable")
+          )
         )
       } else {
         return(NULL)
@@ -760,7 +759,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
 
     # Regular specific elements-------------------------------------------------
-    output$regular_train <- renderUI({
+    output$regular_train <- shiny::renderUI({
       if (input$classifier_type == "regular") {
         ui <- shiny::tagList(
           shinyWidgets::materialSwitch(
@@ -783,7 +782,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     })
 
     # ProtoNet specific elements------------------------------------------------
-    output$protonet_embedding_layer <- renderUI({
+    output$protonet_embedding_layer <- shiny::renderUI({
       if (input$classifier_type == "protonet") {
         ui <- bslib::card(
           bslib::card_header(
@@ -807,7 +806,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       return(ui)
     })
 
-    output$protonet_train <- renderUI({
+    output$protonet_train <- shiny::renderUI({
       if (input$classifier_type == "protonet") {
         ui <- shiny::tagList(
           bslib::card(

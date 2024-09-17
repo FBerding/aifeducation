@@ -14,7 +14,7 @@ License_UI <- function(id) {
       bslib::card_header("License"),
       bslib::card_body(
         shiny::uiOutput(
-          outputId = NS(id, "gpl3_license")
+          outputId = shiny::NS(id, "gpl3_license")
         )
       )
     )
@@ -34,8 +34,9 @@ License_UI <- function(id) {
 #' @keywords internal
 #'
 License_Server <- function(id) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
+    # TODO (Yuliia): remove? Variable is not used
     ns <- session$ns
 
     output$gpl3_license <- shiny::renderUI(

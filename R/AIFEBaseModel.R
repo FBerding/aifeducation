@@ -677,7 +677,7 @@ AIFEBaseModel <- R6::R6Class(
       config_file <- load_R_interface(dir_path)
 
       # Old public state
-      config_public=config_file$public
+      config_public <- config_file$public
 
       # Old private states
       config_private <- config_file$private

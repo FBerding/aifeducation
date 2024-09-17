@@ -426,13 +426,13 @@
 
           # write tokenizer statistics
           if (file.exists(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))) {
-            tmp_tok_statistics=read.csv(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))
-            final_tok_statistics=rbind(
+            tmp_tok_statistics <- read.csv(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))
+            final_tok_statistics <- rbind(
               tmp_tok_statistics,
               unlist(self$temp$tokenizer_statistics)
             )
           } else {
-            final_tok_statistics=self$temp$tokenizer_statistics
+            final_tok_statistics <- self$temp$tokenizer_statistics
           }
           write.csv(
             final_tok_statistics,
@@ -520,8 +520,8 @@
 
     #' @field temp A list containing temporary transformer's parameters
     #'
-    #'   `list()` containing all the temporary local variables that need to be accessed between the step functions. Can be
-    #'   set with `set_model_temp()`.
+    #'   `list()` containing all the temporary local variables that need to be accessed between the step functions. Can
+    #'   be set with `set_model_temp()`.
     #'
     #'   For example, it can be a variable `tok_new` that stores the tokenizer from
     #'   `steps_for_creation$create_tokenizer_draft`. To train the tokenizer, access the variable `tok_new` in

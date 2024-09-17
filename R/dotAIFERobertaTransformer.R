@@ -44,8 +44,8 @@
     #
     # `create_final_tokenizer()` **adds** temporary `tokenizer` parameter to the inherited `temp` list.
     #
-    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the inherited `temp`
-    # list.
+    # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the inherited
+    # `temp` list.
     #
     # Use the `super$set_SFC_*()` methods to set required/optional steps for creation in the base class, where `*` is
     # the name of the step.

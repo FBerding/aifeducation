@@ -392,11 +392,7 @@ TEClassifierProtoNet <- R6::R6Class(
           val_size = self$last_training$config$data_val_size,
           class_levels = self$model_config$target_levels,
           one_hot_encoding = self$model_config$require_one_hot,
-          add_matrix_map = if (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE) {
-            TRUE
-          } else {
-            FALSE
-          },
+          add_matrix_map = (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE),
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
@@ -410,11 +406,7 @@ TEClassifierProtoNet <- R6::R6Class(
           val_size = self$last_training$config$data_val_size,
           class_levels = self$model_config$target_levels,
           one_hot_encoding = self$model_config$require_one_hot,
-          add_matrix_map = if (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE) {
-            TRUE
-          } else {
-            FALSE
-          },
+          add_matrix_map = (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE),
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,

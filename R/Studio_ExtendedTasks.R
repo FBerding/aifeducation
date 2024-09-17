@@ -89,6 +89,7 @@ long_transform_text_to_embeddings <- function(source_path,
     raw_texts <- load_from_disk(source_path)
 
     # Set up top level progress monitoring
+    # TODO (Yuliia): remove? Variables are not used
     top_total <- raw_texts$n_rows()
     top_value <- 0
     total_message <- "Documents"

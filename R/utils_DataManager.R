@@ -68,7 +68,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
         min_k_final <- min_k_final + difference
       }
 
-      if (cat_freq[cat] < max_freq & min_k > 0 & cat_freq[cat] > 3) {
+      if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3) {
         for (m in 1:length(method)) {
           if (method[m] != "dbsmote") {
             for (k in min_k_final:max_k_final) {
@@ -248,7 +248,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
     )
   }
 
-  if (is.null(syn_data) == FALSE | nrow(syn_data$syn_data) > 0) {
+  if (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0) {
     n_cols_embedding <- ncol(matrix_form)
     tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(

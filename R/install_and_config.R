@@ -15,9 +15,8 @@
 #' @family Installation and Configuration
 #'
 #' @export
-install_aifeducation=function(install_aifeducation_studio = TRUE,
-                              cpu_only = FALSE){
-
+install_aifeducation <- function(install_aifeducation_studio = TRUE,
+                                 cpu_only = FALSE) {
   reticulate::install_python()
   reticulate::install_miniconda()
   install_py_modules(
@@ -115,7 +114,7 @@ install_py_modules <- function(envname = "aifeducation",
   }
 
   # Tensorflow Installation
-  if (install == "all" | install == "tensorflow") {
+  if (install == "all" || install == "tensorflow") {
     if (cpu_only == TRUE) {
       reticulate::conda_install(
         packages = c(
@@ -166,7 +165,7 @@ install_py_modules <- function(envname = "aifeducation",
     )
   }
 
-  if (install == "all" | install == "pytorch") {
+  if (install == "all" || install == "pytorch") {
     reticulate::conda_install(
       packages = c(
         "pytorch",

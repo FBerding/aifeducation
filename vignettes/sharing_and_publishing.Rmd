@@ -326,7 +326,7 @@ von Berding und Pargmann (2022) dar.
 ## Text Embedding Model
 
 Das dazugehörige Model zur Transformation von Text in eine numerische Darstellung
-kann per Mail an die Autoren angefordert werden. 
+kann per Mail an die Autoren angefordert werden.
 
 ## Potentielle Verzerrungen
 
@@ -339,9 +339,11 @@ und das Training der KI eingeflossen sind.
 Berding, F. & Pargmann, J. (2022). Iota Reliability Concept of the
 Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
 
-Deci, E. L. & Ryan, R. M. (Hrsg.) (2002). Handbook of self-determination research. Rochester: University of Rochester Press.
+Deci, E. L. & Ryan, R. M. (Hrsg.) (2002). Handbook of self-determination research. Rochester: University of Rochester 
+Press.
 
-Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädagogik. Bielefeld: wbv. <https://doi.org/10.3278/9783763970216>
+Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädagogik. Bielefeld: wbv. 
+<https://doi.org/10.3278/9783763970216>
 
 ```
 

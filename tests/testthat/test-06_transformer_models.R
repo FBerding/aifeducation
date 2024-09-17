@@ -306,7 +306,7 @@ for (framework in ml_frameworks) {
             )
           )
         } else {
-          cat(paste("Creation of the Model: unknown transformer '", ai_method,"'\n"))
+          cat(paste("Creation of the Model: unknown transformer '", ai_method, "'\n"))
         }
       })
 
@@ -533,7 +533,7 @@ for (framework in ml_frameworks) {
             )
           }
         } else {
-          cat(paste("Training of the Model: unknown transformer '", ai_method,"'\n"))
+          cat(paste("Training of the Model: unknown transformer '", ai_method, "'\n"))
         }
       })
     } else {

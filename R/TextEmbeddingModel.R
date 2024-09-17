@@ -1,11 +1,9 @@
 #' @title Text embedding model
-#' @description This `R6` class stores a text embedding model which can be
-#' used to tokenize, encode, decode, and embed raw texts. The object provides a
-#' unique interface for different text processing methods.
-#' @return Objects of class [TextEmbeddingModel] transform raw texts into numerical
-#' representations which can be used for downstream tasks. For this aim objects of this class
-#' allow to tokenize raw texts, to encode tokens to sequences of integers, and to decode sequences
-#' of integers back to tokens.
+#' @description This `R6` class stores a text embedding model which can be used to tokenize, encode, decode, and embed
+#'   raw texts. The object provides a unique interface for different text processing methods.
+#' @return Objects of class [TextEmbeddingModel] transform raw texts into numerical representations which can be used
+#'   for downstream tasks. For this aim objects of this class allow to tokenize raw texts, to encode tokens to sequences
+#'   of integers, and to decode sequences of integers back to tokens.
 #' @family Text Embedding
 #' @export
 TextEmbeddingModel <- R6::R6Class(
@@ -198,17 +196,17 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #------------------------------------------------------------------------
     # Method for loading tokenizer statistics
-    load_tokenizer_statistics=function(model_dir){
+    load_tokenizer_statistics = function(model_dir) {
       path <- paste0(model_dir, "/", "history.log")
       if (file.exists(path) == TRUE) {
-        self$tokenizer_statistics <- read.csv(file = path,row.names=FALSE)
+        self$tokenizer_statistics <- read.csv(file = path, row.names = FALSE)
       } else {
         self$tokenizer_statistics <- NA
       }
     },
     #------------------------------------------------------------------------
-    #Method for saving tokenizer statistics
-    save_tokenizer_statistics=function(dir_path, folder_name) {
+    # Method for saving tokenizer statistics
+    save_tokenizer_statistics = function(dir_path, folder_name) {
       if (is.null_or_na(self$tokenizer_statistics) == FALSE) {
         save_location <- paste0(dir_path, "/", folder_name)
         if (dir.exists(dir_path) == FALSE) {
@@ -479,10 +477,10 @@ TextEmbeddingModel <- R6::R6Class(
     #' Matrix containing the tokenizer statistics for the creation of the tokenizer
     #' and all training runs according to Kaya & Tantuğ (2024).
     #'
-    #'Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish
-    #'large language models. Intelligent Systems with Applications, 21, 200335.
+    #' Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish
+    #' large language models. Intelligent Systems with Applications, 21, 200335.
     #' https://doi.org/10.1016/j.iswa.2024.200335
-    tokenizer_statistics=NULL,
+    tokenizer_statistics = NULL,
 
     #--------------------------------------------------------------------------
     #' @description Method for creating a new text embedding model
@@ -735,7 +733,7 @@ TextEmbeddingModel <- R6::R6Class(
       # Load Training history
       private$load_training_history(model_dir = dir_path)
 
-      #Load Tokenizer statistics
+      # Load Tokenizer statistics
       load_tokenizer_statistics(model_dir = dir_path)
     },
     #--------------------------------------------------------------------------
@@ -1205,7 +1203,10 @@ TextEmbeddingModel <- R6::R6Class(
             index <- index + 1
           }
         }
-        dimnames(text_embedding)[[3]] <- paste0(private$basic_components$method, "_", seq(from = 1, to = n_layer_size, by = 1))
+        dimnames(text_embedding)[[3]] <- paste0(
+          private$basic_components$method, "_",
+          seq(from = 1, to = n_layer_size, by = 1)
+        )
 
         # Add ID of every case
         dimnames(text_embedding)[[1]] <- doc_id[batch]

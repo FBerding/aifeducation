@@ -16,6 +16,8 @@
 #' @family studio_long_tasks
 #' @keywords internal
 #'
+
+# TODO (Yuliia): session has no visible binding
 create_process_modal <- function(ns = session$ns,
                                  title = "In progress. Please wait.",
                                  inc_middle = TRUE,
@@ -70,10 +72,10 @@ create_process_modal <- function(ns = session$ns,
     shiny::tags$hr()
   )
   prograssbars_list[length(prograssbars_list) + 1] <- list(
-    tags$p("Error messages:")
+    shiny::tags$p("Error messages:")
   )
   prograssbars_list[length(prograssbars_list) + 1] <- list(
-    textOutput(outputId = ns("error_messages"))
+    shiny::textOutput(outputId = ns("error_messages"))
   )
 
   modal <- shiny::modalDialog(

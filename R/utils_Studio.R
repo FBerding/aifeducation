@@ -20,6 +20,7 @@ generate_sidebar_information <- function(model) {
 
     max_tokens <- (model$get_model_info()$model_max_size - model$get_transformer_components()$overlap) * model$get_transformer_components()$chunks + model$get_model_info()$model_max_size
 
+    # TODO (Yuliia): remove? Variable is not used
     if (!is.null(model$get_transformer_components()$aggregation)) {
       aggegation <- shiny::tags$p("Hidden States Aggregation: ", model$get_transformer_components()$aggregation)
     } else {
@@ -73,7 +74,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
     )
-  } else if ("TEClassifierRegular" %in% class(model) |
+  } else if ("TEClassifierRegular" %in% class(model) ||
     "TEClassifierProtoNet" %in% class(model)) {
     if (is.null(model)) {
       model_label <- NULL
@@ -190,6 +191,7 @@ generate_model_bib_description <- function(model) {
     if (!is.null(pub_info$modifided_by$citation)) {
       shiny::tags$p("Citation: ", pub_info$modifided_by$citation)
     },
+    # TODO (Yuliia): get_model_info() has no visible binding
     if (!is.null(pub_info$modifided_by$citation)) {
       shiny::tags$p("Language: ", get_model_info()$model_language)
     },
@@ -297,6 +299,7 @@ generate_doc_input_developers <- function(ns, model, type = "developers") {
 #' @keywords internal
 #'
 generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "abstract") {
+  # TODO (Yuliia): remove? Variable "documentation_title" is not used
   if (language == "eng") {
     if (type == "abstract") {
       documention_title <- "Abstract English"
@@ -388,7 +391,7 @@ load_and_check_embeddings <- function(dir_path) {
       # Wait for modal
       Sys.sleep(1)
       embeddings <- load_from_disk(dir_path)
-      if (("EmbeddedText" %in% class(embeddings)) == TRUE |
+      if (("EmbeddedText" %in% class(embeddings)) == TRUE ||
         "LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
         shiny::removeModal()
         return(embeddings)
@@ -451,7 +454,7 @@ load_and_check_target_data <- function(file_path) {
       extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
       extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
 
-      if (extension == "csv" | extension == "txt") {
+      if (extension == "csv" || extension == "txt") {
         target_data <- try(
           as.data.frame(
             utils::read.csv(

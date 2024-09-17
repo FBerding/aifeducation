@@ -169,14 +169,14 @@ Training_Server <- function(id, model) {
             )
 
           # Plot for classifiers-----------------------------------------------
-        } else if ("TEClassifierRegular" %in% class(model()) |
-          "TEClassifierProtoNet" %in% class(model()) |
+        } else if ("TEClassifierRegular" %in% class(model()) ||
+          "TEClassifierProtoNet" %in% class(model()) ||
           "TEFeatureExtractor" %in% class(model())) {
           # Necessary input
           shiny::req(input$measure)
 
           # Get data for plotting
-          if ("TEClassifierRegular" %in% class(model()) |
+          if ("TEClassifierRegular" %in% class(model()) ||
             "TEClassifierProtoNet" %in% class(model())) {
             plot_data <- prepare_training_history(
               model = model(),

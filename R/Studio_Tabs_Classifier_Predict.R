@@ -131,7 +131,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     })
 
     # Predictions
-    prediction_results <- eventReactive(input$start_predictions, {
+    prediction_results <- shiny::eventReactive(input$start_predictions, {
       error_list <- check_errors_predict_classifier(
         model = model(),
         embeddings = data_embeddings()
