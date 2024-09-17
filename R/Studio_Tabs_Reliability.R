@@ -9,13 +9,7 @@
 #'
 Reliability_UI <- function(id) {
   bslib::page(
-    bslib::card(
-      bslib::card_header(),
-      bslib::card_body(
-        shiny::uiOutput(
-          outputId = shiny::NS(id, "ui_relability")
-        )
-      )
+    shiny::uiOutput(outputId = shiny::NS(id, "ui_relability")
     )
   )
 }
@@ -123,91 +117,91 @@ Reliability_Server <- function(id, model) {
                                           The categorical sizes are based on the relative frequencies of the training data.
                                           These sizes are not identical with the sizes of field samples.")
             )
+          )
+        ),
+        bslib::card(
+          bslib::card_header(
+            "Spectral Analysis"
           ),
-          bslib::card(
-            bslib::card_header(
-              "Spectral Analysis"
-            ),
-            bslib::card_body(
-              bslib::page_sidebar(
-                sidebar = bslib::sidebar(
-                  position = "right",
-                  shiny::sliderInput(
-                    inputId = ns("codings_spectral_text_size"),
-                    label = "Text Size",
-                    min = 1,
-                    max = 20,
-                    value = 10,
-                    step = 0.25
-                  ),
-                  shiny::sliderInput(
-                    inputId = ns("codings_spectral_number_size"),
-                    label = "Number Size",
-                    min = 0.1,
-                    max = 5,
-                    value = 3,
-                    step = 0.1
-                  ),
-                  shiny::sliderInput(
-                    inputId = ns("codings_spectral_key_size"),
-                    label = "Key Size",
-                    min = 0.1,
-                    max = 2,
-                    value = 0.1,
-                    step = 0.1
-                  )
+          bslib::card_body(
+            bslib::page_sidebar(
+              sidebar = bslib::sidebar(
+                position = "right",
+                shiny::sliderInput(
+                  inputId = ns("codings_spectral_text_size"),
+                  label = "Text Size",
+                  min = 1,
+                  max = 20,
+                  value = 10,
+                  step = 0.25
                 ),
-                shiny::plotOutput(outputId = ns("coding_spectral_plot")),
-                shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
+                shiny::sliderInput(
+                  inputId = ns("codings_spectral_number_size"),
+                  label = "Number Size",
+                  min = 0.1,
+                  max = 5,
+                  value = 3,
+                  step = 0.1
+                ),
+                shiny::sliderInput(
+                  inputId = ns("codings_spectral_key_size"),
+                  label = "Key Size",
+                  min = 0.1,
+                  max = 2,
+                  value = 0.1,
+                  step = 0.1
+                )
+              ),
+              shiny::plotOutput(outputId = ns("coding_spectral_plot")),
+              shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
                                           The categorical sizes are based on the relative frequencies of the training data.
                                           These sizes are not identical with the sizes of field samples.")
-              )
             )
+          )
+        ),
+        bslib::card(
+          bslib::card_header(
+            "Measures"
           ),
-          bslib::card(
-            bslib::card_header(
-              "Measures"
-            ),
-            bslib::card_body(
-              bslib::layout_column_wrap(
-                bslib::card(
-                  bslib::card_header(
-                    "Scale Level"
-                  ),
-                  bslib::card_body(
-                    shiny::renderTable(t(reliability_scale),
-                      rownames = TRUE,
-                      colnames = FALSE
-                    ),
-                    shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
-                  )
+          bslib::card_body(
+            bslib::layout_column_wrap(
+              bslib::card(
+                bslib::card_header(
+                  "Scale Level"
                 ),
-                bslib::card(
-                  bslib::card_header(
-                    "Categorical Level"
+                bslib::card_body(
+                  shiny::renderTable(t(reliability_scale),
+                    rownames = TRUE,
+                    colnames = FALSE
                   ),
-                  bslib::card_body(
-                    shiny::tags$p(shiny::tags$b("Assignment-Error-Matrix")),
-                    shiny::renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
-                      rownames = TRUE,
-                      colnames = TRUE
-                    ),
-                    shiny::tags$p(shiny::tags$b("Iota")),
-                    shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
-                    shiny::tags$p(shiny::tags$b("Alpha Reliability")),
-                    shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability))),
-                    shiny::tags$p(shiny::tags$b("Beta Reliability")),
-                    shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
-                    shiny::tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
-                  )
+                  shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
+                )
+              ),
+              bslib::card(
+                bslib::card_header(
+                  "Categorical Level"
                 ),
-                bslib::card(
-                  bslib::card_header(
-                    "Measures - Machine Learning"
+                bslib::card_body(
+                  shiny::tags$p(shiny::tags$b("Assignment-Error-Matrix")),
+                  shiny::renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
+                    rownames = TRUE,
+                    colnames = TRUE
                   ),
-                  bslib::card_body(
-                    shiny::renderTable(classifier$reliability$standard_measures_mean)
-                  )
+                  shiny::tags$p(shiny::tags$b("Iota")),
+                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
+                  shiny::tags$p(shiny::tags$b("Alpha Reliability")),
+                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability))),
+                  shiny::tags$p(shiny::tags$b("Beta Reliability")),
+                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
+                  shiny::tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
+                )
+              ),
+              bslib::card(
+                bslib::card_header(
+                  "Measures - Machine Learning"
+                ),
+                bslib::card_body(
+                  shiny::renderTable(classifier$reliability$standard_measures_mean)
                 )
               )
             )
@@ -244,8 +238,6 @@ Reliability_Server <- function(id, model) {
       },
       res = 2 * 72
     )
-
-
 
     #--------------------------------------------------------------------------
   })
