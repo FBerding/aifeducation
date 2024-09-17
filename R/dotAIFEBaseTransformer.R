@@ -209,12 +209,13 @@
                 return_offsets_mapping = FALSE,
                 return_attention_mask = TRUE,
                 return_tensors = "np",
-                request_word_ids = self$params$whole_word,
+                request_word_ids = TRUE,
                 report_to_aifeducation_studio = is_shinyapp_active()
               )
             ),
             remove_columns = raw_text_dataset$column_names
           )
+
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
             relevant_indices <- which(length_vector == self$params$chunk_size)
@@ -224,7 +225,14 @@
                 length_vector >= self$params$min_seq_len
             )
           }
+
           self$temp$tokenized_dataset <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
+          self$temp$tokenizer_statistics[length(self$tmp$tokenizer_statistics) + 1] <- list(
+            calc_tokenizer_statistics(
+              dataset = self$temp$tokenized_dataset,
+              step = "training"
+            )
+          )
         }
       }
 
@@ -408,9 +416,27 @@
             history_log <- clean_pytorch_log_transformers(history_log)
           }
 
+          # Write history log
           write.csv2(
             history_log,
             file = paste0(self$params$output_dir, "/history.log"),
+            row.names = FALSE,
+            quote = FALSE
+          )
+
+          # write tokenizer statistics
+          if (file.exists(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))) {
+            tmp_tok_statistics=read.csv(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))
+            final_tok_statistics=rbind(
+              tmp_tok_statistics,
+              unlist(self$temp$tokenizer_statistics)
+            )
+          } else {
+            final_tok_statistics=self$temp$tokenizer_statistics
+          }
+          write.csv(
+            final_tok_statistics,
+            file = paste0(self$params$output_dir, "/tokenizer_statistics.csv"),
             row.names = FALSE,
             quote = FALSE
           )

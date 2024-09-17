@@ -12,18 +12,19 @@ ml_frameworks<-c("tensorflow",
                  "pytorch")
 
 method_list=list(
-  "tensorflow"=c(#"bert",
-                 "roberta"#,
+  #"tensorflow"=c(#"bert",
+  #               #"roberta"#,
   #               "longformer",
   #               "funnel",
   #               "deberta_v2"
-  )#,
-  #"pytorch"=c(#"bert",
-   #           "roberta"#,
+  #),
+  "pytorch"=c(#"bert",
+   #           #"roberta",
+               "mpnet"#,
               #"longformer",
               #"funnel",
               #"deberta_v2"
-  #)
+  )
 )
 
 example_data<-imdb_movie_reviews
@@ -83,6 +84,54 @@ train_tune_bert_model(ml_framework = framework,
                       sustain_interval = 15,
                       trace=trace,
                       keras_trace = 0)
+
+    } else if(method=="mpnet"){
+      transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
+      transformer$create(ml_framework = framework,
+                         model_dir = root_path_results_model,
+                         vocab_raw_texts = example_data$text[1:10],
+                         vocab_size = 30522,
+                         vocab_do_lower_case = FALSE,
+                         max_position_embeddings = 512,
+                         hidden_size = 256,
+                         num_hidden_layer = 2,
+                         num_attention_heads = 2,
+                         intermediate_size = 1028,
+                         hidden_act = "gelu",
+                         hidden_dropout_prob = 0.1,
+                         attention_probs_dropout_prob = 0.1,
+                         sustain_track = TRUE,
+                         sustain_iso_code = "DEU",
+                         sustain_region = NULL,
+                         sustain_interval = 15,
+                         trace = TRUE,
+                         pytorch_safetensors = TRUE)
+
+      transformer$train(ml_framework = framework,
+                        output_dir = root_path_results_model,
+                        model_dir_path = root_path_results_model,
+                        raw_texts = example_data$text[1:10],
+                        p_mask = 0.15,
+                        p_perm = 0.15,
+                        whole_word = TRUE,
+                        val_size = 0.1,
+                        n_epoch = 2,
+                        batch_size = 12,
+                        chunk_size = 250,
+                        full_sequences_only = FALSE,
+                        min_seq_len = 50,
+                        learning_rate = 3e-3,
+                        n_workers = 1,
+                        multi_process = FALSE,
+                        sustain_track = TRUE,
+                        sustain_iso_code = "DEU",
+                        sustain_region = NULL,
+                        sustain_interval = 15,
+                        trace = TRUE,
+                        keras_trace = 1,
+                        pytorch_trace = 1,
+                        pytorch_safetensors = TRUE)
+
 
     } else if(method=="roberta"){
       create_roberta_model(

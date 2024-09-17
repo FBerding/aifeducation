@@ -480,7 +480,6 @@ TextEmbeddingClassifierNeuralNet<-R6::R6Class(
     #'into an ascending order.
     #'}
     #'}
-    #'@importFrom abind abind
     train=function(data_embeddings,
                    data_targets,
                    data_n_test_samples=5,

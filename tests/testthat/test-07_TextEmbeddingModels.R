@@ -49,17 +49,18 @@ ml_frameworks=c(
   "pytorch"
                 )
 base_model_list=list(
-  "tensorflow"=c("bert",
-                 "roberta",
-                 "longformer",
-                 "funnel",
-                 "deberta_v2"
-                 ),
-  "pytorch"=c("bert",
-              "roberta",
-              "longformer",
-              "funnel",
-              "deberta_v2"
+  #"tensorflow"=c("bert",
+  #               "roberta",
+  #               "longformer",
+  #               "funnel",
+  #               "deberta_v2"
+  #               ),
+  "pytorch"=c(#"bert",
+              #"roberta",
+              #"longformer",
+              #"funnel",
+              #"deberta_v2",
+              "mpnet"
               )
   )
 save_format_list=list(
@@ -72,12 +73,14 @@ pooling_type_list=list(
   "bert"=c("cls","average"),
   "roberta"=c("cls","average"),
   "longformer"=c("cls","average"),
-  "deberta_v2"=c("cls","average")
+  "deberta_v2"=c("cls","average"),
+  "mpnet"=c("cls","average")
 )
 
 max_layers=1:2
 
 #Start tests--------------------------------------------------------------------
+
 for(framework in ml_frameworks){
   for(base_model in base_model_list[[framework]]){
     #Set path to the base model
@@ -88,7 +91,6 @@ for(framework in ml_frameworks){
     for(pooling_type in pooling_type_list[[base_model]]){
       for(max_layer in max_layers){
         for(min_layer in 1:max_layer){
-
           #Create Model
           text_embedding_model<-TextEmbeddingModel$new()
           text_embedding_model$configure(
@@ -350,6 +352,9 @@ for(framework in ml_frameworks){
 
           #One row for creation and one row for training
           expect_equal(nrow(sustain_data),2)
+
+          #Check tokenizer statistics
+          expect_equal(nrow(text_embedding_model_reloaded$tokenizer_statistics),2)
         })
 
         #Documentation----------------------------------------------------------

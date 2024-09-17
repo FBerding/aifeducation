@@ -1,3 +1,68 @@
+#' Estimate tokenizer statistics
+#'
+#' Function for estimating the tokenizer statistics described by Kaya & Tantuğ (2024).
+#'
+#' @param dataset Object of class datasets.arrow_dataset.Dataset. The data set must contain
+#' a column `"length"` containing the number of tokens for every sequence and a column `"word_ids"`
+#' containing the word ids within every sequence.
+#' @param step `string` indicating to which step the statistics belong. Recommended values are
+#' * `"creation"` for the creation of the tokenizer.
+#' * `"initial_training"` for the first training of the transformer.
+#' * `"fine_tuning"` for all following trainings of the transformer.
+#' * `"training"` for a training run of the transformer.
+#' @return Returns a `list` with the following entries:
+#' * n_sequences: Number of sequences
+#' * n_words: Number for words in whole corpus
+#' * n_tokens: Number of tokens in the whole corpus
+#' * mu_t: eqn(n_tokens/n_sequences)
+#' * mu_w: eqn(n_words/n_sequences)
+#' * mu_g: eqn(n_tokens/n_words)
+#'
+#' @references
+#' Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish
+#'large language models. Intelligent Systems with Applications, 21, 200335.
+#' https://doi.org/10.1016/j.iswa.2024.200335
+#'
+#' @family Transformer utils
+#' @keywords internal
+#' @noRd
+calc_tokenizer_statistics=function(dataset,step="creation"){
+  #Argument Checking
+  check_class(dataset,"datasets.arrow_dataset.Dataset",FALSE)
+  if("word_ids"%in%dataset$column_names==FALSE){
+    stop("dataset must contain a column 'word_ids'.")
+  }
+  if("length"%in%dataset$column_names==FALSE){
+    stop("dataset must contain a column 'length'.")
+  }
+
+  n_sequences=dataset$num_rows
+  n_words=0
+  n_tokens=0
+  for(i in 1:n_sequences){
+    n_words=n_words+length(unique(unlist(dataset[i-1]$word_ids)))
+    n_tokens=n_tokens+dataset[i-1]$length
+  }
+
+  mu_t=n_tokens/n_sequences
+  mu_w=n_words/n_sequences
+  mu_g=n_tokens/n_words
+
+  return(
+    list(
+      step=step,
+      date=date(),
+      n_sequences=n_sequences,
+      n_words=n_words,
+      n_tokens=n_tokens,
+      mu_t=mu_t,
+      mu_w=mu_w,
+      mu_g=mu_g
+    )
+  )
+}
+
+
 #' @title Check `max_position_embeddings` argument of transformer
 #' @description Used when creating and training transformers.
 #'

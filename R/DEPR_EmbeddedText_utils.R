@@ -8,7 +8,6 @@
 #'@family combine_embeddings
 #'@export
 #'@importFrom methods isClass
-#'@importFrom abind abind
 combine_embeddings<-function(embeddings_list){
 
   #Check for the right class---------------------------------------------------
@@ -55,8 +54,7 @@ combine_embeddings<-function(embeddings_list){
     if(i==1){
       combined_embeddings<-embeddings_list[[i]]$embeddings
     } else {
-      combined_embeddings<-abind::abind(combined_embeddings,embeddings_list[[i]]$embeddings,
-                                        along = 1)
+      combined_embeddings<-array_form_bind(combined_embeddings,embeddings_list[[i]]$embeddings)
     }
   }
 

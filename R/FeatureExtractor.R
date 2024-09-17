@@ -131,7 +131,6 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param ml_trace `int` \code{ml_trace=0} does not print any information about the training process from pytorch on
     #'   the console. \code{ml_trace=1} prints a progress bar.
     #' @return Function does not return a value. It changes the object into a trained classifier.
-    #' @importFrom abind abind
     train = function(data_embeddings,
                      data_val_size = 0.25,
                      sustain_track = TRUE,
