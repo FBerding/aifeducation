@@ -174,7 +174,7 @@ Second, you can load `aifeducation`. In case you installed python as
 suggested in vignette [01 Get started](aifeducation.html) you
 may start a new session like this:
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 reticulate::use_condaenv(condaenv = "aifeducation")
 library(aifeducation)
 ```
@@ -202,7 +202,7 @@ of raw texts into text embeddings later.
 The creation of a `LargeDataSetForText` is necessary if you would like to create
 or train a base model or to generate text embeddings. In the case you would like to
 create such a data set for the first time you have to call the method new:
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 raw_texts <- LargeDataSetForText$new()
 ```
 Now you have an empty data set. To fill this object with raw texts different methods
@@ -254,7 +254,7 @@ Applying these rules may result in a data structure as follows:
 
 Now you can call the method `add_from_files_txt` by passing the path to the
 directory of the main folder to `dir_path`.
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 raw_texts$add_from_files_txt(
   dir_path = "main folder"
 )
@@ -320,7 +320,7 @@ Please not that all files except the text file must be .txt, not .pdf.
 
 Now you can call the method `add_from_files_pdf` by passing the path to the
 directory of the main folder to `dir_path`.
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 raw_texts$add_from_files_pdf(
   dir_path = "main folder"
 )
@@ -360,7 +360,7 @@ Your .xlsx file may look like
 Now you can call the method `add_from_files_xlsx` by passing the path to the
 directory of the main folder to `dir_path`. Please do not forget to specify the 
 column names for id, text, bibliographic, and license information.
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 raw_texts$add_from_files_xlsx(
   dir_path = "main folder",
   id_column = "id",
@@ -377,7 +377,7 @@ raw_texts$add_from_files_xlsx(
 
 Once you have create a `LargeDataSetForText` you can save your data to disk by
 calling the function `save_to_disk`. In our example the code would be:
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 save_to_disk(
   object = raw_texts,
   dir_path = "C:/",
@@ -392,7 +392,7 @@ within that directory. In this folder the data set is saved.
 
 To load an existing data set you can call the function `load_from_disk` with the
 directory path where you stored the data. In our case this would be.
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 raw_text_dataset <- load_from_disk("C:/raw_texts")
 ```
 Now you can work with your data.
@@ -409,7 +409,7 @@ the categories/classes of a raw texts. Thus, it may be advantageous to save alre
 data. You can save and load an object of this class with the functions `save_to_disk` and `load_from_disk`.
 
 Let us assume that we have a `LargeDataSetForTextEmbeddings` *text_embeddings*. Saving this object may look like:
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 save_to_disk(
   object = text_embeddings,
   dir_path = "C:/",
@@ -417,7 +417,7 @@ save_to_disk(
 )
 ```
 The data set will be saved at `C:/text_embeddings`. Loading this data set may look like:
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 new_text_embeddings <- load_from_disk("C:/text_embeddings")
 ```
 
@@ -447,7 +447,7 @@ of a movie and about 100 imply a negative rating.
 For this tutorial, we modify this data set by setting about 100 positive reviews to `NA`,
 indicating that these reviews are not labeled.
 
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 example_data <- imdb_movie_reviews
 example_data$label <- as.character(example_data$label)
 example_data$label[c(201:300)] <- NA
@@ -457,24 +457,24 @@ table(example_data$label)
 
 We will now create a `LargeDataSetForText` from this `data.frame`. Before we can do this
 we must ensure that the `data.set` has all necessary columns:
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 colnames(example_data)
 ```
 Now we have to add to columns. For this tutorial we do not add any bibliographic or license information
 although this is recommended in practice. 
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 example_data$bib_entry <- NA
 example_data$license <- NA
 colnames(example_data)
 ```
 Now the `data.frame` is ready as input for our data set. The "label" column will
 not be included in this data set.
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 data_set_reviews_text <- LargeDataSetForText$new()
 data_set_reviews_text$add_from_data.frame(example_data)
 ```
 We save the categories/labels within a separate factor.
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 review_labels <- example_data$label
 names(review_labels) <- example_data$id
 ```
@@ -510,10 +510,14 @@ At the beginning you can choose between the different supported
 transformer architectures. Depending on the architecture, you
 have different options determining the shape of your neural network. For this 
 vignette we use a BERT (Devlin et al. 2019) model which can be created
-with the function `create_bert_model`.
+with the `create`-method of the Transformer class. Use `aife_transformer_maker`
+to create a transformer object.
 
-```{r, include = TRUE, eval=FALSE}
-create_bert_model(
+> See p. 3 Transformer Maker [01 Transformers for Developers](transformers.html)
+> for details.
+
+```{r, include = TRUE, eval = FALSE}
+aife_transformer_maker$make("bert")$create(
   ml_framework = "pytorch",
   model_dir = "my_own_transformer",
   vocab_raw_texts = example_data$text,
@@ -585,11 +589,15 @@ directory.
 ## 3.3 Train/Tune a Base Model
 If you would like to train a new base model (see section 3.2) for the
 first time or want to adapt a pre-trained model to a domain-specific
-language or task, you have to can call the corresponding training function. In case
-of a BERT model this is `train_tune_bert_model()`.
+language or task, you have to can call the corresponding `train`-method.
+Use `aife_transformer_maker` to create a transformer object.
+In case of a BERT model this is `aife_transformer_maker$make("bert")$train()`.
 
-```{r, include = TRUE, eval=FALSE}
-train_tune_bert_model(
+> See p. 3 Transformer Maker [01 Transformers for Developers](transformers.html)
+> for details.
+
+```{r, include = TRUE, eval = FALSE}
+aife_transformer_maker$make("bert")$train(
   ml_framework = "pytorch",
   output_dir = "my_own_transformer_trained",
   model_dir_path = "my_own_transformer",
@@ -672,7 +680,7 @@ First you have to choose the base model that should form the foundation
 of your new text embedding model. Since we use a BERT model in our example, 
 we have to set `method = "bert"`.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 bert_modeling <- TextEmbeddingModel$new()
 bert_modeling$configure(
   model_name = "bert_embedding",
@@ -746,7 +754,7 @@ representation you only have to use the `embed_large` method of your model. To
 do this, you must provide a `LargeDataSetForText` to `large_datas_set`. Relying
 on the example data from section 2.3 we can use the movie reviews as raw texts.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 review_embeddings <- bert_modeling$embed_large(
   large_datas_set = data_set_reviews_text,
   trace = TRUE
@@ -771,7 +779,7 @@ text embedding models. For saving your work you can pass your model to `object` 
 the directory where to save the model to `dir_path`. With `folder_name` you can determine
 the name of the folder that should be created at that directory to store the model.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 save_ai_model(
   object = bert_modeling,
   dir_path = "C:/text_embedding_models",
@@ -781,7 +789,7 @@ save_ai_model(
 In this example the model is save in a folder at the location `C:/text_embedding_models/bert_model`.
 If you want to load your model you can call `load_from_disk`.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
 ```
 
@@ -801,7 +809,7 @@ refers to the idea that the classifiers uses text embeddings instead of raw text
 With the example data from section 2.3 and the text embeddings from section 4.3 
 the creation of a new classifier may look like:
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 classifier <- TEClassifierRegular$new()
 classifier$configure(
   name = "movie_review_classifier",
@@ -928,7 +936,7 @@ All performance values saved in the trained classifier refer to the test sample.
 been used during training and provides a more realistic estimation of a
 classifier`s performance.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
@@ -957,7 +965,7 @@ classifier$train(
 )
 ```
 
-```{r, include = FALSE, eval=TRUE}
+```{r, include = FALSE, eval = TRUE}
 classifier <- vignette_classifier
 ```
 
@@ -1091,7 +1099,7 @@ pseudo-labeling is reported.
 The central estimates for the reliability values can be found via
 `reliability$test_metric_mean`. In our example this would be:
 
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 classifier$reliability$test_metric_mean
 ```
 
@@ -1116,13 +1124,13 @@ An addition, standard measures from machine learning are reported. These are
 -   F1-Score
 
 You can acces these values as follows:
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 classifier$reliability$standard_measures_mean
 ```
 Finally, you can plot a coding stream scheme showing how the cases of
 different classes are labeled. Here we use the package *iotarelr*.
 
-```{r, include = TRUE, eval=TRUE, fig.cap="Figure 6: Coding Stream of the Classifier",fig.align="center"}
+```{r, include = TRUE, eval = TRUE, fig.cap = "Figure 6: Coding Stream of the Classifier",fig.align="center"}
 library(iotarelr)
 iotarelr::plot_iota2_alluvial(classifier$reliability$iota_object_end_free)
 ```
@@ -1143,7 +1151,7 @@ like to dive deeper into this topic.
 In the case the classifier was trained with an active sustainability tracker
 you can receive information on sustainability by calling `classifier$get_sustainability_data()`.
 
-```{r, include = TRUE, eval=TRUE}
+```{r, include = TRUE, eval = TRUE}
 classifier$get_sustainability_data()
 ```
 
@@ -1151,7 +1159,7 @@ classifier$get_sustainability_data()
 Saving and loading follows the same pattern as for the other objects in *aifeducation*.
 You can save the classifier by calling `save_to_disk`. In our example this may be:
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 save_to_disk(
   object = classifier,
   dir_path = "C:/classifiers",
@@ -1160,7 +1168,7 @@ save_to_disk(
 ```
 The classifier is saved to `C:/classifiers/imdb_movie_reviews`. To load the model
 call `load_from_disk`.
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 classifier<-load_from_disk("C:/classifiers/imdb_movie_reviews")
 ```
 
@@ -1172,7 +1180,7 @@ expression by using *exactly* the same text embedding model that was
 used for training your classifier (see section 4). In the case of our example classifier we
 use our BERT model.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 # If our mode is not loaded
 bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
 
@@ -1198,7 +1206,7 @@ The resulting object can then be passed to
 the method `predict` of our classifier and you will get the predictions together with an
 estimate of certainty for each class/category.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval = FALSE}
 # If your classifier is not loaded
 classifier<-load_from_disk("C:/classifiers/imdb_movie_reviews")
 
