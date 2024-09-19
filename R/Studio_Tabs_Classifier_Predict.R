@@ -41,7 +41,7 @@ Classifier_Prediction_UI <- function(id) {
         icon = shiny::icon("floppy-disk")
       )
     ),
-    bslib::layout_column_wrap(
+    #bslib::layout_column_wrap(
       bslib::card(
         bslib::card_header("Input Data"),
         bslib::card_body(
@@ -59,7 +59,7 @@ Classifier_Prediction_UI <- function(id) {
         )
       ),
     )
-  )
+  #)
 }
 
 bslib::card(
@@ -159,15 +159,10 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
       if (is.null(predictions)) {
         return(NULL)
       } else {
-        return(DT::formatRound(
-          digits = 3,
-          columns = seq.int(
-            from = 1,
-            to = ncol(prediction_results() - 1),
-            by = 1
-          ),
-          table = DT::datatable(prediction_results())
-        ))
+        for(i in 1:(ncol(predictions)-1)){
+          predictions[,i]<-round(predictions[,i],digits = 3)
+        }
+        return(predictions)
       }
     })
 

@@ -2,12 +2,13 @@
 #' @description Functions check for input errors in AI for Education - Studio in the case of the creation of
 #'   classifiers.
 #'
+#' @param classifier_type `string` Type of classifier.
 #' @param destination_path `string` Path to the destination directory.
 #' @param folder_name `string` Name of the folder to be created within the destination directory.
 #' @param path_to_embeddings `vector` Path to the folder where the embeddings are stored.
 #' @param path_to_target_data `string` Path to the folder where the target data are stored.
 #' @param path_to_feature_extractor `string` Path to the folder where the [TEFeatureExtractor] is stored. If no
-#'   [TEFeatureExtractor] should be used this arugment must be `NULL`.
+#'   [TEFeatureExtractor] should be used this argument must be `NULL`.
 #' @param model_name `string` Name for the model.
 #' @param model_label `string` Label of the model.
 #' @param Ns `int` Value for the sample. Only relevant for ProtoNet.
@@ -22,7 +23,8 @@
 #' @family studio_gui_page_classifier_create
 #' @keywords internal
 #'
-check_errors_create_classifier <- function(destination_path,
+check_errors_create_classifier <- function(classifier_type,
+                                           destination_path,
                                            folder_name,
                                            path_to_embeddings,
                                            path_to_target_data,

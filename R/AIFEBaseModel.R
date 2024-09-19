@@ -692,7 +692,7 @@ AIFEBaseModel <- R6::R6Class(
       private$set_model_info(
         model_name_root = config_private$model_info$model_name_root,
         model_id = config_private$model_info$model_id,
-        label = config_private$model_info$model_date,
+        label = config_private$model_info$model_label,
         model_date = config_private$model_info$model_date
       )
 

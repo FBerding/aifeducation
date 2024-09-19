@@ -186,9 +186,9 @@ start_and_monitor_long_task <- function(id,
         bottom <- NULL
 
         if (!is.null(log)) {
-          if (!is.na(log[1, 3]) && log[1, 3] != "NA") top <- log[1, ]
-          if (!is.na(log[2, 3]) && log[2, 3] != "NA") middle <- log[2, ]
-          if (!is.na(log[3, 3]) && log[3, 3] != "NA") bottom <- log[3, ]
+          if (!is.na(log[1, 3]) & log[1, 3] != "NA") top <- log[1, ]
+          if (!is.na(log[2, 3]) & log[2, 3] != "NA") middle <- log[2, ]
+          if (!is.na(log[3, 3]) & log[3, 3] != "NA") bottom <- log[3, ]
         }
 
         loss_data <- NULL
@@ -227,7 +227,7 @@ start_and_monitor_long_task <- function(id,
             plot <- plot + ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test, color = "test"))
           }
           plot <- plot +
-            ggplot2::theme_dark() +
+            ggplot2::theme_classic() +
             ggplot2::ylab("loss") +
             ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
             ggplot2::xlab("epoch") +
@@ -250,15 +250,16 @@ start_and_monitor_long_task <- function(id,
     # Display progress on the progress modal
     shiny::observe({
       ids <- c("pgr_top", "pgr_middle", "pgr_bottom")
-      prgbars <- c(progress_bar_status()$top, progress_bar_status()$middle, progress_bar_status()$bottom)
+      prgbars_status<-progress_bar_status()
+      prgbars <- list(prgbars_status$top, prgbars_status$middle, prgbars_status$bottom)
 
       for (i in 1:length(ids)) {
-        if (!is.null(prgbars[i])) {
+        if (!is.null(prgbars[[i]])) {
           shinyWidgets::updateProgressBar(
             id = ids[i],
-            value = as.numeric(prgbars[i]$value),
-            total = as.numeric(prgbars[i]$total),
-            title = prgbars[i]$message
+            value = as.numeric(prgbars[[i]]$value),
+            total = as.numeric(prgbars[[i]]$total),
+            title = prgbars[[i]]$message
           )
         }
       }
@@ -269,6 +270,7 @@ start_and_monitor_long_task <- function(id,
       if (CurrentTask$status() == "success") {
         # Remove process modal
         shiny::removeModal()
+        Sys.sleep(1)
 
         success_message <- ""
         if (success_type == "data_sets") {

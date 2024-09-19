@@ -97,10 +97,12 @@ generate_sidebar_information <- function(model) {
       shiny::tags$hr(),
       shiny::tags$p("# Parameter: ", model$count_parameter()),
       shiny::tags$p("Synthetic Cases: ", model$last_training$config$use_sc),
-      shiny::tags$p("Pseudo Labeling: ", model$last_training$config$usepl),
+      shiny::tags$p("Pseudo Labeling: ", model$last_training$config$use_pl),
       shiny::tags$hr(),
-      shiny::tags$p("Energy Consumption (kWh): ", kwh),
-      shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
+      shiny::tags$p("Energy Consumption (kWh): "),
+      shiny::tags$p(kwh),
+      shiny::tags$p("Carbon Footprint (CO2eq. kg): "),
+      shiny::tags$p(co2)
     )
   }
 
@@ -666,7 +668,7 @@ prepare_training_history <- function(model,
                                      pl_step = NULL) {
   plot_data <- model$last_training$history
 
-  if (is.null(final)) final <- FALSE
+  if (is.null_or_na(final)) final <- FALSE
 
   # Get standard statistics
   n_epochs <- model$last_training$config$epochs
@@ -675,7 +677,7 @@ prepare_training_history <- function(model,
 
   # Get information about the existence of a training, validation, and test data set
   # Get Number of folds for the request
-  if (!final) {
+  if (final==FALSE) {
     n_folds <- length(model$last_training$history) - 1
     measures <- names(plot_data[[1]])
     if (!use_pl) {
@@ -686,7 +688,7 @@ prepare_training_history <- function(model,
   } else {
     n_folds <- 1
     measures <- names(plot_data[[index_final]])
-    if (!use_pl) {
+    if (use_pl==FALSE) {
       n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
     } else {
       n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
@@ -731,9 +733,9 @@ prepare_training_history <- function(model,
     )
     final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
 
-    if (!final) {
+    if (final==FALSE) {
       for (i in 1:n_folds) {
-        if (!use_pl) {
+        if (use_pl==FALSE) {
           measure_array[i, , ] <- plot_data[[i]][[measure]]
         } else {
           measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
