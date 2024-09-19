@@ -199,9 +199,9 @@ TextEmbeddingModel <- R6::R6Class(
     #------------------------------------------------------------------------
     # Method for loading tokenizer statistics
     load_tokenizer_statistics=function(model_dir){
-      path <- paste0(model_dir, "/", "history.log")
+      path <- paste0(model_dir, "/", "tokenizer_statistics.csv")
       if (file.exists(path) == TRUE) {
-        self$tokenizer_statistics <- read.csv(file = path,row.names=FALSE)
+        self$tokenizer_statistics <- read.csv(file = path)
       } else {
         self$tokenizer_statistics <- NA
       }
@@ -615,6 +615,9 @@ TextEmbeddingModel <- R6::R6Class(
       # Load Training history
       private$load_training_history(model_dir = model_dir)
 
+      #Load Tokenizer statistics
+      private$load_tokenizer_statistics(model_dir = model_dir)
+
       # Check and Set Embedding Configuration
       private$check_and_set_embedding_layers(
         emb_layer_min = emb_layer_min,
@@ -736,7 +739,7 @@ TextEmbeddingModel <- R6::R6Class(
       private$load_training_history(model_dir = dir_path)
 
       #Load Tokenizer statistics
-      load_tokenizer_statistics(model_dir = dir_path)
+      private$load_tokenizer_statistics(model_dir = dir_path)
     },
     #--------------------------------------------------------------------------
     #' @description Method for saving a transformer model on disk.Relevant
