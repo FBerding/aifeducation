@@ -227,12 +227,7 @@
           }
 
           self$temp$tokenized_dataset <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
-          self$temp$tokenizer_statistics[length(self$tmp$tokenizer_statistics) + 1] <- list(
-            calc_tokenizer_statistics(
-              dataset = self$temp$tokenized_dataset,
-              step = "training"
-            )
-          )
+          private$update_tokenizer_statistics(self$temp$tokenized_dataset, "training")
         }
       }
 
@@ -423,23 +418,6 @@
             row.names = FALSE,
             quote = FALSE
           )
-
-          # write tokenizer statistics
-          if (file.exists(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))) {
-            tmp_tok_statistics <- read.csv(paste0(self$params$output_dir, "/tokenizer_statistics.csv"))
-            final_tok_statistics <- rbind(
-              tmp_tok_statistics,
-              unlist(self$temp$tokenizer_statistics)
-            )
-          } else {
-            final_tok_statistics <- self$temp$tokenizer_statistics
-          }
-          write.csv(
-            final_tok_statistics,
-            file = paste0(self$params$output_dir, "/tokenizer_statistics.csv"),
-            row.names = FALSE,
-            quote = FALSE
-          )
         }
       }
     },
@@ -455,6 +433,66 @@
         measure_power_secs = self$params$sustain_interval,
         save_to_file = FALSE,
         save_to_api = FALSE
+      )
+    },
+
+
+    # Save data csv (for sustainability data and tokenizer statistics)
+    write_data_csv = function(data, csv_file_name, quote = TRUE, mode = "create") {
+      matrix <- t(as.matrix(unlist(data)))
+      x_value <- matrix
+      if (mode == "create") {
+        data_output <- paste0(self$params$model_dir, "/", csv_file_name)
+      } else if (mode == "train") {
+        data_output <- paste0(self$params$output_dir, "/", csv_file_name)
+        data_input <- paste0(self$params$model_dir_path, "/", csv_file_name)
+
+        if (file.exists(data_input)) {
+          data_chronic <- as.matrix(read.csv(data_input))
+          data_chronic <- rbind(data_chronic, matrix)
+
+          x_value <- data_chronic
+        }
+      } else {
+        stop(paste("Mode", mode, "is invalid. Allowed: create or train"))
+      }
+
+      write.csv(
+        x = x_value,
+        file = data_output,
+        row.names = FALSE,
+        quote = quote
+      )
+    },
+
+    # Save Sustainability tracker
+    save_sustainability_data = function(mode = "create") {
+      sustainability_data <- summarize_tracked_sustainability(private$sustainability_tracker)
+
+      private$write_data_csv(
+        data = sustainability_data,
+        csv_file_name = "sustainability.csv",
+        mode = mode
+      )
+    },
+
+    # Save Tokenizer Statistics on disk
+    save_tokenizer_statistics = function(mode = "create") {
+      private$write_data_csv(
+        data = self$temp$tokenizer_statistics,
+        csv_file_name = "tokenizer_statistics.csv",
+        quote = FALSE,
+        mode = mode
+      )
+    },
+
+    # Update Tokenizer Statistics (calculate)
+    update_tokenizer_statistics = function(dataset, step = "creation") {
+      self$temp$tokenizer_statistics[length(self$temp$tokenizer_statistics) + 1] <- list(
+        calc_tokenizer_statistics(
+          dataset = dataset,
+          step = step
+        )
       )
     }
   ),
@@ -714,6 +752,8 @@
         check.hidden_act(hidden_act)
         check.sustain_iso_code(sustain_iso_code, sustain_track)
 
+        private$update_tokenizer_statistics(self$temp$raw_text_dataset)
+
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 1
@@ -766,10 +806,13 @@
           stop("The transformer model must be stored in the 'model' parameter of the 'temp' list.")
         }
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 7
+
         # Saving Model --------------------------------------------------------------
         print_message(paste("Saving", private$title), trace)
         private$steps_for_creation$save_transformer_model(self)
+        private$save_tokenizer_statistics()
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 8
+
         # Saving Tokenizer ----------------------------------------------------------
         print_message("Saving Tokenizer Model", trace)
         self$temp$tokenizer$save_pretrained(model_dir)
@@ -778,16 +821,8 @@
         # Stop Sustainability Tracking if requested ----------------------------------
         if (sustain_track) {
           private$sustainability_tracker$stop()
-          sustainability_data <- summarize_tracked_sustainability(private$sustainability_tracker)
-          sustain_matrix <- t(as.matrix(unlist(sustainability_data)))
-
           print_message("Saving Sustainability Data", trace)
-
-          write.csv(
-            x = sustain_matrix,
-            file = paste0(model_dir, "/sustainability.csv"),
-            row.names = FALSE
-          )
+          private$save_sustainability_data()
         }
 
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 10
@@ -959,6 +994,7 @@
         # Saving Model --------------------------------------------------------------
         print_message(paste("Saving", private$title), trace)
         private$steps_for_training$save_model(self)
+        private$save_tokenizer_statistics("train")
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 8
 
         # Saving Tokenizer -----------------------------------------------------------
@@ -969,29 +1005,8 @@
         # Stop Sustainability Tracking if requested ----------------------------------
         if (sustain_track) {
           private$sustainability_tracker$stop()
-          sustainability_data <- summarize_tracked_sustainability(private$sustainability_tracker)
-          sustain_matrix <- t(as.matrix(unlist(sustainability_data)))
-
           print_message("Saving Sustainability Data", trace)
-
-          sustainability_data_file_path_input <- paste0(model_dir_path, "/sustainability.csv")
-          sustainability_data_file_path <- paste0(output_dir, "/sustainability.csv")
-
-          x_value <- sustain_matrix
-          if (file.exists(sustainability_data_file_path_input)) {
-            sustainability_data_chronic <- as.matrix(read.csv(sustainability_data_file_path_input))
-            sustainability_data_chronic <- rbind(
-              sustainability_data_chronic,
-              sustain_matrix
-            )
-            x_value <- sustainability_data_chronic
-          }
-
-          write.csv(
-            x = x_value,
-            file = sustainability_data_file_path,
-            row.names = FALSE
-          )
+          private$save_sustainability_data("train")
         }
 
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 10

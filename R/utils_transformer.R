@@ -26,24 +26,35 @@
 calc_tokenizer_statistics <- function(dataset, step = "creation") {
   # Argument Checking
   check_class(dataset, "datasets.arrow_dataset.Dataset", FALSE)
-  if ("word_ids" %in% dataset$column_names == FALSE) {
-    stop("dataset must contain a column 'word_ids'.")
-  }
-  if ("length" %in% dataset$column_names == FALSE) {
-    stop("dataset must contain a column 'length'.")
-  }
 
   n_sequences <- dataset$num_rows
-  n_words <- 0
-  n_tokens <- 0
-  for (i in 1:n_sequences) {
-    n_words <- n_words + length(unique(unlist(dataset[i - 1]$word_ids)))
-    n_tokens <- n_tokens + dataset[i - 1]$length
-  }
+  n_words <- NA
+  n_tokens <- NA
+  mu_t <- NA
+  mu_w <- NA
+  mu_g <- NA
 
-  mu_t <- n_tokens / n_sequences
-  mu_w <- n_words / n_sequences
-  mu_g <- n_tokens / n_words
+  if (step == "training") {
+    if ("word_ids" %in% dataset$column_names == FALSE) {
+      stop("dataset must contain a column 'word_ids'.")
+    }
+    if ("length" %in% dataset$column_names == FALSE) {
+      stop("dataset must contain a column 'length'.")
+    }
+
+    n_words <- 0
+    n_tokens <- 0
+    for (i in 1:n_sequences) {
+      n_words <- n_words + length(unique(unlist(dataset[i - 1]$word_ids)))
+      n_tokens <- n_tokens + dataset[i - 1]$length
+    }
+
+    mu_t <- n_tokens / n_sequences
+    mu_w <- n_words / n_sequences
+    mu_g <- n_tokens / n_words
+  } else if (step != "creation") {
+    stop(paste("Step", step, "is invalid. Allowed steps: creation or training"))
+  }
 
   return(
     list(
