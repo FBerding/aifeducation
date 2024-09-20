@@ -5,13 +5,9 @@ testthat::skip_if_not(
 
 # SetUp Test---------------------------------------------------------------------
 root_path_data <- testthat::test_path("test_data/LargeDataSetForTextEmbeddings")
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
+create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/LargeDataSetForTextEmbeddings")
-if (dir.exists(root_path_results) == FALSE) {
-  dir.create(root_path_results)
-}
+create_dir(root_path_results, FALSE)
 
 # object is imdb_embeddings
 load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))

@@ -5,13 +5,10 @@ testthat::skip_if_not(
 
 # SetUp Test---------------------------------------------------------------------
 root_path_data <- testthat::test_path("test_data/LargeDataSetForTexts")
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
+create_dir(testthat::test_path("test_artefacts"), FALSE)
+
 root_path_results <- testthat::test_path("test_artefacts/LargeDataSetForTexts")
-if (dir.exists(root_path_results) == FALSE) {
-  dir.create(root_path_results)
-}
+create_dir(root_path_results, FALSE)
 
 # SetUp datasets
 # Disable tqdm progressbar
@@ -86,9 +83,7 @@ test_that("LargeDataSetForTexts - Add txt", {
 
 test_that("LargeDataSetForTexts - Add txt - with log", {
   log_dir <- root_path_results
-  if (dir.exists(log_dir) == FALSE) {
-    dir.create(log_dir)
-  }
+  create_dir(log_dir, FALSE)
   log_file <- paste0(log_dir, "/aifeducation_state.log")
 
   new_dataset <- LargeDataSetForText$new()
@@ -223,9 +218,7 @@ test_that("LargeDataSetForTexts - Add pdf", {
 
 test_that("LargeDataSetForTexts - Add pdf with log", {
   log_dir <- root_path_results
-  if (dir.exists(log_dir) == FALSE) {
-    dir.create(log_dir)
-  }
+  create_dir(log_dir, FALSE)
   log_file <- paste0(log_dir, "/aifeducation_state.log")
 
   new_dataset <- LargeDataSetForText$new()
@@ -363,9 +356,7 @@ test_that("LargeDataSetForTexts - Add excel", {
 
 test_that("LargeDataSetForTexts - Add excel with log", {
   log_dir <- root_path_results
-  if (dir.exists(log_dir) == FALSE) {
-    dir.create(log_dir)
-  }
+  create_dir(log_dir, FALSE)
   log_file <- paste0(log_dir, "/aifeducation_state.log")
 
   new_dataset <- LargeDataSetForText$new()

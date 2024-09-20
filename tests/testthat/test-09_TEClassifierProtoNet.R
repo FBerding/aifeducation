@@ -12,14 +12,9 @@ skip_3_classes <- FALSE
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/classifier")
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
+create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
-if (dir.exists(root_path_results) == FALSE) {
-  dir.create(root_path_results)
-}
-
+create_dir(root_path_results, FALSE)
 # SetUp datasets
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
@@ -343,9 +338,7 @@ for (framework in ml_frameworks) {
 
             # Create directory for saving checkpoint for every training
             train_path <- paste0(root_path_results, "/", "train_", generate_id())
-            if (dir.exists(train_path) == FALSE) {
-              dir.create(train_path)
-            }
+            create_dir(train_path, FALSE)
 
             classifier <- TEClassifierProtoNet$new()
             classifier$configure(
@@ -568,9 +561,7 @@ for (framework in ml_frameworks) {
       test_that(paste(framework, n_classes, "overfitting test"), {
         # Create directory for saving checkpoint for every training
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
-        if (dir.exists(train_path) == FALSE) {
-          dir.create(train_path)
-        }
+        create_dir(train_path, FALSE)
 
         # Randomly select a configuration for training
         rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]

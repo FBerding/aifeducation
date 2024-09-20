@@ -17,49 +17,20 @@ testthat::skip_if_not(
   message = "Necessary dataset not available"
 )
 
-
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
-
-if (dir.exists(testthat::test_path("test_artefacts/tmp_full_models")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts/tmp_full_models"))
-}
-
-if (dir.exists(testthat::test_path("test_artefacts/classifier")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts/classifier"))
-}
-
-if (dir.exists(testthat::test_path("test_artefacts/tmp")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts/tmp"))
-}
-
-if (dir.exists(testthat::test_path("test_artefacts/tmp/2_classes")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts/tmp/2_classes"))
-}
-
-if (dir.exists(testthat::test_path("test_artefacts/tmp/3_classes")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts/tmp/3_classes"))
-}
+create_dir(testthat::test_path("test_artefacts"), FALSE)
+create_dir(testthat::test_path("test_artefacts/tmp_full_models"), FALSE)
+create_dir(testthat::test_path("test_artefacts/classifier"), FALSE)
+create_dir(testthat::test_path("test_artefacts/tmp"), FALSE)
+create_dir(testthat::test_path("test_artefacts/tmp/2_classes"), FALSE)
+create_dir(testthat::test_path("test_artefacts/tmp/3_classes"), FALSE)
 
 folder_list <- c("keras", "pytorch")
 
 for (folder in folder_list) {
-  if (dir.exists(testthat::test_path(paste0("test_artefacts/tmp_full_models_", folder))) == FALSE) {
-    dir.create(testthat::test_path(paste0("test_artefacts/tmp_full_models_", folder)))
-  }
-
-  if (dir.exists(testthat::test_path(paste0("test_artefacts/tmp_", folder))) == FALSE) {
-    dir.create(testthat::test_path(paste0("test_artefacts/tmp_", folder)))
-  }
-
-  if (dir.exists(testthat::test_path(paste0("test_artefacts/tmp_", folder, "/2_classes"))) == FALSE) {
-    dir.create(testthat::test_path(paste0("test_artefacts/tmp_", folder, "/2_classes")))
-  }
-
-  if (dir.exists(testthat::test_path(paste0("test_artefacts/tmp_", folder, "/3_classes"))) == FALSE) {
-    dir.create(testthat::test_path(paste0("test_artefacts/tmp_", folder, "/3_classes")))
-  }
+  create_dir(testthat::test_path(paste0("test_artefacts/tmp_full_models_", folder)), FALSE)
+  create_dir(testthat::test_path(paste0("test_artefacts/tmp_", folder)), FALSE)
+  create_dir(testthat::test_path(paste0("test_artefacts/tmp_", folder, "/2_classes")), FALSE)
+  create_dir(testthat::test_path(paste0("test_artefacts/tmp_", folder, "/3_classes")), FALSE)
 }
 
 ml_frameworks <- c("tensorflow", "pytorch")

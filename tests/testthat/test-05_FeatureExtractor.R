@@ -6,13 +6,9 @@ testthat::skip_if_not(
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
+create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
-if (dir.exists(root_path_results) == FALSE) {
-  dir.create(root_path_results)
-}
+create_dir(root_path_results, FALSE)
 
 # SetUp tensorflow
 aifeducation::set_config_gpu_low_memory()
@@ -60,9 +56,7 @@ for (framework in ml_frameworks) {
       # Train-----------------------------------------------------------------
       test_that(paste(framework, method, data_type, "train without log"), {
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
-        if (dir.exists(train_path) == FALSE) {
-          dir.create(train_path)
-        }
+        create_dir(train_path, FALSE)
         expect_no_error(
           extractor$train(
             data_embeddings = dataset_list[[data_type]],
@@ -83,9 +77,7 @@ for (framework in ml_frameworks) {
 
       test_that(paste(framework, method, data_type, "train with log"), {
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
-        if (dir.exists(train_path) == FALSE) {
-          dir.create(train_path)
-        }
+        create_dir(train_path, FALSE)
         expect_no_error(
           extractor$train(
             data_embeddings = dataset_list[[data_type]],

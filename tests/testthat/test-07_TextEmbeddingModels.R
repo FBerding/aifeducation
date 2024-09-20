@@ -6,13 +6,10 @@ testthat::skip_if_not(
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/TextEmbeddingModel")
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
+create_dir(testthat::test_path("test_artefacts"), FALSE)
+
 root_path_results <- testthat::test_path("test_artefacts/TextEmbeddingModel")
-if (dir.exists(root_path_results) == FALSE) {
-  dir.create(root_path_results)
-}
+create_dir(root_path_results, FALSE)
 
 # SetUp tensorflow
 aifeducation::set_config_gpu_low_memory()
@@ -50,20 +47,26 @@ ml_frameworks <- c(
   "tensorflow",
   "pytorch"
 )
+# base_model_list <- list(
+#   tensorflow = c(
+#     "bert",
+#     "roberta",
+#     "longformer",
+#     "funnel",
+#     "deberta_v2"
+#   ),
+#   pytorch = c(
+#     "bert",
+#     "roberta",
+#     "longformer",
+#     "funnel",
+#     "deberta_v2",
+#     "mpnet"
+#   )
+# )
 base_model_list <- list(
-  # "tensorflow"=c("bert",
-  #               "roberta",
-  #               "longformer",
-  #               "funnel",
-  #               "deberta_v2"
-  #               ),
-  "pytorch" = c( # "bert",
-    # "roberta",
-    # "longformer",
-    # "funnel",
-    # "deberta_v2",
-    "mpnet"
-  )
+  tensorflow = c(),
+  pytorch = c("bert")
 )
 save_format_list <- list(
   "tensorflow" = c("auto"),
@@ -125,9 +128,10 @@ for (framework in ml_frameworks) {
 
           # Check Configuration of the model
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "configuration"), {
-            expect_equal(text_embedding_model$get_transformer_components()$emb_layer_min, min_layer)
-            expect_equal(text_embedding_model$get_transformer_components()$emb_layer_max, max_layer)
-            expect_equal(text_embedding_model$get_transformer_components()$emb_pool_type, pooling_type)
+            tr_comp <- text_embedding_model$get_transformer_components()
+            expect_equal(tr_comp$emb_layer_min, min_layer)
+            expect_equal(tr_comp$emb_layer_max, max_layer)
+            expect_equal(tr_comp$emb_pool_type, pooling_type)
           })
 
           # Method embed
@@ -179,9 +183,7 @@ for (framework in ml_frameworks) {
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large with log"), {
             # general
             log_dir <- paste0(root_path_results, "/", generate_id())
-            if (dir.exists(log_dir) == FALSE) {
-              dir.create(log_dir)
-            }
+            create_dir(log_dir, FALSE)
             log_file <- paste0(log_dir, "aifeducation_state.log")
             embeddings <- text_embedding_model$embed_large(example_data_large,
               log_file = log_file,
@@ -210,21 +212,15 @@ for (framework in ml_frameworks) {
 
           # encoding
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "encoding"), {
-            encodings <- text_embedding_model$encode(
-              raw_text = example_data$text[1:10],
-              token_encodings_only = TRUE,
-              to_int = TRUE
-            )
-            expect_length(encodings, 10)
-            expect_type(encodings, type = "list")
-
-            encodings <- text_embedding_model$encode(
-              raw_text = example_data$text[1:10],
-              token_encodings_only = TRUE,
-              to_int = FALSE
-            )
-            expect_length(encodings, 10)
-            expect_type(encodings, type = "list")
+            for (to_int in c(TRUE, FALSE)) {
+              encodings <- text_embedding_model$encode(
+                raw_text = example_data$text[1:10],
+                token_encodings_only = TRUE,
+                to_int = to_int
+              )
+              expect_length(encodings, 10)
+              expect_type(encodings, type = "list")
+            }
           })
 
           # Decoding
@@ -234,17 +230,14 @@ for (framework in ml_frameworks) {
               token_encodings_only = TRUE,
               to_int = TRUE
             )
-            decodings <- text_embedding_model$decode(encodings,
-              to_token = FALSE
-            )
-            expect_length(decodings, 10)
-            expect_type(decodings, type = "list")
-
-            decodings <- text_embedding_model$decode(encodings,
-              to_token = TRUE
-            )
-            expect_length(decodings, 10)
-            expect_type(decodings, type = "list")
+            for (to_token in c(TRUE, FALSE)) {
+              decodings <- text_embedding_model$decode(
+                encodings,
+                to_token = to_token
+              )
+              expect_length(decodings, 10)
+              expect_type(decodings, type = "list")
+            }
           })
 
           # Method get_special_tokens
@@ -304,9 +297,7 @@ for (framework in ml_frameworks) {
               min_layer
             )
             save_location <- paste0(root_path_results, "/", folder_name)
-            if (dir.exists(save_location) == FALSE) {
-              dir.create(save_location)
-            }
+            create_dir(save_location, FALSE)
 
             # embeddings for saving
             embeddings <- text_embedding_model$embed(
@@ -346,9 +337,7 @@ for (framework in ml_frameworks) {
               min_layer
             )
             save_location <- paste0(root_path_results, "/", folder_name)
-            if (dir.exists(save_location) == FALSE) {
-              dir.create(save_location)
-            }
+            create_dir(save_location, FALSE)
 
             # embeddings for saving
             embeddings <- text_embedding_model$embed(

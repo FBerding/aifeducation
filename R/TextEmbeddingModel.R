@@ -156,10 +156,7 @@ TextEmbeddingModel <- R6::R6Class(
     # Method for saving sustainability data
     save_sustainability_data = function(dir_path, folder_name) {
       save_location <- paste0(dir_path, "/", folder_name)
-      if (dir.exists(dir_path) == FALSE) {
-        dir.create(dir_path)
-        cat("Creating Directory\n")
-      }
+      create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       sustain_matrix <- private$sustainability$track_log
       write.csv(
         x = sustain_matrix,
@@ -182,10 +179,7 @@ TextEmbeddingModel <- R6::R6Class(
     save_training_history = function(dir_path, folder_name) {
       if (is.null_or_na(self$last_training$history) == FALSE) {
         save_location <- paste0(dir_path, "/", folder_name)
-        if (dir.exists(dir_path) == FALSE) {
-          dir.create(dir_path)
-          cat("Creating Directory\n")
-        }
+        create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
         write.csv2(
           x = self$last_training$history,
           file = paste0(save_location, "/", "history.log"),
@@ -209,10 +203,7 @@ TextEmbeddingModel <- R6::R6Class(
     save_tokenizer_statistics = function(dir_path, folder_name) {
       if (is.null_or_na(self$tokenizer_statistics) == FALSE) {
         save_location <- paste0(dir_path, "/", folder_name)
-        if (dir.exists(dir_path) == FALSE) {
-          dir.create(dir_path)
-          cat("Creating Directory\n")
-        }
+        create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
         write.csv(
           x = self$tokenizer_statistics,
           file = paste0(save_location, "/", "tokenizer_statistics.csv"),
@@ -762,14 +753,8 @@ TextEmbeddingModel <- R6::R6Class(
       }
 
       save_location <- paste0(dir_path, "/", folder_name)
-      if (dir.exists(dir_path) == FALSE) {
-        dir.create(dir_path)
-        cat("Creating Directory\n")
-      }
-      if (dir.exists(save_location) == FALSE) {
-        dir.create(save_location)
-        cat("Creating Directory\n")
-      }
+      create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
+      create_dir(save_location, trace = TRUE, msg_fun = FALSE)
 
       model_dir_data_path <- paste0(save_location, "/", "model_data")
 

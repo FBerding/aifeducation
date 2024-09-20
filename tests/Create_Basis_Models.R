@@ -4,29 +4,33 @@
 # Config-------------------------------------------------------------------------
 root_path_data <- testthat::test_path("test_data/TextEmbeddingModel")
 
-if (dir.exists(root_path_data) == FALSE) {
-  dir.create(root_path_data)
-}
+create_dir(root_path_data, FALSE)
 
 ml_frameworks <- c(
   "tensorflow",
   "pytorch"
 )
 
+# method_list <- list(
+#   tensorflow = c(
+#     "bert",
+#     "roberta",
+#     "longformer",
+#     "funnel",
+#     "deberta_v2"
+#   ),
+#   pytorch = c(
+#     "bert",
+#     "roberta",
+#     "longformer",
+#     "funnel",
+#     "deberta_v2",
+#     "mpnet"
+#   )
+# )
 method_list <- list(
-  # "tensorflow"=c(#"bert",
-  #               #"roberta"#,
-  #               "longformer",
-  #               "funnel",
-  #               "deberta_v2"
-  # ),
-  "pytorch" = c( # "bert",
-    #           #"roberta",
-    "mpnet" # ,
-    # "longformer",
-    # "funnel",
-    # "deberta_v2"
-  )
+  tensorflow = c(),
+  pytorch = c("mpnet")
 )
 
 example_data <- imdb_movie_reviews
@@ -35,15 +39,11 @@ trace <- FALSE
 # Start creation and training---------------------------------------------------
 for (framework in ml_frameworks) {
   root_path_results <- paste0(root_path_data, "/", framework)
-  if (dir.exists(root_path_results) == FALSE) {
-    dir.create(root_path_results)
-  }
+  create_dir(root_path_results, FALSE)
 
   for (method in method_list[[framework]]) {
     root_path_results_model <- paste0(root_path_results, "/", method)
-    if (dir.exists(root_path_results_model) == FALSE) {
-      dir.create(root_path_results_model)
-    }
+    create_dir(root_path_results_model, FALSE)
 
     # Base Models
     if (method == "bert") {
@@ -306,3 +306,4 @@ for (framework in ml_frameworks) {
     }
   }
 }
+

@@ -194,12 +194,8 @@ long_classifier <- function(classifier_type,
       dir_destination, "/",
       "checkpoints"
     )
-    if (dir.exists(dir_destination) == FALSE) {
-      dir.create(dir_destination)
-    }
-    if (dir.exists(dir_checkpoints) == FALSE) {
-      dir.create(dir_checkpoints)
-    }
+    create_dir(dir_destination, FALSE)
+    create_dir(dir_checkpoints, FALSE)
 
     if (classifier_type == "regular") {
       # Create Classifier
@@ -400,12 +396,9 @@ long_feature_extractor <- function(name,
       dir_destination, "/",
       "checkpoints"
     )
-    if (dir.exists(dir_destination) == FALSE) {
-      dir.create(dir_destination)
-    }
-    if (dir.exists(dir_checkpoints) == FALSE) {
-      dir.create(dir_checkpoints)
-    }
+
+    create_dir(dir_destination, FALSE)
+    create_dir(dir_checkpoints, FALSE)
 
     # Create
     feature_extractor <- TEFeatureExtractor$new()

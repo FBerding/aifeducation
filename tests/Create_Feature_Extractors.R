@@ -4,9 +4,7 @@
 # Config-------------------------------------------------------------------------
 root_path_data <- testthat::test_path("test_data/classifier")
 
-if (dir.exists(root_path_data) == FALSE) {
-  dir.create(root_path_data)
-}
+create_dir(root_path_data, FALSE)
 
 ml_frameworks <- c("pytorch")
 

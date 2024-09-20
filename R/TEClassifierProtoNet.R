@@ -807,12 +807,10 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       # Check directory for checkpoints
-      if (dir.exists(paste0(self$last_training$config$dir_checkpoint, "/checkpoints")) == FALSE) {
-        if (self$last_training$config$trace == TRUE) {
-          message(paste(date(), "Creating Checkpoint Directory"))
-        }
-        dir.create(paste0(self$last_training$config$dir_checkpoint, "/checkpoints"))
-      }
+      create_dir(
+        dir_path = paste0(self$last_training$config$dir_checkpoint, "/checkpoints"),
+        trace = self$last_training$config$trace,
+        msg = "Creating Checkpoint Directory")
 
       # Set target column
       if (self$model_config$require_one_hot == FALSE) {

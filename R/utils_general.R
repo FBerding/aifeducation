@@ -99,7 +99,25 @@ generate_id <- function(length = 16) {
 }
 
 #' @title Print message
-#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date.
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date with `message()` or `cat()`
+#'   function.
+#'
+#' @param msg `string` Message that should be printed.
+#' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
+#' @param msg_fun `bool` value that determines what function should be used. `TRUE` for `message()`, `FALSE` for
+#'   `cat()`.
+#'
+#' @return This function returns nothing.
+#' @family Utils
+#' @keywords internal
+#' @noRd
+output_message <- function(msg, trace, msg_fun) {
+  fun <- ifelse(msg_fun, message, cat)
+  if (trace) fun(paste(date(), msg))
+}
+
+#' @title Print message (`message()`)
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date with `message()` function.
 #'
 #' @param msg `string` Message that should be printed.
 #' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
@@ -109,7 +127,21 @@ generate_id <- function(length = 16) {
 #' @keywords internal
 #' @noRd
 print_message <- function(msg, trace) {
-  if (trace) message(paste(date(), msg))
+  output_message(msg, trace, TRUE)
+}
+
+#' @title Print message  (`cat()`)
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date with `cat()` function.
+#'
+#' @param msg `string` Message that should be printed.
+#' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
+#'
+#' @return This function returns nothing.
+#' @family Utils
+#' @keywords internal
+#' @noRd
+cat_message <- function(msg, trace) {
+  output_message(msg, trace, FALSE)
 }
 
 #' @title Create directory if not exists
@@ -124,9 +156,9 @@ print_message <- function(msg, trace) {
 #' @family Utils
 #' @keywords internal
 #' @noRd
-create_dir <- function(dir_path, trace, msg = "") {
+create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TRUE) {
   if (!dir.exists(dir_path)) {
-    print_message(msg, trace)
+    output_message(msg, trace, msg_fun)
     dir.create(dir_path)
   }
 }
