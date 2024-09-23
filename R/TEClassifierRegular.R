@@ -122,6 +122,9 @@ TEClassifierRegular <- R6::R6Class(
                          recurrent_dropout = 0.4,
                          encoder_dropout = 0.1,
                          optimizer = "adam") {
+      #check if already configured
+      private$check_config_for_FALSE()
+
       # Checking of parameters--------------------------------------------------
       if ((ml_framework %in% c("tensorflow", "pytorch")) == FALSE) {
         stop("ml_framework must be 'tensorflow' or 'pytorch'.")
@@ -1972,16 +1975,8 @@ TEClassifierRegular <- R6::R6Class(
         )
       }
 
-      # Provide rownames for the history
-      for (i in 1:length(history)) {
-        if (!is.null(history[[i]])) {
-          if (nrow(history[[i]]) == 2) {
-            rownames(history[[i]]) <- c("train", "val")
-          } else {
-            rownames(history[[i]]) <- c("train", "val", "test")
-          }
-        }
-      }
+      #provide rownames and replace -100
+      history<-private$prepare_history_data(history)
       return(history)
     },
     #--------------------------------------------------------------------------

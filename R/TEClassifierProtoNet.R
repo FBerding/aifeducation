@@ -73,7 +73,7 @@ TEClassifierProtoNet <- R6::R6Class(
                          rec = c(128),
                          rec_type = "gru",
                          rec_bidirectional = FALSE,
-                         embedding_dim = 3,
+                         embedding_dim = 2,
                          self_attention_heads = 0,
                          intermediate_size = NULL,
                          attention_type = "fourier",
@@ -84,6 +84,9 @@ TEClassifierProtoNet <- R6::R6Class(
                          recurrent_dropout = 0.4,
                          encoder_dropout = 0.1,
                          optimizer = "adam") {
+      # check if already configured
+      private$check_config_for_FALSE()
+
       # Checking of parameters--------------------------------------------------
       if ((ml_framework %in% c("pytorch")) == FALSE) {
         stop("ml_framework must be 'pytorch'.")
@@ -242,7 +245,13 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   its corresponding prototypes or pushing cases away from other prototypes. The higher the value the more the
     #'   loss concentrates on pulling cases to its corresponding prototypes.
     #' @param loss_margin `double` Value greater 0 indicating the minimal distance of every case from prototypes of
-    #'   other classes.
+    #'   other classes
+    #' @param sampling_separate `bool` If `TRUE` the cases for every class are divided into a data set for sample and for query.
+    #'    These are never mixed. If `TRUE` sample and query cases are drawn from the same data pool. That is, a case can be
+    #'    part of sample in one epoch and in another epoch it can be part of query. It is ensured that a case is never part of
+    #'    sample and query at the same time.
+    #' @param sampling_shuffle `bool` If `TRUE` cases a randomly drawn from the data during every step. If `FALSE`
+    #'    the cases are not shuffled.
     #' @param dir_checkpoint `string` Path to the directory where the checkpoint during training should be saved. If the
     #'   directory does not exist, it is created.
     #' @param log_dir `string` Path to the directory where the log files should be saved. If no logging is desired set
@@ -284,6 +293,8 @@ TEClassifierProtoNet <- R6::R6Class(
                      Nq = 3,
                      loss_alpha = 0.5,
                      loss_margin = 0.5,
+                     sampling_separate = TRUE,
+                     sampling_shuffle = TRUE,
                      dir_checkpoint,
                      trace = TRUE,
                      ml_trace = 1,
@@ -358,6 +369,9 @@ TEClassifierProtoNet <- R6::R6Class(
       self$last_training$config$dir_checkpoint <- dir_checkpoint
       self$last_training$config$trace <- trace
       self$last_training$config$ml_trace <- ml_trace
+
+      self$last_training$config$sampling_separate <- sampling_separate
+      self$last_training$config$sampling_shuffle <- sampling_shuffle
 
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
@@ -571,12 +585,13 @@ TEClassifierProtoNet <- R6::R6Class(
 
         if (private$ml_framework == "pytorch") {
           prediction_data_q_embeddings$set_format("torch")
-          embeddings_tensors_q <- py$TeProtoNetBatchEmbed(
+          embeddings_and_distances <- py$TeProtoNetBatchEmbedDistance(
             model = self$model,
             dataset_q = prediction_data_q_embeddings,
             batch_size = as.integer(batch_size)
           )
-          embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+          embeddings_tensors_q <- private$detach_tensors(embeddings_and_distances[[1]])
+          distances_tensors_q <- private$detach_tensors(embeddings_and_distances[[2]])
         }
       } else {
         prediction_data_q_embeddings <- private$prepare_embeddings_as_np_array(embeddings_q)
@@ -599,6 +614,8 @@ TEClassifierProtoNet <- R6::R6Class(
             input <- torch$from_numpy(prediction_data_q_embeddings)
             embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
             embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+            distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
+            distances_tensors_q <- private$detach_tensors(distances_tensors_q)
           } else {
             device <- "cpu"
             dtype <- torch$float
@@ -607,6 +624,8 @@ TEClassifierProtoNet <- R6::R6Class(
             input <- torch$from_numpy(prediction_data_q_embeddings)
             embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
             embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+            distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
+            distances_tensors_q <- private$detach_tensors(distances_tensors_q)
           }
         }
       }
@@ -619,10 +638,12 @@ TEClassifierProtoNet <- R6::R6Class(
 
       # Post processing
       rownames(embeddings_tensors_q) <- current_row_names
+      rownames(distances_tensors_q) <- current_row_names
       rownames(embeddings_prototypes) <- self$model_config$target_levels
 
       return(list(
         embeddings_q = embeddings_tensors_q,
+        distances_q = distances_tensors_q,
         embeddings_prototypes = embeddings_prototypes
       ))
     },
@@ -632,10 +653,24 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   embeddings for all cases which should be embedded into the classification space.
     #' @param classes_q Named `factor` containg the true classes for every case. Please note that the names must match
     #'   the names/ids in `embeddings_q`.
+    #'   @param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
+    #'   @param size_points `int` Size of the points excluding the points for prototypes.
+    #'   @param size_points_prototypes `int` Size of points representing prototypes.
+    #'   @param alpha `float` Value indicating how transparent the points should be (important
+    #'   if many points overlapp). Does not apply to points representing prototypes.
     #' @param batch_size `int` batch size.
-    #' @return Returns a plot of class `ggplot`viszualising the embeddings.
+    #' @return Returns a plot of class `ggplot`visualizing embeddings.
     #'
-    plot_embeddings = function(embeddings_q, classes_q, batch_size) {
+    plot_embeddings = function(embeddings_q,
+                               classes_q,
+                               batch_size = 12,
+                               alpha = 0.5,
+                               size_points = 3,
+                               size_points_prototypes = 8,
+                               inc_unlabeled = TRUE) {
+      # Argument checking-------------------------------------------------------
+
+
       embeddings <- self$embed(
         embeddings_q = embeddings_q,
         batch_size = batch_size
@@ -656,19 +691,25 @@ TEClassifierProtoNet <- R6::R6Class(
       true_values$type <- rep("labeled", length(true_values_names))
       colnames(true_values) <- c("x", "y", "class", "type")
 
-      estimated_values_names <- setdiff(
-        x = private$get_rownames_from_embeddings(embeddings_q),
-        y = true_values_names
-      )
-      if (length(estimated_values_names) > 0) {
-        estimated_values <- as.data.frame(embeddings$embeddings_q[estimated_values_names, , drop = FALSE])
-        estimated_values$class <- private$calc_classes_on_distance(
-          embeddings = embeddings$embeddings_q[estimated_values_names, , drop = FALSE],
-          prototypes = embeddings$embeddings_prototypes
+      if (inc_unlabeled == TRUE) {
+        estimated_values_names <- setdiff(
+          x = private$get_rownames_from_embeddings(embeddings_q),
+          y = true_values_names
         )
-        estimated_values$type <- rep("unlabeled", length(estimated_values_names))
-        colnames(estimated_values) <- c("x", "y", "class", "type")
+
+        if (length(estimated_values_names) > 0) {
+          estimated_values <- as.data.frame(embeddings$embeddings_q[estimated_values_names, , drop = FALSE])
+          estimated_values$class <- private$calc_classes_on_distance(
+            distance_matrix = embeddings$distances_q[estimated_values_names, , drop = FALSE],
+            prototypes = embeddings$embeddings_prototypes
+          )
+          estimated_values$type <- rep("unlabeled", length(estimated_values_names))
+          colnames(estimated_values) <- c("x", "y", "class", "type")
+        }
+      } else {
+        estimated_values_names <- NULL
       }
+
 
       if (length(estimated_values_names) > 0) {
         plot_data <- rbind(prototypes, true_values, estimated_values)
@@ -678,28 +719,36 @@ TEClassifierProtoNet <- R6::R6Class(
 
       plot <- ggplot2::ggplot(data = plot_data) +
         ggplot2::geom_point(
-          mapping = ggplot2::aes(x = x, y = y, color = class, shape = type)
-        )
+          mapping = ggplot2::aes(
+            x = x,
+            y = y,
+            color = class,
+            shape = type,
+            size = type,
+            alpha = type
+          ),
+          position = ggplot2::position_jitter(h = 0.1, w = 0.1)
+        ) +
+        ggplot2::scale_size_manual(values = c(
+          "prototype" = size_points_prototypes,
+          "labeled" = size_points,
+          "unlabeled" = size_points
+        )) +
+        ggplot2::scale_alpha_manual(
+          values = c(
+            "prototype" = 1,
+            "labeled" = alpha,
+            "unlabeled" = alpha
+          )
+        ) +
+        ggplot2::theme_classic()
       return(plot)
     }
   ),
   private = list(
     #-------------------------------------------------------------------------
-    calc_classes_on_distance = function(embeddings, prototypes) {
-      distance_matrix <- matrix(
-        data = 0,
-        nrow = nrow(embeddings),
-        ncol = nrow(prototypes)
-      )
-
-      index_vector <- vector(length = nrow(embeddings))
-
-      for (i in nrow(prototypes)) {
-        prototype_embeddings <- prototypes[i, ]
-        distance <- (embeddings - prototype_embeddings)^2
-        distance <- rowSums(distance)
-        distance_matrix[, i] <- distance
-      }
+    calc_classes_on_distance = function(distance_matrix, prototypes) {
+      index_vector <- vector(length = nrow(distance_matrix))
 
       for (i in 1:length(index_vector)) {
         index_vector[i] <- which.min(distance_matrix[i, ])
@@ -949,6 +998,8 @@ TEClassifierProtoNet <- R6::R6Class(
           val_data = pytorch_val_data,
           test_data = pytorch_test_data,
           epochs = as.integer(self$last_training$config$epochs),
+          sampling_separate = self$last_training$config$sampling_separate,
+          sampling_shuffle = self$last_training$config$sampling_shuffle,
           filepath = paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.pt"),
           n_classes = as.integer(length(self$model_config$target_levels)),
           log_dir = log_dir,
@@ -959,16 +1010,9 @@ TEClassifierProtoNet <- R6::R6Class(
         )
       }
 
-      # Provide rownames for the history
-      for (i in 1:length(history)) {
-        if (!is.null(history[[i]])) {
-          if (nrow(history[[i]]) == 2) {
-            rownames(history[[i]]) <- c("train", "val")
-          } else {
-            rownames(history[[i]]) <- c("train", "val", "test")
-          }
-        }
-      }
+      # provide rownames and replace -100
+      history <- private$prepare_history_data(history)
+
       return(history)
     }
   )

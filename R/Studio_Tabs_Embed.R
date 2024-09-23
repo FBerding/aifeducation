@@ -141,7 +141,7 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
           log_path = log_path,
           pgr_use_middle = FALSE,
           pgr_use_bottom = FALSE,
-          update_intervall = 2000,
+          update_intervall = 300,
           success_type = "data_sets"
         )
       } else {

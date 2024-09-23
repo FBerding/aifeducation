@@ -259,7 +259,7 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
           pgr_use_middle = TRUE,
           pgr_use_bottom = TRUE,
           pgr_use_graphic = TRUE,
-          update_intervall = 2,
+          update_intervall = 300,
           success_type = "classifier"
         )
       }

@@ -4,52 +4,145 @@ import numpy as np
 class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
     #Ns Number of examples per class in sample set (k-shot)
     #Nq number of examples per class in the query set (k-shot)
-    def __init__(self, targets, Ns,Nq):
+    #targets pytorch tensor containing the classes/categories
+    def __init__(self, targets, Ns,Nq,separate,shuffle):
         # build data for sampling here
-        self.targets = targets
         self.Ns=Ns
         self.Nq=Nq
-        
-        self.classes=torch.unique(self.targets).numpy()
+        self.separate=separate
+        self.shuffle=shuffle
+
+        #Get the available classes in targets
+        self.classes=torch.unique(targets).numpy()
+        #Get the number of classes
         self.n_classes=len(self.classes)
+        #Calculate the batch size depending on Ns and Nq
         self.batch_size=self.n_classes*(self.Ns+self.Nq)
         
+        #Create dictonary that contains the indexes sorted for every class
         self.indices_per_class={}
+        #Create dictornary thats sotres the number of cases per class
         self.cases_per_class={}
+        #Gather indicies per class and cases per class
         for c in self.classes:
-          self.indices_per_class[c]=torch.where(self.targets==c)[0]
+          self.indices_per_class[c]=torch.where(targets==c)[0]
           self.cases_per_class[c]=len(self.indices_per_class[c])
+        
+         #Create dictonary that contains the indexes sorted for every class and query/sample
+        self.query_indices_per_class={}
+        self.sample_indices_per_class={}
+        #Create dictornary thats sotres the number of cases per class and query/sample
+        self.query_cases_per_class={}
+        self.sample_cases_per_class={}
+
+        #Split indices per class into a sample and query sample if separate is True
+        if self.separate is True:
+          for c in self.classes:
+            #Calculate number of cases for sample
+            n_sample=int(round(self.Ns/(self.Ns+self.Nq)*self.cases_per_class[c]))
+            n_sample=max(1,n_sample)
+            n_sample=min(n_sample,(self.cases_per_class[c]-1))
+            #Calculate number of cases for query
+            n_query=self.cases_per_class[c]-n_sample
+            #Create permutation in order to create a random sample
+            permutation=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
+            #Assign indices
+            self.sample_indices_per_class[c]=permutation[np.array(range(0,n_sample))]
+            self.query_indices_per_class[c]=permutation[np.array(range(n_sample,self.cases_per_class[c]))]
+            #Calculate number of cases
+            self.sample_cases_per_class[c]=len(self.sample_indices_per_class[c])
+            self.query_cases_per_class[c]=len(self.query_indices_per_class[c])
+        else:
+          #Create a random permutation if separate is False and shuffle is False
+          #If shuffle is True random sampling is applied during iter
+          if self.shuffle is False:
+            for c in self.classes:
+              self.indices_per_class[c]=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
+          
+        #Calculate number of batches
         self.number_batches=self.cases_per_class[max(self.cases_per_class,key=self.cases_per_class.get)]//(self.Ns+self.Nq)
         
     def __iter__(self):
-        # implement logic of sampling here
-        permutations={}
-        index_shift=0
-        for c in self.classes:
-            permutations[c]=torch.randperm(self.cases_per_class[c])
-        for batch_number in range(self.number_batches):
-          index_shift=batch_number*(self.Ns+self.Nq)
-          batch_sample=[]
-          batch_query=[]
-          for c in self.classes:
-            class_permutations=permutations[c]
-            ids_sample=np.array(range((0+index_shift),(self.Ns+index_shift)))%self.cases_per_class[c]
-            ids_query=np.array(range((self.Ns+index_shift),((self.Ns+self.Nq)+index_shift)))%self.cases_per_class[c]
-            
-            perm_sample_idx=class_permutations[ids_sample]
-            perm_query_idx=class_permutations[ids_query]
-            
-            perm_sample=self.indices_per_class[c][perm_sample_idx].numpy()
-            perm_query=self.indices_per_class[c][perm_query_idx].numpy()
-            
-            batch_sample.extend(perm_sample)
-            batch_query.extend(perm_query)
-          batch=[]
-          batch=batch_sample+batch_query
-          yield batch
+      for current_iter in range(self.number_batches):
+        #Create list for saving the results per class temporarily 
+        batch_sample=[]
+        batch_query=[]
+      
+        if self.separate is False:
+          if self.shuffle is True:
+            for c in self.classes:
+              #Calculate permutations for the random sample for each class
+              permutations=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
+              
+              #Calculat the indexes for selecting the first Ns+Nq indices
+              ids_sample=np.array(range(0,self.Ns))
+              ids_query=np.array(range(self.Ns,(self.Ns+self.Nq)))
 
+              #Extract the final indices
+              perm_sample=permutations[ids_sample].numpy()
+              perm_query=permutations[ids_query].numpy()
+              
+              #Add them to batch
+              batch_sample.extend(perm_sample)
+              batch_query.extend(perm_query)
+          else:
+            for c in self.classes:
+              #Calculate indices. If the end of all cases is reached for this class
+              #start at beginng and fill the list
+              index_shift= (1+current_iter)*(self.Ns+self.Nq)
+              ids_sample=np.array(range((0+index_shift),(self.Ns+index_shift)))%self.cases_per_class[c]
+              ids_query=np.array(range((self.Ns+index_shift),((self.Ns+self.Nq)+index_shift)))%self.cases_per_class[c]
+              
+              #Extract the final indices
+              perm_sample=self.indices_per_class[c][ids_sample].numpy()
+              perm_query=self.indices_per_class[c][ids_query].numpy()
+            
+              #Add them to batch
+              batch_sample.extend(perm_sample)
+              batch_query.extend(perm_query)
+        if self.separate is True:
+          if self.shuffle is True:
+            for c in self.classes:
+              #Calculate permutations for the random sample for each class
+              permutations_sample=self.sample_indices_per_class[c][torch.randperm(self.sample_cases_per_class[c])]
+              permutations_query=self.query_indices_per_class[c][torch.randperm(self.query_cases_per_class[c])]
+              
+              #Calculat the indexes for selecting the first Ns+Nq indices
+              ids_sample=np.array(range(0,self.Ns))
+              ids_query=np.array(range(0,self.Nq))
+              
+              #Extract the final indices
+              perm_sample=permutations_sample[ids_sample].numpy()
+              perm_query=permutations_query[ids_query].numpy()
+                
+              #Add them to batch
+              batch_sample.extend(perm_sample)
+              batch_query.extend(perm_query)
+          else:
+            #Calculate indices. If the end of all cases is reached for this class
+            #start at beginng and fill the list
+            index_shift_sample= (1+current_iter)*self.Ns
+            index_shift_query= (1+current_iter)*self.Nq
+            for c in self.classes:
+              ids_sample=np.array(range((0+index_shift_sample),(self.Ns+index_shift_sample)))%self.sample_cases_per_class[c]
+              ids_query=np.array(range((0+index_shift_query),(self.Nq+index_shift_query)))%self.query_cases_per_class[c]
+              
+              #Extract the final indices
+              perm_sample=self.sample_indices_per_class[c][ids_sample].numpy()
+              perm_query=self.query_indices_per_class[c][ids_query].numpy()
+              
+              #Add them to batch
+              batch_sample.extend(perm_sample)
+              batch_query.extend(perm_query)
+        #Create the final batch
+        #Add first the sample of all classes and then the query of all classes
+        batch=[]
+        batch=batch_sample+batch_query
+        yield batch
+      
     def __len__(self):
-        return self.number_batches
+      return self.number_batches
+
 
 class ClassMean_PT(torch.nn.Module):
   def __init__(self,n_classes):
@@ -111,6 +204,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     self.n_classes=len(target_levels)
     
     self.trained_prototypes=torch.nn.Parameter(torch.randn(self.n_classes,self.embedding_dim))
+    self.near_factor=torch.nn.Parameter(torch.ones(1))
 
     if isinstance(rec, int):
       rec=[rec]
@@ -168,31 +262,30 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
       prototypes=self.trained_prototypes
     else:
       #Sample set
-      sample_embeddings=self.core_net(input_s)
-      #print(sample_embeddings)
-      sample_embeddings=self.embedding_head(sample_embeddings)
-      #print(sample_embeddings)
+      sample_embeddings=self.embed(input_s)
       prototypes=self.class_mean(x=sample_embeddings,classes=classes_s)
-      #print(prototypes)
 
     #Query set
-    query_embeddings=self.core_net(input_q)
-    query_embeddings=self.embedding_head(query_embeddings)
+    query_embeddings=self.embed(input_q)
 
     #Calc distance from query embeddings to global global prototypes
     distances=self.metric(x=query_embeddings,prototypes=prototypes)
-    probabilities=torch.nn.Softmax(dim=1)(torch.exp(-distances))
+    probabilities=torch.nn.Softmax(dim=1)(torch.exp(-self.near_factor*distances))
       
     if predication_mode==False:
       return probabilities, distances
     else:
       return probabilities
+  
+  def get_distances(self,inputs):
+    distances=self.metric(x=self.embed(inputs),prototypes=self.trained_prototypes)
+    return distances
+  
   def embed(self,inputs):
-    #Sample set
-    sample_embeddings=self.core_net(inputs)
-    #print(sample_embeddings)
-    sample_embeddings=self.embedding_head(sample_embeddings)
-    return sample_embeddings
+    embeddings=self.core_net(inputs)
+    embeddings=torch.tanh(self.embedding_head(embeddings))
+    return embeddings
+  
   def set_trained_prototypes(self,prototypes):
     self.trained_prototypes=torch.nn.Parameter(prototypes)
   def get_trained_prototypes(self):
@@ -201,7 +294,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
 
 #-------------------------------------------------------------------------------    
 def TeClassifierProtoNetTrain_PT_with_Datasets(model,loss_fct_name, optimizer_method, epochs, trace,Ns,Nq,
-loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,test_data=None,
+loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
@@ -240,6 +333,17 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   best_val_loss=float('inf')
   
   #Set Up Loaders
+  ProtoNetSampler_Train=MetaLernerBatchSampler(
+  targets=train_data["labels"],
+  Ns=Ns,
+  Nq=Nq,
+  separate=sampling_separate,
+  shuffle=sampling_shuffle)
+  
+  trainloader=torch.utils.data.DataLoader(
+    train_data,
+    batch_sampler=ProtoNetSampler_Train)
+  
   valloader=torch.utils.data.DataLoader(
     val_data,
     batch_size=Ns+Nq,
@@ -260,33 +364,15 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     current_step=0
     total_epochs=epochs
     
-    ProtoNetSampler_Train=MetaLernerBatchSampler(
-      targets=train_data["labels"],
-      Ns=Ns,
-      Nq=Nq)  
-    
-    trainloader=torch.utils.data.DataLoader(
-      train_data,
-      batch_sampler=ProtoNetSampler_Train)
-    
     total_steps=len(trainloader)+len(valloader)
     if not (test_data is None):
       total_steps=total_steps+len(testloader)
 
+
   for epoch in range(epochs):
     #logging
     current_step=0
-    
-    #Set Up Sampler for a new random selection---------------------------------
-    ProtoNetSampler_Train=MetaLernerBatchSampler(
-      targets=train_data["labels"],
-      Ns=Ns,
-      Nq=Nq)  
-    
-    trainloader=torch.utils.data.DataLoader(
-      train_data,
-      batch_sampler=ProtoNetSampler_Train)
-    
+
     #Training------------------------------------------------------------------
     train_loss=0.0
     n_matches_train=0
@@ -294,8 +380,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     confusion_matrix_train=torch.zeros(size=(n_classes,n_classes))
     confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
     
+    n_batches=0
+    
     model.train(True)
     for batch in trainloader:
+      n_batches=n_batches+1
       #assign colums of the batch
       inputs=batch["input"]
       labels=batch["labels"]
@@ -359,6 +448,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       #assign colums of the batch
       inputs=batch["input"]
       labels=batch["labels"]
+      
+      #inputs=inputs[0:(n_classes*Ns)].clone()
+      #labels=labels[0:(n_classes*Ns)].clone()
       
       inputs = inputs.to(device,dtype=dtype)
       labels=labels.to(device,dtype=dtype)
@@ -425,7 +517,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
 
     acc_val=n_matches_val/n_total_val
     bacc_val=torch.sum(torch.diagonal(confusion_matrix_val)/torch.sum(confusion_matrix_val,dim=1))/n_classes
-   
+
     #Test----------------------------------------------------------------------
     if not (test_data is None):
       test_loss=0.0
@@ -502,7 +594,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
           epoch+1,
           epochs,
-          train_loss,
+          train_loss/len(trainloader),
           acc_train,
           bacc_train,
           val_loss/len(valloader),
@@ -538,6 +630,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
         best_val_loss=val_loss/len(valloader)
+        
+    #Check if there are furhter information for training-----------------------
+    # If there are no addtiononal information. Stop training and continue
+    if train_loss/len(trainloader)<0.0001 and acc_train==1 and bacc_train==1:
+      break
   
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
@@ -555,7 +652,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     
   return history
 
-def TeProtoNetBatchEmbed(model,dataset_q,batch_size):
+def TeProtoNetBatchEmbedDistance(model,dataset_q,batch_size):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
@@ -579,11 +676,14 @@ def TeProtoNetBatchEmbed(model,dataset_q,batch_size):
       inputs = inputs.to(device,dtype=dtype)
       
       predictions=model.embed(inputs)
+      distances=model.get_distances(inputs)
       
       if iteration==0:
         predictions_list=predictions.to("cpu")
+        distance_list=distances.to("cpu")
       else:
         predictions_list=torch.concatenate((predictions_list,predictions.to("cpu")), axis=0, out=None)
+        distance_list=torch.concatenate((distance_list,distances.to("cpu")), axis=0, out=None)
       iteration+=1
   
-  return predictions_list      
+  return predictions_list, distance_list      

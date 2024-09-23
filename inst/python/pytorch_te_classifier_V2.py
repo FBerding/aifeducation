@@ -710,6 +710,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         best_bacc=bacc_val
         best_val_loss=val_loss/len(valloader)
   
+    #Check if there are furhter information for training-----------------------
+    # If there are no addtiononal information. Stop training and continue
+    if train_loss/len(trainloader)<0.0001 and acc_train==1 and bacc_train==1:
+      break
+  
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
     if trace>=1:

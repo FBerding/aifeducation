@@ -206,9 +206,11 @@ DataManagerClassifier <- R6::R6Class(
     #' @return Returns a table describing the absolute frequencies of the labeled and unlabeled data. The rows contain
     #'   the length of the sequences while the columns contain the labels.
     get_statistics = function() {
+      self$datasets$data_labeled$set_format("np")
       length_labeled <- self$datasets$data_labeled["length"]
       labels_labeled <- self$datasets$data_labeled["labels"]
 
+      self$datasets$data_unlabeled$set_format("np")
       length_unlabeled <- self$datasets$data_unlabeled["length"]
       labels_unlabeled <- rep(NA, times = length(length_unlabeled))
 
@@ -244,6 +246,7 @@ DataManagerClassifier <- R6::R6Class(
       requested_datasets <- list()
 
       if (inc_labeled == TRUE) {
+        self$datasets$data_labeled$set_format("np")
         requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled$select(
           as.integer(self$samples[[self$state$iteration]]$train)
         ))
@@ -251,15 +254,22 @@ DataManagerClassifier <- R6::R6Class(
 
       if (inc_synthetic == TRUE) {
         if (!is.null(self$datasets$data_labeled_synthetic)) {
+          self$datasets$data_labeled_synthetic$set_format("np")
           requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled_synthetic)
         }
       }
 
       if (inc_pseudo_data == TRUE) {
+        if (!is.null(self$datasets$data_labeled_pseudo)) {
+        self$datasets$data_labeled_pseudo$set_format("np")
         requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled_pseudo)
+        }
       }
       if (inc_unlabeled == TRUE) {
+        if (!is.null(self$datasets$data_unlabeled)) {
+        self$datasets$data_unlabeled$set_format("np")
         requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_unlabeled)
+        }
       }
 
 
@@ -513,8 +523,14 @@ DataManagerClassifier <- R6::R6Class(
         ))
       }
     },
+    #--------------------------------------------------------------------------
+    get_all_labels=function(){
+      self$datasets$data_labeled$set_format("np")
+      self$datasets$data_labeled["labels"]
+    },
+    #-------------------------------------------------------------------------
     check_and_calculate_number_folds = function(folds) {
-      sample_target <- self$datasets$data_labeled["labels"]
+      sample_target <- private$get_all_labels()
       freq_cat <- table(sample_target)
       min_freq <- min(freq_cat)
       if (min_freq < 6) {

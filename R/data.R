@@ -8,6 +8,17 @@
 #' @keywords internal
 "vignette_classifier"
 
+
+#' @title Vignette classifier ProtoNet
+#'
+#' @description An object of class [TEClassifierProtoNet] trained with the a subset of the Standford Movie Review
+#'   Dataset. The purpose of classifier is for illustration in vignettes.
+#'
+#' @docType data
+#' @format R6
+#' @keywords internal
+"vignette_classifier_ProtoNet"
+
 #' @title Test metric for an example classifier
 #'
 #' @description A matrix of 4 rows and 17 columns containing test metrics for an example classifier. The purpose of the

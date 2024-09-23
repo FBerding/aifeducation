@@ -1,7 +1,9 @@
 # Create ui-------------------------------------------------------------------
 ui <- bslib::page_navbar(
   title = "AI for Education - Studio",
-  theme = bslib::bs_theme(bootswatch = "darkly"),
+  theme = bslib::bs_theme(
+    bootswatch = "flatly"
+    ),
   bslib::nav_panel(
     title = "Home",
     Studio_Home_UI("Home")

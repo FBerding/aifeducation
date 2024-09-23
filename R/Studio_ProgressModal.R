@@ -3,6 +3,8 @@
 #'
 #' @param ns `function` for setting the namespace of the input and output elements.
 #' @param title `string` Title of the modal.
+#' @param string_update_interval `string` indicating in how many seconds the charts updates. Value is displayed
+#' as an information for the user.
 #' @param inc_middle `bool` If `TRUE` includes the middle progress bar.
 #' @param inc_bottom `bool` If `TRUE` includes the bottom progress bar.
 #' @param inc_graphic `bool` If `TRUE` includes a graphic display the development of the loss.
@@ -17,6 +19,7 @@
 #' @keywords internal
 #'
 create_process_modal <- function(ns = session$ns,
+                                 string_update_interval="",
                                  title = "In progress. Please wait.",
                                  inc_middle = TRUE,
                                  inc_bottom = TRUE,
@@ -24,6 +27,11 @@ create_process_modal <- function(ns = session$ns,
                                  easy_close = FALSE,
                                  size = "l") {
   prograssbars_list <- shiny::tagList(
+    shiny::tags$p("Report chart updates every",
+                  string_update_interval,
+                  "seconds.")
+  )
+  prograssbars_list[length(prograssbars_list) + 1] <- shiny::tagList(
     shinyWidgets::progressBar(
       id = ns("pgr_top"),
       value = 0,
@@ -119,7 +127,7 @@ start_and_monitor_long_task <- function(id,
                                         pgr_use_middle = FALSE,
                                         pgr_use_bottom = FALSE,
                                         pgr_use_graphic = FALSE,
-                                        update_intervall = 2,
+                                        update_intervall = 300,
                                         success_type = "data_sets") {
   shiny::moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------
@@ -141,6 +149,7 @@ start_and_monitor_long_task <- function(id,
 
     # Create progress modal
     progress_modal <- create_process_modal(
+      string_update_interval=update_intervall,
       ns = session$ns,
       inc_middle = pgr_use_middle,
       inc_bottom = pgr_use_bottom,
@@ -267,7 +276,6 @@ start_and_monitor_long_task <- function(id,
       if (CurrentTask$status() == "success") {
         # Remove process modal
         shiny::removeModal()
-        Sys.sleep(1)
 
         success_message <- ""
         if (success_type == "data_sets") {
