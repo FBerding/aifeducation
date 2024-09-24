@@ -95,8 +95,21 @@ TEClassifierProtoNet <- R6::R6Class(
       check_type(name, type = "string", FALSE)
       check_type(label, type = "string", FALSE)
       check_type(target_levels, c("vector"), FALSE)
-      check_type(hidden, "vector", TRUE)
-      check_type(rec, "vector", TRUE)
+      check_type(dense_size, type = "int", FALSE)
+      check_type(dense_layers, type = "int", FALSE)
+      if(dense_layers>0){
+        if(dense_size<1){
+          stop("Dense layers added. Size for dense layers must be at least 1.")
+        }
+      }
+
+      check_type(rec_size, type = "int", FALSE)
+      check_type(rec_layers, type = "int", FALSE)
+      if(rec_layers>0){
+        if(rec_size<1){
+          stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
+        }
+      }
       check_type(self_attention_heads, type = "int", FALSE)
       if (optimizer %in% c("adam", "rmsprop") == FALSE) {
         stop("Optimzier must be 'adam' oder 'rmsprop'.")
@@ -137,8 +150,10 @@ TEClassifierProtoNet <- R6::R6Class(
         use_fe = FALSE,
         features = private$text_embedding_model[["features"]],
         times = private$text_embedding_model[["times"]],
-        hidden = hidden,
-        rec = rec,
+        dense_size = dense_size,
+        dense_layers=dense_layers,
+        rec_size = rec_size,
+        rec_layers=rec_layers,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         intermediate_size = intermediate_size,
@@ -293,7 +308,7 @@ TEClassifierProtoNet <- R6::R6Class(
                      Nq = 3,
                      loss_alpha = 0.5,
                      loss_margin = 0.5,
-                     sampling_separate = TRUE,
+                     sampling_separate = FALSE,
                      sampling_shuffle = TRUE,
                      dir_checkpoint,
                      trace = TRUE,
@@ -788,16 +803,10 @@ TEClassifierProtoNet <- R6::R6Class(
         self$model <- py$TextEmbeddingClassifierProtoNet_PT(
           features = as.integer(self$model_config$features),
           times = as.integer(self$model_config$times),
-          hidden = if (!is.null(self$model_config$hidden)) {
-            as.integer(self$model_config$hidden)
-          } else {
-            NULL
-          },
-          rec = if (!is.null(self$model_config$rec)) {
-            as.integer(self$model_config$rec)
-          } else {
-            NULL
-          },
+          dense_size = self$model_config$dense_size,
+          dense_layers=self$model_config$dense_layers,
+          rec_size = self$model_config$rec_size,
+          rec_layers=self$model_config$rec_layers,
           rec_type = self$model_config$rec_type,
           rec_bidirectional = self$model_config$rec_bidirectional,
           intermediate_size = as.integer(self$model_config$intermediate_size),

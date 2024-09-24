@@ -108,8 +108,10 @@ TEClassifierRegular <- R6::R6Class(
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         hidden = c(128),
-                         rec = c(128),
+                         dense_size = 4,
+                         dense_layers=0,
+                         rec_size = 4,
+                         rec_layers=2,
                          rec_type = "gru",
                          rec_bidirectional = FALSE,
                          self_attention_heads = 0,
@@ -131,9 +133,24 @@ TEClassifierRegular <- R6::R6Class(
       }
       check_type(name, type = "string", FALSE)
       check_type(label, type = "string", FALSE)
+
       check_type(target_levels, c("vector"), FALSE)
-      check_type(hidden, c("vector"), TRUE)
-      check_type(rec, c("vector"), TRUE)
+      check_type(dense_size, type = "int", FALSE)
+      check_type(dense_layers, type = "int", FALSE)
+      if(dense_layers>0){
+        if(dense_size<1){
+          stop("Dense layers added. Size for dense layers must be at least 1.")
+        }
+      }
+
+      check_type(rec_size, type = "int", FALSE)
+      check_type(rec_layers, type = "int", FALSE)
+      if(rec_layers>0){
+        if(rec_size<1){
+          stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
+        }
+      }
+
       check_type(self_attention_heads, type = "int", FALSE)
       if (optimizer %in% c("adam", "rmsprop") == FALSE) {
         stop("Optimzier must be 'adam' oder 'rmsprop'.")
@@ -171,8 +188,10 @@ TEClassifierRegular <- R6::R6Class(
         use_fe = FALSE,
         features = private$text_embedding_model[["features"]],
         times = private$text_embedding_model[["times"]],
-        hidden = hidden,
-        rec = rec,
+        dense_size = dense_size,
+        dense_layers=dense_layers,
+        rec_size = rec_size,
+        rec_layers=rec_layers,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         intermediate_size = intermediate_size,
@@ -218,7 +237,7 @@ TEClassifierRegular <- R6::R6Class(
         config["require_one_hot"] <- list(TRUE)
       }
 
-      if (length(rec) > 0 | repeat_encoder > 0) {
+      if (rec_layers > 0 | repeat_encoder > 0) {
         config["require_matrix_map"] <- list(FALSE)
       } else {
         config["require_matrix_map"] <- list(TRUE)
@@ -629,13 +648,13 @@ TEClassifierRegular <- R6::R6Class(
             # Multi Class
             predictions_prob <- self$model$predict(
               x = tf_dataset_predict,
-              ml_trace = as.integer(ml_trace)
+              verbose = as.integer(ml_trace)
             )
             predictions <- max.col(predictions_prob) - 1
           } else {
             predictions_prob <- self$model$predict(
               x = tf_dataset_predict,
-              ml_trace = as.integer(ml_trace)
+              verbose = as.integer(ml_trace)
             )
 
             # Add Column for the second characteristic
@@ -681,14 +700,14 @@ TEClassifierRegular <- R6::R6Class(
             predictions_prob <- self$model$predict(
               x = prediction_data,
               batch_size = as.integer(batch_size),
-              ml_trace = as.integer(ml_trace)
+              verbose = as.integer(ml_trace)
             )
             predictions <- max.col(predictions_prob) - 1
           } else {
             predictions_prob <- self$model$predict(
               x = prediction_data,
               batch_size = as.integer(batch_size),
-              ml_trace = as.integer(ml_trace)
+              verbose = as.integer(ml_trace)
             )
 
             # Add Column for the second characteristic
@@ -954,20 +973,7 @@ TEClassifierRegular <- R6::R6Class(
         # Defining basic keras model
         layer_list <- NULL
 
-        if (is.null(self$model_config$rec) == TRUE) {
-          n_rec <- 0
-        } else {
-          n_rec <- length(self$model_config$rec)
-        }
-
-        if (is.null(self$model_config$hidden) == TRUE) {
-          n_hidden <- 0
-        } else {
-          n_hidden <- length(self$model_config$hidden)
-        }
-
         # Adding Input Layer
-
         # if(n_rec>0 | self$model_config$repeat_encoder>0){
         model_input <- keras$layers$Input(
           shape = list(as.integer(self$model_config$times), as.integer(self$model_config$features)),
@@ -980,7 +986,7 @@ TEClassifierRegular <- R6::R6Class(
         layer_list[1] <- list(model_input)
 
         # Adding a Mask-Layer
-        if (n_rec > 0 | self$model_config$repeat_encoder > 0) {
+        if (self$model_config$rec_layers > 0 | self$model_config$repeat_encoder > 0) {
           masking_layer <- keras$layers$Masking(
             mask_value = 0.0,
             name = "masking_layer",
@@ -1032,14 +1038,14 @@ TEClassifierRegular <- R6::R6Class(
         }
 
         # Adding rec layer
-        if (n_rec > 0) {
+        if (self$model_config$rec_layers > 0) {
           if (self$model_config$rec_bidirectional == TRUE) {
-            for (i in 1:n_rec) {
+            for (i in 1:self$model_config$rec_layers) {
               if (self$model_config$rec_type == "gru") {
                 layer_list[length(layer_list) + 1] <- list(
                   keras$layers$Bidirectional(
                     layer = keras$layers$GRU(
-                      units = as.integer(self$model_config$rec[i]),
+                      units = as.integer(self$model_config$rec_size),
                       input_shape = list(self$model_config$times, self$model_config$features),
                       return_sequences = TRUE,
                       dropout = 0,
@@ -1050,7 +1056,7 @@ TEClassifierRegular <- R6::R6Class(
                     name = paste0("bidirectional_", i)
                   )(layer_list[[length(layer_list)]])
                 )
-                if (i != n_rec) {
+                if (i != self$model_config$rec_layers) {
                   layer_list[length(layer_list) + 1] <- list(
                     keras$layers$Dropout(
                       rate = self$model_config$rec_dropout,
@@ -1062,7 +1068,7 @@ TEClassifierRegular <- R6::R6Class(
                 layer_list[length(layer_list) + 1] <- list(
                   keras$layers$Bidirectional(
                     layer = keras$layers$LSTM(
-                      units = as.integer(self$model_config$rec[i]),
+                      units = as.integer(self$model_config$rec_size),
                       input_shape = list(self$model_config$times, self$model_config$features),
                       return_sequences = TRUE,
                       dropout = 0,
@@ -1073,7 +1079,7 @@ TEClassifierRegular <- R6::R6Class(
                     name = paste0("bidirectional_", i)
                   )(layer_list[[length(layer_list)]])
                 )
-                if (i != n_rec) {
+                if (i != self$model_config$rec_layers) {
                   layer_list[length(layer_list) + 1] <- list(
                     keras$layers$Dropout(
                       rate = self$model_config$rec_dropout,
@@ -1084,11 +1090,11 @@ TEClassifierRegular <- R6::R6Class(
               }
             }
           } else {
-            for (i in 1:n_rec) {
+            for (i in 1:self$model_config$rec_layers) {
               if (self$model_config$rec_type == "gru") {
                 layer_list[length(layer_list) + 1] <- list(
                   layer = keras$layers$GRU(
-                    units = as.integer(self$model_config$rec[i]),
+                    units = as.integer(self$model_config$rec_size),
                     input_shape = list(self$model_config$times, self$model_config$features),
                     return_sequences = TRUE,
                     dropout = 0,
@@ -1097,7 +1103,7 @@ TEClassifierRegular <- R6::R6Class(
                     name = paste0("uni_directional_gru_", i)
                   )(layer_list[[length(layer_list)]])
                 )
-                if (i != n_rec) {
+                if (i != self$model_config$rec_layers) {
                   layer_list[length(layer_list) + 1] <- list(
                     keras$layers$Dropout(
                       rate = self$model_config$rec_dropout,
@@ -1108,7 +1114,7 @@ TEClassifierRegular <- R6::R6Class(
               } else if (self$model_config$rec_type == "lstm") {
                 layer_list[length(layer_list) + 1] <- list(
                   layer = keras$layers$LSTM(
-                    units = as.integer(self$model_config$rec[i]),
+                    units = as.integer(self$model_config$rec_size),
                     input_shape = list(self$model_config$times, self$model_config$features),
                     return_sequences = TRUE,
                     dropout = 0,
@@ -1117,7 +1123,7 @@ TEClassifierRegular <- R6::R6Class(
                     name = paste0("unidirectional_lstm", i)
                   )(layer_list[[length(layer_list)]])
                 )
-                if (i != n_rec) {
+                if (i != self$model_config$rec_layers) {
                   layer_list[length(layer_list) + 1] <- list(
                     keras$layers$Dropout(
                       rate = self$model_config$rec_dropout,
@@ -1139,17 +1145,17 @@ TEClassifierRegular <- R6::R6Class(
 
 
         # Adding standard layer
-        if (n_hidden > 0) {
-          for (i in 1:n_hidden) {
+        if (self$model_config$dense_layers > 0) {
+          for (i in 1:self$model_config$dense_layers) {
             layer_list[length(layer_list) + 1] <- list(
               keras$layers$Dense(
-                units = as.integer(self$model_config$hidden[i]),
+                units = as.integer(self$model_config$dense_size),
                 activation = "gelu",
                 name = paste0("dense_", i)
               )(layer_list[[length(layer_list)]])
             )
 
-            if (i != n_hidden) {
+            if (i != self$model_config$dense_layers) {
               # Add Dropout_Layer
               layer_list[length(layer_list) + 1] <- list(
                 keras$layers$Dropout(
@@ -1198,16 +1204,10 @@ TEClassifierRegular <- R6::R6Class(
         self$model <- py$TextEmbeddingClassifier_PT(
           features = as.integer(self$model_config$features),
           times = as.integer(self$model_config$times),
-          hidden = if (!is.null(self$model_config$hidden)) {
-            as.integer(self$model_config$hidden)
-          } else {
-            NULL
-          },
-          rec = if (!is.null(self$model_config$rec)) {
-            as.integer(self$model_config$rec)
-          } else {
-            NULL
-          },
+          dense_size=as.integer(self$model_config$dense_size),
+          dense_layers=as.integer(self$model_config$dense_layers),
+          rec_size=as.integer(self$model_config$rec_size),
+          rec_layers=as.integer(self$model_config$rec_layers),
           rec_type = self$model_config$rec_type,
           rec_bidirectional = self$model_config$rec_bidirectional,
           intermediate_size = as.integer(self$model_config$intermediate_size),
@@ -1852,7 +1852,7 @@ TEClassifierRegular <- R6::R6Class(
           callback <- keras$callbacks$ModelCheckpoint(
             filepath = paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.h5"),
             monitor = paste0("val_", self$model_config$balanced_metric),
-            ml_trace = as.integer(min(self$last_training$config$ml_trace, 1)),
+            verbose = as.integer(min(self$last_training$config$ml_trace, 1)),
             mode = "auto",
             save_best_only = TRUE,
             save_weights_only = TRUE
@@ -2005,7 +2005,7 @@ TEClassifierRegular <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     adjust_configuration = function() {
-      if (is.null(self$model_config$rec) & self$model_config$self_attention_heads > 0) {
+      if (self$model_config$rec_layers!=0 & self$model_config$self_attention_heads > 0) {
         if (self$model_config$features %% 2 != 0) {
           stop("The number of features of the TextEmbeddingmodel is
                not a multiple of 2.")
@@ -2013,17 +2013,31 @@ TEClassifierRegular <- R6::R6Class(
       }
 
       if (is.null(self$model_config$intermediate_size) == TRUE) {
-        if (self$model_config$attention_type == "fourier" & length(self$model_config$rec) > 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$rec[length(self$model_config$rec)]
-        } else if (self$model_config$attention_type == "fourier" & length(self$model_config$rec) == 0) {
+        if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers > 0) {
+          self$model_config$intermediate_size <- 2 * self$model_config$rec_size
+        } else if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers == 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (self$model_config$attention_type == "multihead" & length(self$model_config$rec) > 0 & self$model_config$self_attention_heads > 0) {
+        } else if (self$model_config$attention_type == "multihead" & self$model_config$rec_layers > 0 & self$model_config$self_attention_heads > 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (self$model_config$attention_type == "multihead" & length(self$model_config$rec) == 0 & self$model_config$self_attention_heads > 0) {
+        } else if (self$model_config$attention_type == "multihead" & self$model_config$rec_layers == 0 & self$model_config$self_attention_heads > 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
         } else {
           self$model_config$intermediate_size <- NULL
         }
+      }
+
+      if(self$model_config$rec_layers<=1){
+        self$model_config$rec_dropout=0.0
+      }
+      if(self$model_config$rec_layers<=0){
+        self$model_config$rec_size=0
+      }
+
+      if(self$model_config$dense_layers<=1){
+        self$model_config$dense_dropout=0.0
+      }
+      if(self$model_config$dense_layers<=0){
+        self$model_config$dense_size=0
       }
     },
     #--------------------------------------------------------------------------

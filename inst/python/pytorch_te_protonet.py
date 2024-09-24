@@ -193,7 +193,7 @@ class ProtoNetLossWithMargin_PT(torch.nn.Module):
     return loss
 
 class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
-  def __init__(self,features, times, hidden, rec,rec_type,rec_bidirectional, intermediate_size,
+  def __init__(self,features, times, dense_size,dense_layers,rec_size,rec_layers,rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
   add_pos_embedding, self_attention_heads, target_levels,embedding_dim):
     
@@ -206,29 +206,13 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     self.trained_prototypes=torch.nn.Parameter(torch.randn(self.n_classes,self.embedding_dim))
     self.near_factor=torch.nn.Parameter(torch.ones(1))
 
-    if isinstance(rec, int):
-      rec=[rec]
-      
-    if isinstance(hidden, int):
-      hidden=[hidden]
-    
-    if rec is None:
-      n_rec=0
-    else:
-      n_rec=len(rec)
-    
-    if hidden is None:
-      n_hidden=0
-    else:
-      n_hidden=len(hidden)
-    
-    if  n_hidden>0:
-      last_in_features=hidden[n_hidden-1]
-    elif n_rec>0:
+    if  dense_layers>0:
+      last_in_features=dense_size
+    elif rec_layers>0:
       if rec_bidirectional==True:
-        last_in_features=2*rec[len(rec)-1]
+        last_in_features=2*rec_size
       else:
-        last_in_features=rec[len(rec)-1]
+        last_in_features=rec_size
     else:
       last_in_features=features
 
@@ -242,8 +226,10 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     self.core_net=TextEmbeddingClassifier_PT(
       features=features, 
       times=times,
-      hidden=hidden, 
-      rec=rec, 
+      dense_layers=dense_layers, 
+      dense_size=dense_size,
+      rec_layers=rec_layers, 
+      rec_size=rec_size,
       rec_type=rec_type,
       rec_bidirectional=rec_bidirectional,
       intermediate_size=intermediate_size,
