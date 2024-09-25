@@ -16,7 +16,7 @@ check_class <- function(object, classes, allow_NULL = FALSE) {
     if (check_results < 1) {
       stop(
         paste(
-          "Class of", quote(object), "must be:",
+          "Class of", dQuote(object), "must be:",
           paste(classes, collapse = ", ")
         )
       )
@@ -26,7 +26,7 @@ check_class <- function(object, classes, allow_NULL = FALSE) {
   if (!allow_NULL && is.null(object)) {
     stop(
       paste(
-        quote(object), "is NULL. It must be:",
+        dQuote(object), "is NULL. It must be:",
         paste(classes, collapse = ", ")
       )
     )
@@ -52,30 +52,30 @@ check_type <- function(object, type = "bool", allow_NULL = FALSE) {
   if (!is.null(object)) {
     if (type == "bool") {
       if (!isTRUE(object) && !isFALSE(object)) {
-        stop(paste(quote(object), "must be TRUE or FALSE"))
+        stop(paste(dQuote(object), "must be TRUE or FALSE"))
       }
     } else if (type == "int") {
       if (!is.numeric(object) || (object %% 1) != 0) {
-        stop(paste(quote(object), "must be an integer"))
+        stop(paste(dQuote(object), "must be an integer"))
       }
     } else if (type == "double") {
       if (!is.double(object)) {
-        stop(paste(quote(object), "must be double"))
+        stop(paste(dQuote(object), "must be double"))
       }
     } else if (type == "string") {
       if (!is.character(object)) {
-        stop(paste(quote(object), "must be a string"))
+        stop(paste(dQuote(object), "must be a string"))
       }
     } else if (type == "vector") {
       if (!is.vector(object)) {
-        stop(paste(quote(object), "must be a vector"))
+        stop(paste(dQuote(object), "must be a vector"))
       }
     } else if (type == "list") {
       if (!is.list(object)) {
-        stop(paste(quote(object), "must be a list"))
+        stop(paste(dQuote(object), "must be a list"))
       }
     } else {
-      warning(paste0("There is no implemented check for type '", quote(type), "'."))
+      warning(paste0("There is no implemented check for type", dQuote(type), "."))
     }
   }
 }
