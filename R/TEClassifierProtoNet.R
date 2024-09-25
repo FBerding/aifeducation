@@ -39,10 +39,10 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   indicating a higher category/class. For nominal data the order does not matter.
     #' @param feature_extractor Object of class [TEFeatureExtractor] which should be used in order to reduce the number
     #'   of dimensions of the text embeddings. If no feature extractor should be applied set `NULL`.
-    #' @param hidden `vector` containing the number of neurons for each dense layer. The length of the vector determines
-    #'   the number of dense layers. If you want no dense layer, set this parameter to `NULL`.
-    #' @param rec `vector` containing the number of neurons for each recurrent layer. The length of the vector
-    #'   determines the number of dense layers. If you want no dense layer, set this parameter to `NULL`.
+    #' @param dense_layers `int` Number of dense layers.
+    #' @param dense_size `int` Number of neurons for each dense layer.
+    #' @param rec_layers `int` Number of recurrent layers.
+    #' @param rec_size `int` Number of neurons for each recurrent layer.
     #' @param rec_type `string` Type of the recurrent layers.`rec_type="gru"` for Gated Recurrent Unit and
     #'   `rec_type="lstm"` for Long Short-Term Memory.
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
@@ -69,8 +69,10 @@ TEClassifierProtoNet <- R6::R6Class(
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         hidden = c(128),
-                         rec = c(128),
+                         dense_size = 4,
+                         dense_layers=0,
+                         rec_size = 4,
+                         rec_layers=2,
                          rec_type = "gru",
                          rec_bidirectional = FALSE,
                          embedding_dim = 2,
@@ -219,6 +221,11 @@ TEClassifierProtoNet <- R6::R6Class(
 
     #-------------------------------------------------------------------------
     #' @description Method for training a neural net.
+    #'
+    #' Training includes a routine for early stopping. In the case that loss<0.0001
+    #' and Accuracy=1.00 and Balanced Accuracy=1.00 training stops. The history uses the values
+    #' of the last trained epoch for the remaining epochs.
+    #'
     #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param data_targets `factor` containing the labels for cases stored in `data_embeddings`. Factor must be named
     #'   and has to use the same names used in `data_embeddings`.
@@ -264,7 +271,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param sampling_separate `bool` If `TRUE` the cases for every class are divided into a data set for sample and for query.
     #'    These are never mixed. If `TRUE` sample and query cases are drawn from the same data pool. That is, a case can be
     #'    part of sample in one epoch and in another epoch it can be part of query. It is ensured that a case is never part of
-    #'    sample and query at the same time.
+    #'    sample and query at the same time. In addition, it is ensured that every cases exists only once during
+    #'    a training step.
     #' @param sampling_shuffle `bool` If `TRUE` cases a randomly drawn from the data during every step. If `FALSE`
     #'    the cases are not shuffled.
     #' @param dir_checkpoint `string` Path to the directory where the checkpoint during training should be saved. If the
@@ -668,14 +676,13 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   embeddings for all cases which should be embedded into the classification space.
     #' @param classes_q Named `factor` containg the true classes for every case. Please note that the names must match
     #'   the names/ids in `embeddings_q`.
-    #'   @param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
-    #'   @param size_points `int` Size of the points excluding the points for prototypes.
-    #'   @param size_points_prototypes `int` Size of points representing prototypes.
-    #'   @param alpha `float` Value indicating how transparent the points should be (important
-    #'   if many points overlapp). Does not apply to points representing prototypes.
+    #'@param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
+    #'@param size_points `int` Size of the points excluding the points for prototypes.
+    #'@param size_points_prototypes `int` Size of points representing prototypes.
+    #'@param alpha `float` Value indicating how transparent the points should be (important
+    #'   if many points overlap). Does not apply to points representing prototypes.
     #' @param batch_size `int` batch size.
     #' @return Returns a plot of class `ggplot`visualizing embeddings.
-    #'
     plot_embeddings = function(embeddings_q,
                                classes_q,
                                batch_size = 12,
@@ -803,10 +810,10 @@ TEClassifierProtoNet <- R6::R6Class(
         self$model <- py$TextEmbeddingClassifierProtoNet_PT(
           features = as.integer(self$model_config$features),
           times = as.integer(self$model_config$times),
-          dense_size = self$model_config$dense_size,
-          dense_layers=self$model_config$dense_layers,
-          rec_size = self$model_config$rec_size,
-          rec_layers=self$model_config$rec_layers,
+          dense_size = as.integer(self$model_config$dense_size),
+          dense_layers=as.integer(self$model_config$dense_layers),
+          rec_size = as.integer(self$model_config$rec_size),
+          rec_layers=as.integer(self$model_config$rec_layers),
           rec_type = self$model_config$rec_type,
           rec_bidirectional = self$model_config$rec_bidirectional,
           intermediate_size = as.integer(self$model_config$intermediate_size),

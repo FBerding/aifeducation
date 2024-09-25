@@ -80,10 +80,10 @@ TEClassifierRegular <- R6::R6Class(
     #' @param target_levels `vector` containing the levels (categories or classes) within the target data. Please not
     #'   that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
     #'   indicating a higher category/class. For nominal data the order does not matter.
-    #' @param hidden `vector` containing the number of neurons for each dense layer. The length of the vector determines
-    #'   the number of dense layers. If you want no dense layer, set this parameter to `NULL`.
-    #' @param rec `vector` containing the number of neurons for each recurrent layer. The length of the vector
-    #'   determines the number of dense layers. If you want no dense layer, set this parameter to `NULL`.
+    #' @param dense_layers `int` Number of dense layers.
+    #' @param dense_size `int` Number of neurons for each dense layer.
+    #' @param rec_layers `int` Number of recurrent layers.
+    #' @param rec_size `int` Number of neurons for each recurrent layer.
     #' @param rec_type `string` Type of the recurrent layers. `rec_type="gru"` for Gated Recurrent Unit and
     #'   `rec_type="lstm"` for Long Short-Term Memory.
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
@@ -264,6 +264,11 @@ TEClassifierRegular <- R6::R6Class(
 
     #-------------------------------------------------------------------------
     #' @description Method for training a neural net.
+    #'
+    #' Training includes a routine for early stopping. In the case that loss<0.0001
+    #' and Accuracy=1.00 and Balanced Accuracy=1.00 training stops. The history uses the values
+    #' of the last trained epoch for the remaining epochs.
+    #'
     #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param data_targets `factor` containing the labels for cases stored in `data_embeddings`. Factor must be named
     #'   and has to use the same names used in `data_embeddings`.

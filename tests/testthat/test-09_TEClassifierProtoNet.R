@@ -56,7 +56,7 @@ r_encoder_list=list(0,1,2)
 attention_list=list("fourier","multihead")
 pos_embedding_list=list(TRUE,FALSE)
 sampling_separate_list=list(TRUE,FALSE)
-ssampling_shuffle_list=list(TRUE,FALSE)
+sampling_shuffle_list=list(TRUE,FALSE)
 
 sc_list=list(FALSE,TRUE)
 pl_list=list(FALSE,TRUE)
@@ -332,8 +332,6 @@ for(framework in ml_frameworks){
             target_levels=target_levels,
             feature_extractor = feature_extractor,
             embedding_dim=3,
-            sampling_separate=sampling_separate,
-            sampling_shuffle=sampling_shuffle,
             dense_layers = dense_layers,
             dense_size=dense_size,
             rec_layers=rec_layers,
@@ -390,7 +388,8 @@ for(framework in ml_frameworks){
                                 batch_size=32,
                                 dir_checkpoint=train_path,
                                 trace=FALSE,
-
+                                sampling_separate=sampling_separate,
+                                sampling_shuffle=sampling_shuffle,
                                 ml_trace=0)
                             )
                             expect_true(classifier$get_sustainability_data()$sustainability_tracked)

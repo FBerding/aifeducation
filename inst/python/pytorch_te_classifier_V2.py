@@ -476,6 +476,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     history_bacc=torch.ones(size=(2,epochs),requires_grad=False)*-100
   
   best_bacc=float('-inf')
+  best_acc=float('-inf')
   best_val_loss=float('inf')
   
   #Log file
@@ -692,13 +693,25 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
+        best_acc=acc_val
         best_val_loss=val_loss/len(valloader)
-      if bacc_val==best_bacc and val_loss/len(valloader)<best_val_loss:
+      
+      if bacc_val==best_bacc and acc_val>best_acc:
+        if trace>=1:
+          print("Val Accuracy increased from {:.4f} to {:.4f}".format(best_acc,acc_val))
+          print("Save checkpoint to {}".format(filepath))
+        torch.save(model.state_dict(),filepath)
+        best_bacc=bacc_val
+        best_acc=acc_val
+        best_val_loss=val_loss/len(valloader)
+        
+      if bacc_val==best_bacc and acc_val==best_acc and val_loss/len(valloader)<best_val_loss:
         if trace>=1:
           print("Val Loss decreased from {:.4f} to {:.4f}".format(best_val_loss,val_loss/len(valloader)))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
+        best_acc=acc_val
         best_val_loss=val_loss/len(valloader)
   
     #Check if there are furhter information for training-----------------------
