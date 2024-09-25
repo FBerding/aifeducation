@@ -483,7 +483,7 @@ LargeDataSetForText <- R6::R6Class(
         # Bib_entry
         file_path <- paste0(dirname(file_paths[index]), "/bib_entry.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 3] <- readLines(con = file_path,warn=FALSE)
+          data[i, 3] <- readLines(con = file_path, warn = FALSE)
         } else {
           data[i, 3] <- NA
         }
@@ -491,7 +491,7 @@ LargeDataSetForText <- R6::R6Class(
         # License
         file_path <- paste0(dirname(file_paths[index]), "/license.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 4] <- readLines(con = file_path,warn=FALSE)
+          data[i, 4] <- readLines(con = file_path, warn = FALSE)
         } else {
           data[i, 4] <- NA
         }
@@ -499,7 +499,7 @@ LargeDataSetForText <- R6::R6Class(
         # URL License
         file_path <- paste0(dirname(file_paths[index]), "/url_license.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 5] <- readLines(con = file_path,warn=FALSE)
+          data[i, 5] <- readLines(con = file_path, warn = FALSE)
         } else {
           data[i, 5] <- NA
         }
@@ -507,7 +507,7 @@ LargeDataSetForText <- R6::R6Class(
         # Text License
         file_path <- paste0(dirname(file_paths[index]), "/text_license.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 6] <- readLines(con = file_path,warn=FALSE)
+          data[i, 6] <- readLines(con = file_path, warn = FALSE)
         } else {
           data[i, 6] <- NA
         }
@@ -515,7 +515,7 @@ LargeDataSetForText <- R6::R6Class(
         # URL Source
         file_path <- paste0(dirname(file_paths[index]), "/url_source.txt")
         if (file.exists(file_path) == TRUE) {
-          data[i, 7] <- readLines(con = file_path,warn=FALSE)
+          data[i, 7] <- readLines(con = file_path, warn = FALSE)
         } else {
           data[i, 7] <- NA
         }

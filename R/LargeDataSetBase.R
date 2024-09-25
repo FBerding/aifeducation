@@ -86,9 +86,7 @@ LargeDataSetBase <- R6::R6Class(
 
       # Create folder
       save_location <- paste0(dir_path, "/", folder_name)
-      if (dir.exists(save_location) == FALSE) {
-        dir.create(save_location)
-      }
+      create_dir(save_location, FALSE)
 
       # Save
       private$data$save_to_disk(dataset_path = save_location)

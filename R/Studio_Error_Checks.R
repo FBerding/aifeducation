@@ -65,7 +65,7 @@ check_errors_create_classifier <- function(classifier_type,
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
+    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
       "EmbeddedText" %in% class(embeddings))) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
@@ -119,6 +119,7 @@ check_errors_create_classifier <- function(classifier_type,
   }
 
   # ProtoNet specific-----------------------------------------------------------
+  # TODO (Yuliia): input$classifier_type? classifier_type - no visible binding
   if (classifier_type == "protonet") {
     if (check_for_empty_input(Ns)) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
@@ -282,7 +283,7 @@ check_errors_create_feature_extractor <- function(destination_path,
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
+    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
       "EmbeddedText" %in% class(embeddings))) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
@@ -347,7 +348,7 @@ check_errors_predict_classifier <- function(embeddings,
   error_list <- NULL
 
   # Embeddings
-  if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) |
+  if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
     "EmbeddedText" %in% class(embeddings))) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
@@ -406,7 +407,7 @@ check_errors_text_embedding_model_embed <- function(destination_path,
                                                    exist. Please check your directory path
                                                    and/or create that directory."))
   }
-  if (is.null(folder_name) | folder_name == "") {
+  if (is.null(folder_name) || folder_name == "") {
     error_list[length(error_list) + 1] <- "Folder name for the dataset storing the embeddings is missing."
   }
 
@@ -467,12 +468,12 @@ check_errors_text_embedding_model_create <- function(destination_path,
                                                    exist. Please check your directory path
                                                    and/or create that directory."))
   }
-  if (is.null(folder_name) | folder_name == "") {
+  if (is.null(folder_name) || folder_name == "") {
     error_list[length(error_list) + 1] <- "File name for the text dataset is missing."
   }
 
   if (!identical(path_to_base_model, character(0))) {
-    if (is.null(interface_architecture[[1]]) &
+    if (is.null(interface_architecture[[1]]) &&
       is.null(interface_architecture[[2]])) {
       error_list[length(error_list) + 1] <- "There is no model to load in the directory."
     }

@@ -81,7 +81,7 @@ ui <- bslib::page_navbar(
   bslib::nav_menu(
     title = "Other",
     bslib::nav_item(
-      shiny::uiOutput(outputId="ui_gpu_acceleration")
+      shiny::uiOutput(outputId = "ui_gpu_acceleration")
     )
   )
 )
@@ -151,25 +151,25 @@ server <- function(input, output, session) {
     type = "Classifier"
   )
 
-  #License
+  # License
   License_Server(
     "GPL_3_License"
   )
 
-  #GPU Acceleration
-  output$ui_gpu_acceleration<-shiny::renderUI({
-    if(torch$cuda$is_available()){
-      ui<-tagList(
+  # GPU Acceleration
+  output$ui_gpu_acceleration <- shiny::renderUI({
+    if (torch$cuda$is_available()) {
+      ui <- shiny::tagList(
         shiny::icon("bolt-lightning"),
         "GPU acceleration available."
       )
     } else {
-      ui<-tagList(
+      ui <- shiny::tagList(
         shiny::icon("xmark"),
         "GPU acceleration not available."
       )
     }
-  return(ui)
+    return(ui)
   })
 }
 

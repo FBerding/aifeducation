@@ -78,6 +78,7 @@ Reliability_Server <- function(id, model) {
 
 
       # Create ui
+      # TODO (Yuliia): remove? Variable is not used
       ui <- shiny::tagList(
         bslib::card(
           bslib::card_header(
@@ -114,8 +115,8 @@ Reliability_Server <- function(id, model) {
               ),
               shiny::plotOutput(outputId = ns("coding_stream_plot")),
               shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
-                                          The categorical sizes are based on the relative frequencies of the training data.
-                                          These sizes are not identical with the sizes of field samples.")
+                            The categorical sizes are based on the relative frequencies of the training data.
+                            These sizes are not identical with the sizes of field samples.")
             )
           )
         ),

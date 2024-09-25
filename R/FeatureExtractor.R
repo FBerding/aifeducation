@@ -198,12 +198,10 @@ TEFeatureExtractor <- R6::R6Class(
       extractor_dataset <- data$map(py$map_input_to_labels)
 
       # Check directory for checkpoints
-      if (dir.exists(self$last_training$config$dir_checkpoint) == FALSE) {
-        if (self$last_training$config$trace == TRUE) {
-          message(paste(date(), "Creating Checkpoint Directory"))
-        }
-        dir.create(self$last_training$config$dir_checkpoint)
-      }
+      create_dir(
+        dir_path = self$last_training$config$dir_checkpoint,
+        trace = self$last_training$config$trace,
+        msg = "Creating Checkpoint Directory")
 
       # Set up log file
       log_top_value <- 0
@@ -318,7 +316,7 @@ TEFeatureExtractor <- R6::R6Class(
       config_file <- load_R_interface(dir_path)
 
       # Set training status
-      private$trained = config_file$private$trained
+      private$trained <- config_file$private$trained
     },
     #---------------------------------------------------------------------------
     #' @description Method for extracting features. Applying this method reduces the number of dimensions of the text

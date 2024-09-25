@@ -429,11 +429,7 @@ TEClassifierProtoNet <- R6::R6Class(
           val_size = self$last_training$config$data_val_size,
           class_levels = self$model_config$target_levels,
           one_hot_encoding = self$model_config$require_one_hot,
-          add_matrix_map = if (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE) {
-            TRUE
-          } else {
-            FALSE
-          },
+          add_matrix_map = (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE),
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
@@ -447,11 +443,7 @@ TEClassifierProtoNet <- R6::R6Class(
           val_size = self$last_training$config$data_val_size,
           class_levels = self$model_config$target_levels,
           one_hot_encoding = self$model_config$require_one_hot,
-          add_matrix_map = if (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE) {
-            TRUE
-          } else {
-            FALSE
-          },
+          add_matrix_map = (self$model_config$require_matrix_map == TRUE | self$last_training$config$use_sc == TRUE),
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
@@ -880,12 +872,10 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       # Check directory for checkpoints
-      if (dir.exists(paste0(self$last_training$config$dir_checkpoint, "/checkpoints")) == FALSE) {
-        if (self$last_training$config$trace == TRUE) {
-          message(paste(date(), "Creating Checkpoint Directory"))
-        }
-        dir.create(paste0(self$last_training$config$dir_checkpoint, "/checkpoints"))
-      }
+      create_dir(
+        dir_path = paste0(self$last_training$config$dir_checkpoint, "/checkpoints"),
+        trace = self$last_training$config$trace,
+        msg = "Creating Checkpoint Directory")
 
       # Set target column
       if (self$model_config$require_one_hot == FALSE) {

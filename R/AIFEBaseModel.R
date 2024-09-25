@@ -178,14 +178,10 @@ AIFEBaseModel <- R6::R6Class(
           extension <- ".h5"
         }
         file_path <- paste0(save_location, "/", "model_data", extension)
-        if (dir.exists(save_location) == FALSE) {
-          dir.create(save_location)
-        }
+        create_dir(save_location, FALSE)
         self$model$save(file_path)
       } else if (private$ml_framework == "pytorch") {
-        if (dir.exists(save_location) == FALSE) {
-          dir.create(save_location)
-        }
+        create_dir(save_location, FALSE)
         self$model$to("cpu", dtype = torch$float)
         if (save_format == "safetensors") {
           file_path <- paste0(save_location, "/", "model_data", ".safetensors")
@@ -683,7 +679,7 @@ AIFEBaseModel <- R6::R6Class(
       config_file <- load_R_interface(dir_path)
 
       # Old public state
-      config_public=config_file$public
+      config_public <- config_file$public
 
       # Old private states
       config_private <- config_file$private

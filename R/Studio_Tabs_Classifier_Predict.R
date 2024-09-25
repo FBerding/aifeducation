@@ -82,6 +82,7 @@ bslib::card(
 Classifier_Prediction_Server <- function(id, model, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
+    # TODO (Yuliia): Remove? Variable is not used
     ns <- session$ns
 
     # File system management----------------------------------------------------
@@ -131,7 +132,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     })
 
     # Predictions
-    prediction_results <- eventReactive(input$start_predictions, {
+    prediction_results <- shiny::eventReactive(input$start_predictions, {
       error_list <- check_errors_predict_classifier(
         model = model(),
         embeddings = data_embeddings()

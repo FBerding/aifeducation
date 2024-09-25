@@ -137,7 +137,8 @@ get_coder_metrics <- function(true_values = NULL,
       tolerance = 0
     )$value / 100
 
-    metric_values["balanced_accuracy"] <- sum(diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)) /
+    metric_values["balanced_accuracy"] <- sum(
+      diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)) /
       ncol(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
 
     metric_values["gwet_ac"] <- irrCAC::gwet.ac1.raw(ratings = cbind(true_values, predicted_values))$est$coeff.val
@@ -267,7 +268,7 @@ calc_standard_classification_measures <- function(true_values, predicted_values)
       precision <- conf_matrix[1, 1] / TP_FP
     }
 
-    if (is.na(recall) | is.na(precision)) {
+    if (is.na(recall) || is.na(precision)) {
       f1 <- NA
     } else {
       f1 <- 2 * precision * recall / (precision + recall)

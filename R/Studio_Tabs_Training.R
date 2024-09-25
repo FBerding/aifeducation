@@ -169,14 +169,14 @@ Training_Server <- function(id, model) {
             )
 
           # Plot for classifiers-----------------------------------------------
-        } else if ("TEClassifierRegular" %in% class(model()) |
-          "TEClassifierProtoNet" %in% class(model()) |
+        } else if ("TEClassifierRegular" %in% class(model()) ||
+          "TEClassifierProtoNet" %in% class(model()) ||
           "TEFeatureExtractor" %in% class(model())) {
           # Necessary input
           shiny::req(input$measure)
 
           # Get data for plotting
-          if ("TEClassifierRegular" %in% class(model()) |
+          if ("TEClassifierRegular" %in% class(model()) ||
             "TEClassifierProtoNet" %in% class(model())) {
             plot_data <- prepare_training_history(
               model = model(),
@@ -207,6 +207,7 @@ Training_Server <- function(id, model) {
             y_label <- "Balanced Accuracy"
           }
 
+          # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_mean, color = "train")) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_mean, color = "validation"))
@@ -236,6 +237,7 @@ Training_Server <- function(id, model) {
                 fill = "blue"
               )
           }
+          # TODO (Yuliia): .data has no visible binding
           if ("test_mean" %in% colnames(plot_data)) {
             plot <- plot +
               ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_mean, color = "test"))

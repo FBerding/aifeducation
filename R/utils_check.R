@@ -50,7 +50,7 @@ check_type <- function(object, type = "bool", allow_NULL = FALSE) {
   }
 
   if (!is.null(object)) {
-    if (type == "bool" && !isTRUE(object) & !isFALSE(object)) {
+    if (type == "bool" && !isTRUE(object) && !isFALSE(object)) {
       stop(paste(quote(object), "must be TRUE or FALSE"))
     } else if (type == "int" && (!is.numeric(object) || (object %% 1) != 0)) {
       stop(paste(quote(object), "must be an integer"))

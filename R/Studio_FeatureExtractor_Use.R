@@ -51,6 +51,7 @@ FeatureExtractors_Use_UI <- function(id) {
 FeatureExtractors_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
+    # TODO (Yuliia): remove? Variable is not used
     ns <- session$ns
 
     # File system management----------------------------------------------------

@@ -39,12 +39,8 @@ save_to_disk <- function(object,
   path_r_interface <- paste0(save_location, "/", "r_interface.rda")
 
   # Check directory
-  if (dir.exists(dir_path) == FALSE) {
-    dir.create(dir_path)
-  }
-  if (dir.exists(save_location) == FALSE) {
-    dir.create(save_location)
-  }
+  create_dir(dir_path, FALSE)
+  create_dir(save_location, FALSE)
 
   # Create config and save to disk
   config_file <- create_config(object)

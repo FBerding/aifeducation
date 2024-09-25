@@ -28,6 +28,7 @@ summarize_tracked_sustainability <- function(sustainability_tracker) {
     gpu_model_tmp <- sustainability_tracker$final_emissions_data$gpu_model
   }
 
+  # TODO (Yuliia): remove? Variable is not used
   results <- list(
     sustainability_tracked = TRUE,
     date = date(),

@@ -11,11 +11,11 @@ write_log <- function(log_file,
                       last_log = NULL,
                       write_interval = 2) {
   if (!is.null(log_file)) {
-    if (value_top == total_top |
-      value_middle == total_middle |
-      value_bottom == total_bottom |
-      value_top == 1 |
-      value_middle == 1 |
+    if (value_top == total_top ||
+      value_middle == total_middle ||
+      value_bottom == total_bottom ||
+      value_top == 1 ||
+      value_middle == 1 ||
       value_bottom == 1) {
       log_data <- rbind(
         c(value_top, total_top, message_top),
