@@ -50,22 +50,32 @@ check_type <- function(object, type = "bool", allow_NULL = FALSE) {
   }
 
   if (!is.null(object)) {
-    if (type == "bool" && !isTRUE(object) && !isFALSE(object)) {
-      stop(paste(quote(object), "must be TRUE or FALSE"))
-    } else if (type == "int" && (!is.numeric(object) || (object %% 1) != 0)) {
-      stop(paste(quote(object), "must be an integer"))
-    } else if (type == "double" && !is.double(object)) {
-      stop(paste(quote(object), "must be double"))
-    } else if (type == "string" && !is.character(object)) {
-      stop(paste(quote(object), "must be a string"))
-    }
-
-    if (allow_NULL) {
-      if (type == "vector" && !is.vector(object)) {
+    if (type == "bool") {
+      if (!isTRUE(object) && !isFALSE(object)) {
+        stop(paste(quote(object), "must be TRUE or FALSE"))
+      }
+    } else if (type == "int") {
+      if (!is.numeric(object) || (object %% 1) != 0) {
+        stop(paste(quote(object), "must be an integer"))
+      }
+    } else if (type == "double") {
+      if (!is.double(object)) {
+        stop(paste(quote(object), "must be double"))
+      }
+    } else if (type == "string") {
+      if (!is.character(object)) {
+        stop(paste(quote(object), "must be a string"))
+      }
+    } else if (type == "vector") {
+      if (!is.vector(object)) {
         stop(paste(quote(object), "must be a vector"))
-      } else if (type == "list" && !is.list(object)) {
+      }
+    } else if (type == "list") {
+      if (!is.list(object)) {
         stop(paste(quote(object), "must be a list"))
       }
+    } else {
+      warning(paste0("There is no implemented check for type '", quote(type), "'."))
     }
   }
 }
