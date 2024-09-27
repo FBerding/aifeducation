@@ -5,35 +5,18 @@ testthat::skip_if_not(
 
 # Skip Tests
 skip_creation_test <- TRUE
-<<<<<<< HEAD
 skip_training_test <- FALSE
 skip_overfitting_test <- TRUE
 skip_3_classes <- TRUE
 include_tensorflow <- TRUE
-=======
-skip_training_test <- TRUE
-skip_overfitting_test <- FALSE
-skip_3_classes <- FALSE
-include_tensorflow <- FALSE
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
 
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/classifier")
-<<<<<<< HEAD
-if (dir.exists(testthat::test_path("test_artefacts")) == FALSE) {
-  dir.create(testthat::test_path("test_artefacts"))
-}
-root_path_results <- testthat::test_path("test_artefacts/TeClassifierRegular")
-if (dir.exists(root_path_results) == FALSE) {
-  dir.create(root_path_results)
-}
-=======
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierRegular")
 create_dir(root_path_results, FALSE)
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
 
 # SetUp datasets
 # Disable tqdm progressbar
@@ -66,19 +49,12 @@ if (include_tensorflow == FALSE) {
   ml_frameworks <- c("pytorch", "tensorflow")
 }
 
-<<<<<<< HEAD
 rec_list_layers <- list(0, 1, 2)
 rec_list_size <- list(2, 8)
 rec_type_list <- list("gru", "lstm")
 rec_bidirectiona_list <- list(TRUE, FALSE)
 dense_list_layers <- list(0, 1, 1)
 dense_list_size <- list(3, 5)
-=======
-rec_list <- list(NULL, c(4), c(4, 3))
-rec_type_list <- list("gru", "lstm")
-rec_bidirectiona_list <- list(TRUE, FALSE)
-hidden_list <- list(NULL, c(4), c(4, 3))
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
 r_encoder_list <- list(0, 1, 2)
 attention_list <- list("fourier", "multihead")
 pos_embedding_list <- list(TRUE, FALSE)
@@ -163,236 +139,8 @@ for (framework in ml_frameworks) {
     # Test creation and prediction of the classifier----------------------------
     if (!skip_creation_test) {
       for (feature_extractor in feature_extractor_list[[framework]]) {
-<<<<<<< HEAD
         for (rec_layers in rec_list_layers) {
-            for (dense_layers in dense_list_layers) {
-                for (r in r_encoder_list) {
-                  for (attention in attention_list) {
-                    for (pos_embedding in pos_embedding_list) {
-                      for (rec_type in rec_type_list) {
-                        for (rec_bidirectional in rec_bidirectiona_list) {
-                          classifier <- NULL
-                          gc()
-
-                          dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-                          rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
-
-                          classifier <- TEClassifierRegular$new()
-                          classifier$configure(
-                            ml_framework = framework,
-                            name = "movie_review_classifier",
-                            label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-                            text_embeddings = test_embeddings,
-                            feature_extractor = feature_extractor,
-                            target_levels = target_levels,
-                            dense_layers = dense_layers,
-                            dense_size = dense_size,
-                            rec_layers = rec_layers,
-                            rec_size = rec_size,
-                            rec_type = rec_type,
-                            rec_bidirectional = rec_bidirectional,
-                            self_attention_heads = 2,
-                            add_pos_embedding = pos_embedding,
-                            attention_type = attention,
-                            rec_dropout = 0.5,
-                            encoder_dropout = 0.1,
-                            repeat_encoder = r,
-                            recurrent_dropout = 0.4
-                          )
-
-                          test_that(paste(
-                            "no sustainability tracking", framework,
-                            "n_classes", n_classes,
-                            "features_extractor", !is.null(feature_extractor),
-                            "rec_layers", paste(rec_layers,rec_size),
-                            "rec_type", rec_type,
-                            "rec_bidirectional", rec_bidirectional,
-                            "dense_layers", paste(dense_layers, dense_size),
-                            "encoder", r,
-                            "attention", attention,
-                            "pos", pos_embedding
-                          ), {
-                            expect_false(classifier$get_sustainability_data()$sustainability_tracked)
-                          })
-
-
-                          test_that(paste(
-                            "predict - basic", framework,
-                            "n_classes", n_classes,
-                            "features_extractor", !is.null(feature_extractor),
-                            "rec_layers", paste(rec_layers,rec_size),
-                            "rec_type", rec_type,
-                            "rec_bidirectional", rec_bidirectional,
-                            "dense_layers", paste(dense_layers, dense_size),
-                            "encoder", r,
-                            "attention", attention,
-                            "pos", pos_embedding
-                          ), {
-                            expect_s3_class(classifier,
-                              class = "TEClassifierRegular"
-                            )
-
-                            predictions <- classifier$predict(
-                              newdata = test_embeddings_reduced,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            expect_equal(
-                              object = length(predictions$expected_category),
-                              expected = nrow(test_embeddings_reduced$embeddings)
-                            )
-                          })
-
-                          test_that(paste(
-                            "predict - single case", framework,
-                            "n_classes", n_classes,
-                            "features_extractor", !is.null(feature_extractor),
-                            "rec_layers", paste(rec_layers,rec_size),
-                            "rec_type", rec_type,
-                            "rec_bidirectional", rec_bidirectional,
-                            "dense_layers", paste(dense_layers, dense_size),
-                            "encoder", r,
-                            "attention", attention,
-                            "pos", pos_embedding
-                          ), {
-                            prediction <- classifier$predict(
-                              newdata = test_embeddings_single_case,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            expect_equal(
-                              object = nrow(prediction),
-                              expected = 1
-                            )
-
-                            prediction_LD <- classifier$predict(
-                              newdata = test_embeddings_single_case_LD,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            expect_equal(
-                              object = nrow(prediction_LD),
-                              expected = 1
-                            )
-                          })
-
-                          test_that(paste(
-                            "predict - randomness", framework,
-                            "n_classes", n_classes,
-                            "features_extractor", !is.null(feature_extractor),
-                            "rec_layers", paste(rec_layers,rec_size),
-                            "rec_type", rec_type,
-                            "rec_bidirectional", rec_bidirectional,
-                            "dense_layers", paste(dense_layers, dense_size),
-                            "encoder", r,
-                            "attention", attention,
-                            "pos", pos_embedding
-                          ), {
-                            # EmbeddedText
-                            predictions <- classifier$predict(
-                              newdata = test_embeddings_reduced,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            predictions_2 <- classifier$predict(
-                              newdata = test_embeddings_reduced,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            expect_equal(predictions, predictions_2)
-
-                            # LargeDataSetForTextEmbeddings
-                            predictions <- classifier$predict(
-                              newdata = test_embeddings_reduced_LD,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            predictions_2 <- classifier$predict(
-                              newdata = test_embeddings_reduced_LD,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            expect_equal(predictions, predictions_2)
-                          })
-
-                          test_that(paste(
-                            "predict - order invariance", framework,
-                            "n_classes", n_classes,
-                            "features_extractor", !is.null(feature_extractor),
-                            "rec_layers", paste(rec_layers,rec_size),
-                            "rec_type", rec_type,
-                            "rec_bidirectional", rec_bidirectional,
-                            "dense_layers", paste(dense_layers, dense_size),
-                            "encoder", r,
-                            "attention", attention,
-                            "pos", pos_embedding
-                          ), {
-                            embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
-                            perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
-                            embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
-
-                            # EmbeddedText
-                            predictions <- classifier$predict(
-                              newdata = test_embeddings_reduced,
-                              batch_size = 50,
-                              ml_trace = 0
-                            )
-                            predictions_Perm <- classifier$predict(
-                              newdata = embeddings_ET_perm,
-                              batch_size = 50,
-                              ml_trace = 0
-                            )
-
-                            predictions_Perm <- predictions_Perm[rownames(predictions), ]
-                            expect_equal(predictions$expected_category, predictions_Perm$expected_category)
-
-                            # LargeDataSetForTextEmbeddings
-                            predictions <- classifier$predict(
-                              newdata = test_embeddings_reduced_LD,
-                              batch_size = 50,
-                              ml_trace = 0
-                            )
-                            predictions_Perm <- classifier$predict(
-                              newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
-                              batch_size = 50,
-                              ml_trace = 0
-                            )
-
-                            predictions_Perm <- predictions_Perm[rownames(predictions), ]
-                            expect_equal(predictions$expected_category, predictions_Perm$expected_category)
-                          })
-
-                          test_that(paste(
-                            "predict - data source invariance", framework,
-                            "n_classes", n_classes,
-                            "features_extractor", !is.null(feature_extractor),
-                            "rec_layers", paste(rec_layers,rec_size),
-                            "rec_type", rec_type,
-                            "rec_bidirectional", rec_bidirectional,
-                            "dense_layers", paste(dense_layers, dense_size),
-                            "encoder", r,
-                            "attention", attention,
-                            "pos", pos_embedding
-                          ), {
-                            predictions_ET <- classifier$predict(
-                              newdata = test_embeddings_reduced,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            predictions_LD <- classifier$predict(
-                              newdata = test_embeddings_reduced_LD,
-                              batch_size = 2,
-                              ml_trace = 0
-                            )
-                            i <- sample(seq.int(from = 1, to = nrow(predictions_ET)), size = 1)
-                            expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
-                          })
-                          gc()
-                        }
-                      }
-=======
-        for (rec in rec_list) {
-          for (hidden in hidden_list) {
+          for (dense_layers in dense_list_layers) {
             for (r in r_encoder_list) {
               for (attention in attention_list) {
                 for (pos_embedding in pos_embedding_list) {
@@ -400,6 +148,10 @@ for (framework in ml_frameworks) {
                     for (rec_bidirectional in rec_bidirectiona_list) {
                       classifier <- NULL
                       gc()
+
+                      dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+                      rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
+
                       classifier <- TEClassifierRegular$new()
                       classifier$configure(
                         ml_framework = framework,
@@ -408,13 +160,16 @@ for (framework in ml_frameworks) {
                         text_embeddings = test_embeddings,
                         feature_extractor = feature_extractor,
                         target_levels = target_levels,
-                        hidden = hidden,
-                        rec = rec,
+                        dense_layers = dense_layers,
+                        dense_size = dense_size,
+                        rec_layers = rec_layers,
+                        rec_size = rec_size,
                         rec_type = rec_type,
                         rec_bidirectional = rec_bidirectional,
                         self_attention_heads = 2,
                         add_pos_embedding = pos_embedding,
                         attention_type = attention,
+                        rec_dropout = 0.5,
                         encoder_dropout = 0.1,
                         repeat_encoder = r,
                         recurrent_dropout = 0.4
@@ -424,10 +179,10 @@ for (framework in ml_frameworks) {
                         "no sustainability tracking", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -440,10 +195,10 @@ for (framework in ml_frameworks) {
                         "predict - basic", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -467,10 +222,10 @@ for (framework in ml_frameworks) {
                         "predict - single case", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -500,10 +255,10 @@ for (framework in ml_frameworks) {
                         "predict - randomness", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -539,10 +294,10 @@ for (framework in ml_frameworks) {
                         "predict - order invariance", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -586,10 +341,10 @@ for (framework in ml_frameworks) {
                         "predict - data source invariance", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -608,12 +363,11 @@ for (framework in ml_frameworks) {
                         expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
                       })
                       gc()
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
                     }
                   }
                 }
-
-
+              }
+            }
           }
         }
       }
@@ -627,8 +381,8 @@ for (framework in ml_frameworks) {
             # Randomly select a configuration for training
             rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
             dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-            dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-            rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
+            dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+            rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
 
             rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
             rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
@@ -642,7 +396,6 @@ for (framework in ml_frameworks) {
             if (dir.exists(train_path) == FALSE) {
               dir.create(train_path)
             }
-<<<<<<< HEAD
 
             classifier <- TEClassifierRegular$new()
             classifier$configure(
@@ -653,9 +406,9 @@ for (framework in ml_frameworks) {
               target_levels = target_levels,
               feature_extractor = feature_extractor,
               dense_layers = dense_layers,
-              dense_size=dense_size,
-              rec_layers=rec_layers,
-              rec_size=rec_size,
+              dense_size = dense_size,
+              rec_layers = rec_layers,
+              rec_size = rec_size,
               rec_type = rec_type,
               rec_bidirectional = rec_bidirectional,
               self_attention_heads = 1,
@@ -672,73 +425,14 @@ for (framework in ml_frameworks) {
 
             test_that(paste(
               framework, "training",
-=======
-          }
-        }
-      }
-    }
-
-    # Test training of the classifier-------------------------------------------
-    if (!skip_training_test) {
-      for (feature_extractor in feature_extractor_list[[framework]]) {
-        for (use_sc in sc_list) {
-          for (use_pl in pl_list) {
-            # Randomly select a configuration for training
-            rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
-            rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-            rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-            hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
-            repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
-            attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-            add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-
-            # Create directory for saving checkpoint for every training
-            train_path <- paste0(root_path_results, "/", "train_", generate_id())
-            create_dir(train_path, FALSE)
-
-            classifier <- TEClassifierRegular$new()
-            classifier$configure(
-              ml_framework = framework,
-              name = paste0("movie_review_classifier_", "classes_", n_classes),
-              label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-              text_embeddings = test_embeddings,
-              target_levels = target_levels,
-              feature_extractor = feature_extractor,
-              hidden = hidden,
-              rec = rec,
-              rec_type = rec_type,
-              rec_bidirectional = rec_bidirectional,
-              self_attention_heads = 1,
-              intermediate_size = NULL,
-              attention_type = attention_type,
-              add_pos_embedding = add_pos_embedding,
-              rec_dropout = 0.1,
-              repeat_encoder = repeat_encoder,
-              dense_dropout = 0.4,
-              recurrent_dropout = 0.4,
-              encoder_dropout = 0.1,
-              optimizer = "adam"
-            )
-
-            test_that(paste(
-              framework, !is.null(feature_extractor), "training",
-              "fe", !is.null(feature_extractor),
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
               "n_classes", n_classes,
               "sc", use_sc,
               "pl", use_pl,
               "features_extractor", !is.null(feature_extractor),
-<<<<<<< HEAD
-              "rec_layers", paste(rec_layers,rec_size),
+              "rec_layers", paste(rec_layers, rec_size),
               "rec_type", rec_type,
               "rec_bidirectional", rec_bidirectional,
               "dense_layers", paste(dense_layers, dense_size),
-=======
-              "rec", paste(rec, collapse = "_"),
-              "rec_type", rec_type,
-              "rec_bidirectional", rec_bidirectional,
-              "hidden", paste(hidden, collapse = "_"),
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
               "encoder", repeat_encoder,
               "attention", attention_type,
               "pos", add_pos_embedding
@@ -784,19 +478,12 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "method save and load"), {
         # Randomly select a configuration for training
-<<<<<<< HEAD
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-        dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-        rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-=======
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
-        rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
@@ -809,15 +496,10 @@ for (framework in ml_frameworks) {
           text_embeddings = test_embeddings,
           target_levels = target_levels,
           feature_extractor = feature_extractor,
-<<<<<<< HEAD
           dense_layers = dense_layers,
-          dense_size=dense_size,
-          rec_layers=rec_layers,
-          rec_size=rec_size,
-=======
-          hidden = hidden,
-          rec = rec,
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -869,19 +551,12 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "function save and load"), {
         # Randomly select a configuration for training
-<<<<<<< HEAD
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-        dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-        rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-=======
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
-        rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
@@ -894,15 +569,10 @@ for (framework in ml_frameworks) {
           text_embeddings = test_embeddings,
           target_levels = target_levels,
           feature_extractor = feature_extractor,
-<<<<<<< HEAD
           dense_layers = dense_layers,
-          dense_size=dense_size,
-          rec_layers=rec_layers,
-          rec_size=rec_size,
-=======
-          hidden = hidden,
-          rec = rec,
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -957,35 +627,19 @@ for (framework in ml_frameworks) {
       test_that(paste(framework, n_classes, "overfitting test with log"), {
         # Create directory for saving checkpoint for every training
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
-<<<<<<< HEAD
-        if (dir.exists(train_path) == FALSE) {
-          dir.create(train_path)
-        }
+        create_dir(train_path, FALSE)
 
         # Randomly select a configuration for training
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-        #dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-        #rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
+        # dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
+        # rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
         # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
 
-=======
-        create_dir(train_path, FALSE)
-
-        # Randomly select a configuration for training
-        # rec=rec_list[[sample(x=seq.int(from = 1,to=length(rec_list)),size = 1)]]
-        rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
-        # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
-        attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
         classifier_overfitting <- TEClassifierRegular$new()
         classifier_overfitting$configure(
           ml_framework = framework,
@@ -994,15 +648,10 @@ for (framework in ml_frameworks) {
           text_embeddings = test_embeddings,
           target_levels = target_levels,
           feature_extractor = NULL,
-<<<<<<< HEAD
           dense_layers = 0,
-          dense_size=10,
+          dense_size = 10,
           rec_size = c(10),
-          rec_layers=1,
-=======
-          hidden = hidden,
-          rec = c(10),
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
+          rec_layers = 1,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -1075,19 +724,12 @@ for (framework in ml_frameworks) {
     # Documentation--------------------------------------------------------------
     test_that(paste(framework, n_classes, "descriptions"), {
       # Randomly select a configuration for training
-<<<<<<< HEAD
       rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
       dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-      dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-      rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
+      dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+      rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
       rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
       rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-=======
-      rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
-      rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-      rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-      hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
       repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
       attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
       add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
@@ -1100,15 +742,10 @@ for (framework in ml_frameworks) {
         text_embeddings = test_embeddings,
         target_levels = target_levels,
         feature_extractor = feature_extractor,
-<<<<<<< HEAD
         dense_layers = dense_layers,
-        dense_size=dense_size,
-        rec_layers=rec_layers,
-        rec_size=rec_size,
-=======
-        hidden = hidden,
-        rec = rec,
->>>>>>> 6e1874cc2f5354187ba84fe674fde1b6c740630a
+        dense_size = dense_size,
+        rec_layers = rec_layers,
+        rec_size = rec_size,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         self_attention_heads = 1,
