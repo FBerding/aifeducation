@@ -69,7 +69,7 @@ Training_Server <- function(id, model) {
               "Final" = TRUE
             )
           ),
-          shinyWidgets::radioGroupButtons(
+          shiny::selectInput(
             inputId = ns("measure"),
             label = "Measures",
             choices = list(
