@@ -1,3 +1,19 @@
+#' @title Get file extension
+#' @description Function for requesting the file extension
+#'
+#' @param file_path `string` Path to a file.
+#' @return Returns the extension of a file as a string.
+#'
+#' @family Utils
+#' @keywords internal
+#'
+#' @export
+get_file_extension<-function(file_path){
+  extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
+  extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
+  return(extension)
+}
+
 #' @title Check if NULL or NA
 #' @description Function for checking if an object is `NULL` or .
 #'
