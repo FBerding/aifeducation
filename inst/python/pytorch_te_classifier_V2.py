@@ -470,14 +470,17 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     history_loss=torch.ones(size=(3,epochs),requires_grad=False)*-100
     history_acc=torch.ones(size=(3,epochs),requires_grad=False)*-100
     history_bacc=torch.ones(size=(3,epochs),requires_grad=False)*-100
+    history_avg_iota=torch.ones(size=(3,epochs),requires_grad=False)*-100
   else:
     history_loss=torch.ones(size=(2,epochs),requires_grad=False)*-100
     history_acc=torch.ones(size=(2,epochs),requires_grad=False)*-100
     history_bacc=torch.ones(size=(2,epochs),requires_grad=False)*-100
+    history_avg_iota=torch.ones(size=(2,epochs),requires_grad=False)*-100
   
   best_bacc=float('-inf')
   best_acc=float('-inf')
   best_val_loss=float('inf')
+  best_val_avg_iota=float('-inf')
   
   #Log file
   if not (log_dir is None):
@@ -546,7 +549,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Calc final metrics for epoch  
     acc_train=n_matches_train/n_total_train
     bacc_train=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
-    
+    avg_iota_train=torch.diagonal(confusion_matrix_train)/(torch.sum(confusion_matrix_train,dim=0)+torch.sum(confusion_matrix_train,dim=1)-torch.diagonal(confusion_matrix_train))
+    avg_iota_train=torch.sum(avg_iota_train)/n_classes
 
     #Validation----------------------------------------------------------------
     val_loss=0.0
@@ -590,6 +594,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
 
     acc_val=n_matches_val/n_total_val
     bacc_val=torch.sum(torch.diagonal(confusion_matrix_val)/torch.sum(confusion_matrix_val,dim=1))/n_classes
+    avg_iota_val=torch.diagonal(confusion_matrix_val)/(torch.sum(confusion_matrix_val,dim=0)+torch.sum(confusion_matrix_val,dim=1)-torch.diagonal(confusion_matrix_val))
+    avg_iota_val=torch.sum(avg_iota_val)/n_classes
     
     #Test----------------------------------------------------------------------
     if not (test_data is None):
@@ -634,6 +640,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
      
       acc_test=n_matches_test/n_total_test
       bacc_test=torch.sum(torch.diagonal(confusion_matrix_test)/torch.sum(confusion_matrix_test,dim=1))/n_classes
+      avg_iota_test=torch.diagonal(confusion_matrix_test)/(torch.sum(confusion_matrix_test,dim=0)+torch.sum(confusion_matrix_test,dim=1)-torch.diagonal(confusion_matrix_test))
+      avg_iota_test=torch.sum(avg_iota_test)/n_classes
     
     
     #Record History
@@ -649,6 +657,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       history_bacc[0,epoch]=bacc_train
       history_bacc[1,epoch]=bacc_val
       history_bacc[2,epoch]=bacc_test
+      
+      history_avg_iota[0,epoch]=avg_iota_train
+      history_avg_iota[1,epoch]=avg_iota_val
+      history_avg_iota[2,epoch]=avg_iota_test
     else:
       history_loss[0,epoch]=train_loss/len(trainloader)
       history_loss[1,epoch]=val_loss/len(valloader)
@@ -658,60 +670,71 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       
       history_bacc[0,epoch]=bacc_train
       history_bacc[1,epoch]=bacc_val
+      
+      history_avg_iota[0,epoch]=avg_iota_train
+      history_avg_iota[1,epoch]=avg_iota_val
 
     #Trace---------------------------------------------------------------------
     if trace>=1:
       if test_data is None:
-        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
+        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} AI {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}  AI: {:.4f}".format(
           epoch+1,
           epochs,
           train_loss/len(trainloader),
           acc_train,
           bacc_train,
-          val_loss/len(valloader),
-          acc_val,
-          bacc_val))
-      else:
-        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} | Test Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
-          epoch+1,
-          epochs,
-          train_loss/len(trainloader),
-          acc_train,
-          bacc_train,
+          avg_iota_train,
           val_loss/len(valloader),
           acc_val,
           bacc_val,
+          avg_iota_val))
+      else:
+        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} AI {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} AI {:.4f} | Test Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} AI: {:.4f}".format(
+          epoch+1,
+          epochs,
+          train_loss/len(trainloader),
+          acc_train,
+          bacc_train,
+          avg_iota_train,
+          val_loss/len(valloader),
+          acc_val,
+          bacc_val,
+          avg_iota_val,
           test_loss/len(testloader),
           acc_test,
-          bacc_test))
+          bacc_test,
+          avg_iota_test))
           
     #Callback-------------------------------------------------------------------
     if use_callback==True:
-      if bacc_val>best_bacc:
+      if avg_iota_val>best_val_avg_iota:
         if trace>=1:
-          print("Val Balanced Accuracy increased from {:.4f} to {:.4f}".format(best_bacc,bacc_val))
+          print("Val Avg. Iota increased from {:.4f} to {:.4f}".format(best_val_avg_iota,avg_iota_val))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
+        best_val_avg_iota=avg_iota_val
         best_acc=acc_val
         best_val_loss=val_loss/len(valloader)
       
-      if bacc_val==best_bacc and acc_val>best_acc:
+      if avg_iota_val==best_val_avg_iota and acc_val>best_acc:
         if trace>=1:
           print("Val Accuracy increased from {:.4f} to {:.4f}".format(best_acc,acc_val))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
         best_acc=acc_val
+        best_val_avg_iota=avg_iota_val
         best_val_loss=val_loss/len(valloader)
         
-      if bacc_val==best_bacc and acc_val==best_acc and val_loss/len(valloader)<best_val_loss:
+      if avg_iota_val==best_val_avg_iota and acc_val==best_acc and val_loss/len(valloader)<best_val_loss:
         if trace>=1:
           print("Val Loss decreased from {:.4f} to {:.4f}".format(best_val_loss,val_loss/len(valloader)))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
         best_acc=acc_val
+        best_val_avg_iota=avg_iota_val
         best_val_loss=val_loss/len(valloader)
   
     #Check if there are furhter information for training-----------------------
@@ -729,7 +752,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   history={
     "loss":history_loss.numpy(),
     "accuracy":history_acc.numpy(),
-    "balanced_accuracy":history_bacc.numpy()} 
+    "balanced_accuracy":history_bacc.numpy(),
+    "avg_iota":history_avg_iota.numpy()} 
   return history
 
 

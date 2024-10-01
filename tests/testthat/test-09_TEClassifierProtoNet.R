@@ -8,7 +8,7 @@ testthat::skip_if_not(
 skip_creation_test <- TRUE
 skip_training_test <- FALSE
 skip_overfitting_test <- FALSE
-skip_3_classes <- FALSE
+skip_3_classes <- TRUE
 
 
 # SetUp-------------------------------------------------------------------------

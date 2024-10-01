@@ -223,8 +223,11 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @description Method for training a neural net.
     #'
     #' Training includes a routine for early stopping. In the case that loss<0.0001
-    #' and Accuracy=1.00 and Balanced Accuracy=1.00 training stops. The history uses the values
+    #' and Accuracy=1.00 and Average Iota=1.00 training stops. The history uses the values
     #' of the last trained epoch for the remaining epochs.
+    #'
+    #' After training the model with the best values for Average Iota, Accuracy, and Loss
+    #' on the validation data set is used as the final model.
     #'
     #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param data_targets `factor` containing the labels for cases stored in `data_embeddings`. Factor must be named

@@ -74,6 +74,7 @@ Training_Server <- function(id, model) {
             label = "Measures",
             choices = list(
               "Loss" = "loss",
+              "Average Iota"="avg_iota",
               "Accuracy" = "accuracy",
               "Balanced Accuracy" = "balanced_accuracy"
             )
