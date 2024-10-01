@@ -200,7 +200,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     super().__init__()
     
     self.embedding_dim=embedding_dim
-    self.classes=torch.from_numpy(target_levels)
+    self.classes=torch.from_numpy(np.copy(target_levels))
     self.n_classes=len(target_levels)
     
     self.trained_prototypes=torch.nn.Parameter(torch.randn(self.n_classes,self.embedding_dim))

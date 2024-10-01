@@ -142,7 +142,6 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     #Render Tokenizer Statistics-----------------------------------------------
     output$tokenizer_statistics<-shiny::renderTable({
       shiny::req(model)
-       shiny::req(model)
        return(model()$tokenizer_statistics)
     })
 

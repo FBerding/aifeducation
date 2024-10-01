@@ -184,7 +184,7 @@ Classifiers_Create_UI <- function(id) {
               bslib::card_body(
                 shiny::sliderInput(
                   value=1,
-                  min=1,
+                  min=0,
                   max=20,
                   step=1,
                   inputId = shiny::NS(id, "rec_layers"),
@@ -225,8 +225,8 @@ Classifiers_Create_UI <- function(id) {
               ),
               bslib::card_body(
                 shiny::sliderInput(
-                  value=1,
-                  min=1,
+                  value=0,
+                  min=0,
                   max=20,
                   step=1,
                   inputId = shiny::NS(id, "dense_layers"),
@@ -529,8 +529,21 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
     # Start training------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
+      # Check vor valid arguments
+      if (identical(as.double(input$alpha), numeric(0))) {
+        loss_alpha <- NULL
+      } else {
+        loss_alpha <- as.double(input$alpha)
+      }
+      if (identical(as.double(input$margin), numeric(0))) {
+        loss_margin <- NULL
+      } else {
+        loss_margin <- as.double(input$margin)
+      }
+
       # Check for errors
       errors <- check_errors_create_classifier(
+        classifier_type=input$classifier_type,
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
@@ -554,18 +567,6 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
           error_messages = errors
         )
       } else {
-        # Check vor valid arguments
-        if (identical(as.double(input$alpha), numeric(0))) {
-          loss_alpha <- NULL
-        } else {
-          loss_alpha <- as.double(input$alpha)
-        }
-        if (identical(as.double(input$margin), numeric(0))) {
-          loss_margin <- NULL
-        } else {
-          loss_margin <- as.double(input$margin)
-        }
-
         # Start task and monitor
         start_and_monitor_long_task(
           id = id,

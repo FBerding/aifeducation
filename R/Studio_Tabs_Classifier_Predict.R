@@ -41,25 +41,28 @@ Classifier_Prediction_UI <- function(id) {
         icon = shiny::icon("floppy-disk")
       )
     ),
-    #bslib::layout_column_wrap(
-      bslib::card(
-        bslib::card_header("Input Data"),
-        bslib::card_body(
-          shiny::textInput(
-            inputId = shiny::NS(id, "embeddings_dir"),
-            label = shiny::tags$p(shiny::icon("folder"), "Path")
-          ),
-          shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
-        )
-      ),
-      bslib::card(
-        bslib::card_header("Predictions"),
-        bslib::card_body(
-          DT::DTOutput(outputId = shiny::NS(id, "table_predictions"))
-        )
-      ),
+    # bslib::layout_column_wrap(
+    bslib::card(
+      bslib::card_header("Input Data"),
+      bslib::card_body(
+        shiny::textInput(
+          inputId = shiny::NS(id, "embeddings_dir"),
+          label = shiny::tags$p(shiny::icon("folder"), "Path")
+        ),
+        shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
+      )
+    ),
+    bslib::card(
+      bslib::card_header("Predictions"),
+      bslib::card_body(
+        DT::DTOutput(outputId = shiny::NS(id, "table_predictions"))
+      )
+    ),
+    shiny::uiOutput(
+      outputId = shiny::NS(id, "proto_net_embeddings")
     )
-  #)
+  )
+  # )
 }
 
 bslib::card(
@@ -149,18 +152,43 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
           newdata = data_embeddings(),
           batch_size = input$batch_size
         )
-        return(predictions)
+
+        # Generate embedding plot for TEProtoNetClassifier
+        if ("TEClassifierProtoNet" %in% class(model)) {
+          if (model$model_config$embedding_dim == 2) {
+            plot <- model$plot_embeddings(
+              embeddings_q = data_embeddings(),
+              classes_q = NULL,
+              batch_size = input$batch_size,
+              alpha = 0.5,
+              size_points = 3,
+              size_points_prototypes = 8,
+              inc_unlabeled = TRUE
+            )
+          } else {
+            plot <- NULL
+          }
+        } else {
+          plot <- NULL
+        }
+
+        return(
+          list(
+            predictions = predictions,
+            plot = plot
+          )
+        )
       }
     })
 
     # Show prediction results
     output$table_predictions <- DT::renderDT({
-      predictions <- prediction_results()
+      predictions <- prediction_results()$predictions
       if (is.null(predictions)) {
         return(NULL)
       } else {
-        for(i in 1:(ncol(predictions)-1)){
-          predictions[,i]<-round(predictions[,i],digits = 3)
+        for (i in 1:(ncol(predictions) - 1)) {
+          predictions[, i] <- round(predictions[, i], digits = 3)
         }
         return(predictions)
       }
@@ -219,6 +247,36 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
           ".csv"
         )
       )
+    })
+
+    # Display Protonet embeddings
+    output$proto_net_embeddings <- shiny::renderUI({
+      model <- model()
+      if ("TEClassifierProtoNet" %in% class(model)) {
+        if (model$model_config$embedding_dim == 2) {
+          ui <- shiny::tagList(
+            bslib::card(
+              bslib::card_header(
+                "Embeddings"
+              ),
+              bslib::card_body(
+                shiny::plotOutput(
+                  outputId = ns("proto_net_embeddings_plot")
+                )
+              )
+            )
+          )
+          return(ui)
+        } else {
+          return(NULL)
+        }
+      } else {
+        return(NULL)
+      }
+    })
+
+    output$proto_net_embeddings_plot <- shiny::renderPlot({
+      return(predictions <- prediction_results()$plot)
     })
 
 
