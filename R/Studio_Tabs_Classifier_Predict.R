@@ -154,9 +154,9 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
         )
 
         # Generate embedding plot for TEProtoNetClassifier
-        if ("TEClassifierProtoNet" %in% class(model)) {
-          if (model$model_config$embedding_dim == 2) {
-            plot <- model$plot_embeddings(
+        if ("TEClassifierProtoNet" %in% class(model())) {
+          if (model()$model_config$embedding_dim == 2) {
+            plot <- model()$plot_embeddings(
               embeddings_q = data_embeddings(),
               classes_q = NULL,
               batch_size = input$batch_size,
@@ -239,7 +239,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     shiny::observeEvent(input$save_modal_button_continue, {
       shiny::removeModal()
       write.csv(
-        prediction_results(),
+        prediction_results()$predictions,
         file = paste0(
           input$save_modal_directory_path,
           "/",
@@ -276,7 +276,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     })
 
     output$proto_net_embeddings_plot <- shiny::renderPlot({
-      return(predictions <- prediction_results()$plot)
+      return(prediction_results()$plot)
     })
 
 

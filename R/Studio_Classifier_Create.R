@@ -860,15 +860,17 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
                 value = 0.5,
                 step = 0.1
               ),
-              shiny::selectInput(
+              shinyWidgets::materialSwitch(
                 inputId = shiny::NS(id, "sampling_separate"),
                 label = "Separate Sample and Query",
-                choices = c(FALSE,TRUE)
+                value = FALSE,
+                status = "primary"
               ),
-              shiny::selectInput(
+              shinyWidgets::materialSwitch(
                 inputId = shiny::NS(id, "sampling_shuffle"),
                 label = "Shuffle",
-                choices = c(TRUE,FALSE)
+                value = TRUE,
+                status = "primary"
               )
             )
           )

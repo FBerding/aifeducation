@@ -679,7 +679,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param batch_size `int` batch size.
     #' @return Returns a plot of class `ggplot`visualizing embeddings.
     plot_embeddings = function(embeddings_q,
-                               classes_q,
+                               classes_q=NULL,
                                batch_size = 12,
                                alpha = 0.5,
                                size_points = 3,
@@ -699,14 +699,20 @@ TEClassifierProtoNet <- R6::R6Class(
       colnames(prototypes) <- c("x", "y", "class", "type")
 
 
-      true_values_names <- intersect(
-        x = names(na.omit(classes_q)),
-        y = private$get_rownames_from_embeddings(embeddings_q)
-      )
-      true_values <- as.data.frame(embeddings$embeddings_q[true_values_names, , drop = FALSE])
-      true_values$class <- classes_q[true_values_names]
-      true_values$type <- rep("labeled", length(true_values_names))
-      colnames(true_values) <- c("x", "y", "class", "type")
+      if(!is.null(classes_q)){
+        true_values_names <- intersect(
+          x = names(na.omit(classes_q)),
+          y = private$get_rownames_from_embeddings(embeddings_q)
+        )
+        true_values <- as.data.frame(embeddings$embeddings_q[true_values_names, , drop = FALSE])
+        true_values$class <- classes_q[true_values_names]
+        true_values$type <- rep("labeled", length(true_values_names))
+        colnames(true_values) <- c("x", "y", "class", "type")
+      } else {
+        true_values_names=NULL
+        true_values=NULL
+      }
+
 
       if (inc_unlabeled == TRUE) {
         estimated_values_names <- setdiff(
@@ -728,10 +734,12 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
 
+      plot_data=prototypes
+      if (length(true_values) > 0) {
+        plot_data=rbind(plot_data,true_values)
+      }
       if (length(estimated_values_names) > 0) {
-        plot_data <- rbind(prototypes, true_values, estimated_values)
-      } else {
-        plot_data <- rbind(prototypes, true_values)
+        plot_data <- rbind(plot_data,estimated_values)
       }
 
       plot <- ggplot2::ggplot(data = plot_data) +
@@ -743,8 +751,8 @@ TEClassifierProtoNet <- R6::R6Class(
             shape = type,
             size = type,
             alpha = type
-          ),
-          position = ggplot2::position_jitter(h = 0.1, w = 0.1)
+          )#,
+          #position = ggplot2::position_jitter(h = 0.1, w = 0.1)
         ) +
         ggplot2::scale_size_manual(values = c(
           "prototype" = size_points_prototypes,

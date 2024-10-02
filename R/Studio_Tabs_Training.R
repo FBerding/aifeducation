@@ -206,7 +206,10 @@ Training_Server <- function(id, model) {
             y_label <- "Accuracy"
           } else if (input$measure == "balanced_accuracy") {
             y_label <- "Balanced Accuracy"
+          } else if (input$measure == "avg_iota") {
+            y_label <- "Average Iota"
           }
+
 
           # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +

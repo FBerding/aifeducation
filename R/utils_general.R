@@ -5,8 +5,6 @@
 #' @return Returns the extension of a file as a string.
 #'
 #' @family Utils
-#' @keywords internal
-#'
 #' @export
 get_file_extension<-function(file_path){
   extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
@@ -21,8 +19,6 @@ get_file_extension<-function(file_path){
 #' @return Returns `FALSE` if the object is not `NULL` and not `NA`. Returns `TRUE` in all other cases.
 #'
 #' @family Utils
-#' @keywords internal
-#'
 #' @export
 is.null_or_na <- function(object) {
   return(is.null(object) || anyNA(object))
@@ -36,8 +32,6 @@ is.null_or_na <- function(object) {
 #' @return Returns a `data.frame` containing epochs, loss, and val_loss.
 #'
 #' @family Utils
-#' @keywords internal
-#'
 #' @export
 clean_pytorch_log_transformers <- function(log) {
   max_epochs <- max(log$epoch)
@@ -71,7 +65,7 @@ clean_pytorch_log_transformers <- function(log) {
 #' @param length `int` determining the length of the id suffix.
 #' @return Returns a `string` of the requested length.
 #' @family Utils
-#' @keywords internal
+#' @export
 generate_id <- function(length = 16) {
   id_suffix <- NULL
   sample_values <- c(
@@ -125,8 +119,7 @@ generate_id <- function(length = 16) {
 #'
 #' @return This function returns nothing.
 #' @family Utils
-#' @keywords internal
-#' @noRd
+#' @export
 output_message <- function(msg, trace, msg_fun) {
   fun <- ifelse(msg_fun, message, cat)
   if (trace) fun(paste(date(), msg))
@@ -140,8 +133,7 @@ output_message <- function(msg, trace, msg_fun) {
 #'
 #' @return This function returns nothing.
 #' @family Utils
-#' @keywords internal
-#' @noRd
+#' @export
 print_message <- function(msg, trace) {
   output_message(msg, trace, TRUE)
 }
@@ -170,8 +162,7 @@ cat_message <- function(msg, trace) {
 #'
 #' @return `TRUE` or `FALSE` depending on whether the shiny app is active.
 #' @family Utils
-#' @keywords internal
-#' @noRd
+#' @export
 create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TRUE) {
   if (!dir.exists(dir_path)) {
     output_message(msg, trace, msg_fun)
@@ -189,8 +180,7 @@ create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TR
 #' @importFrom reticulate py_run_file
 #'
 #' @family Utils
-#' @keywords internal
-#' @noRd
+#' @export
 run_py_file <- function(py_file_name) {
   reticulate::py_run_file(system.file("python", py_file_name, package = "aifeducation"))
 }

@@ -202,7 +202,7 @@ Reliability_Server <- function(id, model) {
                   "Measures - Machine Learning"
                 ),
                 bslib::card_body(
-                  shiny::renderTable(classifier$reliability$standard_measures_mean)
+                  shiny::renderTable(classifier$reliability$standard_measures_mean,rownames = TRUE)
                 )
               )
             )

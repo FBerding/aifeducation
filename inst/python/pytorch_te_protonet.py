@@ -669,9 +669,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   history={
     "loss":history_loss.numpy(),
     "accuracy":history_acc.numpy(),
-    "balanced_accuracy":history_bacc.numpy()} 
- 
-    
+    "balanced_accuracy":history_bacc.numpy(),
+    "avg_iota":history_avg_iota.numpy()} 
+
   return history
 
 def TeProtoNetBatchEmbedDistance(model,dataset_q,batch_size):
