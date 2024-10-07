@@ -32,19 +32,9 @@ class MPLMLoss_PT(nn.Module):
         self.criterion_plm = nn.CrossEntropyLoss(ignore_index = ignore_index)
 
     def forward(self, mlm_logits, plm_logits, mlm_labels, plm_labels):
-        """
-        Logits (torch.FloatTensor of shape (batch_size x sequence_length, vocab_size)):
-            mlm_logits.view(-1, mlm_logits.size(-1))
-            plm_logits.view(-1, plm_logits.size(-1))
-        Targets (torch.FloatTensor of shape (batch_size x sequence_length)):
-            mlm_labels.view(-1)
-            plm_labels.view(-1)
-
-            [0 <= targets[i] < vocab_size]
-        """
         # forward(y_pred, y_true)
-        mlm_loss = self.criterion_mlm(mlm_logits.view(-1, mlm_logits.size(-1)), mlm_labels.view(-1))
-        plm_loss = self.criterion_plm(plm_logits.view(-1, plm_logits.size(-1)), plm_labels.view(-1))
+        mlm_loss = self.criterion_mlm(mlm_logits, mlm_labels)
+        plm_loss = self.criterion_plm(plm_logits, plm_labels)
 
         return mlm_loss + plm_loss
 
@@ -57,36 +47,69 @@ class MPNetForMPLM_PT(MPNetForMaskedLM):
         super().__init__(config)
         self.plm_head = nn.Linear(config.hidden_size, config.vocab_size)  # Adding PLM output layer
 
-        self.init_weights()
+        # Initialize weights and apply final processing
+        self.post_init()
 
     def forward(self, 
                 input_ids = None, 
                 attention_mask = None, 
                 mlm_labels = None, 
-                plm_labels = None):
+                plm_labels = None,
+                return_dict = None,
+                output_hidden_states = None):
         """
         outputs is BaseModelOutputWithPooling with args:
         - last_hidden_state (torch.FloatTensor of shape (batch_size, sequence_length, hidden_size))
-        - ...
+        - pooler_output
+        - hidden_states
+        - attentions
 
-        e.g. hidden_size = 768
+        hidden_size = 768
         """
+
+        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+
         outputs = self.mpnet(input_ids, 
-                             attention_mask=attention_mask)
+                             attention_mask = attention_mask,
+                             output_hidden_states = output_hidden_states)
         
         """
         mlm_logits, plm_logits (torch.FloatTensor of shape (batch_size, sequence_length, vocab_size))
 
-        e.g. vocab_size = 30527
+        vocab_size = 30527
         """
-        mlm_logits = self.lm_head(outputs.last_hidden_state)
-        plm_logits = self.plm_head(outputs.last_hidden_state)  # Computing PLM logits
 
-        outputs = (mlm_logits, plm_logits) + outputs[2:]
+        sequence_output = outputs[0]
 
+        mlm_logits = self.lm_head(sequence_output)
+        plm_logits = self.plm_head(sequence_output)  # Computing PLM logits
+
+        """
+        Logits (torch.FloatTensor of shape (batch_size x sequence_length, vocab_size)):
+            mlm_logits.view(-1, mlm_logits.size(-1))
+            plm_logits.view(-1, plm_logits.size(-1))
+        Targets (torch.FloatTensor of shape (batch_size x sequence_length)):
+            mlm_labels.view(-1)
+            plm_labels.view(-1)
+
+            [0 <= targets[i] < vocab_size]
+        """
+
+        loss = None
         if mlm_labels is not None and plm_labels is not None:
             loss_fct = MPLMLoss_PT()
-            loss = loss_fct(mlm_logits, plm_logits, mlm_labels, plm_labels)
-            outputs = (loss,) + outputs
-
-        return outputs
+            loss = loss_fct(mlm_logits.view(-1, mlm_logits.size(-1)),
+                            plm_logits.view(-1, plm_logits.size(-1)), 
+                            mlm_labels.view(-1),
+                            plm_labels.view(-1))
+        
+        if not return_dict: 
+            output = (mlm_logits, plm_logits) + outputs[2:]
+            return ((loss,) + output) if loss is not None else output
+        
+        return {
+            'loss': loss,
+            'logits': mlm_logits,
+            'hidden_states': outputs.hidden_states,
+            'attentions': outputs.attentions
+        }

@@ -888,6 +888,8 @@ TextEmbeddingModel <- R6::R6Class(
         # text_chunks<-NULL
         encodings <- NULL
         for (i in 1:n_units) {
+          return_token_type_ids <- (private$basic_components$method != AIFETrType$mpnet)
+
           if (private$transformer_components$ml_framework == "tensorflow") {
             tokens <- private$transformer_components$tokenizer(
               raw_text[i],
@@ -899,7 +901,7 @@ TextEmbeddingModel <- R6::R6Class(
               return_length = FALSE,
               return_offsets_mapping = FALSE,
               return_attention_mask = TRUE,
-              return_token_type_ids = TRUE,
+              return_token_type_ids = return_token_type_ids,
               return_tensors = "tf"
             )
           } else {
@@ -913,7 +915,7 @@ TextEmbeddingModel <- R6::R6Class(
               return_length = FALSE,
               return_offsets_mapping = FALSE,
               return_attention_mask = TRUE,
-              return_token_type_ids = TRUE,
+              return_token_type_ids = return_token_type_ids,
               return_tensors = "pt"
             )
           }
@@ -952,13 +954,6 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(to_token, "bool", FALSE)
 
       # Start
-      if (!is.list(int_seqence)) {
-        tmp <- NULL
-        tmp[1] <- list(int_seqence)
-        int_seqence <- tmp[1]
-      }
-
-
       tmp_token_list <- NULL
       for (i in 1:length(int_seqence)) {
         tmp_seq_token_list <- NULL
@@ -1123,14 +1118,23 @@ TextEmbeddingModel <- R6::R6Class(
           # Calculate tensors
           tokens$encodings$set_format(type = "torch")
 
+
           with(
             data = torch$no_grad(), {
-              tensor_embeddings <- private$transformer_components$model(
-                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
-                output_hidden_states = TRUE
-              )$hidden_states
+              if (private$basic_components$method == AIFETrType$mpnet) {
+                tensor_embeddings <- private$transformer_components$model(
+                  input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
+                  attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
+                  output_hidden_states = TRUE
+                )$hidden_states
+              } else {
+                tensor_embeddings <- private$transformer_components$model(
+                  input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
+                  attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
+                  token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
+                  output_hidden_states = TRUE
+                )$hidden_states
+              }
             }
           )
 
@@ -1294,8 +1298,8 @@ TextEmbeddingModel <- R6::R6Class(
       for (i in 1:total_number_of_bachtes) {
         subset <- large_datas_set$select(as.integer(batches_index[[i]]))
         embeddings <- self$embed(
-          raw_text = subset["text"],
-          doc_id = subset["id"],
+          raw_text = c(subset["text"]),
+          doc_id = c(subset["id"]),
           batch_size = batch_size,
           trace = FALSE
         )
@@ -1368,13 +1372,23 @@ TextEmbeddingModel <- R6::R6Class(
         framework <- "tf"
       }
 
-      fill_mask_pipline <- transformers$FillMaskPipeline(
+      return_token_type_ids <- (private$basic_components$method != AIFETrType$mpnet)
+
+      if (private$basic_components$method != "mpnet") {
+        run_py_file("FillMaskForMPLM.py")
+        fill_mask_pipeline_class = py$FillMaskPipelineForMPLM
+      } else {
+        fill_mask_pipeline_class = transformers$FillMaskPipeline
+      }
+
+      fill_mask_pipeline <- fill_mask_pipeline_class(
         model = private$transformer_components$model_mlm,
         tokenizer = private$transformer_components$tokenizer,
         framework = framework,
         num_workers = 1,
         binary_output = FALSE,
-        top_k = as.integer(n_solutions)
+        top_k = as.integer(n_solutions),
+        tokenizer_kwargs = reticulate::dict(list(return_token_type_ids = return_token_type_ids))
       )
 
       special_tokens <- self$get_special_tokens()
@@ -1389,7 +1403,7 @@ TextEmbeddingModel <- R6::R6Class(
         stop("There is no masking token. Please check your input.")
       }
 
-      solutions <- as.list(fill_mask_pipline(text))
+      solutions <- as.list(fill_mask_pipeline(text))
 
       solutions_list <- NULL
 
