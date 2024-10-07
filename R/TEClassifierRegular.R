@@ -2019,12 +2019,6 @@ TEClassifierRegular <- R6::R6Class(
           self$model_config$intermediate_size <- 2 * self$model_config$features
         } else if (self$model_config$attention_type == "multihead" & self$model_config$rec_layers == 0 & self$model_config$self_attention_heads > 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (self$model_config$attention_type == "multihead" & length(self$model_config$rec) > 0 &
-          self$model_config$self_attention_heads > 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (self$model_config$attention_type == "multihead" & length(self$model_config$rec) == 0 &
-          self$model_config$self_attention_heads > 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
         } else {
           self$model_config$intermediate_size <- NULL
         }
