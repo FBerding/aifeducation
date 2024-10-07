@@ -182,11 +182,22 @@ Classifiers_Create_UI <- function(id) {
                 "Recurrent Layers"
               ),
               bslib::card_body(
-                shiny::textInput(
-                  inputId = shiny::NS(id, "rec"),
+                shiny::sliderInput(
+                  value=1,
+                  min=0,
+                  max=20,
+                  step=1,
+                  inputId = shiny::NS(id, "rec_layers"),
                   label = "Reccurrent Layers"
                 ),
-                shiny::textOutput(outputId = shiny::NS(id, "rec_layer_check")),
+                shiny::sliderInput(
+                  value=1,
+                  min=1,
+                  max=20,
+                  step=1,
+                  inputId = shiny::NS(id, "rec_size"),
+                  label = "Reccurrent Layers Size"
+                ),
                 shiny::sliderInput(
                   inputId = shiny::NS(id, "rec_dropout"),
                   label = "Reccurent Layers Dropout",
@@ -213,12 +224,24 @@ Classifiers_Create_UI <- function(id) {
                 "Dense Layers"
               ),
               bslib::card_body(
-                shiny::textInput(
-                  inputId = shiny::NS(id, "hidden"),
+                shiny::sliderInput(
+                  value=0,
+                  min=0,
+                  max=20,
+                  step=1,
+                  inputId = shiny::NS(id, "dense_layers"),
                   label = "Dense Layers",
                   width = "100%"
                 ),
-                shiny::textOutput(outputId = shiny::NS(id, "dense_layer_check")),
+                shiny::sliderInput(
+                  value=1,
+                  min=1,
+                  max=20,
+                  step=1,
+                  inputId = shiny::NS(id, "dense_size"),
+                  label = "Dense Layers Size",
+                  width = "100%"
+                ),
                 shiny::sliderInput(
                   inputId = shiny::NS(id, "dense_dropout"),
                   label = "Dense Dropout",
@@ -506,8 +529,21 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
     # Start training------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
+      # Check vor valid arguments
+      if (identical(as.double(input$alpha), numeric(0))) {
+        loss_alpha <- NULL
+      } else {
+        loss_alpha <- as.double(input$alpha)
+      }
+      if (identical(as.double(input$margin), numeric(0))) {
+        loss_margin <- NULL
+      } else {
+        loss_margin <- as.double(input$margin)
+      }
+
       # Check for errors
       errors <- check_errors_create_classifier(
+        classifier_type=input$classifier_type,
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
@@ -531,31 +567,6 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
           error_messages = errors
         )
       } else {
-        # Check vor valid arguments
-        if (identical(as.double(input$alpha), numeric(0))) {
-          loss_alpha <- NULL
-        } else {
-          loss_alpha <- as.double(input$alpha)
-        }
-        if (identical(as.double(input$margin), numeric(0))) {
-          loss_margin <- NULL
-        } else {
-          loss_margin <- as.double(input$margin)
-        }
-
-        if (check_for_empty_input(input$hidden)) {
-          hidden <- NULL
-        } else {
-          # hidden=as.numeric(stringi::stri_split_regex(input$hidden,pattern=",|[:blank:]")[[1]])
-          hidden <- as.numeric(stringr::str_extract_all(input$hidden, pattern = "\\d+")[[1]])
-        }
-        if (check_for_empty_input(input$rec)) {
-          rec <- NULL
-        } else {
-          # rec=as.numeric(stringi::stri_split_regex(input$rec,pattern=",|[:blank:]")[[1]])
-          rec <- as.numeric(stringr::str_extract_all(input$rec, pattern = "\\d+")[[1]])
-        }
-
         # Start task and monitor
         start_and_monitor_long_task(
           id = id,
@@ -574,8 +585,10 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             # text_embeddings=NULL,
             # feature_extractor=NULL,
             # targets=NULL,
-            hidden = hidden,
-            rec = rec,
+            dense_layers = input$dense_layers,
+            dense_size=input$dense_size,
+            rec_layers = input$rec_layers,
+            rec_size=input$rec_size,
             rec_type = input$rec_type,
             rec_bidirectional = input$rec_bidirectional,
             self_attention_heads = input$self_attention_heads,
@@ -621,13 +634,15 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             Nq = input$n_query,
             loss_alpha = loss_alpha,
             loss_margin = loss_margin,
+            sampling_separate=input$sampling_separate,
+            sampling_shuffle=input$sampling_shuffle,
             embedding_dim = input$protonet_embedding_dim
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,
           pgr_use_bottom = TRUE,
           pgr_use_graphic = TRUE,
-          update_intervall = 2,
+          update_intervall = 300,
           success_type = "classifier"
         )
       }
@@ -844,6 +859,18 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
                 max = 1,
                 value = 0.5,
                 step = 0.1
+              ),
+              shinyWidgets::materialSwitch(
+                inputId = shiny::NS(id, "sampling_separate"),
+                label = "Separate Sample and Query",
+                value = FALSE,
+                status = "primary"
+              ),
+              shinyWidgets::materialSwitch(
+                inputId = shiny::NS(id, "sampling_shuffle"),
+                label = "Shuffle",
+                value = TRUE,
+                status = "primary"
               )
             )
           )

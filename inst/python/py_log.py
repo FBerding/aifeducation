@@ -8,22 +8,6 @@ message_bottom = "NA", last_log = None, write_interval = 2):
   log_time=None
   
   if not (log_file is None):
-    #if value_top==total_top or value_middle==total_middle or value_bottom==total_bottom or value_top==1 or value_middle==1 or value_bottom==1:
-    #  try:
-    #    f = open(file=log_file,mode="w",newline="")
-    #    fieldnames = ["value", "total","message"]
-    #    writer = csv.DictWriter(f, fieldnames=fieldnames,dialect='unix')
-    #    writer.writeheader()
-    #    writer.writerow({'value': value_top, 'total': total_top, 'message': message_top})
-    #    writer.writerow({'value': value_middle, 'total': total_middle, 'message': message_middle})
-    #    writer.writerow({'value': value_bottom, 'total': total_bottom, 'message': message_bottom})
-    #    log_time=time.time()
-    #    f.close()
-    #  except:
-    #    log_time=last_log
-    #  finally:
-     #   f.close()
-    #else:
     if not (last_log is None):
       diff=time.time()-last_log
     else:

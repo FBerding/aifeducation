@@ -444,13 +444,14 @@ or negative), and the third column the ID of the movie review.
 About 200 reviews imply a positive rating
 of a movie and about 100 imply a negative rating.
 
-For this tutorial, we modify this data set by setting about 100 positive reviews to `NA`,
+For this tutorial, we modify this data set by setting about 50 positive and 25 negative reviews to `NA`,
 indicating that these reviews are not labeled.
 
 ```{r, include = TRUE, eval = TRUE}
 example_data <- imdb_movie_reviews
 example_data$label <- as.character(example_data$label)
-example_data$label[c(201:300)] <- NA
+example_data$label[c(76:100)] <- NA
+example_data$label[c(201:250)] <- NA
 example_targets <- as.factor(example_data$label)
 table(example_data$label)
 ```
@@ -817,18 +818,20 @@ classifier$configure(
   text_embeddings = review_embeddings,
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
-  hidden = c(5),
-  rec = c(6, 6),
+  dense_layers=2,
+  dense_size=5,
+  rec_layers=2,
+  rec_size=10,
   rec_type = "gru",
   rec_bidirectional = FALSE,
   self_attention_heads = 0,
   intermediate_size = NULL,
   attention_type = "fourier",
-  add_pos_embedding = TRUE,
-  rec_dropout = 0.1,
+  add_pos_embedding = FALSE,
+  rec_dropout = 0.5,
   repeat_encoder = 0,
-  dense_dropout = 0.4,
-  recurrent_dropout = 0.4,
+  dense_dropout = 0.2,
+  recurrent_dropout = 0.6,
   encoder_dropout = 0.1,
   optimizer = "adam"
 )
@@ -856,22 +859,21 @@ This option is explained in detail in section XY.
 With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.
 
-![Figure 4: Overview of Possible Structure of a
-Classifier](img_articles/classif_fig_04.png){width="100%"}
+![Figure 4: Overview of Possible Structure of a Classifier](img_articles/classif_fig_04.png){width="100%"}
 
-`hidden` takes a vector of integers, determining the number of layers
-and the number of neurons. In our example, there is one dense layers with 5 neurons.
-`rec` also takes a vector of integers determining the number and size of
-the recurrent layers. In this example, we use two layer with
-6 neurons each. With `rec_type` you can choose between two types of recurrent layers.
+`dense_layers` takes a vector of integers, determining the number of layers
+and `dense_size` determines the number of neurons for all dense layers. In our example, there are two dense layers with 5 neurons.
+`rec_layers` also takes a vector of integers determining the number of layers while `rec_size` determines the size of
+all recurrent layers. In this example, we use two layer with
+10 neurons each. With `rec_type` you can choose between two types of recurrent layers.
 `rec_type="gru"` implements a Gated Recurrent Unit (GRU) network and 
 `rec_type="lstm"` implements a Long Short-Term Memory layer. With `rec_bidirectional` you can
 decide whether the recurrent layer should be unidirectional or bidirectional.
 
 Since the classifiers in *aifeducation* use a standardized scheme for
 their creation, dense layers are used after the gru layers. If you want
-to omit gru layers or dense layers, set the corresponding argument to
-`NULL`.
+to omit gru layers or dense layers, set the corresponding argument for the number
+of layers to 0 (`dense_layers=0`, `rec_layers=0`).
 
 If you use a text embedding model that processes more than one chunk we
 would like to recommend to use recurrent layers since they are able to
@@ -940,15 +942,15 @@ classifier`s performance.
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 5,
+  data_folds = 10,
   data_val_size = 0.25,
   balance_class_weights = TRUE,
   balance_sequence_length = TRUE,
-  use_sc = TRUE,
+  use_sc = FALSE,
   sc_method = "dbsmote",
   sc_min_k = 1,
   sc_max_k = 10,
-  use_pl = TRUE,
+  use_pl = FALSE,
   pl_max_steps = 5,
   pl_max = 1.00,
   pl_anchor = 1.00,
@@ -957,7 +959,7 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 60,
+  epochs = 300,
   batch_size = 32,
   dir_checkpoint = "training/classifier",
   trace = TRUE,
@@ -1021,8 +1023,7 @@ method.
 
 Figure 5 illustrates the training loop for the cases that all options are set to `TRUE`.
 
-![Figure 5: Overview of the Steps to Perform a
-Classification](img_articles/classif_fig_05.png){width="100%"}
+![Figure 5: Overview of the Steps to Perform a Classification](img_articles/classif_fig_05.png){width="100%"}
 
 The example above applies the generation of synthetic cases and the algorithm 
 proposed by Cascante-Bonilla et al. (2020). For every fold the training starts 
@@ -1102,7 +1103,6 @@ The central estimates for the reliability values can be found via
 ```{r, include = TRUE, eval = TRUE}
 classifier$reliability$test_metric_mean
 ```
-
 
 Of particular interest
 are the values for alpha from the Iota Concept since they represent a
@@ -1227,6 +1227,327 @@ The estimates can be used in further analysis with common methods of the educati
 and social sciences such as correlation analysis, regression analysis, structural 
 equation modeling, latent class analysis or analysis of variance.
 
+Now you are ready to to use *aifeducation*. In section 6 we describe further
+models for classification tasks and for improving models performance.
+
+# 6 Extensions
+
+## 6.1 Classifiers: ProtoNet
+
+The classifier introduced in section 5 is a regular classifier which comes with the
+traditional challenges of deep learning such as the need for a large number of
+training data, expensive hardware requirements, and only a limited possibility to
+interpret model's parameters (Jadon & Garg 2020, pp.13-14). Since in the educational and
+social science data is a bottle neck a classifier that can work with only small data
+sets would be preferable. These types of models are discussed in the literature with
+terms such as "meta-learning" (Zou 2023) or "few-shot learning" (Jadon & Garg 2020).
+The basic idea behind these approaches is that the model learns to use a support data set
+to predict the output for a query data set (e.g., Zou 2023, pp. 2-3). However, the model is not
+explicitly trained for the query data set. 
+
+One type of models within this area 
+are Prototypical Networks (ProtoNet) which were initially proposed by Snell, Swersky, and
+Zemel (2017). This type of network was developed to create classifiers that are able to 
+generalize to new classes that the model did not seen during training using only the 
+information of a few examples of each class provided to the network (support data set). 
+To achieve this goal the networks learns to create a prototype for every class in the
+support data set with help of the examples for every class. Than the network compares
+the new data with these prototypes and assigns the class of the nearest prototype 
+to the new data. Since the network calculates the distance of every new case to
+every prototype it belongs to the metric-based meta-learning approaches (Zhou 2023, pp. 48).
+
+Since ProtoNet is a simple, easy to understand approach providing good performance
+several extensions have been suggested. *aifeducation* replaces the original loss function with
+the loss function suggested by Zhang et al. (2019) and adds the learnable metric described by
+Oreshkin, Rodriguez, and Lacoste (2019) to increase performance.
+
+> The implementation provided in *aifeducation* currently applies only a fixed set 
+of classes and the prototypes are learned during training by using all availalbe training data.
+This will be extended/changed in the future to allow the selection of the support data set by the user.
+
+The application of a classifier based on ProtoNet is similar to the regular classifiers.
+The only difference is `embedding_dim`. A ProtoNet classifier uses a network to project
+the similarity and differences between the single cases and all prototypes into a 
+n-dimensional space. Similar cases are located near to each other while different cases
+are located with a higher distance to each other. The number of dimensions of this 
+space is determined by `embedding_dim`. In the case `embedding_dim` is set to 1,2 or 3
+the position of every case and the prototypes can be easily visualized. 
+For this example we use the same data as in section 5. Let us first create and
+configure the new classifier.
+
+```{r, include = TRUE, eval=FALSE}
+classifier <- TEClassifierProtoNet$new()
+classifier$configure(
+  name = "proto_net_movie_review_classifier",
+  label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = review_embeddings,
+  feature_extractor = NULL,
+  target_levels = c("neg", "pos"),
+  hidden = c(5),
+  rec = c(6, 6),
+  rec_type = "gru",
+  rec_bidirectional = FALSE,
+  embedding_dim = 2,
+  self_attention_heads = 0,
+  intermediate_size = NULL,
+  attention_type = "fourier",
+  add_pos_embedding = TRUE,
+  rec_dropout = 0.3,
+  repeat_encoder = 0,
+  dense_dropout = 0.4,
+  recurrent_dropout = 0.4,
+  encoder_dropout = 0.1,
+  optimizer = "adam"
+)
+```
+
+Now we can plot how the untrained classifiers embeds the different cases and the 
+prototypes. To create the corresponding plot you can call the method `plot_embeddings`.
+The argument `embeddings_q` takes the embeddings of the different cases as the input 
+of the classifier. In the case you have the true classes for all or same of the
+cases you can add them to the plot by using the argument `classes_q`. The
+resulting plot is shown in the following Figure.
+
+```{r, include = TRUE, eval=FALSE}
+plot_untrained<-classifier$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q=review_labels,
+)
+plot_untrained
+```
+
+
+![Figure 7: Embedding of an untrained classifier of type "ProtoNet"](img_articles/classif_fig_protonet_emb_1.png){width="100%"}
+The great triangles represent the prototypes for every class while the point refer
+to the labeled cases in the data set. For these the colour represents their true
+class. For unlabeled cases a square is used. Her the colour indicates the estimates class.
+As you can see all cases are located very similar and the seems no clear structure.
+Let's see how this changes when we train the model. 
+
+```{r, include = TRUE, eval=FALSE}
+classifier$train(
+  data_embeddings = review_embeddings,
+  data_targets = review_labels,
+  data_folds = 5,
+  data_val_size = 0.25,
+  use_sc = TRUE,
+  sc_method = "dbsmote",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = TRUE,
+  pl_max_steps = 5,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  epochs = 400,
+  batch_size = 32,
+  Ns = 2,
+  Nq = 10,
+  loss_alpha = 0.5,
+  loss_margin = 0.5,
+  sampling_separate=FALSE,
+  sampling_shuffle = TRUE,
+  dir_checkpoint = "training/classifier",
+  trace = TRUE,
+  ml_trace=1
+)
+```
+
+While there are no argument for requesting a balance of the class weights (`balance_class_weights`) or
+balancing the sequence length (`balance_sequence_length`) four new arguments are available.
+With `Ns` you determine how many examples of *every* class should be used during
+training within the support sample. These examples are used to calculate the prototypes
+for every class. With `Nq` you determine how many examples of *every* class should be part
+of the query sample. During training the network tries to predict the correct classes
+of the examples.
+
+The arguments `loss_alpha` and `loss_margin` refer to the configuration of the 
+loss function describes by Zhang et al. (2019). `loss_margin` refers to the minimal 
+distance all examples of the query sample should have to all prototypes that 
+do no represent their class. `loss_alpha` determines if the loss should pay
+more attention to minimize the distance to of the examples to their corresponding prototype or should it
+pay more attention to maximize the distance to the prototypes that do not represent their class.
+If set `loss_alpha=1` the loss pay attention only to minimize the distance of the examples
+to their corresponding prototype. If set `loss_alpha=0` loss pays only attention to 
+maximize the distance of all examples to all prototypes that do not reflect their class.
+
+The next two important arguments refer to the sampling strategies during training.
+With `sampling_separate=TRUE` cases for sample and query a drawn from the same pool of cases.
+Thus, a specific case can be a sample case in one epoch and a query case in another epoch. However,
+it is ensured that a specific cases does never occur as a sample and a query during the
+same training step. In addition, it is ensured that every cases exists only once during 
+a training step. 
+If you set `sampling_separate=FALSE` the training data set is split into one data pool for sample and one data pool for query.
+Thus, a case can only be a sample case or query case.
+With `shuffle` you can request that for every training step a random sample is chosen
+from the training data set resulting in different combinations of sample and query
+cases. For the training we highly recommend do set `shuffle=TRUE` since this will results
+in better performing classifiers. 
+
+After training we can request a visualization of the data again. We first omit
+all unlabeled cases by setting `inc_unlabeled=FALSE` in order to get an impression of the
+quality of training.
+```{r, include = TRUE, eval=FALSE}
+plot_trained_1<-classifier$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q=review_labels,
+  inc_unlabeled=FALSE
+)
+plot_trained_1
+```
+
+As shown in the Figure all cases are now sorted. Cases of the class "neg" are
+located close to the prototype for "neg" while cases of the class "pos" are located
+near the prototype for "pos". Since we use the same data as during training this result
+has to be expected. Only a small number of cases is located near the wrong prototype.
+This can be seen if a red point is close to the prototype for "pos" and green point
+is close to the red prototype for "neg".
+
+![Figure 8: Embedding of a trained classifier of type "ProtoNet" without unlabeled cases](img_articles/classif_fig_protonet_emb_2.png){width="100%"}
+
+Let us now add the unlabeled cases to the plot by setting `inc_unlabeled=TRUE`.
+
+```{r, include = TRUE, eval=FALSE}
+plot_trained_2<-classifier$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q=review_labels,
+  inc_unlabeled=FALSE
+)
+plot_trained_2
+```
+
+As the following Figure shows the model estimates the class of these cases according
+to their distance to the two prototypes. Cases that are close to the prototype for
+"pos" are assigned to "pos" while cases near to the prototype for "neg" are assigned to 
+"neg".
+
+![Figure 9: Embedding of a trained classifier of type "ProtoNet" including unlabeled cases](img_articles/classif_fig_protonet_emb_3.png){width="100%"}
+
+```{r, include = FALSE, eval=TRUE}
+classifier <- vignette_classifier_ProtoNet
+```
+
+Finally, lets report the reliability of this classifier.
+```{r, include = TRUE, eval=TRUE}
+classifier$reliability$test_metric_mean
+```
+
+## 6.2 Feature Extractors
+
+Another option to increase model's performance and/or to increase computational speed
+is to apply a feature extractor. For example, the work by Ganesan et al. (2021) indicates that
+a reduction of the hidden size can increase models accuracy. In *aifeducation* a feature extractor is a model
+that tries to reduce the number of features of given text embeddings before feeding
+the embeddings as input to a classifier. 
+
+The feature extractors implemented in *aifeducation* are auto encoders that support
+sequential data and sequences of different length. The basis architecture of all
+extractors is shown in the following Figure.
+
+![Figure 10: Basic architecure of feature extractors](img_articles/classif_feature_extractor.png){width="100%"}
+
+The learning objective of the feature extractors is first to compress information
+by reducing the number of features to the number of features of the latent space (Frochte 2019, p.281).
+In the Figure above this would mean to reduce the number of features from 8 to 4
+and to store as much information as possible from the 8 dimension in only 4 dimensions.
+In the next step the extractor tries to reconstruct the original information from
+the compressed information of the latent space (Frochte 2019, pp.280-281). That is, the information is extended from
+4 dimensions to 8. After training the hidden representation of the latent space is used
+as a compression of the original input. 
+
+You can create a feature extractor as follows.
+```{r, include = TRUE, eval=FALSE}
+feature_extractor<-TEFeatureExtractor$new()
+feature_extractor$configure(
+   name = "feature_extractor_bert_movie_reviews",
+   label = "Feature extractor for Text Embeddings via BERT",
+   text_embeddings = review_embeddings,
+   features = 128,
+   method = "lstm",
+   noise_factor = 0.2,
+   optimizer = "adam"
+)
+```
+
+Similar to the other models you can use `name` for the model's name and
+`label` for the models' label. The argument `text_embeddings` takes on object of class
+`EmbeddedText` or `LargeDataSetForTextEmbeddings`. With this object you connect your
+feature extractor with a specific TextEmbeddingModel. That is, the feature extractor 
+works only with embeddings from exactly the same TextEmebeddingModel.
+
+`features` determines the number of features for the compressed representation. The
+lower the number the higher is the requested compression. This value corresponds to
+the features of the latent space in the Figure above.
+
+With `method`you determine the type of layer the feature extractor should use. 
+If set `method="lstm"` all layers of the model are long short-term memory layers.
+If set `method="dense"`all layers are standard dense layers. If you set `method="conv"`
+all layers are convolutional layers.
+
+Independently from your choice all models try to generate the latent space such that
+the co-variance of the features is zero. Thus, all features represent unique information.
+In addition, all methods expect `"lstm"` use an orthogonal parameterization to prevent over fitting
+and apply parameter sharing. That is, the opposite layers use the same parameters.
+For more details please refer to Ranjan (2019).
+
+With `noise_factor` you can add some noise during training making the feature extractor
+to an denoising auto encoder which can provide more robust generalizations.
+
+Training the extractor is identical to the other models in *aifeducation*. Please
+note that the text embeddings provided to `data_embeddings` must be generated with
+the same TextEmbeddingModels as the embedings provided during configuration of your model.
+
+```{r, include = TRUE, eval=FALSE}
+feature_extractor$train(
+ data_embeddings=review_embeddings,
+ data_val_size = 0.25,
+ sustain_track = TRUE,
+ sustain_iso_code = "DEU",
+ sustain_region = NULL,
+ sustain_interval = 15,
+ epochs = 40,
+ batch_size = 32,
+ dir_checkpoint,
+ trace = TRUE,
+ ml_trace = 1,
+)
+```
+
+After you have trained your feature extractor you can use it for every classifier.
+Just pass the feature extractor to `feature_extractor` during configuration of the
+classifier. For the classifier described in section 5 this would look like:
+```{r, include = TRUE, eval=FALSE}
+classifier <- TEClassifierRegular$new()
+classifier$configure(
+  name = "movie_review_classifier",
+  label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = review_embeddings,
+  feature_extractor = feature_extractor,
+  target_levels = c("neg", "pos"),
+  hidden = c(5),
+  rec = c(6, 6),
+  rec_type = "gru",
+  rec_bidirectional = FALSE,
+  self_attention_heads = 0,
+  intermediate_size = NULL,
+  attention_type = "fourier",
+  add_pos_embedding = TRUE,
+  rec_dropout = 0.1,
+  repeat_encoder = 0,
+  dense_dropout = 0.4,
+  recurrent_dropout = 0.4,
+  encoder_dropout = 0.1,
+  optimizer = "adam"
+)
+```
+That all. Now you can use and train the classifier in the same way as without
+a feature extractor. Even saving and loading is done automatically.
+
+
 # References
 
 Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
@@ -1264,6 +1585,10 @@ Proceedings of the 2019 Conference of the North (pp. 4171--4186).
 Association for Computational Linguistics.
 <https://doi.org/10.18653/v1/N19-1423>
 
+Frochte, J. (2019). Maschinelles Lernen: Grundlagen und Algorithmen in Python (2., aktualisierte Auflage). Hanser. 
+
+Ganesh, P., Chen, Y., Lou, X., Khan, M. A., Yang, Y., Sajjad, H., Nakov, P., Chen, D., & Winslett, M. (2021). Compressing Large-Scale Transformer-Based Models: A Case Study on BERT. Transactions of the Association for Computational Linguistics, 9, 1061–1080. <https://doi.org/10.1162/tacl_a_00413>
+
 Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive
 guide to measuring the extent of agreement among raters (Fourth
 edition). Gaithersburg: STATAXIS.
@@ -1271,6 +1596,8 @@ edition). Gaithersburg: STATAXIS.
 He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
 BERT with Disentangled Attention.
 <https://doi.org/10.48550/arXiv.2006.03654>
+
+Jadon, S., & Garg, A. (2020). Hands-On One-shot Learning with Python: Learn to Implement Fast and Accurate Deep Learning Models with Fewer Training Samples Using Pytorch. Packt Publishing Limited. <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6175328>
 
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th ed.). Los Angeles: SAGE.
@@ -1303,6 +1630,8 @@ Computational Linguistics: Human Language Technologies (pp. 142–150).
 Association for Computational Linguistics.
 <https://aclanthology.org/P11-1015>
 
+Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task dependent adaptive metric for improved few-shot learning. Advance online publication. <https://doi.org/10.48550/arXiv.1805.10123>
+
 Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
 Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden: Springer.
 <https://doi.org/10.1007/978-3-658-21980-2>
@@ -1317,7 +1646,11 @@ Vectors for Word Representation. Proceedings of the 2014 Conference on
 Empirical Methods in Natural Language Processing.
 <https://aclanthology.org/D14-1162.pdf>
 
+Ranjan, & Chitta. (2019). Build the right Autoencoder — Tune and Optimize using PCA principles.: Part I. <https://towardsdatascience.com/build-the-right-autoencoder-tune-and-optimize-using-pca-principles-part-i-1f01f821999b>
+
 Schreier, M. (2012). Qualitative Content Analysis in Practice. Los Angeles: SAGE.
+
+Snell, J., Swersky, K., & Zemel, R. S. (2017). Prototypical Networks for Few-shot Learning. <https://doi.org/10.48550/arXiv.1703.05175>
 
 Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked and Permuted
 Pre-training for Language Understanding. <https://doi.org/10.48550/arXiv.2004.09297>
@@ -1336,3 +1669,7 @@ Johnson, M., Liu, X., Kaiser, Ł., Gouws, S., Kato, Y., Kudo, T., Kazawa,
 H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
 Bridging the Gap between Human and Machine Translation.
 <https://doi.org/10.48550/arXiv.1609.08144>
+
+Zhang, X., Nie, J., Zong, L., Yu, H., & Liang, W. (2019). One Shot Learning with Margin. In Q. Yang, Z.-H. Zhou, Z. Gong, M.-L. Zhang, & S.-J. Huang (Eds.), Lecture Notes in Computer Science. Advances in Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317). Springer International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
+
+ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications. Elsevier Science & Technology. <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>

@@ -69,11 +69,12 @@ Training_Server <- function(id, model) {
               "Final" = TRUE
             )
           ),
-          shinyWidgets::radioGroupButtons(
+          shiny::selectInput(
             inputId = ns("measure"),
             label = "Measures",
             choices = list(
               "Loss" = "loss",
+              "Average Iota"="avg_iota",
               "Accuracy" = "accuracy",
               "Balanced Accuracy" = "balanced_accuracy"
             )
@@ -205,7 +206,10 @@ Training_Server <- function(id, model) {
             y_label <- "Accuracy"
           } else if (input$measure == "balanced_accuracy") {
             y_label <- "Balanced Accuracy"
+          } else if (input$measure == "avg_iota") {
+            y_label <- "Average Iota"
           }
+
 
           # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +

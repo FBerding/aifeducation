@@ -3,11 +3,13 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+
 # Skip Tests
 skip_creation_test <- TRUE
-skip_training_test <- TRUE
+skip_training_test <- FALSE
 skip_overfitting_test <- FALSE
 skip_3_classes <- FALSE
+
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -43,13 +45,19 @@ test_embeddings_single_case_LD <- test_embeddings_single_case$convert_to_LargeDa
 # Config
 ml_frameworks <- c("pytorch")
 
-rec_list <- list(NULL, c(4), c(4, 3))
+
+rec_list_layers <- list(0, 1, 2)
+rec_list_size <- list(2, 8)
 rec_type_list <- list("gru", "lstm")
 rec_bidirectiona_list <- list(TRUE, FALSE)
-hidden_list <- list(NULL, c(4), c(4, 3))
+dense_list_layers <- list(0, 1, 1)
+dense_list_size <- list(3, 5)
 r_encoder_list <- list(0, 1, 2)
 attention_list <- list("fourier", "multihead")
 pos_embedding_list <- list(TRUE, FALSE)
+sampling_separate_list <- list(TRUE, FALSE)
+sampling_shuffle_list <- list(TRUE, FALSE)
+
 
 sc_list <- list(FALSE, TRUE)
 pl_list <- list(FALSE, TRUE)
@@ -89,13 +97,12 @@ for (framework in ml_frameworks) {
     example_targets <- as.factor(example_data$label)
     names(example_targets) <- example_data$id
 
-
     # Start Tests-------------------------------------------------------------------------------
     # Test creation and prediction of the classifier----------------------------
     if (!skip_creation_test) {
       for (feature_extractor in feature_extractor_list[[framework]]) {
-        for (rec in rec_list) {
-          for (hidden in hidden_list) {
+        for (rec_layers in rec_list_layers) {
+          for (dense_layers in dense_list_layers) {
             for (r in r_encoder_list) {
               for (attention in attention_list) {
                 for (pos_embedding in pos_embedding_list) {
@@ -103,6 +110,9 @@ for (framework in ml_frameworks) {
                     for (rec_bidirectional in rec_bidirectiona_list) {
                       classifier <- NULL
                       gc()
+                      dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+                      rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
+
                       classifier <- TEClassifierProtoNet$new()
                       classifier$configure(
                         ml_framework = framework,
@@ -112,8 +122,10 @@ for (framework in ml_frameworks) {
                         feature_extractor = feature_extractor,
                         embedding_dim = 3,
                         target_levels = target_levels,
-                        hidden = hidden,
-                        rec = rec,
+                        dense_layers = dense_layers,
+                        dense_size = dense_size,
+                        rec_layers = rec_layers,
+                        rec_size = rec_size,
                         rec_type = rec_type,
                         rec_bidirectional = rec_bidirectional,
                         self_attention_heads = 2,
@@ -128,10 +140,10 @@ for (framework in ml_frameworks) {
                         "no sustainability tracking", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -144,10 +156,10 @@ for (framework in ml_frameworks) {
                         "predict - basic", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -155,6 +167,7 @@ for (framework in ml_frameworks) {
                         expect_s3_class(classifier,
                           class = "TEClassifierProtoNet"
                         )
+
 
                         predictions <- classifier$predict(
                           newdata = test_embeddings_reduced,
@@ -167,14 +180,15 @@ for (framework in ml_frameworks) {
                         )
                       })
 
+
                       test_that(paste(
                         "predict - single case", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -200,14 +214,16 @@ for (framework in ml_frameworks) {
                         )
                       })
 
+
+
                       test_that(paste(
                         "predict - randomness", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -243,10 +259,10 @@ for (framework in ml_frameworks) {
                         "predict - order invariance", framework,
                         "n_classes", n_classes,
                         "features_extractor", !is.null(feature_extractor),
-                        "rec", paste(rec, collapse = "_"),
+                        "rec_layers", paste(rec_layers, rec_size),
                         "rec_type", rec_type,
                         "rec_bidirectional", rec_bidirectional,
-                        "hidden", paste(hidden, collapse = "_"),
+                        "dense_layers", paste(dense_layers, dense_size),
                         "encoder", r,
                         "attention", attention,
                         "pos", pos_embedding
@@ -322,23 +338,29 @@ for (framework in ml_frameworks) {
     }
 
 
+
     # Test training of the classifier-------------------------------------------
     if (!skip_training_test) {
       for (feature_extractor in feature_extractor_list[[framework]]) {
         for (use_sc in sc_list) {
           for (use_pl in pl_list) {
             # Randomly select a configuration for training
-            rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
+            rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+            dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+            dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+            rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
             rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
             rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-            hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
             repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
             attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
             add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+            sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+            sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
 
             # Create directory for saving checkpoint for every training
             train_path <- paste0(root_path_results, "/", "train_", generate_id())
             create_dir(train_path, FALSE)
+
 
             classifier <- TEClassifierProtoNet$new()
             classifier$configure(
@@ -349,9 +371,10 @@ for (framework in ml_frameworks) {
               target_levels = target_levels,
               feature_extractor = feature_extractor,
               embedding_dim = 3,
-              hidden = hidden,
-              rec = rec,
-              rec_type = rec_type,
+              dense_layers = dense_layers,
+              dense_size = dense_size,
+              rec_layers = rec_layers,
+              rec_size = rec_size,
               rec_bidirectional = rec_bidirectional,
               self_attention_heads = 1,
               intermediate_size = NULL,
@@ -372,10 +395,12 @@ for (framework in ml_frameworks) {
               "sc", use_sc,
               "pl", use_pl,
               "features_extractor", !is.null(feature_extractor),
-              "rec", paste(rec, collapse = "_"),
+              "rec_layers", paste(rec_layers, rec_size),
               "rec_type", rec_type,
               "rec_bidirectional", rec_bidirectional,
-              "hidden", paste(hidden, collapse = "_"),
+              "dense_layers", paste(dense_layers, dense_size),
+              "sampling_separate", sampling_separate,
+              "sampling_shuffle", sampling_shuffle,
               "encoder", repeat_encoder,
               "attention", attention_type,
               "pos", add_pos_embedding
@@ -404,6 +429,8 @@ for (framework in ml_frameworks) {
                   batch_size = 32,
                   dir_checkpoint = train_path,
                   trace = FALSE,
+                  sampling_separate = sampling_separate,
+                  sampling_shuffle = sampling_shuffle,
                   ml_trace = 0
                 )
               )
@@ -415,17 +442,23 @@ for (framework in ml_frameworks) {
       }
     }
 
+
     # Method save and load------------------------------------------------------
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "method save and load"), {
         # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
+        rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+        dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -435,8 +468,10 @@ for (framework in ml_frameworks) {
           text_embeddings = test_embeddings,
           target_levels = target_levels,
           feature_extractor = feature_extractor,
-          hidden = hidden,
-          rec = rec,
+          dense_layers = dense_layers,
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -484,17 +519,22 @@ for (framework in ml_frameworks) {
       gc()
     }
 
+
     # Function for loading and saving models-----------------------------------
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "function save and load"), {
         # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
+        rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+        dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -505,8 +545,10 @@ for (framework in ml_frameworks) {
           target_levels = target_levels,
           feature_extractor = feature_extractor,
           embedding_dim = 3,
-          hidden = hidden,
-          rec = rec,
+          dense_layers = dense_layers,
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -564,15 +606,20 @@ for (framework in ml_frameworks) {
         create_dir(train_path, FALSE)
 
         # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
+        rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+        dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
         # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
 
         classifier_overfitting <- TEClassifierProtoNet$new()
+
         classifier_overfitting$configure(
           ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
@@ -581,8 +628,10 @@ for (framework in ml_frameworks) {
           target_levels = target_levels,
           feature_extractor = NULL,
           embedding_dim = 5,
-          hidden = hidden,
-          rec = rec,
+          dense_layers = dense_layers,
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -596,7 +645,6 @@ for (framework in ml_frameworks) {
           encoder_dropout = 0.1,
           optimizer = "adam"
         )
-
 
         classifier_overfitting$train(
           data_embeddings = test_embeddings,
@@ -651,13 +699,17 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "embed"), {
         # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
+        rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+        dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -668,8 +720,10 @@ for (framework in ml_frameworks) {
           target_levels = target_levels,
           feature_extractor = feature_extractor,
           embedding_dim = 3,
-          hidden = hidden,
-          rec = rec,
+          dense_layers = dense_layers,
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -711,13 +765,17 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "plot"), {
         # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
+        rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+        dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
         add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -728,8 +786,10 @@ for (framework in ml_frameworks) {
           target_levels = target_levels,
           feature_extractor = feature_extractor,
           embedding_dim = 3,
-          hidden = hidden,
-          rec = rec,
+          dense_layers = dense_layers,
+          dense_size = dense_size,
+          rec_layers = rec_layers,
+          rec_size = rec_size,
           rec_type = rec_type,
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
@@ -755,117 +815,110 @@ for (framework in ml_frameworks) {
       gc()
     }
 
-    plot_embeddings <- function(embeddings_q, classes_q, batch_size) {
-      # Documentation--------------------------------------------------------------
-      test_that(paste(framework, n_classes, "descriptions"), {
-        # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
-        rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
-        repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
-        attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+    # Documentation--------------------------------------------------------------
+    test_that(paste(framework, n_classes, "descriptions"), {
+      # Randomly select a configuration for training
+      rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
+      dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
+      dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+      rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
+      rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
+      rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+      repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
+      attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
+      add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+      sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
+      sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
 
-        classifier <- TEClassifierProtoNet$new()
-        classifier$configure(
-          ml_framework = framework,
-          name = paste0("movie_review_classifier_", "classes_", n_classes),
-          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-          text_embeddings = test_embeddings,
-          target_levels = target_levels,
-          feature_extractor = NULL,
-          embedding_dim = 3,
-          hidden = hidden,
-          rec = rec,
-          rec_type = rec_type,
-          rec_bidirectional = rec_bidirectional,
-          self_attention_heads = 1,
-          intermediate_size = NULL,
-          attention_type = attention_type,
-          add_pos_embedding = add_pos_embedding,
-          rec_dropout = 0.1,
-          repeat_encoder = repeat_encoder,
-          dense_dropout = 0.4,
-          recurrent_dropout = 0.4,
-          encoder_dropout = 0.1,
-          optimizer = "adam"
-        )
+      classifier <- TEClassifierProtoNet$new()
+      classifier$configure(
+        ml_framework = framework,
+        name = paste0("movie_review_classifier_", "classes_", n_classes),
+        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+        text_embeddings = test_embeddings,
+        target_levels = target_levels,
+        feature_extractor = NULL,
+        embedding_dim = 3,
+        dense_layers = dense_layers,
+        dense_size = dense_size,
+        rec_layers = rec_layers,
+        rec_size = rec_size,
+        rec_bidirectional = rec_bidirectional,
+        self_attention_heads = 1,
+        intermediate_size = NULL,
+        attention_type = attention_type,
+        add_pos_embedding = add_pos_embedding,
+        rec_dropout = 0.1,
+        repeat_encoder = repeat_encoder,
+        dense_dropout = 0.4,
+        recurrent_dropout = 0.4,
+        encoder_dropout = 0.1,
+        optimizer = "adam"
+      )
 
-        classifier$set_model_description(
-          eng = "Description",
-          native = "Beschreibung",
-          abstract_eng = "Abstract",
-          abstract_native = "Zusammenfassung",
-          keywords_eng = c("Test", "Neural Net"),
-          keywords_native = c("Test", "Neuronales Netz")
-        )
-        desc <- classifier$get_model_description()
-        expect_equal(
-          object = desc$eng,
-          expected = "Description"
-        )
-        expect_equal(
-          object = desc$native,
-          expected = "Beschreibung"
-        )
-        expect_equal(
-          object = desc$abstract_eng,
-          expected = "Abstract"
-        )
-        expect_equal(
-          object = desc$abstract_native,
-          expected = "Zusammenfassung"
-        )
-        expect_equal(
-          object = desc$keywords_eng,
-          expected = c("Test", "Neural Net")
-        )
-        expect_equal(
-          object = desc$keywords_native,
-          expected = c("Test", "Neuronales Netz")
-        )
-
-
-        classifier$set_software_license("test_license")
-        expect_equal(
-          object = classifier$get_software_license(),
-          expected = c("test_license")
-        )
+      classifier$set_model_description(
+        eng = "Description",
+        native = "Beschreibung",
+        abstract_eng = "Abstract",
+        abstract_native = "Zusammenfassung",
+        keywords_eng = c("Test", "Neural Net"),
+        keywords_native = c("Test", "Neuronales Netz")
+      )
+      desc <- classifier$get_model_description()
+      expect_equal(
+        object = desc$eng,
+        expected = "Description"
+      )
+      expect_equal(
+        object = desc$native,
+        expected = "Beschreibung"
+      )
+      expect_equal(
+        object = desc$abstract_eng,
+        expected = "Abstract"
+      )
+      expect_equal(
+        object = desc$abstract_native,
+        expected = "Zusammenfassung"
+      )
+      expect_equal(
+        object = desc$keywords_eng,
+        expected = c("Test", "Neural Net")
+      )
+      expect_equal(
+        object = desc$keywords_native,
+        expected = c("Test", "Neuronales Netz")
+      )
 
 
-        classifier$set_documentation_license("test_license")
-        expect_equal(
-          object = classifier$get_documentation_license(),
-          expected = c("test_license")
-        )
+      classifier$set_software_license("test_license")
+      expect_equal(
+        object = classifier$get_software_license(),
+        expected = c("test_license")
+      )
 
 
-        classifier$set_publication_info(
-          authors = personList(
-            person(given = "Max", family = "Mustermann")
-          ),
-          citation = "Test Classifier",
-          url = "https://Test.html"
-        )
-        pub_info <- classifier$get_publication_info()
-        expect_equal(
-          object = pub_info$developed_by$authors,
-          expected = personList(
-            person(given = "Max", family = "Mustermann")
-          )
-        )
+      classifier$set_documentation_license("test_license")
+      expect_equal(
+        object = classifier$get_documentation_license(),
+        expected = c("test_license")
+      )
 
-        expect_equal(
-          object = pub_info$developed_by$citation,
-          expected = "Test Classifier"
-        )
 
-        expect_equal(
-          object = pub_info$developed_by$url,
-          expected = "https://Test.html"
+      classifier$set_publication_info(
+        authors = personList(
+          person(given = "Max", family = "Mustermann")
+        ),
+        citation = "Test Classifier",
+        url = "https://Test.html"
+      )
+      pub_info <- classifier$get_publication_info()
+      expect_equal(
+        object = pub_info$developed_by$authors,
+        expected = personList(
+          person(given = "Max", family = "Mustermann")
         )
-      })
-    }
+      )
+    })
   }
 }

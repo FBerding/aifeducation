@@ -16,6 +16,10 @@ Tokenize_Encode_Decode_UI <- function(id) {
       ),
       bslib::card_body(
         bslib::layout_column_wrap(
+          shiny::uiOutput(outputId = shiny::NS(id, "token_table")),
+          shiny::tableOutput(outputId = shiny::NS(id, "tokenizer_statistics"))
+        ),
+        bslib::layout_column_wrap(
           bslib::card(
             bslib::card_header(
               "Raw Text"
@@ -128,6 +132,18 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     # global variables-----------------------------------------------------------
     # TODO (Yuliia): Remove? Variable is not used
     ns <- session$ns
+
+    # Render Token table--------------------------------------------------------
+    output$token_table <- shiny::renderTable({
+      shiny::req(model)
+      model()$get_special_tokens()
+    })
+
+    #Render Tokenizer Statistics-----------------------------------------------
+    output$tokenizer_statistics<-shiny::renderTable({
+      shiny::req(model)
+       return(model()$tokenizer_statistics)
+    })
 
     # Encode-------------------------------------------------------------------
     # Calculate encodings

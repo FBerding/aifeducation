@@ -1,14 +1,29 @@
 # Create ui-------------------------------------------------------------------
 ui <- bslib::page_navbar(
   title = "AI for Education - Studio",
-  theme = bslib::bs_theme(bootswatch = "darkly"),
+  theme = bslib::bs_theme(
+    bootswatch = "flatly"
+  ),
   bslib::nav_panel(
     title = "Home",
     Studio_Home_UI("Home")
   ),
   bslib::nav_panel(
     title = "Data Management",
-    DataManagement_RawTextsUI("DataSetRawTexts")
+    bslib::navset_tab(
+      bslib::nav_panel(
+        title = "DataSetExplorer",
+        DataManagement_DataSetEditorUI("DataSetExplorer")
+      ),
+      bslib::nav_panel(
+        title = "LargeDataSet Creator",
+        DataManagement_RawTextsUI("DataSetRawTexts")
+      ),
+      bslib::nav_panel(
+        title = "Table Editor",
+        DataManagement_TableEditorUI("TableEditor")
+      )
+    )
   ),
   bslib::nav_panel(
     title = "Base Models",
@@ -90,9 +105,19 @@ server <- function(input, output, session) {
   log_dir <- getwd()
   volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
 
-  # Functions
+  # DataMangement
   DataManagement_RawTextsServer(
     id = "DataSetRawTexts",
+    log_dir = log_dir,
+    volumes = volumes
+  )
+  DataManagement_DataSetEditorServer(
+    id = "DataSetExplorer",
+    log_dir = log_dir,
+    volumes = volumes
+  )
+  DataManagement_TableEditorServer(
+    id = "TableEditor",
     log_dir = log_dir,
     volumes = volumes
   )

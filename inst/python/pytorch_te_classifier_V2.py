@@ -78,6 +78,54 @@ class BiDirectionalGRU_PT(torch.nn.Module):
   def forward(self,x):
     result=self.gru_layer(x)
     return result[0]
+
+
+class GRU_PT(torch.nn.Module):
+  def __init__(self,input_size,hidden_size,num_layers,dropout,bidirectional):
+    super().__init__()
+    self.input_size=input_size
+    self.hidden_size=hidden_size
+    self.num_layers=num_layers
+    self.dropout=dropout
+    self.bidirectional=bidirectional
+    
+    self.gru_layer=torch.nn.GRU(
+    input_size= self.input_size,
+    hidden_size=self.hidden_size,
+    num_layers=self.num_layers,
+    bias=True,
+    batch_first=True,
+    dropout=self.dropout,
+    bidirectional=self.bidirectional)
+    
+  def forward(self,x):
+    result=self.gru_layer(x)
+    return result[0]
+  
+class LSTM_PT(torch.nn.Module):
+  def __init__(self,input_size,hidden_size,num_layers,dropout,bidirectional):
+    super().__init__()
+    self.input_size=input_size
+    self.hidden_size=hidden_size
+    self.num_layers=num_layers
+    self.dropout=dropout
+    self.bidirectional=bidirectional
+    
+    self.lstm_layer=torch.nn.LSTM(
+    input_size= self.input_size,
+    hidden_size=self.hidden_size,
+    num_layers=self.num_layers,
+    bias=True,
+    batch_first=True,
+    dropout=self.dropout,
+    bidirectional=self.bidirectional)
+    
+  def forward(self,x):
+    result=self.lstm_layer(x)
+    return result[0]
+
+
+
   
 class UniDirectionalGRU_PT(torch.nn.Module):
   def __init__(self,input_size,hidden_size):
@@ -256,42 +304,23 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
   
 
 class TextEmbeddingClassifier_PT(torch.nn.Module):
-  def __init__(self,features, times, hidden, rec, rec_type,rec_bidirectional, intermediate_size,
+  def __init__(self,features, times, dense_size,dense_layers,rec_size,rec_layers, rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
   add_pos_embedding, self_attention_heads, target_levels,classification_head=True):
     
     super().__init__()
     
-    if isinstance(rec, int):
-      rec=[rec]
-      
-    if isinstance(hidden, int):
-      hidden=[hidden]
-    
-    if rec is None:
-      n_rec=0
-    else:
-      n_rec=len(rec)
-    
-    if hidden is None:
-      n_hidden=0
-    else:
-      n_hidden=len(hidden)
-    
     self.n_target_levels=len(target_levels)
     layer_list=torch.nn.ModuleDict()
     
     current_size=features
-    if n_rec>0 or repeat_encoder>0:
+    if rec_layers>0 or repeat_encoder>0:
       if add_pos_embedding==True:
         layer_list.update({"add_positional_embedding":AddPositionalEmbedding_PT(
           sequence_length=times,
           embedding_dim=features)})
       layer_list.update({"normalizaion_layer":LayerNorm_with_Mask_PT(features=features)})
-      #current_size=features
-    #else:
-    #  layer_list.update({"normalizaion_layer":torch.nn.BatchNorm1d(num_features=times*features)})
-    #  current_size=times*features
+
     
     if repeat_encoder>0:
         for r in range(repeat_encoder):
@@ -308,106 +337,66 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                                 features=features,
                                 dropout_rate=encoder_dropout)})
                                 
-    if n_rec>0:
-      
-      if rec_bidirectional==True:
-        for i in range(n_rec):
-          layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
-          if i==0:
-            if rec_type=="gru":
-              layer_list.update({"bidirectional_gru_"+str(i+1):
-                BiDirectionalGRU_PT(
-                  input_size=current_size,
-                  hidden_size=rec[i])})
-              
-            elif rec_type=="lstm":
-              layer_list.update({"bidirectional_lstm_"+str(i+1):
-                BiDirectionalLSTM_PT(
-                  input_size=current_size,
-                  hidden_size=rec[i])})
-          else:
-            if rec_type=="gru":
-              layer_list.update({"bidirectional_gru_"+str(i+1):
-                BiDirectionalGRU_PT(
-                  input_size=2*rec[i-1],
-                  hidden_size=rec[i])})
-            elif rec_type=="lstm":
-              layer_list.update({"bidirectional_lstm_"+str(i+1):
-                BiDirectionalLSTM_PT(
-                  input_size=2*rec[i-1],
-                  hidden_size=rec[i])})
-          layer_list.update({"unpackandmasking_"+str(i+1):UnPackAndMasking_PT(sequence_length=times)})
-          if i!=(n_rec-1):
-            layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
-      else:
-        for i in range(n_rec):
-          layer_list.update({"packandmasking_"+str(i+1):PackAndMasking_PT()})
-          if i==0:
-            if rec_type=="gru":
-              layer_list.update({"unidirectional_gru_"+str(i+1):
-                UniDirectionalGRU_PT(
-                  input_size=current_size,
-                  hidden_size=rec[i])})
-            elif rec_type=="lstm":
-              layer_list.update({"unidirectional_lstm_"+str(i+1):
-                UniDirectionalLSTM_PT(
-                  input_size=current_size,
-                  hidden_size=rec[i])})
-          else:
-            if rec_type=="gru":
-              layer_list.update({"unidirectional_gru_"+str(i+1):
-                UniDirectionalGRU_PT(
-                  input_size=rec[i-1],
-                  hidden_size=rec[i])})
-            elif rec_type=="lstm":
-              layer_list.update({"unidirectional_lstm_"+str(i+1):
-                UniDirectionalLSTM_PT(
-                  input_size=rec[i-1],
-                  hidden_size=rec[i])})
-          layer_list.update({"unpackandmasking_"+str(i+1):UnPackAndMasking_PT(sequence_length=times)})
-          if i!=(n_rec-1):
-            layer_list.update({"rec_dropout_"+str(i+1):torch.nn.Dropout(p=rec_dropout)})
-      
+    if rec_layers>0:
+      layer_list.update({"packandmasking":PackAndMasking_PT()})
+      if rec_type=="gru":
+        layer_list.update({"gru_bidirectional"+str(rec_bidirectional):
+            GRU_PT(
+              input_size=current_size,
+              hidden_size=rec_size,
+              num_layers=rec_layers,
+              dropout=rec_dropout, 
+              bidirectional=rec_bidirectional)})
+      elif rec_type=="lstm":
+        layer_list.update({"lstm_bidirectional"+str(rec_bidirectional):
+            LSTM_PT(
+              input_size=current_size,
+              hidden_size=rec_size,
+              num_layers=rec_layers,
+              dropout=rec_dropout, 
+              bidirectional=rec_bidirectional)})
+      layer_list.update({"unpackandmasking":UnPackAndMasking_PT(sequence_length=times)})
+
     layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
       
-    if(n_rec>0):
+    if(rec_layers>0):
       if rec_bidirectional==True:
-        current_size_2=2*rec[len(rec)-1]
+        current_size_2=2*rec_size
       else:
-        current_size_2=rec[len(rec)-1]
+        current_size_2=rec_size
     else:
       current_size_2=current_size
     
     #Adding standard layer
-    if n_hidden>0:
-      for i in range(n_hidden):
+    if dense_layers>0:
+      for i in range(dense_layers):
         if i==0:
           layer_list.update({"dense_"+str(i+1):
             torch.nn.Linear(
               in_features=current_size_2,
-              out_features=hidden[i]
+              out_features=dense_size
             )})
           layer_list.update({"dense_act_fct_"+str(i+1):
             torch.nn.GELU()})
         else:
           layer_list.update({"dense_"+str(i+1):
             torch.nn.Linear(
-              in_features=hidden[i-1],
-              out_features=hidden[i])})
+              in_features=dense_size,
+              out_features=dense_size)})
           layer_list.update({"dense_act_fct_"+str(i+1):
             torch.nn.GELU()})
-        if i!=(n_hidden-1):
+        if i!=(dense_layers-1):
           layer_list.update({"dense_dropout_"+str(i+1):torch.nn.Dropout(p=dense_dropout)})
     
-    if n_hidden==0 and n_rec==0 and repeat_encoder==0 and times==1:
+    if dense_layers==0 and rec_layers==0 and repeat_encoder==0 and times==1:
       last_in_features=features*times
-    elif  n_hidden>0:
-      last_in_features=hidden[len(hidden)-1]
-    elif n_rec>0:
+    elif  dense_layers>0:
+      last_in_features=dense_size
+    elif rec_layers>0:
       if rec_bidirectional==True:
-        last_in_features=2*rec[len(rec)-1]
+        last_in_features=2*rec_size
       else:
-        last_in_features=rec[len(rec)-1]
+        last_in_features=rec_size
     else:
       last_in_features=features
 
@@ -441,9 +430,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    model.to(device,dtype=float)
+    current_dtype=float
+    model.to(device,dtype=current_dtype)
   else:
-    model.to(device,dtype=torch.double)
+    current_dtype=torch.double
+    model.to(device,dtype=current_dtype)
   
   if optimizer_method=="adam":
     optimizer=torch.optim.Adam(params=model.parameters(),weight_decay=1e-3)
@@ -479,13 +470,17 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     history_loss=torch.ones(size=(3,epochs),requires_grad=False)*-100
     history_acc=torch.ones(size=(3,epochs),requires_grad=False)*-100
     history_bacc=torch.ones(size=(3,epochs),requires_grad=False)*-100
+    history_avg_iota=torch.ones(size=(3,epochs),requires_grad=False)*-100
   else:
     history_loss=torch.ones(size=(2,epochs),requires_grad=False)*-100
     history_acc=torch.ones(size=(2,epochs),requires_grad=False)*-100
     history_bacc=torch.ones(size=(2,epochs),requires_grad=False)*-100
+    history_avg_iota=torch.ones(size=(2,epochs),requires_grad=False)*-100
   
   best_bacc=float('-inf')
+  best_acc=float('-inf')
   best_val_loss=float('inf')
+  best_val_avg_iota=float('-inf')
   
   #Log file
   if not (log_dir is None):
@@ -519,9 +514,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       sample_weights=batch["sample_weights"]
       sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
 
-      inputs = inputs.to(device)
-      labels=labels.to(device)
-      sample_weights=sample_weights.to(device)
+      inputs = inputs.to(device,dtype=current_dtype)
+      labels=labels.to(device,dtype=current_dtype)
+      sample_weights=sample_weights.to(device,dtype=current_dtype)
       
       optimizer.zero_grad()
       
@@ -554,7 +549,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Calc final metrics for epoch  
     acc_train=n_matches_train/n_total_train
     bacc_train=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
-    
+    avg_iota_train=torch.diagonal(confusion_matrix_train)/(torch.sum(confusion_matrix_train,dim=0)+torch.sum(confusion_matrix_train,dim=1)-torch.diagonal(confusion_matrix_train))
+    avg_iota_train=torch.sum(avg_iota_train)/n_classes
 
     #Validation----------------------------------------------------------------
     val_loss=0.0
@@ -570,8 +566,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         inputs=batch["input"]
         labels=batch["labels"]
 
-        inputs = inputs.to(device)
-        labels=labels.to(device)
+        inputs = inputs.to(device,dtype=current_dtype)
+        labels=labels.to(device,dtype=current_dtype)
       
         outputs=model(inputs,predication_mode=False)
         
@@ -598,6 +594,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
 
     acc_val=n_matches_val/n_total_val
     bacc_val=torch.sum(torch.diagonal(confusion_matrix_val)/torch.sum(confusion_matrix_val,dim=1))/n_classes
+    avg_iota_val=torch.diagonal(confusion_matrix_val)/(torch.sum(confusion_matrix_val,dim=0)+torch.sum(confusion_matrix_val,dim=1)-torch.diagonal(confusion_matrix_val))
+    avg_iota_val=torch.sum(avg_iota_val)/n_classes
     
     #Test----------------------------------------------------------------------
     if not (test_data is None):
@@ -614,8 +612,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           inputs=batch["input"]
           labels=batch["labels"]
 
-          inputs = inputs.to(device)
-          labels=labels.to(device)
+          inputs = inputs.to(device,dtype=current_dtype)
+          labels=labels.to(device,dtype=current_dtype)
         
           outputs=model(inputs,predication_mode=False)
           
@@ -642,6 +640,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
      
       acc_test=n_matches_test/n_total_test
       bacc_test=torch.sum(torch.diagonal(confusion_matrix_test)/torch.sum(confusion_matrix_test,dim=1))/n_classes
+      avg_iota_test=torch.diagonal(confusion_matrix_test)/(torch.sum(confusion_matrix_test,dim=0)+torch.sum(confusion_matrix_test,dim=1)-torch.diagonal(confusion_matrix_test))
+      avg_iota_test=torch.sum(avg_iota_test)/n_classes
     
     
     #Record History
@@ -657,6 +657,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       history_bacc[0,epoch]=bacc_train
       history_bacc[1,epoch]=bacc_val
       history_bacc[2,epoch]=bacc_test
+      
+      history_avg_iota[0,epoch]=avg_iota_train
+      history_avg_iota[1,epoch]=avg_iota_val
+      history_avg_iota[2,epoch]=avg_iota_test
     else:
       history_loss[0,epoch]=train_loss/len(trainloader)
       history_loss[1,epoch]=val_loss/len(valloader)
@@ -666,49 +670,77 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       
       history_bacc[0,epoch]=bacc_train
       history_bacc[1,epoch]=bacc_val
+      
+      history_avg_iota[0,epoch]=avg_iota_train
+      history_avg_iota[1,epoch]=avg_iota_val
 
     #Trace---------------------------------------------------------------------
     if trace>=1:
       if test_data is None:
-        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
+        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} AI {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}  AI: {:.4f}".format(
           epoch+1,
           epochs,
           train_loss/len(trainloader),
           acc_train,
           bacc_train,
-          val_loss/len(valloader),
-          acc_val,
-          bacc_val))
-      else:
-        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} | Test Loss: {:.4f} ACC: {:.4f} BACC: {:.4f}".format(
-          epoch+1,
-          epochs,
-          train_loss/len(trainloader),
-          acc_train,
-          bacc_train,
+          avg_iota_train,
           val_loss/len(valloader),
           acc_val,
           bacc_val,
+          avg_iota_val))
+      else:
+        print("Epoch: {}/{} Train Loss: {:.4f} ACC {:.4f} BACC {:.4f} AI {:.4f} | Val Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} AI {:.4f} | Test Loss: {:.4f} ACC: {:.4f} BACC: {:.4f} AI: {:.4f}".format(
+          epoch+1,
+          epochs,
+          train_loss/len(trainloader),
+          acc_train,
+          bacc_train,
+          avg_iota_train,
+          val_loss/len(valloader),
+          acc_val,
+          bacc_val,
+          avg_iota_val,
           test_loss/len(testloader),
           acc_test,
-          bacc_test))
+          bacc_test,
+          avg_iota_test))
           
     #Callback-------------------------------------------------------------------
     if use_callback==True:
-      if bacc_val>best_bacc:
+      if avg_iota_val>best_val_avg_iota:
         if trace>=1:
-          print("Val Balanced Accuracy increased from {:.4f} to {:.4f}".format(best_bacc,bacc_val))
+          print("Val Avg. Iota increased from {:.4f} to {:.4f}".format(best_val_avg_iota,avg_iota_val))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
+        best_val_avg_iota=avg_iota_val
+        best_acc=acc_val
         best_val_loss=val_loss/len(valloader)
-      if bacc_val==best_bacc and val_loss/len(valloader)<best_val_loss:
+      
+      if avg_iota_val==best_val_avg_iota and acc_val>best_acc:
+        if trace>=1:
+          print("Val Accuracy increased from {:.4f} to {:.4f}".format(best_acc,acc_val))
+          print("Save checkpoint to {}".format(filepath))
+        torch.save(model.state_dict(),filepath)
+        best_bacc=bacc_val
+        best_acc=acc_val
+        best_val_avg_iota=avg_iota_val
+        best_val_loss=val_loss/len(valloader)
+        
+      if avg_iota_val==best_val_avg_iota and acc_val==best_acc and val_loss/len(valloader)<best_val_loss:
         if trace>=1:
           print("Val Loss decreased from {:.4f} to {:.4f}".format(best_val_loss,val_loss/len(valloader)))
           print("Save checkpoint to {}".format(filepath))
         torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
+        best_acc=acc_val
+        best_val_avg_iota=avg_iota_val
         best_val_loss=val_loss/len(valloader)
+  
+    #Check if there are furhter information for training-----------------------
+    # If there are no addtiononal information. Stop training and continue
+    if train_loss/len(trainloader)<0.0001 and acc_train==1 and bacc_train==1:
+      break
   
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
@@ -720,7 +752,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   history={
     "loss":history_loss.numpy(),
     "accuracy":history_acc.numpy(),
-    "balanced_accuracy":history_bacc.numpy()} 
+    "balanced_accuracy":history_bacc.numpy(),
+    "avg_iota":history_avg_iota.numpy()} 
   return history
 
 

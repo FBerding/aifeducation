@@ -632,6 +632,12 @@ AIFEBaseModel <- R6::R6Class(
         stop("The object is not configured. Please call the method configure.")
       }
     },
+    # Method for checking if the configuration is already done
+    check_config_for_FALSE = function() {
+      if (private$configured == TRUE) {
+        stop("The object is configured. Please create a new object if you would like to change the object's configuration.")
+      }
+    },
     #--------------------------------------------------------------------------
     set_text_embedding_model = function(model_info,
                                         feature_extractor_info,
@@ -740,6 +746,36 @@ AIFEBaseModel <- R6::R6Class(
 
       # Finalize config
       private$set_configuration_to_TRUE()
+    },
+
+    #-------------------------------------------------------------------------
+    prepare_history_data = function(history) {
+      # Provide rownames for the history
+      for (i in 1:length(history)) {
+        if (!is.null(history[[i]])) {
+          if (nrow(history[[i]]) == 2) {
+            rownames(history[[i]]) <- c("train", "val")
+          } else {
+            rownames(history[[i]]) <- c("train", "val", "test")
+          }
+
+          # Replace value -100 with the last value
+          # Max index for replacements
+          index_max <- ncol(history[[i]])
+          for (j in 1:nrow(history[[i]])) {
+            # Check if -100 occurs in the row
+            includes_m_100 <- (history[[i]][j, ] == -100)
+            # if at least one -100 occurs
+            if (sum(includes_m_100) > 0) {
+              # min index for replacements
+              index_min <- min(which(includes_m_100))
+              # replace
+              history[[i]][j, index_min:index_max] <- history[[i]][j, (index_min - 1)]
+            }
+          }
+        }
+      }
+      return(history)
     }
   )
 )
