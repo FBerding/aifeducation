@@ -182,8 +182,8 @@
       # SFT: create_chunks_for_training ---------------------------------------------
       if (!is.function(private$steps_for_training$create_chunks_for_training)) {
         private$steps_for_training$create_chunks_for_training <- function(self) {
-          run_py_file("datasets_transformer_prepare_data.py")
 
+          # Preparing Data
           if (class(self$params$raw_texts) %in% c("datasets.arrow_dataset.Dataset") == FALSE) {
             # Create Dataset
             raw_text_dataset <- datasets$Dataset$from_dict(
@@ -192,29 +192,10 @@
           } else {
             raw_text_dataset <- self$params$raw_texts
           }
-          # Preparing Data
-          tokenized_texts_raw <- raw_text_dataset$map(
-            py$tokenize_raw_text,
-            batched = TRUE,
-            batch_size = 2L,
-            fn_kwargs = reticulate::dict(
-              list(
-                tokenizer = self$temp$tokenizer,
-                truncation = TRUE,
-                padding = FALSE,
-                max_length = as.integer(self$params$chunk_size),
-                return_overflowing_tokens = TRUE,
-                return_length = TRUE,
-                return_special_tokens_mask = TRUE,
-                return_offsets_mapping = FALSE,
-                return_attention_mask = TRUE,
-                return_tensors = "np",
-                request_word_ids = TRUE,
-                report_to_aifeducation_studio = is_shinyapp_active()
-              )
-            ),
-            remove_columns = raw_text_dataset$column_names
-          )
+
+          tokenized_texts_raw <- tokenize_dataset(dataset = raw_text_dataset,
+                                                  tokenizer = self$temp$tokenizer,
+                                                  max_length = self$params$chunk_size)
 
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
@@ -752,8 +733,6 @@
         check.hidden_act(hidden_act)
         check.sustain_iso_code(sustain_iso_code, sustain_track)
 
-        private$update_tokenizer_statistics(self$temp$raw_text_dataset)
-
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 1
@@ -798,6 +777,12 @@
         }
         print_message("Creating Tokenizer - Done", trace)
         pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 6
+
+        tokenized_texts_raw <- tokenize_dataset(dataset = self$temp$raw_text_dataset,
+                                                tokenizer = self$temp$tokenizer,
+                                                max_length = 2048)
+
+        private$update_tokenizer_statistics(tokenized_texts_raw, "creation")
 
         # Creating Transformer Model ------------------------------------------------
         print_message("Creating Transformer Model", trace)

@@ -34,7 +34,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation") {
   mu_w <- NA
   mu_g <- NA
 
-  if (step == "training") {
+  if (step == "training" || step == "creation") {
     if ("word_ids" %in% dataset$column_names == FALSE) {
       stop("dataset must contain a column 'word_ids'.")
     }
@@ -52,7 +52,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation") {
     mu_t <- n_tokens / n_sequences
     mu_w <- n_words / n_sequences
     mu_g <- n_tokens / n_words
-  } else if (step != "creation") {
+  } else {
     stop(paste("Step", step, "is invalid. Allowed steps: creation or training"))
   }
 
@@ -140,7 +140,7 @@ check.vocab_raw_texts <- function(vocab_raw_texts) { # nolint
   } else {
     raw_text_dataset <- vocab_raw_texts
     if (is.null(raw_text_dataset$features$text)) {
-      stop("Dataset does not contain a colum 'text' storing the raw texts.")
+      stop("Dataset does not contain a column 'text' storing the raw texts.")
     }
   }
   return(raw_text_dataset)
@@ -487,4 +487,44 @@ Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
 #' @noRd
 Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
   self$temp$tok_new$save_model(self$params$model_dir)
+}
+
+#' @title Dataset tokenization
+#' @description A given dataset must contain a column 'text' storing raw texts.
+#'
+#' @param dataset `datasets.arrow_dataset.Dataset` Dataset that contains a column 'text' storing the raw texts.
+#' @param tokenizer `transformers.Tokenizer()` Tokenizer.
+#' @param max_length `integer` Max length for a given tokenizer.
+#'
+#' @return Tokenized dataset with a given tokenizer.
+#'
+#' @family Defined steps for creation
+#' @keywords internal
+#' @noRd
+tokenize_dataset <- function(dataset, tokenizer, max_length) {
+  run_py_file("datasets_transformer_prepare_data.py")
+
+  tokenized_texts_raw <- dataset$map(
+    py$tokenize_raw_text,
+    batched = TRUE,
+    batch_size = 2L,
+    fn_kwargs = reticulate::dict(
+      list(
+        tokenizer = tokenizer,
+        truncation = TRUE,
+        padding = FALSE,
+        max_length = as.integer(max_length),
+        return_overflowing_tokens = TRUE,
+        return_length = TRUE,
+        return_special_tokens_mask = TRUE,
+        return_offsets_mapping = FALSE,
+        return_attention_mask = TRUE,
+        return_tensors = "np",
+        request_word_ids = TRUE,
+        report_to_aifeducation_studio = is_shinyapp_active()
+      )
+    ),
+    remove_columns = dataset$column_names
+  )
+  return(tokenized_texts_raw)
 }
