@@ -6,6 +6,8 @@
 #' @keywords internal
 #' @noRd
 is_shinyapp_active <- function() {
+  .Deprecated(msg = "`is_shinyapp_active()` function will be removed from `aifeduction` package in the future")
+
   shiny_available <- requireNamespace("shiny", quietly = TRUE)
   shiny_widgets_available <- requireNamespace("shinyWidgets", quietly = TRUE)
   shiny_running <- shiny::isRunning()
@@ -27,6 +29,8 @@ is_shinyapp_active <- function() {
 #' @keywords internal
 #' @noRd
 update_progress_bar <- function(id, value, total, title) {
+  .Deprecated(msg = "`update_progress_bar()` function will be removed from `aifeduction` package in the future")
+
   shinyWidgets::updateProgressBar(
     id = id,
     value = value,
@@ -47,6 +51,8 @@ update_progress_bar <- function(id, value, total, title) {
 #' @family Auxiliary GUI Functions
 #' @export
 update_aifeducation_progress_bar <- function(value, total, title = NULL) {
+  .Deprecated(msg = "`update_aifeducation_progress_bar()` function will be removed from `aifeduction` package in the future")
+
   if (is_shinyapp_active()) update_progress_bar("pgr_bar_aifeducation", value, total, title)
 }
 
@@ -66,6 +72,8 @@ update_aifeducation_progress_bar <- function(value, total, title = NULL) {
 #' @family Auxiliary GUI Functions
 #' @export
 update_aifeducation_progress_bar_epochs <- function(value, total, title = NULL) {
+  .Deprecated(msg = "`update_aifeducation_progress_bar_epochs()` function will be removed from `aifeduction` package in the future")
+
   update_progress_bar("pgr_bar_aifeducation_epochs", value, total, title)
 }
 
@@ -85,6 +93,8 @@ update_aifeducation_progress_bar_epochs <- function(value, total, title = NULL) 
 #' @family Auxiliary GUI Functions
 #' @export
 update_aifeducation_progress_bar_steps <- function(value, total, title = NULL) {
+  .Deprecated(msg = "`update_aifeducation_progress_bar_steps()` function will be removed from `aifeduction` package in the future")
+
   update_progress_bar("pgr_bar_aifeducation_steps", value, total, title)
 }
 
@@ -100,6 +110,8 @@ update_aifeducation_progress_bar_steps <- function(value, total, title = NULL) {
 #' @keywords internal
 #' @noRd
 increment_aife_progress_bar <- function(value, total, title) {
+  .Deprecated(msg = "`increment_aife_progress_bar()` function will be removed from `aifeduction` package in the future")
+
   value <- value + 1
   update_aifeducation_progress_bar(
     value = value,

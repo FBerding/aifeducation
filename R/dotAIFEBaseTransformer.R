@@ -257,6 +257,32 @@
 
           print_message("Preparing Training of the Model", self$params$trace)
 
+          loss_file <- paste0(self$params$output_dir, "/aifeducation_loss.log")
+          log_file <- paste0(self$params$output_dir, "/aifeducation_state.log")
+
+          # Create Custom Callbacks ----
+          if (self$params$ml_framework == "tensorflow") {
+            run_py_file("keras_callbacks.py")
+            logger <- py$create_AIFETransformerCSVLogger_TF(
+              loss_file = loss_file,
+              log_file = log_file,
+              value_top = 6,
+              total_top = 10,
+              message_top = "Overall: Training...",
+              min_step = 10
+            )
+          } else {
+            run_py_file("pytorch_transformer_callbacks.py")
+            logger <- py$create_AIFETransformerCSVLogger_PT(
+              loss_file = loss_file,
+              log_file = log_file,
+              value_top = 6,
+              total_top = 10,
+              message_top = "Overall: Training...",
+              min_step = 10
+            )
+          }
+
           if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
             self$temp$tf_train_dataset <- self$temp$model$prepare_tf_dataset(
               dataset = self$temp$tokenized_dataset$train,
@@ -290,13 +316,8 @@
               append = FALSE
             )
 
-            self$temp$callbacks <- list(callback_checkpoint, callback_history)
-
-            # Add Callback if Shiny App is running -------------------------------------
-            if (is_shinyapp_active()) {
-              run_py_file("keras_callbacks.py")
-              self$temp$callbacks <- list(callback_checkpoint, callback_history, py$ReportAiforeducationShiny())
-            }
+            # Add Callbacks
+            self$temp$callbacks <- list(callback_checkpoint, callback_history, logger)
 
             print_message("Compile Model", self$params$trace)
             self$temp$model$compile(optimizer = adam(self$params$learning_rate), loss = "auto")
@@ -339,11 +360,8 @@
               self$temp$trainer$remove_callback(transformers$ProgressCallback)
             }
 
-            # Add Callback if Shiny App is running
-            if (is_shinyapp_active()) {
-              run_py_file("pytorch_transformer_callbacks.py")
-              self$temp$trainer$add_callback(py$ReportAiforeducationShiny_PT())
-            }
+            # Add Callbacks
+            self$temp$trainer$add_callback(logger)
           }
         }
       }
@@ -718,10 +736,14 @@
         # Check definition of required functions ----
         private$check_required_SFC()
 
-        # Set Shiny Progress Tracking -----------------------------------------------
-        pgr_value <- -1
-        pgr_max <- 10
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 0
+        # Logging file
+        run_py_file("py_log.py")
+        log_file <- paste0(model_dir, "/aifeducation_state.log")
+        total <- 10
+
+        py$write_log_py(log_file,
+                        value_top = 0, total_top = total,
+                        message_top = paste(private$title, "Overall: Checking"))
 
         # argument checking ---------------------------------------------------------
         # optional function
@@ -735,9 +757,12 @@
 
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 1
 
         # Start Sustainability Tracking ---------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 1, total_top = total,
+                        message_top = paste(private$title, "Overall: Starting"))
+
         track_msg <- ifelse(
           sustain_track,
           "Start Sustainability Tracking",
@@ -749,34 +774,45 @@
           private$create_sustain_tracker()
           private$sustainability_tracker$start()
         }
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 2
 
         # Creating a new Tokenizer for Computing Vocabulary -------------------------
+        py$write_log_py(log_file,
+                        value_top = 2, total_top = total,
+                        message_top = paste(private$title, "Overall: Tokenizer Draft"))
+
         print_message("Creating Tokenizer Draft", trace)
         private$steps_for_creation$create_tokenizer_draft(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 3
 
         # Calculating Vocabulary ----------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 3, total_top = total,
+                        message_top = paste(private$title, "Overall: Computing Vocabulary"))
+
         print_message("Start Computing Vocabulary", trace)
         run_py_file("datasets_transformer_compute_vocabulary.py")
         private$steps_for_creation$calculate_vocab(self)
         print_message("Start Computing Vocabulary - Done", trace)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 4
 
         # Saving Tokenizer Draft ----------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 4, total_top = total,
+                        message_top = paste(private$title, "Overall: Saving Tokenizer Draft"))
+
         print_message("Saving Draft", trace)
         create_dir(model_dir, trace, "Creating Model Directory")
         private$steps_for_creation$save_tokenizer_draft(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 5
 
         # Final Tokenizer -----------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 5, total_top = total,
+                        message_top = paste(private$title, "Overall: Creating Final Tokenizer"))
+
         print_message("Creating Tokenizer", trace)
         private$steps_for_creation$create_final_tokenizer(self)
         if (!("tokenizer" %in% names(self$temp))) {
           stop("The final tokenizer must be stored in the 'tokenizer' parameter of the 'temp' list.")
         }
         print_message("Creating Tokenizer - Done", trace)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 6
 
         tokenized_texts_raw <- tokenize_dataset(dataset = self$temp$raw_text_dataset,
                                                 tokenizer = self$temp$tokenizer,
@@ -785,34 +821,49 @@
         private$update_tokenizer_statistics(tokenized_texts_raw, "creation")
 
         # Creating Transformer Model ------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 6, total_top = total,
+                        message_top = paste(private$title, "Overall: Creating Transformer Model"))
+
         print_message("Creating Transformer Model", trace)
         private$steps_for_creation$create_transformer_model(self)
         if (!("model" %in% names(self$temp))) {
           stop("The transformer model must be stored in the 'model' parameter of the 'temp' list.")
         }
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 7
 
         # Saving Model --------------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 7, total_top = total,
+                        message_top = paste(private$title, "Overall: Saving Model"))
+
         print_message(paste("Saving", private$title), trace)
         private$steps_for_creation$save_transformer_model(self)
         private$save_tokenizer_statistics()
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 8
 
         # Saving Tokenizer ----------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 8, total_top = total,
+                        message_top = paste(private$title, "Overall: Saving Tokenizer"))
+
         print_message("Saving Tokenizer Model", trace)
         self$temp$tokenizer$save_pretrained(model_dir)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 9
 
         # Stop Sustainability Tracking if requested ----------------------------------
+        py$write_log_py(log_file,
+                        value_top = 9, total_top = total,
+                        message_top = paste(private$title, "Overall: Stopping"))
+
         if (sustain_track) {
           private$sustainability_tracker$stop()
           print_message("Saving Sustainability Data", trace)
           private$save_sustainability_data()
         }
 
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 10
-
         # Finish --------------------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 10, total_top = total,
+                        message_top = paste(private$title, "Overall: Done"))
+
         print_message("Done", trace)
         # Clear variables -----------------------------------------------------------
         private$clear_variables()
@@ -907,10 +958,14 @@
         # Check defining of required functions ----
         private$check_required_SFT()
 
-        # Set Shiny Progress Tracking -----------------------------------------------
-        pgr_value <- -1
-        pgr_max <- 10
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 0
+        # Logging file
+        run_py_file("py_log.py")
+        log_file <- paste0(output_dir, "/aifeducation_state.log")
+        total <- 10
+
+        py$write_log_py(log_file,
+                        value_top = 0, total_top = total,
+                        message_top = paste(private$title, "Overall: Checking"))
 
         # argument checking ---------------------------------------------------------
         check.ml_framework(ml_framework)
@@ -924,7 +979,10 @@
 
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 1
+
+        py$write_log_py(log_file,
+                        value_top = 1, total_top = total,
+                        message_top = paste(private$title, "Overall: Starting"))
 
         # Start Sustainability Tracking ---------------------------------------------
         track_msg <- ifelse(
@@ -939,9 +997,11 @@
           private$sustainability_tracker$start()
         }
 
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 2
-
         # Loading existing model ----------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 2, total_top = total,
+                        message_top = paste(private$title, "Overall: Loading Existing Model"))
+
         print_message("Loading Existing Model", trace)
         private$steps_for_training$load_existing_model(self)
         if (!("tokenizer" %in% names(self$temp))) {
@@ -950,53 +1010,79 @@
         if (!("model" %in% names(self$temp))) {
           stop("The transformer model must be stored in the 'model' parameter of the 'temp' list.")
         }
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 3
+
 
         # argument checking------------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 3, total_top = total,
+                        message_top = paste(private$title, "Overall: Checking"))
+
         private$steps_for_training$check_chunk_size(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 4
+
 
         # creating chunks of sequences ----------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 4, total_top = total,
+                        message_top = paste(private$title, "Overall: Creating Chunks of Sequences"))
+
         print_message("Creating Chunks of Sequences for Training", trace)
         private$steps_for_training$create_chunks_for_training(self)
 
         n_chunks <- self$temp$tokenized_dataset$num_rows
         print_message(paste(n_chunks, "Chunks Created"), trace)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 5
 
         # Seeting up DataCollator and Dataset ----------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 5, total_top = total,
+                        message_top = paste(private$title, "Overall: Seeting up DataCollator and Dataset"))
+
         create_dir(output_dir, trace, "Creating Output Directory")
         create_dir(paste0(output_dir, "/checkpoints"), trace, "Creating Checkpoint Directory")
 
         private$steps_for_training$prepare_train_tune(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 6
 
         # Start Training -------------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 6, total_top = total,
+                        message_top = paste(private$title, "Overall: Start Training"))
+
         print_message("Start Fine Tuning", trace)
         private$steps_for_training$start_training(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 7
 
         # Saving Model --------------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 7, total_top = total,
+                        message_top = paste(private$title, "Overall: Saving Model"))
+
         print_message(paste("Saving", private$title), trace)
         private$steps_for_training$save_model(self)
         private$save_tokenizer_statistics("train")
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 8
 
         # Saving Tokenizer -----------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 8, total_top = total,
+                        message_top = paste(private$title, "Overall: Saving Tokenizer"))
+
         print_message("Saving Tokenizer", trace)
         self$temp$tokenizer$save_pretrained(output_dir)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 9
 
         # Stop Sustainability Tracking if requested ----------------------------------
+        py$write_log_py(log_file,
+                        value_top = 9, total_top = total,
+                        message_top = paste(private$title, "Overall: Stopping"))
+
         if (sustain_track) {
           private$sustainability_tracker$stop()
           print_message("Saving Sustainability Data", trace)
           private$save_sustainability_data("train")
         }
 
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 10
 
         # Finish --------------------------------------------------------------------
+        py$write_log_py(log_file,
+                        value_top = 10, total_top = total,
+                        message_top = paste(private$title, "Overall: Done"))
+
         print_message("Done", trace)
         # Clear variables -----------------------------------------------------------
         private$clear_variables()

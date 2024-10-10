@@ -1,48 +1,64 @@
 import transformers
 import csv
 
-def create_AIFETransformerCSVLogger(log_file,value_top,total_top,message_top,min_step):
+def create_AIFETransformerCSVLogger_PT(loss_file,
+                                       log_file, value_top, total_top, message_top, min_step,
+                                       log_write_interval = 2):
   class AIFETransformerCSVLogger(transformers.TrainerCallback):
-    def on_train_begin(self, args, state, control, **kwargs):
-      try:
-        f = open(log_file,"w",newline="")
-        fieldnames = ["value", "total","message"]
-        writer = csv.DictWriter(f, fieldnames=fieldnames,dialect='unix')
-        writer.writeheader()
-        writer.writerow({'value': value_top, 'total': total_top, 'message': message_top})
-        writer.writerow({'value': 0, 'total': args.num_train_epochs, 'message': "Epochs"})
-        writer.writerow({'value': 0, 'total': str(int(state.max_steps/args.num_train_epochs)), 'message': "Steps"})
-        f.close()
-      except:
-        a=None
+    def _write_to_log(self, value_epochs = 0, value_steps = 0):
+      self.last_log = write_log_py(log_file, 
+                                   value_top = value_top, total_top = total_top, message_top = message_top,
+                                   value_middle = value_epochs, total_middle = self.total_epochs, message_middle = "Epochs",
+                                   value_bottom = value_steps, total_bottom = self.total_steps, message_bottom = "Steps",
+                                   last_log = self.last_log, write_interval = log_write_interval)
+    
+    def _write_loss(self):
+      history = list()
+      history.append(self.train_loss)
+      history.append(self.eval_loss)
+      if len(self.test_loss) != 0:
+        history.append(self.test_loss)
         
+      self.last_log_loss = write_log_performance_py(loss_file,
+                                                    history = history, 
+                                                    last_log = self.last_log_loss, write_interval = log_write_interval)
+      
+    def _calc_value_steps(self, global_step):
+      return self.total_steps if global_step % self.total_steps == 0 else global_step % self.total_steps
+      
+    def on_train_begin(self, args, state, control, **kwargs):
+      self.train_loss = list()
+      self.eval_loss = list()
+      self.test_loss = list()
+      
+      self.total_epochs = args.num_train_epochs
+      self.total_steps = state.max_steps / self.total_epochs
+      
+      self.last_log = None
+      self.last_log_loss = None
+      
+      self._write_to_log()
+      
     def on_epoch_end(self, args, state, control, **kwargs):
-      #Hier bitte den log der loss function ergänzen bzw. im Event on log
-      try:
-        f = open(log_file,"w",newline="")
-        fieldnames = ["value", "total","message"]
-        writer = csv.DictWriter(f, fieldnames=fieldnames,dialect='unix')
-        writer.writeheader()
-        writer.writerow({'value': value_top, 'total': total_top, 'message': message_top})
-        writer.writerow({'value': state.epoch, 'total': args.num_train_epochs, 'message': "Epochs"})
-        writer.writerow({'value': (state.global_step % (state.max_steps/args.num_train_epochs)), 'total': str(int(state.max_steps/args.num_train_epochs)), 'message': "Steps"})
-        f.close()
-      except:
-        a=None
+      value_steps = self._calc_value_steps(state.global_step)
+      
+      self._write_to_log(value_epochs = state.epoch, value_steps = value_steps)
         
     def on_step_end(self, args, state, control, **kwargs):
-      if (state.global_step % min_step)==0:
-        try:
-          f = open(log_file,"w",newline="")
-          fieldnames = ["value", "total","message"]
-          writer = csv.DictWriter(f, fieldnames=fieldnames,dialect='unix')
-          writer.writeheader()
-          writer.writerow({'value': value_top, 'total': total_top, 'message': message_top})
-          writer.writerow({'value': state.epoch, 'total': args.num_train_epochs, 'message': "Epochs"})
-          writer.writerow({'value': (state.global_step % (state.max_steps/args.num_train_epochs)), 'total': str(int(state.max_steps/args.num_train_epochs)), 'message': "Steps"})
-          f.close()
-        except:
-          a=None
+      value_steps = self._calc_value_steps(state.global_step)
+      
+      if (state.global_step % min_step) == 0:
+        self._write_to_log(value_epochs = state.epoch, value_steps = value_steps)
+          
+    def on_log(self, args, state, control, logs = None, **kwargs):
+        if "loss" in logs:
+          self.train_loss.append(logs["loss"])
+        if "eval_loss" in logs:
+          self.eval_loss.append(logs["eval_loss"])
+        if "test_loss" in logs:
+          self.test_loss.append(logs["test_loss"])
+        
+        self._write_loss()
   
   return AIFETransformerCSVLogger()
     
