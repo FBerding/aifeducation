@@ -523,12 +523,15 @@ LargeDataSetForText <- R6::R6Class(
       return(as.data.frame(data))
     },
     clean_text = function(text) {
-      text <- stringr::str_replace_all(text, pattern = "[:space:]{1,}", replacement = " ")
-      text <- stringr::str_replace_all(text, pattern = "-(?=[:space:])", replacement = "")
+      #text <- stringr::str_replace_all(text, pattern = "[:space:]{1,}", replacement = " ")
+      #text <- stringr::str_replace_all(text, pattern = "-(?=[:space:])", replacement = "")
+      text <- stringi::stri_replace_all(text, regex = "[:space:]{1,}", replacement = " ")
+      text <- stringi::stri_replace_all(text, regex = "-(?=[:space:])", replacement = "")
       return(text)
     },
     remove_file_extenstion = function(file) {
-      tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
+      #tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
+      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1)
       return(paste0(tmp_string[1, 1:(ncol(tmp_string) - 1)], collapse = "."))
     }
   )

@@ -74,6 +74,8 @@ Fill_Mask_UI <- function(id) {
 #' @param model Model used for inference.
 #' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
+#' @importFrom rlang .data
+#'
 #' @family studio_gui_text_embedding_model_fill_mask
 #' @keywords internal
 #'

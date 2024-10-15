@@ -109,6 +109,10 @@ load_R_interface <- function(dir_path) {
 #' Function creates a config that can be saved to disk. It is used during loading
 #' an object from disk in order to set the correct configuration.
 #'
+#' @param object Object of class `"TEClassifierRegular"`, `"TEClassifierProtoNet"`,
+#' `"TEFeatureExtractor"`, `"TextEmbeddingModel"`, `"LargeDataSetForTextEmbeddings"`,
+#' `"LargeDataSetForText"`, `"EmbeddedText"`.
+#'
 #' @return Returns a `list` that contains the class of the object, the public, and
 #' private fields.
 #'

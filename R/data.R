@@ -19,25 +19,15 @@
 #' @keywords internal
 "vignette_classifier_ProtoNet"
 
-#' @title Test metric for an example classifier
+#' @title Vignette classifier trained with Synthetic Cases and Pseudo Labeling
 #'
-#' @description A matrix of 4 rows and 17 columns containing test metrics for an example classifier. The purpose of the
-#'   data is for illustration in vignettes.
-#'
-#' @docType data
-#' @format matrix
-#' @keywords internal
-"test_metric_mean"
-
-#' @title Sustainability data for an example classifier
-#'
-#' @description A list of length 5 containing the used energy consumption and co2 emissions of a classifier during
-#'   training. The purpose of the data is for illustration in vignettes.
+#' @description An object of class [TEClassifierProtoNet] trained with the a subset of the Standford Movie Review
+#'   Dataset. The purpose of classifier is for illustration in vignettes.
 #'
 #' @docType data
-#' @format list
+#' @format R6
 #' @keywords internal
-"test_classifier_sustainability"
+"vignette_classifier_sc_pl"
 
 #' @title Standford Movie Review Dataset
 #'

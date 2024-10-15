@@ -200,7 +200,8 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     decodings <- shiny::eventReactive(input$decode_start, {
       shiny::req(model)
 
-      int_sequence <- stringr::str_extract_all(input$ids_for_decode, "\\d+")
+      #int_sequence <- stringr::str_extract_all(input$ids_for_decode, "\\d+")
+      int_sequence <- stringi::stri_extract_all_regex(str=input$ids_for_decode, pattern="\\d+")
 
       output_list_text <- model()$decode(int_sequence, to_token = FALSE)
 

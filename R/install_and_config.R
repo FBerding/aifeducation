@@ -11,6 +11,7 @@
 #'
 #' @importFrom reticulate install_python
 #' @importFrom reticulate install_miniconda
+#' @importFrom utils install.packages
 #'
 #' @family Installation and Configuration
 #'
@@ -30,7 +31,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
   )
 
   if (install_aifeducation_studio == TRUE) {
-    install.packages(
+    utils::install.packages(
       "ggplot2",
       "rlang",
       "shiny",

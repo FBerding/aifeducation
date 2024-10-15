@@ -41,7 +41,6 @@ Classifier_Prediction_UI <- function(id) {
         icon = shiny::icon("floppy-disk")
       )
     ),
-    # bslib::layout_column_wrap(
     bslib::card(
       bslib::card_header("Input Data"),
       bslib::card_body(
@@ -64,12 +63,6 @@ Classifier_Prediction_UI <- function(id) {
   )
   # )
 }
-
-bslib::card(
-  bslib::card_header(),
-  bslib::card_body()
-)
-
 
 #' @title Server function for: graphical user interface for making predictions with a classifier.
 #' @description Functions generates the functionality of a page on the server.

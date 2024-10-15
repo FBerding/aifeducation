@@ -381,7 +381,6 @@ Classifiers_Create_UI <- function(id) {
 #' @param id `string` determining the id for the namespace.
 #' @param log_dir `string` Path to the directory where the log files should be stored.
 #' @param volumes `vector` containing a named vector of available volumes.
-#' @param model Model used for inference.
 #' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
 #' @family studio_gui_page_classifier_create
