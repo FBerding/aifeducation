@@ -531,7 +531,7 @@ LargeDataSetForText <- R6::R6Class(
     },
     remove_file_extenstion = function(file) {
       #tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
-      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1)
+      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1,simplify=TRUE)
       return(paste0(tmp_string[1, 1:(ncol(tmp_string) - 1)], collapse = "."))
     }
   )

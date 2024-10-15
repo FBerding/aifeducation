@@ -1398,8 +1398,8 @@ TextEmbeddingModel <- R6::R6Class(
       #  stringr::fixed(mask_token),
       #  simplify = TRUE
       #))
-      n_mask_tokens <- ncol(stringi::stri_extract_all_regex(str=text,
-                                                     pattern=stringr::fixed(mask_token),
+      n_mask_tokens <- ncol(stringi::stri_extract_all_fixed(str=text,
+                                                     pattern=mask_token,
                                                      simplify = TRUE
       ))
 
