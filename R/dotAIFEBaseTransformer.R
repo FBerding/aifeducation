@@ -128,7 +128,8 @@
                                         sustain_region,
                                         sustain_interval,
                                         trace,
-                                        pytorch_safetensors) {
+                                        pytorch_safetensors,
+                                        log_dir) {
       self$set_model_param("ml_framework", ml_framework)
       self$set_model_param("sustain_track", sustain_track)
       self$set_model_param("sustain_iso_code", sustain_iso_code)
@@ -136,6 +137,7 @@
       self$set_model_param("sustain_interval", sustain_interval)
       self$set_model_param("trace", trace)
       self$set_model_param("pytorch_safetensors", pytorch_safetensors)
+      self$set_model_param("log_dir", log_dir)
     },
 
 
@@ -182,7 +184,6 @@
       # SFT: create_chunks_for_training ---------------------------------------------
       if (!is.function(private$steps_for_training$create_chunks_for_training)) {
         private$steps_for_training$create_chunks_for_training <- function(self) {
-
           # Preparing Data
           if (class(self$params$raw_texts) %in% c("datasets.arrow_dataset.Dataset") == FALSE) {
             # Create Dataset
@@ -193,9 +194,11 @@
             raw_text_dataset <- self$params$raw_texts
           }
 
-          tokenized_texts_raw <- tokenize_dataset(dataset = raw_text_dataset,
-                                                  tokenizer = self$temp$tokenizer,
-                                                  max_length = self$params$chunk_size)
+          tokenized_texts_raw <- tokenize_dataset(
+            dataset = raw_text_dataset,
+            tokenizer = self$temp$tokenizer,
+            max_length = self$params$chunk_size
+          )
 
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
@@ -692,6 +695,7 @@
     #' @param hidden_act `r paramDesc.hidden_act()`
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
+    #' @param log_dir `r paramDesc.log_dir()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
@@ -711,7 +715,8 @@
                       sustain_region,
                       sustain_interval,
                       trace,
-                      pytorch_safetensors) {
+                      pytorch_safetensors,
+                      log_dir = NULL) {
       tryCatch({
         private$define_required_SFC_functions()
         # Init model parameters -----------------------------------------------------
@@ -719,7 +724,8 @@
         private$init_common_model_params(
           ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
-          trace, pytorch_safetensors
+          trace, pytorch_safetensors,
+          log_dir
         )
         # Each transformer has these parameters in the case of creation ----
         self$set_model_param("model_dir", model_dir)
@@ -738,12 +744,24 @@
 
         # Logging file
         run_py_file("py_log.py")
-        log_file <- paste0(model_dir, "/aifeducation_state.log")
-        total <- 10
 
-        py$write_log_py(log_file,
-                        value_top = 0, total_top = total,
-                        message_top = paste(private$title, "Overall: Checking"))
+        print(paste("log_dir", self$params$log_dir))
+
+        if (is.null(self$params$log_dir)) {
+          self$params$log_dir <- model_dir
+        }
+        log_file <- paste0(self$params$log_dir, "/aifeducation_state.log")
+        self$temp$log_file <- log_file
+
+        total <- 10
+        write_interval <- 0.5
+        last_log <- NULL
+
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 0, total_top = total, message_top = paste(private$title, "Overall: Checking"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         # argument checking ---------------------------------------------------------
         # optional function
@@ -759,9 +777,11 @@
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
 
         # Start Sustainability Tracking ---------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 1, total_top = total,
-                        message_top = paste(private$title, "Overall: Starting"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 1, total_top = total, message_top = paste(private$title, "Overall: Starting"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         track_msg <- ifelse(
           sustain_track,
@@ -776,36 +796,47 @@
         }
 
         # Creating a new Tokenizer for Computing Vocabulary -------------------------
-        py$write_log_py(log_file,
-                        value_top = 2, total_top = total,
-                        message_top = paste(private$title, "Overall: Tokenizer Draft"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 2, total_top = total, message_top = paste(private$title, "Overall: Tokenizer Draft"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Creating Tokenizer Draft", trace)
         private$steps_for_creation$create_tokenizer_draft(self)
 
         # Calculating Vocabulary ----------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 3, total_top = total,
-                        message_top = paste(private$title, "Overall: Computing Vocabulary"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 3, total_top = total, message_top = paste(private$title, "Overall: Computing Vocabulary"),
+          last_log = last_log, write_interval = write_interval
+        )
+
+        self$temp$value_top <- 3
+        self$temp$total_top <- total
+        self$temp$message_top <- paste(private$title, "Overall: Computing Vocabulary")
 
         print_message("Start Computing Vocabulary", trace)
-        run_py_file("datasets_transformer_compute_vocabulary.py")
         private$steps_for_creation$calculate_vocab(self)
         print_message("Start Computing Vocabulary - Done", trace)
 
         # Saving Tokenizer Draft ----------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 4, total_top = total,
-                        message_top = paste(private$title, "Overall: Saving Tokenizer Draft"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 4, total_top = total, message_top = paste(private$title, "Overall: Saving Tokenizer Draft"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Saving Draft", trace)
         create_dir(model_dir, trace, "Creating Model Directory")
         private$steps_for_creation$save_tokenizer_draft(self)
 
         # Final Tokenizer -----------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 5, total_top = total,
-                        message_top = paste(private$title, "Overall: Creating Final Tokenizer"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 5, total_top = total, message_top = paste(private$title, "Overall: Creating Final Tokenizer"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Creating Tokenizer", trace)
         private$steps_for_creation$create_final_tokenizer(self)
@@ -814,16 +845,20 @@
         }
         print_message("Creating Tokenizer - Done", trace)
 
-        tokenized_texts_raw <- tokenize_dataset(dataset = self$temp$raw_text_dataset,
-                                                tokenizer = self$temp$tokenizer,
-                                                max_length = 2048)
+        tokenized_texts_raw <- tokenize_dataset(
+          dataset = self$temp$raw_text_dataset,
+          tokenizer = self$temp$tokenizer,
+          max_length = 2048
+        )
 
         private$update_tokenizer_statistics(tokenized_texts_raw, "creation")
 
         # Creating Transformer Model ------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 6, total_top = total,
-                        message_top = paste(private$title, "Overall: Creating Transformer Model"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 6, total_top = total, message_top = paste(private$title, "Overall: Creating Transformer Model"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Creating Transformer Model", trace)
         private$steps_for_creation$create_transformer_model(self)
@@ -832,26 +867,31 @@
         }
 
         # Saving Model --------------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 7, total_top = total,
-                        message_top = paste(private$title, "Overall: Saving Model"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 7, total_top = total, message_top = paste(private$title, "Overall: Saving Model"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message(paste("Saving", private$title), trace)
         private$steps_for_creation$save_transformer_model(self)
         private$save_tokenizer_statistics()
 
         # Saving Tokenizer ----------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 8, total_top = total,
-                        message_top = paste(private$title, "Overall: Saving Tokenizer"))
-
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 8, total_top = total, message_top = paste(private$title, "Overall: Saving Tokenizer"),
+          last_log = last_log, write_interval = write_interval
+        )
         print_message("Saving Tokenizer Model", trace)
         self$temp$tokenizer$save_pretrained(model_dir)
 
         # Stop Sustainability Tracking if requested ----------------------------------
-        py$write_log_py(log_file,
-                        value_top = 9, total_top = total,
-                        message_top = paste(private$title, "Overall: Stopping"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 9, total_top = total, message_top = paste(private$title, "Overall: Stopping"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         if (sustain_track) {
           private$sustainability_tracker$stop()
@@ -860,9 +900,11 @@
         }
 
         # Finish --------------------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 10, total_top = total,
-                        message_top = paste(private$title, "Overall: Done"))
+        py$write_log_py(
+          log_file,
+          value_top = 10, total_top = total, message_top = paste(private$title, "Overall: Done"),
+          last_log = NULL, write_interval = write_interval
+        )
 
         print_message("Done", trace)
         # Clear variables -----------------------------------------------------------
@@ -899,6 +941,7 @@
     #' @param multi_process `r paramDesc.multi_process()`
     #' @param keras_trace `r paramDesc.keras_trace()`
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
+    #' @param log_dir `r paramDesc.log_dir()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
@@ -927,7 +970,8 @@
                      trace,
                      keras_trace,
                      pytorch_trace,
-                     pytorch_safetensors) {
+                     pytorch_safetensors,
+                     log_dir = NULL) {
       tryCatch({
         private$define_required_SFT_functions()
         # Init model parameters -----------------------------------------------------
@@ -935,7 +979,8 @@
         private$init_common_model_params(
           ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
-          trace, pytorch_safetensors
+          trace, pytorch_safetensors,
+          log_dir
         )
         # Each transformer has these parameters in the case of training ----
         self$set_model_param("output_dir", output_dir)
@@ -960,12 +1005,22 @@
 
         # Logging file
         run_py_file("py_log.py")
-        log_file <- paste0(output_dir, "/aifeducation_state.log")
-        total <- 10
 
-        py$write_log_py(log_file,
-                        value_top = 0, total_top = total,
-                        message_top = paste(private$title, "Overall: Checking"))
+        if (is.null(self$params$log_dir)) {
+          self$params$log_dir <- output_dir
+        }
+        log_file <- paste0(self$params$log_dir, "/aifeducation_state.log")
+        self$temp$log_file <- log_file
+
+        total <- 10
+        write_interval <- 0.5
+        last_log <- NULL
+
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 0, total_top = total, message_top = paste(private$title, "Overall: Checking"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         # argument checking ---------------------------------------------------------
         check.ml_framework(ml_framework)
@@ -980,9 +1035,11 @@
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
 
-        py$write_log_py(log_file,
-                        value_top = 1, total_top = total,
-                        message_top = paste(private$title, "Overall: Starting"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 1, total_top = total, message_top = paste(private$title, "Overall: Starting"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         # Start Sustainability Tracking ---------------------------------------------
         track_msg <- ifelse(
@@ -998,9 +1055,11 @@
         }
 
         # Loading existing model ----------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 2, total_top = total,
-                        message_top = paste(private$title, "Overall: Loading Existing Model"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 2, total_top = total, message_top = paste(private$title, "Overall: Loading Existing Model"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Loading Existing Model", trace)
         private$steps_for_training$load_existing_model(self)
@@ -1013,17 +1072,21 @@
 
 
         # argument checking------------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 3, total_top = total,
-                        message_top = paste(private$title, "Overall: Checking"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 3, total_top = total, message_top = paste(private$title, "Overall: Checking"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         private$steps_for_training$check_chunk_size(self)
 
 
         # creating chunks of sequences ----------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 4, total_top = total,
-                        message_top = paste(private$title, "Overall: Creating Chunks of Sequences"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 4, total_top = total, message_top = paste(private$title, "Overall: Creating Chunks of Sequences"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Creating Chunks of Sequences for Training", trace)
         private$steps_for_training$create_chunks_for_training(self)
@@ -1032,9 +1095,12 @@
         print_message(paste(n_chunks, "Chunks Created"), trace)
 
         # Seeting up DataCollator and Dataset ----------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 5, total_top = total,
-                        message_top = paste(private$title, "Overall: Seeting up DataCollator and Dataset"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 5, total_top = total,
+          message_top = paste(private$title, "Overall: Seeting up DataCollator and Dataset"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         create_dir(output_dir, trace, "Creating Output Directory")
         create_dir(paste0(output_dir, "/checkpoints"), trace, "Creating Checkpoint Directory")
@@ -1042,34 +1108,42 @@
         private$steps_for_training$prepare_train_tune(self)
 
         # Start Training -------------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 6, total_top = total,
-                        message_top = paste(private$title, "Overall: Start Training"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 6, total_top = total, message_top = paste(private$title, "Overall: Start Training"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Start Fine Tuning", trace)
         private$steps_for_training$start_training(self)
 
         # Saving Model --------------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 7, total_top = total,
-                        message_top = paste(private$title, "Overall: Saving Model"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 7, total_top = total, message_top = paste(private$title, "Overall: Saving Model"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message(paste("Saving", private$title), trace)
         private$steps_for_training$save_model(self)
         private$save_tokenizer_statistics("train")
 
         # Saving Tokenizer -----------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 8, total_top = total,
-                        message_top = paste(private$title, "Overall: Saving Tokenizer"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 8, total_top = total, message_top = paste(private$title, "Overall: Saving Tokenizer"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         print_message("Saving Tokenizer", trace)
         self$temp$tokenizer$save_pretrained(output_dir)
 
         # Stop Sustainability Tracking if requested ----------------------------------
-        py$write_log_py(log_file,
-                        value_top = 9, total_top = total,
-                        message_top = paste(private$title, "Overall: Stopping"))
+        last_log <- py$write_log_py(
+          log_file,
+          value_top = 9, total_top = total, message_top = paste(private$title, "Overall: Stopping"),
+          last_log = last_log, write_interval = write_interval
+        )
 
         if (sustain_track) {
           private$sustainability_tracker$stop()
@@ -1079,9 +1153,11 @@
 
 
         # Finish --------------------------------------------------------------------
-        py$write_log_py(log_file,
-                        value_top = 10, total_top = total,
-                        message_top = paste(private$title, "Overall: Done"))
+        py$write_log_py(
+          log_file,
+          value_top = 10, total_top = total, message_top = paste(private$title, "Overall: Done"),
+          last_log = NULL, write_interval = write_interval
+        )
 
         print_message("Done", trace)
         # Clear variables -----------------------------------------------------------

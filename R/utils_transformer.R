@@ -359,11 +359,16 @@ Bert_like.SFC.create_tokenizer_draft <- function(
 #' @keywords internal
 #' @noRd
 Bert_like.SFC.calculate_vocab <- function(self) { # nolint
+  run_py_file("datasets_transformer_compute_vocabulary.py")
+
   self$temp$tok_new$train_from_iterator(
     py$batch_iterator(
       batch_size = as.integer(200),
       dataset = self$temp$raw_text_dataset,
-      report_to_shiny_app = is_shinyapp_active()
+      log_file = self$temp$log_file,
+      value_top = self$temp$value_top,
+      total_top = self$temp$total_top,
+      message_top = self$temp$message_top
     ),
     trainer = self$temp$trainer,
     length = length(self$temp$raw_text_dataset)
@@ -458,11 +463,15 @@ Longformer_like.SFC.create_tokenizer_draft <- function(self) { # nolint
 #' @keywords internal
 #' @noRd
 Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
+  run_py_file("datasets_transformer_compute_vocabulary.py")
   self$temp$tok_new$train_from_iterator(
     py$batch_iterator(
       batch_size = as.integer(200),
       dataset = self$temp$raw_text_dataset,
-      report_to_shiny_app = is_shinyapp_active()
+      log_file = self$temp$log_file,
+      value_top = self$temp$value_top,
+      total_top = self$temp$total_top,
+      message_top = self$temp$message_top
     ),
     length = length(self$temp$raw_text_dataset),
     vocab_size = as.integer(self$params$vocab_size),
@@ -521,7 +530,7 @@ tokenize_dataset <- function(dataset, tokenizer, max_length) {
         return_attention_mask = TRUE,
         return_tensors = "np",
         request_word_ids = TRUE,
-        report_to_aifeducation_studio = is_shinyapp_active()
+        report_to_aifeducation_studio = FALSE
       )
     ),
     remove_columns = dataset$column_names

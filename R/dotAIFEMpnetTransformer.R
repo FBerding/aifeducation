@@ -201,6 +201,7 @@
     #' @param hidden_act `r paramDesc.hidden_act()`
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
+    #' @param log_dir `r paramDesc.log_dir()`
     #'
     #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
     #' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
@@ -225,7 +226,8 @@
                       sustain_region = NULL,
                       sustain_interval = 15,
                       trace = TRUE,
-                      pytorch_safetensors = TRUE) {
+                      pytorch_safetensors = TRUE,
+                      log_dir = NULL) {
       # Init dependent parameters ----
       super$set_model_param("vocab_do_lower_case", vocab_do_lower_case)
       super$set_model_param("num_hidden_layer", num_hidden_layer)
@@ -252,7 +254,8 @@
         sustain_region = sustain_region,
         sustain_interval = sustain_interval,
         trace = trace,
-        pytorch_safetensors = pytorch_safetensors
+        pytorch_safetensors = pytorch_safetensors,
+        log_dir = log_dir
       )
     },
 
@@ -269,7 +272,6 @@
     #' @param model_dir_path `r paramDesc.model_dir_path()`
     #' @param raw_texts `r paramDesc.raw_texts()`
     #' @param p_mask `r paramDesc.p_mask()`
-    #' @param p_perm `double` Ratio that determines the number of words/tokens used for permutation.
     #' @param whole_word `r paramDesc.whole_word()`
     #' @param val_size `r paramDesc.val_size()`
     #' @param n_epoch `r paramDesc.n_epoch()`
@@ -282,6 +284,9 @@
     #' @param multi_process `r paramDesc.multi_process()`
     #' @param keras_trace `r paramDesc.keras_trace()`
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
+    #' @param log_dir `r paramDesc.log_dir()`
+    #'
+    #' @param p_perm `double` Ratio that determines the number of words/tokens used for permutation.
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
     train = function(ml_framework = "pytorch",
@@ -307,7 +312,8 @@
                      trace = TRUE,
                      keras_trace = 1,
                      pytorch_trace = 1,
-                     pytorch_safetensors = TRUE) {
+                     pytorch_safetensors = TRUE,
+                     log_dir = NULL) {
       # Init dependent parameters ----
       super$set_model_param("p_perm", p_perm)
 
@@ -341,7 +347,8 @@
         trace = trace,
         keras_trace = keras_trace,
         pytorch_trace = pytorch_trace,
-        pytorch_safetensors = pytorch_safetensors
+        pytorch_safetensors = pytorch_safetensors,
+        log_dir = log_dir
       )
     }
   )

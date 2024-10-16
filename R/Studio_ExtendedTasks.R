@@ -1,3 +1,4 @@
+# LargeDataSetForText ------------------------------------------------------------
 long_add_texts_to_dataset <- function(source_path,
                                       destination_path,
                                       destination_folder,
@@ -77,6 +78,7 @@ long_add_texts_to_dataset <- function(source_path,
   })
 }
 
+# TextEmbeddingModel --------------------------------------------------------------
 long_transform_text_to_embeddings <- function(source_path,
                                               destination_path,
                                               destination_folder,
@@ -117,6 +119,8 @@ long_transform_text_to_embeddings <- function(source_path,
     return(embeddings$n_rows())
   })
 }
+
+# Classifiers =====================================================================
 
 long_classifier <- function(classifier_type,
                             destination_path,
@@ -380,6 +384,7 @@ get_arguments_extended_task_TEClassifierRegular <- function() {
   ))
 }
 
+# Feature extractor --------------------------------------------------------------
 long_feature_extractor <- function(name,
                                    label,
                                    features,
@@ -452,4 +457,19 @@ long_feature_extractor <- function(name,
     # Returns message
     return("TEFeatureExtractor trained.")
   })
+}
+
+# Transformers =====================================================================
+
+long_create_transformer <- function(transformer_type, params) {
+  promises::future_promise({
+    do.call(aife_transformer_maker$make(transformer_type)$create, params)
+
+    # Returns message
+    return("Transformer created.")
+  })
+}
+
+long_train_transformer <- function(transformer_type) {
+  promises::future_promise({})
 }

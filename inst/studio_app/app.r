@@ -6,33 +6,54 @@ ui <- bslib::page_navbar(
   ),
   bslib::nav_panel(
     title = "Home",
-    Studio_Home_UI("Home")
+    aifeducation:::Studio_Home_UI("Home")
   ),
   bslib::nav_panel(
     title = "Data Management",
     bslib::navset_tab(
       bslib::nav_panel(
         title = "DataSetExplorer",
-        DataManagement_DataSetEditorUI("DataSetExplorer")
+        aifeducation:::DataManagement_DataSetEditorUI("DataSetExplorer")
       ),
       bslib::nav_panel(
         title = "LargeDataSet Creator",
-        DataManagement_RawTextsUI("DataSetRawTexts")
+        aifeducation:::DataManagement_RawTextsUI("DataSetRawTexts")
       ),
       bslib::nav_panel(
         title = "Table Editor",
-        DataManagement_TableEditorUI("TableEditor")
+        aifeducation:::DataManagement_TableEditorUI("TableEditor")
       )
     )
   ),
   bslib::nav_panel(
     title = "Base Models",
-    bslib::navset_underline(
-      bslib::nav_panel(
-        title = "Create"
+    bslib::page_sidebar(
+      sidebar = bslib::sidebar(
+        position = "left",
+        shiny::tags$h4("Sustainability Tracking"),
+        shinyWidgets::materialSwitch(
+          inputId = "is_sustainability_tracked",
+          label = "Activate",
+          value = TRUE,
+          right = TRUE,
+          status = "success"
+        ),
+        shiny::selectInput(
+          inputId = "sustainability_country",
+          label = "Country",
+          choices = aifeducation:::country_alpha_3_list,
+          selected = "DEU"
+        )
       ),
-      bslib::nav_panel(
-        title = "Train"
+      bslib::navset_underline(
+        bslib::nav_panel(
+          title = "Create",
+          aifeducation:::BaseModel_Create_UI("BaseModel_Create")
+        ),
+        bslib::nav_panel(
+          title = "Train",
+          aifeducation:::BaseModel_Train_UI("BaseModel_Train")
+        )
       )
     )
   ),
@@ -41,15 +62,15 @@ ui <- bslib::page_navbar(
     bslib::navset_tab(
       bslib::nav_panel(
         title = "Use",
-        TextEmbeddingModel_Use_UI("TextEmbeddingModel_Use")
+        aifeducation:::TextEmbeddingModel_Use_UI("TextEmbeddingModel_Use")
       ),
       bslib::nav_panel(
         title = "Create",
-        TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
+        aifeducation:::TextEmbeddingModel_Create_UI("TextEmbeddingModel_Create")
       ),
       bslib::nav_panel(
         title = "Document",
-        DocumentPage_UI("TextEmbeddingModel_Document", type = "TextEmbeddingModel")
+        aifeducation:::DocumentPage_UI("TextEmbeddingModel_Document", type = "TextEmbeddingModel")
       )
     )
   ),
@@ -58,15 +79,15 @@ ui <- bslib::page_navbar(
     bslib::navset_tab(
       bslib::nav_panel(
         title = "Use",
-        FeatureExtractors_Use_UI("FeatureExtractors_Use")
+        aifeducation:::FeatureExtractors_Use_UI("FeatureExtractors_Use")
       ),
       bslib::nav_panel(
         title = "Create",
-        FeatureExtractors_Create_UI("FeatureExtractors_Create")
+        aifeducation:::FeatureExtractors_Create_UI("FeatureExtractors_Create")
       ),
       bslib::nav_panel(
         title = "Document",
-        DocumentPage_UI("FeatureExtractors_Document", type = "FeatureExtractors")
+        aifeducation:::DocumentPage_UI("FeatureExtractors_Document", type = "FeatureExtractors")
       )
     )
   ),
@@ -75,21 +96,21 @@ ui <- bslib::page_navbar(
     bslib::navset_tab(
       bslib::nav_panel(
         title = "Use",
-        Classifiers_Use_UI("Classifiers_Use")
+        aifeducation:::Classifiers_Use_UI("Classifiers_Use")
       ),
       bslib::nav_panel(
         title = "Create",
-        Classifiers_Create_UI("Classifiers_Create")
+        aifeducation:::Classifiers_Create_UI("Classifiers_Create")
       ),
       bslib::nav_panel(
         title = "Document",
-        DocumentPage_UI("Classifiers_Document", type = "Classifiers")
+        aifeducation:::DocumentPage_UI("Classifiers_Document", type = "Classifiers")
       )
     )
   ),
   bslib::nav_panel(
     title = "License",
-    License_UI("GPL_3_License")
+    aifeducation:::License_UI("GPL_3_License")
   ),
   bslib::nav_menu(
     title = "Other",
@@ -106,76 +127,100 @@ server <- function(input, output, session) {
   volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
 
   # DataMangement
-  DataManagement_RawTextsServer(
+  aifeducation:::DataManagement_RawTextsServer(
     id = "DataSetRawTexts",
     log_dir = log_dir,
     volumes = volumes
   )
-  DataManagement_DataSetEditorServer(
+  aifeducation:::DataManagement_DataSetEditorServer(
     id = "DataSetExplorer",
     log_dir = log_dir,
     volumes = volumes
   )
-  DataManagement_TableEditorServer(
+  aifeducation:::DataManagement_TableEditorServer(
     id = "TableEditor",
     log_dir = log_dir,
     volumes = volumes
   )
 
+  # BaseModels
+
+  sustain_tracking <- shiny::reactive({
+    return(
+      list(
+        is_sustainability_tracked = input$is_sustainability_tracked,
+        sustainability_country = input$sustainability_country
+      )
+    )
+  })
+
+  aifeducation:::BaseModel_Create_Server(
+    id = "BaseModel_Create",
+    log_dir = log_dir,
+    volumes = volumes,
+    sustain_tracking = sustain_tracking
+  )
+  aifeducation:::BaseModel_Train_Server(
+    id = "BaseModel_Train",
+    log_dir = log_dir,
+    volumes = volumes,
+    sustain_tracking = sustain_tracking
+  )
+
   # TextEmbeddingModels
-  TextEmbeddingModel_Create_Server(
+  aifeducation:::TextEmbeddingModel_Create_Server(
     id = "TextEmbeddingModel_Create",
     log_dir = log_dir,
     volumes = volumes
   )
-  TextEmbeddingModel_Use_Server(
+  aifeducation:::TextEmbeddingModel_Use_Server(
     id = "TextEmbeddingModel_Use",
     log_dir = log_dir,
     volumes = volumes
   )
-  DocumentPage_Server(
+  aifeducation:::DocumentPage_Server(
     id = "TextEmbeddingModel_Document",
     volumes = volumes,
     type = "TextEmbeddingModel"
   )
 
   # FeatureExtractors
-  FeatureExtractor_Create_Server(
+  aifeducation:::FeatureExtractor_Create_Server(
     id = "FeatureExtractors_Create",
     log_dir = log_dir,
     volumes = volumes
   )
-  FeatureExtractors_Use_Server(
+  aifeducation:::FeatureExtractors_Use_Server(
     id = "FeatureExtractors_Use",
     log_dir = log_dir,
     volumes = volumes
   )
-  DocumentPage_Server(
+  aifeducation:::DocumentPage_Server(
     id = "FeatureExtractors_Document",
     volumes = volumes,
     type = "FeatureExtractors"
   )
 
   # Classifiers
-  Classifiers_Create_Server(
+  aifeducation:::Classifiers_Create_Server(
     id = "Classifiers_Create",
     log_dir = log_dir,
     volumes = volumes
   )
 
-  Classifiers_Use_Server(
+  aifeducation:::Classifiers_Use_Server(
     id = "Classifiers_Use",
     log_dir = log_dir,
     volumes = volumes
   )
-  DocumentPage_Server(
+  aifeducation:::DocumentPage_Server(
     id = "Classifiers_Document",
     volumes = volumes,
     type = "Classifier"
   )
 
   # License
-  License_Server(
+  aifeducation:::License_Server(
     "GPL_3_License"
   )
 

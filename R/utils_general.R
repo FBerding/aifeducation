@@ -162,7 +162,7 @@ cat_message <- function(msg, trace) {
 #'
 #' @return `TRUE` or `FALSE` depending on whether the shiny app is active.
 #' @family Utils
-#' @export
+#' @keywords internal
 create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TRUE) {
   if (!dir.exists(dir_path)) {
     output_message(msg, trace, msg_fun)
@@ -180,7 +180,7 @@ create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TR
 #' @importFrom reticulate py_run_file
 #'
 #' @family Utils
-#' @export
+#' @keywords internal
 run_py_file <- function(py_file_name) {
   reticulate::py_run_file(system.file("python", py_file_name, package = "aifeducation"))
 }

@@ -32,6 +32,8 @@ paramDesc.pytorch_safetensors <- function() {
   * `TRUE`: a 'pytorch' model is saved in safetensors format.
   * `FALSE` (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin). "
 }
+#' @keywords internal
+paramDesc.log_dir <- function() " Path to the directory where the log files should be saved. "
 
 # Create ----
 

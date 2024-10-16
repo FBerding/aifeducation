@@ -1,8 +1,17 @@
-def batch_iterator(dataset, batch_size = 200, report_to_shiny_app = False):
-    for i in range(0, len(dataset), batch_size):
-        if report_to_shiny_app:
-            r.py_update_aifeducation_progress_bar_steps(
-                value = min(i + batch_size, len(dataset)),
-                total = len(dataset),
-                title = ("Documents: " + str(min(i + batch_size, len(dataset))) + "/" + str(len(dataset))))
+def batch_iterator(dataset, batch_size = 200,
+                   log_file = None,
+                   value_top = 0, total_top = 1, message_top = "NA"):
+    last_log = None
+    dataset_len = len(dataset)
+    
+    for i in range(0, dataset_len, batch_size):
+        value_middle = min(i + batch_size, dataset_len)
+        if value_middle == dataset_len: # this is the last iteration
+          last_log = None
+        last_log = write_log_py(log_file,
+                                value_top = value_top, total_top = total_top, message_top = message_top,
+                                value_middle = value_middle,
+                                total_middle = dataset_len,
+                                message_middle = "Documents",
+                                last_log = last_log, write_interval = 0.5)
         yield dataset[i : i + batch_size]["text"]

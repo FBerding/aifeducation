@@ -11,7 +11,7 @@ start_aifeducation_studio <- function() {
   check_and_prepare_for_studio()
 
   # Set up for long running tasks
-  future::plan(future::multisession)
+  # future::plan(future::multisession)
 
   # Create App------------------------------------------------------------------
   shiny::shinyAppDir(

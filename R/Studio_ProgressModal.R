@@ -138,11 +138,11 @@ start_and_monitor_long_task <- function(id,
     print(log_path)
     print("Argument")
     print(ExtendedTask_type)
-    print(ExtendedTask_arguments)
+    # print(ExtendedTask_arguments)
 
     # Reset log
     reset_log(log_path = log_path)
-    if (ExtendedTask_type %in% c("classifier", "feature_extractor")) {
+    if (ExtendedTask_type %in% c("classifier", "feature_extractor", "train_transformer")) {
       reset_loss_log(
         log_path = paste0(dirname(log_path), "/aifeducation_loss.log"),
         epochs = ExtendedTask_arguments$epochs
@@ -151,7 +151,7 @@ start_and_monitor_long_task <- function(id,
 
     # Create progress modal
     progress_modal <- create_process_modal(
-      string_update_interval=update_intervall,
+      string_update_interval = update_intervall,
       ns = session$ns,
       inc_middle = pgr_use_middle,
       inc_bottom = pgr_use_bottom,
@@ -166,6 +166,7 @@ start_and_monitor_long_task <- function(id,
     save(args,
       file = paste0(getwd(), "/arguments.rda")
     )
+    future::plan(future::multisession)
 
     # Start ExtendedTask
     CurrentTask <- NULL
@@ -177,6 +178,10 @@ start_and_monitor_long_task <- function(id,
       CurrentTask <- shiny::ExtendedTask$new(long_classifier)
     } else if (ExtendedTask_type == "feature_extractor") {
       CurrentTask <- shiny::ExtendedTask$new(long_feature_extractor)
+    } else if (ExtendedTask_type == "create_transformer") {
+      CurrentTask <- shiny::ExtendedTask$new(long_create_transformer)
+    } else if (ExtendedTask_type == "train_transformer") {
+      CurrentTask <- shiny::ExtendedTask$new(long_train_transformer)
     }
     if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
 
@@ -257,9 +262,9 @@ start_and_monitor_long_task <- function(id,
 
 
     # Display progress on the progress modal
-    shiny::observe({
+    shiny::observeEvent(progress_bar_status(), {
       ids <- c("pgr_top", "pgr_middle", "pgr_bottom")
-      prgbars_status<-progress_bar_status()
+      prgbars_status <- progress_bar_status()
       prgbars <- list(prgbars_status$top, prgbars_status$middle, prgbars_status$bottom)
 
       for (i in 1:length(ids)) {
@@ -295,6 +300,10 @@ start_and_monitor_long_task <- function(id,
           type = "success",
           text = success_message
         )
+      }
+
+      if (CurrentTask$status() %in% c("success", "error")) {
+        future::plan(future::sequential)
       }
     })
 
