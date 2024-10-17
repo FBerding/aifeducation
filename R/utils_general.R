@@ -166,7 +166,7 @@ cat_message <- function(msg, trace) {
 create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TRUE) {
   if (!dir.exists(dir_path)) {
     output_message(msg, trace, msg_fun)
-    dir.create(dir_path)
+    dir.create(dir_path, recursive = TRUE)
   }
 }
 

@@ -18,9 +18,9 @@ BaseModel_Train_UI <- function(id) {
         shiny::tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
           id = ns("button_select_output_model_dir"),
-          label = "Train/tune a Base Model",
+          label = "Choose a Base Model",
           title = "Choose Destination",
-          icon = shiny::icon("floppy-disk")
+          icon = shiny::icon("folder-open")
         ),
         shiny::textInput(
           inputId = ns("output_model_dir_path"),
@@ -99,24 +99,10 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
       )
     })
 
-    output_model_dir <- shiny::eventReactive(input$output_model_dir_path, {
-      if (input$output_model_dir_path != "") {
-        return(input$output_model_dir_path)
-      } else {
-        return(NULL)
-      }
-    })
-
-
     # Main Panel ------------------------------------------------------------------
     BaseModel_Server(
       id = "BaseModel_BaseModel",
       volumes = volumes
     )
-    # ModelArchitecture_Server(
-    #   id = "BaseModel_ModelArchitecture",
-    #   log_dir = log_dir,
-    #   volumes = volumes,
-    #   sustain_tracking = sustain_tracking)
   })
 }

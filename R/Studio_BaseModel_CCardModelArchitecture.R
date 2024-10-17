@@ -137,14 +137,13 @@ ModelArchitecture_UI <- function(id) {
 #' @description Functions generates the functionality of a page on the server.
 #'
 #' @param id `string` determining the id for the namespace.
-#' @param log_dir `string` Path to the directory where the log files should be stored.
 #' @param volumes `vector` containing a named vector of available volumes.
 #' @return TODO (Yuliia)
 #'
 #' @family studio_gui_base_model_create_card_architecture
 #' @keywords internal
 #'
-ModelArchitecture_Server <- function(id, log_dir, volumes) {
+ModelArchitecture_Server <- function(id, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # Global variables -----------------------------------------------------------
     ns <- session$ns

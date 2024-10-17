@@ -18,9 +18,9 @@ BaseModel_Create_UI <- function(id) {
         shiny::tags$h3("Control Panel"),
         shinyFiles::shinyDirButton(
           id = ns("button_select_output_model_dir"),
-          label = "Create a Base Model",
+          label = "Choose Folder",
           title = "Choose Destination",
-          icon = shiny::icon("floppy-disk")
+          icon = shiny::icon("folder-open")
         ),
         shiny::textInput(
           inputId = ns("output_model_dir_path"),
@@ -31,8 +31,7 @@ BaseModel_Create_UI <- function(id) {
           inputId = ns("button_create"),
           label = "Start Creation",
           icon = shiny::icon("paper-plane")
-        ),
-        shiny::uiOutput(outputId = ns("sidebar_description"))
+        )
       ),
       # Main panel ------------------------------------------------------------------
       bslib::page(
@@ -74,19 +73,9 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
       )
     })
 
-    output_model_dir <- shiny::eventReactive(input$output_model_dir_path, {
-      if (input$output_model_dir_path != "") {
-        return(input$output_model_dir_path)
-      } else {
-        return(NULL)
-      }
-    })
-
-
     # Main Panel ------------------------------------------------------------------
     params_reactive <- ModelArchitecture_Server(
       id = "BaseModel_ModelArchitecture",
-      log_dir = log_dir,
       volumes = volumes
     )
 
@@ -111,6 +100,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
         errors <- append(errors, "Please specify a directory path for saving the model.")
       }
 
+      # If there is an error -------------------------------------------------------
       if (length(errors) != 0) {
         error_msg <- paste(errors, collapse = "<br>")
 
@@ -125,7 +115,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
             footer = shiny::modalButton("Close")
           )
         )
-      } else {
+      } else { # No errors ----------------------------------------------------------
         model_params <- params
         # Remove ai_method and dataset_file_path from model_params list
         model_params <- model_params[!names(model_params) %in% c("ai_method", "dataset_file_path")]
