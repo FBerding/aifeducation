@@ -461,8 +461,12 @@ long_feature_extractor <- function(name,
 
 # Transformers =====================================================================
 
-long_create_transformer <- function(transformer_type, params) {
+long_create_transformer <- function(transformer_type, dataset_file_path, params) {
   promises::future_promise({
+    raw_text_object <- load(dataset_file_path)
+    raw_texts <- get(x = raw_text_object)
+
+    params[["vocab_raw_texts"]] <- raw_texts$text
     do.call(aife_transformer_maker$make(transformer_type)$create, params)
 
     # Returns message

@@ -126,15 +126,11 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
           )
         )
       } else {
-        raw_text_object <- load(params$dataset_file_path)
-        raw_texts <- get(x = raw_text_object)
-
         model_params <- params
         # Remove ai_method and dataset_file_path from model_params list
         model_params <- model_params[!names(model_params) %in% c("ai_method", "dataset_file_path")]
         model_params[["ml_framework"]] <- "pytorch"
         model_params[["model_dir"]] <- input$output_model_dir_path
-        model_params[["vocab_raw_texts"]] <- raw_texts$text
         model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
         model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
         model_params[["log_dir"]] <- log_dir
@@ -144,6 +140,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
           ExtendedTask_type = "create_transformer",
           ExtendedTask_arguments = list(
             transformer_type = params$ai_method,
+            dataset_file_path = params$dataset_file_path,
             params = model_params
           ),
           log_path = log_path,

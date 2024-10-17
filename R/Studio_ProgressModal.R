@@ -138,7 +138,7 @@ start_and_monitor_long_task <- function(id,
     print(log_path)
     print("Argument")
     print(ExtendedTask_type)
-    # print(ExtendedTask_arguments)
+    print(ExtendedTask_arguments)
 
     # Reset log
     reset_log(log_path = log_path)
