@@ -45,9 +45,12 @@ for (framework in ml_frameworks) {
     root_path_results_model <- paste0(root_path_results, "/", method)
     create_dir(root_path_results_model, FALSE)
 
-    # Base Models
+    # BaseModels
+    transformer <- aife_transformer_maker$make(method)
+
+    # Create & Train -------------------------------------------------------------------
     if (method == "bert") {
-      create_bert_model(
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
         vocab_raw_texts = example_data$text,
@@ -64,10 +67,11 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
 
-      train_tune_bert_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
@@ -86,10 +90,10 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         trace = trace,
-        keras_trace = 0
+        keras_trace = 0,
+        log_dir = root_path_results_model
       )
     } else if (method == "mpnet") {
-      transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
@@ -109,7 +113,8 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         trace = TRUE,
-        pytorch_safetensors = TRUE
+        pytorch_safetensors = TRUE,
+        log_dir = root_path_results_model
       )
 
       transformer$train(
@@ -136,10 +141,11 @@ for (framework in ml_frameworks) {
         trace = TRUE,
         keras_trace = 1,
         pytorch_trace = 1,
-        pytorch_safetensors = TRUE
+        pytorch_safetensors = TRUE,
+        log_dir = root_path_results_model
       )
     } else if (method == "roberta") {
-      create_roberta_model(
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
         vocab_raw_texts = example_data$text,
@@ -156,9 +162,10 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
-      train_tune_roberta_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
@@ -176,10 +183,11 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         keras_trace = 0,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
     } else if (method == "longformer") {
-      create_longformer_model(
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
         vocab_raw_texts = example_data$text[1:500],
@@ -197,9 +205,10 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
-      train_tune_longformer_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
@@ -217,10 +226,11 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         keras_trace = 0,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
     } else if (method == "funnel") {
-      create_funnel_model(
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
         vocab_raw_texts = example_data$text,
@@ -237,9 +247,10 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
-      train_tune_funnel_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
@@ -259,16 +270,17 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         trace = trace,
-        keras_trace = 0
+        keras_trace = 0,
+        log_dir = root_path_results_model
       )
     } else if (method == "deberta_v2") {
-      create_deberta_v2_model(
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
         vocab_raw_texts = example_data$text,
         vocab_size = 10000,
-        do_lower_case = FALSE,
-        # add_prefix_space=FALSE,
+        vocab_do_lower_case = FALSE,
+        # add_prefix_space = FALSE,
         max_position_embeddings = 512,
         hidden_size = 32,
         num_hidden_layer = 2,
@@ -280,9 +292,10 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
-      train_tune_deberta_v2_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
@@ -301,7 +314,8 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         keras_trace = 0,
-        trace = trace
+        trace = trace,
+        log_dir = root_path_results_model
       )
     }
   }

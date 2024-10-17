@@ -259,32 +259,26 @@
           )
 
           print_message("Preparing Training of the Model", self$params$trace)
-
-          loss_file <- paste0(self$params$output_dir, "/aifeducation_loss.log")
-          log_file <- paste0(self$params$output_dir, "/aifeducation_state.log")
-
           # Create Custom Callbacks ----
+
           if (self$params$ml_framework == "tensorflow") {
             run_py_file("keras_callbacks.py")
-            logger <- py$create_AIFETransformerCSVLogger_TF(
-              loss_file = loss_file,
-              log_file = log_file,
-              value_top = 6,
-              total_top = 10,
-              message_top = "Overall: Training...",
-              min_step = 10
-            )
+            create_logger <- py$create_AIFETransformerCSVLogger_TF
           } else {
             run_py_file("pytorch_transformer_callbacks.py")
-            logger <- py$create_AIFETransformerCSVLogger_PT(
-              loss_file = loss_file,
-              log_file = log_file,
-              value_top = 6,
-              total_top = 10,
-              message_top = "Overall: Training...",
-              min_step = 10
-            )
+            create_logger <- py$create_AIFETransformerCSVLogger_PT
           }
+
+          logger_args <- list(
+            loss_file = self$temp$loss_file,
+            log_file = self$temp$log_file,
+            value_top = 6,
+            total_top = 10,
+            message_top = "Overall: Training...",
+            min_step = 10
+          )
+          logger <- do.call(create_logger, logger_args)
+
 
           if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
             self$temp$tf_train_dataset <- self$temp$model$prepare_tf_dataset(
@@ -745,20 +739,17 @@
         # Logging file
         run_py_file("py_log.py")
 
-        print(paste("log_dir", self$params$log_dir))
-
-        if (is.null(self$params$log_dir)) {
-          self$params$log_dir <- model_dir
+        self$temp$log_file <- NULL
+        if (!is.null(self$params$log_dir) && dir.exists(self$params$log_dir)) {
+          self$temp$log_file <- paste0(self$params$log_dir, "/aifeducation_state.log")
         }
-        log_file <- paste0(self$params$log_dir, "/aifeducation_state.log")
-        self$temp$log_file <- log_file
 
         total <- 10
         write_interval <- 0.5
         last_log <- NULL
 
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 0, total_top = total, message_top = paste(private$title, "Overall: Checking"),
           last_log = last_log, write_interval = write_interval
         )
@@ -778,7 +769,7 @@
 
         # Start Sustainability Tracking ---------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 1, total_top = total, message_top = paste(private$title, "Overall: Starting"),
           last_log = last_log, write_interval = write_interval
         )
@@ -797,7 +788,7 @@
 
         # Creating a new Tokenizer for Computing Vocabulary -------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 2, total_top = total, message_top = paste(private$title, "Overall: Tokenizer Draft"),
           last_log = last_log, write_interval = write_interval
         )
@@ -807,7 +798,7 @@
 
         # Calculating Vocabulary ----------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 3, total_top = total, message_top = paste(private$title, "Overall: Computing Vocabulary"),
           last_log = last_log, write_interval = write_interval
         )
@@ -822,7 +813,7 @@
 
         # Saving Tokenizer Draft ----------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 4, total_top = total, message_top = paste(private$title, "Overall: Saving Tokenizer Draft"),
           last_log = last_log, write_interval = write_interval
         )
@@ -833,7 +824,7 @@
 
         # Final Tokenizer -----------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 5, total_top = total, message_top = paste(private$title, "Overall: Creating Final Tokenizer"),
           last_log = last_log, write_interval = write_interval
         )
@@ -855,7 +846,7 @@
 
         # Creating Transformer Model ------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 6, total_top = total, message_top = paste(private$title, "Overall: Creating Transformer Model"),
           last_log = last_log, write_interval = write_interval
         )
@@ -868,7 +859,7 @@
 
         # Saving Model --------------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 7, total_top = total, message_top = paste(private$title, "Overall: Saving Model"),
           last_log = last_log, write_interval = write_interval
         )
@@ -879,7 +870,7 @@
 
         # Saving Tokenizer ----------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 8, total_top = total, message_top = paste(private$title, "Overall: Saving Tokenizer"),
           last_log = last_log, write_interval = write_interval
         )
@@ -888,7 +879,7 @@
 
         # Stop Sustainability Tracking if requested ----------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 9, total_top = total, message_top = paste(private$title, "Overall: Stopping"),
           last_log = last_log, write_interval = write_interval
         )
@@ -901,7 +892,7 @@
 
         # Finish --------------------------------------------------------------------
         py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 10, total_top = total, message_top = paste(private$title, "Overall: Done"),
           last_log = NULL, write_interval = write_interval
         )
@@ -1006,18 +997,21 @@
         # Logging file
         run_py_file("py_log.py")
 
-        if (is.null(self$params$log_dir)) {
-          self$params$log_dir <- output_dir
+        self$temp$log_file <- NULL
+        self$temp$loss_file <- NULL
+        if (!is.null(self$params$log_dir) && dir.exists(self$params$log_dir)) {
+          self$temp$log_file <- paste0(self$params$log_dir, "/aifeducation_state.log")
+          self$temp$loss_file <- paste0(self$params$log_dir, "/aifeducation_loss.log")
+        } else {
+          self$temp$loss_file <- paste0(self$params$output_dir, "/aifeducation_loss.log")
         }
-        log_file <- paste0(self$params$log_dir, "/aifeducation_state.log")
-        self$temp$log_file <- log_file
 
         total <- 10
         write_interval <- 0.5
         last_log <- NULL
 
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 0, total_top = total, message_top = paste(private$title, "Overall: Checking"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1036,7 +1030,7 @@
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
 
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 1, total_top = total, message_top = paste(private$title, "Overall: Starting"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1056,7 +1050,7 @@
 
         # Loading existing model ----------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 2, total_top = total, message_top = paste(private$title, "Overall: Loading Existing Model"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1073,7 +1067,7 @@
 
         # argument checking------------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 3, total_top = total, message_top = paste(private$title, "Overall: Checking"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1083,7 +1077,7 @@
 
         # creating chunks of sequences ----------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 4, total_top = total, message_top = paste(private$title, "Overall: Creating Chunks of Sequences"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1096,7 +1090,7 @@
 
         # Seeting up DataCollator and Dataset ----------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 5, total_top = total,
           message_top = paste(private$title, "Overall: Seeting up DataCollator and Dataset"),
           last_log = last_log, write_interval = write_interval
@@ -1109,7 +1103,7 @@
 
         # Start Training -------------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 6, total_top = total, message_top = paste(private$title, "Overall: Start Training"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1119,7 +1113,7 @@
 
         # Saving Model --------------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 7, total_top = total, message_top = paste(private$title, "Overall: Saving Model"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1130,7 +1124,7 @@
 
         # Saving Tokenizer -----------------------------------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 8, total_top = total, message_top = paste(private$title, "Overall: Saving Tokenizer"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1140,7 +1134,7 @@
 
         # Stop Sustainability Tracking if requested ----------------------------------
         last_log <- py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 9, total_top = total, message_top = paste(private$title, "Overall: Stopping"),
           last_log = last_log, write_interval = write_interval
         )
@@ -1154,7 +1148,7 @@
 
         # Finish --------------------------------------------------------------------
         py$write_log_py(
-          log_file,
+          self$temp$log_file,
           value_top = 10, total_top = total, message_top = paste(private$title, "Overall: Done"),
           last_log = NULL, write_interval = write_interval
         )
