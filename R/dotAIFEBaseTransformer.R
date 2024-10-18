@@ -825,7 +825,8 @@
         # Final Tokenizer -----------------------------------------------------------
         last_log <- py$write_log_py(
           self$temp$log_file,
-          value_top = 5, total_top = total, message_top = paste(private$title, "Overall: Creating Final Tokenizer"),
+          value_top = 5, total_top = total,
+          message_top = paste(private$title, "Overall: Creating Final Tokenizer & Calculating Statistics"),
           last_log = last_log, write_interval = write_interval
         )
 
@@ -836,10 +837,15 @@
         }
         print_message("Creating Tokenizer - Done", trace)
 
+        # Calculate tokenizer statistics -------------------------------------------
+
         tokenized_texts_raw <- tokenize_dataset(
           dataset = self$temp$raw_text_dataset,
           tokenizer = self$temp$tokenizer,
-          max_length = 2048
+          max_length = 2048,
+          log_file = self$temp$log_file,
+          value_top = 5, total_top = total,
+          message_top = paste(private$title, "Overall: Creating Final Tokenizer & Calculating Statistics")
         )
 
         private$update_tokenizer_statistics(tokenized_texts_raw, "creation")
@@ -1078,7 +1084,8 @@
         # creating chunks of sequences ----------------------------------------------
         last_log <- py$write_log_py(
           self$temp$log_file,
-          value_top = 4, total_top = total, message_top = paste(private$title, "Overall: Creating Chunks of Sequences"),
+          value_top = 4, total_top = total,
+          message_top = paste(private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics"),
           last_log = last_log, write_interval = write_interval
         )
 

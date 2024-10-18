@@ -1,6 +1,10 @@
 import transformers
 import datetime
 
+global current_batch
+current_batch = 0
+last_log = None
+
 def tokenize_raw_text(
     dataset,
     tokenizer,
@@ -14,7 +18,12 @@ def tokenize_raw_text(
     return_attention_mask,
     return_tensors,
     request_word_ids = False,
-    report_to_aifeducation_studio = False):
+    log_file = None,
+    value_top = 0, total_top = 1, message_top = "NA",
+    total_middle = 1):
+      
+    global current_batch
+    global last_log
       
     outputs = tokenizer(
         dataset["text"],
@@ -39,7 +48,7 @@ def tokenize_raw_text(
     attention_masks_batch = []
     special_tokens_mask_batch = []
     length_batch = []
-  
+
     for length, input_ids, attention_mask, special_tokens_mask in zip(outputs["length"], outputs["input_ids"], outputs["attention_mask"], outputs["special_tokens_mask"]):
         if not length == max_length:
             padded_output = padding_collator({ "input_ids": [input_ids],
@@ -65,13 +74,16 @@ def tokenize_raw_text(
             for i in range(len(outputs["input_ids"])):
                 word_ids_batch.append(outputs.word_ids(i)) 
             results["word_ids"] = word_ids_batch
-            
     
-    if report_to_aifeducation_studio == True:
-        report_time = datetime.datetime.now()
-        r.py_update_aifeducation_progress_bar_steps(
-            value = 0,
-            total = 1,
-            title = ("Add: " + str(len(results)) + " Chunks. Last Update: " + report_time.strftime("%c")))
+    current_batch = current_batch + 1
     
+    if current_batch == total_middle: # this is the last iteration
+      last_log = None
+    last_log = write_log_py(log_file,
+                            value_top = value_top, total_top = total_top, message_top = message_top,
+                            value_middle = current_batch,
+                            total_middle = total_middle,
+                            message_middle = "Batches",
+                            last_log = last_log, write_interval = 0.5)
+
     return results

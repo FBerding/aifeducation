@@ -510,13 +510,17 @@ Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-tokenize_dataset <- function(dataset, tokenizer, max_length) {
+tokenize_dataset <- function(dataset, tokenizer, max_length,
+                             log_file = NULL,
+                             value_top = 0, total_top = 1, message_top = "NA") {
   run_py_file("datasets_transformer_prepare_data.py")
+
+  batch_size = 2L
 
   tokenized_texts_raw <- dataset$map(
     py$tokenize_raw_text,
     batched = TRUE,
-    batch_size = 2L,
+    batch_size = batch_size,
     fn_kwargs = reticulate::dict(
       list(
         tokenizer = tokenizer,
@@ -530,7 +534,9 @@ tokenize_dataset <- function(dataset, tokenizer, max_length) {
         return_attention_mask = TRUE,
         return_tensors = "np",
         request_word_ids = TRUE,
-        report_to_aifeducation_studio = FALSE
+        log_file = log_file,
+        value_top = value_top, total_top = total_top, message_top = message_top,
+        total_middle = floor(dataset$num_rows / batch_size)
       )
     ),
     remove_columns = dataset$column_names
