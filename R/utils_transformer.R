@@ -366,6 +366,7 @@ Bert_like.SFC.calculate_vocab <- function(self) { # nolint
       batch_size = as.integer(200),
       dataset = self$temp$raw_text_dataset,
       log_file = self$temp$log_file,
+      write_interval = self$params$log_write_interval,
       value_top = self$temp$value_top,
       total_top = self$temp$total_top,
       message_top = self$temp$message_top
@@ -469,6 +470,7 @@ Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
       batch_size = as.integer(200),
       dataset = self$temp$raw_text_dataset,
       log_file = self$temp$log_file,
+      write_interval = self$params$log_write_interval,
       value_top = self$temp$value_top,
       total_top = self$temp$total_top,
       message_top = self$temp$message_top
@@ -511,7 +513,7 @@ Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
 #' @keywords internal
 #' @noRd
 tokenize_dataset <- function(dataset, tokenizer, max_length,
-                             log_file = NULL,
+                             log_file = NULL, write_interval = 2,
                              value_top = 0, total_top = 1, message_top = "NA") {
   run_py_file("datasets_transformer_prepare_data.py")
 
@@ -535,6 +537,7 @@ tokenize_dataset <- function(dataset, tokenizer, max_length,
         return_tensors = "np",
         request_word_ids = TRUE,
         log_file = log_file,
+        write_interval = write_interval,
         value_top = value_top, total_top = total_top, message_top = message_top,
         total_middle = floor(dataset$num_rows / batch_size)
       )

@@ -172,6 +172,7 @@
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
     #' @param log_dir `r paramDesc.log_dir()`
+    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
     #' @param target_hidden_size `r paramDesc.target_hidden_size()`
@@ -205,7 +206,8 @@
                       sustain_interval = 15,
                       trace = TRUE,
                       pytorch_safetensors = TRUE,
-                      log_dir = NULL) {
+                      log_dir = NULL,
+                      log_write_interval = 2) {
       # Init dependent parameters ----
       super$set_model_param("vocab_do_lower_case", vocab_do_lower_case)
       super$set_model_param("target_hidden_size", target_hidden_size)
@@ -237,7 +239,8 @@
         sustain_interval = sustain_interval,
         trace = trace,
         pytorch_safetensors = pytorch_safetensors,
-        log_dir = log_dir
+        log_dir = log_dir,
+        log_write_interval = log_write_interval
       )
     },
 
@@ -264,6 +267,7 @@
     #' @param keras_trace `r paramDesc.keras_trace()`
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
     #' @param log_dir `r paramDesc.log_dir()`
+    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
     train = function(ml_framework = "pytorch",
@@ -289,7 +293,8 @@
                      keras_trace = 1,
                      pytorch_trace = 1,
                      pytorch_safetensors = TRUE,
-                     log_dir = NULL) {
+                     log_dir = NULL,
+                     log_write_interval = 2) {
       # Define steps for training (SFT) ----
       # Required steps
       super$set_SFT_load_existing_model(private$steps_for_training$load_existing_model)
@@ -319,7 +324,8 @@
         keras_trace = keras_trace,
         pytorch_trace = pytorch_trace,
         pytorch_safetensors = pytorch_safetensors,
-        log_dir = log_dir
+        log_dir = log_dir,
+        log_write_interval = log_write_interval
       )
     }
   )

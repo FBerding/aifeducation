@@ -18,7 +18,7 @@ def tokenize_raw_text(
     return_attention_mask,
     return_tensors,
     request_word_ids = False,
-    log_file = None,
+    log_file = None, write_interval = 2,
     value_top = 0, total_top = 1, message_top = "NA",
     total_middle = 1):
       
@@ -84,6 +84,6 @@ def tokenize_raw_text(
                             value_middle = current_batch,
                             total_middle = total_middle,
                             message_middle = "Batches",
-                            last_log = last_log, write_interval = 0.5)
+                            last_log = last_log, write_interval = write_interval)
 
     return results

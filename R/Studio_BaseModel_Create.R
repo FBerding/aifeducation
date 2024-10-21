@@ -124,6 +124,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
         model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
         model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
         model_params[["log_dir"]] <- log_dir
+        model_params[["log_write_interval"]] <- 2
 
         start_and_monitor_long_task(
           id = id,
@@ -136,7 +137,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
           log_path = log_path,
           pgr_use_middle = TRUE,
           success_type = "create_transformer",
-          update_intervall = 0.5
+          update_intervall = 2
         )
       }
     })

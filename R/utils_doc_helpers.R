@@ -34,6 +34,11 @@ paramDesc.pytorch_safetensors <- function() {
 }
 #' @keywords internal
 paramDesc.log_dir <- function() " Path to the directory where the log files should be saved. "
+#' @keywords internal
+paramDesc.log_write_interval <- function() {
+  " `int` Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
+  if `log_dir` is not `NULL`. "
+}
 
 # Create ----
 

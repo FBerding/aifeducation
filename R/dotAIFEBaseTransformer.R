@@ -129,7 +129,8 @@
                                         sustain_interval,
                                         trace,
                                         pytorch_safetensors,
-                                        log_dir) {
+                                        log_dir,
+                                        log_write_interval) {
       self$set_model_param("ml_framework", ml_framework)
       self$set_model_param("sustain_track", sustain_track)
       self$set_model_param("sustain_iso_code", sustain_iso_code)
@@ -138,6 +139,7 @@
       self$set_model_param("trace", trace)
       self$set_model_param("pytorch_safetensors", pytorch_safetensors)
       self$set_model_param("log_dir", log_dir)
+      self$set_model_param("log_write_interval", log_write_interval)
     },
 
 
@@ -690,6 +692,7 @@
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
     #' @param log_dir `r paramDesc.log_dir()`
+    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
@@ -710,7 +713,8 @@
                       sustain_interval,
                       trace,
                       pytorch_safetensors,
-                      log_dir = NULL) {
+                      log_dir,
+                      log_write_interval) {
       tryCatch({
         private$define_required_SFC_functions()
         # Init model parameters -----------------------------------------------------
@@ -719,7 +723,7 @@
           ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
           trace, pytorch_safetensors,
-          log_dir
+          log_dir, log_write_interval
         )
         # Each transformer has these parameters in the case of creation ----
         self$set_model_param("model_dir", model_dir)
@@ -745,7 +749,7 @@
         }
 
         total <- 10
-        write_interval <- 0.5
+        write_interval <- self$params$log_write_interval
         last_log <- NULL
 
         last_log <- py$write_log_py(
@@ -844,6 +848,7 @@
           tokenizer = self$temp$tokenizer,
           max_length = 2048,
           log_file = self$temp$log_file,
+          write_interval = write_interval,
           value_top = 5, total_top = total,
           message_top = paste(private$title, "Overall: Creating Final Tokenizer & Calculating Statistics")
         )
@@ -939,6 +944,7 @@
     #' @param keras_trace `r paramDesc.keras_trace()`
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
     #' @param log_dir `r paramDesc.log_dir()`
+    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
@@ -968,7 +974,8 @@
                      keras_trace,
                      pytorch_trace,
                      pytorch_safetensors,
-                     log_dir = NULL) {
+                     log_dir,
+                     log_write_interval) {
       tryCatch({
         private$define_required_SFT_functions()
         # Init model parameters -----------------------------------------------------
@@ -977,7 +984,7 @@
           ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
           trace, pytorch_safetensors,
-          log_dir
+          log_dir, log_write_interval
         )
         # Each transformer has these parameters in the case of training ----
         self$set_model_param("output_dir", output_dir)
@@ -1013,7 +1020,7 @@
         }
 
         total <- 10
-        write_interval <- 0.5
+        write_interval <- self$params$log_write_interval
         last_log <- NULL
 
         last_log <- py$write_log_py(
