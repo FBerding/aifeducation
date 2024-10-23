@@ -283,7 +283,7 @@ ModelArchitecture_Server <- function(id, volumes) {
       input = input,
       id = "button_select_dataset",
       roots = volumes,
-      filetype = c("rda", "rdata"),
+      filetype = c("rda", "rdata")
     )
     shiny::observeEvent(input$button_select_dataset, {
       tmp_file_path <- shinyFiles::parseFilePaths(volumes, input$button_select_dataset)
@@ -292,13 +292,6 @@ ModelArchitecture_Server <- function(id, volumes) {
           inputId = "dataset_file_path",
           value = tmp_file_path[[1, "datapath"]]
         )
-      }
-    })
-    dataset_file_path <- shiny::eventReactive(input$dataset_file_path, {
-      if (input$dataset_file_path != "") {
-        return(input$dataset_file_path)
-      } else {
-        return(NULL)
       }
     })
 

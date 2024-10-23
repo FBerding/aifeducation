@@ -24,7 +24,7 @@ BaseModel_Create_UI <- function(id) {
         ),
         shiny::textInput(
           inputId = ns("output_model_dir_path"),
-          label = shiny::tags$p(shiny::icon("folder"), "Path to Base Model"),
+          label = shiny::tags$p(shiny::icon("folder"), "Path for saiving the created Base Model"),
           width = "100%"
         ),
         shiny::actionButton(
@@ -90,7 +90,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
       if (params$dataset_file_path == "") {
         errors <- append(errors, "Please specify a path to the raw texts for a vocabulary.")
       } else if (!file.exists(params$dataset_file_path)) {
-        errors <- append(errors, paste0(
+        errors <- append(errors, paste(
           "Path to the raw texts for a vocabulary is not valid - there is no such file path",
           dQuote(params$dataset_file_path)
         ))
