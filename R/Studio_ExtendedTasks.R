@@ -474,6 +474,15 @@ long_create_transformer <- function(transformer_type, dataset_file_path, params)
   })
 }
 
-long_train_transformer <- function(transformer_type) {
-  promises::future_promise({})
+long_train_transformer <- function(transformer_type, raw_texts_file_path, params) {
+  promises::future_promise({
+    raw_text_object <- load(raw_texts_file_path)
+    raw_texts <- get(x = raw_text_object)
+
+    params[["raw_texts"]] <- raw_texts$text
+    do.call(aife_transformer_maker$make(transformer_type)$train, params)
+
+    # Returns message
+    return("Transformer trained.")
+  })
 }
