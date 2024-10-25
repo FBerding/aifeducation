@@ -162,39 +162,46 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
           )
         )
       } else { # No errors ----------------------------------------------------------
+        sustain_tracking <- sustain_tracking()
+
+        TransformerType <- list(
+          BertModel = "bert",
+          DebertaV2ForMaskedLM = "deberta_v2",
+          FunnelModel = "funnel",
+          LongformerModel = "longformer",
+          MPNetForMPLM_PT = "mpnet",
+          RobertaModel = "roberta"
+        )
+        transformer_type <- TransformerType[[model_architecture$model_architecture]]
+
         model_params <- params_reactive()
-        print(model_params)
 
-        # model_architecture is:
-        # params <- list(
-        #   model_exists = model_exists,
-        #   model_dir_path = model_path,
-        #   model_architecture = model_architecture,
-        #   max_position_embeddings = max_position_embeddings
-        # )
+        model_params[["ml_framework"]] <- "pytorch"
+        model_params[["output_dir"]] <- input$output_model_dir_path
+        model_params[["model_dir_path"]] <- model_architecture$model_dir_path
+        model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
+        model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
+        model_params[["n_workers"]] <- 1
+        model_params[["multi_process"]] <- FALSE
+        model_params[["keras_trace"]] <- 0
+        model_params[["pytorch_trace"]] <- 0
+        model_params[["log_dir"]] <- log_dir
+        model_params[["log_write_interval"]] <- 2
 
-        # model_params <- list()
-        # model_params[["ml_framework"]] <- "pytorch"
-        # model_params[["output_dir"]] <- input$output_model_dir_path
-        # model_params[["model_dir_path"]] <- model_architecture$model_dir_path
-        # model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
-        # model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
-        # model_params[["log_dir"]] <- log_dir
-        # model_params[["log_write_interval"]] <- 2
-        #
-        # start_and_monitor_long_task(
-        #   id = id,
-        #   ExtendedTask_type = "train_transformer",
-        #   ExtendedTask_arguments = list(
-        #     # transformer_type = params$ai_method,
-        #     raw_texts_file_path = raw_texts_file_path,
-        #     params = model_params
-        #   ),
-        #   log_path = log_path,
-        #   pgr_use_middle = TRUE,
-        #   success_type = "create_transformer",
-        #   update_intervall = 2
-        # )
+        start_and_monitor_long_task(
+          id = id,
+          ExtendedTask_type = "train_transformer",
+          ExtendedTask_arguments = list(
+            transformer_type = transformer_type,
+            raw_texts_file_path = raw_texts_file_path,
+            params = model_params
+          ),
+          log_path = log_path,
+          pgr_use_middle = TRUE,
+          pgr_use_graphic = TRUE,
+          success_type = "train_transformer",
+          update_intervall = 2
+        )
       }
     })
   })

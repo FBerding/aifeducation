@@ -142,10 +142,16 @@ start_and_monitor_long_task <- function(id,
 
     # Reset log
     reset_log(log_path = log_path)
-    if (ExtendedTask_type %in% c("classifier", "feature_extractor", "train_transformer")) {
+    loss_log_path <- paste0(dirname(log_path), "/aifeducation_loss.log")
+    if (ExtendedTask_type %in% c("classifier", "feature_extractor")) {
       reset_loss_log(
-        log_path = paste0(dirname(log_path), "/aifeducation_loss.log"),
+        log_path = loss_log_path,
         epochs = ExtendedTask_arguments$epochs
+      )
+    } else if (ExtendedTask_type == "train_transformer") {
+      reset_loss_log(
+        log_path = loss_log_path,
+        epochs = ExtendedTask_arguments$params$n_epoch
       )
     }
 
@@ -207,7 +213,7 @@ start_and_monitor_long_task <- function(id,
 
         loss_data <- NULL
         if (pgr_use_graphic == TRUE) {
-          path_loss <- paste0(dirname(log_path), "/aifeducation_loss.log")
+          path_loss <- loss_log_path
           loss_data <- read_loss_log(path_loss)
         }
 

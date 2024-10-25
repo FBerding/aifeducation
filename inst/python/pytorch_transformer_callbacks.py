@@ -14,11 +14,13 @@ def create_AIFETransformerCSVLogger_PT(loss_file,
     
     def _write_loss(self):
       history = list()
+      
       history.append(self.train_loss)
       history.append(self.eval_loss)
+      
       if len(self.test_loss) != 0:
         history.append(self.test_loss)
-        
+      
       self.last_log_loss = write_log_performance_py(loss_file,
                                                     history = history, 
                                                     last_log = self.last_log_loss, write_interval = log_write_interval)
@@ -58,7 +60,8 @@ def create_AIFETransformerCSVLogger_PT(loss_file,
         if "test_loss" in logs:
           self.test_loss.append(logs["test_loss"])
         
-        self._write_loss()
+        if self.train_loss == self.eval_loss:
+          self._write_loss()
   
   return AIFETransformerCSVLogger()
     
