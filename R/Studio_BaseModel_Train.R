@@ -198,6 +198,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,
+          pgr_use_bottom = TRUE,
           pgr_use_graphic = TRUE,
           success_type = "train_transformer",
           update_intervall = 2

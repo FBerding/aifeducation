@@ -282,7 +282,7 @@
             value_top = 6,
             total_top = 10,
             message_top = "Overall: Training...",
-            min_step = 10
+            min_step = 1
           )
           logger <- do.call(create_logger, logger_args)
 
