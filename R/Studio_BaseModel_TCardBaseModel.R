@@ -30,7 +30,7 @@ BaseModel_UI <- function(id) {
 #'
 #' @param id `string` determining the id for the namespace.
 #' @param volumes `vector` containing a named vector of available volumes.
-#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#' @return Returns errors or `list` with the base model parameters.
 #'
 #' @family studio_gui_base_model_train_card_base_model
 #' @keywords internal

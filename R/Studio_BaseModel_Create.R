@@ -1,5 +1,5 @@
 #' @title Graphical user interface for base models - create
-#' @description Functions generates the page for using a [].
+#' @description Functions generates the page for using the [.AIFE*Transformer]s.
 #'
 #' @param id `string` determining the id for the namespace.
 #' @return This function does nothing return. It is used to build a page for a shiny app.
@@ -47,6 +47,7 @@ BaseModel_Create_UI <- function(id) {
 #' @param id `string` determining the id for the namespace.
 #' @param log_dir `string` Path to the directory where the log files should be stored.
 #' @param volumes `vector` containing a named vector of available volumes.
+#' @param sustain_tracking `list` with the sustainability tracking parameters.
 #' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
 #' @family studio_gui_page_base_model_create
@@ -104,16 +105,11 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
       if (length(errors) != 0) {
         error_msg <- paste(errors, collapse = "<br>")
 
-        shiny::showModal(
-          shiny::modalDialog(
-            title = shiny::tagList(
-              shiny::tags$i(class = "fa fa-exclamation-triangle", style = "color: red;"),
-              "Creation error(s)"
-            ),
-            shiny::HTML(error_msg),
-            easyClose = FALSE,
-            footer = shiny::modalButton("Close")
-          )
+        shinyWidgets::show_alert(
+          title = "Creation error(s)",
+          text = shiny::HTML(error_msg),
+          html = TRUE,
+          type = "error"
         )
       } else { # No errors ----------------------------------------------------------
         model_params <- params

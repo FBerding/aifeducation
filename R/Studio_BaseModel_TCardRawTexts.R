@@ -32,7 +32,7 @@ RawTexts_UI <- function(id) {
 #'
 #' @param id `string` determining the id for the namespace.
 #' @param volumes `vector` containing a named vector of available volumes.
-#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#' @return `string` Path to the raw texts for training the transformers.
 #'
 #' @family studio_gui_base_model_train_card_raw_texts
 #' @keywords internal

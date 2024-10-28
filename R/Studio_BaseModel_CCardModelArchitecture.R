@@ -101,7 +101,6 @@ ModelArchitecture_UI <- function(id) {
             bslib::card(
               bslib::card_header("Vocabulary"),
               bslib::card_body(
-                # shiny::fileInput(shiny::NS(id, "file1"), "Choose CSV File", accept = ".csv"),
                 shinyFiles::shinyFilesButton(
                   id = ns("button_select_dataset"),
                   label = "Choose File",
@@ -138,7 +137,7 @@ ModelArchitecture_UI <- function(id) {
 #'
 #' @param id `string` determining the id for the namespace.
 #' @param volumes `vector` containing a named vector of available volumes.
-#' @return TODO (Yuliia)
+#' @return `list` of the parameters for creation the transformers.
 #'
 #' @family studio_gui_base_model_create_card_architecture
 #' @keywords internal

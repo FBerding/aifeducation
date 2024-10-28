@@ -19,7 +19,8 @@ TrainTuneSettings_UI <- function(id) {
 #' @description Functions generates the functionality of a page on the server.
 #'
 #' @param id `string` determining the id for the namespace.
-#' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
+#' @param model_architecture `list` with model architecture parameters from the BaseModel card.
+#' @return Returns `NULL` or `list` of the parameters for training the transformers.
 #'
 #' @family studio_gui_base_model_train_card_train_tune_settings
 #' @keywords internal
