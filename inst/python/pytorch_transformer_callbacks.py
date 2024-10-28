@@ -60,7 +60,7 @@ def create_AIFETransformerCSVLogger_PT(loss_file,
         if "test_loss" in logs:
           self.test_loss.append(logs["test_loss"])
         
-        if self.train_loss == self.eval_loss:
+        if len(self.eval_loss) == len(self.train_loss):
           self._write_loss()
   
   return AIFETransformerCSVLogger()
