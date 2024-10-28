@@ -199,7 +199,12 @@
           tokenized_texts_raw <- tokenize_dataset(
             dataset = raw_text_dataset,
             tokenizer = self$temp$tokenizer,
-            max_length = self$params$chunk_size
+            max_length = self$params$chunk_size,
+            log_file = self$temp$log_file,
+            write_interval = self$temp$write_interval,
+            value_top = self$temp$value_top,
+            total_top = self$temp$total_top,
+            message_top = self$temp$message_top
           )
 
           length_vector <- tokenized_texts_raw["length"]
@@ -1095,6 +1100,11 @@
           message_top = paste(private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics"),
           last_log = last_log, write_interval = write_interval
         )
+
+        self$temp$write_interval <- write_interval
+        self$temp$value_top <- 4
+        self$temp$total_top <- total
+        self$temp$message_top <- paste(private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics")
 
         print_message("Creating Chunks of Sequences for Training", trace)
         private$steps_for_training$create_chunks_for_training(self)
