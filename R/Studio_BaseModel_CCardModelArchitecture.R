@@ -252,8 +252,6 @@ ModelArchitecture_Server <- function(id, volumes) {
     modelBasedReactiveParams <- shiny::reactive({
       params <- list()
       if (input$base_architecture_type %in% c("bert", "roberta", "deberta_v2", "mpnet")) {
-        print("num_hidden_layer" %in% input)
-        print("num_hidden_layer" %in% output)
         params <- list(
           num_hidden_layer = input$num_hidden_layer
         )
