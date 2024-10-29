@@ -26,8 +26,8 @@ set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 
 # Load Embeddings
-# object is imdb_embeddings
-load(paste0(root_path_data, "/imdb_embeddings.rda"))
+imdb_embeddings=load_from_disk(paste0(root_path_data, "/imdb_embeddings"))
+
 test_embeddings_large <- imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
 test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
 
