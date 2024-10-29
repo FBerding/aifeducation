@@ -912,7 +912,7 @@ TEClassifierRegular <- R6::R6Class(
 
       # Add classifier specific data
       # Load R file
-      config_file <- load_R_interface(dir_path)
+      config_file <- load_R_config_state(dir_path)
 
       # Set Reliability measures
       self$reliability <- list(
@@ -1602,6 +1602,7 @@ TEClassifierRegular <- R6::R6Class(
         # Generate pseudo labels
         pseudo_data <- private$estimate_pseudo_labels(
           unlabeled_data = data_manager$get_unlabeled_data(),
+          val_data=val_data,
           current_step = step
         )
 
@@ -1682,6 +1683,7 @@ TEClassifierRegular <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     estimate_pseudo_labels = function(unlabeled_data,
+                                      val_data,
                                       current_step) {
       # Predict pseudo labels for unlabeled data
       predicted_labels <- self$predict(
@@ -1697,6 +1699,12 @@ TEClassifierRegular <- R6::R6Class(
       )
       rownames(new_categories) <- rownames(predicted_labels)
       colnames(new_categories) <- c("cat", "prob")
+
+      #Correct probabilities for reliability on the validation data
+      predicted_labels<-private$pseudo_labels_correct_prob(
+        predictions=predicted_labels,
+        val_data=val_data
+      )
 
       # Gather information for every case. That is the category with the
       # highest probability and save both
@@ -1754,6 +1762,48 @@ TEClassifierRegular <- R6::R6Class(
       )
 
       return(pseudo_data)
+    },
+    #--------------------------------------------------------------------------
+    pseudo_labels_correct_prob=function(predictions,val_data){
+      #Predict on val data
+      val_predictions <- self$predict(
+        newdata = val_data,
+        ml_trace = self$last_training$config$ml_trace,
+        batch_size = self$last_training$config$batch_size
+      )
+      val_pred_cat <- val_predictions$expected_category
+      names(val_pred_cat) <- rownames(val_predictions)
+      val_pred_cat <- val_pred_cat[val_data["id"]]
+
+      #Calculate Assignment Error Matrix
+      val_data$set_format("np")
+      val_iota_object<-iotarelr::check_new_rater(
+        true_values = factor(
+          x = val_data["labels"],
+          levels = 0:(length(self$model_config$target_levels) - 1),
+          labels = self$model_config$target_levels
+        ),
+        assigned_values = val_pred_cat,
+        free_aem = TRUE
+      )
+
+      #Estimate probability of each category
+      aem=val_iota_object$categorical_level$raw_estimates$assignment_error_matrix
+      class_sizes=val_iota_object$information$est_true_cat_sizes
+      p_cat=class_sizes%*%aem
+
+      #Estimate probability that the category is the true category
+      p_cat_true=class_sizes*diag(aem)/p_cat
+      p_cat_true=replace(p_cat_true,list=is.nan(p_cat_true),values=0)
+
+      #Correct probabilities
+      number_columns=ncol(predictions)
+      col=ncol(predictions)-1
+      for(i in 1:nrow(predictions)){
+        predictions[i,1:col]<-predictions[i,1:col]*p_cat_true/sum(predictions[i,1:col]*p_cat_true)
+        predictions[i,number_columns]<-self$model_config$target_levels[which.max(as.numeric(predictions[i,1:col]))]
+      }
+      return(predictions)
     },
     #--------------------------------------------------------------------------
     basic_train = function(train_data = NULL,

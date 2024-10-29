@@ -19,8 +19,7 @@ transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
 # object is imdb_embeddings
-load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))
-
+imdb_embeddings<-load_from_disk(testthat::test_path("test_data/classifier/imdb_embeddings"))
 
 # Start test---------------------------------------------------------------------
 test_that("EmbeddedText - Create", {

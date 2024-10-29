@@ -36,15 +36,15 @@ save_to_disk <- function(object,
   save_location <- paste0(dir_path, "/", folder_name)
 
   # Create path to r_interface
-  path_r_interface <- paste0(save_location, "/", "r_interface.rda")
+  path_r_config_state<- paste0(save_location, "/", "r_config_state.rda")
 
   # Check directory
   create_dir(dir_path, FALSE)
   create_dir(save_location, FALSE)
 
   # Create config and save to disk
-  config_file <- create_config(object)
-  save(config_file, file = path_r_interface)
+  config_file <- create_config_state(object)
+  save(config_file, file = path_r_config_state)
 
   # Save Python objects and additional files
   object$save(
@@ -65,7 +65,7 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
-  loaded_config <- load_R_interface(dir_path)
+  loaded_config <- load_R_config_state(dir_path)
 
   if (loaded_config$class == "TEClassifierRegular") {
     model <- TEClassifierRegular$new()
@@ -79,6 +79,8 @@ load_from_disk <- function(dir_path) {
     model <- LargeDataSetForTextEmbeddings$new()
   } else if (loaded_config$class == "LargeDataSetForText") {
     model <- LargeDataSetForText$new()
+  } else if (loaded_config$class =="EmbeddedText"){
+    model <- EmbeddedText$new()
   } else {
     stop("Class type not supported.")
   }
@@ -89,13 +91,13 @@ load_from_disk <- function(dir_path) {
 }
 
 
-load_R_interface <- function(dir_path) {
+load_R_config_state <- function(dir_path) {
   # Load the Interface to R
-  interface_path <- paste0(dir_path, "/r_interface.rda")
+  interface_path <- paste0(dir_path, "/r_config_state.rda")
 
-  # Check for r_interface.rda
+  # Check for r_config_state.rda
   if (file.exists(interface_path) == FALSE) {
-    stop("There is no file r_interface.rda in the selected directory")
+    stop("There is no file r_config_state.rda in the selected directory")
   }
 
   # Load interface
@@ -119,7 +121,7 @@ load_R_interface <- function(dir_path) {
 #' @family Saving and Loading
 #'
 #' @export
-create_config <- function(object) {
+create_config_state <- function(object) {
   config <- object$get_all_fields()
   config["class"] <- class(object)[1]
   return(config)

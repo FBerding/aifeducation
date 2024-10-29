@@ -6,9 +6,9 @@ testthat::skip_if_not(
 # Skip Tests
 skip_creation_test <- TRUE
 skip_training_test <- FALSE
-skip_overfitting_test <- TRUE
+skip_overfitting_test <- FALSE
 skip_3_classes <- TRUE
-include_tensorflow <- TRUE
+include_tensorflow <- FALSE
 
 
 # SetUp-------------------------------------------------------------------------

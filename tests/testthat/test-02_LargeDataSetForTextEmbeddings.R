@@ -11,7 +11,14 @@ create_dir(root_path_results, FALSE)
 
 # object is imdb_embeddings
 load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))
+imdb_embeddings<-imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+imdb_embeddings<-imdb_embeddings$convert_to_EmbeddedText()
 
+save_to_disk(
+  dir_path=testthat::test_path("test_data/classifier/"),
+  folder_name="imdb_embeddings",
+  object=imdb_embeddings)
+imdb_embeddings<-
 
 # Start test---------------------------------------------------------------------
 test_that("LargeDataSetForTextEmbeddings - Create", {

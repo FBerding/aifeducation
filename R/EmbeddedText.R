@@ -153,6 +153,36 @@ EmbeddedText <- R6::R6Class(
       self$embeddings <- embeddings
     },
     #--------------------------------------------------------------------------
+    #' @description Saves a data set to disk.
+    #' @param dir_path Path where to store the data set.
+    #' @param folder_name `string` Name of the folder for storing the data set.
+    #' @param create_dir `bool` If `True` the directory will be created if it does not exist.
+    #' @return Method does not return anything. It write the data set to disk.
+    save = function(dir_path, folder_name, create_dir = TRUE) {
+      # Create directory
+      if (dir.exists(dir_path) == FALSE) {
+        if (create_dir == TRUE) {
+          dir.create(dir_path)
+        } else {
+          stop("Directory does not exist.")
+        }
+      }
+
+      #save date
+      data_embeddings=self$embeddings
+      save(
+        data_embeddings,
+        file = paste0(dir_path,"/",folder_name,"/data.rda")
+        )
+    },
+    #-------------------------------------------------------------------------
+    #' @description Method for checking if the model was successfully configured. An object can only be used if this
+    #'   value is `TRUE`.
+    #' @return `bool` `TRUE` if the model is fully configured. `FALSE` if not.
+    is_configured = function() {
+      return(private$configured)
+    },
+    #--------------------------------------------------------------------------
     #' @description loads an object of class [EmbeddedText] from disk and updates the object to the current version of
     #'   the package.
     #' @param dir_path Path where the data set set is stored.
@@ -163,25 +193,43 @@ EmbeddedText <- R6::R6Class(
       }
 
       # Load R file
-      old_model <- load_R_interface(dir_path)
-
-      # Set arguments
-      args <- old_model$get_model_info()
-      args$embeddings <- old_model$embeddings
+      config_file <- load_R_config_state(dir_path)
 
       # Set configuration
-      do.call(
-        what = self$configure,
-        args = old_model$get_model_info()
+      self$configure(
+        model_name = config_file$private$model_name,
+        model_label = config_file$private$model_label,
+        model_date = config_file$private$model_date,
+        model_method = config_file$private$model_method,
+        model_version = config_file$private$model_version,
+        model_language = config_file$private$model_language,
+        param_seq_length = config_file$private$param_seq_length,
+        param_chunks = config_file$private$param_chunks,
+        param_features = config_file$private$param_features,
+        param_overlap = config_file$private$param_overlap,
+        param_emb_layer_min = config_file$private$param_emb_layer_min,
+        param_emb_layer_max = config_file$private$param_emb_layer_max,
+        param_emb_pool_type = config_file$private$param_emb_pool_type,
+        param_aggregation = config_file$private$param_aggregation,
+        embeddings = NULL
       )
 
       # Check for feature extractor and add information
-      if (old_model$is_compressed == TRUE) {
-        do.call(
-          what = self$add_feature_extractor_info,
-          args = old_model$get_feature_extractor_info
+      if (is.null_or_na(config_file$private$feature_extractor$model_name) == FALSE) {
+        self$add_feature_extractor_info(
+          model_name = config_file$private$feature_extractor$model_name,
+          model_label = config_file$private$feature_extractor$model_label,
+          features = config_file$private$feature_extractor$features,
+          method = config_file$private$feature_extractor$method,
+          noise_factor = config_file$private$feature_extractor$noise_factor,
+          optimizer = config_file$private$feature_extractor$optimizer
         )
       }
+
+      #Load data
+      data=load(paste0(dir_path,"/","data.rda"))
+      data=get(data)
+      self$embeddings=data
     },
     #--------------------------------------------------------------------------
     #' @description Method for retrieving information about the model that generated this embedding.

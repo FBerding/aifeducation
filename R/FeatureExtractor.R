@@ -313,7 +313,7 @@ TEFeatureExtractor <- R6::R6Class(
 
       # Add FeatureExtractor specific data
       # Load R file
-      config_file <- load_R_interface(dir_path)
+      config_file <- load_R_config_state(dir_path)
 
       # Set training status
       private$trained <- config_file$private$trained

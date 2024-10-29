@@ -194,7 +194,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       }
 
       # Load R file
-      config_file <- load_R_interface(dir_path)
+      config_file <- load_R_config_state(dir_path)
 
       # Set configuration
       self$configure(

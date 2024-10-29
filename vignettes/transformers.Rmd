@@ -1,6 +1,6 @@
 ---
 title: "01 Transformers"
-author: "Florian Berding, Yuliia Tykhonova"
+author: "Yuliia Tykhonova, Florian Berding"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{01 Transformers}
