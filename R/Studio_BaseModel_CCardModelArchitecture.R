@@ -101,17 +101,15 @@ ModelArchitecture_UI <- function(id) {
             bslib::card(
               bslib::card_header("Vocabulary"),
               bslib::card_body(
-                shinyFiles::shinyFilesButton(
-                  id = ns("button_select_dataset"),
-                  label = "Choose File",
-                  title = "Please choose a file",
-                  icon = shiny::icon("file"),
-                  multiple = FALSE,
-                  filetype = c("rda", "rdata")
+                shinyFiles::shinyDirButton(
+                  id = ns("button_select_dataset_dir"),
+                  label = "Choose Folder",
+                  title = "Please choose a folder",
+                  icon = shiny::icon("folder-open")
                 ),
                 shiny::textInput(
-                  inputId = ns("dataset_file_path"),
-                  label = shiny::tags$p(shiny::icon("file"), "File path"),
+                  inputId = ns("dataset_dir_path"),
+                  label = shiny::tags$p(shiny::icon("folder"), "Dataset Folder"),
                   width = "100%"
                 ),
                 shiny::numericInput(
@@ -158,7 +156,7 @@ ModelArchitecture_Server <- function(id, volumes) {
         num_attention_heads = input$num_attention_heads,
         ai_method = input$base_architecture_type,
         vocab_size = input$vocab_size,
-        dataset_file_path = input$dataset_file_path
+        dataset_dir_path = input$dataset_dir_path
       )
     })
 
@@ -276,20 +274,18 @@ ModelArchitecture_Server <- function(id, volumes) {
 
 
     # General vocab parameters -------------------------------------------------------------
-    shinyFiles::shinyFileChoose(
+    shinyFiles::shinyDirChoose(
       input = input,
-      id = "button_select_dataset",
+      id = "button_select_dataset_dir",
       roots = volumes,
-      filetype = c("rda", "rdata")
+      allowDirCreate = FALSE
     )
-    shiny::observeEvent(input$button_select_dataset, {
-      tmp_file_path <- shinyFiles::parseFilePaths(volumes, input$button_select_dataset)
-      if (nrow(tmp_file_path) > 0) {
-        shiny::updateTextInput(
-          inputId = "dataset_file_path",
-          value = tmp_file_path[[1, "datapath"]]
-        )
-      }
+    shiny::observeEvent(input$button_select_dataset_dir, {
+      path <- shinyFiles::parseDirPath(volumes, input$button_select_dataset_dir)
+      shiny::updateTextInput(
+        inputId = "dataset_dir_path",
+        value = path
+      )
     })
 
     # Model-based vocab parameters ---------------------------------------------------------

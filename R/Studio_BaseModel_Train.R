@@ -47,10 +47,10 @@ BaseModel_Train_UI <- function(id) {
           ),
           bslib::card(
             bslib::card_header(
-              "Raw Texts"
+              "Dataset"
             ),
             bslib::card_body(
-              RawTexts_UI(id = ns("BaseModel_RawTexts"))
+              Dataset_UI(id = ns("BaseModel_Dataset"))
             )
           )
         ),
@@ -105,8 +105,8 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
       id = "BaseModel_BaseModel",
       volumes = volumes
     )
-    raw_texts_file_path_reactive <- RawTexts_Server(
-      id = "BaseModel_RawTexts",
+    dataset_dir_path_reactive <- Dataset_Server(
+      id = "BaseModel_Dataset",
       volumes = volumes
     )
     params_reactive <- TrainTuneSettings_Server(
@@ -117,18 +117,18 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
     shiny::observeEvent(input$button_train_tune, {
       model_architecture <- model_architecture_reactive()
 
-      raw_texts_file_path <- raw_texts_file_path_reactive()
+      dataset_dir_path <- dataset_dir_path_reactive()
 
       # Checking ------------------------------------------------------------------
 
       errors <- c()
 
-      if (raw_texts_file_path == "") {
-        errors <- append(errors, "Please specify a path to the raw texts for the training.")
-      } else if (!file.exists(raw_texts_file_path)) {
+      if (dataset_dir_path == "") {
+        errors <- append(errors, "Please specify a path to the dataset for the training.")
+      } else if (!dir.exists(dataset_dir_path)) {
         errors <- append(errors, paste(
-          "Path to the raw texts for the training is not valid - there is no such file path",
-          dQuote(raw_texts_file_path)
+          "Path to the raw texts for the training is not valid - there is no such directory path",
+          dQuote(dataset_dir_path)
         ))
       }
 
@@ -189,7 +189,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
           ExtendedTask_type = "train_transformer",
           ExtendedTask_arguments = list(
             transformer_type = transformer_type,
-            raw_texts_file_path = raw_texts_file_path,
+            dataset_dir_path = dataset_dir_path,
             params = model_params
           ),
           log_path = log_path,

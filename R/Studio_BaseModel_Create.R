@@ -88,12 +88,12 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
 
       errors <- c()
 
-      if (params$dataset_file_path == "") {
-        errors <- append(errors, "Please specify a path to the raw texts for a vocabulary.")
-      } else if (!file.exists(params$dataset_file_path)) {
+      if (params$dataset_dir_path == "") {
+        errors <- append(errors, "Please specify a path to the dataset for a vocabulary.")
+      } else if (!dir.exists(params$dataset_dir_path)) {
         errors <- append(errors, paste(
-          "Path to the raw texts for a vocabulary is not valid - there is no such file path",
-          dQuote(params$dataset_file_path)
+          "Path to the dataset for a vocabulary is not valid - there is no such directory path",
+          dQuote(params$dataset_dir_path)
         ))
       }
 
@@ -113,8 +113,8 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
         )
       } else { # No errors ----------------------------------------------------------
         model_params <- params
-        # Remove ai_method and dataset_file_path from model_params list
-        model_params <- model_params[!names(model_params) %in% c("ai_method", "dataset_file_path")]
+        # Remove ai_method and dataset_dir_path from model_params list
+        model_params <- model_params[!names(model_params) %in% c("ai_method", "dataset_dir_path")]
         model_params[["ml_framework"]] <- "pytorch"
         model_params[["model_dir"]] <- input$output_model_dir_path
         model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
@@ -127,7 +127,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
           ExtendedTask_type = "create_transformer",
           ExtendedTask_arguments = list(
             transformer_type = params$ai_method,
-            dataset_file_path = params$dataset_file_path,
+            dataset_dir_path = params$dataset_dir_path,
             params = model_params
           ),
           log_path = log_path,

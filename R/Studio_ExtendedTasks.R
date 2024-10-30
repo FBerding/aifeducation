@@ -461,12 +461,12 @@ long_feature_extractor <- function(name,
 
 # Transformers =====================================================================
 
-long_create_transformer <- function(transformer_type, dataset_file_path, params) {
+long_create_transformer <- function(transformer_type, dataset_dir_path, params) {
   promises::future_promise({
-    raw_text_object <- load(dataset_file_path)
-    raw_texts <- get(x = raw_text_object)
+    text_dataset <- LargeDataSetForText$new()
+    text_dataset$load_from_disk(dataset_dir_path)
 
-    params[["vocab_raw_texts"]] <- raw_texts$text
+    params[["text_dataset"]] <- text_dataset
     do.call(aife_transformer_maker$make(transformer_type)$create, params)
 
     # Returns message
@@ -474,12 +474,12 @@ long_create_transformer <- function(transformer_type, dataset_file_path, params)
   })
 }
 
-long_train_transformer <- function(transformer_type, raw_texts_file_path, params) {
+long_train_transformer <- function(transformer_type, dataset_dir_path, params) {
   promises::future_promise({
-    raw_text_object <- load(raw_texts_file_path)
-    raw_texts <- get(x = raw_text_object)
+    text_dataset <- LargeDataSetForText$new()
+    text_dataset$load_from_disk(dataset_dir_path)
 
-    params[["raw_texts"]] <- raw_texts$text
+    params[["text_dataset"]] <- text_dataset
     do.call(aife_transformer_maker$make(transformer_type)$train, params)
 
     # Returns message
