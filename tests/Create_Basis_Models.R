@@ -30,10 +30,18 @@ ml_frameworks <- c(
 # )
 method_list <- list(
   tensorflow = c(),
-  pytorch = c("mpnet")
+  pytorch = c("bert")
 )
 
 example_data <- imdb_movie_reviews
+example_data["bib_entry"] = NA
+example_data["license"] = NA
+example_data["url_license"] = NA
+example_data["text_license"] = NA
+example_data["url_source"] = NA
+
+full_text_dataset <- LargeDataSetForText$new(example_data)
+
 trace <- FALSE
 
 # Start creation and training---------------------------------------------------
@@ -53,7 +61,7 @@ for (framework in ml_frameworks) {
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
+        text_dataset = full_text_dataset,
         vocab_size = 50000,
         vocab_do_lower_case = FALSE,
         max_position_embeddings = 512,
@@ -75,7 +83,7 @@ for (framework in ml_frameworks) {
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:10],
+        text_dataset = LargeDataSetForText$new(example_data[1:10, ]),
         p_mask = 0.15,
         whole_word = TRUE,
         full_sequences_only = TRUE,
@@ -97,7 +105,7 @@ for (framework in ml_frameworks) {
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text[1:10],
+        text_dataset = LargeDataSetForText$new(example_data[1:10, ]),
         vocab_size = 30522,
         vocab_do_lower_case = FALSE,
         max_position_embeddings = 512,
@@ -121,7 +129,7 @@ for (framework in ml_frameworks) {
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:10],
+        text_dataset = LargeDataSetForText$new(example_data[1:10, ]),
         p_mask = 0.15,
         p_perm = 0.15,
         whole_word = TRUE,
@@ -148,7 +156,7 @@ for (framework in ml_frameworks) {
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
+        text_dataset = full_text_dataset,
         vocab_size = 10000,
         add_prefix_space = TRUE,
         max_position_embeddings = 512,
@@ -169,7 +177,7 @@ for (framework in ml_frameworks) {
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:5],
+        text_dataset = LargeDataSetForText$new(example_data[1:5, ]),
         p_mask = 0.30,
         val_size = 0.1,
         n_epoch = 2,
@@ -190,7 +198,7 @@ for (framework in ml_frameworks) {
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text[1:500],
+        text_dataset = full_text_dataset,
         vocab_size = 10000,
         add_prefix_space = FALSE,
         max_position_embeddings = 512,
@@ -212,7 +220,7 @@ for (framework in ml_frameworks) {
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:5],
+        text_dataset = LargeDataSetForText$new(example_data[1:5, ]),
         p_mask = 0.30,
         val_size = 0.1,
         n_epoch = 2,
@@ -233,7 +241,7 @@ for (framework in ml_frameworks) {
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
+        text_dataset = full_text_dataset,
         vocab_size = 10000,
         max_position_embeddings = 512,
         hidden_size = 32,
@@ -254,7 +262,7 @@ for (framework in ml_frameworks) {
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:20],
+        text_dataset = LargeDataSetForText$new(example_data[1:20, ]),
         p_mask = 0.15,
         whole_word = FALSE,
         val_size = 0.1,
@@ -277,7 +285,7 @@ for (framework in ml_frameworks) {
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
+        text_dataset = full_text_dataset,
         vocab_size = 10000,
         vocab_do_lower_case = FALSE,
         # add_prefix_space = FALSE,
@@ -299,7 +307,7 @@ for (framework in ml_frameworks) {
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:5],
+        text_dataset = LargeDataSetForText$new(example_data[1:5, ]),
         p_mask = 0.15,
         whole_word = FALSE,
         val_size = 0.1,

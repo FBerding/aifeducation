@@ -10,6 +10,16 @@ LargeDataSetForText <- R6::R6Class(
   inherit = LargeDataSetBase,
   public = list(
     #--------------------------------------------------------------------------
+    #' @description Method for creation of [LargeDataSetForText] instance. It can be initialized with `init_data`
+    #'   parameter if passed (Uses `add_from_data.frame()` method if `init_data` is `data.frame`).
+    #' @param init_data Initial `data.frame` for dataset.
+    #' @return A new instance of this class initialized with `init_data` if passed.
+    initialize = function(init_data = NULL) {
+      if (is.data.frame(init_data)) {
+        self$add_from_data.frame(init_data)
+      }
+    },
+    #--------------------------------------------------------------------------
     #' @description Method for adding raw texts saved within .txt files to the data set. Please note the the directory
     #'   should contain one folder for each .txt file. In order to create an informative data set every folder can
     #'   contain the following additional files:
