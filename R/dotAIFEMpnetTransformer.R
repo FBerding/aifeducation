@@ -9,12 +9,15 @@
 #' @section Train: To train the model, pass the directory of the model to the method `.AIFEMpnetTransformer$train`.
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
+#' @param text_dataset `r paramDesc.text_dataset()`
 #' @param sustain_track `r paramDesc.sustain_track()`
 #' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
 #' @param sustain_region `r paramDesc.sustain_region()`
 #' @param sustain_interval `r paramDesc.sustain_interval()`
 #' @param trace `r paramDesc.trace()`
 #' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
+#' @param log_dir `r paramDesc.log_dir()`
+#' @param log_write_interval `r paramDesc.log_write_interval()`
 #'
 #'
 #' @references Song,K., Tan, X., Qin, T., Lu, J. & Liu, T.-Y. (2020). MPNet: Masked and Permuted Pre-training for
@@ -192,7 +195,6 @@
     #'   * `num_hidden_layer`
     #'
     #' @param model_dir `r paramDesc.model_dir()`
-    #' @param vocab_raw_texts `r paramDesc.vocab_raw_texts()`
     #' @param vocab_size `r paramDesc.vocab_size()`
     #' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
     #' @param hidden_size `r paramDesc.hidden_size()`
@@ -201,8 +203,6 @@
     #' @param hidden_act `r paramDesc.hidden_act()`
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
-    #' @param log_dir `r paramDesc.log_dir()`
-    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
     #' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
@@ -211,7 +211,7 @@
     #'   model to disk.
     create = function(ml_framework = "pytorch",
                       model_dir,
-                      vocab_raw_texts,
+                      text_dataset,
                       vocab_size = 30522,
                       vocab_do_lower_case = FALSE,
                       max_position_embeddings = 512,
@@ -242,7 +242,7 @@
       super$create(
         ml_framework = ml_framework,
         model_dir = model_dir,
-        vocab_raw_texts = vocab_raw_texts,
+        text_dataset = text_dataset,
         vocab_size = vocab_size,
         max_position_embeddings = max_position_embeddings,
         hidden_size = hidden_size,
@@ -273,7 +273,6 @@
     #'
     #' @param output_dir `r paramDesc.output_dir()`
     #' @param model_dir_path `r paramDesc.model_dir_path()`
-    #' @param raw_texts `r paramDesc.raw_texts()`
     #' @param p_mask `r paramDesc.p_mask()`
     #' @param whole_word `r paramDesc.whole_word()`
     #' @param val_size `r paramDesc.val_size()`
@@ -287,8 +286,6 @@
     #' @param multi_process `r paramDesc.multi_process()`
     #' @param keras_trace `r paramDesc.keras_trace()`
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
-    #' @param log_dir `r paramDesc.log_dir()`
-    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @param p_perm `double` Ratio that determines the number of words/tokens used for permutation.
     #'
@@ -296,7 +293,7 @@
     train = function(ml_framework = "pytorch",
                      output_dir,
                      model_dir_path,
-                     raw_texts,
+                     text_dataset,
                      p_mask = 0.15,
                      p_perm = 0.15,
                      whole_word = TRUE,
@@ -333,7 +330,7 @@
         ml_framework = ml_framework,
         output_dir = output_dir,
         model_dir_path = model_dir_path,
-        raw_texts = raw_texts,
+        text_dataset = text_dataset,
         p_mask = p_mask,
         whole_word = whole_word,
         val_size = val_size,

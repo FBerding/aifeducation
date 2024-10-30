@@ -18,12 +18,15 @@
 #'   [Transformers for Developers](https://fberding.github.io/aifeducation/articles/transformers.html)
 #'
 #' @param ml_framework `r paramDesc.ml_framework()`
+#' @param text_dataset `r paramDesc.text_dataset()`
 #' @param sustain_track `r paramDesc.sustain_track()`
 #' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
 #' @param sustain_region `r paramDesc.sustain_region()`
 #' @param sustain_interval `r paramDesc.sustain_interval()`
 #' @param trace `r paramDesc.trace()`
 #' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
+#' @param log_dir `r paramDesc.log_dir()`
+#' @param log_write_interval `r paramDesc.log_write_interval()`
 #'
 #' @references Hugging Face transformers documantation:
 #'   * [BERT](https://huggingface.co/docs/transformers/model_doc/bert)
@@ -130,7 +133,8 @@
                                         trace,
                                         pytorch_safetensors,
                                         log_dir,
-                                        log_write_interval) {
+                                        log_write_interval,
+                                        text_dataset) {
       self$set_model_param("ml_framework", ml_framework)
       self$set_model_param("sustain_track", sustain_track)
       self$set_model_param("sustain_iso_code", sustain_iso_code)
@@ -140,6 +144,7 @@
       self$set_model_param("pytorch_safetensors", pytorch_safetensors)
       self$set_model_param("log_dir", log_dir)
       self$set_model_param("log_write_interval", log_write_interval)
+      self$set_model_param("text_dataset", text_dataset)
     },
 
 
@@ -186,18 +191,8 @@
       # SFT: create_chunks_for_training ---------------------------------------------
       if (!is.function(private$steps_for_training$create_chunks_for_training)) {
         private$steps_for_training$create_chunks_for_training <- function(self) {
-          # Preparing Data
-          if (class(self$params$raw_texts) %in% c("datasets.arrow_dataset.Dataset") == FALSE) {
-            # Create Dataset
-            raw_text_dataset <- datasets$Dataset$from_dict(
-              reticulate::dict(list(text = self$params$raw_texts))
-            )
-          } else {
-            raw_text_dataset <- self$params$raw_texts
-          }
-
           tokenized_texts_raw <- tokenize_dataset(
-            dataset = raw_text_dataset,
+            dataset = self$temp$raw_text_dataset,
             tokenizer = self$temp$tokenizer,
             max_length = self$params$chunk_size,
             log_file = self$temp$log_file,
@@ -687,7 +682,6 @@
     #'   `temp` list.
     #'
     #' @param model_dir `r paramDesc.model_dir()`
-    #' @param vocab_raw_texts `r paramDesc.vocab_raw_texts()`
     #' @param vocab_size `r paramDesc.vocab_size()`
     #' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
     #' @param hidden_size `r paramDesc.hidden_size()`
@@ -696,14 +690,12 @@
     #' @param hidden_act `r paramDesc.hidden_act()`
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
-    #' @param log_dir `r paramDesc.log_dir()`
-    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
     create = function(ml_framework,
                       model_dir,
-                      vocab_raw_texts,
+                      text_dataset,
                       vocab_size,
                       max_position_embeddings,
                       hidden_size,
@@ -728,11 +720,11 @@
           ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
           trace, pytorch_safetensors,
-          log_dir, log_write_interval
+          log_dir, log_write_interval,
+          text_dataset
         )
         # Each transformer has these parameters in the case of creation ----
         self$set_model_param("model_dir", model_dir)
-        self$set_model_param("vocab_raw_texts", vocab_raw_texts)
         self$set_model_param("vocab_size", vocab_size)
         self$set_model_param("max_position_embeddings", max_position_embeddings)
         self$set_model_param("hidden_size", hidden_size)
@@ -768,7 +760,12 @@
         if (is.function(private$steps_for_creation$check_max_pos_emb)) {
           private$steps_for_creation$check_max_pos_emb(self)
         }
-        self$temp$raw_text_dataset <- check.vocab_raw_texts(vocab_raw_texts)
+        check_class(text_dataset, "LargeDataSetForText", FALSE)
+        self$temp$raw_text_dataset <- text_dataset$get_dataset()
+        if (is.null(self$temp$raw_text_dataset$features$text)) {
+          stop("Dataset does not contain a column 'text' storing the raw texts.")
+        }
+
         check.ml_framework(ml_framework)
         check.hidden_act(hidden_act)
         check.sustain_iso_code(sustain_iso_code, sustain_track)
@@ -934,7 +931,6 @@
     #'
     #' @param output_dir `r paramDesc.output_dir()`
     #' @param model_dir_path `r paramDesc.model_dir_path()`
-    #' @param raw_texts `r paramDesc.raw_texts()`
     #' @param p_mask `r paramDesc.p_mask()`
     #' @param whole_word `r paramDesc.whole_word()`
     #' @param val_size `r paramDesc.val_size()`
@@ -948,8 +944,6 @@
     #' @param multi_process `r paramDesc.multi_process()`
     #' @param keras_trace `r paramDesc.keras_trace()`
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
-    #' @param log_dir `r paramDesc.log_dir()`
-    #' @param log_write_interval `r paramDesc.log_write_interval()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
@@ -959,7 +953,7 @@
     train = function(ml_framework,
                      output_dir,
                      model_dir_path,
-                     raw_texts,
+                     text_dataset,
                      p_mask,
                      whole_word,
                      val_size,
@@ -989,12 +983,12 @@
           ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
           trace, pytorch_safetensors,
-          log_dir, log_write_interval
+          log_dir, log_write_interval,
+          text_dataset
         )
         # Each transformer has these parameters in the case of training ----
         self$set_model_param("output_dir", output_dir)
         self$set_model_param("model_dir_path", model_dir_path)
-        self$set_model_param("raw_texts", raw_texts)
         self$set_model_param("p_mask", p_mask)
         self$set_model_param("whole_word", whole_word)
         self$set_model_param("val_size", val_size)
@@ -1041,6 +1035,12 @@
         self$temp$from_pt <- model_files_check$from_pt
         self$temp$from_tf <- model_files_check$from_tf
         self$temp$load_safe <- model_files_check$load_safe
+
+        check_class(text_dataset, "LargeDataSetForText", FALSE)
+        self$temp$raw_text_dataset <- text_dataset$get_dataset()
+        if (is.null(self$temp$raw_text_dataset$features$text)) {
+          stop("Dataset does not contain a column 'text' storing the texts for training.")
+        }
 
         check.sustain_iso_code(sustain_iso_code, sustain_track)
 

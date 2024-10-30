@@ -39,13 +39,13 @@ paramDesc.log_write_interval <- function() {
   " `int` Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
   if `log_dir` is not `NULL`. "
 }
+#' @keywords internal
+paramDesc.text_dataset <- function() " Object of class [LargeDataSetForText]. "
 
 # Create ----
 
 #' @keywords internal
 paramDesc.model_dir <- function() " `string` Path to the directory where the model should be saved. "
-#' @keywords internal
-paramDesc.vocab_raw_texts <- function() " `vector` containing the raw texts for creating the vocabulary. "
 #' @keywords internal
 paramDesc.vocab_size <- function() " `int` Size of the vocabulary. "
 #' @keywords internal
@@ -117,8 +117,6 @@ paramDesc.output_dir <- function() {
 }
 #' @keywords internal
 paramDesc.model_dir_path <- function() " `string` Path to the directory where the original model is stored. "
-#' @keywords internal
-paramDesc.raw_texts <- function() " `vector` containing the raw texts for training. "
 #' @keywords internal
 paramDesc.p_mask <- function() " `double` Ratio that determines the number of words/tokens used for masking. "
 #' @keywords internal

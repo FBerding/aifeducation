@@ -120,32 +120,6 @@ check.ml_framework <- function(ml_framework) { # nolint
   }
 }
 
-#' @title Check `vocab_raw_texts` argument of transformer
-#' @description Used when creating and training transformers.
-#'
-#' @param vocab_raw_texts `r paramDesc.vocab_raw_texts()`
-#' @return Dataset created base on raw texts.
-#'
-#' @importFrom reticulate dict
-#'
-#' @family Transformer utils
-#' @keywords internal
-#' @noRd
-check.vocab_raw_texts <- function(vocab_raw_texts) { # nolint
-  raw_text_dataset <- NULL
-  if (class(vocab_raw_texts) %in% c("datasets.arrow_dataset.Dataset") == FALSE) {
-    raw_text_dataset <- datasets$Dataset$from_dict(
-      reticulate::dict(list(text = vocab_raw_texts))
-    )
-  } else {
-    raw_text_dataset <- vocab_raw_texts
-    if (is.null(raw_text_dataset$features$text)) {
-      stop("Dataset does not contain a column 'text' storing the raw texts.")
-    }
-  }
-  return(raw_text_dataset)
-}
-
 #' @title Check `sustain_iso_code` argument of transformer
 #' @description Used when creating and training transformers.
 #'
