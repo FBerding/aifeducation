@@ -36,7 +36,7 @@ save_to_disk <- function(object,
   save_location <- paste0(dir_path, "/", folder_name)
 
   # Create path to r_interface
-  path_r_config_state<- paste0(save_location, "/", "r_config_state.rda")
+  path_r_config_state <- paste0(save_location, "/", "r_config_state.rda")
 
   # Check directory
   create_dir(dir_path, FALSE)
@@ -79,7 +79,7 @@ load_from_disk <- function(dir_path) {
     model <- LargeDataSetForTextEmbeddings$new()
   } else if (loaded_config$class == "LargeDataSetForText") {
     model <- LargeDataSetForText$new()
-  } else if (loaded_config$class =="EmbeddedText"){
+  } else if (loaded_config$class == "EmbeddedText") {
     model <- EmbeddedText$new()
   } else {
     stop("Class type not supported.")
@@ -97,7 +97,10 @@ load_R_config_state <- function(dir_path) {
 
   # Check for r_config_state.rda
   if (file.exists(interface_path) == FALSE) {
-    stop("There is no file r_config_state.rda in the selected directory")
+    stop(paste(
+      "There is no file r_config_state.rda in the selected directory",
+      "The directory is:", dir_path
+    ))
   }
 
   # Load interface

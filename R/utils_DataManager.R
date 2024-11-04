@@ -102,8 +102,9 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     }
   }
 
-
-  result_list <- foreach::foreach(index = 1:length(input), .export = "create_synthetic_units_from_matrix") %dopar% {
+  result_list <- foreach::foreach(index = 1:length(input),
+                                  .export = "create_synthetic_units_from_matrix",
+                                  .errorhandling="pass") %dopar% {
     # index=1
     create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
@@ -225,29 +226,38 @@ create_synthetic_units_from_matrix <- function(matrix_form,
 
   syn_data <- NULL
   if (method == "smote") {
-    syn_data <- smotefamily::SMOTE(
-      X = as.data.frame(matrix_form),
-      target = tmp_target,
-      K = k,
-      dup_size = dup_size
+    syn_data <- try(
+      smotefamily::SMOTE(
+        X = as.data.frame(matrix_form),
+        target = tmp_target,
+        K = k,
+        dup_size = dup_size
+      ),
+      silent = TRUE
     )
   } else if (method == "adas") {
-    syn_data <- smotefamily::ADAS(
-      X = as.data.frame(matrix_form),
-      target = tmp_target,
-      K = k
+    syn_data <- try(
+      smotefamily::ADAS(
+        X = as.data.frame(matrix_form),
+        target = tmp_target,
+        K = k
+      ),
+      silent = TRUE
     )
   } else if (method == "dbsmote") {
-    syn_data <- smotefamily::DBSMOTE(
-      X = as.data.frame(matrix_form),
-      target = tmp_target,
-      dupSize = dup_size,
-      MinPts = NULL,
-      eps = NULL
+    syn_data <- try(
+      smotefamily::DBSMOTE(
+        X = as.data.frame(matrix_form),
+        target = tmp_target,
+        dupSize = dup_size,
+        MinPts = NULL,
+        eps = NULL
+      ),
+      silent = TRUE
     )
   }
 
-  if (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0) {
+  if (inherits(x = syn_data, what = "try-error") == FALSE & (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)) {
     n_cols_embedding <- ncol(matrix_form)
     tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(

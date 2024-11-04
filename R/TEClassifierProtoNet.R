@@ -287,6 +287,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param trace `bool` `TRUE`, if information about the estimation phase should be printed to the console.
     #' @param ml_trace `int` `ml_trace=0` does not print any information about the training process from pytorch on the
     #'   console.
+    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only relevant if
+    #'  `use_sc=TRUE`.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -325,7 +327,8 @@ TEClassifierProtoNet <- R6::R6Class(
                      trace = TRUE,
                      ml_trace = 1,
                      log_dir = NULL,
-                     log_write_interval = 10) {
+                     log_write_interval = 10,
+                     n_cores=4) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -346,6 +349,7 @@ TEClassifierProtoNet <- R6::R6Class(
       check_type(batch_size, type = "int", FALSE)
       check_type(dir_checkpoint, type = "string", FALSE)
       check_type(trace, type = "bool", FALSE)
+      check_type(n_cores, type = "int", FALSE)
 
       check_type(Ns, type = "int", FALSE)
       check_type(Nq, type = "int", FALSE)
@@ -395,6 +399,8 @@ TEClassifierProtoNet <- R6::R6Class(
       self$last_training$config$dir_checkpoint <- dir_checkpoint
       self$last_training$config$trace <- trace
       self$last_training$config$ml_trace <- ml_trace
+
+      self$last_training$config$n_cores<-n_cores
 
       self$last_training$config$sampling_separate <- sampling_separate
       self$last_training$config$sampling_shuffle <- sampling_shuffle

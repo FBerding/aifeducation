@@ -6,6 +6,7 @@ testthat::skip_if_not(
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
+root_path_general_data<-testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
 create_dir(root_path_results, FALSE)
@@ -22,7 +23,7 @@ datasets$disable_progress_bars()
 
 # load data for test
 # object is imdb_embeddings
-load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))
+imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
 dataset_list <- list(
   "EmbeddedText" = imdb_embeddings,

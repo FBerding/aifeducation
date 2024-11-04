@@ -13,7 +13,9 @@ include_tensorflow <- FALSE
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
+root_path_general_data<-testthat::test_path("test_data/Embeddings")
 root_path_data <- testthat::test_path("test_data/classifier")
+root_path_general_data<-testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierRegular")
 create_dir(root_path_results, FALSE)
@@ -29,7 +31,7 @@ set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 
 # Load Embeddings
-imdb_embeddings=load_from_disk(paste0(root_path_data, "/imdb_embeddings"))
+imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
 test_embeddings_large <- imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
 test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
@@ -359,7 +361,6 @@ for (framework in ml_frameworks) {
                           batch_size = 2,
                           ml_trace = 0
                         )
-                        i <- sample(seq.int(from = 1, to = nrow(predictions_ET)), size = 1)
                         expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
                       })
                       gc()
@@ -456,11 +457,12 @@ for (framework in ml_frameworks) {
                   sustain_iso_code = "DEU",
                   sustain_region = NULL,
                   sustain_interval = 15,
-                  epochs = 2,
+                  epochs = 20,
                   batch_size = 32,
                   dir_checkpoint = train_path,
                   trace = FALSE,
-                  ml_trace = 0
+                  ml_trace = 0,
+                  n_cores=2
                 )
               )
               expect_true(classifier$get_sustainability_data()$sustainability_tracked)
@@ -657,11 +659,11 @@ for (framework in ml_frameworks) {
           intermediate_size = NULL,
           attention_type = attention_type,
           add_pos_embedding = add_pos_embedding,
-          rec_dropout = 0.1,
+          rec_dropout = 0.0,
           repeat_encoder = 0,
-          dense_dropout = 0.4,
-          recurrent_dropout = 0.4,
-          encoder_dropout = 0.1,
+          dense_dropout = 0.0,
+          recurrent_dropout = 0.0,
+          encoder_dropout = 0.0,
           optimizer = "adam"
         )
 
@@ -695,7 +697,8 @@ for (framework in ml_frameworks) {
           dir_checkpoint = train_path,
           log_dir = train_path,
           trace = FALSE,
-          ml_trace = 0
+          ml_trace = 0,
+          n_cores=2
         )
 
         history <- classifier_overfitting$last_training$history[[1]]$accuracy["train", ]

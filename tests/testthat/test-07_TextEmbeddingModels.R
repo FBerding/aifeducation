@@ -5,7 +5,7 @@ testthat::skip_if_not(
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_data <- testthat::test_path("test_data/TextEmbeddingModel")
+root_path_data <- testthat::test_path("test_data/TEM")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 
 root_path_results <- testthat::test_path("test_artefacts/TextEmbeddingModel")

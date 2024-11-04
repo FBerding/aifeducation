@@ -316,6 +316,8 @@ TEClassifierRegular <- R6::R6Class(
     #' @param trace `bool` `TRUE`, if information about the estimation phase should be printed to the console.
     #' @param ml_trace `int` `ml_trace=0` does not print any information about the training process from pytorch on the
     #'   console.
+    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only relevant if
+    #'  `use_sc=TRUE`.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -350,7 +352,8 @@ TEClassifierRegular <- R6::R6Class(
                      trace = TRUE,
                      ml_trace = 1,
                      log_dir = NULL,
-                     log_write_interval = 10) {
+                     log_write_interval = 10,
+                     n_cores=4) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -373,6 +376,7 @@ TEClassifierRegular <- R6::R6Class(
       check_type(batch_size, type = "int", FALSE)
       check_type(dir_checkpoint, type = "string", FALSE)
       check_type(trace, type = "bool", FALSE)
+      check_type(n_cores, type = "int", FALSE)
 
       check_class(data_embeddings, c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
       self$check_embedding_model(data_embeddings, require_compressed = FALSE)
@@ -414,6 +418,8 @@ TEClassifierRegular <- R6::R6Class(
       self$last_training$config$trace <- trace
       self$last_training$config$ml_trace <- ml_trace
 
+      self$last_training$config$n_cores<-n_cores
+
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
       private$log_config$log_write_interval <- log_write_interval
@@ -451,7 +457,8 @@ TEClassifierRegular <- R6::R6Class(
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
-          trace = trace
+          trace = trace,
+          n_cores=self$last_training$config$n_cores
         )
       } else {
         data_manager <- DataManagerClassifier$new(
@@ -465,7 +472,8 @@ TEClassifierRegular <- R6::R6Class(
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
-          trace = trace
+          trace = trace,
+          n_cores=self$last_training$config$n_cores
         )
       }
 
