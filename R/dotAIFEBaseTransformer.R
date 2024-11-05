@@ -505,18 +505,20 @@
     #'
     #'   Regardless of the transformer, the following parameters are always included:
     #'   * `ml_framework`
+    #'   * `text_dataset`
     #'   * `sustain_track`
     #'   * `sustain_iso_code`
     #'   * `sustain_region`
     #'   * `sustain_interval`
     #'   * `trace`
     #'   * `pytorch_safetensors`
+    #'   * `log_dir`
+    #'   * `log_write_interval`
     #'
     #'   ### **'Dynamic' parameters**
     #'
     #'   In the case of **create** it also contains (see `create`-method for details):
     #'   * `model_dir`
-    #'   * `vocab_raw_texts`
     #'   * `vocab_size`
     #'   * `max_position_embeddings`
     #'   * `hidden_size`
@@ -529,7 +531,6 @@
     #'   In the case of **train** it also contains (see `train`-method for details):
     #'   * `output_dir`
     #'   * `model_dir_path`
-    #'   * `raw_texts`
     #'   * `p_mask`
     #'   * `whole_word`
     #'   * `val_size`
@@ -678,8 +679,18 @@
     #' @description This method creates a transformer configuration based on the child-transformer architecture and a
     #'   vocabulary using the python libraries `transformers` and `tokenizers`.
     #'
-    #'   This method **adds** `raw_text_dataset` and `pt_safe_save`, **uses** `tokenizer` temporary parameters of the
-    #'   `temp` list.
+    #'   This method **adds** the following parameters to the `temp` list:
+    #'   * `log_file`
+    #'   * `raw_text_dataset`
+    #'   * `pt_safe_save`
+    #'   * `value_top`
+    #'   * `total_top`
+    #'   * `message_top`
+    #'
+    #'   This method **uses** the following parameters from the `temp` list:
+    #'   * `log_file`
+    #'   * `raw_text_dataset`
+    #'   * `tokenizer`
     #'
     #' @param model_dir `r paramDesc.model_dir()`
     #' @param vocab_size `r paramDesc.vocab_size()`
@@ -926,8 +937,23 @@
     #' @description This method can be used to train or fine-tune a transformer based on `BERT` architecture with the
     #'   help of the python libraries `transformers`, `datasets`, and `tokenizers`.
     #'
-    #'   This method **adds** `from_pt`, `from_tf`, `load_safe` and `pt_safe_save`, **uses** `tokenized_dataset` and
-    #'   `tokenizer` temporary parameters of the `temp` list.
+    #'   This method **adds** the following parameters to the `temp` list:
+    #'   * `log_file`
+    #'   * `loss_file`
+    #'   * `from_pt`
+    #'   * `from_tf`
+    #'   * `load_safe`
+    #'   * `raw_text_dataset`
+    #'   * `pt_safe_save`
+    #'   * `value_top`
+    #'   * `total_top`
+    #'   * `message_top`
+    #'
+    #'   This method **uses** the following parameters from the `temp` list:
+    #'   * `log_file`
+    #'   * `raw_text_dataset`
+    #'   * `tokenized_dataset`
+    #'   * `tokenizer`
     #'
     #' @param output_dir `r paramDesc.output_dir()`
     #' @param model_dir_path `r paramDesc.model_dir_path()`

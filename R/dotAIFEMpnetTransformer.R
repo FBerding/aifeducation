@@ -19,6 +19,7 @@
 #' @param log_dir `r paramDesc.log_dir()`
 #' @param log_write_interval `r paramDesc.log_write_interval()`
 #'
+#' @note Using this class with `tensorflow` is not supported. Supported framework is `pytorch`.
 #'
 #' @references Song,K., Tan, X., Qin, T., Lu, J. & Liu, T.-Y. (2020). MPNet: Masked and Permuted Pre-training for
 #'   Language Understanding. \doi{10.48550/arXiv.2004.09297}
@@ -230,6 +231,11 @@
                       pytorch_safetensors = TRUE,
                       log_dir = NULL,
                       log_write_interval = 2) {
+
+      if (ml_framework == "tensorflow") {
+        stop("Using AIFEMpnetTransformer with 'tensorflow' is not supported.")
+      }
+
       # Init dependent parameters ----
       super$set_model_param("vocab_do_lower_case", vocab_do_lower_case)
       super$set_model_param("num_hidden_layer", num_hidden_layer)
@@ -316,6 +322,11 @@
                      pytorch_safetensors = TRUE,
                      log_dir = NULL,
                      log_write_interval = 2) {
+
+      if (ml_framework == "tensorflow") {
+        stop("Using AIFEMpnetTransformer with 'tensorflow' is not supported.")
+      }
+
       # Init dependent parameters ----
       super$set_model_param("p_perm", p_perm)
 

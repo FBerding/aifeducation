@@ -272,6 +272,8 @@ always included:
 
 -   `ml_framework`
 
+-   `text_dataset`
+
 -   `sustain_track`
 
 -   `sustain_iso_code`
@@ -284,14 +286,16 @@ always included:
 
 -   `pytorch_safetensors`
 
+-   `log_dir`
+
+-   `log_write_interval`
+
 #### **'Dynamic' parameters**
 
 In the case of **create** it also contains (see `create`-method
 for details):
 
 -   `model_dir`
-
--   `vocab_raw_texts`
 
 -   `vocab_size`
 
@@ -315,8 +319,6 @@ for details):
 -   `output_dir`
 
 -   `model_dir_path`
-
--   `raw_texts`
 
 -   `p_mask`
 
@@ -425,6 +427,8 @@ bert_transformer$train(...)                    # (3)
 +---------------------+-----------+---------------------------------------------------------------------------+
 | ml_framework        | `string`  | Framework to use for training and inference^1^                            |
 +---------------------+-----------+---------------------------------------------------------------------------+
+| text_dataset        | `object`  | Object of the class `LargeDataSetForText`                                 |
++---------------------+-----------+---------------------------------------------------------------------------+
 | sustain_track       | `bool`    | If `TRUE` energy consumption is tracked during training^2^                |
 +---------------------+-----------+---------------------------------------------------------------------------+
 | sustain_iso_code    | `string`  | ISO code (Alpha-3-Code) for the country^3^                                |
@@ -437,6 +441,10 @@ bert_transformer$train(...)                    # (3)
 +---------------------+-----------+---------------------------------------------------------------------------+
 | pytorch_safetensors | `bool`    | Choose between safetensors and standard pytorch format^5^                 |
 +---------------------+-----------+---------------------------------------------------------------------------+
+| log_dir             | `string`  | Path to the directory where the log files should be saved                 |
++---------------------+-----------+---------------------------------------------------------------------------+
+| log_write_interval  | `integer` | Time in seconds for updating the log files^6^                             |
++---------------------+-----------+---------------------------------------------------------------------------+
 
 ^1 Available frameworks are "tensorflow" and "pytorch"^
 
@@ -448,14 +456,14 @@ bert_transformer$train(...)                    # (3)
 
 ^5 Only relevant for pytorch models. `TRUE`: a 'pytorch' model is saved in safetensors format; `FALSE` (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin)^
 
+^6 Only relevant if `log_dir` is not `NULL`^
+
 ### **'Dynamic' parameters for creation**
 
 +------------------------------+----------+-----------------------------------------------------------------------------+
 | **Name**                     | **Type** | **Description**                                                             |
 +------------------------------+----------+-----------------------------------------------------------------------------+
 | model_dir                    | `string` | Path to the directory where the model should be saved                       |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| vocab_raw_texts              | `vector` | Contains the raw texts for creating the vocabulary                          |
 +------------------------------+----------+-----------------------------------------------------------------------------+
 | vocab_size                   | `int`    | Size of the vocabulary                                                      |
 +------------------------------+----------+-----------------------------------------------------------------------------+
@@ -508,8 +516,6 @@ bert_transformer$train(...)                    # (3)
 | output_dir          | `string` | Path to the directory where the final model should be saved^1^                     |
 +---------------------+----------+------------------------------------------------------------------------------------+
 | model_dir_path      | `string` | Path to the directory where the original model is stored                           |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| raw_texts           | `vector` | Contains the raw texts for training                                                |
 +---------------------+----------+------------------------------------------------------------------------------------+
 | p_mask              | `double` | Ratio that determines the number of words/tokens used for masking                  |
 +---------------------+----------+------------------------------------------------------------------------------------+
@@ -580,7 +586,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$bert)
 ```{r, eval = FALSE}
 transformer$create(ml_framework = ml_framework,
                    model_dir = model_dir,
-                   vocab_raw_texts = NULL,
+                   text_dataset = text_dataset,
                    vocab_size = 30522,
                    vocab_do_lower_case = FALSE,
                    max_position_embeddings = 512,
@@ -596,7 +602,9 @@ transformer$create(ml_framework = ml_framework,
                    sustain_region = NULL,
                    sustain_interval = 15,
                    trace = TRUE,
-                   pytorch_safetensors = TRUE)
+                   pytorch_safetensors = TRUE,
+                   log_dir = NULL,
+                   log_write_interval = 2)
 ```
 
 #### Train
@@ -605,7 +613,7 @@ transformer$create(ml_framework = ml_framework,
 transformer$train(ml_framework = ml_framework,
                   output_dir = output_dir,
                   model_dir_path = model_dir_path,
-                  raw_texts = raw_texts,
+                  text_dataset = text_dataset,
                   p_mask = 0.15,
                   whole_word = TRUE,
                   val_size = 0.1,
@@ -624,7 +632,9 @@ transformer$train(ml_framework = ml_framework,
                   trace = TRUE,
                   keras_trace = 1,
                   pytorch_trace = 1,
-                  pytorch_safetensors = TRUE)
+                  pytorch_safetensors = TRUE,
+                  log_dir = NULL,
+                  log_write_interval = 2)
 ```
 
 ### `DeBERTa-v2`
@@ -642,7 +652,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$deberta_v2)
 ```{r, eval = FALSE}
 transformer$create(ml_framework = ml_framework,
                    model_dir = model_dir,
-                   vocab_raw_texts = vocab_raw_texts,
+                   text_dataset = text_dataset,
                    vocab_size = 128100,
                    vocab_do_lower_case = FALSE,
                    max_position_embeddings = 512,
@@ -658,7 +668,9 @@ transformer$create(ml_framework = ml_framework,
                    sustain_region = NULL,
                    sustain_interval = 15,
                    trace = TRUE,
-                   pytorch_safetensors = TRUE)
+                   pytorch_safetensors = TRUE,
+                   log_dir = NULL,
+                   log_write_interval = 2)
 ```
 
 #### Train
@@ -667,7 +679,7 @@ transformer$create(ml_framework = ml_framework,
 transformer$train(ml_framework = ml_framework,
                   output_dir = output_dir,
                   model_dir_path = model_dir_path,
-                  raw_texts = raw_texts,
+                  text_dataset = text_dataset,
                   p_mask = 0.15,
                   whole_word = TRUE,
                   val_size = 0.1,
@@ -686,7 +698,9 @@ transformer$train(ml_framework = ml_framework,
                   trace = TRUE,
                   keras_trace = 1,
                   pytorch_trace = 1,
-                  pytorch_safetensors = TRUE)
+                  pytorch_safetensors = TRUE,
+                  log_dir = NULL,
+                  log_write_interval = 2)
 ```
 
 ### `RoBERTa`
@@ -704,7 +718,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$roberta)
 ```{r, eval = FALSE}
 transformer$create(ml_framework = ml_framework,
                    model_dir = model_dir,
-                   vocab_raw_texts = vocab_raw_texts,
+                   text_dataset = text_dataset,
                    vocab_size = 30522,
                    add_prefix_space = FALSE,
                    trim_offsets = TRUE,
@@ -721,7 +735,9 @@ transformer$create(ml_framework = ml_framework,
                    sustain_region = NULL,
                    sustain_interval = 15,
                    trace = TRUE,
-                   pytorch_safetensors = TRUE)
+                   pytorch_safetensors = TRUE,
+                   log_dir = NULL,
+                   log_write_interval = 2)
 ```
 
 #### Train
@@ -730,7 +746,7 @@ transformer$create(ml_framework = ml_framework,
 transformer$train(ml_framework = ml_framework,
                   output_dir = output_dir,
                   model_dir_path = model_dir_path,
-                  raw_texts = raw_texts,
+                  text_dataset = text_dataset,
                   p_mask = 0.15,
                   val_size = 0.1,
                   n_epoch = 1,
@@ -748,7 +764,9 @@ transformer$train(ml_framework = ml_framework,
                   trace = TRUE,
                   keras_trace = 1,
                   pytorch_trace = 1,
-                  pytorch_safetensors = TRUE)
+                  pytorch_safetensors = TRUE,
+                  log_dir = NULL,
+                  log_write_interval = 2)
 ```
 
 ### `Funnel`
@@ -766,7 +784,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$funnel)
 ```{r, eval = FALSE}
 transformer$create(ml_framework = ml_framework,
                    model_dir = model_dir,
-                   vocab_raw_texts = vocab_raw_texts,
+                   text_dataset = text_dataset,
                    vocab_size = 30522,
                    vocab_do_lower_case = FALSE,
                    max_position_embeddings = 512,
@@ -786,7 +804,9 @@ transformer$create(ml_framework = ml_framework,
                    sustain_region = NULL,
                    sustain_interval = 15,
                    trace = TRUE,
-                   pytorch_safetensors = TRUE)
+                   pytorch_safetensors = TRUE,
+                   log_dir = NULL,
+                   log_write_interval = 2)
 ```
 
 #### Train
@@ -795,7 +815,7 @@ transformer$create(ml_framework = ml_framework,
 transformer$train(ml_framework = ml_framework,
                   output_dir = output_dir,
                   model_dir_path = model_dir_path,
-                  raw_texts = raw_texts,
+                  text_dataset = text_dataset,
                   p_mask = 0.15,
                   whole_word = TRUE,
                   val_size = 0.1,
@@ -814,7 +834,9 @@ transformer$train(ml_framework = ml_framework,
                   trace = TRUE,
                   keras_trace = 1,
                   pytorch_trace = 1,
-                  pytorch_safetensors = TRUE)
+                  pytorch_safetensors = TRUE,
+                  log_dir = NULL,
+                  log_write_interval = 2)
 ```
 
 ### `Longformer`
@@ -832,7 +854,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$longformer)
 ```{r, eval = FALSE}
 transformer$create(ml_framework = ml_framework,
                    model_dir = model_dir,
-                   vocab_raw_texts = NULL,
+                   text_dataset = text_dataset,
                    vocab_size = 30522,
                    add_prefix_space = FALSE,
                    trim_offsets = TRUE,
@@ -850,7 +872,9 @@ transformer$create(ml_framework = ml_framework,
                    sustain_region = NULL,
                    sustain_interval = 15,
                    trace = TRUE,
-                   pytorch_safetensors = TRUE)
+                   pytorch_safetensors = TRUE,
+                   log_dir = NULL,
+                   log_write_interval = 2)
 ```
 
 #### Train
@@ -859,7 +883,7 @@ transformer$create(ml_framework = ml_framework,
 transformer$train(ml_framework = ml_framework,
                   output_dir = output_dir,
                   model_dir_path = model_dir_path,
-                  raw_texts = raw_texts,
+                  text_dataset = text_dataset,
                   p_mask = 0.15,
                   val_size = 0.1,
                   n_epoch = 1,
@@ -877,7 +901,9 @@ transformer$train(ml_framework = ml_framework,
                   trace = TRUE,
                   keras_trace = 1,
                   pytorch_trace = 1,
-                  pytorch_safetensors = TRUE)
+                  pytorch_safetensors = TRUE,
+                  log_dir = NULL,
+                  log_write_interval = 2)
 ```
 
 ### `MPNet`
@@ -895,7 +921,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
 ```{r, eval = FALSE}
 transformer$create(ml_framework = ml_framework,
                    model_dir = model_dir,
-                   vocab_raw_texts = NULL,
+                   text_dataset = text_dataset,
                    vocab_size = 30522,
                    vocab_do_lower_case = FALSE,
                    max_position_embeddings = 512,
@@ -911,7 +937,9 @@ transformer$create(ml_framework = ml_framework,
                    sustain_region = NULL,
                    sustain_interval = 15,
                    trace = TRUE,
-                   pytorch_safetensors = TRUE)
+                   pytorch_safetensors = TRUE,
+                   log_dir = NULL,
+                   log_write_interval = 2)
 ```
 
 #### Train
@@ -920,7 +948,7 @@ transformer$create(ml_framework = ml_framework,
 transformer$train(ml_framework = ml_framework,
                   output_dir = output_dir,
                   model_dir_path = model_dir_path,
-                  raw_texts = raw_texts,
+                  text_dataset = text_dataset,
                   p_mask = 0.15,
                   p_perm = 0.15,
                   whole_word = TRUE,
@@ -940,7 +968,9 @@ transformer$train(ml_framework = ml_framework,
                   trace = TRUE,
                   keras_trace = 1,
                   pytorch_trace = 1,
-                  pytorch_safetensors = TRUE)
+                  pytorch_safetensors = TRUE,
+                  log_dir = NULL,
+                  log_write_interval = 2)
 ```
 
 # 4 Implement A Custom Transformer
@@ -1092,12 +1122,13 @@ To implement a new transformer, do the following steps:
         create = function(# (2) --------------------------
                           ml_framework,
                           model_dir,
-                          vocab_raw_texts,
+                          text_dataset,
                           vocab_size,
                           # ...
                           trace,
                           pytorch_safetensors,
-
+                          # ...
+                          
                           # (3) --------------------------
                           dep_param1,
                           dep_param2,
@@ -1119,11 +1150,13 @@ To implement a new transformer, do the following steps:
           super$create(
             ml_framework = ml_framework,
             model_dir = model_dir,
-            vocab_raw_texts = vocab_raw_texts,
+            text_dataset = text_dataset,
             vocab_size = vocab_size,
             # ...
             trace = trace,
-            pytorch_safetensors = pytorch_safetensors)
+            pytorch_safetensors = pytorch_safetensors
+            # ...
+          )
         }
       )
     )

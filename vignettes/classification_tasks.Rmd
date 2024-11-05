@@ -521,7 +521,7 @@ to create a transformer object.
 aife_transformer_maker$make("bert")$create(
   ml_framework = "pytorch",
   model_dir = "my_own_transformer",
-  vocab_raw_texts = example_data$text,
+  text_dataset = LargeDataSetForText$new(example_data),
   vocab_size = 30522,
   vocab_do_lower_case = FALSE,
   max_position_embeddings = 512,
@@ -535,7 +535,9 @@ aife_transformer_maker$make("bert")$create(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  trace = TRUE
+  trace = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
 )
 ```
 
@@ -602,7 +604,7 @@ aife_transformer_maker$make("bert")$train(
   ml_framework = "pytorch",
   output_dir = "my_own_transformer_trained",
   model_dir_path = "my_own_transformer",
-  raw_texts = example_data$text,
+  text_dataset = LargeDataSetForText$new(example_data[1:10, ]),
   p_mask = 0.15,
   whole_word = TRUE,
   val_size = 0.1,
@@ -615,7 +617,9 @@ aife_transformer_maker$make("bert")$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  trace = TRUE
+  trace = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
 )
 ```
 
@@ -626,7 +630,7 @@ saved to avoid reading and writing collisions.
 
 Now, the provided raw data is used to train your model. In the case of a BERT model
 the learning objective is *Masked Language Modeling*. Other models may use other
-learning objectives. Please refer to the documentation for more detials on every model.
+learning objectives. Please refer to the documentation for more details on every model.
 
 First, you can set the length of token sequences with
 `chunk_size`. With `whole_word` you can choose between masking single

@@ -32,11 +32,12 @@
     create = function( # --------------------------
                       ml_framework,
                       model_dir,
-                      vocab_raw_texts,
+                      text_dataset,
                       vocab_size,
                       # ...
                       trace,
                       pytorch_safetensors,
+                      # ...
                       # --------------------------
                       dep_param1,
                       dep_param2,
@@ -58,11 +59,12 @@
       super$create(
         ml_framework = ml_framework,
         model_dir = model_dir,
-        vocab_raw_texts = vocab_raw_texts,
+        text_dataset = text_dataset,
         vocab_size = vocab_size,
         # ...
         trace = trace,
         pytorch_safetensors = pytorch_safetensors
+        # ...
       )
     },
     train = function( # --------
