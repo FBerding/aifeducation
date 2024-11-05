@@ -8,6 +8,7 @@ testthat::skip_if_not(
 set_config_gpu_low_memory()
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
+
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
@@ -17,8 +18,11 @@ aifeducation::set_config_gpu_low_memory()
 set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 
+#config trace
+trace=FALSE
+
 test_art_path <- testthat::test_path("test_artefacts")
-test_art_tmp_path <- testthat::test_path("test_artefacts/tmp")
+test_art_tmp_path <- testthat::test_path("test_artefacts/base_models")
 create_dir(test_art_path, FALSE)
 create_dir(test_art_tmp_path, FALSE)
 
@@ -43,7 +47,7 @@ rows_susatainability <- c(
 
 example_data <- imdb_movie_reviews
 
-tmp_full_models_path <- paste0(test_art_path, "/tmp_full_models")
+tmp_full_models_path <- paste0(test_art_path, "/fct_save_load")
 create_dir(tmp_full_models_path, FALSE)
 
 tmp_full_models_pt_path <- paste0(tmp_full_models_path, "/pytorch")
@@ -86,7 +90,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
 
@@ -108,7 +112,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
         } else if (ai_method == AIFETrType$roberta) {
@@ -130,7 +134,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
 
@@ -152,7 +156,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
         } else if (ai_method == AIFETrType$deberta_v2) {
@@ -174,7 +178,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
 
@@ -196,7 +200,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
         } else if (ai_method == AIFETrType$funnel) {
@@ -218,7 +222,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
 
@@ -239,7 +243,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
         } else if (ai_method == AIFETrType$longformer) {
@@ -262,7 +266,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
 
@@ -285,7 +289,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
         } else if (ai_method == AIFETrType$mpnet) {
@@ -307,7 +311,7 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE
+              trace = trace
             )
           )
         } else {
@@ -337,8 +341,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE,
-              keras_trace = 0
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
           Sys.sleep(5)
@@ -361,8 +366,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE,
-              keras_trace = 0
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
         } else if (ai_method == AIFETrType$roberta) {
@@ -384,8 +390,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              keras_trace = 0,
-              trace = FALSE
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
         } else if (ai_method == AIFETrType$deberta_v2) {
@@ -408,8 +415,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              keras_trace = 0,
-              trace = FALSE
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
           Sys.sleep(2)
@@ -432,8 +440,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              keras_trace = 0,
-              trace = FALSE
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
         } else if (ai_method == AIFETrType$funnel) {
@@ -457,8 +466,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE,
-              keras_trace = 0
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
           Sys.sleep(2)
@@ -482,8 +492,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              trace = FALSE,
-              keras_trace = 0
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
         } else if (ai_method == AIFETrType$longformer) {
@@ -505,8 +516,9 @@ for (framework in ml_frameworks) {
               sustain_iso_code = "DEU",
               sustain_region = NULL,
               sustain_interval = 15,
-              keras_trace = 0,
-              trace = FALSE
+              trace = trace,
+              keras_trace = as.numeric(trace),
+              pytorch_trace = as.numeric(trace)
             )
           )
         } else if (ai_method == AIFETrType$mpnet) {
@@ -532,8 +544,9 @@ for (framework in ml_frameworks) {
                 sustain_iso_code = "DEU",
                 sustain_region = NULL,
                 sustain_interval = 15,
-                trace = FALSE,
-                keras_trace = 0
+                trace = trace,
+                keras_trace = as.numeric(trace),
+                pytorch_trace = as.numeric(trace)
               )
             )
           }

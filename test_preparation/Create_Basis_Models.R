@@ -28,10 +28,6 @@ ml_frameworks <- c(
      "mpnet"
    )
  )
-#method_list <- list(
-#  tensorflow = c(),
-#  pytorch = c("mpnet")
-#)
 
 example_data <- imdb_movie_reviews
 text_data <- example_data$text
