@@ -221,7 +221,6 @@ v en
 Ġchar act
 or t
 Ġ F
-N A
 Ġt im
 i ve
 u m
@@ -266,6 +265,7 @@ on g
 it e
 Ġse e
 Ġn o
+Ġ N
 Ġn e
 at ch
 Ġtim e
@@ -274,7 +274,6 @@ it y
 a g
 c i
 Ġre ally
-Ġ N
 Ġsc en
 o re
 ar s
@@ -1000,6 +999,7 @@ ro ss
 Ġes pecially
 Ġwom an
 ' d
+A T
 a ve
 d ay
 e x
@@ -1060,7 +1060,6 @@ et s
 Ġent ertain
 Ġprodu ction
 0 0
-A T
 h aps
 l ing
 n ot
@@ -1241,6 +1240,7 @@ oll y
 Ġsim ply
 Ġcou nt
 Ġepisod e
+I N
 n er
 v o
 w or
@@ -1323,7 +1323,6 @@ app oint
 Ġtele vision
 ili ar
 1 9
-I N
 c y
 c ess
 i et
@@ -1792,8 +1791,8 @@ res sion
 ĠO f
 ĠO sc
 Ġshow ing
-ag on
 ĠN O
+ag on
 Ġget ting
 Ġcl im
 Ġthem selves
@@ -1840,6 +1839,7 @@ ec ut
 Ġextrem e
 A nd
 B ut
+E N
 O ne
 b and
 b ack
@@ -2050,7 +2050,6 @@ ron t
 Ġsupport ing
 Ġhus band
 3 0
-E N
 F ido
 L E
 O U
@@ -2336,8 +2335,8 @@ ogra p
 Ġcred it
 Ġloc al
 Ġposs ible
-Ġincred ibly
 IN G
+Ġincred ibly
 cess ary
 Ġopp ortun
 Ġdisappoint ed
@@ -2364,6 +2363,7 @@ lus ion
 ĠMiy azaki
 ! )
 ! <
+A M
 I C
 b ed
 d ers
@@ -2480,8 +2480,8 @@ ich ard
 ud d
 Ġup on
 Ġle ave
-Ġne ar
 ĠN ow
+Ġne ar
 Ġte nd
 Ġte xt
 Ġtr ad
@@ -2578,7 +2578,8 @@ yb org
 Ġcommer cial
 ĠEwo ks
 ? )
-A M
+A D
+A N
 I ON
 S o
 S he
@@ -2812,7 +2813,6 @@ akespe are
 ĠEpisod e
 ! "
 5 0
-A N
 A l
 A fter
 A ny
@@ -2971,7 +2971,6 @@ if f
 Ġdo ll
 Ġal one
 Ġsu gg
-ĠL A
 ĠL i
 ĠL au
 ĠL ike
@@ -3148,6 +3147,7 @@ ograp hed
 " )
 ' ,
 ' .
+A L
 A ll
 B l
 B atman
@@ -3323,6 +3323,7 @@ us se
 ak s
 ak ed
 ak ers
+ĠL A
 ĠL V
 ĠL ou
 ĠL et
@@ -3355,12 +3356,12 @@ ort s
 ight s
 ate ver
 Ġno ise
+ĠN ick
+ĠN ever
 Ġne arly
 atch ing
 Ġstory line
 ag ue
-ĠN ick
-ĠN ever
 Ġany where
 Ġte am
 Ġtr ou
@@ -3536,8 +3537,6 @@ How ever
 " ...
 . )<
 : <
-A D
-A L
 A t
 A ST
 B e
@@ -3819,10 +3818,10 @@ ap er
 ĠO men
 Ġshow er
 Ġshow ed
-Ġne igh
-ag es
 ĠN orth
 ĠN ancy
+Ġne igh
+ag es
 Ġscen ery
 Ġthan ked
 Ġen cou
@@ -4207,7 +4206,6 @@ y ou
 Â Ĺ
 Ġ !
 Ġ `
-Ġ NA
 Ġ !!!
 Ġ venge
 Ġt ur
@@ -4682,6 +4680,7 @@ ines e
 Ġpass ed
 ĠAn n
 ĠAn other
+AT ION
 Ġgl ass
 Ġgl oom
 Ġexpl ains
@@ -5003,7 +5002,6 @@ E T
 E ven
 E lection
 G E
-G I
 G o
 G rand
 G irl
@@ -5016,7 +5014,6 @@ I nt
 J ust
 J ames
 L A
-L D
 L ag
 L ike
 M ark
@@ -5433,8 +5430,8 @@ ur ring
 ĠH art
 ĠH ard
 ĠH oll
-ĠH eston
 ĠH AD
+ĠH eston
 ĠH orror
 Ġwe althy
 ck ing
@@ -5442,7 +5439,6 @@ ill e
 ill ed
 ill ie
 ers ed
-ĠC E
 ĠC r
 ĠC or
 ĠC om
@@ -5609,16 +5605,16 @@ ate ur
 Ġshe er
 Ġlo cked
 Ġlo yal
-Ġne at
-ag g
-ag er
-ag an
 ĠN o
 ĠN at
 ĠN ight
 ĠN orm
 ĠN olan
 ĠN aschy
+Ġne at
+ag g
+ag er
+ag an
 Ġany way
 Ġany body
 od e
@@ -6154,7 +6150,6 @@ oop ers
 ĠCarl ito
 ĠDu fy
 iff hanger
-ĠLA P
 ĠLi ving
 ĠGl enn
 Ġvul nerable
@@ -6187,6 +6182,7 @@ ram a
 ĠBra z
 ĠMus ka
 ĠPres ident
+ĠLA P
 ĠLou is
 ĠRob ot
 ĠEnd or
@@ -6377,7 +6373,6 @@ C RE
 D b
 D is
 D ING
-D IA
 D GE
 D ressed
 E D
@@ -6389,6 +6384,7 @@ E VER
 F r
 F or
 G B
+G I
 G i
 G l
 G ay
@@ -6408,6 +6404,7 @@ J enn
 K ung
 K urt
 K oly
+L D
 L Y
 L e
 L il
@@ -6422,8 +6419,8 @@ M uch
 M ery
 M aster
 M ah
-M ichael
 M AN
+M ichael
 M ovies
 M Db
 N T
@@ -6462,7 +6459,6 @@ T om
 T ony
 T wo
 T IC
-T ION
 U S
 U n
 V C
@@ -7202,6 +7198,7 @@ pe au
 ĠC ross
 ĠC ape
 ĠC AR
+ĠC EN
 ĠC any
 ĠC oming
 ĠC GI
@@ -7495,15 +7492,16 @@ ate ful
 Ġsee ks
 Ġsee king
 Ġno body
-Ġne cess
-ag gy
-ci ously
 ĠN on
 ĠN ap
 ĠN els
+ĠN AD
 ĠN iro
 ĠN ichol
 ĠN EVER
+Ġne cess
+ag gy
+ci ously
 ore tta
 Ġany time
 od ge
@@ -7980,7 +7978,6 @@ ison ed
 Ġrest aur
 Ġcomm ended
 ĠLu c
-AT ION
 Ġsm iles
 Ġsm oking
 Ġph one
@@ -8244,6 +8241,7 @@ St anisl
 !!! "
 Ġsusp icious
 Ġhilarious ly
+EN T
 Ġfat ally
 Ġfat ale
 Ġfat ness
@@ -8297,7 +8295,6 @@ lect ronic
 Ġdeli ri
 Ġdeli very
 Ġhonest y
-EN T
 OU S
 ps ons
 Ġtreat s
@@ -8409,6 +8406,7 @@ udd led
 Ġcelebr ity
 Ġcelebr atory
 Ġcommercial s
+AN D
 Wh o
 go ing
 ivi er
@@ -8450,7 +8448,6 @@ arsh an
 Ġsymp athy
 Ġdestro ying
 Ġwitness es
-AN D
 Al though
 Any way
 OW N
@@ -8517,6 +8514,7 @@ raw ley
 Ġsuggest ion
 Ġsuggest ive
 Ġsymbol ism
+AL LY
 Th ink
 just ice
 min ute
@@ -8577,7 +8575,6 @@ rapp ed
 Ġcartoon ish
 Ġintrigu ed
 Ġembarrass ed
-AL LY
 Be autiful
 First ly
 IR ST
@@ -8650,7 +8647,6 @@ Origin al
 cons cious
 fr anch
 hib ition
-ĠNA DIA
 Ġvenge ful
 Ġvenge ance
 Ġtort ured
@@ -8826,7 +8822,6 @@ entle man
 ĠBank olÃ©
 ĠMed em
 ĠHoll iday
-ĠCE NA
 ĠCr ime
 ĠCor man
 ĠCom edy
@@ -8851,8 +8846,8 @@ elight ful
 Ġorchest ra
 Ġmanufact ured
 Ġloyal ty
-Ġneat ly
 ĠNorm a
+Ġneat ly
 Ġunin volving
 Ġarchite ct
 Ġfeed ing
@@ -8902,10 +8897,10 @@ interest ingly
 Ġtreas ure
 Ġgraph ic
 Ġlaunch ing
-ĠLAP D
 Ġidiot ically
 Ġveter an
 ĠBraz il
+ĠLAP D
 Ġoblig ation
 ĠGwyn ne
 Ġmesmer izing
@@ -8997,6 +8992,7 @@ semb led
 ĠHoech lin
 ĠComm un
 ĠCamp bell
+ĠCEN A
 ĠCany on
 ĠCalif ornia
 ĠDest ro
@@ -9043,9 +9039,10 @@ apoc alyptic
 ĠOPER ATION
 ĠOlymp ic
 Ġleuke mia
-Ġnecess ity
 ĠNels on
+ĠNAD IA
 ĠNichol son
+Ġnecess ity
 Ġunint entional
 Ġunple asant
 ablish ment

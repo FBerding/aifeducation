@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "tests/testthat/test_data/TextEmbeddingModel/pytorch/mpnet",
+  "_name_or_path": "tests/testthat/test_data/TEM/pytorch/mpnet",
   "architectures": [
     "MPNetForMPLM_PT"
   ],
@@ -10,7 +10,7 @@
   "hidden_dropout_prob": 0.1,
   "hidden_size": 256,
   "initializer_range": 0.02,
-  "intermediate_size": 1028,
+  "intermediate_size": 512,
   "layer_norm_eps": 1e-12,
   "max_position_embeddings": 512,
   "model_type": "mpnet",
@@ -20,5 +20,5 @@
   "relative_attention_num_buckets": 32,
   "torch_dtype": "float32",
   "transformers_version": "4.37.2",
-  "vocab_size": 2565
+  "vocab_size": 16807
 }

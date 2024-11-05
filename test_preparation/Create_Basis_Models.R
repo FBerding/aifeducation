@@ -2,7 +2,7 @@
 # that can be used for testing TextEmbeddingModels.
 
 # Config-------------------------------------------------------------------------
-root_path_data <- testthat::test_path("test_data/TextEmbeddingModel")
+root_path_data <- testthat::test_path("test_data/TEM")
 
 create_dir(root_path_data, FALSE)
 
@@ -11,32 +11,36 @@ ml_frameworks <- c(
   "pytorch"
 )
 
-# method_list <- list(
-#   tensorflow = c(
-#     "bert",
-#     "roberta",
-#     "longformer",
-#     "funnel",
-#     "deberta_v2"
-#   ),
-#   pytorch = c(
-#     "bert",
-#     "roberta",
-#     "longformer",
-#     "funnel",
-#     "deberta_v2",
-#     "mpnet"
-#   )
-# )
-method_list <- list(
-  tensorflow = c(),
-  pytorch = c("mpnet")
-)
+ method_list <- list(
+   tensorflow = c(
+     "bert",
+     "roberta",
+     "longformer",
+     "funnel",
+     "deberta_v2"
+   ),
+   pytorch = c(
+     "bert",
+     "roberta",
+     "longformer",
+     "funnel",
+     "deberta_v2",
+     "mpnet"
+   )
+ )
+#method_list <- list(
+#  tensorflow = c(),
+#  pytorch = c("mpnet")
+#)
 
 example_data <- imdb_movie_reviews
-trace <- FALSE
+text_data <- example_data$text
 
+trace <- FALSE
+epochs <- 2
 # Start creation and training---------------------------------------------------
+
+
 for (framework in ml_frameworks) {
   root_path_results <- paste0(root_path_data, "/", framework)
   create_dir(root_path_results, FALSE)
@@ -47,60 +51,18 @@ for (framework in ml_frameworks) {
 
     # Base Models
     if (method == "bert") {
-      create_bert_model(
-        ml_framework = framework,
-        model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
-        vocab_size = 50000,
-        vocab_do_lower_case = FALSE,
-        max_position_embeddings = 512,
-        hidden_size = 256,
-        num_hidden_layer = 2,
-        num_attention_heads = 2,
-        intermediate_size = 256,
-        hidden_act = "gelu",
-        hidden_dropout_prob = 0.1,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        trace = trace
-      )
-
-      train_tune_bert_model(
-        ml_framework = framework,
-        output_dir = root_path_results_model,
-        model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:10],
-        p_mask = 0.15,
-        whole_word = TRUE,
-        full_sequences_only = TRUE,
-        val_size = 0.25,
-        n_epoch = 2,
-        batch_size = 2,
-        chunk_size = 100,
-        n_workers = 1,
-        multi_process = FALSE,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        trace = trace,
-        keras_trace = 0
-      )
-    } else if (method == "mpnet") {
-      transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
+      transformer <- aife_transformer_maker$make(AIFETrType$bert)
       transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text[1:10],
+        vocab_raw_texts = text_data,
         vocab_size = 30522,
         vocab_do_lower_case = FALSE,
         max_position_embeddings = 512,
         hidden_size = 256,
         num_hidden_layer = 2,
         num_attention_heads = 2,
-        intermediate_size = 1028,
+        intermediate_size = 512,
         hidden_act = "gelu",
         hidden_dropout_prob = 0.1,
         attention_probs_dropout_prob = 0.1,
@@ -108,20 +70,18 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = TRUE,
+        trace = trace,
         pytorch_safetensors = TRUE
       )
-
       transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:10],
+        raw_texts = text_data,
         p_mask = 0.15,
-        p_perm = 0.15,
         whole_word = TRUE,
         val_size = 0.1,
-        n_epoch = 2,
+        n_epoch = epochs,
         batch_size = 12,
         chunk_size = 250,
         full_sequences_only = FALSE,
@@ -133,125 +93,49 @@ for (framework in ml_frameworks) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = TRUE,
-        keras_trace = 1,
-        pytorch_trace = 1,
+        trace = trace,
+        keras_trace = as.numeric(trace),
+        pytorch_trace = as.numeric(trace),
         pytorch_safetensors = TRUE
       )
-    } else if (method == "roberta") {
-      create_roberta_model(
+    } else if (method == "mpnet") {
+      transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
-        vocab_size = 10000,
-        add_prefix_space = TRUE,
+        vocab_raw_texts = text_data,
+        vocab_size = 30522,
+        vocab_do_lower_case = FALSE,
         max_position_embeddings = 512,
-        hidden_size = 32,
+        hidden_size = 256,
         num_hidden_layer = 2,
         num_attention_heads = 2,
-        intermediate_size = 128,
+        intermediate_size = 512,
         hidden_act = "gelu",
         hidden_dropout_prob = 0.1,
+        attention_probs_dropout_prob = 0.1,
         sustain_track = TRUE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        pytorch_safetensors = TRUE
       )
-      train_tune_roberta_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:5],
-        p_mask = 0.30,
-        val_size = 0.1,
-        n_epoch = 2,
-        batch_size = 1,
-        chunk_size = 70,
-        full_sequences_only = TRUE,
-        n_workers = 1,
-        multi_process = FALSE,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        keras_trace = 0,
-        trace = trace
-      )
-    } else if (method == "longformer") {
-      create_longformer_model(
-        ml_framework = framework,
-        model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text[1:500],
-        vocab_size = 10000,
-        add_prefix_space = FALSE,
-        max_position_embeddings = 512,
-        hidden_size = 32,
-        num_hidden_layer = 2,
-        num_attention_heads = 2,
-        intermediate_size = 128,
-        hidden_act = "gelu",
-        hidden_dropout_prob = 0.1,
-        attention_window = 40,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        trace = trace
-      )
-      train_tune_longformer_model(
-        ml_framework = framework,
-        output_dir = root_path_results_model,
-        model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:5],
-        p_mask = 0.30,
-        val_size = 0.1,
-        n_epoch = 2,
-        batch_size = 1,
-        chunk_size = 512,
-        full_sequences_only = FALSE,
-        n_workers = 1,
-        multi_process = FALSE,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        keras_trace = 0,
-        trace = trace
-      )
-    } else if (method == "funnel") {
-      create_funnel_model(
-        ml_framework = framework,
-        model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
-        vocab_size = 10000,
-        max_position_embeddings = 512,
-        hidden_size = 32,
-        block_sizes = c(2, 2, 2),
-        num_decoder_layers = 2,
-        num_attention_heads = 2,
-        intermediate_size = 128,
-        hidden_act = "gelu",
-        hidden_dropout_prob = 0.1,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        trace = trace
-      )
-      train_tune_funnel_model(
-        ml_framework = framework,
-        output_dir = root_path_results_model,
-        model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:20],
+        raw_texts = text_data,
         p_mask = 0.15,
-        whole_word = FALSE,
+        p_perm = 0.15,
+        whole_word = TRUE,
         val_size = 0.1,
-        n_epoch = 2,
-        batch_size = 2,
-        min_seq_len = 50,
-        full_sequences_only = TRUE,
+        n_epoch = epochs,
+        batch_size = 12,
         chunk_size = 250,
+        full_sequences_only = FALSE,
+        min_seq_len = 50,
+        learning_rate = 3e-3,
         n_workers = 1,
         multi_process = FALSE,
         sustain_track = TRUE,
@@ -259,51 +143,207 @@ for (framework in ml_frameworks) {
         sustain_region = NULL,
         sustain_interval = 15,
         trace = trace,
-        keras_trace = 0
+        keras_trace = as.numeric(trace),
+        pytorch_trace = as.numeric(trace),
+        pytorch_safetensors = TRUE
       )
-    } else if (method == "deberta_v2") {
-      create_deberta_v2_model(
+    } else if (method == "roberta") {
+      transformer <- aife_transformer_maker$make(AIFETrType$roberta)
+      transformer$create(
         ml_framework = framework,
         model_dir = root_path_results_model,
-        vocab_raw_texts = example_data$text,
-        vocab_size = 10000,
-        do_lower_case = FALSE,
-        # add_prefix_space=FALSE,
+        vocab_raw_texts = text_data,
+        vocab_size = 30522,
+        add_prefix_space = FALSE,
+        trim_offsets = TRUE,
         max_position_embeddings = 512,
-        hidden_size = 32,
+        hidden_size = 256,
         num_hidden_layer = 2,
         num_attention_heads = 2,
-        intermediate_size = 128,
+        intermediate_size = 512,
         hidden_act = "gelu",
         hidden_dropout_prob = 0.1,
+        attention_probs_dropout_prob = 0.1,
         sustain_track = TRUE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = trace,
+        pytorch_safetensors = TRUE
       )
-      train_tune_deberta_v2_model(
+      transformer$train(
         ml_framework = framework,
         output_dir = root_path_results_model,
         model_dir_path = root_path_results_model,
-        raw_texts = example_data$text[1:5],
+        raw_texts = text_data,
         p_mask = 0.15,
-        whole_word = FALSE,
         val_size = 0.1,
-        n_epoch = 2,
-        batch_size = 2,
-        chunk_size = 100,
+        n_epoch = epochs,
+        batch_size = 12,
+        chunk_size = 250,
         full_sequences_only = FALSE,
+        min_seq_len = 50,
+        learning_rate = 3e-2,
         n_workers = 1,
         multi_process = FALSE,
         sustain_track = TRUE,
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        keras_trace = 0,
-        trace = trace
+        trace = trace,
+        keras_trace = as.numeric(trace),
+        pytorch_trace = as.numeric(trace),
+        pytorch_safetensors = TRUE
+      )
+    } else if (method == "longformer") {
+      transformer <- aife_transformer_maker$make(AIFETrType$longformer)
+      transformer$create(
+        ml_framework = framework,
+        model_dir = root_path_results_model,
+        vocab_raw_texts = text_data,
+        vocab_size = 30522,
+        add_prefix_space = FALSE,
+        trim_offsets = TRUE,
+        max_position_embeddings = 512,
+        hidden_size = 256,
+        num_hidden_layer = 2,
+        num_attention_heads = 2,
+        intermediate_size = 512,
+        hidden_act = "gelu",
+        hidden_dropout_prob = 0.1,
+        attention_probs_dropout_prob = 0.1,
+        attention_window = 512,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace,
+        pytorch_safetensors = TRUE
+      )
+      transformer$train(
+        ml_framework = framework,
+        output_dir = root_path_results_model,
+        model_dir_path = root_path_results_model,
+        raw_texts = text_data,
+        p_mask = 0.15,
+        val_size = 0.1,
+        n_epoch = epochs,
+        batch_size = 12,
+        chunk_size = 250,
+        full_sequences_only = FALSE,
+        min_seq_len = 50,
+        learning_rate = 3e-2,
+        n_workers = 1,
+        multi_process = FALSE,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace,
+        keras_trace = as.numeric(trace),
+        pytorch_trace = as.numeric(trace),
+        pytorch_safetensors = TRUE
+      )
+    } else if (method == "funnel") {
+      transformer <- aife_transformer_maker$make(AIFETrType$funnel)
+      transformer$create(
+        ml_framework = framework,
+        model_dir = root_path_results_model,
+        vocab_raw_texts = text_data,
+        vocab_size = 30522,
+        vocab_do_lower_case = FALSE,
+        max_position_embeddings = 512,
+        hidden_size = 256,
+        target_hidden_size = 32,
+        block_sizes = c(4, 4, 4),
+        num_attention_heads = 2,
+        intermediate_size = 512,
+        num_decoder_layers = 2,
+        pooling_type = "mean",
+        hidden_act = "gelu",
+        hidden_dropout_prob = 0.1,
+        attention_probs_dropout_prob = 0.1,
+        activation_dropout = 0.0,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace,
+        pytorch_safetensors = TRUE
+      )
+      transformer$train(
+        ml_framework = framework,
+        output_dir = root_path_results_model,
+        model_dir_path = root_path_results_model,
+        raw_texts = text_data,
+        p_mask = 0.15,
+        whole_word = TRUE,
+        val_size = 0.1,
+        n_epoch = epochs,
+        batch_size = 12,
+        chunk_size = 250,
+        full_sequences_only = FALSE,
+        min_seq_len = 50,
+        learning_rate = 3e-3,
+        n_workers = 1,
+        multi_process = FALSE,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace,
+        keras_trace = as.numeric(trace),
+        pytorch_trace = as.numeric(trace),
+        pytorch_safetensors = TRUE
+      )
+    } else if (method == "deberta_v2") {
+      transformer <- aife_transformer_maker$make(AIFETrType$deberta_v2)
+      transformer$create(
+        ml_framework = framework,
+        model_dir = root_path_results_model,
+        vocab_raw_texts = text_data,
+        vocab_size = 30000,
+        vocab_do_lower_case = FALSE,
+        max_position_embeddings = 512,
+        hidden_size = 256,
+        num_hidden_layer = 2,
+        num_attention_heads = 2,
+        intermediate_size = 512,
+        hidden_act = "gelu",
+        hidden_dropout_prob = 0.1,
+        attention_probs_dropout_prob = 0.1,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace,
+        pytorch_safetensors = TRUE
+      )
+      transformer$train(
+        ml_framework = framework,
+        output_dir = root_path_results_model,
+        model_dir_path = root_path_results_model,
+        raw_texts = text_data,
+        p_mask = 0.15,
+        whole_word = TRUE,
+        val_size = 0.1,
+        n_epoch = epochs,
+        batch_size = 12,
+        chunk_size = 250,
+        full_sequences_only = FALSE,
+        min_seq_len = 50,
+        learning_rate = 3e-2,
+        n_workers = 1,
+        multi_process = FALSE,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace,
+        keras_trace = as.numeric(trace),
+        pytorch_trace = as.numeric(trace),
+        pytorch_safetensors = TRUE
       )
     }
   }
 }
-
