@@ -183,11 +183,29 @@ start_aifeducation_studio()
 
 Please note that this can take a moment.
 
-At the beginning you will see the home page (Figure 4).
+At the beginning you will see the start page (Figure 4). Here you can
+configure your current session. First, it is very important that you
+choose the machine learning framework that you would like to use during
+the session (box *Machine Learning Framework*). This choice cannot be changed after the session
+starts. To change the framework you have to restart *Aifeducation Studio*.
 
-![Figure 4: Home Page](img_articles/gui/home.png){width="100%"}
+![Figure 4: Start Page](img_articles/gui_aife_studio_config.jpg){width="100%"}
 
-Here you cannot choose framework (*pytorch* is activated by default).
+Depending on the chosen framework, you can activate some further
+settings (box *Machine Learning Framework*). If you would like to use *tensorflow* and your
+computer has a graphic device with low memory, we recommend to activate
+the option for low memory. For *pytorch*, no configuration is necessary.
+
+On the right side of the start page, you can decide if energy
+consumption should be recorded during training AI (box *Sustainability Tracking*). 
+Tracking energy
+consumption allows to estimate the CO2 emissions of using AI. Since our
+world faces the challenge of climate change, we recommend to enable this
+option. In this case you have to choose your country in order to allow a
+more accurate estimation of the model's sustainability impact.
+
+If you are ready you can press the start button (box *Start Session*), which directs
+you to the home page.
 
 # 3 Using Aifeducation Studio
 
@@ -206,15 +224,16 @@ embeddings which can be used as input for training a classifier or for
 predicting the texts' labels via classifier.
 
 To create a collection of raw texts, you have to choose the 
-*Data Management* page on the top panel as shown in Figure 5. 
+*Data Preparation* page on the right side as shown in Figure 5. 
 
-![Figure 5: Data Management Page](img_articles/gui/DM_Creator.png){width="100%"} 
+![Figure 5: Start Page](img_articles/gui_aife_studio_home.jpg){width="100%"} 
 
 On the
 resulting page (see Figure 6), you first have to choose the directory where the texts
 are stored (box *Text Sources*). We recommend that you store all texts you would
 like to use in a single folder. Within this folder, you can structure
-your data with sub-folders.
+your data with sub-folders. In case you use sub-folders, please ensure
+that you include them for creating a collection of raw texts.
 
 ![Figure 6: Data Preparation Page](img_articles/gui_aife_studio_create_text_collection.jpg){width="100%"}
 
