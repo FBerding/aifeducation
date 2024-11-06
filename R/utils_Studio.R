@@ -193,9 +193,8 @@ generate_model_bib_description <- function(model) {
     if (!is.null(pub_info$modifided_by$citation)) {
       shiny::tags$p("Citation: ", pub_info$modifided_by$citation)
     },
-    # TODO (Yuliia): get_model_info() has no visible binding
     if (!is.null(pub_info$modifided_by$citation)) {
-      shiny::tags$p("Language: ", get_model_info()$model_language)
+      shiny::tags$p("Language: ", model$get_model_info()$model_language)
     },
   )
 
@@ -436,6 +435,9 @@ load_and_check_embeddings <- function(dir_path) {
 #' @return If there are any errors an error modal is displayed by calling the function [display_errors]. If there are no
 #'   errors the function returns a `data.frame` containing the target data. In the case of erros the function returns
 #'   `NULL`.
+#'
+#' @importFrom stringi stri_split_fixed
+#' @importFrom stringi stri_trans_tolower
 #'
 #' @family studio_utils
 #' @keywords internal

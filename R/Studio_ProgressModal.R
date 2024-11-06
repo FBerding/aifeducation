@@ -1,7 +1,7 @@
 #' @title Create process modal for long running tasks
 #' @description Function creates a shiny modal which is used to report the current status of all long running tasks.
 #'
-#' @param ns `function` for setting the namespace of the input and output elements.
+#' @param ns `function` for setting the namespace of the input and output elements. In most cases this is `session$ns`.
 #' @param title `string` Title of the modal.
 #' @param string_update_interval `string` indicating in how many seconds the charts updates. Value is displayed
 #' as an information for the user.
@@ -20,7 +20,7 @@
 #'
 
 # TODO (Yuliia): session has no visible binding
-create_process_modal <- function(ns = session$ns,
+create_process_modal <- function(ns,
                                  string_update_interval="",
                                  title = "In progress. Please wait.",
                                  inc_middle = TRUE,

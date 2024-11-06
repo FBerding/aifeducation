@@ -14,7 +14,7 @@
 #' @param Ns `int` Value for the sample. Only relevant for ProtoNet.
 #' @param Nq `int` value for the query. Only relevant for ProtoNet.
 #' @param loss_alpha `double` Value for alpha in the loss. Only relevant for ProtoNet.
-#' @param loss_maring `double` Value for the margin. Only relevant for ProtoNet.
+#' @param loss_margin `double` Value for the margin. Only relevant for ProtoNet.
 #' @param embedding_dim `int` Number of dimensions for the embedding. Only relevant for ProtoNet.
 #'
 #' @return Returns a `list` containing the elements of a user interface for displaying the errors. If no errors ware

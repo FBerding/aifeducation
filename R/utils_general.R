@@ -159,6 +159,7 @@ cat_message <- function(msg, trace) {
 #' @param dir_path `string` A new directory path that should be created.
 #' @param trace `bool` Whether a `msg` message should be printed.
 #' @param msg `string` A message that should be printed if `trace` is `TRUE`.
+#' @param msg_fun `func` Function used for printing the message.
 #'
 #' @return `TRUE` or `FALSE` depending on whether the shiny app is active.
 #' @family Utils

@@ -62,6 +62,7 @@ DataManagerClassifier <- R6::R6Class(
     #' @param sc_min_k `int` determining the minimal number of neighbors during the creating of synthetic cases.
     #' @param sc_max_k `int` determining the minimal number of neighbors during the creating of synthetic cases.
     #' @param trace `bool` If `TRUE` information on the process are printed to the console.
+    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases.
     #' @return Method returns an initialized object of class [DataManagerClassifier].
     initialize = function(data_embeddings,
                           data_targets,
@@ -73,7 +74,8 @@ DataManagerClassifier <- R6::R6Class(
                           sc_methods = "dbsmote",
                           sc_min_k = 1,
                           sc_max_k = 10,
-                          trace = TRUE) {
+                          trace = TRUE,
+                          n_cores=4) {
       # Checking Prerequisites---------------------------------------------------
       check_class(data_embeddings, c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
       check_class(data_targets, c("factor"), FALSE)
@@ -92,6 +94,7 @@ DataManagerClassifier <- R6::R6Class(
       check_type(sc_min_k, "int")
       check_type(sc_max_k, "int")
       check_type(trace, "bool")
+      check_type(n_cores, "int",FALSE)
 
       # Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -118,6 +121,7 @@ DataManagerClassifier <- R6::R6Class(
       self$config$sc$methods <- sc_methods
       self$config$sc$max_k <- sc_max_k
       self$config$sc$min_k <- sc_min_k
+      self$config$n_cores<-n_cores
 
       # Add one hot encoding if necessary
       if (self$config$one_hot_encoding == TRUE) {
@@ -345,7 +349,7 @@ DataManagerClassifier <- R6::R6Class(
 
       # Set up parallel processing
       requireNamespace(package = "foreach", quietly = TRUE)
-      cl <- parallel::makeCluster(parallel::detectCores())
+      cl <- parallel::makeCluster(self$config$n_cores)
       doParallel::registerDoParallel(cl)
 
       # Create Synthetic Cases

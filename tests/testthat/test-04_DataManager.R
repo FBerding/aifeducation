@@ -4,7 +4,8 @@ testthat::skip_if_not(
 )
 
 # SetUp-------------------------------------------------------------------------
-# root_path_data=testthat::test_path("test_data/DataManager")
+root_path_general_data<-testthat::test_path("test_data/Embeddings")
+root_path_data <- testthat::test_path("test_data/classifier")
 # if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
 #  dir.create(testthat::test_path("test_artefacts"))
 # }
@@ -19,8 +20,7 @@ transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
 # Load test data
-path <- "test_data/classifier/imdb_embeddings.rda"
-load(testthat::test_path(path))
+imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 current_embeddings <- imdb_embeddings$clone(deep = TRUE)
 example_data <- imdb_movie_reviews
 
@@ -57,7 +57,8 @@ for (method in methods) {
       sc_methods = method,
       sc_min_k = 1,
       sc_max_k = 10,
-      trace = FALSE
+      trace = FALSE,
+      n_cores=2
     )
 
     for (i in 1:(test_datamanager$get_n_folds() + 1)) {

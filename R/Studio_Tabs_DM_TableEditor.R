@@ -166,12 +166,12 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
       ignoreNULL = FALSE
     )
     # Reactive Value------------------------------------------------------------
-    current_table <- reactiveVal()
-    file_path <- reactiveVal()
-    reload_table <- reactiveVal(value = TRUE)
+    current_table <- shiny::reactiveVal()
+    file_path <- shiny::reactiveVal()
+    reload_table <- shiny::reactiveVal(value = TRUE)
 
     # Routines------------------------------------------------------------------
-    observeEvent(input$button_new_table, {
+    shiny::observeEvent(input$button_new_table, {
       table <- as.data.frame(matrix(
         data = NA,
         nrow = 5,
@@ -191,7 +191,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
       return(file_path())
     })
 
-    observe({
+    shiny::observe({
       if (reload_table() == TRUE) {
         output$card_body_table_editor <- DT::renderDataTable({
           return(
@@ -207,7 +207,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
     })
 
     # Edit Cell-----------------------------------------------------------------
-    observeEvent(input$card_body_table_editor_cell_edit, {
+    shiny::observeEvent(input$card_body_table_editor_cell_edit, {
       tmp_data <- current_table()
       tmp_row <- input$card_body_table_editor_cell_edit[1, 1]
       tmp_col <- input$card_body_table_editor_cell_edit[1, 2] + 1
@@ -218,7 +218,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
     })
 
     # Add and remove rows-------------------------------------------------------
-    observeEvent(input$add_row, {
+    shiny::observeEvent(input$add_row, {
       tmp_data <- current_table()
       shiny::req(tmp_data)
       new_row <- rep(x = NA, times = ncol(tmp_data))
@@ -227,7 +227,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
       reload_table(TRUE)
       current_table(tmp_data)
     })
-    observeEvent(input$remove_row, {
+    shiny::observeEvent(input$remove_row, {
       tmp_data <- current_table()
       shiny::req(tmp_data)
       if (input$remove_row_number <= nrow(tmp_data) & input$remove_row_number > 0) {
@@ -238,14 +238,14 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
     })
 
     # Add and remove col-------------------------------------------------------
-    observeEvent(input$add_col, {
+    shiny::observeEvent(input$add_col, {
       tmp_data <- current_table()
       shiny::req(tmp_data)
       tmp_data[[paste0("new_col_", ncol(tmp_data))]] <- NA
       reload_table(TRUE)
       current_table(tmp_data)
     })
-    observeEvent(input$remove_col, {
+    shiny::observeEvent(input$remove_col, {
       tmp_data <- current_table()
       shiny::req(tmp_data)
       index <- which(colnames(tmp_data) == input$remove_col_name)
@@ -257,7 +257,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
     })
 
     # Rename columns------------------------------------------------------------
-    observeEvent(input$rename_col, {
+    shiny::observeEvent(input$rename_col, {
       tmp_data <- current_table()
       shiny::req(tmp_data)
       if (input$rename_col_old %in% colnames(tmp_data) & !input$rename_col_new %in% colnames(tmp_data)) {

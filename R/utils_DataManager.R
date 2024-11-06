@@ -102,8 +102,9 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     }
   }
 
-
-  result_list <- foreach::foreach(index = 1:length(input), .export = "create_synthetic_units_from_matrix") %dopar% {
+  result_list <- foreach::foreach(index = 1:length(input),
+                                  .export = "create_synthetic_units_from_matrix",
+                                  .errorhandling="pass") %dopar% {
     # index=1
     create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
@@ -176,7 +177,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #---------------------------------------------
 #' @title Create synthetic units
 #' @description Function for creating synthetic cases in order to balance the data for training with
-#'   [TextEmbeddingClassifierNeuralNet]. This is an auxiliary function for use with [get_synthetic_cases] to allow
+#'   [TextEmbeddingClassifierNeuralNet]. This is an auxiliary function for use with [get_synthetic_cases_from_matrix] to allow
 #'   parallel computations.
 #'
 #' @param matrix_form Named `matrix` containing the text embeddings in matrix form. In most cases this object is taken
@@ -190,7 +191,6 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #' @param method `vector` containing strings of the requested methods for generating new cases. Currently
 #'   "smote","dbsmote", and "adas" from the package smotefamily are available.
 #' @param cat `string` The category for which new cases should be created.
-#' @param cat_freq Object of class `"table"` containing the absolute frequencies of every category/label.
 #' @return Returns a `list` which contains the text embeddings of the new synthetic cases as a named `data.frame` and
 #'   their labels as a named `factor`.
 #'
@@ -226,29 +226,38 @@ create_synthetic_units_from_matrix <- function(matrix_form,
 
   syn_data <- NULL
   if (method == "smote") {
-    syn_data <- smotefamily::SMOTE(
-      X = as.data.frame(matrix_form),
-      target = tmp_target,
-      K = k,
-      dup_size = dup_size
+    syn_data <- try(
+      smotefamily::SMOTE(
+        X = as.data.frame(matrix_form),
+        target = tmp_target,
+        K = k,
+        dup_size = dup_size
+      ),
+      silent = TRUE
     )
   } else if (method == "adas") {
-    syn_data <- smotefamily::ADAS(
-      X = as.data.frame(matrix_form),
-      target = tmp_target,
-      K = k
+    syn_data <- try(
+      smotefamily::ADAS(
+        X = as.data.frame(matrix_form),
+        target = tmp_target,
+        K = k
+      ),
+      silent = TRUE
     )
   } else if (method == "dbsmote") {
-    syn_data <- smotefamily::DBSMOTE(
-      X = as.data.frame(matrix_form),
-      target = tmp_target,
-      dupSize = dup_size,
-      MinPts = NULL,
-      eps = NULL
+    syn_data <- try(
+      smotefamily::DBSMOTE(
+        X = as.data.frame(matrix_form),
+        target = tmp_target,
+        dupSize = dup_size,
+        MinPts = NULL,
+        eps = NULL
+      ),
+      silent = TRUE
     )
   }
 
-  if (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0) {
+  if (inherits(x = syn_data, what = "try-error") == FALSE & (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)) {
     n_cols_embedding <- ncol(matrix_form)
     tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(

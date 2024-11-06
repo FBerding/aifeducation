@@ -4,14 +4,16 @@ testthat::skip_if_not(
 )
 
 # SetUp Test---------------------------------------------------------------------
-root_path_data <- testthat::test_path("test_data/LargeDataSetForTextEmbeddings")
+root_path_general_data<-testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/LargeDataSetForTextEmbeddings")
 create_dir(root_path_results, FALSE)
 
 # object is imdb_embeddings
-load(testthat::test_path("test_data/classifier/imdb_embeddings.rda"))
+imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
+imdb_embeddings<-imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+imdb_embeddings<-imdb_embeddings$convert_to_EmbeddedText()
 
 # Start test---------------------------------------------------------------------
 test_that("LargeDataSetForTextEmbeddings - Create", {

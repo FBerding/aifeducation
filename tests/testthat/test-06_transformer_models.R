@@ -8,9 +8,14 @@ testthat::skip_if_not(
 set_config_gpu_low_memory()
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
+# Disable tqdm progressbar
+transformers$logging$disable_progress_bar()
+datasets$disable_progress_bars()
+
+# SetUp tensorflow
+aifeducation::set_config_gpu_low_memory()
 set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
-transformers$logging$disable_progress_bar()
 
 test_art_path <- testthat::test_path("test_artefacts")
 test_art_tmp_path <- testthat::test_path("test_artefacts/tmp")

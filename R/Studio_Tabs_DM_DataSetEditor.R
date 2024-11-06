@@ -142,7 +142,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
 
     # Reactive Values-----------------------------------------------------------
     # Load Data Sets
-    loaded_object <- reactive({
+    loaded_object <- shiny::reactive({
       if (!is.null(folder_path())) {
         object <- load_from_disk(dir_path = folder_path())
         if ("LargeDataSetForText" %in% class(object)) {
@@ -157,7 +157,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
         return(NULL)
       }
     })
-    n_documents <- reactive({
+    n_documents <- shiny::reactive({
       if (!is.null(loaded_object())) {
         n_documents <- loaded_object()$n_rows()
         shiny::updateNumericInput(
@@ -170,7 +170,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
         return(NULL)
       }
     })
-    current_document <- reactive({
+    current_document <- shiny::reactive({
       if (!is.null(loaded_object())) {
         document <- loaded_object()$get_dataset()
         # Python is zero based
@@ -180,7 +180,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
         return(NULL)
       }
     })
-    max_pages <- reactive({
+    max_pages <- shiny::reactive({
       if (!is.null(current_document())) {
         max_pages <- ceiling(nchar(current_document()$text) / 1800)
         shiny::updateNumericInput(
@@ -252,26 +252,26 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
     })
 
     ## Ui Elements editor Selection of documents---------------------------------
-    observeEvent(input$document_plus, {
+    shiny::observeEvent(input$document_plus, {
       shiny::updateNumericInput(
         inputId = "document_selected",
         value = min(input$document_selected + 1, n_documents())
       )
     })
-    observeEvent(input$document_minus, {
+    shiny::observeEvent(input$document_minus, {
       shiny::updateNumericInput(
         inputId = "document_selected",
         value = max(1, input$document_selected - 1)
       )
     })
     # Selection of pages--------------------------------------------------------
-    observeEvent(input$page_plus, {
+    shiny::observeEvent(input$page_plus, {
       shiny::updateNumericInput(
         inputId = "page_selected",
         value = min(input$page_selected + 1, max_pages())
       )
     })
-    observeEvent(input$page_minus, {
+    shiny::observeEvent(input$page_minus, {
       shiny::updateNumericInput(
         inputId = "page_selected",
         value = max(1, input$page_selected - 1)

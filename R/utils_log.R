@@ -17,7 +17,7 @@ write_log <- function(log_file,
 
     log <- try(write.csv(x = log_data, file = log_file, row.names = FALSE))
 
-    if (class(log) != "try-error") {
+    if (!inherits(log, "try-error")) {
       return(Sys.time())
     } else {
       return(last_log)
@@ -45,7 +45,7 @@ read_log <- function(file_path) {
   res <- NULL
   if (!is.null_or_na(file_path)) {
     log_file <- try(read.csv(file_path))
-    if (class(log_file) != "try-error") res <- log_file
+    if (!inherits(log_file, "try-error")) res <- log_file
   }
   return(res)
 }
@@ -71,7 +71,7 @@ read_loss_log <- function(path_loss) {
   }
 
   loss_data <- try(
-    read.table(file = path_loss, sep = ",", header = FALSE),
+    utils::read.table(file = path_loss, sep = ",", header = FALSE),
     silent = TRUE
   )
 
@@ -109,7 +109,7 @@ reset_loss_log <- function(log_path, epochs) {
   )
 
   try(
-    write.table(
+    utils::write.table(
       x = log_data, file = log_path,
       row.names = FALSE,
       col.names = FALSE,
