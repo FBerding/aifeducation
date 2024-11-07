@@ -22,6 +22,8 @@ long_add_texts_to_dataset <- function(source_path,
 
     # Start processing different file types
     if (include_txt) {
+      top_value <- top_value + 1
+
       new_dataset$add_from_files_txt(
         dir_path = source_path,
         batch_size = 2,
@@ -32,10 +34,11 @@ long_add_texts_to_dataset <- function(source_path,
         log_write_interval = log_write_interval,
         trace = FALSE
       )
-      top_value <- top_value + 1
     }
 
     if (include_pdf) {
+      top_value <- top_value + 1
+
       new_dataset$add_from_files_pdf(
         dir_path = source_path,
         batch_size = 2,
@@ -46,10 +49,11 @@ long_add_texts_to_dataset <- function(source_path,
         log_write_interval = log_write_interval,
         trace = FALSE
       )
-      top_value <- top_value + 1
     }
 
     if (include_xlsx) {
+      top_value <- top_value + 1
+
       new_dataset$add_from_files_xlsx(
         dir_path = source_path,
         trace = FALSE,
@@ -63,7 +67,6 @@ long_add_texts_to_dataset <- function(source_path,
         log_top_message = total_message,
         log_write_interval = log_write_interval,
       )
-      top_value <- top_value + 1
     }
 
     # Save

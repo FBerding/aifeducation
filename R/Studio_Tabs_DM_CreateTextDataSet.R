@@ -77,19 +77,23 @@ DataManagement_RawTextsUI <- function(id) {
                   ),
                   shiny::textInput(
                     inputId = shiny::NS(id, "excel_id_column"),
-                    label = "Name of ID column for xlsx files"
+                    label = "Name of ID column for xlsx files",
+                    value = "id"
                   ),
                   shiny::textInput(
                     inputId = shiny::NS(id, "excel_text_column"),
-                    label = "Name of text column for xlsx files"
+                    label = "Name of text column for xlsx files",
+                    value = "text"
                   ),
                   shiny::textInput(
                     inputId = shiny::NS(id, "excel_license_column"),
-                    label = "Name of license column for xlsx files"
+                    label = "Name of license column for xlsx files",
+                    value = "license"
                   ),
                   shiny::textInput(
                     inputId = shiny::NS(id, "excel_bib_entry_column"),
-                    label = "Name of bib entry column for xlsx files"
+                    label = "Name of bib entry column for xlsx files",
+                    value = "bib_entry"
                   )
                 )
               )

@@ -323,6 +323,7 @@ ModelArchitecture_Server <- function(id, volumes) {
           trim_offsets_ui
         )
       }
+      return(model_based_vocab_params_list)
     })
 
     output$model_based_vocab_config <- shiny::renderUI({
