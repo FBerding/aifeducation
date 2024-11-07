@@ -41,7 +41,6 @@ reference:
 - contents:
   - has_concept("Graphical User Interface")
   - has_concept("Auxiliary GUI Functions")
-  - has_concept("studio_utils")
 
 - title: Saving and Loading
 - contents:
@@ -98,4 +97,8 @@ reference:
 - subtitle: Utils
 - contents:
   - has_concept("Utils")
+- subtitle: AI for Education Studio
+- contents:
+  - has_concept("studio_utils")
+
 

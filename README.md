@@ -14,7 +14,8 @@ status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-proje
 [![Project Status: Active - The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-
+[![Codecov test
+coverage](https://codecov.io/gh/FBerding/aifeducation/graph/badge.svg)](https://app.codecov.io/gh/FBerding/aifeducation)
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
