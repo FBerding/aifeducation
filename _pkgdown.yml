@@ -29,7 +29,6 @@ navbar:
       - text: "A01 Supported Machine Learning Frameworks"
         href: "articles/Appendix_A01_Supported_Frameworks.html"
 
-
 reference:
 - title: Installation and Configuration
 - contents:
@@ -38,9 +37,11 @@ reference:
 - contents:
   - has_concept("Installation and Configuration Tensorflow")
 
-- title: Graphical User Interface
+- title: AI for Education Studio
 - contents:
   - has_concept("Graphical User Interface")
+  - has_concept("Auxiliary GUI Functions")
+  - has_concept("studio_utils")
 
 - title: Saving and Loading
 - contents:
@@ -49,15 +50,11 @@ reference:
 - contents:
   - has_concept("Saving and Loading Deprecated")
 
-- title: Preparation
-- contents:
-  - has_concept("Preparation")
-
 - title: Data Management
 - contents:
   - has_concept("Data Management")
 
-- title: Transformer
+- title: Base Models and Transformers
 - contents:
   - has_concept("Transformer")
 - subtitle: Deprecated
@@ -88,11 +85,6 @@ reference:
 - contents:
   - has_concept("classifier_utils")
 
-- subtitle: AI for Education Studio
-- contents:
-  - has_concept("Auxiliary GUI Functions")
-  - has_concept("studio_utils")
-
 - title: For developers
 - subtitle: Transformers
 - contents:
@@ -103,6 +95,7 @@ reference:
 - subtitle: Classifiers
 - contents:
   - has_concept("Classifiers for developers")
-- subtitle: Transformers
+- subtitle: Utils
+- contents:
   - has_concept("Utils")
 

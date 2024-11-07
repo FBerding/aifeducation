@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Text embedding classifier with a neural net
 #' @description Abstract class for neural nets with 'keras'/'tensorflow' and ' pytorch'.
 #'
@@ -490,10 +504,6 @@ TEClassifierRegular <- R6::R6Class(
       datasets$disable_progress_bars()
       # datasets$disable_caching()
 
-      # SetUp GUI----------------------------------------------------------------
-      private$init_gui(data_manager = data_manager)
-      private$gui_inc_progressbar()
-
       # Start Sustainability Tracking-------------------------------------------
       if (sustain_track == TRUE) {
         if (is.null(sustain_iso_code) == TRUE) {
@@ -511,9 +521,6 @@ TEClassifierRegular <- R6::R6Class(
         )
         sustainability_tracker$start()
       }
-
-      # Update Progressbar-------------------------------------------------------
-      private$gui_inc_progressbar()
 
       # Start Training----------------------------------------------------------
       # Load Custom Model Scripts
@@ -1301,8 +1308,6 @@ TEClassifierRegular <- R6::R6Class(
       # Save results
       self$reliability$test_metric[iteration, ] <- test_res
 
-      # Update GUI
-      private$gui_inc_progressbar()
     },
     #--------------------------------------------------------------------------
     calculate_measures_on_categorical_level = function(data_manager, iteration) {
@@ -1432,34 +1437,6 @@ TEClassifierRegular <- R6::R6Class(
         }
       }
       self$reliability$standard_measures_mean <- standard_measures / self$last_training$config$n_folds
-    },
-    #--------------------------------------------------------------------------
-    init_gui = function(data_manager) {
-      # Check for a running Shiny App and set the configuration
-      # The Gui functions must be set in the server function of shiny globally
-      if (requireNamespace("shiny", quietly = TRUE) & requireNamespace("shinyWidgets", quietly = TRUE)) {
-        if (shiny::isRunning()) {
-          private$gui$shiny_app_active <- TRUE
-        } else {
-          private$gui$shiny_app_active <- FALSE
-        }
-      } else {
-        private$gui$shiny_app_active <- FALSE
-      }
-
-      # SetUp Progressbar for UI
-      private$gui$pgr_value <- -1
-      private$gui$pgr_max_value <- data_manager$get_n_folds() + 1 +
-        (data_manager$get_n_folds() + 1) * self$last_training$config$use_pl * self$last_training$config$pl_max_steps
-    },
-    #--------------------------------------------------------------------------
-    gui_inc_progressbar = function() {
-      private$gui$pgr_value <- private$gui$pgr_value + 1
-      update_aifeducation_progress_bar(
-        value = private$gui$pgr_value,
-        total = private$gui$pgr_max_value,
-        title = "Train Classifier"
-      )
     },
     #--------------------------------------------------------------------------
     train_standard = function(iteration = NULL,
@@ -1672,9 +1649,6 @@ TEClassifierRegular <- R6::R6Class(
 
         # Save history
         step_histories[step] <- list(train_history)
-
-        # Update GUI
-        private$gui_inc_progressbar()
       }
 
       # Save the histories for the complete iteration

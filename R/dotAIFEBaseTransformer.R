@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Base `R6` class for creation and definition of `.AIFE*Transformer-like` classes
 #'
 #' @description This base class is used to create and define `.AIFE*Transformer-like` classes. It serves as a skeleton
@@ -737,11 +751,6 @@
         # Check definition of required functions ----
         private$check_required_SFC()
 
-        # Set Shiny Progress Tracking -----------------------------------------------
-        pgr_value <- -1
-        pgr_max <- 10
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 0
-
         # argument checking ---------------------------------------------------------
         # optional function
         if (is.function(private$steps_for_creation$check_max_pos_emb)) {
@@ -756,7 +765,6 @@
 
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 1
 
         # Start Sustainability Tracking ---------------------------------------------
         track_msg <- ifelse(
@@ -770,25 +778,22 @@
           private$create_sustain_tracker()
           private$sustainability_tracker$start()
         }
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 2
+
 
         # Creating a new Tokenizer for Computing Vocabulary -------------------------
         print_message("Creating Tokenizer Draft", trace)
         private$steps_for_creation$create_tokenizer_draft(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 3
 
         # Calculating Vocabulary ----------------------------------------------------
         print_message("Start Computing Vocabulary", trace)
         run_py_file("datasets_transformer_compute_vocabulary.py")
         private$steps_for_creation$calculate_vocab(self)
         print_message("Start Computing Vocabulary - Done", trace)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 4
 
         # Saving Tokenizer Draft ----------------------------------------------------
         print_message("Saving Draft", trace)
         create_dir(model_dir, trace, "Creating Model Directory")
         private$steps_for_creation$save_tokenizer_draft(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 5
 
         # Final Tokenizer -----------------------------------------------------------
         print_message("Creating Tokenizer", trace)
@@ -797,7 +802,6 @@
           stop("The final tokenizer must be stored in the 'tokenizer' parameter of the 'temp' list.")
         }
         print_message("Creating Tokenizer - Done", trace)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 6
 
         # Creating Transformer Model ------------------------------------------------
         print_message("Creating Transformer Model", trace)
@@ -805,18 +809,15 @@
         if (!("model" %in% names(self$temp))) {
           stop("The transformer model must be stored in the 'model' parameter of the 'temp' list.")
         }
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 7
 
         # Saving Model --------------------------------------------------------------
         print_message(paste("Saving", private$title), trace)
         private$steps_for_creation$save_transformer_model(self)
         private$save_tokenizer_statistics()
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 8
 
         # Saving Tokenizer ----------------------------------------------------------
         print_message("Saving Tokenizer Model", trace)
         self$temp$tokenizer$save_pretrained(model_dir)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 9
 
         # Stop Sustainability Tracking if requested ----------------------------------
         if (sustain_track) {
@@ -825,7 +826,6 @@
           private$save_sustainability_data()
         }
 
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 10
 
         # Finish --------------------------------------------------------------------
         print_message("Done", trace)
@@ -922,11 +922,6 @@
         # Check defining of required functions ----
         private$check_required_SFT()
 
-        # Set Shiny Progress Tracking -----------------------------------------------
-        pgr_value <- -1
-        pgr_max <- 10
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 0
-
         # argument checking ---------------------------------------------------------
         check.ml_framework(ml_framework)
 
@@ -939,7 +934,6 @@
 
         # Check possible save formats
         self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 1
 
         # Start Sustainability Tracking ---------------------------------------------
         track_msg <- ifelse(
@@ -954,7 +948,6 @@
           private$sustainability_tracker$start()
         }
 
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 2
 
         # Loading existing model ----------------------------------------------------
         print_message("Loading Existing Model", trace)
@@ -965,11 +958,9 @@
         if (!("model" %in% names(self$temp))) {
           stop("The transformer model must be stored in the 'model' parameter of the 'temp' list.")
         }
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 3
 
         # argument checking------------------------------------------------------------
         private$steps_for_training$check_chunk_size(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 4
 
         # creating chunks of sequences ----------------------------------------------
         print_message("Creating Chunks of Sequences for Training", trace)
@@ -977,30 +968,25 @@
 
         n_chunks <- self$temp$tokenized_dataset$num_rows
         print_message(paste(n_chunks, "Chunks Created"), trace)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 5
 
         # Seeting up DataCollator and Dataset ----------------------------------------
         create_dir(output_dir, trace, "Creating Output Directory")
         create_dir(paste0(output_dir, "/checkpoints"), trace, "Creating Checkpoint Directory")
 
         private$steps_for_training$prepare_train_tune(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 6
 
         # Start Training -------------------------------------------------------------
         print_message("Start Fine Tuning", trace)
         private$steps_for_training$start_training(self)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 7
 
         # Saving Model --------------------------------------------------------------
         print_message(paste("Saving", private$title), trace)
         private$steps_for_training$save_model(self)
         private$save_tokenizer_statistics("train")
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 8
 
         # Saving Tokenizer -----------------------------------------------------------
         print_message("Saving Tokenizer", trace)
         self$temp$tokenizer$save_pretrained(output_dir)
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 9
 
         # Stop Sustainability Tracking if requested ----------------------------------
         if (sustain_track) {
@@ -1008,8 +994,6 @@
           print_message("Saving Sustainability Data", trace)
           private$save_sustainability_data("train")
         }
-
-        pgr_value <- increment_aife_progress_bar(pgr_value, pgr_max, private$title) # 10
 
         # Finish --------------------------------------------------------------------
         print_message("Done", trace)

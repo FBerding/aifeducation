@@ -28,4 +28,5 @@ arguments.rda
 ^LICENSE\.md$
 .Rhistory
 pkgdown
+^pkgdown$
 test_preparation

@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #-----------------------------------------------------------------------------
 #' @title Create synthetic cases for balancing training data
 #' @description This function creates synthetic cases for balancing the training with an object of the class
@@ -300,6 +314,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
 #'
 #' @family data_management_utils
 #' @keywords internal
+#' @noRd
 get_train_test_split <- function(embedding = NULL,
                                  target,
                                  val_size) {
@@ -363,6 +378,7 @@ get_train_test_split <- function(embedding = NULL,
 #'   [TextEmbeddingClassifierNeuralNet] works well with all options turned on.
 #' @family data_management_utils
 #' @keywords internal
+#' @noRd
 get_folds <- function(target,
                       k_folds) {
   sample_target <- na.omit(target)
@@ -461,6 +477,7 @@ get_folds <- function(target,
 #' @return `list` which contains the names of the cases belonging to the train sample and to the validation sample.
 #' @family data_management_utils
 #' @keywords internal
+#' @noRd
 get_stratified_train_test_split <- function(targets, val_size = 0.25) {
   test_sample <- NULL
   categories <- names(table(targets))

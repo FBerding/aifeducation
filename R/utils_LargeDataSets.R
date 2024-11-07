@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Convert data.frame to arrow data set
 #' @description Function for converting a data.frame into a pyarrow data set.
 #'
@@ -6,6 +20,7 @@
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 data.frame_to_py_dataset <- function(data_frame) {
   if (nrow(data_frame) == 1) {
     data_frame <- rbind(data_frame, data_frame)
@@ -31,6 +46,7 @@ data.frame_to_py_dataset <- function(data_frame) {
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 py_dataset_to_embeddings <- function(py_dataset) {
   py_dataset$set_format("np")
   embeddings <- py_dataset["input"]
@@ -47,6 +63,7 @@ py_dataset_to_embeddings <- function(py_dataset) {
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 prepare_r_array_for_dataset <- function(r_array) {
   return(np$squeeze(np$split(reticulate::np_array(r_array), as.integer(nrow(r_array)), axis = 0L)))
 }
@@ -62,6 +79,7 @@ prepare_r_array_for_dataset <- function(r_array) {
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 get_batches_index <- function(number_rows, batch_size, zero_based = FALSE) {
   n_batches <- ceiling(number_rows / batch_size)
   index_list <- NULL
@@ -87,6 +105,7 @@ get_batches_index <- function(number_rows, batch_size, zero_based = FALSE) {
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 reduce_to_unique <- function(dataset_to_reduce, column_name) {
   selected_column <- dataset_to_reduce$data$column(column_name)
   unique_values <- pyarrow$compute$unique(selected_column)
@@ -103,6 +122,7 @@ reduce_to_unique <- function(dataset_to_reduce, column_name) {
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 class_vector_to_py_dataset <- function(vector) {
   data_frame <- as.data.frame(vector)
   data_frame$id <- names(vector)
@@ -131,6 +151,7 @@ class_vector_to_py_dataset <- function(vector) {
 #'
 #' @family Data Management
 #' @keywords internal
+#' @noRd
 array_form_bind <- function(...) {
   objects <- list(...)
   arrays <- NULL
