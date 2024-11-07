@@ -23,8 +23,12 @@ trace=FALSE
 
 test_art_path <- testthat::test_path("test_artefacts")
 test_art_tmp_path <- testthat::test_path("test_artefacts/base_models")
+tmp_full_models_pt_path <- paste0(test_art_tmp_path, "/pytorch")
+tmp_full_models_tf_path <- paste0(test_art_tmp_path, "/tensorflow")
 create_dir(test_art_path, FALSE)
 create_dir(test_art_tmp_path, FALSE)
+create_dir(tmp_full_models_pt_path, FALSE)
+create_dir(tmp_full_models_tf_path, FALSE)
 
 ml_frameworks <- c("tensorflow", "pytorch")
 ai_methods <- unname(unlist(AIFETrType))
@@ -47,25 +51,21 @@ rows_susatainability <- c(
 
 example_data <- imdb_movie_reviews
 
-tmp_full_models_path <- paste0(test_art_path, "/fct_save_load")
-create_dir(tmp_full_models_path, FALSE)
-
-tmp_full_models_pt_path <- paste0(tmp_full_models_path, "/pytorch")
-create_dir(tmp_full_models_pt_path, FALSE)
-
-tmp_full_models_tf_path <- paste0(tmp_full_models_path, "/tensorflow")
-create_dir(tmp_full_models_tf_path, FALSE)
-
 for (framework in ml_frameworks) {
   for (ai_method in ai_methods) {
     base::gc(verbose = FALSE, full = TRUE)
-    ai_method_path <- paste0(test_art_path, "/", ai_method)
-    create_dir(ai_method_path, FALSE)
 
-    tmp_ai_method_path <- paste0(test_art_tmp_path, "/", ai_method)
+    #create main folder for every model
+    tmp_ai_method_path <- paste0(test_art_tmp_path,"/", framework,"/", ai_method)
     create_dir(tmp_ai_method_path, FALSE)
 
-    model_dir_path <- paste0(ai_method_path, "/", framework)
+    #Create sub-folders for every model
+    tmp_ai_create<-paste0(tmp_ai_method_path,"/create")
+    create_dir(tmp_ai_create, FALSE)
+    tmp_ai_train<-paste0(tmp_ai_method_path,"/train")
+    create_dir(tmp_ai_train, FALSE)
+    tmp_full_models_path <- paste0(tmp_ai_method_path, "/fct_save_load")
+    create_dir(tmp_full_models_path, FALSE)
 
     if (ai_framework_matrix[ai_method, framework] == 1) {
       # Creation of the Model ----
@@ -75,7 +75,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 50000,
               vocab_do_lower_case = FALSE,
@@ -97,7 +97,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 50000,
               vocab_do_lower_case = TRUE,
@@ -119,7 +119,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 10000,
               add_prefix_space = FALSE,
@@ -141,7 +141,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 10000,
               add_prefix_space = TRUE,
@@ -163,7 +163,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 10000,
               vocab_do_lower_case = FALSE,
@@ -185,7 +185,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 10000,
               vocab_do_lower_case = TRUE,
@@ -207,7 +207,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 10000,
               max_position_embeddings = 512,
@@ -229,7 +229,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 10000,
               max_position_embeddings = 512,
@@ -250,7 +250,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text[1:500],
               vocab_size = 10000,
               add_prefix_space = FALSE,
@@ -273,7 +273,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text[1:500],
               vocab_size = 10000,
               add_prefix_space = TRUE,
@@ -296,7 +296,7 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
-              model_dir = model_dir_path,
+              model_dir = tmp_ai_create,
               vocab_raw_texts = example_data$text,
               vocab_size = 50000,
               vocab_do_lower_case = FALSE,
@@ -325,8 +325,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:10],
               p_mask = 0.15,
               whole_word = TRUE,
@@ -350,8 +350,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:10],
               p_mask = 0.30,
               whole_word = FALSE,
@@ -375,8 +375,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:5],
               p_mask = 0.30,
               val_size = 0.1,
@@ -399,8 +399,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:5],
               p_mask = 0.15,
               whole_word = TRUE,
@@ -424,8 +424,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:5],
               p_mask = 0.15,
               whole_word = FALSE,
@@ -449,8 +449,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:20],
               p_mask = 0.15,
               whole_word = TRUE,
@@ -475,8 +475,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:20],
               p_mask = 0.15,
               whole_word = FALSE,
@@ -501,8 +501,8 @@ for (framework in ml_frameworks) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$train(
               ml_framework = framework,
-              output_dir = model_dir_path,
-              model_dir_path = model_dir_path,
+              output_dir = tmp_ai_train,
+              model_dir_path = tmp_ai_create,
               raw_texts = example_data$text[1:5],
               p_mask = 0.30,
               val_size = 0.1,
@@ -522,13 +522,12 @@ for (framework in ml_frameworks) {
             )
           )
         } else if (ai_method == AIFETrType$mpnet) {
-          # TODO (Yuliia): Training with tensorflow
           if (framework == "pytorch") {
             expect_no_error(
               aife_transformer_maker$make(ai_method)$train(
                 ml_framework = framework,
-                output_dir = model_dir_path,
-                model_dir_path = model_dir_path,
+                output_dir = tmp_ai_train,
+                model_dir_path = tmp_ai_create,
                 raw_texts = example_data$text[1:10],
                 p_mask = 0.15,
                 p_perm = 0.15,
