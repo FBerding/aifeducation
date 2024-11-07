@@ -30,3 +30,4 @@ arguments.rda
 pkgdown
 ^pkgdown$
 test_preparation
+^codecov\.yml$
