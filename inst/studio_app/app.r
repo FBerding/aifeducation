@@ -226,7 +226,7 @@ server <- function(input, output, session) {
 
   # GPU Acceleration
   output$ui_gpu_acceleration <- shiny::renderUI({
-    if (torch$cuda$is_available()) {
+    if (aifeducation:::torch$cuda$is_available()) {
       ui <- shiny::tagList(
         shiny::icon("bolt-lightning"),
         "GPU acceleration available."

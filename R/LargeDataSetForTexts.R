@@ -153,6 +153,7 @@ LargeDataSetForText <- R6::R6Class(
         # Process every batch
         list_datasets <- list()
         last_log <- NULL
+
         for (i in 1:n_batches) {
           chunk <- private$get_batch(batches[[i]],
             file_paths = file_paths,
@@ -271,9 +272,7 @@ LargeDataSetForText <- R6::R6Class(
         # Bib_entry column
         index <- which(colnames(chunk) %in% bib_entry_column)
         if (length(index) == 0) {
-          bib_entry <- vector(length = nrow(chunk))
-          bib_entry[] <- NA
-          chunk$bib_entry <- bib_entry
+          chunk$bib_entry <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "bib_entry"
         }
@@ -281,9 +280,7 @@ LargeDataSetForText <- R6::R6Class(
         # License column
         index <- which(colnames(chunk) %in% license_column)
         if (length(index) == 0) {
-          license <- vector(length = nrow(chunk))
-          license[] <- NA
-          chunk$license <- license
+          chunk$license <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "license"
         }
@@ -291,9 +288,7 @@ LargeDataSetForText <- R6::R6Class(
         # URL License column
         index <- which(colnames(chunk) %in% url_license_column)
         if (length(index) == 0) {
-          url_license <- vector(length = nrow(chunk))
-          url_license[] <- NA
-          chunk$url_license <- url_license
+          chunk$url_license <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "url_license"
         }
@@ -301,9 +296,7 @@ LargeDataSetForText <- R6::R6Class(
         # Text License column
         index <- which(colnames(chunk) %in% text_license_column)
         if (length(index) == 0) {
-          text_license <- vector(length = nrow(chunk))
-          text_license[] <- NA
-          chunk$text_license <- text_license
+          chunk$text_license <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "text_license"
         }
@@ -311,9 +304,7 @@ LargeDataSetForText <- R6::R6Class(
         # URL source column
         index <- which(colnames(chunk) %in% url_source_column)
         if (length(index) == 0) {
-          url_source <- vector(length = nrow(chunk))
-          url_source[] <- NA
-          chunk$url_source <- url_source
+          chunk$url_source <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "url_source"
         }
@@ -330,6 +321,7 @@ LargeDataSetForText <- R6::R6Class(
         )]
 
         chunk_dataset <- data.frame_to_py_dataset(chunk)
+
         list_datasets[i] <- list(chunk_dataset)
         if (trace == TRUE) {
           message(paste(
