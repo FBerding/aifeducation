@@ -1050,8 +1050,6 @@ TextEmbeddingModel <- R6::R6Class(
       n_batches <- ceiling(n_units / batch_size)
       batch_results <- NULL
 
-      update_aifeducation_progress_bar(value = 0, total = n_batches, title = "Embedding")
-
       if (private$transformer_components$emb_pool_type == "average") {
         if (private$transformer_components$ml_framework == "pytorch") {
           reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
@@ -1225,8 +1223,6 @@ TextEmbeddingModel <- R6::R6Class(
           ))
         }
         base::gc(verbose = FALSE, full = TRUE)
-
-        update_aifeducation_progress_bar(value = b, total = n_batches, title = "Embedding")
       }
 
       # Summarizing the results over all batches
