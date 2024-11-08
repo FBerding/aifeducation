@@ -21,85 +21,111 @@ DataManagement_RawTextsUI <- function(id) {
         )
       ),
       bslib::page(
-        bslib::layout_column_wrap(
-          bslib::card(
-            bslib::card_header("Text Sources"),
-            bslib::card_body(
-              width = "33%",
-              shinyFiles::shinyDirButton(
-                id = shiny::NS(id, "source_dir_select"),
-                label = "Choose Folder",
-                title = "Please choose a folder",
-                icon = shiny::icon("folder-open")
-              ),
-              shiny::textInput(
-                inputId = shiny::NS(id, "text_source_dir"),
-                label = shiny::tags$p(shiny::icon("folder"), "Path to Folder")
+        shiny::fluidRow(
+          shiny::column(
+            width = 4,
+            bslib::card(
+              bslib::card_header("Text Sources"),
+              bslib::card_body(
+                width = "33%",
+                shinyFiles::shinyDirButton(
+                  id = shiny::NS(id, "source_dir_select"),
+                  label = "Choose Folder",
+                  title = "Please choose a folder",
+                  icon = shiny::icon("folder-open")
+                ),
+                shiny::textInput(
+                  inputId = shiny::NS(id, "text_source_dir"),
+                  label = shiny::tags$p(shiny::icon("folder"), "Path to Folder")
+                )
               )
             )
           ),
-          bslib::card(
-            bslib::card_header("File Types"),
-            bslib::card_body(
-              bslib::card(
-                bslib::card_body(
-                  width = "33%", shinyWidgets::materialSwitch(
-                    inputId = shiny::NS(id, "include_txt"),
-                    label = shiny::tags$p("Include .txt ", shiny::icon(name = "file")),
-                    right = TRUE,
-                    inline = FALSE,
-                    value = TRUE,
-                    status = "primary"
+          shiny::column(
+            width = 8,
+            bslib::card(
+              bslib::card_header("File Types"),
+              bslib::card_body(
+                bslib::card(
+                  bslib::card_body(
+                    width = "33%",
+                    shinyWidgets::materialSwitch(
+                      inputId = shiny::NS(id, "include_txt"),
+                      label = shiny::tags$p("Include .txt ", shiny::icon(name = "file")),
+                      right = TRUE,
+                      inline = FALSE,
+                      value = TRUE,
+                      status = "primary"
+                    )
                   )
-                )
-              ),
-              bslib::card(
-                bslib::card_body(
-                  shinyWidgets::materialSwitch(
-                    inputId = shiny::NS(id, "include_pdf"),
-                    label = shiny::tags$p("Include .pdf", shiny::icon(name = "file-pdf")),
-                    right = TRUE,
-                    inline = FALSE,
-                    value = FALSE,
-                    status = "primary"
+                ),
+                bslib::card(
+                  bslib::card_body(
+                    shinyWidgets::materialSwitch(
+                      inputId = shiny::NS(id, "include_pdf"),
+                      label = shiny::tags$p("Include .pdf", shiny::icon(name = "file-pdf")),
+                      right = TRUE,
+                      inline = FALSE,
+                      value = FALSE,
+                      status = "primary"
+                    )
                   )
-                )
-              ),
-              bslib::card(
-                bslib::card_body(
-                  shinyWidgets::materialSwitch(
-                    inputId = shiny::NS(id, "include_xlsx"),
-                    label = shiny::tags$p("Include .xlsx", shiny::icon(name = "file-excel")),
-                    right = TRUE,
-                    inline = FALSE,
-                    value = FALSE,
-                    status = "primary"
-                  ),
-                  shiny::textInput(
-                    inputId = shiny::NS(id, "excel_id_column"),
-                    label = "Name of ID column for xlsx files",
-                    value = "id"
-                  ),
-                  shiny::textInput(
-                    inputId = shiny::NS(id, "excel_text_column"),
-                    label = "Name of text column for xlsx files",
-                    value = "text"
-                  ),
-                  shiny::textInput(
-                    inputId = shiny::NS(id, "excel_license_column"),
-                    label = "Name of license column for xlsx files",
-                    value = "license"
-                  ),
-                  shiny::textInput(
-                    inputId = shiny::NS(id, "excel_bib_entry_column"),
-                    label = "Name of bib entry column for xlsx files",
-                    value = "bib_entry"
+                ),
+                bslib::card(
+                  bslib::card_body(
+                    shinyWidgets::materialSwitch(
+                      inputId = shiny::NS(id, "include_xlsx"),
+                      label = shiny::tags$p("Include .xlsx", shiny::icon(name = "file-excel")),
+                      right = TRUE,
+                      inline = FALSE,
+                      value = FALSE,
+                      status = "primary"
+                    ),
+                    bslib::layout_column_wrap(
+                      width = 1 / 2,
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_id_column"),
+                        label = shiny::HTML("Name of <b>ID column</b>"),
+                        value = "id"
+                      ),
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_text_column"),
+                        label = shiny::HTML("Name of <b>text column</b>"),
+                        value = "text"
+                      ),
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_license_column"),
+                        label = shiny::HTML("Name of <b>license column</b>"),
+                        value = "license"
+                      ),
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_bib_entry_column"),
+                        label = shiny::HTML("Name of <b>bib entry column</b>"),
+                        value = "bib_entry"
+                      ),
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_url_license_column"),
+                        label = shiny::HTML("Name of <b>url license column</b>"),
+                        value = "url_license"
+                      ),
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_text_license_column"),
+                        label = shiny::HTML("Name of <b>text license column</b>"),
+                        value = "text_license"
+                      ),
+                      shiny::textInput(
+                        inputId = shiny::NS(id, "excel_url_source_column"),
+                        label = shiny::HTML("Name of <b>url source column</b>"),
+                        value = "url_source"
+                      )
+                    )
                   )
                 )
               )
             )
           )
         )
+
       )
     )
   )
@@ -178,7 +204,10 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
         excel_id_column = input$excel_id_column,
         excel_text_column = input$excel_text_column,
         excel_license_column = input$excel_license_column,
-        excel_bib_entry_column = input$excel_bib_entry_column
+        excel_bib_entry_column = input$excel_bib_entry_column,
+        excel_url_license_column = input$excel_url_license_column,
+        excel_text_license_column = input$excel_text_license_column,
+        excel_url_source_column = input$excel_url_source_column
       )
 
       # If there are errors display them. If not start running task.
@@ -206,6 +235,9 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
             excel_text_column = input$excel_text_column,
             excel_license_column = input$excel_license_column,
             excel_bib_entry_column = input$excel_bib_entry_column,
+            excel_url_license_column = input$excel_url_license_column,
+            excel_text_license_column = input$excel_text_license_column,
+            excel_url_source_column = input$excel_url_source_column,
             log_write_interval = 2
           ),
           log_path = log_path,

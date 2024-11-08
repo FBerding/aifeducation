@@ -10,6 +10,9 @@ long_add_texts_to_dataset <- function(source_path,
                                       excel_text_column,
                                       excel_license_column,
                                       excel_bib_entry_column,
+                                      excel_url_license_column,
+                                      excel_text_license_column,
+                                      excel_url_source_column,
                                       log_write_interval = 2) {
   promises::future_promise({
     # Set up top level progress monitoring
@@ -61,11 +64,14 @@ long_add_texts_to_dataset <- function(source_path,
         text_column = excel_text_column,
         license_column = excel_license_column,
         bib_entry_column = excel_bib_entry_column,
+        url_license_column = excel_url_license_column,
+        text_license_column = excel_text_license_column,
+        url_source_column = excel_url_source_column,
         log_file = log_path,
         log_top_value = top_value,
         log_top_total = top_total,
         log_top_message = total_message,
-        log_write_interval = log_write_interval,
+        log_write_interval = log_write_interval
       )
     }
 

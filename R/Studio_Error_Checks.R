@@ -194,7 +194,10 @@ check_errors_create_dataset_raw_texts <- function(source_path,
                                                   excel_id_column,
                                                   excel_text_column,
                                                   excel_license_column,
-                                                  excel_bib_entry_column) {
+                                                  excel_bib_entry_column,
+                                                  excel_url_license_column,
+                                                  excel_text_license_column,
+                                                  excel_url_source_column) {
   # List for gathering errors
   error_list <- NULL
 
@@ -216,6 +219,19 @@ check_errors_create_dataset_raw_texts <- function(source_path,
   if (!include_txt && !include_pdf && !include_xlsx) {
     error_list[length(error_list) + 1] <- "No file types selected. Please select
       at least one file type."
+  }
+  if (include_xlsx) {
+    excel_columns <- c(excel_id_column,
+                       excel_text_column,
+                       excel_license_column,
+                       excel_bib_entry_column,
+                       excel_url_license_column,
+                       excel_text_license_column,
+                       excel_url_source_column)
+    if (sum(excel_columns %in% "") != 0) {
+      # if there is any empty column name
+      error_list[length(error_list) + 1] <- "All column names for excel file must be specified."
+    }
   }
 
   tmp_ui_error <- NULL
