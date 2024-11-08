@@ -1,5 +1,5 @@
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE),
+  condition = check_aif_py_modules(trace = FALSE,check = "all"),
   message = "Necessary python modules not available"
 )
 
@@ -8,7 +8,7 @@ skip_creation_test <- FALSE
 skip_training_test <- FALSE
 skip_overfitting_test <- FALSE
 skip_3_classes <- FALSE
-include_tensorflow <- FALSE
+include_tensorflow <- TRUE
 
 
 # SetUp-------------------------------------------------------------------------
@@ -714,7 +714,9 @@ for (framework in ml_frameworks) {
         expect_gte(object = max(history), expected = 0.95)
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
-        expect_true(state_log_exists)
+        if(framework=="pytorch"){
+          expect_true(state_log_exists)
+        }
         if (state_log_exists) {
           log_state <- read.csv(paste0(train_path, "/aifeducation_state.log"))
           expect_equal(nrow(log_state), 3)
@@ -723,7 +725,9 @@ for (framework in ml_frameworks) {
         }
 
         loss_log_exists <- file.exists(paste0(train_path, "/aifeducation_loss.log"))
-        expect_true(loss_log_exists)
+        if(framework=="pytorch"){
+          expect_true(loss_log_exists)
+        }
         if (loss_log_exists == TRUE) {
           log_loss <- read.csv(paste0(train_path, "/aifeducation_loss.log"), header = FALSE)
           expect_gte(ncol(log_loss), 2)

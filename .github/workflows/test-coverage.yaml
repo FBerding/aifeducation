@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, test_3]
+    branches: [main, master]
   pull_request:
     branches: [main, master]
 
@@ -52,7 +52,8 @@ jobs:
 
           conda_install(
             packages = c(
-            "tensorflow<=2.14"
+            "tensorflow<=2.15",
+            "numpy<2"
             ),
             envname = envname,
             conda = "auto",

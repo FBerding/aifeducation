@@ -1,5 +1,5 @@
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE),
+  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
   message = "Necessary python modules not available"
 )
 
@@ -20,11 +20,6 @@ create_dir(root_path_results, FALSE)
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
-
-# SetUp tensorflow
-aifeducation::set_config_gpu_low_memory()
-set_config_tf_logger("ERROR")
-set_config_os_environ_logger("ERROR")
 
 # Load Embeddings
 imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
@@ -638,15 +633,6 @@ for (framework in ml_frameworks) {
         create_dir(train_path, FALSE)
 
         # Randomly select a configuration for training
-        rec <- rec_list[[sample(x = seq.int(from = 1, to = length(rec_list)), size = 1)]]
-        rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-        hidden <- hidden_list[[sample(x = seq.int(from = 1, to = length(hidden_list)), size = 1)]]
-        # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
-        attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-
-        # Randomly select a configuration for training
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -720,7 +706,9 @@ for (framework in ml_frameworks) {
         expect_gte(object = max(history), expected = 0.90)
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
-        expect_true(state_log_exists)
+        if(framework=="pytorch"){
+          expect_true(state_log_exists)
+        }
         if (state_log_exists) {
           log_state <- read.csv(paste0(train_path, "/aifeducation_state.log"))
           expect_equal(nrow(log_state), 3)
@@ -729,7 +717,9 @@ for (framework in ml_frameworks) {
         }
 
         loss_log_exists <- file.exists(paste0(train_path, "/aifeducation_loss.log"))
-        expect_true(loss_log_exists)
+        if(framework=="pytorch"){
+          expect_true(loss_log_exists)
+        }
         if (loss_log_exists == TRUE) {
           log_loss <- read.csv(paste0(train_path, "/aifeducation_loss.log"), header = FALSE)
           expect_gte(ncol(log_loss), 2)

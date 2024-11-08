@@ -8,7 +8,7 @@ testthat::skip_if_not(
 root_path_data <- testthat::test_path("test_data/TEM")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 
-root_path_results <- testthat::test_path("test_artefacts/TextEmbeddingModel")
+root_path_results <- testthat::test_path("test_artefacts/TEM")
 create_dir(root_path_results, FALSE)
 
 # SetUp tensorflow
@@ -47,31 +47,27 @@ ml_frameworks <- c(
   "tensorflow",
   "pytorch"
 )
-# base_model_list <- list(
-#   tensorflow = c(
-#     "bert",
-#     "roberta",
-#     "longformer",
-#     "funnel",
-#     "deberta_v2"
-#   ),
-#   pytorch = c(
-#     "bert",
-#     "roberta",
-#     "longformer",
-#     "funnel",
-#     "deberta_v2",
-#     "mpnet"
-#   )
-# )
-base_model_list <- list(
-  tensorflow = c(),
-  pytorch = c("bert")
-)
-save_format_list <- list(
-  "tensorflow" = c("auto"),
-  "pytorch" = c("auto", "pt", "safetensors")
-)
+ base_model_list <- list(
+   tensorflow = c(
+     "bert",
+     "roberta",
+     "longformer",
+     "funnel",
+     "deberta_v2"
+   ),
+   pytorch = c(
+     "bert",
+     "roberta",
+     "longformer",
+     "funnel",
+     "deberta_v2",
+     "mpnet"
+   )
+ )
+#base_model_list <- list(
+#  tensorflow = c(),
+#  pytorch = c("bert")
+#)
 
 pooling_type_list <- list(
   "funnel" = c("cls"),

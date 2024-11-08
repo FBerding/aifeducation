@@ -65,7 +65,8 @@ jobs:
 
           conda_install(
             packages = c(
-            "tensorflow<=2.14"
+            "tensorflow<=2.15",
+            "numpy<2
             ),
             envname = envname,
             conda = "auto",

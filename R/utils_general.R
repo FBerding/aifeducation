@@ -35,7 +35,15 @@ get_file_extension<-function(file_path){
 #' @family Utils
 #' @export
 is.null_or_na <- function(object) {
-  return(is.null(object) || anyNA(object))
+  if(is.null(object)){
+    return(TRUE)
+  } else {
+    if(sum(is.na(object))==length(object)){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  }
 }
 
 #' @title Clean pytorch log of transformers
