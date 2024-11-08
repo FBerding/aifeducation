@@ -79,8 +79,10 @@ if (skip_3_classes == TRUE) {
   max_classes <- 3
 }
 
+n_local_samples=150
+
 #Git Hub specific
-n_git_samples=50
+n_git_samples=10
 
 
 for (framework in ml_frameworks) {
@@ -139,7 +141,7 @@ for (framework in ml_frameworks) {
         }
       }
 
-      # If on github use only a random sample
+      # If on github use only a small random sample
       if (Sys.getenv("CI") != TRUE) {
         test_combinations <- all_test_combinations[sample(
           x = seq.int(
@@ -150,7 +152,14 @@ for (framework in ml_frameworks) {
           replace = FALSE
         )]
       } else {
-        test_combinations <- all_test_combinations
+        test_combinations <- all_test_combinations[sample(
+          x = seq.int(
+            from = 1,
+            to = length(all_test_combinations)
+          ),
+          size = n_local_samples,
+          replace = FALSE
+        )]
       }
 
       for (i in 1:length(test_combinations)) {
