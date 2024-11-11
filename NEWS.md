@@ -6,16 +6,40 @@ editor_options:
 # aifeducation 1.0.0
 
 First complete release of the package including major changes, bug fixes, new
-features, and objects. The following changes have been made:
+features, and objects. 
+
+The most important change is that we decided to concentrate the package on 'PyTorch'
+for several reasons.
+First, 'PyTorch' is a very flexible and stable machine learning framework.
+At the moment most new architectures are based on 'Py'Torch' as can be seen on 
+hugging face. Currently (11th November 2024) there are 190,237 models for this framework
+compared to 13,346 models for 'tensorflow'. Second, 'PyTorch' provides an easy installation
+and supports native gpu acceleration on linux and windows while tensorflow supports 
+native gpu support only on linux and for windows only in version 2.10 or lower. Fourth,
+keras which was an important element of 'tensorflow' changed to a multi backend framework.
+However, keras 3.0 does not have a native windows support. Since we assume that many
+educational researchers use either windows or mac and are not familiar with more complex
+system configurations (such as using Windows subsystem for linux (WSL)) this is problematic.
+
+In addition, we changed the algorithm for saving and loading models, data, and objects
+to ensure that models trained with the package are working in future versions of
+*aifeducation* and can be updated to new developments. This is also necessary
+to allow reproducibility of models and research based on these models. 
+To achieve this goal we had 
+to make some breaking changes
+for models created with version 0.3.3 or lower. If you still need these models
+please install an older version of *aifeducation*.
+
+The following changes have been made:
 
 **Major Changes**
 
-- The core machine learning framework is now 'pytorch'. 'Tensorflow' is still supported
+- The core machine learning framework is now 'PyTorch'. 'Tensorflow' is still supported
   but only for some models and limited to version 2.15. Further implementation and 
   support for 'tensorflow' models is currently not planed. We decided to found the package
-  on 'pytorch' because this framework is widely used in research, is very flexible, 
+  on 'PyTorch' because this framework is widely used in research, is very flexible, 
   provides a broad gpu support, and offers more stable code across versions.
-- Implemented a method for all objects allowing objects that were created with
+- Implemented a new machanic and new methods for all objects allowing objects that were created with
   an older version of the package to update to the current version during loading.
 - Removed the bag-of-words models from the package in order to focus the package
   on approaches which use AI.

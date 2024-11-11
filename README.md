@@ -124,6 +124,12 @@ models. Please refer to appendix [A01 Supported Machine Learning
 Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
 for a detailed overview.
 
+## Model Life Cycle
+
+Research requires reproducibility and traceability. Thus, starting with
+version 1.0.0 of this package ensuring that already trained models work
+with future versions of this package has top priority.
+
 ## Classification Tasks
 
 ### Transforming Texts into Numbers
