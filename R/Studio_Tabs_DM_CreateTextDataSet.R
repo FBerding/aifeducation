@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_data_management
 #' @keywords internal
+#' @noRd
 #'
 
 DataManagement_RawTextsUI <- function(id) {
@@ -125,6 +126,7 @@ DataManagement_RawTextsUI <- function(id) {
 #'
 #' @family studio_gui_page_data_management
 #' @keywords internal
+#' @noRd
 #'
 DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

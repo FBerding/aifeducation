@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_training
 #' @keywords internal
+#' @noRd
 #'
 Training_UI <- function(id) {
   bslib::page(
@@ -66,6 +67,7 @@ Training_UI <- function(id) {
 #'
 #' @family studio_gui_training
 #' @keywords internal
+#' @noRd
 #'
 Training_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {

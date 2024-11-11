@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_text_embedding_model_create
 #' @keywords internal
+#' @noRd
 #'
 TextEmbeddingModel_Create_UI <- function(id) {
   shiny::tagList(
@@ -77,6 +78,7 @@ TextEmbeddingModel_Create_UI <- function(id) {
 #'
 #' @family studio_gui_page_text_embedding_model_create
 #' @keywords internal
+#' @noRd
 #'
 TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

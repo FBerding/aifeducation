@@ -11,8 +11,7 @@ R6
 vignette_classifier
 }
 \description{
-An object of class \code{TEClassifierRegular} trained with the a subset of
-the Standford Movie Review Dataset. The purpose of classifier is for illustration
-in vignettes.
+An object of class \link{TEClassifierRegular} trained with the a subset of the Standford Movie Review
+Dataset. The purpose of classifier is for illustration in vignettes.
 }
 \keyword{internal}

@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_feature_extractor_create
 #' @keywords internal
+#' @noRd
 #'
 FeatureExtractors_Create_UI <- function(id) {
   shiny::tagList(
@@ -154,6 +155,7 @@ FeatureExtractors_Create_UI <- function(id) {
 #'
 #' @family studio_gui_page_feature_extractor_create
 #' @keywords internal
+#' @noRd
 #'
 FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

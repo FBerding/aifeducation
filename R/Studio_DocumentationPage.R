@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_document
 #' @keywords internal
+#' @noRd
 #'
 DocumentPage_UI <- function(id, type = "TextEmbeddingModel") {
   bslib::page(
@@ -85,6 +86,7 @@ DocumentPage_UI <- function(id, type = "TextEmbeddingModel") {
 #'
 #' @family studio_gui_page_document
 #' @keywords internal
+#' @noRd
 #'
 DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
   shiny::moduleServer(id, function(input, output, session) {

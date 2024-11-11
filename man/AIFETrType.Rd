@@ -5,7 +5,7 @@
 \alias{AIFETrType}
 \title{Transformer types}
 \format{
-An object of class \code{list} of length 5.
+An object of class \code{list} of length 6.
 }
 \usage{
 AIFETrType
@@ -16,14 +16,15 @@ This list contains transformer types. Elements of the list can be used in the pu
 
 It has the following elements:
 \itemize{
-\item \code{bert} = "bert"
-\item \code{roberta} = "roberta"
-\item \code{deberta} = "deberta_v2"
-\item \code{funnel} = "funnel"
-\item \code{longformer} = "longformer"
-}
+\item \code{bert} = 'bert'
+\item \code{roberta} = 'roberta'
+\item \code{deberta_v2} = 'deberta_v2'
+\item \code{funnel} = 'funnel'
+\item \code{longformer} = 'longformer'
+\item \code{mpnet} = 'mpnet'
 
 Elements can be used like \code{AIFETrType$bert}, \code{AIFETrType$deberta_v2}, \code{AIFETrType$funnel}, etc.
+}
 }
 \seealso{
 Other Transformer: 

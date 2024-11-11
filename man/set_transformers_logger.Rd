@@ -2,32 +2,25 @@
 % Please edit documentation in R/install_and_config.R
 \name{set_transformers_logger}
 \alias{set_transformers_logger}
-\title{Sets the level for logging information of the 'transformers' library.}
+\title{Sets the level for logging information of the 'transformers' library}
 \usage{
 set_transformers_logger(level = "ERROR")
 }
 \arguments{
-\item{level}{\code{string} Minimal level that should be printed to console. Four
-levels are available: INFO, WARNING, ERROR and DEBUG}
+\item{level}{\code{string} Minimal level that should be printed to console. Four levels are available: INFO, WARNING,
+ERROR and DEBUG}
 }
 \value{
-This function does not return anything. It is used for its
-side effects.
+This function does not return anything. It is used for its side effects.
 }
 \description{
-This function changes the level for logging information of the 'transformers' library.
-It influences the output printed to console for creating and training transformer models as well as
-\link{TextEmbeddingModel}s.
+This function changes the level for logging information of the 'transformers' library. It influences the
+output printed to console for creating and training transformer models as well as \link{TextEmbeddingModel}s.
 }
 \seealso{
 Other Installation and Configuration: 
-\code{\link{AifeducationConfiguration}},
-\code{\link{aifeducation_config}},
 \code{\link{check_aif_py_modules}()},
-\code{\link{install_py_modules}()},
-\code{\link{set_config_cpu_only}()},
-\code{\link{set_config_gpu_low_memory}()},
-\code{\link{set_config_os_environ_logger}()},
-\code{\link{set_config_tf_logger}()}
+\code{\link{install_aifeducation}()},
+\code{\link{install_py_modules}()}
 }
 \concept{Installation and Configuration}

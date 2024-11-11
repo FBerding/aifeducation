@@ -21,6 +21,7 @@
 #'
 #' @family studio_gui_text_embedding_model_embed
 #' @keywords internal
+#' @noRd
 #'
 Embed_UI <- function(id) {
   bslib::page(
@@ -71,6 +72,7 @@ Embed_UI <- function(id) {
 #'
 #' @family studio_gui_text_embedding_model_embed
 #' @keywords internal
+#' @noRd
 #'
 Embed_Server <- function(id, model, model_path, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

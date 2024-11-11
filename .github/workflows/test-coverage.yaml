@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, test_3]
   pull_request:
     branches: [main, master]
 
@@ -85,9 +85,37 @@ jobs:
 
       - name: Test coverage
         run: |
+          gui_functions<-c(
+            "start_aifeducation_studio",
+            "Studio_Home_UI",
+            "DataManagement_DataSetEditorUI",
+            "DataManagement_RawTextsUI",
+            "DataManagement_TableEditorUI",
+            "TextEmbeddingModel_Use_UI",
+            "TextEmbeddingModel_Create_UI",
+            "DocumentPage_UI",
+            "FeatureExtractors_Use_UI",
+            "FeatureExtractors_Create_UI",
+            "Classifiers_Use_UI",
+            "Classifiers_Create_UI",
+            "License_UI",
+            "DataManagement_RawTextsServer",
+            "DataManagement_DataSetEditorServer",
+            "DataManagement_TableEditorServer",
+            "TextEmbeddingModel_Create_Server",
+            "TextEmbeddingModel_Use_Server",
+            "DocumentPage_Server",
+            "FeatureExtractor_Create_Server",
+            "FeatureExtractors_Use_Server",
+            "DocumentPage_Server",
+            "Classifiers_Create_Server",
+            "Classifiers_Use_Server",
+            "License_Server"
+          )
           cov <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
+            function_exclusions = NULL,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
           covr::to_cobertura(cov)

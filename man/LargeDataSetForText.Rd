@@ -2,14 +2,13 @@
 % Please edit documentation in R/LargeDataSetForTexts.R
 \name{LargeDataSetForText}
 \alias{LargeDataSetForText}
-\title{Abstract class for large data sets containing raw texts.}
+\title{Abstract class for large data sets containing raw texts}
 \value{
 Returns a new object of this class.
 }
 \description{
-This object stores raw texts. The data of this objects is not
-stored in memory directly. By using memory mapping these objects allow to work
-with data sets which do not fit into memory/RAM.
+This object stores raw texts. The data of this objects is not stored in memory directly. By using memory
+mapping these objects allow to work with data sets which do not fit into memory/RAM.
 }
 \seealso{
 Other Data Management: 
@@ -28,16 +27,19 @@ Other Data Management:
 \item \href{#method-LargeDataSetForText-add_from_files_pdf}{\code{LargeDataSetForText$add_from_files_pdf()}}
 \item \href{#method-LargeDataSetForText-add_from_files_xlsx}{\code{LargeDataSetForText$add_from_files_xlsx()}}
 \item \href{#method-LargeDataSetForText-add_from_data.frame}{\code{LargeDataSetForText$add_from_data.frame()}}
+\item \href{#method-LargeDataSetForText-get_private}{\code{LargeDataSetForText$get_private()}}
 \item \href{#method-LargeDataSetForText-clone}{\code{LargeDataSetForText$clone()}}
 }
 }
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_all_fields"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_all_fields'><code>aifeducation::LargeDataSetBase$get_all_fields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_colnames"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_colnames'><code>aifeducation::LargeDataSetBase$get_colnames()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_dataset"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_dataset'><code>aifeducation::LargeDataSetBase$get_dataset()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_ids"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_ids'><code>aifeducation::LargeDataSetBase$get_ids()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="load"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-load'><code>aifeducation::LargeDataSetBase$load()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="load_from_disk"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-load_from_disk'><code>aifeducation::LargeDataSetBase$load_from_disk()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="n_cols"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-n_cols'><code>aifeducation::LargeDataSetBase$n_cols()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="n_rows"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-n_rows'><code>aifeducation::LargeDataSetBase$n_rows()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="reduce_to_unique_ids"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-reduce_to_unique_ids'><code>aifeducation::LargeDataSetBase$reduce_to_unique_ids()</code></a></span></li>
@@ -50,21 +52,19 @@ Other Data Management:
 \if{html}{\out{<a id="method-LargeDataSetForText-add_from_files_txt"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForText-add_from_files_txt}{}}}
 \subsection{Method \code{add_from_files_txt()}}{
-Method for adding raw texts saved within .txt files to the
-data set. Please note
-the the directory should contain one folder for each .txt file. In order to
-create an informative data set every folder should contain the following
-additional files:
+Method for adding raw texts saved within .txt files to the data set. Please note the the directory
+should contain one folder for each .txt file. In order to create an informative data set every folder can
+contain the following additional files:
 \itemize{
-\item bib_entry.txt: containing a text version of the bibliographic information
-of the raw text.
-\item license.txt: containing a statement about the license to use the raw text
-such as CC BY.
-}
+\item bib_entry.txt: containing a text version of the bibliographic information of the raw text.
+\item license.txt: containing a statement about the license to use the raw text such as "CC BY".
+\item url_license.txt: containing the url/link to the license in the internet.
+\item text_license.txt: containing the license in raw text.
+\item url_source.txt: containing the url/link to the source in the internet.
 
-The id of every .txt file is the file name without file extension. Please
-be aware to provide unique file names.
-Id and raw texts are mandatory, bibliographic and license information are optional.
+The id of every .txt file is the file name without file extension. Please be aware to provide unique file
+names. Id and raw texts are mandatory, bibliographic and license information are optional.
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_txt(
   dir_path,
@@ -85,35 +85,45 @@ Id and raw texts are mandatory, bibliographic and license information are option
 
 \item{\code{batch_size}}{\code{int} determining the number of files to process at once.}
 
-\item{\code{trace}}{\code{bool} If \code{TRUE} information on the progress is printed
-to the console.}
+\item{\code{log_file}}{\code{string} Path to the file where the log should be saved. If no logging is desired set this
+argument to \code{NULL}.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_file} is not \code{NULL}.}
+
+\item{\code{log_top_value}}{\code{int} indicating the current iteration of the process.}
+
+\item{\code{log_top_total}}{\code{int} determining the maximal number of iterations.}
+
+\item{\code{log_top_message}}{\code{string} providing additional information of the process.}
+
+\item{\code{trace}}{\code{bool} If \code{TRUE} information on the progress is printed to the console.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-The method does not return anything. It adds new raw texts to
-the data set.
+The method does not return anything. It adds new raw texts to the data set.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForText-add_from_files_pdf"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForText-add_from_files_pdf}{}}}
 \subsection{Method \code{add_from_files_pdf()}}{
-Method for adding raw texts saved within .pdf files to the
-data set. Please note
-the the directory should contain one folder for each .pdf file. In order to
-create an informative data set every folder should contain the following
-additional files:
+Method for adding raw texts saved within .pdf files to the data set. Please note the the directory
+should contain one folder for each .pdf file. In order to create an informative data set every folder can
+contain the following additional files:
 \itemize{
 \item bib_entry.txt: containing a text version of the bibliographic information
 of the raw text.
 \item license.txt: containing a statement about the license to use the raw text
-such as CC BY.
-}
+such as "CC BY".
+\item url_license.txt: containing the url/link to the license in the internet.
+\item text_license.txt: containing the license in raw text.
+\item url_source.txt: containing the url/link to the source in the internet.
 
-The id of every .pdf file is the file name without file extension. Please
-be aware to provide unique file names.
-Id and raw texts are mandatory, bibliographic and license information are optional.
+The id of every .pdf file is the file name without file extension. Please be aware to provide unique file
+names. Id and raw texts are mandatory, bibliographic and license information are optional.
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_pdf(
   dir_path,
@@ -134,28 +144,36 @@ Id and raw texts are mandatory, bibliographic and license information are option
 
 \item{\code{batch_size}}{\code{int} determining the number of files to process at once.}
 
-\item{\code{trace}}{\code{bool} If \code{TRUE} information on the progress is printed
-to the console.}
+\item{\code{log_file}}{\code{string} Path to the file where the log should be saved. If no logging is desired set this
+argument to \code{NULL}.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_file} is not \code{NULL}.}
+
+\item{\code{log_top_value}}{\code{int} indicating the current iteration of the process.}
+
+\item{\code{log_top_total}}{\code{int} determining the maximal number of iterations.}
+
+\item{\code{log_top_message}}{\code{string} providing additional information of the process.}
+
+\item{\code{trace}}{\code{bool} If \code{TRUE} information on the progress is printed to the console.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-The method does not return anything. It adds new raw texts to
-the data set.
+The method does not return anything. It adds new raw texts to the data set.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForText-add_from_files_xlsx"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForText-add_from_files_xlsx}{}}}
 \subsection{Method \code{add_from_files_xlsx()}}{
-Method for adding raw texts saved within .xlsx files to the
-data set. The method assumes that the texts are saved in the rows and that the columns
-store the id and the raw texts in the columns. In addition, a column for the
-bibliography information and the license can be added. The column names
-for these rows must be specified with the following arguments. They must be
-the same for all .xlsx files in the chosen directory.
-Id and raw texts are mandatory, bibliographic and license information are optional.
-Additional columns are dropped.
+Method for adding raw texts saved within .xlsx files to the data set. The method assumes that the
+texts are saved in the rows and that the columns store the id and the raw texts in the columns. In addition, a
+column for the bibliography information and the license can be added. The column names for these rows must be
+specified with the following arguments. They must be the same for all .xlsx files in the chosen directory. Id
+and raw texts are mandatory, bibliographic, license, license's url, license's text, and source's url are
+optional. Additional columns are dropped.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_xlsx(
   dir_path,
@@ -164,6 +182,9 @@ Additional columns are dropped.
   text_column = "text",
   bib_entry_column = "bib_entry",
   license_column = "license",
+  url_license_column = "url_license",
+  text_license_column = "text_license",
+  url_source_column = "url_source",
   log_file = NULL,
   log_write_interval = 2,
   log_top_value = 0,
@@ -177,24 +198,40 @@ Additional columns are dropped.
 \describe{
 \item{\code{dir_path}}{Path to the directory where the files are stored.}
 
-\item{\code{trace}}{\code{bool} If \code{TRUE} prints information on the progress to the
-console.}
+\item{\code{trace}}{\code{bool} If \code{TRUE} prints information on the progress to the console.}
 
 \item{\code{id_column}}{\code{string} Name of the column storing the ids for the texts.}
 
 \item{\code{text_column}}{\code{string} Name of the column storing the raw text.}
 
-\item{\code{bib_entry_column}}{\code{string} Name of the column storing the bibliographic
-information of the texts.}
+\item{\code{bib_entry_column}}{\code{string} Name of the column storing the bibliographic information of the texts.}
 
-\item{\code{license_column}}{\code{string} Name of the column storing information about
-the licenses.}
+\item{\code{license_column}}{\code{string} Name of the column storing information about the licenses.}
+
+\item{\code{url_license_column}}{\code{string} Name of the column storing information about the url to the license in the
+internet.}
+
+\item{\code{text_license_column}}{\code{string} Name of the column storing the license as text.}
+
+\item{\code{url_source_column}}{\code{string} Name of the column storing information about about the url to the source in the
+internet.}
+
+\item{\code{log_file}}{\code{string} Path to the file where the log should be saved. If no logging is desired set this
+argument to \code{NULL}.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_file} is not \code{NULL}.}
+
+\item{\code{log_top_value}}{\code{int} indicating the current iteration of the process.}
+
+\item{\code{log_top_total}}{\code{int} determining the maximal number of iterations.}
+
+\item{\code{log_top_message}}{\code{string} providing additional information of the process.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-The method does not return anything. It adds new raw texts to
-the data set.
+The method does not return anything. It adds new raw texts to the data set.
 }
 }
 \if{html}{\out{<hr>}}
@@ -209,15 +246,27 @@ Method for adding raw texts from a \code{data.frame}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data_frame}}{Object of class \code{data.frame} with at least the following
-columns "id","text","bib_entry", and "license". If a column is missing
-an error occurs. Additional columns are dropped.}
+\item{\code{data_frame}}{Object of class \code{data.frame} with at least the following columns "id","text","bib_entry",
+"license", "url_license", "text_license", and "url_source". If a column is missing an error occurs. Additional
+columns are dropped.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-The method does not return anything. It adds new raw texts to
-the data set.
+The method does not return anything. It adds new raw texts to the data set.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForText-get_private"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForText-get_private}{}}}
+\subsection{Method \code{get_private()}}{
+Method for requesting all private fields and methods. Used for loading and updating an object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$get_private()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list} with all private fields and methods.
 }
 }
 \if{html}{\out{<hr>}}

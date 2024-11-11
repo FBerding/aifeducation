@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_classifier_use
 #' @keywords internal
+#' @noRd
 #'
 Classifiers_Use_UI <- function(id) {
   shiny::tagList(
@@ -69,6 +70,7 @@ Classifiers_Use_UI <- function(id) {
 #'
 #' @family studio_gui_page_classifier_use
 #' @keywords internal
+#' @noRd
 #'
 Classifiers_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

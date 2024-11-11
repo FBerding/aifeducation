@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_data_management_data_set_editor
 #' @keywords internal
+#' @noRd
 #'
 DataManagement_DataSetEditorUI <- function(id) {
   bslib::page_sidebar(
@@ -62,6 +63,7 @@ DataManagement_DataSetEditorUI <- function(id) {
 #'
 #' @family studio_gui_page_data_management_data_set_editor
 #' @keywords internal
+#' @noRd
 #'
 DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

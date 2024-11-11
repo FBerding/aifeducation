@@ -21,6 +21,7 @@
 #'
 #' @family studio_gui_text_embedding_model_tokenize_encode_decode
 #' @keywords internal
+#' @noRd
 #'
 Tokenize_Encode_Decode_UI <- function(id) {
   bslib::page(
@@ -140,6 +141,7 @@ Tokenize_Encode_Decode_UI <- function(id) {
 #'
 #' @family studio_gui_text_embedding_model_tokenize_encode_decode
 #' @keywords internal
+#' @noRd
 #'
 Tokenize_Encode_Decode_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {

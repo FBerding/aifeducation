@@ -16,8 +16,4 @@ unique cases of the input objects.
 \description{
 Function for combining embedded texts of the same model
 }
-\seealso{
-Other Text Embedding: 
-\code{\link{TextEmbeddingModel}}
-}
-\concept{Text Embedding}
+\concept{combine_embeddings}

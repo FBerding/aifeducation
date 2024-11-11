@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_page_data_management_table_editor
 #' @keywords internal
+#' @noRd
 #'
 DataManagement_TableEditorUI <- function(id) {
   # Sidebar------------------------------------------------------------------
@@ -131,6 +132,7 @@ DataManagement_TableEditorUI <- function(id) {
 #'
 #' @family studio_gui_page_data_management_table_editor
 #' @keywords internal
+#' @noRd
 #'
 DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_pages_and_tabs
 #' @keywords internal
+#' @noRd
 #'
 Studio_Home_UI <- function(id) {
   shiny::tagList(

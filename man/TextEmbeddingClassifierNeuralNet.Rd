@@ -15,16 +15,9 @@ for training.
 }
 \description{
 Abstract class for neural nets with 'keras'/'tensorflow' and
-'pytorch'.
+' pytorch'.
 }
-\seealso{
-Other Classification: 
-\code{\link{AIFEBaseModel}},
-\code{\link{TEClassifierProtoNet}},
-\code{\link{TEClassifierRegular}},
-\code{\link{TEFeatureExtractor}}
-}
-\concept{Classification}
+\concept{Classification Deprecated}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -69,36 +62,39 @@ if not.}
 }}
 }}
 
-\item{\code{reliability}}{('list()')\cr
-List for storing central reliability measures of the last training.
+\item{\code{reliability}}{('list()')\cr List for storing central reliability measures of the last training.
 \itemize{
 \item{\code{reliability$test_metric: }Array containing the reliability measures for the validation data for
 every fold, method, and step (in case of pseudo-labeling).}
 \item{\code{reliability$test_metric_mean: }Array containing the reliability measures for the validation data for
 every method and step (in case of pseudo-labeling). The values represent
 the mean values for every fold.}
-\item{\code{reliability$raw_iota_objects: }List containing all iota_object generated with the package \code{iotarelr}
+\item{\code{reliability$raw_iota_objects: }List containing all iota_object generated with the package
+\code{iotarelr}
 for every fold at the start and the end of the last training.
 \itemize{
-\item{\code{reliability$raw_iota_objects$iota_objects_start: }List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_start: }List of objects with class \code{iotarelr_iota2}
+containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
 If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.}
-\item{\code{reliability$raw_iota_objects$iota_objects_end: }List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_end: }List of objects with class \code{iotarelr_iota2}
+containing the
 estimated iota reliability of the second generation for the final model
 for every fold. Depending of the requested training method these values
 refer to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo labeling or a combination of balanced
 synthetic cases with pseudo labeling.}
-\item{\code{reliability$raw_iota_objects$iota_objects_start_free: }List of objects with class \code{iotarelr_iota2} containing the
+\item{\code{reliability$raw_iota_objects$iota_objects_start_free: }List of objects with class
+\code{iotarelr_iota2} containing the
 estimated iota reliability of the second generation for the baseline model
 for every fold.
 If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-\item{\code{reliability$raw_iota_objects$iota_objects_end_free: }List of objects with class \code{iotarelr_iota2} containing the
-estimated iota reliability of the second generation for the final model
+\item{\code{reliability$raw_iota_objects$iota_objects_end_free: }List of objects with class \code{iotarelr_iota2}
+containing the estimated iota reliability of the second generation for the final model
 for every fold. Depending of the requested training method, these values
 refer to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo-labeling or a combination of balanced
@@ -107,22 +103,24 @@ Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
 }
 }
-\item{\code{reliability$iota_object_start: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
+\item{\code{reliability$iota_object_start: }Object of class \code{iotarelr_iota2} as a mean of the individual
+objects
 for every fold. If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.}
-\item{\code{ reliability$iota_object_start_free: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
+\item{\code{ reliability$iota_object_start_free: }Object of class \code{iotarelr_iota2} as a mean of the
+individual objects
 for every fold. If the estimation of the baseline model is not requested, the list is
 set to \code{NULL}.
 Please note that the model is estimated without
 forcing the Assignment Error Matrix to be in line with the assumption of weak superiority.}
-\item{\code{reliability$iota_object_end: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
-for every fold.
+\item{\code{reliability$iota_object_end: }Object of class \code{iotarelr_iota2} as a mean of the individual
+objects for every fold.
 Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo-labeling or a combination of balanced
 synthetic cases and pseudo-labeling.}
-\item{\code{reliability$iota_object_end_free: }Object of class \code{iotarelr_iota2} as a mean of the individual objects
-for every fold.
+\item{\code{reliability$iota_object_end_free: }Object of class \code{iotarelr_iota2} as a mean of the individual
+objects for every fold.
 Depending on the requested training method, this object
 refers to the baseline model, a trained model on the basis of balanced
 synthetic cases, balanced pseudo-labeling or a combination of balanced
@@ -173,7 +171,7 @@ measures for precision, recall, and f1 at the end of every fold.}
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$new(
-  ml_framework = aifeducation_config$get_framework(),
+  ml_framework = "pytorch",
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -196,61 +194,54 @@ Creating a new instance of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
-for 'pytorch'}
+\item{\code{ml_framework}}{\code{string} Framework to use for training and inference. \code{ml_framework="tensorflow"}
+for 'tensorflow' and \code{ml_framework="pytorch"} for 'pytorch'}
 
-\item{\code{name}}{\code{Character} Name of the new classifier. Please refer to
-common name conventions. Free text can be used with parameter \code{label}.}
+\item{\code{name}}{\code{Character} Name of the new classifier. Please refer to common name conventions. Free text can
+be used with parameter \code{label}.}
 
-\item{\code{label}}{\code{Character} Label for the new classifier. Here you can use
-free text.}
+\item{\code{label}}{\code{Character} Label for the new classifier. Here you can use free text.}
 
 \item{\code{text_embeddings}}{An object of class\code{TextEmbeddingModel}.}
 
 \item{\code{targets}}{\code{factor} containing the target values of the classifier.}
 
-\item{\code{hidden}}{\code{vector} containing the number of neurons for each dense layer.
-The length of the vector determines the number of dense layers. If you want no dense layer,
-set this parameter to \code{NULL}.}
+\item{\code{hidden}}{\code{vector} containing the number of neurons for each dense layer. The length of the vector
+determines the number of dense layers. If you want no dense layer, set this parameter to \code{NULL}.}
 
-\item{\code{rec}}{\code{vector} containing the number of neurons for each recurrent layer.
-The length of the vector determines the number of dense layers. If you want no dense layer,
-set this parameter to \code{NULL}.}
+\item{\code{rec}}{\code{vector} containing the number of neurons for each recurrent layer. The length of the vector
+determines the number of dense layers. If you want no dense layer, set this parameter to \code{NULL}.}
 
-\item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads
-for a self-attention layer. Only relevant if \code{attention_type="multihead"}}
+\item{\code{self_attention_heads}}{\code{integer} determining the number of attention heads for a self-attention layer.
+Only relevant if \code{attention_type="multihead"}}
 
-\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within
-a each transformer encoder.}
+\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer
+encoder.}
 
-\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values
-are \code{"fourier"} and \code{multihead}.}
+\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values are \code{"fourier"} and
+\code{multihead}.}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 
-\item{\code{rec_dropout}}{\code{double} ranging between 0 and lower 1, determining the
-dropout between bidirectional gru layers.}
+\item{\code{rec_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout between bidirectional gru
+layers.}
 
-\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be
-added to the network.}
+\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be added to the network.}
 
-\item{\code{dense_dropout}}{\code{double} ranging between 0 and lower 1, determining the
-dropout between dense layers.}
+\item{\code{dense_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout between dense layers.}
 
-\item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1, determining the
-recurrent dropout for each recurrent layer. Only relevant for keras models.}
+\item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1, determining the recurrent dropout for each
+recurrent layer. Only relevant for keras models.}
 
-\item{\code{encoder_dropout}}{\code{double} ranging between 0 and lower 1, determining the
-dropout for the dense projection within the encoder layers.}
+\item{\code{encoder_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout for the dense
+projection within the encoder layers.}
 
 \item{\code{optimizer}}{Object of class \code{keras.optimizers}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Returns an object of class \link{TextEmbeddingClassifierNeuralNet} which is ready for
-training.
+Returns an object of class \link{TextEmbeddingClassifierNeuralNet} which is ready for training.
 }
 }
 \if{html}{\out{<hr>}}
@@ -699,7 +690,7 @@ and the native language.
 \if{latex}{\out{\hypertarget{method-TextEmbeddingClassifierNeuralNet-save_model}{}}}
 \subsection{Method \code{save_model()}}{
 Method for saving a model to 'Keras v3 format',
-'tensorflow' SavedModel format or h5 format.
+' tensorflow' SavedModel format or h5 format.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingClassifierNeuralNet$save_model(dir_path, save_format = "default")}\if{html}{\out{</div>}}
 }
@@ -717,7 +708,7 @@ or \code{"h5"} for HDF5.
 For 'pytorch' models \code{"safetensors"} for 'safetensors' or
 \code{"pt"} for 'pytorch' via pickle.
 Use \code{"default"} for the standard format. This is keras for
-'tensorflow'/'keras' models and safetensors for 'pytorch' models.}
+' tensorflow'/'keras' models and safetensors for 'pytorch' models.}
 }
 \if{html}{\out{</div>}}
 }

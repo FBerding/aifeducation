@@ -7,11 +7,11 @@
 save_to_disk(object, dir_path, folder_name)
 }
 \arguments{
-\item{object}{Object of class \link{TEClassifierRegular},
-\link{TEClassifierProtoNet},  \link{TEFeatureExtractor}, \link{TextEmbeddingModel}, \link{LargeDataSetForTextEmbeddings},
-\link{LargeDataSetForText} or \link{EmbeddedText} which should be saved.}
+\item{object}{Object of class \link{TEClassifierRegular}, \link{TEClassifierProtoNet},  \link{TEFeatureExtractor},
+\link{TextEmbeddingModel}, \link{LargeDataSetForTextEmbeddings}, \link{LargeDataSetForText} or \link{EmbeddedText} which should be
+saved.}
 
-\item{dir_path}{Path to the directory where the should model is stored.}
+\item{dir_path}{\code{string} Path to the directory where the should model is stored.}
 
 \item{folder_name}{\code{string} Name of the folder where the files should be stored.}
 }
@@ -25,8 +25,7 @@ Function for saving objects created with 'aifeducation'.
 }
 \seealso{
 Other Saving and Loading: 
-\code{\link{load_ai_model}()},
-\code{\link{load_from_disk}()},
-\code{\link{save_ai_model}()}
+\code{\link{create_config_state}()},
+\code{\link{load_from_disk}()}
 }
 \concept{Saving and Loading}

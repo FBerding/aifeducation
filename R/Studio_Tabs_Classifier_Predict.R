@@ -21,6 +21,7 @@
 #'
 #' @family studio_gui_page_classifier_predict
 #' @keywords internal
+#' @noRd
 #'
 Classifier_Prediction_UI <- function(id) {
   bslib::page_sidebar(
@@ -88,6 +89,7 @@ Classifier_Prediction_UI <- function(id) {
 #'
 #' @family studio_gui_page_classifier_predict
 #' @keywords internal
+#' @noRd
 #'
 Classifier_Prediction_Server <- function(id, model, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

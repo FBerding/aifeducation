@@ -4,7 +4,7 @@
 \alias{load_ai_model}
 \title{Loading models created with 'aifeducation'}
 \usage{
-load_ai_model(model_dir, ml_framework = aifeducation_config$get_framework())
+load_ai_model(model_dir, ml_framework = "pytorch")
 }
 \arguments{
 \item{model_dir}{Path to the directory where the model is stored.}
@@ -22,9 +22,7 @@ Returns an object of class \link{TextEmbeddingClassifierNeuralNet} or
 Function for loading models created with 'aifeducation'.
 }
 \seealso{
-Other Saving and Loading: 
-\code{\link{load_from_disk}()},
-\code{\link{save_ai_model}()},
-\code{\link{save_to_disk}()}
+Other Saving and Loading Deprecated: 
+\code{\link{save_ai_model}()}
 }
-\concept{Saving and Loading}
+\concept{Saving and Loading Deprecated}

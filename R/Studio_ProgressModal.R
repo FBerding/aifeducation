@@ -31,6 +31,7 @@
 #'
 #' @family studio_long_tasks
 #' @keywords internal
+#' @noRd
 #'
 
 # TODO (Yuliia): session has no visible binding
@@ -135,6 +136,7 @@ create_process_modal <- function(ns,
 #'
 #' @family studio_long_tasks
 #' @keywords internal
+#' @noRd
 #'
 start_and_monitor_long_task <- function(id,
                                         ExtendedTask_type,

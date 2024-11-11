@@ -26,6 +26,7 @@
 #'
 #' @family studio_modals
 #' @keywords internal
+#' @noRd
 #'
 display_errors <- function(
     title = "Error",
@@ -56,6 +57,7 @@ display_errors <- function(
 #'
 #' @family studio_modals
 #' @keywords internal
+#' @noRd
 #'
 display_processing <- function(
     title = "Working. Please wait.",

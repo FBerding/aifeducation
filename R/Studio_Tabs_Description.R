@@ -20,6 +20,7 @@
 #'
 #' @family studio_gui_description
 #' @keywords internal
+#' @noRd
 #'
 Description_UI <- function(id) {
   bslib::page(
@@ -59,6 +60,7 @@ Description_UI <- function(id) {
 #'
 #' @family studio_gui_description
 #' @keywords internal
+#' @noRd
 #'
 Description_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {

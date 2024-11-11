@@ -21,6 +21,7 @@
 #'
 #' @family studio_gui_text_embedding_model_fill_mask
 #' @keywords internal
+#' @noRd
 #'
 Fill_Mask_UI <- function(id) {
   bslib::page(
@@ -92,6 +93,7 @@ Fill_Mask_UI <- function(id) {
 #'
 #' @family studio_gui_text_embedding_model_fill_mask
 #' @keywords internal
+#' @noRd
 #'
 Fill_Mask_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {

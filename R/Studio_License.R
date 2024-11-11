@@ -21,6 +21,7 @@
 #'
 #' @family studio_gui_page_license
 #' @keywords internal
+#' @noRd
 #'
 License_UI <- function(id) {
   shiny::tagList(

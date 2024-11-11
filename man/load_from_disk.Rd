@@ -7,20 +7,18 @@
 load_from_disk(dir_path)
 }
 \arguments{
-\item{dir_path}{Path to the directory where the model is stored.}
+\item{dir_path}{\code{string} Path to the directory where the model is stored.}
 }
 \value{
-Returns an object of class \link{TEClassifierRegular},
-\link{TEClassifierProtoNet},  \link{TEFeatureExtractor}, \link{TextEmbeddingModel}, \link{LargeDataSetForTextEmbeddings},
-\link{LargeDataSetForText} or \link{EmbeddedText}.
+Returns an object of class \link{TEClassifierRegular}, \link{TEClassifierProtoNet},  \link{TEFeatureExtractor},
+\link{TextEmbeddingModel}, \link{LargeDataSetForTextEmbeddings}, \link{LargeDataSetForText} or \link{EmbeddedText}.
 }
 \description{
 Function for loading objects created with 'aifeducation'.
 }
 \seealso{
 Other Saving and Loading: 
-\code{\link{load_ai_model}()},
-\code{\link{save_ai_model}()},
+\code{\link{create_config_state}()},
 \code{\link{save_to_disk}()}
 }
 \concept{Saving and Loading}

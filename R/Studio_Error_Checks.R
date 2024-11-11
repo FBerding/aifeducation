@@ -36,6 +36,7 @@
 #'
 #' @family studio_gui_page_classifier_create
 #' @keywords internal
+#' @noRd
 #'
 check_errors_create_classifier <- function(classifier_type,
                                            destination_path,
@@ -198,6 +199,7 @@ check_errors_create_classifier <- function(classifier_type,
 #'
 #' @family studio_gui_page_data_management
 #' @keywords internal
+#' @noRd
 #'
 check_errors_create_dataset_raw_texts <- function(source_path,
                                                   destination_path,
@@ -261,6 +263,7 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 #'
 #' @family studio_gui_page_feature_extractor_create
 #' @keywords internal
+#' @noRd
 #'
 check_errors_create_feature_extractor <- function(destination_path,
                                                   folder_name,
@@ -355,6 +358,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 #'
 #' @family studio_gui_page_classifier_predict
 #' @keywords internal
+#' @noRd
 #'
 check_errors_predict_classifier <- function(embeddings,
                                             model) {
@@ -407,6 +411,7 @@ check_errors_predict_classifier <- function(embeddings,
 #'
 #' @family studio_gui_text_embedding_model_embed
 #' @keywords internal
+#' @noRd
 #'
 check_errors_text_embedding_model_embed <- function(destination_path,
                                                     folder_name,
@@ -468,6 +473,7 @@ check_errors_text_embedding_model_embed <- function(destination_path,
 #'
 #' @family studio_gui_page_text_embedding_model_create
 #' @keywords internal
+#' @noRd
 #'
 check_errors_text_embedding_model_create <- function(destination_path,
                                                      folder_name,
