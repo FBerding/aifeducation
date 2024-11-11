@@ -1635,19 +1635,19 @@ TextEmbeddingModel <- R6::R6Class(
     #' the language modeling head of the model. If `FALSE` only the number of parameters of
     #' the core model is returned.
     #' @return Returns the number of trainable parameters of the model.
-    count_parameter = function() {
+    count_parameter = function(with_head = FALSE) {
       if (with_head == FALSE) {
         model <- private$transformer_components$model
       } else {
         model <- private$transformer_components$model_mlm
       }
 
-      if (private$ml_framework == "tensorflow") {
+      if (private$transformer_components$ml_framework == "tensorflow") {
         count <- 0
         for (i in 1:length(model$trainable_weights)) {
           count <- count + tf$keras$backend$count_params(model$trainable_weights[[i]])
         }
-      } else if (private$ml_framework == "pytorch") {
+      } else if (private$transformer_components$ml_framework == "pytorch") {
         iterator <- reticulate::as_iterator(model$parameters())
         iteration_finished <- FALSE
         count <- 0
