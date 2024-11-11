@@ -212,7 +212,11 @@
             )
           }
 
-          self$temp$tokenized_dataset <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
+          if (length(relevant_indices) == 0) {
+            self$temp$tokenized_dataset <- tokenized_texts_raw
+          } else {
+            self$temp$tokenized_dataset <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
+          }
           private$update_tokenizer_statistics(self$temp$tokenized_dataset, "training")
         }
       }
