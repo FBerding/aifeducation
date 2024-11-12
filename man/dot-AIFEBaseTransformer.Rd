@@ -7,363 +7,24 @@
 This base class is used to create and define \code{.AIFE*Transformer-like} classes. It serves as a skeleton
 for a future concrete transformer and cannot be used to create an object of itself (an attempt to call \code{new}-method
 will produce an error).
+
+See p.1 Base Transformer Class in
+\href{https://fberding.github.io/aifeducation/articles/transformers.html}{Transformers for Developers} for details.
 }
-\section{Private attributes}{
- Developers should know the purpose of all the private attributes.
-\subsection{\strong{Attribute \code{title}}}{
-
-\code{string} The title for a transformer. This title is displayed in the progress bar. Can be set with \code{set_title()}.
-}
-
-\subsection{\strong{Attribute \code{steps_for_creation}}}{
-
-\code{list()} that stores required and optional steps (functions) for creating a new transformer.
-
-To access (input) parameters of the transformer, use the \code{params} list (e.g. \code{params$ml_framework}). To access a
-local variable outside of a function, put it in the \code{temp} list.
-\subsection{Required}{
-
-The \strong{required steps} to be defined in each child transformer are:
-\itemize{
-\item \code{create_tokenizer_draft}: \verb{function()} that creates a tokenizer draft. In this function a new tokenizer must
-be created and stored as an element of a list \code{temp} (e.g. \code{temp$tok_new}). This function can include the
-definition of special tokens and/or trainers (\code{tokenizers.trainers.WordPieceTrainer}). See the
-\code{create_WordPiece_tokenizer()} and \code{create_ByteLevelBPE_tokenizer()} functions to create a new tokenizer object
-(\code{tokenizers.Tokenizer}) based on the \code{tokenizers.models.WordPiece} and \code{tokenizers.models.ByteLevel} models
-respectively.
-\item \code{calculate_vocab}: \verb{function()} for calculating a vocabulary. The tokenizer created in the
-\code{create_tokenizer_draft()} function is trained. See \code{tokenizers.Tokenizer.train_from_iterator()} for details.
-\item \code{save_tokenizer_draft}: \verb{function()} that saves a tokenizer draft to a model directory (e.g. to a \code{vocab.txt} file).
-See \code{tokenizers.Tokenizer.save_model()} for details.
-\item \code{create_final_tokenizer}: \verb{function()} that creates a new transformer tokenizer object. The tokenizer must be stored
-in the \code{tokenizer} parameter of the \code{temp} list. See \code{transformers.PreTrainedTokenizerFast},
-\code{transformers.LongformerTokenizerFast} and \code{transformers.RobertaTokenizerFast} for details.
-\item \code{create_transformer_model}: \verb{function()} that creates a transformer model. The model must be passed to the \code{model}
-parameter of the \code{temp} list. See \verb{transformers.(TF)BertModel}, \verb{transformers.(TF)DebertaV2ForMaskedLM},
-\verb{transformers.(TF)FunnelModel}, \verb{transformers.(TF)LongformerModel}, \verb{transformers.(TF)RobertaModel}, etc. for
-details.
-}
-}
-
-\subsection{Optional}{
-
-\strong{Optional step} is:
-\itemize{
-\item \code{check_max_pos_emb}: \verb{function()} that checks transformer parameter \code{max_position_embeddings}.
-Leave \code{NULL} to skip the check.
-}
-}
-
-\subsection{Other}{
-
-\strong{Required and already defined step} is:
-\itemize{
-\item \code{save_transformer_model}: \verb{function()} that saves a newly created transformer. Uses the temporary \code{model}
-and \code{pt_safe_save} parameters of the \code{temp} list. See \verb{transformers.(TF)PreTrainedModel.save_pretrained()} for
-details.
-}
-
-Use the \verb{set_SFC_*()} methods to set required/optional steps for creation, where * is the name of the step.
-
-Use the \code{set_required_SFC()} method to set all required steps at once.
-}
-
-}
-
-\subsection{\strong{Attribute \code{steps_for_training}}}{
-
-\code{list()} that stores required and optional steps (functions) for training the transformer.
-
-To access (input) parameters of the transformer, use the \code{params} list (e.g. \code{params$ml_framework}). To access a
-local variable outside of a function, put it in the \code{temp} list.
-\subsection{Required}{
-
-The \strong{required step} in each child transformer is:
-\itemize{
-\item \code{load_existing_model}: \verb{function()} that loads the model and its tokenizer. The model and the transformer must be
-stored to the \code{model} and \code{tokenizer} parameters respectively of the \code{temp} list. See
-\verb{transformers.(TF)PreTrainedModel} for details.
-}
-}
-
-\subsection{Optional}{
-
-\strong{Optional step} is:
-\itemize{
-\item \code{cuda_empty_cache}: \verb{function()} to empty the cache if \code{torch.cuda} is available.
-}
-}
-
-\subsection{Other}{
-
-\strong{Required and already defined steps} are:
-\itemize{
-\item \code{check_chunk_size}: \verb{function()} that checks transformer's parameter \code{chunk_size} and adjusts it. Uses
-the \code{model} parameter of the \code{temp} list and modifies the \code{chunk_size} parameter of the \code{params}
-list.
-\item \code{create_chunks_for_training}: \verb{function()} that creates chunks of the sequenses for the trainining. Uses the
-\code{tokenizer} parameter and adds \code{tokenized_dataset} parameter to the \code{temp} list.
-\item \code{prepare_train_tune}: \verb{function()} that prepares the data for the training. For \code{tensorflow}: uses the \code{model}
-and \code{tokenizer} parameters, adds the \code{tf_train_dataset}, \code{tf_test_dataset}, \code{callbacks} parameters to the
-\code{temp} list. For \code{pytorch}: uses the \code{model}, \code{tokenizer} parameters, adds the \code{trainer} parameter to the
-\code{temp} list.
-\item \code{start_training}: \verb{function()} that starts the training. For \code{tensorflow}: uses the \code{model}, \code{tf_train_dataset},
-\code{tf_test_dataset}, \code{callbacks} parameters of the \code{temp} list. For \code{pytorch}: uses the \code{trainer} parameter
-of the \code{temp} list.
-\item \code{save_model}: \verb{function()} that saves the model. For \code{tensorflow}: uses the \code{model} parameter of the \code{temp} list.
-For \code{pytorch}: uses the \code{model}, \code{pt_safe_save} and \code{trainer} parameters of the \code{temp} list.
-}
-
-Use the \verb{set_SFT_*()} methods to set required/optional steps for creation, where * is the name of the step.
-}
-
-}
-}
-
 \section{Create}{
  The \code{create}-method is a basic algorithm that is used to create a new transformer, but cannot be
-called directly. It has some required and optional steps stored in a private \code{steps_for_creation} list.
+called directly.
 }
 
 \section{Train}{
  The \code{train}-method is a basic algorithm that is used to train and tune the transformer but cannot be
-called directly. It has some required and optional steps stored in a private \code{steps_for_training} list.
+called directly.
 }
 
 \section{Concrete transformer implementation}{
  There are already implemented concrete (child) transformers (e.g.
-\code{BERT}, \code{DeBERTa-V2}, etc.).
-
-To implement a new one, do the following steps:
-
-1 Create a new \code{R}-file with a name like \code{dotAIFECustomTransformer}.
-
-2 Open the file and write the creation of a new \code{R6::R6Class()} inside of it (see the code below). The name of the
-class must be defined here \strong{(1)}. Remember to inherit the base transformer class \strong{(2)}. Use the \code{private} list
-for the private attributes \strong{(3)} like \code{title}, \code{steps_for_creation}, etc. (which will be explained later) and the
-\code{public} list \strong{(4)} for the \code{initialize}, \code{create}, \code{train} methods.
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{.AIFECustomTransformer <- R6::R6Class(
-   classname = ".AIFECustomTransformer", # (1)
-   inherit = .AIFEBaseTransformer,       # (2)
-   private = list(),                     # (3)
-   public = list()                       # (4)
-)
-}\if{html}{\out{</div>}}
-
-3 Define the private \code{title} attribute \strong{(1)} and set it in the \code{initialize} method \strong{(2)} using the inherited
-\code{super$set_title()} base method \strong{(3)} in the base class.
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{.AIFECustomTransformer <- R6::R6Class(
-   classname = ".AIFECustomTransformer",
-   inherit = .AIFEBaseTransformer,
-   private = list(
-     title = "Custom Model"           # (1)
-   ),
-   public = list(
-     initialize = function() \{        # (2)
-       super$set_title(private$title) # (3)
-     \}
-   )
-)
-}\if{html}{\out{</div>}}
-
-4 Define the private \code{steps_for_creation} list \strong{(1)} to implement the required steps (functions) \strong{(2)}-\strong{(6)},
-and \strong{(7)} if needed. Do not forget to pass \code{self} as input parameter of the functions.
-
-\strong{Note} that local variables created inside of functions can be used through the inherited \code{temp} list. Put the
-local \code{tok_new} variable \strong{(8)} in the \code{temp} list in the \code{create_tokenizer_draft} step \strong{(2)} and use it in the
-\code{calculate_vocab} step \strong{(3)} like \strong{(9)}.
-
-Similarly, use the input parameters of the transformer such as \code{ml_framework} using the inherited \code{params} list like
-\strong{(10)}.
-
-\strong{Important!}
-
-In the \code{create_final_tokenizer} step \strong{(5)} store the tokenizer in the \code{self$temp$tokenizer} variable \strong{(11)}.
-
-In the \code{create_transformer_model} step \strong{(6)} store the transformer model in the \code{self$temp$model} variable
-\strong{(12)}.
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{.AIFECustomTransformer <- R6::R6Class(
-   classname = ".AIFECustomTransformer",
-   inherit = .AIFEBaseTransformer,
-   private = list(
-     title = "Custom Model",
-     steps_for_creation = list(                   # (1)
-       # required
-       create_tokenizer_draft = function(self) \{      # (2)
-         # The implementation must be here
-         # self$temp$tok_new <- ...         # (8)
-       \},
-       calculate_vocab = function(self) \{             # (3)
-         # The implementation must be here
-         # ... self$temp$tok_new ...        # (9)
-       \},
-       save_tokenizer_draft = function(self) \{        # (4)
-         # The implementation must be here
-       \},
-       create_final_tokenizer = function(self) \{      # (5)
-         # The implementation must be here
-         # self$temp$tokenizer <- ... # (!!!) (11)
-       \},
-       create_transformer_model = function(self) \{    # (6)
-         # The implementation must be here
-         # ... self$params$ml_framework ... # (10)
-         # self$temp$model <- ...     # (!!!) (12)
-       \},
-       # optional: omit this element if do not needed
-       check_max_pos_emb = function(self) \{           # (7)
-         # The implementation must be here
-       \}
-     )
-   ),
-   public = list(
-     initialize = function() \{
-       super$set_title(private$title)
-     \}
-   )
-)
-}\if{html}{\out{</div>}}
-
-5 Define the \code{create} method \strong{(1)} with all the input parameters \strong{(2)} of the \code{create} method of the base
-class. Add all the dependent parameters of the custom transformer to the input parameters \strong{(3)}. Dependent
-parameters are parameters that depend on the transformer and are not present in the base class. Set these dependent
-parameters to the base class using the \code{super$set_model_param()} method \strong{(4)}. Set required and optional steps to
-the base class using the \code{super$set_required_SFC()} and \code{super$set_SFC_check_max_pos_emb()} methods respectively
-\strong{(5)}. Finally run the basic \code{create} algorithm using \code{super$create()} \strong{(6)} with all the input parameters
-\strong{(2)}.
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{.AIFECustomTransformer <- R6::R6Class(
-   classname = ".AIFECustomTransformer",
-   inherit = .AIFEBaseTransformer,
-   private = list(
-     title = "Custom Model",
-     steps_for_creation = list(
-       # required
-       create_tokenizer_draft = function(self) \{ \},
-       calculate_vocab = function(self) \{ \},
-       save_tokenizer_draft = function(self) \{ \},
-       create_final_tokenizer = function(self) \{ \},
-       create_transformer_model = function(self) \{ \},
-       # optional: omit this element if do not needed
-       check_max_pos_emb = function(self) \{ \}
-     )
-   ),
-   public = list(
-     initialize = function() \{ \},
-     # (1)
-     create = function(# (2) --------------------------
-                       ml_framework,
-                       model_dir,
-                       vocab_raw_texts,
-                       vocab_size,
-                       # ...
-                       trace,
-                       pytorch_safetensors,
-
-                       # (3) --------------------------
-                       dep_param1,
-                       dep_param2,
-                       # ...
-                       dep_paramN) \{
-       # (4) -----------------------------------------
-       super$set_model_param("dep_param1", dep_param1)
-       super$set_model_param("dep_param2", dep_param2)
-       # ...
-       super$set_model_param("dep_paramN", dep_paramN)
-
-       # (5) -----------------------------------------
-       super$set_required_SFC(private$steps_for_creation)
-
-       # optional, can be omitted if do not needed
-       super$set_SFC_check_max_pos_emb(private$steps_for_creation$check_max_pos_emb)
-
-       # (6) -----------------------------------------
-       super$create(
-         ml_framework = ml_framework,
-         model_dir = model_dir,
-         vocab_raw_texts = vocab_raw_texts,
-         vocab_size = vocab_size,
-         # ...
-         trace = trace,
-         pytorch_safetensors = pytorch_safetensors)
-     \}
-   )
-)
-}\if{html}{\out{</div>}}
-
-6 Define \code{train} method \strong{(1)} similarly to the step 5. Implement steps (functions) in the private
-\code{steps_for_training} list \strong{(2)}. Do not forget to pass \code{self} as input parameter of the required function. Set the dependent parameters \strong{(4)} in the base class using
-\code{super$set_model_param()} method \strong{(5)}. Set the implemented steps for training in the base class using
-\verb{super$set_SFT_*()} methods \strong{(6)}. Finally run the basic \code{train} algorithm \strong{(7)} of the base class with all the
-(input) parameters \strong{(3)}.
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{.AIFECustomTransformer <- R6::R6Class(
-   classname = ".AIFECustomTransformer",
-   inherit = .AIFEBaseTransformer,
-   private = list(
-     title = "Custom Model",
-     steps_for_creation = list(
-       # required
-       create_tokenizer_draft = function(self) \{ \},
-       calculate_vocab = function(self) \{ \},
-       save_tokenizer_draft = function(self) \{ \},
-       create_final_tokenizer = function(self) \{ \},
-       create_transformer_model = function(self) \{ \},
-       # optional: omit this element if do not needed
-       check_max_pos_emb = function(self) \{ \}
-     ),
-     # (2)
-     steps_for_training = list(
-       # required
-       load_existing_model = function(self) \{ \},
-       # optional
-       cuda_empty_cache = function() \{ \}
-     )
-   ),
-   public = list(
-     initialize = function() \{ \},
-     create = function( ) \{
-       # ---------------------------
-       # super$set_model_param(...)
-       # ...
-       # ---------------------------
-       # super$set_required_SFC(...)
-       # super$set_SFC_*(...)
-       # ...
-       # ---------------------------
-       # super$create(...)
-     \},
-
-     # (1)
-     train = function(# (3) --------
-                      ml_framework,
-                      # ...
-
-                      # (4) --------
-                      dep_param1,
-                      # ...
-                      dep_paramN) \{
-       # (5) -----------------------------------------
-       super$set_model_param("dep_param1", dep_param1)
-       # ...
-       super$set_model_param("dep_paramN", dep_paramN)
-
-       # (6) -----------------------------------------
-       super$set_SFT_load_existing_model(private$steps_for_creation$load_existing_model)
-       # optional
-       super$set_SFT_cuda_empty_cache(private$steps_for_creation$cuda_empty_cache)
-
-       # (7) -----------------------------------------
-       super$train(
-         ml_framework = ml_framework,
-         # ...
-       )
-     \}
-   )
-)
-}\if{html}{\out{</div>}}
+\code{BERT}, \code{DeBERTa-V2}, etc.), to implement a new one see p.4 Implement A Custom Transformer in
+\href{https://fberding.github.io/aifeducation/articles/transformers.html}{Transformers for Developers}
 }
 
 \references{
@@ -374,6 +35,7 @@ Hugging Face transformers documantation:
 \item \href{https://huggingface.co/docs/transformers/model_doc/funnel}{Funnel}
 \item \href{https://huggingface.co/docs/transformers/model_doc/longformer}{Longformer}
 \item \href{https://huggingface.co/docs/transformers/model_doc/roberta}{RoBERTa}
+\item \href{https://huggingface.co/docs/transformers/model_doc/mpnet}{MPNet}
 }
 }
 \seealso{
@@ -382,7 +44,9 @@ Other Transformers for developers:
 \code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFELongformerTransformer}},
-\code{\link{.AIFERobertaTransformer}}
+\code{\link{.AIFEMpnetTransformer}},
+\code{\link{.AIFERobertaTransformer}},
+\code{\link{.AIFETrObj}}
 }
 \concept{Transformers for developers}
 \section{Public fields}{
@@ -451,24 +115,16 @@ Depending on the transformer and the method used class may contain different par
 \item \code{add_prefix_space}
 \item etc.
 }
-
-\figure{transformer_params_list.png}
-
-Figure 1: Possible parameters in the params list
 }}
 
 \item{\code{temp}}{A list containing temporary transformer's parameters
 
-\code{list()} containing all the temporary local variables that need to be accessed between the step functions. Can be
-set with \code{set_model_temp()}.
+\code{list()} containing all the temporary local variables that need to be accessed between the step functions. Can
+be set with \code{set_model_temp()}.
 
 For example, it can be a variable \code{tok_new} that stores the tokenizer from
 \code{steps_for_creation$create_tokenizer_draft}. To train the tokenizer, access the variable \code{tok_new} in
-\code{steps_for_creation$calculate_vocab} through the \code{temp} list of this class.
-
-\figure{transformer_temp_list.png}
-
-Figure 2: Possible parameters in the temp list}
+\code{steps_for_creation$calculate_vocab} through the \code{temp} list of this class.}
 }
 \if{html}{\out{</div>}}
 }
@@ -488,6 +144,7 @@ Figure 2: Possible parameters in the temp list}
 \item \href{#method-.AIFEBaseTransformer-set_required_SFC}{\code{.AIFEBaseTransformer$set_required_SFC()}}
 \item \href{#method-.AIFEBaseTransformer-set_SFT_load_existing_model}{\code{.AIFEBaseTransformer$set_SFT_load_existing_model()}}
 \item \href{#method-.AIFEBaseTransformer-set_SFT_cuda_empty_cache}{\code{.AIFEBaseTransformer$set_SFT_cuda_empty_cache()}}
+\item \href{#method-.AIFEBaseTransformer-set_SFT_create_data_collator}{\code{.AIFEBaseTransformer$set_SFT_create_data_collator()}}
 \item \href{#method-.AIFEBaseTransformer-create}{\code{.AIFEBaseTransformer$create()}}
 \item \href{#method-.AIFEBaseTransformer-train}{\code{.AIFEBaseTransformer$train()}}
 \item \href{#method-.AIFEBaseTransformer-clone}{\code{.AIFEBaseTransformer$clone()}}
@@ -761,6 +418,28 @@ This method returns nothing.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-.AIFEBaseTransformer-set_SFT_create_data_collator"></a>}}
+\if{latex}{\out{\hypertarget{method-.AIFEBaseTransformer-set_SFT_create_data_collator}{}}}
+\subsection{Method \code{set_SFT_create_data_collator()}}{
+Setter for the \code{create_data_collator} element of the private \code{steps_for_training} list. Sets a new
+\code{fun} function as the \code{create_data_collator} step. Use this method to make a custom data collator for a
+transformer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$set_SFT_create_data_collator(fun)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{fun}}{\verb{function()} A new function.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+This method returns nothing.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-.AIFEBaseTransformer-create"></a>}}
 \if{latex}{\out{\hypertarget{method-.AIFEBaseTransformer-create}{}}}
 \subsection{Method \code{create()}}{
@@ -893,7 +572,8 @@ This method \strong{adds} \code{from_pt}, \code{from_tf}, \code{load_safe} and \
 \item \code{ml_framework = "pytorch"}: for 'pytorch'.
 }}
 
-\item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be created.}
+\item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be
+created.}
 
 \item{\code{model_dir_path}}{\code{string} Path to the directory where the original model is stored.}
 

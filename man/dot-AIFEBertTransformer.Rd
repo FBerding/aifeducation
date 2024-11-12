@@ -44,7 +44,9 @@ Other Transformers for developers:
 \code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFELongformerTransformer}},
-\code{\link{.AIFERobertaTransformer}}
+\code{\link{.AIFEMpnetTransformer}},
+\code{\link{.AIFERobertaTransformer}},
+\code{\link{.AIFETrObj}}
 }
 \concept{Transformers for developers}
 \section{Super class}{
@@ -68,6 +70,7 @@ Other Transformers for developers:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_create_tokenizer_draft"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_create_tokenizer_draft'><code>aifeducation::.AIFEBaseTransformer$set_SFC_create_tokenizer_draft()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_create_transformer_model"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_create_transformer_model'><code>aifeducation::.AIFEBaseTransformer$set_SFC_create_transformer_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_save_tokenizer_draft"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_save_tokenizer_draft'><code>aifeducation::.AIFEBaseTransformer$set_SFC_save_tokenizer_draft()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFT_create_data_collator"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFT_create_data_collator'><code>aifeducation::.AIFEBaseTransformer$set_SFT_create_data_collator()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFT_cuda_empty_cache"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFT_cuda_empty_cache'><code>aifeducation::.AIFEBaseTransformer$set_SFT_cuda_empty_cache()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFT_load_existing_model"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFT_load_existing_model'><code>aifeducation::.AIFEBaseTransformer$set_SFT_load_existing_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_model_param"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_model_param'><code>aifeducation::.AIFEBaseTransformer$set_model_param()</code></a></span></li>
@@ -104,7 +107,7 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 }
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBertTransformer$create(
-  ml_framework = aifeducation_config$get_framework()[1],
+  ml_framework = "pytorch",
   model_dir,
   vocab_raw_texts = NULL,
   vocab_size = 30522,
@@ -117,7 +120,7 @@ This method adds the following \emph{'dependent' parameters} to the base class's
   hidden_act = "gelu",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1,
-  sustain_track = TRUE,
+  sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15,
@@ -194,7 +197,7 @@ This method can be used to train or fine-tune a transformer based on \code{BERT}
 help of the python libraries \code{transformers}, \code{datasets}, and \code{tokenizers}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBertTransformer$train(
-  ml_framework = aifeducation_config$get_framework()[1],
+  ml_framework = "pytorch",
   output_dir,
   model_dir_path,
   raw_texts,
@@ -209,7 +212,7 @@ help of the python libraries \code{transformers}, \code{datasets}, and \code{tok
   learning_rate = 0.003,
   n_workers = 1,
   multi_process = FALSE,
-  sustain_track = TRUE,
+  sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15,
@@ -229,7 +232,8 @@ help of the python libraries \code{transformers}, \code{datasets}, and \code{tok
 \item \code{ml_framework = "pytorch"}: for 'pytorch'.
 }}
 
-\item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be created.}
+\item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be
+created.}
 
 \item{\code{model_dir_path}}{\code{string} Path to the directory where the original model is stored.}
 

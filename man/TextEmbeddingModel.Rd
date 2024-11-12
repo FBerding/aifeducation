@@ -4,19 +4,17 @@
 \alias{TextEmbeddingModel}
 \title{Text embedding model}
 \value{
-Objects of class \link{TextEmbeddingModel} transform raw texts into numerical
-representations which can be used for downstream tasks. For this aim objects of this class
-allow to tokenize raw texts, to encode tokens to sequences of integers, and to decode sequences
-of integers back to tokens.
+Objects of class \link{TextEmbeddingModel} transform raw texts into numerical representations which can be used
+for downstream tasks. For this aim objects of this class allow to tokenize raw texts, to encode tokens to sequences
+of integers, and to decode sequences of integers back to tokens.
 }
 \description{
-This \code{R6} class stores a text embedding model which can be
-used to tokenize, encode, decode, and embed raw texts. The object provides a
-unique interface for different text processing methods.
+This \code{R6} class stores a text embedding model which can be used to tokenize, encode, decode, and embed
+raw texts. The object provides a unique interface for different text processing methods.
 }
 \seealso{
 Other Text Embedding: 
-\code{\link{combine_embeddings}()}
+\code{\link{TEFeatureExtractor}}
 }
 \concept{Text Embedding}
 \section{Public fields}{
@@ -25,13 +23,22 @@ Other Text Embedding:
 \item{\code{last_training}}{('list()')\cr
 List for storing the history and the results of the last training. This
 information will be overwritten if a new training is started.}
+
+\item{\code{tokenizer_statistics}}{('matrix()')\cr
+Matrix containing the tokenizer statistics for the creation of the tokenizer
+and all training runs according to Kaya & Tantuğ (2024).
+
+Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish
+large language models. Intelligent Systems with Applications, 21, 200335.
+https://doi.org/10.1016/j.iswa.2024.200335}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-TextEmbeddingModel-new}{\code{TextEmbeddingModel$new()}}
+\item \href{#method-TextEmbeddingModel-configure}{\code{TextEmbeddingModel$configure()}}
+\item \href{#method-TextEmbeddingModel-load_from_disk}{\code{TextEmbeddingModel$load_from_disk()}}
 \item \href{#method-TextEmbeddingModel-load}{\code{TextEmbeddingModel$load()}}
 \item \href{#method-TextEmbeddingModel-save}{\code{TextEmbeddingModel$save()}}
 \item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
@@ -51,24 +58,25 @@ information will be overwritten if a new training is started.}
 \item \href{#method-TextEmbeddingModel-get_model_info}{\code{TextEmbeddingModel$get_model_info()}}
 \item \href{#method-TextEmbeddingModel-get_package_versions}{\code{TextEmbeddingModel$get_package_versions()}}
 \item \href{#method-TextEmbeddingModel-get_basic_components}{\code{TextEmbeddingModel$get_basic_components()}}
-\item \href{#method-TextEmbeddingModel-get_bow_components}{\code{TextEmbeddingModel$get_bow_components()}}
 \item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
 \item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
 \item \href{#method-TextEmbeddingModel-get_ml_framework}{\code{TextEmbeddingModel$get_ml_framework()}}
 \item \href{#method-TextEmbeddingModel-count_parameter}{\code{TextEmbeddingModel$count_parameter()}}
+\item \href{#method-TextEmbeddingModel-is_configured}{\code{TextEmbeddingModel$is_configured()}}
+\item \href{#method-TextEmbeddingModel-get_private}{\code{TextEmbeddingModel$get_private()}}
+\item \href{#method-TextEmbeddingModel-get_all_fields}{\code{TextEmbeddingModel$get_all_fields()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-new"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-new}{}}}
-\subsection{Method \code{new()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-configure"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-configure}{}}}
+\subsection{Method \code{configure()}}{
 Method for creating a new text embedding model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$new(
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$configure(
   model_name = NULL,
   model_label = NULL,
-  model_version = NULL,
   model_language = NULL,
   method = NULL,
   ml_framework = "pytorch",
@@ -78,14 +86,7 @@ Method for creating a new text embedding model
   emb_layer_min = "middle",
   emb_layer_max = "2_3_layer",
   emb_pool_type = "average",
-  model_dir,
-  bow_basic_text_rep,
-  bow_n_dim = 10,
-  bow_n_cluster = 100,
-  bow_max_iter = 500,
-  bow_max_iter_cluster = 500,
-  bow_cr_criterion = 1e-08,
-  bow_learning_rate = 1e-08,
+  model_dir = NULL,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -96,8 +97,6 @@ Method for creating a new text embedding model
 \item{\code{model_name}}{\code{string} containing the name of the new model.}
 
 \item{\code{model_label}}{\code{string} containing the label/title of the new model.}
-
-\item{\code{model_version}}{\code{string} version of the model.}
 
 \item{\code{model_language}}{\code{string} containing the language which the model
 represents (e.g., English).}
@@ -114,7 +113,8 @@ details for more information.}
 
 \item{\code{ml_framework}}{\code{string} Framework to use for the model.
 \code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
-for 'pytorch'. Only relevant for transformer models.}
+for 'pytorch'. Only relevant for transformer models. To request bag-of-words model
+set \code{ml_framework=NULL}.}
 
 \item{\code{max_length}}{\code{int} determining the maximum length of token
 sequences used in transformer models. Not relevant for the other methods.}
@@ -145,45 +145,40 @@ within each layer. If \code{"cls"} only the embedding of the CLS token is used. 
 \item{\code{model_dir}}{\code{string} path to the directory where the
 BERT model is stored.}
 
-\item{\code{bow_basic_text_rep}}{object of class \code{basic_text_rep} created via
-the function \link{bow_pp_create_basic_text_rep}. Only relevant for \code{method="glove_cluster"}
-and \code{method="lda"}.}
-
-\item{\code{bow_n_dim}}{\code{int} Number of dimensions of the GlobalVector or
-number of topics for LDA.}
-
-\item{\code{bow_n_cluster}}{\code{int} Number of clusters created on the basis
-of GlobalVectors. Parameter is not relevant for \code{method="lda"} and
-any transformer.}
-
-\item{\code{bow_max_iter}}{\code{int} Maximum number of iterations for fitting
-GlobalVectors and Topic Models.}
-
-\item{\code{bow_max_iter_cluster}}{\code{int} Maximum number of iterations for
-fitting cluster if \code{method="glove"}.}
-
-\item{\code{bow_cr_criterion}}{\code{double} convergence criterion for GlobalVectors.}
-
-\item{\code{bow_learning_rate}}{\code{double} initial learning rate for GlobalVectors.}
-
 \item{\code{trace}}{\code{bool} \code{TRUE} prints information about the progress.
 \code{FALSE} does not.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-In the case of any transformer (e.g.\code{method="bert"}, \code{method="roberta"}, and \code{method="longformer"}),
-a pretrained transformer model must be supplied via \code{model_dir}. For \code{method="glove"}
-and \code{method="lda"} a new model will be created based on the data provided
-via \code{bow_basic_text_rep}.
-
-The original algorithm for GlobalVectors provides
-only word embeddings, not text embeddings. To achieve text embeddings the words
-are clustered based on their word embeddings with kmeans.
+In the case of any transformer (e.g.\code{method="bert"},
+\code{method="roberta"}, and \code{method="longformer"}),
+a pretrained transformer model must be supplied via \code{model_dir}.
 }
 
 \subsection{Returns}{
 Returns an object of class \link{TextEmbeddingModel}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-load_from_disk"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_from_disk}{}}}
+\subsection{Method \code{load_from_disk()}}{
+loads an object from disk
+and updates the object to the current version of the package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_from_disk(dir_path)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir_path}}{Path where the object set is stored.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Method does not return anything. It loads an object from disk.
 }
 }
 \if{html}{\out{<hr>}}
@@ -378,6 +373,12 @@ raw texts.}
 
 \item{\code{trace}}{\code{bool} \code{TRUE}, if information about the progression
 should be printed on console.}
+
+\item{\code{log_file}}{\code{string} Path to the file where the log should be saved.
+If no logging is desired set this argument to \code{NULL}.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which
+the logger should try to update the log files. Only relevant if \code{log_file} is not \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -601,7 +602,7 @@ Method for requesting the model information
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_package_versions}{}}}
 \subsection{Method \code{get_package_versions()}}{
 Method for requesting a summary of the R and python packages'
-versions used for creating the classifier.
+versions used for creating the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_package_versions()}\if{html}{\out{</div>}}
 }
@@ -619,20 +620,6 @@ Method for requesting the part of interface's configuration that is
 necessary for all models.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_basic_components()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{list}.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_bow_components"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_bow_components}{}}}
-\subsection{Method \code{get_bow_components()}}{
-Method for requesting the part of interface's configuration that is
-necessary bag-of-words models.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_bow_components()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -704,6 +691,48 @@ the core model is returned.}
 }
 \subsection{Returns}{
 Returns the number of trainable parameters of the model.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-is_configured"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-is_configured}{}}}
+\subsection{Method \code{is_configured()}}{
+Method for checking if the model was successfully configured.
+An object can only be used if this value is \code{TRUE}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$is_configured()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{bool} \code{TRUE} if the model is fully configured. \code{FALSE} if not.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_private"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_private}{}}}
+\subsection{Method \code{get_private()}}{
+Method for requesting all private fields and methods. Used
+for loading and updating an object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_private()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list} with all private fields and methods.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_all_fields"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_all_fields}{}}}
+\subsection{Method \code{get_all_fields()}}{
+Return all fields.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_all_fields()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Method returns a \code{list} containing all public and private fields
+of the object.
 }
 }
 \if{html}{\out{<hr>}}

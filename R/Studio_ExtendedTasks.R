@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 # LargeDataSetForText ------------------------------------------------------------
 long_add_texts_to_dataset <- function(source_path,
                                       destination_path,
@@ -160,7 +174,7 @@ long_classifier <- function(classifier_type,
                             log_dir,
                             dense_layers,
                             dense_size,
-                            rec_layers ,
+                            rec_layers,
                             rec_size,
                             rec_type,
                             rec_bidirectional,
@@ -225,9 +239,9 @@ long_classifier <- function(classifier_type,
         feature_extractor = feature_extractor,
         target_levels = target_levels,
         dense_layers = dense_layers,
-        dense_size=dense_size,
+        dense_size = dense_size,
         rec_layers = rec_layers,
-        rec_size=rec_size,
+        rec_size = rec_size,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         self_attention_heads = self_attention_heads,
@@ -283,9 +297,9 @@ long_classifier <- function(classifier_type,
         feature_extractor = feature_extractor,
         target_levels = target_levels,
         dense_layers = dense_layers,
-        dense_size=dense_size,
+        dense_size = dense_size,
         rec_layers = rec_layers,
-        rec_size=rec_size,
+        rec_size = rec_size,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         self_attention_heads = self_attention_heads,
@@ -330,8 +344,8 @@ long_classifier <- function(classifier_type,
         Nq = Nq,
         loss_alpha = loss_alpha,
         loss_margin = loss_margin,
-        sampling_separate=sampling_separate,
-        sampling_shuffle=sampling_shuffle
+        sampling_separate = sampling_separate,
+        sampling_shuffle = sampling_shuffle
       )
     }
     # Save
@@ -373,9 +387,9 @@ get_arguments_extended_task_TEClassifierRegular <- function() {
     "epochs",
     "batch_size",
     "log_dir",
-    "dense_layers" ,
+    "dense_layers",
     "dense_size",
-    "rec_layers" ,
+    "rec_layers",
     "rec_size",
     "rec_type",
     "rec_bidirectional",

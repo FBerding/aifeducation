@@ -12,38 +12,14 @@ calc_standard_classification_measures(true_values, predicted_values)
 \item{predicted_values}{\code{factor} containing the predicted labels/categories.}
 }
 \value{
-Returns a matrix which contains the cases categories in the rows and
-the measures (precision, recall, f1) in the columns.
+Returns a matrix which contains the cases categories in the rows and the measures (precision, recall, f1) in
+the columns.
 }
 \description{
 Function for calculating recall, precision, and f1.
 }
 \seealso{
-Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{check_class}()},
-\code{\link{check_embedding_models}()},
-\code{\link{check_type}()},
-\code{\link{class_vector_to_py_dataset}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_iota2_mean_object}()},
-\code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{data.frame_to_py_dataset}()},
-\code{\link{generate_id}()},
-\code{\link{get_batches_index}()},
-\code{\link{get_coder_metrics}()},
-\code{\link{get_folds}()},
-\code{\link{get_n_chunks}()},
-\code{\link{get_stratified_train_test_split}()},
-\code{\link{get_synthetic_cases_from_matrix}()},
-\code{\link{get_train_test_split}()},
-\code{\link{is.null_or_na}()},
-\code{\link{matrix_to_array_c}()},
-\code{\link{prepare_r_array_for_dataset}()},
-\code{\link{py_dataset_to_embeddings}()},
-\code{\link{reduce_to_unique}()},
-\code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()},
-\code{\link{to_categorical_c}()}
+Other classifier_utils: 
+\code{\link{get_coder_metrics}()}
 }
-\concept{Auxiliary Functions}
+\concept{classifier_utils}

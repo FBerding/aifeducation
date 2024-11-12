@@ -10,39 +10,20 @@ generate_id(length = 16)
 \item{length}{\code{int} determining the length of the id suffix.}
 }
 \value{
-Returns a \code{string} of the requested length
+Returns a \code{string} of the requested length.
 }
 \description{
-Function for generating an ID suffix for objects of class
-\link{TextEmbeddingModel} and \link{TextEmbeddingClassifierNeuralNet}.
+Function for generating an ID suffix for objects of class \link{TextEmbeddingModel} and
+\link{TextEmbeddingClassifierNeuralNet}.
 }
 \seealso{
-Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{calc_standard_classification_measures}()},
-\code{\link{check_class}()},
-\code{\link{check_embedding_models}()},
-\code{\link{check_type}()},
-\code{\link{class_vector_to_py_dataset}()},
+Other Utils: 
 \code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_iota2_mean_object}()},
-\code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{data.frame_to_py_dataset}()},
-\code{\link{get_batches_index}()},
-\code{\link{get_coder_metrics}()},
-\code{\link{get_folds}()},
-\code{\link{get_n_chunks}()},
-\code{\link{get_stratified_train_test_split}()},
-\code{\link{get_synthetic_cases_from_matrix}()},
-\code{\link{get_train_test_split}()},
+\code{\link{create_dir}()},
+\code{\link{get_file_extension}()},
 \code{\link{is.null_or_na}()},
-\code{\link{matrix_to_array_c}()},
-\code{\link{prepare_r_array_for_dataset}()},
-\code{\link{py_dataset_to_embeddings}()},
-\code{\link{reduce_to_unique}()},
-\code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()},
-\code{\link{to_categorical_c}()}
+\code{\link{output_message}()},
+\code{\link{print_message}()},
+\code{\link{run_py_file}()}
 }
-\concept{Auxiliary Functions}
-\keyword{internal}
+\concept{Utils}

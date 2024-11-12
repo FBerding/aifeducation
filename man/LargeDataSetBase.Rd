@@ -2,16 +2,15 @@
 % Please edit documentation in R/LargeDataSetBase.R
 \name{LargeDataSetBase}
 \alias{LargeDataSetBase}
-\title{Abstract base class for large data sets.}
+\title{Abstract base class for large data sets}
 \value{
 Returns a new object of this class.
 }
 \description{
-This object contains public and private methods which may be useful for every
-large data sets. Objects of this class are not intended to be used directly.
-\link{LargeDataSetForTextEmbeddings} or \link{LargeDataSetForText}.
+This object contains public and private methods which may be useful for every large data sets. Objects
+of this class are not intended to be used directly. \link{LargeDataSetForTextEmbeddings} or \link{LargeDataSetForText}.
 }
-\concept{Developers}
+\concept{LargeDataSets for developers}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -23,7 +22,9 @@ large data sets. Objects of this class are not intended to be used directly.
 \item \href{#method-LargeDataSetBase-select}{\code{LargeDataSetBase$select()}}
 \item \href{#method-LargeDataSetBase-get_ids}{\code{LargeDataSetBase$get_ids()}}
 \item \href{#method-LargeDataSetBase-save}{\code{LargeDataSetBase$save()}}
+\item \href{#method-LargeDataSetBase-load_from_disk}{\code{LargeDataSetBase$load_from_disk()}}
 \item \href{#method-LargeDataSetBase-load}{\code{LargeDataSetBase$load()}}
+\item \href{#method-LargeDataSetBase-get_all_fields}{\code{LargeDataSetBase$get_all_fields()}}
 \item \href{#method-LargeDataSetBase-clone}{\code{LargeDataSetBase$clone()}}
 }
 }
@@ -83,25 +84,23 @@ Returns the data set of this object as an object of class \code{datasets.arrow_d
 \if{html}{\out{<a id="method-LargeDataSetBase-reduce_to_unique_ids"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetBase-reduce_to_unique_ids}{}}}
 \subsection{Method \code{reduce_to_unique_ids()}}{
-Reduces the data set to a data set containing only unique ids.
-In the case an id exists multiple times in the data set the first case
-remains in the data set. The other cases are dropped.
+Reduces the data set to a data set containing only unique ids. In the case an id exists multiple
+times in the data set the first case remains in the data set. The other cases are dropped.
+
 \strong{Attention} Calling this method will change the data set in place.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$reduce_to_unique_ids()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Method does not return anything. It changes the data set of this
-object in place.
+Method does not return anything. It changes the data set of this object in place.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetBase-select"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetBase-select}{}}}
 \subsection{Method \code{select()}}{
-Returns a data set which contains only the cases belonging to
-the specific indices.
+Returns a data set which contains only the cases belonging to the specific indices.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$select(indicies)}\if{html}{\out{</div>}}
 }
@@ -109,14 +108,12 @@ the specific indices.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{indicies}}{\code{vector} of \code{int} for selecting rows in the data set.
-\strong{Attention} The indices are zero-based.}
+\item{\code{indicies}}{\code{vector} of \code{int} for selecting rows in the data set. \strong{Attention} The indices are zero-based.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Returns a data set of class \code{datasets.arrow_dataset.Dataset} with the
-selected rows.
+Returns a data set of class \code{datasets.arrow_dataset.Dataset} with the selected rows.
 }
 }
 \if{html}{\out{<hr>}}
@@ -148,8 +145,7 @@ Saves a data set to disk.
 
 \item{\code{folder_name}}{\code{string} Name of the folder for storing the data set.}
 
-\item{\code{create_dir}}{\code{bool} If \code{True} the directory will be created if it
-does not exist.}
+\item{\code{create_dir}}{\code{bool} If \code{True} the directory will be created if it does not exist.}
 }
 \if{html}{\out{</div>}}
 }
@@ -158,10 +154,31 @@ Method does not return anything. It write the data set to disk.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetBase-load_from_disk"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetBase-load_from_disk}{}}}
+\subsection{Method \code{load_from_disk()}}{
+loads an object of class \link{LargeDataSetBase} from disk 'and updates the object to the current version
+of the package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$load_from_disk(dir_path)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir_path}}{Path where the data set set is stored.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Method does not return anything. It loads an object from disk.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetBase-load"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetBase-load}{}}}
 \subsection{Method \code{load()}}{
-loads a data set from disk.
+Loads a data set from disk.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$load(dir_path)}\if{html}{\out{</div>}}
 }
@@ -175,6 +192,19 @@ loads a data set from disk.
 }
 \subsection{Returns}{
 Method does not return anything. It loads a data set from disk.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetBase-get_all_fields"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetBase-get_all_fields}{}}}
+\subsection{Method \code{get_all_fields()}}{
+Return all fields.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$get_all_fields()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Method returns a \code{list} containing all public and private fields of the object.
 }
 }
 \if{html}{\out{<hr>}}

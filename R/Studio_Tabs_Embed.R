@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Graphical user interface for transforming raw texts into numerical text embeddings.
 #' @description Functions generates the tab within a page for generating text embeddings with an object of class
 #'   [TextEmbeddingModel].
@@ -7,6 +21,7 @@
 #'
 #' @family studio_gui_text_embedding_model_embed
 #' @keywords internal
+#' @noRd
 #'
 Embed_UI <- function(id) {
   bslib::page(
@@ -57,6 +72,7 @@ Embed_UI <- function(id) {
 #'
 #' @family studio_gui_text_embedding_model_embed
 #' @keywords internal
+#' @noRd
 #'
 Embed_Server <- function(id, model, model_path, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

@@ -15,43 +15,38 @@ install_py_modules(
 )
 }
 \arguments{
-\item{envname}{\code{string} Name of the environment where the packages should
-be installed.}
+\item{envname}{\code{string} Name of the environment where the packages should be installed.}
 
-\item{install}{\code{character} determining which machine learning frameworks
-should be installed. \code{install="all"}  for 'pytorch' and 'tensorflow'.
-\code{install="pytorch"}  for 'pytorch', and \code{install="tensorflow"}  for 'tensorflow'.}
+\item{install}{\code{character} determining which machine learning frameworks should be installed.
+\itemize{
+\item \code{install = "all"}: for 'pytorch' and 'tensorflow'.
+\item \code{install = "pytorch"}: for 'pytorch'.
+\item \code{install = "tensorflow"}: for 'tensorflow'.
+}}
 
 \item{tf_version}{\code{string} determining the desired version of 'tensorflow'.}
 
-\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for
-'PyTorch'.}
+\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for ' PyTorch'.}
 
 \item{python_version}{\code{string} Python version to use.}
 
-\item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before
-recreating the environment and installing the packages. If \code{FALSE} the packages
-are installed in the existing environment without any prior changes.}
+\item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before recreating the environment and
+installing the packages. If \code{FALSE} the packages are installed in the existing environment without any prior
+changes.}
 
-\item{cpu_only}{\code{bool} \code{TRUE} installs the cpu only version of the
-machine learning frameworks.}
+\item{cpu_only}{\code{bool} \code{TRUE} installs the cpu only version of the machine learning frameworks.}
 }
 \value{
-Returns no values or objects. Function is used for installing the
-necessary python libraries in a conda environment.
+Returns no values or objects. Function is used for installing the necessary python libraries in a conda
+environment.
 }
 \description{
-Function for installing the necessary python modules
+Function for installing the necessary python modules.
 }
 \seealso{
 Other Installation and Configuration: 
-\code{\link{AifeducationConfiguration}},
-\code{\link{aifeducation_config}},
 \code{\link{check_aif_py_modules}()},
-\code{\link{set_config_cpu_only}()},
-\code{\link{set_config_gpu_low_memory}()},
-\code{\link{set_config_os_environ_logger}()},
-\code{\link{set_config_tf_logger}()},
+\code{\link{install_aifeducation}()},
 \code{\link{set_transformers_logger}()}
 }
 \concept{Installation and Configuration}

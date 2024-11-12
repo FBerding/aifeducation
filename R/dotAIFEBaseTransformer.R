@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Base `R6` class for creation and definition of `.AIFE*Transformer-like` classes
 #'
 #' @description This base class is used to create and define `.AIFE*Transformer-like` classes. It serves as a skeleton
@@ -1112,7 +1126,6 @@
           stop("The transformer model must be stored in the 'model' parameter of the 'temp' list.")
         }
 
-
         # argument checking------------------------------------------------------------
         last_log <- py$write_log_py(
           self$temp$log_file,
@@ -1121,7 +1134,6 @@
         )
 
         private$steps_for_training$check_chunk_size(self)
-
 
         # creating chunks of sequences ----------------------------------------------
         last_log <- py$write_log_py(
@@ -1198,7 +1210,6 @@
           print_message("Saving Sustainability Data", trace)
           private$save_sustainability_data("train")
         }
-
 
         # Finish --------------------------------------------------------------------
         py$write_log_py(

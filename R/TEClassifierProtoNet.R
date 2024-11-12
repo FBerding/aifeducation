@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Text embedding classifier with a ProtoNet
 #' @description Abstract class for neural nets with 'keras'/'tensorflow' and 'pytorch'.
 #'
@@ -472,10 +486,6 @@ TEClassifierProtoNet <- R6::R6Class(
       # disable Progress bars
       datasets$disable_progress_bars()
 
-      # SetUp GUI----------------------------------------------------------------
-      private$init_gui(data_manager = data_manager)
-      private$gui_inc_progressbar()
-
       # Start Sustainability Tracking-------------------------------------------
       if (sustain_track == TRUE) {
         if (is.null(sustain_iso_code) == TRUE) {
@@ -493,9 +503,6 @@ TEClassifierProtoNet <- R6::R6Class(
         )
         sustainability_tracker$start()
       }
-
-      # Update Progressbar-------------------------------------------------------
-      private$gui_inc_progressbar()
 
       # Start Training----------------------------------------------------------
       # Load Custom Model Scripts

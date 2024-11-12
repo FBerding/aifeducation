@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Text embedding model
 #' @description This `R6` class stores a text embedding model which can be used to tokenize, encode, decode, and embed
 #'   raw texts. The object provides a unique interface for different text processing methods.
@@ -1036,8 +1050,6 @@ TextEmbeddingModel <- R6::R6Class(
       n_batches <- ceiling(n_units / batch_size)
       batch_results <- NULL
 
-      update_aifeducation_progress_bar(value = 0, total = n_batches, title = "Embedding")
-
       if (private$transformer_components$emb_pool_type == "average") {
         if (private$transformer_components$ml_framework == "pytorch") {
           reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
@@ -1211,8 +1223,6 @@ TextEmbeddingModel <- R6::R6Class(
           ))
         }
         base::gc(verbose = FALSE, full = TRUE)
-
-        update_aifeducation_progress_bar(value = b, total = n_batches, title = "Embedding")
       }
 
       # Summarizing the results over all batches

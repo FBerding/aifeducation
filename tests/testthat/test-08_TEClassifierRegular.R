@@ -1,21 +1,21 @@
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE),
+  condition = check_aif_py_modules(trace = FALSE,check = "all"),
   message = "Necessary python modules not available"
 )
 
 # Skip Tests
-skip_creation_test <- TRUE
+skip_creation_test <- FALSE
 skip_training_test <- FALSE
 skip_overfitting_test <- FALSE
 skip_3_classes <- FALSE
-include_tensorflow <- FALSE
+include_tensorflow <- TRUE
 
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_general_data<-testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 root_path_data <- testthat::test_path("test_data/classifier")
-root_path_general_data<-testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierRegular")
 create_dir(root_path_results, FALSE)
@@ -31,7 +31,7 @@ set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 
 # Load Embeddings
-imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
+imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
 test_embeddings_large <- imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
 test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
@@ -73,45 +73,16 @@ feature_extractor_list["pytorch"] <- list(list(
   NULL
 ))
 
-# Create feature extractors
-# feature_extractor_list=NULL
-# for(framework in ml_frameworks){
-#  checkpoint_path=paste0(root_path_results,"/",framework,"_fe")
-#  extractor<-TEFeatureExtractor$new(
-#    ml_framework = framework,
-#    name="Test_extractor",
-#    label="Test Extractor",
-#    text_embeddings=test_embeddings,
-#    features=128,
-#    method="lstm",
-#    noise_factor=0.01,
-#    optimizer="adam"
-#  )
-#  if(dir.exists(checkpoint_path)==FALSE){
-#    dir.create(checkpoint_path)
-#  }
-#  extractor$train(
-#    data_embeddings=test_embeddings,
-#    data_val_size=0.25,
-#    sustain_track=TRUE,
-#    sustain_iso_code="DEU",
-#    sustain_region=NULL,
-#    sustain_interval=15,
-#    epochs=2,
-#    batch_size=100,
-#    dir_checkpoint=checkpoint_path,
-#    trace=FALSE,
-#
-#    ml_trace=0
-#  )
-#  feature_extractor_list[framework]=list(c(extractor,NULL))
-# }
-
 if (skip_3_classes == TRUE) {
   max_classes <- 2
 } else {
   max_classes <- 3
 }
+
+n_local_samples=150
+
+#Git Hub specific
+n_git_samples=10
 
 
 for (framework in ml_frameworks) {
@@ -140,6 +111,7 @@ for (framework in ml_frameworks) {
     # Start Tests-------------------------------------------------------------------------------
     # Test creation and prediction of the classifier----------------------------
     if (!skip_creation_test) {
+      all_test_combinations <- NULL
       for (feature_extractor in feature_extractor_list[[framework]]) {
         for (rec_layers in rec_list_layers) {
           for (dense_layers in dense_list_layers) {
@@ -148,222 +120,18 @@ for (framework in ml_frameworks) {
                 for (pos_embedding in pos_embedding_list) {
                   for (rec_type in rec_type_list) {
                     for (rec_bidirectional in rec_bidirectiona_list) {
-                      classifier <- NULL
-                      gc()
-
-                      dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
-                      rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
-
-                      classifier <- TEClassifierRegular$new()
-                      classifier$configure(
-                        ml_framework = framework,
-                        name = "movie_review_classifier",
-                        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-                        text_embeddings = test_embeddings,
-                        feature_extractor = feature_extractor,
-                        target_levels = target_levels,
-                        dense_layers = dense_layers,
-                        dense_size = dense_size,
-                        rec_layers = rec_layers,
-                        rec_size = rec_size,
-                        rec_type = rec_type,
-                        rec_bidirectional = rec_bidirectional,
-                        self_attention_heads = 2,
-                        add_pos_embedding = pos_embedding,
-                        attention_type = attention,
-                        rec_dropout = 0.5,
-                        encoder_dropout = 0.1,
-                        repeat_encoder = r,
-                        recurrent_dropout = 0.4
+                      all_test_combinations[length(all_test_combinations) + 1] <- list(
+                        list(
+                          feature_extractor = feature_extractor,
+                          rec_layers = rec_layers,
+                          dense_layers = dense_layers,
+                          r = r,
+                          attention = attention,
+                          pos_embedding = pos_embedding,
+                          rec_type = rec_type,
+                          rec_bidirectional = rec_bidirectional
+                        )
                       )
-
-                      test_that(paste(
-                        "no sustainability tracking", framework,
-                        "n_classes", n_classes,
-                        "features_extractor", !is.null(feature_extractor),
-                        "rec_layers", paste(rec_layers, rec_size),
-                        "rec_type", rec_type,
-                        "rec_bidirectional", rec_bidirectional,
-                        "dense_layers", paste(dense_layers, dense_size),
-                        "encoder", r,
-                        "attention", attention,
-                        "pos", pos_embedding
-                      ), {
-                        expect_false(classifier$get_sustainability_data()$sustainability_tracked)
-                      })
-
-
-                      test_that(paste(
-                        "predict - basic", framework,
-                        "n_classes", n_classes,
-                        "features_extractor", !is.null(feature_extractor),
-                        "rec_layers", paste(rec_layers, rec_size),
-                        "rec_type", rec_type,
-                        "rec_bidirectional", rec_bidirectional,
-                        "dense_layers", paste(dense_layers, dense_size),
-                        "encoder", r,
-                        "attention", attention,
-                        "pos", pos_embedding
-                      ), {
-                        expect_s3_class(classifier,
-                          class = "TEClassifierRegular"
-                        )
-
-                        predictions <- classifier$predict(
-                          newdata = test_embeddings_reduced,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        expect_equal(
-                          object = length(predictions$expected_category),
-                          expected = nrow(test_embeddings_reduced$embeddings)
-                        )
-                      })
-
-                      test_that(paste(
-                        "predict - single case", framework,
-                        "n_classes", n_classes,
-                        "features_extractor", !is.null(feature_extractor),
-                        "rec_layers", paste(rec_layers, rec_size),
-                        "rec_type", rec_type,
-                        "rec_bidirectional", rec_bidirectional,
-                        "dense_layers", paste(dense_layers, dense_size),
-                        "encoder", r,
-                        "attention", attention,
-                        "pos", pos_embedding
-                      ), {
-                        prediction <- classifier$predict(
-                          newdata = test_embeddings_single_case,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        expect_equal(
-                          object = nrow(prediction),
-                          expected = 1
-                        )
-
-                        prediction_LD <- classifier$predict(
-                          newdata = test_embeddings_single_case_LD,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        expect_equal(
-                          object = nrow(prediction_LD),
-                          expected = 1
-                        )
-                      })
-
-                      test_that(paste(
-                        "predict - randomness", framework,
-                        "n_classes", n_classes,
-                        "features_extractor", !is.null(feature_extractor),
-                        "rec_layers", paste(rec_layers, rec_size),
-                        "rec_type", rec_type,
-                        "rec_bidirectional", rec_bidirectional,
-                        "dense_layers", paste(dense_layers, dense_size),
-                        "encoder", r,
-                        "attention", attention,
-                        "pos", pos_embedding
-                      ), {
-                        # EmbeddedText
-                        predictions <- classifier$predict(
-                          newdata = test_embeddings_reduced,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        predictions_2 <- classifier$predict(
-                          newdata = test_embeddings_reduced,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        expect_equal(predictions, predictions_2)
-
-                        # LargeDataSetForTextEmbeddings
-                        predictions <- classifier$predict(
-                          newdata = test_embeddings_reduced_LD,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        predictions_2 <- classifier$predict(
-                          newdata = test_embeddings_reduced_LD,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        expect_equal(predictions, predictions_2)
-                      })
-
-                      test_that(paste(
-                        "predict - order invariance", framework,
-                        "n_classes", n_classes,
-                        "features_extractor", !is.null(feature_extractor),
-                        "rec_layers", paste(rec_layers, rec_size),
-                        "rec_type", rec_type,
-                        "rec_bidirectional", rec_bidirectional,
-                        "dense_layers", paste(dense_layers, dense_size),
-                        "encoder", r,
-                        "attention", attention,
-                        "pos", pos_embedding
-                      ), {
-                        embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
-                        perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
-                        embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
-
-                        # EmbeddedText
-                        predictions <- classifier$predict(
-                          newdata = test_embeddings_reduced,
-                          batch_size = 50,
-                          ml_trace = 0
-                        )
-                        predictions_Perm <- classifier$predict(
-                          newdata = embeddings_ET_perm,
-                          batch_size = 50,
-                          ml_trace = 0
-                        )
-
-                        predictions_Perm <- predictions_Perm[rownames(predictions), ]
-                        expect_equal(predictions$expected_category, predictions_Perm$expected_category)
-
-                        # LargeDataSetForTextEmbeddings
-                        predictions <- classifier$predict(
-                          newdata = test_embeddings_reduced_LD,
-                          batch_size = 50,
-                          ml_trace = 0
-                        )
-                        predictions_Perm <- classifier$predict(
-                          newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
-                          batch_size = 50,
-                          ml_trace = 0
-                        )
-
-                        predictions_Perm <- predictions_Perm[rownames(predictions), ]
-                        expect_equal(predictions$expected_category, predictions_Perm$expected_category)
-                      })
-
-                      test_that(paste(
-                        "predict - data source invariance", framework,
-                        "n_classes", n_classes,
-                        "features_extractor", !is.null(feature_extractor),
-                        "rec_layers", paste(rec_layers, rec_size),
-                        "rec_type", rec_type,
-                        "rec_bidirectional", rec_bidirectional,
-                        "dense_layers", paste(dense_layers, dense_size),
-                        "encoder", r,
-                        "attention", attention,
-                        "pos", pos_embedding
-                      ), {
-                        predictions_ET <- classifier$predict(
-                          newdata = test_embeddings_reduced,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        predictions_LD <- classifier$predict(
-                          newdata = test_embeddings_reduced_LD,
-                          batch_size = 2,
-                          ml_trace = 0
-                        )
-                        expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
-                      })
-                      gc()
                     }
                   }
                 }
@@ -372,7 +140,248 @@ for (framework in ml_frameworks) {
           }
         }
       }
+
+      # If on github use only a small random sample
+      if (Sys.getenv("CI") != TRUE) {
+        test_combinations <- all_test_combinations[sample(
+          x = seq.int(
+            from = 1,
+            to = length(all_test_combinations)
+          ),
+          size = n_git_samples,
+          replace = FALSE
+        )]
+      } else {
+        test_combinations <- all_test_combinations[sample(
+          x = seq.int(
+            from = 1,
+            to = length(all_test_combinations)
+          ),
+          size = n_local_samples,
+          replace = FALSE
+        )]
+      }
+
+      for (i in 1:length(test_combinations)) {
+        classifier <- NULL
+        gc()
+
+        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
+
+        classifier <- TEClassifierRegular$new()
+        classifier$configure(
+          ml_framework = framework,
+          name = "movie_review_classifier",
+          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+          text_embeddings = test_embeddings,
+          feature_extractor = test_combinations[[i]]$feature_extractor,
+          target_levels = target_levels,
+          dense_layers = test_combinations[[i]]$dense_layers,
+          dense_size = dense_size,
+          rec_layers = test_combinations[[i]]$rec_layers,
+          rec_size = rec_size,
+          rec_type = test_combinations[[i]]$rec_type,
+          rec_bidirectional = test_combinations[[i]]$rec_bidirectional,
+          self_attention_heads = 2,
+          add_pos_embedding = test_combinations[[i]]$pos_embedding,
+          attention_type = test_combinations[[i]]$attention,
+          rec_dropout = 0.5,
+          encoder_dropout = 0.1,
+          repeat_encoder = test_combinations[[i]]$r,
+          recurrent_dropout = 0.4
+        )
+
+        test_that(paste(
+          "no sustainability tracking", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          expect_false(classifier$get_sustainability_data()$sustainability_tracked)
+        })
+
+
+        test_that(paste(
+          "predict - basic", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          expect_s3_class(classifier,
+            class = "TEClassifierRegular"
+          )
+
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          expect_equal(
+            object = length(predictions$expected_category),
+            expected = nrow(test_embeddings_reduced$embeddings)
+          )
+        })
+
+        test_that(paste(
+          "predict - single case", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          prediction <- classifier$predict(
+            newdata = test_embeddings_single_case,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          expect_equal(
+            object = nrow(prediction),
+            expected = 1
+          )
+
+          prediction_LD <- classifier$predict(
+            newdata = test_embeddings_single_case_LD,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          expect_equal(
+            object = nrow(prediction_LD),
+            expected = 1
+          )
+        })
+
+        test_that(paste(
+          "predict - randomness", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          # EmbeddedText
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          predictions_2 <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          expect_equal(predictions, predictions_2)
+
+          # LargeDataSetForTextEmbeddings
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced_LD,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          predictions_2 <- classifier$predict(
+            newdata = test_embeddings_reduced_LD,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          expect_equal(predictions, predictions_2)
+        })
+
+        test_that(paste(
+          "predict - order invariance", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
+          perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
+          embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
+
+          # EmbeddedText
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 50,
+            ml_trace = 0
+          )
+          predictions_Perm <- classifier$predict(
+            newdata = embeddings_ET_perm,
+            batch_size = 50,
+            ml_trace = 0
+          )
+
+          predictions_Perm <- predictions_Perm[rownames(predictions), ]
+          expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+
+          # LargeDataSetForTextEmbeddings
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced_LD,
+            batch_size = 50,
+            ml_trace = 0
+          )
+          predictions_Perm <- classifier$predict(
+            newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+            batch_size = 50,
+            ml_trace = 0
+          )
+
+          predictions_Perm <- predictions_Perm[rownames(predictions), ]
+          expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+        })
+
+        test_that(paste(
+          "predict - data source invariance", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          predictions_ET <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          predictions_LD <- classifier$predict(
+            newdata = test_embeddings_reduced_LD,
+            batch_size = 2,
+            ml_trace = 0
+          )
+          expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
+        })
+        gc()
+      }
     }
+
 
     # Test training of the classifier-------------------------------------------
     if (!skip_training_test) {
@@ -462,7 +471,7 @@ for (framework in ml_frameworks) {
                   dir_checkpoint = train_path,
                   trace = FALSE,
                   ml_trace = 0,
-                  n_cores=2
+                  n_cores = 2
                 )
               )
               expect_true(classifier$get_sustainability_data()$sustainability_tracked)
@@ -698,14 +707,16 @@ for (framework in ml_frameworks) {
           log_dir = train_path,
           trace = FALSE,
           ml_trace = 0,
-          n_cores=2
+          n_cores = 2
         )
 
         history <- classifier_overfitting$last_training$history[[1]]$accuracy["train", ]
         expect_gte(object = max(history), expected = 0.95)
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
-        expect_true(state_log_exists)
+        if(framework=="pytorch"){
+          expect_true(state_log_exists)
+        }
         if (state_log_exists) {
           log_state <- read.csv(paste0(train_path, "/aifeducation_state.log"))
           expect_equal(nrow(log_state), 3)
@@ -714,7 +725,9 @@ for (framework in ml_frameworks) {
         }
 
         loss_log_exists <- file.exists(paste0(train_path, "/aifeducation_loss.log"))
-        expect_true(loss_log_exists)
+        if(framework=="pytorch"){
+          expect_true(loss_log_exists)
+        }
         if (loss_log_exists == TRUE) {
           log_loss <- read.csv(paste0(train_path, "/aifeducation_loss.log"), header = FALSE)
           expect_gte(ncol(log_loss), 2)

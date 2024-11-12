@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Graphical user interface for classifiers - create
 #' @description Functions generates the page for a creating new classifiers.
 #'
@@ -6,6 +20,7 @@
 #'
 #' @family studio_gui_page_classifier_create
 #' @keywords internal
+#' @noRd
 #'
 Classifiers_Create_UI <- function(id) {
   shiny::tagList(
@@ -385,6 +400,7 @@ Classifiers_Create_UI <- function(id) {
 #'
 #' @family studio_gui_page_classifier_create
 #' @keywords internal
+#' @noRd
 #'
 Classifiers_Create_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

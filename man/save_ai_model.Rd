@@ -30,7 +30,7 @@ or \code{"h5"} for HDF5.
 For 'pytorch' models \code{"safetensors"} for 'safetensors' or
 \code{"pt"} for 'pytorch via pickle'.
 Use \code{"default"} for the standard format. This is keras for
-'tensorflow'/'keras' models and safetensors for 'pytorch' models.}
+' tensorflow'/'keras' models and safetensors for 'pytorch' models.}
 
 \item{append_ID}{\code{bool} \code{TRUE} if the ID should be appended to
 the model directory for saving purposes. \code{FALSE} if not.}
@@ -44,9 +44,7 @@ No return value, called for side effects.
 Function for saving models created with 'aifeducation'.
 }
 \seealso{
-Other Saving and Loading: 
-\code{\link{load_ai_model}()},
-\code{\link{load_from_disk}()},
-\code{\link{save_to_disk}()}
+Other Saving and Loading Deprecated: 
+\code{\link{load_ai_model}()}
 }
-\concept{Saving and Loading}
+\concept{Saving and Loading Deprecated}

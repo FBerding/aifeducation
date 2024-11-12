@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Graphical user interface for making predictions with a classifier.
 #' @description Functions generates the tab within a page for making predictions with an object of class
 #'   [TEClassifierRegular] and [TEClassifierProtoNet].
@@ -7,6 +21,7 @@
 #'
 #' @family studio_gui_page_classifier_predict
 #' @keywords internal
+#' @noRd
 #'
 Classifier_Prediction_UI <- function(id) {
   bslib::page_sidebar(
@@ -74,6 +89,7 @@ Classifier_Prediction_UI <- function(id) {
 #'
 #' @family studio_gui_page_classifier_predict
 #' @keywords internal
+#' @noRd
 #'
 Classifier_Prediction_Server <- function(id, model, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

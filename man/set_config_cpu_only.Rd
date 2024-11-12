@@ -7,8 +7,7 @@
 set_config_cpu_only()
 }
 \value{
-This function does not return anything. It is used for its
-side effects.
+This function does not return anything. It is used for its side effects.
 }
 \description{
 This functions configurates 'tensorflow' to use only cpus.
@@ -17,14 +16,9 @@ This functions configurates 'tensorflow' to use only cpus.
 os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")
 }
 \seealso{
-Other Installation and Configuration: 
-\code{\link{AifeducationConfiguration}},
-\code{\link{aifeducation_config}},
-\code{\link{check_aif_py_modules}()},
-\code{\link{install_py_modules}()},
+Other Installation and Configuration Tensorflow: 
 \code{\link{set_config_gpu_low_memory}()},
 \code{\link{set_config_os_environ_logger}()},
-\code{\link{set_config_tf_logger}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{set_config_tf_logger}()}
 }
-\concept{Installation and Configuration}
+\concept{Installation and Configuration Tensorflow}

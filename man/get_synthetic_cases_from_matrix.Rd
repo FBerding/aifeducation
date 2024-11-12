@@ -26,56 +26,28 @@ get_synthetic_cases_from_matrix(
 
 \item{sequence_length}{\code{int} Length of the text embedding sequences.}
 
-\item{method}{\code{vector} containing strings of the requested methods for generating new cases.
-Currently "smote","dbsmote", and "adas" from the package smotefamily are available.}
+\item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently "smote",
+"dbsmote", and "adas" from the package smotefamily are available.}
 
 \item{min_k}{\code{int} The minimal number of nearest neighbors during sampling process.}
 
 \item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
 }
 \value{
-\code{list} with the following components.
+\code{list} with the following components:
 \itemize{
-\item{\code{syntetic_embeddings: }Named \code{data.frame} containing the text embeddings of
-the synthetic cases.}
-
-\item{\code{syntetic_targets }Named \code{factor} containing the labels of the corresponding
-synthetic cases.}
-
-\item{\code{n_syntetic_units }\code{table} showing the number of synthetic cases for every
-label/category.}
+\item \code{syntetic_embeddings}: Named \code{data.frame} containing the text embeddings of the synthetic cases.
+\item \code{syntetic_targets}: Named \code{factor} containing the labels of the corresponding synthetic cases.
+\item \code{n_syntetic_units}: \code{table} showing the number of synthetic cases for every label/category.
 }
 }
 \description{
-This function creates synthetic cases for balancing the training with an
-object of the class \link{TextEmbeddingClassifierNeuralNet}.
+This function creates synthetic cases for balancing the training with an object of the class
+\link{TextEmbeddingClassifierNeuralNet}.
 }
 \seealso{
-Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{calc_standard_classification_measures}()},
-\code{\link{check_class}()},
-\code{\link{check_embedding_models}()},
-\code{\link{check_type}()},
-\code{\link{class_vector_to_py_dataset}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_iota2_mean_object}()},
+Other data_management_utils: 
 \code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{data.frame_to_py_dataset}()},
-\code{\link{generate_id}()},
-\code{\link{get_batches_index}()},
-\code{\link{get_coder_metrics}()},
-\code{\link{get_folds}()},
-\code{\link{get_n_chunks}()},
-\code{\link{get_stratified_train_test_split}()},
-\code{\link{get_train_test_split}()},
-\code{\link{is.null_or_na}()},
-\code{\link{matrix_to_array_c}()},
-\code{\link{prepare_r_array_for_dataset}()},
-\code{\link{py_dataset_to_embeddings}()},
-\code{\link{reduce_to_unique}()},
-\code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()},
-\code{\link{to_categorical_c}()}
+\code{\link{get_n_chunks}()}
 }
-\concept{Auxiliary Functions}
+\concept{data_management_utils}

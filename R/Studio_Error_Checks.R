@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Check for input errors - classifier create
 #' @description Functions check for input errors in AI for Education - Studio in the case of the creation of
 #'   classifiers.
@@ -22,6 +36,7 @@
 #'
 #' @family studio_gui_page_classifier_create
 #' @keywords internal
+#' @noRd
 #'
 check_errors_create_classifier <- function(classifier_type,
                                            destination_path,
@@ -184,6 +199,7 @@ check_errors_create_classifier <- function(classifier_type,
 #'
 #' @family studio_gui_page_data_management
 #' @keywords internal
+#' @noRd
 #'
 check_errors_create_dataset_raw_texts <- function(source_path,
                                                   destination_path,
@@ -263,6 +279,7 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 #'
 #' @family studio_gui_page_feature_extractor_create
 #' @keywords internal
+#' @noRd
 #'
 check_errors_create_feature_extractor <- function(destination_path,
                                                   folder_name,
@@ -357,6 +374,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 #'
 #' @family studio_gui_page_classifier_predict
 #' @keywords internal
+#' @noRd
 #'
 check_errors_predict_classifier <- function(embeddings,
                                             model) {
@@ -409,6 +427,7 @@ check_errors_predict_classifier <- function(embeddings,
 #'
 #' @family studio_gui_text_embedding_model_embed
 #' @keywords internal
+#' @noRd
 #'
 check_errors_text_embedding_model_embed <- function(destination_path,
                                                     folder_name,
@@ -470,6 +489,7 @@ check_errors_text_embedding_model_embed <- function(destination_path,
 #'
 #' @family studio_gui_page_text_embedding_model_create
 #' @keywords internal
+#' @noRd
 #'
 check_errors_text_embedding_model_create <- function(destination_path,
                                                      folder_name,

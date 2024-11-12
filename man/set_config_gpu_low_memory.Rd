@@ -7,27 +7,19 @@
 set_config_gpu_low_memory()
 }
 \value{
-This function does not return anything. It is used for its
-side effects.
+This function does not return anything. It is used for its side effects.
 }
 \description{
-This function changes the memory usage of the gpus to allow computations
-on machines with small memory. With this function, some computations of large
-models may be possible but the speed of computation decreases.
+This function changes the memory usage of the gpus to allow computations on machines with small memory.
+With this function, some computations of large models may be possible but the speed of computation decreases.
 }
 \note{
-This function sets TF_GPU_ALLOCATOR to \code{"cuda_malloc_async"} and
-sets memory growth to \code{TRUE}.
+This function sets TF_GPU_ALLOCATOR to \code{"cuda_malloc_async"} and sets memory growth to \code{TRUE}.
 }
 \seealso{
-Other Installation and Configuration: 
-\code{\link{AifeducationConfiguration}},
-\code{\link{aifeducation_config}},
-\code{\link{check_aif_py_modules}()},
-\code{\link{install_py_modules}()},
+Other Installation and Configuration Tensorflow: 
 \code{\link{set_config_cpu_only}()},
 \code{\link{set_config_os_environ_logger}()},
-\code{\link{set_config_tf_logger}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{set_config_tf_logger}()}
 }
-\concept{Installation and Configuration}
+\concept{Installation and Configuration Tensorflow}

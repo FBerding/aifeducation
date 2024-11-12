@@ -2,26 +2,22 @@
 % Please edit documentation in R/LargeDataSetForTextEmbeddings.R
 \name{LargeDataSetForTextEmbeddings}
 \alias{LargeDataSetForTextEmbeddings}
-\title{Abstract class for large data sets containing text embeddings.}
+\title{Abstract class for large data sets containing text embeddings}
 \value{
 Returns a new object of this class.
 }
 \description{
-This object stores text embeddings which are usually produced
-by an object of class \link{TextEmbeddingModel}. The data of this objects is not
-stored in memory directly. By using memory mapping these objects allow to work
-with data sets which do not fit into memory/RAM.
+This object stores text embeddings which are usually produced by an object of class
+\link{TextEmbeddingModel}. The data of this objects is not stored in memory directly. By using memory mapping these
+objects allow to work with data sets which do not fit into memory/RAM.
 
-\link{LargeDataSetForTextEmbeddings} are used
-for storing and managing the text embeddings created with objects of class \link{TextEmbeddingModel}.
-Objects of class \link{LargeDataSetForTextEmbeddings} serve as input for objects of class
-\link{TEClassifierRegular}, \link{TEClassifierProtoNet}, and \link{TEFeatureExtractor}.
-The main aim of this class is to provide a structured link between
-embedding models and classifiers. Since objects of this class save information on
-the text embedding model that created the text embedding it ensures that only
-embedding generated with same embedding model are combined. Furthermore, the stored information allows
-objects to check if embeddings of the correct text embedding model are used for
-training and predicting.
+\link{LargeDataSetForTextEmbeddings} are used for storing and managing the text embeddings created with objects of class
+\link{TextEmbeddingModel}. Objects of class \link{LargeDataSetForTextEmbeddings} serve as input for objects of class
+\link{TEClassifierRegular}, \link{TEClassifierProtoNet}, and \link{TEFeatureExtractor}. The main aim of this class is to provide a
+structured link between embedding models and classifiers. Since objects of this class save information on the text
+embedding model that created the text embedding it ensures that only embedding generated with same embedding model
+are combined. Furthermore, the stored information allows objects to check if embeddings of the correct text
+embedding model are used for training and predicting.
 }
 \seealso{
 Other Data Management: 
@@ -36,9 +32,11 @@ Other Data Management:
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-LargeDataSetForTextEmbeddings-new}{\code{LargeDataSetForTextEmbeddings$new()}}
+\item \href{#method-LargeDataSetForTextEmbeddings-configure}{\code{LargeDataSetForTextEmbeddings$configure()}}
+\item \href{#method-LargeDataSetForTextEmbeddings-is_configured}{\code{LargeDataSetForTextEmbeddings$is_configured()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-get_text_embedding_model_name}{\code{LargeDataSetForTextEmbeddings$get_text_embedding_model_name()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-get_model_info}{\code{LargeDataSetForTextEmbeddings$get_model_info()}}
+\item \href{#method-LargeDataSetForTextEmbeddings-load_from_disk}{\code{LargeDataSetForTextEmbeddings$load_from_disk()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-get_model_label}{\code{LargeDataSetForTextEmbeddings$get_model_label()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-add_feature_extractor_info}{\code{LargeDataSetForTextEmbeddings$add_feature_extractor_info()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-get_feature_extractor_info}{\code{LargeDataSetForTextEmbeddings$get_feature_extractor_info()}}
@@ -48,6 +46,7 @@ Other Data Management:
 \item \href{#method-LargeDataSetForTextEmbeddings-get_original_features}{\code{LargeDataSetForTextEmbeddings$get_original_features()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-add_embeddings_from_array}{\code{LargeDataSetForTextEmbeddings$add_embeddings_from_array()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-add_embeddings_from_EmbeddedText}{\code{LargeDataSetForTextEmbeddings$add_embeddings_from_EmbeddedText()}}
+\item \href{#method-LargeDataSetForTextEmbeddings-add_embeddings_from_LargeDataSetForTextEmbeddings}{\code{LargeDataSetForTextEmbeddings$add_embeddings_from_LargeDataSetForTextEmbeddings()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-convert_to_EmbeddedText}{\code{LargeDataSetForTextEmbeddings$convert_to_EmbeddedText()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-clone}{\code{LargeDataSetForTextEmbeddings$clone()}}
 }
@@ -55,6 +54,7 @@ Other Data Management:
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_all_fields"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_all_fields'><code>aifeducation::LargeDataSetBase$get_all_fields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_colnames"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_colnames'><code>aifeducation::LargeDataSetBase$get_colnames()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_dataset"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_dataset'><code>aifeducation::LargeDataSetBase$get_dataset()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_ids"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_ids'><code>aifeducation::LargeDataSetBase$get_ids()</code></a></span></li>
@@ -68,12 +68,12 @@ Other Data Management:
 </details>
 }}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-new"></a>}}
-\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-new}{}}}
-\subsection{Method \code{new()}}{
+\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-configure"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-configure}{}}}
+\subsection{Method \code{configure()}}{
 Creates a new object representing text embeddings.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$new(
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$configure(
   model_name = NA,
   model_label = NA,
   model_date = NA,
@@ -115,17 +115,16 @@ Creates a new object representing text embeddings.
 \item{\code{param_overlap}}{\code{int} Number of tokens that were added at the beginning of the sequence for the next chunk
 by this model.}
 
-\item{\code{param_emb_layer_min}}{\code{int} or \code{string} determining the first layer to be included
-in the creation of embeddings.}
+\item{\code{param_emb_layer_min}}{\code{int} or \code{string} determining the first layer to be included in the creation of
+embeddings.}
 
-\item{\code{param_emb_layer_max}}{\code{int} or \code{string} determining the last layer to be included
-in the creation of embeddings.}
+\item{\code{param_emb_layer_max}}{\code{int} or \code{string} determining the last layer to be included in the creation of
+embeddings.}
 
-\item{\code{param_emb_pool_type}}{\code{string} determining the method for pooling the token embeddings
-within each layer.}
+\item{\code{param_emb_pool_type}}{\code{string} determining the method for pooling the token embeddings within each layer.}
 
-\item{\code{param_aggregation}}{\code{string} Aggregation method of the hidden states. Deprecated. Only included
-for backward compatibility.}
+\item{\code{param_aggregation}}{\code{string} Aggregation method of the hidden states. Deprecated. Only included for backward
+compatibility.}
 }
 \if{html}{\out{</div>}}
 }
@@ -134,35 +133,71 @@ The method returns a new object of this class.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-is_configured"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-is_configured}{}}}
+\subsection{Method \code{is_configured()}}{
+Method for checking if the model was successfully configured. An object can only be used if this
+value is \code{TRUE}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$is_configured()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{bool} \code{TRUE} if the model is fully configured. \code{FALSE} if not.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_text_embedding_model_name"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-get_text_embedding_model_name}{}}}
 \subsection{Method \code{get_text_embedding_model_name()}}{
+Method for requesting the name (unique id) of the underlying text embedding model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$get_text_embedding_model_name()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Returns a \code{string} describing name of the text embedding model.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_model_info"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-get_model_info}{}}}
 \subsection{Method \code{get_model_info()}}{
-Method for retrieving information about the model that
-generated this embedding.
+Method for retrieving information about the model that generated this embedding.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$get_model_info()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-\code{list} containing all saved information about the underlying
-text embedding model.
+\code{list} containing all saved information about the underlying text embedding model.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-load_from_disk"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-load_from_disk}{}}}
+\subsection{Method \code{load_from_disk()}}{
+loads an object of class \link{LargeDataSetForTextEmbeddings} from disk and updates the object to the
+current version of the package.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$load_from_disk(dir_path)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir_path}}{Path where the data set set is stored.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Method does not return anything. It loads an object from disk.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_model_label"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-get_model_label}{}}}
 \subsection{Method \code{get_model_label()}}{
-Method for retrieving the label of the model that
-generated this embedding.
+Method for retrieving the label of the model that generated this embedding.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$get_model_label()}\if{html}{\out{</div>}}
 }
@@ -175,9 +210,8 @@ generated this embedding.
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-add_feature_extractor_info"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-add_feature_extractor_info}{}}}
 \subsection{Method \code{add_feature_extractor_info()}}{
-Method setting information on the \link{TEFeatureExtractor} that
-was used to reduce the number of dimensions of the text embeddings. This
-information should only be used if a \link{TEFeatureExtractor} was applied.
+Method setting information on the \link{TEFeatureExtractor} that was used to reduce the number of
+dimensions of the text embeddings. This information should only be used if a \link{TEFeatureExtractor} was applied.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$add_feature_extractor_info(
   model_name,
@@ -198,8 +232,8 @@ information should only be used if a \link{TEFeatureExtractor} was applied.
 
 \item{\code{features}}{\code{int} Number of dimension (features) for the \strong{compressed} text embeddings.}
 
-\item{\code{method}}{\code{string} Method that the \link{TEFeatureExtractor} applies for genereating the
-compressed text embeddings.}
+\item{\code{method}}{\code{string} Method that the \link{TEFeatureExtractor} applies for genereating the compressed text
+embeddings.}
 
 \item{\code{noise_factor}}{\code{double} Noise factor of the \link{TEFeatureExtractor}.}
 
@@ -215,15 +249,15 @@ Method does nothing return. It sets information on a \link{TEFeatureExtractor}.
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_feature_extractor_info"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-get_feature_extractor_info}{}}}
 \subsection{Method \code{get_feature_extractor_info()}}{
-Method for receiving information on the \link{TEFeatureExtractor} that
-was used to reduce the number of dimensions of the text embeddings.
+Method for receiving information on the \link{TEFeatureExtractor} that was used to reduce the number of
+dimensions of the text embeddings.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$get_feature_extractor_info()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Returns a \code{list} with information on the \link{TEFeatureExtractor}.
-If no \link{TEFeatureExtractor} was used it returns \code{NULL}.
+Returns a \code{list} with information on the \link{TEFeatureExtractor}. If no \link{TEFeatureExtractor} was used it
+returns \code{NULL}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -236,8 +270,7 @@ Checks if the text embedding were reduced by a \link{TEFeatureExtractor}.
 }
 
 \subsection{Returns}{
-Returns \code{TRUE} if the number of dimensions was reduced by a \link{TEFeatureExtractor}.
-If not return \code{FALSE}.
+Returns \code{TRUE} if the number of dimensions was reduced by a \link{TEFeatureExtractor}. If not return \code{FALSE}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -250,26 +283,23 @@ Number of chunks/times of the text embeddings.
 }
 
 \subsection{Returns}{
-Returns an \code{int} describing the number of chunks/times of the
-text embeddings.
+Returns an \code{int} describing the number of chunks/times of the text embeddings.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-get_features"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-get_features}{}}}
 \subsection{Method \code{get_features()}}{
-Number of actual features/dimensions of the text embeddings.In the
-case a \link{TEFeatureExtractor} was used the number of features is smaller as the
-original number of features. To receive the original number of features (the number of features before
-applying a \link{TEFeatureExtractor}) you can use the method \code{get_original_features}
-of this class.
+Number of actual features/dimensions of the text embeddings.In the case a \link{TEFeatureExtractor} was
+used the number of features is smaller as the original number of features. To receive the original number of
+features (the number of features before applying a \link{TEFeatureExtractor}) you can use the method
+\code{get_original_features} of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$get_features()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Returns an \code{int} describing the number of features/dimensions of the
-text embeddings.
+Returns an \code{int} describing the number of features/dimensions of the text embeddings.
 }
 }
 \if{html}{\out{<hr>}}
@@ -282,18 +312,17 @@ Number of original features/dimensions of the text embeddings.
 }
 
 \subsection{Returns}{
-Returns an \code{int} describing the number of features/dimensions if no
-\link{TEFeatureExtractor}) is used or before a
-\link{TEFeatureExtractor}) is applied.
+Returns an \code{int} describing the number of features/dimensions if no \link{TEFeatureExtractor}) is used or
+before a \link{TEFeatureExtractor}) is applied.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-add_embeddings_from_array"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-add_embeddings_from_array}{}}}
 \subsection{Method \code{add_embeddings_from_array()}}{
-Method for adding new data to the data set from an \code{array}.
-Please note that the method does not check if cases already exist in the data
-set. To reduce the data set to unique cases call the method \code{reduce_to_unique_ids}.
+Method for adding new data to the data set from an \code{array}. Please note that the method does not
+check if cases already exist in the data set. To reduce the data set to unique cases call the method
+\code{reduce_to_unique_ids}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$add_embeddings_from_array(embedding_array)}\if{html}{\out{</div>}}
 }
@@ -313,9 +342,9 @@ The method does not return anything. It adds new data to the data set.
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-add_embeddings_from_EmbeddedText"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-add_embeddings_from_EmbeddedText}{}}}
 \subsection{Method \code{add_embeddings_from_EmbeddedText()}}{
-Method for adding new data to the data set from an \link{EmbeddedText}.
-Please note that the method does not check if cases already exist in the data
-set. To reduce the data set to unique cases call the method \code{reduce_to_unique_ids}.
+Method for adding new data to the data set from an \link{EmbeddedText}. Please note that the method does
+not check if cases already exist in the data set. To reduce the data set to unique cases call the method
+\code{reduce_to_unique_ids}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$add_embeddings_from_EmbeddedText(EmbeddedText)}\if{html}{\out{</div>}}
 }
@@ -332,20 +361,44 @@ The method does not return anything. It adds new data to the data set.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-add_embeddings_from_LargeDataSetForTextEmbeddings"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-add_embeddings_from_LargeDataSetForTextEmbeddings}{}}}
+\subsection{Method \code{add_embeddings_from_LargeDataSetForTextEmbeddings()}}{
+Method for adding new data to the data set from an \link{LargeDataSetForTextEmbeddings}. Please note that
+the method does not check if cases already exist in the data set. To reduce the data set to unique cases call
+the method \code{reduce_to_unique_ids}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$add_embeddings_from_LargeDataSetForTextEmbeddings(
+  dataset
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dataset}}{Object of class \link{LargeDataSetForTextEmbeddings}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The method does not return anything. It adds new data to the data set.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-convert_to_EmbeddedText"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-convert_to_EmbeddedText}{}}}
 \subsection{Method \code{convert_to_EmbeddedText()}}{
 Method for converting this object to an object of class \link{EmbeddedText}.
+
 \strong{Attention} This object uses memory mapping to allow the usage of data sets
-that do not fit into memory. By calling this method the data set will be loaded
-and stored into memory/RAM. This may lead to an out-of-memory error.
+that do not fit into memory. By calling this method the data set will be loaded and stored into memory/RAM.
+This may lead to an out-of-memory error.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$convert_to_EmbeddedText()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-LargeDataSetForTextEmbeddings an object of class \link{EmbeddedText} which is stored in the
-memory/RAM.
+LargeDataSetForTextEmbeddings an object of class \link{EmbeddedText} which is stored in the memory/RAM.
 }
 }
 \if{html}{\out{<hr>}}

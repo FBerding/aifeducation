@@ -16,65 +16,37 @@ create_synthetic_units_from_matrix(
 )
 }
 \arguments{
-\item{matrix_form}{Named \code{matrix} containing the text embeddings in matrix form.
-In most cases this object is taken from \link{EmbeddedText}$embeddings.}
+\item{matrix_form}{Named \code{matrix} containing the text embeddings in matrix form. In most cases this object is taken
+from \link{EmbeddedText}$embeddings.}
 
 \item{target}{Named \code{factor} containing the labels/categories of the corresponding cases.}
 
-\item{required_cases}{\code{int} Number of cases necessary to fill the gab between the frequency
-of the class under investigation and the major class.}
+\item{required_cases}{\code{int} Number of cases necessary to fill the gab between the frequency of the class under
+investigation and the major class.}
 
 \item{k}{\code{int} The number of nearest neighbors during sampling process.}
 
-\item{method}{\code{vector} containing strings of the requested methods for generating new cases.
-Currently "smote","dbsmote", and "adas" from the package smotefamily are available.}
+\item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently
+"smote","dbsmote", and "adas" from the package smotefamily are available.}
 
 \item{cat}{\code{string} The category for which new cases should be created.}
 
 \item{k_s}{\code{int} Number of ks in the complete generation process.}
 
 \item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
-
-\item{cat_freq}{Object of class \code{"table"} containing the absolute frequencies
-of every category/label.}
 }
 \value{
-Returns a \code{list} which contains the text embeddings of the
-new synthetic cases as a named \code{data.frame} and their labels as a named
-\code{factor}.
+Returns a \code{list} which contains the text embeddings of the new synthetic cases as a named \code{data.frame} and
+their labels as a named \code{factor}.
 }
 \description{
-Function for creating synthetic cases in order to balance the data for
-training with \link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary
-function for use with \link{get_synthetic_cases} to allow parallel
-computations.
+Function for creating synthetic cases in order to balance the data for training with
+\link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary function for use with \link{get_synthetic_cases_from_matrix} to allow
+parallel computations.
 }
 \seealso{
-Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{calc_standard_classification_measures}()},
-\code{\link{check_class}()},
-\code{\link{check_embedding_models}()},
-\code{\link{check_type}()},
-\code{\link{class_vector_to_py_dataset}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_iota2_mean_object}()},
-\code{\link{data.frame_to_py_dataset}()},
-\code{\link{generate_id}()},
-\code{\link{get_batches_index}()},
-\code{\link{get_coder_metrics}()},
-\code{\link{get_folds}()},
+Other data_management_utils: 
 \code{\link{get_n_chunks}()},
-\code{\link{get_stratified_train_test_split}()},
-\code{\link{get_synthetic_cases_from_matrix}()},
-\code{\link{get_train_test_split}()},
-\code{\link{is.null_or_na}()},
-\code{\link{matrix_to_array_c}()},
-\code{\link{prepare_r_array_for_dataset}()},
-\code{\link{py_dataset_to_embeddings}()},
-\code{\link{reduce_to_unique}()},
-\code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()},
-\code{\link{to_categorical_c}()}
+\code{\link{get_synthetic_cases_from_matrix}()}
 }
-\concept{Auxiliary Functions}
+\concept{data_management_utils}

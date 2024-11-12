@@ -11,41 +11,17 @@ get_n_chunks(text_embeddings, features, times)
 
 \item{features}{\code{int} Number of features within each sequence.}
 
-\item{times}{\code{int} Number of sequences}
+\item{times}{\code{int} Number of sequences.}
 }
 \value{
-Named\code{vector} of integers representing the number of chunks/sequences
-for every case.
+Named\code{vector} of integers representing the number of chunks/sequences for every case.
 }
 \description{
-Function for calculating the number of chunks/sequences for every case
+Function for calculating the number of chunks/sequences for every case.
 }
 \seealso{
-Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{calc_standard_classification_measures}()},
-\code{\link{check_class}()},
-\code{\link{check_embedding_models}()},
-\code{\link{check_type}()},
-\code{\link{class_vector_to_py_dataset}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_iota2_mean_object}()},
+Other data_management_utils: 
 \code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{data.frame_to_py_dataset}()},
-\code{\link{generate_id}()},
-\code{\link{get_batches_index}()},
-\code{\link{get_coder_metrics}()},
-\code{\link{get_folds}()},
-\code{\link{get_stratified_train_test_split}()},
-\code{\link{get_synthetic_cases_from_matrix}()},
-\code{\link{get_train_test_split}()},
-\code{\link{is.null_or_na}()},
-\code{\link{matrix_to_array_c}()},
-\code{\link{prepare_r_array_for_dataset}()},
-\code{\link{py_dataset_to_embeddings}()},
-\code{\link{reduce_to_unique}()},
-\code{\link{split_labeled_unlabeled}()},
-\code{\link{summarize_tracked_sustainability}()},
-\code{\link{to_categorical_c}()}
+\code{\link{get_synthetic_cases_from_matrix}()}
 }
-\concept{Auxiliary Functions}
+\concept{data_management_utils}

@@ -1,3 +1,17 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 #' @title Generate sidebar
 #' @description Function for generating a sidebar containing information on a model.
 #'
@@ -8,6 +22,7 @@
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 generate_sidebar_information <- function(model) {
   if ("TextEmbeddingModel" %in% class(model)) {
@@ -124,6 +139,7 @@ generate_sidebar_information <- function(model) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 generate_model_description <- function(model, eng) {
   if (!is.null(model)) {
@@ -165,6 +181,7 @@ generate_model_description <- function(model, eng) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 generate_model_bib_description <- function(model) {
   pub_info <- model$get_publication_info()
@@ -214,6 +231,7 @@ generate_model_bib_description <- function(model) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 generate_doc_input_developers <- function(ns, model, type = "developers") {
   if (type == "developers") {
@@ -298,6 +316,7 @@ generate_doc_input_developers <- function(ns, model, type = "developers") {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "abstract") {
   # TODO (Yuliia): remove? Variable "documentation_title" is not used
@@ -379,6 +398,7 @@ generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 load_and_check_embeddings <- function(dir_path) {
   if (!is.null(dir_path)) {
@@ -441,7 +461,7 @@ load_and_check_embeddings <- function(dir_path) {
 #'
 #' @family studio_utils
 #' @keywords internal
-#'
+#' @noRd
 load_and_check_target_data <- function(file_path) {
   if (!is.null(file_path)) {
     if (file.exists(file_path) == TRUE) {
@@ -543,6 +563,7 @@ load_and_check_target_data <- function(file_path) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 transform_input <- function(object) {
   res <- NULL
@@ -560,6 +581,7 @@ transform_input <- function(object) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 check_for_empty_input <- function(input) {
   return(is.null(input) || input == "")
@@ -575,6 +597,7 @@ check_for_empty_input <- function(input) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 check_numeric_input <- function(input) {
   res <- NULL
@@ -663,6 +686,7 @@ long_load_target_data <- function(file_path, selectet_column) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 prepare_training_history <- function(model,
                                      final = FALSE,
@@ -835,6 +859,7 @@ create_data_embeddings_description <- function(embeddings) {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 check_and_prepare_for_studio <- function() {
   message("Checking R Packages.")
@@ -925,6 +950,7 @@ check_and_prepare_for_studio <- function() {
 #'
 #' @family studio_utils
 #' @keywords internal
+#' @noRd
 #'
 generate_doc_input_licensing_editor <- function(ns, model) {
   ui <- shiny::tagList(

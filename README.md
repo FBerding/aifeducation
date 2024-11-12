@@ -14,7 +14,8 @@ status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-proje
 [![Project Status: Active - The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-
+[![Codecov test
+coverage](https://codecov.io/gh/FBerding/aifeducation/graph/badge.svg)](https://app.codecov.io/gh/FBerding/aifeducation)
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
@@ -122,6 +123,12 @@ learning framework.
 models. Please refer to appendix [A01 Supported Machine Learning
 Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
 for a detailed overview.
+
+## Model Life Cycle
+
+Research requires reproducibility and traceability. Thus, starting with
+version 1.0.0 of this package ensuring that already trained models work
+with future versions of this package has top priority.
 
 ## Classification Tasks
 
