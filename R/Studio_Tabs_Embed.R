@@ -32,14 +32,14 @@ Embed_UI <- function(id) {
       bslib::card_body(
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "choose_file_raw_texts"),
-          label = "Choose File",
-          title = "Please choose a file",
-          icon = shiny::icon("file"),
+          label = "Choose Folder",
+          title = "Please choose a folder",
+          icon = shiny::icon("folder"),
           multiple = FALSE
         ),
         shiny::textInput(
           inputId = shiny::NS(id, "file_path_raw_texts"),
-          label = shiny::tags$p(shiny::icon("file"), "File Path")
+          label = shiny::tags$p(shiny::icon("folder"), "Path to folder")
         ),
         shiny::numericInput(
           inputId = shiny::NS(id, "batch_size"),
