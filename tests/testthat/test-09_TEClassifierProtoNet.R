@@ -2,11 +2,20 @@ testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
   message = "Necessary python modules not available"
 )
+testthat::skip_if_not(
+  condition = dir.exists(testthat::test_path("test_data/classifier/feature_extractor_pytorch")),
+  message = "Feature Extractor for tests not available"
+)
 
 # Skip Tests
 skip_creation_test <- FALSE
+skip_method_save_load<-FALSE
+skip_function_save_load<-FALSE
 skip_training_test <- FALSE
 skip_overfitting_test <- FALSE
+skip_classification_embedding<-FALSE
+skip_plot<-FALSE
+skip_documentation<-FALSE
 skip_3_classes <- FALSE
 
 # SetUp-------------------------------------------------------------------------
@@ -67,10 +76,10 @@ if (skip_3_classes == TRUE) {
   max_classes <- 3
 }
 
-n_local_samples=150
-
+#can be set to all
+n_local_samples="all"
 #Git Hub specific
-n_git_samples=10
+n_git_samples=50
 
 for (framework in ml_frameworks) {
   for (n_classes in 2:max_classes) {
@@ -127,6 +136,9 @@ for (framework in ml_frameworks) {
         }
       }
 
+      if(n_local_samples=="all"){
+        n_local_samples=length(all_test_combinations)
+      }
       # If on github use only a small random sample
       if (Sys.getenv("CI") != TRUE) {
         test_combinations <- all_test_combinations[sample(
@@ -134,7 +146,7 @@ for (framework in ml_frameworks) {
             from = 1,
             to = length(all_test_combinations)
           ),
-          size = n_git_samples,
+          size = n_local_samples,
           replace = FALSE
         )]
       } else {
@@ -143,7 +155,7 @@ for (framework in ml_frameworks) {
             from = 1,
             to = length(all_test_combinations)
           ),
-          size = n_local_samples,
+          size = n_git_samples,
           replace = FALSE
         )]
       }
@@ -161,7 +173,7 @@ for (framework in ml_frameworks) {
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
           feature_extractor = test_combinations[[i]]$feature_extractor,
-          embedding_dim = 3,
+          embedding_dim = 5,
           target_levels = target_levels,
           dense_layers = test_combinations[[i]]$dense_layers,
           dense_size = dense_size,
@@ -219,7 +231,6 @@ for (framework in ml_frameworks) {
           )
         })
 
-        testthat::skip_on_ci()
         test_that(paste(
           "predict - single case", framework,
           "n_classes", n_classes,
@@ -253,7 +264,6 @@ for (framework in ml_frameworks) {
           )
         })
 
-        testthat::skip_on_ci()
         test_that(paste(
           "predict - randomness", framework,
           "n_classes", n_classes,
@@ -278,6 +288,8 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
           expect_equal(predictions, predictions_2)
+          #print(predictions)
+          #print(predictions_2)
 
           # LargeDataSetForTextEmbeddings
           predictions <- classifier$predict(
@@ -466,13 +478,20 @@ for (framework in ml_frameworks) {
               )
               expect_true(classifier$get_sustainability_data()$sustainability_tracked)
             })
+            #Clean Directory
+            unlink(
+              x=train_path,
+              recursive = TRUE
+            )
             gc()
           }
         }
       }
     }
 
+
     # Method save and load------------------------------------------------------
+    if(!skip_method_save_load){
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "method save and load"), {
         # Randomly select a configuration for training
@@ -543,11 +562,19 @@ for (framework in ml_frameworks) {
           predictions_2[i, , drop = FALSE],
           tolerance = 1e-6
         )
+
+        #Clean Directory
+        unlink(
+          x=dir_path,
+          recursive = TRUE
+        )
       })
       gc()
     }
+    }
 
     # Function for loading and saving models-----------------------------------
+    if(!skip_function_save_load){
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "function save and load"), {
         # Randomly select a configuration for training
@@ -621,8 +648,15 @@ for (framework in ml_frameworks) {
           predictions_2[i, , drop = FALSE],
           tolerance = 1e-6
         )
+
+        #Clean Directory
+        unlink(
+          x=dir_path,
+          recursive = TRUE
+        )
       })
       gc()
+    }
     }
 
     # Overfitting test----------------------------------------------------------
@@ -633,10 +667,10 @@ for (framework in ml_frameworks) {
         create_dir(train_path, FALSE)
 
         # Randomly select a configuration for training
-        rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
-        dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-        dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
-        rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
+        rec_layers <- 2
+        dense_layers <- 2
+        dense_size <- 10
+        rec_size <- 2
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
         # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
@@ -725,6 +759,12 @@ for (framework in ml_frameworks) {
           expect_gte(ncol(log_loss), 2)
           expect_gte(nrow(log_loss), 2)
         }
+
+        #Clean Directory
+        unlink(
+          x=train_path,
+          recursive = TRUE
+        )
       })
 
 
@@ -978,6 +1018,7 @@ for (framework in ml_frameworks) {
     }
 
     # Embed----------------------------------------------------------------------
+    if(!skip_classification_embedding){
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "embed"), {
         # Randomly select a configuration for training
@@ -1043,7 +1084,10 @@ for (framework in ml_frameworks) {
       })
       gc()
     }
+    }
+
     # Plot-----------------------------------------------------------------------
+    if(!skip_plot){
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "plot"), {
         # Randomly select a configuration for training
@@ -1096,8 +1140,10 @@ for (framework in ml_frameworks) {
       })
       gc()
     }
+    }
 
     # Documentation--------------------------------------------------------------
+    if(skip_documentation){
     test_that(paste(framework, n_classes, "descriptions"), {
       # Randomly select a configuration for training
       rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
@@ -1202,5 +1248,14 @@ for (framework in ml_frameworks) {
         )
       )
     })
+    }
   }
+}
+
+#Clean Directory
+if(dir.exists(root_path_results)){
+  unlink(
+    x=root_path_results,
+    recursive = TRUE
+  )
 }

@@ -709,6 +709,12 @@ test_that("LargeDataSetForTexts - Method Save and Load", {
     new_dataset$get_dataset()["url_source"],
     c("NA", "https://url.to.source.txt_b.txt")
   )
+
+  #Clean Directory
+  unlink(
+    x=load_path,
+         recursive = TRUE
+    )
 })
 
 #-----------------------------------------------------------------------------
@@ -780,4 +786,19 @@ test_that("LargeDataSetForTexts - Function Save and Load", {
     new_dataset$get_dataset()["url_source"],
     c("NA", "https://url.to.source.txt_b.txt")
   )
+
+  #Clean Directory
+  unlink(
+    x=load_path,
+    recursive = TRUE
+  )
+
 })
+
+#Clean Directory
+if(dir.exists(root_path_results)){
+  unlink(
+    x=root_path_results,
+    recursive = TRUE
+  )
+}

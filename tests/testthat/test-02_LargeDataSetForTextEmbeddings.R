@@ -197,3 +197,11 @@ test_that("LargeDataSetForTextEmbeddings - Function Save and Load", {
     )
   }
 })
+
+#Clean Directory
+if(dir.exists(root_path_results)){
+  unlink(
+    x=root_path_results,
+    recursive = TRUE
+  )
+}

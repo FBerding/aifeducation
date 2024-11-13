@@ -30,6 +30,14 @@ create_dir(test_art_tmp_path, FALSE)
 create_dir(tmp_full_models_pt_path, FALSE)
 create_dir(tmp_full_models_tf_path, FALSE)
 
+#Results of this test are used within the test for TextEmbeddingModels
+tmp_results_folder_path<-testthat::test_path("test_data_tmp")
+create_dir(tmp_results_folder_path, FALSE)
+tmp_results_TEM_path<-paste0(tmp_results_folder_path,"/TEM")
+create_dir(tmp_results_TEM_path, FALSE)
+create_dir(paste0(tmp_results_TEM_path,"/pytorch"), FALSE)
+create_dir(paste0(tmp_results_TEM_path,"/tensorflow"), FALSE)
+
 ml_frameworks <- c("tensorflow", "pytorch")
 ai_methods <- unname(unlist(AIFETrType))
 
@@ -55,17 +63,15 @@ for (framework in ml_frameworks) {
   for (ai_method in ai_methods) {
     base::gc(verbose = FALSE, full = TRUE)
 
-    #create main folder for every model
+    #create main folder ans sub-folder for every model in creation
     tmp_ai_method_path <- paste0(test_art_tmp_path,"/", framework,"/", ai_method)
     create_dir(tmp_ai_method_path, FALSE)
-
-    #Create sub-folders for every model
     tmp_ai_create<-paste0(tmp_ai_method_path,"/create")
     create_dir(tmp_ai_create, FALSE)
-    tmp_ai_train<-paste0(tmp_ai_method_path,"/train")
+
+    #Create folder and sub-folder for tmp results used in other tests
+    tmp_ai_train<- paste0(tmp_results_TEM_path,"/", framework,"/", ai_method)
     create_dir(tmp_ai_train, FALSE)
-    tmp_full_models_path <- paste0(tmp_ai_method_path, "/fct_save_load")
-    create_dir(tmp_full_models_path, FALSE)
 
     if (ai_framework_matrix[ai_method, framework] == 1) {
       # Creation of the Model ----
@@ -556,5 +562,27 @@ for (framework in ml_frameworks) {
     } else {
       cat(paste(framework, "not supported for", ai_method, "\n"))
     }
+
+    #Clean Directory
+    if(dir.exists(tmp_ai_create)){
+      unlink(
+        x=tmp_ai_create,
+        recursive = TRUE
+      )
+    }
+    #if(dir.exists(tmp_ai_train)){
+    #  unlink(
+    #    x=tmp_ai_create,
+    #    recursive = TRUE
+    #  )
+    #}
   }
+}
+
+#Clean Directory
+if(dir.exists(test_art_tmp_path)){
+  unlink(
+    x=test_art_tmp_path,
+    recursive = TRUE
+  )
 }

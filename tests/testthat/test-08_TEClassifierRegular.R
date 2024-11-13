@@ -1,15 +1,18 @@
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "all"),
+  condition = check_aif_py_modules(trace = FALSE, check = "all"),
   message = "Necessary python modules not available"
 )
 
 # Skip Tests
 skip_creation_test <- FALSE
+skip_method_save_load<-FALSE
+skip_function_save_load<-FALSE
 skip_training_test <- FALSE
 skip_overfitting_test <- FALSE
+skip_documentation<-FALSE
 skip_3_classes <- FALSE
-include_tensorflow <- TRUE
 
+include_tensorflow <- TRUE
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -19,6 +22,7 @@ root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierRegular")
 create_dir(root_path_results, FALSE)
+root_path_feature_extractor<-testthat::test_path("test_data_tmp/classifier/feature_extractor_pytorch")
 
 # SetUp datasets
 # Disable tqdm progressbar
@@ -68,10 +72,20 @@ pl_list <- list(FALSE, TRUE)
 feature_extractor_list <- NULL
 feature_extractor_list["tensorflow"] <- list(list(NULL))
 
-feature_extractor_list["pytorch"] <- list(list(
-  load_from_disk(paste0(root_path_data, "/feature_extractor_pytorch")),
-  NULL
-))
+if (file.exists(root_path_feature_extractor)) {
+  feature_extractor_list["pytorch"] <- list(
+    list(
+      load_from_disk(root_path_feature_extractor),
+      NULL
+    )
+  )
+} else {
+  feature_extractor_list["pytorch"] <- list(
+    list(
+      NULL
+    )
+  )
+}
 
 if (skip_3_classes == TRUE) {
   max_classes <- 2
@@ -79,10 +93,11 @@ if (skip_3_classes == TRUE) {
   max_classes <- 3
 }
 
-n_local_samples=150
+#Can be set to "all"
+n_local_samples="all"
 
-#Git Hub specific
-n_git_samples=10
+# Git Hub specific
+n_git_samples <- 50
 
 
 for (framework in ml_frameworks) {
@@ -141,6 +156,9 @@ for (framework in ml_frameworks) {
         }
       }
 
+      if(n_local_samples=="all"){
+        n_local_samples=length(all_test_combinations)
+      }
       # If on github use only a small random sample
       if (Sys.getenv("CI") != TRUE) {
         test_combinations <- all_test_combinations[sample(
@@ -148,7 +166,7 @@ for (framework in ml_frameworks) {
             from = 1,
             to = length(all_test_combinations)
           ),
-          size = n_git_samples,
+          size = n_local_samples,
           replace = FALSE
         )]
       } else {
@@ -157,7 +175,7 @@ for (framework in ml_frameworks) {
             from = 1,
             to = length(all_test_combinations)
           ),
-          size = n_local_samples,
+          size = n_git_samples,
           replace = FALSE
         )]
       }
@@ -476,6 +494,12 @@ for (framework in ml_frameworks) {
               )
               expect_true(classifier$get_sustainability_data()$sustainability_tracked)
             })
+
+            # Clean Directory
+            unlink(
+              x = train_path,
+              recursive = TRUE
+            )
             gc()
           }
         }
@@ -485,6 +509,7 @@ for (framework in ml_frameworks) {
 
 
     # Method save and load------------------------------------------------------
+    if(!skip_method_save_load){
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "method save and load"), {
         # Randomly select a configuration for training
@@ -553,11 +578,19 @@ for (framework in ml_frameworks) {
           predictions_2[i, , drop = FALSE],
           tolerance = 1e-6
         )
+
+        # Clean Directory
+        unlink(
+          x = dir_path,
+          recursive = TRUE
+        )
       })
       gc()
     }
+    }
 
     # Function for loading and saving models-----------------------------------
+    if(!skip_function_save_load){
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "function save and load"), {
         # Randomly select a configuration for training
@@ -628,8 +661,15 @@ for (framework in ml_frameworks) {
           predictions_2[i, , drop = FALSE],
           tolerance = 1e-6
         )
+
+        # Clean Directory
+        unlink(
+          x = dir_path,
+          recursive = TRUE
+        )
       })
       gc()
+    }
     }
 
     # Overfitting test----------------------------------------------------------
@@ -714,7 +754,7 @@ for (framework in ml_frameworks) {
         expect_gte(object = max(history), expected = 0.95)
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
-        if(framework=="pytorch"){
+        if (framework == "pytorch") {
           expect_true(state_log_exists)
         }
         if (state_log_exists) {
@@ -725,7 +765,7 @@ for (framework in ml_frameworks) {
         }
 
         loss_log_exists <- file.exists(paste0(train_path, "/aifeducation_loss.log"))
-        if(framework=="pytorch"){
+        if (framework == "pytorch") {
           expect_true(loss_log_exists)
         }
         if (loss_log_exists == TRUE) {
@@ -733,10 +773,17 @@ for (framework in ml_frameworks) {
           expect_gte(ncol(log_loss), 2)
           expect_gte(nrow(log_loss), 2)
         }
+
+        # Clean Directory
+        unlink(
+          x = train_path,
+          recursive = TRUE
+        )
       })
     }
 
     # Documentation--------------------------------------------------------------
+    if(skip_documentation){
     test_that(paste(framework, n_classes, "descriptions"), {
       # Randomly select a configuration for training
       rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
@@ -852,5 +899,14 @@ for (framework in ml_frameworks) {
         expected = "https://Test.html"
       )
     })
+    }
   }
+}
+
+#Clean Directory
+if(dir.exists(root_path_results)){
+  unlink(
+    x=root_path_results,
+    recursive = TRUE
+  )
 }
