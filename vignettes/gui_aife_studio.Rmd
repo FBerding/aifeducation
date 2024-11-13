@@ -391,7 +391,7 @@ train/fine-tune base models.
 
 In order to create a new base model you have to choose the option (tab)
 *Create* on the tab *Base Models* on the top panel of the
-app (Figure 5). Figure 10 shows the corresponding page.
+app. Figure 10 shows the corresponding page.
 
 [![Figure 10: Base Models - Create Transformer](img_articles/gui/BM_Create_Fill_fields.png){width="100%"}](img_articles/gui/BM_Create_Fill_fields.png)
 Figure 10: Base Models - Create Transformer (click image to enlarge)
@@ -540,25 +540,24 @@ computational intensity. Finally, this approach allows the analysis of
 long documents by applying the same algorithm to different parts.
 
 You can open the creation page
-by clicking on "Create" in the section "Text Embedding Model" 
-via "Language Modeling" (see Figure 5). Figure 12 shows the corresponding page.
+by clicking on "Create" tab in the section "Text Embedding Models". Figure 12 shows the corresponding page.
 
 [![Figure 12: Text Embedding Model - Create](img_articles/gui/TEM_Create_Fill_fields.png){width="100%"}](img_articles/gui/TEM_Create_Fill_fields.png)
 Figure 12: Text Embedding Model - Create (click image to enlarge)
 
 First you have to choose the base model that should form the foundation
 of your new text embedding model. Please select the folder that contains
-the entire model and not single files (box *Base Model*).
+the entire model and not single files (button *Choose a Base Model* on the *Control Panel*).
 
 After choosing a model, new boxes appear which allow you to customize
-your interface (box *Interface Setting*). Here it is very important that
-you give your model a unique name and label. The difference between
+your interface. Here it is very important that
+you give your model a unique name and label (*Control Panel*). The difference between
 *Name* and *Label* is that *Name* is used for the computer and *Label*
 for users. Thus, *Name* should not contain any spaces or special
 characters. *Label* does not have any restrictions. Think of *Label* as
-the title of a book or paper. With *Version* you can provide a version
+the title of a book or paper. With *Label* you can also provide a version
 number if you create a newer version of your model. In case you create a
-new model, we recommend to use "0.0.1". For *Language,* it is necessary
+new model, we recommend to use "0.0.1". Fo    essary
 that you choose which language your model is created for, such as
 English, French, German, etc.
 
@@ -586,7 +585,7 @@ should process raw text:
     the embedding of a text chunk.
     
 -   **Pooling Type**: With this option you can decide if only the hidden states of
-    the cls-token should be used for the embedding. If you set thisn option to
+    the cls-token should be used for the embedding. If you set this option to
     "average" the hidden states of all tokens are averaged within each layer except
     the hidden states for padding tokens.
 
@@ -600,19 +599,19 @@ further analysis.
 > different configuration based on the same base model.
 
 The last step is to provide and name a folder to save the model to
-(box *Creation*).
+(button *Save Model*).
 
 ### 3.3.2 Using a Text Embedding Model
 
 Using a text embedding model is a central aspect of applying artificial
 intelligence in *aifeducation*. The corresponding page can be found by
-clicking on "Use" in the tab "Language Modeling". At the start you have
+clicking on "Use" in the tab "Text Embedding Models". At the start you have
 to choose the model that you would like to use. Please select the folder
-that contains the entire model instead of selecting single files. After
+that contains the entire model instead of selecting single files (button *Choose a Model*). After
 selecting and loading a model, a new box appears that shows you the
 different aspects of the model and how you can use it.
 
-The tab *Model Description* (Figure 13) provides you with the documentation of the
+The tab *Description* (Figure 13) provides you with the documentation of the
 model.
 
 [![Figure 13: Text Embedding Model - Description](img_articles/gui/TEM_Use_Fill_fields.png){width="100%"}](img_articles/gui/TEM_Use_Fill_fields.png)
@@ -622,41 +621,41 @@ The tab *Training* shows the development of the loss and the validation loss
 during the last training of the corresponding base model. If no plot is displayed no 
 history data is available.
 
-The tab *Create Text Embeddings* (Figure 14) allows you to transform raw texts into
+The tab *Embedd Text* (Figure 14) allows you to transform raw texts into
 a numerical representation of these texts, called text embeddings. These
 text embeddings can be used in downstream tasks such as classifying
 texts. In order to transform raw texts into embedded texts, you first
-have to select a collection of raw texts. We
+have to select a collection of raw texts (a folder containing several files). We
 recommend that you create this collection according to section 3.1.1.
 Next you have to provide the folder where the embeddings should be
 stored and name it. With *Batch Size* you can determine how
 many raw texts should be processed simultaneously. Please adjust this
-value to your machine's capacities. By clicking on the button "Start
-Embed" the transformation of texts begins.
+value to your machine's capacities. By clicking on the button "Save Embeddings"
+the transformation of texts begins.
 
 [![Figure 14: Text Embedding Model - Embeddings](img_articles/gui/TEM_Use_Embedd_text.png){width="100%"}](img_articles/gui/TEM_Use_Embedd_text.png)
 Figure 14: Text Embedding Model - Embeddings (click image to enlarge)
 
-The tab *Encode/Decode/Tokenize* (Figure 15) offers you insights into the way your
+The tab *Tokenize/Encode/Decode* (Figure 15) offers you insights into the way your
 text embedding model processes data. In the box *Encode* you can insert
 a raw text and after clicking on *Encode* you can see how the text is
 divided into tokens and their corresponding IDs. The IDs are passed to
 the base model and are used to generate the numeric representation of a
 text. The box *Decode* allows you to reverse this process. There you can
 insert a sequence of numbers (separated with a comma or with spaces) and
-after clicking on *Decode,* the corresponding tokens and the raw text
+after clicking on *Decode*, the corresponding tokens and the raw text
 appear.
 
-[![Figure 15: Text Embedding Model - Encode/Decode/Tokenize](img_articles/gui/TEM_Use_TED_Encode.png){width="100%"}](img_articles/gui/TEM_Use_TED_Encode.png)
-Figure 15: Text Embedding Model - Encode/Decode/Tokenize (click image to enlarge)
+[![Figure 15: Text Embedding Model - Tokenize/Encode/Decode](img_articles/gui/TEM_Use_TED_Encode.png){width="100%"}](img_articles/gui/TEM_Use_TED_Encode.png)
+Figure 15: Text Embedding Model - Tokenize/Encode/Decode (click image to enlarge)
 
 Finally, the tab *Fill Mask* (Figure 16) allows you to request the underlying base
 model of your text embedding model to calculate a solution to a
 fill-in-the-blank text. In the box *Text* you can insert a raw text. A
 gap is signaled by insert the corresponding masking token. This token
 can be found in the table above in the row for "mask_token". If you
-insert a gap/mask_token please ensure correct spelling. With "N
-Solutions per Mask*"* you can determine how many tokens the model should
+insert a gap/mask_token please ensure correct spelling. With 
+*N Solutions per mask* you can determine how many tokens the model should
 calculate for every gap/mask_token. After clicking "Calculate Tokens",
 you will find an image on the right side of the box, showing you the
 most reasonable token for the selected gap. The tokens are ordered by
@@ -677,12 +676,12 @@ important in order to judge the limitations of a model.
 
 To support developers in documenting their work, *Aifeducation Studio*
 provides an easy way to add a comprehensive description. You find this
-part of the app by clicking on "Document" in the tab *Language
-Modeling*. First, you have to choose the text embedding model you would
+part of the app by clicking on "Document" in the tab *Text Embedding Models*. 
+First, you have to choose the text embedding model you would
 like to document (not the base model!).
 
 After choosing a model, a new box appears, allowing you to insert the
-necessary information. Via the tabs *Developers* and *Modifiers,* you
+necessary information. Via the tabs *Developers* and *Modifiers*, you
 can provide the names and email addresses of all relevant contributors.
 *Developers* refer to the people who created a model, while *Modifiers*
 refers to the people who adapted a pre-trained model to another domain or
@@ -709,7 +708,7 @@ possible by clicking on *Save*.
 ### 3.4.1 Create a Classifier
 
 Classifiers are built on top of a text embedding model. To create a
-classifier, click on "Create and Train" in the tab *Classification* (see Figure 5).
+classifier, click on *Create* in the tab *Classifiers*.
 Figure 18 shows the corresponding page.
 
 [![Figure 18: Classifier - Creation Part 1](img_articles/gui_aife_studio_classifier_create_part_1.jpg){width="100%"}](img_articles/gui_aife_studio_classifier_create_part_1.jpg)
