@@ -33,7 +33,7 @@ generate_sidebar_information <- function(model) {
       model_label <- model$get_model_info()$model_label
     }
 
-    max_tokens <- (model$get_model_info()$model_max_size - model$get_transformer_components()$overlap) * model$get_transformer_components()$chunks + model$get_model_info()$model_max_size
+    max_tokens <- (model$get_basic_components()$max_length - model$get_transformer_components()$overlap) * model$get_transformer_components()$chunks + model$get_basic_components()$max_length
 
     # TODO (Yuliia): remove? Variable is not used
     if (!is.null(model$get_transformer_components()$aggregation)) {
@@ -77,8 +77,8 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p(model_label),
       shiny::tags$hr(),
       shiny::tags$p("# Parameter: ", model$count_parameter()),
-      shiny::tags$p("Method: ", model$get_model_info()$model_method),
-      shiny::tags$p("Max Tokens per Chunk: ", model$get_model_info()$model_max_size),
+      shiny::tags$p("Method: ", model$get_basic_components()$method),
+      shiny::tags$p("Max Tokens per Chunk: ", model$get_basic_components()$max_length),
       shiny::tags$p("Max Chunks: ", model$get_transformer_components()$chunks),
       shiny::tags$p("Token Overlap: ", model$get_transformer_components()$overlap),
       shiny::tags$p("Max Tokens: ", max_tokens),
