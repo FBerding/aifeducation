@@ -8,3 +8,5 @@
 
 library(testthat)
 library(aifeducation)
+
+test_check("aifeducation")
