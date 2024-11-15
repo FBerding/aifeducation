@@ -73,6 +73,12 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
         )
+
+        #Clean Directory
+        unlink(
+          x=train_path,
+          recursive = TRUE
+        )
       })
       gc()
 
@@ -112,6 +118,12 @@ for (framework in ml_frameworks) {
           expect_gte(ncol(log_loss), 2)
           expect_gte(nrow(log_loss), 2)
         }
+
+        #Clean Directory
+        unlink(
+          x=train_path,
+          recursive = TRUE
+        )
       })
 
       # Predict---------------------------------------------------------------
@@ -259,6 +271,12 @@ for (framework in ml_frameworks) {
           predictions_2$embeddings[i, , , drop = FALSE],
           tolerance = 1e-6
         )
+
+        #Clean Directory
+        unlink(
+          x=dir_path,
+          recursive = TRUE
+        )
       })
       gc()
 
@@ -310,8 +328,22 @@ for (framework in ml_frameworks) {
           predictions_2$embeddings[i, , , drop = FALSE],
           tolerance = 1e-6
         )
+
+        #Clean Directory
+        unlink(
+          x=dir_path,
+          recursive = TRUE
+        )
       })
       gc()
     }
   }
+}
+
+#Clean Directory
+if(dir.exists(root_path_results)){
+  unlink(
+    x=root_path_results,
+    recursive = TRUE
+  )
 }

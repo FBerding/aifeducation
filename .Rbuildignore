@@ -5,6 +5,7 @@ Trial
 materials
 test_model
 tests/testthat/test_artefacts
+tests/testthat/test_data_tmp
 .h5
 .git
 .gitignore

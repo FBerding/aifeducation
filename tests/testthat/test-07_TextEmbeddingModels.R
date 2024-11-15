@@ -1,11 +1,15 @@
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE),
+  condition = check_aif_py_modules(trace = FALSE,check="all"),
   message = "Necessary python modules not available"
+)
+testthat::skip_if_not(
+  condition = dir.exists(testthat::test_path("test_data_tmp/TEM")),
+  message = "Base models for tests not available"
 )
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_data <- testthat::test_path("test_data/TEM")
+root_path_data <- testthat::test_path("test_data_tmp/TEM")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 
 root_path_results <- testthat::test_path("test_artefacts/TEM")
@@ -64,10 +68,6 @@ ml_frameworks <- c(
      "mpnet"
    )
  )
-#base_model_list <- list(
-#  tensorflow = c(),
-#  pytorch = c("bert")
-#)
 
 pooling_type_list <- list(
   "funnel" = c("cls"),
@@ -320,9 +320,16 @@ for (framework in ml_frameworks) {
               embeddings_2$embeddings[i, , , drop = FALSE],
               tolerance = 1e-6
             )
+
+            #Clean Directory
+            unlink(
+              x=save_location,
+              recursive = TRUE
+            )
+
           })
 
-          # Function Saving and Loading
+          # Function Saving and Loading-----------------------------------------
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "function_save_load"), {
             folder_name <- paste0(
               "function_save_load_",
@@ -381,6 +388,12 @@ for (framework in ml_frameworks) {
 
             # Check tokenizer statistics
             expect_equal(nrow(text_embedding_model_reloaded$tokenizer_statistics), 2)
+
+            #Clean Directory
+            unlink(
+              x=save_location,
+              recursive = TRUE
+            )
           })
 
           # Documentation----------------------------------------------------------

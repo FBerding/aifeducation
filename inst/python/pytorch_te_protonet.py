@@ -174,7 +174,7 @@ class ClassMean_PT(torch.nn.Module):
 class ProtoNetMetric_PT(torch.nn.Module):
   def __init__(self):
     super().__init__()
-    self.alpha=torch.nn.Parameter(torch.randn(1))
+    self.alpha=torch.nn.Parameter(torch.ones(1))
   
   def forward(self,x,prototypes):
     distance_matrix=torch.zeros(x.size()[0],prototypes.size(0))
@@ -217,8 +217,8 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
     self.classes=torch.from_numpy(np.copy(target_levels))
     self.n_classes=len(target_levels)
     
-    self.trained_prototypes=torch.nn.Parameter(torch.randn(self.n_classes,self.embedding_dim))
-    self.near_factor=torch.nn.Parameter(torch.ones(1))
+    self.trained_prototypes=torch.nn.Parameter(torch.rand(self.n_classes,self.embedding_dim))
+    #self.near_factor=torch.nn.Parameter(torch.ones(1))
 
     if  dense_layers>0:
       last_in_features=dense_size
@@ -270,7 +270,7 @@ class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
 
     #Calc distance from query embeddings to global global prototypes
     distances=self.metric(x=query_embeddings,prototypes=prototypes)
-    probabilities=torch.nn.Softmax(dim=1)(torch.exp(-self.near_factor*distances))
+    probabilities=torch.nn.Softmax(dim=1)(torch.exp(-distances))
       
     if predication_mode==False:
       return probabilities, distances
@@ -676,7 +676,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   if use_callback==True:
     if trace>=1:
       print("Load Best Weights from {}".format(filepath))
-    model.load_state_dict(torch.load(filepath))
+    model.load_state_dict(torch.load(filepath,weights_only=True))
     #safetensors.torch.load_model(model=model,filename=filepath)
 
 

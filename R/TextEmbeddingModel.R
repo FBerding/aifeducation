@@ -1010,8 +1010,8 @@ TextEmbeddingModel <- R6::R6Class(
 
       for (i in 1:length(special_tokens)) {
         tokens_map[i, 1] <- special_tokens[i]
-        tokens_map[i, 2] <- private$transformer_components$tokenizer[special_tokens[i]]
-        tokens_map[i, 3] <- private$transformer_components$tokenizer[paste0(special_tokens[i], "_id")]
+        tokens_map[i, 2] <- replace_null_with_na(private$transformer_components$tokenizer[special_tokens[i]])
+        tokens_map[i, 3] <- replace_null_with_na(private$transformer_components$tokenizer[paste0(special_tokens[i], "_id")])
       }
 
       return(tokens_map)

@@ -760,7 +760,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   if use_callback==True:
     if trace>=1:
       print("Load Best Weights from {}".format(filepath))
-    model.load_state_dict(torch.load(filepath))
+    model.load_state_dict(torch.load(filepath,weights_only=True))
 
 
   history={
