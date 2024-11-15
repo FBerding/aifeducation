@@ -39,8 +39,8 @@ Classifiers_Create_UI <- function(id) {
           id = shiny::NS(id, "button_select_target_data"),
           multiple = FALSE,
           label = "Choose Target Data",
-          title = "Please choose a folder",
-          icon = shiny::icon("folder-open")
+          title = "Please choose a file",
+          icon = shiny::icon("file")
         ),
         shiny::tags$hr(),
         shiny::textInput(
