@@ -979,3 +979,20 @@ generate_doc_input_licensing_editor <- function(ns, model) {
   )
   return(ui)
 }
+
+#' @title Replace NULL with NA
+#' @description Function replaces `NULL` with `NA`
+#'
+#' @return If value is `NULL` returns `NA`. In all other cases it returns value.
+#'
+#' @family studio_utils
+#' @keywords internal
+#' @noRd
+#'
+replace_null_with_na<-function(value){
+  if(is.null(value)){
+    return(NA)
+  } else {
+    return(value)
+  }
+}

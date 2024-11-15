@@ -94,7 +94,7 @@ if (skip_3_classes == TRUE) {
 }
 
 #Can be set to "all"
-n_local_samples="all"
+local_samples="all"
 
 # Git Hub specific
 n_git_samples <- 50
@@ -156,11 +156,14 @@ for (framework in ml_frameworks) {
         }
       }
 
-      if(n_local_samples=="all"){
+      if(local_samples=="all"){
         n_local_samples=length(all_test_combinations)
+      } else {
+        n_local_samples=local_samples
       }
+
       # If on github use only a small random sample
-      if (Sys.getenv("CI") != TRUE) {
+      if (Sys.getenv("CI") != "true") {
         test_combinations <- all_test_combinations[sample(
           x = seq.int(
             from = 1,

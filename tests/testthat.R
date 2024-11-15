@@ -9,4 +9,8 @@
 library(testthat)
 library(aifeducation)
 
+print("Env Variables---------------------------------------------------------")
+print(Sys.getenv())
+print("----------------------------------------------------------------------")
+
 test_check("aifeducation")
