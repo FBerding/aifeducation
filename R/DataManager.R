@@ -224,19 +224,32 @@ DataManagerClassifier <- R6::R6Class(
     #' @return Returns a table describing the absolute frequencies of the labeled and unlabeled data. The rows contain
     #'   the length of the sequences while the columns contain the labels.
     get_statistics = function() {
-      self$datasets$data_labeled$set_format("np")
-      length_labeled <- self$datasets$data_labeled["length"]
-      labels_labeled <- self$datasets$data_labeled["labels"]
+      if (!is.null(self$datasets)) {
+        if (!is.null(self$datasets$data_labeled)) {
+          self$datasets$data_labeled$set_format("np")
+          length_labeled <- self$datasets$data_labeled["length"]
+          labels_labeled <- self$datasets$data_labeled["labels"]
 
-      self$datasets$data_unlabeled$set_format("np")
-      length_unlabeled <- self$datasets$data_unlabeled["length"]
-      labels_unlabeled <- rep(NA, times = length(length_unlabeled))
+          if (!is.null(self$datasets$data_unlabeled)) {
+            self$datasets$data_unlabeled$set_format("np")
+            length_unlabeled <- self$datasets$data_unlabeled["length"]
+            labels_unlabeled <- rep(NA, times = length(length_unlabeled))
+          } else {
+            length_unlabeled <- NULL
+            labels_unlabeled <- NULL
+          }
 
-      statistics <- table(c(length_labeled, length_unlabeled),
-        c(labels_labeled, labels_unlabeled),
-        useNA = "ifany"
-      )
-      return(statistics)
+          statistics <- table(c(length_labeled, length_unlabeled),
+                              c(labels_labeled, labels_unlabeled),
+                              useNA = "ifany"
+          )
+          return(statistics)
+        } else {
+          stop("Labeled data not set.")
+        }
+      } else {
+        stop("Data not set.")
+      }
     },
 
     #' @description Method for requesting a data set for training depending in the current state of the

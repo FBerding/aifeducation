@@ -195,7 +195,8 @@ long_classifier <- function(classifier_type,
                             loss_alpha,
                             loss_margin,
                             sampling_separate,
-                            sampling_shuffle) {
+                            sampling_shuffle,
+                            n_cores) {
   promises::future_promise({
     # Load data
     embeddings <- load_from_disk(path_to_embeddings)
@@ -283,7 +284,8 @@ long_classifier <- function(classifier_type,
         trace = FALSE,
         ml_trace = 0,
         log_dir = log_dir,
-        log_write_interval = log_write_interval
+        log_write_interval = log_write_interval,
+        n_cores=n_cores
       )
     } else if (classifier_type == "protonet") {
       # Create
@@ -345,7 +347,8 @@ long_classifier <- function(classifier_type,
         loss_alpha = loss_alpha,
         loss_margin = loss_margin,
         sampling_separate = sampling_separate,
-        sampling_shuffle = sampling_shuffle
+        sampling_shuffle = sampling_shuffle,
+        n_cores=n_cores
       )
     }
     # Save
@@ -403,7 +406,8 @@ get_arguments_extended_task_TEClassifierRegular <- function() {
     "recurrent_dropout",
     "encoder_dropout",
     "optimizer",
-    "log_write_interval"
+    "log_write_interval",
+    "n_cores"
   ))
 }
 
