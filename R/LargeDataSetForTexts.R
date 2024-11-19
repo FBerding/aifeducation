@@ -369,10 +369,12 @@ LargeDataSetForText <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Method for adding raw texts from a `data.frame`
     #' @param data_frame Object of class `data.frame` with at least the following columns "id","text","bib_entry",
-    #'   "license", "url_license", "text_license", and "url_source". If a column is missing an error occurs. Additional
-    #'   columns are dropped.
+    #'   "license", "url_license", "text_license", and "url_source". If "id" and7or "text" is missing an error occurs.
+    #'   If the other columns are not present in the `data.frame` they are added with empty values(`NA`).
+    #'   Additional columns are dropped.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_data.frame = function(data_frame) {
+      #Necessary columns
       if (is.data.frame(data_frame) == FALSE) {
         stop("Input must be of type data.frame")
       }
@@ -382,24 +384,28 @@ LargeDataSetForText <- R6::R6Class(
       if ("text" %in% colnames(data_frame) == FALSE) {
         stop("data.frame must contain a column text.")
       }
-      if ("bib_entry" %in% colnames(data_frame) == FALSE) {
-        stop("data.frame must contain a column bib_entry.")
+
+      data_to_add<-data_frame
+
+      #optional columns
+      if ("bib_entry" %in% colnames(data_to_add) == FALSE) {
+        data_to_add["bib_entry"]<-rep(x=NA,times=nrow(data_to_add))
       }
-      if ("license" %in% colnames(data_frame) == FALSE) {
-        stop("data.frame must contain a column license.")
+      if ("license" %in% colnames(data_to_add) == FALSE) {
+        data_to_add["license"]<-rep(x=NA,times=nrow(data_to_add))
       }
-      if ("url_license" %in% colnames(data_frame) == FALSE) {
-        stop("data.frame must contain a column url_license")
+      if ("url_license" %in% colnames(data_to_add) == FALSE) {
+        data_to_add["url_license"]<-rep(x=NA,times=nrow(data_to_add))
       }
-      if ("text_license" %in% colnames(data_frame) == FALSE) {
-        stop("data.frame must contain a column text_license")
+      if ("text_license" %in% colnames(data_to_add) == FALSE) {
+        data_to_add["text_license"]<-rep(x=NA,times=nrow(data_to_add))
       }
-      if ("url_source" %in% colnames(data_frame) == FALSE) {
-        stop("data.frame must contain a column url_source")
+      if ("url_source" %in% colnames(data_to_add) == FALSE) {
+        data_to_add["url_source"]<-rep(x=NA,times=nrow(data_to_add))
       }
 
       # Transform to a python dataset
-      new_dataset <- data.frame_to_py_dataset(data_frame[c(
+      new_dataset <- data.frame_to_py_dataset(data_to_add[c(
         "id",
         "text",
         "bib_entry",

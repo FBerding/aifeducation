@@ -38,7 +38,17 @@ create_dir(tmp_results_TEM_path, FALSE)
 create_dir(paste0(tmp_results_TEM_path,"/pytorch"), FALSE)
 create_dir(paste0(tmp_results_TEM_path,"/tensorflow"), FALSE)
 
-ml_frameworks <- c("tensorflow", "pytorch")
+if(Sys.getenv("CI")=="true"){
+  ml_frameworks <- c(
+    "pytorch"
+  )
+} else {
+  ml_frameworks <- c(
+    "tensorflow",
+    "pytorch"
+  )
+}
+
 ai_methods <- unname(unlist(AIFETrType))
 
 ai_framework_matrix <- matrix(
@@ -57,10 +67,28 @@ rows_susatainability <- c(
   "deberta_v2" = 3
 )
 
+supported_methods<-list(
+  tensorflow=list(
+    "bert" ,
+    "funnel" ,
+    "roberta" ,
+    "longformer" ,
+    "deberta_v2"
+  ),
+  pytorch=list(
+    "bert" ,
+    "funnel" ,
+    "roberta" ,
+    "longformer" ,
+    "deberta_v2",
+    "mpnet"
+  )
+)
+
 example_data <- imdb_movie_reviews
 
 for (framework in ml_frameworks) {
-  for (ai_method in ai_methods) {
+  for (ai_method in supported_methods[[framework]]) {
     base::gc(verbose = FALSE, full = TRUE)
 
     #create main folder ans sub-folder for every model in creation
@@ -82,7 +110,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 50000,
               vocab_do_lower_case = FALSE,
               max_position_embeddings = 512,
@@ -104,7 +132,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 50000,
               vocab_do_lower_case = TRUE,
               max_position_embeddings = 512,
@@ -126,7 +154,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = FALSE,
               max_position_embeddings = 512,
@@ -148,7 +176,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = TRUE,
               max_position_embeddings = 512,
@@ -170,7 +198,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               vocab_do_lower_case = FALSE,
               max_position_embeddings = 512,
@@ -192,7 +220,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               vocab_do_lower_case = TRUE,
               max_position_embeddings = 512,
@@ -214,7 +242,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               max_position_embeddings = 512,
               hidden_size = 32,
@@ -236,7 +264,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               max_position_embeddings = 512,
               hidden_size = 32,
@@ -257,7 +285,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text[1:500],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = FALSE,
               max_position_embeddings = 512,
@@ -280,7 +308,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text[1:500],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = TRUE,
               max_position_embeddings = 512,
@@ -303,7 +331,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 50000,
               vocab_do_lower_case = FALSE,
               max_position_embeddings = 512,
@@ -333,7 +361,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:10],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = TRUE,
               full_sequences_only = TRUE,
@@ -358,7 +386,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:10],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.30,
               whole_word = FALSE,
               full_sequences_only = TRUE,
@@ -383,7 +411,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.30,
               val_size = 0.1,
               n_epoch = 2,
@@ -407,7 +435,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = TRUE,
               val_size = 0.1,
@@ -432,7 +460,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = FALSE,
               val_size = 0.1,
@@ -457,7 +485,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:20],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = TRUE,
               val_size = 0.1,
@@ -483,7 +511,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:20],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = FALSE,
               val_size = 0.1,
@@ -509,7 +537,7 @@ for (framework in ml_frameworks) {
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.30,
               val_size = 0.1,
               n_epoch = 2,
@@ -534,7 +562,7 @@ for (framework in ml_frameworks) {
                 ml_framework = framework,
                 output_dir = tmp_ai_train,
                 model_dir_path = tmp_ai_create,
-                raw_texts = example_data$text[1:10],
+                text_dataset = LargeDataSetForText$new(example_data[1:50,]),
                 p_mask = 0.15,
                 p_perm = 0.15,
                 whole_word = TRUE,

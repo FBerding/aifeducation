@@ -12,7 +12,12 @@ skip_overfitting_test <- FALSE
 skip_documentation<-FALSE
 skip_3_classes <- FALSE
 
-include_tensorflow <- TRUE
+if(Sys.getenv("CI")=="true"){
+  include_tensorflow <- FALSE
+} else {
+  include_tensorflow <- TRUE
+}
+
 
 # SetUp-------------------------------------------------------------------------
 # Set paths

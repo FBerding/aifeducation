@@ -822,7 +822,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param raw_text `vector`containing the raw texts.
     #' @param token_encodings_only `bool` If `TRUE`, only the token
     #' encodings are returned. If `FALSE`, the complete encoding is returned
-    #' which is important for BERT models.
+    #' which is important for some transformer models.
     #' @param to_int `bool` If `TRUE` the integer ids of the tokens are
     #' returned. If `FALSE` the tokens are returned. Argument only applies
     #' for transformer models and if `token_encodings_only=TRUE`.
@@ -842,11 +842,9 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Start
       n_units <- length(raw_text)
-
-      chunk_list <- vector(length = n_units)
-      encodings <- NULL
       #---------------------------------------------------------------------
       if (token_encodings_only == TRUE) {
+        encodings <- NULL
         encodings_only <- NULL
         for (i in 1:n_units) {
           tokens_unit <- NULL
@@ -899,8 +897,9 @@ TextEmbeddingModel <- R6::R6Class(
 
         #--------------------------------------------------------------------
       } else {
-        # text_chunks<-NULL
         encodings <- NULL
+        chunk_list <- vector(length = n_units)
+        total_chunk_list <- vector(length = n_units)
         for (i in 1:n_units) {
           return_token_type_ids <- (private$basic_components$method != AIFETrType$mpnet)
 
@@ -938,18 +937,19 @@ TextEmbeddingModel <- R6::R6Class(
 
           seq_len <- tmp_dataset$num_rows
           chunk_list[i] <- min(seq_len, private$transformer_components$chunks)
-
-          if (chunk_list[i] == 1) {
-            encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
+          total_chunk_list[i]<-seq_len
+          if(chunk_list[i]==1){
+            tmp_dataset <- tmp_dataset$select(list(as.integer((1:chunk_list[[i]]) - 1)))
           } else {
             tmp_dataset <- tmp_dataset$select(as.integer((1:chunk_list[[i]]) - 1))
-            encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
           }
+
+          encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
         }
-        # print(encodings["input_ids"])
         return(encodings_list = list(
           encodings = encodings,
-          chunks = chunk_list
+          chunks = chunk_list,
+          total_chunks=total_chunk_list
         ))
       }
     },
@@ -1022,7 +1022,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' into text embeddings. For a large number of texts please use the method `embed_large`.
     #' In the case of using a GPU and running out of memory while using 'tensorflow'  reduce the
     #' batch size or restart R and switch to use cpu only via `set_config_cpu_only`. In general,
-    #' not relevant for 'pytorch'.       #'
+    #' not relevant for 'pytorch'.
     #' @param raw_text `vector` containing the raw texts.
     #' @param doc_id `vector` containing the corresponding IDs for every text.
     #' @param batch_size `int` determining the maximal size of every batch.
@@ -1056,6 +1056,7 @@ TextEmbeddingModel <- R6::R6Class(
             package = "aifeducation"
           ))
           pooling <- py$GlobalAveragePooling1D_PT()
+          pooling$eval()
         } else if (private$transformer_components$ml_framework == "tensorflow") {
           pooling <- keras$layers$GlobalAveragePooling1D()
         }
@@ -1130,7 +1131,6 @@ TextEmbeddingModel <- R6::R6Class(
           # Calculate tensors
           tokens$encodings$set_format(type = "torch")
 
-
           with(
             data = torch$no_grad(), {
               if (private$basic_components$method == AIFETrType$mpnet) {
@@ -1151,7 +1151,7 @@ TextEmbeddingModel <- R6::R6Class(
           )
 
           if (private$transformer_components$emb_pool_type == "average") {
-            # Average Pooling over all tokens
+            # Average Pooling over all tokens of a layer
             for (i in tmp_selected_layer) {
               tensor_embeddings[i] <- list(pooling(
                 x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
