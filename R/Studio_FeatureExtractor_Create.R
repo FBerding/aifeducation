@@ -83,7 +83,7 @@ FeatureExtractors_Create_UI <- function(id) {
             ),
             shiny::selectInput(
               inputId = shiny::NS(id, "method"),
-              label = "Optimizer",
+              label = "Method",
               choices = c("conv", "lstm", "dense")
             ),
             shiny::sliderInput(
