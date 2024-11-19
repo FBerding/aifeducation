@@ -1052,7 +1052,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       if (private$transformer_components$emb_pool_type == "average") {
         if (private$transformer_components$ml_framework == "pytorch") {
-          reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+          reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
             package = "aifeducation"
           ))
           pooling <- py$GlobalAveragePooling1D_PT()

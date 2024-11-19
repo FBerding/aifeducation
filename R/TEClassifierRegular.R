@@ -771,6 +771,7 @@ TEClassifierRegular <- R6::R6Class(
         }
       }
 
+
       # Transforming predictions to target levels------------------------------
       predictions <- as.character(as.vector(predictions))
       for (i in 0:(length(self$model_config$target_levels) - 1)) {

@@ -95,3 +95,21 @@ check_type <- function(object, type = "bool", allow_NULL = FALSE) {
     }
   }
 }
+
+#' @title Check numpy array to be writable
+#' @description Function for checking if a numpy array is writable.
+#'
+#' @param np_array A numpy array.
+#' @return Function returns `TRUE` if the numpy array is writable. It retuns `FALSE`
+#' if the array is not writable.
+#'
+#' @family Utils
+#' @keywords internal
+#' @noRd
+#'
+numpy_writeable <- function(np_array) {
+  if(!inherits(x=np_array,what=c("numpy.ndarray"))){
+    stop("Provided object is no numpy array")
+  }
+return(reticulate::py_to_r(np_array$flags["WRITEABLE"]))
+}

@@ -53,7 +53,7 @@ if(Sys.getenv("CI")=="true"){
   )
 } else {
   ml_frameworks <- c(
-    "tensorflow",
+    #"tensorflow",
     "pytorch"
   )
 }
