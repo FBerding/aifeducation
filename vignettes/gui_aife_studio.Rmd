@@ -973,6 +973,50 @@ clicking on *Save*
 > the vignette [03 Sharing and Using Trained
 > AI/Models](sharing_and_publishing.html).
 
+## 3.5 Extensions
+
+### 3.5.1 Feature Extractors
+
+Another option to increase model's performance and/or to increase computational speed
+is to apply a feature extractor. For example, the work by Ganesan et al. (2021) indicates that
+a reduction of the hidden size can increase models accuracy. In *aifeducation* a feature extractor is a model
+that tries to reduce the number of features of given text embeddings before feeding
+the embeddings as input to a classifier. 
+
+You can create a feature extractor as follows in Figure 30 (*Create* tab in the tab *Feature Extractors*).
+
+![Figure 30: Basic architecure of feature extractors](img_articles/gui/FE_Create_Fill_fields.png){width="100%"}
+
+First, you need to choose embeddings that you can see after choosing in box *Input Data*
+(*Choose Embeddings* button on the *Control Panel*). You can specify name and label of the model in *Model Name* and *Model Label* fields respectively.
+
+Specify an architecture and training settings in *Architecture* and *Training Settings* boxes.
+
+-   *Target Features* determines the number of features for the compressed representation. The
+lower the number the higher is the requested compression. This value corresponds to
+the features of the latent space in the Figure above.
+
+-   With *Method* you determine the type of layer the feature extractor should use. 
+If set "lstm" all layers of the model are long short-term memory layers.
+If set "dense" all layers are standard dense layers. If you set "conv"
+all layers are convolutional layers.
+
+-   With *Noise Factor* you can add some noise during training making the feature extractor
+to an denoising auto encoder which can provide more robust generalizations.
+
+When you are ready,
+to start training just click on the *Train Model* button. Then you have to choose a path to a folder and a folder name, where you want to store the model.
+
+Please note that training a
+classifier can take up to several hours. You can see a progress on the progress bars.
+
+After you have trained your feature extractor you can use it for every classifier.
+Just pass the feature extractor path to *Feature Extractor* during configuration of the
+classifier (Figure 23).
+
+That all. Now you can use and train the classifier in the same way as without
+a feature extractor.
+
 # References
 
 Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
