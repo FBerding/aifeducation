@@ -1,10 +1,7 @@
+testthat::skip_on_cran()
 testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
   message = "Necessary python modules not available"
-)
-testthat::skip_if_not(
-  condition = dir.exists(testthat::test_path("test_data/classifier/feature_extractor_pytorch")),
-  message = "Feature Extractor for tests not available"
 )
 
 # Skip Tests
@@ -12,11 +9,21 @@ skip_creation_test <- FALSE
 skip_method_save_load<-FALSE
 skip_function_save_load<-FALSE
 skip_training_test <- FALSE
-skip_overfitting_test <- FALSE
 skip_classification_embedding<-FALSE
 skip_plot<-FALSE
 skip_documentation<-FALSE
 class_range=c(2,3)
+
+#can be set to all
+local_samples=50
+#Git Hub specific
+n_git_samples=50
+
+if(Sys.getenv("CI")=="true"){
+  skip_overfitting_test <- TRUE
+} else {
+  skip_overfitting_test <- FALSE
+}
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -25,6 +32,8 @@ root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
 create_dir(root_path_results, FALSE)
+root_path_feature_extractor<-testthat::test_path("test_data_tmp/classifier/feature_extractor_pytorch")
+
 # SetUp datasets
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
@@ -65,10 +74,22 @@ pl_list <- list(FALSE, TRUE)
 
 # Load feature extractors
 feature_extractor_list <- NULL
-feature_extractor_list["pytorch"] <- list(list(
-  load_from_disk(paste0(root_path_data, "/feature_extractor_pytorch")),
-  NULL
-))
+feature_extractor_list["tensorflow"] <- list(list(NULL))
+
+if (file.exists(root_path_feature_extractor)) {
+  feature_extractor_list["pytorch"] <- list(
+    list(
+      load_from_disk(root_path_feature_extractor),
+      NULL
+    )
+  )
+} else {
+  feature_extractor_list["pytorch"] <- list(
+    list(
+      NULL
+    )
+  )
+}
 
 # Prepare data for different classification types---------------------------
 target_data<-NULL
@@ -97,10 +118,7 @@ for(n_classes in class_range){
   target_levels[n_classes]<-list(tmp_target_levels)
 }
 
-#can be set to all
-local_samples="all"
-#Git Hub specific
-n_git_samples=50
+
 
 for (framework in ml_frameworks) {
 

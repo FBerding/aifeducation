@@ -1,27 +1,36 @@
-testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE, check = "all"),
-  message = "Necessary python modules not available"
-)
+testthat::skip_on_cran()
+if(Sys.getenv("CI")=="true"){
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+    message = "Necessary python modules not available"
+  )
+} else {
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "all"),
+    message = "Necessary python modules not available"
+  )
+}
 
 # Skip Tests
 skip_creation_test <- FALSE
 skip_method_save_load<-FALSE
 skip_function_save_load<-FALSE
 skip_training_test <- FALSE
-skip_overfitting_test <- FALSE
 skip_documentation<-FALSE
 class_range=c(2,3)
 
 #Can be set to "all"
-local_samples=3
+local_samples=50
 
 # Git Hub specific
 n_git_samples <- 50
 
 if(Sys.getenv("CI")=="true"){
   include_tensorflow <- FALSE
+  skip_overfitting_test <- TRUE
 } else {
   include_tensorflow <- TRUE
+  skip_overfitting_test <- FALSE
 }
 
 

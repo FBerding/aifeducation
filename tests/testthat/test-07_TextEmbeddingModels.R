@@ -1,7 +1,15 @@
-testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check="all"),
-  message = "Necessary python modules not available"
-)
+testthat::skip_on_cran()
+if(Sys.getenv("CI")=="true"){
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+    message = "Necessary python modules not available"
+  )
+} else {
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "all"),
+    message = "Necessary python modules not available"
+  )
+}
 testthat::skip_if_not(
   condition = dir.exists(testthat::test_path("test_data_tmp/TEM")),
   message = "Base models for tests not available"
