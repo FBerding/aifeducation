@@ -26,7 +26,7 @@ set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 
 #config trace
-trace=TRUE
+trace=FALSE
 
 test_art_path <- testthat::test_path("test_artefacts")
 test_art_tmp_path <- testthat::test_path("test_artefacts/base_models")
@@ -385,8 +385,7 @@ for (framework in ml_frameworks) {
               sustain_interval = 15,
               trace = trace
             )
-          Sys.sleep(3)
-
+          Sys.sleep(5)
           expect_no_error(
             base_model$train(
               ml_framework = framework,
@@ -411,7 +410,7 @@ for (framework in ml_frameworks) {
               pytorch_trace = as.numeric(trace)
             )
           )
-          Sys.sleep(3)
+          Sys.sleep(5)
           expect_no_error(
             base_model$train(
               ml_framework = framework,
@@ -457,7 +456,7 @@ for (framework in ml_frameworks) {
               sustain_interval = 15,
               trace = trace
             )
-          Sys.sleep(3)
+          Sys.sleep(5)
 
           expect_no_error(
             base_model$train(
