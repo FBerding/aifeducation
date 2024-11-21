@@ -26,7 +26,7 @@ set_config_tf_logger("ERROR")
 set_config_os_environ_logger("ERROR")
 
 #config trace
-trace=FALSE
+trace=TRUE
 
 test_art_path <- testthat::test_path("test_artefacts")
 test_art_tmp_path <- testthat::test_path("test_artefacts/base_models")
