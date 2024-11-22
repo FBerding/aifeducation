@@ -60,12 +60,15 @@ Other Transformers for developers:
 Regardless of the transformer, the following parameters are always included:
 \itemize{
 \item \code{ml_framework}
+\item \code{text_dataset}
 \item \code{sustain_track}
 \item \code{sustain_iso_code}
 \item \code{sustain_region}
 \item \code{sustain_interval}
 \item \code{trace}
 \item \code{pytorch_safetensors}
+\item \code{log_dir}
+\item \code{log_write_interval}
 }
 }
 
@@ -74,7 +77,6 @@ Regardless of the transformer, the following parameters are always included:
 In the case of \strong{create} it also contains (see \code{create}-method for details):
 \itemize{
 \item \code{model_dir}
-\item \code{vocab_raw_texts}
 \item \code{vocab_size}
 \item \code{max_position_embeddings}
 \item \code{hidden_size}
@@ -89,7 +91,6 @@ In the case of \strong{train} it also contains (see \code{train}-method for deta
 \itemize{
 \item \code{output_dir}
 \item \code{model_dir_path}
-\item \code{raw_texts}
 \item \code{p_mask}
 \item \code{whole_word}
 \item \code{val_size}
@@ -446,13 +447,27 @@ This method returns nothing.
 This method creates a transformer configuration based on the child-transformer architecture and a
 vocabulary using the python libraries \code{transformers} and \code{tokenizers}.
 
-This method \strong{adds} \code{raw_text_dataset} and \code{pt_safe_save}, \strong{uses} \code{tokenizer} temporary parameters of the
-\code{temp} list.
+This method \strong{adds} the following parameters to the \code{temp} list:
+\itemize{
+\item \code{log_file}
+\item \code{raw_text_dataset}
+\item \code{pt_safe_save}
+\item \code{value_top}
+\item \code{total_top}
+\item \code{message_top}
+}
+
+This method \strong{uses} the following parameters from the \code{temp} list:
+\itemize{
+\item \code{log_file}
+\item \code{raw_text_dataset}
+\item \code{tokenizer}
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$create(
   ml_framework,
   model_dir,
-  vocab_raw_texts,
+  text_dataset,
   vocab_size,
   max_position_embeddings,
   hidden_size,
@@ -466,7 +481,9 @@ This method \strong{adds} \code{raw_text_dataset} and \code{pt_safe_save}, \stro
   sustain_region,
   sustain_interval,
   trace,
-  pytorch_safetensors
+  pytorch_safetensors,
+  log_dir,
+  log_write_interval
 )}\if{html}{\out{</div>}}
 }
 
@@ -481,7 +498,7 @@ This method \strong{adds} \code{raw_text_dataset} and \code{pt_safe_save}, \stro
 
 \item{\code{model_dir}}{\code{string} Path to the directory where the model should be saved.}
 
-\item{\code{vocab_raw_texts}}{\code{vector} containing the raw texts for creating the vocabulary.}
+\item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
 
 \item{\code{vocab_size}}{\code{int} Size of the vocabulary.}
 
@@ -518,6 +535,11 @@ information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 \item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
 \item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
 }}
+
+\item{\code{log_dir}}{Path to the directory where the log files should be saved.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
+if \code{log_dir} is not \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -533,14 +555,33 @@ model to disk.
 This method can be used to train or fine-tune a transformer based on \code{BERT} architecture with the
 help of the python libraries \code{transformers}, \code{datasets}, and \code{tokenizers}.
 
-This method \strong{adds} \code{from_pt}, \code{from_tf}, \code{load_safe} and \code{pt_safe_save}, \strong{uses} \code{tokenized_dataset} and
-\code{tokenizer} temporary parameters of the \code{temp} list.
+This method \strong{adds} the following parameters to the \code{temp} list:
+\itemize{
+\item \code{log_file}
+\item \code{loss_file}
+\item \code{from_pt}
+\item \code{from_tf}
+\item \code{load_safe}
+\item \code{raw_text_dataset}
+\item \code{pt_safe_save}
+\item \code{value_top}
+\item \code{total_top}
+\item \code{message_top}
+}
+
+This method \strong{uses} the following parameters from the \code{temp} list:
+\itemize{
+\item \code{log_file}
+\item \code{raw_text_dataset}
+\item \code{tokenized_dataset}
+\item \code{tokenizer}
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$train(
   ml_framework,
   output_dir,
   model_dir_path,
-  raw_texts,
+  text_dataset,
   p_mask,
   whole_word,
   val_size,
@@ -559,7 +600,9 @@ This method \strong{adds} \code{from_pt}, \code{from_tf}, \code{load_safe} and \
   trace,
   keras_trace,
   pytorch_trace,
-  pytorch_safetensors
+  pytorch_safetensors,
+  log_dir,
+  log_write_interval
 )}\if{html}{\out{</div>}}
 }
 
@@ -577,7 +620,7 @@ created.}
 
 \item{\code{model_dir_path}}{\code{string} Path to the directory where the original model is stored.}
 
-\item{\code{raw_texts}}{\code{vector} containing the raw texts for training.}
+\item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
 
 \item{\code{p_mask}}{\code{double} Ratio that determines the number of words/tokens used for masking.}
 
@@ -636,6 +679,11 @@ information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 \item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
 \item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
 }}
+
+\item{\code{log_dir}}{Path to the directory where the log files should be saved.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
+if \code{log_dir} is not \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }

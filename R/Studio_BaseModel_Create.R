@@ -6,6 +6,7 @@
 #'
 #' @family studio_gui_page_base_model_create
 #' @keywords internal
+#' @noRd
 #'
 BaseModel_Create_UI <- function(id) {
   ns <- shiny::NS(id)
@@ -52,6 +53,7 @@ BaseModel_Create_UI <- function(id) {
 #'
 #' @family studio_gui_page_base_model_create
 #' @keywords internal
+#' @noRd
 #'
 BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
   shiny::moduleServer(id, function(input, output, session) {

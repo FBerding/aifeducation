@@ -6,6 +6,7 @@
 #'
 #' @family studio_gui_base_model_train_card_base_model
 #' @keywords internal
+#' @noRd
 #'
 BaseModel_UI <- function(id) {
   ns <- shiny::NS(id)
@@ -34,6 +35,7 @@ BaseModel_UI <- function(id) {
 #'
 #' @family studio_gui_base_model_train_card_base_model
 #' @keywords internal
+#' @noRd
 #'
 BaseModel_Server <- function(id, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

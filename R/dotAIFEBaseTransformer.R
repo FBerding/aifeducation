@@ -374,8 +374,8 @@
               train_dataset = self$temp$tokenized_dataset$train,
               eval_dataset = self$temp$tokenized_dataset$test,
               args = training_args,
-              data_collator = self$temp$data_collator,
-              tokenizer = self$temp$tokenizer
+              data_collator = self$temp$data_collator#,
+              #tokenizer = self$temp$tokenizer
             )
             print("d1")
 

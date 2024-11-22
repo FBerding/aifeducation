@@ -108,7 +108,7 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 \if{html}{\out{<div class="r">}}\preformatted{.AIFELongformerTransformer$create(
   ml_framework = "pytorch",
   model_dir,
-  vocab_raw_texts = NULL,
+  text_dataset,
   vocab_size = 30522,
   add_prefix_space = FALSE,
   trim_offsets = TRUE,
@@ -126,7 +126,9 @@ This method adds the following \emph{'dependent' parameters} to the base class's
   sustain_region = NULL,
   sustain_interval = 15,
   trace = TRUE,
-  pytorch_safetensors = TRUE
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
 )}\if{html}{\out{</div>}}
 }
 
@@ -141,7 +143,7 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 
 \item{\code{model_dir}}{\code{string} Path to the directory where the model should be saved.}
 
-\item{\code{vocab_raw_texts}}{\code{vector} containing the raw texts for creating the vocabulary.}
+\item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
 
 \item{\code{vocab_size}}{\code{int} Size of the vocabulary.}
 
@@ -186,6 +188,11 @@ information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 \item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
 \item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
 }}
+
+\item{\code{log_dir}}{Path to the directory where the log files should be saved.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
+if \code{log_dir} is not \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -205,7 +212,7 @@ architecture with the help of the python libraries \code{transformers}, \code{da
   ml_framework = "pytorch",
   output_dir,
   model_dir_path,
-  raw_texts,
+  text_dataset,
   p_mask = 0.15,
   val_size = 0.1,
   n_epoch = 1,
@@ -223,7 +230,9 @@ architecture with the help of the python libraries \code{transformers}, \code{da
   trace = TRUE,
   keras_trace = 1,
   pytorch_trace = 1,
-  pytorch_safetensors = TRUE
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
 )}\if{html}{\out{</div>}}
 }
 
@@ -241,7 +250,7 @@ created.}
 
 \item{\code{model_dir_path}}{\code{string} Path to the directory where the original model is stored.}
 
-\item{\code{raw_texts}}{\code{vector} containing the raw texts for training.}
+\item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
 
 \item{\code{p_mask}}{\code{double} Ratio that determines the number of words/tokens used for masking.}
 
@@ -294,6 +303,11 @@ information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
 \item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
 \item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
 }}
+
+\item{\code{log_dir}}{Path to the directory where the log files should be saved.}
+
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
+if \code{log_dir} is not \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }

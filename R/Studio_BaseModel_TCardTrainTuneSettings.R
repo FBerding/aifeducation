@@ -6,6 +6,7 @@
 #'
 #' @family studio_gui_base_model_train_card_train_tune_settings
 #' @keywords internal
+#' @noRd
 #'
 TrainTuneSettings_UI <- function(id) {
   ns <- shiny::NS(id)
@@ -24,6 +25,7 @@ TrainTuneSettings_UI <- function(id) {
 #'
 #' @family studio_gui_base_model_train_card_train_tune_settings
 #' @keywords internal
+#' @noRd
 #'
 TrainTuneSettings_Server <- function(id, model_architecture) {
   shiny::moduleServer(id, function(input, output, session) {
@@ -34,7 +36,7 @@ TrainTuneSettings_Server <- function(id, model_architecture) {
     train_tune_settings_ui <- shiny::eventReactive(model_architecture(), {
       model_architecture <- model_architecture()
 
-      if (class(model_architecture) == "errors" || !model_architecture$model_exists) {
+      if (inherits(x=model_architecture,what = "errors") || !model_architecture$model_exists) {
         return(NULL)
       }
 
@@ -179,7 +181,7 @@ TrainTuneSettings_Server <- function(id, model_architecture) {
     params_reactive <- shiny::reactive({
       model_architecture <- model_architecture()
 
-      if (class(model_architecture) == "errors" || !model_architecture$model_exists) {
+      if (inherits(x=model_architecture,what = "errors") || !model_architecture$model_exists) {
         return(NULL)
       }
 

@@ -27,8 +27,12 @@ long_add_texts_to_dataset <- function(source_path,
                                       excel_url_license_column,
                                       excel_text_license_column,
                                       excel_url_source_column,
-                                      log_write_interval = 2) {
+                                      log_write_interval = 2,
+                                      current_conda_env) {
   promises::future_promise({
+    #Set up conda env
+    reticulate::use_condaenv(condaenv = current_conda_env)
+
     # Set up top level progress monitoring
     top_total <- include_txt + include_pdf + include_xlsx
     top_value <- 0
@@ -108,8 +112,12 @@ long_transform_text_to_embeddings <- function(source_path,
                                               log_path,
                                               batch_size,
                                               model_path,
-                                              log_write_interval = 2) {
+                                              log_write_interval = 2,
+                                              current_conda_env) {
   promises::future_promise({
+    #Set up conda env
+    reticulate::use_condaenv(condaenv = current_conda_env)
+
     # Read the large data set for raw texts
     raw_texts <- load_from_disk(source_path)
 
@@ -196,8 +204,12 @@ long_classifier <- function(classifier_type,
                             loss_margin,
                             sampling_separate,
                             sampling_shuffle,
-                            n_cores) {
+                            n_cores,
+                            current_conda_env) {
   promises::future_promise({
+    #Set up conda env
+    reticulate::use_condaenv(condaenv = current_conda_env)
+
     # Load data
     embeddings <- load_from_disk(path_to_embeddings)
     target_data <- long_load_target_data(
@@ -426,8 +438,12 @@ long_feature_extractor <- function(name,
                                    log_write_interval,
                                    path_to_embeddings,
                                    destination_path,
-                                   folder_name) {
+                                   folder_name,
+                                   current_conda_env) {
   promises::future_promise({
+    #Set up conda env
+    reticulate::use_condaenv(condaenv = current_conda_env)
+
     # Load data
     embeddings <- load_from_disk(path_to_embeddings)
 
@@ -488,8 +504,12 @@ long_feature_extractor <- function(name,
 
 # Transformers =====================================================================
 
-long_create_transformer <- function(transformer_type, dataset_dir_path, params) {
+long_create_transformer <- function(transformer_type, dataset_dir_path, params,
+                                    current_conda_env) {
   promises::future_promise({
+    #Set up conda env
+    reticulate::use_condaenv(condaenv = current_conda_env)
+
     text_dataset <- LargeDataSetForText$new()
     text_dataset$load_from_disk(dataset_dir_path)
 
@@ -501,8 +521,12 @@ long_create_transformer <- function(transformer_type, dataset_dir_path, params) 
   })
 }
 
-long_train_transformer <- function(transformer_type, dataset_dir_path, params) {
+long_train_transformer <- function(transformer_type, dataset_dir_path, params,
+                                   current_conda_env) {
   promises::future_promise({
+    #Set up conda env
+    reticulate::use_condaenv(condaenv = current_conda_env)
+
     text_dataset <- LargeDataSetForText$new()
     text_dataset$load_from_disk(dataset_dir_path)
 

@@ -6,6 +6,7 @@
 #'
 #' @family studio_gui_base_model_create_card_architecture
 #' @keywords internal
+#' @noRd
 #'
 ModelArchitecture_UI <- function(id) {
   ns <- shiny::NS(id)
@@ -139,6 +140,7 @@ ModelArchitecture_UI <- function(id) {
 #'
 #' @family studio_gui_base_model_create_card_architecture
 #' @keywords internal
+#' @noRd
 #'
 ModelArchitecture_Server <- function(id, volumes) {
   shiny::moduleServer(id, function(input, output, session) {

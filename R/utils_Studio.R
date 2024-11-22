@@ -703,7 +703,7 @@ prepare_training_history <- function(model,
 
   # Get information about the existence of a training, validation, and test data set
   # Get Number of folds for the request
-  if (final==FALSE) {
+  if (final == FALSE) {
     n_folds <- length(model$last_training$history) - 1
     measures <- names(plot_data[[1]])
     if (!use_pl) {
@@ -714,7 +714,7 @@ prepare_training_history <- function(model,
   } else {
     n_folds <- 1
     measures <- names(plot_data[[index_final]])
-    if (use_pl==FALSE) {
+    if (use_pl == FALSE) {
       n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
     } else {
       n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
@@ -759,9 +759,9 @@ prepare_training_history <- function(model,
     )
     final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
 
-    if (final==FALSE) {
+    if (final == FALSE) {
       for (i in 1:n_folds) {
-        if (use_pl==FALSE) {
+        if (use_pl == FALSE) {
           measure_array[i, , ] <- plot_data[[i]][[measure]]
         } else {
           measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
@@ -921,16 +921,21 @@ check_and_prepare_for_studio <- function() {
       }
     }
   } else {
-    message("Python is initalized. Try to start Aifeducation Studio with the current environment.")
+    current_conda_session <- get_current_conda_env()
+    message(paste(
+      "Python is already initalized with the conda environment",
+      "'",current_conda_session, "'.",
+      "Try to start Aifeducation Studio with the current environment."
+    ))
   }
 
-  message("Checking machine learning frameworks.")
+  message("Checking pytorch machine learning framework.")
   available_ml_frameworks <- NULL
   if (check_aif_py_modules(trace = FALSE, check = "pytorch")) {
     available_ml_frameworks <- append(available_ml_frameworks, values = "pytorch")
   }
   if (is.null(available_ml_frameworks)) {
-    stop("No available machine learning frameworks found.")
+    stop("No pytorch machine learning frameworks found.")
   }
 
   # Set Transformer Logger to Error
@@ -989,8 +994,8 @@ generate_doc_input_licensing_editor <- function(ns, model) {
 #' @keywords internal
 #' @noRd
 #'
-replace_null_with_na<-function(value){
-  if(is.null(value)){
+replace_null_with_na <- function(value) {
+  if (is.null(value)) {
     return(NA)
   } else {
     return(value)
@@ -1006,10 +1011,12 @@ replace_null_with_na<-function(value){
 #' @keywords internal
 #' @noRd
 #'
-replace_null_with_na<-function(value){
-  if(is.null(value)){
+replace_null_with_na <- function(value) {
+  if (is.null(value)) {
     return(NA)
   } else {
     return(value)
   }
 }
+
+
