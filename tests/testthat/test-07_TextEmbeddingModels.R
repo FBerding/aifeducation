@@ -9,6 +9,10 @@ if(Sys.getenv("CI")=="true"){
     condition = check_aif_py_modules(trace = FALSE,check = "all"),
     message = "Necessary python modules not available"
   )
+  # SetUp tensorflow
+  aifeducation::set_config_gpu_low_memory()
+  set_config_tf_logger("ERROR")
+  set_config_os_environ_logger("ERROR")
 }
 testthat::skip_if_not(
   condition = dir.exists(testthat::test_path("test_data_tmp/TEM")),
@@ -22,11 +26,6 @@ create_dir(testthat::test_path("test_artefacts"), FALSE)
 
 root_path_results <- testthat::test_path("test_artefacts/TEM")
 create_dir(root_path_results, FALSE)
-
-# SetUp tensorflow
-aifeducation::set_config_gpu_low_memory()
-set_config_tf_logger("ERROR")
-set_config_os_environ_logger("ERROR")
 
 # SetUp datasets
 # Disable tqdm progressbar

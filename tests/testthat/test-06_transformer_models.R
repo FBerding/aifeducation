@@ -9,21 +9,20 @@ if(Sys.getenv("CI")=="true"){
     condition = check_aif_py_modules(trace = FALSE,check = "all"),
     message = "Necessary python modules not available"
   )
+
+  # SetUp tensorflow
+  aifeducation::set_config_gpu_low_memory()
+  set_config_tf_logger("ERROR")
+  set_config_os_environ_logger("ERROR")
 }
 
-
-set_config_gpu_low_memory()
+#Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
-
-# SetUp tensorflow
-aifeducation::set_config_gpu_low_memory()
-set_config_tf_logger("ERROR")
-set_config_os_environ_logger("ERROR")
 
 #config trace
 trace=FALSE
