@@ -9,6 +9,10 @@ if(Sys.getenv("CI")=="true"){
     condition = check_aif_py_modules(trace = FALSE,check = "all"),
     message = "Necessary python modules not available"
   )
+  # SetUp tensorflow
+  aifeducation::set_config_gpu_low_memory()
+  set_config_tf_logger("ERROR")
+  set_config_os_environ_logger("ERROR")
 }
 
 # Skip Tests
@@ -48,11 +52,6 @@ root_path_feature_extractor<-testthat::test_path("test_data_tmp/classifier/featu
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
-
-# SetUp tensorflow
-aifeducation::set_config_gpu_low_memory()
-set_config_tf_logger("ERROR")
-set_config_os_environ_logger("ERROR")
 
 # Load Embeddings
 imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
