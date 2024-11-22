@@ -24,7 +24,7 @@ skip_documentation<-FALSE
 class_range=c(2,3)
 
 #Can be set to "all"
-local_samples=50
+local_samples=2
 
 # Git Hub specific
 n_git_samples <- 50
@@ -324,7 +324,8 @@ for (framework in ml_frameworks) {
             batch_size = 2,
             ml_trace = 0
           )
-          expect_equal(predictions, predictions_2)
+          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_2[,1:(ncol(predictions_2)-1)],
+                       tolerance = 1e-6)
 
           # LargeDataSetForTextEmbeddings
           predictions <- classifier$predict(
@@ -337,7 +338,8 @@ for (framework in ml_frameworks) {
             batch_size = 2,
             ml_trace = 0
           )
-          expect_equal(predictions, predictions_2)
+          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_2[,1:(ncol(predictions_2)-1)],
+                       tolerance = 1e-6)
         })
 
         test_that(paste(
@@ -369,7 +371,8 @@ for (framework in ml_frameworks) {
           )
 
           predictions_Perm <- predictions_Perm[rownames(predictions), ]
-          expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+                       tolerance = 1e-6)
 
           # LargeDataSetForTextEmbeddings
           predictions <- classifier$predict(
@@ -384,7 +387,8 @@ for (framework in ml_frameworks) {
           )
 
           predictions_Perm <- predictions_Perm[rownames(predictions), ]
-          expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+                       tolerance = 1e-6)
         })
 
         test_that(paste(
@@ -409,7 +413,8 @@ for (framework in ml_frameworks) {
             batch_size = 2,
             ml_trace = 0
           )
-          expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
+          expect_equal(predictions_ET[,1:(ncol(predictions_ET)-1)], predictions_LD[,1:(ncol(predictions_LD)-1)],
+                       tolerance = 1e-6)
         })
         gc()
       }

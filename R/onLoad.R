@@ -41,3 +41,9 @@ packageStartupMessage(
   is available on CRAN or GitHub. Please refer to news for more details.",
   appendLF = TRUE
 )
+
+packageStartupMessage(
+  "Future Warning: With releasing version 1.1.0 of this package tensorflow support will be
+  removed.",
+  appendLF = TRUE
+)

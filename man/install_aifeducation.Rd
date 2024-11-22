@@ -4,13 +4,11 @@
 \alias{install_aifeducation}
 \title{Install aifeducation on a machine}
 \usage{
-install_aifeducation(install_aifeducation_studio = TRUE, cpu_only = FALSE)
+install_aifeducation(install_aifeducation_studio = TRUE)
 }
 \arguments{
 \item{install_aifeducation_studio}{\code{bool} If \code{TRUE} all necessary R packages are installed for using AI for Education
 Studio.}
-
-\item{cpu_only}{\code{bool} \code{TRUE} installs the cpu only version of the machine learning frameworks.}
 }
 \value{
 Function does nothing return. It installes python, optional R packages, and necessary 'python' packages on a
