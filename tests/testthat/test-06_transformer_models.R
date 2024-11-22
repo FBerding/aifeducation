@@ -363,6 +363,7 @@ for (framework in ml_frameworks) {
 
       # Training of the Model ----
       test_that(paste0(ai_method, ": training of the model with ", framework), {
+        print("train")
         if (ai_method == AIFETrType$bert) {
 
           base_model<-aife_transformer_maker$make(ai_method)
@@ -386,6 +387,7 @@ for (framework in ml_frameworks) {
               trace = trace
             )
           Sys.sleep(5)
+          print("test_a")
           expect_no_error(
             base_model$train(
               ml_framework = framework,
@@ -411,6 +413,7 @@ for (framework in ml_frameworks) {
             )
           )
           Sys.sleep(5)
+          print("test_b")
           expect_no_error(
             base_model$train(
               ml_framework = framework,

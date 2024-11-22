@@ -205,6 +205,7 @@
       # SFT: create_chunks_for_training ---------------------------------------------
       if (!is.function(private$steps_for_training$create_chunks_for_training)) {
         private$steps_for_training$create_chunks_for_training <- function(self) {
+          print("a")
           tokenized_texts_raw <- tokenize_dataset(
             dataset = self$temp$raw_text_dataset,
             tokenizer = self$temp$tokenizer,
@@ -215,6 +216,7 @@
             total_top = self$temp$total_top,
             message_top = self$temp$message_top
           )
+          print("a1")
 
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
@@ -242,19 +244,23 @@
         # For mpnet transformer see AIFEMpnetTransformer -> SFT -> create_data_collator
         private$steps_for_training$create_data_collator <- function(self) {
           if (self$params$whole_word) {
+            print("b")
             self$temp$data_collator <- transformers$DataCollatorForWholeWordMask(
               tokenizer = self$temp$tokenizer,
               mlm = TRUE,
               mlm_probability = self$params$p_mask,
               return_tensors = self$temp$return_tensors
             )
+            print("b1")
           } else {
+            print("c")
             self$temp$data_collator <- transformers$DataCollatorForLanguageModeling(
               tokenizer = self$temp$tokenizer,
               mlm = TRUE,
               mlm_probability = self$params$p_mask,
               return_tensors = self$temp$return_tensors
             )
+            print("c1")
           }
         }
       }
@@ -362,6 +368,7 @@
               disable_tqdm = !self$params$pytorch_trace
             )
 
+            print("d")
             self$temp$trainer <- transformers$Trainer(
               model = self$temp$model,
               train_dataset = self$temp$tokenized_dataset$train,
@@ -370,6 +377,7 @@
               data_collator = self$temp$data_collator,
               tokenizer = self$temp$tokenizer
             )
+            print("d1")
 
             self$temp$trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
             if (!as.logical(self$params$pytorch_trace)) {
@@ -874,6 +882,7 @@
 
         # Calculate tokenizer statistics -------------------------------------------
 
+        print("e")
         tokenized_texts_raw <- tokenize_dataset(
           dataset = self$temp$raw_text_dataset,
           tokenizer = self$temp$tokenizer,
@@ -883,6 +892,7 @@
           value_top = 5, total_top = total,
           message_top = paste(private$title, "Overall: Creating Final Tokenizer & Calculating Statistics")
         )
+        print("e1")
 
         private$update_tokenizer_statistics(tokenized_texts_raw, "creation")
 
