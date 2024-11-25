@@ -201,7 +201,7 @@ class FourierTransformation_PT(torch.nn.Module):
     
   def forward(self,x):
     #return torch.real(torch.fft.fft(torch.fft.fft(input=x,dim=2),dim=1))
-    return torch.real(torch.fft.fftn(input=x,dim=(-2, -1)))
+    return torch.real(torch.fft.fftn(input=x,dim=(-2, -1),norm="ortho"))
   
 class FourierEncoder_PT(torch.nn.Module):
   def __init__(self, dense_dim, features, dropout_rate):
