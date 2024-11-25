@@ -18,6 +18,7 @@ Function for generating an ID suffix for objects of class \link{TextEmbeddingMod
 }
 \seealso{
 Other Utils: 
+\code{\link{auto_n_cores}()},
 \code{\link{clean_pytorch_log_transformers}()},
 \code{\link{create_dir}()},
 \code{\link{get_file_extension}()},

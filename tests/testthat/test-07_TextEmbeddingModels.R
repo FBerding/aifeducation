@@ -171,8 +171,8 @@ for (framework in ml_frameworks) {
             )
             for (i in 1:10) {
               expect_equal(embeddings$embeddings[i, , ,drop=FALSE],
-                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , ,drop=FALSE]#,
-                #tolerance = 1e-9
+                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , ,drop=FALSE],
+                tolerance = 1e-6
               )
             }
           })

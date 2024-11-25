@@ -207,3 +207,26 @@ create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TR
 run_py_file <- function(py_file_name) {
   reticulate::py_run_file(system.file("python", py_file_name, package = "aifeducation"))
 }
+
+#' @title Number of cores for multiple tasks
+#' @description Function for getting the number of cores that should be used
+#' for parallel processing of tasks. The number of cores is set to 75 % of the
+#' available cores. If the environment variable `CI` is set to `"true"` or if the
+#' process is running on cran `2` is returned.
+#'
+#' @importFrom parallel detectCores
+#'
+#' @return Returns `int` as the number of cores.
+#'
+#' @family Utils
+#' @export
+auto_n_cores<-function(){
+  if(Sys.getenv("CI")=="true"|
+     Sys.getenv("NOT_CRAN")=="true"|
+     Sys.getenv("_R_CHECK_LIMIT_CORES_")=="true"){
+    n_cores=min(2,parallel::detectCores())
+  } else {
+    n_cores=floor(parallel::detectCores()*0.75)
+  }
+return(n_cores=max(1,n_cores))
+}

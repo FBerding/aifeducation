@@ -237,7 +237,7 @@ on the validation data set is used as the final model.
   ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
-  n_cores = 4
+  n_cores = auto_n_cores()
 )}\if{html}{\out{</div>}}
 }
 

@@ -367,7 +367,7 @@ TEClassifierRegular <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores=4) {
+                     n_cores=auto_n_cores()) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)

@@ -18,6 +18,7 @@ Used to run python files with \code{reticulate::py_run_file()} from folder \code
 }
 \seealso{
 Other Utils: 
+\code{\link{auto_n_cores}()},
 \code{\link{clean_pytorch_log_transformers}()},
 \code{\link{create_dir}()},
 \code{\link{generate_id}()},

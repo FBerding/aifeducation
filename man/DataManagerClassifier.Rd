@@ -88,7 +88,7 @@ Creating a new instance of this class.
   sc_min_k = 1,
   sc_max_k = 10,
   trace = TRUE,
-  n_cores = 4
+  n_cores = auto_n_cores()
 )}\if{html}{\out{</div>}}
 }
 

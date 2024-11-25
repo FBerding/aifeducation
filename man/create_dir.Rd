@@ -24,6 +24,7 @@ message if \code{trace} is \code{TRUE}.
 }
 \seealso{
 Other Utils: 
+\code{\link{auto_n_cores}()},
 \code{\link{clean_pytorch_log_transformers}()},
 \code{\link{generate_id}()},
 \code{\link{get_file_extension}()},

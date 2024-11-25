@@ -652,7 +652,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             sampling_separate=input$sampling_separate,
             sampling_shuffle=input$sampling_shuffle,
             embedding_dim = input$protonet_embedding_dim,
-            n_cores=4
+            n_cores=auto_n_cores()
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,

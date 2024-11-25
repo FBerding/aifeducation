@@ -342,7 +342,7 @@ TEClassifierProtoNet <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores=4) {
+                     n_cores=auto_n_cores()) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -456,7 +456,8 @@ TEClassifierProtoNet <- R6::R6Class(
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
-          trace = trace
+          trace = trace,
+          self$last_training$config$n_cores
         )
       } else {
         data_manager <- DataManagerClassifier$new(
@@ -470,7 +471,8 @@ TEClassifierProtoNet <- R6::R6Class(
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
-          trace = trace
+          trace = trace,
+          self$last_training$config$n_cores
         )
       }
 

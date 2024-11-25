@@ -348,6 +348,8 @@
             # Clear session to provide enough resources for computations ---------------
             tf$keras$backend$clear_session()
           } else { # PYTORCH ------------------
+
+            if(utils::compareVersion(transformers["__version__"],"4.46.0")>=0){
             training_args <- transformers$TrainingArguments(
               output_dir = paste0(self$params$output_dir, "/checkpoints"),
               overwrite_output_dir = TRUE,
@@ -367,17 +369,47 @@
               log_level = "error",
               disable_tqdm = !self$params$pytorch_trace
             )
+            } else {
+              training_args <- transformers$TrainingArguments(
+                output_dir = paste0(self$params$output_dir, "/checkpoints"),
+                overwrite_output_dir = TRUE,
+                evaluation_strategy  = "epoch",
+                num_train_epochs = as.integer(self$params$n_epoch),
+                logging_strategy = "epoch",
+                save_strategy = "epoch",
+                save_total_limit = as.integer(1),
+                load_best_model_at_end = TRUE,
+                optim = "adamw_torch",
+                learning_rate = self$params$learning_rate,
+                per_device_train_batch_size = as.integer(self$params$batch_size),
+                per_device_eval_batch_size = as.integer(self$params$batch_size),
+                save_safetensors = TRUE,
+                auto_find_batch_size = FALSE,
+                report_to = "none",
+                log_level = "error",
+                disable_tqdm = !self$params$pytorch_trace
+              )
+            }
 
-
-            self$temp$trainer <- transformers$Trainer(
-              model = self$temp$model,
-              train_dataset = self$temp$tokenized_dataset$train,
-              eval_dataset = self$temp$tokenized_dataset$test,
-              args = training_args,
-              data_collator = self$temp$data_collator#,
-              #tokenizer = self$temp$tokenizer
-            )
-
+            if(utils::compareVersion(transformers["__version__"],"4.46.0")>=0){
+              self$temp$trainer <- transformers$Trainer(
+                model = self$temp$model,
+                train_dataset = self$temp$tokenized_dataset$train,
+                eval_dataset = self$temp$tokenized_dataset$test,
+                args = training_args,
+                data_collator = self$temp$data_collator,
+                processing_class  = self$temp$tokenizer
+              )
+            } else {
+              self$temp$trainer <- transformers$Trainer(
+                model = self$temp$model,
+                train_dataset = self$temp$tokenized_dataset$train,
+                eval_dataset = self$temp$tokenized_dataset$test,
+                args = training_args,
+                data_collator = self$temp$data_collator,
+                tokenizer = self$temp$tokenizer
+              )
+            }
 
             self$temp$trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
             if (!as.logical(self$params$pytorch_trace)) {

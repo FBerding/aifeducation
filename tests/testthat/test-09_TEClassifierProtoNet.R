@@ -14,7 +14,7 @@ skip_plot<-FALSE
 skip_documentation<-FALSE
 class_range=c(2,3)
 
-#can be set to all
+#can be set to "all"
 local_samples=50
 #Git Hub specific
 n_git_samples=50
@@ -121,26 +121,6 @@ for(n_classes in class_range){
 
 
 for (framework in ml_frameworks) {
-
-    # Prepare data for different classification types---------------------------
-    example_data <- imdb_movie_reviews
-
-    rownames(example_data) <- rownames(test_embeddings$embeddings)
-    example_data$id <- rownames(test_embeddings$embeddings)
-    example_data <- example_data[intersect(
-      rownames(example_data), rownames(test_embeddings$embeddings)
-    ), ]
-
-    example_data$label <- as.character(example_data$label)
-    example_data$label[c(201:300)] <- NA
-    if (n_classes > 2) {
-      example_data$label[c(201:250)] <- "medium"
-      target_levels <- c("neg", "medium", "pos")
-    } else {
-      target_levels <- c("neg", "pos")
-    }
-    example_targets <- as.factor(example_data$label)
-    names(example_targets) <- example_data$id
 
     # Start Tests-------------------------------------------------------------------------------
     # Test creation and prediction of the classifier----------------------------
@@ -496,7 +476,7 @@ for (framework in ml_frameworks) {
               expect_no_error(
                 classifier$train(
                   data_embeddings = test_embeddings,
-                   data_targets = target_data[[n_classes]],
+                  data_targets = target_data[[n_classes]],
                   data_folds = 2,
                   use_sc = use_sc,
                   sc_method = "dbsmote",
@@ -780,7 +760,7 @@ for (framework in ml_frameworks) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          epochs = 100,
+          epochs = 300,
           batch_size = 32,
           dir_checkpoint = train_path,
           log_dir = train_path,

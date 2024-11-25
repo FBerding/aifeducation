@@ -24,7 +24,7 @@ skip_documentation<-FALSE
 class_range=c(2,3)
 
 #Can be set to "all"
-local_samples=2
+local_samples=50
 
 # Git Hub specific
 n_git_samples <- 50

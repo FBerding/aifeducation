@@ -17,6 +17,7 @@ Function for requesting the file extension
 }
 \seealso{
 Other Utils: 
+\code{\link{auto_n_cores}()},
 \code{\link{clean_pytorch_log_transformers}()},
 \code{\link{create_dir}()},
 \code{\link{generate_id}()},
