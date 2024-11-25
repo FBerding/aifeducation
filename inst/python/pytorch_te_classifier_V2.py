@@ -213,13 +213,15 @@ class FourierEncoder_PT(torch.nn.Module):
    
     self.attention=FourierTransformation_PT()
     self.dropout=torch.nn.Dropout(p=dropout_rate)
-    self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
+    #self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
+    self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.features)
     self.dense_proj=torch.nn.Sequential(
       torch.nn.Linear(in_features=self.features,out_features=self.dense_dim),
       torch.nn.GELU(),
       torch.nn.Linear(in_features=self.dense_dim,out_features=self.features)
     )
-    self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
+    #self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
+    self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.features)
     
   def forward(self,x):
     attention_output=self.attention(x)

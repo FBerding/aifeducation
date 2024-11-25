@@ -703,7 +703,7 @@ for (framework in ml_frameworks) {
         rec_layers <- 2
         dense_layers <- 2
         dense_size <- 10
-        rec_size <- 2
+        rec_size <- 10
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
         # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
