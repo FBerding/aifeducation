@@ -510,6 +510,14 @@ TEClassifierRegular <- R6::R6Class(
           stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
         }
+
+        if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
+          path_look_file=codecarbon$lock$LOCKFILE
+          if(file.exists(path_look_file)){
+            unlink(path_look_file)
+          }
+        }
+
         sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
           country_iso_code = sustain_iso_code,
           region = sustain_region,

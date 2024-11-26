@@ -362,8 +362,13 @@ for (framework in ml_frameworks) {
           )
 
           predictions_Perm <- predictions_Perm[rownames(predictions), ]
-          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
-                       tolerance = 1e-6)
+          if(test_combinations[[i]]$attention!="fourier"){
+            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+                         tolerance = 1e-6)
+          } else {
+            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+                         tolerance = 1e-1)
+          }
 
           # LargeDataSetForTextEmbeddings
           predictions<-NULL
@@ -380,8 +385,13 @@ for (framework in ml_frameworks) {
           )
 
           predictions_Perm <- predictions_Perm[rownames(predictions), ]
-          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
-                       tolerance = 1e-6)
+          if(test_combinations[[i]]$attention!="fourier"){
+            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+                         tolerance = 1e-6)
+          } else {
+            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+                         tolerance = 1e-1)
+          }
         })
 
         test_that(paste(

@@ -481,6 +481,12 @@
 
     # Creates a sustainability tracker and stores it in the private `sustainability_tracker` attribute
     create_sustain_tracker = function() {
+      if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
+        path_look_file=codecarbon$lock$LOCKFILE
+        if(file.exists(path_look_file)){
+          unlink(path_look_file)
+        }
+      }
       private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
         country_iso_code = self$params$sustain_iso_code,
         region = self$params$sustain_region,

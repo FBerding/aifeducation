@@ -165,6 +165,9 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       self.stride=1
       self.kernel_size=2
       
+      #dilation of 1 means no dilation
+      self.dilation=1
+      
       self.param_w1=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/2)),self.features_in,self.kernel_size))
       self.param_w2=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/2)),self.kernel_size))
       
@@ -185,18 +188,18 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
         x=torch.transpose(x, dim0=1, dim1=2)
         
         #Encoder
-        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride,padding='same'))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w1,stride=self.stride,padding='same',dilation=self.dilation))
 
         #Latent Space
-        latent_space=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride,padding='same'))
+        latent_space=torch.nn.functional.tanh(torch.nn.functional.conv1d(x,weight=self.param_w2,stride=self.stride,padding='same',dilation=self.dilation))
         latent_space=torch.transpose(latent_space, dim0=1, dim1=2)
         latent_space=~self.get_mask(latent_space)*latent_space
         latent_space=torch.transpose(latent_space, dim0=1, dim1=2)
 
         #Decoder
-        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(latent_space,weight=self.param_w2,stride=self.stride,padding=0,output_padding=0))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(latent_space,weight=self.param_w2,stride=self.stride,padding=0,output_padding=0,dilation=self.dilation))
         x=self.sequence_reduction(x)
-        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(x,weight=self.param_w1,stride=self.stride,padding=0,output_padding=0))
+        x=torch.nn.functional.tanh(torch.nn.functional.conv_transpose1d(x,weight=self.param_w1,stride=self.stride,padding=0,output_padding=0,dilation=self.dilation))
         x=self.sequence_reduction(x)
         
         #Change position of time and features

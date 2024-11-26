@@ -1,4 +1,3 @@
-testthat::skip()
 testthat::skip_on_cran()
 if(Sys.getenv("CI")=="true"){
   testthat::skip_if_not(
