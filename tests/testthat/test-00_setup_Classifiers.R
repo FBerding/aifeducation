@@ -1,6 +1,6 @@
 # This file does not contain any tests. It is used for creating FeatureExtractors
 # that can be used for testing Classifiers
-
+testthat::skip()
 testthat::skip_on_cran()
 
 testthat::skip_if_not(
