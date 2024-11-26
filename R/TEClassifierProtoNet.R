@@ -62,7 +62,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
     #' @param embedding_dim `int` determining the number of dimensions for the text embedding.
     #' @param attention_type `string` Choose the relevant attention type. Possible values are `"fourier"` and
-    #'   `multihead`.
+    #'   `"multihead"`.
     #' @param self_attention_heads `int` determining the number of attention heads for a self-attention layer. Only
     #'   relevant if `attention_type="multihead"`.
     #' @param repeat_encoder `int` determining how many times the encoder should be added to the network.

@@ -363,6 +363,8 @@ for (framework in ml_frameworks) {
           perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
           embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
 
+          ids=rownames(test_embeddings_reduced$embeddings)
+
           # EmbeddedText
           predictions<-NULL
           predictions_Perm<-NULL
@@ -377,12 +379,11 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-          predictions_Perm <- predictions_Perm[rownames(predictions), ]
           if(test_combinations[[i]]$attention!="fourier"){
-            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
                          tolerance = 1e-6)
           } else {
-            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
                          tolerance = 1e-1)
           }
 
@@ -401,10 +402,10 @@ for (framework in ml_frameworks) {
           )
 
           if(test_combinations[[i]]$attention!="fourier"){
-            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
                          tolerance = 1e-6)
           } else {
-            expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_Perm[,1:(ncol(predictions_Perm)-1)],
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
                          tolerance = 1e-1)
           }
         })
