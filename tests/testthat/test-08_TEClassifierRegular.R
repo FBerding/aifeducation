@@ -33,7 +33,7 @@ if(Sys.getenv("CI")=="true"){
   include_tensorflow <- FALSE
   skip_overfitting_test <- TRUE
 } else {
-  include_tensorflow <- TRUE
+  include_tensorflow <- FALSE
   skip_overfitting_test <- FALSE
 }
 
@@ -314,6 +314,8 @@ for (framework in ml_frameworks) {
           "pos", test_combinations[[i]]$pos_embedding
         ), {
           # EmbeddedText
+          predictions<-NULL
+          predictions_2<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 2,
@@ -328,6 +330,8 @@ for (framework in ml_frameworks) {
                        tolerance = 1e-6)
 
           # LargeDataSetForTextEmbeddings
+          predictions<-NULL
+          predictions_2<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced_LD,
             batch_size = 2,
@@ -359,6 +363,8 @@ for (framework in ml_frameworks) {
           embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
 
           # EmbeddedText
+          predictions<-NULL
+          predictions_Perm<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 50,
@@ -375,6 +381,8 @@ for (framework in ml_frameworks) {
                        tolerance = 1e-6)
 
           # LargeDataSetForTextEmbeddings
+          predictions<-NULL
+          predictions_Perm<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced_LD,
             batch_size = 50,

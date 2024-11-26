@@ -137,9 +137,6 @@ class LSTM_PT(torch.nn.Module):
   def forward(self,x):
     result=self.lstm_layer(x)
     return result[0]
-
-
-
   
 class UniDirectionalGRU_PT(torch.nn.Module):
   def __init__(self,input_size,hidden_size):
@@ -200,9 +197,10 @@ class FourierTransformation_PT(torch.nn.Module):
     super().__init__()
     
   def forward(self,x):
-    #return torch.real(torch.fft.fft(torch.fft.fft(input=x,dim=2),dim=1))
-    x_complex=x.to(dtype=torch.complex128)
-    return torch.real(torch.fft.fftn(input=x_complex,dim=(1,2),norm="ortho"))
+    #result=torch.real(torch.fft.fft(torch.fft.fft(input=x_complex,dim=2),dim=1))
+    result_1=torch.fft.fftn(x,norm="forward",dim=1)
+    result=torch.fft.fftn(result_1,norm="forward",dim=2).real
+    return result
   
 class FourierEncoder_PT(torch.nn.Module):
   def __init__(self, dense_dim, features, dropout_rate):
@@ -214,15 +212,15 @@ class FourierEncoder_PT(torch.nn.Module):
    
     self.attention=FourierTransformation_PT()
     self.dropout=torch.nn.Dropout(p=dropout_rate)
-    #self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
-    self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.features)
+    self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
+    #self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.features)
     self.dense_proj=torch.nn.Sequential(
       torch.nn.Linear(in_features=self.features,out_features=self.dense_dim),
       torch.nn.GELU(),
       torch.nn.Linear(in_features=self.dense_dim,out_features=self.features)
     )
-    #self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
-    self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.features)
+    self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
+    #self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.features)
     
   def forward(self,x):
     attention_output=self.attention(x)
@@ -780,7 +778,7 @@ def TeClassifierBatchPredict(model,dataset,batch_size):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=float
+    dtype=torch.float
     model.to(device,dtype=dtype)
   else:
     dtype=torch.double
