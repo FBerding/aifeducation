@@ -76,7 +76,7 @@ jobs:
           paste0("tokenizers", tokenizers_version),
           paste0("pandas", pandas_version),
           paste0("datasets", datasets_version),
-          paste0("codecarbon", codecarbon_version)
+          paste0("codecarbon", codecarbon_version),
           paste0("safetensors", safetensors_version),
           paste0("torcheval", torcheval_version),
           paste0("accelerate", accelerate_version)
