@@ -267,7 +267,7 @@ AIFEBaseModel <- R6::R6Class(
         sustain_data <- read.csv(sustain_path)
 
         private$sustainability <- list(
-          sustainability_tracked = TRUE,
+          sustainability_tracked = sustain_data$sustainability_tracked,
           date = sustain_data$date,
           sustainability_data = list(
             duration_sec = sustain_data$sustainability_data.duration_sec,

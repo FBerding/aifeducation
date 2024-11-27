@@ -25,6 +25,8 @@
 #' @noRd
 #'
 generate_sidebar_information <- function(model) {
+  ui <- shiny::tagList()
+
   if ("TextEmbeddingModel" %in% class(model)) {
     # Prepare output
     if (is.null(model)) {
@@ -105,7 +107,6 @@ generate_sidebar_information <- function(model) {
       co2 <- "not estimated"
     }
 
-
     ui <- shiny::tagList(
       shiny::tags$p(shiny::tags$b("Model:")),
       shiny::tags$p(model_label),
@@ -119,6 +120,34 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Carbon Footprint (CO2eq. kg): "),
       shiny::tags$p(co2)
     )
+  } else if ("TEFeatureExtractor" %in% class(model)) {
+    if (!is.null(model)) {
+
+      if (model$get_sustainability_data()$sustainability_tracked == TRUE) {
+        kwh <- round(model$get_sustainability_data()$sustainability_data$total_energy_kwh, 3)
+        co2 <- round(model$get_sustainability_data()$sustainability_data$co2eq_kg, 3)
+      } else {
+        kwh <- "not estimated"
+        co2 <- "not estimated"
+      }
+
+      ui <- shiny::tagList(
+        shiny::tags$p(shiny::tags$b("Model:")),
+        shiny::tags$p(model$get_model_info()$model_label),
+        shiny::tags$hr(),
+        shiny::tags$p("# Parameter: ", model$count_parameter()),
+        shiny::tags$hr(),
+        shiny::tags$p("Target Features: ", model$model_config$features),
+        shiny::tags$p("Method: ", model$model_config$method),
+        shiny::tags$p("Noise Factor: ", model$model_config$noise_factor),
+        shiny::tags$p("Optimizer: ", model$model_config$optimizer),
+        shiny::tags$hr(),
+        shiny::tags$p("Energy Consumption (kWh): "),
+        shiny::tags$p(kwh),
+        shiny::tags$p("Carbon Footprint (CO2eq. kg): "),
+        shiny::tags$p(co2)
+      )
+    }
   }
 
 
@@ -694,17 +723,23 @@ prepare_training_history <- function(model,
                                      pl_step = NULL) {
   plot_data <- model$last_training$history
 
+  if ("TEFeatureExtractor" %in% class(model)) {
+    plot_data[[1]] <- list(loss = plot_data[[1]])
+  }
+
   if (is.null_or_na(final)) final <- FALSE
 
   # Get standard statistics
   n_epochs <- model$last_training$config$epochs
   index_final <- length(model$last_training$history)
 
-
   # Get information about the existence of a training, validation, and test data set
   # Get Number of folds for the request
   if (final==FALSE) {
-    n_folds <- length(model$last_training$history) - 1
+    n_folds <- length(model$last_training$history)
+    if (n_folds > 1) {
+      n_folds <- n_folds - 1
+    }
     measures <- names(plot_data[[1]])
     if (!use_pl) {
       n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
@@ -720,7 +755,6 @@ prepare_training_history <- function(model,
       n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
     }
   }
-
 
   if (n_sample_type == 3) {
     sample_type_name <- c("train", "validation", "test")

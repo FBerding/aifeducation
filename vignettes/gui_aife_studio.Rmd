@@ -362,7 +362,7 @@ ID and one or multiple columns that contain the texts'
 categories/classes. Supported file formats are .xlsx, .csv, and
 .rda/.rdata. Figure 12 illustrates an example for a .xslx file.  
 
-![Figure 12: Filnames as IDs](img_articles/gui_excel_target_data.png){width="50%"}
+![Figure 12: Filnames as IDs](img_articles/gui/CF_Create_Targets.png){width="50%"}
 
 > In any case, the table must contain a column with the name "id" which
 > contains the texts' IDs. All other columns must also have unique
