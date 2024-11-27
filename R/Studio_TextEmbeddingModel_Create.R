@@ -218,8 +218,8 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           shiny::sliderInput(
             inputId = ns("lm_chunks"),
             label = "N Chunks",
-            value = 1,
-            min = 1,
+            value = 2,
+            min = 2,
             max = 50,
             step = 1
           ),

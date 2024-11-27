@@ -508,8 +508,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' details for more information.
     #' @param max_length `int` determining the maximum length of token
     #' sequences used in transformer models. Not relevant for the other methods.
-    #' @param chunks `int` Maximum number of chunks. Only relevant for
-    #' transformer models.
+    #' @param chunks `int` Maximum number of chunks. Must be at least 2.
     #' @param overlap `int` determining the number of tokens which should be added
     #' at the beginning of the next chunk. Only relevant for transformer models.
     #' @param emb_layer_min `int` or `string` determining the first layer to be included
@@ -546,7 +545,7 @@ TextEmbeddingModel <- R6::R6Class(
                          method = NULL,
                          ml_framework = "pytorch",
                          max_length = 0,
-                         chunks = 1,
+                         chunks = 2,
                          overlap = 0,
                          emb_layer_min = "middle",
                          emb_layer_max = "2_3_layer",
@@ -576,6 +575,9 @@ TextEmbeddingModel <- R6::R6Class(
 
       check_type(max_length, "int", FALSE)
       check_type(chunks, "int", FALSE)
+      if(chunks<2){
+        stop("Parameter chunks must be at least 2.")
+      }
       check_type(overlap, "int", FALSE)
       # emb_layer_min
       # emb_layer_max
