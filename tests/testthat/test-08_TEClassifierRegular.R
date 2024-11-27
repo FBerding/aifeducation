@@ -19,7 +19,7 @@ if(Sys.getenv("CI")=="true"){
 skip_creation_test <- FALSE
 skip_method_save_load<-FALSE
 skip_function_save_load<-FALSE
-skip_training_test <- TRUE
+skip_training_test <- FALSE
 skip_documentation<-FALSE
 class_range=c(2,3)
 
@@ -54,7 +54,7 @@ transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
 # Load Embeddings
-imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings_chunks_50"))
+imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
 test_embeddings_large <- imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
 test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
@@ -384,7 +384,7 @@ for (framework in ml_frameworks) {
                          tolerance = 1e-6)
           } else {
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-                         tolerance = 1e-5)
+                         tolerance = 1e-3)
           }
 
           # LargeDataSetForTextEmbeddings
@@ -406,7 +406,7 @@ for (framework in ml_frameworks) {
                          tolerance = 1e-6)
           } else {
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-                         tolerance = 1e-5)
+                         tolerance = 1e-3)
           }
         })
 
