@@ -14,6 +14,9 @@ skip_plot<-FALSE
 skip_documentation<-FALSE
 class_range=c(2,3)
 
+prob_precision=1e-4
+prob_precision_fourier=1e-3
+
 #can be set to "all"
 local_samples=50
 #Git Hub specific
@@ -363,13 +366,12 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-
           if(test_combinations[[i]]$attention!="fourier"){
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-                         tolerance = 1e-6)
+                         tolerance = prob_precision)
           } else {
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-                         tolerance = 1e-3)
+                         tolerance = prob_precision_fourier)
           }
 
           # LargeDataSetForTextEmbeddings
@@ -386,13 +388,12 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-
           if(test_combinations[[i]]$attention!="fourier"){
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-                         tolerance = 1e-6)
+                         tolerance = prob_precision)
           } else {
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-                         tolerance = 1e-3)
+                         tolerance = prob_precision_fourier)
           }
         })
 

@@ -54,6 +54,9 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 
 
 # config
+#Set Chunks
+chunks=sample(x=c(4,30),size = 1,replace=FALSE)
+
 if(Sys.getenv("CI")=="true"){
   ml_frameworks <- c(
     "pytorch"
@@ -108,8 +111,6 @@ for (framework in ml_frameworks) {
     for (pooling_type in pooling_type_list[[base_model]]) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
-          #Set Chunks
-          chunks=sample(x=c(1,4),size = 1,replace=FALSE)
 
           # Create Model
           text_embedding_model <- TextEmbeddingModel$new()

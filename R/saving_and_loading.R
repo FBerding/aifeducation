@@ -141,5 +141,11 @@ load_R_config_state <- function(dir_path) {
 create_config_state <- function(object) {
   config <- object$get_all_fields()
   config["class"] <- class(object)[1]
+
+  #Remove embeddings to avoid duplicate data storage
+  if(config["class"]=="EmbeddedText"){
+    config$self$embeddings=NA
+  }
+
   return(config)
 }
