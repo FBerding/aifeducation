@@ -250,7 +250,7 @@ Method for encoding words of raw texts into integers.
 
 \item{\code{token_encodings_only}}{\code{bool} If \code{TRUE}, only the token
 encodings are returned. If \code{FALSE}, the complete encoding is returned
-which is important for BERT models.}
+which is important for some transformer models.}
 
 \item{\code{to_int}}{\code{bool} If \code{TRUE} the integer ids of the tokens are
 returned. If \code{FALSE} the tokens are returned. Argument only applies
@@ -314,7 +314,7 @@ This method should only be used if a small number of texts should be transformed
 into text embeddings. For a large number of texts please use the method \code{embed_large}.
 In the case of using a GPU and running out of memory while using 'tensorflow'  reduce the
 batch size or restart R and switch to use cpu only via \code{set_config_cpu_only}. In general,
-not relevant for 'pytorch'.       #'
+not relevant for 'pytorch'.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(
   raw_text = NULL,
@@ -677,7 +677,7 @@ for the classifier.
 \subsection{Method \code{count_parameter()}}{
 Method for counting the trainable parameters of a model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$count_parameter()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$count_parameter(with_head = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

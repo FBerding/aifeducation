@@ -89,7 +89,7 @@ DataManagerClassifier <- R6::R6Class(
                           sc_min_k = 1,
                           sc_max_k = 10,
                           trace = TRUE,
-                          n_cores=4) {
+                          n_cores=auto_n_cores()) {
       # Checking Prerequisites---------------------------------------------------
       check_class(data_embeddings, c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
       check_class(data_targets, c("factor"), FALSE)

@@ -205,6 +205,7 @@
       # SFT: create_chunks_for_training ---------------------------------------------
       if (!is.function(private$steps_for_training$create_chunks_for_training)) {
         private$steps_for_training$create_chunks_for_training <- function(self) {
+
           tokenized_texts_raw <- tokenize_dataset(
             dataset = self$temp$raw_text_dataset,
             tokenizer = self$temp$tokenizer,
@@ -215,6 +216,7 @@
             total_top = self$temp$total_top,
             message_top = self$temp$message_top
           )
+
 
           length_vector <- tokenized_texts_raw["length"]
           if (self$params$full_sequences_only) {
@@ -242,19 +244,23 @@
         # For mpnet transformer see AIFEMpnetTransformer -> SFT -> create_data_collator
         private$steps_for_training$create_data_collator <- function(self) {
           if (self$params$whole_word) {
+
             self$temp$data_collator <- transformers$DataCollatorForWholeWordMask(
               tokenizer = self$temp$tokenizer,
               mlm = TRUE,
               mlm_probability = self$params$p_mask,
               return_tensors = self$temp$return_tensors
             )
+
           } else {
+
             self$temp$data_collator <- transformers$DataCollatorForLanguageModeling(
               tokenizer = self$temp$tokenizer,
               mlm = TRUE,
               mlm_probability = self$params$p_mask,
               return_tensors = self$temp$return_tensors
             )
+
           }
         }
       }
@@ -342,10 +348,12 @@
             # Clear session to provide enough resources for computations ---------------
             tf$keras$backend$clear_session()
           } else { # PYTORCH ------------------
+
+            if(utils::compareVersion(transformers["__version__"],"4.46.0")>=0){
             training_args <- transformers$TrainingArguments(
               output_dir = paste0(self$params$output_dir, "/checkpoints"),
               overwrite_output_dir = TRUE,
-              evaluation_strategy = "epoch",
+              eval_strategy = "epoch",
               num_train_epochs = as.integer(self$params$n_epoch),
               logging_strategy = "epoch",
               save_strategy = "epoch",
@@ -361,15 +369,47 @@
               log_level = "error",
               disable_tqdm = !self$params$pytorch_trace
             )
+            } else {
+              training_args <- transformers$TrainingArguments(
+                output_dir = paste0(self$params$output_dir, "/checkpoints"),
+                overwrite_output_dir = TRUE,
+                evaluation_strategy  = "epoch",
+                num_train_epochs = as.integer(self$params$n_epoch),
+                logging_strategy = "epoch",
+                save_strategy = "epoch",
+                save_total_limit = as.integer(1),
+                load_best_model_at_end = TRUE,
+                optim = "adamw_torch",
+                learning_rate = self$params$learning_rate,
+                per_device_train_batch_size = as.integer(self$params$batch_size),
+                per_device_eval_batch_size = as.integer(self$params$batch_size),
+                save_safetensors = TRUE,
+                auto_find_batch_size = FALSE,
+                report_to = "none",
+                log_level = "error",
+                disable_tqdm = !self$params$pytorch_trace
+              )
+            }
 
-            self$temp$trainer <- transformers$Trainer(
-              model = self$temp$model,
-              train_dataset = self$temp$tokenized_dataset$train,
-              eval_dataset = self$temp$tokenized_dataset$test,
-              args = training_args,
-              data_collator = self$temp$data_collator,
-              tokenizer = self$temp$tokenizer
-            )
+            if(utils::compareVersion(transformers["__version__"],"4.46.0")>=0){
+              self$temp$trainer <- transformers$Trainer(
+                model = self$temp$model,
+                train_dataset = self$temp$tokenized_dataset$train,
+                eval_dataset = self$temp$tokenized_dataset$test,
+                args = training_args,
+                data_collator = self$temp$data_collator,
+                processing_class  = self$temp$tokenizer
+              )
+            } else {
+              self$temp$trainer <- transformers$Trainer(
+                model = self$temp$model,
+                train_dataset = self$temp$tokenized_dataset$train,
+                eval_dataset = self$temp$tokenized_dataset$test,
+                args = training_args,
+                data_collator = self$temp$data_collator,
+                tokenizer = self$temp$tokenizer
+              )
+            }
 
             self$temp$trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
             if (!as.logical(self$params$pytorch_trace)) {
@@ -441,6 +481,12 @@
 
     # Creates a sustainability tracker and stores it in the private `sustainability_tracker` attribute
     create_sustain_tracker = function() {
+      if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
+        path_look_file=codecarbon$lock$LOCKFILE
+        if(file.exists(path_look_file)){
+          unlink(path_look_file)
+        }
+      }
       private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
         country_iso_code = self$params$sustain_iso_code,
         region = self$params$sustain_region,
@@ -874,6 +920,7 @@
 
         # Calculate tokenizer statistics -------------------------------------------
 
+
         tokenized_texts_raw <- tokenize_dataset(
           dataset = self$temp$raw_text_dataset,
           tokenizer = self$temp$tokenizer,
@@ -883,6 +930,7 @@
           value_top = 5, total_top = total,
           message_top = paste(private$title, "Overall: Creating Final Tokenizer & Calculating Statistics")
         )
+
 
         private$update_tokenizer_statistics(tokenized_texts_raw, "creation")
 

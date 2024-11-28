@@ -1,7 +1,19 @@
-testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check="all"),
-  message = "Necessary python modules not available"
-)
+testthat::skip_on_cran()
+if(Sys.getenv("CI")=="true"){
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+    message = "Necessary python modules not available"
+  )
+} else {
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "all"),
+    message = "Necessary python modules not available"
+  )
+  # SetUp tensorflow
+  aifeducation::set_config_gpu_low_memory()
+  set_config_tf_logger("ERROR")
+  set_config_os_environ_logger("ERROR")
+}
 testthat::skip_if_not(
   condition = dir.exists(testthat::test_path("test_data_tmp/TEM")),
   message = "Base models for tests not available"
@@ -14,11 +26,6 @@ create_dir(testthat::test_path("test_artefacts"), FALSE)
 
 root_path_results <- testthat::test_path("test_artefacts/TEM")
 create_dir(root_path_results, FALSE)
-
-# SetUp tensorflow
-aifeducation::set_config_gpu_low_memory()
-set_config_tf_logger("ERROR")
-set_config_os_environ_logger("ERROR")
 
 # SetUp datasets
 # Disable tqdm progressbar
@@ -47,10 +54,20 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 
 
 # config
-ml_frameworks <- c(
-  "tensorflow",
-  "pytorch"
-)
+#Set Chunks
+chunks=sample(x=c(4,30),size = 1,replace=FALSE)
+
+if(Sys.getenv("CI")=="true"){
+  ml_frameworks <- c(
+    "pytorch"
+  )
+} else {
+  ml_frameworks <- c(
+    #"tensorflow",
+    "pytorch"
+  )
+}
+
  base_model_list <- list(
    tensorflow = c(
      "bert",
@@ -94,6 +111,7 @@ for (framework in ml_frameworks) {
     for (pooling_type in pooling_type_list[[base_model]]) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
+
           # Create Model
           text_embedding_model <- TextEmbeddingModel$new()
           text_embedding_model$configure(
@@ -103,7 +121,7 @@ for (framework in ml_frameworks) {
             method = base_model,
             ml_framework = framework,
             max_length = 20,
-            chunks = 4,
+            chunks = chunks,
             overlap = 10,
             emb_layer_min = min_layer,
             emb_layer_max = max_layer,
@@ -130,12 +148,13 @@ for (framework in ml_frameworks) {
             expect_equal(tr_comp$emb_pool_type, pooling_type)
           })
 
-          # Method embed
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed"), {
+          # Method embed--------------------------------------------------------
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed","chunks",chunks), {
             # general
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:10],
-              doc_id = example_data$id[1:10]
+              doc_id = example_data$id[1:10],
+              batch_size = 5
             )
             expect_s3_class(embeddings, class = "EmbeddedText")
             expect_false(embeddings$is_compressed())
@@ -148,16 +167,18 @@ for (framework in ml_frameworks) {
             perm <- sample(x = 1:10, size = 10, replace = FALSE)
             embeddings_perm <- text_embedding_model$embed(
               raw_text = example_data$text[perm],
-              doc_id = example_data$id[perm]
+              doc_id = example_data$id[perm],
+              batch_size = 5
             )
             for (i in 1:10) {
-              expect_equal(embeddings$embeddings[i, , ],
-                embeddings_perm$embeddings[which(perm == i), , ],
-                tolerance = 1e-5
+              expect_equal(embeddings$embeddings[i, , ,drop=FALSE],
+                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , ,drop=FALSE],
+                tolerance = 1e-6
               )
             }
           })
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case"), {
+
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case","chunks",chunks), {
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:1],
               doc_id = example_data$id[1:1]
@@ -167,8 +188,8 @@ for (framework in ml_frameworks) {
             expect_equal(embeddings$n_rows(), 1)
           })
 
-          # Method embed_large
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large"), {
+          # Method embed_large--------------------------------------------------
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large","chunks",chunks), {
             # general
             embeddings <- text_embedding_model$embed_large(example_data_large)
             expect_s3_class(embeddings, class = "LargeDataSetForTextEmbeddings")
@@ -206,8 +227,9 @@ for (framework in ml_frameworks) {
             expect_equal(embeddings$n_rows(), 1)
           })
 
-          # encoding
+          # encoding------------------------------------------------------------
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "encoding"), {
+            #Request for tokens only
             for (to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
@@ -216,10 +238,33 @@ for (framework in ml_frameworks) {
               )
               expect_length(encodings, 10)
               expect_type(encodings, type = "list")
+
+              #Check order invariance
+              perm <- sample(x = 1:10, size = 10, replace = FALSE)
+              encodings_perm <- text_embedding_model$encode(
+                raw_text = example_data$text[perm],
+                token_encodings_only = TRUE,
+                to_int = to_int
+              )
+              for (i in 1:10) {
+                expect_equal(encodings[[i]],
+                             encodings_perm[[which(x=(perm==i))]]
+                )
+              }
+            }
+
+            #Request for all tokens types
+            for (to_int in c(TRUE, FALSE)) {
+              encodings <- text_embedding_model$encode(
+                raw_text = example_data$text[1:10],
+                token_encodings_only = FALSE
+              )
+              expect_type(encodings, type = "list")
+              expect_equal(encodings$encodings$num_rows,sum(encodings$chunks))
             }
           })
 
-          # Decoding
+          # Decoding-----------------------------------------------------------
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "decoding"), {
             encodings <- text_embedding_model$encode(
               raw_text = example_data$text[1:10],

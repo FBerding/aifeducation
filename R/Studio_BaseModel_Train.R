@@ -6,6 +6,7 @@
 #'
 #' @family studio_gui_page_base_model_train
 #' @keywords internal
+#' @noRd
 #'
 BaseModel_Train_UI <- function(id) {
   ns <- shiny::NS(id)
@@ -78,6 +79,7 @@ BaseModel_Train_UI <- function(id) {
 #'
 #' @family studio_gui_page_base_model_train
 #' @keywords internal
+#' @noRd
 #'
 BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
   shiny::moduleServer(id, function(input, output, session) {
@@ -136,9 +138,9 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
         errors <- append(errors, "Please specify a directory path for saiving the trained Base Model.")
       }
 
-      if (class(model_architecture) == "errors") {
+      if (inherits(x=model_architecture,what = "errors")) {
         errors <- append(errors, model_architecture)
-      } else if (class(model_architecture) == "params") {
+      } else if (inherits(x=model_architecture,what= "params")) {
         if (!model_architecture$model_exists) {
           errors <- append(errors, paste(
             "There is no model to load in the directory",

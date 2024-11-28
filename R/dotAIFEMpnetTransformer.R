@@ -197,7 +197,7 @@
     #' @return This method returns nothing.
     initialize = function() {
       super$set_title(private$title)
-      print(paste(private$title, "has been inizialized."))
+      print(paste(private$title, "has been initialized."))
     },
 
 

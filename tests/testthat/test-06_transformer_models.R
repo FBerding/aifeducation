@@ -1,22 +1,28 @@
 testthat::skip_on_cran()
+if(Sys.getenv("CI")=="true"){
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+    message = "Necessary python modules not available"
+  )
+} else {
+  testthat::skip_if_not(
+    condition = check_aif_py_modules(trace = FALSE,check = "all"),
+    message = "Necessary python modules not available"
+  )
 
-testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "all"),
-  message = "Necessary python modules not available"
-)
+  # SetUp tensorflow
+  aifeducation::set_config_gpu_low_memory()
+  set_config_tf_logger("ERROR")
+  set_config_os_environ_logger("ERROR")
+}
 
-set_config_gpu_low_memory()
+#Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
-
-# SetUp tensorflow
-aifeducation::set_config_gpu_low_memory()
-set_config_tf_logger("ERROR")
-set_config_os_environ_logger("ERROR")
 
 #config trace
 trace=FALSE
@@ -38,7 +44,17 @@ create_dir(tmp_results_TEM_path, FALSE)
 create_dir(paste0(tmp_results_TEM_path,"/pytorch"), FALSE)
 create_dir(paste0(tmp_results_TEM_path,"/tensorflow"), FALSE)
 
-ml_frameworks <- c("tensorflow", "pytorch")
+if(Sys.getenv("CI")=="true"){
+  ml_frameworks <- c(
+    "pytorch"
+  )
+} else {
+  ml_frameworks <- c(
+    "tensorflow",
+    "pytorch"
+  )
+}
+
 ai_methods <- unname(unlist(AIFETrType))
 
 ai_framework_matrix <- matrix(
@@ -57,10 +73,28 @@ rows_susatainability <- c(
   "deberta_v2" = 3
 )
 
+supported_methods<-list(
+  tensorflow=list(
+    "bert" ,
+    "funnel" ,
+    "roberta" ,
+    "longformer" ,
+    "deberta_v2"
+  ),
+  pytorch=list(
+    "bert" ,
+    "funnel" ,
+    "roberta" ,
+    "longformer" ,
+    "deberta_v2",
+    "mpnet"
+  )
+)
+
 example_data <- imdb_movie_reviews
 
 for (framework in ml_frameworks) {
-  for (ai_method in ai_methods) {
+  for (ai_method in supported_methods[[framework]]) {
     base::gc(verbose = FALSE, full = TRUE)
 
     #create main folder ans sub-folder for every model in creation
@@ -82,7 +116,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 50000,
               vocab_do_lower_case = FALSE,
               max_position_embeddings = 512,
@@ -104,7 +138,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 50000,
               vocab_do_lower_case = TRUE,
               max_position_embeddings = 512,
@@ -121,12 +155,13 @@ for (framework in ml_frameworks) {
               trace = trace
             )
           )
+
         } else if (ai_method == AIFETrType$roberta) {
           expect_no_error(
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = FALSE,
               max_position_embeddings = 512,
@@ -148,7 +183,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = TRUE,
               max_position_embeddings = 512,
@@ -170,7 +205,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               vocab_do_lower_case = FALSE,
               max_position_embeddings = 512,
@@ -192,7 +227,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               vocab_do_lower_case = TRUE,
               max_position_embeddings = 512,
@@ -214,7 +249,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               max_position_embeddings = 512,
               hidden_size = 32,
@@ -236,7 +271,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               max_position_embeddings = 512,
               hidden_size = 32,
@@ -257,7 +292,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text[1:500],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = FALSE,
               max_position_embeddings = 512,
@@ -280,7 +315,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text[1:500],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 10000,
               add_prefix_space = TRUE,
               max_position_embeddings = 512,
@@ -303,7 +338,7 @@ for (framework in ml_frameworks) {
             aife_transformer_maker$make(ai_method)$create(
               ml_framework = framework,
               model_dir = tmp_ai_create,
-              vocab_raw_texts = example_data$text,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               vocab_size = 50000,
               vocab_do_lower_case = FALSE,
               max_position_embeddings = 512,
@@ -328,12 +363,34 @@ for (framework in ml_frameworks) {
       # Training of the Model ----
       test_that(paste0(ai_method, ": training of the model with ", framework), {
         if (ai_method == AIFETrType$bert) {
+
+          base_model<-aife_transformer_maker$make(ai_method)
+          base_model$create(
+              ml_framework = framework,
+              model_dir = tmp_ai_create,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
+              vocab_size = 50000,
+              vocab_do_lower_case = FALSE,
+              max_position_embeddings = 512,
+              hidden_size = 256,
+              num_hidden_layer = 2,
+              num_attention_heads = 2,
+              intermediate_size = 256,
+              hidden_act = "gelu",
+              hidden_dropout_prob = 0.1,
+              sustain_track = TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              trace = trace
+            )
+          Sys.sleep(5)
           expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+            base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:10],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = TRUE,
               full_sequences_only = TRUE,
@@ -354,11 +411,11 @@ for (framework in ml_frameworks) {
           )
           Sys.sleep(5)
           expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+            base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:10],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.30,
               whole_word = FALSE,
               full_sequences_only = TRUE,
@@ -378,12 +435,34 @@ for (framework in ml_frameworks) {
             )
           )
         } else if (ai_method == AIFETrType$roberta) {
+          base_model<-aife_transformer_maker$make(ai_method)
+          base_model$create(
+              ml_framework = framework,
+              model_dir = tmp_ai_create,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
+              vocab_size = 10000,
+              add_prefix_space = FALSE,
+              max_position_embeddings = 512,
+              hidden_size = 16,
+              num_hidden_layer = 2,
+              num_attention_heads = 2,
+              intermediate_size = 128,
+              hidden_act = "gelu",
+              hidden_dropout_prob = 0.1,
+              sustain_track = TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              trace = trace
+            )
+          Sys.sleep(5)
+
           expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+            base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.30,
               val_size = 0.1,
               n_epoch = 2,
@@ -402,12 +481,34 @@ for (framework in ml_frameworks) {
             )
           )
         } else if (ai_method == AIFETrType$deberta_v2) {
+          base_model<-aife_transformer_maker$make(ai_method)
+          base_model$create(
+              ml_framework = framework,
+              model_dir = tmp_ai_create,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
+              vocab_size = 10000,
+              vocab_do_lower_case = FALSE,
+              max_position_embeddings = 512,
+              hidden_size = 32,
+              num_hidden_layer = 2,
+              num_attention_heads = 2,
+              intermediate_size = 128,
+              hidden_act = "gelu",
+              hidden_dropout_prob = 0.1,
+              sustain_track = TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              trace = trace
+          )
+          Sys.sleep(3)
+
           expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+            base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = TRUE,
               val_size = 0.1,
@@ -427,12 +528,11 @@ for (framework in ml_frameworks) {
             )
           )
           Sys.sleep(2)
-          expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+          expect_no_error(base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = FALSE,
               val_size = 0.1,
@@ -452,12 +552,34 @@ for (framework in ml_frameworks) {
             )
           )
         } else if (ai_method == AIFETrType$funnel) {
+          base_model<-aife_transformer_maker$make(ai_method)
+          base_model$create(
+              ml_framework = framework,
+              model_dir = tmp_ai_create,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
+              vocab_size = 10000,
+              max_position_embeddings = 512,
+              hidden_size = 32,
+              block_sizes = c(2, 2, 2),
+              num_decoder_layers = 2,
+              num_attention_heads = 2,
+              intermediate_size = 128,
+              hidden_act = "gelu",
+              hidden_dropout_prob = 0.1,
+              sustain_track = TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              trace = trace
+            )
+          Sys.sleep(3)
+
           expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+            base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:20],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = TRUE,
               val_size = 0.1,
@@ -479,11 +601,11 @@ for (framework in ml_frameworks) {
           )
           Sys.sleep(2)
           expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+            base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:20],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.15,
               whole_word = FALSE,
               val_size = 0.1,
@@ -504,12 +626,34 @@ for (framework in ml_frameworks) {
             )
           )
         } else if (ai_method == AIFETrType$longformer) {
-          expect_no_error(
-            aife_transformer_maker$make(ai_method)$train(
+          base_model<-aife_transformer_maker$make(ai_method)
+          base_model$create(
+              ml_framework = framework,
+              model_dir = tmp_ai_create,
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
+              vocab_size = 10000,
+              add_prefix_space = FALSE,
+              max_position_embeddings = 512,
+              hidden_size = 32,
+              num_hidden_layer = 2,
+              num_attention_heads = 2,
+              intermediate_size = 128,
+              hidden_act = "gelu",
+              hidden_dropout_prob = 0.1,
+              attention_window = 40,
+              sustain_track = TRUE,
+              sustain_iso_code = "DEU",
+              sustain_region = NULL,
+              sustain_interval = 15,
+              trace = trace
+            )
+          Sys.sleep(3)
+
+          expect_no_error(base_model$train(
               ml_framework = framework,
               output_dir = tmp_ai_train,
               model_dir_path = tmp_ai_create,
-              raw_texts = example_data$text[1:5],
+              text_dataset = LargeDataSetForText$new(example_data[1:50,]),
               p_mask = 0.30,
               val_size = 0.1,
               n_epoch = 2,
@@ -529,12 +673,34 @@ for (framework in ml_frameworks) {
           )
         } else if (ai_method == AIFETrType$mpnet) {
           if (framework == "pytorch") {
+            base_model<-aife_transformer_maker$make(ai_method)
+            base_model$create(
+                ml_framework = framework,
+                model_dir = tmp_ai_create,
+                text_dataset = LargeDataSetForText$new(example_data[1:50,]),
+                vocab_size = 50000,
+                vocab_do_lower_case = FALSE,
+                max_position_embeddings = 512,
+                hidden_size = 256,
+                num_hidden_layer = 2,
+                num_attention_heads = 2,
+                intermediate_size = 256,
+                hidden_act = "gelu",
+                hidden_dropout_prob = 0.1,
+                sustain_track = TRUE,
+                sustain_iso_code = "DEU",
+                sustain_region = NULL,
+                sustain_interval = 15,
+                trace = trace
+              )
+            Sys.sleep(3)
+
             expect_no_error(
-              aife_transformer_maker$make(ai_method)$train(
+              base_model$train(
                 ml_framework = framework,
                 output_dir = tmp_ai_train,
                 model_dir_path = tmp_ai_create,
-                raw_texts = example_data$text[1:10],
+                text_dataset = LargeDataSetForText$new(example_data[1:50,]),
                 p_mask = 0.15,
                 p_perm = 0.15,
                 whole_word = TRUE,

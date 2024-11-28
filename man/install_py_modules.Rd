@@ -7,11 +7,10 @@
 install_py_modules(
   envname = "aifeducation",
   install = "pytorch",
-  tf_version = "2.15",
+  transformer_version = "4.46",
   pytorch_cuda_version = "12.1",
   python_version = "3.9",
-  remove_first = FALSE,
-  cpu_only = FALSE
+  remove_first = FALSE
 )
 }
 \arguments{
@@ -24,7 +23,7 @@ install_py_modules(
 \item \code{install = "tensorflow"}: for 'tensorflow'.
 }}
 
-\item{tf_version}{\code{string} determining the desired version of 'tensorflow'.}
+\item{transformer_version}{\code{string} determining the desired version of the python library 'transformers'.}
 
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for ' PyTorch'.}
 
@@ -33,8 +32,6 @@ install_py_modules(
 \item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before recreating the environment and
 installing the packages. If \code{FALSE} the packages are installed in the existing environment without any prior
 changes.}
-
-\item{cpu_only}{\code{bool} \code{TRUE} installs the cpu only version of the machine learning frameworks.}
 }
 \value{
 Returns no values or objects. Function is used for installing the necessary python libraries in a conda

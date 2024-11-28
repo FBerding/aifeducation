@@ -62,7 +62,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
     #' @param embedding_dim `int` determining the number of dimensions for the text embedding.
     #' @param attention_type `string` Choose the relevant attention type. Possible values are `"fourier"` and
-    #'   `multihead`.
+    #'   `"multihead"`.
     #' @param self_attention_heads `int` determining the number of attention heads for a self-attention layer. Only
     #'   relevant if `attention_type="multihead"`.
     #' @param repeat_encoder `int` determining how many times the encoder should be added to the network.
@@ -342,7 +342,7 @@ TEClassifierProtoNet <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores=4) {
+                     n_cores=auto_n_cores()) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -456,7 +456,8 @@ TEClassifierProtoNet <- R6::R6Class(
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
-          trace = trace
+          trace = trace,
+          self$last_training$config$n_cores
         )
       } else {
         data_manager <- DataManagerClassifier$new(
@@ -470,7 +471,8 @@ TEClassifierProtoNet <- R6::R6Class(
           sc_method = sc_method,
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
-          trace = trace
+          trace = trace,
+          self$last_training$config$n_cores
         )
       }
 
@@ -492,6 +494,14 @@ TEClassifierProtoNet <- R6::R6Class(
           stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
         }
+
+        if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
+          path_look_file=codecarbon$lock$LOCKFILE
+          if(file.exists(path_look_file)){
+            unlink(path_look_file)
+          }
+        }
+
         sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
           country_iso_code = sustain_iso_code,
           region = sustain_region,

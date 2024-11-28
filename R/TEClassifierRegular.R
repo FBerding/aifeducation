@@ -367,7 +367,7 @@ TEClassifierRegular <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores=4) {
+                     n_cores=auto_n_cores()) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -510,6 +510,14 @@ TEClassifierRegular <- R6::R6Class(
           stop("Sustainability tracking is activated but iso code for the
                country is missing. Add iso code or deactivate tracking.")
         }
+
+        if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
+          path_look_file=codecarbon$lock$LOCKFILE
+          if(file.exists(path_look_file)){
+            unlink(path_look_file)
+          }
+        }
+
         sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
           country_iso_code = sustain_iso_code,
           region = sustain_region,
@@ -770,6 +778,7 @@ TEClassifierRegular <- R6::R6Class(
           predictions <- max.col(predictions_prob) - 1
         }
       }
+
 
       # Transforming predictions to target levels------------------------------
       predictions <- as.character(as.vector(predictions))

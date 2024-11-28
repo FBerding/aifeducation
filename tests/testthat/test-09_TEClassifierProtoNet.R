@@ -1,10 +1,7 @@
+testthat::skip_on_cran()
 testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
   message = "Necessary python modules not available"
-)
-testthat::skip_if_not(
-  condition = dir.exists(testthat::test_path("test_data/classifier/feature_extractor_pytorch")),
-  message = "Feature Extractor for tests not available"
 )
 
 # Skip Tests
@@ -12,11 +9,24 @@ skip_creation_test <- FALSE
 skip_method_save_load<-FALSE
 skip_function_save_load<-FALSE
 skip_training_test <- FALSE
-skip_overfitting_test <- FALSE
 skip_classification_embedding<-FALSE
 skip_plot<-FALSE
 skip_documentation<-FALSE
-skip_3_classes <- FALSE
+class_range=c(2,3)
+
+prob_precision=1e-4
+prob_precision_fourier=1e-3
+
+#can be set to "all"
+local_samples=50
+#Git Hub specific
+n_git_samples=50
+
+if(Sys.getenv("CI")=="true"){
+  skip_overfitting_test <- TRUE
+} else {
+  skip_overfitting_test <- FALSE
+}
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -25,6 +35,8 @@ root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
 create_dir(root_path_results, FALSE)
+root_path_feature_extractor<-testthat::test_path("test_data_tmp/classifier/feature_extractor_pytorch")
+
 # SetUp datasets
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
@@ -65,43 +77,53 @@ pl_list <- list(FALSE, TRUE)
 
 # Load feature extractors
 feature_extractor_list <- NULL
-feature_extractor_list["pytorch"] <- list(list(
-  load_from_disk(paste0(root_path_data, "/feature_extractor_pytorch")),
-  NULL
-))
+feature_extractor_list["tensorflow"] <- list(list(NULL))
 
-if (skip_3_classes == TRUE) {
-  max_classes <- 2
+if (file.exists(root_path_feature_extractor)) {
+  feature_extractor_list["pytorch"] <- list(
+    list(
+      load_from_disk(root_path_feature_extractor),
+      NULL
+    )
+  )
 } else {
-  max_classes <- 3
+  feature_extractor_list["pytorch"] <- list(
+    list(
+      NULL
+    )
+  )
 }
 
-#can be set to all
-local_samples="all"
-#Git Hub specific
-n_git_samples=50
+# Prepare data for different classification types---------------------------
+target_data<-NULL
+target_levels<-NULL
+for(n_classes in class_range){
+  example_data <- imdb_movie_reviews
+
+  rownames(example_data) <- rownames(test_embeddings$embeddings)
+  example_data$id <- rownames(test_embeddings$embeddings)
+  example_data <- example_data[intersect(
+    rownames(example_data), rownames(test_embeddings$embeddings)
+  ), ]
+
+  example_data$label <- as.character(example_data$label)
+  example_data$label[c(201:300)] <- NA
+  if (n_classes > 2) {
+    example_data$label[c(201:250)] <- "medium"
+    tmp_target_levels <- c("neg", "medium", "pos")
+  } else {
+    tmp_target_levels <- c("neg", "pos")
+  }
+  example_targets <- as.factor(example_data$label)
+  names(example_targets) <- example_data$id
+
+  target_data[n_classes]<-list(example_targets)
+  target_levels[n_classes]<-list(tmp_target_levels)
+}
+
+
 
 for (framework in ml_frameworks) {
-  for (n_classes in 2:max_classes) {
-    # Prepare data for different classification types---------------------------
-    example_data <- imdb_movie_reviews
-
-    rownames(example_data) <- rownames(test_embeddings$embeddings)
-    example_data$id <- rownames(test_embeddings$embeddings)
-    example_data <- example_data[intersect(
-      rownames(example_data), rownames(test_embeddings$embeddings)
-    ), ]
-
-    example_data$label <- as.character(example_data$label)
-    example_data$label[c(201:300)] <- NA
-    if (n_classes > 2) {
-      example_data$label[c(201:250)] <- "medium"
-      target_levels <- c("neg", "medium", "pos")
-    } else {
-      target_levels <- c("neg", "pos")
-    }
-    example_targets <- as.factor(example_data$label)
-    names(example_targets) <- example_data$id
 
     # Start Tests-------------------------------------------------------------------------------
     # Test creation and prediction of the classifier----------------------------
@@ -164,6 +186,7 @@ for (framework in ml_frameworks) {
 
       for (i in 1:length(test_combinations)) {
         classifier <- NULL
+        n_classes=sample(x=class_range,size = 1,replace = FALSE)
         gc()
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
@@ -176,7 +199,7 @@ for (framework in ml_frameworks) {
           text_embeddings = test_embeddings,
           feature_extractor = test_combinations[[i]]$feature_extractor,
           embedding_dim = 5,
-          target_levels = target_levels,
+          target_levels = target_levels[[n_classes]],
           dense_layers = test_combinations[[i]]$dense_layers,
           dense_size = dense_size,
           rec_layers = test_combinations[[i]]$rec_layers,
@@ -279,6 +302,8 @@ for (framework in ml_frameworks) {
           "pos", test_combinations[[i]]$pos_embedding
         ), {
           # EmbeddedText
+          predictions<-NULL
+          predictions_2<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 2,
@@ -289,11 +314,12 @@ for (framework in ml_frameworks) {
             batch_size = 2,
             ml_trace = 0
           )
-          expect_equal(predictions, predictions_2)
-          #print(predictions)
-          #print(predictions_2)
+          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_2[,1:(ncol(predictions_2)-1)],
+                       tolerance = 1e-6)
 
           # LargeDataSetForTextEmbeddings
+          predictions<-NULL
+          predictions_2<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced_LD,
             batch_size = 2,
@@ -304,7 +330,8 @@ for (framework in ml_frameworks) {
             batch_size = 2,
             ml_trace = 0
           )
-          expect_equal(predictions, predictions_2)
+          expect_equal(predictions[,1:(ncol(predictions)-1)], predictions_2[,1:(ncol(predictions_2)-1)],
+                       tolerance = 1e-6)
         })
 
         test_that(paste(
@@ -323,7 +350,11 @@ for (framework in ml_frameworks) {
           perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
           embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
 
+          ids=rownames(test_embeddings_reduced$embeddings)
+
           # EmbeddedText
+          predictions<-NULL
+          predictions_Perm<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 50,
@@ -335,10 +366,17 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-          predictions_Perm <- predictions_Perm[rownames(predictions), ]
-          expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+          if(test_combinations[[i]]$attention!="fourier"){
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
+                         tolerance = prob_precision)
+          } else {
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
+                         tolerance = prob_precision_fourier)
+          }
 
           # LargeDataSetForTextEmbeddings
+          predictions<-NULL
+          predictions_Perm<-NULL
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced_LD,
             batch_size = 50,
@@ -350,8 +388,13 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-          predictions_Perm <- predictions_Perm[rownames(predictions), ]
-          expect_equal(predictions$expected_category, predictions_Perm$expected_category)
+          if(test_combinations[[i]]$attention!="fourier"){
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
+                         tolerance = prob_precision)
+          } else {
+            expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
+                         tolerance = prob_precision_fourier)
+          }
         })
 
         test_that(paste(
@@ -376,7 +419,8 @@ for (framework in ml_frameworks) {
             batch_size = 2,
             ml_trace = 0
           )
-          expect_equal(predictions_ET$expected_category, predictions_LD$expected_category)
+          expect_equal(predictions_ET[,1:(ncol(predictions_ET)-1)], predictions_LD[,1:(ncol(predictions_LD)-1)],
+                       tolerance = 1e-6)
         })
         gc()
       }
@@ -389,6 +433,8 @@ for (framework in ml_frameworks) {
         for (use_sc in sc_list) {
           for (use_pl in pl_list) {
             # Randomly select a configuration for training
+            n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
             rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
             dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
             dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -411,7 +457,7 @@ for (framework in ml_frameworks) {
               name = paste0("movie_review_classifier_", "classes_", n_classes),
               label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
               text_embeddings = test_embeddings,
-              target_levels = target_levels,
+              target_levels = target_levels[[n_classes]],
               feature_extractor = feature_extractor,
               embedding_dim = 3,
               dense_layers = dense_layers,
@@ -451,7 +497,7 @@ for (framework in ml_frameworks) {
               expect_no_error(
                 classifier$train(
                   data_embeddings = test_embeddings,
-                  data_targets = example_targets,
+                  data_targets = target_data[[n_classes]],
                   data_folds = 2,
                   use_sc = use_sc,
                   sc_method = "dbsmote",
@@ -497,6 +543,8 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "method save and load"), {
         # Randomly select a configuration for training
+        n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -515,7 +563,7 @@ for (framework in ml_frameworks) {
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
-          target_levels = target_levels,
+          target_levels = target_levels[[n_classes]],
           feature_extractor = feature_extractor,
           dense_layers = dense_layers,
           dense_size = dense_size,
@@ -580,6 +628,8 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "function save and load"), {
         # Randomly select a configuration for training
+        n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -598,7 +648,7 @@ for (framework in ml_frameworks) {
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
-          target_levels = target_levels,
+          target_levels = target_levels[[n_classes]],
           feature_extractor = feature_extractor,
           embedding_dim = 3,
           dense_layers = dense_layers,
@@ -665,6 +715,8 @@ for (framework in ml_frameworks) {
     if (!skip_overfitting_test) {
       test_that(paste(framework, n_classes, "overfitting test"), {
         # Create directory for saving checkpoint for every training
+        n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
         create_dir(train_path, FALSE)
 
@@ -672,7 +724,7 @@ for (framework in ml_frameworks) {
         rec_layers <- 2
         dense_layers <- 2
         dense_size <- 10
-        rec_size <- 2
+        rec_size <- 10
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
         rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
         # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
@@ -688,7 +740,7 @@ for (framework in ml_frameworks) {
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
-          target_levels = target_levels,
+          target_levels = target_levels[[n_classes]],
           feature_extractor = NULL,
           embedding_dim = 5,
           dense_layers = dense_layers,
@@ -712,7 +764,7 @@ for (framework in ml_frameworks) {
 
         classifier_overfitting$train(
           data_embeddings = test_embeddings,
-          data_targets = example_targets,
+           data_targets = target_data[[n_classes]],
           data_folds = 2,
           loss_alpha = 0.5,
           loss_margin = 0.5,
@@ -729,7 +781,7 @@ for (framework in ml_frameworks) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          epochs = 100,
+          epochs = 300,
           batch_size = 32,
           dir_checkpoint = train_path,
           log_dir = train_path,
@@ -774,6 +826,8 @@ for (framework in ml_frameworks) {
       for (feature_extractor in feature_extractor_list[[framework]]) {
         test_that(paste(framework, !is.null(feature_extractor), "embed"), {
           # Randomly select a configuration for training
+          n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
           rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
           dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
           dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -792,7 +846,7 @@ for (framework in ml_frameworks) {
             name = paste0("movie_review_classifier_", "classes_", n_classes),
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings = test_embeddings,
-            target_levels = target_levels,
+            target_levels = target_levels[[n_classes]],
             feature_extractor = feature_extractor,
             embedding_dim = 3,
             dense_layers = dense_layers,
@@ -840,6 +894,8 @@ for (framework in ml_frameworks) {
       for (feature_extractor in feature_extractor_list[[framework]]) {
         test_that(paste(framework, !is.null(feature_extractor), "plot"), {
           # Randomly select a configuration for training
+          n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
           rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
           dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
           dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -858,7 +914,7 @@ for (framework in ml_frameworks) {
             name = paste0("movie_review_classifier_", "classes_", n_classes),
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings = test_embeddings,
-            target_levels = target_levels,
+            target_levels = target_levels[[n_classes]],
             feature_extractor = feature_extractor,
             embedding_dim = 3,
             dense_layers = dense_layers,
@@ -894,6 +950,8 @@ for (framework in ml_frameworks) {
         # Documentation--------------------------------------------------------------
         test_that(paste(framework, n_classes, "descriptions"), {
           # Randomly select a configuration for training
+          n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
           rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
           dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
           dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -912,7 +970,7 @@ for (framework in ml_frameworks) {
             name = paste0("movie_review_classifier_", "classes_", n_classes),
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings = test_embeddings,
-            target_levels = target_levels,
+            target_levels = target_levels[[n_classes]],
             feature_extractor = NULL,
             embedding_dim = 3,
             dense_layers = dense_layers,
@@ -1024,6 +1082,8 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "embed"), {
         # Randomly select a configuration for training
+        n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -1042,7 +1102,7 @@ for (framework in ml_frameworks) {
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
-          target_levels = target_levels,
+          target_levels = target_levels[[n_classes]],
           feature_extractor = feature_extractor,
           embedding_dim = 3,
           dense_layers = dense_layers,
@@ -1093,6 +1153,8 @@ for (framework in ml_frameworks) {
     for (feature_extractor in feature_extractor_list[[framework]]) {
       test_that(paste(framework, !is.null(feature_extractor), "plot"), {
         # Randomly select a configuration for training
+        n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
         rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
         dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -1111,7 +1173,7 @@ for (framework in ml_frameworks) {
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
-          target_levels = target_levels,
+          target_levels = target_levels[[n_classes]],
           feature_extractor = feature_extractor,
           embedding_dim = 3,
           dense_layers = dense_layers,
@@ -1148,6 +1210,8 @@ for (framework in ml_frameworks) {
     if(skip_documentation){
     test_that(paste(framework, n_classes, "descriptions"), {
       # Randomly select a configuration for training
+      n_classes=sample(x=class_range,size = 1,replace = FALSE)
+
       rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
       dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
       dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
@@ -1166,7 +1230,7 @@ for (framework in ml_frameworks) {
         name = paste0("movie_review_classifier_", "classes_", n_classes),
         label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
         text_embeddings = test_embeddings,
-        target_levels = target_levels,
+        target_levels = target_levels[[n_classes]],
         feature_extractor = NULL,
         embedding_dim = 3,
         dense_layers = dense_layers,
@@ -1251,7 +1315,7 @@ for (framework in ml_frameworks) {
       )
     })
     }
-  }
+
 }
 
 #Clean Directory

@@ -23,6 +23,7 @@ Other Data Management:
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-LargeDataSetForText-new}{\code{LargeDataSetForText$new()}}
 \item \href{#method-LargeDataSetForText-add_from_files_txt}{\code{LargeDataSetForText$add_from_files_txt()}}
 \item \href{#method-LargeDataSetForText-add_from_files_pdf}{\code{LargeDataSetForText$add_from_files_pdf()}}
 \item \href{#method-LargeDataSetForText-add_from_files_xlsx}{\code{LargeDataSetForText$add_from_files_xlsx()}}
@@ -48,6 +49,27 @@ Other Data Management:
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForText-new"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForText-new}{}}}
+\subsection{Method \code{new()}}{
+Method for creation of \link{LargeDataSetForText} instance. It can be initialized with \code{init_data}
+parameter if passed (Uses \code{add_from_data.frame()} method if \code{init_data} is \code{data.frame}).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$new(init_data = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{init_data}}{Initial \code{data.frame} for dataset.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new instance of this class initialized with \code{init_data} if passed.
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetForText-add_from_files_txt"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetForText-add_from_files_txt}{}}}
@@ -247,8 +269,9 @@ Method for adding raw texts from a \code{data.frame}
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{data_frame}}{Object of class \code{data.frame} with at least the following columns "id","text","bib_entry",
-"license", "url_license", "text_license", and "url_source". If a column is missing an error occurs. Additional
-columns are dropped.}
+"license", "url_license", "text_license", and "url_source". If "id" and7or "text" is missing an error occurs.
+If the other columns are not present in the \code{data.frame} they are added with empty values(\code{NA}).
+Additional columns are dropped.}
 }
 \if{html}{\out{</div>}}
 }

@@ -205,3 +205,16 @@ get_tr_types_list_decsription <- function() {
   }
   return(list_description)
 }
+
+
+
+# For deprecated functions only------------------------------------------------
+#' @keywords internal
+paramDesc.raw_texts <- function() {
+  return(" `vector` containing the raw texts for training.")
+}
+
+#' @keywords internal
+paramDesc.vocab_raw_texts <- function() {
+  return("`vector` containing the raw texts for creating the vocabulary.")
+}

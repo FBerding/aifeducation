@@ -607,18 +607,23 @@ AIFEBaseModel <- R6::R6Class(
     prepare_embeddings_as_np_array = function(embeddings) {
       if ("EmbeddedText" %in% class(embeddings)) {
         prepared_dataset <- embeddings$embeddings
-        return(np$array(prepared_dataset))
+        tmp_np_array=np$array(prepared_dataset)
       } else if ("array" %in% class(embeddings)) {
         prepared_dataset <- embeddings
-        return(np$array(prepared_dataset))
+        tmp_np_array=np$array(prepared_dataset)
       } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
         prepared_dataset <- embeddings$set_format("np")
-        return(prepared_dataset["input"])
+        tmp_np_array=prepared_dataset["input"]
       } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
         prepared_dataset <- embeddings$get_dataset()
         prepared_dataset$set_format("np")
-        return(prepared_dataset["input"])
+        tmp_np_array=prepared_dataset["input"]
       }
+      tmp_np_array=reticulate::np_array(tmp_np_array)
+      if(numpy_writeable(tmp_np_array)==FALSE){
+        warning("Numpy array is not writable")
+      }
+      return(tmp_np_array)
     },
     #--------------------------------------------------------------------------
     get_rownames_from_embeddings = function(embeddings) {

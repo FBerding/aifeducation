@@ -18,7 +18,6 @@
 #'
 #' @param install_aifeducation_studio `bool` If `TRUE` all necessary R packages are installed for using AI for Education
 #'   Studio.
-#' @param cpu_only `bool` `TRUE` installs the cpu only version of the machine learning frameworks.
 #'
 #' @return Function does nothing return. It installes python, optional R packages, and necessary 'python' packages on a
 #'   machine.
@@ -30,18 +29,15 @@
 #' @family Installation and Configuration
 #'
 #' @export
-install_aifeducation <- function(install_aifeducation_studio = TRUE,
-                                 cpu_only = FALSE) {
+install_aifeducation <- function(install_aifeducation_studio = TRUE) {
   reticulate::install_python()
   reticulate::install_miniconda()
   install_py_modules(
     envname = "aifeducation",
     install = "pytorch",
-    tf_version = "2.15",
     pytorch_cuda_version = "12.1",
     python_version = "3.12",
-    remove_first = FALSE,
-    cpu_only = cpu_only
+    remove_first = FALSE
   )
 
   if (install_aifeducation_studio == TRUE) {
@@ -70,13 +66,19 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #'   * `install = "all"`: for 'pytorch' and 'tensorflow'.
 #'   * `install = "pytorch"`: for 'pytorch'.
 #'   * `install = "tensorflow"`: for 'tensorflow'.
-#' @param tf_version `string` determining the desired version of 'tensorflow'.
+#' @param transformer_version `string` determining the desired version of the python library 'transformers'.#'
+#' @param tokenizers_version `string` determining the desired version of the python library 'tokenizers'.
+#' @param pandas_version `string` determining the desired version of the python library 'pandas'.
+#' @param datasets_version `string` determining the desired version of the python library 'datasets'.
+#' @param codecarbon_version `string` determining the desired version of the python library 'codecarbon'.
+#' @param safetensors_version `string` determining the desired version of the python library 'safetensors'.
+#' @param torcheval_version `string` determining the desired version of the python library 'torcheval'.
+#' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.#'
 #' @param pytorch_cuda_version `string` determining the desired version of 'cuda' for ' PyTorch'.
 #' @param python_version `string` Python version to use.
 #' @param remove_first `bool` If `TRUE` removes the environment completely before recreating the environment and
 #'   installing the packages. If `FALSE` the packages are installed in the existing environment without any prior
 #'   changes.
-#' @param cpu_only `bool` `TRUE` installs the cpu only version of the machine learning frameworks.
 #' @return Returns no values or objects. Function is used for installing the necessary python libraries in a conda
 #'   environment.
 #' @importFrom reticulate conda_create
@@ -88,22 +90,28 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' @export
 install_py_modules <- function(envname = "aifeducation",
                                install = "pytorch",
-                               tf_version = "2.15",
+                               transformer_version = "<=4.46",
+                               tokenizers_version = "<=0.20.4",
+                               pandas_version = "<=2.2.3",
+                               datasets_version = "<=3.1.0",
+                               codecarbon_version = "<=2.8.0",
+                               safetensors_version = "<=0.4.5",
+                               torcheval_version = "<=0.0.7",
+                               accelerate_version = "<=1.1.1",
                                pytorch_cuda_version = "12.1",
                                python_version = "3.9",
-                               remove_first = FALSE,
-                               cpu_only = FALSE) {
+                               remove_first = FALSE) {
   relevant_modules <- c(
-    "transformers",
-    "tokenizers",
-    "pandas",
-    "datasets",
-    "codecarbon"
+    paste0("transformers", transformer_version),
+    paste0("tokenizers", tokenizers_version),
+    paste0("pandas", pandas_version),
+    paste0("datasets", datasets_version),
+    paste0("codecarbon", codecarbon_version)
   )
   relevant_modules_pt <- c(
-    "safetensors",
-    "torcheval",
-    "accelerate"
+    paste0("safetensors", safetensors_version),
+    paste0("torcheval", torcheval_version),
+    paste0("accelerate", accelerate_version)
   )
 
   # Check Arguments
@@ -128,58 +136,42 @@ install_py_modules <- function(envname = "aifeducation",
     )
   }
 
-  # Tensorflow Installation
+  # Tensorflow Installation---------------------------------------------------
   if (install == "all" || install == "tensorflow") {
-    if (cpu_only == TRUE) {
+    tf_version <- "2.15"
+    if (utils::compareVersion(tf_version, "2.16") < 0) {
       reticulate::conda_install(
         packages = c(
-          paste0("tensorflow-cpu", tf_version)
+          paste0("tensorflow-cpu<=", tf_version)
         ),
         envname = envname,
         conda = "auto",
         pip = TRUE
       )
     } else {
-      if (utils::compareVersion(tf_version, "2.16") < 0) {
-        reticulate::conda_install(
-          packages = c(
-            paste0("tensorflow<=", tf_version)
-          ),
-          envname = envname,
-          conda = "auto",
-          pip = TRUE
-        )
-      } else {
-        reticulate::conda_install(
-          packages = c(
-            paste0("tensorflow<=", tf_version),
-            "tf-keras"
-          ),
-          envname = envname,
-          conda = "auto",
-          pip = TRUE
-        )
-      }
-
       reticulate::conda_install(
         packages = c(
-          "cudatoolkit",
-          "cuDNN"
+          paste0("tensorflow-cpu<=", tf_version),
+          "tf-keras"
         ),
         envname = envname,
         conda = "auto",
-        pip = FALSE
+        pip = TRUE
       )
     }
 
     reticulate::conda_install(
-      packages = relevant_modules,
+      packages = c(
+        "cudatoolkit",
+        "cuDNN"
+      ),
       envname = envname,
       conda = "auto",
-      pip = TRUE
+      pip = FALSE
     )
   }
 
+  # PyTorch Installation---------------------------------------------------
   if (install == "all" || install == "pytorch") {
     reticulate::conda_install(
       packages = c(
@@ -191,9 +183,19 @@ install_py_modules <- function(envname = "aifeducation",
       conda = "auto",
       pip = FALSE
     )
+  }
 
+  # Necessary Packages----------------------------------------------------
+  if (install == "all" || install == "pytorch") {
     reticulate::conda_install(
       packages = c(relevant_modules, relevant_modules_pt),
+      envname = envname,
+      conda = "auto",
+      pip = TRUE
+    )
+  } else {
+    reticulate::conda_install(
+      packages = c(relevant_modules),
       envname = envname,
       conda = "auto",
       pip = TRUE

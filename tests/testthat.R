@@ -9,8 +9,14 @@
 library(testthat)
 library(aifeducation)
 
-print("Env Variables---------------------------------------------------------")
-print(Sys.getenv())
-print("----------------------------------------------------------------------")
+if(Sys.getenv("CI")=="true"){
+  print("---------------------------------------------------------")
+  print("On Continuous Integreation")
+  print("---------------------------------------------------------")
+} else {
+  print("---------------------------------------------------------")
+  print("Not On Continuous Integreation")
+  print("---------------------------------------------------------")
+}
 
 test_check("aifeducation")

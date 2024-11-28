@@ -18,6 +18,7 @@ library 'transformer's.
 }
 \seealso{
 Other Utils: 
+\code{\link{auto_n_cores}()},
 \code{\link{create_dir}()},
 \code{\link{generate_id}()},
 \code{\link{get_file_extension}()},

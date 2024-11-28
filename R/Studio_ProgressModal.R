@@ -150,12 +150,6 @@ start_and_monitor_long_task <- function(id,
   shiny::moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------
 
-    print("log_path")
-    print(log_path)
-    print("Argument")
-    print(ExtendedTask_type)
-    print(ExtendedTask_arguments)
-
     # Reset log
     reset_log(log_path = log_path)
     loss_log_path <- paste0(dirname(log_path), "/aifeducation_loss.log")
@@ -184,6 +178,17 @@ start_and_monitor_long_task <- function(id,
 
     # Show modal
     shiny::showModal(progress_modal)
+
+    #Add current conda env to arguments
+    ExtendedTask_arguments["current_conda_env"]=get_current_conda_env()
+
+
+    print("log_path")
+    print(log_path)
+    print("Argument")
+    print(ExtendedTask_type)
+    print(ExtendedTask_arguments)
+
     args <- ExtendedTask_arguments
     save(args,
       file = paste0(getwd(), "/arguments.rda")
@@ -205,7 +210,7 @@ start_and_monitor_long_task <- function(id,
     } else if (ExtendedTask_type == "train_transformer") {
       CurrentTask <- shiny::ExtendedTask$new(long_train_transformer)
     }
-    if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments)
+    if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = args)
 
     # Check progress of the task
     progress_bar_status <- shiny::reactive({
