@@ -153,7 +153,7 @@ relevant if \code{attention_type="multihead"}.}
 \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder.}
 
 \item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values are \code{"fourier"} and
-\code{multihead}.}
+\code{"multihead"}.}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 

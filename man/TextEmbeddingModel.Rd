@@ -81,7 +81,7 @@ Method for creating a new text embedding model
   method = NULL,
   ml_framework = "pytorch",
   max_length = 0,
-  chunks = 1,
+  chunks = 2,
   overlap = 0,
   emb_layer_min = "middle",
   emb_layer_max = "2_3_layer",
@@ -119,8 +119,7 @@ set \code{ml_framework=NULL}.}
 \item{\code{max_length}}{\code{int} determining the maximum length of token
 sequences used in transformer models. Not relevant for the other methods.}
 
-\item{\code{chunks}}{\code{int} Maximum number of chunks. Only relevant for
-transformer models.}
+\item{\code{chunks}}{\code{int} Maximum number of chunks. Must be at least 2.}
 
 \item{\code{overlap}}{\code{int} determining the number of tokens which should be added
 at the beginning of the next chunk. Only relevant for transformer models.}
