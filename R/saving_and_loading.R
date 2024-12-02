@@ -144,7 +144,7 @@ create_config_state <- function(object) {
 
   #Remove embeddings to avoid duplicate data storage
   if(config["class"]=="EmbeddedText"){
-    config$self$embeddings=NA
+    config$public$embeddings=NA
   }
 
   return(config)

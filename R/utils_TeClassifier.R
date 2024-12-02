@@ -33,10 +33,10 @@
 #'   * **dynamic_iota_index**: Dynamic Iota Index Iota Reliability Concept Version 2.
 #'   * **kalpha_nominal**: Krippendorff's Alpha for nominal variables.
 #'   * **kalpha_ordinal**: Krippendorff's Alpha for ordinal variables.
-#'   * **kendall**: Kendall's coefficient of concordance W.
-#'   * **kappa2_unweighted**: Cohen's Kappa unweighted.
-#'   * **kappa2_equal_weighted**: Weighted Cohen's Kappa with equal weights.
-#'   * **kappa2_squared_weighted**: Weighted Cohen's Kappa with squared weights.
+#'   * **kendall**: Kendall's coefficient of concordance W with correction for ties.
+#'   * **c_kappa_unweighted**: Cohen's Kappa unweighted.
+#'   * **c_kappa_linear**: Weighted Cohen's Kappa with linear increasing weights.
+#'   * **c_kappa_squared**: Weighted Cohen's Kappa with quadratic increasing weights.
 #'   * **kappa_fleiss**: Fleiss' Kappa for multiple raters without exact estimation.
 #'   * **percentage_agreement**: Percentage Agreement.
 #'   * **balanced_accuracy**: Average accuracy within each class.
@@ -62,9 +62,9 @@ get_coder_metrics <- function(true_values = NULL,
     "kalpha_nominal",
     "kalpha_ordinal",
     "kendall",
-    "kappa2_unweighted",
-    "kappa2_equal_weighted",
-    "kappa2_squared_weighted",
+    "c_kappa_unweighted",
+    "c_kappa_linear",
+    "c_kappa_squared",
     "kappa_fleiss",
     "percentage_agreement",
     "balanced_accuracy",
@@ -112,33 +112,16 @@ get_coder_metrics <- function(true_values = NULL,
       method = "ordinal"
     )$value
 
-    metric_values["kendall"] <- irr::kendall(
-      ratings = cbind(true_values, predicted_values),
-      correct = TRUE
-    )$value
+    #Kendall
+    metric_values["kendall"] <- kendalls_w(
+      rater_one = true_values,
+      rater_two = predicted_values)$kendall_w_corrected
 
-    if (length(table(predicted_values)) > 1) {
-      metric_values["kappa2_unweighted"] <- irr::kappa2(
-        ratings = cbind(true_values, predicted_values),
-        weight = "unweighted",
-        sort.levels = FALSE
-      )$value
-      metric_values["kappa2_equal_weighted"] <- irr::kappa2(
-        ratings = cbind(true_values, predicted_values),
-        weight = "equal",
-        sort.levels = FALSE
-      )$value
-      metric_values["kappa2_squared_weighted"] <- irr::kappa2(
-        ratings = cbind(true_values, predicted_values),
-        weight = "squared",
-        sort.levels = FALSE
-      )$value
-    } else {
-      metric_values["kappa2_unweighted"] <- NA
-      metric_values["kappa2_equal_weighted"] <- NA
-      metric_values["kappa2_squared_weighted"] <- NA
-    }
-
+    #Cohens Kappa
+    c_kappa=cohens_kappa(rater_one = true_values,rater_two = predicted_values)
+      metric_values["c_kappa_unweighted"] <- c_kappa$kappa_unweighted
+      metric_values["c_kappa_linear"] <- c_kappa$kappa_linear
+      metric_values["c_kappa_squared"] <- c_kappa$kappa_squared
 
     metric_values["kappa_fleiss"] <- irr::kappam.fleiss(
       ratings = cbind(true_values, predicted_values),
@@ -146,10 +129,7 @@ get_coder_metrics <- function(true_values = NULL,
       detail = FALSE
     )$value
 
-    metric_values["percentage_agreement"] <- irr::agree(
-      ratings = cbind(true_values, predicted_values),
-      tolerance = 0
-    )$value / 100
+    metric_values["percentage_agreement"] <- sum(diag(table(rater_one,rater_two))/length(rater_one))
 
     metric_values["balanced_accuracy"] <- sum(
       diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)) /
@@ -157,6 +137,7 @@ get_coder_metrics <- function(true_values = NULL,
 
     metric_values["gwet_ac"] <- irrCAC::gwet.ac1.raw(ratings = cbind(true_values, predicted_values))$est$coeff.val
 
+    #Standard measures
     standard_measures <- calc_standard_classification_measures(
       true_values = true_values,
       predicted_values = predicted_values

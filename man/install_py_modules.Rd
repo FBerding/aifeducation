@@ -7,7 +7,14 @@
 install_py_modules(
   envname = "aifeducation",
   install = "pytorch",
-  transformer_version = "4.46",
+  transformer_version = "<=4.46",
+  tokenizers_version = "<=0.20.4",
+  pandas_version = "<=2.2.3",
+  datasets_version = "<=3.1.0",
+  codecarbon_version = "<=2.8.0",
+  safetensors_version = "<=0.4.5",
+  torcheval_version = "<=0.0.7",
+  accelerate_version = "<=1.1.1",
   pytorch_cuda_version = "12.1",
   python_version = "3.9",
   remove_first = FALSE
@@ -23,7 +30,21 @@ install_py_modules(
 \item \code{install = "tensorflow"}: for 'tensorflow'.
 }}
 
-\item{transformer_version}{\code{string} determining the desired version of the python library 'transformers'.}
+\item{transformer_version}{\code{string} determining the desired version of the python library 'transformers'.#'}
+
+\item{tokenizers_version}{\code{string} determining the desired version of the python library 'tokenizers'.}
+
+\item{pandas_version}{\code{string} determining the desired version of the python library 'pandas'.}
+
+\item{datasets_version}{\code{string} determining the desired version of the python library 'datasets'.}
+
+\item{codecarbon_version}{\code{string} determining the desired version of the python library 'codecarbon'.}
+
+\item{safetensors_version}{\code{string} determining the desired version of the python library 'safetensors'.}
+
+\item{torcheval_version}{\code{string} determining the desired version of the python library 'torcheval'.}
+
+\item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.#'}
 
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for ' PyTorch'.}
 
