@@ -182,13 +182,13 @@ EmbeddedText <- R6::R6Class(
         }
       }
 
-      #save date
-      data_embeddings=self$embeddings
+      # save date
+      data_embeddings <- self$embeddings
 
       save(
         data_embeddings,
-        file = paste0(dir_path,"/",folder_name,"/data.rda")
-        )
+        file = paste0(dir_path, "/", folder_name, "/data.rda")
+      )
     },
     #-------------------------------------------------------------------------
     #' @description Method for checking if the model was successfully configured. An object can only be used if this
@@ -241,10 +241,10 @@ EmbeddedText <- R6::R6Class(
         )
       }
 
-      #Load data
-      data=load(paste0(dir_path,"/","data.rda"))
-      data=get(data)
-      self$embeddings=data
+      # Load data
+      data <- load(paste0(dir_path, "/", "data.rda"))
+      data <- get(data)
+      self$embeddings <- data
     },
     #--------------------------------------------------------------------------
     #' @description Method for retrieving information about the model that generated this embedding.

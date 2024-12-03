@@ -215,7 +215,8 @@ TEFeatureExtractor <- R6::R6Class(
       create_dir(
         dir_path = self$last_training$config$dir_checkpoint,
         trace = self$last_training$config$trace,
-        msg = "Creating Checkpoint Directory")
+        msg = "Creating Checkpoint Directory"
+      )
 
       # Set up log file
       log_top_value <- 0

@@ -30,7 +30,7 @@ long_add_texts_to_dataset <- function(source_path,
                                       log_write_interval = 2,
                                       current_conda_env) {
   promises::future_promise({
-    #Set up conda env
+    # Set up conda env
     reticulate::use_condaenv(condaenv = current_conda_env)
 
     # Set up top level progress monitoring
@@ -115,7 +115,7 @@ long_transform_text_to_embeddings <- function(source_path,
                                               log_write_interval = 2,
                                               current_conda_env) {
   promises::future_promise({
-    #Set up conda env
+    # Set up conda env
     reticulate::use_condaenv(condaenv = current_conda_env)
 
     # Read the large data set for raw texts
@@ -207,7 +207,7 @@ long_classifier <- function(classifier_type,
                             n_cores,
                             current_conda_env) {
   promises::future_promise({
-    #Set up conda env
+    # Set up conda env
     reticulate::use_condaenv(condaenv = current_conda_env)
 
     # Load data
@@ -297,7 +297,7 @@ long_classifier <- function(classifier_type,
         ml_trace = 0,
         log_dir = log_dir,
         log_write_interval = log_write_interval,
-        n_cores=n_cores
+        n_cores = n_cores
       )
     } else if (classifier_type == "protonet") {
       # Create
@@ -360,7 +360,7 @@ long_classifier <- function(classifier_type,
         loss_margin = loss_margin,
         sampling_separate = sampling_separate,
         sampling_shuffle = sampling_shuffle,
-        n_cores=n_cores
+        n_cores = n_cores
       )
     }
     # Save
@@ -441,7 +441,7 @@ long_feature_extractor <- function(name,
                                    folder_name,
                                    current_conda_env) {
   promises::future_promise({
-    #Set up conda env
+    # Set up conda env
     reticulate::use_condaenv(condaenv = current_conda_env)
 
     # Load data
@@ -507,7 +507,7 @@ long_feature_extractor <- function(name,
 long_create_transformer <- function(transformer_type, dataset_dir_path, params,
                                     current_conda_env) {
   promises::future_promise({
-    #Set up conda env
+    # Set up conda env
     reticulate::use_condaenv(condaenv = current_conda_env)
 
     text_dataset <- LargeDataSetForText$new()
@@ -524,7 +524,7 @@ long_create_transformer <- function(transformer_type, dataset_dir_path, params,
 long_train_transformer <- function(transformer_type, dataset_dir_path, params,
                                    current_conda_env) {
   promises::future_promise({
-    #Set up conda env
+    # Set up conda env
     reticulate::use_condaenv(condaenv = current_conda_env)
 
     text_dataset <- LargeDataSetForText$new()

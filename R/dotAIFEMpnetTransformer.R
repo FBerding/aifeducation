@@ -245,7 +245,6 @@
                       pytorch_safetensors = TRUE,
                       log_dir = NULL,
                       log_write_interval = 2) {
-
       if (ml_framework == "tensorflow") {
         stop("Using AIFEMpnetTransformer with 'tensorflow' is not supported.")
       }
@@ -336,7 +335,6 @@
                      pytorch_safetensors = TRUE,
                      log_dir = NULL,
                      log_write_interval = 2) {
-
       if (ml_framework == "tensorflow") {
         stop("Using AIFEMpnetTransformer with 'tensorflow' is not supported.")
       }

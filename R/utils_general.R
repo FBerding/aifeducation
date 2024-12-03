@@ -20,7 +20,7 @@
 #'
 #' @family Utils
 #' @export
-get_file_extension<-function(file_path){
+get_file_extension <- function(file_path) {
   extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
   extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
   return(extension)
@@ -35,10 +35,10 @@ get_file_extension<-function(file_path){
 #' @family Utils
 #' @export
 is.null_or_na <- function(object) {
-  if(is.null(object)){
+  if (is.null(object)) {
     return(TRUE)
   } else {
-    if(sum(is.na(object))==length(object)){
+    if (sum(is.na(object)) == length(object)) {
       return(TRUE)
     } else {
       return(FALSE)
@@ -220,13 +220,13 @@ run_py_file <- function(py_file_name) {
 #'
 #' @family Utils
 #' @export
-auto_n_cores<-function(){
-  if(Sys.getenv("CI")=="true"|
-     Sys.getenv("NOT_CRAN")=="true"|
-     Sys.getenv("_R_CHECK_LIMIT_CORES_")=="true"){
-    n_cores=min(2,parallel::detectCores())
+auto_n_cores <- function() {
+  if (Sys.getenv("CI") == "true" |
+    Sys.getenv("NOT_CRAN") == "true" |
+    Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true") {
+    n_cores <- min(2, parallel::detectCores())
   } else {
-    n_cores=floor(parallel::detectCores()*0.75)
+    n_cores <- floor(parallel::detectCores() * 0.75)
   }
-return(n_cores=max(1,n_cores))
+  return(n_cores = max(1, n_cores))
 }

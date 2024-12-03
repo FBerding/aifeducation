@@ -112,16 +112,17 @@ get_coder_metrics <- function(true_values = NULL,
       method = "ordinal"
     )$value
 
-    #Kendall
+    # Kendall
     metric_values["kendall"] <- kendalls_w(
       rater_one = true_values,
-      rater_two = predicted_values)$kendall_w_corrected
+      rater_two = predicted_values
+    )$kendall_w_corrected
 
-    #Cohens Kappa
-    c_kappa=cohens_kappa(rater_one = true_values,rater_two = predicted_values)
-      metric_values["c_kappa_unweighted"] <- c_kappa$kappa_unweighted
-      metric_values["c_kappa_linear"] <- c_kappa$kappa_linear
-      metric_values["c_kappa_squared"] <- c_kappa$kappa_squared
+    # Cohens Kappa
+    c_kappa <- cohens_kappa(rater_one = true_values, rater_two = predicted_values)
+    metric_values["c_kappa_unweighted"] <- c_kappa$kappa_unweighted
+    metric_values["c_kappa_linear"] <- c_kappa$kappa_linear
+    metric_values["c_kappa_squared"] <- c_kappa$kappa_squared
 
     metric_values["kappa_fleiss"] <- irr::kappam.fleiss(
       ratings = cbind(true_values, predicted_values),
@@ -129,15 +130,16 @@ get_coder_metrics <- function(true_values = NULL,
       detail = FALSE
     )$value
 
-    metric_values["percentage_agreement"] <- sum(diag(table(rater_one,rater_two))/length(rater_one))
+    metric_values["percentage_agreement"] <- sum(diag(table(rater_one, rater_two)) / length(rater_one))
 
     metric_values["balanced_accuracy"] <- sum(
-      diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)) /
+      diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
+    ) /
       ncol(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
 
     metric_values["gwet_ac"] <- irrCAC::gwet.ac1.raw(ratings = cbind(true_values, predicted_values))$est$coeff.val
 
-    #Standard measures
+    # Standard measures
     standard_measures <- calc_standard_classification_measures(
       true_values = true_values,
       predicted_values = predicted_values

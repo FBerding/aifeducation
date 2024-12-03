@@ -123,9 +123,9 @@ TEClassifierRegular <- R6::R6Class(
                          feature_extractor = NULL,
                          target_levels = NULL,
                          dense_size = 4,
-                         dense_layers=0,
+                         dense_layers = 0,
                          rec_size = 4,
-                         rec_layers=2,
+                         rec_layers = 2,
                          rec_type = "gru",
                          rec_bidirectional = FALSE,
                          self_attention_heads = 0,
@@ -138,7 +138,7 @@ TEClassifierRegular <- R6::R6Class(
                          recurrent_dropout = 0.4,
                          encoder_dropout = 0.1,
                          optimizer = "adam") {
-      #check if already configured
+      # check if already configured
       private$check_config_for_FALSE()
 
       # Checking of parameters--------------------------------------------------
@@ -151,16 +151,16 @@ TEClassifierRegular <- R6::R6Class(
       check_type(target_levels, c("vector"), FALSE)
       check_type(dense_size, type = "int", FALSE)
       check_type(dense_layers, type = "int", FALSE)
-      if(dense_layers>0){
-        if(dense_size<1){
+      if (dense_layers > 0) {
+        if (dense_size < 1) {
           stop("Dense layers added. Size for dense layers must be at least 1.")
         }
       }
 
       check_type(rec_size, type = "int", FALSE)
       check_type(rec_layers, type = "int", FALSE)
-      if(rec_layers>0){
-        if(rec_size<1){
+      if (rec_layers > 0) {
+        if (rec_size < 1) {
           stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
         }
       }
@@ -203,9 +203,9 @@ TEClassifierRegular <- R6::R6Class(
         features = private$text_embedding_model[["features"]],
         times = private$text_embedding_model[["times"]],
         dense_size = dense_size,
-        dense_layers=dense_layers,
+        dense_layers = dense_layers,
         rec_size = rec_size,
-        rec_layers=rec_layers,
+        rec_layers = rec_layers,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         intermediate_size = intermediate_size,
@@ -367,7 +367,7 @@ TEClassifierRegular <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores=auto_n_cores()) {
+                     n_cores = auto_n_cores()) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -432,7 +432,7 @@ TEClassifierRegular <- R6::R6Class(
       self$last_training$config$trace <- trace
       self$last_training$config$ml_trace <- ml_trace
 
-      self$last_training$config$n_cores<-n_cores
+      self$last_training$config$n_cores <- n_cores
 
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
@@ -472,7 +472,7 @@ TEClassifierRegular <- R6::R6Class(
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
           trace = trace,
-          n_cores=self$last_training$config$n_cores
+          n_cores = self$last_training$config$n_cores
         )
       } else {
         data_manager <- DataManagerClassifier$new(
@@ -487,7 +487,7 @@ TEClassifierRegular <- R6::R6Class(
           sc_min_k = sc_min_k,
           sc_max_k = sc_max_k,
           trace = trace,
-          n_cores=self$last_training$config$n_cores
+          n_cores = self$last_training$config$n_cores
         )
       }
 
@@ -511,9 +511,9 @@ TEClassifierRegular <- R6::R6Class(
                country is missing. Add iso code or deactivate tracking.")
         }
 
-        if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
-          path_look_file=codecarbon$lock$LOCKFILE
-          if(file.exists(path_look_file)){
+        if (utils::compareVersion(codecarbon["__version__"], "2.8.0") >= 0) {
+          path_look_file <- codecarbon$lock$LOCKFILE
+          if (file.exists(path_look_file)) {
             unlink(path_look_file)
           }
         }
@@ -1228,10 +1228,10 @@ TEClassifierRegular <- R6::R6Class(
         self$model <- py$TextEmbeddingClassifier_PT(
           features = as.integer(self$model_config$features),
           times = as.integer(self$model_config$times),
-          dense_size=as.integer(self$model_config$dense_size),
-          dense_layers=as.integer(self$model_config$dense_layers),
-          rec_size=as.integer(self$model_config$rec_size),
-          rec_layers=as.integer(self$model_config$rec_layers),
+          dense_size = as.integer(self$model_config$dense_size),
+          dense_layers = as.integer(self$model_config$dense_layers),
+          rec_size = as.integer(self$model_config$rec_size),
+          rec_layers = as.integer(self$model_config$rec_layers),
           rec_type = self$model_config$rec_type,
           rec_bidirectional = self$model_config$rec_bidirectional,
           intermediate_size = as.integer(self$model_config$intermediate_size),
@@ -1316,7 +1316,6 @@ TEClassifierRegular <- R6::R6Class(
 
       # Save results
       self$reliability$test_metric[iteration, ] <- test_res
-
     },
     #--------------------------------------------------------------------------
     calculate_measures_on_categorical_level = function(data_manager, iteration) {
@@ -1596,7 +1595,7 @@ TEClassifierRegular <- R6::R6Class(
         # Generate pseudo labels
         pseudo_data <- private$estimate_pseudo_labels(
           unlabeled_data = data_manager$get_unlabeled_data(),
-          val_data=val_data,
+          val_data = val_data,
           current_step = step
         )
 
@@ -1691,10 +1690,10 @@ TEClassifierRegular <- R6::R6Class(
       rownames(new_categories) <- rownames(predicted_labels)
       colnames(new_categories) <- c("cat", "prob")
 
-      #Correct probabilities for reliability on the validation data
-      predicted_labels<-private$pseudo_labels_correct_prob(
-        predictions=predicted_labels,
-        val_data=val_data
+      # Correct probabilities for reliability on the validation data
+      predicted_labels <- private$pseudo_labels_correct_prob(
+        predictions = predicted_labels,
+        val_data = val_data
       )
 
       # Gather information for every case. That is the category with the
@@ -1755,8 +1754,8 @@ TEClassifierRegular <- R6::R6Class(
       return(pseudo_data)
     },
     #--------------------------------------------------------------------------
-    pseudo_labels_correct_prob=function(predictions,val_data){
-      #Predict on val data
+    pseudo_labels_correct_prob = function(predictions, val_data) {
+      # Predict on val data
       val_predictions <- self$predict(
         newdata = val_data,
         ml_trace = self$last_training$config$ml_trace,
@@ -1766,9 +1765,9 @@ TEClassifierRegular <- R6::R6Class(
       names(val_pred_cat) <- rownames(val_predictions)
       val_pred_cat <- val_pred_cat[val_data["id"]]
 
-      #Calculate Assignment Error Matrix
+      # Calculate Assignment Error Matrix
       val_data$set_format("np")
-      val_iota_object<-iotarelr::check_new_rater(
+      val_iota_object <- iotarelr::check_new_rater(
         true_values = factor(
           x = val_data["labels"],
           levels = 0:(length(self$model_config$target_levels) - 1),
@@ -1778,21 +1777,21 @@ TEClassifierRegular <- R6::R6Class(
         free_aem = TRUE
       )
 
-      #Estimate probability of each category
-      aem=val_iota_object$categorical_level$raw_estimates$assignment_error_matrix
-      class_sizes=val_iota_object$information$est_true_cat_sizes
-      p_cat=class_sizes%*%aem
+      # Estimate probability of each category
+      aem <- val_iota_object$categorical_level$raw_estimates$assignment_error_matrix
+      class_sizes <- val_iota_object$information$est_true_cat_sizes
+      p_cat <- class_sizes %*% aem
 
-      #Estimate probability that the category is the true category
-      p_cat_true=class_sizes*diag(aem)/p_cat
-      p_cat_true=replace(p_cat_true,list=is.nan(p_cat_true),values=0)
+      # Estimate probability that the category is the true category
+      p_cat_true <- class_sizes * diag(aem) / p_cat
+      p_cat_true <- replace(p_cat_true, list = is.nan(p_cat_true), values = 0)
 
-      #Correct probabilities
-      number_columns=ncol(predictions)
-      col=ncol(predictions)-1
-      for(i in 1:nrow(predictions)){
-        predictions[i,1:col]<-predictions[i,1:col]*p_cat_true/sum(predictions[i,1:col]*p_cat_true)
-        predictions[i,number_columns]<-self$model_config$target_levels[which.max(as.numeric(predictions[i,1:col]))]
+      # Correct probabilities
+      number_columns <- ncol(predictions)
+      col <- ncol(predictions) - 1
+      for (i in 1:nrow(predictions)) {
+        predictions[i, 1:col] <- predictions[i, 1:col] * p_cat_true / sum(predictions[i, 1:col] * p_cat_true)
+        predictions[i, number_columns] <- self$model_config$target_levels[which.max(as.numeric(predictions[i, 1:col]))]
       }
       return(predictions)
     },
@@ -1876,7 +1875,8 @@ TEClassifierRegular <- R6::R6Class(
       create_dir(
         dir_path = paste0(self$last_training$config$dir_checkpoint, "/checkpoints"),
         trace = self$last_training$config$trace,
-        msg = "Creating Checkpoint Directory")
+        msg = "Creating Checkpoint Directory"
+      )
 
       # Set target column
       if (self$model_config$require_one_hot == FALSE) {
@@ -2014,8 +2014,8 @@ TEClassifierRegular <- R6::R6Class(
         )
       }
 
-      #provide rownames and replace -100
-      history<-private$prepare_history_data(history)
+      # provide rownames and replace -100
+      history <- private$prepare_history_data(history)
       return(history)
     },
     #--------------------------------------------------------------------------
@@ -2044,7 +2044,7 @@ TEClassifierRegular <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     adjust_configuration = function() {
-      if (self$model_config$rec_layers!=0 & self$model_config$self_attention_heads > 0) {
+      if (self$model_config$rec_layers != 0 & self$model_config$self_attention_heads > 0) {
         if (self$model_config$features %% 2 != 0) {
           stop("The number of features of the TextEmbeddingmodel is
                not a multiple of 2.")
@@ -2065,18 +2065,18 @@ TEClassifierRegular <- R6::R6Class(
         }
       }
 
-      if(self$model_config$rec_layers<=1){
-        self$model_config$rec_dropout=0.0
+      if (self$model_config$rec_layers <= 1) {
+        self$model_config$rec_dropout <- 0.0
       }
-      if(self$model_config$rec_layers<=0){
-        self$model_config$rec_size=0
+      if (self$model_config$rec_layers <= 0) {
+        self$model_config$rec_size <- 0
       }
 
-      if(self$model_config$dense_layers<=1){
-        self$model_config$dense_dropout=0.0
+      if (self$model_config$dense_layers <= 1) {
+        self$model_config$dense_dropout <- 0.0
       }
-      if(self$model_config$dense_layers<=0){
-        self$model_config$dense_size=0
+      if (self$model_config$dense_layers <= 0) {
+        self$model_config$dense_size <- 0
       }
     },
     #--------------------------------------------------------------------------

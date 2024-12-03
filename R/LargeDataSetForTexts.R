@@ -374,7 +374,7 @@ LargeDataSetForText <- R6::R6Class(
     #'   Additional columns are dropped.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_data.frame = function(data_frame) {
-      #Necessary columns
+      # Necessary columns
       if (is.data.frame(data_frame) == FALSE) {
         stop("Input must be of type data.frame")
       }
@@ -385,23 +385,23 @@ LargeDataSetForText <- R6::R6Class(
         stop("data.frame must contain a column text.")
       }
 
-      data_to_add<-data_frame
+      data_to_add <- data_frame
 
-      #optional columns
+      # optional columns
       if ("bib_entry" %in% colnames(data_to_add) == FALSE) {
-        data_to_add["bib_entry"]<-rep(x=NA,times=nrow(data_to_add))
+        data_to_add["bib_entry"] <- rep(x = NA, times = nrow(data_to_add))
       }
       if ("license" %in% colnames(data_to_add) == FALSE) {
-        data_to_add["license"]<-rep(x=NA,times=nrow(data_to_add))
+        data_to_add["license"] <- rep(x = NA, times = nrow(data_to_add))
       }
       if ("url_license" %in% colnames(data_to_add) == FALSE) {
-        data_to_add["url_license"]<-rep(x=NA,times=nrow(data_to_add))
+        data_to_add["url_license"] <- rep(x = NA, times = nrow(data_to_add))
       }
       if ("text_license" %in% colnames(data_to_add) == FALSE) {
-        data_to_add["text_license"]<-rep(x=NA,times=nrow(data_to_add))
+        data_to_add["text_license"] <- rep(x = NA, times = nrow(data_to_add))
       }
       if ("url_source" %in% colnames(data_to_add) == FALSE) {
-        data_to_add["url_source"]<-rep(x=NA,times=nrow(data_to_add))
+        data_to_add["url_source"] <- rep(x = NA, times = nrow(data_to_add))
       }
 
       # Transform to a python dataset
@@ -545,15 +545,15 @@ LargeDataSetForText <- R6::R6Class(
       return(as.data.frame(data))
     },
     clean_text = function(text) {
-      #text <- stringr::str_replace_all(text, pattern = "[:space:]{1,}", replacement = " ")
-      #text <- stringr::str_replace_all(text, pattern = "-(?=[:space:])", replacement = "")
+      # text <- stringr::str_replace_all(text, pattern = "[:space:]{1,}", replacement = " ")
+      # text <- stringr::str_replace_all(text, pattern = "-(?=[:space:])", replacement = "")
       text <- stringi::stri_replace_all(text, regex = "[:space:]{1,}", replacement = " ")
       text <- stringi::stri_replace_all(text, regex = "-(?=[:space:])", replacement = "")
       return(text)
     },
     remove_file_extenstion = function(file) {
-      #tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
-      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1,simplify=TRUE)
+      # tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
+      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1, simplify = TRUE)
       return(paste0(tmp_string[1, 1:(ncol(tmp_string) - 1)], collapse = "."))
     }
   )

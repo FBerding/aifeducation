@@ -147,12 +147,12 @@ kripp_alpha <- function(rater_one, rater_two) {
       for (j in 1:ncol(value_unit_matrix)) {
         value_1 <- value_unit_matrix[i_1, j]
         value_2 <- value_unit_matrix[i_2, j]
-        m_u=sum(value_unit_matrix[, j])
-        if(m_u>1){
+        m_u <- sum(value_unit_matrix[, j])
+        if (m_u > 1) {
           if (i_1 == i_2) {
-            tmp_sum <- tmp_sum + value_1 * (value_2 - 1)/(m_u-1)
+            tmp_sum <- tmp_sum + value_1 * (value_2 - 1) / (m_u - 1)
           } else {
-            tmp_sum <- tmp_sum + value_1 * value_2/(m_u-1)
+            tmp_sum <- tmp_sum + value_1 * value_2 / (m_u - 1)
           }
         }
       }
@@ -167,7 +167,7 @@ kripp_alpha <- function(rater_one, rater_two) {
     data = 0, nrow = length(levels(rater_one)),
     ncol = length(levels(rater_one))
   )
-  row_sums=rowSums(value_unit_matrix)
+  row_sums <- rowSums(value_unit_matrix)
   for (i_1 in 1:nrow(value_unit_matrix)) {
     for (i_2 in 1:nrow(value_unit_matrix)) {
       if (i_1 == i_2) {

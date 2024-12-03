@@ -36,7 +36,7 @@
 
 # TODO (Yuliia): session has no visible binding
 create_process_modal <- function(ns,
-                                 string_update_interval="",
+                                 string_update_interval = "",
                                  title = "In progress. Please wait.",
                                  inc_middle = TRUE,
                                  inc_bottom = TRUE,
@@ -44,9 +44,11 @@ create_process_modal <- function(ns,
                                  easy_close = FALSE,
                                  size = "l") {
   prograssbars_list <- shiny::tagList(
-    shiny::tags$p("Report chart updates every",
-                  string_update_interval,
-                  "seconds.")
+    shiny::tags$p(
+      "Report chart updates every",
+      string_update_interval,
+      "seconds."
+    )
   )
   prograssbars_list[length(prograssbars_list) + 1] <- shiny::tagList(
     shinyWidgets::progressBar(
@@ -179,8 +181,8 @@ start_and_monitor_long_task <- function(id,
     # Show modal
     shiny::showModal(progress_modal)
 
-    #Add current conda env to arguments
-    ExtendedTask_arguments["current_conda_env"]=get_current_conda_env()
+    # Add current conda env to arguments
+    ExtendedTask_arguments["current_conda_env"] <- get_current_conda_env()
 
 
     print("log_path")

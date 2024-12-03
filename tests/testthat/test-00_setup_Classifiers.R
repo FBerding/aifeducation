@@ -12,9 +12,9 @@ test_that("Setup Classifier Data", {
   root_path_data <- testthat::test_path("test_data/Embeddings")
   create_dir(root_path_data, FALSE)
 
-  root_path_results<- testthat::test_path("test_data_tmp")
+  root_path_results <- testthat::test_path("test_data_tmp")
   create_dir(root_path_results, FALSE)
-  root_path_results<- testthat::test_path("test_data_tmp/classifier")
+  root_path_results <- testthat::test_path("test_data_tmp/classifier")
   create_dir(root_path_results, FALSE)
 
   ml_frameworks <- c("pytorch")
@@ -22,7 +22,7 @@ test_that("Setup Classifier Data", {
 
   method_list <- "lstm"
 
-  imdb_embeddings<-load_from_disk(paste0(root_path_data,"/imdb_embeddings"))
+  imdb_embeddings <- load_from_disk(paste0(root_path_data, "/imdb_embeddings"))
 
   dataset_list <- list(
     "EmbeddedText" = imdb_embeddings,
@@ -68,6 +68,6 @@ test_that("Setup Classifier Data", {
   }
 
   expect_true(
-    file.exists(paste0(root_path_results,"/","feature_extractor_",framework,"/","model_data.safetensors"))
+    file.exists(paste0(root_path_results, "/", "feature_extractor_", framework, "/", "model_data.safetensors"))
   )
 })

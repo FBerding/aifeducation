@@ -116,9 +116,11 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     }
   }
 
-  result_list <- foreach::foreach(index = 1:length(input),
-                                  .export = "create_synthetic_units_from_matrix",
-                                  .errorhandling="pass") %dopar% {
+  result_list <- foreach::foreach(
+    index = 1:length(input),
+    .export = "create_synthetic_units_from_matrix",
+    .errorhandling = "pass"
+  ) %dopar% {
     # index=1
     create_synthetic_units_from_matrix(
       matrix_form = matrix_form[

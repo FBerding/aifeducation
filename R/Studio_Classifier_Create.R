@@ -198,18 +198,18 @@ Classifiers_Create_UI <- function(id) {
               ),
               bslib::card_body(
                 shiny::sliderInput(
-                  value=1,
-                  min=0,
-                  max=20,
-                  step=1,
+                  value = 1,
+                  min = 0,
+                  max = 20,
+                  step = 1,
                   inputId = shiny::NS(id, "rec_layers"),
                   label = "Reccurrent Layers"
                 ),
                 shiny::sliderInput(
-                  value=1,
-                  min=1,
-                  max=20,
-                  step=1,
+                  value = 1,
+                  min = 1,
+                  max = 20,
+                  step = 1,
                   inputId = shiny::NS(id, "rec_size"),
                   label = "Reccurrent Layers Size"
                 ),
@@ -240,19 +240,19 @@ Classifiers_Create_UI <- function(id) {
               ),
               bslib::card_body(
                 shiny::sliderInput(
-                  value=0,
-                  min=0,
-                  max=20,
-                  step=1,
+                  value = 0,
+                  min = 0,
+                  max = 20,
+                  step = 1,
                   inputId = shiny::NS(id, "dense_layers"),
                   label = "Dense Layers",
                   width = "100%"
                 ),
                 shiny::sliderInput(
-                  value=1,
-                  min=1,
-                  max=20,
-                  step=1,
+                  value = 1,
+                  min = 1,
+                  max = 20,
+                  step = 1,
                   inputId = shiny::NS(id, "dense_size"),
                   label = "Dense Layers Size",
                   width = "100%"
@@ -558,7 +558,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
       # Check for errors
       errors <- check_errors_create_classifier(
-        classifier_type=input$classifier_type,
+        classifier_type = input$classifier_type,
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
@@ -601,9 +601,9 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             # feature_extractor=NULL,
             # targets=NULL,
             dense_layers = input$dense_layers,
-            dense_size=input$dense_size,
+            dense_size = input$dense_size,
             rec_layers = input$rec_layers,
-            rec_size=input$rec_size,
+            rec_size = input$rec_size,
             rec_type = input$rec_type,
             rec_bidirectional = input$rec_bidirectional,
             self_attention_heads = input$self_attention_heads,
@@ -649,10 +649,10 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             Nq = input$n_query,
             loss_alpha = loss_alpha,
             loss_margin = loss_margin,
-            sampling_separate=input$sampling_separate,
-            sampling_shuffle=input$sampling_shuffle,
+            sampling_separate = input$sampling_separate,
+            sampling_shuffle = input$sampling_shuffle,
             embedding_dim = input$protonet_embedding_dim,
-            n_cores=auto_n_cores()
+            n_cores = auto_n_cores()
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,

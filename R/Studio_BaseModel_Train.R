@@ -138,9 +138,9 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
         errors <- append(errors, "Please specify a directory path for saiving the trained Base Model.")
       }
 
-      if (inherits(x=model_architecture,what = "errors")) {
+      if (inherits(x = model_architecture, what = "errors")) {
         errors <- append(errors, model_architecture)
-      } else if (inherits(x=model_architecture,what= "params")) {
+      } else if (inherits(x = model_architecture, what = "params")) {
         if (!model_architecture$model_exists) {
           errors <- append(errors, paste(
             "There is no model to load in the directory",

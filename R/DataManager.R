@@ -89,7 +89,7 @@ DataManagerClassifier <- R6::R6Class(
                           sc_min_k = 1,
                           sc_max_k = 10,
                           trace = TRUE,
-                          n_cores=auto_n_cores()) {
+                          n_cores = auto_n_cores()) {
       # Checking Prerequisites---------------------------------------------------
       check_class(data_embeddings, c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
       check_class(data_targets, c("factor"), FALSE)
@@ -108,7 +108,7 @@ DataManagerClassifier <- R6::R6Class(
       check_type(sc_min_k, "int")
       check_type(sc_max_k, "int")
       check_type(trace, "bool")
-      check_type(n_cores, "int",FALSE)
+      check_type(n_cores, "int", FALSE)
 
       # Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -135,7 +135,7 @@ DataManagerClassifier <- R6::R6Class(
       self$config$sc$methods <- sc_methods
       self$config$sc$max_k <- sc_max_k
       self$config$sc$min_k <- sc_min_k
-      self$config$n_cores<-n_cores
+      self$config$n_cores <- n_cores
 
       # Add one hot encoding if necessary
       if (self$config$one_hot_encoding == TRUE) {
@@ -240,8 +240,8 @@ DataManagerClassifier <- R6::R6Class(
           }
 
           statistics <- table(c(length_labeled, length_unlabeled),
-                              c(labels_labeled, labels_unlabeled),
-                              useNA = "ifany"
+            c(labels_labeled, labels_unlabeled),
+            useNA = "ifany"
           )
           return(statistics)
         } else {
@@ -292,14 +292,14 @@ DataManagerClassifier <- R6::R6Class(
 
       if (inc_pseudo_data == TRUE) {
         if (!is.null(self$datasets$data_labeled_pseudo)) {
-        self$datasets$data_labeled_pseudo$set_format("np")
-        requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled_pseudo)
+          self$datasets$data_labeled_pseudo$set_format("np")
+          requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled_pseudo)
         }
       }
       if (inc_unlabeled == TRUE) {
         if (!is.null(self$datasets$data_unlabeled)) {
-        self$datasets$data_unlabeled$set_format("np")
-        requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_unlabeled)
+          self$datasets$data_unlabeled$set_format("np")
+          requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_unlabeled)
         }
       }
 
@@ -555,7 +555,7 @@ DataManagerClassifier <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    get_all_labels=function(){
+    get_all_labels = function() {
       self$datasets$data_labeled$set_format("np")
       self$datasets$data_labeled["labels"]
     },

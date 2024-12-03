@@ -1,13 +1,13 @@
 testthat::skip_on_cran()
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
   message = "Necessary python modules not available"
 )
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
-root_path_general_data<-testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
 create_dir(root_path_results, FALSE)
@@ -19,7 +19,7 @@ datasets$disable_progress_bars()
 
 # load data for test
 # object is imdb_embeddings
-imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
+imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
 dataset_list <- list(
   "EmbeddedText" = imdb_embeddings,
@@ -70,9 +70,9 @@ for (framework in ml_frameworks) {
           )
         )
 
-        #Clean Directory
+        # Clean Directory
         unlink(
-          x=train_path,
+          x = train_path,
           recursive = TRUE
         )
       })
@@ -115,9 +115,9 @@ for (framework in ml_frameworks) {
           expect_gte(nrow(log_loss), 2)
         }
 
-        #Clean Directory
+        # Clean Directory
         unlink(
-          x=train_path,
+          x = train_path,
           recursive = TRUE
         )
       })
@@ -268,9 +268,9 @@ for (framework in ml_frameworks) {
           tolerance = 1e-6
         )
 
-        #Clean Directory
+        # Clean Directory
         unlink(
-          x=dir_path,
+          x = dir_path,
           recursive = TRUE
         )
       })
@@ -325,9 +325,9 @@ for (framework in ml_frameworks) {
           tolerance = 1e-6
         )
 
-        #Clean Directory
+        # Clean Directory
         unlink(
-          x=dir_path,
+          x = dir_path,
           recursive = TRUE
         )
       })
@@ -336,10 +336,10 @@ for (framework in ml_frameworks) {
   }
 }
 
-#Clean Directory
-if(dir.exists(root_path_results)){
+# Clean Directory
+if (dir.exists(root_path_results)) {
   unlink(
-    x=root_path_results,
+    x = root_path_results,
     recursive = TRUE
   )
 }

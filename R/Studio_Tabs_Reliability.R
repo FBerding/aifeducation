@@ -9,8 +9,7 @@
 #'
 Reliability_UI <- function(id) {
   bslib::page(
-    shiny::uiOutput(outputId = shiny::NS(id, "ui_relability")
-    )
+    shiny::uiOutput(outputId = shiny::NS(id, "ui_relability"))
   )
 }
 
@@ -202,7 +201,7 @@ Reliability_Server <- function(id, model) {
                   "Measures - Machine Learning"
                 ),
                 bslib::card_body(
-                  shiny::renderTable(classifier$reliability$standard_measures_mean,rownames = TRUE)
+                  shiny::renderTable(classifier$reliability$standard_measures_mean, rownames = TRUE)
                 )
               )
             )

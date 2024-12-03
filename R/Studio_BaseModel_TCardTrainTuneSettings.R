@@ -36,7 +36,7 @@ TrainTuneSettings_Server <- function(id, model_architecture) {
     train_tune_settings_ui <- shiny::eventReactive(model_architecture(), {
       model_architecture <- model_architecture()
 
-      if (inherits(x=model_architecture,what = "errors") || !model_architecture$model_exists) {
+      if (inherits(x = model_architecture, what = "errors") || !model_architecture$model_exists) {
         return(NULL)
       }
 
@@ -181,7 +181,7 @@ TrainTuneSettings_Server <- function(id, model_architecture) {
     params_reactive <- shiny::reactive({
       model_architecture <- model_architecture()
 
-      if (inherits(x=model_architecture,what = "errors") || !model_architecture$model_exists) {
+      if (inherits(x = model_architecture, what = "errors") || !model_architecture$model_exists) {
         return(NULL)
       }
 

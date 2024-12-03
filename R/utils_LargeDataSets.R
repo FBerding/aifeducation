@@ -65,11 +65,11 @@ py_dataset_to_embeddings <- function(py_dataset) {
 #' @keywords internal
 #' @noRd
 prepare_r_array_for_dataset <- function(r_array) {
-  tmp_np_array<-reticulate::r_to_py(
+  tmp_np_array <- reticulate::r_to_py(
     np$squeeze(np$split(reticulate::np_array(r_array), as.integer(nrow(r_array)), axis = 0L))
   )
-  if(length(tmp_np_array$shape)==2){
-    tmp_np_array=np$expand_dims(
+  if (length(tmp_np_array$shape) == 2) {
+    tmp_np_array <- np$expand_dims(
       tmp_np_array,
       1L
     )
@@ -219,4 +219,3 @@ array_form_bind <- function(...) {
     return(arrays[[1]])
   }
 }
-

@@ -84,9 +84,9 @@ TEClassifierProtoNet <- R6::R6Class(
                          feature_extractor = NULL,
                          target_levels = NULL,
                          dense_size = 4,
-                         dense_layers=0,
+                         dense_layers = 0,
                          rec_size = 4,
-                         rec_layers=2,
+                         rec_layers = 2,
                          rec_type = "gru",
                          rec_bidirectional = FALSE,
                          embedding_dim = 2,
@@ -113,16 +113,16 @@ TEClassifierProtoNet <- R6::R6Class(
       check_type(target_levels, c("vector"), FALSE)
       check_type(dense_size, type = "int", FALSE)
       check_type(dense_layers, type = "int", FALSE)
-      if(dense_layers>0){
-        if(dense_size<1){
+      if (dense_layers > 0) {
+        if (dense_size < 1) {
           stop("Dense layers added. Size for dense layers must be at least 1.")
         }
       }
 
       check_type(rec_size, type = "int", FALSE)
       check_type(rec_layers, type = "int", FALSE)
-      if(rec_layers>0){
-        if(rec_size<1){
+      if (rec_layers > 0) {
+        if (rec_size < 1) {
           stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
         }
       }
@@ -167,9 +167,9 @@ TEClassifierProtoNet <- R6::R6Class(
         features = private$text_embedding_model[["features"]],
         times = private$text_embedding_model[["times"]],
         dense_size = dense_size,
-        dense_layers=dense_layers,
+        dense_layers = dense_layers,
         rec_size = rec_size,
-        rec_layers=rec_layers,
+        rec_layers = rec_layers,
         rec_type = rec_type,
         rec_bidirectional = rec_bidirectional,
         intermediate_size = intermediate_size,
@@ -342,7 +342,7 @@ TEClassifierProtoNet <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores=auto_n_cores()) {
+                     n_cores = auto_n_cores()) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -414,7 +414,7 @@ TEClassifierProtoNet <- R6::R6Class(
       self$last_training$config$trace <- trace
       self$last_training$config$ml_trace <- ml_trace
 
-      self$last_training$config$n_cores<-n_cores
+      self$last_training$config$n_cores <- n_cores
 
       self$last_training$config$sampling_separate <- sampling_separate
       self$last_training$config$sampling_shuffle <- sampling_shuffle
@@ -495,9 +495,9 @@ TEClassifierProtoNet <- R6::R6Class(
                country is missing. Add iso code or deactivate tracking.")
         }
 
-        if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
-          path_look_file=codecarbon$lock$LOCKFILE
-          if(file.exists(path_look_file)){
+        if (utils::compareVersion(codecarbon["__version__"], "2.8.0") >= 0) {
+          path_look_file <- codecarbon$lock$LOCKFILE
+          if (file.exists(path_look_file)) {
             unlink(path_look_file)
           }
         }
@@ -694,15 +694,15 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   embeddings for all cases which should be embedded into the classification space.
     #' @param classes_q Named `factor` containg the true classes for every case. Please note that the names must match
     #'   the names/ids in `embeddings_q`.
-    #'@param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
-    #'@param size_points `int` Size of the points excluding the points for prototypes.
-    #'@param size_points_prototypes `int` Size of points representing prototypes.
-    #'@param alpha `float` Value indicating how transparent the points should be (important
+    #' @param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
+    #' @param size_points `int` Size of the points excluding the points for prototypes.
+    #' @param size_points_prototypes `int` Size of points representing prototypes.
+    #' @param alpha `float` Value indicating how transparent the points should be (important
     #'   if many points overlap). Does not apply to points representing prototypes.
     #' @param batch_size `int` batch size.
     #' @return Returns a plot of class `ggplot`visualizing embeddings.
     plot_embeddings = function(embeddings_q,
-                               classes_q=NULL,
+                               classes_q = NULL,
                                batch_size = 12,
                                alpha = 0.5,
                                size_points = 3,
@@ -722,7 +722,7 @@ TEClassifierProtoNet <- R6::R6Class(
       colnames(prototypes) <- c("x", "y", "class", "type")
 
 
-      if(!is.null(classes_q)){
+      if (!is.null(classes_q)) {
         true_values_names <- intersect(
           x = names(na.omit(classes_q)),
           y = private$get_rownames_from_embeddings(embeddings_q)
@@ -732,8 +732,8 @@ TEClassifierProtoNet <- R6::R6Class(
         true_values$type <- rep("labeled", length(true_values_names))
         colnames(true_values) <- c("x", "y", "class", "type")
       } else {
-        true_values_names=NULL
-        true_values=NULL
+        true_values_names <- NULL
+        true_values <- NULL
       }
 
 
@@ -757,12 +757,12 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
 
-      plot_data=prototypes
+      plot_data <- prototypes
       if (length(true_values) > 0) {
-        plot_data=rbind(plot_data,true_values)
+        plot_data <- rbind(plot_data, true_values)
       }
       if (length(estimated_values_names) > 0) {
-        plot_data <- rbind(plot_data,estimated_values)
+        plot_data <- rbind(plot_data, estimated_values)
       }
 
       plot <- ggplot2::ggplot(data = plot_data) +
@@ -774,8 +774,8 @@ TEClassifierProtoNet <- R6::R6Class(
             shape = type,
             size = type,
             alpha = type
-          )#,
-          #position = ggplot2::position_jitter(h = 0.1, w = 0.1)
+          ) # ,
+          # position = ggplot2::position_jitter(h = 0.1, w = 0.1)
         ) +
         ggplot2::scale_size_manual(values = c(
           "prototype" = size_points_prototypes,
@@ -837,9 +837,9 @@ TEClassifierProtoNet <- R6::R6Class(
           features = as.integer(self$model_config$features),
           times = as.integer(self$model_config$times),
           dense_size = as.integer(self$model_config$dense_size),
-          dense_layers=as.integer(self$model_config$dense_layers),
+          dense_layers = as.integer(self$model_config$dense_layers),
           rec_size = as.integer(self$model_config$rec_size),
-          rec_layers=as.integer(self$model_config$rec_layers),
+          rec_layers = as.integer(self$model_config$rec_layers),
           rec_type = self$model_config$rec_type,
           rec_bidirectional = self$model_config$rec_bidirectional,
           intermediate_size = as.integer(self$model_config$intermediate_size),
@@ -909,7 +909,8 @@ TEClassifierProtoNet <- R6::R6Class(
       create_dir(
         dir_path = paste0(self$last_training$config$dir_checkpoint, "/checkpoints"),
         trace = self$last_training$config$trace,
-        msg = "Creating Checkpoint Directory")
+        msg = "Creating Checkpoint Directory"
+      )
 
       # Set target column
       if (self$model_config$require_one_hot == FALSE) {

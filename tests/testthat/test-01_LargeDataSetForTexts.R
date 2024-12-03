@@ -710,11 +710,11 @@ test_that("LargeDataSetForTexts - Method Save and Load", {
     c("NA", "https://url.to.source.txt_b.txt")
   )
 
-  #Clean Directory
+  # Clean Directory
   unlink(
-    x=load_path,
-         recursive = TRUE
-    )
+    x = load_path,
+    recursive = TRUE
+  )
 })
 
 #-----------------------------------------------------------------------------
@@ -787,18 +787,17 @@ test_that("LargeDataSetForTexts - Function Save and Load", {
     c("NA", "https://url.to.source.txt_b.txt")
   )
 
-  #Clean Directory
+  # Clean Directory
   unlink(
-    x=load_path,
+    x = load_path,
     recursive = TRUE
   )
-
 })
 
-#Clean Directory
-if(dir.exists(root_path_results)){
+# Clean Directory
+if (dir.exists(root_path_results)) {
   unlink(
-    x=root_path_results,
+    x = root_path_results,
     recursive = TRUE
   )
 }

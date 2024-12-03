@@ -72,8 +72,8 @@ write_log <- function(log_file,
   }
 
   if (value_top %in% c(1, total_top) ||
-      value_middle %in% c(1, total_middle) ||
-      value_bottom %in% c(1, total_bottom)) {
+    value_middle %in% c(1, total_middle) ||
+    value_bottom %in% c(1, total_bottom)) {
     # if this is the first or last iteration
     return(try_write_log_data())
   } else {

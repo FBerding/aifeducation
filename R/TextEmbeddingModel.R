@@ -204,7 +204,7 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #------------------------------------------------------------------------
     # Method for loading tokenizer statistics
-    load_tokenizer_statistics=function(model_dir){
+    load_tokenizer_statistics = function(model_dir) {
       path <- paste0(model_dir, "/", "tokenizer_statistics.csv")
       if (file.exists(path) == TRUE) {
         self$tokenizer_statistics <- read.csv(file = path)
@@ -575,7 +575,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       check_type(max_length, "int", FALSE)
       check_type(chunks, "int", FALSE)
-      if(chunks<2){
+      if (chunks < 2) {
         stop("Parameter chunks must be at least 2.")
       }
       check_type(overlap, "int", FALSE)
@@ -620,7 +620,7 @@ TextEmbeddingModel <- R6::R6Class(
       # Load Training history
       private$load_training_history(model_dir = model_dir)
 
-      #Load Tokenizer statistics
+      # Load Tokenizer statistics
       private$load_tokenizer_statistics(model_dir = model_dir)
 
       # Check and Set Embedding Configuration
@@ -743,7 +743,7 @@ TextEmbeddingModel <- R6::R6Class(
       # Load Training history
       private$load_training_history(model_dir = dir_path)
 
-      #Load Tokenizer statistics
+      # Load Tokenizer statistics
       private$load_tokenizer_statistics(model_dir = dir_path)
     },
     #--------------------------------------------------------------------------
@@ -939,8 +939,8 @@ TextEmbeddingModel <- R6::R6Class(
 
           seq_len <- tmp_dataset$num_rows
           chunk_list[i] <- min(seq_len, private$transformer_components$chunks)
-          total_chunk_list[i]<-seq_len
-          if(chunk_list[i]==1){
+          total_chunk_list[i] <- seq_len
+          if (chunk_list[i] == 1) {
             tmp_dataset <- tmp_dataset$select(list(as.integer((1:chunk_list[[i]]) - 1)))
           } else {
             tmp_dataset <- tmp_dataset$select(as.integer((1:chunk_list[[i]]) - 1))
@@ -951,7 +951,7 @@ TextEmbeddingModel <- R6::R6Class(
         return(encodings_list = list(
           encodings = encodings,
           chunks = chunk_list,
-          total_chunks=total_chunk_list
+          total_chunks = total_chunk_list
         ))
       }
     },
@@ -1134,7 +1134,8 @@ TextEmbeddingModel <- R6::R6Class(
           tokens$encodings$set_format(type = "torch")
 
           with(
-            data = torch$no_grad(), {
+            data = torch$no_grad(),
+            {
               if (private$basic_components$method == AIFETrType$mpnet) {
                 tensor_embeddings <- private$transformer_components$model(
                   input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
@@ -1388,9 +1389,9 @@ TextEmbeddingModel <- R6::R6Class(
 
       if (private$basic_components$method != "mpnet") {
         run_py_file("FillMaskForMPLM.py")
-        fill_mask_pipeline_class = py$FillMaskPipelineForMPLM
+        fill_mask_pipeline_class <- py$FillMaskPipelineForMPLM
       } else {
-        fill_mask_pipeline_class = transformers$FillMaskPipeline
+        fill_mask_pipeline_class <- transformers$FillMaskPipeline
       }
 
       fill_mask_pipeline <- fill_mask_pipeline_class(
@@ -1406,13 +1407,14 @@ TextEmbeddingModel <- R6::R6Class(
       special_tokens <- self$get_special_tokens()
       mask_token <- special_tokens[special_tokens[, "type"] == "mask_token", "token"]
 
-      #n_mask_tokens <- ncol(stringr::str_extract_all(text,
+      # n_mask_tokens <- ncol(stringr::str_extract_all(text,
       #  stringr::fixed(mask_token),
       #  simplify = TRUE
-      #))
-      n_mask_tokens <- ncol(stringi::stri_extract_all_fixed(str=text,
-                                                     pattern=mask_token,
-                                                     simplify = TRUE
+      # ))
+      n_mask_tokens <- ncol(stringi::stri_extract_all_fixed(
+        str = text,
+        pattern = mask_token,
+        simplify = TRUE
       ))
 
       if (n_mask_tokens == 0) {

@@ -4,16 +4,16 @@ testthat::skip_if_not(
 )
 
 # SetUp Test---------------------------------------------------------------------
-root_path_general_data<-testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/LargeDataSetForTextEmbeddings")
 create_dir(root_path_results, FALSE)
 
 # object is imdb_embeddings
-imdb_embeddings=load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
+imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
 
-imdb_embeddings<-imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
-imdb_embeddings<-imdb_embeddings$convert_to_EmbeddedText()
+imdb_embeddings <- imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+imdb_embeddings <- imdb_embeddings$convert_to_EmbeddedText()
 
 # Start test---------------------------------------------------------------------
 test_that("LargeDataSetForTextEmbeddings - Create", {
@@ -198,10 +198,10 @@ test_that("LargeDataSetForTextEmbeddings - Function Save and Load", {
   }
 })
 
-#Clean Directory
-if(dir.exists(root_path_results)){
+# Clean Directory
+if (dir.exists(root_path_results)) {
   unlink(
-    x=root_path_results,
+    x = root_path_results,
     recursive = TRUE
   )
 }

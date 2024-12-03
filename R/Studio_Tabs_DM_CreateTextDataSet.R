@@ -140,7 +140,6 @@ DataManagement_RawTextsUI <- function(id) {
             )
           )
         )
-
       )
     )
   )

@@ -108,8 +108,8 @@ check_type <- function(object, type = "bool", allow_NULL = FALSE) {
 #' @noRd
 #'
 numpy_writeable <- function(np_array) {
-  if(!inherits(x=np_array,what=c("numpy.ndarray"))){
+  if (!inherits(x = np_array, what = c("numpy.ndarray"))) {
     stop("Provided object is no numpy array")
   }
-return(reticulate::py_to_r(np_array$flags["WRITEABLE"]))
+  return(reticulate::py_to_r(np_array$flags["WRITEABLE"]))
 }

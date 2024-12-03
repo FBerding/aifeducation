@@ -1,12 +1,12 @@
 testthat::skip_on_cran()
-if(Sys.getenv("CI")=="true"){
+if (Sys.getenv("CI") == "true") {
   testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+    condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
     message = "Necessary python modules not available"
   )
 } else {
   testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "all"),
+    condition = check_aif_py_modules(trace = FALSE, check = "all"),
     message = "Necessary python modules not available"
   )
   # SetUp tensorflow
@@ -54,37 +54,37 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 
 
 # config
-#Set Chunks
-chunks=sample(x=c(4,30),size = 1,replace=FALSE)
+# Set Chunks
+chunks <- sample(x = c(4, 30), size = 1, replace = FALSE)
 
-if(Sys.getenv("CI")=="true"){
+if (Sys.getenv("CI") == "true") {
   ml_frameworks <- c(
     "pytorch"
   )
 } else {
   ml_frameworks <- c(
-    #"tensorflow",
+    # "tensorflow",
     "pytorch"
   )
 }
 
- base_model_list <- list(
-   tensorflow = c(
-     "bert",
-     "roberta",
-     "longformer",
-     "funnel",
-     "deberta_v2"
-   ),
-   pytorch = c(
-     "bert",
-     "roberta",
-     "longformer",
-     "funnel",
-     "deberta_v2",
-     "mpnet"
-   )
- )
+base_model_list <- list(
+  tensorflow = c(
+    "bert",
+    "roberta",
+    "longformer",
+    "funnel",
+    "deberta_v2"
+  ),
+  pytorch = c(
+    "bert",
+    "roberta",
+    "longformer",
+    "funnel",
+    "deberta_v2",
+    "mpnet"
+  )
+)
 
 pooling_type_list <- list(
   "funnel" = c("cls"),
@@ -111,7 +111,6 @@ for (framework in ml_frameworks) {
     for (pooling_type in pooling_type_list[[base_model]]) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
-
           # Create Model
           text_embedding_model <- TextEmbeddingModel$new()
           text_embedding_model$configure(
@@ -149,7 +148,7 @@ for (framework in ml_frameworks) {
           })
 
           # Method embed--------------------------------------------------------
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed","chunks",chunks), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed", "chunks", chunks), {
             # general
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:10],
@@ -171,14 +170,14 @@ for (framework in ml_frameworks) {
               batch_size = 5
             )
             for (i in 1:10) {
-              expect_equal(embeddings$embeddings[i, , ,drop=FALSE],
-                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , ,drop=FALSE],
+              expect_equal(embeddings$embeddings[i, , , drop = FALSE],
+                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , , drop = FALSE],
                 tolerance = 1e-6
               )
             }
           })
 
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case","chunks",chunks), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:1],
               doc_id = example_data$id[1:1]
@@ -189,7 +188,7 @@ for (framework in ml_frameworks) {
           })
 
           # Method embed_large--------------------------------------------------
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large","chunks",chunks), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large", "chunks", chunks), {
             # general
             embeddings <- text_embedding_model$embed_large(example_data_large)
             expect_s3_class(embeddings, class = "LargeDataSetForTextEmbeddings")
@@ -229,7 +228,7 @@ for (framework in ml_frameworks) {
 
           # encoding------------------------------------------------------------
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "encoding"), {
-            #Request for tokens only
+            # Request for tokens only
             for (to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
@@ -239,7 +238,7 @@ for (framework in ml_frameworks) {
               expect_length(encodings, 10)
               expect_type(encodings, type = "list")
 
-              #Check order invariance
+              # Check order invariance
               perm <- sample(x = 1:10, size = 10, replace = FALSE)
               encodings_perm <- text_embedding_model$encode(
                 raw_text = example_data$text[perm],
@@ -247,20 +246,21 @@ for (framework in ml_frameworks) {
                 to_int = to_int
               )
               for (i in 1:10) {
-                expect_equal(encodings[[i]],
-                             encodings_perm[[which(x=(perm==i))]]
+                expect_equal(
+                  encodings[[i]],
+                  encodings_perm[[which(x = (perm == i))]]
                 )
               }
             }
 
-            #Request for all tokens types
+            # Request for all tokens types
             for (to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
                 token_encodings_only = FALSE
               )
               expect_type(encodings, type = "list")
-              expect_equal(encodings$encodings$num_rows,sum(encodings$chunks))
+              expect_equal(encodings$encodings$num_rows, sum(encodings$chunks))
             }
           })
 
@@ -366,12 +366,11 @@ for (framework in ml_frameworks) {
               tolerance = 1e-6
             )
 
-            #Clean Directory
+            # Clean Directory
             unlink(
-              x=save_location,
+              x = save_location,
               recursive = TRUE
             )
-
           })
 
           # Function Saving and Loading-----------------------------------------
@@ -434,9 +433,9 @@ for (framework in ml_frameworks) {
             # Check tokenizer statistics
             expect_equal(nrow(text_embedding_model_reloaded$tokenizer_statistics), 2)
 
-            #Clean Directory
+            # Clean Directory
             unlink(
-              x=save_location,
+              x = save_location,
               recursive = TRUE
             )
           })

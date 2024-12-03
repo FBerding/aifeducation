@@ -233,7 +233,7 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-create_WordPiece_tokenizer <- function( # nolint
+create_WordPiece_tokenizer <- function(# nolint
     vocab_do_lower_case,
     sep_token = "[SEP]",
     sep_id = 1,
@@ -267,8 +267,7 @@ create_WordPiece_tokenizer <- function( # nolint
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-create_ByteLevelBPE_tokenizer <- function(
-    # nolint
+create_ByteLevelBPE_tokenizer <- function(# nolint
     max_position_embeddings,
     add_prefix_space,
     trim_offsets) {
@@ -504,7 +503,7 @@ tokenize_dataset <- function(dataset, tokenizer, max_length,
                              value_top = 0, total_top = 1, message_top = "NA") {
   run_py_file("datasets_transformer_prepare_data.py")
 
-  batch_size = 2L
+  batch_size <- 2L
 
   tokenized_texts_raw <- dataset$map(
     py$tokenize_raw_text,
