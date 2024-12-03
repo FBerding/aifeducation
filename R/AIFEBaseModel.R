@@ -339,7 +339,7 @@ AIFEBaseModel <- R6::R6Class(
     count_parameter = function() {
       if (private$ml_framework == "tensorflow") {
         count <- 0
-        for (i in 1:length(self$model$trainable_weights)) {
+        for (i in seq_len(length(self$model$trainable_weights))) {
           count <- count + tf$keras$backend$count_params(self$model$trainable_weights[[i]])
         }
       } else if (private$ml_framework == "pytorch") {
@@ -656,7 +656,8 @@ AIFEBaseModel <- R6::R6Class(
     # Method for checking if the configuration is already done
     check_config_for_FALSE = function() {
       if (private$configured == TRUE) {
-        stop("The object is configured. Please create a new object if you would like to change the object's configuration.")
+        stop("The object is configured. Please create a new object if you would like to change the object's
+             configuration.")
       }
     },
     #--------------------------------------------------------------------------
@@ -772,7 +773,7 @@ AIFEBaseModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     prepare_history_data = function(history) {
       # Provide rownames for the history
-      for (i in 1:length(history)) {
+      for (i in seq_len(length(history))) {
         if (!is.null(history[[i]])) {
           if (nrow(history[[i]]) == 2) {
             rownames(history[[i]]) <- c("train", "val")
@@ -783,7 +784,7 @@ AIFEBaseModel <- R6::R6Class(
           # Replace value -100 with the last value
           # Max index for replacements
           index_max <- ncol(history[[i]])
-          for (j in 1:nrow(history[[i]])) {
+          for (j in seq_len(nrow(history[[i]]))) {
             # Check if -100 occurs in the row
             includes_m_100 <- (history[[i]][j, ] == -100)
             # if at least one -100 occurs

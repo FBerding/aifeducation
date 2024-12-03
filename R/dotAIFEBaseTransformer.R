@@ -1182,14 +1182,18 @@
         last_log <- py$write_log_py(
           self$temp$log_file,
           value_top = 4, total_top = total,
-          message_top = paste(private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics"),
+          message_top = paste(
+            private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics"
+          ),
           last_log = last_log, write_interval = write_interval
         )
 
         self$temp$write_interval <- write_interval
         self$temp$value_top <- 4
         self$temp$total_top <- total
-        self$temp$message_top <- paste(private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics")
+        self$temp$message_top <- paste(
+          private$title, "Overall: Creating Chunks of Sequences & Calculating Tokenizer Statistics"
+        )
 
         print_message("Creating Chunks of Sequences for Training", trace)
         private$steps_for_training$create_chunks_for_training(self)

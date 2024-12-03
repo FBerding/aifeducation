@@ -83,7 +83,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
       }
 
       if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3) {
-        for (m in 1:length(method)) {
+        for (m in seq_len(length(method))) {
           if (method[m] != "dbsmote") {
             for (k in min_k_final:max_k_final) {
               input[[index]] <- list(
@@ -117,7 +117,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
   }
 
   result_list <- foreach::foreach(
-    index = 1:length(input),
+    index = seq_len(length(input)),
     .export = "create_synthetic_units_from_matrix",
     .errorhandling = "pass"
   ) %dopar% {
@@ -139,7 +139,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 
   # get number of synthetic cases
   n_syn_cases <- 0
-  for (i in 1:length(result_list)) {
+  for (i in seq_len(length(result_list))) {
     if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
       n_syn_cases <- n_syn_cases + nrow(result_list[[i]]$syntetic_embeddings)
     }
@@ -156,7 +156,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 
   n_row <- 0
   names_vector <- NULL
-  for (i in 1:length(result_list)) {
+  for (i in seq_len(length(result_list))) {
     if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
       syntetic_embeddings[
         (n_row + 1):(n_row + nrow(result_list[[i]]$syntetic_embeddings)),
@@ -273,7 +273,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
     )
   }
 
-  if (inherits(x = syn_data, what = "try-error") == FALSE & (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)) {
+  if (inherits(x = syn_data, what = "try-error") == FALSE && (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)) {
     n_cols_embedding <- ncol(matrix_form)
     tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(
@@ -420,7 +420,7 @@ get_folds <- function(target,
     }
 
     possible_assignments <- NULL
-    for (i in 1:length(cases_per_fold)) {
+    for (i in seq_len(length(cases_per_fold))) {
       possible_assignments <- append(
         x = possible_assignments,
         values = rep.int(

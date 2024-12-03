@@ -9,7 +9,7 @@
 library(testthat)
 library(aifeducation)
 
-if(Sys.getenv("CI")=="true"){
+if (Sys.getenv("CI") == "true") {
   print("---------------------------------------------------------")
   print("On Continuous Integreation")
   print("---------------------------------------------------------")

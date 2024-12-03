@@ -443,7 +443,7 @@ LargeDataSetForText <- R6::R6Class(
     clean_path = function(paths) {
       new_paths <- vector(length = length(paths))
       new_paths[] <- NA
-      for (i in 1:length(paths)) {
+      for (i in seq_len(length(paths))) {
         path <- paths[i]
         bib_entry_path <- paste0(
           dirname(path), "/bib_entry.txt"
@@ -487,7 +487,7 @@ LargeDataSetForText <- R6::R6Class(
       )
       colnames(data) <- col_names
 
-      for (i in 1:length(batch)) {
+      for (i in seq_len(length(batch))) {
         index <- batch[i]
         document <- readtext::readtext(file = file_paths[index])
 

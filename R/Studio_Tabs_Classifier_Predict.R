@@ -94,7 +94,6 @@ Classifier_Prediction_UI <- function(id) {
 Classifier_Prediction_Server <- function(id, model, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
     ns <- session$ns
 
     # File system management----------------------------------------------------

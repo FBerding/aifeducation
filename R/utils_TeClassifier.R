@@ -130,6 +130,7 @@ get_coder_metrics <- function(true_values = NULL,
       detail = FALSE
     )$value
 
+    # TODO (Yuliia): no visible binding for variable rater_one
     metric_values["percentage_agreement"] <- sum(diag(table(rater_one, rater_two)) / length(rater_one))
 
     metric_values["balanced_accuracy"] <- sum(
@@ -177,7 +178,7 @@ create_iota2_mean_object <- function(iota2_list,
   mean_categorical_sizes <- NULL
   n_performance_estimation <- length(iota2_list)
 
-  for (i in 1:length(iota2_list)) {
+  for (i in seq_len(length(iota2_list))) {
     if (i == 1) {
       mean_aem <- iota2_list[[i]]$categorical_level$raw_estimates$assignment_error_matrix
     } else {
@@ -242,7 +243,7 @@ calc_standard_classification_measures <- function(true_values, predicted_values)
   colnames(results) <- c("precision", "recall", "f1")
   rownames(results) <- categories
 
-  for (i in 1:length(categories)) {
+  for (i in seq_len(length(categories))) {
     bin_true_values <- (true_values == categories[i])
     bin_true_values <- factor(as.character(bin_true_values), levels = c("TRUE", "FALSE"))
 

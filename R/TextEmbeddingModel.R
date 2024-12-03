@@ -882,10 +882,10 @@ TextEmbeddingModel <- R6::R6Class(
           # Convert ids to tokens
 
           token_seq_list <- NULL
-          for (i in 1:length(encodings_only)) {
+          for (i in seq_len(length(encodings_only))) {
             tmp_sequence <- encodings_only[[i]]
             tmp_seqeunce_tok <- NULL
-            for (j in 1:length(tmp_sequence)) {
+            for (j in seq_len(length(tmp_sequence))) {
               tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
                 private$transformer_components$tokenizer$convert_ids_to_tokens(
                   ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
@@ -971,9 +971,9 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Start
       tmp_token_list <- NULL
-      for (i in 1:length(int_seqence)) {
+      for (i in seq_len(length(int_seqence))) {
         tmp_seq_token_list <- NULL
-        for (j in 1:length(int_seqence[[i]])) {
+        for (j in seq_len(length(int_seqence[[i]]))) {
           tmp_vector <- int_seqence[[i]][[j]]
           mode(tmp_vector) <- "integer"
           if (to_token == FALSE) {
@@ -1010,7 +1010,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
       colnames(tokens_map) <- c("type", "token", "id")
 
-      for (i in 1:length(special_tokens)) {
+      for (i in seq_len(length(special_tokens))) {
         tokens_map[i, 1] <- special_tokens[i]
         tokens_map[i, 2] <- replace_null_with_na(private$transformer_components$tokenizer[special_tokens[i]])
         tokens_map[i, 3] <- replace_null_with_na(private$transformer_components$tokenizer[paste0(special_tokens[i], "_id")])
@@ -1167,7 +1167,7 @@ TextEmbeddingModel <- R6::R6Class(
         # Sorting the hidden states to the corresponding cases and times
         # If more than one layer is selected the mean is calculated
         index <- 0
-        for (i in 1:length(batch)) {
+        for (i in seq_len(length(batch))) {
           for (j in 1:tokens$chunks[i]) {
             for (layer in tmp_selected_layer) {
               if (private$transformer_components$ml_framework == "tensorflow") {
@@ -1435,7 +1435,7 @@ TextEmbeddingModel <- R6::R6Class(
           "token",
           "token_str"
         )
-        for (i in 1:length(solutions)) {
+        for (i in seq_len(length(solutions))) {
           solution_data_frame[i, "score"] <- solutions[[i]]$score
           solution_data_frame[i, "token"] <- solutions[[i]]$token
           solution_data_frame[i, "token_str"] <- solutions[[i]]$token_str
@@ -1444,7 +1444,7 @@ TextEmbeddingModel <- R6::R6Class(
         solution_data_frame$score <- as.numeric(solution_data_frame$score)
         solutions_list[length(solutions_list) + 1] <- list(solution_data_frame)
       } else {
-        for (j in 1:length(solutions)) {
+        for (j in seq_len(length(solutions))) {
           solution_data_frame <- matrix(
             nrow = length(solutions[[j]]),
             ncol = 3
@@ -1454,7 +1454,7 @@ TextEmbeddingModel <- R6::R6Class(
             "token",
             "token_str"
           )
-          for (i in 1:length(solutions[[j]])) {
+          for (i in seq_len(length(solutions[[j]]))) {
             solution_data_frame[i, "score"] <- solutions[[j]][[i]]$score
             solution_data_frame[i, "token"] <- solutions[[j]][[i]]$token
             solution_data_frame[i, "token_str"] <- solutions[[j]][[i]]$token_str
@@ -1658,7 +1658,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       if (private$transformer_components$ml_framework == "tensorflow") {
         count <- 0
-        for (i in 1:length(model$trainable_weights)) {
+        for (i in seq_len(length(model$trainable_weights))) {
           count <- count + tf$keras$backend$count_params(model$trainable_weights[[i]])
         }
       } else if (private$transformer_components$ml_framework == "pytorch") {

@@ -763,7 +763,7 @@ prepare_training_history <- function(model,
 
   # Create array for saving the data-------------------------------------------
   result_list <- NULL
-  for (j in 1:length(measures)) {
+  for (j in seq_len(length(measures))) {
     measure <- measures[j]
     measure_array <- array(
       dim = c(
@@ -912,7 +912,7 @@ check_and_prepare_for_studio <- function() {
   )
 
   missing_r_packages <- NULL
-  for (i in 1:length(r_packages)) {
+  for (i in seq_len(length(r_packages))) {
     if (!requireNamespace(r_packages[i], quietly = TRUE, )) {
       missing_r_packages <- append(
         x = missing_r_packages,

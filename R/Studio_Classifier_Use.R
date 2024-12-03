@@ -75,8 +75,7 @@ Classifiers_Use_UI <- function(id) {
 Classifiers_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
-    ns <- session$ns
+    # ns <- session$ns
 
     # File system management----------------------------------------------------
     shinyFiles::shinyDirChoose(

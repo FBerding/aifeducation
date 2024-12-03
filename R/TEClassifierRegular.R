@@ -687,7 +687,7 @@ TEClassifierRegular <- R6::R6Class(
               nrow = length(predictions_prob)
             )
 
-            for (i in 1:length(predictions_prob)) {
+            for (i in seq_len(length(predictions_prob))) {
               if (predictions_prob[i] >= 0.5) {
                 predictions_binary_prob[i, 1] <- 1 - predictions_prob[i]
                 predictions_binary_prob[i, 2] <- predictions_prob[i]
@@ -740,7 +740,7 @@ TEClassifierRegular <- R6::R6Class(
               nrow = length(predictions_prob)
             )
 
-            for (i in 1:length(predictions_prob)) {
+            for (i in seq_len(length(predictions_prob))) {
               if (predictions_prob[i] >= 0.5) {
                 predictions_binary_prob[i, 1] <- 1 - predictions_prob[i]
                 predictions_binary_prob[i, 2] <- predictions_prob[i]
@@ -1389,7 +1389,7 @@ TEClassifierRegular <- R6::R6Class(
       n_mean[] <- self$last_training$config$n_folds
 
       for (i in 1:self$last_training$config$n_folds) {
-        for (j in 1:ncol(self$reliability$test_metric)) {
+        for (j in seq_len(ncol(self$reliability$test_metric))) {
           if (is.na(self$reliability$test_metric[i, j]) == FALSE) {
             test_metric_mean[j] <- test_metric_mean[j] + self$reliability$test_metric[i, j]
           } else {
@@ -1698,7 +1698,7 @@ TEClassifierRegular <- R6::R6Class(
 
       # Gather information for every case. That is the category with the
       # highest probability and save both
-      for (i in 1:nrow(predicted_labels)) {
+      for (i in seq_len(nrow(predicted_labels))) {
         tmp_est_prob <- predicted_labels[i, 1:(ncol(predicted_labels) - 1)]
         new_categories[i, 1] <- which.max(tmp_est_prob) - 1
         new_categories[i, 2] <- max(tmp_est_prob)
@@ -1789,7 +1789,7 @@ TEClassifierRegular <- R6::R6Class(
       # Correct probabilities
       number_columns <- ncol(predictions)
       col <- ncol(predictions) - 1
-      for (i in 1:nrow(predictions)) {
+      for (i in seq_len(nrow(predictions))) {
         predictions[i, 1:col] <- predictions[i, 1:col] * p_cat_true / sum(predictions[i, 1:col] * p_cat_true)
         predictions[i, number_columns] <- self$model_config$target_levels[which.max(as.numeric(predictions[i, 1:col]))]
       }
@@ -1832,7 +1832,7 @@ TEClassifierRegular <- R6::R6Class(
         sequence_order <- names(abs_freq_length)
 
         sample_weights <- vector(length = length(sequence_length))
-        for (i in 1:length(sample_weights)) {
+        for (i in seq_len(length(sample_weights))) {
           idx <- which(sequence_length[i] == sequence_order)
           sample_weights[i] <- sample_weight_per_sequence_length[idx]
         }

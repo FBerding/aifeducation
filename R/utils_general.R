@@ -221,8 +221,8 @@ run_py_file <- function(py_file_name) {
 #' @family Utils
 #' @export
 auto_n_cores <- function() {
-  if (Sys.getenv("CI") == "true" |
-    Sys.getenv("NOT_CRAN") == "true" |
+  if (Sys.getenv("CI") == "true" ||
+    Sys.getenv("NOT_CRAN") == "true" ||
     Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true") {
     n_cores <- min(2, parallel::detectCores())
   } else {

@@ -183,7 +183,7 @@ for (framework in ml_frameworks) {
       )]
     }
 
-    for (i in 1:length(test_combinations)) {
+    for (i in seq_len(length(test_combinations))) {
       classifier <- NULL
       n_classes <- sample(x = class_range, size = 1, replace = FALSE)
       gc()
@@ -887,7 +887,7 @@ for (framework in ml_frameworks) {
           embeddings_q = test_embeddings_reduced_perm,
           batch_size = 50
         )
-        for (i in 1:nrow(embeddings$embeddings_q)) {
+        for (i in seq_len(nrow(embeddings$embeddings_q))) {
           expect_equal(embeddings$embeddings_q[i, ],
             embeddings_perm$embeddings_q[which(perm == i), ],
             tolerance = 1e-5
@@ -1143,7 +1143,7 @@ for (framework in ml_frameworks) {
           embeddings_q = test_embeddings_reduced_perm,
           batch_size = 50
         )
-        for (i in 1:nrow(embeddings$embeddings_q)) {
+        for (i in seq_len(nrow(embeddings$embeddings_q))) {
           expect_equal(embeddings$embeddings_q[i, ],
             embeddings_perm$embeddings_q[which(perm == i), ],
             tolerance = 1e-5

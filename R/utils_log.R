@@ -176,7 +176,7 @@ read_loss_log <- function(path_loss) {
     }
 
     loss_data <- as.data.frame(loss_data)
-    for (i in 1:ncol(loss_data)) {
+    for (i in seq_len(ncol(loss_data))) {
       loss_data[, i] <- as.numeric(loss_data[, i])
     }
     loss_data$epoch <- seq.int(

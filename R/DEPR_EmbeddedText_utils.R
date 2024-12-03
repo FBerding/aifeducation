@@ -24,7 +24,7 @@
 #' @importFrom methods isClass
 combine_embeddings <- function(embeddings_list) {
   # Check for the right class---------------------------------------------------
-  for (i in 1:length(embeddings_list)) {
+  for (i in seq_len(length(embeddings_list))) {
     if (methods::isClass(
       where = embeddings_list[[i]],
       Class = "EmbeddedText"
@@ -49,7 +49,7 @@ combine_embeddings <- function(embeddings_list) {
   # Check for unique names------------------------------------------------------
   tmp_names <- NULL
   tmp_cases <- NULL
-  for (i in 1:length(embeddings_list)) {
+  for (i in seq_len(length(embeddings_list))) {
     if (i == 1) {
       tmp_names <- rownames(embeddings_list[[i]]$embeddings)
       tmp_cases <- nrow(embeddings_list[[i]]$embeddings)
@@ -67,7 +67,7 @@ combine_embeddings <- function(embeddings_list) {
 
   # Combine embeddings-----------------------------------------------------------
 
-  for (i in 1:length(embeddings_list)) {
+  for (i in seq_len(length(embeddings_list))) {
     if (i == 1) {
       combined_embeddings <- embeddings_list[[i]]$embeddings
     } else {

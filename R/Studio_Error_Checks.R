@@ -169,7 +169,7 @@ check_errors_create_classifier <- function(classifier_type,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -254,7 +254,7 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 
   tmp_ui_error <- NULL
   if (length(error_list) > 0) {
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -351,7 +351,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -404,7 +404,7 @@ check_errors_predict_classifier <- function(embeddings,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -465,7 +465,7 @@ check_errors_text_embedding_model_embed <- function(destination_path,
   # summary
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -519,7 +519,7 @@ check_errors_text_embedding_model_create <- function(destination_path,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )

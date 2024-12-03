@@ -73,7 +73,7 @@ check_embedding_models <- function(object_list,
 
   # Check if the class of the object is TextEmbeddingModel, EmbeddedText or
   # TextEmbeddingClassifierNeuralNet
-  for (i in 1:length(object_list)) {
+  for (i in seq_len(length(object_list))) {
     if (!(methods::is(object_list[[i]], "TextEmbeddingModel") ||
       methods::is(object_list[[i]], "EmbeddedText") ||
       methods::is(object_list[[i]], "TextEmbeddingClassifierNeuralNet"))) {
@@ -85,7 +85,7 @@ check_embedding_models <- function(object_list,
   # Check if all object are from the same class---------------------------------
   if (same_class == TRUE) {
     tmp_class <- NULL
-    for (i in 1:length(object_list)) {
+    for (i in seq_len(length(object_list))) {
       tmp_class[i] <- list(class(object_list[[i]]))
       if (i > 1) {
         if (tmp_class[[i - 1]][[1]] != tmp_class[[i]][[1]]) {
@@ -104,7 +104,7 @@ check_embedding_models <- function(object_list,
   to_check <- c("model_name")
 
   tmp_model_config <- NULL
-  for (i in 1:length(object_list)) {
+  for (i in seq_len(length(object_list))) {
     if (methods::is(object_list[[i]], "TextEmbeddingModel")) {
       if (object_list[[i]]$get_model_info()$model_method == "bert" ||
         object_list[[i]]$get_model_info()$model_method == "roberta" ||
@@ -130,7 +130,7 @@ check_embedding_models <- function(object_list,
     }
   }
 
-  for (i in 1:length(object_list)) {
+  for (i in seq_len(length(object_list))) {
     if (i > 1) {
       tmp_i_1 <- tmp_model_config[[i - 1]]
       tmp_i <- tmp_model_config[[i]]

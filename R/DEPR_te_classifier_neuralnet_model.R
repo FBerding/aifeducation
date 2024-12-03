@@ -1140,7 +1140,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
 
             # Gather information for every case. That is the category with the
             # highest probability and save both
-            for (i in 1:nrow(est_remaining_data)) {
+            for (i in seq_len(nrow(est_remaining_data))) {
               tmp_est_prob <- est_remaining_data[i, 1:(ncol(est_remaining_data) - 1)]
               new_categories[i, 1] <- categories[which.max(tmp_est_prob)]
               new_categories[i, 2] <- max(tmp_est_prob)
@@ -1210,7 +1210,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
             weights_cases_list[2] <- list(names(targets_pseudo_labeled))
             tmp_weights <- NULL
             tmp_weights_names <- NULL
-            for (i in 1:length(weights_cases_list)) {
+            for (i in seq_len(length(weights_cases_list))) {
               if (i == 1) {
                 w <- 1
               } else {
@@ -1726,7 +1726,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
 
           # Gather information for every case. That is the category with the
           # highest probability and save both
-          for (i in 1:nrow(est_remaining_data)) {
+          for (i in seq_len(nrow(est_remaining_data))) {
             tmp_est_prob <- est_remaining_data[i, 1:(ncol(est_remaining_data) - 1)]
             new_categories[i, 1] <- categories[which.max(tmp_est_prob)]
             new_categories[i, 2] <- max(tmp_est_prob)
@@ -1797,7 +1797,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
           weights_cases_list[2] <- list(names(targets_pseudo_labeled))
           tmp_weights <- NULL
           tmp_weights_names <- NULL
-          for (i in 1:length(weights_cases_list)) {
+          for (i in seq_len(length(weights_cases_list))) {
             if (i == 1) {
               w <- 1
             } else {
@@ -1932,7 +1932,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
 
       for (i in 1:folds$n_folds) {
         tmp_val_metric <- test_metric[i, , ]
-        for (j in 1:nrow(tmp_val_metric)) {
+        for (j in seq_len(nrow(tmp_val_metric))) {
           if (sum(is.na(tmp_val_metric[j, ])) != length(tmp_val_metric[j, ])) {
             test_metric_mean[j, ] <- test_metric_mean[j, ] + tmp_val_metric[j, ]
           } else {
@@ -2112,7 +2112,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
           nrow = length(predictions_prob)
         )
 
-        for (i in 1:length(predictions_prob)) {
+        for (i in seq_len(length(predictions_prob))) {
           if (predictions_prob[i] >= 0.5) {
             predictions_binary_prob[i, 1] <- 1 - predictions_prob[i]
             predictions_binary_prob[i, 2] <- predictions_prob[i]
@@ -3117,7 +3117,7 @@ TextEmbeddingClassifierNeuralNet <- R6::R6Class(
       }
 
       # Provide rownames for the history
-      for (i in 1:length(history)) {
+      for (i in seq_len(length(history))) {
         if (!is.null(history[[i]])) {
           if (nrow(history[[i]]) == 2) {
             rownames(history[[i]]) <- c("train", "val")

@@ -197,7 +197,7 @@ for (framework in ml_frameworks) {
       )]
     }
 
-    for (i in 1:length(test_combinations)) {
+    for (i in seq_len(length(test_combinations))) {
       classifier <- NULL
       n_classes <- sample(x = class_range, size = 1, replace = FALSE)
       gc()

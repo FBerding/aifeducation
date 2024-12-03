@@ -296,7 +296,7 @@ start_and_monitor_long_task <- function(id,
       prgbars_status <- progress_bar_status()
       prgbars <- list(prgbars_status$top, prgbars_status$middle, prgbars_status$bottom)
 
-      for (i in 1:length(ids)) {
+      for (i in seq_len(length(ids))) {
         if (!is.null(prgbars[[i]])) {
           shinyWidgets::updateProgressBar(
             id = ids[i],

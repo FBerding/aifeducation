@@ -36,7 +36,7 @@ cohens_kappa <- function(rater_one, rater_two) {
   freq_rater_one <- rowSums(freq_table)
   freq_rater_two <- colSums(freq_table)
   probability_expected <- 0
-  for (i in 1:length(freq_rater_one)) {
+  for (i in seq_len(length(freq_rater_one))) {
     probability_expected <- probability_expected + freq_rater_one[i] * freq_rater_two[i]
   }
   probability_expected <- 1 / (N * N)
@@ -51,8 +51,8 @@ cohens_kappa <- function(rater_one, rater_two) {
   )
   weight_matrix_squared <- weight_matrix_linear
   expected_freq <- weight_matrix_squared
-  for (i in 1:length(levels(rater_one))) {
-    for (j in 1:length(levels(rater_one))) {
+  for (i in seq_len(length(levels(rater_one)))) {
+    for (j in seq_len(length(levels(rater_one)))) {
       weight_matrix_linear[i, j] <- abs(i - j)
       weight_matrix_squared[i, j] <- abs(i - j)^2
       expected_freq[i, j] <- freq_rater_one[i] * freq_rater_two[j] / N^2
@@ -86,7 +86,7 @@ kendalls_w <- function(rater_one, rater_two) {
   raw_table <- cbind(rater_one, rater_two)
   # Create ranking
   ranking_table <- raw_table
-  for (i in 1:ncol(raw_table)) {
+  for (i in seq_len(ncol(raw_table))) {
     ranking_table[, i] <- rank(raw_table[, i], ties.method = "average")
   }
 
@@ -131,7 +131,7 @@ kripp_alpha <- function(rater_one, rater_two) {
 
   # create value unit matrix
   value_unit_matrix <- matrix(data = 0, nrow = length(levels(rater_one)), ncol = N)
-  for (i in 1:ncol(canonical_form)) {
+  for (i in seq_len(ncol(canonical_form))) {
     value_unit_matrix[, i] <- as.vector(table(factor(canonical_form[, i], levels = seq(from = 1, to = length(levels(rater_one))))))
   }
 
@@ -141,10 +141,10 @@ kripp_alpha <- function(rater_one, rater_two) {
     ncol = length(levels(rater_one))
   )
 
-  for (i_1 in 1:nrow(value_unit_matrix)) {
-    for (i_2 in 1:nrow(value_unit_matrix)) {
+  for (i_1 in seq_len(nrow(value_unit_matrix))) {
+    for (i_2 in seq_len(nrow(value_unit_matrix))) {
       tmp_sum <- 0
-      for (j in 1:ncol(value_unit_matrix)) {
+      for (j in seq_len(ncol(value_unit_matrix))) {
         value_1 <- value_unit_matrix[i_1, j]
         value_2 <- value_unit_matrix[i_2, j]
         m_u <- sum(value_unit_matrix[, j])
@@ -168,8 +168,8 @@ kripp_alpha <- function(rater_one, rater_two) {
     ncol = length(levels(rater_one))
   )
   row_sums <- rowSums(value_unit_matrix)
-  for (i_1 in 1:nrow(value_unit_matrix)) {
-    for (i_2 in 1:nrow(value_unit_matrix)) {
+  for (i_1 in seq_len(nrow(value_unit_matrix))) {
+    for (i_2 in seq_len(nrow(value_unit_matrix))) {
       if (i_1 == i_2) {
         exp_coincidence_matrix[i_1, i_2] <- row_sums[i_1] * (row_sums[i_2] - 1)
       } else {
@@ -191,8 +191,8 @@ kripp_alpha <- function(rater_one, rater_two) {
     ncol = length(levels(rater_one))
   )
   n_ranks <- rowSums(obs_coincidence_matrix)
-  for (i in 1:nrow(ordinal_metric_matrix)) {
-    for (j in 1:nrow(ordinal_metric_matrix)) {
+  for (i in seq_len(nrow(ordinal_metric_matrix))) {
+    for (j in seq_len(nrow(ordinal_metric_matrix))) {
       categories_between <- seq(from = min(i, j), to = max(i, j), by = 1)
       ordinal_metric_matrix[i, j] <- (sum(n_ranks[categories_between]) - (n_ranks[i] + n_ranks[j]) / 2)^2
     }

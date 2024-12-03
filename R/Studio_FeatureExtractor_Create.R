@@ -160,8 +160,7 @@ FeatureExtractors_Create_UI <- function(id) {
 FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # TODO (Yuliia): remove? Variable is not used
-    ns <- session$ns
+    # ns <- session$ns
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # File system management----------------------------------------------------

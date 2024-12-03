@@ -798,12 +798,12 @@ TEClassifierProtoNet <- R6::R6Class(
     calc_classes_on_distance = function(distance_matrix, prototypes) {
       index_vector <- vector(length = nrow(distance_matrix))
 
-      for (i in 1:length(index_vector)) {
+      for (i in seq_len(length(index_vector))) {
         index_vector[i] <- which.min(distance_matrix[i, ])
       }
 
       classes <- factor(index_vector,
-        levels = 1:nrow(prototypes),
+        levels = seq_len(nrow(prototypes)),
         labels = rownames(prototypes)
       )
       return(classes)

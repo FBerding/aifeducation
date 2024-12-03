@@ -167,7 +167,7 @@ array_form_bind <- function(...) {
 
   for (object in objects) {
     if (is.list(object)) {
-      for (j in 1:length(object)) {
+      for (j in seq_len(length(object))) {
         arrays[length(arrays) + 1] <- list(object[[j]])
       }
     } else {
@@ -181,7 +181,7 @@ array_form_bind <- function(...) {
 
     dimension <- dim(arrays[[1]])
 
-    for (i in 1:length(arrays)) {
+    for (i in seq_len(length(arrays))) {
       total_rows <- total_rows + dim(arrays[[i]])[1]
 
       # Check number of dimensions
@@ -199,7 +199,7 @@ array_form_bind <- function(...) {
     row_names <- NULL
 
 
-    for (i in 1:length(arrays)) {
+    for (i in seq_len(length(arrays))) {
       index <- seq.int(
         from = 1,
         to = nrow(arrays[[i]]),

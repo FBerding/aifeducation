@@ -185,7 +185,7 @@ paramDesc.pytorch_trace <- function() {
 get_allowed_transformer_types <- function(in_quotation_marks = FALSE) {
   res_str <- ""
   if (in_quotation_marks) {
-    for (i in 1:length(AIFETrType)) {
+    for (i in seq_len(length(AIFETrType))) {
       tr_name <- names(AIFETrType)[i]
       if (i != 1) res_str <- paste0(res_str, ", ")
       res_str <- paste0(res_str, "'", tr_name, "'")
@@ -198,7 +198,7 @@ get_allowed_transformer_types <- function(in_quotation_marks = FALSE) {
 #' @keywords internal
 get_tr_types_list_decsription <- function() {
   list_description <- ""
-  for (i in 1:length(AIFETrType)) {
+  for (i in seq_len(length(AIFETrType))) {
     tr_name <- names(AIFETrType)[i]
     list_element <- paste0("* `", tr_name, "` = '", tr_name, "'")
     list_description <- paste0(list_description, "\n", list_element)
