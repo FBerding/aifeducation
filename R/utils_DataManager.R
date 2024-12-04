@@ -15,7 +15,7 @@
 #-----------------------------------------------------------------------------
 #' @title Create synthetic cases for balancing training data
 #' @description This function creates synthetic cases for balancing the training with an object of the class
-#'   [TextEmbeddingClassifierNeuralNet].
+#'   [TEClassifierRegular] or [TEClassifierProtoNet].
 #'
 #' @param matrix_form Named `matrix` containing the text embeddings in a matrix form.
 #' @param target Named `factor` containing the labels of the corresponding embeddings.
@@ -191,7 +191,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #---------------------------------------------
 #' @title Create synthetic units
 #' @description Function for creating synthetic cases in order to balance the data for training with
-#'   [TextEmbeddingClassifierNeuralNet]. This is an auxiliary function for use with [get_synthetic_cases_from_matrix] to allow
+#'   [TEClassifierRegular] or [TEClassifierProtoNet]]. This is an auxiliary function for use with [get_synthetic_cases_from_matrix] to allow
 #'   parallel computations.
 #'
 #' @param matrix_form Named `matrix` containing the text embeddings in matrix form. In most cases this object is taken
@@ -375,7 +375,7 @@ get_train_test_split <- function(embedding = NULL,
 #' @note the function checks the absolute frequencies of every category/label. If the absolute frequency is not
 #'   sufficient to ensure at least four cases in every fold, the number of folds is adjusted. In these cases, a warning
 #'   is printed to the console. At least four cases per fold are necessary to ensure that the training of
-#'   [TextEmbeddingClassifierNeuralNet] works well with all options turned on.
+#'   [TEClassifierRegular] or [TEClassifierProtoNet] works well with all options turned on.
 #' @family data_management_utils
 #' @keywords internal
 #' @noRd

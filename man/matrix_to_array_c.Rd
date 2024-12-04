@@ -23,9 +23,6 @@ an array for use with keras.
 }
 \seealso{
 Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{check_embedding_models}()},
-\code{\link{split_labeled_unlabeled}()},
 \code{\link{summarize_tracked_sustainability}()},
 \code{\link{to_categorical_c}()}
 }

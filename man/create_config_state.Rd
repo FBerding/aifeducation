@@ -20,8 +20,16 @@ Function creates a config that can be saved to disk. It is used during loading
 an object from disk in order to set the correct configuration.
 }
 \seealso{
-Other Saving and Loading: 
-\code{\link{load_from_disk}()},
-\code{\link{save_to_disk}()}
+Other Utils: 
+\code{\link{auto_n_cores}()},
+\code{\link{clean_pytorch_log_transformers}()},
+\code{\link{create_dir}()},
+\code{\link{generate_id}()},
+\code{\link{get_file_extension}()},
+\code{\link{is.null_or_na}()},
+\code{\link{output_message}()},
+\code{\link{print_message}()},
+\code{\link{run_py_file}()}
 }
-\concept{Saving and Loading}
+\concept{Utils}
+\keyword{internal}

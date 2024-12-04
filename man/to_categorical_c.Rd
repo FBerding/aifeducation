@@ -22,10 +22,7 @@ a binary class matrix.
 }
 \seealso{
 Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{check_embedding_models}()},
 \code{\link{matrix_to_array_c}()},
-\code{\link{split_labeled_unlabeled}()},
 \code{\link{summarize_tracked_sustainability}()}
 }
 \concept{Auxiliary Functions}

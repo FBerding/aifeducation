@@ -81,8 +81,8 @@ clean_pytorch_log_transformers <- function(log) {
 }
 
 #' @title Generate ID suffix for objects
-#' @description Function for generating an ID suffix for objects of class [TextEmbeddingModel] and
-#'   [TextEmbeddingClassifierNeuralNet].
+#' @description Function for generating an ID suffix for objects of class [TextEmbeddingModel],
+#'   [TEClassifierRegular], and [TEClassifierProtoNet].
 #'
 #' @param length `int` determining the length of the id suffix.
 #' @return Returns a `string` of the requested length.

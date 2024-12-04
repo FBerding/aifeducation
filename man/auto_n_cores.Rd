@@ -18,6 +18,7 @@ process is running on cran \code{2} is returned.
 \seealso{
 Other Utils: 
 \code{\link{clean_pytorch_log_transformers}()},
+\code{\link{create_config_state}()},
 \code{\link{create_dir}()},
 \code{\link{generate_id}()},
 \code{\link{get_file_extension}()},

@@ -19,10 +19,7 @@ Function for summarizing the tracked sustainability data with a tracker of the p
 }
 \seealso{
 Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{check_embedding_models}()},
 \code{\link{matrix_to_array_c}()},
-\code{\link{split_labeled_unlabeled}()},
 \code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}

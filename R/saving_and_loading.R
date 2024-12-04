@@ -135,9 +135,8 @@ load_R_config_state <- function(dir_path) {
 #' @return Returns a `list` that contains the class of the object, the public, and
 #' private fields.
 #'
-#' @family Saving and Loading
-#'
-#' @export
+#' @family Utils
+#' @keywords internal
 create_config_state <- function(object) {
   config <- object$get_all_fields()
   config["class"] <- class(object)[1]

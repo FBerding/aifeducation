@@ -49,7 +49,6 @@ Imports:
     doParallel,
     foreach,
     iotarelr(>= 0.1.5),
-    irr,
     irrCAC,
     methods,
     Rcpp (>= 1.0.10),

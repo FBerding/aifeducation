@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" align="right" height="120" alt="aifeducation website" /></a>
+# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" alt="aifeducation website" align="right" height="120"/></a>
 
 <!-- badges: start -->
 
@@ -16,6 +16,7 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Codecov test
 coverage](https://codecov.io/gh/FBerding/aifeducation/graph/badge.svg)](https://app.codecov.io/gh/FBerding/aifeducation)
+
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
@@ -31,13 +32,13 @@ special conditions of the educational and social sciences.
 ## Features Overview
 
 - Simple usage of artificial intelligence by providing routines for the
-  most important tasks for educators and researchers from social and
-  educational science.
+  most important tasks of educators and researchers from social and
+  educational sciences.
 - Provides a graphical user interface (Aifeducation Studio), allowing
-  people to work with AI without any coding skills.
+  users to work with AI without the need for coding skills.
 - Supports ‘PyTorch’ as the core machine learning framework which is
   widely used in research.
-- Implements the advantages of the python library ‘datasets’ increasing
+- Implements the advantages of the python library ‘datasets’, increasing
   computational speed and allowing the use of large data sets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
@@ -80,8 +81,8 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 > Started](https://fberding.github.io/aifeducation/articles/aifeducation.html)
 > for more details.
 
-Using the package with *R* syntax is described in the vignette [03 Using
-R syntax](classification_tasks.html).
+How to use the package with *R* syntax is described in vignette [03
+Using R syntax](classification_tasks.html).
 
 ## Graphical User Interface *AI for Education - Studio*
 
@@ -113,7 +114,7 @@ computer is located.
 
 ## PyTorch and Tensorflow Compatibility
 
-The core machine learning framework of this package is ‘PyTorch’
+The core machine learning framework of this package is ‘PyTorch’,
 providing a broad support of graphical devices to accelerate
 computations, access to new and unique model architectures, and a high
 compatibility of models across different versions of this machine
@@ -127,8 +128,8 @@ for a detailed overview.
 ## Model Life Cycle
 
 Research requires reproducibility and traceability. Thus, starting with
-version 1.0.0 of this package ensuring that already trained models work
-with future versions of this package has top priority.
+version 1.0.0 of this package , it has top priority to ensure that
+already trained models work with future versions of this package.
 
 ## Classification Tasks
 
@@ -136,12 +137,12 @@ with future versions of this package has top priority.
 
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports both
-newer approaches such as MPNet (Song et al. 2020), BERT (Devlin et
-al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et
-al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer
-(Beltagy, Peters & Cohan 2020) and older approaches such as
-GlobalVectors (Pennington, Socher & Manning 2014) or Latent Dirichlet
-Allocation/Topic Modeling in classification tasks.
+newer approaches (such as MPNet (Song et al. 2020), BERT (Devlin et al.
+2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
+Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
+Cohan 2020)) and older approaches (such as GlobalVectors (Pennington,
+Socher & Manning 2014) or Latent Dirichlet Allocation/Topic Modeling) in
+classification tasks.
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
@@ -151,8 +152,9 @@ configuration](model_configuration.html) for details about the
 configuration of a new model.
 
 The package supports the analysis of long texts. Depending on the
-method, long texts are transformed into vectors at once or, if too long,
-are split into several chunks which results in a sequence of vectors.
+method, long texts are transformed into vectors at once, or, if too
+long, are split into several chunks which results in a sequence of
+vectors.
 
 ### Training AI under Challenging Conditions
 
@@ -166,8 +168,8 @@ applying AI. These are:
   schools or universities, students often solve tasks by creating
   handwritten documents. Thus, educators and researchers first have to
   transform analogue data into a digital form, involving human action.
-  This makes data generation financially expensive and time-consuming,
-  leading to *small data sets*.
+  This makes data generation expensive and time-consuming, leading to
+  *small data sets*.
 - **high privacy policy standards:** Furthermore, in the educational and
   social sciences, data often refers to humans and/or their actions.
   These kinds of data are protected by privacy policies in many
@@ -184,7 +186,7 @@ applying AI. These are:
   requires humans to generate a valid data set for the training process,
   leading to *small data sets*.
 - **complex constructs:** Compared to classification tasks where, for
-  instance, AI has to differentiate between a ‘good’ or ‘bad’ movie
+  instance, AI has to differentiate between a ‘good’ or a ‘bad’ movie
   review, constructs in the educational and social sciences are more
   complex. For example, some research instruments in motivational
   psychology require to infer personal motifs from written essays (e.g.,
@@ -220,8 +222,8 @@ this very part. The remainder of the data is not processed by humans.
 Instead, AI uses this part of data to learn on its own. Thus, educators
 and researchers only have to provide additional data for the AI’s
 learning process without coding it themselves. This offers the
-possibility to add more data to the training process and to reduce labor
-costs.
+possibility to add more data to the training process and reduce labor
+cost.
 
 ### Evaluating Performance
 
@@ -244,8 +246,8 @@ evaluated with the following measures and concepts:
 - Cohen’s Kappa with squared weights
 - Fleiss’ Kappa for multiple raters without exact estimation
 
-In Addition the some traditional measures from the machine learning
-literature are also available:
+In addition, some traditional measures from machine learning literature
+are also available:
 
 - Precision
 - Recall
@@ -284,7 +286,7 @@ you can find a detailed guide on how to document and share your models.
   studies for finding a good configuration for a model.
 - [05 Sharing and Using Trained
   AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):
-  A description for sharing models.
+  Guidance on how to share models.
 
 ## References
 

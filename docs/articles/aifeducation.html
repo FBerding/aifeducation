@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>01 Get started • aifeducation</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,9 +41,16 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
-    <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02a Aifeducation Studio</a></li>
-    <li><a class="dropdown-item" href="../articles/classification_tasks.html">02b Classification tasks</a></li>
-    <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">03 Sharing and Using Trained AI/Models</a></li>
+    <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
+    <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
+    <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
+    <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
+    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
+    <li><a class="dropdown-item" href="../articles/Appendix_A01_Supported_Frameworks.html">A01 Supported Machine Learning Frameworks</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -59,8 +72,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>01 Get started</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>01 Get started</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/aifeducation.Rmd" class="external-link"><code>vignettes/aifeducation.Rmd</code></a></small>
@@ -94,270 +106,125 @@ libraries for machine learning are written in python. Fortunately, an
 interface to python is provided via the <em>R</em> package <a href="https://cran.r-project.org/package=reticulate" class="external-link">reticulate</a>.</p>
 <p>The R package <em>Artificial Intelligence for Education
 (aifeducation)</em> aims to provide educators, educational researchers,
-and social researchers a convincing interface to these state-of-the-art
-models for natural language processing and tries to address the special
-needs and challenges of the educational and social sciences. The package
-currently supports the application of Artificial Intelligence (AI) for
-tasks such as text embedding and classification.</p>
+and social researchers with a convincing interface to these
+state-of-the-art models for natural language processing and tries to
+address the special needs and challenges of the educational and social
+sciences. The package currently supports the application of Artificial
+Intelligence (AI) for tasks such as text embedding and
+classification.</p>
 <p>Since state-of-the-art approaches in natural language processing rely
 on large models compared to classical statistical methods (e.g., latent
 class analysis, structural equation modeling) and are based largely on
 python, some additional installation steps are necessary.</p>
 <p>If you would like to train and to develop your own models and AIs, a
 compatible graphic device is necessary. Even a low performing graphic
-device can speed up computations significantly. If you prefer using
+device can speed up computations significantly. If you prefer to use
 pre-trained models however, this is <strong>not</strong> necessary. In
-this case a ‘normal’ office computer without a graphic device should be
-sufficient in most cases.</p>
+this case, a ‘normal’ office computer without a graphic device should be
+sufficient in most cases. To get ready for using the package, two steps
+are necessary.</p>
 </div>
 <div class="section level3">
-<h3 id="step-1---install-the-r-package">Step 1 - Install the R Package<a class="anchor" aria-label="anchor" href="#step-1---install-the-r-package"></a>
+<h3 id="step-1---install-the-r-package">Step 1 - Install the R package<a class="anchor" aria-label="anchor" href="#step-1---install-the-r-package"></a>
 </h3>
-<p>In order to use the package, you first need to install it. This can
-be done by:</p>
+<p>First you need to install the package. This can be done by:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
-<p>With this command, all necessary <em>R</em> packages are installed on
-your machine.</p>
+<p>With this command, <code>aifeducation</code> is installed on your
+machine.</p>
 </div>
 <div class="section level3">
-<h3 id="step-2---install-python">Step 2 - Install Python<a class="anchor" aria-label="anchor" href="#step-2---install-python"></a>
+<h3 id="step-2---install-python-and-optional-r-packages">Step 2 - Install Python and optional R packages<a class="anchor" aria-label="anchor" href="#step-2---install-python-and-optional-r-packages"></a>
 </h3>
 <p>Since natural language processing with neural nets is based on models
-which are computationally intensive, <em>keras</em>, <em>PyTorch</em>,
-and <em>tensorflow</em> are used within this package together with some
-other specialized python libraries. To install them, you need to install
-python on your machine first. This may take some time.</p>
+which are computationally intensive, <em>PyTorch</em> is used within
+this package together with some other specialized python libraries.</p>
+<p>The most straightforward method for getting started is to call the
+function <code>install_aifeducation</code> as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/install_python.html" class="external-link">install_python</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>You can check if everything is working by using the function
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/install_aifeducation.html">install_aifeducation</a></span><span class="op">(</span></span>
+<span>  install_aifeducation_studio <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cpu_only <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This function will install python, miniconda, and all relevant python
+libraries into a conda environment called “aifeducation”.</p>
+<p>In addition, we recommend to set
+<code>install_aifeducation_studio=TRUE</code> since this will install
+the optional <em>R</em> packages necessary to use <em>AI for Education -
+Studio</em>. <em>AI for Education - Studio</em> is a graphical user
+interface for applying these packages. We recommend to use it for
+everyone who is unfamiliar with <em>R</em> or machine learning. If you
+do not want use the studio, you can set the argument to
+<code>FALSE</code>. In this case you have to use the package with
+<em>R</em> syntax.</p>
+<p>If you have a suitable machine and would like to use a graphic card
+for computations you need to install some further software. You can find
+further information here: <a href="https://pytorch.org/get-started/locally/" class="external-link uri">https://pytorch.org/get-started/locally/</a> If not you can
+set <code>cpu_only=TRUE</code>.</p>
+<p>You can check if python is working by using the function
 <code><a href="https://rstudio.github.io/reticulate/reference/py_available.html" class="external-link">reticulate::py_available()</a></code>. This should return
 <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_available.html" class="external-link">py_available</a></span><span class="op">(</span>initialize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="step-3---install-miniconda">Step 3 - Install Miniconda<a class="anchor" aria-label="anchor" href="#step-3---install-miniconda"></a>
-</h3>
-<p>The next step is to install miniconda since <em>aifeducation</em>
-uses conda environments for managing the different modules.</p>
+<p>You can check if all necessary python packages are successfully
+installed by calling the function <code>check_aif_py_modules</code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/install_miniconda.html" class="external-link">install_miniconda</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="step-4---install-support-for-graphic-devices">Step 4 - Install Support for Graphic Devices<a class="anchor" aria-label="anchor" href="#step-4---install-support-for-graphic-devices"></a>
-</h3>
-<p><em>PyTorch</em> and <em>tensorflow</em> as underlying machine
-learning backend run on MacOS, Linux, and Windows. However, there are
-some limitations for accelerate computations with graphic cards. The
-following table provides an overview.</p>
-<p><em>Table: Possible gpu acceleration by operating system</em></p>
-<table class="table">
-<thead><tr class="header">
-<th>Operating System</th>
-<th>PyTorch</th>
-<th>tensorflow</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>MacOS</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr class="even">
-<td>Linux</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr class="odd">
-<td>Windows</td>
-<td>Yes</td>
-<td>&lt;= version 2.10</td>
-</tr>
-<tr class="even">
-<td>Windows with WSL</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p>If you have a suitable machine and would like to use a graphic card
-for computations you need to install some further software. If not you
-can skip this step. A list with links to downloads can be found here if
-you would like to use <em>tensorflow</em> as machine learning framework:
-<a href="https://www.tensorflow.org/install/pip#linux" class="external-link uri">https://www.tensorflow.org/install/pip#linux</a></p>
-<p>If you would like to use <em>PyTorch</em> as framework you can find
-further information here: <a href="https://pytorch.org/get-started/locally/" class="external-link uri">https://pytorch.org/get-started/locally/</a></p>
-<p>In general you need</p>
-<ul>
-<li>NVIDIA GPU Drivers</li>
-<li>CUDA Toolkit</li>
-<li>cuDNN SDK</li>
-</ul>
-<p>Except the gpu drivers all components will be installed in step 5
-automatically.</p>
-<p>If you would like to use Windows with WSL (Windows Subsystem for
-Linux) installing gpu acceleration is a more complex topic. In this case
-please refer to the specific Windows or Ubuntu documentations.</p>
-</div>
-<div class="section level3">
-<h3 id="step-5---install-specialized-python-libraries">Step 5 - Install Specialized Python Libraries<a class="anchor" aria-label="anchor" href="#step-5---install-specialized-python-libraries"></a>
-</h3>
-<p>If everything is working, you can now install the remaining python
-libraries. For convenience, <em>aifeducation</em> comes with an
-auxiliary function <code><a href="../reference/install_py_modules.html">install_py_modules()</a></code> doing that for
-you.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">FALSE</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.15"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span></code></pre></div>
-<blockquote>
-<p>With <code>install="all"</code> you can decide which machine learning
-framework should be installed. Use <code>install="all"</code> to request
-the installation of both ‘PyTorch’ and ‘tensorflow’. If you would like
-to install only ‘PyTorch’ or ‘tensorflow’ set
-<code>install="pytorch"</code> or <code>install="tenorflow"</code>. For
-<em>aifeducation</em> a version of tensorflow between 2.13 and 2.15 is
-necessary.</p>
-</blockquote>
-<p>It is very important that you call this function <em>before</em>
-loading the package the first time. If you load the library without
-installing the necessary modules an error may occur.</p>
-<p>This function installs the following python modules:</p>
-<p><strong>both frameworks:</strong> - transformers, - tokenizers, -
-datasets, - codecarbon</p>
-<p><strong>Pytorch</strong> - torch, - torcheval, - safetensors, -
-accelerate - pandas</p>
-<p><strong>Tensorflow</strong> - keras, - tensorflow</p>
-<p>and its dependencies in the environment “aifeducation”.</p>
-<p>If you would like to use <em>aifeducation</em> with other packages or
-within other environments, please ensure that these python modules are
-available. For gpu support some further packages are installed.</p>
-<p>With <code><a href="../reference/check_aif_py_modules.html">check_aif_py_modules()</a></code> you can check, if all
-modules are successfully installed for a specific machine learning
-framework.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>                                   check<span class="op">=</span><span class="st">"pytorch"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span>print<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>                                   check<span class="op">=</span><span class="st">"tensorflow"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/check_aif_py_modules.html">check_aif_py_modules</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Now everything is ready to use the package.</p>
-<blockquote>
-<p><strong>Important note:</strong> When you start a new <em>R</em>
-session, please note that you have to call
-<code>reticulate::use_condaenv(condaenv = "aifeducation")</code>
-<strong>before</strong> loading the library to make the python modules
-available for work.</p>
-</blockquote>
 </div>
 </div>
 <div class="section level2">
-<h2 id="configuration-of-tensorflow">2) Configuration of Tensorflow<a class="anchor" aria-label="anchor" href="#configuration-of-tensorflow"></a>
+<h2 id="starting-a-new-session">2) Starting a new session<a class="anchor" aria-label="anchor" href="#starting-a-new-session"></a>
 </h2>
-<p>In general, educators and educational researchers neither have access
-to high performance computing nor do they own computers with a
-performing graphic device for their work. Thus, some additional
-configuration can be done to get computations working on your
-machine.</p>
-<p>If you do use a computer that does own a graphic device, but you
-would like to use cpu only you can disable the graphic device support of
-<em>tensorflow</em> with the function
-<code><a href="../reference/set_config_cpu_only.html">set_config_cpu_only()</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_cpu_only.html">set_config_cpu_only</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Now your machine only uses cpus only for computations.</p>
-<p>If your machine has a graphic card but with limited memory, it is
-recommended to change the configuration of the memory usage with
-<code><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory()</a></code></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>This enables your machine to compute ‘large’ models with limited
-resources. For ‘small’ models, this option is not relevant since it
-decreases the computational speed.</p>
-<p>Finally, in some cases you might want to disable <em>tensorflow</em>
-to print information on the console. You can change the behavior with
-the function <code><a href="../reference/set_config_tf_logger.html">set_config_tf_logger()</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/set_config_tf_logger.html">set_config_tf_logger</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>You can choose between five levels “FATAL”, “ERROR”, “WARN”, “INFO”,
-and “DEBUG”, setting the minimal level for logging.</p>
-</div>
-<div class="section level2">
-<h2 id="starting-a-new-session">3) Starting a New Session<a class="anchor" aria-label="anchor" href="#starting-a-new-session"></a>
-</h2>
-<p>Before you can work with <em>aifeducation</em> you must set up a new
-<em>R</em> session. First, it is necessary that you load the library.
-Second, you must set up python via reticulate. In case you installed
-python as suggested in this vignette you may start a new session like
-this:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p>The most convenient way to work with the package is to use <em>AI for
+Education - Studio</em> which you can start by calling
+<code><a href="../reference/start_aifeducation_studio.html">aifeducation::start_aifeducation_studio()</a></code>.</p>
+<p>In case you do not want to use the graphical user interface, you have
+to prepare your <em>R</em> sessions. First, it is necessary that you set
+up python via ‘reticulate’ and choose the conda environment where all
+necessary python libraries are available. Then you can load
+<code>aifeducation</code>. In case you installed python as suggested in
+this vignette, you may start a new session like this:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span>condaenv <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/aifeducation/">aifeducation</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/set_transformers_logger.html">set_transformers_logger</a></span><span class="op">(</span><span class="st">"ERROR"</span><span class="op">)</span></span></code></pre></div>
-<p>Next you have to choose the machine learning framework you would like
-to use. You can set the framework for the complete session with</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#For tensorflow</span></span>
-<span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"tensorflow"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#For PyTorch</span></span>
-<span><span class="va">aifeducation_config</span><span class="op">$</span><span class="fu">set_global_ml_backend</span><span class="op">(</span><span class="st">"pytorch"</span><span class="op">)</span></span></code></pre></div>
-<p>You can change the framework at anytime during a session by calling
-this method again or by passing the framework to the
-<code>ml_framework</code> argument of a function or method. Please note
-that not all models are available for both frameworks and that the
-weights of trained models cannot be shared across frameworks for all
-models.</p>
-<p>In the case that you would like to use <em>tensorflow</em> now is a
-good time to configure that backend, since some configurations can only
-be done <strong>before</strong> <em>tensorflow</em> is used the first
-time.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#if you would like to use only cpus</span></span>
-<span><span class="fu"><a href="../reference/set_config_cpu_only.html">set_config_cpu_only</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#if you have a graphic device with low memory</span></span>
-<span><span class="fu"><a href="../reference/set_config_gpu_low_memory.html">set_config_gpu_low_memory</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#if you would like to reduce the tensorflow output to errors</span></span>
-<span><span class="fu"><a href="../reference/set_config_os_environ_logger.html">set_config_os_environ_logger</a></span><span class="op">(</span>level <span class="op">=</span> <span class="st">"ERROR"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/aifeducation/">aifeducation</a></span><span class="op">)</span></span></code></pre></div>
 <blockquote>
 <p><strong>Note:</strong> Please remember: Every time you start a new
-session in <em>R</em> you have to to set the correct conda environment,
-to load the library <em>aifeducation</em>, and to chose your machine
-learning framework.</p>
+session in <em>R,</em> you have to to set the correct conda environment
+and load the library <code>aifeducation</code>. This is not necessary if
+you use <em>AI for Education - Studio</em>.</p>
 </blockquote>
 </div>
 <div class="section level2">
-<h2 id="tutorials-and-guides">4) Tutorials and Guides<a class="anchor" aria-label="anchor" href="#tutorials-and-guides"></a>
+<h2 id="tutorials-and-guides">3) Tutorials and Guides<a class="anchor" aria-label="anchor" href="#tutorials-and-guides"></a>
 </h2>
-<p>A guide how to use the graphical user interface can be found in
-vignette <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html">02a
-classification tasks</a>.</p>
+<p>A guide on how to use the graphical user interface can be found in
+vignette <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html">02
+Using the graphical user interface Aifeducation - Studio</a>.</p>
 <p>A short introduction into the package with examples for
-classification tasks can be found in vignette <a href="https://fberding.github.io/aifeducation/articles/classification_tasks.html">02b
-classification tasks</a>.</p>
-<p>Documenting and sharing your work is described in vignette <a href="sharing_and_publishing.html">03 sharing and using trained
-AI/models</a></p>
+classification tasks can be found in vignette <a href="https://fberding.github.io/aifeducation/articles/classification_tasks.html">03
+Using R syntax</a>.</p>
+<p>Documenting and sharing your work is described in vignette <a href="sharing_and_publishing.html">04 Sharing and using trained
+AI/models</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="update-aifeducation">5) Update <em>aifeducation</em><a class="anchor" aria-label="anchor" href="#update-aifeducation"></a>
+<h2 id="update-aifeducation">4) Update <em>aifeducation</em><a class="anchor" aria-label="anchor" href="#update-aifeducation"></a>
 </h2>
-<p>In the case you already use <em>aifeducation</em> and you want to
-update to a newer version of this package it is recommended to update
-the used python libraries. The easiest way is to remove the conda
+<p>In case you already use <em>aifeducation</em> and you want to update
+to a newer version of this package, it is recommended to update the used
+python libraries as well. The easiest way is to remove the conda
 environment “aifeducation” and to install the libraries into a fresh
 environment. This can be done by setting <code>remove_first=TRUE</code>
 in <code>install_py_modules</code>.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>aifeducation<span class="sc">::</span><span class="fu">install_py_modules</span>(<span class="at">envname=</span><span class="st">"aifeducation"</span>,</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>                                 <span class="at">install=</span><span class="st">"all"</span>,</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>                                 <span class="at">remove_first=</span><span class="cn">TRUE</span>,</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>                                 <span class="at">tf_version=</span><span class="st">"&lt;=2.15"</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>                                 <span class="at">pytorch_cuda_version =</span> <span class="st">"12.1"</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>                                 <span class="at">cpu_only=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/install_py_modules.html">install_py_modules</a></span><span class="op">(</span></span>
+<span>  envname <span class="op">=</span> <span class="st">"aifeducation"</span>,</span>
+<span>  install <span class="op">=</span> <span class="st">"pytorch"</span>,</span>
+<span>  remove_first <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  python_version <span class="op">=</span> <span class="st">"3.12"</span>,</span>
+<span>  pytorch_cuda_version <span class="op">=</span> <span class="st">"12.1"</span>,</span>
+<span>  cpu_only <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -366,11 +233,11 @@ in <code>install_py_modules</code>.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Berding Florian.</p>
+  <p>Developed by Berding Florian, Tykhonova Yuliia.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

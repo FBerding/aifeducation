@@ -1,3 +1,10 @@
+gui_aife_studio.Rmd
+classification_tasks.Rmd
+Appendix_A01_Supported_Frameworks.Rmd
+model_configuration.Rmd
+sharing_and_publishing.Rmd
+transformers.Rmd
+
 ^.*\.Rproj$
 ^\.Rproj\.user$
 Trial
@@ -6,6 +13,7 @@ materials
 test_model
 tests/testthat/test_artefacts
 tests/testthat/test_data_tmp
+tests/testthat/test_data
 .h5
 .git
 .gitignore
@@ -19,8 +27,6 @@ cran-comments.md
 ^CRAN-SUBMISSION$
 ^doc$
 ^Meta$
-gui_aife_studio.Rmd
-classification_tasks.Rmd
 intel_power_gadget_log.csv
 reference
 aifeducation_state.log
@@ -32,3 +38,4 @@ pkgdown
 ^pkgdown$
 test_preparation
 ^codecov\.yml$
+Deprecated

@@ -43,7 +43,7 @@ get_synthetic_cases_from_matrix(
 }
 \description{
 This function creates synthetic cases for balancing the training with an object of the class
-\link{TextEmbeddingClassifierNeuralNet}.
+\link{TEClassifierRegular} or \link{TEClassifierProtoNet}.
 }
 \seealso{
 Other data_management_utils: 

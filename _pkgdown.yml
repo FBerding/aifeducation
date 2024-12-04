@@ -45,9 +45,9 @@ reference:
 - title: Saving and Loading
 - contents:
   - has_concept("Saving and Loading")
-- subtitle: Deprecated
-- contents:
-  - has_concept("Saving and Loading Deprecated")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("Saving and Loading Deprecated")
 
 - title: Data Management
 - contents:
@@ -56,23 +56,23 @@ reference:
 - title: Base Models and Transformers
 - contents:
   - has_concept("Transformer")
-- subtitle: Deprecated
-- contents:
-  - has_concept("Deprecated transformer")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("Deprecated transformer")
 
 - title: Text Embedding
 - contents:
   - has_concept("Text Embedding")
-- subtitle: Deprecated
-- contents:
-  - has_concept("combine_embeddings")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("combine_embeddings")
 
 - title: Classification
 - contents:
   - has_concept("Classification")
-- subtitle: Deprecated
-- contents:
-  - has_concept("Classification Deprecated")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("Classification Deprecated")
 
 - title: Auxiliary Functions
 - subtitle: Data Management
@@ -83,6 +83,10 @@ reference:
 - subtitle: Classification
 - contents:
   - has_concept("classifier_utils")
+
+- subtitle: Performance Measures
+- contents:
+  - has_concept("performance measures")
 
 - title: For developers
 - subtitle: Transformers

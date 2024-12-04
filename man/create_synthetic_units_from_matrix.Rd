@@ -41,7 +41,7 @@ their labels as a named \code{factor}.
 }
 \description{
 Function for creating synthetic cases in order to balance the data for training with
-\link{TextEmbeddingClassifierNeuralNet}. This is an auxiliary function for use with \link{get_synthetic_cases_from_matrix} to allow
+\link{TEClassifierRegular} or \link{TEClassifierProtoNet}]. This is an auxiliary function for use with \link{get_synthetic_cases_from_matrix} to allow
 parallel computations.
 }
 \seealso{
