@@ -398,7 +398,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
       tmp_model <- model()
 
       tmp_model$set_documentation_license(input$doc_editor_documentation_license)
-      tmp_model$set_software_license(input$doc_editor_software_license)
+      tmp_model$set_model_license(input$doc_editor_software_license)
 
       r_interface_path <- paste0(model_path(), "/r_interface.rda")
       save(tmp_model, file = r_interface_path)

@@ -553,7 +553,7 @@ TEFeatureExtractor <- R6::R6Class(
           package = "aifeducation"
         ))
       } else if (private$ml_framework == "pytorch") {
-        reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
           package = "aifeducation"
         ))
         reticulate::py_run_file(system.file("python/pytorch_autoencoder.py",

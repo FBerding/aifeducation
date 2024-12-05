@@ -481,9 +481,9 @@ for (framework in ml_frameworks) {
 
           # Software License
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "software license"), {
-            text_embedding_model$set_software_license("test_license")
+            text_embedding_model$set_model_license("test_license")
             expect_equal(
-              object = text_embedding_model$get_software_license(),
+              object = text_embedding_model$get_model_license(),
               expected = c("test_license")
             )
           })

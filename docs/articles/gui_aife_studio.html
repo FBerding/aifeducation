@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="02 Using the graphical user interface Aifeducation - Studio">
 </head>
 <body>
@@ -155,7 +155,7 @@ disciplines using different, sometimes overlapping concepts. Even within
 a single research area, concepts are not unified. Figure 1 illustrates
 this package’s understanding.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
+<img src="classif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
 Concepts</div>
 </div>
 <p>Since <em>aifeducation</em> looks at the application of AI for
@@ -176,7 +176,7 @@ text is labeled with the correct class. As Figure 2 illustrates, two
 kinds of data are necessary to train an AI to classify text in line with
 supervised machine learning principles.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
+<img src="classif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
 Learning</div>
 </div>
 <p>By providing AI with both the textual data as input data and the
@@ -208,7 +208,7 @@ target data for training AI to classify a text.</p>
 <p>In <em>aifeducation,</em> these steps are covered with three
 different types of models, as shown in Figure 3.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_model_hierachy.png" style="width:100.0%" alt="Figure 3: Modells Types in aifeducation"><div class="figcaption">Figure 3: Modells Types in aifeducation</div>
+<img src="classif_model_hierachy.png" style="width:100.0%" alt="Figure 3: Modells Types in aifeducation"><div class="figcaption">Figure 3: Modells Types in aifeducation</div>
 </div>
 <ul>
 <li><p><strong>Base Models:</strong> The base models are the models
@@ -244,7 +244,7 @@ console:</p>
 <p>Please note that this can take a moment.</p>
 <p>At the beginning you will see the home page (Figure 4).</p>
 <div class="float">
-<img src="img_articles%2Fgui%2Fhome.png" style="width:100.0%" alt="Figure 4: Home Page"><div class="figcaption">Figure 4: Home Page</div>
+<img src="home.png" style="width:100.0%" alt="Figure 4: Home Page"><div class="figcaption">Figure 4: Home Page</div>
 </div>
 <p>Here you cannot choose framework (<em>pytorch</em> is activated by
 default).</p>
@@ -269,7 +269,7 @@ predicting the texts’ labels via classifier.</p>
 <p>To create a collection of raw texts, you have to choose the <em>Data
 Management</em> page on the top panel as shown in Figure 5.</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create.png" style="width:100.0%" alt="Figure 5: Data Management Page"><div class="figcaption">Figure 5: Data Management Page</div>
+<img src="DM_Create.png" style="width:100.0%" alt="Figure 5: Data Management Page"><div class="figcaption">Figure 5: Data Management Page</div>
 </div>
 <p>On the resulting page (see Figure 6), you first have to choose the
 directory where the texts are stored (box <em>Text Sources</em>). We
@@ -277,7 +277,7 @@ recommend that you store all texts you would like to use in a single
 folder. Within this folder, you can structure your data with
 sub-folders.</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 6: Data Preparation Page"><div class="figcaption">Figure 6: Data Preparation Page</div>
+<img src="DM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 6: Data Preparation Page"><div class="figcaption">Figure 6: Data Preparation Page</div>
 </div>
 <p>In the next step, you can decide which file formats should be
 included (box <em>File Types</em>). Currently, <em>aifeducation</em>
@@ -443,7 +443,7 @@ url.</li>
 </tbody>
 </table>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create_Excel_file.png" style="width:75.0%" alt="Figure 7: Structure of Raw Texts within an Excel Sheet"><div class="figcaption">Figure 7: Structure of Raw Texts within an Excel
+<img src="DM_Create_Excel_file.png" style="width:75.0%" alt="Figure 7: Structure of Raw Texts within an Excel Sheet"><div class="figcaption">Figure 7: Structure of Raw Texts within an Excel
 Sheet</div>
 </div>
 <p>The last step is to choose a folder where your collection of raw
@@ -454,19 +454,19 @@ location where to save the object and with <em>Folder Name</em> field
 you define the name of the folder that will be created within that
 directory. In this folder the data set is saved.</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create_Start_creation.png" style="width:100.0%" alt="Figure 8: Selecting a path for a data set"><div class="figcaption">Figure 8: Selecting a path for a data set</div>
+<img src="DM_Create_Start_creation.png" style="width:100.0%" alt="Figure 8: Selecting a path for a data set"><div class="figcaption">Figure 8: Selecting a path for a data set</div>
 </div>
 <p>Finally, you can start creating the collection (<em>Continue</em>
 button in Figure 8). Please note that this can take some time. Creation
 progress you can see in the progress bars (Figure 9).</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create_Progress.png" style="width:100.0%" alt="Figure 9: Progress of Dataset creation process"><div class="figcaption">Figure 9: Progress of Dataset creation
+<img src="DM_Create_Progress.png" style="width:100.0%" alt="Figure 9: Progress of Dataset creation process"><div class="figcaption">Figure 9: Progress of Dataset creation
 process</div>
 </div>
 <p>When the process finishes you can see message like in Figure 10 (in
 the case if the process has completed without any errors).</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create_Success.png" style="width:100.0%" alt="Figure 10: Progress of Dataset creation process"><div class="figcaption">Figure 10: Progress of Dataset creation
+<img src="DM_Create_Success.png" style="width:100.0%" alt="Figure 10: Progress of Dataset creation process"><div class="figcaption">Figure 10: Progress of Dataset creation
 process</div>
 </div>
 <p>You have a folder with the files that can be used for further tasks
@@ -477,7 +477,7 @@ the texts’ IDs are set to the IDs stored in the corresponding column for
 ID. In the case of .pdf and .txt files, the file names are used as ID
 (without the file extension, see Figure 11).</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FDM_Create_Text_sources.png" style="width:75.0%" alt="Figure 11: Filnames as IDs"><div class="figcaption">Figure 11: Filnames as IDs</div>
+<img src="DM_Create_Text_sources.png" style="width:75.0%" alt="Figure 11: Filnames as IDs"><div class="figcaption">Figure 11: Filnames as IDs</div>
 </div>
 <blockquote>
 <p>Please note that a consequence of this is that two files
@@ -497,7 +497,7 @@ ID and one or multiple columns that contain the texts’
 categories/classes. Supported file formats are .xlsx, .csv, and
 .rda/.rdata. Figure 12 illustrates an example for a .xslx file.</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FCF_Create_Targets.png" style="width:50.0%" alt="Figure 12: Filnames as IDs"><div class="figcaption">Figure 12: Filnames as IDs</div>
+<img src="CF_Create_Targets.png" style="width:50.0%" alt="Figure 12: Filnames as IDs"><div class="figcaption">Figure 12: Filnames as IDs</div>
 </div>
 <blockquote>
 <p>In any case, the table must contain a column with the name “id” which
@@ -532,7 +532,7 @@ train/fine-tune base models.</p>
 <p>In order to create a new base model you have to choose the option
 (tab) <em>Create</em> on the tab <em>Base Models</em> on the top panel
 of the app. Figure 13 shows the corresponding page.</p>
-<p><a href="img_articles/gui/BM_Create_Fill_fields.png"><img src="img_articles%2Fgui%2FBM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 13: Base Models - Create Transformer"></a> Figure 13: Base
+<p><a href="BM_Create_Fill_fields.png"><img src="BM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 13: Base Models - Create Transformer"></a> Figure 13: Base
 Models - Create Transformer (click image to enlarge)</p>
 <p>Every transformer model is composed of two parts: 1) the tokenizer
 which splits raw texts into smaller pieces to model a large number of
@@ -584,7 +584,7 @@ You can see the progress of a creation with progress bars.</p>
 the first time or want to adapt a pre-trained model to a domain-specific
 language or task, you have to click on <em>Train</em> section on the
 <em>Base Models</em> tab.</p>
-<p><a href="img_articles/gui/BM_Train_Fill_fields.png"><img src="img_articles%2Fgui%2FBM_Train_Fill_fields.png" style="width:100.0%" alt="Figure 14: Base Models - Train/Tune Transformer"></a> Figure 14:
+<p><a href="BM_Train_Fill_fields.png"><img src="BM_Train_Fill_fields.png" style="width:100.0%" alt="Figure 14: Base Models - Train/Tune Transformer"></a> Figure 14:
 Base Models - Train/Tune Transformer (click image to enlarge)</p>
 <p>In the first step, you have to choose the base model you would like
 to train/tune (box <em>Base Model</em>). Please note that every base
@@ -646,7 +646,7 @@ days or even weeks, depending on the size and the kind of model, the
 amount of data, and the capacities of your machine. You can see the
 training progress with the progress bars and plot (Figure 15).</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FBM_Train_Progress.png" style="width:100.0%" alt="Figure 15: Progress of training the transformer"><div class="figcaption">Figure 15: Progress of training the
+<img src="BM_Train_Progress.png" style="width:100.0%" alt="Figure 15: Progress of training the transformer"><div class="figcaption">Figure 15: Progress of training the
 transformer</div>
 </div>
 </div>
@@ -675,7 +675,7 @@ long documents by applying the same algorithm to different parts.</p>
 <p>You can open the creation page by clicking on “Create” tab in the
 section “Text Embedding Models”. Figure 12 shows the corresponding
 page.</p>
-<p><a href="img_articles/gui/TEM_Create_Fill_fields.png"><img src="img_articles%2Fgui%2FTEM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 16: Text Embedding Model - Create"></a> Figure 16: Text
+<p><a href="TEM_Create_Fill_fields.png"><img src="TEM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 16: Text Embedding Model - Create"></a> Figure 16: Text
 Embedding Model - Create (click image to enlarge)</p>
 <p>First you have to choose the base model that should form the
 foundation of your new text embedding model. Please select the folder
@@ -745,7 +745,7 @@ and loading a model, a new box appears that shows you the different
 aspects of the model and how you can use it.</p>
 <p>The tab <em>Description</em> (Figure 17) provides you with the
 documentation of the model.</p>
-<p><a href="img_articles/gui/TEM_Use_Fill_fields.png"><img src="img_articles%2Fgui%2FTEM_Use_Fill_fields.png" style="width:100.0%" alt="Figure 17: Text Embedding Model - Description"></a> Figure 17:
+<p><a href="TEM_Use_Fill_fields.png"><img src="TEM_Use_Fill_fields.png" style="width:100.0%" alt="Figure 17: Text Embedding Model - Description"></a> Figure 17:
 Text Embedding Model - Description (click image to enlarge)</p>
 <p>The tab <em>Training</em> shows the development of the loss and the
 validation loss during the last training of the corresponding base
@@ -761,7 +761,7 @@ the embeddings should be stored and name it. With <em>Batch Size</em>
 you can determine how many raw texts should be processed simultaneously.
 Please adjust this value to your machine’s capacities. By clicking on
 the button “Save Embeddings” the transformation of texts begins.</p>
-<p><a href="img_articles/gui/TEM_Use_Embedd_text.png"><img src="img_articles%2Fgui%2FTEM_Use_Embedd_text.png" style="width:100.0%" alt="Figure 18: Text Embedding Model - Embeddings"></a> Figure 18:
+<p><a href="TEM_Use_Embedd_text.png"><img src="TEM_Use_Embedd_text.png" style="width:100.0%" alt="Figure 18: Text Embedding Model - Embeddings"></a> Figure 18:
 Text Embedding Model - Embeddings (click image to enlarge)</p>
 <p>The tab <em>Tokenize/Encode/Decode</em> (Figure 19) offers you
 insights into the way your text embedding model processes data. In the
@@ -773,7 +773,7 @@ used to generate the numeric representation of a text. The box
 a sequence of numbers (separated with a comma or with spaces) and after
 clicking on <em>Decode</em>, the corresponding tokens and the raw text
 appear.</p>
-<p><a href="img_articles/gui/TEM_Use_TED_Encode.png"><img src="img_articles%2Fgui%2FTEM_Use_TED_Encode.png" style="width:100.0%" alt="Figure 19: Text Embedding Model - Tokenize/Encode/Decode"></a>
+<p><a href="TEM_Use_TED_Encode.png"><img src="TEM_Use_TED_Encode.png" style="width:100.0%" alt="Figure 19: Text Embedding Model - Tokenize/Encode/Decode"></a>
 Figure 19: Text Embedding Model - Tokenize/Encode/Decode (click image to
 enlarge)</p>
 <p>Finally, the tab <em>Fill Mask</em> (Figure 16) allows you to request
@@ -789,7 +789,7 @@ the box, showing you the most reasonable token for the selected gap. The
 tokens are ordered by certainty; from the perspective of the model, the
 most reasonable tokens are at the top and the less reasonable tokens are
 at the bottom.</p>
-<p><a href="img_articles/gui/TEM_Use_Fill_mask.png"><img src="img_articles%2Fgui%2FTEM_Use_Fill_mask.png" style="width:100.0%" alt="Figure 20: Text Embedding Model - Fill Mask"></a> Figure 20: Text
+<p><a href="TEM_Use_Fill_mask.png"><img src="TEM_Use_Fill_mask.png" style="width:100.0%" alt="Figure 20: Text Embedding Model - Fill Mask"></a> Figure 20: Text
 Embedding Model - Fill Mask (click image to enlarge)</p>
 </div>
 <div class="section level4">
@@ -812,7 +812,7 @@ necessary information. Via the tabs <em>Developers</em> and
 relevant contributors. <em>Developers</em> refer to the people who
 created a model, while <em>Modifiers</em> refers to the people who
 adapted a pre-trained model to another domain or task.</p>
-<p><a href="img_articles/gui/TEM_Document_Desc_english.png"><img src="img_articles%2Fgui%2FTEM_Document_Desc_english.png" style="width:100.0%" alt="Figure 21: Text Embedding Model - Documentation"></a> Figure 21:
+<p><a href="TEM_Document_Desc_english.png"><img src="TEM_Document_Desc_english.png" style="width:100.0%" alt="Figure 21: Text Embedding Model - Documentation"></a> Figure 21:
 Text Embedding Model - Documentation (click image to enlarge)</p>
 <p>In the tabs <em>Abstract</em> and <em>Description</em>, you can
 provide an abstract and a detailed description of your work in English
@@ -840,7 +840,7 @@ Trained AI/Models</a>.</p>
 <p>Classifiers are built on top of a text embedding model. To create a
 classifier, click on <em>Create</em> in the tab <em>Classifiers</em>.
 Figure 22 shows the corresponding page.</p>
-<p><a href="img_articles/gui/CF_Create_Fill_fields_1.png"><img src="img_articles%2Fgui%2FCF_Create_Fill_fields_1.png" style="width:100.0%" alt="Figure 22: Classifier - Creation Part 1"></a> Figure 22:
+<p><a href="CF_Create_Fill_fields_1.png"><img src="CF_Create_Fill_fields_1.png" style="width:100.0%" alt="Figure 22: Classifier - Creation Part 1"></a> Figure 22:
 Classifier - Creation Part 1 (click image to enlarge)</p>
 <p>Creating a classifier requires two kinds of data. First, a text
 embedding of a collection of texts. These embeddings should be created
@@ -880,7 +880,7 @@ should not contain any spaces or special characters. For <em>Model
 Label,</em> there are no restrictions.</p>
 <p>In the third box (<em>Architecture</em>) you create the architecture
 of your neural network (Figure 23).</p>
-<p><a href="img_articles/gui/CF_Create_Fill_fields_2.png"><img src="img_articles%2Fgui%2FCF_Create_Fill_fields_2.png" style="width:100.0%" alt="Figure 23: Classifier - Creation Part 2"></a> Figure 23:
+<p><a href="CF_Create_Fill_fields_2.png"><img src="CF_Create_Fill_fields_2.png" style="width:100.0%" alt="Figure 23: Classifier - Creation Part 2"></a> Figure 23:
 Classifier - Creation Part 2 (click image to enlarge)</p>
 <p>Since a detailed explanation of every option is beyond the scope of
 this introduction. Here we can only provide an overview.</p>
@@ -985,7 +985,7 @@ et al. (2020). Therefore, the following parameters have to be set:</p>
 <li>Certainty Anchor = 1.00</li>
 <li>Min Certainty Value = 0.00</li>
 </ul>
-<p><a href="img_articles/gui/CF_Create_Fill_fields_3.png"><img src="img_articles%2Fgui%2FCF_Create_Fill_fields_3.png" style="width:100.0%" alt="Figure 24: Classifier - Creation Part 3"></a> Figure 24:
+<p><a href="CF_Create_Fill_fields_3.png"><img src="CF_Create_Fill_fields_3.png" style="width:100.0%" alt="Figure 24: Classifier - Creation Part 3"></a> Figure 24:
 Classifier - Creation Part 3 (click image to enlarge)</p>
 <p>Before you start training, you can check how many cases can be
 matched between the text embeddings and the target data by clicking on
@@ -1012,24 +1012,24 @@ these files and not single files. After loading a classifier, a new box
 appears.</p>
 <p>In the first tab, <em>Description</em>, (Figure 25) you will find the
 documentation of the model.</p>
-<p><a href="img_articles/gui/CF_Use_Fill_fields.png"><img src="img_articles%2Fgui%2FCF_Use_Fill_fields.png" style="width:100.0%" alt="Figure 25: Classifier - Description"></a> Figure 25: Classifier -
-Description (click image to enlarge)</p>
+<p><a href="CF_Use_Fill_fields.png"><img src="CF_Use_Fill_fields.png" style="width:100.0%" alt="Figure 25: Classifier - Description"></a>
+Figure 25: Classifier - Description (click image to enlarge)</p>
 <p>In the second tab, <em>Training</em> (Figure 26) you receive a
 summary of the training process of the model. This includes a
 visualization of the loss, the accuracy, and the balanced accuracy for
 every fold and every epoch. Depending on the applied training techniques
 (such as <em>Balanced Pseudo-Labeling</em>), you can request additional
 images.</p>
-<p><a href="img_articles/gui/CF_Use_Training.png"><img src="img_articles%2Fgui%2FCF_Use_Training.png" style="width:100.0%" alt="Figure 26: Classifier - Training"></a> Figure 26: Classifier -
-Training (click image to enlarge)</p>
+<p><a href="CF_Use_Training.png"><img src="CF_Use_Training.png" style="width:100.0%" alt="Figure 26: Classifier - Training"></a>
+Figure 26: Classifier - Training (click image to enlarge)</p>
 <p>The third tab, <em>Reliability</em>, (Figure 27) provides you with
 information on the quality of the model. Here you find visualizations
 giving you insights into how the classifier is able to generate reliable
 results. In addition, measures from content analysis as well as machine
 learning allow you to analyze specific aspects of the model’s
 performance.</p>
-<p><a href="img_articles/gui/CF_Use_Reliability.png"><img src="img_articles%2Fgui%2FCF_Use_Reliability.png" style="width:100.0%" alt="Figure 27: Classifier - Reliability"></a> Figure 27: Classifier -
-Reliability (click image to enlarge)</p>
+<p><a href="CF_Use_Reliability.png"><img src="CF_Use_Reliability.png" style="width:100.0%" alt="Figure 27: Classifier - Reliability"></a>
+Figure 27: Classifier - Reliability (click image to enlarge)</p>
 <p>The last tab, <em>Prediction</em> (Figure 28) allows you to apply a
 trained model to new data. Here you can use the trained model to assign
 classes/categories to new texts. For this purpose, you must first
@@ -1037,8 +1037,8 @@ provide the file that contains the text embeddings of the documents you
 would like to classify. You can create these embeddings with the text
 embedding model used for providing the training data of the classifier.
 The necessary steps are described in section 3.3.2.</p>
-<p><a href="img_articles/gui/CF_Use_Prediction_1.png"><img src="img_articles%2Fgui%2FCF_Use_Prediction_1.png" style="width:100.0%" alt="Figure 28: Classifier - Prediction"></a> Figure 28: Classifier -
-Prediction (click image to enlarge)</p>
+<p><a href="CF_Use_Prediction_1.png"><img src="CF_Use_Prediction_1.png" style="width:100.0%" alt="Figure 28: Classifier - Prediction"></a>
+Figure 28: Classifier - Prediction (click image to enlarge)</p>
 <blockquote>
 <p>These embeddings must be created with the same text embedding model
 that created the text embeddings for training. If not, an error will
@@ -1049,7 +1049,7 @@ the predictions and to provide a file name. The default case is to store
 the predictions in an .csv file. The resulting data table may look like
 shown in Figure 29.</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FCF_Use_Prediction_Result.png" style="width:50.0%" alt="Figure 29: Classifier - Prediction Results"><div class="figcaption">Figure 29: Classifier - Prediction Results</div>
+<img src="CF_Use_Prediction_Result.png" style="width:50.0%" alt="Figure 29: Classifier - Prediction Results"><div class="figcaption">Figure 29: Classifier - Prediction Results</div>
 </div>
 </div>
 <div class="section level4">
@@ -1097,7 +1097,7 @@ classifier.</p>
 <p>You can create a feature extractor as follows in Figure 30
 (<em>Create</em> tab in the tab <em>Feature Extractors</em>).</p>
 <div class="float">
-<img src="img_articles%2Fgui%2FFE_Create_Fill_fields.png" style="width:100.0%" alt="Figure 30: Basic architecure of feature extractors"><div class="figcaption">Figure 30: Basic architecure of feature
+<img src="FE_Create_Fill_fields.png" style="width:100.0%" alt="Figure 30: Basic architecure of feature extractors"><div class="figcaption">Figure 30: Basic architecure of feature
 extractors</div>
 </div>
 <p>First, you need to choose embeddings that you can see after choosing

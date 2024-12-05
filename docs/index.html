@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Artificial Intelligence for Education">
 <meta name="description" content="In social and educational settings, the use of Artificial Intelligence (AI) is a challenging task. Relevant data is often only available in handwritten forms, or the use of data is restricted by privacy policies. This often leads to small data sets. Furthermore, in the educational and social sciences, data is often unbalanced in terms of frequencies. To support educators as well as educational and social researchers in using the potentials of AI for their work, this package provides a unified interface for neural nets in PyTorch to deal with natural language problems. In addition, the package ships with a shiny app, providing a graphical user interface. This allows the usage of AI for people without skills in writing python/R scripts. The tools integrate existing mathematical and statistical methods for dealing with small data sets via pseudo-labeling (e.g. Cascante-Bonilla et al. (2020) &lt;doi:10.48550/arXiv.2001.06001&gt;) and imbalanced data via the creation of synthetic cases (e.g. Bunkhumpornpat et al. (2012) &lt;doi:10.1007/s10489-011-0287-y&gt;). Performance evaluation of AI is connected to measures from content analysis which educational and social researchers are generally more familiar with (e.g. Berding &amp; Pargmann (2022) &lt;doi:10.30819/5581&gt;, Gwet (2014) &lt;ISBN:978-0-9708062-8-4&gt;, Krippendorff (2019) &lt;doi:10.4135/9781071878781&gt;). Estimation of energy consumption and CO2 emissions during model training is done with the python library codecarbon. Finally, all objects created with this package allow to share trained AI models with other people.">
 <meta property="og:description" content="In social and educational settings, the use of Artificial Intelligence (AI) is a challenging task. Relevant data is often only available in handwritten forms, or the use of data is restricted by privacy policies. This often leads to small data sets. Furthermore, in the educational and social sciences, data is often unbalanced in terms of frequencies. To support educators as well as educational and social researchers in using the potentials of AI for their work, this package provides a unified interface for neural nets in PyTorch to deal with natural language problems. In addition, the package ships with a shiny app, providing a graphical user interface. This allows the usage of AI for people without skills in writing python/R scripts. The tools integrate existing mathematical and statistical methods for dealing with small data sets via pseudo-labeling (e.g. Cascante-Bonilla et al. (2020) &lt;doi:10.48550/arXiv.2001.06001&gt;) and imbalanced data via the creation of synthetic cases (e.g. Bunkhumpornpat et al. (2012) &lt;doi:10.1007/s10489-011-0287-y&gt;). Performance evaluation of AI is connected to measures from content analysis which educational and social researchers are generally more familiar with (e.g. Berding &amp; Pargmann (2022) &lt;doi:10.30819/5581&gt;, Gwet (2014) &lt;ISBN:978-0-9708062-8-4&gt;, Krippendorff (2019) &lt;doi:10.4135/9781071878781&gt;). Estimation of energy consumption and CO2 emissions during model training is done with the python library codecarbon. Finally, all objects created with this package allow to share trained AI models with other people.">
@@ -121,7 +121,7 @@
 <a class="anchor" aria-label="anchor" href="#graphical-user-interface-ai-for-education---studio"></a>
 </h2>
 <p>The package ships with a shiny app that serves as a graphical user interface.</p>
-<figure><img src="reference/figures/gui_aife_readme.JPG" style="width:100.0%" alt="Figure 1: Aifeducation Studio"><figcaption aria-hidden="true">
+<figure><img src="reference/figures/home.png" style="width:100.0%" alt="Figure 1: Aifeducation Studio"><figcaption aria-hidden="true">
 Figure 1: Aifeducation Studio
 </figcaption></figure><p><em>AI for Education - Studio</em> allows users to easily develop, train, apply, document, and analyse AI models without any coding skills. See the corresponding vignette for more details: <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html">02 Using the graphical user interface Aifeducation - Studio</a>.</p>
 </div>
@@ -180,10 +180,13 @@ Figure 1: Aifeducation Studio
 <li>Percentage Agreement</li>
 <li>Gwet’s AC1/AC2 (Gwet 2014)</li>
 <li>Kendall’s coefficient of concordance W</li>
-<li>Cohen’s Kappa unweighted</li>
-<li>Cohen’s Kappa with equal weights</li>
-<li>Cohen’s Kappa with squared weights</li>
-<li>Fleiss’ Kappa for multiple raters without exact estimation</li>
+<li>Cohen’s Kappa unweighted (Cohen 1960)</li>
+<li>Cohen’s Kappa with equal weights (Cohen 1968)</li>
+<li>Cohen’s Kappa with squared weights (Cohen 1968)</li>
+<li>Fleiss’ Kappa for multiple raters without exact estimation (Fleiss
+<ol start="1971" style="list-style-type: decimal"><li>
+</li></ol>
+</li>
 </ul>
 <p>In addition, some traditional measures from machine learning literature are also available:</p>
 <ul>
@@ -224,9 +227,12 @@ Figure 1: Aifeducation Studio
 <p>Bloemen, A. (2011). Lernaufgaben in Schulbüchern der Wirtschaftslehre: Analyse, Konstruktion und Evaluation von Lernaufgaben für die Lernfelder industrieller Geschäftsprozesse. Hampp.</p>
 <p>Bunkhumpornpat, C., Sinapiromsaran, K., &amp; Lursinsap, C. (2012). DBSMOTE: Density-Based Synthetic Minority Over-sampling Technique. Applied Intelligence, 36(3), 664–684. <a href="https://doi.org/10.1007/s10489-011-0287-y" class="external-link uri">https://doi.org/10.1007/s10489-011-0287-y</a></p>
 <p>Chawla, N. V., Bowyer, K. W., Hall, L. O., &amp; Kegelmeyer, W. P. (2002). SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial Intelligence Research, 16, 321–357. <a href="https://doi.org/10.1613/jair.953" class="external-link uri">https://doi.org/10.1613/jair.953</a></p>
+<p>Cohen, J (1968). Weighted kappa: Nominal scale agreement with provision for scaled disagreement or partial credit. Psychological Bulletin, 70(4), 213–220. <a href="https://doi.org/10.1037/h0026256" class="external-link uri">https://doi.org/10.1037/h0026256</a></p>
+<p>Cohen, J (1960). A Coefficient of Agreement for Nominal Scales. Educational and Psychological Measurement, 20(1), 37–46. <a href="https://doi.org/10.1177/001316446002000104" class="external-link uri">https://doi.org/10.1177/001316446002000104</a></p>
 <p>Courty, B., Schmidt, V., Goyal-Kamal, Coutarel, M., Feld, B., Lecourt, J., &amp; … (2023). mlco2/codecarbon: v2.2.7. <a href="https://doi.org/10.5281/zenodo.8181237" class="external-link uri">https://doi.org/10.5281/zenodo.8181237</a></p>
 <p>Dai, Z., Lai, G., Yang, Y. &amp; Le, Q. V. (2020). Funnel-Transformer: Filtering out Sequential Redundancy for Efficient Language Processing. <a href="https://doi.org/10.48550/arXiv.2006.03236" class="external-link uri">https://doi.org/10.48550/arXiv.2006.03236</a></p>
 <p>Devlin, J., Chang, M.‑W., Lee, K., &amp; Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. Doran, &amp; T. Solorio (Eds.), Proceedings of the 2019 Conference of the North (pp. 4171–4186). Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/N19-1423" class="external-link uri">https://doi.org/10.18653/v1/N19-1423</a></p>
+<p>Fleiss, J. L. (1971). Measuring nominal scale agreement among many raters. Psychological Bulletin, 76(5), 378–382. <a href="https://doi.org/10.1037/h0031619" class="external-link uri">https://doi.org/10.1037/h0031619</a></p>
 <p>Gruber, N., &amp; Kreuzpointner, L. (2013). Measuring the reliability of picture story exercises like the TAT. PloS One, 8(11), e79450. <a href="https://doi.org/10.1371/journal.pone.0079450" class="external-link uri">https://doi.org/10.1371/journal.pone.0079450</a></p>
 <p>Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive guide to measuring the extent of agreement among raters (Fourth edition). STATAXIS.</p>
 <p>Haixiang, G., Yijing, L., Shang, J., Mingyun, G., Yuanyue, H., &amp; Bing, G. (2017). Learning from class-imbalanced data: Review of methods and applications. Expert Systems with Applications, 73, 220–239. <a href="https://doi.org/10.1016/j.eswa.2016.12.035" class="external-link uri">https://doi.org/10.1016/j.eswa.2016.12.035</a></p>

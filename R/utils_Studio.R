@@ -999,7 +999,7 @@ generate_doc_input_licensing_editor <- function(ns, model) {
           inputId = ns(paste0("doc_editor_", "documentation_license")),
           label = "Model License",
           width = "100%",
-          value = model$get_software_license()
+          value = model$get_model_license()
         ),
         shiny::textInput(
           inputId = ns(paste0("doc_editor_", "software_license")),

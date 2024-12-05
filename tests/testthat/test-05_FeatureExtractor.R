@@ -7,7 +7,7 @@ testthat::skip_if_not(
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
-root_path_general_data<-testthat::test_path("test_data/Embeddings")
+root_path_general_data<-testthat::test_path("test_data_tmp/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
 create_dir(root_path_results, FALSE)

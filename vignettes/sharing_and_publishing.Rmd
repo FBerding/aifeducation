@@ -3,7 +3,7 @@ title: "05 Sharing and Using Trained AI/Models"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{05 sharing and using trained ai/models}
+  %\VignetteIndexEntry{05 Sharing and Using Trained AI/Models}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -171,10 +171,10 @@ example_model$get_publication_info()
 ```
 
 Finally, you must provide a license for using your model. This can be
-done with `set_software_license` and `get_software_license`.
+done with `set_model_license` and `get_model_license`.
 
 ```{r, include = TRUE, eval=FALSE}
-example_model$set_software_license("GPL-3")
+example_model$set_model_license("GPL-3")
 ```
 
 The documentation of your work is not part of the software. Here you can

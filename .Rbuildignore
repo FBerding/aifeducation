@@ -13,14 +13,15 @@ materials
 test_model
 tests/testthat/test_artefacts
 tests/testthat/test_data_tmp
-tests/testthat/test_data
 .h5
 .git
 .gitignore
 _pkgdown.yml
 docs
 ^vignettes/articles$
-^vignettes/img_articles$
+vignettes/img_articles
+^vignettes/.*\.png
+vignettes/.jpg
 ^\.github$
 checkpoints
 cran-comments.md

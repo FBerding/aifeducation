@@ -94,13 +94,13 @@ AIFEBaseModel <- R6::R6Class(
     #' @param license `string` containing the abbreviation of the license or the license text.
     #' @return Function does not return a value. It is used for setting the private member for the software license of
     #'   the model.
-    set_software_license = function(license = "CC BY") {
+    set_model_license = function(license = "CC BY") {
       private$model_info$model_license <- license
     },
     #' @description Method for getting the license of the model.
     #' @param license `string` containing the abbreviation of the license or the license text.
     #' @return `string` representing the license for the model.
-    get_software_license = function() {
+    get_model_license = function() {
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
@@ -736,7 +736,7 @@ AIFEBaseModel <- R6::R6Class(
       self$last_training$data <- config_public$last_training$data
 
       # Set license
-      self$set_software_license(config_private$model_info$model_license)
+      self$set_model_license(config_private$model_info$model_license)
       self$set_documentation_license(config_private$model_description$license)
 
       # Set description and documentation

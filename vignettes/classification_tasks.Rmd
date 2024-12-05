@@ -91,7 +91,7 @@ within a single research area, concepts are not unified. Figure 1
 illustrates this package's understanding.
 
 ![Figure 1: Understanding of Central
-Concepts](img_articles/classif_fig_01.png){width="100%"}
+Concepts](classif_fig_01.png){width="100%"}
 
 Since *aifeducation* looks at the application of AI for classification
 tasks from the perspective of the empirical method of content analysis,
@@ -113,7 +113,7 @@ data are necessary to train an AI to classify text in line with
 supervised machine learning principles.
 
 ![Figure 2: Basic Structure of Supervised Machine
-Learning](img_articles/classif_fig_02.png){width="100%"}
+Learning](classif_fig_02.png){width="100%"}
 
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -148,7 +148,7 @@ In *aifeducation,* these steps are covered with three different types of
 models, as shown in Figure 3.
 
 ![Figure 3: Model Types in
-aifeducation](img_articles/classif_model_hierachy.png){width="100%"}
+aifeducation](classif_model_hierachy.png){width="100%"}
 
 -   **Base Models:** The base models contain the capacities to
     understand natural language. In general, these are transformers such
@@ -580,7 +580,8 @@ with the `create`-method of the Transformer class. Use
 > Developers](transformers.html) for details.
 
 ```{r, include = TRUE, eval = FALSE}
-aife_transformer_maker$make("bert")$create(
+base_model<-aife_transformer_maker$make("bert")
+base_model$create(
   ml_framework = "pytorch",
   model_dir = "my_own_transformer",
   text_dataset = LargeDataSetForText$new(example_data),
@@ -656,15 +657,13 @@ directory.
 
 If you would like to train a new base model (see section 3.2) for the
 first time or want to adapt a pre-trained model to a domain-specific
-language or task, you can call the corresponding `train`-method. Use
-`aife_transformer_maker` to create a transformer object. In case of a
-BERT model this is `aife_transformer_maker$make("bert")$train()`.
+language or task, you can call the corresponding `train`-method. 
 
 > See p. 3 Transformer Maker [01 Transformers for
 > Developers](transformers.html) for details.
 
 ```{r, include = TRUE, eval = FALSE}
-aife_transformer_maker$make("bert")$train(
+base_model$train(
   ml_framework = "pytorch",
   output_dir = "my_own_transformer_trained",
   model_dir_path = "my_own_transformer",
@@ -703,7 +702,7 @@ complete words (Please remember that modern tokenizers split words into
 several tokens. Thus, tokens and words are not forced to match each
 other directly). With `p_mask` you can determine how many tokens should
 be masked. Finally, with `val_size`, you set how many chunks of tokens
-should be used for the validation sample.
+should be used for the validation sample. Minimum is 2.
 
 Please remember to set the correct alpha-3 code for tracking the
 ecological impact of training your model (`sustain_iso_code`).
@@ -944,7 +943,7 @@ With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.
 
 ![Figure 4: Overview of Possible Structure of a
-Classifier](img_articles/classif_fig_04.png){width="100%"}
+Classifier](classif_fig_04.png){width="100%"}
 
 `dense_layers` takes a vector of integers, determining the number of
 layers and `dense_size` determines the number of neurons for all dense
@@ -1122,7 +1121,7 @@ Figure 5 illustrates the training loop for the cases that all options
 are set to `TRUE`.
 
 ![Figure 5: Overview of the Steps to Perform a
-Classification](img_articles/classif_fig_05.png){width="100%"}
+Classification](classif_fig_05.png){width="100%"}
 
 The example above applies the generation of synthetic cases and the
 algorithm proposed by Cascante-Bonilla et al. (2020). For every fold,
@@ -1440,7 +1439,7 @@ plot_untrained
 ```
 
 ![Figure 7: Embedding of an untrained classifier of type
-"ProtoNet"](img_articles/classif_fig_protonet_emb_1.png){width="100%"}
+"ProtoNet"](classif_fig_protonet_emb_1.png){width="100%"}
 The large triangles represent the prototypes for every class while the
 dots refer to the labeled cases in the data set. For these, the color
 represents their true class. For unlabeled cases, a square is used.
@@ -1542,7 +1541,7 @@ close to the red prototype for "neg".
 
 ![Figure 8: Embedding of a trained classifier of type "ProtoNet" without
 unlabeled
-cases](img_articles/classif_fig_protonet_emb_2.png){width="100%"}
+cases](classif_fig_protonet_emb_2.png){width="100%"}
 
 Let us now add the unlabeled cases to the plot by setting
 `inc_unlabeled=TRUE`.
@@ -1563,7 +1562,7 @@ the prototype for "neg" are assigned to "neg".
 
 ![Figure 9: Embedding of a trained classifier of type "ProtoNet"
 including unlabeled
-cases](img_articles/classif_fig_protonet_emb_3.png){width="100%"}
+cases](classif_fig_protonet_emb_3.png){width="100%"}
 
 ```{r, include = FALSE, eval=TRUE}
 classifier <- vignette_classifier_ProtoNet
@@ -1590,7 +1589,7 @@ that support sequential data and sequences of different length. The
 basic architecture of all extractors is shown in the following figure.
 
 ![Figure 10: Basic architecture of feature
-extractors](img_articles/classif_feature_extractor.png){width="100%"}
+extractors](classif_feature_extractor.png){width="100%"}
 
 The learning objective of the feature extractors is first to compress
 information by reducing the number of features to the number of features

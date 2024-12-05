@@ -106,7 +106,7 @@ The package ships with a shiny app that serves as a graphical user
 interface.
 
 ![Figure 1: Aifeducation
-Studio](man/figures/gui_aife_readme.JPG){width="100%"}
+Studio](man/figures/home.png){width="100%"}
 
 *AI for Education - Studio* allows users to easily develop, train,
 apply, document, and analyse AI models without any coding skills. See
@@ -255,10 +255,10 @@ evaluated with the following measures and concepts:
 -   Percentage Agreement
 -   Gwet's AC1/AC2 (Gwet 2014)
 -   Kendall's coefficient of concordance W
--   Cohen's Kappa unweighted
--   Cohen's Kappa with equal weights
--   Cohen's Kappa with squared weights
--   Fleiss' Kappa for multiple raters without exact estimation
+-   Cohen's Kappa unweighted (Cohen 1960)
+-   Cohen's Kappa with equal weights (Cohen 1968)
+-   Cohen's Kappa with squared weights (Cohen 1968)
+-   Fleiss' Kappa for multiple raters without exact estimation (Fleiss 1971)
 
 In addition, some traditional measures from machine learning literature
 are also available:
@@ -329,6 +329,13 @@ Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002).
 SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial
 Intelligence Research, 16, 321--357. <https://doi.org/10.1613/jair.953>
 
+Cohen, J (1968). Weighted kappa: Nominal scale agreement
+with provision for scaled disagreement or partial credit.
+Psychological Bulletin, 70(4), 213–220. <https://doi.org/10.1037/h0026256>
+
+Cohen, J (1960). A Coefficient of Agreement for Nominal Scales.
+Educational and Psychological Measurement, 20(1), 37–46. <https://doi.org/10.1177/001316446002000104>
+
 Courty, B., Schmidt, V., Goyal-Kamal, Coutarel, M., Feld, B., Lecourt,
 J., & ... (2023). mlco2/codecarbon: v2.2.7.
 <https://doi.org/10.5281/zenodo.8181237>
@@ -343,6 +350,9 @@ Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
 Proceedings of the 2019 Conference of the North (pp. 4171--4186).
 Association for Computational Linguistics.
 <https://doi.org/10.18653/v1/N19-1423>
+
+Fleiss, J. L. (1971). Measuring nominal scale agreement among
+many raters. Psychological Bulletin, 76(5), 378–382. <https://doi.org/10.1037/h0031619>
 
 Gruber, N., & Kreuzpointner, L. (2013). Measuring the reliability of
 picture story exercises like the TAT. PloS One, 8(11), e79450.

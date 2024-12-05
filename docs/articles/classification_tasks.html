@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="03 Using R syntax">
 </head>
 <body>
@@ -153,7 +153,7 @@ disciplines using different, sometimes overlapping, concepts. Even
 within a single research area, concepts are not unified. Figure 1
 illustrates this package’s understanding.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
+<img src="classif_fig_01.png" style="width:100.0%" alt="Figure 1: Understanding of Central Concepts"><div class="figcaption">Figure 1: Understanding of Central
 Concepts</div>
 </div>
 <p>Since <em>aifeducation</em> looks at the application of AI for
@@ -174,7 +174,7 @@ text is labeled with the correct class. As Figure 2 illustrates, two
 kinds of data are necessary to train an AI to classify text in line with
 supervised machine learning principles.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
+<img src="classif_fig_02.png" style="width:100.0%" alt="Figure 2: Basic Structure of Supervised Machine Learning"><div class="figcaption">Figure 2: Basic Structure of Supervised Machine
 Learning</div>
 </div>
 <p>By providing AI with both the textual data as input data and the
@@ -206,7 +206,7 @@ target data when training AI to classify a text.</p>
 <p>In <em>aifeducation,</em> these steps are covered with three
 different types of models, as shown in Figure 3.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_model_hierachy.png" style="width:100.0%" alt="Figure 3: Model Types in aifeducation"><div class="figcaption">Figure 3: Model Types in aifeducation</div>
+<img src="classif_model_hierachy.png" style="width:100.0%" alt="Figure 3: Model Types in aifeducation"><div class="figcaption">Figure 3: Model Types in aifeducation</div>
 </div>
 <ul>
 <li><p><strong>Base Models:</strong> The base models contain the
@@ -1047,7 +1047,7 @@ this in Section 6.2.</p>
 <p>With the other parameters you decide about the structure of your
 classifier. Figure 4 illustrates this.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_04.png" style="width:100.0%" alt="Figure 4: Overview of Possible Structure of a Classifier"><div class="figcaption">Figure 4: Overview of Possible Structure of a
+<img src="classif_fig_04.png" style="width:100.0%" alt="Figure 4: Overview of Possible Structure of a Classifier"><div class="figcaption">Figure 4: Overview of Possible Structure of a
 Classifier</div>
 </div>
 <p><code>dense_layers</code> takes a vector of integers, determining the
@@ -1214,7 +1214,7 @@ every step. The maximum number of steps is determined with
 <p>Figure 5 illustrates the training loop for the cases that all options
 are set to <code>TRUE</code>.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_05.png" style="width:100.0%" alt="Figure 5: Overview of the Steps to Perform a Classification"><div class="figcaption">Figure 5: Overview of the Steps to Perform a
+<img src="classif_fig_05.png" style="width:100.0%" alt="Figure 5: Overview of the Steps to Perform a Classification"><div class="figcaption">Figure 5: Overview of the Steps to Perform a
 Classification</div>
 </div>
 <p>The example above applies the generation of synthetic cases and the
@@ -1590,7 +1590,7 @@ Figure.</p>
 <span>  classes_q<span class="op">=</span><span class="va">review_labels</span>,</span>
 <span><span class="op">)</span></span>
 <span><span class="va">plot_untrained</span></span></code></pre></div>
-<p><img src="img_articles%2Fclassif_fig_protonet_emb_1.png" style="width:100.0%" alt="Figure 7: Embedding of an untrained classifier of type “ProtoNet”">
+<p><img src="classif_fig_protonet_emb_1.png" style="width:100.0%" alt="Figure 7: Embedding of an untrained classifier of type “ProtoNet”">
 The large triangles represent the prototypes for every class while the
 dots refer to the labeled cases in the data set. For these, the color
 represents their true class. For unlabeled cases, a square is used.
@@ -1684,7 +1684,7 @@ small number of cases is located near the wrong prototype. This can be
 seen if a red dot is close to the prototype for “pos” and a green dot is
 close to the red prototype for “neg”.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_protonet_emb_2.png" style="width:100.0%" alt="Figure 8: Embedding of a trained classifier of type “ProtoNet” without unlabeled cases"><div class="figcaption">Figure 8: Embedding of a trained classifier of
+<img src="classif_fig_protonet_emb_2.png" style="width:100.0%" alt="Figure 8: Embedding of a trained classifier of type “ProtoNet” without unlabeled cases"><div class="figcaption">Figure 8: Embedding of a trained classifier of
 type “ProtoNet” without unlabeled cases</div>
 </div>
 <p>Let us now add the unlabeled cases to the plot by setting
@@ -1701,7 +1701,7 @@ cases according to their distance to the two prototypes. Cases that are
 close to the prototype for “pos” are assigned to “pos”, while cases near
 the prototype for “neg” are assigned to “neg”.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_fig_protonet_emb_3.png" style="width:100.0%" alt="Figure 9: Embedding of a trained classifier of type “ProtoNet” including unlabeled cases"><div class="figcaption">Figure 9: Embedding of a trained classifier of
+<img src="classif_fig_protonet_emb_3.png" style="width:100.0%" alt="Figure 9: Embedding of a trained classifier of type “ProtoNet” including unlabeled cases"><div class="figcaption">Figure 9: Embedding of a trained classifier of
 type “ProtoNet” including unlabeled cases</div>
 </div>
 <p>Finally, let us report the reliability of this classifier.</p>
@@ -1739,7 +1739,7 @@ auto-encoders that support sequential data and sequences of different
 length. The basic architecture of all extractors is shown in the
 following figure.</p>
 <div class="float">
-<img src="img_articles%2Fclassif_feature_extractor.png" style="width:100.0%" alt="Figure 10: Basic architecture of feature extractors"><div class="figcaption">Figure 10: Basic architecture of feature
+<img src="classif_feature_extractor.png" style="width:100.0%" alt="Figure 10: Basic architecture of feature extractors"><div class="figcaption">Figure 10: Basic architecture of feature
 extractors</div>
 </div>
 <p>The learning objective of the feature extractors is first to compress

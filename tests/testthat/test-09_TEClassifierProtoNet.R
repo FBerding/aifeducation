@@ -30,8 +30,7 @@ if(Sys.getenv("CI")=="true"){
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_data <- testthat::test_path("test_data/classifier")
-root_path_general_data <- testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
 create_dir(root_path_results, FALSE)
@@ -1025,9 +1024,9 @@ for (framework in ml_frameworks) {
           )
 
 
-          classifier$set_software_license("test_license")
+          classifier$set_model_license("test_license")
           expect_equal(
-            object = classifier$get_software_license(),
+            object = classifier$get_model_license(),
             expected = c("test_license")
           )
 
@@ -1285,9 +1284,9 @@ for (framework in ml_frameworks) {
       )
 
 
-      classifier$set_software_license("test_license")
+      classifier$set_model_license("test_license")
       expect_equal(
-        object = classifier$get_software_license(),
+        object = classifier$get_model_license(),
         expected = c("test_license")
       )
 

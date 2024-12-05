@@ -680,7 +680,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
 
       # Set license
-      self$set_software_license(config_file$private$model_info$model_license)
+      self$set_model_license(config_file$private$model_info$model_license)
       self$set_documentation_license(config_file$private$model_description$license)
 
       # Set description and documentation
@@ -1054,7 +1054,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       if (private$transformer_components$emb_pool_type == "average") {
         if (private$transformer_components$ml_framework == "pytorch") {
-          reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
+          reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
             package = "aifeducation"
           ))
           pooling <- py$GlobalAveragePooling1D_PT()
@@ -1500,12 +1500,12 @@ TextEmbeddingModel <- R6::R6Class(
     #' the license text.
     #' @return Function does not return a value. It is used for setting the private
     #' member for the software license of the model.
-    set_software_license = function(license = "CC BY") {
+    set_model_license = function(license = "CC BY") {
       private$model_info$model_license <- license
     },
     #' @description Method for requesting the license of the model
     #' @return `string` License of the model
-    get_software_license = function() {
+    get_model_license = function() {
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------

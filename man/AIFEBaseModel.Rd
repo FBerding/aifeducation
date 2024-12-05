@@ -41,8 +41,8 @@ training. This information will be overwritten if a new training is started.
 \item \href{#method-AIFEBaseModel-get_text_embedding_model}{\code{AIFEBaseModel$get_text_embedding_model()}}
 \item \href{#method-AIFEBaseModel-set_publication_info}{\code{AIFEBaseModel$set_publication_info()}}
 \item \href{#method-AIFEBaseModel-get_publication_info}{\code{AIFEBaseModel$get_publication_info()}}
-\item \href{#method-AIFEBaseModel-set_software_license}{\code{AIFEBaseModel$set_software_license()}}
-\item \href{#method-AIFEBaseModel-get_software_license}{\code{AIFEBaseModel$get_software_license()}}
+\item \href{#method-AIFEBaseModel-set_model_license}{\code{AIFEBaseModel$set_model_license()}}
+\item \href{#method-AIFEBaseModel-get_model_license}{\code{AIFEBaseModel$get_model_license()}}
 \item \href{#method-AIFEBaseModel-set_documentation_license}{\code{AIFEBaseModel$set_documentation_license()}}
 \item \href{#method-AIFEBaseModel-get_documentation_license}{\code{AIFEBaseModel$get_documentation_license()}}
 \item \href{#method-AIFEBaseModel-set_model_description}{\code{AIFEBaseModel$set_model_description()}}
@@ -125,12 +125,12 @@ Method for requesting the bibliographic information of the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-AIFEBaseModel-set_software_license"></a>}}
-\if{latex}{\out{\hypertarget{method-AIFEBaseModel-set_software_license}{}}}
-\subsection{Method \code{set_software_license()}}{
+\if{html}{\out{<a id="method-AIFEBaseModel-set_model_license"></a>}}
+\if{latex}{\out{\hypertarget{method-AIFEBaseModel-set_model_license}{}}}
+\subsection{Method \code{set_model_license()}}{
 Method for setting the license of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AIFEBaseModel$set_software_license(license = "CC BY")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AIFEBaseModel$set_model_license(license = "CC BY")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -146,12 +146,12 @@ the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-AIFEBaseModel-get_software_license"></a>}}
-\if{latex}{\out{\hypertarget{method-AIFEBaseModel-get_software_license}{}}}
-\subsection{Method \code{get_software_license()}}{
+\if{html}{\out{<a id="method-AIFEBaseModel-get_model_license"></a>}}
+\if{latex}{\out{\hypertarget{method-AIFEBaseModel-get_model_license}{}}}
+\subsection{Method \code{get_model_license()}}{
 Method for getting the license of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AIFEBaseModel$get_software_license()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AIFEBaseModel$get_model_license()}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
