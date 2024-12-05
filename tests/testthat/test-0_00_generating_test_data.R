@@ -109,11 +109,11 @@ test_that("Generating Test Data", {
                dir_path = path_test_data,
                folder_name = "imdb_embeddings")
 
-  #Clean data
+  Clean data
   unlink(x=test_path_train,
          recursive = TRUE)
 
   #Save test data
-  expect_true(dir.exists(paste0(path_test_data,"/imdb_embeddings")))
+  expect_true(file.exists(paste0(path_test_data,"/imdb_embeddings/r_config_state.rda")))
 
 })

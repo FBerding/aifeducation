@@ -241,7 +241,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     dtype=float
     model.to(device,dtype=dtype)
   else:
-    model.to(device,dtype=torch.double)
+    dtype=torch.double
+    model.to(device,dtype=dtype)
   
   optimizer=torch.optim.Adam(params=model.parameters(),weight_decay=0)
   
