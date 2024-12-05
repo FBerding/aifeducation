@@ -109,7 +109,7 @@ test_that("Generating Test Data", {
                dir_path = path_test_data,
                folder_name = "imdb_embeddings")
 
-  Clean data
+  #Clean data
   unlink(x=test_path_train,
          recursive = TRUE)
 
