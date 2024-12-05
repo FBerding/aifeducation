@@ -55,6 +55,8 @@ test_that("Generating Test Data", {
     trace = trace
   )
 
+  Sys.sleep(5)
+
   base_model$train(
     ml_framework = "pytorch",
     output_dir = test_path_train,
@@ -65,8 +67,8 @@ test_that("Generating Test Data", {
     full_sequences_only = TRUE,
     val_size = 0.25,
     n_epoch = 10,
-    batch_size = 15,
-    chunk_size = 100,
+    batch_size = 25,
+    chunk_size = 512,
     n_workers = 1,
     multi_process = FALSE,
     sustain_track = TRUE,
@@ -77,9 +79,13 @@ test_that("Generating Test Data", {
     keras_trace = as.numeric(trace),
     pytorch_trace = as.numeric(trace)
   )
+  Sys.sleep(5)
+
   #Clean data
   unlink(x=test_path_create,
          recursive = TRUE)
+
+  Sys.sleep(5)
 
   text_embedding_model <- TextEmbeddingModel$new()
   text_embedding_model$configure(
