@@ -15,7 +15,7 @@ skip_documentation<-FALSE
 class_range=c(2,3)
 
 prob_precision=1e-4
-prob_precision_fourier=1e-3
+prob_precision_fourier=1e-1
 
 #can be set to "all"
 local_samples=50

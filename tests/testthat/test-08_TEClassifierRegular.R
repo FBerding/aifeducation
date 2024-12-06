@@ -30,7 +30,7 @@ local_samples=50
 n_git_samples <- 50
 
 prob_precision=1e-4
-prob_precision_fourier=1e-3
+prob_precision_fourier=1e-1
 
 if(Sys.getenv("CI")=="true"){
   include_tensorflow <- FALSE

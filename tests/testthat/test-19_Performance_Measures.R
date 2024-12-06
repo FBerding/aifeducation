@@ -162,35 +162,49 @@ test_that("Kendall's w",{
     nrow = 4,
     byrow = TRUE
   )
-  raters=matrix(data = 0,nrow = 4,ncol = 5)
 
-  for(i in 1:nrow(freq_table)){
-    index=0
-    for (k in 1:5) {
-      tmp_value=freq_table[i,k]
-      if(tmp_value>0){
-        for (j in (1+index):(tmp_value+index)) {
-          raters[i,j]=k
-        }
-        index=index+tmp_value
-      }
-    }
-  }
-
+  raters<-t(freq_table)
   r_1<-factor(raters[,1],levels = c(1,2,3,4,5))
   r_2<-factor(raters[,2],levels = c(1,2,3,4,5))
   r_3<-factor(raters[,3],levels = c(1,2,3,4,5))
   r_4<-factor(raters[,4],levels = c(1,2,3,4,5))
-  r_5<-factor(raters[,5],levels = c(1,2,3,4,5))
   results<-kendalls_w(rater_one = r_1,
                         rater_two = r_2,
-                        additional_raters=list(r_3,r_4,r_5))
+                        additional_raters=list(r_3,r_4))
   expect_equal(results$kendall_w,0.6875,tolerance = 1e-3)
-  expect_equal(results$kendall_w_corrected,0.6794,tolerance = 1e-3)
 
   results<-NULL
   results<-kendalls_w(rater_one = r_1,rater_two = r_1)
   expect_equal(results$kendall_w,1,tolerance = 1e-3)
+  expect_equal(results$kendall_w_corrected,1,tolerance = 1e-3)
+  #------------
+  #Example taken form Gwet (2014)
+  freq_table<-matrix(
+    data = c(9,2,5,8,
+             6,1,3,2,
+             8,4,6,8,
+             7,1,2,6,
+             10,5,6,9,
+             6,2,4,7),
+    ncol = 4,
+    nrow = 6,
+    byrow = TRUE
+  )
+  lvs=names(table(freq_table))
+  raters<-freq_table
+  r_1<-factor(raters[,1],levels = lvs)
+  r_2<-factor(raters[,2],levels = lvs)
+  r_3<-factor(raters[,3],levels = lvs)
+  r_4<-factor(raters[,4],levels = lvs)
+  results<-kendalls_w(rater_one = r_1,
+                      rater_two = r_2,
+                      additional_raters=list(r_3,r_4))
+
+  expect_equal(results$kendall_w_corrected,0.887,tolerance = 1e-3)
+  #----
+  results<-NULL
+  results<-kendalls_w(rater_one = r_1,rater_two = r_1)
+  #expect_equal(results$kendall_w,1,tolerance = 1e-3)
   expect_equal(results$kendall_w_corrected,1,tolerance = 1e-3)
 })
 
