@@ -72,7 +72,7 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       if encoder_mode==False:
         if self.training==True:
           mask=self.get_mask(x)
-          x=x+self.noise_factor*torch.rand(size=x.size())
+          x=x+self.add_noise(x)
           x=~mask*x
         x=self.PackAndMasking_PT(x)
         x=self.encoder_1(x)[0]
@@ -97,6 +97,11 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
       mask_long=mask_long.to(device)
       return mask_long
+    def add_noise(self, x):
+      device=('cuda' if torch.cuda.is_available() else 'cpu')
+      noise=self.noise_factor*torch.rand(size=x.size())
+      noise=noise.to(device)
+      return(noise)
       
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
     def __init__(self, features_in,features_out,noise_factor):
@@ -119,7 +124,7 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         #Add noise
         if self.training==True:
           mask=self.get_mask(x)
-          x=x+self.noise_factor*torch.rand(size=x.size())
+          x=x+self.add_noise(x)
           x=~mask*x
         
         #Encoder
@@ -154,6 +159,11 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
       mask_long=mask_long.to(device)
       return mask_long
+    def add_noise(self, x):
+      device=('cuda' if torch.cuda.is_available() else 'cpu')
+      noise=self.noise_factor*torch.rand(size=x.size())
+      noise=noise.to(device)
+      return(noise)
     
 class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
     def __init__(self, features_in,features_out,noise_factor):
@@ -181,7 +191,7 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
         #Add noise
         if self.training==True:
           mask=self.get_mask(x)
-          x=x+self.noise_factor*torch.rand(size=x.size())
+          x=x+self.add_noise(x)
           x=~mask*x
         
         #Change position of time and features
@@ -229,7 +239,13 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       mask=(time_sums==0)
       mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=x.size(dim=2),dim=1),(x.size(dim=0),x.size(dim=1),x.size(dim=2)))
       mask_long=mask_long.to(device)
-      return mask_long    
+      return mask_long
+    def add_noise(self, x):
+      device=('cuda' if torch.cuda.is_available() else 'cpu')
+      noise=self.noise_factor*torch.rand(size=x.size())
+      noise=noise.to(device)
+      return(noise)
+
     
 def AutoencoderTrain_PT_with_Datasets(model,epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,
