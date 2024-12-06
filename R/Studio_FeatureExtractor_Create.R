@@ -232,6 +232,9 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     # Start training------------------------------------------------------------
 
     shiny::observeEvent(input$save_modal_button_continue, {
+      #Remove Save Modal
+      shiny::removeModal()
+
       # Check for errors
       errors <- check_errors_create_feature_extractor(
         destination_path = input$save_modal_directory_path,

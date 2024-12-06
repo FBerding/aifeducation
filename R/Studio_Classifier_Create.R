@@ -539,11 +539,11 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     })
 
 
-
-
-
     # Start training------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
+      #Remove Save Modal
+      shiny::removeModal()
+
       # Check vor valid arguments
       if (identical(as.double(input$alpha), numeric(0))) {
         loss_alpha <- NULL

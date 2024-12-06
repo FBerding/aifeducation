@@ -18,7 +18,7 @@ prob_precision=1e-4
 prob_precision_fourier=1e-1
 
 #can be set to "all"
-local_samples=50
+local_samples="all"
 #Git Hub specific
 n_git_samples=50
 

@@ -134,6 +134,9 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
 
     # Calculate Embedding------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
+      #Remove Save Modal
+      shiny::removeModal()
+
       # Check input
       error_list <- check_errors_text_embedding_model_embed(
         destination_path = input$save_modal_directory_path,

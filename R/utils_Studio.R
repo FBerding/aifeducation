@@ -925,7 +925,7 @@ check_and_prepare_for_studio <- function() {
     install_now <- utils::askYesNo(
       msg = paste(
         "The following R packages are missing for Aifeducation Studio.",
-        missing_r_packages,
+        "'",paste(missing_r_packages,collapse = ","),"'.",
         "Do you want to install them now?"
       ),
       default = TRUE,
