@@ -197,9 +197,6 @@ class FourierTransformation_PT(torch.nn.Module):
     super().__init__()
     
   def forward(self,x):
-    #result=torch.real(torch.fft.fft(torch.fft.fft(input=x_complex,dim=2),dim=1))
-    #result_1=torch.fft.fftn(x,norm="forward",dim=1)
-    #result=torch.fft.fftn(result_1,norm="forward",dim=2).real
     result=torch.fft.fft2(x,norm="backward").real
     return result
   

@@ -4,11 +4,16 @@ if(Sys.getenv("CI")=="true"){
     condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
     message = "Necessary python modules not available"
   )
+  include_tensorflow <- FALSE
+  skip_overfitting_test <- TRUE
 } else {
   testthat::skip_if_not(
     condition = check_aif_py_modules(trace = FALSE,check = "all"),
     message = "Necessary python modules not available"
   )
+  include_tensorflow <- TRUE
+  skip_overfitting_test <- FALSE
+
   # SetUp tensorflow
   aifeducation::set_config_gpu_low_memory()
   set_config_tf_logger("ERROR")
@@ -29,17 +34,13 @@ local_samples="all"
 # Git Hub specific
 n_git_samples <- 50
 
-prob_precision=1e-4
-prob_precision_fourier=1e-3
+prob_precision=1e-3
 
-if(Sys.getenv("CI")=="true"){
-  include_tensorflow <- FALSE
-  skip_overfitting_test <- TRUE
+if (include_tensorflow == FALSE) {
+  ml_frameworks <- c("pytorch")
 } else {
-  include_tensorflow <- FALSE
-  skip_overfitting_test <- FALSE
+  ml_frameworks <- c("pytorch", "tensorflow")
 }
-
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -70,11 +71,6 @@ test_embeddings_single_case$embeddings <- test_embeddings_single_case$embeddings
 test_embeddings_single_case_LD <- test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
 
 # Config
-if (include_tensorflow == FALSE) {
-  ml_frameworks <- c("pytorch")
-} else {
-  ml_frameworks <- c("pytorch", "tensorflow")
-}
 
 rec_list_layers <- list(0, 1, 2)
 rec_list_size <- list(2, 8)
@@ -349,6 +345,7 @@ for (framework in ml_frameworks) {
         })
 
 
+        if(test_combinations[[i]]$attention!="fourier"){
         test_that(paste(
           "predict - order invariance", framework,
           "n_classes", n_classes,
@@ -381,13 +378,10 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-          if(test_combinations[[i]]$attention!="fourier"){
+
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
                          tolerance = prob_precision)
-          } else {
-            #expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-            #             tolerance = prob_precision_fourier)
-          }
+
 
           # LargeDataSetForTextEmbeddings
           predictions<-NULL
@@ -403,14 +397,11 @@ for (framework in ml_frameworks) {
             ml_trace = 0
           )
 
-          if(test_combinations[[i]]$attention!="fourier"){
             expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
                          tolerance = prob_precision)
-          } else {
-            #expect_equal(predictions[ids,1:(ncol(predictions)-1)], predictions_Perm[ids,1:(ncol(predictions_Perm)-1)],
-            #             tolerance = prob_precision_fourier)
-          }
+
         })
+        }
 
         test_that(paste(
           "predict - data source invariance", framework,

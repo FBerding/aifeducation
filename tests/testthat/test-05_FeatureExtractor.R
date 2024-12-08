@@ -203,8 +203,9 @@ for (framework in ml_frameworks) {
         }
       })
 
+      if (data_type == "EmbeddedText") {
       test_that(paste(framework, method, "predict - data source invariance"), {
-        if (data_type == "EmbeddedText") {
+
           predictions_ET <- extractor$extract_features(
             data_embeddings = dataset_list[["EmbeddedText"]],
             batch_size = 50
@@ -218,8 +219,8 @@ for (framework in ml_frameworks) {
             predictions_LD$select(i - 1)["input"],
             tolerance = 1e-7
           )
-        }
       })
+      }
       gc()
 
       # Method for loading and saving models-----------------------------------
