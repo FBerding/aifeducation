@@ -30,7 +30,7 @@ dataset_list <- list(
 ml_frameworks <- c("pytorch")
 
 method_list <- list(
-  "pytorch" = c("lstm", "dense", "conv")
+  "pytorch" = c("lstm", "dense")
 )
 
 # Start tests--------------------------------------------------------------------

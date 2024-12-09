@@ -1632,8 +1632,7 @@ in the figure above.
 With `method` you determine the type of layer the feature extractor
 should use. If set `method="lstm"`, all layers of the model are long
 short-term memory layers. If set `method="dense"` all layers are
-standard dense layers. If you set `method="conv"` all layers are
-convolutional layers.
+standard dense layers. 
 
 Independently from your choice, all models try to generate the latent
 space such that the co-variance of the features to be zero. Thus, all

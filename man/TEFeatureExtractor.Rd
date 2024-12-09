@@ -104,8 +104,8 @@ with parameter \code{label}.}
 \item{\code{features}}{\code{int} determining the number of dimensions to which the dimension of the text embedding should be
 reduced.}
 
-\item{\code{method}}{\code{string} Method to use for the feature extraction. \code{"lstm"} for an extractor based on LSTM-layers,
-\code{"conv"} for convolutional layers or \code{"dense"} for dense layers.}
+\item{\code{method}}{\code{string} Method to use for the feature extraction. \code{"lstm"} for an extractor based on LSTM-layers or
+\code{"dense"} for dense layers.}
 
 \item{\code{noise_factor}}{\code{double} between 0 and a value lower 1 indicating how much noise should be added for the
 training of the feature extractor.}

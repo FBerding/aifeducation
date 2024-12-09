@@ -84,7 +84,7 @@ FeatureExtractors_Create_UI <- function(id) {
             shiny::selectInput(
               inputId = shiny::NS(id, "method"),
               label = "Method",
-              choices = c("conv", "lstm", "dense")
+              choices = c("lstm", "dense")
             ),
             shiny::sliderInput(
               inputId = shiny::NS(id, "noise_factor"),
