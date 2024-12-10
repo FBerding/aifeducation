@@ -143,8 +143,7 @@ this package together with some other specialized python libraries.</p>
 function <code>install_aifeducation</code> as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/install_aifeducation.html">install_aifeducation</a></span><span class="op">(</span></span>
-<span>  install_aifeducation_studio <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  cpu_only <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  install_aifeducation_studio <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This function will install python, miniconda, and all relevant python
 libraries into a conda environment called “aifeducation”.</p>
@@ -159,8 +158,7 @@ do not want use the studio, you can set the argument to
 <em>R</em> syntax.</p>
 <p>If you have a suitable machine and would like to use a graphic card
 for computations you need to install some further software. You can find
-further information here: <a href="https://pytorch.org/get-started/locally/" class="external-link uri">https://pytorch.org/get-started/locally/</a> If not you can
-set <code>cpu_only=TRUE</code>.</p>
+further information here: <a href="https://pytorch.org/get-started/locally/" class="external-link uri">https://pytorch.org/get-started/locally/</a></p>
 <p>You can check if python is working by using the function
 <code><a href="https://rstudio.github.io/reticulate/reference/py_available.html" class="external-link">reticulate::py_available()</a></code>. This should return
 <code>TRUE</code>.</p>
@@ -218,12 +216,7 @@ environment. This can be done by setting <code>remove_first=TRUE</code>
 in <code>install_py_modules</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/install_py_modules.html">install_py_modules</a></span><span class="op">(</span></span>
-<span>  envname <span class="op">=</span> <span class="st">"aifeducation"</span>,</span>
-<span>  install <span class="op">=</span> <span class="st">"pytorch"</span>,</span>
-<span>  remove_first <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  python_version <span class="op">=</span> <span class="st">"3.12"</span>,</span>
-<span>  pytorch_cuda_version <span class="op">=</span> <span class="st">"12.1"</span>,</span>
-<span>  cpu_only <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  remove_first <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

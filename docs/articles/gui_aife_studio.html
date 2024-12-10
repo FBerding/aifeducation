@@ -100,14 +100,14 @@ educational context.</p>
 <p>This article overlaps with vignette <a href="classification_tasks.html">03 Using R syntax</a>, which explains
 how to use the package with <em>R</em> syntax. We assume that
 <em>aifeducation</em> is installed as described in vignette <a href="https://fberding.github.io/aifeducation/articles/aifeducation.html">01
-Get Started</a>. The introduction starts with a brief explanation of
+Get Started</a>. The introduction starts with a brief explanation of the
 basic concepts, which are necessary to work with this package.</p>
 </div>
 <div class="section level3">
 <h3 id="basic-concepts">1.2 Basic Concepts<a class="anchor" aria-label="anchor" href="#basic-concepts"></a>
 </h3>
-<p>In the educational and social sciences, assigning an observation to
-scientific concepts is an important task that allows researchers to
+<p>In the educational and social sciences, assigning scientific concepts
+to observations is an important task that allows researchers to
 understand an observation, to generate new insights, and to derive
 recommendations for research and practice.</p>
 <p>In educational science, several areas deal with this kind of task.
@@ -239,15 +239,14 @@ etc.).</p></li>
 start Aifeducation Studio by entering the following into the
 console:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fberding.github.io/aifeducation/">aifeducation</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/start_aifeducation_studio.html">start_aifeducation_studio</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/start_aifeducation_studio.html">start_aifeducation_studio</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Please note that this can take a moment.</p>
 <p>At the beginning you will see the home page (Figure 4).</p>
 <div class="float">
 <img src="home.png" style="width:100.0%" alt="Figure 4: Home Page"><div class="figcaption">Figure 4: Home Page</div>
 </div>
-<p>Here you cannot choose framework (<em>pytorch</em> is activated by
-default).</p>
+<p>Here you cannot choose the framework (<em>pytorch</em> is activated
+by default).</p>
 </div>
 <div class="section level2">
 <h2 id="using-aifeducation-studio">3 Using Aifeducation Studio<a class="anchor" aria-label="anchor" href="#using-aifeducation-studio"></a>
@@ -265,7 +264,7 @@ embeddings) or texts’ labels.</p>
 <p>Collections of raw texts are necessary in two cases: First, to train
 or to fine-tune base models. Second, to transform texts into texts
 embeddings which can be used as input for training a classifier or for
-predicting the texts’ labels via classifier.</p>
+predicting the texts’ labels via classifiers.</p>
 <p>To create a collection of raw texts, you have to choose the <em>Data
 Management</em> page on the top panel as shown in Figure 5.</p>
 <div class="float">
@@ -298,13 +297,13 @@ for the raw text.</li>
 <code>license.txt</code> which contains a short statement for the
 license of the text such as “CC BY”.</li>
 <li>Add an additional .txt file to the folder named
-<code>url_license.txt</code> which contains the url/link to the license’
+<code>url_license.txt</code> which contains the URL/link to the license’
 text such as “<a href="https://creativecommons.org/licenses/by/4.0/" class="external-link uri">https://creativecommons.org/licenses/by/4.0/</a>”.</li>
 <li>Add an additional .txt file to the folder named
 <code>text_license.txt</code> which contains the full license in raw
 texts.</li>
 <li>Add an additional .txt file to the folder named
-<code>url_source.txt</code> which contains the url/link to the text file
+<code>url_source.txt</code> which contains the URL/link to the text file
 in the internet.</li>
 </ul>
 <p>Applying these rules may result in a data structure as follows:</p>
@@ -348,29 +347,29 @@ in the internet.</li>
 <code>license.txt</code>, <code>url_license.txt</code>,
 <code>text_license.txt</code>, and <code>url_soruce.text</code> to every
 folder is optional. If there is no such a file in the corresponding
-folder there will be an empty entry in the data set. However, against
-the backdrop of the European AI Act we recommend to provide license and
+folder, there will be an empty entry in the data set. However, against
+the backdrop of the European AI Act, we recommend to provide license and
 bibliographic information to make the documentation of your models more
-straightforward. Furthermore, some license such as the licenses provides
-by Creative Commons require statements about the creators, a copyright
-notice, an url or link to the source material (if possible), the license
-of the material and an url or link to the license’s text in the internet
-or the license text itself. Please check the licenses of the material
-your are using for the requirements.</p>
+straightforward. Furthermore, some licenses, such as those provided by
+Creative Commons, require statements about the creators, a copyright
+notice, a URL or link to the source material (if possible), the license
+of the material and a URL or link to the license’s text on the internet
+or the license text itself. Please check the license requirements of the
+material you are using, too.</p>
 <p><strong>.pdf files</strong></p>
-<p>The second alternative is to use .pdf files as source for raw texts.
-Here the necessary structure is similar to .txt files.</p>
-<p>Please not that all files except the text file must be .txt, not
+<p>The second alternative is to use .pdf files as a source for raw
+texts. Here the necessary structure is similar to .txt files.</p>
+<p>Please note that all files except the text file must be .txt, not
 .pdf.</p>
 <p>As stated above <code>bib_entry.txt</code>, <code>license.txt</code>,
 <code>url_license.txt</code>, <code>text_license.txt</code>, and
 <code>url_soruce.text</code> are optional.</p>
 <p><strong>.xlsx files</strong></p>
-<p>The third alternative is to store the raw texts into .xlsx files.
-This alternative is practicable if you have many small raw texts. For
-raw texts that are very large such as books or papers we recommend to
+<p>The third alternative is to store the raw texts as .xlsx files. This
+alternative is practicable if you have many small raw texts. For raw
+texts that are very large, such as books or papers, we recommend to
 store them as .txt or .pdf files.</p>
-<p>In order to add raw texts from .xlsx files the files need a special
+<p>In order to add raw texts from .xlsx files, the files need a special
 structure:</p>
 <ul>
 <li>Create a main folder for storing all .xlsx files you would like to
@@ -378,19 +377,19 @@ read.</li>
 <li>All .xlsx files must contain the names of the columns in the first
 row (Figure 7) and the names must be identical for each column across
 all .xslx files you would like to read.</li>
-<li>Every .xslx files must contain a column storing the text id and must
-contain a column storing the raw text. Every text must have a unique id
+<li>Every .xslx files must contain a column storing the text ID and must
+contain a column storing the raw text. Every text must have a unique ID
 across all .xlsx files.</li>
 <li>Every .xslx file can contain an additional column for the bib
 entry.</li>
 <li>Every .xslx file can contain an additional column for the
 license.</li>
 <li>Every .xslx file can contain an additional column for the license’s
-url.</li>
+URL.</li>
 <li>Every .xslx file can contain an additional column for the license’s
 text.</li>
 <li>Every .xslx file can contain an additional column for the source’s
-url.</li>
+URL.</li>
 </ul>
 <p>Your .xlsx file may look like</p>
 <table style="width:100%;" class="table">
@@ -449,33 +448,33 @@ Sheet</div>
 <p>The last step is to choose a folder where your collection of raw
 texts should be saved. Please select a path and a folder name for your
 LargeDataSet (<em>Create Data Set</em> button on the <em>Control
-Panel</em>) (Figure 8). With <em>Directory</em> field you specify the
-location where to save the object and with <em>Folder Name</em> field
-you define the name of the folder that will be created within that
+Panel</em>) (Figure 8). In the <em>Directory</em> field you specify the
+location where to save the object and with <em>Folder Name</em> you
+define the name of the folder that will be created within that
 directory. In this folder the data set is saved.</p>
 <div class="float">
 <img src="DM_Create_Start_creation.png" style="width:100.0%" alt="Figure 8: Selecting a path for a data set"><div class="figcaption">Figure 8: Selecting a path for a data set</div>
 </div>
 <p>Finally, you can start creating the collection (<em>Continue</em>
-button in Figure 8). Please note that this can take some time. Creation
-progress you can see in the progress bars (Figure 9).</p>
+button in Figure 8). Please note that this can take some time. You can
+see the creation progress in the progress bars (Figure 9).</p>
 <div class="float">
 <img src="DM_Create_Progress.png" style="width:100.0%" alt="Figure 9: Progress of Dataset creation process"><div class="figcaption">Figure 9: Progress of Dataset creation
 process</div>
 </div>
-<p>When the process finishes you can see message like in Figure 10 (in
-the case if the process has completed without any errors).</p>
+<p>When the process finishes you can see a message like in Figure 10 (if
+the process has completed without any errors).</p>
 <div class="float">
 <img src="DM_Create_Success.png" style="width:100.0%" alt="Figure 10: Progress of Dataset creation process"><div class="figcaption">Figure 10: Progress of Dataset creation
 process</div>
 </div>
-<p>You have a folder with the files that can be used for further tasks
-like creation and training/tuning the transformers (<em>Base Models</em>
-tab on the top panel), etc. The object contains a <code>dataset</code>
-that stores the texts together with their IDs. In case of .xlsx files,
-the texts’ IDs are set to the IDs stored in the corresponding column for
-ID. In the case of .pdf and .txt files, the file names are used as ID
-(without the file extension, see Figure 11).</p>
+<p>You now have a folder with the files that can be used for further
+tasks like creation and training/tuning the transformers (<em>Base
+Models</em> tab on the top panel), etc. The object contains a
+<code>dataset</code> that stores the texts together with their IDs. In
+case of .xlsx files, the texts’ IDs are set to the IDs stored in the
+corresponding column for ID. In case of .pdf and .txt files, the file
+names are used as ID (without the file extension, see Figure 11).</p>
 <div class="float">
 <img src="DM_Create_Text_sources.png" style="width:75.0%" alt="Figure 11: Filnames as IDs"><div class="figcaption">Figure 11: Filnames as IDs</div>
 </div>
@@ -486,7 +485,7 @@ not allowed. Please ensure that you use unique IDs across file
 formats.</p>
 </blockquote>
 <p>The IDs are very important since they are used to match the
-corresponding class/category if available.</p>
+corresponding class/category, if available.</p>
 </div>
 <div class="section level4">
 <h4 id="collections-of-texts-labels">3.1.2 Collections of Texts’ Labels<a class="anchor" aria-label="anchor" href="#collections-of-texts-labels"></a>
@@ -516,9 +515,9 @@ Please pay attention to use “id” and not “ID” or “Id”.</p>
 <em>aifeducation</em>. At the moment, these are transformer models such
 as BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version
 2 (He et al. 2020), Funnel-Transformer (Dai et al. 2020), Longformer
-(Beltagy, Peters &amp; Cohan 2020), and MPNet. In general, these models
-are trained on a large corpus of general texts in the first step. In the
-next step, the models are fine-tuned to domain-specific texts and/or
+(Beltagy, Peters &amp; Cohan 2020), and MPNet. As a general first step,
+these models are trained on a large corpus of general texts. In the next
+step, the models are fine-tuned to domain-specific texts and/or
 fine-tuned for specific tasks. Since the creation of base models
 requires a huge number of texts resulting in high computational time, it
 is recommended to use pre-trained models. These can be found on <a href="https://huggingface.co/" class="external-link">Huggingface</a>. Sometimes, however, it
@@ -546,15 +545,15 @@ Architecture</em>). Depending on the architecture, you have different
 options determining the shape of your neural network. You also have
 independent (general) options for all the transformers (box <em>General
 parameters</em>).</p>
-<p>In the right-bottom side of the box <em>Model Architecture</em>, you
+<p>On the right-bottom side of the box <em>Model Architecture</em>, you
 find a box named <em>Vocabulary</em>. Here you must provide the path to
-a folder which contains files with a data for LargeDataSet. This data
-set is used to calculate the vocabulary of the transformer. This file
-should be created with <em>Aifeducation Studio</em> (tab <em>Data
+a folder which contains files with data for LargeDataSet. This data set
+is used to calculate the vocabulary of the transformer. This file should
+be created with <em>Aifeducation Studio</em> (tab <em>Data
 Management</em>) to ensure compatibility. See section 3.1.1 for more
 details. It is very important that you provide a number of how many
 tokens the vocabulary should include. Depending on the transformer
-method, you can set additional options affecting a transformer’s
+method, you can set additional options, affecting a transformer’s
 vocabulary.</p>
 <ul>
 <li><p><strong>Transform to Lower:</strong> If this option is enabled,
@@ -582,7 +581,7 @@ You can see the progress of a creation with progress bars.</p>
 </h4>
 <p>If you would like to train a new base model (see section 3.2.2) for
 the first time or want to adapt a pre-trained model to a domain-specific
-language or task, you have to click on <em>Train</em> section on the
+language or task, you have to click on the <em>Train</em> section on the
 <em>Base Models</em> tab.</p>
 <p><a href="BM_Train_Fill_fields.png"><img src="BM_Train_Fill_fields.png" style="width:100.0%" alt="Figure 14: Base Models - Train/Tune Transformer"></a> Figure 14:
 Base Models - Train/Tune Transformer (click image to enlarge)</p>
@@ -668,11 +667,11 @@ This is to reduce computational time on machines with low performance.
 By separating text embedding from other tasks, the text embedding has to
 be calculated only once and can be used for different tasks at the same
 time. Another advantage is that the training of the downstream tasks
-involves only the downstream tasks an not the parameters of the
+involves only the downstream tasks and not the parameters of the
 embedding model, making training less time-consuming, thus decreasing
 computational intensity. Finally, this approach allows the analysis of
 long documents by applying the same algorithm to different parts.</p>
-<p>You can open the creation page by clicking on “Create” tab in the
+<p>You can open the creation page by clicking on the “Create” tab in the
 section “Text Embedding Models”. Figure 12 shows the corresponding
 page.</p>
 <p><a href="TEM_Create_Fill_fields.png"><img src="TEM_Create_Fill_fields.png" style="width:100.0%" alt="Figure 16: Text Embedding Model - Create"></a> Figure 16: Text
@@ -690,15 +689,17 @@ contain any spaces or special characters. <em>Label</em> does not have
 any restrictions. Think of <em>Label</em> as the title of a book or
 paper. With <em>Label</em> you can also provide a version number if you
 create a newer version of your model. In case you create a new model, we
-recommend to use “0.0.1”. Fo essary that you choose which language your
-model is created for, such as English, French, German, etc.</p>
+recommend to use “0.0.1”. It is also important that you choose which
+language your model is created for, such as English, French, German,
+etc.</p>
 <p>On the right side of the box <em>Interface Setting</em> you can set
 how the interface should process raw text:</p>
 <ul>
 <li><p><strong>N chunks:</strong> Sometimes texts are very long. With
 this value, you can decide into how many chunks longer texts should be
 divided. The maximum length of every chunk is determined by the value
-provided at “Maximum Sequence Length”.</p></li>
+provided at “Maximum Sequence Length”. Minimum if chunks is
+two.</p></li>
 <li><p><strong>Maximal Sequence Length:</strong> This value determines
 the maximum number of tokens your model processes for every
 chunk.</p></li>
@@ -708,15 +709,15 @@ overlap can be useful to provide the correct context for every
 chunk.</p></li>
 <li><p><strong>Layers for Embeddings - Min</strong>: Base models
 transform raw data into a sequence of numbers by using the different
-layers’ hidden states. With this option you can decide which is the
-first layer to use.</p></li>
+layers’ hidden states. With this option you can decide which layer to
+use first.</p></li>
 <li><p><strong>Layers for Embeddings - Max</strong>: With this option
 you can decide which is the last layer to use. The hidden states of all
 layers between min and max are averaged to form the embedding of a text
 chunk.</p></li>
 <li><p><strong>Pooling Type</strong>: With this option you can decide if
 only the hidden states of the cls-token should be used for the
-embedding. If you set this option to “average” the hidden states of all
+embedding. If you set this option to “average”, the hidden states of all
 tokens are averaged within each layer except the hidden states for
 padding tokens.</p></li>
 </ul>
@@ -749,7 +750,7 @@ documentation of the model.</p>
 Text Embedding Model - Description (click image to enlarge)</p>
 <p>The tab <em>Training</em> shows the development of the loss and the
 validation loss during the last training of the corresponding base
-model. If no plot is displayed no history data is available.</p>
+model. If no plot is displayed, no history data is available.</p>
 <p>The tab <em>Embedd Text</em> (Figure 18) allows you to transform raw
 texts into a numerical representation of these texts, called text
 embeddings. These text embeddings can be used in downstream tasks such
@@ -766,7 +767,7 @@ Text Embedding Model - Embeddings (click image to enlarge)</p>
 <p>The tab <em>Tokenize/Encode/Decode</em> (Figure 19) offers you
 insights into the way your text embedding model processes data. In the
 box <em>Encode</em> you can insert a raw text and after clicking on
-<em>Encode</em> you can see how the text is divided into tokens and
+<em>Encode,</em> you can see how the text is divided into tokens and
 their corresponding IDs. The IDs are passed to the base model and are
 used to generate the numeric representation of a text. The box
 <em>Decode</em> allows you to reverse this process. There you can insert
@@ -779,8 +780,8 @@ enlarge)</p>
 <p>Finally, the tab <em>Fill Mask</em> (Figure 16) allows you to request
 the underlying base model of your text embedding model to calculate a
 solution to a fill-in-the-blank text. In the box <em>Text</em> you can
-insert a raw text. A gap is signaled by insert the corresponding masking
-token. This token can be found in the table above in the row for
+insert a raw text. A gap is signaled when you insert the corresponding
+masking token. This token can be found in the table above in the row for
 “mask_token”. If you insert a gap/mask_token please ensure correct
 spelling. With <em>N Solutions per mask</em> you can determine how many
 tokens the model should calculate for every gap/mask_token. After
@@ -848,7 +849,7 @@ with a text embedding model as described in section 3.3.2. Second, a
 table with the labels of every text. This kind of data should be created
 as described in section 3.1.2.</p>
 <p>You can provide the text embeddings by opening the corresponding file
-in the first box (<em>Input Data</em>) by clicking on <em>Choose
+in the first box (<em>Input Data</em>) by clicking on the <em>Choose
 Embeddings</em> button. After selecting the embeddings, you will see a
 summary of the underlying text embedding model that generated the
 embeddings. In addition, you can see how many documents are in the
@@ -883,17 +884,17 @@ of your neural network (Figure 23).</p>
 <p><a href="CF_Create_Fill_fields_2.png"><img src="CF_Create_Fill_fields_2.png" style="width:100.0%" alt="Figure 23: Classifier - Creation Part 2"></a> Figure 23:
 Classifier - Creation Part 2 (click image to enlarge)</p>
 <p>Since a detailed explanation of every option is beyond the scope of
-this introduction. Here we can only provide an overview.</p>
+this introduction, we will give you the short version:</p>
 <ul>
 <li><p><strong>Positional Embedding:</strong> By activating this option,
 you add positional embedding to your classifier. This provides the
-neural network with the ability to take the order within a sequence into
-account.</p></li>
+neural network with the ability to take into account the order within a
+sequence.</p></li>
 <li><p><strong>Encoding Layers:</strong> These layers are similar to
 encoding layers used in some transformer models, allowing to calculate
-context-sensitive text embeddings. That is, they provide your classifier
-with the ability to take the surrounding text chunks (see section 3.3.1)
-of the sequences into account.</p></li>
+context-sensitive text embeddings. They provide your classifier with the
+ability to take the surrounding text chunks (see section 3.3.1) of the
+sequences into account.</p></li>
 <li><p><strong>Recurrent Layers:</strong> This section allows you to add
 recurrent layers to your classifier. These layers are able to account
 for the order within a sequence. In order to add these layers, just pass
@@ -958,10 +959,12 @@ k</em>. Every <em>k</em> contributes proportional to the synthetic
 cases.</p>
 <p><strong>Section: Pseudo-Labeling</strong></p>
 <ul>
-<li><p><strong>Add Pseudo Labeling:</strong> If activated,
+<li>
+<p><strong>Add Pseudo Labeling:</strong> If activated,
 pseudo-labeling is used during training as described by Cascante-Bonilla
 et al. (2020). The way pseudo-labeling is applied can be configured with
-the following parameters:</p></li>
+the following parameters:</p>
+<ul>
 <li><p><strong>Max Steps:</strong> The number of steps during
 pseudo-labeling. For example, in the first step, 1/Max Steps
 pseudo-labeled cases are added, in the second step, 2/Max Steps
@@ -976,6 +979,8 @@ are the cases that are closest to this value.</p></li>
 exceeding this value are not included during training.</p></li>
 <li><p><strong>Min Certainty Value:</strong> Pseudo-labeled cases
 falling bellow this value are not included during training.</p></li>
+</ul>
+</li>
 </ul>
 <p>We recommend to use pseudo-labeling as described by Cascante-Bonilla
 et al. (2020). Therefore, the following parameters have to be set:</p>
@@ -995,14 +1000,14 @@ If everything is okay you can provide the directory where you would like
 to save the model and start training the model by clicking on <em>Train
 Model</em>.</p>
 <p>Please note that training a classifier can take up to several hours.
-You can see a progress on the progress bars.</p>
+You can see your progress in the progress bars.</p>
 </div>
 <div class="section level4">
 <h4 id="using-a-classifier">3.4.2 Using a Classifier<a class="anchor" aria-label="anchor" href="#using-a-classifier"></a>
 </h4>
 <p>In case you have trained a classifier or are using a classifier
 trained by other users, you can analyze the model’s performance or use
-the model to classify new texts. To do so, you have to select
+the model to classify new texts. To do so, you have to select the
 <em>Use</em> tab in the tab <em>Classifiers</em>.</p>
 <p>Similar to the other functions of this app, you first have to select
 the classifier by providing the folder that contains the entire model.
@@ -1010,11 +1015,11 @@ Please note that a classifier is made up of several files. Thus,
 <em>Aifeducation Studio</em> asks you to select the folder containing
 these files and not single files. After loading a classifier, a new box
 appears.</p>
-<p>In the first tab, <em>Description</em>, (Figure 25) you will find the
+<p>In the first tab, <em>Description</em> (Figure 25), you will find the
 documentation of the model.</p>
 <p><a href="CF_Use_Fill_fields.png"><img src="CF_Use_Fill_fields.png" style="width:100.0%" alt="Figure 25: Classifier - Description"></a>
 Figure 25: Classifier - Description (click image to enlarge)</p>
-<p>In the second tab, <em>Training</em> (Figure 26) you receive a
+<p>In the second tab, <em>Training</em> (Figure 26), you receive a
 summary of the training process of the model. This includes a
 visualization of the loss, the accuracy, and the balanced accuracy for
 every fold and every epoch. Depending on the applied training techniques
@@ -1022,15 +1027,15 @@ every fold and every epoch. Depending on the applied training techniques
 images.</p>
 <p><a href="CF_Use_Training.png"><img src="CF_Use_Training.png" style="width:100.0%" alt="Figure 26: Classifier - Training"></a>
 Figure 26: Classifier - Training (click image to enlarge)</p>
-<p>The third tab, <em>Reliability</em>, (Figure 27) provides you with
-information on the quality of the model. Here you find visualizations
+<p>The third tab, <em>Reliability</em> (Figure 27), provides you with
+the information on the model’s quality. Here you can find visualizations
 giving you insights into how the classifier is able to generate reliable
 results. In addition, measures from content analysis as well as machine
 learning allow you to analyze specific aspects of the model’s
 performance.</p>
 <p><a href="CF_Use_Reliability.png"><img src="CF_Use_Reliability.png" style="width:100.0%" alt="Figure 27: Classifier - Reliability"></a>
 Figure 27: Classifier - Reliability (click image to enlarge)</p>
-<p>The last tab, <em>Prediction</em> (Figure 28) allows you to apply a
+<p>The last tab, <em>Prediction</em> (Figure 28), allows you to apply a
 trained model to new data. Here you can use the trained model to assign
 classes/categories to new texts. For this purpose, you must first
 provide the file that contains the text embeddings of the documents you
@@ -1087,10 +1092,10 @@ Trained AI/Models</a>.</p>
 <div class="section level4">
 <h4 id="feature-extractors">3.5.1 Feature Extractors<a class="anchor" aria-label="anchor" href="#feature-extractors"></a>
 </h4>
-<p>Another option to increase model’s performance and/or to increase
+<p>Another option to increase the model’s performance and/or to increase
 computational speed is to apply a feature extractor. For example, the
 work by Ganesan et al. (2021) indicates that a reduction of the hidden
-size can increase models accuracy. In <em>aifeducation</em> a feature
+size can increase model accuracy. In <em>aifeducation,</em> a feature
 extractor is a model that tries to reduce the number of features of
 given text embeddings before feeding the embeddings as input to a
 classifier.</p>
@@ -1101,34 +1106,35 @@ classifier.</p>
 extractors</div>
 </div>
 <p>First, you need to choose embeddings that you can see after choosing
-in box <em>Input Data</em> (<em>Choose Embeddings</em> button on the
-<em>Control Panel</em>). You can specify name and label of the model in
-<em>Model Name</em> and <em>Model Label</em> fields respectively.</p>
+the box <em>Input Data</em> (<em>Choose Embeddings</em> button on the
+<em>Control Panel</em>). You can specify the name and label of the model
+in the <em>Model Name</em> and <em>Model Label</em> fields,
+respectively.</p>
 <p>Specify an architecture and training settings in
 <em>Architecture</em> and <em>Training Settings</em> boxes.</p>
 <ul>
 <li><p><em>Target Features</em> determines the number of features for
-the compressed representation. The lower the number the higher is the
-requested compression. This value corresponds to the features of the
-latent space in the Figure above.</p></li>
+the compressed representation. The lower the number, the higher the
+requested compression. This value corresponds with the features of the
+latent space in the figure above.</p></li>
 <li><p>With <em>Method</em> you determine the type of layer the feature
-extractor should use. If set “lstm” all layers of the model are long
-short-term memory layers. If set “dense” all layers are standard dense
-layers. If you set “conv” all layers are convolutional layers.</p></li>
-<li><p>With <em>Noise Factor</em> you can add some noise during training
-making the feature extractor to an denoising auto encoder which can
-provide more robust generalizations.</p></li>
+extractor should use. If set “lstm”, all layers of the model are long
+short-term memory layers. If set “dense”, all layers are standard dense
+layers.</p></li>
+<li><p>With <em>Noise Factor</em> you can add some noise during
+training, making the feature extractor do a denoising auto encoder,
+which can provide more robust generalizations.</p></li>
 </ul>
-<p>When you are ready, to start training just click on the <em>Train
+<p>When you are ready to start training, just click on the <em>Train
 Model</em> button. Then you have to choose a path to a folder and a
-folder name, where you want to store the model.</p>
+folder name where you want to store the model.</p>
 <p>Please note that training a classifier can take up to several hours.
-You can see a progress on the progress bars.</p>
-<p>After you have trained your feature extractor you can use it for
+You can see your progress in the progress bars.</p>
+<p>After you have trained your feature extractor, you can use it for
 every classifier. Just pass the feature extractor path to <em>Feature
 Extractor</em> during configuration of the classifier (Figure 23).</p>
-<p>That all. Now you can use and train the classifier in the same way as
-without a feature extractor.</p>
+<p>That is all. Now you can use and train the classifier in the same way
+as without a feature extractor.</p>
 </div>
 </div>
 </div>

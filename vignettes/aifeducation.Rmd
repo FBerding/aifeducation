@@ -83,8 +83,7 @@ function `install_aifeducation` as follows:
 
 ```{r, include = TRUE, eval=FALSE}
 install_aifeducation(
-  install_aifeducation_studio = TRUE,
-  cpu_only = FALSE
+  install_aifeducation_studio = TRUE
 )
 ```
 
@@ -101,8 +100,7 @@ you have to use the package with *R* syntax.
 
 If you have a suitable machine and would like to use a graphic card for
 computations you need to install some further software. You can find
-further information here: <https://pytorch.org/get-started/locally/> If
-not you can set `cpu_only=TRUE`.
+further information here: <https://pytorch.org/get-started/locally/>
 
 You can check if python is working by using the function
 `reticulate::py_available()`. This should return `TRUE`.
@@ -166,11 +164,6 @@ This can be done by setting `remove_first=TRUE` in `install_py_modules`.
 
 ```{r, include = TRUE, eval=FALSE}
 aifeducation::install_py_modules(
-  envname = "aifeducation",
-  install = "pytorch",
-  remove_first = TRUE,
-  python_version = "3.12",
-  pytorch_cuda_version = "12.1",
-  cpu_only = FALSE
+  remove_first = TRUE
 )
 ```

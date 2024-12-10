@@ -123,12 +123,13 @@ learning framework.
 ‘Tensorflow’ is also supported but only for version 2.16 and not for all
 models. Please refer to appendix [A01 Supported Machine Learning
 Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
-for a detailed overview.
+for a detailed overview.Tensorflow support will be removed with version
+1.1.0 of this package.
 
 ## Model Life Cycle
 
 Research requires reproducibility and traceability. Thus, starting with
-version 1.0.0 of this package , it has top priority to ensure that
+version 1.0.0 of this package, it has top priority to ensure that
 already trained models work with future versions of this package.
 
 ## Classification Tasks
@@ -136,13 +137,11 @@ already trained models work with future versions of this package.
 ### Transforming Texts into Numbers
 
 Classification tasks require the transformation of raw texts into a
-representation with numbers. For this step, *aifeducation* supports both
-newer approaches (such as MPNet (Song et al. 2020), BERT (Devlin et al.
-2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
+representation with numbers. For this step, *aifeducation* supports new
+approaches such as MPNet (Song et al. 2020), BERT (Devlin et al. 2019),
+RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
 Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
-Cohan 2020)) and older approaches (such as GlobalVectors (Pennington,
-Socher & Manning 2014) or Latent Dirichlet Allocation/Topic Modeling) in
-classification tasks.
+Cohan 2020).
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
@@ -383,11 +382,6 @@ Baltes, J., Guerra, R., Li, P., & Tsai, C.‑C. (2020). Challenges and
 Future Directions of Big Data and Artificial Intelligence in Education.
 Frontiers in Psychology, 11, 1–11.
 <https://doi.org/10.3389/fpsyg.2020.580820>
-
-Pennington, J., Socher, R., & Manning, C. D. (2014). GloVe: Global
-Vectors for Word Representation. Proceedings of the 2014 Conference on
-Empirical Methods in Natural Language Processing.
-<https://aclanthology.org/D14-1162.pdf>
 
 Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked
 and Permuted Pre-training for Language Understanding.

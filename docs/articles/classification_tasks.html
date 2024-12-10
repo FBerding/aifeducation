@@ -689,7 +689,8 @@ with the <code>create</code>-method of the Transformer class. Use
 Transformers for Developers</a> for details.</p>
 </blockquote>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">aife_transformer_maker</span><span class="op">$</span><span class="fu">make</span><span class="op">(</span><span class="st">"bert"</span><span class="op">)</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">base_model</span><span class="op">&lt;-</span><span class="va">aife_transformer_maker</span><span class="op">$</span><span class="fu">make</span><span class="op">(</span><span class="st">"bert"</span><span class="op">)</span></span>
+<span><span class="va">base_model</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span></span>
 <span>  ml_framework <span class="op">=</span> <span class="st">"pytorch"</span>,</span>
 <span>  model_dir <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
 <span>  text_dataset <span class="op">=</span> <span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span>,</span>
@@ -764,15 +765,13 @@ model directory.</p>
 <p>If you would like to train a new base model (see section 3.2) for the
 first time or want to adapt a pre-trained model to a domain-specific
 language or task, you can call the corresponding
-<code>train</code>-method. Use <code>aife_transformer_maker</code> to
-create a transformer object. In case of a BERT model this is
-<code>aife_transformer_maker$make("bert")$train()</code>.</p>
+<code>train</code>-method.</p>
 <blockquote>
 <p>See p. 3 Transformer Maker <a href="transformers.html">01
 Transformers for Developers</a> for details.</p>
 </blockquote>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">aife_transformer_maker</span><span class="op">$</span><span class="fu">make</span><span class="op">(</span><span class="st">"bert"</span><span class="op">)</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">base_model</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>  ml_framework <span class="op">=</span> <span class="st">"pytorch"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"my_own_transformer_trained"</span>,</span>
 <span>  model_dir_path <span class="op">=</span> <span class="st">"my_own_transformer"</span>,</span>
@@ -808,7 +807,7 @@ that modern tokenizers split words into several tokens. Thus, tokens and
 words are not forced to match each other directly). With
 <code>p_mask</code> you can determine how many tokens should be masked.
 Finally, with <code>val_size</code>, you set how many chunks of tokens
-should be used for the validation sample.</p>
+should be used for the validation sample. Minimum is 2.</p>
 <p>Please remember to set the correct alpha-3 code for tracking the
 ecological impact of training your model
 (<code>sustain_iso_code</code>).</p>
@@ -1778,8 +1777,7 @@ latent space in the figure above.</p>
 <p>With <code>method</code> you determine the type of layer the feature
 extractor should use. If set <code>method="lstm"</code>, all layers of
 the model are long short-term memory layers. If set
-<code>method="dense"</code> all layers are standard dense layers. If you
-set <code>method="conv"</code> all layers are convolutional layers.</p>
+<code>method="dense"</code> all layers are standard dense layers.</p>
 <p>Independently from your choice, all models try to generate the latent
 space such that the co-variance of the features to be zero. Thus, all
 features represent unique information. In addition, all methods except

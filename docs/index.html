@@ -134,12 +134,12 @@ Figure 1: Aifeducation Studio
 <h2 id="pytorch-and-tensorflow-compatibility">PyTorch and Tensorflow Compatibility<a class="anchor" aria-label="anchor" href="#pytorch-and-tensorflow-compatibility"></a>
 </h2>
 <p>The core machine learning framework of this package is ‘PyTorch’, providing a broad support of graphical devices to accelerate computations, access to new and unique model architectures, and a high compatibility of models across different versions of this machine learning framework.</p>
-<p>‘Tensorflow’ is also supported but only for version 2.15 and not for all models. Please refer to appendix <a href="https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html">A01 Supported Machine Learning Frameworks</a> for a detailed overview.</p>
+<p>‘Tensorflow’ is also supported but only for version 2.16 and not for all models. Please refer to appendix <a href="https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html">A01 Supported Machine Learning Frameworks</a> for a detailed overview.Tensorflow support will be removed with version 1.1.0 of this package.</p>
 </div>
 <div class="section level2">
 <h2 id="model-life-cycle">Model Life Cycle<a class="anchor" aria-label="anchor" href="#model-life-cycle"></a>
 </h2>
-<p>Research requires reproducibility and traceability. Thus, starting with version 1.0.0 of this package , it has top priority to ensure that already trained models work with future versions of this package.</p>
+<p>Research requires reproducibility and traceability. Thus, starting with version 1.0.0 of this package, it has top priority to ensure that already trained models work with future versions of this package.</p>
 </div>
 <div class="section level2">
 <h2 id="classification-tasks">Classification Tasks<a class="anchor" aria-label="anchor" href="#classification-tasks"></a>
@@ -147,7 +147,7 @@ Figure 1: Aifeducation Studio
 <div class="section level3">
 <h3 id="transforming-texts-into-numbers">Transforming Texts into Numbers<a class="anchor" aria-label="anchor" href="#transforming-texts-into-numbers"></a>
 </h3>
-<p>Classification tasks require the transformation of raw texts into a representation with numbers. For this step, <em>aifeducation</em> supports both newer approaches (such as MPNet (Song et al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &amp; Cohan 2020)) and older approaches (such as GlobalVectors (Pennington, Socher &amp; Manning 2014) or Latent Dirichlet Allocation/Topic Modeling) in classification tasks.</p>
+<p>Classification tasks require the transformation of raw texts into a representation with numbers. For this step, <em>aifeducation</em> supports new approaches such as MPNet (Song et al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &amp; Cohan 2020).</p>
 <p><em>aifeducation</em> supports the use of pre-trained transformer models provided by <a href="https://huggingface.co/" class="external-link">Hugging Face</a> and the creation of new transformers, allowing educators and researchers to develop specialized and domain-specific models. See <a href="model_configuration.html">04 Model configuration</a> for details about the configuration of a new model.</p>
 <p>The package supports the analysis of long texts. Depending on the method, long texts are transformed into vectors at once, or, if too long, are split into several chunks which results in a sequence of vectors.</p>
 </div>
@@ -242,7 +242,6 @@ Figure 1: Aifeducation Studio
 <p>Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient Semi-Supervised Learning Method for Deep Neural Networks. CML 2013 Workshop: Challenges in Representation Learning.</p>
 <p>Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &amp; Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. <a href="https://doi.org/10.48550/arXiv.1907.11692" class="external-link uri">https://doi.org/10.48550/arXiv.1907.11692</a></p>
 <p>Luan, H., Geczy, P., Lai, H., Gobert, J., Yang, S. J. H., Ogata, H., Baltes, J., Guerra, R., Li, P., &amp; Tsai, C.‑C. (2020). Challenges and Future Directions of Big Data and Artificial Intelligence in Education. Frontiers in Psychology, 11, 1–11. <a href="https://doi.org/10.3389/fpsyg.2020.580820" class="external-link uri">https://doi.org/10.3389/fpsyg.2020.580820</a></p>
-<p>Pennington, J., Socher, R., &amp; Manning, C. D. (2014). GloVe: Global Vectors for Word Representation. Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing. <a href="https://aclanthology.org/D14-1162.pdf" class="external-link uri">https://aclanthology.org/D14-1162.pdf</a></p>
 <p>Song, K., Tan, X., Qin, T., Lu, J. &amp; Liu, T.‑Y. (2020). MPNet: Masked and Permuted Pre-training for Language Understanding. <a href="https://doi.org/10.48550/arXiv.2004.09297" class="external-link uri">https://doi.org/10.48550/arXiv.2004.09297</a></p>
 <p>Stütz, S., Berding, F., Reincke, S., &amp; Scheper, L. (2022). Characteristics of learning tasks in accounting textbooks: an AI assisted analysis. Empirical Research in Vocational Education and Training, 14(1). <a href="https://doi.org/10.1186/s40461-022-00138-2" class="external-link uri">https://doi.org/10.1186/s40461-022-00138-2</a></p>
 <p>Wong, J., Baars, M., Koning, B. B. de, van der Zee, T., Davis, D., Khalil, M., Houben, G.‑J., &amp; Paas, F. (2019). Educational Theories and Learning Analytics: From Data to Knowledge. In D. Ifenthaler, D.-K. Mah, &amp; J. Y.-K. Yau (Eds.), Utilizing Learning Analytics to Support Study Success (pp. 3–25). Springer. <a href="https://doi.org/10.1007/978-3-319-64792-0_1" class="external-link uri">https://doi.org/10.1007/978-3-319-64792-0_1</a></p>
