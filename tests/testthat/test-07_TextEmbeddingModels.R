@@ -163,6 +163,12 @@ for (framework in ml_frameworks) {
             # Check if embeddings are array with 3 dimensions
             expect_equal(length(dim(embeddings$embeddings)), 3)
 
+            #Check if data is valid
+            expect_false(anyNA(embeddings$embeddings),FALSE)
+            expect_false(0%in%get_n_chunks(embeddings$embeddings,
+                                           features=text_embedding_model$get_transformer_components()$features,
+                                           times=chunks))
+
             # check case order invariance
             perm <- sample(x = 1:10, size = 10, replace = FALSE)
             embeddings_perm <- text_embedding_model$embed(

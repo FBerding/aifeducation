@@ -1616,6 +1616,7 @@ TextEmbeddingModel <- R6::R6Class(
       return(
         list(
           chunks = private$transformer_components$chunks,
+          features=private$transformer_components$features,
           overlap = private$transformer_components$overlap,
           ml_framework = private$transformer_components$ml_framework,
           emb_layer_min = private$transformer_components$emb_layer_min,

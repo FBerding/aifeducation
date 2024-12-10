@@ -693,7 +693,7 @@ def TeProtoNetBatchEmbedDistance(model,dataset_q,batch_size):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=float
+    dtype=torch.float64
     model.to(device,dtype=dtype)
   else:
     dtype=torch.double

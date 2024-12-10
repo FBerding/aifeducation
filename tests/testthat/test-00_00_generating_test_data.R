@@ -109,6 +109,10 @@ test_that("Generating Test Data", {
                dir_path = path_test_data,
                folder_name = "imdb_embeddings")
 
+  #Check data
+  expect_false(anyNA(embeddings$embeddings),FALSE)
+  expect_false(0%in%get_n_chunks(embeddings$embeddings,features=64, times=6))
+
   #Clean data
   unlink(x=test_path_train,
          recursive = TRUE)

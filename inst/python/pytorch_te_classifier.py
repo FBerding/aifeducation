@@ -776,7 +776,7 @@ def TeClassifierBatchPredict(model,dataset,batch_size):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=torch.float
+    dtype=torch.float64
     model.to(device,dtype=dtype)
   else:
     dtype=torch.double
