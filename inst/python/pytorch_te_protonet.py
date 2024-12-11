@@ -300,7 +300,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=float
+    dtype=torch.float64
     model.to(device,dtype=dtype)
   else:
     dtype=torch.double

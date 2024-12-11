@@ -22,7 +22,7 @@ This function calculates Fleiss' Kappa.
 }
 \references{
 Fleiss, J. L. (1971). Measuring nominal scale agreement among
-many raters. Psychological Bulletin, 76(5), 378–382. \url{https://doi.org/10.1037/h0031619}
+many raters. Psychological Bulletin, 76(5), 378–382. \url{doi:10.1037/h0031619}
 }
 \seealso{
 Other performance measures: 

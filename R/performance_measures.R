@@ -23,9 +23,9 @@
 #'
 #' @references Cohen, J (1968). Weighted kappa: Nominal scale agreement
 #' with provision for scaled disagreement or partial credit.
-#' Psychological Bulletin, 70(4), 213–220. <https://doi.org/10.1037/h0026256>
+#' Psychological Bulletin, 70(4), 213–220. <doi:10.1037/h0026256>
 #' @references Cohen, J (1960). A Coefficient of Agreement for Nominal Scales.
-#' Educational and Psychological Measurement, 20(1), 37–46. <https://doi.org/10.1177/001316446002000104>
+#' Educational and Psychological Measurement, 20(1), 37–46. <doi:10.1177/001316446002000104>
 #'
 #' @family performance measures
 #' @export
@@ -282,7 +282,7 @@ kripp_alpha <- function(rater_one, rater_two,additional_raters=NULL) {
 #' @return Retuns the value for Fleiss' Kappa.
 #'
 #' @references Fleiss, J. L. (1971). Measuring nominal scale agreement among
-#' many raters. Psychological Bulletin, 76(5), 378–382. <https://doi.org/10.1037/h0031619>
+#' many raters. Psychological Bulletin, 76(5), 378–382. <doi:10.1037/h0031619>
 #'
 #' @family performance measures
 #' @export

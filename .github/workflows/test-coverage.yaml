@@ -110,12 +110,25 @@ jobs:
             "DocumentPage_Server",
             "Classifiers_Create_Server",
             "Classifiers_Use_Server",
-            "License_Server"
+            "License_Server",
+            "ModelArchitecture_UI",
+            "ModelArchitecture_Server",
+            "BaseModel_Create_UI",
+            "BaseModel_Create_Server",
+            "BaseModel_UI",
+            "BaseModel_Server",
+            "Dataset_UI",
+            "Dataset_Server",
+            "TrainTuneSettings_UI",
+            "TrainTuneSettings_Server",
+            "BaseModel_Train_UI",
+            "BaseModel_Train_Server"
           )
+
           cov <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
-            function_exclusions = NULL,
+            function_exclusions = gui_functions,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
           covr::to_cobertura(cov)

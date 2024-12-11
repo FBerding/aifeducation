@@ -197,6 +197,8 @@ default).
 
 ### 3.1.1 Collection of Raw Texts
 
+#### 3.1.1.1 Creating a Dataset
+
 The fist step in working with AI is to gather and to structure data. In
 the scope of *aifeducation,* data can be either a collection of raw
 texts, sequences of numbers representing the texts (text embeddings) or
@@ -373,6 +375,16 @@ extension, see Figure 11).
 
 The IDs are very important since they are used to match the
 corresponding class/category, if available.
+
+#### 3.1.1.2 Exploring a Dataset
+
+If you would like to explore a LargeDataSet for raw texts which is saved on the 
+disk you can use the *DataSetExplorer*. The explorer can be found on the tab *Data Management*.
+
+On the rights side (*Control Panel*) you can choose a folder where the dataset is stored. After
+loading you can explore the texts by using the widgets within the 
+*Control Panel*. Please note that the explorer is only used for displaying the raw
+texts and not for changing the data.
 
 ### 3.1.2 Collections of Texts' Labels
 

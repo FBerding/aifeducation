@@ -152,7 +152,7 @@ tasks can be found in vignette [03 Using R
 syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 
 Documenting and sharing your work is described in vignette [04 Sharing
-and using trained AI/models](sharing_and_publishing.html).
+and using trained AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html).
 
 # 4) Update *aifeducation*
 

@@ -66,14 +66,14 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE) {
 #'   * `install = "all"`: for 'pytorch' and 'tensorflow'.
 #'   * `install = "pytorch"`: for 'pytorch'.
 #'   * `install = "tensorflow"`: for 'tensorflow'.
-#' @param transformer_version `string` determining the desired version of the python library 'transformers'.#'
+#' @param transformer_version `string` determining the desired version of the python library 'transformers'.
 #' @param tokenizers_version `string` determining the desired version of the python library 'tokenizers'.
 #' @param pandas_version `string` determining the desired version of the python library 'pandas'.
 #' @param datasets_version `string` determining the desired version of the python library 'datasets'.
 #' @param codecarbon_version `string` determining the desired version of the python library 'codecarbon'.
 #' @param safetensors_version `string` determining the desired version of the python library 'safetensors'.
 #' @param torcheval_version `string` determining the desired version of the python library 'torcheval'.
-#' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.#'
+#' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.
 #' @param pytorch_cuda_version `string` determining the desired version of 'cuda' for ' PyTorch'.
 #' @param python_version `string` Python version to use.
 #' @param remove_first `bool` If `TRUE` removes the environment completely before recreating the environment and

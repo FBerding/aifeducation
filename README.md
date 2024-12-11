@@ -82,7 +82,8 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 > for more details.
 
 How to use the package with *R* syntax is described in vignette [03
-Using R syntax](classification_tasks.html).
+Using R
+syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 
 ## Graphical User Interface *AI for Education - Studio*
 
@@ -147,8 +148,8 @@ Cohan 2020).
 provided by [Hugging Face](https://huggingface.co/) and the creation of
 new transformers, allowing educators and researchers to develop
 specialized and domain-specific models. See [04 Model
-configuration](model_configuration.html) for details about the
-configuration of a new model.
+configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html)
+for details about the configuration of a new model.
 
 The package supports the analysis of long texts. Depending on the
 method, long texts are transformed into vectors at once, or, if too
@@ -266,8 +267,9 @@ Studio* or just load both to *R* and start predictions. Vignette [02
 Using the graphical user interface Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
 describes how to use the user interface. Vignette [03 Using R
-syntax](classification_tasks.html) describes how to save and load the
-objects with *R* syntax. In vignette [05 Sharing and Using Trained
+syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
+describes how to save and load the objects with *R* syntax. In vignette
+[05 Sharing and Using Trained
 AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
 you can find a detailed guide on how to document and share your models.
 
@@ -279,11 +281,13 @@ you can find a detailed guide on how to document and share your models.
 - [02 Using the graphical user interface Aifeducation -
   Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html):
   Introduction graphical user interface *Aifeducation Studio*.
-- [03 Using R syntax](classification_tasks.html): A short introduction
-  into using the package with *R* syntax with examples for
-  classification tasks.
-- [04 Model configuration](model_configuration.html): Summary of some
-  studies for finding a good configuration for a model.
+- [03 Using R
+  syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html):
+  A short introduction into using the package with *R* syntax with
+  examples for classification tasks.
+- [04 Model
+  configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html):
+  Summary of some studies for finding a good configuration for a model.
 - [05 Sharing and Using Trained
   AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):
   Guidance on how to share models.

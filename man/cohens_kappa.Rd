@@ -23,10 +23,10 @@ This function calculates different version of Cohen's Kappa.
 \references{
 Cohen, J (1968). Weighted kappa: Nominal scale agreement
 with provision for scaled disagreement or partial credit.
-Psychological Bulletin, 70(4), 213–220. \url{https://doi.org/10.1037/h0026256}
+Psychological Bulletin, 70(4), 213–220. \url{doi:10.1037/h0026256}
 
 Cohen, J (1960). A Coefficient of Agreement for Nominal Scales.
-Educational and Psychological Measurement, 20(1), 37–46. \url{https://doi.org/10.1177/001316446002000104}
+Educational and Psychological Measurement, 20(1), 37–46. \url{doi:10.1177/001316446002000104}
 }
 \seealso{
 Other performance measures: 
