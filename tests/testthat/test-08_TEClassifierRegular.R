@@ -738,7 +738,7 @@ for (framework in ml_frameworks) {
           text_embeddings = test_embeddings,
           target_levels = target_levels[[n_classes]],
           feature_extractor = NULL,
-          dense_layers = 0,
+          dense_layers = 1,
           dense_size = 10,
           rec_size = c(10),
           rec_layers = 1,

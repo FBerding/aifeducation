@@ -119,5 +119,5 @@ test_that("Generating Test Data", {
 
   #Save test data
   expect_true(file.exists(paste0(path_test_data,"/imdb_embeddings/r_config_state.rda")))
-  print("Test data generated.")
+  #print("Test data generated.")
 })

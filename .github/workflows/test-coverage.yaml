@@ -32,7 +32,7 @@ jobs:
         with:
           activate-environment: r-reticulate
           auto-update-conda: true
-          python-version: 3.9
+          python-version: 3.12
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
@@ -75,7 +75,8 @@ jobs:
             packages = python_packages,
             envname = envname,
             conda = "auto",
-            pip = TRUE
+            pip = TRUE,
+            python_version="3.12"
           )
 
           path_to_python <- conda_python("r-reticulate")

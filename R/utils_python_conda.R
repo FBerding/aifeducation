@@ -44,6 +44,8 @@ get_current_conda_env <- function() {
 #'
 get_py_package_versions<-function(){
   list_of_packages<-c(
+    "torch",
+    "pyarrow",
     "transformers",
     "tokenizers",
     "pandas",
