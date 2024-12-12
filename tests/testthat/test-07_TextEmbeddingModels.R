@@ -673,9 +673,9 @@ for (framework in ml_frameworks) {
           #Method get_model_info
           model_info=text_embedding_model$get_model_info()
           expect_equal(model_info$model_license,"test_license")
-          expect_true(is.character(model_info$model_name_root))
+          expect_equal(model_info$model_name,paste0(base_model, "_embedding","_ID_",model_info$model_id))
           expect_true(is.character(model_info$model_id))
-          expect_equal(model_info$model_name ,paste0(base_model, "_embedding"))
+          expect_equal(model_info$model_name_root ,paste0(base_model, "_embedding"))
           expect_equal(model_info$model_label , paste0("Text Embedding via", base_model))
           #expect_equal(model_info$model_date ="test_license")
           expect_equal(model_info$model_language ,"english")

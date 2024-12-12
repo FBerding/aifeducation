@@ -30,7 +30,7 @@ install_py_modules(
 \item \code{install = "tensorflow"}: for 'tensorflow'.
 }}
 
-\item{transformer_version}{\code{string} determining the desired version of the python library 'transformers'.#'}
+\item{transformer_version}{\code{string} determining the desired version of the python library 'transformers'.}
 
 \item{tokenizers_version}{\code{string} determining the desired version of the python library 'tokenizers'.}
 
@@ -44,7 +44,7 @@ install_py_modules(
 
 \item{torcheval_version}{\code{string} determining the desired version of the python library 'torcheval'.}
 
-\item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.#'}
+\item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.}
 
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for ' PyTorch'.}
 

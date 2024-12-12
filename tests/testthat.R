@@ -19,4 +19,7 @@ if(Sys.getenv("CI")=="true"){
   print("---------------------------------------------------------")
 }
 
+#Print python versions of the test system
+print(get_py_package_versions())
+
 test_check("aifeducation")
