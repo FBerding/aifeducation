@@ -75,8 +75,7 @@ jobs:
             packages = python_packages,
             envname = envname,
             conda = "auto",
-            pip = TRUE,
-            python_version="3.12"
+            pip = TRUE
           )
 
           path_to_python <- conda_python("r-reticulate")

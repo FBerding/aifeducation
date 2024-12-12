@@ -193,7 +193,7 @@ class ProtoNetLossWithMargin_PT(torch.nn.Module):
     K=distance_matrix.size()[1]
 
     index_matrix=torch.nn.functional.one_hot(torch.Tensor.to(classes_q,dtype=torch.int64),num_classes=K)
-    index_matrix=torch.Tensor.to(index_matrix,dtype=distance_matrix.dtype)
+    index_matrix=torch.Tensor.to(index_matrix,dtype=distance_matrix.dtype,device=('cuda' if torch.cuda.is_available() else 'cpu'))
     
     distance_to_min=self.alpha*(torch.sum(torch.diag(torch.matmul(index_matrix.float(),torch.square(torch.transpose(distance_matrix,0,1))))))
     
@@ -202,8 +202,6 @@ class ProtoNetLossWithMargin_PT(torch.nn.Module):
     
     distance_to_max=(1-self.alpha)*(torch.sum(torch.diag(torch.matmul(1-index_matrix.float(),torch.square(distance_margin)))))
     loss=(1/K)*(distance_to_min+distance_to_max)
-    #print(distance_to_min)
-    #print(distance_to_max)
     return loss
 
 class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
