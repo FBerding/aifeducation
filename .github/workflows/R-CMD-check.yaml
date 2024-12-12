@@ -72,6 +72,7 @@ jobs:
          pytorch_cuda_version = "12.1"
 
          python_packages <- c(
+          "pytorch",
           paste0("transformers", transformer_version),
           paste0("tokenizers", tokenizers_version),
           paste0("pandas", pandas_version),
@@ -114,8 +115,9 @@ jobs:
           conda_install(
             packages = python_packages,
             envname = envname,
+            channel = c("pytorch", "nvidia"),
             conda = "auto",
-            pip = TRUE
+            pip = FALSE
           )
 
           path_to_python <- conda_python("r-reticulate")
