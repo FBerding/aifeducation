@@ -32,7 +32,7 @@ jobs:
         with:
           activate-environment: r-reticulate
           auto-update-conda: true
-          python-version: 3.12
+          python-version: 3.11
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
@@ -57,53 +57,35 @@ jobs:
          accelerate_version = "<=1.1.1"
          pytorch_cuda_version = "12.1"
 
-         python_packages <- c(
-          "pytorch",
-          paste0("transformers", transformer_version),
-          paste0("tokenizers", tokenizers_version),
-          paste0("pandas", pandas_version),
-          paste0("datasets", datasets_version),
-          paste0("codecarbon", codecarbon_version),
-          paste0("safetensors", safetensors_version),
-          paste0("torcheval", torcheval_version),
-          paste0("accelerate", accelerate_version)
+          relevant_modules <- c(
+            paste0("transformers", transformer_version),
+            paste0("tokenizers", tokenizers_version),
+            paste0("pandas", pandas_version),
+            paste0("datasets", datasets_version),
+            paste0("codecarbon", codecarbon_version)
+          )
+          relevant_modules_pt <- c(
+            paste0("safetensors", safetensors_version),
+            paste0("torcheval", torcheval_version),
+            paste0("accelerate", accelerate_version)
           )
 
 
-          #python_packages<-c("transformers",
-          #                   "tokenizers",
-          #                   "datasets",
-          #                   "codecarbon")
-
-
-
-          #conda_install(
-          #  packages = c(
-          #  "tensorflow<=2.15",
-          #  "numpy<2"
-          #  ),
-          #  envname = envname,
-          #  conda = "auto",
-          #  pip = TRUE
-          #)
-
-          #conda_install(
-          #  packages = c(
-          #  "torch",
-          #  "torcheval",
-          #  "safetensors",
-          #  "accelerate"),
-          #  envname = envname,
-          #  conda = "auto",
-          #  pip = TRUE
-          #)
-
-          conda_install(
-            packages = python_packages,
+          reticulate::conda_install(
+            packages = c(
+              "pytorch"#,
+              #paste0("pytorch-cuda", "=", pytorch_cuda_version)
+            ),
             envname = envname,
             channel = c("pytorch", "nvidia"),
             conda = "auto",
             pip = FALSE
+          )
+          reticulate::conda_install(
+            packages = c(relevant_modules, relevant_modules_pt),
+            envname = envname,
+            conda = "auto",
+            pip = TRUE
           )
 
           path_to_python <- conda_python("r-reticulate")
