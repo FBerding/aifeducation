@@ -8,10 +8,15 @@ if(Sys.getenv("CI")=="true"){
   skip_overfitting_test <- TRUE
 } else {
   testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "all"),
+    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
     message = "Necessary python modules not available"
   )
-  include_tensorflow <- TRUE
+  if(check_aif_py_modules(check = "tensorflow",trace=FALSE)==TRUE){
+    include_tensorflow <- TRUE
+  } else {
+    include_tensorflow <- FALSE
+  }
+
   skip_overfitting_test <- FALSE
 
   # SetUp tensorflow

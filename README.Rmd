@@ -295,32 +295,6 @@ you can find a detailed guide on how to document and share your models.
 -   [05 Sharing and Using Trained AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):
     Guidance on how to share models.
 
-## Test Environments
-
-*aifeducation* was successfully tested with the following configurations.
-
-|OS            |Windows 11   |Windows 10    |Ubuntu    |Ubuntu   |
-|--------------|-------------|--------------|--------- |---------|
-|GPU           |Yes          |No            |No        |No       |
-|Extended Tests|Yes          |Yes           |No        |No       |
-|R             |    |   |   |   |
-|Python        |    |   |   |   |
-|torch         |    |   |   |   |
-|pyarrow       |    |   |   |   |
-|transformers  |    |   |   |   |
-|tokenizers    |    |   |   |   |
-|pandas        |    |   |   |   |
-|datasets      |    |   |   |   |
-|codecarbon    |    |   |   |   |
-|safetensors   |    |   |   |   |
-|torcheval     |    |   |   |   |
-|accelerate    |    |   |   |   |
-|numpy         |    |   |   |   |
-
-Values for code coverage refer to the standard test flows.
-
-*AI for Education - Studio* is tested manually.
-
 ## References
 
 Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
