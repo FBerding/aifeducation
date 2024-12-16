@@ -23,52 +23,62 @@ library(aifeducation)
 
 ## 1.1 Overview
 
-See [Base Transformer Class Documentation](https://fberding.github.io/aifeducation/reference/dot-AIFEBaseTransformer.html) for details.
+See [Base Transformer Class
+Documentation](https://fberding.github.io/aifeducation/reference/dot-AIFEBaseTransformer.html)
+for details.
 
 UML-diagram of Base Transformer Class:
 
-![Figure 1.1: UML-diagram of Base Transformer Class](img_articles/transformer_base_class.png){width="50%"}
+![Figure 1.1: UML-diagram of Base Transformer
+Class](img_articles/transformer_base_class.png){width="50%"}
 
 This class has:
 
 -   private attributes: `title`, `sustainability_tracker`,
-    `steps_for_creation` and `steps_for_training` (see p. 1.2 Private
+    `steps_for_creation` and `steps_for_training` (see 1.2 Private
     attributes).
 
--   public attributes: `params` and `temp` lists (see p. 1.3 Public
+-   public attributes: `params` and `temp` lists (see 1.3 Public
     attributes).
-    
+
 -   private methods:
-    +   `clear_variables` method sets the `params`, `temp` and 
-        `sustainability_tracker` attributes to `NULL`.
-        
-    +   `check_required_SFC` and `check_required_SFT` methods check the 
-        required steps (functions) in SFC and SFT lists for `NULL` respectively. 
-        Steps set to `NULL` by default and must be functions.
-    
-    +   `init_common_model_params` method contains `set_model_params` method
-        calls to set common model's parameters (listed as 'static'
-        parameters in p. 1.3 Public attributes -> `param` list).
-    
-    +   `define_required_SFC_functions` and `define_required_SFT_functions`
-        methods contains the definitions for the required creation/training 
-        steps (functions) respectively.
 
--   public methods: `initialize`, setters for `title` attribute, `params` and
-    `temp` lists elements, steps for creation (SFC) and training (STF) 
-    functions, main `create` and `train` user-methods. See [documentation](https://fberding.github.io/aifeducation/reference/dot-AIFEBaseTransformer.html)
+    -   `clear_variables` method sets the `params`, `temp` and
+        `sustainability_tracker` attributes to `NULL`.
+
+    -   `check_required_SFC` and `check_required_SFT` methods check the
+        required steps (functions) in SFC and SFT lists for `NULL`
+        respectively. Steps set to `NULL` by default and must be
+        functions.
+
+    -   `init_common_model_params` method contains `set_model_params`
+        method calls to set common model's parameters (listed as
+        'static' parameters in p. 1.3 Public attributes -\> `param`
+        list).
+
+    -   `define_required_SFC_functions` and
+        `define_required_SFT_functions` methods contains the definitions
+        for the required creation/training steps (functions)
+        respectively.
+
+-   public methods: `initialize`, setters for `title` attribute,
+    `params` and `temp` lists elements, steps for creation (SFC) and
+    training (STF) functions, main `create` and `train` user-methods.
+    See
+    [documentation](https://fberding.github.io/aifeducation/reference/dot-AIFEBaseTransformer.html)
     for details.
 
 ## 1.2 Private attributes
 
-Developers should know the purpose of all the private attributes.
+Developers should know the purpose of all private attributes.
 
 ### **Attribute `title`**
 
 `string` The title for a transformer. This title is displayed in the
-progress bar. By default title set to `"Transformer Model"`.
+progress bar. By default title is set to `"Transformer Model"`.
 
-Can be set with `set_title()` method (for example when implementing a new child-transformer in `initialize`-method):
+Can be set with `set_title()` method (for example when implementing a
+new child-transformer in `initialize`-method):
 
 ```{r, eval = FALSE}
 .AIFECustomTransformer <- R6::R6Class(
@@ -86,7 +96,9 @@ Use `super` to access public methods of the base class **(1)**.
 
 ### **Attribute `sustainability_tracker`**
 
-`codecarbon.OfflineEmissionsTracker` object is used to track sustainability on demand. It can be created with the private `create_sustain_tracker()` method.
+`codecarbon.OfflineEmissionsTracker` object is used to track
+sustainability on demand. It can be created with the private
+`create_sustain_tracker()` method.
 
 ### **Attribute `steps_for_creation`**
 
@@ -175,7 +187,6 @@ The **required steps** to be defined in each child transformer are:
     See `transformers.(TF)PreTrainedModel.save_pretrained()` for
     details.
 
-
 ### **Attribute** `steps_for_training`
 
 `list()` that stores required and optional steps (functions) for
@@ -262,13 +273,13 @@ custom version:
 
 ### `params` list
 
-A list containing all the transformer's parameters ('static', 'dynamic' 
+A list containing all the transformer's parameters ('static', 'dynamic'
 and 'dependent' parameters). Can be set with `set_model_param()`.
 
 #### **'Static' parameters**
 
-Regardless of the transformer, the following parameters are 
-always included:
+Regardless of the transformer, the following parameters are always
+included:
 
 -   `ml_framework`
 
@@ -292,8 +303,8 @@ always included:
 
 #### **'Dynamic' parameters**
 
-In the case of **create** it also contains (see `create`-method
-for details):
+In the case of **create** it also contains (see `create`-method for
+details):
 
 -   `model_dir`
 
@@ -313,8 +324,8 @@ for details):
 
 -   `num_attention_heads`
 
-In the case of **train** it also contains (see `train`-method
-for details):
+In the case of **train** it also contains (see `train`-method for
+details):
 
 -   `output_dir`
 
@@ -348,7 +359,7 @@ for details):
 
 #### **'Dependent' parameters**
 
-Depending on the transformer and the method used class may contain 
+Depending on the transformer and the method used, class may contain
 different parameters:
 
 -   `vocab_do_lower_case`
@@ -359,24 +370,24 @@ different parameters:
 
 -   etc.
 
-![Figure 1.2: Possible parameters in the params list](img_articles/transformer_params_list.png){width="50%"}
-
+![Figure 1.2: Possible parameters in the params
+list](img_articles/transformer_params_list.png){width="50%"}
 
 ### `temp` list
 
 A list containing temporary transformer's parameters
 
-`list()` containing all the temporary local variables that
-need to be accessed between the step functions. Can be
-set with `set_model_temp()`.
+`list()` containing all the temporary local variables that need to be
+accessed between the step functions. Can be set with `set_model_temp()`.
 
-For example, it can be a variable `tok_new` that stores the 
-tokenizer from `steps_for_creation$create_tokenizer_draft`.
-To train the tokenizer, access the variable `tok_new` in
-`steps_for_creation$calculate_vocab` through the `temp` list 
-of this class.
+For example, it can be a variable `tok_new` that stores the tokenizer
+from `steps_for_creation$create_tokenizer_draft`. To train the
+tokenizer, access the variable `tok_new` in
+`steps_for_creation$calculate_vocab` through the `temp` list of this
+class.
 
-![Figure 1.3: Possible parameters in the temp list](img_articles/transformer_temp_list.png){width="50%"}
+![Figure 1.3: Possible parameters in the temp
+list](img_articles/transformer_temp_list.png){width="50%"}
 
 # 2 Allowed Transformers
 
@@ -384,7 +395,8 @@ of this class.
 
 UML-diagram of Transformer Classes:
 
-![Figure 2.1: UML-diagram of Base Transformer Class](img_articles/transformer_allowed_classes.png){width="75%"}
+![Figure 2.1: UML-diagram of Base Transformer
+Class](img_articles/transformer_allowed_classes.png){width="75%"}
 
 The Base Transformer Class has the following child-classes:
 
@@ -400,11 +412,11 @@ The Base Transformer Class has the following child-classes:
 
 -   .AIFEMpnetTransformer
 
-The object of the Base Transformer Class cannot be created, 
-thus the `create` and `train` methods cannot be called directly.
-However objects of the child classes can be created with `new`-method
-**(1)**. Use `create` **(2)** and `train` **(3)** methods to 
-create/train the concrete transformer respectively:
+The object of the Base Transformer Class cannot be created, thus the
+`create` and `train` methods cannot be called directly. However objects
+of the child classes can be created with `new`-method **(1)**. Use
+`create` **(2)** and `train` **(3)** methods to create/train the
+concrete transformer respectively:
 
 ```{r, eval = FALSE}
 # Example of using .AIFEBertTransformer class
@@ -422,29 +434,19 @@ bert_transformer$train(...)                    # (3)
 
 ### **'Static' parameters**
 
-+---------------------+-----------+---------------------------------------------------------------------------+
-| **Name**            | **Type**  | **Description**                                                           |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| ml_framework        | `string`  | Framework to use for training and inference^1^                            |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| text_dataset        | `object`  | Object of the class `LargeDataSetForText`                                 |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| sustain_track       | `bool`    | If `TRUE` energy consumption is tracked during training^2^                |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| sustain_iso_code    | `string`  | ISO code (Alpha-3-Code) for the country^3^                                |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| sustain_region      | `string`  | Region within a country. Only available for USA and Canada^4^             |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| sustain_interval    | `integer` | Interval in seconds for measuring power usage                             |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| trace               | `bool`    | `TRUE` if information about the progress should be printed to the console |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| pytorch_safetensors | `bool`    | Choose between safetensors and standard pytorch format^5^                 |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| log_dir             | `string`  | Path to the directory where the log files should be saved                 |
-+---------------------+-----------+---------------------------------------------------------------------------+
-| log_write_interval  | `integer` | Time in seconds for updating the log files^6^                             |
-+---------------------+-----------+---------------------------------------------------------------------------+
+|  |  |  |
+|--------------|--------------|--------------------------------------------|
+| **Name** | **Type** | **Description** |
+| ml_framework | `string` | Framework to use for training and inference^1^ |
+| text_dataset | `object` | Object of the class `LargeDataSetForText` |
+| sustain_track | `bool` | If `TRUE` energy consumption is tracked during training^2^ |
+| sustain_iso_code | `string` | ISO code (Alpha-3-Code) for the country^3^ |
+| sustain_region | `string` | Region within a country. Only available for USA and Canada^4^ |
+| sustain_interval | `integer` | Interval in seconds for measuring power usage |
+| trace | `bool` | `TRUE` if information about the progress should be printed to the console |
+| pytorch_safetensors | `bool` | Choose between safetensors and standard pytorch format^5^ |
+| log_dir | `string` | Path to the directory where the log files should be saved |
+| log_write_interval | `integer` | Time in seconds for updating the log files^6^ |
 
 ^1 Available frameworks are "tensorflow" and "pytorch"^
 
@@ -460,47 +462,28 @@ bert_transformer$train(...)                    # (3)
 
 ### **'Dynamic' parameters for creation**
 
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| **Name**                     | **Type** | **Description**                                                             |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| model_dir                    | `string` | Path to the directory where the model should be saved                       |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| vocab_size                   | `int`    | Size of the vocabulary                                                      |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| max_position_embeddings      | `int`    | Number of maximum position embeddings^1^                                    |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| hidden_size                  | `int`    | Number of neurons in each layer^2^                                          |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| hidden_act                   | `string` | Name of the activation function                                             |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| hidden_dropout_prob          | `double` | Ratio of dropout                                                            |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| attention_probs_dropout_prob | `double` | Ratio of dropout for attention probabilities                                |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| intermediate_size            | `int`    | Number of neurons in the intermediate layer of the attention mechanism      |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| num_attention_heads          | `int`    | Number of attention heads                                                   |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| vocab_do_lower_case          | `bool`   | `TRUE` if all words/tokens should be lower case                             |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| num_hidden_layer             | `int`    | Number of hidden layers                                                     |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| target_hidden_size           | `int`    | Number of neurons in the final layer^2^                                     |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| block_sizes                  | `vector` | Contains `int`s that determine the number and sizes of each block           |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| num_decoder_layers           | `int`    | Number of decoding layers                                                   |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| activation_dropout           | `float`  | Dropout probability between the layers of the feed-forward blocks           |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| pooling_type                 | `string` | Type of pooling^3^                                                          |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| add_prefix_space             | `bool`   | `TRUE` if an additional space should be inserted to the leading words       |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| trim_offsets                 | `bool`   | `TRUE` trims the whitespaces from the produced offsets                      |
-+------------------------------+----------+-----------------------------------------------------------------------------+
-| attention_window             | `int`    | Size of the window around each token for attention mechanism in every layer |
-+------------------------------+----------+-----------------------------------------------------------------------------+
+|  |  |  |
+|---------------|---------------|------------------------------------------|
+| **Name** | **Type** | **Description** |
+| model_dir | `string` | Path to the directory where the model should be saved |
+| vocab_size | `int` | Size of the vocabulary |
+| max_position_embeddings | `int` | Number of maximum position embeddings^1^ |
+| hidden_size | `int` | Number of neurons in each layer^2^ |
+| hidden_act | `string` | Name of the activation function |
+| hidden_dropout_prob | `double` | Ratio of dropout |
+| attention_probs_dropout_prob | `double` | Ratio of dropout for attention probabilities |
+| intermediate_size | `int` | Number of neurons in the intermediate layer of the attention mechanism |
+| num_attention_heads | `int` | Number of attention heads |
+| vocab_do_lower_case | `bool` | `TRUE` if all words/tokens should be lower case |
+| num_hidden_layer | `int` | Number of hidden layers |
+| target_hidden_size | `int` | Number of neurons in the final layer^2^ |
+| block_sizes | `vector` | Contains `int`s that determine the number and sizes of each block |
+| num_decoder_layers | `int` | Number of decoding layers |
+| activation_dropout | `float` | Dropout probability between the layers of the feed-forward blocks |
+| pooling_type | `string` | Type of pooling^3^ |
+| add_prefix_space | `bool` | `TRUE` if an additional space should be inserted to the leading words |
+| trim_offsets | `bool` | `TRUE` trims the whitespaces from the produced offsets |
+| attention_window | `int` | Size of the window around each token for attention mechanism in every layer |
 
 ^1 This parameter also determines the maximum length of a sequence which can be processed with the model^
 
@@ -510,39 +493,24 @@ bert_transformer$train(...)                    # (3)
 
 ### **'Dynamic' parameters for training**
 
-+---------------------+----------+------------------------------------------------------------------------------------+
-| **Name**            | **Type** | **Description**                                                                    |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| output_dir          | `string` | Path to the directory where the final model should be saved^1^                     |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| model_dir_path      | `string` | Path to the directory where the original model is stored                           |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| p_mask              | `double` | Ratio that determines the number of words/tokens used for masking                  |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| whole_word          | `bool`   | Choose a type of masking^2^                                                        |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| val_size            | `double` | Ratio that determines the amount of token chunks used for validation               |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| n_epoch             | `int`    | Number of epochs for training                                                      |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| batch_size          | `int`    | Size of batches                                                                    |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| chunk_size          | `int`    | Size of every chunk for training                                                   |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| min_seq_len         | `int`    | Value determines the minimal sequence length included in training process^3^       |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| full_sequences_only | `bool`   | `TRUE` for using only chunks with a sequence length equal to `chunk_size`          |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| learning_rate       | `double` | Learning rate for adam optimizer                                                   |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| n_workers           | `int`    | Number of workers^4^                                                               |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| multi_process       | `bool`   | `TRUE` if multiple processes should be activated^4^                                |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| keras_trace         | `int`    | Controls the information about the training process from keras on the console^4,5^ |
-+---------------------+----------+------------------------------------------------------------------------------------+
-| pytorch_trace       | `int`    | Controls the information about the training process from pytorch on the console    |
-+---------------------+----------+------------------------------------------------------------------------------------+
+|  |  |  |
+|-------------|-------------|---------------------------------------------|
+| **Name** | **Type** | **Description** |
+| output_dir | `string` | Path to the directory where the final model should be saved^1^ |
+| model_dir_path | `string` | Path to the directory where the original model is stored |
+| p_mask | `double` | Ratio that determines the number of words/tokens used for masking |
+| whole_word | `bool` | Choose a type of masking^2^ |
+| val_size | `double` | Ratio that determines the amount of token chunks used for validation |
+| n_epoch | `int` | Number of epochs for training |
+| batch_size | `int` | Size of batches |
+| chunk_size | `int` | Size of every chunk for training |
+| min_seq_len | `int` | Value determines the minimal sequence length included in training process^3^ |
+| full_sequences_only | `bool` | `TRUE` for using only chunks with a sequence length equal to `chunk_size` |
+| learning_rate | `double` | Learning rate for adam optimizer |
+| n_workers | `int` | Number of workers^4^ |
+| multi_process | `bool` | `TRUE` if multiple processes should be activated^4^ |
+| keras_trace | `int` | Controls the information about the training process from keras on the console^4,5^ |
+| pytorch_trace | `int` | Controls the information about the training process from pytorch on the console |
 
 ^1 If the directory does not exist, it will be created^
 
@@ -560,26 +528,31 @@ bert_transformer$train(...)                    # (3)
 
 ## 3.1 Overview
 
-See [Transformer Maker Class](https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html) for details.
+See [Transformer Maker
+Class](https://fberding.github.io/aifeducation/reference/AIFETransformerMaker.html)
+for details.
 
-Transformer Maker Class has a `make`-method to create a Transformer object.
+Transformer Maker Class has a `make`-method to create a Transformer
+object.
 
 UML-diagram of the Transformer Maker Class:
 
-![Figure 3.1: UML-diagram of Transformer Maker Class](img_articles/transformer_maker_class.png){width="85%"}
+![Figure 3.1: UML-diagram of Transformer Maker
+Class](img_articles/transformer_maker_class.png){width="85%"}
 
 ## 3.2 Usage
 
 ### `BERT`
 
-See [BERT Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEBertTransformer.html) for details.
+See [BERT Transformer for
+Developers](https://fberding.github.io/aifeducation/reference/dot-AIFEBertTransformer.html)
+for details.
 
 ```{r, eval = FALSE}
 transformer <- aife_transformer_maker$make(AIFETrType$bert)
 # or
 # transformer <- aife_transformer_maker$make("bert")
 ```
-
 
 #### Create
 
@@ -639,7 +612,9 @@ transformer$train(ml_framework = ml_framework,
 
 ### `DeBERTa-v2`
 
-See [DeBERTa-v2 Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEDebertaTransformer.html) for details.
+See [DeBERTa-v2 Transformer for
+Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEDebertaTransformer.html)
+for details.
 
 ```{r, eval = FALSE}
 transformer <- aife_transformer_maker$make(AIFETrType$deberta_v2)
@@ -705,7 +680,9 @@ transformer$train(ml_framework = ml_framework,
 
 ### `RoBERTa`
 
-See [RoBERTa Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFERobertaTransformer.html) for details.
+See [RoBERTa Transformer for
+Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFERobertaTransformer.html)
+for details.
 
 ```{r, eval = FALSE}
 transformer <- aife_transformer_maker$make(AIFETrType$roberta)
@@ -771,7 +748,9 @@ transformer$train(ml_framework = ml_framework,
 
 ### `Funnel`
 
-See [Funnel Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEFunnelTransformer.html) for details.
+See [Funnel Transformer for
+Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEFunnelTransformer.html)
+for details.
 
 ```{r, eval = FALSE}
 transformer <- aife_transformer_maker$make(AIFETrType$funnel)
@@ -841,7 +820,9 @@ transformer$train(ml_framework = ml_framework,
 
 ### `Longformer`
 
-See [Longformer Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFELongformerTransformer.html) for details.
+See [Longformer Transformer for
+Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFELongformerTransformer.html)
+for details.
 
 ```{r, eval = FALSE}
 transformer <- aife_transformer_maker$make(AIFETrType$longformer)
@@ -908,7 +889,9 @@ transformer$train(ml_framework = ml_framework,
 
 ### `MPNet`
 
-See [MPNet Transformer for Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEMpnetTransformer.html) for details.
+See [MPNet Transformer for
+Develovers](https://fberding.github.io/aifeducation/reference/dot-AIFEMpnetTransformer.html)
+for details.
 
 ```{r, eval = FALSE}
 transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
@@ -977,7 +960,8 @@ transformer$train(ml_framework = ml_framework,
 
 ## 4.1 Overview
 
-A Custom Transformer template ("dotAIIFECustomTransformer.R") is located in the `R`-folder of the project.  
+A Custom Transformer template ("dotAIIFECustomTransformer.R") is located
+in the `R`-folder of the project.
 
 ## 4.2 Implementation Steps
 
@@ -1037,11 +1021,11 @@ To implement a new transformer, do the following steps:
 
     > **Important!**
     >
-    > In the `create_final_tokenizer` step **(5)** store the tokenizer in
-    > the `self$temp$tokenizer` variable **(11)**.
+    > In the `create_final_tokenizer` step **(5)** store the tokenizer
+    > in the `self$temp$tokenizer` variable **(11)**.
     >
-    > In the `create_transformer_model` step **(6)** store the transformer
-    > model in the `self$temp$model` variable **(12)**.
+    > In the `create_transformer_model` step **(6)** store the
+    > transformer model in the `self$temp$model` variable **(12)**.
 
     ``` r
     {r}
@@ -1128,7 +1112,7 @@ To implement a new transformer, do the following steps:
                           trace,
                           pytorch_safetensors,
                           # ...
-                          
+
                           # (3) --------------------------
                           dep_param1,
                           dep_param2,
@@ -1240,12 +1224,13 @@ To implement a new transformer, do the following steps:
       )
     )
     ```
-    
-    > Now use the transformer (created in p. 4.2) like in the code example from p. 2.1.
-    
-7.  In the file "R/AIFETransformerMaker.R" find the definition of the `AIFETrType` list
-    and add a new element to the end of it **(1)**:
-    
+
+    > Now use the transformer (created in p. 4.2) like in the code
+    > example from p. 2.1.
+
+7.  In the file "R/AIFETransformerMaker.R" find the definition of the
+    `AIFETrType` list and add a new element to the end of it **(1)**:
+
     ```{r, eval = FALSE}
     AIFETrType <- list(
       bert = "bert",
@@ -1255,12 +1240,13 @@ To implement a new transformer, do the following steps:
       custom = "custom"   # (1)
     )
     ```
-    
-    In the end of the file "R/dotAIFECustomTransformer.R" put the following line to use
-    this transformer with Transformer Maker:
-    
+
+    In the end of the file "R/dotAIFECustomTransformer.R" put the
+    following line to use this transformer with Transformer Maker:
+
     ```{r, eval = FALSE}
     .AIFETrObj[[AIFETrType$custom]] <- .AIFECustomTransformer$new
     ```
-    
-    > Now use the Transformer Maker class to create a custom transformer like in p. 3.2.
+
+    > Now use the Transformer Maker class to create a custom transformer
+    > like in p. 3.2.

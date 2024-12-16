@@ -193,17 +193,19 @@ class ProtoNetLossWithMargin_PT(torch.nn.Module):
     K=distance_matrix.size()[1]
 
     index_matrix=torch.nn.functional.one_hot(torch.Tensor.to(classes_q,dtype=torch.int64),num_classes=K)
-    index_matrix=torch.Tensor.to(index_matrix,dtype=distance_matrix.dtype)
+    index_matrix=torch.Tensor.to(index_matrix,dtype=distance_matrix.dtype,device=('cuda' if torch.cuda.is_available() else 'cpu'))
     
-    distance_to_min=self.alpha*(torch.sum(torch.diag(torch.matmul(index_matrix.float(),torch.square(torch.transpose(distance_matrix,0,1))))))
+    selection_matrix=torch.square(torch.transpose(distance_matrix,0,1))
+    selection_matrix=torch.Tensor.to(selection_matrix,dtype=distance_matrix.dtype,device=('cuda' if torch.cuda.is_available() else 'cpu'))
+    
+    distance_to_min=self.alpha*(torch.sum(torch.diag(torch.matmul(index_matrix,selection_matrix))))
     
     distance_margin=(self.margin-torch.transpose(distance_matrix,0,1))
     distance_margin=torch.where(distance_margin<0,torch.zeros(size=distance_margin.size()),distance_margin)
+    distance_margin=torch.Tensor.to(distance_margin,dtype=distance_matrix.dtype,device=('cuda' if torch.cuda.is_available() else 'cpu'))
     
-    distance_to_max=(1-self.alpha)*(torch.sum(torch.diag(torch.matmul(1-index_matrix.float(),torch.square(distance_margin)))))
+    distance_to_max=(1-self.alpha)*(torch.sum(torch.diag(torch.matmul(1-index_matrix,torch.square(distance_margin)))))
     loss=(1/K)*(distance_to_min+distance_to_max)
-    #print(distance_to_min)
-    #print(distance_to_max)
     return loss
 
 class TextEmbeddingClassifierProtoNet_PT(torch.nn.Module):
@@ -300,7 +302,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=float
+    dtype=torch.float64
     model.to(device,dtype=dtype)
   else:
     dtype=torch.double
@@ -388,6 +390,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     
     model.train(True)
     for batch in trainloader:
+      model.train()
       n_batches=n_batches+1
       #assign colums of the batch
       inputs=batch["input"]
@@ -420,8 +423,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       model.eval()
       
       #Calc Accuracy
-      pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long)
-      label_idx=query_classes.to(dtype=torch.long)
+      pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+      label_idx=query_classes.to(dtype=torch.long,device=device)
       
       match=(pred_idx==label_idx)
       n_matches_train+=match.sum().item()
@@ -503,8 +506,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         val_loss +=loss.item()
         
         #Calc Accuracy
-        pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long)
-        label_idx=labels.to(dtype=torch.long)
+        pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+        label_idx=labels.to(dtype=torch.long,device=device)
         
         match=(pred_idx==label_idx)
         n_matches_val+=match.sum().item()
@@ -550,8 +553,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           test_loss +=loss.item()
         
           #Calc Accuracy
-          pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long)
-          label_idx=labels.to(dtype=torch.long)
+          pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+          label_idx=labels.to(dtype=torch.long,device=device)
             
           match=(pred_idx==label_idx)
           n_matches_test+=match.sum().item()
@@ -693,7 +696,7 @@ def TeProtoNetBatchEmbedDistance(model,dataset_q,batch_size):
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=float
+    dtype=torch.float64
     model.to(device,dtype=dtype)
   else:
     dtype=torch.double

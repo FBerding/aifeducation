@@ -3,7 +3,7 @@ title: "05 Sharing and Using Trained AI/Models"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{05 sharing and using trained ai/models}
+  %\VignetteIndexEntry{05 Sharing and Using Trained AI/Models}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -24,68 +24,79 @@ library(aifeducation)
 
 # 1 Introduction
 
-In the educational and social sciences, it is a common practice to share
+In the educational and social sciences, it is common practice to share
 research instruments such as questionnaires or tests. For example, the
-[Open Test Archive](https://www.testarchiv.eu/en) provides researchers
-and practitioners access to a large number of open access instruments.
-*aifeducation* assumes AI-based classifiers
-should be shareable, similarly to research instruments, to empower
-educational and social science researchers and to support the
+[Open Test Archive](https://www.testarchiv.eu/en) provides access to a
+large number of open access instruments. *aifeducation* assumes AI-based
+classifiers should be shareable, similarly to research instruments, to
+empower educational and social science researchers and to support the
 application of AI for educational purposes. Thus, *aifeducation* aims to
-make the sharing process as easy as possible.
+make the sharing process as convenient as possible.
 
 For this aim, every model generated with *aifeducation* can be prepared
 for publication in a few basic steps. In this vignette, we would like to
 show you how to make your AI ready for publication and how to use models
-from other persons. How to save, load, and apply the models is described in
-[02 Using the graphical user interface Aifeducation - Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
+from others. How to save, load, and apply these models is described in
+[02 Using the graphical user interface Aifeducation -
+Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
 and [03 Using R syntax](classification_tasks.html).
 
 # 2 Creating Documentation with AI for Education - Studio
 
-The most convenience way for documenting your work is to use *AI for Education - Studio*.
-In a first step you have to start the user interface by calling `start_aifeducation_studio`:
+The most convenience way to document your work is to use *AI for
+Education - Studio*. In a first step you have to start the user
+interface by calling `start_aifeducation_studio`:
+
 ```{r, include = TRUE, eval=FALSE}
 start_aifeducation_studio()
 ```
 
-The next steps depend on the model you would like to document. In the case you would
-like to document a `TextEmbeddingModel` you first have to select *TextEmbeddingModels*
-at the top of the app. In the next window, please select the tab *Document*. Now you can
-load the model you would like to document by clicking on the button "Choose a Model".
+The next steps depend on the model you would like to document. In case
+you would like to document a `TextEmbeddingModel,` you first have to
+select *TextEmbeddingModels* at the top of the app. In the next window,
+please select the tab *Document*. Now you can load the model you would
+like to document by clicking on the button "Choose a Model".
 
-After loading the model you can see different tabs for different parts of the documentation.
-The first tab is *Developer*. Here you can add the names and e-mail address of the persons
-who developed the model. In addition, you can add a suggestion for the citation and an url as a link to relevant sites
-of the model.
+After loading the model you can see different tabs for different parts
+of the documentation. The first tab is *Developer*. Here you can add the
+names and e-mail addresses of the model's developers. In addition, you
+can add a suggested citation and a URL as a link to relevant sites of
+the model.
 
-With help of the other tabs you can write an abstract in English, an abstract in the native language of the model
-such as French or German, and you can add a detailed description in both languages. The
-tab for the abstracts allows you to set keywords for your work. which help to find your work with search
-engines.
+With help of the other tabs you can write an abstract in English, an
+abstract in the native language of the model such as French or German,
+and you can add a detailed description in both languages. The tab for
+the abstracts allows you to set keywords for your work, which help
+others to find your work through search engines.
 
-Your documentation goes into the corresponding text field on the left side within
-a tab. If you click on the button "Preview" you will see a preview of the documentation on the rights side. When you finished 
-documenting a part of your model please click on the "Save" button to save your changes.
+Your documentation goes into the corresponding text field on the left
+side within a tab. If you click on the button "Preview", you will see a
+preview of the documentation on the right side. When you finished
+documenting a part of your model, please click on the "Save" button to
+save your changes.
 
-The last tab allows you to set the license for your model and for your documentation.
+The last tab allows you to set the license for your model and for your
+documentation.
 
-The documentation for all other models such as `TEFeautreExtractor`s, `TEClassifierRegular`, and
-`TEClassifierProtoNet` works exactly the same. The only difference is that you have to select the 
-corresponding tab at the top of the app.
+The documentation for all other models such as `TEFeautreExtractor`s,
+`TEClassifierRegular`, and `TEClassifierProtoNet` works exactly the
+same. The only difference is that you have to select the corresponding
+tab at the top of the app.
 
-For `TextEmbeddingModels` there is an additional tab "Modifiers". This tab is relevant
-if you do not develop your own base model but if you modify a base model created by other persons.
-Such a modification can be an adaption to specific tasks or specific domains.
-In this case we recommend to add the persons who developed the base model with the tab "Developers"
-and your research group within the tab "Modifiers".  
+For `TextEmbeddingModels` there is an additional tab called "Modifiers".
+This tab is relevant if you do not develop your own base model but
+rather modify a base model created by other. Such a modification can be
+an adaption to specific tasks or specific domains. In this case we
+recommend to add the people who developed the base model via the tab
+"Developers" and your research group via the tab "Modifiers".
 
 # 3 Creating Documentation with *R* Syntax
 
-The process for documenting a model is similar for all models in *aifeducation* since
-all models use the same methods. We illustrate the process for a `TextEmbeddingModel`.
+The process for documenting a model is similar for all models in
+*aifeducation,* since all models use the same methods. Here, we will
+illustrate the process for a `TextEmbeddingModel`.
 
-First, every model needs a clear description how it was developed,
+First, every model needs a clear description of how it was developed,
 modified and how it can be used. You can add a description via the
 method `set_model_description`.
 
@@ -102,13 +113,13 @@ example_model$set_model_description(
 
 This method allows you to provide a description in English and in the
 native language of your model to make the distribution of your model
-easier. 
+easier.
 
 With `abstract_eng` and `abstract_native` you can provide a summary of
 your description. This is very important if you would like to share your
 work on a repository. With `keywords_eng` and `keywords_native` you can
-set a vector of keywords which help to find your work with search
-engines. 
+set a vector of keywords, which helps others to find your work through
+search engines.
 
 You can access a model's description by using the method
 `get_model_description`
@@ -117,8 +128,8 @@ You can access a model's description by using the method
 example_model$get_model_description()
 ```
 
-Besides a description of your work it is necessary to provide
-information about other people who were involved in creating a model.
+Besides a description of your work, it is necessary to provide
+information on other people who were involved in creating the model.
 This can be done with the method `set_publication_info`.
 
 ```{r, include = TRUE, eval=FALSE}
@@ -130,28 +141,28 @@ example_model$set_publication_info(
 )
 ```
 
-First of all you have to decide the type of information you would like
-to add. You have two choices: "developer", and "modifier",
-which you set with `type`.
+First of all, you have to decide the type of information you would like
+to add. You have two choices: "developer", and "modifier", which you set
+with `type`.
 
-- `type="developer"` stores all information about the people involved in
-  the process of developing the model. If you use a transformer model from
-  [Hugging Face](https://huggingface.co/), the people and their description
-  of the model should be entered as developers. In all other cases you can
-  use this type for providing a description of how you developed the
-  model.
+-   `type="developer"` stores all information about the people involved
+    in the process of developing the model. If you use a transformer
+    model from [Hugging Face](https://huggingface.co/), the contributors
+    and their description of the model should be entered as developers.
+    In all other cases you can use this type for providing a description
+    of how you developed the model.
 
-- In some cases you might wish to modify an existing model. This might be
-  the case if you use a transformer model and you adapt the model to a
-  specific domain or task. In this case you rely on the work of other
-  people and modify their work. In these cases you can describe your
-  modifications by setting `type=modifier`.
+-   In some cases you might wish to modify an existing model. This might
+    be the case if you use a transformer model and you adapt the model
+    to a specific domain or task. In this case you rely on the work of
+    other people and modify their work. As such, you can describe your
+    modifications by setting `type=modifier`.
 
-For every type of person you can add the relevant individuals via
-`authors`. Please use the *R*'s function `personList()` for this. With
-`citation` you can provide a free text how to cite the work of the
-different persons. With `url` you can provide a link to relevant sites
-of the model.
+For every type of contributor you can add the relevant individuals via
+`authors`. Please use the *R* function `personList()` for this. With
+`citation` you can provide a short text on how to cite the work of the
+different contributors. With `url` you can provide a link to relevant
+sites of the model.
 
 You can access the information by using `get_publication_info`.
 
@@ -160,29 +171,32 @@ example_model$get_publication_info()
 ```
 
 Finally, you must provide a license for using your model. This can be
-done with `set_software_license` and `get_software_license`.
+done with `set_model_license` and `get_model_license`.
 
 ```{r, include = TRUE, eval=FALSE}
-example_model$set_software_license("GPL-3")
+example_model$set_model_license("GPL-3")
 ```
 
-The documentation of your work is not part of the software. Here you can set
-another as for your software. 
-You can set the license for your documentation by using the method 
-`set_documentation_license`.
+The documentation of your work is not part of the software. Here you can
+set another as for your software. You can set the license for your
+documentation by using the method `set_documentation_license`.
 
 ```{r, include = TRUE, eval=FALSE}
 example_model$set_documentation_license("CC BY-SA")
 ```
 
 Now you are able to share your work. Please remember to save your now
-fully described object as described in the vignette [03 Using R syntax](classification_tasks.html).
+fully described object as described in the vignette [03 Using R
+syntax](classification_tasks.html).
 
-The documentation process is the same for all other models such as 
+The documentation process is the same for all other models such as
 `TEFeautreExtractor`s, `TEClassifierRegular`, and
-`TEClassifierProtoNet`. There is only one difference. For `TextEmbeddingModels`you can
-differentiate between "developers" and "modifiers". This is not possible for the other models.
-For these models you do not need the argument `type`. Calling this method would look like:
+`TEClassifierProtoNet`. There is only one difference. For
+`TextEmbeddingModels`you can differentiate between "developers" and
+"modifiers". This is not possible for the other models. For these models
+you do not need the argument `type`. Calling this method would look
+like:
+
 ```{r, include = TRUE, eval=FALSE}
 example_model$set_publication_info(
   authors,
@@ -193,30 +207,33 @@ example_model$set_publication_info(
 
 # 4 Content and Style of a Documentation
 
-The necessary structure and content of a documentation depends on the kind of 
-model you would like to document, national laws (such as the European AI Act), 
-and the research standards of a discipline.
+The necessary structure and content of a documentation depends on the
+kind of model you would like to document, national laws (such as the
+European AI Act), and the research standards of a discipline.
 
-From a scientific point of view we recommend that every model has an abstract, keywords,
-and a detailed description in English. An additional abstract, keywords, and a description in
-the native language of the model may be helpful for reaching a broad audience in the
-corresponding language community.
+From a scientific point of view, we recommend that every model has an
+abstract, keywords, and a detailed description in English. An additional
+abstract, keywords, and a description in the native language of the
+model may be helpful for reaching a broad audience in the corresponding
+language community.
 
-You can write your abstracts and descriptions in HTML and R Markdown which allow you to
-add links to other sources or publications, to add tables or to
-highlight important aspects of your model.
+You can write your abstracts and descriptions in HTML and R Markdown
+which allows you to add links to other sources or publications, to add
+tables or to highlight important aspects of your model.
 
-For all models we recommend that your description provides at least answers to
-the following questions:
+For all models we recommend that your description answers at least the
+following questions:
 
 -   Which kind of data was used to create the model?
 -   How much data was used to create the model?
 -   Which steps were performed and which method was used?
--   For which kinds of tasks or materials the model can be used?
+-   For which kinds of tasks or materials can the model be used?
 
-This kind of information is necessary for others to to conceive an opinion about the model.
+This kind of information is necessary for others to form an opinion
+about the model.
 
-In the case of classifiers we recommend to add some further description:
+In the case of classifiers, we recommend to add some further
+descriptions:
 
 -   A short reference to the theoretical models that guided the
     development.
@@ -225,19 +242,21 @@ In the case of classifiers we recommend to add some further description:
 -   A description of the kind and quantity of data used for training.
 -   Information on potential bias in the data.
 -   If possible, information about the inter-coder-reliability of the
-    coding process providing the data.
+    coding process of the data.
 -   If possible, provide a link to the corresponding text embedding
-    model or at least state where potential users can get the text embedding model.
-    
-The statement where to get the text embedding model is important since a classifier
-can only be used with the corresponding text embedding model.
+    model or at least state where potential users can get the text
+    embedding model.
+
+The statement where to get the text embedding model is important since a
+classifier can only be used with the corresponding text embedding model.
 
 > Please do not report the performance values of your classifier in the
-  description.** These are displayed automaticalls in *AI for Education - Studio* or 
-  can be accessed directly via
-  `example_classifier$reliability$test_metric_mean`.    
-    
-An example documentation for a classifier could look like:
+> description.\*\* These are displayed automatically in *AI for
+> Education - Studio* or can be accessed directly via
+> `example_classifier$reliability$test_metric_mean`.
+
+Please consider this native language example for a classifier:
+
 ```{r, include = FALSE, eval=FALSE}
 "Dieser Klassifizierer kann dazu verwendet werden, um Unterrichtsentwürfe,
 Unterrichtsmaterial und Aufgaben in Bezug auf die Erfüllung des Bedürfnisses nach
@@ -346,11 +365,3 @@ Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädago
 <https://doi.org/10.3278/9783763970216>
 
 ```
-
-
-
-
-
-
-
-

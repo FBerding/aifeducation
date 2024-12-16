@@ -925,7 +925,7 @@ check_and_prepare_for_studio <- function() {
     install_now <- utils::askYesNo(
       msg = paste(
         "The following R packages are missing for Aifeducation Studio.",
-        missing_r_packages,
+        "'",paste(missing_r_packages,collapse = ","),"'.",
         "Do you want to install them now?"
       ),
       default = TRUE,
@@ -999,7 +999,7 @@ generate_doc_input_licensing_editor <- function(ns, model) {
           inputId = ns(paste0("doc_editor_", "documentation_license")),
           label = "Model License",
           width = "100%",
-          value = model$get_software_license()
+          value = model$get_model_license()
         ),
         shiny::textInput(
           inputId = ns(paste0("doc_editor_", "software_license")),

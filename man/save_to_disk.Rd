@@ -25,7 +25,6 @@ Function for saving objects created with 'aifeducation'.
 }
 \seealso{
 Other Saving and Loading: 
-\code{\link{create_config_state}()},
 \code{\link{load_from_disk}()}
 }
 \concept{Saving and Loading}

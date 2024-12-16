@@ -18,7 +18,6 @@ Function for loading objects created with 'aifeducation'.
 }
 \seealso{
 Other Saving and Loading: 
-\code{\link{create_config_state}()},
 \code{\link{save_to_disk}()}
 }
 \concept{Saving and Loading}

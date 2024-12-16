@@ -32,10 +32,10 @@ If \code{return_names_only = FALSE} returns a \code{vector} with the following r
 \item \strong{dynamic_iota_index}: Dynamic Iota Index Iota Reliability Concept Version 2.
 \item \strong{kalpha_nominal}: Krippendorff's Alpha for nominal variables.
 \item \strong{kalpha_ordinal}: Krippendorff's Alpha for ordinal variables.
-\item \strong{kendall}: Kendall's coefficient of concordance W.
-\item \strong{kappa2_unweighted}: Cohen's Kappa unweighted.
-\item \strong{kappa2_equal_weighted}: Weighted Cohen's Kappa with equal weights.
-\item \strong{kappa2_squared_weighted}: Weighted Cohen's Kappa with squared weights.
+\item \strong{kendall}: Kendall's coefficient of concordance W with correction for ties.
+\item \strong{c_kappa_unweighted}: Cohen's Kappa unweighted.
+\item \strong{c_kappa_linear}: Weighted Cohen's Kappa with linear increasing weights.
+\item \strong{c_kappa_squared}: Weighted Cohen's Kappa with quadratic increasing weights.
 \item \strong{kappa_fleiss}: Fleiss' Kappa for multiple raters without exact estimation.
 \item \strong{percentage_agreement}: Percentage Agreement.
 \item \strong{balanced_accuracy}: Average accuracy within each class.

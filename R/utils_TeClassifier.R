@@ -103,14 +103,10 @@ get_coder_metrics <- function(true_values = NULL,
     metric_values["static_iota_index"] <- val_res$scale_level$iota_index_d4
     metric_values["dynamic_iota_index"] <- val_res$scale_level$iota_index_dyn2
 
-    metric_values["kalpha_nominal"] <- irr::kripp.alpha(
-      x = rbind(true_values, predicted_values),
-      method = "nominal"
-    )$value
-    metric_values["kalpha_ordinal"] <- irr::kripp.alpha(
-      x = rbind(true_values, predicted_values),
-      method = "ordinal"
-    )$value
+    # Krippendorff's Alpha
+    kripp_alpha <- kripp_alpha(rater_one = true_values, rater_two = predicted_values, additional_raters = NULL)
+    metric_values["kalpha_nominal"] <- kripp_alpha$alpha_nominal
+    metric_values["kalpha_ordinal"] <- kripp_alpha$alpha_ordinal
 
     # Kendall
     metric_values["kendall"] <- kendalls_w(
@@ -124,14 +120,9 @@ get_coder_metrics <- function(true_values = NULL,
     metric_values["c_kappa_linear"] <- c_kappa$kappa_linear
     metric_values["c_kappa_squared"] <- c_kappa$kappa_squared
 
-    metric_values["kappa_fleiss"] <- irr::kappam.fleiss(
-      ratings = cbind(true_values, predicted_values),
-      exact = FALSE,
-      detail = FALSE
-    )$value
+    metric_values["kappa_fleiss"] <- fleiss_kappa(rater_one = true_values, rater_two = predicted_values, additional_raters = NULL)
 
-    # TODO (Yuliia): no visible binding for variable rater_one
-    metric_values["percentage_agreement"] <- sum(diag(table(rater_one, rater_two)) / length(rater_one))
+    metric_values["percentage_agreement"] <- sum(diag(table(true_values, predicted_values)) / length(true_values))
 
     metric_values["balanced_accuracy"] <- sum(
       diag(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)

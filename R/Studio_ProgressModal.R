@@ -48,6 +48,10 @@ create_process_modal <- function(ns,
       "Report chart updates every",
       string_update_interval,
       "seconds."
+    ),
+    shiny::actionButton(
+      inputId = ns("force_update"),
+      label = "Update Now"
     )
   )
   prograssbars_list[length(prograssbars_list) + 1] <- shiny::tagList(
@@ -185,11 +189,11 @@ start_and_monitor_long_task <- function(id,
     ExtendedTask_arguments["current_conda_env"] <- get_current_conda_env()
 
 
-    print("log_path")
-    print(log_path)
-    print("Argument")
-    print(ExtendedTask_type)
-    print(ExtendedTask_arguments)
+    # print("log_path")
+    # print(log_path)
+    # print("Argument")
+    # print(ExtendedTask_type)
+    # print(ExtendedTask_arguments)
 
     args <- ExtendedTask_arguments
     save(args,
@@ -219,7 +223,8 @@ start_and_monitor_long_task <- function(id,
       # Do periodical checks only if the task is actual running
       if (CurrentTask$status() == "running") {
         shiny::invalidateLater(millis = update_intervall * 1000)
-        print(date())
+        force_update <- input$force_update
+        # print(date())
 
         log <- NULL
         if (!is.null(log_path)) log <- read_log(log_path)
@@ -259,7 +264,6 @@ start_and_monitor_long_task <- function(id,
           } else {
             data_columns <- c("train", "validation")
           }
-
           y_max <- max(plot_data[data_columns])
           y_min <- 0
           # TODO (Yuliia): .data has no visible binding

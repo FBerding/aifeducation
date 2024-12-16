@@ -48,8 +48,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param text_embeddings An object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param features `int` determining the number of dimensions to which the dimension of the text embedding should be
     #'   reduced.
-    #' @param method `string` Method to use for the feature extraction. `"lstm"` for an extractor based on LSTM-layers,
-    #'   `"conv"` for convolutional layers or `"dense"` for dense layers.
+    #' @param method `string` Method to use for the feature extraction. `"lstm"` for an extractor based on LSTM-layers or
+    #'   `"dense"` for dense layers.
     #' @param noise_factor `double` between 0 and a value lower 1 indicating how much noise should be added for the
     #'   training of the feature extractor.
     #' @param optimizer `string` `"adam"` or `"rmsprop"` .
@@ -74,7 +74,7 @@ TEFeatureExtractor <- R6::R6Class(
         stop("Optimzier must be 'adam' oder 'rmsprop'.")
       }
       check_type(method, "string", FALSE)
-      if (method %in% c("lstm", "dense", "conv") == FALSE) {
+      if (method %in% c("lstm", "dense") == FALSE) {
         stop("Method must be lstm, dense or conv. Please check.")
       }
       private$check_embeddings_object_type(text_embeddings, strict = TRUE)
@@ -554,7 +554,7 @@ TEFeatureExtractor <- R6::R6Class(
           package = "aifeducation"
         ))
       } else if (private$ml_framework == "pytorch") {
-        reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
           package = "aifeducation"
         ))
         reticulate::py_run_file(system.file("python/pytorch_autoencoder.py",

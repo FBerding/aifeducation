@@ -62,7 +62,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
     #' @param embedding_dim `int` determining the number of dimensions for the text embedding.
     #' @param attention_type `string` Choose the relevant attention type. Possible values are `"fourier"` and
-    #'   `"multihead"`.
+    #'   `"multihead"`. Please note that you may see different values for a case for different input orders if you choose `fourier` on linux.
     #' @param self_attention_heads `int` determining the number of attention heads for a self-attention layer. Only
     #'   relevant if `attention_type="multihead"`.
     #' @param repeat_encoder `int` determining how many times the encoder should be added to the network.
@@ -813,7 +813,7 @@ TEClassifierProtoNet <- R6::R6Class(
       if (private$ml_framework == "tensorflow") {
 
       } else if (private$ml_framework == "pytorch") {
-        reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
           package = "aifeducation"
         ))
         reticulate::py_run_file(system.file("python/pytorch_te_protonet.py",

@@ -84,7 +84,7 @@ FeatureExtractors_Create_UI <- function(id) {
             shiny::selectInput(
               inputId = shiny::NS(id, "method"),
               label = "Method",
-              choices = c("conv", "lstm", "dense")
+              choices = c("lstm", "dense")
             ),
             shiny::sliderInput(
               inputId = shiny::NS(id, "noise_factor"),
@@ -231,6 +231,9 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     # Start training------------------------------------------------------------
 
     shiny::observeEvent(input$save_modal_button_continue, {
+      #Remove Save Modal
+      shiny::removeModal()
+
       # Check for errors
       errors <- check_errors_create_feature_extractor(
         destination_path = input$save_modal_directory_path,

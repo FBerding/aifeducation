@@ -4,7 +4,7 @@ testthat::skip_if_not(
 )
 
 # SetUp-------------------------------------------------------------------------
-root_path_general_data <- testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
 root_path_data <- testthat::test_path("test_data/classifier")
 # if(dir.exists(testthat::test_path("test_artefacts"))==FALSE){
 #  dir.create(testthat::test_path("test_artefacts"))

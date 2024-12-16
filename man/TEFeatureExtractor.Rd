@@ -53,10 +53,10 @@ Other Text Embedding:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_ml_framework"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_ml_framework'><code>aifeducation::AIFEBaseModel$get_ml_framework()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_model_description'><code>aifeducation::AIFEBaseModel$get_model_description()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_model_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_model_info'><code>aifeducation::AIFEBaseModel$get_model_info()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_model_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_model_license'><code>aifeducation::AIFEBaseModel$get_model_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_package_versions"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_package_versions'><code>aifeducation::AIFEBaseModel$get_package_versions()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_private"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_private'><code>aifeducation::AIFEBaseModel$get_private()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_software_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_software_license'><code>aifeducation::AIFEBaseModel$get_software_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_text_embedding_model"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_text_embedding_model'><code>aifeducation::AIFEBaseModel$get_text_embedding_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_text_embedding_model_name'><code>aifeducation::AIFEBaseModel$get_text_embedding_model_name()</code></a></span></li>
@@ -65,8 +65,8 @@ Other Text Embedding:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="save"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-save'><code>aifeducation::AIFEBaseModel$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_description'><code>aifeducation::AIFEBaseModel$set_model_description()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_license'><code>aifeducation::AIFEBaseModel$set_model_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_publication_info'><code>aifeducation::AIFEBaseModel$set_publication_info()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_software_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_software_license'><code>aifeducation::AIFEBaseModel$set_software_license()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -104,8 +104,8 @@ with parameter \code{label}.}
 \item{\code{features}}{\code{int} determining the number of dimensions to which the dimension of the text embedding should be
 reduced.}
 
-\item{\code{method}}{\code{string} Method to use for the feature extraction. \code{"lstm"} for an extractor based on LSTM-layers,
-\code{"conv"} for convolutional layers or \code{"dense"} for dense layers.}
+\item{\code{method}}{\code{string} Method to use for the feature extraction. \code{"lstm"} for an extractor based on LSTM-layers or
+\code{"dense"} for dense layers.}
 
 \item{\code{noise_factor}}{\code{double} between 0 and a value lower 1 indicating how much noise should be added for the
 training of the feature extractor.}

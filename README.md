@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" align="right" height="120" alt="aifeducation website" /></a>
+# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" alt="aifeducation website" align="right" height="120"/></a>
 
 <!-- badges: start -->
 
@@ -16,6 +16,7 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Codecov test
 coverage](https://codecov.io/gh/FBerding/aifeducation/graph/badge.svg)](https://app.codecov.io/gh/FBerding/aifeducation)
+
 <!-- badges: end -->
 
 The R package *Artificial Intelligence for Education (aifeducation)* is
@@ -31,13 +32,13 @@ special conditions of the educational and social sciences.
 ## Features Overview
 
 - Simple usage of artificial intelligence by providing routines for the
-  most important tasks for educators and researchers from social and
-  educational science.
+  most important tasks of educators and researchers from social and
+  educational sciences.
 - Provides a graphical user interface (Aifeducation Studio), allowing
-  people to work with AI without any coding skills.
+  users to work with AI without the need for coding skills.
 - Supports ‘PyTorch’ as the core machine learning framework which is
   widely used in research.
-- Implements the advantages of the python library ‘datasets’ increasing
+- Implements the advantages of the python library ‘datasets’, increasing
   computational speed and allowing the use of large data sets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
@@ -80,8 +81,9 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 > Started](https://fberding.github.io/aifeducation/articles/aifeducation.html)
 > for more details.
 
-Using the package with *R* syntax is described in the vignette [03 Using
-R syntax](classification_tasks.html).
+How to use the package with *R* syntax is described in vignette [03
+Using R
+syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 
 ## Graphical User Interface *AI for Education - Studio*
 
@@ -89,7 +91,7 @@ The package ships with a shiny app that serves as a graphical user
 interface.
 
 <figure>
-<img src="man/figures/gui_aife_readme.JPG" style="width:100.0%"
+<img src="man/figures/home.png" style="width:100.0%"
 alt="Figure 1: Aifeducation Studio" />
 <figcaption aria-hidden="true">Figure 1: Aifeducation
 Studio</figcaption>
@@ -113,46 +115,46 @@ computer is located.
 
 ## PyTorch and Tensorflow Compatibility
 
-The core machine learning framework of this package is ‘PyTorch’
+The core machine learning framework of this package is ‘PyTorch’,
 providing a broad support of graphical devices to accelerate
 computations, access to new and unique model architectures, and a high
 compatibility of models across different versions of this machine
 learning framework.
 
-‘Tensorflow’ is also supported but only for version 2.15 and not for all
+‘Tensorflow’ is also supported but only for version 2.16 and not for all
 models. Please refer to appendix [A01 Supported Machine Learning
 Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
-for a detailed overview.
+for a detailed overview.Tensorflow support will be removed with version
+1.1.0 of this package.
 
 ## Model Life Cycle
 
 Research requires reproducibility and traceability. Thus, starting with
-version 1.0.0 of this package ensuring that already trained models work
-with future versions of this package has top priority.
+version 1.0.0 of this package, it has top priority to ensure that
+already trained models work with future versions of this package.
 
 ## Classification Tasks
 
 ### Transforming Texts into Numbers
 
 Classification tasks require the transformation of raw texts into a
-representation with numbers. For this step, *aifeducation* supports both
-newer approaches such as MPNet (Song et al. 2020), BERT (Devlin et
-al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et
-al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer
-(Beltagy, Peters & Cohan 2020) and older approaches such as
-GlobalVectors (Pennington, Socher & Manning 2014) or Latent Dirichlet
-Allocation/Topic Modeling in classification tasks.
+representation with numbers. For this step, *aifeducation* supports new
+approaches such as MPNet (Song et al. 2020), BERT (Devlin et al. 2019),
+RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
+Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
+Cohan 2020).
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
 new transformers, allowing educators and researchers to develop
 specialized and domain-specific models. See [04 Model
-configuration](model_configuration.html) for details about the
-configuration of a new model.
+configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html)
+for details about the configuration of a new model.
 
 The package supports the analysis of long texts. Depending on the
-method, long texts are transformed into vectors at once or, if too long,
-are split into several chunks which results in a sequence of vectors.
+method, long texts are transformed into vectors at once, or, if too
+long, are split into several chunks which results in a sequence of
+vectors.
 
 ### Training AI under Challenging Conditions
 
@@ -166,8 +168,8 @@ applying AI. These are:
   schools or universities, students often solve tasks by creating
   handwritten documents. Thus, educators and researchers first have to
   transform analogue data into a digital form, involving human action.
-  This makes data generation financially expensive and time-consuming,
-  leading to *small data sets*.
+  This makes data generation expensive and time-consuming, leading to
+  *small data sets*.
 - **high privacy policy standards:** Furthermore, in the educational and
   social sciences, data often refers to humans and/or their actions.
   These kinds of data are protected by privacy policies in many
@@ -184,7 +186,7 @@ applying AI. These are:
   requires humans to generate a valid data set for the training process,
   leading to *small data sets*.
 - **complex constructs:** Compared to classification tasks where, for
-  instance, AI has to differentiate between a ‘good’ or ‘bad’ movie
+  instance, AI has to differentiate between a ‘good’ or a ‘bad’ movie
   review, constructs in the educational and social sciences are more
   complex. For example, some research instruments in motivational
   psychology require to infer personal motifs from written essays (e.g.,
@@ -220,8 +222,8 @@ this very part. The remainder of the data is not processed by humans.
 Instead, AI uses this part of data to learn on its own. Thus, educators
 and researchers only have to provide additional data for the AI’s
 learning process without coding it themselves. This offers the
-possibility to add more data to the training process and to reduce labor
-costs.
+possibility to add more data to the training process and reduce labor
+cost.
 
 ### Evaluating Performance
 
@@ -239,13 +241,14 @@ evaluated with the following measures and concepts:
 - Percentage Agreement
 - Gwet’s AC1/AC2 (Gwet 2014)
 - Kendall’s coefficient of concordance W
-- Cohen’s Kappa unweighted
-- Cohen’s Kappa with equal weights
-- Cohen’s Kappa with squared weights
-- Fleiss’ Kappa for multiple raters without exact estimation
+- Cohen’s Kappa unweighted (Cohen 1960)
+- Cohen’s Kappa with equal weights (Cohen 1968)
+- Cohen’s Kappa with squared weights (Cohen 1968)
+- Fleiss’ Kappa for multiple raters without exact estimation (Fleiss
+  1971)
 
-In Addition the some traditional measures from the machine learning
-literature are also available:
+In addition, some traditional measures from machine learning literature
+are also available:
 
 - Precision
 - Recall
@@ -264,8 +267,9 @@ Studio* or just load both to *R* and start predictions. Vignette [02
 Using the graphical user interface Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
 describes how to use the user interface. Vignette [03 Using R
-syntax](classification_tasks.html) describes how to save and load the
-objects with *R* syntax. In vignette [05 Sharing and Using Trained
+syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
+describes how to save and load the objects with *R* syntax. In vignette
+[05 Sharing and Using Trained
 AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html)
 you can find a detailed guide on how to document and share your models.
 
@@ -277,14 +281,43 @@ you can find a detailed guide on how to document and share your models.
 - [02 Using the graphical user interface Aifeducation -
   Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html):
   Introduction graphical user interface *Aifeducation Studio*.
-- [03 Using R syntax](classification_tasks.html): A short introduction
-  into using the package with *R* syntax with examples for
-  classification tasks.
-- [04 Model configuration](model_configuration.html): Summary of some
-  studies for finding a good configuration for a model.
+- [03 Using R
+  syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html):
+  A short introduction into using the package with *R* syntax with
+  examples for classification tasks.
+- [04 Model
+  configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html):
+  Summary of some studies for finding a good configuration for a model.
 - [05 Sharing and Using Trained
   AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):
-  A description for sharing models.
+  Guidance on how to share models.
+
+## Test Environments
+
+*aifeducation* was successfully tested with the following
+configurations.
+
+| OS             | Windows 11 | Windows 10 | Ubuntu | Ubuntu |
+|----------------|------------|------------|--------|--------|
+| GPU            | Yes        | No         | No     | No     |
+| Extended Tests | Yes        | Yes        | No     | No     |
+| R              |            |            |        |        |
+| Python         |            |            |        |        |
+| torch          |            |            |        |        |
+| pyarrow        |            |            |        |        |
+| transformers   |            |            |        |        |
+| tokenizers     |            |            |        |        |
+| pandas         |            |            |        |        |
+| datasets       |            |            |        |        |
+| codecarbon     |            |            |        |        |
+| safetensors    |            |            |        |        |
+| torcheval      |            |            |        |        |
+| accelerate     |            |            |        |        |
+| numpy          |            |            |        |        |
+
+Values for code coverage refer to the standard test flows.
+
+*AI for Education - Studio* is tested manually.
 
 ## References
 
@@ -313,6 +346,14 @@ Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002).
 SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial
 Intelligence Research, 16, 321–357. <https://doi.org/10.1613/jair.953>
 
+Cohen, J (1968). Weighted kappa: Nominal scale agreement with provision
+for scaled disagreement or partial credit. Psychological Bulletin,
+70(4), 213–220. <https://doi.org/10.1037/h0026256>
+
+Cohen, J (1960). A Coefficient of Agreement for Nominal Scales.
+Educational and Psychological Measurement, 20(1), 37–46.
+<https://doi.org/10.1177/001316446002000104>
+
 Courty, B., Schmidt, V., Goyal-Kamal, Coutarel, M., Feld, B., Lecourt,
 J., & … (2023). mlco2/codecarbon: v2.2.7.
 <https://doi.org/10.5281/zenodo.8181237>
@@ -327,6 +368,10 @@ Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
 Proceedings of the 2019 Conference of the North (pp. 4171–4186).
 Association for Computational Linguistics.
 <https://doi.org/10.18653/v1/N19-1423>
+
+Fleiss, J. L. (1971). Measuring nominal scale agreement among many
+raters. Psychological Bulletin, 76(5), 378–382.
+<https://doi.org/10.1037/h0031619>
 
 Gruber, N., & Kreuzpointner, L. (2013). Measuring the reliability of
 picture story exercises like the TAT. PloS One, 8(11), e79450.
@@ -368,11 +413,6 @@ Baltes, J., Guerra, R., Li, P., & Tsai, C.‑C. (2020). Challenges and
 Future Directions of Big Data and Artificial Intelligence in Education.
 Frontiers in Psychology, 11, 1–11.
 <https://doi.org/10.3389/fpsyg.2020.580820>
-
-Pennington, J., Socher, R., & Manning, C. D. (2014). GloVe: Global
-Vectors for Word Representation. Proceedings of the 2014 Conference on
-Empirical Methods in Natural Language Processing.
-<https://aclanthology.org/D14-1162.pdf>
 
 Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked
 and Permuted Pre-training for Language Understanding.

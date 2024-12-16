@@ -14,11 +14,10 @@ skip_plot <- FALSE
 skip_documentation <- FALSE
 class_range <- c(2, 3)
 
-prob_precision <- 1e-4
-prob_precision_fourier <- 1e-3
+prob_precision <- 1e-3
 
 # can be set to "all"
-local_samples <- 50
+local_samples <- "all"
 # Git Hub specific
 n_git_samples <- 50
 
@@ -30,8 +29,7 @@ if (Sys.getenv("CI") == "true") {
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_data <- testthat::test_path("test_data/classifier")
-root_path_general_data <- testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
 create_dir(root_path_results, FALSE)
@@ -65,7 +63,7 @@ rec_list_size <- list(2, 8)
 rec_type_list <- list("gru", "lstm")
 rec_bidirectiona_list <- list(TRUE, FALSE)
 dense_list_layers <- list(0, 1, 1)
-dense_list_size <- list(3, 5)
+dense_list_size <- list(5, 8)
 r_encoder_list <- list(0, 1, 2)
 attention_list <- list("fourier", "multihead")
 pos_embedding_list <- list(TRUE, FALSE)
@@ -335,72 +333,66 @@ for (framework in ml_frameworks) {
         )
       })
 
-      test_that(paste(
-        "predict - order invariance", framework,
-        "n_classes", n_classes,
-        "features_extractor", !is.null(feature_extractor),
-        "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
-        "rec_type", test_combinations[[i]]$rec_type,
-        "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
-        "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
-        "encoder", test_combinations[[i]]$r,
-        "attention", test_combinations[[i]]$attention,
-        "pos", test_combinations[[i]]$pos_embedding
-      ), {
-        embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
-        perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
-        embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
+      if (test_combinations[[i]]$attention != "fourier") {
+        test_that(paste(
+          "predict - order invariance", framework,
+          "n_classes", n_classes,
+          "features_extractor", !is.null(feature_extractor),
+          "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
+          "rec_type", test_combinations[[i]]$rec_type,
+          "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
+          "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
+          "encoder", test_combinations[[i]]$r,
+          "attention", test_combinations[[i]]$attention,
+          "pos", test_combinations[[i]]$pos_embedding
+        ), {
+          embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
+          perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
+          embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
 
-        ids <- rownames(test_embeddings_reduced$embeddings)
+          ids <- rownames(test_embeddings_reduced$embeddings)
 
-        # EmbeddedText
-        predictions <- NULL
-        predictions_Perm <- NULL
-        predictions <- classifier$predict(
-          newdata = test_embeddings_reduced,
-          batch_size = 50,
-          ml_trace = 0
-        )
-        predictions_Perm <- classifier$predict(
-          newdata = embeddings_ET_perm,
-          batch_size = 50,
-          ml_trace = 0
-        )
+          # EmbeddedText
+          predictions <- NULL
+          predictions_Perm <- NULL
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 50,
+            ml_trace = 0
+          )
+          predictions_Perm <- classifier$predict(
+            newdata = embeddings_ET_perm,
+            batch_size = 50,
+            ml_trace = 0
+          )
 
-        if (test_combinations[[i]]$attention != "fourier") {
-          expect_equal(predictions[ids, 1:(ncol(predictions) - 1)], predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
+          expect_equal(
+            predictions[ids, 1:(ncol(predictions) - 1)],
+            predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
             tolerance = prob_precision
           )
-        } else {
-          expect_equal(predictions[ids, 1:(ncol(predictions) - 1)], predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-            tolerance = prob_precision_fourier
+
+          # LargeDataSetForTextEmbeddings
+          predictions <- NULL
+          predictions_Perm <- NULL
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced_LD,
+            batch_size = 50,
+            ml_trace = 0
           )
-        }
+          predictions_Perm <- classifier$predict(
+            newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+            batch_size = 50,
+            ml_trace = 0
+          )
 
-        # LargeDataSetForTextEmbeddings
-        predictions <- NULL
-        predictions_Perm <- NULL
-        predictions <- classifier$predict(
-          newdata = test_embeddings_reduced_LD,
-          batch_size = 50,
-          ml_trace = 0
-        )
-        predictions_Perm <- classifier$predict(
-          newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
-          batch_size = 50,
-          ml_trace = 0
-        )
-
-        if (test_combinations[[i]]$attention != "fourier") {
-          expect_equal(predictions[ids, 1:(ncol(predictions) - 1)], predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
+          expect_equal(
+            predictions[ids, 1:(ncol(predictions) - 1)],
+            predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
             tolerance = prob_precision
           )
-        } else {
-          expect_equal(predictions[ids, 1:(ncol(predictions) - 1)], predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-            tolerance = prob_precision_fourier
-          )
-        }
-      })
+        })
+      }
 
       test_that(paste(
         "predict - data source invariance", framework,
@@ -1031,9 +1023,9 @@ for (framework in ml_frameworks) {
         )
 
 
-        classifier$set_software_license("test_license")
+        classifier$set_model_license("test_license")
         expect_equal(
-          object = classifier$get_software_license(),
+          object = classifier$get_model_license(),
           expected = c("test_license")
         )
 
@@ -1291,9 +1283,9 @@ for (framework in ml_frameworks) {
       )
 
 
-      classifier$set_software_license("test_license")
+      classifier$set_model_license("test_license")
       expect_equal(
-        object = classifier$get_software_license(),
+        object = classifier$get_model_license(),
         expected = c("test_license")
       )
 

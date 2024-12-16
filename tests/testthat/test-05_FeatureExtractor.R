@@ -7,7 +7,7 @@ testthat::skip_if_not(
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
-root_path_general_data <- testthat::test_path("test_data/Embeddings")
+root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
 create_dir(root_path_results, FALSE)
@@ -30,7 +30,7 @@ dataset_list <- list(
 ml_frameworks <- c("pytorch")
 
 method_list <- list(
-  "pytorch" = c("lstm", "dense", "conv")
+  "pytorch" = c("lstm", "dense")
 )
 
 # Start tests--------------------------------------------------------------------
@@ -203,8 +203,8 @@ for (framework in ml_frameworks) {
         }
       })
 
-      test_that(paste(framework, method, "predict - data source invariance"), {
-        if (data_type == "EmbeddedText") {
+      if (data_type == "EmbeddedText") {
+        test_that(paste(framework, method, "predict - data source invariance"), {
           predictions_ET <- extractor$extract_features(
             data_embeddings = dataset_list[["EmbeddedText"]],
             batch_size = 50
@@ -218,8 +218,8 @@ for (framework in ml_frameworks) {
             predictions_LD$select(i - 1)["input"],
             tolerance = 1e-7
           )
-        }
-      })
+        })
+      }
       gc()
 
       # Method for loading and saving models-----------------------------------

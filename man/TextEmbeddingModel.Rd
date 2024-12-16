@@ -49,8 +49,8 @@ https://doi.org/10.1016/j.iswa.2024.200335}
 \item \href{#method-TextEmbeddingModel-fill_mask}{\code{TextEmbeddingModel$fill_mask()}}
 \item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
 \item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
-\item \href{#method-TextEmbeddingModel-set_software_license}{\code{TextEmbeddingModel$set_software_license()}}
-\item \href{#method-TextEmbeddingModel-get_software_license}{\code{TextEmbeddingModel$get_software_license()}}
+\item \href{#method-TextEmbeddingModel-set_model_license}{\code{TextEmbeddingModel$set_model_license()}}
+\item \href{#method-TextEmbeddingModel-get_model_license}{\code{TextEmbeddingModel$get_model_license()}}
 \item \href{#method-TextEmbeddingModel-set_documentation_license}{\code{TextEmbeddingModel$set_documentation_license()}}
 \item \href{#method-TextEmbeddingModel-get_documentation_license}{\code{TextEmbeddingModel$get_documentation_license()}}
 \item \href{#method-TextEmbeddingModel-set_model_description}{\code{TextEmbeddingModel$set_model_description()}}
@@ -451,12 +451,12 @@ Method for getting the bibliographic information of the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-set_software_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_software_license}{}}}
-\subsection{Method \code{set_software_license()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-set_model_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_model_license}{}}}
+\subsection{Method \code{set_model_license()}}{
 Method for setting the license of the model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_software_license(license = "CC BY")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_model_license(license = "CC BY")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -473,12 +473,12 @@ member for the software license of the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_software_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_software_license}{}}}
-\subsection{Method \code{get_software_license()}}{
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_model_license"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_model_license}{}}}
+\subsection{Method \code{get_model_license()}}{
 Method for requesting the license of the model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_software_license()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_model_license()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

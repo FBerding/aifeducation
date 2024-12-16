@@ -26,8 +26,10 @@ message if \code{trace} is \code{TRUE}.
 Other Utils: 
 \code{\link{auto_n_cores}()},
 \code{\link{clean_pytorch_log_transformers}()},
+\code{\link{create_config_state}()},
 \code{\link{generate_id}()},
 \code{\link{get_file_extension}()},
+\code{\link{get_py_package_versions}()},
 \code{\link{is.null_or_na}()},
 \code{\link{output_message}()},
 \code{\link{print_message}()},

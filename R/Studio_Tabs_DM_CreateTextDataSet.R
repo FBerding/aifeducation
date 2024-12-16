@@ -208,6 +208,9 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
     # Implement Algorithm--------------------------------------------------------
     # button_continue comes from the SaveModal
     shiny::observeEvent(input$save_modal_button_continue, {
+      #Remove Save Modal
+      shiny::removeModal()
+
       # Check for errors
       errors <- check_errors_create_dataset_raw_texts(
         source_path = input$text_source_dir,

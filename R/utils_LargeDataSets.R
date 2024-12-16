@@ -50,7 +50,7 @@ data.frame_to_py_dataset <- function(data_frame) {
 py_dataset_to_embeddings <- function(py_dataset) {
   py_dataset$set_format("np")
   embeddings <- py_dataset["input"]
-  rownames(embeddings) <- py_dataset["id"]
+  rownames(embeddings) <- as.character(py_dataset["id"])
   return(embeddings)
 }
 

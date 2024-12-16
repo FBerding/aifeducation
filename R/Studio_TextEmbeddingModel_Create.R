@@ -265,6 +265,9 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
 
     # Save the model to disk----------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
+      #Remove Save Modal
+      shiny::removeModal()
+
       model_architecture <- interface_architecture()[[1]]
       if (model_architecture == "BertForMaskedLM" |
         model_architecture == "BertModel") {

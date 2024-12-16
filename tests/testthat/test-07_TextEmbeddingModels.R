@@ -111,6 +111,101 @@ for (framework in ml_frameworks) {
     for (pooling_type in pooling_type_list[[base_model]]) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
+          # Error Checking: Max layer greater as the number of layers
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"), {
+            text_embedding_model <- TextEmbeddingModel$new()
+            expect_error(
+              text_embedding_model$configure(
+                model_name = paste0(base_model, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model),
+                model_language = "english",
+                method = base_model,
+                ml_framework = framework,
+                max_length = 20,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = min_layer,
+                emb_layer_max = 50,
+                emb_pool_type = pooling_type,
+                model_dir = model_path
+              )
+            )
+          })
+          # Error Checking: min layer is smaller 1
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: min layer is smaller 1"), {
+            text_embedding_model <- TextEmbeddingModel$new()
+            expect_error(
+              text_embedding_model$configure(
+                model_name = paste0(base_model, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model),
+                model_language = "english",
+                method = base_model,
+                ml_framework = framework,
+                max_length = 20,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = -1,
+                emb_layer_max = max_layer,
+                emb_pool_type = pooling_type,
+                model_dir = model_path
+              )
+            )
+          })
+          # Error Checking: max length exceeded
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: max length exceeded"), {
+            text_embedding_model <- TextEmbeddingModel$new()
+            expect_error(
+              text_embedding_model$configure(
+                model_name = paste0(base_model, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model),
+                model_language = "english",
+                method = base_model,
+                ml_framework = framework,
+                max_length = 50000,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = min_layer,
+                emb_layer_max = max_layer,
+                emb_pool_type = pooling_type,
+                model_dir = model_path
+              )
+            )
+          })
+          # Error Checking: Configuration already set
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"), {
+            text_embedding_model <- TextEmbeddingModel$new()
+            text_embedding_model$configure(
+              model_name = paste0(base_model, "_embedding"),
+              model_label = paste0("Text Embedding via", base_model),
+              model_language = "english",
+              method = base_model,
+              ml_framework = framework,
+              max_length = 100,
+              chunks = chunks,
+              overlap = 10,
+              emb_layer_min = min_layer,
+              emb_layer_max = max_layer,
+              emb_pool_type = pooling_type,
+              model_dir = model_path
+            )
+            expect_error(
+              text_embedding_model$configure(
+                model_name = paste0(base_model, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model),
+                model_language = "english",
+                method = base_model,
+                ml_framework = framework,
+                max_length = 100,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = min_layer,
+                emb_layer_max = max_layer,
+                emb_pool_type = pooling_type,
+                model_dir = model_path
+              )
+            )
+          })
+
           # Create Model
           text_embedding_model <- TextEmbeddingModel$new()
           text_embedding_model$configure(
@@ -119,9 +214,9 @@ for (framework in ml_frameworks) {
             model_language = "english",
             method = base_model,
             ml_framework = framework,
-            max_length = 20,
+            max_length = 400,
             chunks = chunks,
-            overlap = 10,
+            overlap = 50,
             emb_layer_min = min_layer,
             emb_layer_max = max_layer,
             emb_pool_type = pooling_type,
@@ -162,6 +257,20 @@ for (framework in ml_frameworks) {
             # Check if embeddings are array with 3 dimensions
             expect_equal(length(dim(embeddings$embeddings)), 3)
 
+            # Check if data is valid
+            expect_false(anyNA(embeddings$embeddings), FALSE)
+            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
+              features = text_embedding_model$get_transformer_components()$features,
+              times = chunks
+            ))
+
+            # Check if data is valid
+            expect_false(anyNA(embeddings$embeddings), FALSE)
+            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
+              features = text_embedding_model$get_transformer_components()$features,
+              times = chunks
+            ))
+
             # check case order invariance
             perm <- sample(x = 1:10, size = 10, replace = FALSE)
             embeddings_perm <- text_embedding_model$embed(
@@ -175,6 +284,20 @@ for (framework in ml_frameworks) {
                 tolerance = 1e-6
               )
             }
+
+
+            # Check embedding in LargeDataSetForTextEmbeddings
+            embeddings_large <- text_embedding_model$embed(
+              raw_text = example_data$text[1:10],
+              doc_id = example_data$id[1:10],
+              batch_size = 5,
+              return_large_dataset = TRUE
+            )
+            expect_s3_class(embeddings_large, class = "LargeDataSetForTextEmbeddings")
+            expect_equal(embeddings$embeddings,
+              embeddings_large$convert_to_EmbeddedText()$embeddings,
+              tolerance = 1e-6
+            )
           })
 
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {
@@ -478,11 +601,11 @@ for (framework in ml_frameworks) {
             )
           })
 
-          # Software License
+          # Model License
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "software license"), {
-            text_embedding_model$set_software_license("test_license")
+            text_embedding_model$set_model_license("test_license")
             expect_equal(
-              object = text_embedding_model$get_software_license(),
+              object = text_embedding_model$get_model_license(),
               expected = c("test_license")
             )
           })
@@ -555,6 +678,16 @@ for (framework in ml_frameworks) {
             expect_no_error(text_embedding_model$get_transformer_components())
             expect_no_error(text_embedding_model$get_basic_components())
           })
+
+          # Method get_model_info
+          model_info <- text_embedding_model$get_model_info()
+          expect_equal(model_info$model_license, "test_license")
+          expect_equal(model_info$model_name, paste0(base_model, "_embedding", "_ID_", model_info$model_id))
+          expect_true(is.character(model_info$model_id))
+          expect_equal(model_info$model_name_root, paste0(base_model, "_embedding"))
+          expect_equal(model_info$model_label, paste0("Text Embedding via", base_model))
+          # expect_equal(model_info$model_date ="test_license")
+          expect_equal(model_info$model_language, "english")
         }
       }
     }

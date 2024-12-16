@@ -101,7 +101,8 @@ TEClassifierRegular <- R6::R6Class(
     #' @param rec_type `string` Type of the recurrent layers. `rec_type="gru"` for Gated Recurrent Unit and
     #'   `rec_type="lstm"` for Long Short-Term Memory.
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
-    #' @param attention_type `string` Choose the relevant attention type. Possible values are `fourier` and `multihead`.
+    #' @param attention_type `string` Choose the relevant attention type. Possible values are `fourier` and `multihead`. Please note
+    #' that you may see different values for a case for different input orders if you choose `fourier` on linux.
     #' @param self_attention_heads `int` determining the number of attention heads for a self-attention layer. Only
     #'   relevant if `attention_type="multihead"`
     #' @param repeat_encoder `int` determining how many times the encoder should be added to the network.
@@ -975,7 +976,7 @@ TEClassifierRegular <- R6::R6Class(
           package = "aifeducation"
         ))
       } else if (private$ml_framework == "pytorch") {
-        reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
           package = "aifeducation"
         ))
         reticulate::py_run_file(system.file("python/pytorch_autoencoder.py",

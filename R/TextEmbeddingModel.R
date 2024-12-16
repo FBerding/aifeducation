@@ -320,8 +320,8 @@ TextEmbeddingModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for checking and setting max_length
     check_and_set_max_length = function(max_length) {
-      if (private$basic_components$method == "longformer" |
-        private$basic_components$method == "roberta") {
+      #if (private$basic_components$method == "longformer" |
+      #  private$basic_components$method == "roberta") {
         if (max_length > (private$transformer_components$model$config$max_position_embeddings)) {
           stop(paste(
             "max_length is", max_length, ". This value is not allowed to exceed",
@@ -330,9 +330,9 @@ TextEmbeddingModel <- R6::R6Class(
         } else {
           private$basic_components$max_length <- as.integer(max_length)
         }
-      } else {
-        private$basic_components$max_length <- as.integer(max_length)
-      }
+      #} else {
+      #  private$basic_components$max_length <- as.integer(max_length)
+      #}
     },
     #--------------------------------------------------------------------------
     # Method for loading transformer models and tokenizers
@@ -552,6 +552,13 @@ TextEmbeddingModel <- R6::R6Class(
                          emb_pool_type = "average",
                          model_dir = NULL,
                          trace = FALSE) {
+
+      # Check if configuration is already set----------------------------------
+      if (self$is_configured() == TRUE) {
+        stop("The object has already been configured. Please use the method
+             'load' for loading the weights of a model.")
+      }
+
       # Parameter check---------------------------------------------------------
       check_type(model_name, "string", FALSE)
       check_type(model_label, "string", FALSE)
@@ -574,6 +581,7 @@ TextEmbeddingModel <- R6::R6Class(
 
 
       check_type(max_length, "int", FALSE)
+
       check_type(chunks, "int", FALSE)
       if (chunks < 2) {
         stop("Parameter chunks must be at least 2.")
@@ -631,6 +639,9 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Check and set pooling type
       private$check_and_set_pooling_type(emb_pool_type)
+
+      #Close config
+      private$set_configuration_to_TRUE()
     },
     #--------------------------------------------------------------------------
     #' @description loads an object from disk
@@ -680,7 +691,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
 
       # Set license
-      self$set_software_license(config_file$private$model_info$model_license)
+      self$set_model_license(config_file$private$model_info$model_license)
       self$set_documentation_license(config_file$private$model_description$license)
 
       # Set description and documentation
@@ -1054,7 +1065,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       if (private$transformer_components$emb_pool_type == "average") {
         if (private$transformer_components$ml_framework == "pytorch") {
-          reticulate::py_run_file(system.file("python/pytorch_te_classifier_V2.py",
+          reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
             package = "aifeducation"
           ))
           pooling <- py$GlobalAveragePooling1D_PT()
@@ -1502,12 +1513,12 @@ TextEmbeddingModel <- R6::R6Class(
     #' the license text.
     #' @return Function does not return a value. It is used for setting the private
     #' member for the software license of the model.
-    set_software_license = function(license = "CC BY") {
+    set_model_license = function(license = "CC BY") {
       private$model_info$model_license <- license
     },
     #' @description Method for requesting the license of the model
     #' @return `string` License of the model
-    get_software_license = function() {
+    get_model_license = function() {
       return(private$model_info$model_license)
     },
     #--------------------------------------------------------------------------
@@ -1618,6 +1629,7 @@ TextEmbeddingModel <- R6::R6Class(
       return(
         list(
           chunks = private$transformer_components$chunks,
+          features=private$transformer_components$features,
           overlap = private$transformer_components$overlap,
           ml_framework = private$transformer_components$ml_framework,
           emb_layer_min = private$transformer_components$emb_layer_min,
