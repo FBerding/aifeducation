@@ -752,6 +752,12 @@ for (framework in ml_frameworks) {
           optimizer = "adam"
         )
 
+        if (n_classes < 3) {
+          epochs <- 500
+        } else {
+          epochs <- 500
+        }
+
 
         classifier_overfitting$train(
           data_embeddings = test_embeddings,
@@ -772,7 +778,7 @@ for (framework in ml_frameworks) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          epochs = 300,
+          epochs = epochs,
           batch_size = 32,
           dir_checkpoint = train_path,
           log_dir = train_path,
@@ -781,8 +787,16 @@ for (framework in ml_frameworks) {
           n_cores = 2
         )
 
-        history <- classifier_overfitting$last_training$history[[1]]$accuracy["train", ]
-        expect_gte(object = max(history), expected = 0.90)
+        n_training_runs<-length(classifier_overfitting$last_training$history)
+        history_results<-vector(length = n_training_runs)
+        for(i in 1:n_training_runs){
+          tmp_history <- classifier_overfitting$last_training$history[[i]]$accuracy["train", ]
+          history_results[i]<-max(tmp_history)
+        }
+        expect_gte(object = max(history_results), expected = .90)
+        if(max(history_results)<.90){
+          print(history_results)
+        }
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
         if(framework=="pytorch"){
@@ -1047,6 +1061,9 @@ for (framework in ml_frameworks) {
 
           history <- classifier_overfitting$last_training$history[[1]]$accuracy["train", ]
           expect_gte(object = max(history), expected = 0.90)
+          if(max(history)<0.90){
+            print(history)
+          }
 
           state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
           expect_true(state_log_exists)

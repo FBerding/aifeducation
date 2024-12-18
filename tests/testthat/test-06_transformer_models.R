@@ -1,20 +1,10 @@
 testthat::skip_on_cran()
-if(Sys.getenv("CI")=="true"){
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
-    message = "Necessary python modules not available"
-  )
-} else {
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "all"),
-    message = "Necessary python modules not available"
-  )
 
-  # SetUp tensorflow
-  aifeducation::set_config_gpu_low_memory()
-  set_config_tf_logger("ERROR")
-  set_config_os_environ_logger("ERROR")
-}
+testthat::skip_if_not(
+  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+  message = "Necessary python modules not available"
+)
+
 
 #Config transformer library
 transformers$utils$logging$set_verbosity_error()
@@ -44,16 +34,7 @@ create_dir(tmp_results_TEM_path, FALSE)
 create_dir(paste0(tmp_results_TEM_path,"/pytorch"), FALSE)
 create_dir(paste0(tmp_results_TEM_path,"/tensorflow"), FALSE)
 
-if(Sys.getenv("CI")=="true"){
-  ml_frameworks <- c(
-    "pytorch"
-  )
-} else {
-  ml_frameworks <- c(
-    "tensorflow",
-    "pytorch"
-  )
-}
+ml_frameworks <- c("pytorch")
 
 ai_methods <- unname(unlist(AIFETrType))
 

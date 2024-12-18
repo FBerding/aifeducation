@@ -121,7 +121,7 @@ computations, access to new and unique model architectures, and a high
 compatibility of models across different versions of this machine
 learning framework.
 
-‘Tensorflow’ is also supported but only for version 2.16 and not for all
+‘Tensorflow’ is also supported but only for version 2.15 and not for all
 models. Please refer to appendix [A01 Supported Machine Learning
 Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
 for a detailed overview.Tensorflow support will be removed with version

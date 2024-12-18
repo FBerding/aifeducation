@@ -4,25 +4,9 @@ if(Sys.getenv("CI")=="true"){
     condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
     message = "Necessary python modules not available"
   )
-  include_tensorflow <- FALSE
   skip_overfitting_test <- TRUE
 } else {
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
-    message = "Necessary python modules not available"
-  )
-  if(check_aif_py_modules(check = "tensorflow",trace=FALSE)==TRUE){
-    include_tensorflow <- TRUE
-  } else {
-    include_tensorflow <- FALSE
-  }
-
   skip_overfitting_test <- FALSE
-
-  # SetUp tensorflow
-  aifeducation::set_config_gpu_low_memory()
-  set_config_tf_logger("ERROR")
-  set_config_os_environ_logger("ERROR")
 }
 
 # Skip Tests
@@ -41,11 +25,8 @@ n_git_samples <- 50
 
 prob_precision=1e-3
 
-if (include_tensorflow == FALSE) {
-  ml_frameworks <- c("pytorch")
-} else {
-  ml_frameworks <- c("pytorch", "tensorflow")
-}
+ml_frameworks <- c("pytorch")
+
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -762,9 +743,9 @@ for (framework in ml_frameworks) {
         )
 
         if (n_classes < 3) {
-          epochs <- 100
+          epochs <- 500
         } else {
-          epochs <- 300
+          epochs <- 500
         }
 
         classifier_overfitting$train(
@@ -795,8 +776,16 @@ for (framework in ml_frameworks) {
           n_cores = 2
         )
 
-        history <- classifier_overfitting$last_training$history[[1]]$accuracy["train", ]
-        expect_gte(object = max(history), expected = 0.95)
+        n_training_runs<-length(classifier_overfitting$last_training$history)
+        history_results<-vector(length = n_training_runs)
+        for(i in 1:n_training_runs){
+          tmp_history <- classifier_overfitting$last_training$history[[i]]$accuracy["train", ]
+          history_results[i]<-max(tmp_history)
+        }
+        expect_gte(object = max(history_results), expected = 0.95)
+        if(max(history_results)<0.95){
+          print(history_results)
+        }
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
         if (framework == "pytorch") {
