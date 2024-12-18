@@ -19,7 +19,7 @@
 #' @param install_aifeducation_studio `bool` If `TRUE` all necessary R packages are installed for using AI for Education
 #'   Studio.
 #'
-#' @return Function does nothing return. It installes python, optional R packages, and necessary 'python' packages on a
+#' @return Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
 #'   machine.
 #'
 #' @importFrom reticulate install_python
@@ -36,7 +36,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE) {
     envname = "aifeducation",
     install = "pytorch",
     pytorch_cuda_version = "12.1",
-    python_version = "3.12",
+    python_version = "3.11",
     remove_first = FALSE
   )
 
