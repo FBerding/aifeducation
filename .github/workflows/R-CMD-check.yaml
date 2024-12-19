@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, version_0_3_3_dev]
+    branches: [main, master, version_1_0_0_dev]
   pull_request:
-    branches: [main, master, version_0_3_3_dev]
+    branches: [main, master, version_1_0_0_dev]
 
 name: R-CMD-check
 
@@ -18,7 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
+          #- {os: macos-latest,   r: 'release'}
+          #- {os: macos-latest,   r: 'devel'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'devel'}
     env:
@@ -45,7 +46,7 @@ jobs:
         with:
           activate-environment: r-reticulate
           auto-update-conda: true
-          python-version: 3.9
+          python-version: 3.11
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
@@ -56,35 +57,46 @@ jobs:
         shell: Rscript {0}
         run: |
 
-          library(reticulate)
-          python_packages<-c("transformers",
-                             "tokenizers",
-                             "datasets",
-                             "codecarbon")
-          envname<-"r-reticulate"
+         library(reticulate)
 
-          conda_install(
+         envname<-"r-reticulate"
+
+         transformer_version = "<=4.46"
+         tokenizers_version = "<=0.20.4"
+         pandas_version = "<=2.2.3"
+         datasets_version = "<=3.1.0"
+         codecarbon_version = "<=2.8.0"
+         safetensors_version = "<=0.4.5"
+         torcheval_version = "<=0.0.7"
+         accelerate_version = "<=1.1.1"
+         pytorch_cuda_version = "12.1"
+
+          relevant_modules <- c(
+            paste0("transformers", transformer_version),
+            paste0("tokenizers", tokenizers_version),
+            paste0("pandas", pandas_version),
+            paste0("datasets", datasets_version),
+            paste0("codecarbon", codecarbon_version)
+          )
+          relevant_modules_pt <- c(
+            paste0("safetensors", safetensors_version),
+            paste0("torcheval", torcheval_version),
+            paste0("accelerate", accelerate_version)
+          )
+
+
+          reticulate::conda_install(
             packages = c(
-            "tensorflow<=2.14"
+              "pytorch"#,
+              #paste0("pytorch-cuda", "=", pytorch_cuda_version)
             ),
             envname = envname,
+            channel = c("pytorch", "nvidia"),
             conda = "auto",
-            pip = TRUE
+            pip = FALSE
           )
-
-          conda_install(
-            packages = c(
-            "torch",
-            "torcheval",
-            "safetensors",
-            "accelerate"),
-            envname = envname,
-            conda = "auto",
-            pip = TRUE
-          )
-
-          conda_install(
-            packages = python_packages,
+          reticulate::conda_install(
+            packages = c(relevant_modules, relevant_modules_pt),
             envname = envname,
             conda = "auto",
             pip = TRUE

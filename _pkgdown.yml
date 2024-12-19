@@ -1,4 +1,4 @@
-url: ~
+url: https://fberding.github.io/aifeducation/
 template:
   bootstrap: 5
 
@@ -12,49 +12,97 @@ navbar:
       menu:
       - text: "01 Get started"
         href: "articles/aifeducation.html"
-      - text: "02a Aifeducation Studio"
+      - text: "02 Aifeducation Studio"
         href: "articles/gui_aife_studio.html"
-      - text: "02b Classification tasks"
+      - text: "03 Using the Package without Studio"
         href: "articles/classification_tasks.html"
-      - text: "03 Sharing and Using Trained AI/Models"
+      - text: "04 Model configuration"
+        href: "articles/model_configuration.html"
+      - text: "05 Sharing and Using Trained AI/Models"
         href: "articles/sharing_and_publishing.html"
+      - text: -------
+      - text: "For developers"
+      - text: "01 Transformers"
+        href: "articles/transformers.html"
+      - text: -------
+      - text: "Appendix"
+      - text: "A01 Supported Machine Learning Frameworks"
+        href: "articles/Appendix_A01_Supported_Frameworks.html"
 
 reference:
 - title: Installation and Configuration
 - contents:
   - has_concept("Installation and Configuration")
+- subtitle: Tensorflow only
+- contents:
+  - has_concept("Installation and Configuration Tensorflow")
 
-- title: Graphical User Interface
+- title: AI for Education Studio
 - contents:
   - has_concept("Graphical User Interface")
+  - has_concept("Auxiliary GUI Functions")
 
 - title: Saving and Loading
 - contents:
   - has_concept("Saving and Loading")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("Saving and Loading Deprecated")
 
-- title: Preparation
+- title: Data Management
 - contents:
-  - has_concept("Preparation")
+  - has_concept("Data Management")
 
-- title: Transformer
+- title: Base Models and Transformers
 - contents:
   - has_concept("Transformer")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("Deprecated transformer")
 
 - title: Text Embedding
 - contents:
   - has_concept("Text Embedding")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("combine_embeddings")
 
 - title: Classification
 - contents:
   - has_concept("Classification")
+#- subtitle: Deprecated
+#- contents:
+#  - has_concept("Classification Deprecated")
 
 - title: Auxiliary Functions
+- subtitle: Data Management
 - contents:
+  - has_concept("data_management_utils")
   - has_concept("Auxiliary Functions")
 
-- title: Auxiliary GUI Functions
+- subtitle: Classification
 - contents:
-  - has_concept("Auxiliary GUI Functions")
+  - has_concept("classifier_utils")
 
+- subtitle: Performance Measures
+- contents:
+  - has_concept("performance measures")
+
+- title: For developers
+- subtitle: Transformers
+- contents:
+  - has_concept("Transformers for developers")
+- subtitle: Large Data Sets
+- contents:
+  - has_concept("LargeDataSets for developers")
+- subtitle: Classifiers
+- contents:
+  - has_concept("Classifiers for developers")
+- subtitle: Utils
+- contents:
+  - has_concept("Utils")
+- subtitle: AI for Education Studio
+- contents:
+  - has_concept("studio_utils")
 
 

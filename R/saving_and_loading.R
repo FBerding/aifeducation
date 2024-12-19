@@ -1,193 +1,150 @@
-#'Loading models created with 'aifeducation'
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
+#' @title Saving objects created with 'aifeducation'
+#' @description Function for saving objects created with 'aifeducation'.
 #'
-#'Function for loading models created with 'aifeducation'.
+#' @param object Object of class [TEClassifierRegular], [TEClassifierProtoNet],  [TEFeatureExtractor],
+#'   [TextEmbeddingModel], [LargeDataSetForTextEmbeddings], [LargeDataSetForText] or [EmbeddedText] which should be
+#'   saved.
+#' @param dir_path `string` Path to the directory where the should model is stored.
+#' @param folder_name `string` Name of the folder where the files should be stored.
+#' @return Function does not return a value. It saves the model to disk.
+#' @return No return value, called for side effects.
 #'
-#'@param model_dir Path to the directory where the model is stored.
-#'@param ml_framework \code{string} Determines the machine learning framework
-#'for using the model. Possible are \code{ml_framework="pytorch"} for 'pytorch',
-#'\code{ml_framework="tensorflow"} for 'tensorflow', and \code{ml_framework="auto"}.
-#'for using the framework used when saving the model.
-#'@return Returns an object of class \link{TextEmbeddingClassifierNeuralNet} or
-#'\link{TextEmbeddingModel}.
+#' @family Saving and Loading
 #'
-#'@family Saving and Loading
-#'
-#'@importFrom utils compareVersion
-#'
-#'@export
-load_ai_model<-function(model_dir,ml_framework=aifeducation_config$get_framework()){
+#' @export
+save_to_disk <- function(object,
+                         dir_path,
+                         folder_name) {
+  # Check class of object
+  check_class(
+    object,
+    c(
+      "TEClassifierRegular",
+      "TEClassifierProtoNet",
+      "TEFeatureExtractor",
+      "TextEmbeddingModel",
+      "LargeDataSetForTextEmbeddings",
+      "LargeDataSetForText",
+      "EmbeddedText"
+    ),
+    FALSE
+  )
+  check_type(dir_path, "string", FALSE)
+  check_type(folder_name, "string", FALSE)
 
-  if((ml_framework %in%c("pytorch","tensorflow","auto","not_specified"))==FALSE){
-    stop("ml_framework must be 'tensorflow', 'pytorch' or 'auto'.")
-  }
+  # Create path to save location
+  save_location <- paste0(dir_path, "/", folder_name)
 
-  if(ml_framework=="not_specified"){
-    stop("The global machine learning framework is not set. Please use
-             aifeducation_config$set_global_ml_backend() directly after loading
-             the library to set the global framework. ")
-  }
+  # Create path to r_interface
+  path_r_config_state <- paste0(save_location, "/", "r_config_state.rda")
 
-  #Load the Interface to R
-  interface_path=paste0(model_dir,"/r_interface.rda")
+  # Check directory
+  create_dir(dir_path, FALSE)
+  create_dir(save_location, FALSE)
 
-  if(file.exists(interface_path)==TRUE){
-    name_interface<-load(interface_path)
+  # Create config and save to disk
+  config_file <- create_config_state(object)
+  save(config_file, file = path_r_config_state)
 
-    loaded_model<-get(x=name_interface)
-
-    if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
-      aifeducation_version<-loaded_model$get_package_versions()[[1]]$aifeducation
-    } else {
-      aifeducation_version<-loaded_model$get_package_versions()$aifeducation
-    }
-
-    #For aifeducation 0.2.0 and lower-----------------------------------------
-    if(utils::compareVersion(as.character(aifeducation_version),"0.2.0")<=0){
-      if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
-        loaded_model$load_model(model_dir)
-      } else if (methods::is(loaded_model,"TextEmbeddingModel")){
-        if(loaded_model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
-          loaded_model$load_model(model_dir)
-        }
-      }
-      return(loaded_model)
-    } else {
-      #For aifeducation 0.2.1 and higher-----------------------------------------
-      if(methods::is(loaded_model,"TextEmbeddingClassifierNeuralNet")){
-        loaded_model$load_model(
-          dir_path=model_dir,
-          ml_framework=ml_framework)
-      } else if (methods::is(loaded_model,"TextEmbeddingModel")){
-        if(loaded_model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
-          loaded_model$load_model(
-            model_dir=model_dir,
-            ml_framework=ml_framework)
-        }
-      }
-      return(loaded_model)
-    }
-  } else {
-    stop("There is no file r_interface.rda in the selected directory")
-  }
+  # Save Python objects and additional files
+  object$save(
+    dir_path = dir_path,
+    folder_name = folder_name
+  )
 }
 
-#'Saving models created with 'aifeducation'
+
+#' @title Loading objects created with 'aifeducation'
+#' @description Function for loading objects created with 'aifeducation'.
 #'
-#'Function for saving models created with 'aifeducation'.
+#' @param dir_path `string` Path to the directory where the model is stored.
+#' @return Returns an object of class [TEClassifierRegular], [TEClassifierProtoNet],  [TEFeatureExtractor],
+#'   [TextEmbeddingModel], [LargeDataSetForTextEmbeddings], [LargeDataSetForText] or [EmbeddedText].
 #'
-#'@param model Object of class \link{TextEmbeddingClassifierNeuralNet} or
-#'\link{TextEmbeddingModel} which should be saved.
-#'@param model_dir Path to the directory where the should model is stored.
-#'@param dir_name Name of the folder that will be created at \code{model_dir}.
-#'If\code{dir_name=NULL} the model's name will be used. If additionally \code{append_ID=TRUE}
-#'the models's name and ID will be used for generating a name for that directory.
-#'@param save_format Only relevant for \link{TextEmbeddingClassifierNeuralNet}.
-#'Format for saving the model. For 'tensorflow'/'keras' models
-#'\code{"keras"} for 'Keras v3 format',
-#'\code{"tf"} for SavedModel
-#'or \code{"h5"} for HDF5.
-#'For 'pytorch' models \code{"safetensors"} for 'safetensors' or
-#'\code{"pt"} for 'pytorch via pickle'.
-#'Use \code{"default"} for the standard format. This is keras for
-#''tensorflow'/'keras' models and safetensors for 'pytorch' models.
-#'@return Function does not return a value. It saves the model to disk.
-#'@param append_ID \code{bool} \code{TRUE} if the ID should be appended to
-#'the model directory for saving purposes. \code{FALSE} if not.
-#'@return No return value, called for side effects.
+#' @family Saving and Loading
 #'
-#'@family Saving and Loading
-#'
-#'@export
-save_ai_model<-function(model,
-                        model_dir,
-                        dir_name=NULL,
-                        save_format="default",
-                        append_ID=TRUE){
-  if(methods::is(model,"TextEmbeddingClassifierNeuralNet") |
-     methods::is(model,"TextEmbeddingModel")){
+#' @export
+load_from_disk <- function(dir_path) {
+  loaded_config <- load_R_config_state(dir_path)
 
-    #Check for valid save formats----------------------------------------------
-    if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
-      if(model$get_ml_framework()=="pytorch"){
-        if(save_format%in%c("default","pt","safetensors")==FALSE){
-          stop("For classifiers based on 'pytorch' only 'pt' and 'safetensors' are
-          valid save formats.")
-        }
-      } else if(model$get_ml_framework()=="tensorflow"){
-        if(save_format%in%c("default","h5","tf","keras")==FALSE){
-          stop("For classifiers based on 'tensorflow' only 'h5', 'tf', and 'keras' are
-          valid save formats.")
-        }
-      }
-    } else if(methods::is(model,"TextEmbeddingModel")){
-      if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
-        if(model$get_ml_framework()=="pytorch"){
-          if(save_format%in%c("default","pt","safetensors")==FALSE){
-            stop("For TextEmbeddingModels based on 'pytorch' only 'pt' and 'safetensors' are
-          valid save formats.")
-          }
-        } else if(model$get_ml_framework()=="tensorflow"){
-          if(save_format%in%c("default","h5","tf","keras")==FALSE){
-            stop("For TextEmbeddingModels based on 'tensorflow' only 'h5' is a
-          valid save format.")
-          }
-        }
-      }
-    }
-
-
-    if(is.null(dir_name)){
-      if(append_ID==TRUE){
-        final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name)
-      } else {
-        final_model_dir_path=paste0(model_dir,"/",model$get_model_info()$model_name_root)
-      }
-    } else {
-      final_model_dir_path=paste0(model_dir,"/",dir_name)
-    }
-
-
-    if(dir.exists(final_model_dir_path)==FALSE){
-      dir.create(final_model_dir_path)
-    }
-
-    #Save R Interface------------------------------
-    save(model,file = paste0(final_model_dir_path,"/r_interface.rda"))
-
-    #Get Package Version
-    if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
-      aifeducation_version<-model$get_package_versions()[[1]]$aifeducation
-    } else {
-      aifeducation_version<-model$get_package_versions()$aifeducation
-    }
-
-    #Save ML-Model---------------------
-    if(utils::compareVersion(as.character(aifeducation_version),"0.3.0")<=0){
-      if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
-        model$save_model(dir_path = final_model_dir_path,
-                         save_format=save_format)
-      } else {
-        #TextEmbeddingModels
-        if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
-          model$save_model(model_dir = final_model_dir_path)
-        }
-      }
-    } else {
-      if(methods::is(model,"TextEmbeddingClassifierNeuralNet")){
-        model$save_model(dir_path = final_model_dir_path,
-                         save_format=save_format)
-      } else {
-        #TextEmbeddingModels
-        if(model$get_model_info()$model_method%in%c("glove_cluster","lda")==FALSE){
-          model$save_model(model_dir = final_model_dir_path,
-                           save_format=save_format)
-        }
-      }
-    }
-
-
+  if (loaded_config$class == "TEClassifierRegular") {
+    model <- TEClassifierRegular$new()
+  } else if (loaded_config$class == "TEClassifierProtoNet") {
+    model <- TEClassifierProtoNet$new()
+  } else if (loaded_config$class == "TEFeatureExtractor") {
+    model <- TEFeatureExtractor$new()
+  } else if (loaded_config$class == "TextEmbeddingModel") {
+    model <- TextEmbeddingModel$new()
+  } else if (loaded_config$class == "LargeDataSetForTextEmbeddings") {
+    model <- LargeDataSetForTextEmbeddings$new()
+  } else if (loaded_config$class == "LargeDataSetForText") {
+    model <- LargeDataSetForText$new()
+  } else if (loaded_config$class == "EmbeddedText") {
+    model <- EmbeddedText$new()
   } else {
-    stop("Function supports only objects of class TextEmbeddingClassifierNeuralNet or
-         TextEmbeddingModel")
+    stop("Class type not supported.")
   }
+
+  # load and update model
+  model$load_from_disk(dir_path = dir_path)
+  return(model)
+}
+
+
+load_R_config_state <- function(dir_path) {
+  # Load the Interface to R
+  interface_path <- paste0(dir_path, "/r_config_state.rda")
+
+  # Check for r_config_state.rda
+  if (file.exists(interface_path) == FALSE) {
+    stop(paste(
+      "There is no file r_config_state.rda in the selected directory",
+      "The directory is:", dir_path
+    ))
+  }
+
+  # Load interface
+  name_interface <- load(interface_path)
+  loaded_object <- get(x = name_interface)
+  return(loaded_object)
+}
+
+#' Create config for R interfaces
+#'
+#' Function creates a config that can be saved to disk. It is used during loading
+#' an object from disk in order to set the correct configuration.
+#'
+#' @param object Object of class `"TEClassifierRegular"`, `"TEClassifierProtoNet"`,
+#' `"TEFeatureExtractor"`, `"TextEmbeddingModel"`, `"LargeDataSetForTextEmbeddings"`,
+#' `"LargeDataSetForText"`, `"EmbeddedText"`.
+#'
+#' @return Returns a `list` that contains the class of the object, the public, and
+#' private fields.
+#'
+#' @family Utils
+#' @keywords internal
+create_config_state <- function(object) {
+  config <- object$get_all_fields()
+  config["class"] <- class(object)[1]
+
+  #Remove embeddings to avoid duplicate data storage
+  if(config["class"]=="EmbeddedText"){
+    config$public$embeddings=NA
+  }
+
+  return(config)
 }

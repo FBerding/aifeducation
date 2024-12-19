@@ -1,0 +1,46 @@
+---
+title: "A01 Supported Machine Learning Frameworks"
+author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A01 Supported Machine Learning Frameworks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Base Models
+
+| Model                    | PyTorch | Tensorflow | Weight Sharing |
+|--------------------------|---------|------------|----------------|
+| BERT                     | Yes     | Yes        | Yes            |
+| RoBERTa                  | Yes     | Yes        | Yes            |
+| DeBERTa                  | Yes     | Yes        | Yes            |
+| Funnel Transformer       | Yes     | Yes        | Yes            |
+| Longformer               | Yes     | Yes        | Yes            |
+| MPNet                    | Yes     | Yes        | No             |
+
+# Feature Extractors
+
+| Model                    | PyTorch | Tensorflow | Weight Sharing |
+|--------------------------|---------|------------|----------------|
+| Dense                    | Yes     | No         | No             |
+| LSTM                     | Yes     | No         | No             |
+| Convolutional            | Yes     | No         | No             |
+
+# Classifiers
+
+| Model                    | PyTorch | Tensorflow | Weight Sharing |
+|--------------------------|---------|------------|----------------|
+| Regular                  | Yes     | partly     | No             |
+| ProtoNet                 | Yes     | No         | No             |
+

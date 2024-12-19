@@ -18,7 +18,9 @@ knitr::opts_chunk$set(
 ```
 
 # 1) Installation and Technical Requirements
+
 ## Introduction
+
 Several packages allow users to use machine learning directly in *R*
 such as [nnet](https://cran.r-project.org/package=nnet) for single layer
 neural nets, [rpart](https://CRAN.R-project.org/package=rpart) for
@@ -32,20 +34,20 @@ These packages can be used with a 'normal' computer and provide an easy
 installation. In terms of natural language processing, these approaches
 are currently limited. State-of-the-art approaches rely on neural nets
 with multiple layers and consist of a huge number of parameters making
-them computationally demanding. With specialized libraries such as keras, PyTorch
-and tensorflow, graphical processing units (gpu) can help to speed up
-computations significantly. However, many of these specialized libraries
-for machine learning are written in python. Fortunately, an interface to
-python is provided via the *R* package
+them computationally demanding. With specialized libraries such as
+*keras*, *PyTorch* and *tensorflow*, graphical processing units (gpu)
+can help to speed up computations significantly. However, many of these
+specialized libraries for machine learning are written in python.
+Fortunately, an interface to python is provided via the *R* package
 [reticulate](https://cran.r-project.org/package=reticulate).
 
 The R package *Artificial Intelligence for Education (aifeducation)*
 aims to provide educators, educational researchers, and social
-researchers a convincing interface to these state-of-the-art models for
-natural language processing and tries to address the special needs and
-challenges of the educational and social sciences. The package currently
-supports the application of Artificial Intelligence (AI) for tasks such
-as text embedding, classification, and question answering.
+researchers with a convincing interface to these state-of-the-art models
+for natural language processing and tries to address the special needs
+and challenges of the educational and social sciences. The package
+currently supports the application of Artificial Intelligence (AI) for
+tasks such as text embedding and classification.
 
 Since state-of-the-art approaches in natural language processing rely on
 large models compared to classical statistical methods (e.g., latent
@@ -54,300 +56,114 @@ python, some additional installation steps are necessary.
 
 If you would like to train and to develop your own models and AIs, a
 compatible graphic device is necessary. Even a low performing graphic
-device can speed up computations significantly. If you prefer using
-pre-trained models however, this is **not** necessary. In this case a
+device can speed up computations significantly. If you prefer to use
+pre-trained models however, this is **not** necessary. In this case, a
 'normal' office computer without a graphic device should be sufficient
-in most cases.
+in most cases. To get ready for using the package, two steps are
+necessary.
 
-## Step 1 - Install the R Package
+## Step 1 - Install the R package
 
-In order to use the package, you first need to install it. This can be
-done by:
+First you need to install the package. This can be done by:
 
 ```{r, include = TRUE, eval=FALSE}
 install.packages("aifeducation")
 ```
 
-With this command, all necessary *R* packages are installed on your
-machine. 
+With this command, `aifeducation` is installed on your machine.
 
-## Step 2 - Install Python
+## Step 2 - Install Python and optional R packages
 
-Since natural language processing with neural nets is based on
-models which are computationally intensive, *keras*, *PyTorch*, and *tensorflow* are
-used within this package together with some other specialized python
-libraries. To install them, you need to install python on your machine
-first. This may take some time.
+Since natural language processing with neural nets is based on models
+which are computationally intensive, *PyTorch* is used within this
+package together with some other specialized python libraries.
+
+The most straightforward method for getting started is to call the
+function `install_aifeducation` as follows:
 
 ```{r, include = TRUE, eval=FALSE}
-reticulate::install_python()
+install_aifeducation(
+  install_aifeducation_studio = TRUE
+)
 ```
 
-You can check if everything is working by using the function
+This function will install python, miniconda, and all relevant python
+libraries into a conda environment called "aifeducation".
+
+In addition, we recommend to set `install_aifeducation_studio=TRUE`
+since this will install the optional *R* packages necessary to use *AI
+for Education - Studio*. *AI for Education - Studio* is a graphical user
+interface for applying these packages. We recommend to use it for
+everyone who is unfamiliar with *R* or machine learning. If you do not
+want use the studio, you can set the argument to `FALSE`. In this case
+you have to use the package with *R* syntax.
+
+If you have a suitable machine and would like to use a graphic card for
+computations you need to install some further software. You can find
+further information here: <https://pytorch.org/get-started/locally/>
+
+You can check if python is working by using the function
 `reticulate::py_available()`. This should return `TRUE`.
 
 ```{r, include = TRUE, eval=FALSE}
 reticulate::py_available(initialize = TRUE)
 ```
 
-## Step 3 - Install Miniconda
-
-The next step is to install miniconda since *aifeducation* uses conda 
-environments for managing the different modules.
-```{r, include = TRUE, eval=FALSE}
-reticulate::install_miniconda()
-```
-
-## Step 4 - Install Support for Graphic Devices
-
-PyTorch and tensorflow as underlying machine learning backend run on MacOS,
-Linux, and Windows. However, there are some limitations for accelerate
-computations with graphic cards. The following table provides an overview.
-
-*Table: Possible gpu acceleration by operating system*
-
-|Operating System|PyTorch|tensorflow|
-|----------------|-------|----------|
-|MacOS           |No     |No        |
-|Linux           |Yes    |Yes       |
-|Windows         |Yes    |<= version 2.10|
-|Windows with WSL|Yes    |Yes       |
-
-If you have a suitable machine and would like to use a graphic card for computations you need to install
-some further software. If not you can skip this step. A list with links to downloads can be found here if you would
-like to use tensorflow as machine learning framework:
-https://www.tensorflow.org/install/pip#linux
-
-If you would like to use PyTorch as framework you can find further
-information here: https://pytorch.org/get-started/locally/
-
-In general you need
-
-- NVIDIA GPU Drivers
-- CUDA Toolkit
-- cuDNN SDK
-
-Except the gpu drivers all components will be installed in step 5 automatically.
-
-If you would like to use Windows with WSL (Windows Subsystem for Linux) installing
-gpu acceleration is a more complex topic. In this case please refer to the specific
-Windows or Ubuntu documentations.
-
-## Step 5 - Install Specialized Python Libraries
-
-If everything is working, you can now install the remaining python
-libraries. For convenience, *aifeducation* comes with an auxiliary
-function `install_py_modules()` doing that for you.
+You can check if all necessary python packages are successfully
+installed by calling the function `check_aif_py_modules`
 
 ```{r, include = TRUE, eval=FALSE}
-#For Linux
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=FALSE,
-                                 tf_version="<=2.15",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=FALSE)
-
-#For Windows and MacOS
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=FALSE,
-                                 tf_version="<=2.15",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
-
+aifeducation::check_aif_py_modules()
 ```
 
-> With `install="all"` you can decide which machine learning framework should be
-installed. Use `install="all"` to request the installation of both 'PyTorch' and
-'tensorflow'. If you would like to install only 'PyTorch' or 'tensorflow' set
-`install="pytorch"` or `install="tenorflow"`. For *aifeducation* a version of 
-tensorflow between 2.13 and 2.15 is necessary.
+Now everything is ready to use the package.
 
-It is very important that you call this function *before* loading the package
-the first time. If you load the library without installing the necessary modules
-an error may occur.
+# 2) Starting a new session
 
-This function installs the following python modules:
+The most convenient way to work with the package is to use *AI for
+Education - Studio* which you can start by calling
+`aifeducation::start_aifeducation_studio()`.
 
-**both frameworks:**
--   transformers,
--   tokenizers,
--   datasets,
--   codecarbon
-
-**Pytorch**
--   torch,
--   torcheval,
--   safetensors,
--   accelerate
--   pandas
-
-**Tensorflow**
--   keras,
--   tensorflow
-
-and its dependencies in the environment "aifeducation". 
-    
-If you would like to use *aifeducation* with other packages or within
-other environments, please ensure that these python modules are
-available. For gpu support some further packages are installed.
-
-With `check_aif_py_modules()` you can check, if all modules are
-successfully installed or a specific machine learning framework.
-
-```{r, include = TRUE, eval=FALSE}
-aifeducation::check_aif_py_modules(print=TRUE,
-                                   check="pytorch")
-
-aifeducation::check_aif_py_modules(print=TRUE,
-                                   check="tensorflow")
-```
-
-Now everything is ready to use the package. 
-
-> **Important note:** When you start a new *R* session, please note that you have to call
-`reticulate::use_condaenv(condaenv = "aifeducation")` **before** loading the library
-to make the python modules available for work.
-
-# 2) Configuration of Tensorflow
-
-In general, educators and educational researchers neither have access to
-high performance computing nor do they own computers with a performing
-graphic device for their work. Thus, some additional configuration can
-be done to get computations working on your machine.
-
-If you do use a computer that does own a graphic device, but you would like to use cpu only
-you can disable the graphic device support of tensorflow with the function
-`set_config_cpu_only()`.
-
-```{r, include = TRUE, eval=FALSE}
-aifeducation::set_config_cpu_only()
-```
-
-Now your machine only uses cpus only for computations.
-
-If your machine has a graphic card but with limited memory, it is
-recommended to change the configuration of the memory usage with
-`set_config_gpu_low_memory()`
-
-```{r, include = TRUE, eval=FALSE}
-aifeducation::set_config_gpu_low_memory()
-```
-
-This enables your machine to compute 'large' models with limited
-resources. For 'small' models, this option is not relevant since it
-decreases the computational speed.
-
-Finally, in some cases you might want to disable tensorflow to print
-information on the console. You can change the behavior with the
-function `set_config_tf_logger()`. 
-
-```{r, include = TRUE, eval=FALSE}
-aifeducation::set_config_tf_logger()
-```
-
-You can choose between five levels
-"FATAL", "ERROR", "WARN", "INFO", and "DEBUG", setting the minimal level
-for logging.
-
-# 3 Starting a New Session
-Before you can work with *aifeducation* you must set up a new *R*
-session. First, it is necessary that you load the library. Second, you
-must set up python via reticulate. In case you installed python as
-suggested in this vignette you may start a new session like this:
+In case you do not want to use the graphical user interface, you have to
+prepare your *R* sessions. First, it is necessary that you set up python
+via 'reticulate' and choose the conda environment where all necessary
+python libraries are available. Then you can load `aifeducation`. In
+case you installed python as suggested in this vignette, you may start a
+new session like this:
 
 ```{r, include = TRUE, eval=FALSE}
 reticulate::use_condaenv(condaenv = "aifeducation")
 library(aifeducation)
-set_transformers_logger("ERROR")
 ```
 
-Next you have to choose the machine learning framework you would like to use.
-You can set the framework for the complete session with
+> **Note:** Please remember: Every time you start a new session in *R,*
+> you have to to set the correct conda environment and load the library
+> `aifeducation`. This is not necessary if you use *AI for Education -
+> Studio*.
+
+# 3) Tutorials and Guides
+
+A guide on how to use the graphical user interface can be found in
+vignette [02 Using the graphical user interface Aifeducation -
+Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
+
+A short introduction into the package with examples for classification
+tasks can be found in vignette [03 Using R
+syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+
+Documenting and sharing your work is described in vignette [04 Sharing
+and using trained AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html).
+
+# 4) Update *aifeducation*
+
+In case you already use *aifeducation* and you want to update to a newer
+version of this package, it is recommended to update the used python
+libraries as well. The easiest way is to remove the conda environment
+"aifeducation" and to install the libraries into a fresh environment.
+This can be done by setting `remove_first=TRUE` in `install_py_modules`.
 
 ```{r, include = TRUE, eval=FALSE}
-#For tensorflow
-aifeducation_config$set_global_ml_backend("tensorflow")
-
-#For PyTorch
-aifeducation_config$set_global_ml_backend("pytorch")
+aifeducation::install_py_modules(
+  remove_first = TRUE
+)
 ```
-
-You can change the framework at anytime during a session by calling this method
-again or by passing the framework to the `ml_framework` argument of a function
-or method. Please note that not all models are available for both frameworks and 
-that the weights of trained models cannot be shared across frameworks for all models.
-
-In the case that you would like to use tensorflow now is a good time to 
-configure that backend, since some configurations
-can only be done **before** tensorflow is used the first time.
-
-```{r, include = TRUE, eval=FALSE}
-#if you would like to use only cpus
-set_config_cpu_only()
-
-#if you have a graphic device with low memory
-set_config_gpu_low_memory()
-
-#if you would like to reduce the tensorflow output to errors
-set_config_os_environ_logger(level = "ERROR")
-```
-
-> **Note:** Please remember: Every time you start a new session in *R* you have to
-to set the correct conda environment, to load the library *aifeducation*, and
-to chose your machine learning framework.
-
-# 4) Tutorials and Guides
-A guide how to use the graphical user interface can be found in vignette
-  [02a classification tasks](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html). 
-
-A short introduction into the
-package with examples for classification tasks can be found in vignette
-[02b classification tasks](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
-
-Documenting and sharing your work is described in vignette
-[03 sharing and using trained AI/models](sharing_and_publishing.html)
-
-# 5) Update *aifeducation*
-
-In the case you already use *aifeducation* and you want to update to a newer version
-of this package it is recommended to update the used python libraries. The
-easiest way is to remove the conda environment "aifeducation" and to install the
-libraries into a fresh environment. This can be done by setting `remove_first=TRUE`
-in `install_py_modules`.
-
-```{r, include = TRUE, eval=FALSE}
-#For Linux
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.14",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=FALSE)
-
-#For Windows with gpu support
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.10",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=FALSE)
-#For Windows without gpu support
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.14",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
-
-#For MacOS
-aifeducation::install_py_modules(envname="aifeducation",
-                                 install="all",
-                                 remove_first=TRUE,
-                                 tf_version="<=2.14",
-                                 pytorch_cuda_version = "12.1"
-                                 cpu_only=TRUE)
-```
-
-

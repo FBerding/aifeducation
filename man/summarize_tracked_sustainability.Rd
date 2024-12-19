@@ -7,34 +7,19 @@
 summarize_tracked_sustainability(sustainability_tracker)
 }
 \arguments{
-\item{sustainability_tracker}{Object of class \code{codecarbon.emissions_tracker.OfflineEmissionsTracker}
-of the python library codecarbon.}
+\item{sustainability_tracker}{Object of class \code{codecarbon.emissions_tracker.OfflineEmissionsTracker} of the python
+library codecarbon.}
 }
 \value{
 Returns a \code{list} which contains the tracked sustainability data.
 }
 \description{
-Function for summarizing the tracked sustainability data with a tracker
-of the python library 'codecarbon'.
+Function for summarizing the tracked sustainability data with a tracker of the python library
+'codecarbon'.
 }
 \seealso{
 Other Auxiliary Functions: 
-\code{\link{array_to_matrix}()},
-\code{\link{calc_standard_classification_measures}()},
-\code{\link{check_embedding_models}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_iota2_mean_object}()},
-\code{\link{create_synthetic_units}()},
-\code{\link{generate_id}()},
-\code{\link{get_coder_metrics}()},
-\code{\link{get_folds}()},
-\code{\link{get_n_chunks}()},
-\code{\link{get_stratified_train_test_split}()},
-\code{\link{get_synthetic_cases}()},
-\code{\link{get_train_test_split}()},
-\code{\link{is.null_or_na}()},
 \code{\link{matrix_to_array_c}()},
-\code{\link{split_labeled_unlabeled}()},
 \code{\link{to_categorical_c}()}
 }
 \concept{Auxiliary Functions}

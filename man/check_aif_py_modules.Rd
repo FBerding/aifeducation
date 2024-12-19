@@ -4,36 +4,31 @@
 \alias{check_aif_py_modules}
 \title{Check if all necessary python modules are available}
 \usage{
-check_aif_py_modules(trace = TRUE, check = "all")
+check_aif_py_modules(trace = TRUE, check = "pytorch")
 }
 \arguments{
-\item{trace}{\code{bool} \code{TRUE} if a list with all modules and their
-availability should be printed to the console.}
+\item{trace}{\code{bool} \code{TRUE} if a list with all modules and their availability should be printed to the console.}
 
 \item{check}{\code{string} determining the machine learning framework to check for.
-\code{check="pytorch"} for 'pytorch', \code{check="tensorflow"} for 'tensorflow',
-and \code{check="all"} for both frameworks.}
+\itemize{
+\item \code{check = "pytorch"}: for 'pytorch'.
+\item \code{check = "tensorflow"}: for 'tensorflow'.
+\item \code{check = "all"}: for both frameworks.
+}}
 }
 \value{
-The function prints a table with all relevant packages and shows
-which modules are available or unavailable.
+The function prints a table with all relevant packages and shows which modules are available or unavailable.
 
-If all relevant modules are available, the functions returns \code{TRUE}.
-In all other cases it returns \code{FALSE}
+If all relevant modules are available, the functions returns \code{TRUE}. In all other cases it returns \code{FALSE}
 }
 \description{
-This function checks if all  python modules necessary for the package
-aifeducation to work are available.
+This function checks if all  python modules necessary for the package aifeducation to work are
+available.
 }
 \seealso{
 Other Installation and Configuration: 
-\code{\link{AifeducationConfiguration}},
-\code{\link{aifeducation_config}},
+\code{\link{install_aifeducation}()},
 \code{\link{install_py_modules}()},
-\code{\link{set_config_cpu_only}()},
-\code{\link{set_config_gpu_low_memory}()},
-\code{\link{set_config_os_environ_logger}()},
-\code{\link{set_config_tf_logger}()},
 \code{\link{set_transformers_logger}()}
 }
 \concept{Installation and Configuration}

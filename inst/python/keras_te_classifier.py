@@ -1,5 +1,23 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 import tensorflow as tf
 import keras
+
+def extract_sample_weight(inputs, labels):
+    weight = inputs.pop("sample_weights")
+    return inputs, labels, weight
 
 @keras.saving.register_keras_serializable(package="aifeducation")
 class TransformerEncoder(keras.layers.Layer):

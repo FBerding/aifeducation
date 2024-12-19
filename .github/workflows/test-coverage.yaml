@@ -1,0 +1,197 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: test-coverage.yaml
+
+permissions: read-all
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr, any::xml2
+          needs: coverage
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: r-reticulate
+          auto-update-conda: true
+          python-version: 3.11
+          channels: conda-forge
+          allow-softlinks: true
+          channel-priority: flexible
+          show-channel-urls: true
+          use-only-tar-bz2: true
+
+      - name: setup r-reticulate conda
+        shell: Rscript {0}
+        run: |
+
+         library(reticulate)
+
+         envname<-"r-reticulate"
+
+         transformer_version = "<=4.46"
+         tokenizers_version = "<=0.20.4"
+         pandas_version = "<=2.2.3"
+         datasets_version = "<=3.1.0"
+         codecarbon_version = "<=2.8.0"
+         safetensors_version = "<=0.4.5"
+         torcheval_version = "<=0.0.7"
+         accelerate_version = "<=1.1.1"
+         pytorch_cuda_version = "12.1"
+
+          relevant_modules <- c(
+            paste0("transformers", transformer_version),
+            paste0("tokenizers", tokenizers_version),
+            paste0("pandas", pandas_version),
+            paste0("datasets", datasets_version),
+            paste0("codecarbon", codecarbon_version)
+          )
+          relevant_modules_pt <- c(
+            paste0("safetensors", safetensors_version),
+            paste0("torcheval", torcheval_version),
+            paste0("accelerate", accelerate_version)
+          )
+
+
+          reticulate::conda_install(
+            packages = c(
+              "pytorch"#,
+              #paste0("pytorch-cuda", "=", pytorch_cuda_version)
+            ),
+            envname = envname,
+            channel = c("pytorch", "nvidia"),
+            conda = "auto",
+            pip = FALSE
+          )
+          reticulate::conda_install(
+            packages = c(relevant_modules, relevant_modules_pt),
+            envname = envname,
+            conda = "auto",
+            pip = TRUE
+          )
+
+          path_to_python <- conda_python("r-reticulate")
+
+          writeLines(sprintf("RETICULATE_PYTHON=%s", path_to_python),
+                     Sys.getenv("GITHUB_ENV"))
+
+      - name: Test coverage
+        run: |
+          gui_functions<-c(
+            "start_aifeducation_studio",
+            "Studio_Home_UI",
+            "DataManagement_DataSetEditorUI",
+            "DataManagement_RawTextsUI",
+            "DataManagement_TableEditorUI",
+            "TextEmbeddingModel_Use_UI",
+            "TextEmbeddingModel_Create_UI",
+            "DocumentPage_UI",
+            "FeatureExtractors_Use_UI",
+            "FeatureExtractors_Create_UI",
+            "Classifiers_Use_UI",
+            "Classifiers_Create_UI",
+            "License_UI",
+            "DataManagement_RawTextsServer",
+            "DataManagement_DataSetEditorServer",
+            "DataManagement_TableEditorServer",
+            "TextEmbeddingModel_Create_Server",
+            "TextEmbeddingModel_Use_Server",
+            "DocumentPage_Server",
+            "FeatureExtractor_Create_Server",
+            "FeatureExtractors_Use_Server",
+            "DocumentPage_Server",
+            "Classifiers_Create_Server",
+            "Classifiers_Use_Server",
+            "License_Server",
+            "ModelArchitecture_UI",
+            "ModelArchitecture_Server",
+            "BaseModel_Create_UI",
+            "BaseModel_Create_Server",
+            "BaseModel_UI",
+            "BaseModel_Server",
+            "Dataset_UI",
+            "Dataset_Server",
+            "TrainTuneSettings_UI",
+            "TrainTuneSettings_Server",
+            "BaseModel_Train_UI",
+            "BaseModel_Train_Server",
+            "display_errors",
+            "display_processing",
+            "check_errors_create_classifier",
+            "check_errors_create_dataset_raw_texts",
+            "check_errors_create_feature_extractor",
+            "check_errors_predict_classifier",
+            "check_errors_text_embedding_model_embed",
+            "check_errors_text_embedding_model_create",
+            "long_add_texts_to_dataset",
+            "long_transform_text_to_embeddings",
+            "long_classifier",
+            "get_arguments_extended_task_TEClassifierRegular",
+            "long_feature_extractor",
+            "long_create_transformer",
+            "create_process_modal",
+            "start_and_monitor_long_task",
+            "create_save_modal",
+            "Classifier_Prediction_UI",
+            "Classifier_Prediction_Server",
+            "Description_UI",
+            "Embed_UI",
+            "Embed_Server",
+            "Fill_Mask_UI",
+            "Fill_Mask_Server",
+            "Reliability_UI",
+            "Reliability_Server",
+            "Tokenize_Encode_Decode_UI",
+            "Tokenize_Encode_Decode_Server",
+            "Training_UI",
+            "Training_Server"
+          )
+
+          cov <- covr::package_coverage(
+            quiet = FALSE,
+            clean = FALSE,
+            function_exclusions = gui_functions,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+          )
+          covr::to_cobertura(cov)
+        shell: Rscript {0}
+
+      - uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
+          file: ./cobertura.xml
+          plugin: noop
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          find '${{ runner.temp }}/package' -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures
+          path: ${{ runner.temp }}/package
