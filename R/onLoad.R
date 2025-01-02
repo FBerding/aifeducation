@@ -34,7 +34,7 @@ pyarrow <- NULL
 
 #Message on load of the package
 packageStartupMessage(
-  "This is version 1.0.0 of aifeducation. Please note that the package's primary
+  "This is version 1.0.1 of aifeducation. Please note that the package's primary
   machine learning framework is now pytorch. Due to changing the framework we had
   to make some breaking changes for models generated with version 0.3.3 or lower.
   If you need to use these models please use an older version of this package which
