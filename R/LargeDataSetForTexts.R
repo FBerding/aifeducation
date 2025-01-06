@@ -460,11 +460,8 @@ LargeDataSetForText <- R6::R6Class(
         url_source_path <- paste0(
           dirname(path), "/url_source.txt"
         )
-        if (path != bib_entry_path &
-          path != licence_path &
-          path != license_text_path &
-          path != url_licence_path &
-          path != url_source_path) {
+        path_list <- c(bib_entry_path, licence_path, license_text_path, url_licence_path, url_source_path)
+        if (path %in% path_list == FALSE) {
           new_paths[i] <- path
         }
       }

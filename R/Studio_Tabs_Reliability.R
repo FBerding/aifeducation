@@ -154,8 +154,8 @@ Reliability_Server <- function(id, model) {
               ),
               shiny::plotOutput(outputId = ns("coding_spectral_plot")),
               shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
-                                          The categorical sizes are based on the relative frequencies of the training data.
-                                          These sizes are not identical with the sizes of field samples.")
+                            The categorical sizes are based on the relative frequencies of the training data.
+                            These sizes are not identical with the sizes of field samples.")
             )
           )
         ),
@@ -174,7 +174,8 @@ Reliability_Server <- function(id, model) {
                     rownames = TRUE,
                     colnames = FALSE
                   ),
-                  shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
+                  shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted
+                                Assignment-Error-Matrix.")
                 )
               ),
               bslib::card(
@@ -183,16 +184,29 @@ Reliability_Server <- function(id, model) {
                 ),
                 bslib::card_body(
                   shiny::tags$p(shiny::tags$b("Assignment-Error-Matrix")),
-                  shiny::renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
+                  shiny::renderTable(
+                    classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
                     rownames = TRUE,
                     colnames = TRUE
                   ),
                   shiny::tags$p(shiny::tags$b("Iota")),
-                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
+                  shiny::renderTable(
+                    t(as.matrix(
+                      classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota
+                    ))
+                  ),
                   shiny::tags$p(shiny::tags$b("Alpha Reliability")),
-                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability))),
+                  shiny::renderTable(
+                    t(as.matrix(
+                      classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability
+                    ))
+                  ),
                   shiny::tags$p(shiny::tags$b("Beta Reliability")),
-                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
+                  shiny::renderTable(
+                    t(as.matrix(
+                      classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability
+                    ))
+                  ),
                   shiny::tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
                 )
               ),
@@ -208,6 +222,8 @@ Reliability_Server <- function(id, model) {
           )
         )
       )
+
+      return(ui)
     })
 
     # Render Plots-------------------------------------------------------------

@@ -77,7 +77,6 @@ Embed_UI <- function(id) {
 Embed_Server <- function(id, model, model_path, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # ns <- session$ns
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # file system---------------------------------------------------------------

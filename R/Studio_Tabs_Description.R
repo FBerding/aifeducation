@@ -64,9 +64,6 @@ Description_UI <- function(id) {
 #'
 Description_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # ns <- session$ns
-
     # Bibliographic Description------------------------------------------------
     output$bibliographic <- shiny::renderUI({
       shiny::req(model())

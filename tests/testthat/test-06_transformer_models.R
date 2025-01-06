@@ -732,9 +732,9 @@ for (framework in ml_frameworks) {
         recursive = TRUE
       )
     }
-    # if(dir.exists(tmp_ai_train)){
+    # if (dir.exists(tmp_ai_train)) {
     #  unlink(
-    #    x=tmp_ai_create,
+    #    x = tmp_ai_create,
     #    recursive = TRUE
     #  )
     # }

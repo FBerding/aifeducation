@@ -7,9 +7,20 @@ test_that("Krippendorff's Alpha", {
     levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"),
     c("Buch", "Brief", "Telefon", "Telefon", "Brief", "Buch", "Computer", "Buch", "Brief", NA, NA, NA)
   )
-  r_2 <- factor(levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"), c("Buch", "Brief", "Telefon", "Telefon", "Brief", "Brief", "Computer", "Buch", "Brief", "Ordner", NA, NA))
-  r_3 <- factor(levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"), c(NA, "Telefon", "Telefon", "Telefon", "Brief", "Telefon", "Computer", "Brief", "Brief", "Ordner", "Buch", "Telefon"))
-  r_4 <- factor(levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"), c("Buch", "Brief", "Telefon", "Telefon", "Brief", "Computer", "Computer", "Buch", "Brief", "Ordner", "Buch", NA))
+  r_2 <- factor(
+    levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"),
+    c("Buch", "Brief", "Telefon", "Telefon", "Brief", "Brief", "Computer", "Buch", "Brief", "Ordner", NA, NA)
+  )
+  r_3 <- factor(
+    levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"),
+    c(
+      NA, "Telefon", "Telefon", "Telefon", "Brief", "Telefon", "Computer", "Brief", "Brief", "Ordner", "Buch", "Telefon"
+    )
+  )
+  r_4 <- factor(
+    levels = c("Buch", "Brief", "Telefon", "Computer", "Ordner"),
+    c("Buch", "Brief", "Telefon", "Telefon", "Brief", "Computer", "Computer", "Buch", "Brief", "Ordner", "Buch", NA)
+  )
 
   results <- kripp_alpha(rater_one = r_1, rater_two = r_2, additional_raters = list(r_3, r_4))
 
@@ -125,7 +136,7 @@ test_that("Fleiss Kappa", {
   )
   raters <- matrix(data = 0, nrow = 30, ncol = 6)
 
-  for (i in 1:nrow(freq_table)) {
+  for (i in seq_len(nrow(freq_table))) {
     index <- 0
     for (k in 1:5) {
       tmp_value <- freq_table[i, k]
@@ -217,6 +228,6 @@ test_that("Kendall's w", {
   #----
   results <- NULL
   results <- kendalls_w(rater_one = r_1, rater_two = r_1)
-  # expect_equal(results$kendall_w,1,tolerance = 1e-3)
+  # expect_equal(results$kendall_w, 1, tolerance = 1e-3)
   expect_equal(results$kendall_w_corrected, 1, tolerance = 1e-3)
 })

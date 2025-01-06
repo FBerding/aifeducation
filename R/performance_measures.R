@@ -106,7 +106,9 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Check levels
   for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) != max(length(levels(raters[[1]])), length(levels(raters[[i]])))) {
+    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
+        max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+    ) {
       stop("Levels for values are not identical.")
     }
   }
@@ -118,7 +120,7 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   M <- length(raters)
 
   raw_table <- matrix(data = 0, nrow = N, ncol = length(raters))
-  for (i in 1:length(raters)) {
+  for (i in seq_len(length(raters))) {
     raw_table[, i] <- as.numeric(raters[[i]])
   }
 
@@ -154,7 +156,6 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   )
 }
 
-
 #' @title Calculate Krippendorff's Alpha
 #' @description This function calculates different Krippendorff's Alpha for nominal and ordinal variables.
 #' @param rater_one `factor` rating of the first coder.
@@ -180,7 +181,9 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Check levels
   for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) != max(length(levels(raters[[1]])), length(levels(raters[[i]])))) {
+    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
+        max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+    ) {
       stop("Levels for values are not identical.")
     }
   }
@@ -190,7 +193,7 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   # create canonical form
   # raters in rows, cases in columns
   canonical_form <- matrix(data = 0, nrow = length(raters), ncol = N)
-  for (i in 1:length(raters)) {
+  for (i in seq_len(length(raters))) {
     canonical_form[i, ] <- as.numeric(raters[[i]])
   }
   canonical_form <- replace(x = canonical_form, list = is.na(canonical_form), values = 0)
@@ -198,7 +201,10 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   # create value unit matrix
   value_unit_matrix <- matrix(data = 0, nrow = length(levels(rater_one)), ncol = N)
   for (i in seq_len(ncol(canonical_form))) {
-    value_unit_matrix[, i] <- as.vector(table(factor(canonical_form[, i], levels = seq(from = 1, to = length(levels(rater_one))))))
+    value_unit_matrix[, i] <- as.vector(table(factor(
+      canonical_form[, i],
+      levels = seq(from = 1, to = length(levels(rater_one)))
+    )))
   }
 
   # Create matrix of observed coincidences
@@ -264,8 +270,10 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   }
 
   # final values
-  alpha_nominal <- 1 - sum(obs_coincidence_matrix * nominal_metric_matrix) / sum(exp_coincidence_matrix * nominal_metric_matrix)
-  alpha_ordinal <- 1 - sum(obs_coincidence_matrix * ordinal_metric_matrix) / sum(exp_coincidence_matrix * ordinal_metric_matrix)
+  alpha_nominal <- 1 - sum(obs_coincidence_matrix * nominal_metric_matrix) /
+    sum(exp_coincidence_matrix * nominal_metric_matrix)
+  alpha_ordinal <- 1 - sum(obs_coincidence_matrix * ordinal_metric_matrix) /
+    sum(exp_coincidence_matrix * ordinal_metric_matrix)
 
   return(
     list(
@@ -299,7 +307,9 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Check levels
   for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) != max(length(levels(raters[[1]])), length(levels(raters[[i]])))) {
+    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
+        max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+    ) {
       stop("Levels for values are not identical.")
     }
   }
@@ -311,7 +321,7 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
   # Create raw matrix
   # cases in the rows and categories in the column
   raw_matrix <- matrix(data = 0, nrow = N, ncol = k)
-  for (i in 1:length(raters)) {
+  for (i in seq_len(length(raters))) {
     raw_matrix <- raw_matrix + to_categorical_c(
       class_vector = (as.numeric(raters[[i]]) - 1),
       n_classes = k

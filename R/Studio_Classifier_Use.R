@@ -75,7 +75,6 @@ Classifiers_Use_UI <- function(id) {
 Classifiers_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # ns <- session$ns
 
     # File system management----------------------------------------------------
     shinyFiles::shinyDirChoose(
@@ -110,8 +109,10 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
         model <- try(load_from_disk(model_path), silent = TRUE)
 
         if ("try-error" %in% class(model) == FALSE) {
-          if ("TEClassifierRegular" %in% class(model) |
-            "TEClassifierProtoNet" %in% class(model)) {
+          if (
+            "TEClassifierRegular" %in% class(model) |
+              "TEClassifierProtoNet" %in% class(model)
+          ) {
             shiny::removeModal()
             return(model)
           } else {

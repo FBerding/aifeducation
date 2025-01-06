@@ -14,13 +14,12 @@
 
 
 #' @title Write log
-#' @description Function for writing a log file from R containing three rows
-#' and three columns. The log file can report the current status of maximal
-#' three processes. The first row describes the top process. The second row describes
-#' the status of the process within the top process. The third row can be used
-#' to describe the status of a process within the middle process.
+#' @description Function for writing a log file from R containing three rows and three columns. The log file can report
+#'   the current status of maximal three processes. The first row describes the top process. The second row describes
+#'   the status of the process within the top process. The third row can be used to describe the status of a process
+#'   within the middle process.
 #'
-#' The log can be read with [read_log].
+#'   The log can be read with [read_log].
 #'
 #' @param log_file `string` Path to the file where the log should be saved and updated.
 #' @param value_top `double` Current value for the top process.
@@ -35,11 +34,12 @@
 #' @param last_log `POSIXct` Time when the last log was created. If there is no log file set this value to `NULL`.
 #' @param write_interval `int` Time in seconds. This time must be past before a new log is created.
 #'
-#' @return This function writes a log file to the given location. If `log_file` is `NULL` the function
-#' will not try to write a log file.
-#' @return If `log_file` is a valid path to a file the function will write a log if the time specified by `write_interval` has passed.
-#' In addition the function will return an object of class `POSIXct` describing the time when the log file was successfully updated. If the initial attempt
-#' for writing log fails the function returns the value of `last_log` which is `NULL` by default.
+#' @return This function writes a log file to the given location. If `log_file` is `NULL` the function will not try to
+#'   write a log file.
+#' @return If `log_file` is a valid path to a file the function will write a log if the time specified by
+#'   `write_interval` has passed. In addition the function will return an object of class `POSIXct` describing the time
+#'   when the log file was successfully updated. If the initial attempt for writing log fails the function returns the
+#'   value of `last_log` which is `NULL` by default.
 #'
 #' @family log_utils
 #' @keywords internal
@@ -71,9 +71,11 @@ write_log <- function(log_file,
     }
   }
 
-  if (value_top %in% c(1, total_top) ||
-    value_middle %in% c(1, total_middle) ||
-    value_bottom %in% c(1, total_bottom)) {
+  if (
+    value_top %in% c(1, total_top) ||
+      value_middle %in% c(1, total_middle) ||
+      value_bottom %in% c(1, total_bottom)
+  ) {
     # if this is the first or last iteration
     return(try_write_log_data())
   } else {

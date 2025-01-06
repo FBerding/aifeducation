@@ -120,7 +120,9 @@ get_coder_metrics <- function(true_values = NULL,
     metric_values["c_kappa_linear"] <- c_kappa$kappa_linear
     metric_values["c_kappa_squared"] <- c_kappa$kappa_squared
 
-    metric_values["kappa_fleiss"] <- fleiss_kappa(rater_one = true_values, rater_two = predicted_values, additional_raters = NULL)
+    metric_values["kappa_fleiss"] <- fleiss_kappa(
+      rater_one = true_values, rater_two = predicted_values, additional_raters = NULL
+    )
 
     metric_values["percentage_agreement"] <- sum(diag(table(true_values, predicted_values)) / length(true_values))
 
@@ -179,7 +181,7 @@ create_iota2_mean_object <- function(iota2_list,
 
   mean_aem <- mean_aem / n_performance_estimation
   mean_categorical_sizes <- iota2_list[[i]]$information$est_true_cat_sizes
-  # mean_categorical_sizes<-mean_categorical_sizes/n_performance_estimation
+  # mean_categorical_sizes <- mean_categorical_sizes / n_performance_estimation
 
   colnames(mean_aem) <- original_cat_labels
   rownames(mean_aem) <- original_cat_labels
@@ -197,7 +199,6 @@ create_iota2_mean_object <- function(iota2_list,
   Esimtates_Information["convergence"] <- list(NA)
   Esimtates_Information["est_true_cat_sizes"] <- list(mean_categorical_sizes)
   Esimtates_Information["conformity"] <- list(iotarelr::check_conformity_c(aem = mean_aem))
-  # Esimtates_Information["conformity"] <- list(NA)
   Esimtates_Information["boundaries"] <- list(NA)
   Esimtates_Information["p_boundaries"] <- list(NA)
   Esimtates_Information["n_rater"] <- list(1)

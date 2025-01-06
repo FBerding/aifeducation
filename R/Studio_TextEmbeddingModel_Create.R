@@ -207,8 +207,10 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
       if (length(interface_architecture()[[2]]) > 0) {
         max_layer_transformer <- interface_architecture()[[3]]
 
-        if (interface_architecture()[[1]] == "FunnelForMaskedLM" |
-          interface_architecture()[[1]] == "FunnelModel") {
+        if (
+          interface_architecture()[[1]] == "FunnelForMaskedLM" |
+            interface_architecture()[[1]] == "FunnelModel"
+        ) {
           pool_type_choices <- c("cls")
         } else {
           pool_type_choices <- c("average", "cls")
@@ -265,24 +267,34 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
 
     # Save the model to disk----------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       model_architecture <- interface_architecture()[[1]]
-      if (model_architecture == "BertForMaskedLM" |
-        model_architecture == "BertModel") {
+      if (
+        model_architecture == "BertForMaskedLM" |
+          model_architecture == "BertModel"
+      ) {
         method <- "bert"
-      } else if (model_architecture == "FunnelForMaskedLM" |
-        model_architecture == "FunnelModel") {
+      } else if (
+        model_architecture == "FunnelForMaskedLM" |
+          model_architecture == "FunnelModel"
+      ) {
         method <- "funnel"
-      } else if (model_architecture == "LongformerForMaskedLM" |
-        model_architecture == "LongformerModel") {
+      } else if (
+        model_architecture == "LongformerForMaskedLM" |
+          model_architecture == "LongformerModel"
+      ) {
         method <- "longformer"
-      } else if (model_architecture == "RobertaForMaskedLM" |
-        model_architecture == "RobertaModel") {
+      } else if (
+        model_architecture == "RobertaForMaskedLM" |
+          model_architecture == "RobertaModel"
+      ) {
         method <- "roberta"
-      } else if (model_architecture == "DebertaV2ForMaskedLM" |
-        model_architecture == "DebertaV2Model") {
+      } else if (
+        model_architecture == "DebertaV2ForMaskedLM" |
+          model_architecture == "DebertaV2Model"
+      ) {
         method <- "deberta_v2"
       }
 
@@ -340,8 +352,10 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     # Error handling-----------------------------------------------------------
     shiny::observe({
       if (!identical(path_to_base_model(), character(0))) {
-        if (is.null(interface_architecture()[[1]]) &
-          is.null(interface_architecture()[[2]])) {
+        if (
+          is.null(interface_architecture()[[1]]) &
+            is.null(interface_architecture()[[2]])
+        ) {
           display_errors(
             title = "Error",
             size = "l",

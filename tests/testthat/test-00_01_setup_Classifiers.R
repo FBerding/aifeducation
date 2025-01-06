@@ -70,5 +70,5 @@ test_that("Setup Classifier Data", {
   expect_true(
     file.exists(paste0(root_path_results, "/", "feature_extractor_", framework, "/", "model_data.safetensors"))
   )
-  #print("FeatureExtractor for tests generated")
+  # print("FeatureExtractor for tests generated")
 })

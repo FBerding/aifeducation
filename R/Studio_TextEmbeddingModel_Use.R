@@ -78,9 +78,6 @@ TextEmbeddingModel_Use_UI <- function(id) {
 #'
 TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # ns <- session$ns
-
     # File system management----------------------------------------------------
     shinyFiles::shinyDirChoose(
       input = input,

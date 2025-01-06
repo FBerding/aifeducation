@@ -178,8 +178,7 @@ AIFEBaseModel <- R6::R6Class(
       }
 
 
-      if (save_format == "safetensors" &
-        reticulate::py_module_available("safetensors") == FALSE) {
+      if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
         warning("Python library 'safetensors' is not available. Using
                  standard save format for pytorch.")
         save_format <- "pt"
@@ -325,8 +324,10 @@ AIFEBaseModel <- R6::R6Class(
       embedding_model_config <- text_embeddings$get_model_info()
       check <- c("model_name")
 
-      if (!is.null_or_na(embedding_model_config[[check]]) &
-        !is.null_or_na(private$text_embedding_model$model[[check]])) {
+      if (
+        !is.null_or_na(embedding_model_config[[check]]) &
+          !is.null_or_na(private$text_embedding_model$model[[check]])
+      ) {
         if (embedding_model_config[[check]] != private$text_embedding_model$model[[check]]) {
           stop("The TextEmbeddingModel that generated the data_embeddings is not
                the same as the TextEmbeddingModel when generating the classifier.")
@@ -526,15 +527,19 @@ AIFEBaseModel <- R6::R6Class(
     },
     check_embeddings_object_type = function(embeddings, strict = TRUE) {
       if (strict == TRUE) {
-        if (!("EmbeddedText" %in% class(embeddings)) &
-          !("LargeDataSetForTextEmbeddings" %in% class(embeddings))) {
+        if (
+          !("EmbeddedText" %in% class(embeddings)) &
+            !("LargeDataSetForTextEmbeddings" %in% class(embeddings))
+        ) {
           stop("text_embeddings must be of class EmbeddedText or LargeDataSetForTextEmbeddings.")
         }
       } else {
-        if (!("EmbeddedText" %in% class(embeddings)) &
-          !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
-          !("array" %in% class(embeddings)) &
-          !("datasets.arrow_dataset.Dataset" %in% class(embeddings))) {
+        if (
+          !("EmbeddedText" %in% class(embeddings)) &
+            !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
+            !("array" %in% class(embeddings)) &
+            !("datasets.arrow_dataset.Dataset" %in% class(embeddings))
+        ) {
           stop("text_embeddings must be of class EmbeddedText, LargeDataSetForTextEmbeddings,
                datasets.arrow_dataset.Dataset or array.")
         }
@@ -550,8 +555,10 @@ AIFEBaseModel <- R6::R6Class(
     },
     #-------------------------------------------------------------------------
     check_single_prediction = function(embeddings) {
-      if ("EmbeddedText" %in% class(embeddings) |
-        "LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+      if (
+        "EmbeddedText" %in% class(embeddings) |
+          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+      ) {
         if (embeddings$n_rows() > 1) {
           single_prediction <- FALSE
         } else {

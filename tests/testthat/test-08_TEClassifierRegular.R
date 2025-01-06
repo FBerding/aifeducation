@@ -455,11 +455,15 @@ for (framework in ml_frameworks) {
           rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
 
           rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-          rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+          rec_bidirectional <- rec_bidirectiona_list[[
+            sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+          ]]
 
           repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
           attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-          add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+          add_pos_embedding <- pos_embedding_list[[
+            sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+          ]]
 
           # Create directory for saving checkpoint for every training
           train_path <- paste0(root_path_results, "/", "train_", generate_id())
@@ -562,10 +566,14 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
@@ -645,10 +653,14 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
@@ -730,13 +742,17 @@ for (framework in ml_frameworks) {
 
       rec_layers <- rec_list_layers[[sample(x = seq.int(from = 1, to = length(rec_list_layers)), size = 1)]]
       dense_layers <- dense_list_layers[[sample(x = seq.int(from = 1, to = length(dense_list_layers)), size = 1)]]
-      # dense_size=dense_list_size[[sample(x=seq.int(from = 1,to=length(dense_list_size)),size = 1)]]
-      # rec_size=rec_list_size[[sample(x=seq.int(from = 1,to=length(rec_list_size)),size = 1)]]
+      # dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
+      # rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
       rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-      rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-      # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
+      rec_bidirectional <- rec_bidirectiona_list[[
+        sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+      ]]
+      # repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
       attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-      add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+      add_pos_embedding <- pos_embedding_list[[
+        sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+      ]]
 
       classifier_overfitting <- TEClassifierRegular$new()
       classifier_overfitting$configure(
@@ -841,10 +857,14 @@ for (framework in ml_frameworks) {
       dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
       rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
       rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-      rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+      rec_bidirectional <- rec_bidirectiona_list[[
+        sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+      ]]
       repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
       attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-      add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
+      add_pos_embedding <- pos_embedding_list[[
+        sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+      ]]
 
       classifier <- TEClassifierRegular$new()
       classifier$configure(

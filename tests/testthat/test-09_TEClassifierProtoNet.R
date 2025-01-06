@@ -50,7 +50,7 @@ test_embeddings_reduced <- test_embeddings$clone(deep = TRUE)
 test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[1:5, , ]
 test_embeddings_reduced_LD <- test_embeddings_reduced$convert_to_LargeDataSetForTextEmbeddings()
 
-# case=sample(x=seq.int(from = 1,to=nrow(test_embeddings$embeddings)))
+# case <- sample(x = seq.int(from = 1, to = nrow(test_embeddings$embeddings)))
 test_embeddings_single_case <- test_embeddings$clone(deep = TRUE)
 test_embeddings_single_case$embeddings <- test_embeddings_single_case$embeddings[1, , , drop = FALSE]
 test_embeddings_single_case_LD <- test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
@@ -438,12 +438,20 @@ for (framework in ml_frameworks) {
           dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
           rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
           rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-          rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+          rec_bidirectional <- rec_bidirectiona_list[[
+            sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+          ]]
           repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
           attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-          add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-          sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-          sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+          add_pos_embedding <- pos_embedding_list[[
+            sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+          ]]
+          sampling_separate <- sampling_separate_list[[
+            sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+          ]]
+          sampling_shuffle <- sampling_shuffle_list[[
+            sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+          ]]
 
           # Create directory for saving checkpoint for every training
           train_path <- paste0(root_path_results, "/", "train_", generate_id())
@@ -548,12 +556,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -633,12 +649,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -724,12 +748,20 @@ for (framework in ml_frameworks) {
       dense_size <- 10
       rec_size <- 10
       rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-      rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
-      # repeat_encoder=r_encoder_list[[sample(x=seq.int(from = 1,to=length(r_encoder_list)),size = 1)]]
+      rec_bidirectional <- rec_bidirectiona_list[[
+        sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+      ]]
+      # repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
       attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-      add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-      sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-      sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+      add_pos_embedding <- pos_embedding_list[[
+        sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+      ]]
+      sampling_separate <- sampling_separate_list[[
+        sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+      ]]
+      sampling_shuffle <- sampling_shuffle_list[[
+        sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+      ]]
 
       classifier_overfitting <- TEClassifierProtoNet$new()
 
@@ -831,12 +863,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -899,12 +939,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -955,12 +1003,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -1087,12 +1143,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -1158,12 +1222,20 @@ for (framework in ml_frameworks) {
         dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
         rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
         rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-        rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+        rec_bidirectional <- rec_bidirectiona_list[[
+          sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+        ]]
         repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
         attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-        add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-        sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-        sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+        add_pos_embedding <- pos_embedding_list[[
+          sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+        ]]
+        sampling_separate <- sampling_separate_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+        ]]
+        sampling_shuffle <- sampling_shuffle_list[[
+          sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+        ]]
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
@@ -1215,12 +1287,20 @@ for (framework in ml_frameworks) {
       dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
       rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
       rec_type <- rec_type_list[[sample(x = seq.int(from = 1, to = length(rec_type_list)), size = 1)]]
-      rec_bidirectional <- rec_bidirectiona_list[[sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)]]
+      rec_bidirectional <- rec_bidirectiona_list[[
+        sample(x = seq.int(from = 1, to = length(rec_bidirectiona_list)), size = 1)
+      ]]
       repeat_encoder <- r_encoder_list[[sample(x = seq.int(from = 1, to = length(r_encoder_list)), size = 1)]]
       attention_type <- attention_list[[sample(x = seq.int(from = 1, to = length(attention_list)), size = 1)]]
-      add_pos_embedding <- pos_embedding_list[[sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)]]
-      sampling_separate <- sampling_separate_list[[sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)]]
-      sampling_shuffle <- sampling_shuffle_list[[sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)]]
+      add_pos_embedding <- pos_embedding_list[[
+        sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
+      ]]
+      sampling_separate <- sampling_separate_list[[
+        sample(x = seq.int(from = 1, to = length(sampling_separate_list)), size = 1)
+      ]]
+      sampling_shuffle <- sampling_shuffle_list[[
+        sample(x = seq.int(from = 1, to = length(sampling_shuffle_list)), size = 1)
+      ]]
 
       classifier <- TEClassifierProtoNet$new()
       classifier$configure(

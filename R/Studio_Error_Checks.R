@@ -80,8 +80,9 @@ check_errors_create_classifier <- function(classifier_type,
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
-      "EmbeddedText" %in% class(embeddings))) {
+    } else if (
+      !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+    ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
         or 'EmbeddedText'."
@@ -318,8 +319,9 @@ check_errors_create_feature_extractor <- function(destination_path,
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
-      "EmbeddedText" %in% class(embeddings))) {
+    } else if (
+      !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+    ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
         or 'EmbeddedText'."
@@ -384,8 +386,9 @@ check_errors_predict_classifier <- function(embeddings,
   error_list <- NULL
 
   # Embeddings
-  if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
-    "EmbeddedText" %in% class(embeddings))) {
+  if (
+    !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+  ) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
         or 'EmbeddedText'."
@@ -511,8 +514,10 @@ check_errors_text_embedding_model_create <- function(destination_path,
   }
 
   if (!identical(path_to_base_model, character(0))) {
-    if (is.null(interface_architecture[[1]]) &&
-      is.null(interface_architecture[[2]])) {
+    if (
+      is.null(interface_architecture[[1]]) &&
+        is.null(interface_architecture[[2]])
+    ) {
       error_list[length(error_list) + 1] <- "There is no model to load in the directory."
     }
   }

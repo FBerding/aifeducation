@@ -39,9 +39,6 @@ Dataset_UI <- function(id) {
 #'
 Dataset_Server <- function(id, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # Global variables -----------------------------------------------------------
-    # ns <- session$ns
-
     # Control Panel --------------------------------------------------------------
     shinyFiles::shinyDirChoose(
       input = input,

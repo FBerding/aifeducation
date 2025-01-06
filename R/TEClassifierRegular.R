@@ -101,8 +101,9 @@ TEClassifierRegular <- R6::R6Class(
     #' @param rec_type `string` Type of the recurrent layers. `rec_type="gru"` for Gated Recurrent Unit and
     #'   `rec_type="lstm"` for Long Short-Term Memory.
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
-    #' @param attention_type `string` Choose the relevant attention type. Possible values are `fourier` and `multihead`. Please note
-    #' that you may see different values for a case for different input orders if you choose `fourier` on linux.
+    #' @param attention_type `string` Choose the relevant attention type. Possible values are `fourier` and `multihead`.
+    #'   Please note that you may see different values for a case for different input orders if you choose `fourier` on
+    #'   linux.
     #' @param self_attention_heads `int` determining the number of attention heads for a self-attention layer. Only
     #'   relevant if `attention_type="multihead"`
     #' @param repeat_encoder `int` determining how many times the encoder should be added to the network.
@@ -280,12 +281,11 @@ TEClassifierRegular <- R6::R6Class(
     #-------------------------------------------------------------------------
     #' @description Method for training a neural net.
     #'
-    #' Training includes a routine for early stopping. In the case that loss<0.0001
-    #' and Accuracy=1.00 and Average Iota=1.00 training stops. The history uses the values
-    #' of the last trained epoch for the remaining epochs.
+    #'   Training includes a routine for early stopping. In the case that loss<0.0001 and Accuracy=1.00 and Average
+    #'   Iota=1.00 training stops. The history uses the values of the last trained epoch for the remaining epochs.
     #'
-    #' After training the model with the best values for Average Iota, Accuracy, and Loss
-    #' on the validation data set is used as the final model.
+    #'   After training the model with the best values for Average Iota, Accuracy, and Loss on the validation data set
+    #'   is used as the final model.
     #'
     #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param data_targets `factor` containing the labels for cases stored in `data_embeddings`. Factor must be named
@@ -331,8 +331,8 @@ TEClassifierRegular <- R6::R6Class(
     #' @param trace `bool` `TRUE`, if information about the estimation phase should be printed to the console.
     #' @param ml_trace `int` `ml_trace=0` does not print any information about the training process from pytorch on the
     #'   console.
-    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only relevant if
-    #'  `use_sc=TRUE`.
+    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only
+    #'   relevant if `use_sc=TRUE`.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -612,8 +612,10 @@ TEClassifierRegular <- R6::R6Class(
       requires_compression <- self$requires_compression(newdata)
 
       # Check input for compatible text embedding models and feature extractors
-      if ("EmbeddedText" %in% class(newdata) |
-        "LargeDataSetForTextEmbeddings" %in% class(newdata)) {
+      if (
+        "EmbeddedText" %in% class(newdata) |
+          "LargeDataSetForTextEmbeddings" %in% class(newdata)
+      ) {
         self$check_embedding_model(text_embeddings = newdata, require_compressed = FALSE)
       } else {
         private$check_embeddings_object_type(newdata, strict = FALSE)
@@ -815,8 +817,10 @@ TEClassifierRegular <- R6::R6Class(
       embedding_model_config <- text_embeddings$get_model_info()
       check <- c("model_name")
 
-      if (!is.null_or_na(embedding_model_config[[check]]) &
-        !is.null_or_na(private$text_embedding_model$model[[check]])) {
+      if (
+        !is.null_or_na(embedding_model_config[[check]]) &
+          !is.null_or_na(private$text_embedding_model$model[[check]])
+      ) {
         if (embedding_model_config[[check]] != private$text_embedding_model$model[[check]]) {
           stop("The TextEmbeddingModel that generated the data_embeddings is not
                the same as the TextEmbeddingModel when generating the classifier.")
@@ -883,8 +887,10 @@ TEClassifierRegular <- R6::R6Class(
         "array", "datasets.arrow_dataset.Dataset"
       ), FALSE)
 
-      if ("EmbeddedText" %in% class(text_embeddings) |
-        "LargeDataSetForTextEmbeddings" %in% class(text_embeddings)) {
+      if (
+        "EmbeddedText" %in% class(text_embeddings) |
+          "LargeDataSetForTextEmbeddings" %in% class(text_embeddings)
+      ) {
         if (self$model_config$use_fe == TRUE & text_embeddings$is_compressed() == FALSE) {
           return(TRUE)
         } else {
@@ -1033,9 +1039,9 @@ TEClassifierRegular <- R6::R6Class(
           )(layer_list[[length(layer_list)]])
           layer_list[length(layer_list) + 1] <- list(norm_layer)
         } # else {
-        # norm_layer<-keras$layers$BatchNormalization(
+        # norm_layer <- keras$layers$BatchNormalization(
         #  name = "normalizaion_layer")(layer_list[[length(layer_list)]])
-        # layer_list[length(layer_list)+1]<-list(norm_layer)
+        # layer_list[length(layer_list) + 1] <- list(norm_layer)
         # }
 
         if (self$model_config$repeat_encoder > 0) {
@@ -1709,13 +1715,16 @@ TEClassifierRegular <- R6::R6Class(
       # Transforming the probabilities to an information index
       new_categories[, 2] <- abs(
         self$last_training$config$pl_anchor -
-          (as.numeric(new_categories[, 2]) - 1 / length(self$model_config$target_levels)) / (1 - 1 / length(self$model_config$target_levels))
+          (as.numeric(new_categories[, 2]) - 1 / length(self$model_config$target_levels)) /
+            (1 - 1 / length(self$model_config$target_levels))
       )
       new_categories <- as.data.frame(new_categories)
 
       # Reducing the new categories to the desired range
-      condition <- (new_categories[, 2] >= self$last_training$config$pl_min &
-        new_categories[, 2] <= self$last_training$config$pl_max)
+      condition <- (
+        new_categories[, 2] >= self$last_training$config$pl_min &
+          new_categories[, 2] <= self$last_training$config$pl_max
+      )
       new_categories <- subset(new_categories, condition)
 
       # Calculate number of cases to include
@@ -1829,7 +1838,9 @@ TEClassifierRegular <- R6::R6Class(
         sequence_length <- train_data["length"]
         abs_freq_length <- table(sequence_length)
 
-        sample_weight_per_sequence_length <- as.vector(sum(abs_freq_length) / (length(abs_freq_length) * abs_freq_length))
+        sample_weight_per_sequence_length <- as.vector(
+          sum(abs_freq_length) / (length(abs_freq_length) * abs_freq_length)
+        )
         sequence_order <- names(abs_freq_length)
 
         sample_weights <- vector(length = length(sequence_length))
@@ -2057,9 +2068,17 @@ TEClassifierRegular <- R6::R6Class(
           self$model_config$intermediate_size <- 2 * self$model_config$rec_size
         } else if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers == 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (self$model_config$attention_type == "multihead" & self$model_config$rec_layers > 0 & self$model_config$self_attention_heads > 0) {
+        } else if (
+          self$model_config$attention_type == "multihead" &
+            self$model_config$rec_layers > 0 &
+            self$model_config$self_attention_heads > 0
+        ) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (self$model_config$attention_type == "multihead" & self$model_config$rec_layers == 0 & self$model_config$self_attention_heads > 0) {
+        } else if (
+          self$model_config$attention_type == "multihead" &
+            self$model_config$rec_layers == 0 &
+            self$model_config$self_attention_heads > 0
+        ) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
         } else {
           self$model_config$intermediate_size <- NULL

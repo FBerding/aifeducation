@@ -42,8 +42,8 @@ get_current_conda_env <- function() {
 #' @importFrom reticulate import
 #' @export
 #'
-get_py_package_versions<-function(){
-  list_of_packages<-c(
+get_py_package_versions <- function() {
+  list_of_packages <- c(
     "torch",
     "pyarrow",
     "transformers",
@@ -57,15 +57,15 @@ get_py_package_versions<-function(){
     "numpy"
   )
 
-  versions=vector(length = length(list_of_packages)+1)
-  names(versions)=c("python",list_of_packages)
-  versions["python"]<-as.character(reticulate::py_config()$version)
-  for(package in list_of_packages){
-    if(reticulate::py_module_available(package)==TRUE){
-      tmp_package=reticulate::import(module = package,delay_load = FALSE)
-      versions[package]<-tmp_package["__version__"]
+  versions <- vector(length = length(list_of_packages) + 1)
+  names(versions) <- c("python", list_of_packages)
+  versions["python"] <- as.character(reticulate::py_config()$version)
+  for (package in list_of_packages) {
+    if (reticulate::py_module_available(package) == TRUE) {
+      tmp_package <- reticulate::import(module = package, delay_load = FALSE)
+      versions[package] <- tmp_package["__version__"]
     } else {
-      versions[package]<-NA
+      versions[package] <- NA
     }
   }
   return(versions)

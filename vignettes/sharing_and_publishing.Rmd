@@ -358,10 +358,10 @@ und das Training der KI eingeflossen sind.
 Berding, F. & Pargmann, J. (2022). Iota Reliability Concept of the
 Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
 
-Deci, E. L. & Ryan, R. M. (Hrsg.) (2002). Handbook of self-determination research. Rochester: University of Rochester 
+Deci, E. L. & Ryan, R. M. (Hrsg.) (2002). Handbook of self-determination research. Rochester: University of Rochester
 Press.
 
-Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädagogik. Bielefeld: wbv. 
+Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädagogik. Bielefeld: wbv.
 <https://doi.org/10.3278/9783763970216>
 
 ```

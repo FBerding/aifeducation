@@ -286,7 +286,6 @@ Classifiers_Create_UI <- function(id) {
                   inputId = shiny::NS(id, "sustainability_country"),
                   label = "Country for Sustainability Tracking",
                   choices = country_alpha_3_list,
-                  # choices=NULL,
                   selected = "DEU"
                 ),
                 shiny::uiOutput(outputId = shiny::NS(id, "regular_train")),
@@ -510,7 +509,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
-      # ns=session$ns,
+      # ns = session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"
@@ -597,9 +596,9 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             path_to_feature_extractor = path_to_feature_extractor(),
             name = input$name,
             label = input$label,
-            # text_embeddings=NULL,
-            # feature_extractor=NULL,
-            # targets=NULL,
+            # text_embeddings = NULL,
+            # feature_extractor = NULL,
+            # targets = NULL,
             dense_layers = input$dense_layers,
             dense_size = input$dense_size,
             rec_layers = input$rec_layers,
@@ -640,9 +639,9 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
             epochs = input$epochs,
             batch_size = input$batch_size,
             # dir_checkpoint,
-            # trace=TRUE,
-            # keras_trace=0,
-            # pytorch_trace=0,
+            # trace = TRUE,
+            # keras_trace = 0,
+            # pytorch_trace = 0,
             log_dir = log_dir,
             log_write_interval = 3,
             Ns = input$n_sample,

@@ -303,14 +303,14 @@ create_ByteLevelBPE_tokenizer <- function(# nolint
 #' @family Defined steps for creation
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.create_tokenizer_draft <- function(
+Bert_like.SFC.create_tokenizer_draft <- function( # nolint
     self,
     sep_token = "[SEP]",
     sep_id = 1,
     cls_token = "[CLS]",
     cls_id = 0,
     unk_token = "[UNK]",
-    special_tokens = c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")) { # nolint
+    special_tokens = c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")) {
 
   self$temp$special_tokens <- special_tokens
   self$temp$tok_new <- create_WordPiece_tokenizer(

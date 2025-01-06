@@ -76,8 +76,10 @@ Training_Server <- function(id, model) {
 
     # Control widgets for classifiers--------------------------------------------
     output$classifier_specific <- shiny::renderUI({
-      if ("TEClassifierRegular" %in% class(model()) |
-        "TEClassifierProtoNet" %in% class(model())) {
+      if (
+        "TEClassifierRegular" %in% class(model()) |
+          "TEClassifierProtoNet" %in% class(model())
+      ) {
         ui <- shiny::tagList(
           shinyWidgets::radioGroupButtons(
             inputId = ns("training_phase"),
@@ -131,8 +133,9 @@ Training_Server <- function(id, model) {
 
 
     output$widget_classifier_pl_step <- shiny::renderUI({
-      if ("TEClassifierRegular" %in% class(model()) |
-        "TEClassifierProtoNet" %in% class(model())) {
+      if (
+        "TEClassifierRegular" %in% class(model()) | "TEClassifierProtoNet" %in% class(model())
+      ) {
         if (model()$last_training$config$use_pl == TRUE) {
           n_steps <- model()$last_training$config$pl_max_steps
           return(
@@ -192,15 +195,19 @@ Training_Server <- function(id, model) {
           }
 
           # Plot for classifiers-----------------------------------------------
-        } else if ("TEClassifierRegular" %in% class(model()) ||
-          "TEClassifierProtoNet" %in% class(model()) ||
-          "TEFeatureExtractor" %in% class(model())) {
+        } else if (
+          "TEClassifierRegular" %in% class(model()) ||
+            "TEClassifierProtoNet" %in% class(model()) ||
+            "TEFeatureExtractor" %in% class(model())
+        ) {
           # Necessary input
           shiny::req(input$measure)
 
           # Get data for plotting
-          if ("TEClassifierRegular" %in% class(model()) ||
-            "TEClassifierProtoNet" %in% class(model())) {
+          if (
+            "TEClassifierRegular" %in% class(model()) ||
+              "TEClassifierProtoNet" %in% class(model())
+          ) {
             plot_data <- prepare_training_history(
               model = model(),
               final = input$training_phase,

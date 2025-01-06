@@ -48,8 +48,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param text_embeddings An object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param features `int` determining the number of dimensions to which the dimension of the text embedding should be
     #'   reduced.
-    #' @param method `string` Method to use for the feature extraction. `"lstm"` for an extractor based on LSTM-layers or
-    #'   `"dense"` for dense layers.
+    #' @param method `string` Method to use for the feature extraction. `"lstm"` for an extractor based on LSTM-layers
+    #' or `"dense"` for dense layers.
     #' @param noise_factor `double` between 0 and a value lower 1 indicating how much noise should be added for the
     #'   training of the feature extractor.
     #' @param optimizer `string` `"adam"` or `"rmsprop"` .
@@ -230,7 +230,6 @@ TEFeatureExtractor <- R6::R6Class(
         # Split into train and validation data
         extractor_dataset <- extractor_dataset$train_test_split(self$last_training$config$data_val_size)
 
-        # print(extractor_dataset$train)
         self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
           model = self$model,
           epochs = as.integer(self$last_training$config$epochs),
@@ -347,8 +346,7 @@ TEFeatureExtractor <- R6::R6Class(
       # Argument checking
       check_type(batch_size, "int", FALSE)
       # check data_embeddings object
-      if ("EmbeddedText" %in% class(data_embeddings) |
-        "LargeDataSetForTextEmbeddings" %in% class(data_embeddings)) {
+      if ("EmbeddedText" %in% class(data_embeddings) | "LargeDataSetForTextEmbeddings" %in% class(data_embeddings)) {
         self$check_embedding_model(text_embeddings = data_embeddings)
       } else {
         private$check_embeddings_object_type(data_embeddings, strict = FALSE)
@@ -383,7 +381,10 @@ TEFeatureExtractor <- R6::R6Class(
             shuffle = FALSE
           )
 
-          encoder_model <- tf$keras$Model(inputs = self$model$input, outputs = self$model$get_layer("latent_space_output")$output)
+          encoder_model <- tf$keras$Model(
+            inputs = self$model$input,
+            outputs = self$model$get_layer("latent_space_output")$output
+          )
 
           reduced_embeddings <- encoder_model$predict(prepared_embeddings_tf,
             verbose = as.integer(0)
@@ -415,7 +416,10 @@ TEFeatureExtractor <- R6::R6Class(
             reduced_embeddings <- private$detach_tensors(reduced_tensors)
           }
         } else if (private$ml_framework == "tensorflow") {
-          encoder_model <- tf$keras$Model(inputs = self$model$input, outputs = self$model$get_layer("latent_space_output")$output)
+          encoder_model <- tf$keras$Model(
+            inputs = self$model$input,
+            outputs = self$model$get_layer("latent_space_output")$output
+          )
           reduced_embeddings <- encoder_model$predict(prepared_embeddings,
             verbose = as.integer(0)
           )

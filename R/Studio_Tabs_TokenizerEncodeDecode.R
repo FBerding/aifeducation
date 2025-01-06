@@ -145,9 +145,6 @@ Tokenize_Encode_Decode_UI <- function(id) {
 #'
 Tokenize_Encode_Decode_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # ns <- session$ns
-
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)

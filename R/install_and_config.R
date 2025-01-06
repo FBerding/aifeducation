@@ -254,7 +254,7 @@ check_aif_py_modules <- function(trace = TRUE, check = "pytorch") {
   )
   colnames(matrix_overview) <- c("module", "available")
   matrix_overview <- as.data.frame(matrix_overview)
-  for (i in 1:length(relevant_modules)) {
+  for (i in seq_len(length(relevant_modules))) {
     matrix_overview[i, 1] <- relevant_modules[i]
     matrix_overview[i, 2] <- reticulate::py_module_available(relevant_modules[i])
   }
@@ -294,7 +294,7 @@ set_config_gpu_low_memory <- function() {
   os$environ$setdefault("TF_GPU_ALLOCATOR", "cuda_malloc_async")
   gpu <- tf$config$list_physical_devices("GPU")
   if (length(gpu) > 0) {
-    for (i in 1:length(gpu)) {
+    for (i in seq_len(length(gpu))) {
       tf$config$experimental$set_memory_growth(gpu[[i]], TRUE)
     }
   }

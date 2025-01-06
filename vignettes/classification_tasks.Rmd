@@ -580,7 +580,7 @@ with the `create`-method of the Transformer class. Use
 > Developers](transformers.html) for details.
 
 ```{r, include = TRUE, eval = FALSE}
-base_model<-aife_transformer_maker$make("bert")
+base_model <- aife_transformer_maker$make("bert")
 base_model$create(
   ml_framework = "pytorch",
   model_dir = "my_own_transformer",
@@ -899,10 +899,10 @@ classifier$configure(
   text_embeddings = review_embeddings,
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
-  dense_layers=2,
-  dense_size=5,
-  rec_layers=2,
-  rec_size=10,
+  dense_layers = 2,
+  dense_size = 5,
+  rec_layers = 2,
+  rec_size = 10,
   rec_type = "gru",
   rec_bidirectional = FALSE,
   self_attention_heads = 0,
@@ -1431,9 +1431,9 @@ them to the plot by using the argument `classes_q`. The resulting plot
 is shown in the following Figure.
 
 ```{r, include = TRUE, eval=FALSE}
-plot_untrained<-classifier$plot_embeddings(
+plot_untrained <- classifier$plot_embeddings(
   embeddings_q = review_embeddings,
-  classes_q=review_labels,
+  classes_q = review_labels,
 )
 plot_untrained
 ```
@@ -1472,11 +1472,11 @@ classifier$train(
   Nq = 10,
   loss_alpha = 0.5,
   loss_margin = 0.5,
-  sampling_separate=FALSE,
+  sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   dir_checkpoint = "training/classifier",
   trace = TRUE,
-  ml_trace=1
+  ml_trace = 1
 )
 ```
 
@@ -1523,10 +1523,10 @@ first omit all unlabeled cases by setting `inc_unlabeled=FALSE` in order
 to get an impression of the quality of training.
 
 ```{r, include = TRUE, eval=FALSE}
-plot_trained_1<-classifier$plot_embeddings(
+plot_trained_1 <- classifier$plot_embeddings(
   embeddings_q = review_embeddings,
-  classes_q=review_labels,
-  inc_unlabeled=FALSE
+  classes_q = review_labels,
+  inc_unlabeled = FALSE
 )
 plot_trained_1
 ```
@@ -1547,10 +1547,10 @@ Let us now add the unlabeled cases to the plot by setting
 `inc_unlabeled=TRUE`.
 
 ```{r, include = TRUE, eval=FALSE}
-plot_trained_2<-classifier$plot_embeddings(
+plot_trained_2 <- classifier$plot_embeddings(
   embeddings_q = review_embeddings,
-  classes_q=review_labels,
-  inc_unlabeled=FALSE
+  classes_q = review_labels,
+  inc_unlabeled = FALSE
 )
 plot_trained_2
 ```
@@ -1605,15 +1605,15 @@ a compression of the original input.
 You can create a feature extractor as follows.
 
 ```{r, include = TRUE, eval=FALSE}
-feature_extractor<-TEFeatureExtractor$new()
+feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
-   name = "feature_extractor_bert_movie_reviews",
-   label = "Feature extractor for Text Embeddings via BERT",
-   text_embeddings = review_embeddings,
-   features = 128,
-   method = "lstm",
-   noise_factor = 0.2,
-   optimizer = "adam"
+  name = "feature_extractor_bert_movie_reviews",
+  label = "Feature extractor for Text Embeddings via BERT",
+  text_embeddings = review_embeddings,
+  features = 128,
+  method = "lstm",
+  noise_factor = 0.2,
+  optimizer = "adam"
 )
 ```
 
@@ -1652,17 +1652,17 @@ the embeddings provided during the configuration of your model.
 
 ```{r, include = TRUE, eval=FALSE}
 feature_extractor$train(
- data_embeddings=review_embeddings,
- data_val_size = 0.25,
- sustain_track = TRUE,
- sustain_iso_code = "DEU",
- sustain_region = NULL,
- sustain_interval = 15,
- epochs = 40,
- batch_size = 32,
- dir_checkpoint,
- trace = TRUE,
- ml_trace = 1,
+  data_embeddings = review_embeddings,
+  data_val_size = 0.25,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  epochs = 40,
+  batch_size = 32,
+  dir_checkpoint,
+  trace = TRUE,
+  ml_trace = 1,
 )
 ```
 

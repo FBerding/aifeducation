@@ -121,7 +121,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     .export = "create_synthetic_units_from_matrix",
     .errorhandling = "pass"
   ) %dopar% {
-    # index=1
+    # index <- 1
     create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
         input[[index]]$selected_cases,
@@ -160,8 +160,8 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
       syntetic_embeddings[
         (n_row + 1):(n_row + nrow(result_list[[i]]$syntetic_embeddings)),
-        c(1:ncol(result_list[[i]]$syntetic_embeddings))
-      ] <- result_list[[i]]$syntetic_embeddings[, c(1:ncol(result_list[[i]]$syntetic_embeddings))]
+        c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))
+      ] <- result_list[[i]]$syntetic_embeddings[, c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))]
       syntetic_targets <- append(syntetic_targets, values = result_list[[i]]$syntetic_targets)
       n_row <- n_row + nrow(result_list[[i]]$syntetic_embeddings)
       names_vector <- append(
@@ -178,7 +178,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     features = features
   )
   rownames(syntetic_embeddings) <- names_vector
-  # dimnames(syntetic_embeddings)[3]<-feature_names
+  # dimnames(syntetic_embeddings)[3] <- feature_names
 
   n_syntetic_units <- table(syntetic_targets)
 
@@ -193,8 +193,8 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #---------------------------------------------
 #' @title Create synthetic units
 #' @description Function for creating synthetic cases in order to balance the data for training with
-#'   [TEClassifierRegular] or [TEClassifierProtoNet]]. This is an auxiliary function for use with [get_synthetic_cases_from_matrix] to allow
-#'   parallel computations.
+#'   [TEClassifierRegular] or [TEClassifierProtoNet]]. This is an auxiliary function for use with
+#'   [get_synthetic_cases_from_matrix] to allow parallel computations.
 #'
 #' @param matrix_form Named `matrix` containing the text embeddings in matrix form. In most cases this object is taken
 #'   from [EmbeddedText]$embeddings.
@@ -273,7 +273,10 @@ create_synthetic_units_from_matrix <- function(matrix_form,
     )
   }
 
-  if (inherits(x = syn_data, what = "try-error") == FALSE && (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)) {
+  if (
+    inherits(x = syn_data, what = "try-error") == FALSE &&
+      (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)
+  ) {
     n_cols_embedding <- ncol(matrix_form)
     tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(

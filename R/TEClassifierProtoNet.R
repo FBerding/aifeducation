@@ -62,7 +62,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param rec_bidirectional `bool` If `TRUE` a bidirectional version of the recurrent layers is used.
     #' @param embedding_dim `int` determining the number of dimensions for the text embedding.
     #' @param attention_type `string` Choose the relevant attention type. Possible values are `"fourier"` and
-    #'   `"multihead"`. Please note that you may see different values for a case for different input orders if you choose `fourier` on linux.
+    #'   `"multihead"`. Please note that you may see different values for a case for different input orders if you
+    #'   choose `fourier` on linux.
     #' @param self_attention_heads `int` determining the number of attention heads for a self-attention layer. Only
     #'   relevant if `attention_type="multihead"`.
     #' @param repeat_encoder `int` determining how many times the encoder should be added to the network.
@@ -208,8 +209,8 @@ TEClassifierProtoNet <- R6::R6Class(
 
       config["require_one_hot"] <- list(FALSE)
 
-      # if(length(rec)>0|repeat_encoder>0){
-      #  config["require_matrix_map"]=list(FALSE)
+      # if (length(rec) > 0 | repeat_encoder > 0) {
+      #  config["require_matrix_map"] <- list(FALSE)
       # } else {
       config["require_matrix_map"] <- list(TRUE)
       # }
@@ -236,12 +237,11 @@ TEClassifierProtoNet <- R6::R6Class(
     #-------------------------------------------------------------------------
     #' @description Method for training a neural net.
     #'
-    #' Training includes a routine for early stopping. In the case that loss<0.0001
-    #' and Accuracy=1.00 and Average Iota=1.00 training stops. The history uses the values
-    #' of the last trained epoch for the remaining epochs.
+    #'   Training includes a routine for early stopping. In the case that loss<0.0001 and Accuracy=1.00 and Average
+    #'   Iota=1.00 training stops. The history uses the values of the last trained epoch for the remaining epochs.
     #'
-    #' After training the model with the best values for Average Iota, Accuracy, and Loss
-    #' on the validation data set is used as the final model.
+    #'   After training the model with the best values for Average Iota, Accuracy, and Loss on the validation data set
+    #'   is used as the final model.
     #'
     #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
     #' @param data_targets `factor` containing the labels for cases stored in `data_embeddings`. Factor must be named
@@ -285,13 +285,13 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   loss concentrates on pulling cases to its corresponding prototypes.
     #' @param loss_margin `double` Value greater 0 indicating the minimal distance of every case from prototypes of
     #'   other classes
-    #' @param sampling_separate `bool` If `TRUE` the cases for every class are divided into a data set for sample and for query.
-    #'    These are never mixed. If `TRUE` sample and query cases are drawn from the same data pool. That is, a case can be
-    #'    part of sample in one epoch and in another epoch it can be part of query. It is ensured that a case is never part of
-    #'    sample and query at the same time. In addition, it is ensured that every cases exists only once during
-    #'    a training step.
-    #' @param sampling_shuffle `bool` If `TRUE` cases a randomly drawn from the data during every step. If `FALSE`
-    #'    the cases are not shuffled.
+    #' @param sampling_separate `bool` If `TRUE` the cases for every class are divided into a data set for sample and
+    #'   for query. These are never mixed. If `TRUE` sample and query cases are drawn from the same data pool. That is,
+    #'   a case can be part of sample in one epoch and in another epoch it can be part of query. It is ensured that a
+    #'   case is never part of sample and query at the same time. In addition, it is ensured that every cases exists
+    #'   only once during a training step.
+    #' @param sampling_shuffle `bool` If `TRUE` cases a randomly drawn from the data during every step. If `FALSE` the
+    #'   cases are not shuffled.
     #' @param dir_checkpoint `string` Path to the directory where the checkpoint during training should be saved. If the
     #'   directory does not exist, it is created.
     #' @param log_dir `string` Path to the directory where the log files should be saved. If no logging is desired set
@@ -301,8 +301,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param trace `bool` `TRUE`, if information about the estimation phase should be printed to the console.
     #' @param ml_trace `int` `ml_trace=0` does not print any information about the training process from pytorch on the
     #'   console.
-    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only relevant if
-    #'  `use_sc=TRUE`.
+    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only
+    #'   relevant if `use_sc=TRUE`.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'

@@ -7,7 +7,7 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Config transformer library
+# Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 
@@ -15,26 +15,26 @@ os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
-#config trace
-trace=FALSE
+# config trace
+trace <- FALSE
 
-#config ai method
-ai_method="bert"
+# config ai method
+ai_method <- "bert"
 
-root_path_output=testthat::test_path("test_data_tmp")
-test_path_create=paste0(root_path_output,"/transformer_create")
-test_path_train=paste0(root_path_output,"/transformer_train")
-path_test_data=testthat::test_path("test_data_tmp/Embeddings")
+root_path_output <- testthat::test_path("test_data_tmp")
+test_path_create <- paste0(root_path_output, "/transformer_create")
+test_path_train <- paste0(root_path_output, "/transformer_train")
+path_test_data <- testthat::test_path("test_data_tmp/Embeddings")
 
 create_dir(root_path_output, FALSE)
 create_dir(test_path_create, FALSE)
 create_dir(test_path_train, FALSE)
-create_dir(path_test_data,FALSE)
+create_dir(path_test_data, FALSE)
 
 test_that("Generating Test Data", {
-  train_data=LargeDataSetForText$new(imdb_movie_reviews)
+  train_data <- LargeDataSetForText$new(imdb_movie_reviews)
 
-  base_model<-aife_transformer_maker$make(ai_method)
+  base_model <- aife_transformer_maker$make(ai_method)
   base_model$create(
     ml_framework = "pytorch",
     model_dir = test_path_create,
@@ -81,9 +81,11 @@ test_that("Generating Test Data", {
   )
   Sys.sleep(5)
 
-  #Clean data
-  unlink(x=test_path_create,
-         recursive = TRUE)
+  # Clean data
+  unlink(
+    x = test_path_create,
+    recursive = TRUE
+  )
 
   Sys.sleep(5)
 
@@ -103,21 +105,25 @@ test_that("Generating Test Data", {
     model_dir = test_path_train
   )
 
-  embeddings <- text_embedding_model$embed_large(train_data,trace=trace)
-  embeddings<-embeddings$convert_to_EmbeddedText()
-  save_to_disk(object = embeddings,
-               dir_path = path_test_data,
-               folder_name = "imdb_embeddings")
+  embeddings <- text_embedding_model$embed_large(train_data, trace = trace)
+  embeddings <- embeddings$convert_to_EmbeddedText()
+  save_to_disk(
+    object = embeddings,
+    dir_path = path_test_data,
+    folder_name = "imdb_embeddings"
+  )
 
-  #Check data
-  expect_false(anyNA(embeddings$embeddings),FALSE)
-  expect_false(0%in%get_n_chunks(embeddings$embeddings,features=64, times=6))
+  # Check data
+  expect_false(anyNA(embeddings$embeddings), FALSE)
+  expect_false(0 %in% get_n_chunks(embeddings$embeddings, features = 64, times = 6))
 
-  #Clean data
-  unlink(x=test_path_train,
-         recursive = TRUE)
+  # Clean data
+  unlink(
+    x = test_path_train,
+    recursive = TRUE
+  )
 
-  #Save test data
-  expect_true(file.exists(paste0(path_test_data,"/imdb_embeddings/r_config_state.rda")))
-  #print("Test data generated.")
+  # Save test data
+  expect_true(file.exists(paste0(path_test_data, "/imdb_embeddings/r_config_state.rda")))
+  # print("Test data generated.")
 })

@@ -111,7 +111,6 @@ FeatureExtractors_Create_UI <- function(id) {
               inputId = shiny::NS(id, "sustainability_country"),
               label = "Country for Sustainability Tracking",
               choices = country_alpha_3_list,
-              # choices=NULL,
               selected = "DEU"
             ),
             shiny::sliderInput(
@@ -160,7 +159,6 @@ FeatureExtractors_Create_UI <- function(id) {
 FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # ns <- session$ns
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # File system management----------------------------------------------------
@@ -200,7 +198,7 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
-      # ns=session$ns,
+      # ns = session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"

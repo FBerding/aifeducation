@@ -112,7 +112,10 @@ for (framework in ml_frameworks) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
           # Error Checking: Max layer greater as the number of layers
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"), {
+          test_that(paste(
+            framework, base_model, pooling_type, max_layer, min_layer,
+            "Max layer greater as the number of layers"
+          ), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -132,7 +135,10 @@ for (framework in ml_frameworks) {
             )
           })
           # Error Checking: min layer is smaller 1
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: min layer is smaller 1"), {
+          test_that(paste(
+            framework, base_model, pooling_type, max_layer, min_layer,
+            "Error Checking: min layer is smaller 1"
+          ), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -152,7 +158,10 @@ for (framework in ml_frameworks) {
             )
           })
           # Error Checking: max length exceeded
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: max length exceeded"), {
+          test_that(paste(
+            framework, base_model, pooling_type, max_layer, min_layer,
+            "Error Checking: max length exceeded"
+          ), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -172,7 +181,10 @@ for (framework in ml_frameworks) {
             )
           })
           # Error Checking: Configuration already set
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"), {
+          test_that(paste(
+            framework, base_model, pooling_type, max_layer, min_layer,
+            "Error Checking: Configuration already set"
+          ), {
             text_embedding_model <- TextEmbeddingModel$new()
             text_embedding_model$configure(
               model_name = paste0(base_model, "_embedding"),
@@ -259,14 +271,16 @@ for (framework in ml_frameworks) {
 
             # Check if data is valid
             expect_false(anyNA(embeddings$embeddings), FALSE)
-            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
+            expect_false(0 %in% get_n_chunks(
+              embeddings$embeddings,
               features = text_embedding_model$get_transformer_components()$features,
               times = chunks
             ))
 
             # Check if data is valid
             expect_false(anyNA(embeddings$embeddings), FALSE)
-            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
+            expect_false(0 %in% get_n_chunks(
+              embeddings$embeddings,
               features = text_embedding_model$get_transformer_components()$features,
               times = chunks
             ))
@@ -300,7 +314,10 @@ for (framework in ml_frameworks) {
             )
           })
 
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {
+          test_that(paste(
+            framework, base_model, pooling_type, max_layer, min_layer,
+            "embed single case", "chunks", chunks
+          ), {
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:1],
               doc_id = example_data$id[1:1]

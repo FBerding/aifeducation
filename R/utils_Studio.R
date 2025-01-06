@@ -35,9 +35,9 @@ generate_sidebar_information <- function(model) {
       model_label <- model$get_model_info()$model_label
     }
 
-    max_tokens <- (model$get_basic_components()$max_length - model$get_transformer_components()$overlap) * model$get_transformer_components()$chunks + model$get_basic_components()$max_length
+    max_tokens <- (model$get_basic_components()$max_length - model$get_transformer_components()$overlap) *
+      model$get_transformer_components()$chunks + model$get_basic_components()$max_length
 
-    # TODO (Yuliia): remove? Variable is not used
     if (!is.null(model$get_transformer_components()$aggregation)) {
       aggegation <- shiny::tags$p("Hidden States Aggregation: ", model$get_transformer_components()$aggregation)
     } else {
@@ -80,6 +80,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$hr(),
       shiny::tags$p("# Parameter: ", model$count_parameter()),
       shiny::tags$p("Method: ", model$get_basic_components()$method),
+      aggegation,
       shiny::tags$p("Max Tokens per Chunk: ", model$get_basic_components()$max_length),
       shiny::tags$p("Max Chunks: ", model$get_transformer_components()$chunks),
       shiny::tags$p("Token Overlap: ", model$get_transformer_components()$overlap),
@@ -91,8 +92,10 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
     )
-  } else if ("TEClassifierRegular" %in% class(model) ||
-    "TEClassifierProtoNet" %in% class(model)) {
+  } else if (
+    "TEClassifierRegular" %in% class(model) ||
+      "TEClassifierProtoNet" %in% class(model)
+  ) {
     if (is.null(model)) {
       model_label <- NULL
     } else {
@@ -440,8 +443,10 @@ load_and_check_embeddings <- function(dir_path) {
       # Wait for modal
       Sys.sleep(1)
       embeddings <- load_from_disk(dir_path)
-      if (("EmbeddedText" %in% class(embeddings)) == TRUE ||
-        "LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+      if (
+        "EmbeddedText" %in% class(embeddings) ||
+          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+      ) {
         shiny::removeModal()
         return(embeddings)
       } else {
@@ -500,9 +505,9 @@ load_and_check_target_data <- function(file_path) {
         message = ""
       )
 
-      # extension=stringr::str_split_fixed(file_path,pattern="\\.",n=Inf)
-      # extension=extension[1,ncol(extension)]
-      # extension=stringr::str_to_lower(extension)
+      # extension <- stringr::str_split_fixed(file_path, pattern = "\\.", n = Inf)
+      # extension <- extension[1, ncol(extension)]
+      # extension <- stringr::str_to_lower(extension)
       extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
       extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
 
@@ -925,7 +930,7 @@ check_and_prepare_for_studio <- function() {
     install_now <- utils::askYesNo(
       msg = paste(
         "The following R packages are missing for Aifeducation Studio.",
-        "'",paste(missing_r_packages,collapse = ","),"'.",
+        "'", paste(missing_r_packages, collapse = ","), "'.",
         "Do you want to install them now?"
       ),
       default = TRUE,

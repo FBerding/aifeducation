@@ -58,7 +58,6 @@ BaseModel_Create_UI <- function(id) {
 BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
   shiny::moduleServer(id, function(input, output, session) {
     # Global variables -----------------------------------------------------------
-    ns <- session$ns
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # Control Panel --------------------------------------------------------------
