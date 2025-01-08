@@ -1,5 +1,5 @@
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
   message = "Necessary python modules not available"
 )
 
@@ -437,8 +437,10 @@ test_that("LargeDataSetForTexts - Add excel with log", {
 test_that("LargeDataSetForTexts - Add data.frame", {
   text_data_frame <- rbind(
     c("df_A", "data.frame text A", "bib_entry Text A", NA, NA, NA, NA),
-    c("df_B", "data.frame text B", "bib_entry Text B",
-      "CC BY", "www.url_to_license", "This is license text.", "www.to.source")
+    c(
+      "df_B", "data.frame text B", "bib_entry Text B",
+      "CC BY", "www.url_to_license", "This is license text.", "www.to.source"
+    )
   )
   colnames(text_data_frame) <- c(
     "id",

@@ -5,7 +5,7 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-if(Sys.getenv("CI")=="true"){
+if (Sys.getenv("CI") == "true") {
   print("---------------------------------------------------------")
   print("On Continuous Integreation")
   print("---------------------------------------------------------")
@@ -15,5 +15,5 @@ if(Sys.getenv("CI")=="true"){
   print("---------------------------------------------------------")
 }
 
-#Print python versions of the test system
+# Print python versions of the test system
 print(get_py_package_versions())
