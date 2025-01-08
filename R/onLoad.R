@@ -43,7 +43,7 @@ packageStartupMessage(
 )
 
 packageStartupMessage(
-  "Future Warning: With releasing version 1.1.0 of this package tensorflow support will be
+  "Future Warning: With releasing version 1.1.0 (March 2025) of this package tensorflow support will be
   removed.",
   appendLF = TRUE
 )

@@ -11,7 +11,7 @@ install_aifeducation(install_aifeducation_studio = TRUE)
 Studio.}
 }
 \value{
-Function does nothing return. It installes python, optional R packages, and necessary 'python' packages on a
+Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
 machine.
 }
 \description{

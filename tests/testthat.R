@@ -9,17 +9,4 @@
 library(testthat)
 library(aifeducation)
 
-if (Sys.getenv("CI") == "true") {
-  print("---------------------------------------------------------")
-  print("On Continuous Integreation")
-  print("---------------------------------------------------------")
-} else {
-  print("---------------------------------------------------------")
-  print("Not On Continuous Integreation")
-  print("---------------------------------------------------------")
-}
-
-#Print python versions of the test system
-print(get_py_package_versions())
-
 test_check("aifeducation")
