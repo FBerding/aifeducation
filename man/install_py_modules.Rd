@@ -11,7 +11,7 @@ install_py_modules(
   tokenizers_version = "<=0.20.4",
   pandas_version = "<=2.2.3",
   datasets_version = "<=3.1.0",
-  codecarbon_version = "<=2.8.0",
+  codecarbon_version = "<=2.8.2",
   safetensors_version = "<=0.4.5",
   torcheval_version = "<=0.0.7",
   accelerate_version = "<=1.1.1",
