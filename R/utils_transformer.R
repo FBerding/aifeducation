@@ -118,21 +118,6 @@ check.hidden_act <- function(hidden_act) { # nolint
   }
 }
 
-#' @title Check `ml_framework` argument of transformer
-#' @description Used when creating and training transformers.
-#'
-#' @param ml_framework `r paramDesc.ml_framework()`
-#' @return Error if `ml_framework` is not `"pytorch"`, `"tensorflow"`, or `"not_specified"`.
-#'
-#' @family Transformer utils
-#' @keywords internal
-#' @noRd
-check.ml_framework <- function(ml_framework) { # nolint
-  if ((ml_framework %in% c("pytorch", "tensorflow")) == FALSE) {
-    stop("ml_framework must be 'tensorflow' or 'pytorch'.")
-  }
-}
-
 #' @title Check `sustain_iso_code` argument of transformer
 #' @description Used when creating and training transformers.
 #'
@@ -153,7 +138,6 @@ check.sustain_iso_code <- function(sustain_iso_code, sustain_track) { # nolint
 #' @title Check possible save formats
 #' @description Used when creating and training transformers.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
 #' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
 #' @return Whether to save the model using `safetensors` or the traditional `pytorch` way.
 #'
@@ -162,11 +146,10 @@ check.sustain_iso_code <- function(sustain_iso_code, sustain_track) { # nolint
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-check.possible_save_formats <- function(ml_framework, pytorch_safetensors) { # nolint
-  is_pt <- ml_framework == "pytorch"
+check.possible_save_formats <- function(pytorch_safetensors) { # nolint
   safetensors_available <- reticulate::py_module_available("safetensors")
-  pt_safe_save <- is_pt && pytorch_safetensors && safetensors_available
-  if (is_pt && pytorch_safetensors && !safetensors_available) {
+  pt_safe_save <- pytorch_safetensors && safetensors_available
+  if (pytorch_safetensors && !safetensors_available) {
     warning("Python library 'safetensors' not available. Model will be saved
             in the standard pytorch format.")
   }
@@ -177,16 +160,15 @@ check.possible_save_formats <- function(ml_framework, pytorch_safetensors) { # n
 #' @description Used when creating and training transformers. Checks `pytorch_model.bin`, `model.safetensors` and
 #'   `tf_model.h5` files.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
 #' @param model_dir_path `r paramDesc.model_dir_path()`
-#' @return A list with the variables `from_pt`, `from_tf` and `load_safe`.
+#' @return A list with the variables `from_tf` and `load_safe`.
 #'
 #' @importFrom reticulate py_module_available
 #'
 #' @family Transformer utils
 #' @keywords internal
 #' @noRd
-check.model_files <- function(ml_framework, model_dir_path) { # nolint
+check.model_files <- function(model_dir_path) { # nolint
   bin_exists <- file.exists(paste0(model_dir_path, "/pytorch_model.bin"))
   safetensors_exists <- file.exists(paste0(model_dir_path, "/model.safetensors"))
   h5_exists <- file.exists(paste0(model_dir_path, "/tf_model.h5"))
@@ -196,21 +178,16 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
          a model.safetensors file.")
   }
 
-  is_tf <- ml_framework == "tensorflow"
+  from_tf <- !bin_exists && !safetensors_exists && h5_exists
 
-  from_pt <- is_tf && !h5_exists && (bin_exists || safetensors_exists)
-  from_tf <- !is_tf && !bin_exists && !safetensors_exists && h5_exists
-
-  # In the case of pytorch
   # Check to load from pt/bin or safetensors
   # Use safetensors as preferred method
 
   safetensors_available <- reticulate::py_module_available("safetensors")
-  load_safe <- !is_tf && (safetensors_exists || from_tf) && safetensors_available
+  load_safe <- (safetensors_exists || from_tf) && safetensors_available
 
   return(
     list(
-      from_pt = from_pt,
       from_tf = from_tf,
       load_safe = load_safe
     )

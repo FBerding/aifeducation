@@ -557,8 +557,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$bert)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(ml_framework = ml_framework,
-                   model_dir = model_dir,
+transformer$create(model_dir = model_dir,
                    text_dataset = text_dataset,
                    vocab_size = 30522,
                    vocab_do_lower_case = FALSE,
@@ -583,8 +582,7 @@ transformer$create(ml_framework = ml_framework,
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(ml_framework = ml_framework,
-                  output_dir = output_dir,
+transformer$train(output_dir = output_dir,
                   model_dir_path = model_dir_path,
                   text_dataset = text_dataset,
                   p_mask = 0.15,
@@ -625,8 +623,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$deberta_v2)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(ml_framework = ml_framework,
-                   model_dir = model_dir,
+transformer$create(model_dir = model_dir,
                    text_dataset = text_dataset,
                    vocab_size = 128100,
                    vocab_do_lower_case = FALSE,
@@ -651,8 +648,7 @@ transformer$create(ml_framework = ml_framework,
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(ml_framework = ml_framework,
-                  output_dir = output_dir,
+transformer$train(output_dir = output_dir,
                   model_dir_path = model_dir_path,
                   text_dataset = text_dataset,
                   p_mask = 0.15,
@@ -693,8 +689,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$roberta)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(ml_framework = ml_framework,
-                   model_dir = model_dir,
+transformer$create(model_dir = model_dir,
                    text_dataset = text_dataset,
                    vocab_size = 30522,
                    add_prefix_space = FALSE,
@@ -720,8 +715,7 @@ transformer$create(ml_framework = ml_framework,
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(ml_framework = ml_framework,
-                  output_dir = output_dir,
+transformer$train(output_dir = output_dir,
                   model_dir_path = model_dir_path,
                   text_dataset = text_dataset,
                   p_mask = 0.15,
@@ -761,8 +755,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$funnel)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(ml_framework = ml_framework,
-                   model_dir = model_dir,
+transformer$create(model_dir = model_dir,
                    text_dataset = text_dataset,
                    vocab_size = 30522,
                    vocab_do_lower_case = FALSE,
@@ -791,8 +784,7 @@ transformer$create(ml_framework = ml_framework,
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(ml_framework = ml_framework,
-                  output_dir = output_dir,
+transformer$train(output_dir = output_dir,
                   model_dir_path = model_dir_path,
                   text_dataset = text_dataset,
                   p_mask = 0.15,
@@ -833,8 +825,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$longformer)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(ml_framework = ml_framework,
-                   model_dir = model_dir,
+transformer$create(model_dir = model_dir,
                    text_dataset = text_dataset,
                    vocab_size = 30522,
                    add_prefix_space = FALSE,
@@ -861,8 +852,7 @@ transformer$create(ml_framework = ml_framework,
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(ml_framework = ml_framework,
-                  output_dir = output_dir,
+transformer$train(output_dir = output_dir,
                   model_dir_path = model_dir_path,
                   text_dataset = text_dataset,
                   p_mask = 0.15,
@@ -902,8 +892,7 @@ transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(ml_framework = ml_framework,
-                   model_dir = model_dir,
+transformer$create(model_dir = model_dir,
                    text_dataset = text_dataset,
                    vocab_size = 30522,
                    vocab_do_lower_case = FALSE,
@@ -928,8 +917,7 @@ transformer$create(ml_framework = ml_framework,
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(ml_framework = ml_framework,
-                  output_dir = output_dir,
+transformer$train(output_dir = output_dir,
                   model_dir_path = model_dir_path,
                   text_dataset = text_dataset,
                   p_mask = 0.15,
@@ -1104,7 +1092,6 @@ To implement a new transformer, do the following steps:
         initialize = function() { },
         # (1)
         create = function(# (2) --------------------------
-                          ml_framework,
                           model_dir,
                           text_dataset,
                           vocab_size,
@@ -1132,7 +1119,6 @@ To implement a new transformer, do the following steps:
 
           # (6) -----------------------------------------
           super$create(
-            ml_framework = ml_framework,
             model_dir = model_dir,
             text_dataset = text_dataset,
             vocab_size = vocab_size,
@@ -1197,7 +1183,6 @@ To implement a new transformer, do the following steps:
 
         # (1)
         train = function(# (3) --------
-                         ml_framework,
                          # ...
 
                          # (4) --------
@@ -1217,7 +1202,6 @@ To implement a new transformer, do the following steps:
 
           # (7) -----------------------------------------
           super$train(
-            ml_framework = ml_framework,
             # ...
           )
         }

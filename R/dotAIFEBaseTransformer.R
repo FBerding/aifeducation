@@ -31,7 +31,6 @@
 #'   `BERT`, `DeBERTa-V2`, etc.), to implement a new one see p.4 Implement A Custom Transformer in
 #'   [Transformers for Developers](https://fberding.github.io/aifeducation/articles/transformers.html)
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
 #' @param text_dataset `r paramDesc.text_dataset()`
 #' @param sustain_track `r paramDesc.sustain_track()`
 #' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
@@ -139,8 +138,7 @@
     # Other ----
 
     # Initializes the 'static' parameters of the transformer in the `param` list
-    init_common_model_params = function(ml_framework,
-                                        sustain_track,
+    init_common_model_params = function(sustain_track,
                                         sustain_iso_code,
                                         sustain_region,
                                         sustain_interval,
@@ -149,7 +147,6 @@
                                         log_dir,
                                         log_write_interval,
                                         text_dataset) {
-      self$set_model_param("ml_framework", ml_framework)
       self$set_model_param("sustain_track", sustain_track)
       self$set_model_param("sustain_iso_code", sustain_iso_code)
       self$set_model_param("sustain_region", sustain_region)
@@ -166,15 +163,10 @@
     define_required_SFC_functions = function() {
       if (!is.function(private$steps_for_creation$save_transformer_model)) {
         private$steps_for_creation$save_transformer_model <- function(self) {
-          if (self$params$ml_framework == "tensorflow") {
-            self$temp$model$build()
-            self$temp$model$save_pretrained(save_directory = self$params$model_dir)
-          } else {
-            self$temp$model$save_pretrained(
-              save_directory = self$params$model_dir,
-              safe_serilization = self$temp$pt_safe_save
-            )
-          }
+          self$temp$model$save_pretrained(
+            save_directory = self$params$model_dir,
+            safe_serilization = self$temp$pt_safe_save
+          )
         }
       }
     },
@@ -267,14 +259,13 @@
           msg <- ifelse(self$params$whole_word, "Using Whole Word Masking", "Using Token Masking")
           print_message(msg, self$params$trace)
 
-          self$temp$return_tensors <- ifelse(self$params$ml_framework == "tensorflow", "tf", "pt")
+          self$temp$return_tensors <- "pt"
 
           # Create data collator
           private$steps_for_training$create_data_collator(self)
 
           # ----
-          format_type <- ifelse(self$params$ml_framework == "tensorflow", "tensorflow", "torch")
-          self$temp$tokenized_dataset$set_format(type = format_type)
+          self$temp$tokenized_dataset$set_format(type = "torch")
           self$temp$tokenized_dataset <- self$temp$tokenized_dataset$train_test_split(
             test_size = self$params$val_size
           )
@@ -282,13 +273,8 @@
           print_message("Preparing Training of the Model", self$params$trace)
           # Create Custom Callbacks ----
 
-          if (self$params$ml_framework == "tensorflow") {
-            run_py_file("keras_callbacks.py")
-            create_logger <- py$create_AIFETransformerCSVLogger_TF
-          } else {
-            run_py_file("pytorch_transformer_callbacks.py")
-            create_logger <- py$create_AIFETransformerCSVLogger_PT
-          }
+          run_py_file("pytorch_transformer_callbacks.py")
+          create_logger <- py$create_AIFETransformerCSVLogger_PT
 
           logger_args <- list(
             loss_file = self$temp$loss_file,
@@ -301,120 +287,76 @@
           logger <- do.call(create_logger, logger_args)
 
 
-          if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
-            self$temp$tf_train_dataset <- self$temp$model$prepare_tf_dataset(
-              dataset = self$temp$tokenized_dataset$train,
-              batch_size = as.integer(self$params$batch_size),
-              collate_fn = self$temp$data_collator,
-              shuffle = TRUE
+          if (utils::compareVersion(transformers["__version__"], "4.46.0") >= 0) {
+            training_args <- transformers$TrainingArguments(
+              output_dir = paste0(self$params$output_dir, "/checkpoints"),
+              overwrite_output_dir = TRUE,
+              eval_strategy = "epoch",
+              num_train_epochs = as.integer(self$params$n_epoch),
+              logging_strategy = "epoch",
+              save_strategy = "epoch",
+              save_total_limit = as.integer(1),
+              load_best_model_at_end = TRUE,
+              optim = "adamw_torch",
+              learning_rate = self$params$learning_rate,
+              per_device_train_batch_size = as.integer(self$params$batch_size),
+              per_device_eval_batch_size = as.integer(self$params$batch_size),
+              save_safetensors = TRUE,
+              auto_find_batch_size = FALSE,
+              report_to = "none",
+              log_level = "error",
+              disable_tqdm = !self$params$pytorch_trace
             )
-            self$temp$tf_test_dataset <- self$temp$model$prepare_tf_dataset(
-              dataset = self$temp$tokenized_dataset$test,
-              batch_size = as.integer(self$params$batch_size),
-              collate_fn = self$temp$data_collator,
-              shuffle = TRUE
+          } else {
+            training_args <- transformers$TrainingArguments(
+              output_dir = paste0(self$params$output_dir, "/checkpoints"),
+              overwrite_output_dir = TRUE,
+              evaluation_strategy = "epoch",
+              num_train_epochs = as.integer(self$params$n_epoch),
+              logging_strategy = "epoch",
+              save_strategy = "epoch",
+              save_total_limit = as.integer(1),
+              load_best_model_at_end = TRUE,
+              optim = "adamw_torch",
+              learning_rate = self$params$learning_rate,
+              per_device_train_batch_size = as.integer(self$params$batch_size),
+              per_device_eval_batch_size = as.integer(self$params$batch_size),
+              save_safetensors = TRUE,
+              auto_find_batch_size = FALSE,
+              report_to = "none",
+              log_level = "error",
+              disable_tqdm = !self$params$pytorch_trace
             )
-
-            adam <- tf$keras$optimizers$Adam
-
-            # Create Callbacks ---------------------------------------------------------
-            callback_checkpoint <- tf$keras$callbacks$ModelCheckpoint(
-              filepath = paste0(self$params$output_dir, "/checkpoints/best_weights.h5"),
-              monitor = "val_loss",
-              verbose = as.integer(min(self$params$keras_trace, 1)),
-              mode = "auto",
-              save_best_only = TRUE,
-              save_freq = "epoch",
-              save_weights_only = TRUE
-            )
-
-            callback_history <- tf$keras$callbacks$CSVLogger(
-              filename = paste0(self$params$output_dir, "/checkpoints/history.log"),
-              separator = ",",
-              append = FALSE
-            )
-
-            # Add Callbacks
-            self$temp$callbacks <- list(callback_checkpoint, callback_history, logger)
-
-            print_message("Compile Model", self$params$trace)
-            self$temp$model$compile(optimizer = adam(self$params$learning_rate), loss = "auto")
-
-            # Clear session to provide enough resources for computations ---------------
-            tf$keras$backend$clear_session()
-          } else { # PYTORCH ------------------
-
-            if (utils::compareVersion(transformers["__version__"], "4.46.0") >= 0) {
-              training_args <- transformers$TrainingArguments(
-                output_dir = paste0(self$params$output_dir, "/checkpoints"),
-                overwrite_output_dir = TRUE,
-                eval_strategy = "epoch",
-                num_train_epochs = as.integer(self$params$n_epoch),
-                logging_strategy = "epoch",
-                save_strategy = "epoch",
-                save_total_limit = as.integer(1),
-                load_best_model_at_end = TRUE,
-                optim = "adamw_torch",
-                learning_rate = self$params$learning_rate,
-                per_device_train_batch_size = as.integer(self$params$batch_size),
-                per_device_eval_batch_size = as.integer(self$params$batch_size),
-                save_safetensors = TRUE,
-                auto_find_batch_size = FALSE,
-                report_to = "none",
-                log_level = "error",
-                disable_tqdm = !self$params$pytorch_trace
-              )
-            } else {
-              training_args <- transformers$TrainingArguments(
-                output_dir = paste0(self$params$output_dir, "/checkpoints"),
-                overwrite_output_dir = TRUE,
-                evaluation_strategy = "epoch",
-                num_train_epochs = as.integer(self$params$n_epoch),
-                logging_strategy = "epoch",
-                save_strategy = "epoch",
-                save_total_limit = as.integer(1),
-                load_best_model_at_end = TRUE,
-                optim = "adamw_torch",
-                learning_rate = self$params$learning_rate,
-                per_device_train_batch_size = as.integer(self$params$batch_size),
-                per_device_eval_batch_size = as.integer(self$params$batch_size),
-                save_safetensors = TRUE,
-                auto_find_batch_size = FALSE,
-                report_to = "none",
-                log_level = "error",
-                disable_tqdm = !self$params$pytorch_trace
-              )
-            }
-
-            if (utils::compareVersion(transformers["__version__"], "4.46.0") >= 0) {
-              self$temp$trainer <- transformers$Trainer(
-                model = self$temp$model,
-                train_dataset = self$temp$tokenized_dataset$train,
-                eval_dataset = self$temp$tokenized_dataset$test,
-                args = training_args,
-                data_collator = self$temp$data_collator,
-                processing_class = self$temp$tokenizer
-              )
-            } else {
-              self$temp$trainer <- transformers$Trainer(
-                model = self$temp$model,
-                train_dataset = self$temp$tokenized_dataset$train,
-                eval_dataset = self$temp$tokenized_dataset$test,
-                args = training_args,
-                data_collator = self$temp$data_collator,
-                tokenizer = self$temp$tokenizer
-              )
-            }
-
-            self$temp$trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
-            if (!as.logical(self$params$pytorch_trace)) {
-              self$temp$trainer$remove_callback(transformers$PrinterCallback)
-              self$temp$trainer$remove_callback(transformers$ProgressCallback)
-            }
-
-            # Add Callbacks
-            self$temp$trainer$add_callback(logger)
           }
+
+          if (utils::compareVersion(transformers["__version__"], "4.46.0") >= 0) {
+            self$temp$trainer <- transformers$Trainer(
+              model = self$temp$model,
+              train_dataset = self$temp$tokenized_dataset$train,
+              eval_dataset = self$temp$tokenized_dataset$test,
+              args = training_args,
+              data_collator = self$temp$data_collator,
+              processing_class = self$temp$tokenizer
+            )
+          } else {
+            self$temp$trainer <- transformers$Trainer(
+              model = self$temp$model,
+              train_dataset = self$temp$tokenized_dataset$train,
+              eval_dataset = self$temp$tokenized_dataset$test,
+              args = training_args,
+              data_collator = self$temp$data_collator,
+              tokenizer = self$temp$tokenizer
+            )
+          }
+
+          self$temp$trainer$remove_callback(transformers$integrations$CodeCarbonCallback)
+          if (!as.logical(self$params$pytorch_trace)) {
+            self$temp$trainer$remove_callback(transformers$PrinterCallback)
+            self$temp$trainer$remove_callback(transformers$ProgressCallback)
+          }
+
+          # Add Callbacks
+          self$temp$trainer$add_callback(logger)
         }
       }
 
@@ -422,25 +364,10 @@
       # SFT: start_training ---------------------------------------------------------
       if (!is.function(private$steps_for_training$start_training)) {
         private$steps_for_training$start_training <- function(self) {
-          if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
-            self$temp$model$fit(
-              x = self$temp$tf_train_dataset,
-              validation_data = self$temp$tf_test_dataset,
-              epochs = as.integer(self$params$n_epoch),
-              workers = as.integer(self$params$n_workers),
-              use_multiprocessing = self$params$multi_process,
-              callbacks = list(self$temp$callbacks),
-              verbose = as.integer(self$params$keras_trace)
-            )
-
-            print_message("Load Weights From Best Checkpoint", self$params$trace)
-            self$temp$model$load_weights(paste0(self$params$output_dir, "/checkpoints/best_weights.h5"))
-          } else { # PYTORCH -----------------
-            if (is.function(private$steps_for_training$cuda_empty_cache)) {
-              private$steps_for_training$cuda_empty_cache()
-            }
-            self$temp$trainer$train()
+          if (is.function(private$steps_for_training$cuda_empty_cache)) {
+            private$steps_for_training$cuda_empty_cache()
           }
+          self$temp$trainer$train()
         }
       }
 
@@ -448,19 +375,12 @@
       # SFT: save_model -------------------------------------------------------------
       if (!is.function(private$steps_for_training$save_model)) {
         private$steps_for_training$save_model <- function(self) {
-          if (self$params$ml_framework == "tensorflow") { # TENSORFLOW --------------
-            self$temp$model$save_pretrained(
-              save_directory = self$params$output_dir
-            )
-            history_log <- read.csv(file = paste0(self$params$output_dir, "/checkpoints/history.log"))
-          } else { # PYTORCH -----------------
-            self$temp$model$save_pretrained(
-              save_directory = self$params$output_dir,
-              safe_serilization = self$temp$pt_safe_save
-            )
-            history_log <- pandas$DataFrame(self$temp$trainer$state$log_history)
-            history_log <- clean_pytorch_log_transformers(history_log)
-          }
+          self$temp$model$save_pretrained(
+            save_directory = self$params$output_dir,
+            safe_serilization = self$temp$pt_safe_save
+          )
+          history_log <- pandas$DataFrame(self$temp$trainer$state$log_history)
+          history_log <- clean_pytorch_log_transformers(history_log)
 
           # Write history log
           write.csv2(
@@ -565,7 +485,6 @@
     #'   ### **'Static' parameters**
     #'
     #'   Regardless of the transformer, the following parameters are always included:
-    #'   * `ml_framework`
     #'   * `text_dataset`
     #'   * `sustain_track`
     #'   * `sustain_iso_code`
@@ -765,8 +684,7 @@
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
-    create = function(ml_framework,
-                      model_dir,
+    create = function(model_dir,
                       text_dataset,
                       vocab_size,
                       max_position_embeddings,
@@ -789,7 +707,6 @@
         # Init model parameters -----------------------------------------------------
         # Each transformer has these parameters ----
         private$init_common_model_params(
-          ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
           trace, pytorch_safetensors,
           log_dir, log_write_interval,
@@ -838,12 +755,11 @@
           stop("Dataset does not contain a column 'text' storing the raw texts.")
         }
 
-        check.ml_framework(ml_framework)
         check.hidden_act(hidden_act)
         check.sustain_iso_code(sustain_iso_code, sustain_track)
 
         # Check possible save formats
-        self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
+        self$temp$pt_safe_save <- check.possible_save_formats(pytorch_safetensors)
 
         # Start Sustainability Tracking ---------------------------------------------
         last_log <- py$write_log_py(
@@ -1039,8 +955,7 @@
     #'
     #' @importFrom utils write.csv
     #' @importFrom utils read.csv
-    train = function(ml_framework,
-                     output_dir,
+    train = function(output_dir,
                      model_dir_path,
                      text_dataset,
                      p_mask,
@@ -1069,7 +984,6 @@
         # Init model parameters -----------------------------------------------------
         # Each transformer has these parameters ----
         private$init_common_model_params(
-          ml_framework,
           sustain_track, sustain_iso_code, sustain_region, sustain_interval,
           trace, pytorch_safetensors,
           log_dir, log_write_interval,
@@ -1118,9 +1032,8 @@
         )
 
         # argument checking ---------------------------------------------------------
-        check.ml_framework(ml_framework)
 
-        model_files_check <- check.model_files(ml_framework, model_dir_path)
+        model_files_check <- check.model_files(model_dir_path)
         self$temp$from_pt <- model_files_check$from_pt
         self$temp$from_tf <- model_files_check$from_tf
         self$temp$load_safe <- model_files_check$load_safe
@@ -1134,7 +1047,7 @@
         check.sustain_iso_code(sustain_iso_code, sustain_track)
 
         # Check possible save formats
-        self$temp$pt_safe_save <- check.possible_save_formats(ml_framework, pytorch_safetensors)
+        self$temp$pt_safe_save <- check.possible_save_formats(pytorch_safetensors)
 
         last_log <- py$write_log_py(
           self$temp$log_file,

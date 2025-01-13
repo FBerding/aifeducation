@@ -26,7 +26,6 @@
 #'
 #'    Training of this model makes use of dynamic masking.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
 #' @param text_dataset `r paramDesc.text_dataset()`
 #' @param sustain_track `r paramDesc.sustain_track()`
 #' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
@@ -110,11 +109,7 @@
           pos_att_type = c("p2c", "c2p")
         )
 
-        if (self$params$ml_framework == "tensorflow") {
-          self$temp$model <- transformers$TFDebertaV2ForMaskedLM(configuration)
-        } else {
-          self$temp$model <- transformers$DebertaV2ForMaskedLM(configuration)
-        }
+        self$temp$model <- transformers$DebertaV2ForMaskedLM(configuration)
       }
     ),
 
@@ -130,18 +125,11 @@
 
       # SFT: load_existing_model ----
       load_existing_model = function(self) {
-        if (self$params$ml_framework == "tensorflow") {
-          self$temp$model <- transformers$TFDebertaV2ForMaskedLM$from_pretrained(
-            self$params$model_dir_path,
-            from_pt = self$temp$from_pt
-          )
-        } else {
-          self$temp$model <- transformers$DebertaV2ForMaskedLM$from_pretrained(
-            self$params$model_dir_path,
-            from_tf = self$temp$from_tf,
-            use_safetensors = self$temp$load_safe
-          )
-        }
+        self$temp$model <- transformers$DebertaV2ForMaskedLM$from_pretrained(
+          self$params$model_dir_path,
+          from_tf = self$temp$from_tf,
+          use_safetensors = self$temp$load_safe
+        )
 
         self$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(self$params$model_dir_path)
       },
@@ -191,8 +179,7 @@
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
-    create = function(ml_framework = "pytorch",
-                      model_dir,
+    create = function(model_dir,
                       text_dataset,
                       vocab_size = 128100,
                       vocab_do_lower_case = FALSE,
@@ -222,7 +209,6 @@
 
       # Create method of super ----
       super$create(
-        ml_framework = ml_framework,
         model_dir = model_dir,
         text_dataset = text_dataset,
         vocab_size = vocab_size,
@@ -267,8 +253,7 @@
     #' @param pytorch_trace `r paramDesc.pytorch_trace()`
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
-    train = function(ml_framework = "pytorch",
-                     output_dir,
+    train = function(output_dir,
                      model_dir_path,
                      text_dataset,
                      p_mask = 0.15,
@@ -300,7 +285,6 @@
 
       # Train method of super ----
       super$train(
-        ml_framework = ml_framework,
         output_dir = output_dir,
         model_dir_path = model_dir_path,
         text_dataset = text_dataset,

@@ -44,7 +44,6 @@
       super$set_title(private$title)
     },
     create = function( # --------------------------
-                      ml_framework,
                       model_dir,
                       text_dataset,
                       vocab_size,
@@ -71,7 +70,6 @@
 
       # -----------------------------------------
       super$create(
-        ml_framework = ml_framework,
         model_dir = model_dir,
         text_dataset = text_dataset,
         vocab_size = vocab_size,
@@ -82,7 +80,6 @@
       )
     },
     train = function( # --------
-                     ml_framework,
                      # ...
                      # --------
                      dep_param1,
@@ -101,7 +98,6 @@
 
       # -----------------------------------------
       super$train(
-        ml_framework = ml_framework,
         # ...
       )
     }

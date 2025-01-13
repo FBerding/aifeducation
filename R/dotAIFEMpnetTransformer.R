@@ -22,7 +22,6 @@
 #'
 #' @section Train: To train the model, pass the directory of the model to the method `.AIFEMpnetTransformer$train`.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
 #' @param text_dataset `r paramDesc.text_dataset()`
 #' @param sustain_track `r paramDesc.sustain_track()`
 #' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
@@ -107,14 +106,9 @@
           layer_norm_eps = 1e-12
         )
 
-        if (self$params$ml_framework == "tensorflow") {
-          run_py_file("MPNetForMPLM_TF.py")
-          self$temp$model <- py$MPNetForMPLM_TF(configuration)
-        } else {
-          run_py_file("MPNetForMPLM_PT.py")
-          device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-          self$temp$model <- py$MPNetForMPLM_PT(configuration)$to(device)
-        }
+        run_py_file("MPNetForMPLM_PT.py")
+        device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
+        self$temp$model <- py$MPNetForMPLM_PT(configuration)$to(device)
       }
     ),
 
@@ -124,19 +118,12 @@
 
       # SFT: load_existing_model ----
       load_existing_model = function(self) {
-        if (self$params$ml_framework == "tensorflow") {
-          self$temp$model <- py$MPNetForMPLM_TF$from_pretrained(
-            self$params$model_dir_path,
-            from_pt = self$temp$from_pt
-          )
-        } else {
-          device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-          self$temp$model <- py$MPNetForMPLM_PT$from_pretrained(
-            self$params$model_dir_path,
-            from_tf = self$temp$from_tf,
-            use_safetensors = self$temp$load_safe
-          )$to(device)
-        }
+        device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
+        self$temp$model <- py$MPNetForMPLM_PT$from_pretrained(
+          self$params$model_dir_path,
+          from_tf = self$temp$from_tf,
+          use_safetensors = self$temp$load_safe
+        )$to(device)
 
         self$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(self$params$model_dir_path)
       },
@@ -145,25 +132,14 @@
       # Overwrite the default data collator
       create_data_collator = function(self) {
         collator_maker <- NULL
-        if (self$params$ml_framework == "tensorflow") {
-          run_py_file("DataCollatorForMPLM_TF.py")
-          collator_maker <- py$CollatorMaker_TF(
-            tokenizer = self$temp$tokenizer,
-            mlm = TRUE,
-            mlm_probability = self$params$p_mask,
-            plm_probability = self$params$p_perm,
-            mask_whole_words = self$params$whole_word
-          )
-        } else if (self$params$ml_framework == "pytorch") {
-          run_py_file("DataCollatorForMPLM_PT.py")
-          collator_maker <- py$CollatorMaker_PT(
-            tokenizer = self$temp$tokenizer,
-            mlm = TRUE,
-            mlm_probability = self$params$p_mask,
-            plm_probability = self$params$p_perm,
-            mask_whole_words = self$params$whole_word
-          )
-        }
+        run_py_file("DataCollatorForMPLM_PT.py")
+        collator_maker <- py$CollatorMaker_PT(
+          tokenizer = self$temp$tokenizer,
+          mlm = TRUE,
+          mlm_probability = self$params$p_mask,
+          plm_probability = self$params$p_perm,
+          mask_whole_words = self$params$whole_word
+        )
         if (!is.null(collator_maker)) {
           self$temp$data_collator <- collator_maker$collator$collate_batch
         }
@@ -224,8 +200,7 @@
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
-    create = function(ml_framework = "pytorch",
-                      model_dir,
+    create = function(model_dir,
                       text_dataset,
                       vocab_size = 30522,
                       vocab_do_lower_case = FALSE,
@@ -245,10 +220,6 @@
                       pytorch_safetensors = TRUE,
                       log_dir = NULL,
                       log_write_interval = 2) {
-      if (ml_framework == "tensorflow") {
-        stop("Using AIFEMpnetTransformer with 'tensorflow' is not supported.")
-      }
-
       # Init dependent parameters ----
       super$set_model_param("vocab_do_lower_case", vocab_do_lower_case)
       super$set_model_param("num_hidden_layer", num_hidden_layer)
@@ -259,7 +230,6 @@
 
       # Create method of super ----
       super$create(
-        ml_framework = ml_framework,
         model_dir = model_dir,
         text_dataset = text_dataset,
         vocab_size = vocab_size,
@@ -309,8 +279,7 @@
     #' @param p_perm `double` Ratio that determines the number of words/tokens used for permutation.
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
-    train = function(ml_framework = "pytorch",
-                     output_dir,
+    train = function(output_dir,
                      model_dir_path,
                      text_dataset,
                      p_mask = 0.15,
@@ -335,10 +304,6 @@
                      pytorch_safetensors = TRUE,
                      log_dir = NULL,
                      log_write_interval = 2) {
-      if (ml_framework == "tensorflow") {
-        stop("Using AIFEMpnetTransformer with 'tensorflow' is not supported.")
-      }
-
       # Init dependent parameters ----
       super$set_model_param("p_perm", p_perm)
 
@@ -350,7 +315,6 @@
 
       # Train method of super ----
       super$train(
-        ml_framework = ml_framework,
         output_dir = output_dir,
         model_dir_path = model_dir_path,
         text_dataset = text_dataset,
