@@ -173,7 +173,6 @@ BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
 
         model_params <- params_reactive()
 
-        model_params[["ml_framework"]] <- "pytorch"
         model_params[["output_dir"]] <- input$output_model_dir_path
         model_params[["model_dir_path"]] <- model_architecture$model_dir_path
         model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked

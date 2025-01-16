@@ -116,7 +116,6 @@ BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
         model_params <- params
         # Remove ai_method and dataset_dir_path from model_params list
         model_params <- model_params[!names(model_params) %in% c("ai_method", "dataset_dir_path")]
-        model_params[["ml_framework"]] <- "pytorch"
         model_params[["model_dir"]] <- input$output_model_dir_path
         model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
         model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
