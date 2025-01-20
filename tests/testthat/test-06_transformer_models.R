@@ -57,12 +57,13 @@ for (ai_method in ai_methods) {
   tmp_ai_train <- paste0(tmp_results_TEM_path, "/", framework, "/", ai_method)
   create_dir(tmp_ai_train, FALSE)
 
-  # Creation of the Model ----
+  base_model <- aife_transformer.make(ai_method)
 
+  # Creation of the Model ----
   test_that(paste0(ai_method, ": creation of the model with ", framework), {
     if (ai_method == AIFETrType$bert) {
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 50000,
@@ -83,7 +84,7 @@ for (ai_method in ai_methods) {
       )
 
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 50000,
@@ -104,7 +105,7 @@ for (ai_method in ai_methods) {
       )
     } else if (ai_method == AIFETrType$roberta) {
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -125,7 +126,7 @@ for (ai_method in ai_methods) {
       )
 
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -146,7 +147,7 @@ for (ai_method in ai_methods) {
       )
     } else if (ai_method == AIFETrType$deberta_v2) {
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -167,7 +168,7 @@ for (ai_method in ai_methods) {
       )
 
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -188,7 +189,7 @@ for (ai_method in ai_methods) {
       )
     } else if (ai_method == AIFETrType$funnel) {
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -209,7 +210,7 @@ for (ai_method in ai_methods) {
       )
 
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -229,7 +230,7 @@ for (ai_method in ai_methods) {
       )
     } else if (ai_method == AIFETrType$longformer) {
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -251,7 +252,7 @@ for (ai_method in ai_methods) {
       )
 
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 10000,
@@ -273,7 +274,7 @@ for (ai_method in ai_methods) {
       )
     } else if (ai_method == AIFETrType$mpnet) {
       expect_no_error(
-        aife_transformer_maker$make(ai_method)$create(
+        base_model$create(
           model_dir = tmp_ai_create,
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 50000,
@@ -300,7 +301,6 @@ for (ai_method in ai_methods) {
   # Training of the Model ----
   test_that(paste0(ai_method, ": training of the model with ", framework), {
     if (ai_method == AIFETrType$bert) {
-      base_model <- aife_transformer_maker$make(ai_method)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -368,7 +368,6 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$roberta) {
-      base_model <- aife_transformer_maker$make(ai_method)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -412,7 +411,6 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$deberta_v2) {
-      base_model <- aife_transformer_maker$make(ai_method)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -457,29 +455,30 @@ for (ai_method in ai_methods) {
         )
       )
       Sys.sleep(2)
-      expect_no_error(base_model$train(
-        output_dir = tmp_ai_train,
-        model_dir_path = tmp_ai_create,
-        text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
-        p_mask = 0.15,
-        whole_word = FALSE,
-        val_size = 0.1,
-        n_epoch = 2,
-        batch_size = 2,
-        chunk_size = 100,
-        full_sequences_only = FALSE,
-        n_workers = 1,
-        multi_process = FALSE,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        trace = trace,
-        keras_trace = as.numeric(trace),
-        pytorch_trace = as.numeric(trace)
-      ))
+      expect_no_error(
+        base_model$train(
+          output_dir = tmp_ai_train,
+          model_dir_path = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          p_mask = 0.15,
+          whole_word = FALSE,
+          val_size = 0.1,
+          n_epoch = 2,
+          batch_size = 2,
+          chunk_size = 100,
+          full_sequences_only = FALSE,
+          n_workers = 1,
+          multi_process = FALSE,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace,
+          keras_trace = as.numeric(trace),
+          pytorch_trace = as.numeric(trace)
+        )
+      )
     } else if (ai_method == AIFETrType$funnel) {
-      base_model <- aife_transformer_maker$make(ai_method)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -550,7 +549,6 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$longformer) {
-      base_model <- aife_transformer_maker$make(ai_method)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -572,28 +570,29 @@ for (ai_method in ai_methods) {
       )
       Sys.sleep(3)
 
-      expect_no_error(base_model$train(
-        output_dir = tmp_ai_train,
-        model_dir_path = tmp_ai_create,
-        text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
-        p_mask = 0.30,
-        val_size = 0.1,
-        n_epoch = 2,
-        batch_size = 1,
-        chunk_size = 512,
-        full_sequences_only = FALSE,
-        n_workers = 1,
-        multi_process = FALSE,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        sustain_region = NULL,
-        sustain_interval = 15,
-        trace = trace,
-        keras_trace = as.numeric(trace),
-        pytorch_trace = as.numeric(trace)
-      ))
+      expect_no_error(
+        base_model$train(
+          output_dir = tmp_ai_train,
+          model_dir_path = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          p_mask = 0.30,
+          val_size = 0.1,
+          n_epoch = 2,
+          batch_size = 1,
+          chunk_size = 512,
+          full_sequences_only = FALSE,
+          n_workers = 1,
+          multi_process = FALSE,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace,
+          keras_trace = as.numeric(trace),
+          pytorch_trace = as.numeric(trace)
+        )
+      )
     } else if (ai_method == AIFETrType$mpnet) {
-      base_model <- aife_transformer_maker$make(ai_method)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -652,7 +651,7 @@ for (ai_method in ai_methods) {
   }
   # if (dir.exists(tmp_ai_train)) {
   #  unlink(
-  #    x = tmp_ai_create,
+  #    x = tmp_ai_train,
   #    recursive = TRUE
   #  )
   # }
@@ -665,4 +664,3 @@ if (dir.exists(test_art_tmp_path)) {
     recursive = TRUE
   )
 }
-
