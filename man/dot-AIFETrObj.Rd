@@ -11,8 +11,8 @@ An object of class \code{list} of length 6.
 .AIFETrObj
 }
 \description{
-This list contains transformer objects. Elements of the list are used in the public \code{make} of the
-\link{AIFETransformerMaker} \code{R6} class. This list is not designed to be used directly.
+This list contains transformer objects. Elements of the list can be used in \code{\link[=aife_transformer.make]{aife_transformer.make()}}
+function as input parameter \code{type}. This list is not designed to be used directly.
 
 It has the following elements: bert, roberta, deberta_v2, funnel, longformer, mpnet
 }

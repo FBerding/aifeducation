@@ -114,7 +114,6 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 }
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEFunnelTransformer$create(
-  ml_framework = "pytorch",
   model_dir,
   text_dataset,
   vocab_size = 30522,
@@ -145,12 +144,6 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\itemize{
-\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
-\item \code{ml_framework = "pytorch"}: for 'pytorch'.
-}}
-
 \item{\code{model_dir}}{\code{string} Path to the directory where the model should be saved.}
 
 \item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
@@ -228,7 +221,6 @@ This method can be used to train or fine-tune a transformer based on \code{Funne
 architecture with the help of the python libraries \code{transformers}, \code{datasets}, and \code{tokenizers}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEFunnelTransformer$train(
-  ml_framework = "pytorch",
   output_dir,
   model_dir_path,
   text_dataset,
@@ -259,12 +251,6 @@ architecture with the help of the python libraries \code{transformers}, \code{da
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\itemize{
-\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
-\item \code{ml_framework = "pytorch"}: for 'pytorch'.
-}}
-
 \item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be
 created.}
 

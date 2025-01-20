@@ -59,7 +59,6 @@ Other Transformers for developers:
 
 Regardless of the transformer, the following parameters are always included:
 \itemize{
-\item \code{ml_framework}
 \item \code{text_dataset}
 \item \code{sustain_track}
 \item \code{sustain_iso_code}
@@ -465,7 +464,6 @@ This method \strong{uses} the following parameters from the \code{temp} list:
 }
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$create(
-  ml_framework,
   model_dir,
   text_dataset,
   vocab_size,
@@ -490,12 +488,6 @@ This method \strong{uses} the following parameters from the \code{temp} list:
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\itemize{
-\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
-\item \code{ml_framework = "pytorch"}: for 'pytorch'.
-}}
-
 \item{\code{model_dir}}{\code{string} Path to the directory where the model should be saved.}
 
 \item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
@@ -578,7 +570,6 @@ This method \strong{uses} the following parameters from the \code{temp} list:
 }
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$train(
-  ml_framework,
   output_dir,
   model_dir_path,
   text_dataset,
@@ -609,12 +600,6 @@ This method \strong{uses} the following parameters from the \code{temp} list:
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\itemize{
-\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
-\item \code{ml_framework = "pytorch"}: for 'pytorch'.
-}}
-
 \item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be
 created.}
 
