@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 **GitHub**
-[![](https://img.shields.io/badge/devel%20version-1.0.0-green.svg)](https://github.com/fberding/iotarelr)
+[![](https://img.shields.io/badge/devel%20version-1.0.1-green.svg)](https://github.com/fberding/iotarelr)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 **CRAN** [![CRAN
 status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-project.org/package=aifeducation)

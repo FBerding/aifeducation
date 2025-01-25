@@ -512,7 +512,10 @@ TEClassifierRegular <- R6::R6Class(
                country is missing. Add iso code or deactivate tracking.")
         }
 
-        if(utils::compareVersion(codecarbon["__version__"],"2.8.0")>=0){
+
+        tmp_code_carbon<-reticulate::import("codecarbon")
+        codecarbon_version=as.character(tmp_code_carbon["__version__"])
+        if(utils::compareVersion(codecarbon_version,"2.8.0")>=0){
           path_look_file=codecarbon$lock$LOCKFILE
           if(file.exists(path_look_file)){
             unlink(path_look_file)

@@ -4,6 +4,10 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.0.1
+
+Fixed a bug with the initialization of 'codecarbon' on linux.
+
 # aifeducation 1.0.0
 
 First complete release of the package including major changes, bug
