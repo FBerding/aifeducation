@@ -1,3 +1,4 @@
+testthat::skip_on_cran()
 testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
   message = "Necessary python modules not available"
