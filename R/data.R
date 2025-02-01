@@ -45,3 +45,11 @@
 #'   Computational Linguistics. https://aclanthology.org/P11-1015
 #'
 "imdb_movie_reviews"
+
+#' @title Country Alpha 3 List
+#'
+#' @description A `list` containing the alpha-3 codes for most countries.
+#' @docType data
+#' @format list
+#' @keywords internal
+"country_alpha_3_list"
