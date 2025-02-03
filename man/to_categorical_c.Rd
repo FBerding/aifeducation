@@ -22,6 +22,7 @@ a binary class matrix.
 }
 \seealso{
 Other Auxiliary Functions: 
+\code{\link{get_alpha_3_codes}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{summarize_tracked_sustainability}()}
 }
