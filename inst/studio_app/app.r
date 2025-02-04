@@ -41,7 +41,7 @@ ui <- bslib::page_navbar(
         shiny::selectInput(
           inputId = "sustainability_country",
           label = "Country",
-          choices = get_alpha_3_codes(),
+          choices = aifeducation::get_alpha_3_codes(),
           selected = "DEU"
         )
       ),
