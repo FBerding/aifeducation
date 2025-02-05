@@ -110,7 +110,7 @@ FeatureExtractors_Create_UI <- function(id) {
             shiny::selectInput(
               inputId = shiny::NS(id, "sustainability_country"),
               label = "Country for Sustainability Tracking",
-              choices = country_alpha_3_list,
+              choices = get_alpha_3_codes(),
               # choices=NULL,
               selected = "DEU"
             ),

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,7 +47,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.0.0" id="aifeducation-100">aifeducation 1.0.0<a class="anchor" aria-label="anchor" href="#aifeducation-100"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.0.2" id="aifeducation-102">aifeducation 1.0.2<a class="anchor" aria-label="anchor" href="#aifeducation-102"></a></h2>
+<ul><li>Fixed a bug with alpha 3 codes for sustainability tracking preventing Ai for Education Studio to start.</li>
+<li>The source urls of entries in LargeDataSetsForTexts are now displayed correctly within Ai for Education Studio.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.1" id="aifeducation-101">aifeducation 1.0.1<a class="anchor" aria-label="anchor" href="#aifeducation-101"></a></h2><p class="text-muted">CRAN release: 2025-01-28</p>
+<p>Fixed a bug with the initialization of ‘codecarbon’ on linux.</p>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="aifeducation-100">aifeducation 1.0.0<a class="anchor" aria-label="anchor" href="#aifeducation-100"></a></h2><p class="text-muted">CRAN release: 2024-12-20</p>
 <p>First complete release of the package including major changes, bug fixes, new features, and objects.</p>
 <p>The most important change is that we decided to use ‘PyTorch’ for several reasons. First, ‘PyTorch’ is a very flexible and stable machine learning framework. At the moment, most new architectures are based on ‘PyTorch’ as can be seen on Hugging Face. Currently (11th November 2024) there are 190,237 models for this framework compared to 13,346 models for ‘tensorflow’. Second, ‘PyTorch’ provides an easy installation and supports native GPU acceleration on Linux and Windows while tensorflow supports native GPU support only on Linux and for Windows only in version 2.10 or lower. Fourth, keras, which was an important element of ‘tensorflow’, changed to a multi-back-end framework. However, keras 3.0 does not have a native Windows support. Since we assume that many educational researchers use either Windows or Mac and are not familiar with more complex system configurations (such as using Windows subsystem for Linux (WSL)), this is problematic.</p>
 <p>In addition, we changed the algorithm for saving and loading models, data, and objects to ensure that models trained with the package are working within future versions of <em>aifeducation</em> and can be updated to new developments. This is also necessary to allow reproducibility of models and research based on these models. To achieve this goal we had to make some changes for models created with version 0.3.3 or lower. If you still need these models, please install an older version of <em>aifeducation</em>.</p>

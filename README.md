@@ -5,17 +5,18 @@
 
 <!-- badges: start -->
 
-**GitHub**
-[![](https://img.shields.io/badge/devel%20version-1.0.1-green.svg)](https://github.com/fberding/iotarelr)
+**GitHub** [![Project Status: Active - The project has reached a stable,
+usable state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![](https://img.shields.io/badge/devel%20version-1.0.2-green.svg)](https://github.com/fberding/aifeducation)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
+[![CodeFactor](https://www.codefactor.io/repository/github/fberding/aifeducation/badge)](https://www.codefactor.io/repository/github/fberding/aifeducation)
+[![Codecov test
+coverage](https://codecov.io/gh/FBerding/aifeducation/graph/badge.svg)](https://app.codecov.io/gh/FBerding/aifeducation)
+
 **CRAN** [![CRAN
 status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-project.org/package=aifeducation)
 [![Downloads](http://cranlogs.r-pkg.org/badges/grand-total/aifeducation)](https://cran.r-project.org/package=aifeducation)
-[![Project Status: Active - The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Codecov test
-coverage](https://codecov.io/gh/FBerding/aifeducation/graph/badge.svg)](https://app.codecov.io/gh/FBerding/aifeducation)
 
 <!-- badges: end -->
 

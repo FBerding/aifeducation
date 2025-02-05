@@ -138,7 +138,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
           ),
           license_ui,
           shiny::tags$p(
-            "Source URL: ", current_document()$url_license
+            "Source URL: ", current_document()$url_source
           )
         )
       )
