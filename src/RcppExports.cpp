@@ -11,6 +11,19 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// knnor
+arma::mat knnor(const Rcpp::List& dataset, size_t k, size_t aug_num);
+RcppExport SEXP _aifeducation_knnor(SEXP datasetSEXP, SEXP kSEXP, SEXP aug_numSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type dataset(datasetSEXP);
+    Rcpp::traits::input_parameter< size_t >::type k(kSEXP);
+    Rcpp::traits::input_parameter< size_t >::type aug_num(aug_numSEXP);
+    rcpp_result_gen = Rcpp::wrap(knnor(dataset, k, aug_num));
+    return rcpp_result_gen;
+END_RCPP
+}
 // matrix_to_array_c
 arma::cube matrix_to_array_c(arma::mat matrix, arma::uword times, arma::uword features);
 RcppExport SEXP _aifeducation_matrix_to_array_c(SEXP matrixSEXP, SEXP timesSEXP, SEXP featuresSEXP) {
@@ -36,10 +49,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tensor_to_matrix_c
+arma::mat tensor_to_matrix_c(arma::cube tensor, arma::uword times, arma::uword features);
+RcppExport SEXP _aifeducation_tensor_to_matrix_c(SEXP tensorSEXP, SEXP timesSEXP, SEXP featuresSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube >::type tensor(tensorSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type features(featuresSEXP);
+    rcpp_result_gen = Rcpp::wrap(tensor_to_matrix_c(tensor, times, features));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 3},
     {"_aifeducation_matrix_to_array_c", (DL_FUNC) &_aifeducation_matrix_to_array_c, 3},
     {"_aifeducation_to_categorical_c", (DL_FUNC) &_aifeducation_to_categorical_c, 2},
+    {"_aifeducation_tensor_to_matrix_c", (DL_FUNC) &_aifeducation_tensor_to_matrix_c, 3},
     {NULL, NULL, 0}
 };
 
