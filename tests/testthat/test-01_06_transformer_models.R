@@ -1,7 +1,7 @@
 testthat::skip_on_cran()
 
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
@@ -55,13 +55,6 @@ rows_susatainability <- c(
 )
 
 supported_methods<-list(
-  tensorflow=list(
-    "bert" ,
-    "funnel" ,
-    "roberta" ,
-    "longformer" ,
-    "deberta_v2"
-  ),
   pytorch=list(
     "bert" ,
     "funnel" ,

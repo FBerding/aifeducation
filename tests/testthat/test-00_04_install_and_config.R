@@ -3,6 +3,3 @@ test_that("check_python_modules", {
               "logical")
 })
 
-test_that("check_python_modules", {
-  expect_no_error(set_config_os_environ_logger(level = "ERROR"))
-})

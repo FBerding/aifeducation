@@ -1,6 +1,6 @@
 testthat::skip_on_cran()
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
@@ -40,7 +40,6 @@ for (framework in ml_frameworks) {
       # Create----------------------------------------------------------------
       extractor <- TEFeatureExtractor$new()
       extractor$configure(
-        ml_framework = framework,
         name = "Test_extractor",
         label = "Test Extractor",
         text_embeddings = dataset_list[[data_type]],

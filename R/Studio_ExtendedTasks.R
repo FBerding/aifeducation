@@ -245,7 +245,6 @@ long_classifier <- function(classifier_type,
       # Create Classifier
       classifier <- TEClassifierRegular$new()
       classifier$configure(
-        ml_framework = "pytorch",
         name = name,
         label = label,
         text_embeddings = embeddings,
@@ -303,7 +302,6 @@ long_classifier <- function(classifier_type,
       # Create
       classifier <- TEClassifierProtoNet$new()
       classifier$configure(
-        ml_framework = "pytorch",
         embedding_dim = embedding_dim,
         name = name,
         label = label,
@@ -463,7 +461,6 @@ long_feature_extractor <- function(name,
     # Create
     feature_extractor <- TEFeatureExtractor$new()
     feature_extractor$configure(
-      ml_framework = "pytorch",
       name = name,
       label = label,
       text_embeddings = embeddings,

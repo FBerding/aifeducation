@@ -24,8 +24,8 @@
 AIFEBaseModel <- R6::R6Class(
   classname = "AIFEBaseModel",
   public = list(
-    #' @field model ('tensorflow_model' or 'pytorch_model')\cr
-    #'   Field for storing the 'tensorflow' or 'pytorch' model after loading.
+    #' @field model ('pytorch_model')\cr
+    #'   Field for storing a 'pytorch' model after loading.
     model = NULL,
 
     #' @field model_config ('list()')\cr
@@ -171,12 +171,7 @@ AIFEBaseModel <- R6::R6Class(
     save = function(dir_path, folder_name) {
       save_location <- paste0(dir_path, "/", folder_name)
 
-      if (private$ml_framework == "tensorflow") {
-        save_format <- "keras"
-      } else if (private$ml_framework == "pytorch") {
-        save_format <- "safetensors"
-      }
-
+      save_format <- "safetensors"
 
       if (save_format == "safetensors" &
         reticulate::py_module_available("safetensors") == FALSE) {
@@ -185,28 +180,16 @@ AIFEBaseModel <- R6::R6Class(
         save_format <- "pt"
       }
 
-      if (private$ml_framework == "tensorflow") {
-        if (save_format == "keras") {
-          extension <- ".keras"
-        } else if (save_format == "tf") {
-          extension <- ".tf"
-        } else {
-          extension <- ".h5"
-        }
-        file_path <- paste0(save_location, "/", "model_data", extension)
-        create_dir(save_location, FALSE)
-        self$model$save(file_path)
-      } else if (private$ml_framework == "pytorch") {
-        create_dir(save_location, FALSE)
-        self$model$to("cpu", dtype = torch$float)
-        if (save_format == "safetensors") {
-          file_path <- paste0(save_location, "/", "model_data", ".safetensors")
-          safetensors$torch$save_model(model = self$model, filename = file_path)
-        } else if (save_format == "pt") {
-          file_path <- paste0(save_location, "/", "model_data", ".pt")
-          torch$save(self$model$state_dict(), file_path)
-        }
+      create_dir(save_location, FALSE)
+      self$model$to("cpu", dtype = torch$float)
+      if (save_format == "safetensors") {
+        file_path <- paste0(save_location, "/", "model_data", ".safetensors")
+        safetensors$torch$save_model(model = self$model, filename = file_path)
+      } else if (save_format == "pt") {
+        file_path <- paste0(save_location, "/", "model_data", ".pt")
+        torch$save(self$model$state_dict(), file_path)
       }
+
 
       # Saving Sustainability Data
       sustain_matrix <- t(as.matrix(unlist(private$sustainability)))
@@ -225,41 +208,21 @@ AIFEBaseModel <- R6::R6Class(
       private$load_reload_python_scripts()
 
       # Load the model---------------------------------------------------------
-      if (private$ml_framework == "tensorflow") {
-        path <- paste0(dir_path, "/", "model_data", ".keras")
-        if (file.exists(paths = path) == TRUE) {
-          self$model <- keras$models$load_model(path)
+      path_pt <- paste0(dir_path, "/", "model_data", ".pt")
+      path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
+      private$create_reset_model()
+      if (file.exists(path_safe_tensors)) {
+        safetensors$torch$load_model(model = self$model, filename = path_safe_tensors)
+      } else {
+        if (file.exists(paths = path_pt) == TRUE) {
+          self$model$load_state_dict(torch$load(path_pt))
         } else {
-          path <- paste0(dir_path, "/", "model_data", ".tf")
-          if (dir.exists(paths = path) == TRUE) {
-            self$model <- keras$models$load_model(path)
-          } else {
-            path <- paste0(dir_path, "/", "model_data", ".h5")
-            if (file.exists(paths = path) == TRUE) {
-              self$model <- keras$models$load_model(paste0(dir_path, "/", "model_data", ".h5"))
-            } else {
-              stop("There is no compatible model file in the choosen directory.
-                   Please check path. Please note that classifiers have to be loaded with
-                   the same framework as during creation.")
-            }
-          }
-        }
-      } else if (private$ml_framework == "pytorch") {
-        path_pt <- paste0(dir_path, "/", "model_data", ".pt")
-        path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
-        private$create_reset_model()
-        if (file.exists(path_safe_tensors)) {
-          safetensors$torch$load_model(model = self$model, filename = path_safe_tensors)
-        } else {
-          if (file.exists(paths = path_pt) == TRUE) {
-            self$model$load_state_dict(torch$load(path_pt))
-          } else {
-            stop("There is no compatible model file in the choosen directory.
+          stop("There is no compatible model file in the choosen directory.
                      Please check path. Please note that classifiers have to be loaded with
                      the same framework as during creation.")
-          }
         }
       }
+
 
       # Load sustainability_data
       sustain_path <- paste0(dir_path, "/sustainability.csv")
@@ -337,23 +300,16 @@ AIFEBaseModel <- R6::R6Class(
     #' @description Method for counting the trainable parameters of a model.
     #' @return Returns the number of trainable parameters of the model.
     count_parameter = function() {
-      if (private$ml_framework == "tensorflow") {
-        count <- 0
-        for (i in 1:length(self$model$trainable_weights)) {
-          count <- count + tf$keras$backend$count_params(self$model$trainable_weights[[i]])
-        }
-      } else if (private$ml_framework == "pytorch") {
-        iterator <- reticulate::as_iterator(self$model$parameters())
-        iteration_finished <- FALSE
-        count <- 0
-        while (iteration_finished == FALSE) {
-          iter_results <- reticulate::iter_next(it = iterator)
-          if (is.null(iter_results)) {
-            iteration_finished <- TRUE
-          } else {
-            if (iter_results$requires_grad == TRUE) {
-              count <- count + iter_results$numel()
-            }
+      iterator <- reticulate::as_iterator(self$model$parameters())
+      iteration_finished <- FALSE
+      count <- 0
+      while (iteration_finished == FALSE) {
+        iter_results <- reticulate::iter_next(it = iterator)
+        if (is.null(iter_results)) {
+          iteration_finished <- TRUE
+        } else {
+          if (iter_results$requires_grad == TRUE) {
+            count <- count + iter_results$numel()
           }
         }
       }
@@ -607,20 +563,20 @@ AIFEBaseModel <- R6::R6Class(
     prepare_embeddings_as_np_array = function(embeddings) {
       if ("EmbeddedText" %in% class(embeddings)) {
         prepared_dataset <- embeddings$embeddings
-        tmp_np_array=np$array(prepared_dataset)
+        tmp_np_array <- np$array(prepared_dataset)
       } else if ("array" %in% class(embeddings)) {
         prepared_dataset <- embeddings
-        tmp_np_array=np$array(prepared_dataset)
+        tmp_np_array <- np$array(prepared_dataset)
       } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
         prepared_dataset <- embeddings$set_format("np")
-        tmp_np_array=prepared_dataset["input"]
+        tmp_np_array <- prepared_dataset["input"]
       } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
         prepared_dataset <- embeddings$get_dataset()
         prepared_dataset$set_format("np")
-        tmp_np_array=prepared_dataset["input"]
+        tmp_np_array <- prepared_dataset["input"]
       }
-      tmp_np_array=reticulate::np_array(tmp_np_array)
-      if(numpy_writeable(tmp_np_array)==FALSE){
+      tmp_np_array <- reticulate::np_array(tmp_np_array)
+      if (numpy_writeable(tmp_np_array) == FALSE) {
         warning("Numpy array is not writable")
       }
       return(tmp_np_array)
@@ -674,15 +630,7 @@ AIFEBaseModel <- R6::R6Class(
       private$r_package_versions$aifeducation <- packageVersion("aifeducation")
       private$r_package_versions$reticulate <- packageVersion("reticulate")
 
-      if (private$ml_framework == "pytorch") {
-        private$py_package_versions$torch <- torch["__version__"]
-        private$py_package_versions$tensorflow <- NULL
-        private$py_package_versions$keras <- NULL
-      } else {
-        private$py_package_versions$torch <- NULL
-        private$py_package_versions$tensorflow <- tf$version$VERSION
-        private$py_package_versions$keras <- keras["__version__"]
-      }
+      private$py_package_versions$torch <- torch["__version__"]
       private$py_package_versions$numpy <- np$version$short_version
     },
 
@@ -761,8 +709,6 @@ AIFEBaseModel <- R6::R6Class(
       private$r_package_versions$reticulate <- config_private$r_package_versions$reticulate
 
       private$py_package_versions$torch <- config_private$py_package_versions$torch
-      private$py_package_versions$tensorflow <- config_private$py_package_versions$tensorflow
-      private$py_package_versions$keras <- config_private$py_package_versions$keras
       private$py_package_versions$numpy <- config_private$py_package_versions$numpy
 
       # Finalize config

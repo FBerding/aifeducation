@@ -313,7 +313,6 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           emb_layer_min = input$lm_emb_layers[1],
           emb_layer_max = input$lm_emb_layers[2],
           emb_pool_type = input$lm_emb_pool_type,
-          ml_framework = "pytorch",
           model_dir = path_to_base_model(),
           method = method
         )

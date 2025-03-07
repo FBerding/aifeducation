@@ -1,19 +1,9 @@
 testthat::skip_on_cran()
-if(Sys.getenv("CI")=="true"){
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
-    message = "Necessary python modules not available"
-  )
-} else {
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "all"),
-    message = "Necessary python modules not available"
-  )
-  # SetUp tensorflow
-  aifeducation::set_config_gpu_low_memory()
-  set_config_tf_logger("ERROR")
-  set_config_os_environ_logger("ERROR")
-}
+testthat::skip_if_not(
+  condition = check_aif_py_modules(trace = FALSE),
+  message = "Necessary python modules not available"
+)
+
 testthat::skip_if_not(
   condition = dir.exists(testthat::test_path("test_data_tmp/TEM")),
   message = "Base models for tests not available"
@@ -54,37 +44,23 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 
 
 # config
-#Set Chunks
-chunks=sample(x=c(4,30),size = 1,replace=FALSE)
+# Set Chunks
+chunks <- sample(x = c(4, 30), size = 1, replace = FALSE)
 
-if(Sys.getenv("CI")=="true"){
-  ml_frameworks <- c(
-    "pytorch"
-  )
-} else {
-  ml_frameworks <- c(
-    #"tensorflow",
-    "pytorch"
-  )
-}
+ml_frameworks <- c(
+  "pytorch"
+)
 
- base_model_list <- list(
-   tensorflow = c(
-     "bert",
-     "roberta",
-     "longformer",
-     "funnel",
-     "deberta_v2"
-   ),
-   pytorch = c(
-     "bert",
-     "roberta",
-     "longformer",
-     "funnel",
-     "deberta_v2",
-     "mpnet"
-   )
- )
+base_model_list <- list(
+  pytorch = c(
+    "bert",
+    "roberta",
+    "longformer",
+    "funnel",
+    "deberta_v2",
+    "mpnet"
+  )
+)
 
 pooling_type_list <- list(
   "funnel" = c("cls"),
@@ -111,16 +87,15 @@ for (framework in ml_frameworks) {
     for (pooling_type in pooling_type_list[[base_model]]) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
-          #Error Checking: Max layer greater as the number of layers
-            test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"),{
-              text_embedding_model <- TextEmbeddingModel$new()
-              expect_error(
+          # Error Checking: Max layer greater as the number of layers
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"), {
+            text_embedding_model <- TextEmbeddingModel$new()
+            expect_error(
               text_embedding_model$configure(
                 model_name = paste0(base_model, "_embedding"),
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 20,
                 chunks = chunks,
                 overlap = 10,
@@ -129,10 +104,10 @@ for (framework in ml_frameworks) {
                 emb_pool_type = pooling_type,
                 model_dir = model_path
               )
-              )
-            })
-          #Error Checking: min layer is smaller 1
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: min layer is smaller 1"),{
+            )
+          })
+          # Error Checking: min layer is smaller 1
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: min layer is smaller 1"), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -140,7 +115,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 20,
                 chunks = chunks,
                 overlap = 10,
@@ -151,8 +125,8 @@ for (framework in ml_frameworks) {
               )
             )
           })
-          #Error Checking: max length exceeded
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: max length exceeded"),{
+          # Error Checking: max length exceeded
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: max length exceeded"), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -160,7 +134,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 50000,
                 chunks = chunks,
                 overlap = 10,
@@ -171,15 +144,14 @@ for (framework in ml_frameworks) {
               )
             )
           })
-          #Error Checking: Configuration already set
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"),{
+          # Error Checking: Configuration already set
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"), {
             text_embedding_model <- TextEmbeddingModel$new()
             text_embedding_model$configure(
               model_name = paste0(base_model, "_embedding"),
               model_label = paste0("Text Embedding via", base_model),
               model_language = "english",
               method = base_model,
-              ml_framework = framework,
               max_length = 100,
               chunks = chunks,
               overlap = 10,
@@ -194,7 +166,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 100,
                 chunks = chunks,
                 overlap = 10,
@@ -213,7 +184,6 @@ for (framework in ml_frameworks) {
             model_label = paste0("Text Embedding via", base_model),
             model_language = "english",
             method = base_model,
-            ml_framework = framework,
             max_length = 400,
             chunks = chunks,
             overlap = 50,
@@ -243,7 +213,7 @@ for (framework in ml_frameworks) {
           })
 
           # Method embed--------------------------------------------------------
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed","chunks",chunks), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed", "chunks", chunks), {
             # general
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:10],
@@ -257,11 +227,12 @@ for (framework in ml_frameworks) {
             # Check if embeddings are array with 3 dimensions
             expect_equal(length(dim(embeddings$embeddings)), 3)
 
-            #Check if data is valid
-            expect_false(anyNA(embeddings$embeddings),FALSE)
-            expect_false(0%in%get_n_chunks(embeddings$embeddings,
-                                           features=text_embedding_model$get_transformer_components()$features,
-                                           times=chunks))
+            # Check if data is valid
+            expect_false(anyNA(embeddings$embeddings), FALSE)
+            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
+              features = text_embedding_model$get_transformer_components()$features,
+              times = chunks
+            ))
 
             # check case order invariance
             perm <- sample(x = 1:10, size = 10, replace = FALSE)
@@ -271,26 +242,27 @@ for (framework in ml_frameworks) {
               batch_size = 5
             )
             for (i in 1:10) {
-              expect_equal(embeddings$embeddings[i, , ,drop=FALSE],
-                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , ,drop=FALSE],
+              expect_equal(embeddings$embeddings[i, , , drop = FALSE],
+                embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , , drop = FALSE],
                 tolerance = 1e-2
               )
             }
 
-            #Check embedding in LargeDataSetForTextEmbeddings
+            # Check embedding in LargeDataSetForTextEmbeddings
             embeddings_large <- text_embedding_model$embed(
               raw_text = example_data$text[1:10],
               doc_id = example_data$id[1:10],
               batch_size = 5,
-              return_large_dataset=TRUE
+              return_large_dataset = TRUE
             )
             expect_s3_class(embeddings_large, class = "LargeDataSetForTextEmbeddings")
             expect_equal(embeddings$embeddings,
-                         embeddings_large$convert_to_EmbeddedText()$embeddings,
-                         tolerance = 1e-6)
+              embeddings_large$convert_to_EmbeddedText()$embeddings,
+              tolerance = 1e-6
+            )
           })
 
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case","chunks",chunks), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:1],
               doc_id = example_data$id[1:1]
@@ -301,7 +273,7 @@ for (framework in ml_frameworks) {
           })
 
           # Method embed_large--------------------------------------------------
-          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large","chunks",chunks), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large", "chunks", chunks), {
             # general
             embeddings <- text_embedding_model$embed_large(example_data_large)
             expect_s3_class(embeddings, class = "LargeDataSetForTextEmbeddings")
@@ -341,7 +313,7 @@ for (framework in ml_frameworks) {
 
           # encoding------------------------------------------------------------
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "encoding"), {
-            #Request for tokens only
+            # Request for tokens only
             for (to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
@@ -351,7 +323,7 @@ for (framework in ml_frameworks) {
               expect_length(encodings, 10)
               expect_type(encodings, type = "list")
 
-              #Check order invariance
+              # Check order invariance
               perm <- sample(x = 1:10, size = 10, replace = FALSE)
               encodings_perm <- text_embedding_model$encode(
                 raw_text = example_data$text[perm],
@@ -359,20 +331,21 @@ for (framework in ml_frameworks) {
                 to_int = to_int
               )
               for (i in 1:10) {
-                expect_equal(encodings[[i]],
-                             encodings_perm[[which(x=(perm==i))]]
+                expect_equal(
+                  encodings[[i]],
+                  encodings_perm[[which(x = (perm == i))]]
                 )
               }
             }
 
-            #Request for all tokens types
+            # Request for all tokens types
             for (to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
                 token_encodings_only = FALSE
               )
               expect_type(encodings, type = "list")
-              expect_equal(encodings$encodings$num_rows,sum(encodings$chunks))
+              expect_equal(encodings$encodings$num_rows, sum(encodings$chunks))
             }
           })
 
@@ -478,12 +451,11 @@ for (framework in ml_frameworks) {
               tolerance = 1e-6
             )
 
-            #Clean Directory
+            # Clean Directory
             unlink(
-              x=save_location,
+              x = save_location,
               recursive = TRUE
             )
-
           })
 
           # Function Saving and Loading-----------------------------------------
@@ -546,9 +518,9 @@ for (framework in ml_frameworks) {
             # Check tokenizer statistics
             expect_equal(nrow(text_embedding_model_reloaded$tokenizer_statistics), 2)
 
-            #Clean Directory
+            # Clean Directory
             unlink(
-              x=save_location,
+              x = save_location,
               recursive = TRUE
             )
           })
@@ -556,7 +528,6 @@ for (framework in ml_frameworks) {
           # Documentation----------------------------------------------------------
           # Description
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "description"), {
-
             text_embedding_model$set_model_description(
               eng = "Description",
               native = "Beschreibung",
@@ -670,15 +641,15 @@ for (framework in ml_frameworks) {
             expect_no_error(text_embedding_model$get_basic_components())
           })
 
-          #Method get_model_info
-          model_info=text_embedding_model$get_model_info()
-          expect_equal(model_info$model_license,"test_license")
-          expect_equal(model_info$model_name,paste0(base_model, "_embedding","_ID_",model_info$model_id))
+          # Method get_model_info
+          model_info <- text_embedding_model$get_model_info()
+          expect_equal(model_info$model_license, "test_license")
+          expect_equal(model_info$model_name, paste0(base_model, "_embedding", "_ID_", model_info$model_id))
           expect_true(is.character(model_info$model_id))
-          expect_equal(model_info$model_name_root ,paste0(base_model, "_embedding"))
-          expect_equal(model_info$model_label , paste0("Text Embedding via", base_model))
-          #expect_equal(model_info$model_date ="test_license")
-          expect_equal(model_info$model_language ,"english")
+          expect_equal(model_info$model_name_root, paste0(base_model, "_embedding"))
+          expect_equal(model_info$model_label, paste0("Text Embedding via", base_model))
+          # expect_equal(model_info$model_date ="test_license")
+          expect_equal(model_info$model_language, "english")
         }
       }
     }

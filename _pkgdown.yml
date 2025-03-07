@@ -24,18 +24,11 @@ navbar:
       - text: "For developers"
       - text: "01 Transformers"
         href: "articles/transformers.html"
-      - text: -------
-      - text: "Appendix"
-      - text: "A01 Supported Machine Learning Frameworks"
-        href: "articles/Appendix_A01_Supported_Frameworks.html"
 
 reference:
 - title: Installation and Configuration
 - contents:
   - has_concept("Installation and Configuration")
-- subtitle: Tensorflow only
-- contents:
-  - has_concept("Installation and Configuration Tensorflow")
 
 - title: AI for Education Studio
 - contents:

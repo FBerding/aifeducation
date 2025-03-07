@@ -1,6 +1,6 @@
 testthat::skip_on_cran()
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
@@ -75,7 +75,6 @@ pl_list <- list(FALSE, TRUE)
 
 # Load feature extractors
 feature_extractor_list <- NULL
-feature_extractor_list["tensorflow"] <- list(list(NULL))
 
 if (file.exists(root_path_feature_extractor)) {
   feature_extractor_list["pytorch"] <- list(
@@ -191,7 +190,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
-          ml_framework = framework,
           name = "movie_review_classifier",
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -444,7 +442,6 @@ for (framework in ml_frameworks) {
 
             classifier <- TEClassifierProtoNet$new()
             classifier$configure(
-              ml_framework = framework,
               name = paste0("movie_review_classifier_", "classes_", n_classes),
               label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
               text_embeddings = test_embeddings,
@@ -550,7 +547,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -635,7 +631,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -727,7 +722,6 @@ for (framework in ml_frameworks) {
         classifier_overfitting <- TEClassifierProtoNet$new()
 
         classifier_overfitting$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -847,7 +841,6 @@ for (framework in ml_frameworks) {
 
           classifier <- TEClassifierProtoNet$new()
           classifier$configure(
-            ml_framework = framework,
             name = paste0("movie_review_classifier_", "classes_", n_classes),
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings = test_embeddings,
@@ -915,7 +908,6 @@ for (framework in ml_frameworks) {
 
           classifier <- TEClassifierProtoNet$new()
           classifier$configure(
-            ml_framework = framework,
             name = paste0("movie_review_classifier_", "classes_", n_classes),
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings = test_embeddings,
@@ -971,7 +963,6 @@ for (framework in ml_frameworks) {
 
           classifier <- TEClassifierProtoNet$new()
           classifier$configure(
-            ml_framework = framework,
             name = paste0("movie_review_classifier_", "classes_", n_classes),
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             text_embeddings = test_embeddings,
@@ -1106,7 +1097,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -1177,7 +1167,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierProtoNet$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -1234,7 +1223,6 @@ for (framework in ml_frameworks) {
 
       classifier <- TEClassifierProtoNet$new()
       classifier$configure(
-        ml_framework = framework,
         name = paste0("movie_review_classifier_", "classes_", n_classes),
         label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
         text_embeddings = test_embeddings,

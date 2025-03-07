@@ -13,7 +13,7 @@ class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} has to be used
 \link{TextEmbeddingModel} as for training.
 }
 \description{
-Abstract class for neural nets with 'keras'/'tensorflow' and 'pytorch'.
+Abstract class for neural nets with 'pytorch'.
 
 This object represents in implementation of a prototypical network for few-shot learning as described by Snell,
 Swersky, and Zemel (2017). The network uses a multi way contrastive loss described by Zhang et al. (2019). The
@@ -87,7 +87,6 @@ Other Classification:
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$configure(
-  ml_framework = "pytorch",
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -116,8 +115,6 @@ Creating a new instance of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Currently only pytorch is supported (\code{ml_framework="pytorch"}).}
-
 \item{\code{name}}{\code{string} Name of the new classifier. Please refer to common name conventions. Free text can be used
 with parameter \code{label}.}
 

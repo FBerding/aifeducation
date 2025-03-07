@@ -35,7 +35,7 @@ installation. In terms of natural language processing, these approaches
 are currently limited. State-of-the-art approaches rely on neural nets
 with multiple layers and consist of a huge number of parameters making
 them computationally demanding. With specialized libraries such as
-*keras*, *PyTorch* and *tensorflow*, graphical processing units (gpu)
+*PyTorch*, graphical processing units (gpu)
 can help to speed up computations significantly. However, many of these
 specialized libraries for machine learning are written in python.
 Fortunately, an interface to python is provided via the *R* package

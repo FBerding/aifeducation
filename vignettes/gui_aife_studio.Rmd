@@ -188,8 +188,6 @@ At the beginning you will see the home page (Figure 4).
 
 ![Figure 4: Home Page](home.png){width="100%"}
 
-Here you cannot choose the framework (*pytorch* is activated by
-default).
 
 # 3 Using Aifeducation Studio
 

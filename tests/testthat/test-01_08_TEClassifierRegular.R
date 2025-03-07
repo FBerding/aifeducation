@@ -1,13 +1,10 @@
 testthat::skip_on_cran()
-if(Sys.getenv("CI")=="true"){
   testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE,check = "pytorch"),
+    condition = check_aif_py_modules(trace = FALSE),
     message = "Necessary python modules not available"
   )
   skip_overfitting_test <- TRUE
-} else {
-  skip_overfitting_test <- FALSE
-}
+
 
 # Skip Tests
 skip_creation_test <- FALSE
@@ -73,7 +70,6 @@ pl_list <- list(FALSE, TRUE)
 
 # Load feature extractors
 feature_extractor_list <- NULL
-feature_extractor_list["tensorflow"] <- list(list(NULL))
 
 if (file.exists(root_path_feature_extractor)) {
   feature_extractor_list["pytorch"] <- list(
@@ -188,7 +184,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
-          ml_framework = framework,
           name = "movie_review_classifier",
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -446,7 +441,6 @@ for (framework in ml_frameworks) {
             }
             classifier <- TEClassifierRegular$new()
             classifier$configure(
-              ml_framework = framework,
               name = paste0("movie_review_classifier_", "classes_", n_classes),
               label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
               text_embeddings = test_embeddings,
@@ -547,7 +541,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -630,7 +623,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -718,7 +710,6 @@ for (framework in ml_frameworks) {
 
         classifier_overfitting <- TEClassifierRegular$new()
         classifier_overfitting$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -834,7 +825,6 @@ for (framework in ml_frameworks) {
 
       classifier <- TEClassifierRegular$new()
       classifier$configure(
-        ml_framework = framework,
         name = paste0("movie_review_classifier_", "classes_", n_classes),
         label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
         text_embeddings = test_embeddings,
