@@ -19,6 +19,7 @@ Function for summarizing the tracked sustainability data with a tracker of the p
 }
 \seealso{
 Other Auxiliary Functions: 
+\code{\link{get_alpha_3_codes}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{to_categorical_c}()}
 }

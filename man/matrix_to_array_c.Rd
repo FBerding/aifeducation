@@ -23,6 +23,7 @@ an array for use with keras.
 }
 \seealso{
 Other Auxiliary Functions: 
+\code{\link{get_alpha_3_codes}()},
 \code{\link{summarize_tracked_sustainability}()},
 \code{\link{to_categorical_c}()}
 }

@@ -4,6 +4,13 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.0.2
+
+- Fixed a bug with alpha 3 codes for sustainability tracking preventing
+  Ai for Education Studio to start.
+- The source urls of entries in LargeDataSetsForTexts are now displayed correctly
+  within Ai for Education Studio.
+
 # aifeducation 1.0.1
 
 Fixed a bug with the initialization of 'codecarbon' on linux.

@@ -285,7 +285,8 @@ Classifiers_Create_UI <- function(id) {
                 shiny::selectInput(
                   inputId = shiny::NS(id, "sustainability_country"),
                   label = "Country for Sustainability Tracking",
-                  choices = country_alpha_3_list,
+                  choices = get_alpha_3_codes(),
+                  # choices=NULL,
                   selected = "DEU"
                 ),
                 shiny::uiOutput(outputId = shiny::NS(id, "regular_train")),
@@ -540,7 +541,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
     # Start training------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       # Check vor valid arguments
