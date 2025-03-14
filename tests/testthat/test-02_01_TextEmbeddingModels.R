@@ -1,19 +1,9 @@
 testthat::skip_on_cran()
-if (Sys.getenv("CI") == "true") {
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
-    message = "Necessary python modules not available"
-  )
-} else {
-  testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE, check = "all"),
-    message = "Necessary python modules not available"
-  )
-  # SetUp tensorflow
-  aifeducation::set_config_gpu_low_memory()
-  set_config_tf_logger("ERROR")
-  set_config_os_environ_logger("ERROR")
-}
+testthat::skip_if_not(
+  condition = check_aif_py_modules(trace = FALSE),
+  message = "Necessary python modules not available"
+)
+
 testthat::skip_if_not(
   condition = dir.exists(testthat::test_path("test_data_tmp/TEM")),
   message = "Base models for tests not available"
@@ -57,25 +47,11 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 # Set Chunks
 chunks <- sample(x = c(4, 30), size = 1, replace = FALSE)
 
-if (Sys.getenv("CI") == "true") {
-  ml_frameworks <- c(
-    "pytorch"
-  )
-} else {
-  ml_frameworks <- c(
-    # "tensorflow",
-    "pytorch"
-  )
-}
+ml_frameworks <- c(
+  "pytorch"
+)
 
 base_model_list <- list(
-  tensorflow = c(
-    "bert",
-    "roberta",
-    "longformer",
-    "funnel",
-    "deberta_v2"
-  ),
   pytorch = c(
     "bert",
     "roberta",
@@ -112,10 +88,7 @@ for (framework in ml_frameworks) {
       for (max_layer in max_layers) {
         for (min_layer in 1:max_layer) {
           # Error Checking: Max layer greater as the number of layers
-          test_that(paste(
-            framework, base_model, pooling_type, max_layer, min_layer,
-            "Max layer greater as the number of layers"
-          ), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -123,7 +96,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 20,
                 chunks = chunks,
                 overlap = 10,
@@ -135,10 +107,7 @@ for (framework in ml_frameworks) {
             )
           })
           # Error Checking: min layer is smaller 1
-          test_that(paste(
-            framework, base_model, pooling_type, max_layer, min_layer,
-            "Error Checking: min layer is smaller 1"
-          ), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: min layer is smaller 1"), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -146,7 +115,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 20,
                 chunks = chunks,
                 overlap = 10,
@@ -158,10 +126,7 @@ for (framework in ml_frameworks) {
             )
           })
           # Error Checking: max length exceeded
-          test_that(paste(
-            framework, base_model, pooling_type, max_layer, min_layer,
-            "Error Checking: max length exceeded"
-          ), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: max length exceeded"), {
             text_embedding_model <- TextEmbeddingModel$new()
             expect_error(
               text_embedding_model$configure(
@@ -169,7 +134,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 50000,
                 chunks = chunks,
                 overlap = 10,
@@ -181,17 +145,13 @@ for (framework in ml_frameworks) {
             )
           })
           # Error Checking: Configuration already set
-          test_that(paste(
-            framework, base_model, pooling_type, max_layer, min_layer,
-            "Error Checking: Configuration already set"
-          ), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"), {
             text_embedding_model <- TextEmbeddingModel$new()
             text_embedding_model$configure(
               model_name = paste0(base_model, "_embedding"),
               model_label = paste0("Text Embedding via", base_model),
               model_language = "english",
               method = base_model,
-              ml_framework = framework,
               max_length = 100,
               chunks = chunks,
               overlap = 10,
@@ -206,7 +166,6 @@ for (framework in ml_frameworks) {
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
                 method = base_model,
-                ml_framework = framework,
                 max_length = 100,
                 chunks = chunks,
                 overlap = 10,
@@ -225,7 +184,6 @@ for (framework in ml_frameworks) {
             model_label = paste0("Text Embedding via", base_model),
             model_language = "english",
             method = base_model,
-            ml_framework = framework,
             max_length = 400,
             chunks = chunks,
             overlap = 50,
@@ -271,16 +229,7 @@ for (framework in ml_frameworks) {
 
             # Check if data is valid
             expect_false(anyNA(embeddings$embeddings), FALSE)
-            expect_false(0 %in% get_n_chunks(
-              embeddings$embeddings,
-              features = text_embedding_model$get_transformer_components()$features,
-              times = chunks
-            ))
-
-            # Check if data is valid
-            expect_false(anyNA(embeddings$embeddings), FALSE)
-            expect_false(0 %in% get_n_chunks(
-              embeddings$embeddings,
+            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
               features = text_embedding_model$get_transformer_components()$features,
               times = chunks
             ))
@@ -299,7 +248,6 @@ for (framework in ml_frameworks) {
               )
             }
 
-
             # Check embedding in LargeDataSetForTextEmbeddings
             embeddings_large <- text_embedding_model$embed(
               raw_text = example_data$text[1:10],
@@ -314,10 +262,7 @@ for (framework in ml_frameworks) {
             )
           })
 
-          test_that(paste(
-            framework, base_model, pooling_type, max_layer, min_layer,
-            "embed single case", "chunks", chunks
-          ), {
+          test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {
             embeddings <- text_embedding_model$embed(
               raw_text = example_data$text[1:1],
               doc_id = example_data$id[1:1]

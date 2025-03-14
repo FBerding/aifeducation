@@ -19,7 +19,7 @@ For predictions an object of class \link{EmbeddedText} or \link{LargeDataSetForT
 created with the same \link{TextEmbeddingModel} as for training.
 }
 \description{
-Abstract class for neural nets with 'keras'/'tensorflow' and ' pytorch'.
+Abstract class for neural nets with 'pytorch'.
 }
 \seealso{
 Other Classification: 
@@ -109,7 +109,6 @@ recall, and f1 for every fold.
 Creating a new instance of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifierRegular$configure(
-  ml_framework = "pytorch",
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
@@ -137,9 +136,6 @@ Creating a new instance of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference. \code{ml_framework="tensorflow"} for
-'tensorflow' and \code{ml_framework="pytorch"} for 'pytorch'}
-
 \item{\code{name}}{\code{string} Name of the new classifier. Please refer to common name conventions. Free text can be used
 with parameter \code{label}.}
 

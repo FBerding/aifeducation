@@ -123,19 +123,13 @@ for CPUs, GPUs and RAM during training and derives a value for CO2
 emission. This value is based on the energy mix in the country where the
 computer is located.
 
-## PyTorch and Tensorflow Compatibility
+## PyTorch as Machine Learning Framework
 
 The core machine learning framework of this package is 'PyTorch',
 providing a broad support of graphical devices to accelerate
 computations, access to new and unique model architectures, and a high
 compatibility of models across different versions of this machine
 learning framework.
-
-'Tensorflow' is also supported but only for version 2.15 and not for all
-models. Please refer to appendix [A01 Supported Machine Learning
-Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
-for a detailed overview.Tensorflow support will be removed with version 1.1.0 of
-this package.
 
 ## Model Life Cycle
 

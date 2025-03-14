@@ -79,7 +79,6 @@ Method for creating a new text embedding model
   model_label = NULL,
   model_language = NULL,
   method = NULL,
-  ml_framework = "pytorch",
   max_length = 0,
   chunks = 2,
   overlap = 0,
@@ -110,11 +109,6 @@ the following models are supported:
 \code{method="deberta_v2"} for Decoding-enhanced BERT with Disentangled Attention (DeBERTa V2),
 \verb{method="glove"`` for GlobalVector Clusters, and }method="lda"` for topic modeling. See
 details for more information.}
-
-\item{\code{ml_framework}}{\code{string} Framework to use for the model.
-\code{ml_framework="tensorflow"} for 'tensorflow' and \code{ml_framework="pytorch"}
-for 'pytorch'. Only relevant for transformer models. To request bag-of-words model
-set \code{ml_framework=NULL}.}
 
 \item{\code{max_length}}{\code{int} determining the maximum length of token
 sequences used in transformer models. Not relevant for the other methods.}
@@ -311,9 +305,6 @@ and their type, token, and id in the columns.
 Method for creating text embeddings from raw texts.
 This method should only be used if a small number of texts should be transformed
 into text embeddings. For a large number of texts please use the method \code{embed_large}.
-In the case of using a GPU and running out of memory while using 'tensorflow'  reduce the
-batch size or restart R and switch to use cpu only via \code{set_config_cpu_only}. In general,
-not relevant for 'pytorch'.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(
   raw_text = NULL,

@@ -1,13 +1,10 @@
 testthat::skip_on_cran()
-if (Sys.getenv("CI") == "true") {
   testthat::skip_if_not(
-    condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
+    condition = check_aif_py_modules(trace = FALSE),
     message = "Necessary python modules not available"
   )
   skip_overfitting_test <- TRUE
-} else {
-  skip_overfitting_test <- FALSE
-}
+
 
 # Skip Tests
 skip_creation_test <- FALSE
@@ -73,7 +70,6 @@ pl_list <- list(FALSE, TRUE)
 
 # Load feature extractors
 feature_extractor_list <- NULL
-feature_extractor_list["tensorflow"] <- list(list(NULL))
 
 if (file.exists(root_path_feature_extractor)) {
   feature_extractor_list["pytorch"] <- list(
@@ -186,59 +182,26 @@ for (framework in ml_frameworks) {
       dense_size <- dense_list_size[[sample(x = seq.int(from = 1, to = length(dense_list_size)), size = 1)]]
       rec_size <- rec_list_size[[sample(x = seq.int(from = 1, to = length(rec_list_size)), size = 1)]]
 
-      classifier <- TEClassifierRegular$new()
-      classifier$configure(
-        ml_framework = framework,
-        name = "movie_review_classifier",
-        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-        text_embeddings = test_embeddings,
-        feature_extractor = test_combinations[[i]]$feature_extractor,
-        target_levels = target_levels[[n_classes]],
-        dense_layers = test_combinations[[i]]$dense_layers,
-        dense_size = dense_size,
-        rec_layers = test_combinations[[i]]$rec_layers,
-        rec_size = rec_size,
-        rec_type = test_combinations[[i]]$rec_type,
-        rec_bidirectional = test_combinations[[i]]$rec_bidirectional,
-        self_attention_heads = 2,
-        add_pos_embedding = test_combinations[[i]]$pos_embedding,
-        attention_type = test_combinations[[i]]$attention,
-        rec_dropout = 0.5,
-        encoder_dropout = 0.1,
-        repeat_encoder = test_combinations[[i]]$r,
-        recurrent_dropout = 0.4
-      )
-
-      test_that(paste(
-        "no sustainability tracking", framework,
-        "n_classes", n_classes,
-        "features_extractor", !is.null(feature_extractor),
-        "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
-        "rec_type", test_combinations[[i]]$rec_type,
-        "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
-        "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
-        "encoder", test_combinations[[i]]$r,
-        "attention", test_combinations[[i]]$attention,
-        "pos", test_combinations[[i]]$pos_embedding
-      ), {
-        expect_false(classifier$get_sustainability_data()$sustainability_tracked)
-      })
-
-
-      test_that(paste(
-        "predict - basic", framework,
-        "n_classes", n_classes,
-        "features_extractor", !is.null(feature_extractor),
-        "rec_layers", paste(test_combinations[[i]]$rec_layers, rec_size),
-        "rec_type", test_combinations[[i]]$rec_type,
-        "rec_bidirectional", test_combinations[[i]]$rec_bidirectional,
-        "dense_layers", paste(test_combinations[[i]]$dense_layers, dense_size),
-        "encoder", test_combinations[[i]]$r,
-        "attention", test_combinations[[i]]$attention,
-        "pos", test_combinations[[i]]$pos_embedding
-      ), {
-        expect_s3_class(classifier,
-          class = "TEClassifierRegular"
+        classifier <- TEClassifierRegular$new()
+        classifier$configure(
+          name = "movie_review_classifier",
+          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+          text_embeddings = test_embeddings,
+          feature_extractor = test_combinations[[i]]$feature_extractor,
+          target_levels = target_levels[[n_classes]],
+          dense_layers = test_combinations[[i]]$dense_layers,
+          dense_size = dense_size,
+          rec_layers = test_combinations[[i]]$rec_layers,
+          rec_size = rec_size,
+          rec_type = test_combinations[[i]]$rec_type,
+          rec_bidirectional = test_combinations[[i]]$rec_bidirectional,
+          self_attention_heads = 2,
+          add_pos_embedding = test_combinations[[i]]$pos_embedding,
+          attention_type = test_combinations[[i]]$attention,
+          rec_dropout = 0.5,
+          encoder_dropout = 0.1,
+          repeat_encoder = test_combinations[[i]]$r,
+          recurrent_dropout = 0.4
         )
 
         predictions <- classifier$predict(
@@ -451,10 +414,87 @@ for (framework in ml_frameworks) {
             sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
           ]]
 
-          # Create directory for saving checkpoint for every training
-          train_path <- paste0(root_path_results, "/", "train_", generate_id())
-          if (dir.exists(train_path) == FALSE) {
-            dir.create(train_path)
+            # Create directory for saving checkpoint for every training
+            train_path <- paste0(root_path_results, "/", "train_", generate_id())
+            if (dir.exists(train_path) == FALSE) {
+              dir.create(train_path)
+            }
+            classifier <- TEClassifierRegular$new()
+            classifier$configure(
+              name = paste0("movie_review_classifier_", "classes_", n_classes),
+              label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+              text_embeddings = test_embeddings,
+              target_levels = target_levels[[n_classes]],
+              feature_extractor = feature_extractor,
+              dense_layers = dense_layers,
+              dense_size = dense_size,
+              rec_layers = rec_layers,
+              rec_size = rec_size,
+              rec_type = rec_type,
+              rec_bidirectional = rec_bidirectional,
+              self_attention_heads = 1,
+              intermediate_size = NULL,
+              attention_type = attention_type,
+              add_pos_embedding = add_pos_embedding,
+              rec_dropout = 0.1,
+              repeat_encoder = repeat_encoder,
+              dense_dropout = 0.4,
+              recurrent_dropout = 0.4,
+              encoder_dropout = 0.1,
+              optimizer = "adam"
+            )
+
+            test_that(paste(
+              framework, "training",
+              "n_classes", n_classes,
+              "sc", use_sc,
+              "pl", use_pl,
+              "features_extractor", !is.null(feature_extractor),
+              "rec_layers", paste(rec_layers, rec_size),
+              "rec_type", rec_type,
+              "rec_bidirectional", rec_bidirectional,
+              "dense_layers", paste(dense_layers, dense_size),
+              "encoder", repeat_encoder,
+              "attention", attention_type,
+              "pos", add_pos_embedding
+            ), {
+              expect_no_error(
+                classifier$train(
+                  data_embeddings = test_embeddings,
+                  data_targets = target_data[[n_classes]],
+                  data_folds = 2,
+                  balance_class_weights = TRUE,
+                  balance_sequence_length = TRUE,
+                  use_sc = use_sc,
+                  sc_method = "dbsmote",
+                  sc_min_k = 1,
+                  sc_max_k = 2,
+                  use_pl = use_pl,
+                  pl_max_steps = 2,
+                  pl_max = 1.00,
+                  pl_anchor = 1.00,
+                  pl_min = 0.00,
+                  sustain_track = TRUE,
+                  sustain_iso_code = "DEU",
+                  sustain_region = NULL,
+                  sustain_interval = 15,
+                  epochs = 20,
+                  batch_size = 32,
+                  dir_checkpoint = train_path,
+                  trace = FALSE,
+                  ml_trace = 0,
+                  n_cores = 2
+                )
+              )
+              expect_true(classifier$get_sustainability_data()$sustainability_tracked)
+            })
+
+            # Clean Directory
+            unlink(
+              x = train_path,
+              recursive = TRUE
+            )
+            gc()
           }
           classifier <- TEClassifierRegular$new()
           classifier$configure(
@@ -563,7 +603,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -650,7 +689,6 @@ for (framework in ml_frameworks) {
 
         classifier <- TEClassifierRegular$new()
         classifier$configure(
-          ml_framework = framework,
           name = paste0("movie_review_classifier_", "classes_", n_classes),
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           text_embeddings = test_embeddings,
@@ -740,31 +778,30 @@ for (framework in ml_frameworks) {
         sample(x = seq.int(from = 1, to = length(pos_embedding_list)), size = 1)
       ]]
 
-      classifier_overfitting <- TEClassifierRegular$new()
-      classifier_overfitting$configure(
-        ml_framework = framework,
-        name = paste0("movie_review_classifier_", "classes_", n_classes),
-        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-        text_embeddings = test_embeddings,
-        target_levels = target_levels[[n_classes]],
-        feature_extractor = NULL,
-        dense_layers = 1,
-        dense_size = 10,
-        rec_size = c(10),
-        rec_layers = 1,
-        rec_type = rec_type,
-        rec_bidirectional = rec_bidirectional,
-        self_attention_heads = 1,
-        intermediate_size = NULL,
-        attention_type = attention_type,
-        add_pos_embedding = add_pos_embedding,
-        rec_dropout = 0.0,
-        repeat_encoder = 0,
-        dense_dropout = 0.0,
-        recurrent_dropout = 0.0,
-        encoder_dropout = 0.0,
-        optimizer = "adam"
-      )
+        classifier_overfitting <- TEClassifierRegular$new()
+        classifier_overfitting$configure(
+          name = paste0("movie_review_classifier_", "classes_", n_classes),
+          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+          text_embeddings = test_embeddings,
+          target_levels = target_levels[[n_classes]],
+          feature_extractor = NULL,
+          dense_layers = 1,
+          dense_size = 10,
+          rec_size = c(10),
+          rec_layers = 1,
+          rec_type = rec_type,
+          rec_bidirectional = rec_bidirectional,
+          self_attention_heads = 1,
+          intermediate_size = NULL,
+          attention_type = attention_type,
+          add_pos_embedding = add_pos_embedding,
+          rec_dropout = 0.0,
+          repeat_encoder = 0,
+          dense_dropout = 0.0,
+          recurrent_dropout = 0.0,
+          encoder_dropout = 0.0,
+          optimizer = "adam"
+        )
 
       if (n_classes < 3) {
         epochs <- 500
@@ -862,7 +899,6 @@ for (framework in ml_frameworks) {
 
       classifier <- TEClassifierRegular$new()
       classifier$configure(
-        ml_framework = framework,
         name = paste0("movie_review_classifier_", "classes_", n_classes),
         label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
         text_embeddings = test_embeddings,

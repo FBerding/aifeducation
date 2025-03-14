@@ -6,7 +6,6 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  install = "pytorch",
   transformer_version = "<=4.46",
   tokenizers_version = "<=0.20.4",
   pandas_version = "<=2.2.3",
@@ -22,13 +21,6 @@ install_py_modules(
 }
 \arguments{
 \item{envname}{\code{string} Name of the environment where the packages should be installed.}
-
-\item{install}{\code{character} determining which machine learning frameworks should be installed.
-\itemize{
-\item \code{install = "all"}: for 'pytorch' and 'tensorflow'.
-\item \code{install = "pytorch"}: for 'pytorch'.
-\item \code{install = "tensorflow"}: for 'tensorflow'.
-}}
 
 \item{transformer_version}{\code{string} determining the desired version of the python library 'transformers'.}
 

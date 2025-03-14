@@ -13,7 +13,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 #' @title Text embedding classifier with a ProtoNet
-#' @description Abstract class for neural nets with 'keras'/'tensorflow' and 'pytorch'.
+#' @description Abstract class for neural nets with 'pytorch'.
 #'
 #'   This object represents in implementation of a prototypical network for few-shot learning as described by Snell,
 #'   Swersky, and Zemel (2017). The network uses a multi way contrastive loss described by Zhang et al. (2019). The
@@ -43,7 +43,6 @@ TEClassifierProtoNet <- R6::R6Class(
   public = list(
     # New-----------------------------------------------------------------------
     #' @description Creating a new instance of this class.
-    #' @param ml_framework `string` Currently only pytorch is supported (`ml_framework="pytorch"`).
     #' @param name `string` Name of the new classifier. Please refer to common name conventions. Free text can be used
     #'   with parameter `label`.
     #' @param label `string` Label for the new classifier. Here you can use free text.
@@ -78,8 +77,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   recurrent layer. Only relevant for keras models.
     #' @param optimizer `string` `"adam"` or `"rmsprop"` .
     #' @return Returns an object of class [TEClassifierProtoNet] which is ready for training.
-    configure = function(ml_framework = "pytorch",
-                         name = NULL,
+    configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
                          feature_extractor = NULL,
@@ -626,16 +624,14 @@ TEClassifierProtoNet <- R6::R6Class(
         # Returns a data set object
         prediction_data_q_embeddings <- private$prepare_embeddings_as_dataset(embeddings_q)
 
-        if (private$ml_framework == "pytorch") {
-          prediction_data_q_embeddings$set_format("torch")
-          embeddings_and_distances <- py$TeProtoNetBatchEmbedDistance(
-            model = self$model,
-            dataset_q = prediction_data_q_embeddings,
-            batch_size = as.integer(batch_size)
-          )
-          embeddings_tensors_q <- private$detach_tensors(embeddings_and_distances[[1]])
-          distances_tensors_q <- private$detach_tensors(embeddings_and_distances[[2]])
-        }
+        prediction_data_q_embeddings$set_format("torch")
+        embeddings_and_distances <- py$TeProtoNetBatchEmbedDistance(
+          model = self$model,
+          dataset_q = prediction_data_q_embeddings,
+          batch_size = as.integer(batch_size)
+        )
+        embeddings_tensors_q <- private$detach_tensors(embeddings_and_distances[[1]])
+        distances_tensors_q <- private$detach_tensors(embeddings_and_distances[[2]])
       } else {
         prediction_data_q_embeddings <- private$prepare_embeddings_as_np_array(embeddings_q)
 
@@ -648,36 +644,33 @@ TEClassifierProtoNet <- R6::R6Class(
           )$embeddings)
         }
 
-        if (private$ml_framework == "pytorch") {
-          if (torch$cuda$is_available()) {
-            device <- "cuda"
-            dtype <- torch$double
-            self$model$to(device, dtype = dtype)
-            self$model$eval()
-            input <- torch$from_numpy(prediction_data_q_embeddings)
-            embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
-            embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
-            distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
-            distances_tensors_q <- private$detach_tensors(distances_tensors_q)
-          } else {
-            device <- "cpu"
-            dtype <- torch$float
-            self$model$to(device, dtype = dtype)
-            self$model$eval()
-            input <- torch$from_numpy(prediction_data_q_embeddings)
-            embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
-            embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
-            distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
-            distances_tensors_q <- private$detach_tensors(distances_tensors_q)
-          }
+
+        if (torch$cuda$is_available()) {
+          device <- "cuda"
+          dtype <- torch$double
+          self$model$to(device, dtype = dtype)
+          self$model$eval()
+          input <- torch$from_numpy(prediction_data_q_embeddings)
+          embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
+          embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+          distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
+          distances_tensors_q <- private$detach_tensors(distances_tensors_q)
+        } else {
+          device <- "cpu"
+          dtype <- torch$float
+          self$model$to(device, dtype = dtype)
+          self$model$eval()
+          input <- torch$from_numpy(prediction_data_q_embeddings)
+          embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
+          embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+          distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
+          distances_tensors_q <- private$detach_tensors(distances_tensors_q)
         }
       }
 
-      if (private$ml_framework == "pytorch") {
-        embeddings_prototypes <- private$detach_tensors(
-          self$model$get_trained_prototypes()
-        )
-      }
+      embeddings_prototypes <- private$detach_tensors(
+        self$model$get_trained_prototypes()
+      )
 
       # Post processing
       rownames(embeddings_tensors_q) <- current_row_names
@@ -812,50 +805,48 @@ TEClassifierProtoNet <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     load_reload_python_scripts = function() {
-      if (private$ml_framework == "tensorflow") {
-
-      } else if (private$ml_framework == "pytorch") {
-        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+      reticulate::py_run_file(
+        system.file("python/pytorch_te_classifier.py",
           package = "aifeducation"
-        ))
-        reticulate::py_run_file(system.file("python/pytorch_te_protonet.py",
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/pytorch_te_protonet.py",
           package = "aifeducation"
-        ))
-        reticulate::py_run_file(system.file("python/py_log.py",
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/py_log.py",
           package = "aifeducation"
-        ))
-      }
+        )
+      )
     },
     #--------------------------------------------------------------------------
     create_reset_model = function() {
       private$check_config_for_TRUE()
-      if (private$ml_framework == "tensorflow") {
-
-      } else {
-        #--------------------------------------------------------------------------
-        # Load Custom Pytorch Objects and Functions
-        private$load_reload_python_scripts()
-        self$model <- py$TextEmbeddingClassifierProtoNet_PT(
-          features = as.integer(self$model_config$features),
-          times = as.integer(self$model_config$times),
-          dense_size = as.integer(self$model_config$dense_size),
-          dense_layers = as.integer(self$model_config$dense_layers),
-          rec_size = as.integer(self$model_config$rec_size),
-          rec_layers = as.integer(self$model_config$rec_layers),
-          rec_type = self$model_config$rec_type,
-          rec_bidirectional = self$model_config$rec_bidirectional,
-          intermediate_size = as.integer(self$model_config$intermediate_size),
-          attention_type = self$model_config$attention_type,
-          repeat_encoder = as.integer(self$model_config$repeat_encoder),
-          dense_dropout = self$model_config$dense_dropout,
-          rec_dropout = self$model_config$rec_dropout,
-          encoder_dropout = self$model_config$encoder_dropout,
-          add_pos_embedding = self$model_config$add_pos_embedding,
-          self_attention_heads = as.integer(self$model_config$self_attention_heads),
-          embedding_dim = as.integer(self$model_config$embedding_dim),
-          target_levels = reticulate::np_array(seq(from = 0, to = (length(self$model_config$target_levels) - 1)))
-        )
-      }
+      #--------------------------------------------------------------------------
+      # Load Custom Pytorch Objects and Functions
+      private$load_reload_python_scripts()
+      self$model <- py$TextEmbeddingClassifierProtoNet_PT(
+        features = as.integer(self$model_config$features),
+        times = as.integer(self$model_config$times),
+        dense_size = as.integer(self$model_config$dense_size),
+        dense_layers = as.integer(self$model_config$dense_layers),
+        rec_size = as.integer(self$model_config$rec_size),
+        rec_layers = as.integer(self$model_config$rec_layers),
+        rec_type = self$model_config$rec_type,
+        rec_bidirectional = self$model_config$rec_bidirectional,
+        intermediate_size = as.integer(self$model_config$intermediate_size),
+        attention_type = self$model_config$attention_type,
+        repeat_encoder = as.integer(self$model_config$repeat_encoder),
+        dense_dropout = self$model_config$dense_dropout,
+        rec_dropout = self$model_config$rec_dropout,
+        encoder_dropout = self$model_config$encoder_dropout,
+        add_pos_embedding = self$model_config$add_pos_embedding,
+        self_attention_heads = as.integer(self$model_config$self_attention_heads),
+        embedding_dim = as.integer(self$model_config$embedding_dim),
+        target_levels = reticulate::np_array(seq(from = 0, to = (length(self$model_config$target_levels) - 1)))
+      )
     },
     #--------------------------------------------------------------------------
     basic_train = function(train_data = NULL,
@@ -869,12 +860,8 @@ TEClassifierProtoNet <- R6::R6Class(
                            log_top_total = NULL,
                            log_top_message = NULL) {
       # Clear session to provide enough resources for computations
-      if (private$ml_framework == "tensorflow") {
-        keras$backend$clear_session()
-      } else if (private$ml_framework == "pytorch") {
-        if (torch$cuda$is_available()) {
-          torch$cuda$empty_cache()
-        }
+      if (torch$cuda$is_available()) {
+        torch$cuda$empty_cache()
       }
 
       # Reset model if requested
@@ -883,29 +870,13 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       # Set Optimizer
-      if (private$ml_framework == "tensorflow") {
-        balanced_metric <- py$BalancedAccuracy(n_classes = as.integer(length(self$model_config$target_levels)))
-        if (self$model_config$optimizer == "adam") {
-          self$model$compile(
-            loss = self$model_config$err_fct,
-            optimizer = keras$optimizers$Adam(),
-            metrics = c(self$model_config$metric, balanced_metric)
-          )
-        } else if (self$model_config$optimizer == "rmsprop") {
-          self$model$compile(
-            loss = self$model_config$err_fct,
-            optimizer = keras$optimizers$RMSprop(),
-            metrics = c(self$model_config$metric, balanced_metric)
-          )
-        }
-      } else if (private$ml_framework == "pytorch") {
-        loss_fct_name <- "CrossEntropyLoss"
-        if (self$model_config$optimizer == "adam") {
-          optimizer <- "adam"
-        } else if (self$model_config$optimizer == "rmsprop") {
-          optimizer <- "rmsprop"
-        }
+      loss_fct_name <- "CrossEntropyLoss"
+      if (self$model_config$optimizer == "adam") {
+        optimizer <- "adam"
+      } else if (self$model_config$optimizer == "rmsprop") {
+        optimizer <- "rmsprop"
       }
+
 
       # Check directory for checkpoints
       create_dir(
@@ -921,137 +892,53 @@ TEClassifierProtoNet <- R6::R6Class(
         target_column <- "one_hot_encoding"
       }
 
-      # Tensorflow - Callbacks and training
-      if (private$ml_framework == "tensorflow") {
-        if (use_callback == TRUE) {
-          callback <- keras$callbacks$ModelCheckpoint(
-            filepath = paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.h5"),
-            monitor = paste0("val_", self$model_config$balanced_metric),
-            verbose = as.integer(min(self$last_training$config$ml_trace, 1)),
-            mode = "auto",
-            save_best_only = TRUE,
-            save_weights_only = TRUE
-          )
-        } else {
-          callback <- reticulate::py_none()
-        }
-
-        if (private$gui$shiny_app_active == TRUE) {
-          private$load_reload_python_scripts()
-
-          callback <- list(callback, py$ReportAiforeducationShiny())
-        }
-
-        data_set_weights <- datasets$Dataset$from_dict(
-          reticulate::dict(list(
-            sample_weights = sample_weights
-          ))
-        )
-        # inputs, targets, sample_weights
-        dataset_tf <- train_data$add_column("sample_weights", data_set_weights["sample_weights"])
-        dataset_tf <- dataset_tf$rename_column("input", "input_embeddings")
-
-        # Choose correct target column and rename
-        dataset_tf <- dataset_tf$rename_column(target_column, "targets")
-
-        dataset_tf$with_format("tf")
-        tf_dataset_train <- dataset_tf$to_tf_dataset(
-          columns = c("input_embeddings", "sample_weights"),
-          batch_size = as.integer(self$last_training$config$batch_size),
-          shuffle = TRUE,
-          label_cols = "targets"
-        )
-        # Add sample weights
-        tf_dataset_train <- tf_dataset_train$map(py$extract_sample_weight)
-
-        dataset_tf_val <- val_data$rename_column("input", "input_embeddings")
-        # Choose correct target column and rename
-        dataset_tf_val <- dataset_tf_val$rename_column(target_column, "targets")
-
-        tf_dataset_val <- dataset_tf_val$to_tf_dataset(
-          columns = c("input_embeddings"),
-          batch_size = as.integer(self$last_training$config$batch_size),
-          shuffle = FALSE,
-          label_cols = "targets"
-        )
-
-        history <- self$model$fit(
-          verbose = as.integer(self$last_training$config$ml_trace),
-          x = tf_dataset_train,
-          validation_data = tf_dataset_val,
-          epochs = as.integer(self$last_training$config$epochs),
-          callbacks = callback,
-          class_weight = reticulate::py_dict(keys = names(class_weights), values = class_weights)
-        )$history
-
-        if (self$model_config$n_categories == 2) {
-          history <- list(
-            loss = rbind(history$loss, history$val_loss),
-            accuracy = rbind(history$binary_accuracy, history$val_binary_accuracy),
-            balanced_accuracy = rbind(history$balanced_accuracy, history$val_balanced_accuracy)
-          )
-        } else {
-          history <- list(
-            loss = rbind(history$loss, history$val_loss),
-            accuracy = rbind(history$categorical_accuracy, history$val_categorical_accuracy),
-            balanced_accuracy = rbind(history$balanced_accuracy, history$val_balanced_accuracy)
-          )
-        }
-
-        if (use_callback == TRUE) {
-          self$model$load_weights(paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.h5"))
-        }
-
-        # PyTorch - Callbacks and training
-      } else if (private$ml_framework == "pytorch") {
-        dataset_train <- train_data$select_columns(c("input", target_column))
-        if (self$model_config$require_one_hot == TRUE) {
-          dataset_train <- dataset_train$rename_column(target_column, "labels")
-        }
-
-        pytorch_train_data <- dataset_train$with_format("torch")
-
-        pytorch_val_data <- val_data$select_columns(c("input", target_column))
-        if (self$model_config$require_one_hot == TRUE) {
-          pytorch_val_data <- pytorch_val_data$rename_column(target_column, "labels")
-        }
-        pytorch_val_data <- pytorch_val_data$with_format("torch")
-
-        if (!is.null(test_data)) {
-          pytorch_test_data <- test_data$select_columns(c("input", target_column))
-          if (self$model_config$require_one_hot == TRUE) {
-            pytorch_test_data <- pytorch_test_data$rename_column(target_column, "labels")
-          }
-          pytorch_test_data <- pytorch_test_data$with_format("torch")
-        } else {
-          pytorch_test_data <- NULL
-        }
-
-        history <- py$TeClassifierProtoNetTrain_PT_with_Datasets(
-          model = self$model,
-          loss_fct_name = loss_fct_name,
-          optimizer_method = self$model_config$optimizer,
-          Ns = as.integer(self$last_training$config$Ns),
-          Nq = as.integer(self$last_training$config$Nq),
-          loss_alpha = self$last_training$config$loss_alpha,
-          loss_margin = self$last_training$config$loss_margin,
-          trace = as.integer(self$last_training$config$ml_trace),
-          use_callback = use_callback,
-          train_data = pytorch_train_data,
-          val_data = pytorch_val_data,
-          test_data = pytorch_test_data,
-          epochs = as.integer(self$last_training$config$epochs),
-          sampling_separate = self$last_training$config$sampling_separate,
-          sampling_shuffle = self$last_training$config$sampling_shuffle,
-          filepath = paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.pt"),
-          n_classes = as.integer(length(self$model_config$target_levels)),
-          log_dir = log_dir,
-          log_write_interval = log_write_interval,
-          log_top_value = log_top_value,
-          log_top_total = log_top_total,
-          log_top_message = log_top_message
-        )
+      dataset_train <- train_data$select_columns(c("input", target_column))
+      if (self$model_config$require_one_hot == TRUE) {
+        dataset_train <- dataset_train$rename_column(target_column, "labels")
       }
+
+      pytorch_train_data <- dataset_train$with_format("torch")
+
+      pytorch_val_data <- val_data$select_columns(c("input", target_column))
+      if (self$model_config$require_one_hot == TRUE) {
+        pytorch_val_data <- pytorch_val_data$rename_column(target_column, "labels")
+      }
+      pytorch_val_data <- pytorch_val_data$with_format("torch")
+
+      if (!is.null(test_data)) {
+        pytorch_test_data <- test_data$select_columns(c("input", target_column))
+        if (self$model_config$require_one_hot == TRUE) {
+          pytorch_test_data <- pytorch_test_data$rename_column(target_column, "labels")
+        }
+        pytorch_test_data <- pytorch_test_data$with_format("torch")
+      } else {
+        pytorch_test_data <- NULL
+      }
+
+      history <- py$TeClassifierProtoNetTrain_PT_with_Datasets(
+        model = self$model,
+        loss_fct_name = loss_fct_name,
+        optimizer_method = self$model_config$optimizer,
+        Ns = as.integer(self$last_training$config$Ns),
+        Nq = as.integer(self$last_training$config$Nq),
+        loss_alpha = self$last_training$config$loss_alpha,
+        loss_margin = self$last_training$config$loss_margin,
+        trace = as.integer(self$last_training$config$ml_trace),
+        use_callback = use_callback,
+        train_data = pytorch_train_data,
+        val_data = pytorch_val_data,
+        test_data = pytorch_test_data,
+        epochs = as.integer(self$last_training$config$epochs),
+        sampling_separate = self$last_training$config$sampling_separate,
+        sampling_shuffle = self$last_training$config$sampling_shuffle,
+        filepath = paste0(self$last_training$config$dir_checkpoint, "/checkpoints/best_weights.pt"),
+        n_classes = as.integer(length(self$model_config$target_levels)),
+        log_dir = log_dir,
+        log_write_interval = log_write_interval,
+        log_top_value = log_top_value,
+        log_top_total = log_top_total,
+        log_top_message = log_top_message
+      )
 
       # provide rownames and replace -100
       history <- private$prepare_history_data(history)

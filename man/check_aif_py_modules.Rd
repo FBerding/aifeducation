@@ -4,17 +4,10 @@
 \alias{check_aif_py_modules}
 \title{Check if all necessary python modules are available}
 \usage{
-check_aif_py_modules(trace = TRUE, check = "pytorch")
+check_aif_py_modules(trace = TRUE)
 }
 \arguments{
 \item{trace}{\code{bool} \code{TRUE} if a list with all modules and their availability should be printed to the console.}
-
-\item{check}{\code{string} determining the machine learning framework to check for.
-\itemize{
-\item \code{check = "pytorch"}: for 'pytorch'.
-\item \code{check = "tensorflow"}: for 'tensorflow'.
-\item \code{check = "all"}: for both frameworks.
-}}
 }
 \value{
 The function prints a table with all relevant packages and shows which modules are available or unavailable.

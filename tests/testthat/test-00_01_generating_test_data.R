@@ -1,9 +1,9 @@
-# This file does not contain any tests. It is used for creating FeatureExtractors
+# This file does not contain any tests. It is used for creating embedded texts
 # that can be used for testing Classifiers
 testthat::skip_on_cran()
 
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
@@ -93,7 +93,6 @@ test_that("Generating Test Data", {
     model_label = "Text Embedding for Test",
     model_language = "english",
     method = ai_method,
-    ml_framework = "pytorch",
     max_length = 512,
     chunks = 6,
     overlap = 10,

@@ -62,10 +62,6 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE) {
 #' @description Function for installing the necessary python modules.
 #'
 #' @param envname `string` Name of the environment where the packages should be installed.
-#' @param install `character` determining which machine learning frameworks should be installed.
-#'   * `install = "all"`: for 'pytorch' and 'tensorflow'.
-#'   * `install = "pytorch"`: for 'pytorch'.
-#'   * `install = "tensorflow"`: for 'tensorflow'.
 #' @param transformer_version `string` determining the desired version of the python library 'transformers'.
 #' @param tokenizers_version `string` determining the desired version of the python library 'tokenizers'.
 #' @param pandas_version `string` determining the desired version of the python library 'pandas'.
@@ -89,7 +85,6 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE) {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               install = "pytorch",
                                transformer_version = "<=4.46",
                                tokenizers_version = "<=0.20.4",
                                pandas_version = "<=2.2.3",
@@ -114,11 +109,6 @@ install_py_modules <- function(envname = "aifeducation",
     paste0("accelerate", accelerate_version)
   )
 
-  # Check Arguments
-  if (!(install %in% c("all", "pytorch", "tensorflow"))) {
-    stop("install must be all, pytorch or tensorflow.")
-  }
-
   if (reticulate::condaenv_exists(envname = envname) == TRUE) {
     if (remove_first == TRUE) {
       reticulate::conda_remove(envname = envname)
@@ -136,62 +126,25 @@ install_py_modules <- function(envname = "aifeducation",
     )
   }
 
-
   # PyTorch Installation---------------------------------------------------
-  if (install == "all" || install == "pytorch") {
-    reticulate::conda_install(
-      packages = c(
-        "pytorch",
-        paste0("pytorch-cuda", "=", pytorch_cuda_version)
-      ),
-      envname = envname,
-      channel = c("pytorch", "nvidia"),
-      conda = "auto",
-      pip = FALSE
-    )
-  }
-
-  # Tensorflow Installation---------------------------------------------------
-  if (install == "all" || install == "tensorflow") {
-    tf_version <- "2.15"
-    if (utils::compareVersion(tf_version, "2.16") < 0) {
-      reticulate::conda_install(
-        packages = c(
-          paste0("tensorflow-cpu<=", tf_version)
-        ),
-        envname = envname,
-        conda = "auto",
-        pip = TRUE
-      )
-    } else {
-      reticulate::conda_install(
-        packages = c(
-          paste0("tensorflow-cpu<=", tf_version),
-          "tf-keras"
-        ),
-        envname = envname,
-        conda = "auto",
-        pip = TRUE
-      )
-    }
-  }
+  reticulate::conda_install(
+    packages = c(
+      "pytorch",
+      paste0("pytorch-cuda", "=", pytorch_cuda_version)
+    ),
+    envname = envname,
+    channel = c("pytorch", "nvidia"),
+    conda = "auto",
+    pip = FALSE
+  )
 
   # Necessary Packages----------------------------------------------------
-  if (install == "all" || install == "pytorch") {
-    reticulate::conda_install(
-      packages = c(relevant_modules, relevant_modules_pt),
-      envname = envname,
-      conda = "auto",
-      pip = TRUE
-    )
-  } else {
-    reticulate::conda_install(
-      packages = c(relevant_modules),
-      envname = envname,
-      conda = "auto",
-      pip = TRUE
-    )
-  }
+  reticulate::conda_install(
+    packages = c(relevant_modules, relevant_modules_pt),
+    envname = envname,
+    conda = "auto",
+    pip = TRUE
+  )
 }
 
 #' @title Check if all necessary python modules are available
@@ -199,19 +152,11 @@ install_py_modules <- function(envname = "aifeducation",
 #'   available.
 #'
 #' @param trace `bool` `TRUE` if a list with all modules and their availability should be printed to the console.
-#' @param check `string` determining the machine learning framework to check for.
-#'   * `check = "pytorch"`: for 'pytorch'.
-#'   * `check = "tensorflow"`: for 'tensorflow'.
-#'   * `check = "all"`: for both frameworks.
 #' @return The function prints a table with all relevant packages and shows which modules are available or unavailable.
 #' @return If all relevant modules are available, the functions returns `TRUE`. In all other cases it returns `FALSE`
 #' @family Installation and Configuration
 #' @export
-check_aif_py_modules <- function(trace = TRUE, check = "pytorch") {
-  if (!(check %in% c("all", "pytorch", "tensorflow"))) {
-    stop("check must be all, pytorch or tensorflow.")
-  }
-
+check_aif_py_modules <- function(trace = TRUE) {
   general_modules <- c(
     "os",
     "transformers",
@@ -226,26 +171,10 @@ check_aif_py_modules <- function(trace = TRUE, check = "pytorch") {
     "accelerate",
     "pandas"
   )
-  tensorflow_modules <- c("tensorflow")
-
-  if (check == "all") {
-    relevant_modules <- c(
-      general_modules,
-      pytorch_modules,
-      tensorflow_modules
-    )
-  } else if (check == "pytorch") {
-    relevant_modules <- c(
-      general_modules,
-      pytorch_modules
-    )
-  } else if (check == "tensorflow") {
-    relevant_modules <- c(
-      general_modules,
-      tensorflow_modules
-    )
-  }
-
+  relevant_modules <- c(
+    general_modules,
+    pytorch_modules
+  )
 
   matrix_overview <- matrix(
     data = NA,
@@ -268,72 +197,6 @@ check_aif_py_modules <- function(trace = TRUE, check = "pytorch") {
   } else {
     return(FALSE)
   }
-}
-
-
-#' @title Setting cpu only for 'tensorflow'
-#' @description This functions configurates 'tensorflow' to use only cpus.
-#'
-#' @return This function does not return anything. It is used for its side effects.
-#' @note os$environ$setdefault("CUDA_VISIBLE_DEVICES","-1")
-#' @family Installation and Configuration Tensorflow
-#' @export
-set_config_cpu_only <- function() {
-  os$environ$setdefault("CUDA_VISIBLE_DEVICES", "-1")
-}
-
-#' @title Setting gpus' memory usage
-#' @description This function changes the memory usage of the gpus to allow computations on machines with small memory.
-#'   With this function, some computations of large models may be possible but the speed of computation decreases.
-#'
-#' @return This function does not return anything. It is used for its side effects.
-#' @note This function sets TF_GPU_ALLOCATOR to `"cuda_malloc_async"` and sets memory growth to `TRUE`.
-#' @family Installation and Configuration Tensorflow
-#' @export
-set_config_gpu_low_memory <- function() {
-  os$environ$setdefault("TF_GPU_ALLOCATOR", "cuda_malloc_async")
-  gpu <- tf$config$list_physical_devices("GPU")
-  if (length(gpu) > 0) {
-    for (i in seq_len(length(gpu))) {
-      tf$config$experimental$set_memory_growth(gpu[[i]], TRUE)
-    }
-  }
-}
-
-#' @title Sets the level for logging information in tensorflow
-#' @description This function changes the level for logging information with 'tensorflow'.
-#'
-#' @param level `string` Minimal level that should be printed to console. Five levels are available: FATAL, ERROR, WARN,
-#'   INFO, and DEBUG.
-#' @return This function does not return anything. It is used for its side effects.
-#' @family Installation and Configuration Tensorflow
-#' @export
-set_config_tf_logger <- function(level = "ERROR") {
-  logger <- tf$get_logger()
-  logger$setLevel(level)
-}
-
-#' @title Sets the level for logging information in tensorflow
-#' @description This function changes the level for logging information with 'tensorflow' via the os environment. This
-#'   function must be called before importing 'tensorflow'.
-#'
-#' @param level `string` Minimal level that should be printed to console. Four levels are available: INFO, WARNING,
-#'   ERROR and NONE.
-#' @return This function does not return anything. It is used for its side effects.
-#' @family Installation and Configuration Tensorflow
-#' @export
-set_config_os_environ_logger <- function(level = "ERROR") {
-  if (level == "ERROR") {
-    level_int <- "2"
-  } else if (level == "WARNING") {
-    level_int <- "1"
-  } else if (level == "INFO") {
-    level_int <- "0"
-  } else if (level == "NONE") {
-    level_int <- "3"
-  }
-
-  os$environ$setdefault("TF_CPP_MIN_LOG_LEVEL", level_int)
 }
 
 #' @title Sets the level for logging information of the 'transformers' library

@@ -14,8 +14,8 @@ Abstract class for all models that do not rely on the python library 'transforme
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{model}}{('tensorflow_model' or 'pytorch_model')\cr
-Field for storing the 'tensorflow' or 'pytorch' model after loading.}
+\item{\code{model}}{('pytorch_model')\cr
+Field for storing a 'pytorch' model after loading.}
 
 \item{\code{model_config}}{('list()')\cr
 List for storing information about the configuration of the model.}

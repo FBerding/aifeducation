@@ -38,13 +38,6 @@ TextEmbeddingModel <- R6::R6Class(
       numpy = NA
     ),
     supported_transformers = list(
-      tensorflow = c(
-        "bert",
-        "roberta",
-        "longformer",
-        "funnel",
-        "deberta_v2"
-      ),
       pytorch = c(
         "bert",
         "roberta",
@@ -133,15 +126,8 @@ TextEmbeddingModel <- R6::R6Class(
       private$r_package_versions$reticulate <- packageVersion("reticulate")
 
       if (!is.null_or_na(private$ml_framework)) {
-        if (private$ml_framework == "pytorch") {
-          private$py_package_versions$torch <- torch["__version__"]
-          private$py_package_versions$tensorflow <- NULL
-          private$py_package_versions$keras <- NULL
-        } else {
-          private$py_package_versions$torch <- NULL
-          private$py_package_versions$tensorflow <- tf$version$VERSION
-          private$py_package_versions$keras <- keras["__version__"]
-        }
+        private$py_package_versions$torch <- torch["__version__"]
+
         private$py_package_versions$numpy <- np$version$short_version
       }
     },
@@ -332,9 +318,9 @@ TextEmbeddingModel <- R6::R6Class(
       } else {
         private$basic_components$max_length <- as.integer(max_length)
       }
-      #} else {
+      # } else {
       #  private$basic_components$max_length <- as.integer(max_length)
-      #}
+      # }
     },
     #--------------------------------------------------------------------------
     # Method for loading transformer models and tokenizers
@@ -343,180 +329,94 @@ TextEmbeddingModel <- R6::R6Class(
       # Search for the corresponding files and set loading behavior.
       # If the model exists based on another ml framework try to
       # load from the other framework
-      if (private$transformer_components$ml_framework == "tensorflow") {
-        if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
-          from_pt <- FALSE
-        } else if (
-          file.exists(paste0(model_dir, "/pytorch_model.bin")) |
-            file.exists(paste0(model_dir, "/model.safetensors"))
-        ) {
-          from_pt <- TRUE
-        } else {
-          stop("Directory does not contain a tf_model.h5, pytorch_model.bin
-                 or a model.saftensors file.")
-        }
+      if (file.exists(paste0(model_dir, "/pytorch_model.bin")) |
+        file.exists(paste0(model_dir, "/model.safetensors"))) {
+        from_tf <- FALSE
+      } else if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
+        from_tf <- TRUE
       } else {
-        if (
-          file.exists(paste0(model_dir, "/pytorch_model.bin")) |
-            file.exists(paste0(model_dir, "/model.safetensors"))
-        ) {
-          from_tf <- FALSE
-        } else if (file.exists(paste0(model_dir, "/tf_model.h5"))) {
-          from_tf <- TRUE
-        } else {
-          stop("Directory does not contain a tf_model.h5,pytorch_model.bin
+        stop("Directory does not contain a tf_model.h5,pytorch_model.bin
                  or a model.saftensors file.")
-        }
       }
+
 
       #------------------------------------------------------------------------
       # In the case of pytorch
       # Check to load from pt/bin or safetensors
       # Use safetensors as preferred method
-      if (private$transformer_components$ml_framework == "pytorch") {
-        if (
-          (file.exists(paste0(model_dir, "/model.safetensors")) == FALSE & from_tf == FALSE) |
-            reticulate::py_module_available("safetensors") == FALSE
-        ) {
-          load_safe <- FALSE
-        } else {
-          load_safe <- TRUE
-        }
+      if ((file.exists(paste0(model_dir, "/model.safetensors")) == FALSE &
+        from_tf == FALSE) |
+        reticulate::py_module_available("safetensors") == FALSE) {
+        load_safe <- FALSE
+      } else {
+        load_safe <- TRUE
       }
+
 
       # Load models and tokenizer-----------------------------------------------
 
       if (private$basic_components$method == "bert") {
         private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          private$transformer_components$model <- transformers$TFBertModel$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-          private$transformer_components$model_mlm <- transformers$TFBertForMaskedLM$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-        } else {
-          private$transformer_components$model <- transformers$BertModel$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-          private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-        }
+        private$transformer_components$model <- transformers$BertModel$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
+        private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
       } else if (private$basic_components$method == "roberta") {
         private$transformer_components$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(model_dir)
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          private$transformer_components$model <- transformers$TFRobertaModel$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-          private$transformer_components$model_mlm <- transformers$TFRobertaForMaskedLM$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-        } else {
-          private$transformer_components$model <- transformers$RobertaModel$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-          private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-        }
-      } else if (private$basic_components$method == "longformer") {
-        private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(
-          model_dir
+        private$transformer_components$model <- transformers$RobertaModel$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
         )
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          private$transformer_components$model <- transformers$TFLongformerModel$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-          private$transformer_components$model_mlm <- transformers$TFLongformerForMaskedLM$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-        } else {
-          private$transformer_components$model <- transformers$LongformerModel$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-          private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-        }
+        private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
+      } else if (private$basic_components$method == "longformer") {
+        private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(model_dir)
+        private$transformer_components$model <- transformers$LongformerModel$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
+        private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
       } else if (private$basic_components$method == "funnel") {
         private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          private$transformer_components$model <- transformers$TFFunnelBaseModel$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-          private$transformer_components$model_mlm <- transformers$TFFunnelForMaskedLM$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-        } else {
-          private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-          private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-        }
+        private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
+        private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
       } else if (private$basic_components$method == "deberta_v2") {
         private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          private$transformer_components$model <- transformers$TFDebertaV2Model$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-          private$transformer_components$model_mlm <- transformers$TFDebertaForMaskedLM$from_pretrained(
-            model_dir,
-            from_pt = from_pt
-          )
-        } else {
-          private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-          private$transformer_components$model_mlm <- transformers$DebertaForMaskedLM$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-        }
+        private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
+        private$transformer_components$model_mlm <- transformers$DebertaForMaskedLM$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
       } else if (private$basic_components$method == "mpnet") {
         private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        if (private$transformer_components$ml_framework == "pytorch") {
-          private$transformer_components$model <- transformers$MPNetModel$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-          private$transformer_components$model_mlm <- py$MPNetForMPLM_PT$from_pretrained(
-            model_dir,
-            from_tf = from_tf,
-            use_safetensors = load_safe
-          )
-        }
+
+        private$transformer_components$model <- transformers$MPNetModel$from_pretrained(model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
+        private$transformer_components$model_mlm <- py$MPNetForMPLM_PT$from_pretrained(
+          model_dir,
+          from_tf = from_tf,
+          use_safetensors = load_safe
+        )
       }
     }
   ),
@@ -544,10 +444,6 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param model_label `string` containing the label/title of the new model.
     #' @param model_language `string` containing the language which the model
     #' represents (e.g., English).
-    #' @param ml_framework `string` Framework to use for the model.
-    #' `ml_framework="tensorflow"` for 'tensorflow' and `ml_framework="pytorch"`
-    #' for 'pytorch'. Only relevant for transformer models. To request bag-of-words model
-    #' set `ml_framework=NULL`.
     #' @param method `string` determining the kind of embedding model. Currently
     #' the following models are supported:
     #' `method="bert"` for Bidirectional Encoder Representations from Transformers (BERT),
@@ -594,7 +490,6 @@ TextEmbeddingModel <- R6::R6Class(
                          model_label = NULL,
                          model_language = NULL,
                          method = NULL,
-                         ml_framework = "pytorch",
                          max_length = 0,
                          chunks = 2,
                          overlap = 0,
@@ -613,11 +508,8 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(model_name, "string", FALSE)
       check_type(model_label, "string", FALSE)
       check_type(model_language, "string", FALSE)
-      check_type(ml_framework, "string", TRUE)
-      if ((ml_framework %in% c("tensorflow", "pytorch")) == FALSE) {
-        stop("ml_framework must be 'tensorflow' or 'pytorch'.")
-      }
       check_type(method, "string", FALSE)
+      ml_framework <- "pytorch"
       if (method %in% c(private$supported_transformers[[ml_framework]]) == FALSE) {
         stop(
           paste(
@@ -773,8 +665,6 @@ TextEmbeddingModel <- R6::R6Class(
       private$r_package_versions$reticulate <- config_file$private$r_package_versions$reticulate
 
       private$py_package_versions$torch <- config_file$private$py_package_versions$torch
-      private$py_package_versions$tensorflow <- config_file$private$py_package_versions$tensorflow
-      private$py_package_versions$keras <- config_file$private$py_package_versions$keras
       private$py_package_versions$numpy <- config_file$private$py_package_versions$numpy
 
       # Finalize config
@@ -822,45 +712,36 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(dir_path, "string", FALSE)
       check_type(folder_name, "string", FALSE)
 
-
-      if (private$transformer_components$ml_framework == "tensorflow") {
-        save_format <- "h5"
-      } else if (private$transformer_components$ml_framework == "pytorch") {
-        save_format <- "safetensors"
-      }
-
+      save_format <- "safetensors"
       save_location <- paste0(dir_path, "/", folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       create_dir(save_location, trace = TRUE, msg_fun = FALSE)
 
       model_dir_data_path <- paste0(save_location, "/", "model_data")
 
-      if (private$transformer_components$ml_framework == "pytorch") {
-        if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == TRUE) {
-          private$transformer_components$model$save_pretrained(
-            save_directory = model_dir_data_path,
-            safe_serilization = TRUE
-          )
-          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
-        } else if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
-          private$transformer_components$model$save_pretrained(
-            save_directory = model_dir_data_path,
-            safe_serilization = FALSE
-          )
-          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
-          warning("Python library 'safetensors' is not available. Saving model in standard
+
+      if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == TRUE) {
+        private$transformer_components$model$save_pretrained(
+          save_directory = model_dir_data_path,
+          safe_serilization = TRUE
+        )
+        private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+      } else if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
+        private$transformer_components$model$save_pretrained(
+          save_directory = model_dir_data_path,
+          safe_serilization = FALSE
+        )
+        private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
+        warning("Python library 'safetensors' is not available. Saving model in standard
                   pytorch format.")
-        } else if (save_format == "pt") {
-          private$transformer_components$model$save_pretrained(
-            save_directory = model_dir_data_path,
-            safe_serilization = FALSE
-          )
-          private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
-        }
-      } else {
-        private$transformer_components$model$save_pretrained(save_directory = model_dir_data_path)
+      } else if (save_format == "pt") {
+        private$transformer_components$model$save_pretrained(
+          save_directory = model_dir_data_path,
+          safe_serilization = FALSE
+        )
         private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
       }
+
 
       # Save Sustainability Data
       private$save_sustainability_data(
@@ -966,35 +847,20 @@ TextEmbeddingModel <- R6::R6Class(
         for (i in 1:n_units) {
           return_token_type_ids <- (private$basic_components$method != AIFETrType$mpnet)
 
-          if (private$transformer_components$ml_framework == "tensorflow") {
-            tokens <- private$transformer_components$tokenizer(
-              raw_text[i],
-              stride = as.integer(private$transformer_components$overlap),
-              padding = "max_length",
-              truncation = TRUE,
-              max_length = as.integer(private$basic_components$max_length),
-              return_overflowing_tokens = TRUE,
-              return_length = FALSE,
-              return_offsets_mapping = FALSE,
-              return_attention_mask = TRUE,
-              return_token_type_ids = return_token_type_ids,
-              return_tensors = "tf"
-            )
-          } else {
-            tokens <- private$transformer_components$tokenizer(
-              raw_text[i],
-              stride = as.integer(private$transformer_components$overlap),
-              padding = "max_length",
-              truncation = TRUE,
-              max_length = as.integer(private$basic_components$max_length),
-              return_overflowing_tokens = TRUE,
-              return_length = FALSE,
-              return_offsets_mapping = FALSE,
-              return_attention_mask = TRUE,
-              return_token_type_ids = return_token_type_ids,
-              return_tensors = "pt"
-            )
-          }
+          tokens <- private$transformer_components$tokenizer(
+            raw_text[i],
+            stride = as.integer(private$transformer_components$overlap),
+            padding = "max_length",
+            truncation = TRUE,
+            max_length = as.integer(private$basic_components$max_length),
+            return_overflowing_tokens = TRUE,
+            return_length = FALSE,
+            return_offsets_mapping = FALSE,
+            return_attention_mask = TRUE,
+            return_token_type_ids = return_token_type_ids,
+            return_tensors = "pt"
+          )
+
 
           tmp_dataset <- datasets$Dataset$from_dict(tokens)
 
@@ -1085,9 +951,6 @@ TextEmbeddingModel <- R6::R6Class(
     #' @description Method for creating text embeddings from raw texts.
     #' This method should only be used if a small number of texts should be transformed
     #' into text embeddings. For a large number of texts please use the method `embed_large`.
-    #' In the case of using a GPU and running out of memory while using 'tensorflow'  reduce the
-    #' batch size or restart R and switch to use cpu only via `set_config_cpu_only`. In general,
-    #' not relevant for 'pytorch'.
     #' @param raw_text `vector` containing the raw texts.
     #' @param doc_id `vector` containing the corresponding IDs for every text.
     #' @param batch_size `int` determining the maximal size of every batch.
@@ -1116,31 +979,26 @@ TextEmbeddingModel <- R6::R6Class(
       batch_results <- NULL
 
       if (private$transformer_components$emb_pool_type == "average") {
-        if (private$transformer_components$ml_framework == "pytorch") {
-          reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
-            package = "aifeducation"
-          ))
-          pooling <- py$GlobalAveragePooling1D_PT()
-          pooling$eval()
-        } else if (private$transformer_components$ml_framework == "tensorflow") {
-          pooling <- keras$layers$GlobalAveragePooling1D()
-        }
+        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+          package = "aifeducation"
+        ))
+        pooling <- py$GlobalAveragePooling1D_PT()
+        pooling$eval()
       }
 
       for (b in 1:n_batches) {
-        if (private$transformer_components$ml_framework == "pytorch") {
-          # Set model to evaluation mode
-          private$transformer_components$model$eval()
-          if (torch$cuda$is_available()) {
-            pytorch_device <- "cuda"
-          } else {
-            pytorch_device <- "cpu"
-          }
-          private$transformer_components$model$to(pytorch_device)
-          if (private$transformer_components$emb_pool_type == "average") {
-            pooling$to(pytorch_device)
-          }
+        # Set model to evaluation mode
+        private$transformer_components$model$eval()
+        if (torch$cuda$is_available()) {
+          pytorch_device <- "cuda"
+        } else {
+          pytorch_device <- "cpu"
         }
+        private$transformer_components$model$to(pytorch_device)
+        if (private$transformer_components$emb_pool_type == "average") {
+          pooling$to(pytorch_device)
+        }
+
 
         index_min <- 1 + (b - 1) * batch_size
         index_max <- min(b * batch_size, n_units)
@@ -1165,67 +1023,44 @@ TextEmbeddingModel <- R6::R6Class(
         selected_layer <- private$transformer_components$emb_layer_min:private$transformer_components$emb_layer_max
         tmp_selected_layer <- 1 + selected_layer
 
-        if (private$transformer_components$ml_framework == "tensorflow") {
-          # Clear session to ensure enough memory
-          tf$keras$backend$clear_session()
+        # Clear memory
+        if (torch$cuda$is_available()) {
+          torch$cuda$empty_cache()
+        }
 
-          # Calculate tensors
-          tokens$encodings$set_format(type = "tensorflow")
+        # Calculate tensors
+        tokens$encodings$set_format(type = "torch")
 
-          tensor_embeddings <- private$transformer_components$model(
-            input_ids = tokens$encodings["input_ids"],
-            attention_mask = tokens$encodings["attention_mask"],
-            token_type_ids = tokens$encodings["token_type_ids"],
-            output_hidden_states = TRUE
-          )$hidden_states
-          if (private$transformer_components$emb_pool_type == "average") {
-            # Average Pooling over all tokens
-            for (i in tmp_selected_layer) {
-              tensor_embeddings[i] <- list(pooling(
-                inputs = tensor_embeddings[[as.integer(i)]],
-                mask = tokens$encodings["attention_mask"]
-              ))
+        with(
+          data = torch$no_grad(),
+          {
+            if (private$basic_components$method == AIFETrType$mpnet) {
+              tensor_embeddings <- private$transformer_components$model(
+                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
+                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
+                output_hidden_states = TRUE
+              )$hidden_states
+            } else {
+              tensor_embeddings <- private$transformer_components$model(
+                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
+                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
+                token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
+                output_hidden_states = TRUE
+              )$hidden_states
             }
           }
-        } else {
-          # Clear memory
-          if (torch$cuda$is_available()) {
-            torch$cuda$empty_cache()
-          }
+        )
 
-          # Calculate tensors
-          tokens$encodings$set_format(type = "torch")
-
-          with(
-            data = torch$no_grad(),
-            {
-              if (private$basic_components$method == AIFETrType$mpnet) {
-                tensor_embeddings <- private$transformer_components$model(
-                  input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                  attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                  output_hidden_states = TRUE
-                )$hidden_states
-              } else {
-                tensor_embeddings <- private$transformer_components$model(
-                  input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                  attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                  token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
-                  output_hidden_states = TRUE
-                )$hidden_states
-              }
-            }
-          )
-
-          if (private$transformer_components$emb_pool_type == "average") {
-            # Average Pooling over all tokens of a layer
-            for (i in tmp_selected_layer) {
-              tensor_embeddings[i] <- list(pooling(
-                x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
-                mask = tokens$encodings["attention_mask"]$to(pytorch_device)
-              ))
-            }
+        if (private$transformer_components$emb_pool_type == "average") {
+          # Average Pooling over all tokens of a layer
+          for (i in tmp_selected_layer) {
+            tensor_embeddings[i] <- list(pooling(
+              x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
+              mask = tokens$encodings["attention_mask"]$to(pytorch_device)
+            ))
           }
         }
+
 
         # Sorting the hidden states to the corresponding cases and times
         # If more than one layer is selected the mean is calculated
@@ -1235,40 +1070,28 @@ TextEmbeddingModel <- R6::R6Class(
             for (layer in tmp_selected_layer) {
               layer_int <- as.integer(layer)
               index_int <- as.integer(index)
-              if (private$transformer_components$ml_framework == "tensorflow") {
+
+              if (torch$cuda$is_available() == FALSE) {
                 if (private$transformer_components$emb_pool_type == "cls") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$numpy()
+                    tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$numpy()
                   )
                 } else if (private$transformer_components$emb_pool_type == "average") {
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]]$numpy()
+                    tensor_embeddings[[layer_int]][[index_int]]$detach()$numpy()
                   )
                 }
               } else {
-                if (torch$cuda$is_available() == FALSE) {
-                  if (private$transformer_components$emb_pool_type == "cls") {
-                    # CLS Token is always the first token
-                    text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                      tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$numpy()
-                    )
-                  } else if (private$transformer_components$emb_pool_type == "average") {
-                    text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                      tensor_embeddings[[layer_int]][[index_int]]$detach()$numpy()
-                    )
-                  }
-                } else {
-                  if (private$transformer_components$emb_pool_type == "cls") {
-                    # CLS Token is always the first token
-                    text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                      tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$cpu()$numpy()
-                    )
-                  } else if (private$transformer_components$emb_pool_type == "average") {
-                    text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                      tensor_embeddings[[layer_int]][[index_int]]$detach()$cpu()$numpy()
-                    )
-                  }
+                if (private$transformer_components$emb_pool_type == "cls") {
+                  # CLS Token is always the first token
+                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
+                    tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$cpu()$numpy()
+                  )
+                } else if (private$transformer_components$emb_pool_type == "average") {
+                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
+                    tensor_embeddings[[layer_int]][[index_int]]$detach()$cpu()$numpy()
+                  )
                 }
               }
             }
@@ -1443,12 +1266,10 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(text, "string", FALSE)
       check_type(n_solutions, "int", FALSE)
 
-      if (private$transformer_components$ml_framework == "pytorch") {
-        framework <- "pt"
-        private$transformer_components$model_mlm$to("cpu")
-      } else {
-        framework <- "tf"
-      }
+
+      framework <- "pt"
+      private$transformer_components$model_mlm$to("cpu")
+
 
       return_token_type_ids <- (private$basic_components$method != AIFETrType$mpnet)
 
@@ -1722,26 +1543,21 @@ TextEmbeddingModel <- R6::R6Class(
         model <- private$transformer_components$model_mlm
       }
 
-      if (private$transformer_components$ml_framework == "tensorflow") {
-        count <- 0
-        for (i in seq_len(length(model$trainable_weights))) {
-          count <- count + tf$keras$backend$count_params(model$trainable_weights[[i]])
-        }
-      } else if (private$transformer_components$ml_framework == "pytorch") {
-        iterator <- reticulate::as_iterator(model$parameters())
-        iteration_finished <- FALSE
-        count <- 0
-        while (iteration_finished == FALSE) {
-          iter_results <- reticulate::iter_next(it = iterator)
-          if (is.null(iter_results)) {
-            iteration_finished <- TRUE
-          } else {
-            if (iter_results$requires_grad == TRUE) {
-              count <- count + iter_results$numel()
-            }
+
+      iterator <- reticulate::as_iterator(model$parameters())
+      iteration_finished <- FALSE
+      count <- 0
+      while (iteration_finished == FALSE) {
+        iter_results <- reticulate::iter_next(it = iterator)
+        if (is.null(iter_results)) {
+          iteration_finished <- TRUE
+        } else {
+          if (iter_results$requires_grad == TRUE) {
+            count <- count + iter_results$numel()
           }
         }
       }
+
       return(count)
     },
     #-------------------------------------------------------------------------

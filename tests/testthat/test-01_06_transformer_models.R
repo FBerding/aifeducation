@@ -1,7 +1,7 @@
 testthat::skip_on_cran()
 
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
@@ -40,6 +40,17 @@ rows_susatainability <- c(
   "roberta" = 2,
   "longformer" = 2,
   "deberta_v2" = 3
+)
+
+supported_methods <- list(
+  pytorch = list(
+    "bert",
+    "funnel",
+    "roberta",
+    "longformer",
+    "deberta_v2",
+    "mpnet"
+  )
 )
 
 example_data <- imdb_movie_reviews

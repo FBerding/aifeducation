@@ -582,7 +582,6 @@ with the `create`-method of the Transformer class. Use
 ```{r, include = TRUE, eval = FALSE}
 base_model <- aife_transformer_maker$make("bert")
 base_model$create(
-  ml_framework = "pytorch",
   model_dir = "my_own_transformer",
   text_dataset = LargeDataSetForText$new(example_data),
   vocab_size = 30522,
@@ -604,9 +603,6 @@ base_model$create(
 )
 ```
 
-First, the function receives the machine learning framework you chose at
-the start of the session. However, you can change this by setting
-`ml_framework="tensorflow"` or by `ml_framework="pytorch"`.
 
 For this function to work, you must provide a path to a directory where
 your new transformer should be saved (`model_dir`). Furthermore, you
@@ -664,7 +660,6 @@ language or task, you can call the corresponding `train`-method.
 
 ```{r, include = TRUE, eval = FALSE}
 base_model$train(
-  ml_framework = "pytorch",
   output_dir = "my_own_transformer_trained",
   model_dir_path = "my_own_transformer",
   text_dataset = LargeDataSetForText$new(example_data[1:10, ]),
@@ -708,17 +703,11 @@ Please remember to set the correct alpha-3 code for tracking the
 ecological impact of training your model (`sustain_iso_code`).
 
 If you work on a machine and your graphic device only has small memory
-capacity, please reduce the batch size significantly. We also recommend
-to change the usage of memory with `set_config_gpu_low_memory()` at the
-beginning of the session if you use *tensorflow* as framework.
+capacity, please reduce the batch size significantly. 
 
 After the training finishes, you can find the transformer ready to use
 in your output_directory. Now you are able to create a text embedding
 model.
-
-Again you can change the machine learning framework by setting
-`ml_framework="tensorflow"` or `ml_framework="pytorch"`. If you do not
-change this argument, the framework you chose at the beginning is used.
 
 # 4 Text Embedding Models
 
