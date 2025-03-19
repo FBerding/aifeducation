@@ -168,8 +168,9 @@ relevant if \code{attention_type="multihead"}}
 
 \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder.}
 
-\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values are \code{fourier} and \code{multihead}. Please note
-that you may see different values for a case for different input orders if you choose \code{fourier} on linux.}
+\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values are \code{fourier} and \code{multihead}.
+Please note that you may see different values for a case for different input orders if you choose \code{fourier} on
+linux.}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 
@@ -200,12 +201,11 @@ Returns an object of class \link{TEClassifierRegular} which is ready for trainin
 \subsection{Method \code{train()}}{
 Method for training a neural net.
 
-Training includes a routine for early stopping. In the case that loss<0.0001
-and Accuracy=1.00 and Average Iota=1.00 training stops. The history uses the values
-of the last trained epoch for the remaining epochs.
+Training includes a routine for early stopping. In the case that loss<0.0001 and Accuracy=1.00 and Average
+Iota=1.00 training stops. The history uses the values of the last trained epoch for the remaining epochs.
 
-After training the model with the best values for Average Iota, Accuracy, and Loss
-on the validation data set is used as the final model.
+After training the model with the best values for Average Iota, Accuracy, and Loss on the validation data set
+is used as the final model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifierRegular$train(
   data_embeddings,
@@ -215,7 +215,7 @@ on the validation data set is used as the final model.
   balance_class_weights = TRUE,
   balance_sequence_length = TRUE,
   use_sc = TRUE,
-  sc_method = "dbsmote",
+  sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
   use_pl = TRUE,
@@ -261,8 +261,7 @@ has the weight 1.}
 
 \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
 
-\item{\code{sc_method}}{\code{vector} containing the method for generating synthetic cases. Possible are \code{sc_method="adas"},
-\code{sc_method="smote"}, and \code{sc_method="dbsmote"}.}
+\item{\code{sc_method}}{\code{vector} containing the method for generating synthetic cases. Possible is \code{sc_method="knnor"}.}
 
 \item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units.}
 
@@ -311,8 +310,8 @@ this argument to \code{NULL}.}
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
 the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
 
-\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if
-\code{use_sc=TRUE}.}
+\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only
+relevant if \code{use_sc=TRUE}.}
 }
 \if{html}{\out{</div>}}
 }

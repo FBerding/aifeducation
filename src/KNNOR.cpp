@@ -84,17 +84,17 @@ arma::mat knnor(const Rcpp::List &dataset, size_t k, size_t aug_num)
 
 // KNN =================================================================================================================
 
-//' K-Nearest Neighbors
-//'
-//' Function written in C++ for calculating `k`-nearest neighbors and distances
-//'
-//' @param embeddings `2-D array (matrix)` with size `batch` x `times*features`
-//' @param k `unsigned integer` number of nearest neighbors
-//'
-//' @return Returns a list with the following fields:
-//'   - `neighbors`: an 2-D array (matrix) with size `batch` x `k`. Each row contains indices of neighbor cases
-//'   - `distances`: an 2-D array (matrix) with size `batch` x `k`. Each row contains distance values between two cases
-//'
+// K-Nearest Neighbors
+//
+// Function written in C++ for calculating `k`-nearest neighbors and distances
+//
+// @param embeddings `2-D array (matrix)` with size `batch` x `times*features`
+// @param k `unsigned integer` number of nearest neighbors
+//
+// @return Returns a list with the following fields:
+//   - `neighbors`: an 2-D array (matrix) with size `batch` x `k`. Each row contains indices of neighbor cases
+//   - `distances`: an 2-D array (matrix) with size `batch` x `k`. Each row contains distance values between two cases
+//
 Rcpp::List knn(const arma::mat &embeddings, size_t k)
 {
   size_t n = embeddings.n_rows;
@@ -134,20 +134,20 @@ Rcpp::List knn(const arma::mat &embeddings, size_t k)
 
 // Algorithm 1 KNNOR Filtering =========================================================================================
 
-//' KNNOR-Filtering
-//'
-//' Function written in C++ for KNNOR-filtering.
-//' Split `dataset` into two embedding matrices for minority `embeddings_min` and majority `embeddings_maj` classes.
-//' Sort `embeddings_min` by distance in ascending order and take batches to be used for augmentation in
-//' `embeddings_min_sorted`
-//'
-//' @param dataset `list` containing the following fields:
-//'   - `embeddings`: an 2-D array (matrix) with size `batch` x `times*features`
-//'   - `labels`: an 1-D array (vector) of integers with `batch` elements
-//' @param k `unsigned integer` number of nearest neighbors
-//'
-//' @return Returns a list with the fields `embeddings_min`, `embeddings_maj` and `embeddings_min_sorted`
-//'
+// KNNOR-Filtering
+//
+// Function written in C++ for KNNOR-filtering.
+// Split `dataset` into two embedding matrices for minority `embeddings_min` and majority `embeddings_maj` classes.
+// Sort `embeddings_min` by distance in ascending order and take batches to be used for augmentation in
+// `embeddings_min_sorted`
+//
+// @param dataset `list` containing the following fields:
+//   - `embeddings`: an 2-D array (matrix) with size `batch` x `times*features`
+//   - `labels`: an 1-D array (vector) of integers with `batch` elements
+// @param k `unsigned integer` number of nearest neighbors
+//
+// @return Returns a list with the fields `embeddings_min`, `embeddings_maj` and `embeddings_min_sorted`
+//
 Rcpp::List knnor_filter(const Rcpp::List &dataset, size_t k)
 {
   arma::mat embeddings = dataset["embeddings"];
@@ -194,14 +194,14 @@ Rcpp::List knnor_filter(const Rcpp::List &dataset, size_t k)
       Rcpp::_["embeddings_min_sorted"] = embeddings_min_sorted);
 }
 
-//' Threshold distance
-//'
-//' Function written in C++ for calculating the threshold distance (KNNOR-Filtering)
-//'
-//' @param y `array` sorted distances
-//'
-//' @return Returns the threshold distance
-//'
+// Threshold distance
+//
+// Function written in C++ for calculating the threshold distance (KNNOR-Filtering)
+//
+// @param y `array` sorted distances
+//
+// @return Returns the threshold distance
+//
 double calc_threshold_distance(const arma::vec &y)
 {
   /*
@@ -220,18 +220,18 @@ double calc_threshold_distance(const arma::vec &y)
   return double(max_pos) / double(dy.n_elem);
 }
 
-//' 1-D Savitzky-Golay filter
-//'
-//' Function written in C++ for applying a 1-D Savitzky-Golay filter to an array (KNNOR-Filtering)
-//'
-//' @param y `array` the data to be filtered
-//' @param window_length `unsigned integer` the length of the filter window (i.e., the number of coefficients)
-//'   `window_length` must be odd
-//' @param poly_order `unsigned integer` the order of the polynomial used to fit the samples.
-//'   `poly_order` must be less than `window_length` parameter
-//'
-//' @return Returns an array with the filtered data
-//'
+// 1-D Savitzky-Golay filter
+//
+// Function written in C++ for applying a 1-D Savitzky-Golay filter to an array (KNNOR-Filtering)
+//
+// @param y `array` the data to be filtered
+// @param window_length `unsigned integer` the length of the filter window (i.e., the number of coefficients)
+//   `window_length` must be odd
+// @param poly_order `unsigned integer` the order of the polynomial used to fit the samples.
+//   `poly_order` must be less than `window_length` parameter
+//
+// @return Returns an array with the filtered data
+//
 arma::vec savgol_filter(const arma::vec &y, size_t window_length, size_t poly_order)
 {
   /*
@@ -263,17 +263,17 @@ arma::vec savgol_filter(const arma::vec &y, size_t window_length, size_t poly_or
   return Y;
 }
 
-//' Compute the coefficients for a 1-D Savitzky-Golay filter
-//'
-//' Function written in C++ for calculating the coefficients for Savitzky-Golay filter (KNNOR-Filtering)
-//'
-//' @param window_length `unsigned integer` the length of the filter window (i.e., the number of coefficients).
-//'   `window_length` must be odd
-//' @param poly_order `unsigned integer` the order of the polynomial used to fit the samples.
-//'   `poly_order` must be less than `window_length` parameter
-//'
-//' @return Returns an array with the filter coefficients
-//'
+// Compute the coefficients for a 1-D Savitzky-Golay filter
+//
+// Function written in C++ for calculating the coefficients for Savitzky-Golay filter (KNNOR-Filtering)
+//
+// @param window_length `unsigned integer` the length of the filter window (i.e., the number of coefficients).
+//   `window_length` must be odd
+// @param poly_order `unsigned integer` the order of the polynomial used to fit the samples.
+//   `poly_order` must be less than `window_length` parameter
+//
+// @return Returns an array with the filter coefficients
+//
 arma::vec savgol_coeffs(size_t window_length, size_t poly_order)
 {
   if (window_length % 2 == 0)
@@ -302,15 +302,15 @@ arma::vec savgol_coeffs(size_t window_length, size_t poly_order)
   return C;
 }
 
-//' Calculate the first derivative
-//'
-//' Function written in C++ for calculating the first derivative, used while calculating threshold distance
-//'   (KNNOR-Filtering).
-//'
-//' @param y `array` containing the data points
-//'
-//' @return Returns an array, the first derivative
-//'
+// Calculate the first derivative
+//
+// Function written in C++ for calculating the first derivative, used while calculating threshold distance
+//   (KNNOR-Filtering).
+//
+// @param y `array` containing the data points
+//
+// @return Returns an array, the first derivative
+//
 arma::vec first_derivative(const arma::vec &y)
 {
   /*
@@ -335,21 +335,21 @@ arma::vec first_derivative(const arma::vec &y)
 
 // Algorithm 2 KNNOR Augmentation ======================================================================================
 
-//' KNNOR-Augmentation
-//'
-//' Function written in C++ for KNNOR-Augmentation
-//'
-//' @param embeddings_min `2-D array (matrix)` minority embeddings (with size `batch` x `times*features`)
-//' @param embeddings_maj `2-D array (matrix)` majority embeddings (with size `batch` x `times*features`)
-//' @param embeddings_min_sorted `2-D array (matrix)` sorted minprity embeddings to be used for augmentation
-//'   (with size `batch` x `times*features`)
-//' @param k `unsigned integer` number of nearest neighbors
-//' @param aug_num `unsigned integer` number of datapoints to be augmented
-//' @param embeddings `2-D array (matrix)` embeddings (with size `batch` x `times*features`)
-//' @param labels `1-D array (vector)` of integers with `batch` elements
-//'
-//' @return Returns artificial points (`2-D array (matrix) with size `aug_num` x `times*features`)
-//'
+// KNNOR-Augmentation
+//
+// Function written in C++ for KNNOR-Augmentation
+//
+// @param embeddings_min `2-D array (matrix)` minority embeddings (with size `batch` x `times*features`)
+// @param embeddings_maj `2-D array (matrix)` majority embeddings (with size `batch` x `times*features`)
+// @param embeddings_min_sorted `2-D array (matrix)` sorted minprity embeddings to be used for augmentation
+//   (with size `batch` x `times*features`)
+// @param k `unsigned integer` number of nearest neighbors
+// @param aug_num `unsigned integer` number of datapoints to be augmented
+// @param embeddings `2-D array (matrix)` embeddings (with size `batch` x `times*features`)
+// @param labels `1-D array (vector)` of integers with `batch` elements
+//
+// @return Returns artificial points (`2-D array (matrix) with size `aug_num` x `times*features`)
+//
 arma::mat knnor_augmentation(const arma::mat &embeddings_min,
                              const arma::mat &embeddings_maj,
                              const arma::mat &embeddings_min_sorted,
@@ -400,16 +400,16 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
   return embeddings_augmented;
 }
 
-//' Calculate alpha coefficient
-//'
-//' Function written in C++ for calculating the minimum distance between all minority and majority points
-//' (KNNOR-Augmentation)
-//'
-//' @param embeddings_min `2-D array (matrix)` minority embeddings (with size `batch` x `times*features`)
-//' @param embeddings_maj `2-D array (matrix)` majority embeddings (with size `batch` x `times*features`)
-//'
-//' @return Returns alpha coefficient
-//'
+// Calculate alpha coefficient
+//
+// Function written in C++ for calculating the minimum distance between all minority and majority points
+// (KNNOR-Augmentation)
+//
+// @param embeddings_min `2-D array (matrix)` minority embeddings (with size `batch` x `times*features`)
+// @param embeddings_maj `2-D array (matrix)` majority embeddings (with size `batch` x `times*features`)
+//
+// @return Returns alpha coefficient
+//
 double alpha_coefficient(const arma::mat &embeddings_min,
                          const arma::mat &embeddings_maj)
 {
@@ -432,17 +432,17 @@ double alpha_coefficient(const arma::mat &embeddings_min,
   return min_dist;
 }
 
-//' Interpolate point
-//'
-//' Function written in C++ for point interpolation (KNNOR-Augmentation)
-//'
-//' @param Xi_new `1-D array (vector)` i-th origin point (with `times*features` elements)
-//' @param p `1-D array (vector)` a neighbor with `Xi_new` (with `times*features` elements)
-//' @param alpha `double` distance for a new point between `Xi_new` and `p`
-//'
-//' @return Returns an 1-D array (vector), interpolated point between two points on distance `alpha`
-//'   (with `times*features` elements)
-//'
+// Interpolate point
+//
+// Function written in C++ for point interpolation (KNNOR-Augmentation)
+//
+// @param Xi_new `1-D array (vector)` i-th origin point (with `times*features` elements)
+// @param p `1-D array (vector)` a neighbor with `Xi_new` (with `times*features` elements)
+// @param alpha `double` distance for a new point between `Xi_new` and `p`
+//
+// @return Returns an 1-D array (vector), interpolated point between two points on distance `alpha`
+//   (with `times*features` elements)
+//
 arma::rowvec interpolate_point(const arma::rowvec &Xi_new, const arma::rowvec &p, double alpha)
 {
   return Xi_new + (p - Xi_new) * alpha;
@@ -450,17 +450,17 @@ arma::rowvec interpolate_point(const arma::rowvec &Xi_new, const arma::rowvec &p
 
 // Algorithm 3 KNNOR Validation ========================================================================================
 
-//' Validate a new point
-//'
-//' Function written in C++ for validating a new point (KNNOR-Validation)
-//'
-//' @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
-//' @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
-//' @param labels `1-D array (vector)` of integers with `batch` elements
-//' @param k `unsigned integer` number of nearest neighbors
-//'
-//' @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
-//'
+// Validate a new point
+//
+// Function written in C++ for validating a new point (KNNOR-Validation)
+//
+// @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
+// @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
+// @param labels `1-D array (vector)` of integers with `batch` elements
+// @param k `unsigned integer` number of nearest neighbors
+//
+// @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
+//
 bool is_same_class(const arma::rowvec &new_point, const arma::mat &dataset, const arma::uvec &labels, size_t k)
 {
   std::vector<std::pair<double, int>> distances;

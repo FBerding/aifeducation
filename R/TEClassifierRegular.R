@@ -286,8 +286,7 @@ TEClassifierRegular <- R6::R6Class(
     #'   the frequencies of the training data with the method Inverse Class Frequency'. If `FALSE` each sequences length
     #'   has the weight 1.
     #' @param use_sc `bool` `TRUE` if the estimation should integrate synthetic cases. `FALSE` if not.
-    #' @param sc_method `vector` containing the method for generating synthetic cases. Possible are `sc_method="adas"`,
-    #'   `sc_method="smote"`, and `sc_method="dbsmote"`.
+    #' @param sc_method `vector` containing the method for generating synthetic cases. Possible is `sc_method="knnor"`.
     #' @param sc_min_k `int` determining the minimal number of k which is used for creating synthetic units.
     #' @param sc_max_k `int` determining the maximal number of k which is used for creating synthetic units.
     #' @param use_pl `bool` `TRUE` if the estimation should integrate pseudo-labeling. `FALSE` if not.
@@ -335,7 +334,7 @@ TEClassifierRegular <- R6::R6Class(
                      balance_class_weights = TRUE,
                      balance_sequence_length = TRUE,
                      use_sc = TRUE,
-                     sc_method = "dbsmote",
+                     sc_method = "knnor",
                      sc_min_k = 1,
                      sc_max_k = 10,
                      use_pl = TRUE,

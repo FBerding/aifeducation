@@ -28,7 +28,6 @@ TextEmbeddingModel <- R6::R6Class(
     configured = FALSE,
     r_package_versions = list(
       aifeducation = NA,
-      smotefamily = NA,
       reticulate = NA
     ),
     py_package_versions = list(

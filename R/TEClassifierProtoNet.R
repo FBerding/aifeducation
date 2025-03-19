@@ -103,9 +103,6 @@ TEClassifierProtoNet <- R6::R6Class(
       private$check_config_for_FALSE()
 
       # Checking of parameters--------------------------------------------------
-      if ((ml_framework %in% c("pytorch")) == FALSE) {
-        stop("ml_framework must be 'pytorch'.")
-      }
       private$check_embeddings_object_type(text_embeddings, strict = TRUE)
       check_type(name, type = "string", FALSE)
       check_type(label, type = "string", FALSE)
@@ -142,7 +139,7 @@ TEClassifierProtoNet <- R6::R6Class(
 
       #------------------------------------------------------------------------
       # Setting ML Framework
-      private$ml_framework <- ml_framework
+      private$ml_framework <- "pytorch"
 
       # Setting Label and Name
       private$set_model_info(
@@ -254,8 +251,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   the frequencies of the training data with the method Inverse Class Frequency'. If `FALSE` each sequences length
     #'   has the weight 1.
     #' @param use_sc `bool` `TRUE` if the estimation should integrate synthetic cases. `FALSE` if not.
-    #' @param sc_method `vector` containing the method for generating synthetic cases. Possible are `sc_method="adas"`,
-    #'   `sc_method="smote"`, and `sc_method="dbsmote"`.
+    #' @param sc_method `vector` containing the method for generating synthetic cases. Possible is `sc_method="knnor"`.
     #' @param sc_min_k `int` determining the minimal number of k which is used for creating synthetic units.
     #' @param sc_max_k `int` determining the maximal number of k which is used for creating synthetic units.
     #' @param use_pl `bool` `TRUE` if the estimation should integrate pseudo-labeling. `FALSE` if not.
@@ -315,7 +311,7 @@ TEClassifierProtoNet <- R6::R6Class(
                      data_folds = 5,
                      data_val_size = 0.25,
                      use_sc = TRUE,
-                     sc_method = "dbsmote",
+                     sc_method = "knnor",
                      sc_min_k = 1,
                      sc_max_k = 10,
                      use_pl = TRUE,

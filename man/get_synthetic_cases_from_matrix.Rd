@@ -10,7 +10,7 @@ get_synthetic_cases_from_matrix(
   features,
   target,
   sequence_length,
-  method = c("smote"),
+  method = c("knnor"),
   min_k = 1,
   max_k = 6
 )
@@ -26,8 +26,8 @@ get_synthetic_cases_from_matrix(
 
 \item{sequence_length}{\code{int} Length of the text embedding sequences.}
 
-\item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently "smote",
-"dbsmote", and "adas" from the package smotefamily are available.}
+\item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently
+"knnor" from this package is available.}
 
 \item{min_k}{\code{int} The minimal number of nearest neighbors during sampling process.}
 

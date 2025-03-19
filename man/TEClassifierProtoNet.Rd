@@ -150,7 +150,8 @@ relevant if \code{attention_type="multihead"}.}
 \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder.}
 
 \item{\code{attention_type}}{\code{string} Choose the relevant attention type. Possible values are \code{"fourier"} and
-\code{"multihead"}. Please note that you may see different values for a case for different input orders if you choose \code{fourier} on linux.}
+\code{"multihead"}. Please note that you may see different values for a case for different input orders if you
+choose \code{fourier} on linux.}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 
@@ -181,12 +182,11 @@ Returns an object of class \link{TEClassifierProtoNet} which is ready for traini
 \subsection{Method \code{train()}}{
 Method for training a neural net.
 
-Training includes a routine for early stopping. In the case that loss<0.0001
-and Accuracy=1.00 and Average Iota=1.00 training stops. The history uses the values
-of the last trained epoch for the remaining epochs.
+Training includes a routine for early stopping. In the case that loss<0.0001 and Accuracy=1.00 and Average
+Iota=1.00 training stops. The history uses the values of the last trained epoch for the remaining epochs.
 
-After training the model with the best values for Average Iota, Accuracy, and Loss
-on the validation data set is used as the final model.
+After training the model with the best values for Average Iota, Accuracy, and Loss on the validation data set
+is used as the final model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$train(
   data_embeddings,
@@ -194,7 +194,7 @@ on the validation data set is used as the final model.
   data_folds = 5,
   data_val_size = 0.25,
   use_sc = TRUE,
-  sc_method = "dbsmote",
+  sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
   use_pl = TRUE,
@@ -239,8 +239,7 @@ data.}
 
 \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
 
-\item{\code{sc_method}}{\code{vector} containing the method for generating synthetic cases. Possible are \code{sc_method="adas"},
-\code{sc_method="smote"}, and \code{sc_method="dbsmote"}.}
+\item{\code{sc_method}}{\code{vector} containing the method for generating synthetic cases. Possible is \code{sc_method="knnor"}.}
 
 \item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units.}
 
@@ -286,14 +285,14 @@ loss concentrates on pulling cases to its corresponding prototypes.}
 \item{\code{loss_margin}}{\code{double} Value greater 0 indicating the minimal distance of every case from prototypes of
 other classes}
 
-\item{\code{sampling_separate}}{\code{bool} If \code{TRUE} the cases for every class are divided into a data set for sample and for query.
-These are never mixed. If \code{TRUE} sample and query cases are drawn from the same data pool. That is, a case can be
-part of sample in one epoch and in another epoch it can be part of query. It is ensured that a case is never part of
-sample and query at the same time. In addition, it is ensured that every cases exists only once during
-a training step.}
+\item{\code{sampling_separate}}{\code{bool} If \code{TRUE} the cases for every class are divided into a data set for sample and
+for query. These are never mixed. If \code{TRUE} sample and query cases are drawn from the same data pool. That is,
+a case can be part of sample in one epoch and in another epoch it can be part of query. It is ensured that a
+case is never part of sample and query at the same time. In addition, it is ensured that every cases exists
+only once during a training step.}
 
-\item{\code{sampling_shuffle}}{\code{bool} If \code{TRUE} cases a randomly drawn from the data during every step. If \code{FALSE}
-the cases are not shuffled.}
+\item{\code{sampling_shuffle}}{\code{bool} If \code{TRUE} cases a randomly drawn from the data during every step. If \code{FALSE} the
+cases are not shuffled.}
 
 \item{\code{dir_checkpoint}}{\code{string} Path to the directory where the checkpoint during training should be saved. If the
 directory does not exist, it is created.}
@@ -309,8 +308,8 @@ this argument to \code{NULL}.}
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
 the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
 
-\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if
-\code{use_sc=TRUE}.}
+\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only
+relevant if \code{use_sc=TRUE}.}
 
 \item{\code{balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.}

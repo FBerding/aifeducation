@@ -84,7 +84,7 @@ Creating a new instance of this class.
   class_levels,
   one_hot_encoding = TRUE,
   add_matrix_map = TRUE,
-  sc_methods = "dbsmote",
+  sc_methods = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
   trace = TRUE,

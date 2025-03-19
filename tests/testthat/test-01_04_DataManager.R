@@ -41,7 +41,7 @@ data_embeddings <- current_embeddings
 
 # config test
 folds <- c(2, 5)
-methods <- c("dbsmote", "smote")
+methods <- c("knnor")
 datasets$disable_progress_bars()
 
 # Start Tests-------------------------------------------------------------------

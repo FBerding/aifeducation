@@ -217,8 +217,8 @@ learning process. Currently, the *Basic Synthetic Minority Oversampling
 Technique* (Chawla et al. 2002), *Density-Bases Synthetic Minority
 Oversampling Technique* (Bunkhumpornpat, Sinapiromsaran & Lursinsap
 2012), and *Adaptive Synthetic Sampling Approach for Imbalanced
-Learning* (Hem Garcia & Li 2008) are implemented via the *R* package
-*smotefamiliy*.
+Learning* (Hem Garcia & Li 2008) are implemented via the *KNNOR* method,
+written in *C++*.
 
 In order to address the problem of small data sets, training loops of AI
 integrate *pseudo-labeling* (e.g., Lee 2013). Pseudo-labeling is a
@@ -305,15 +305,6 @@ Concept Based on Content Analysis. Frontiers in Education, 1-21.
 Bloemen, A. (2011). Lernaufgaben in Schulbüchern der Wirtschaftslehre:
 Analyse, Konstruktion und Evaluation von Lernaufgaben für die Lernfelder
 industrieller Geschäftsprozesse. Hampp.
-
-Bunkhumpornpat, C., Sinapiromsaran, K., & Lursinsap, C. (2012). DBSMOTE:
-Density-Based Synthetic Minority Over-sampling Technique. Applied
-Intelligence, 36(3), 664--684.
-<https://doi.org/10.1007/s10489-011-0287-y>
-
-Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002).
-SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial
-Intelligence Research, 16, 321--357. <https://doi.org/10.1613/jair.953>
 
 Cohen, J (1968). Weighted kappa: Nominal scale agreement
 with provision for scaled disagreement or partial credit.

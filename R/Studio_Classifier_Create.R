@@ -338,7 +338,7 @@ Classifiers_Create_UI <- function(id) {
                 shiny::selectInput(
                   inputId = shiny::NS(id, "sc_method"),
                   label = "Method",
-                  choices = c("dbsmote", "adas", "smote")
+                  choices = c("knnor")
                 ),
                 shiny::sliderInput(
                   inputId = shiny::NS(id, "sc_min_max_k"),

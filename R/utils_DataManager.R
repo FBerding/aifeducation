@@ -22,8 +22,8 @@
 #' @param times `int` for the number of sequences/times.
 #' @param features `int` for the number of features within each sequence.
 #' @param sequence_length `int` Length of the text embedding sequences.
-#' @param method `vector` containing strings of the requested methods for generating new cases. Currently "smote",
-#'   "dbsmote", and "adas" from the package smotefamily are available.
+#' @param method `vector` containing strings of the requested methods for generating new cases. Currently
+#'   "knnor" from this package is available.
 #' @param min_k `int` The minimal number of nearest neighbors during sampling process.
 #' @param max_k `int` The maximum number of nearest neighbors during sampling process.
 #' @return `list` with the following components:
@@ -41,7 +41,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
                                             features,
                                             target,
                                             sequence_length,
-                                            method = c("smote"),
+                                            method = c("knnor"),
                                             min_k = 1,
                                             max_k = 6) {
   # get possible seq lengthes in order to group the cases by sequence length
@@ -84,30 +84,16 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 
       if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3) {
         for (m in seq_len(length(method))) {
-          if (method[m] != "dbsmote") {
-            for (k in min_k_final:max_k_final) {
-              input[[index]] <- list(
-                cat = cat,
-                required_cases = required_cases,
-                k = k,
-                method = method[m],
-                selected_cases = idx,
-                chunks = current_seq_length,
-                k_s = length(min_k_final:max_k_final),
-                max_k = max_k_final
-              )
-              index <- index + 1
-            }
-          } else {
+          for (k in min_k_final:max_k_final) {
             input[[index]] <- list(
               cat = cat,
               required_cases = required_cases,
-              k = 0,
+              k = k,
               method = method[m],
               selected_cases = idx,
               chunks = current_seq_length,
-              k_s = 1,
-              max_k = 0
+              k_s = length(min_k_final:max_k_final),
+              max_k = max_k_final
             )
             index <- index + 1
           }
@@ -205,7 +191,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #' @param max_k `int` The maximum number of nearest neighbors during sampling process.
 #' @param k_s `int` Number of ks in the complete generation process.
 #' @param method `vector` containing strings of the requested methods for generating new cases. Currently
-#'   "smote","dbsmote", and "adas" from the package smotefamily are available.
+#'   "knnor" from this package is available.
 #' @param cat `string` The category for which new cases should be created.
 #' @return Returns a `list` which contains the text embeddings of the new synthetic cases as a named `data.frame` and
 #'   their labels as a named `factor`.
@@ -213,6 +199,8 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #' @family data_management_utils
 #'
 #' @export
+
+# TODO (Yuliia): k_s and max_k parameters can be removed
 create_synthetic_units_from_matrix <- function(matrix_form,
                                                target,
                                                required_cases,
@@ -224,50 +212,16 @@ create_synthetic_units_from_matrix <- function(matrix_form,
   # Transform to a binary problem
   tmp_target <- (target == cat)
 
-  n_minor <- sum(tmp_target)
-
-  # Calculate n of all other cases
-  n_major <- sum(!tmp_target)
-
-  # Adept the number of cases for every k in the loop
-  min_k <- max_k - k_s + 1
-
-  if (k < (min_k + max_k) / 2) {
-    requested_number_cases <- max(1, floor(required_cases / k_s))
-  } else {
-    requested_number_cases <- ceiling(required_cases / k_s)
-  }
-
-  dup_size <- n_major / n_minor
-
   syn_data <- NULL
-  if (method == "smote") {
+  if (method == "knnor") {
     syn_data <- try(
-      smotefamily::SMOTE(
-        X = as.data.frame(matrix_form),
-        target = tmp_target,
-        K = k,
-        dup_size = dup_size
-      ),
-      silent = TRUE
-    )
-  } else if (method == "adas") {
-    syn_data <- try(
-      smotefamily::ADAS(
-        X = as.data.frame(matrix_form),
-        target = tmp_target,
-        K = k
-      ),
-      silent = TRUE
-    )
-  } else if (method == "dbsmote") {
-    syn_data <- try(
-      smotefamily::DBSMOTE(
-        X = as.data.frame(matrix_form),
-        target = tmp_target,
-        dupSize = dup_size,
-        MinPts = NULL,
-        eps = NULL
+      knnor(
+        dataset = list(
+          embeddings = matrix_form,
+          labels = tmp_target
+        ),
+        k = k,
+        aug_num = required_cases
       ),
       silent = TRUE
     )
@@ -278,7 +232,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
       (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)
   ) {
     n_cols_embedding <- ncol(matrix_form)
-    tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
+    tmp_data <- syn_data$syn_data[1:required_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(
       method, "_", cat, "_", k, "_", n_cols_embedding, "_",
       seq(from = 1, to = nrow(tmp_data), by = 1)
