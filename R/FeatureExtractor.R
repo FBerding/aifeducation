@@ -52,7 +52,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' or `"dense"` for dense layers.
     #' @param noise_factor `double` between 0 and a value lower 1 indicating how much noise should be added for the
     #'   training of the feature extractor.
-    #' @param optimizer `string` `"adam"` or `"rmsprop"` .
+    #' @param optimizer `string` `"adam"`, `"adamw` or `"rmsprop"` .
     #' @return Returns an object of class [TEFeatureExtractor] which is ready for training.
     configure = function(ml_framework = "pytorch",
                          name = NULL,
@@ -61,7 +61,7 @@ TEFeatureExtractor <- R6::R6Class(
                          features = 128,
                          method = "lstm",
                          noise_factor = 0.2,
-                         optimizer = "adam") {
+                         optimizer = "adamw") {
       # Checking of parameters--------------------------------------------------
       check_type(ml_framework, "string", FALSE)
       if ((ml_framework %in% c("pytorch")) == FALSE) {
@@ -70,8 +70,8 @@ TEFeatureExtractor <- R6::R6Class(
       check_type(name, "string", FALSE)
       check_type(label, "string", FALSE)
       check_type(optimizer, "string", FALSE)
-      if (optimizer %in% c("adam", "rmsprop") == FALSE) {
-        stop("Optimzier must be 'adam' oder 'rmsprop'.")
+      if (optimizer %in% c("adam", "rmsprop","adamw") == FALSE) {
+        stop("Optimzier must be 'adam', 'adamw' oder 'rmsprop'.")
       }
       check_type(method, "string", FALSE)
       if (method %in% c("lstm", "dense") == FALSE) {
@@ -144,6 +144,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param trace `bool` `TRUE`, if information about the estimation phase should be printed to the console.
     #' @param ml_trace `int` \code{ml_trace=0} does not print any information about the training process from pytorch on
     #'   the console. \code{ml_trace=1} prints a progress bar.
+    #' @param lr_rate `double` Initial learning rate for the training.
+    #' @param lr_warm_up_ratio `double` Number of epochs used for warm up.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     train = function(data_embeddings,
                      data_val_size = 0.25,
@@ -157,7 +159,9 @@ TEFeatureExtractor <- R6::R6Class(
                      trace = TRUE,
                      ml_trace = 1,
                      log_dir = NULL,
-                     log_write_interval = 10) {
+                     log_write_interval = 10,
+                     lr_rate=1e-3,
+                     lr_warm_up_ratio=0.02) {
       # Checking Arguments------------------------------------------------------
       self$check_embedding_model(data_embeddings)
       check_type(data_val_size, "double", FALSE)
@@ -169,6 +173,8 @@ TEFeatureExtractor <- R6::R6Class(
       check_type(batch_size, "int", FALSE)
       check_type(dir_checkpoint, "string", FALSE)
       check_type(trace, "bool", FALSE)
+      check_type(lr_rate, type = "double", FALSE)
+      check_type(lr_warm_up_ratio, type = "double", FALSE)
 
       # Saving training configuration-------------------------------------------
       self$last_training$config$data_val_size <- data_val_size
@@ -181,6 +187,9 @@ TEFeatureExtractor <- R6::R6Class(
       self$last_training$config$dir_checkpoint <- dir_checkpoint
       self$last_training$config$trace <- trace
       self$last_training$config$ml_trace <- ml_trace
+
+      self$last_training$config$lr_rate=lr_rate
+      self$last_training$config$lr_warm_up_ratio=lr_warm_up_ratio
 
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
@@ -232,6 +241,9 @@ TEFeatureExtractor <- R6::R6Class(
       # print(extractor_dataset$train)
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
         model = self$model,
+        optimizer_method = self$model_config$optimizer,
+        lr_rate=self$last_training$config$lr_rate,
+        lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
         batch_size = as.integer(self$last_training$config$batch_size),

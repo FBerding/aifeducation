@@ -4,11 +4,20 @@
 \alias{install_aifeducation}
 \title{Install aifeducation on a machine}
 \usage{
-install_aifeducation(install_aifeducation_studio = TRUE)
+install_aifeducation(
+  install_aifeducation_studio = TRUE,
+  python_version = "3.12",
+  use_conda = FALSE
+)
 }
 \arguments{
 \item{install_aifeducation_studio}{\code{bool} If \code{TRUE} all necessary R packages are installed for using AI for Education
 Studio.}
+
+\item{use_conda}{\code{bool} If \code{TRUE} installation installs 'miniconda' and uses 'conda' as package manager. If \code{FALSE}
+installation installs python and uses virtual environments for package management.}
+
+\item{`string`}{for selecting the version of python to be installed.}
 }
 \value{
 Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
@@ -22,6 +31,7 @@ Function for installing 'aifeducation' on a machine. This functions assumes that
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_py_modules}()},
+\code{\link{prepare_python}()},
 \code{\link{set_transformers_logger}()}
 }
 \concept{Installation and Configuration}

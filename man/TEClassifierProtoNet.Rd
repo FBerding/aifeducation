@@ -108,7 +108,7 @@ Creating a new instance of this class.
   dense_dropout = 0.4,
   recurrent_dropout = 0.4,
   encoder_dropout = 0.1,
-  optimizer = "adam"
+  optimizer = "adamw"
 )}\if{html}{\out{</div>}}
 }
 
@@ -168,7 +168,7 @@ recurrent layer. Only relevant for keras models.}
 \item{\code{encoder_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout for the dense projection
 within the encoder layers.}
 
-\item{\code{optimizer}}{\code{string} \code{"adam"} or \code{"rmsprop"} .}
+\item{\code{optimizer}}{\code{string} \code{"adam"}, \verb{"adamw} or \code{"rmsprop"} .}
 }
 \if{html}{\out{</div>}}
 }
@@ -219,7 +219,9 @@ is used as the final model.
   ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
-  n_cores = auto_n_cores()
+  n_cores = auto_n_cores(),
+  lr_rate = 0.001,
+  lr_warm_up_ratio = 0.02
 )}\if{html}{\out{</div>}}
 }
 
@@ -310,6 +312,10 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
 
 \item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only
 relevant if \code{use_sc=TRUE}.}
+
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training.}
+
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up.}
 
 \item{\code{balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency'. If \code{FALSE} each class has the weight 1.}

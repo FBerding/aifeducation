@@ -40,3 +40,4 @@ pkgdown
 test_preparation
 ^codecov\.yml$
 Deprecated
+.lintr

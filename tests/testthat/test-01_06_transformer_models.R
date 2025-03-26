@@ -5,7 +5,6 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-
 # Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")

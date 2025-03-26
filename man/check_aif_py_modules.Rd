@@ -22,6 +22,7 @@ available.
 Other Installation and Configuration: 
 \code{\link{install_aifeducation}()},
 \code{\link{install_py_modules}()},
+\code{\link{prepare_python}()},
 \code{\link{set_transformers_logger}()}
 }
 \concept{Installation and Configuration}

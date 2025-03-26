@@ -6,17 +6,18 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  transformer_version = "<=4.46",
-  tokenizers_version = "<=0.20.4",
+  transformer_version = "<=4.49.0",
+  tokenizers_version = "<=0.21.1",
   pandas_version = "<=2.2.3",
-  datasets_version = "<=3.1.0",
-  codecarbon_version = "<=2.8.2",
-  safetensors_version = "<=0.4.5",
+  datasets_version = "<=3.4.1",
+  codecarbon_version = "<=2.8.3",
+  safetensors_version = "<=0.5.3",
   torcheval_version = "<=0.0.7",
-  accelerate_version = "<=1.1.1",
-  pytorch_cuda_version = "12.1",
-  python_version = "3.9",
-  remove_first = FALSE
+  accelerate_version = "<=1.5.2",
+  pytorch_cuda_version = "12.6",
+  python_version = "3.12",
+  remove_first = FALSE,
+  use_conda = FALSE
 )
 }
 \arguments{
@@ -38,13 +39,16 @@ install_py_modules(
 
 \item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.}
 
-\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for ' PyTorch'.}
+\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for 'PyTorch'.}
 
 \item{python_version}{\code{string} Python version to use.}
 
 \item{remove_first}{\code{bool} If \code{TRUE} removes the environment completely before recreating the environment and
 installing the packages. If \code{FALSE} the packages are installed in the existing environment without any prior
 changes.}
+
+\item{use_conda}{\code{bool} If \code{TRUE} uses 'conda' for package management. If \code{FALSE} uses virtual environments for
+package management.}
 }
 \value{
 Returns no values or objects. Function is used for installing the necessary python libraries in a conda
@@ -57,6 +61,7 @@ Function for installing the necessary python modules.
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_aifeducation}()},
+\code{\link{prepare_python}()},
 \code{\link{set_transformers_logger}()}
 }
 \concept{Installation and Configuration}

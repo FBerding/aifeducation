@@ -25,6 +25,7 @@ datasets$disable_progress_bars()
 # load data for test
 # Use internal sample data
 example_data <- imdb_movie_reviews
+
 # Create LargeDataSet
 example_data_for_large <- example_data
 empty_vector <- vector(length = nrow(example_data))
@@ -77,12 +78,55 @@ max_layers <- 1:2
 
 for (framework in ml_frameworks) {
   for (base_model in base_model_list[[framework]]) {
+
     # Set path to the base model
     model_path <- paste0(
       root_path_data, "/",
       framework, "/",
       base_model
     )
+
+    test_that(paste(framework, base_model, "Detection of model type"), {
+      text_embedding_model <- TextEmbeddingModel$new()
+      text_embedding_model$configure(
+        model_name = paste0(base_model, "_embedding"),
+        model_label = paste0("Text Embedding via", base_model),
+        model_language = "english",
+        #method = base_model,
+        max_length = 20,
+        chunks = 2,
+        overlap = 10,
+        emb_layer_min = 1,
+        emb_layer_max = 1,
+        emb_pool_type = "cls",
+        model_dir = model_path
+      )
+
+      expect_equal(text_embedding_model$get_basic_components()$method,base_model)
+    })
+
+    test_that(paste(framework, base_model, "Number of parameters"), {
+      text_embedding_model <- TextEmbeddingModel$new()
+      text_embedding_model$configure(
+        model_name = paste0(base_model, "_embedding"),
+        model_label = paste0("Text Embedding via", base_model),
+        model_language = "english",
+        #method = base_model,
+        max_length = 20,
+        chunks = 2,
+        overlap = 10,
+        emb_layer_min = 1,
+        emb_layer_max = 1,
+        emb_pool_type = "cls",
+        model_dir = model_path
+      )
+
+      expect_gte(
+        text_embedding_model$count_parameter(with_head = TRUE),
+                 text_embedding_model$count_parameter(with_head = FALSE)
+                 )
+
+    })
 
     for (pooling_type in pooling_type_list[[base_model]]) {
       for (max_layer in max_layers) {
@@ -95,7 +139,7 @@ for (framework in ml_frameworks) {
                 model_name = paste0(base_model, "_embedding"),
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
-                method = base_model,
+                #method = base_model,
                 max_length = 20,
                 chunks = chunks,
                 overlap = 10,
@@ -114,7 +158,7 @@ for (framework in ml_frameworks) {
                 model_name = paste0(base_model, "_embedding"),
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
-                method = base_model,
+                #method = base_model,
                 max_length = 20,
                 chunks = chunks,
                 overlap = 10,
@@ -133,7 +177,7 @@ for (framework in ml_frameworks) {
                 model_name = paste0(base_model, "_embedding"),
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
-                method = base_model,
+                #method = base_model,
                 max_length = 50000,
                 chunks = chunks,
                 overlap = 10,
@@ -151,7 +195,7 @@ for (framework in ml_frameworks) {
               model_name = paste0(base_model, "_embedding"),
               model_label = paste0("Text Embedding via", base_model),
               model_language = "english",
-              method = base_model,
+              #method = base_model,
               max_length = 100,
               chunks = chunks,
               overlap = 10,
@@ -165,7 +209,7 @@ for (framework in ml_frameworks) {
                 model_name = paste0(base_model, "_embedding"),
                 model_label = paste0("Text Embedding via", base_model),
                 model_language = "english",
-                method = base_model,
+                #method = base_model,
                 max_length = 100,
                 chunks = chunks,
                 overlap = 10,
@@ -183,7 +227,7 @@ for (framework in ml_frameworks) {
             model_name = paste0(base_model, "_embedding"),
             model_label = paste0("Text Embedding via", base_model),
             model_language = "english",
-            method = base_model,
+            #method = base_model,
             max_length = 400,
             chunks = chunks,
             overlap = 50,

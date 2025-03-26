@@ -23,3 +23,9 @@ Returns artificial points (\verb{2-D array (matrix) with size }aug_num\code{x}ti
 \description{
 K-Nearest Neighbor OveRsampling approach (KNNOR)
 }
+\references{
+Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
+KNNOR: An oversampling technique for imbalanced datasets.
+Applied Soft Computing, 115, 108288. https://doi.org/10.1016/j.asoc.2021.108288
+}
+\concept{oversampling_approaches}

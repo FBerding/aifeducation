@@ -46,7 +46,10 @@ Reliability_Server <- function(id, model) {
       kappa_fleiss = "Fleiss' Kappa for Multiple Raters (Without Exact Estimation)",
       percentage_agreement = "Percentage Agreement",
       balanced_accuracy = "Average Accuracy within each Class",
-      gwet_ac = "Gwet's AC1/AC2 Agreement Coefficient"
+      gwet_ac = "Gwet's AC1/AC2 Agreement Coefficient",
+      gwet_ac1_nominal="Gwet's AC1 (Nominal)",
+      gwet_ac2_linear="Gwet's AC2 (Linear Weights, Ordinal)",
+      gwet_ac2_quadratic="Gwet's AC2 (Quadratic Weights, Ordinal)"
     )
     measures_scale_level <- c(
       "dynamic_iota_index",
@@ -59,7 +62,10 @@ Reliability_Server <- function(id, model) {
       "kappa_fleiss",
       "percentage_agreement",
       "balanced_accuracy",
-      "gwet_ac"
+      "gwet_ac",
+      "gwet_ac1_nominal",
+      "gwet_ac2_linear",
+      "gwet_ac2_quadratic"
     )
     #-------------
     output$ui_relability <- shiny::renderUI({

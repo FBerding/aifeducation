@@ -78,7 +78,6 @@ Method for creating a new text embedding model
   model_name = NULL,
   model_label = NULL,
   model_language = NULL,
-  method = NULL,
   max_length = 0,
   chunks = 2,
   overlap = 0,
@@ -99,16 +98,6 @@ Method for creating a new text embedding model
 
 \item{\code{model_language}}{\code{string} containing the language which the model
 represents (e.g., English).}
-
-\item{\code{method}}{\code{string} determining the kind of embedding model. Currently
-the following models are supported:
-\code{method="bert"} for Bidirectional Encoder Representations from Transformers (BERT),
-\code{method="roberta"} for A Robustly Optimized BERT Pretraining Approach (RoBERTa),
-\code{method="longformer"} for Long-Document Transformer,
-\code{method="funnel"} for Funnel-Transformer,
-\code{method="deberta_v2"} for Decoding-enhanced BERT with Disentangled Attention (DeBERTa V2),
-\verb{method="glove"`` for GlobalVector Clusters, and }method="lda"` for topic modeling. See
-details for more information.}
 
 \item{\code{max_length}}{\code{int} determining the maximum length of token
 sequences used in transformer models. Not relevant for the other methods.}
@@ -143,12 +132,6 @@ BERT model is stored.}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Details}{
-In the case of any transformer (e.g.\code{method="bert"},
-\code{method="roberta"}, and \code{method="longformer"}),
-a pretrained transformer model must be supplied via \code{model_dir}.
-}
-
 \subsection{Returns}{
 Returns an object of class \link{TextEmbeddingModel}.
 }

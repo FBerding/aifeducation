@@ -39,7 +39,9 @@ If \code{return_names_only = FALSE} returns a \code{vector} with the following r
 \item \strong{kappa_fleiss}: Fleiss' Kappa for multiple raters without exact estimation.
 \item \strong{percentage_agreement}: Percentage Agreement.
 \item \strong{balanced_accuracy}: Average accuracy within each class.
-\item \strong{gwet_ac}: Gwet's AC1/AC2 agreement coefficient.
+\item \strong{gwet_ac1_nominal}: Gwet's Agreement Coefficient 1 (AC1) for nominal data which is unweighted.
+\item \strong{gwet_ac2_linear}: Gwet's Agreement Coefficient 2 (AC2) for ordinal data with linear weights.
+\item \strong{gwet_ac2_quadratic}: Gwet's Agreement Coefficient 2 (AC2) for ordinal data with quadratic weights.
 }
 
 If \code{return_names_only = TRUE} returns only the names of the vector elements.

@@ -97,6 +97,33 @@ TextEmbeddingModel <- R6::R6Class(
       license = NA
     ),
     #---------------------------------------------------------------------------
+    #Method for detecting the name of the architecture of a base model
+    detect_base_model_type=function(model){
+      type_string=model$config$architectures
+      if(stringi::stri_detect(str=tolower(type_string),regex = "^funnel([:alnum:]*)")){
+        return("funnel")
+      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^bert([:alnum:]*)")){
+        return("bert")
+      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^debertav2([:alnum:]*)")){
+        return("deberta_v2")
+      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^mpnet([:alnum:]*)")){
+        return("mpnet")
+      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^longformer([:alnum:]*)")){
+        return("longformer")
+      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^roberta([:alnum:]*)")){
+        return("roberta")
+      } else {
+        stop("Architectue for the model could not be detected.")
+      }
+    },
+    #--------------------------------------------------------------------------
+    #Method for setting the method of the model
+    set_model_method=function(model_dir){
+      tmp_model<-transformers$AutoModel$from_pretrained(model_dir)
+      method<-private$detect_base_model_type(tmp_model)
+      private$basic_components$method <- method
+    },
+    #---------------------------------------------------------------------------
     # Method for setting configured to TRUE
     set_configuration_to_TRUE = function() {
       private$configured <- TRUE
@@ -443,15 +470,6 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param model_label `string` containing the label/title of the new model.
     #' @param model_language `string` containing the language which the model
     #' represents (e.g., English).
-    #' @param method `string` determining the kind of embedding model. Currently
-    #' the following models are supported:
-    #' `method="bert"` for Bidirectional Encoder Representations from Transformers (BERT),
-    #' `method="roberta"` for A Robustly Optimized BERT Pretraining Approach (RoBERTa),
-    #' `method="longformer"` for Long-Document Transformer,
-    #' `method="funnel"` for Funnel-Transformer,
-    #' `method="deberta_v2"` for Decoding-enhanced BERT with Disentangled Attention (DeBERTa V2),
-    #' `method="glove"`` for GlobalVector Clusters, and `method="lda"` for topic modeling. See
-    #' details for more information.
     #' @param max_length `int` determining the maximum length of token
     #' sequences used in transformer models. Not relevant for the other methods.
     #' @param chunks `int` Maximum number of chunks. Must be at least 2.
@@ -476,11 +494,6 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param trace `bool` `TRUE` prints information about the progress.
     #' `FALSE` does not.
     #' @return Returns an object of class [TextEmbeddingModel].
-    #' @details
-    #'
-    #' In the case of any transformer (e.g.`method="bert"`,
-    #' `method="roberta"`, and `method="longformer"`),
-    #' a pretrained transformer model must be supplied via `model_dir`.
     #'
     #' @import reticulate
     #' @import stats
@@ -488,7 +501,6 @@ TextEmbeddingModel <- R6::R6Class(
     configure = function(model_name = NULL,
                          model_label = NULL,
                          model_language = NULL,
-                         method = NULL,
                          max_length = 0,
                          chunks = 2,
                          overlap = 0,
@@ -503,25 +515,15 @@ TextEmbeddingModel <- R6::R6Class(
              'load' for loading the weights of a model.")
       }
 
+      #Set Framework
+      ml_framework="pytorch"
+
       # Parameter check---------------------------------------------------------
       check_type(model_name, "string", FALSE)
       check_type(model_label, "string", FALSE)
       check_type(model_language, "string", FALSE)
-      check_type(method, "string", FALSE)
-      ml_framework <- "pytorch"
-      if (method %in% c(private$supported_transformers[[ml_framework]]) == FALSE) {
-        stop(
-          paste(
-            "For",
-            ml_framework,
-            "method must be",
-            paste(private$supported_transformers[[ml_framework]], collapse = ", ")
-          )
-        )
-      }
-
-
       check_type(max_length, "int", FALSE)
+
 
       check_type(chunks, "int", FALSE)
       if (chunks < 2) {
@@ -545,11 +547,11 @@ TextEmbeddingModel <- R6::R6Class(
       # Set package versions
       private$set_package_versions()
 
-      # basic_components
-      private$basic_components$method <- method
+      # set model method
+      private$set_model_method(model_dir)
 
       # Load python scripts
-      # Must be called after setting private$basic_components$method
+      # Must be called after setting private$set_model_method
       private$load_reload_python_scripts()
 
       # transformer_components

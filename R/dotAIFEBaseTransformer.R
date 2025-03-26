@@ -286,8 +286,7 @@
           )
           logger <- do.call(create_logger, logger_args)
 
-
-          if (utils::compareVersion(transformers["__version__"], "4.46.0") >= 0) {
+          if(check_versions(a=get_py_package_version("transformers"),operator = ">=",b="4.46.0")){
             training_args <- transformers$TrainingArguments(
               output_dir = paste0(self$params$output_dir, "/checkpoints"),
               overwrite_output_dir = TRUE,
@@ -329,7 +328,7 @@
             )
           }
 
-          if (utils::compareVersion(transformers["__version__"], "4.46.0") >= 0) {
+          if(check_versions(a=get_py_package_version("transformers"),operator = ">=",b="4.46.0")){
             self$temp$trainer <- transformers$Trainer(
               model = self$temp$model,
               train_dataset = self$temp$tokenized_dataset$train,
@@ -396,9 +395,7 @@
 
     # Creates a sustainability tracker and stores it in the private `sustainability_tracker` attribute
     create_sustain_tracker = function() {
-      tmp_code_carbon <- reticulate::import("codecarbon")
-      codecarbon_version <- as.character(tmp_code_carbon["__version__"])
-      if (utils::compareVersion(codecarbon_version, "2.8.0") >= 0) {
+      if(check_versions(a=get_py_package_version("codecarbon"),operator = ">=",b="2.8.0")){
         path_look_file <- codecarbon$lock$LOCKFILE
         if (file.exists(path_look_file)) {
           unlink(path_look_file)

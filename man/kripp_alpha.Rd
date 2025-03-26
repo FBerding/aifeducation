@@ -21,6 +21,9 @@ nominal and ordinal data.
 \description{
 This function calculates different Krippendorff's Alpha for nominal and ordinal variables.
 }
+\note{
+Missing values are supported.
+}
 \references{
 Krippendorff, K. (2019). Content Analysis: An Introduction to
 Its Methodology (4th Ed.). SAGE
@@ -29,6 +32,7 @@ Its Methodology (4th Ed.). SAGE
 Other performance measures: 
 \code{\link{cohens_kappa}()},
 \code{\link{fleiss_kappa}()},
+\code{\link{gwet_ac}()},
 \code{\link{kendalls_w}()}
 }
 \concept{performance measures}

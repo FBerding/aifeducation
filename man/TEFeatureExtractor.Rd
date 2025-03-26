@@ -84,7 +84,7 @@ Creating a new instance of this class.
   features = 128,
   method = "lstm",
   noise_factor = 0.2,
-  optimizer = "adam"
+  optimizer = "adamw"
 )}\if{html}{\out{</div>}}
 }
 
@@ -110,7 +110,7 @@ or \code{"dense"} for dense layers.}
 \item{\code{noise_factor}}{\code{double} between 0 and a value lower 1 indicating how much noise should be added for the
 training of the feature extractor.}
 
-\item{\code{optimizer}}{\code{string} \code{"adam"} or \code{"rmsprop"} .}
+\item{\code{optimizer}}{\code{string} \code{"adam"}, \verb{"adamw} or \code{"rmsprop"} .}
 }
 \if{html}{\out{</div>}}
 }
@@ -137,7 +137,9 @@ Method for training a neural net.
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
-  log_write_interval = 10
+  log_write_interval = 10,
+  lr_rate = 0.001,
+  lr_warm_up_ratio = 0.02
 )}\if{html}{\out{</div>}}
 }
 
@@ -178,6 +180,10 @@ this argument to \code{NULL}.}
 
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
 the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
+
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training.}
+
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up.}
 }
 \if{html}{\out{</div>}}
 }

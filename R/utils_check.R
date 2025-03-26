@@ -100,7 +100,7 @@ check_type <- function(object, type = "bool", allow_NULL = FALSE) {
 #' @description Function for checking if a numpy array is writable.
 #'
 #' @param np_array A numpy array.
-#' @return Function returns `TRUE` if the numpy array is writable. It retuns `FALSE`
+#' @return Function returns `TRUE` if the numpy array is writable. It returns `FALSE`
 #' if the array is not writable.
 #'
 #' @family Utils
@@ -112,4 +112,59 @@ numpy_writeable <- function(np_array) {
     stop("Provided object is no numpy array")
   }
   return(reticulate::py_to_r(np_array$flags["WRITEABLE"]))
+}
+
+#' @title Compares and checks the versions of packages
+#' @description Function for checking if a package is later as another package.
+#'
+#' @param a Version string of the first package.
+#' @param b Version string of the second package.
+#' @param `string` Operator determining the kind of comparison. Allowed values are
+#' * `"=="` for equality.
+#' * `">="` if package a should be equal or later as package b.
+#' * `">"` if package a should be later as package b.
+#' * `"<="` if package a should be equal or earlier as package b.
+#' * `"<"` if package a should be earlier as package b.
+#' @return Function returns `TRUE` if the numpy array is writable. It returns `FALSE`
+#' if the array is not writable.
+#'
+#'@importFrom utils compareVersion
+#'
+#' @family Utils
+#' @keywords internal
+#' @noRd
+#'
+check_versions<-function(a,operator="==",b){
+  res<-utils::compareVersion(a=a,b=b)
+  if(operator=="=="){
+    if(res==0){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  } else if(operator==">="){
+    if(res>=0){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  } else if(operator==">"){
+    if(res>0){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  } else if (operator=="<="){
+    if(res<=0){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  } else if(operator=="<"){
+    if(res<0){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  }
 }

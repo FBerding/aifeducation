@@ -247,7 +247,7 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       return(noise)
 
     
-def AutoencoderTrain_PT_with_Datasets(model,epochs, trace,batch_size,
+def AutoencoderTrain_PT_with_Datasets(model,optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
@@ -260,8 +260,19 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     dtype=torch.double
     model.to(device,dtype=dtype)
   
-  optimizer=torch.optim.Adam(params=model.parameters(),weight_decay=0)
+  if optimizer_method=="adam":
+    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=0)
+  elif optimizer_method=="rmsprop":
+    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="adamw":
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
   
+  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
+  main_steps=epochs-warm_up_steps
+  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
+  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
+ 
   loss_fct=torch.nn.MSELoss()
 
   trainloader=torch.utils.data.DataLoader(
@@ -319,6 +330,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
                   total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
                   message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
         last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
+    
+    #Update learning rate
+    scheduler.step()
     
     #Validation----------------------------------------------------------------
     val_loss=0.0

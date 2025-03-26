@@ -22,7 +22,7 @@
 #' @export
 start_aifeducation_studio <- function() {
   # Prepare for studio
-  check_and_prepare_for_studio()
+  check_and_prepare_for_studio(env_type="auto")
 
   # Set up for long running tasks
   # future::plan(future::multisession)

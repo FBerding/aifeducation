@@ -15,6 +15,7 @@
 import torch 
 from torcheval.metrics.functional import multiclass_confusion_matrix
 import numpy as np
+import math
 import safetensors
 
 class LayerNorm_with_Mask_PT(torch.nn.Module):
@@ -437,7 +438,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
 
 
 
-def TeClassifierTrain_PT_with_Datasets(model,loss_fct_name, optimizer_method, epochs, trace,batch_size,
+def TeClassifierTrain_PT_with_Datasets(model,loss_fct_name, optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
@@ -452,10 +453,18 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     model.to(device,dtype=current_dtype)
   
   if optimizer_method=="adam":
-    optimizer=torch.optim.Adam(params=model.parameters(),weight_decay=1e-3)
+    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
   elif optimizer_method=="rmsprop":
-    optimizer=torch.optim.RMSprop(model.parameters())
-    
+    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="adamw":
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
+  
+  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
+  main_steps=epochs-warm_up_steps
+  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
+  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
+ 
   class_weights=class_weights.clone()
   class_weights=class_weights.to(device)
   
@@ -566,6 +575,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     bacc_train=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
     avg_iota_train=torch.diagonal(confusion_matrix_train)/(torch.sum(confusion_matrix_train,dim=0)+torch.sum(confusion_matrix_train,dim=1)-torch.diagonal(confusion_matrix_train))
     avg_iota_train=torch.sum(avg_iota_train)/n_classes
+    
+    #Update learning rate
+    scheduler.step()
 
     #Validation----------------------------------------------------------------
     val_loss=0.0

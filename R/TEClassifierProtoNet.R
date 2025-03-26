@@ -75,7 +75,7 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   recurrent layers.
     #' @param recurrent_dropout `double` ranging between 0 and lower 1, determining the recurrent dropout for each
     #'   recurrent layer. Only relevant for keras models.
-    #' @param optimizer `string` `"adam"` or `"rmsprop"` .
+    #' @param optimizer `string` `"adam"`, `"adamw` or `"rmsprop"` .
     #' @return Returns an object of class [TEClassifierProtoNet] which is ready for training.
     configure = function(name = NULL,
                          label = NULL,
@@ -98,7 +98,7 @@ TEClassifierProtoNet <- R6::R6Class(
                          dense_dropout = 0.4,
                          recurrent_dropout = 0.4,
                          encoder_dropout = 0.1,
-                         optimizer = "adam") {
+                         optimizer = "adamw") {
       # check if already configured
       private$check_config_for_FALSE()
 
@@ -123,8 +123,8 @@ TEClassifierProtoNet <- R6::R6Class(
         }
       }
       check_type(self_attention_heads, type = "int", FALSE)
-      if (optimizer %in% c("adam", "rmsprop") == FALSE) {
-        stop("Optimzier must be 'adam' oder 'rmsprop'.")
+      if (optimizer %in% c("adam", "rmsprop","adamw") == FALSE) {
+        stop("Optimzier must be 'adam', 'adamw' oder 'rmsprop'.")
       }
       check_type(embedding_dim, "int", FALSE)
       if (embedding_dim <= 0) {
@@ -188,19 +188,19 @@ TEClassifierProtoNet <- R6::R6Class(
       config["target_levels"] <- list(target_levels)
       config["n_categories"] <- list(length(target_levels))
       config["input_variables"] <- list(variable_name_order)
-      if (length(target_levels) > 2) {
-        # Multi Class
-        config["act_fct_last"] <- "softmax"
-        config["err_fct"] <- "categorical_crossentropy"
-        config["metric"] <- "categorical_accuracy"
-        config["balanced_metric"] <- "balanced_accuracy"
-      } else {
-        # Binary Classification
-        config["act_fct_last"] <- "sigmoid"
-        config["err_fct"] <- "binary_crossentropy"
-        config["metric"] <- "binary_accuracy"
-        config["balanced_metric"] <- "balanced_accuracy"
-      }
+      #if (length(target_levels) > 2) {
+      #  # Multi Class
+      #  config["act_fct_last"] <- "softmax"
+      #  config["err_fct"] <- "categorical_crossentropy"
+      #  config["metric"] <- "categorical_accuracy"
+      #  config["balanced_metric"] <- "balanced_accuracy"
+      #} else {
+      #  # Binary Classification
+      #  config["act_fct_last"] <- "sigmoid"
+      #  config["err_fct"] <- "binary_crossentropy"
+      #  config["metric"] <- "binary_accuracy"
+      #  config["balanced_metric"] <- "balanced_accuracy"
+      #}
 
       config["require_one_hot"] <- list(FALSE)
 
@@ -297,6 +297,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   console.
     #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases. Only
     #'   relevant if `use_sc=TRUE`.
+    #' @param lr_rate `double` Initial learning rate for the training.
+    #' @param lr_warm_up_ratio `double` Number of epochs used for warm up.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -336,7 +338,9 @@ TEClassifierProtoNet <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     n_cores = auto_n_cores()) {
+                     n_cores = auto_n_cores(),
+                     lr_rate=1e-3,
+                     lr_warm_up_ratio=0.02) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -358,6 +362,9 @@ TEClassifierProtoNet <- R6::R6Class(
       check_type(dir_checkpoint, type = "string", FALSE)
       check_type(trace, type = "bool", FALSE)
       check_type(n_cores, type = "int", FALSE)
+
+      check_type(lr_rate, type = "double", FALSE)
+      check_type(lr_warm_up_ratio, type = "double", FALSE)
 
       check_type(Ns, type = "int", FALSE)
       check_type(Nq, type = "int", FALSE)
@@ -409,6 +416,9 @@ TEClassifierProtoNet <- R6::R6Class(
       self$last_training$config$ml_trace <- ml_trace
 
       self$last_training$config$n_cores <- n_cores
+
+      self$last_training$config$lr_rate=lr_rate
+      self$last_training$config$lr_warm_up_ratio=lr_warm_up_ratio
 
       self$last_training$config$sampling_separate <- sampling_separate
       self$last_training$config$sampling_shuffle <- sampling_shuffle
@@ -476,6 +486,14 @@ TEClassifierProtoNet <- R6::R6Class(
       # Save the number of folds
       self$last_training$config$n_folds <- data_manager$get_n_folds()
 
+      #Check if pseudo labeling can be applied
+      if(self$last_training$config$use_pl==TRUE){
+        if(data_manager$contains_unlabeled_data()){
+          warning("There are no cases without labels. Setting 'use_pl' to 'FALSE'.")
+          self$last_training$config$use_pl=FALSE
+        }
+      }
+
       # Init Training------------------------------------------------------------
       private$init_train()
 
@@ -489,9 +507,7 @@ TEClassifierProtoNet <- R6::R6Class(
                country is missing. Add iso code or deactivate tracking.")
         }
 
-        tmp_code_carbon <- reticulate::import("codecarbon")
-        codecarbon_version <- as.character(tmp_code_carbon["__version__"])
-        if (utils::compareVersion(codecarbon_version, "2.8.0") >= 0) {
+        if(check_versions(a=get_py_package_version("codecarbon"),operator = ">=",b="2.8.0")){
           path_look_file <- codecarbon$lock$LOCKFILE
           if (file.exists(path_look_file)) {
             unlink(path_look_file)
@@ -865,14 +881,8 @@ TEClassifierProtoNet <- R6::R6Class(
         private$create_reset_model()
       }
 
-      # Set Optimizer
-      loss_fct_name <- "CrossEntropyLoss"
-      if (self$model_config$optimizer == "adam") {
-        optimizer <- "adam"
-      } else if (self$model_config$optimizer == "rmsprop") {
-        optimizer <- "rmsprop"
-      }
-
+      # Set loss function
+      loss_fct_name <- "ProtoNetworkMargin"
 
       # Check directory for checkpoints
       create_dir(
@@ -915,6 +925,8 @@ TEClassifierProtoNet <- R6::R6Class(
         model = self$model,
         loss_fct_name = loss_fct_name,
         optimizer_method = self$model_config$optimizer,
+        lr_rate=self$last_training$config$lr_rate,
+        lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
         Ns = as.integer(self$last_training$config$Ns),
         Nq = as.integer(self$last_training$config$Nq),
         loss_alpha = self$last_training$config$loss_alpha,

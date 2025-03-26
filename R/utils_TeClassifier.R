@@ -40,7 +40,9 @@
 #'   * **kappa_fleiss**: Fleiss' Kappa for multiple raters without exact estimation.
 #'   * **percentage_agreement**: Percentage Agreement.
 #'   * **balanced_accuracy**: Average accuracy within each class.
-#'   * **gwet_ac**: Gwet's AC1/AC2 agreement coefficient.
+#'   * **gwet_ac1_nominal**: Gwet's Agreement Coefficient 1 (AC1) for nominal data which is unweighted.
+#'   * **gwet_ac2_linear**: Gwet's Agreement Coefficient 2 (AC2) for ordinal data with linear weights.
+#'   * **gwet_ac2_quadratic**: Gwet's Agreement Coefficient 2 (AC2) for ordinal data with quadratic weights.
 #'
 #' @return If `return_names_only = TRUE` returns only the names of the vector elements.
 #'
@@ -68,7 +70,9 @@ get_coder_metrics <- function(true_values = NULL,
     "kappa_fleiss",
     "percentage_agreement",
     "balanced_accuracy",
-    "gwet_ac",
+    "gwet_ac1_nominal",
+    "gwet_ac2_linear",
+    "gwet_ac2_quadratic",
     "avg_precision",
     "avg_recall",
     "avg_f1"
@@ -131,7 +135,11 @@ get_coder_metrics <- function(true_values = NULL,
     ) /
       ncol(val_res_free$categorical_level$raw_estimates$assignment_error_matrix)
 
-    metric_values["gwet_ac"] <- irrCAC::gwet.ac1.raw(ratings = cbind(true_values, predicted_values))$est$coeff.val
+    res_gwet_ac <- gwet_ac(rater_one = true_values, rater_two = predicted_values)
+
+    metric_values["gwet_ac1_nominal"] <- res_gwet_ac$ac1
+    metric_values["gwet_ac2_linear"] <- res_gwet_ac$ac2_linear
+    metric_values["gwet_ac2_quadratic"] <- res_gwet_ac$ac2_quadratic
 
     # Standard measures
     standard_measures <- calc_standard_classification_measures(

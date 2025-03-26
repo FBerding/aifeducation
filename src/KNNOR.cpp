@@ -65,6 +65,13 @@ bool is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, 
 //' @param aug_num `unsigned integer` number of datapoints to be augmented
 //'
 //' @return Returns artificial points (`2-D array (matrix) with size `aug_num` x `times*features`)
+//'
+//' @references  Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
+//' KNNOR: An oversampling technique for imbalanced datasets.
+//' Applied Soft Computing, 115, 108288. https://doi.org/10.1016/j.asoc.2021.108288
+//'
+//' @family oversampling_approaches
+//'
 //' @export
 // [[Rcpp::export]]
 arma::mat knnor(const Rcpp::List &dataset, size_t k, size_t aug_num)

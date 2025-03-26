@@ -92,7 +92,7 @@ test_that("Generating Test Data", {
     model_name = "text_embedding_model_for_test",
     model_label = "Text Embedding for Test",
     model_language = "english",
-    method = ai_method,
+    #method = ai_method,
     max_length = 512,
     chunks = 6,
     overlap = 10,

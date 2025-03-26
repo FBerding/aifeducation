@@ -67,6 +67,10 @@ reference:
 #- contents:
 #  - has_concept("Classification Deprecated")
 
+- title: Oversampling Approaches
+- contents:
+  - has_concept("oversampling_approaches")
+
 - title: Auxiliary Functions
 - subtitle: Data Management
 - contents:

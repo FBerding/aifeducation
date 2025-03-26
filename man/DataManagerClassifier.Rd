@@ -62,6 +62,7 @@ the final training can be requested with \code{i+1}.}
 \item \href{#method-DataManagerClassifier-get_n_folds}{\code{DataManagerClassifier$get_n_folds()}}
 \item \href{#method-DataManagerClassifier-get_n_classes}{\code{DataManagerClassifier$get_n_classes()}}
 \item \href{#method-DataManagerClassifier-get_statistics}{\code{DataManagerClassifier$get_statistics()}}
+\item \href{#method-DataManagerClassifier-contains_unlabeled_data}{\code{DataManagerClassifier$contains_unlabeled_data()}}
 \item \href{#method-DataManagerClassifier-get_dataset}{\code{DataManagerClassifier$get_dataset()}}
 \item \href{#method-DataManagerClassifier-get_val_dataset}{\code{DataManagerClassifier$get_val_dataset()}}
 \item \href{#method-DataManagerClassifier-get_test_dataset}{\code{DataManagerClassifier$get_test_dataset()}}
@@ -247,6 +248,20 @@ Method for requesting descriptive sample statistics.
 \subsection{Returns}{
 Returns a table describing the absolute frequencies of the labeled and unlabeled data. The rows contain
 the length of the sequences while the columns contain the labels.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DataManagerClassifier-contains_unlabeled_data"></a>}}
+\if{latex}{\out{\hypertarget{method-DataManagerClassifier-contains_unlabeled_data}{}}}
+\subsection{Method \code{contains_unlabeled_data()}}{
+Method for checking if the dataset contains cases without labels.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$contains_unlabeled_data()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns \code{TRUE} if the dataset contains cases without labels. Returns \code{FALSE}
+if all cases have labels.
 }
 }
 \if{html}{\out{<hr>}}

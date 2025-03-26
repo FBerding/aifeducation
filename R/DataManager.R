@@ -252,6 +252,17 @@ DataManagerClassifier <- R6::R6Class(
       }
     },
 
+    #' @description Method for checking if the dataset contains cases without labels.
+    #' @return Returns `TRUE` if the dataset contains cases without labels. Returns `FALSE`
+    #' if all cases have labels.
+    contains_unlabeled_data=function(){
+      if(is.null(self$datasets$data_unlabeled)){
+        return(FALSE)
+      } else {
+        return(TRUE)
+      }
+    },
+
     #' @description Method for requesting a data set for training depending in the current state of the
     #'   DataManagerClassifier.
     #' @param inc_labeled `bool` If `TRUE` the data set includes all cases which have labels.

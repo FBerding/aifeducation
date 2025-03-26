@@ -4,6 +4,52 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.0
+
+**Major Changes**
+
+- Removed support for 'tensorflow'.
+
+**Installation and Configuration**
+
+- Removed functions belonging to 'tensorflow'.
+- Added the possibility to install python packages either to a 'conda' environment
+  or a virtual environment.
+
+**Ai for Education Studio**
+
+- Fixed a bug that prevented classifiers with applied pseudo labeling to visualize training history.
+
+**TextEmbeddingModel**
+
+- Removed parameter `method` from method `configure`. The method of the model is now 
+  detected automatically.
+
+**Classifiers**
+
+- Added parameters for determining the learning rate and warm up ratio for training.
+  
+**FeatureExtractor**
+
+- Added the option to choose an optimizer is now working.
+- Added parameters for determining the learning rate and warm up ratio for training.
+
+**Minorty Oversamping Techniques**
+
+- Added K-Nearest Neighbor OveRsampling approach (KNNOR) in C++ as new oversampling technique.
+- Removed support for all other oversampling techniques. No dependency to the package 'smotefamily'.
+
+**Performance Measures**
+
+- Added an own implementation of Gwet's AC1 and AC2 according to Gwet(2021).
+- Removed dependency to package 'irrCAC'.
+
+**Minor Changes**
+
+- Updated code for newer versions of numpy.
+- Added the function `prepare_python` for a convinent set up of virtual and 
+  conda environments.
+
 # aifeducation 1.0.2
 
 - Fixed a bug with alpha 3 codes for sustainability tracking preventing

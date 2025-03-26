@@ -744,10 +744,12 @@ prepare_training_history <- function(model,
     if (n_folds > 1) {
       n_folds <- n_folds - 1
     }
-    measures <- names(plot_data[[1]])
+
     if (!use_pl) {
+      measures <- names(plot_data[[1]])
       n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
     } else {
+      measures <- names(plot_data[[1]][[1]])
       n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]][[measures[1]]])
     }
   } else {
@@ -888,9 +890,16 @@ create_data_embeddings_description <- function(embeddings) {
 }
 
 #' @title Function for setting up AI for Education - Studio
-#' @description This functions checks if all nevessary R packages and python packages are available for using AI for
-#'   Education - Studio. In the case python is not initialized it will set the conda environment to `"aifeducation"`. In
+#' @description This functions checks if all necessary R packages and python packages are available for using AI for
+#'   Education - Studio. In the case python is not initialized it will first try to set a virtual environment `"aifeducation"`. If
+#'   this does not exist it tries to use a 'conda' environment `"aifeducation"`. In
 #'   the case python is already initialized it checks if the app can be run within the current environment.
+#'
+#' @param env_type `string` If set to `"venv"`  virtual environment is requested. If set to
+#' `"conda"` a 'conda' environment is requested. If set to `"auto"` the function tries to
+#' activate a virtual environment with the given name. If this environment does not exist
+#' it tries to activate a conda environment with the given name. If this fails
+#' the default virtual environment is used.
 #'
 #' @return Function does not return anything. It is used for preparing python and R
 #' in order to run AI for Education - Studio.
@@ -899,37 +908,54 @@ create_data_embeddings_description <- function(embeddings) {
 #' @keywords internal
 #' @noRd
 #'
-check_and_prepare_for_studio <- function() {
+check_and_prepare_for_studio <- function(env_type="auto") {
   message("Checking R Packages.")
-  r_packages <- c(
-    "ggplot2",
-    "rlang",
-    "shiny",
-    "shinyFiles",
-    "shinyWidgets",
-    "sortable",
-    "bslib",
-    "future",
-    "promises",
-    "DT",
-    "readtext",
-    "readxl"
+  r_packages <- list(
+    "ggplot2" = NULL,
+    "rlang" = NULL,
+    "shiny" = "1.9.0",
+    "shinyFiles" = NULL,
+    "shinyWidgets" = NULL,
+    "sortable" = NULL,
+    "bslib" = NULL,
+    "future" = NULL,
+    "promises" = NULL,
+    "DT" = NULL,
+    "readtext" = NULL,
+    "readxl" = NULL
   )
 
   missing_r_packages <- NULL
   for (i in seq_len(length(r_packages))) {
-    if (!requireNamespace(r_packages[i], quietly = TRUE, )) {
+    if (!requireNamespace(names(r_packages)[i], quietly = TRUE, )) {
       missing_r_packages <- append(
         x = missing_r_packages,
-        values = r_packages[i]
+        values = names(r_packages)[i]
       )
+    } else {
+      if (!is.null(r_packages[[i]])) {
+        if (!check_versions(
+          a = as.character(packageVersion(names(r_packages)[[i]])),
+          operator = ">=",
+          b = r_packages[[i]]
+        )) {
+          cat(paste(
+            "version of", names(r_packages)[i], "is", packageVersion(names(r_packages)[i]),
+            "but must be at least", r_packages[[i]], "."
+          ))
+          missing_r_packages <- append(
+            x = missing_r_packages,
+            values = names(r_packages)[i]
+          )
+        }
+      }
     }
   }
 
   if (length(missing_r_packages) > 0) {
     install_now <- utils::askYesNo(
       msg = paste(
-        "The following R packages are missing for Aifeducation Studio.",
+        "The following R packages are missing or need a newer version for Aifeducation Studio.",
         "'", paste(missing_r_packages, collapse = ","), "'.",
         "Do you want to install them now?"
       ),
@@ -937,39 +963,20 @@ check_and_prepare_for_studio <- function() {
       prompts = getOption("askYesNo", gettext(c("Yes", "No")))
     )
     if (install_now) {
-      utils::install.packages(missing_r_packages)
+      utils::install.packages(
+        pkgs = missing_r_packages,
+        dependencies = c("Depends", "Imports", "LinkingTo")
+      )
     } else {
       stop("Some necessary R Packages are missing.")
     }
   }
 
-  message("Setting the correct conda environment.")
-  if (!reticulate::py_available(FALSE)) {
-    message("Python is not initalized.")
-    if (!reticulate::condaenv_exists("aifeducation")) {
-      stop("Aifeducation studio requires a conda environment 'aifeducation' with
-      specific python libraries. Please install this. Please refer to the corresponding
-      vignette for more details.")
-    } else {
-      message("Setting conda environment to 'aifeducation'.")
-      reticulate::use_condaenv("aifeducation")
-      message("Initializing python.")
-      if (!reticulate::py_available(TRUE)) {
-        stop("Python cannot be initalized. Please check your installation of python.")
-      }
-    }
-  } else {
-    current_conda_session <- get_current_conda_env()
-    message(paste(
-      "Python is already initalized with the conda environment",
-      "'", current_conda_session, "'.",
-      "Try to start Aifeducation Studio with the current environment."
-    ))
-  }
+  prepare_python(env_type=env_type,envname="aifeducation")
 
   message("Checking pytorch machine learning framework.")
   available_ml_frameworks <- NULL
-  if (check_aif_py_modules(trace = FALSE, check = "pytorch")) {
+  if (check_aif_py_modules(trace = FALSE)) {
     available_ml_frameworks <- append(available_ml_frameworks, values = "pytorch")
   }
   if (is.null(available_ml_frameworks)) {

@@ -107,7 +107,7 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-        max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -168,6 +168,8 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @references Krippendorff, K. (2019). Content Analysis: An Introduction to
 #' Its Methodology (4th Ed.). SAGE
 #'
+#' @note Missing values are supported.
+#'
 #' @family performance measures
 #' @export
 kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
@@ -182,7 +184,7 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-        max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -289,7 +291,7 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @param rater_two `factor` ratings of the second coder.
 #' @param additional_raters `list` Additional raters with same requirements as `rater_one` and `rater_two`. If
 #' there are no additional raters set to `NULL`.
-#' @return Retuns the value for Fleiss' Kappa.
+#' @return Returns the value for Fleiss' Kappa.
 #'
 #' @references Fleiss, J. L. (1971). Measuring nominal scale agreement among
 #' many raters. Psychological Bulletin, 76(5), 378–382. <doi:10.1037/h0031619>
@@ -308,7 +310,7 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-        max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -350,4 +352,147 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
   kappa <- (p_agree_mean - p_agree_mean_expected) / (1 - p_agree_mean_expected)
 
   return(kappa)
+}
+
+#' @title Calculate Gwet's AC1 and AC2
+#' @description This function calculates Gwets Agreement Coefficients.
+#' @param rater_one `factor` rating of the first coder.
+#' @param rater_two `factor` ratings of the second coder.
+#' @param additional_raters `list` Additional raters with same requirements as `rater_one` and `rater_two`. If
+#' there are no additional raters set to `NULL`.
+#' @return Returns a `list` with the following entries
+#'  * ac1: Gwet's Agreement Coefficient 1 (AC1) for nominal data which is unweighted.
+#'  * ac2_linear: Gwet's Agreement Coefficient 2 (AC2) for ordinal data with linear weights.
+#'  * ac2_quadratic: Gwet's Agreement Coefficient 2 (AC2) for ordinal data with quadratic weights.
+#'
+#' @references Gwet, K. L. (2021). Handbook of inter-rater reliability:
+#' The definitive guide to measuring the extent of agreement among raters
+#' (Fifth edition, volume 1). AgreeStat Analytics.
+#'
+#' @note Weights are calculated as described in Gwet (2021).
+#' @note Missing values are supported.
+#'
+#' @family performance measures
+#' @export
+gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
+  check_class(rater_one, "factor", FALSE)
+  check_class(rater_two, "factor", FALSE)
+  check_class(additional_raters, "list", TRUE)
+
+  # create list of raters
+  raters <- list(rater_one, rater_two)
+  raters <- append(raters, additional_raters)
+
+  # Check levels
+  for (i in 2:length(raters)) {
+    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
+      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+    ) {
+      stop("Levels for values are not identical.")
+    }
+  }
+
+  N <- length(rater_one)
+  k <- length(levels(rater_one))
+  n <- length(raters)
+
+  # Create raw matrix
+  # cases in the rows and categories in the column
+  raw_matrix <- matrix(data = 0, nrow = N, ncol = k)
+  for (i in seq_len(length(raters))) {
+    tmp <- to_categorical_c(
+      class_vector = (as.numeric(raters[[i]]) - 1),
+      n_classes = k
+    )
+    tmp <- replace(
+      x = tmp,
+      is.na(raters[[i]]),
+      values = 0
+    )
+    raw_matrix <- raw_matrix + tmp
+  }
+  row_sums <- rowSums(raw_matrix)
+
+  # Exclude subjects with only one rating
+  reduced_raw_matrix <- subset(
+    x = raw_matrix,
+    subset = (rowSums(raw_matrix) >= 2)
+  )
+  row_sums_reduced <- rowSums(reduced_raw_matrix)
+
+  # Agreement
+  p_a <- 0
+  for (i in 1:nrow(reduced_raw_matrix)) {
+    for (j in 1:k) {
+      p_a <- p_a + (reduced_raw_matrix[i, j] * (reduced_raw_matrix[i, j] - 1)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1))
+    }
+  }
+  p_a <- p_a / nrow(reduced_raw_matrix)
+
+  # Expected
+  p_e <- 0
+  for (j in 1:k) {
+    pi <- 0
+    for (i in 1:nrow(raw_matrix)) {
+      pi <- pi + raw_matrix[i, j] / row_sums[i]
+    }
+    pi <- pi / N
+    p_e <- p_e + pi * (1 - pi)
+  }
+  p_e <- p_e / (k - 1)
+
+  ac1 <- (p_a - p_e) / (1 - p_e)
+
+  # Calculation of ac2
+  weights_quadratic <- matrix(data = NA, nrow = k, ncol = k)
+  weights_linear <- weights_quadratic
+  for (i in 1:k) {
+    for (j in 1:k) {
+      weights_quadratic[i, j] <- 1 - (i - j)^2 / (k - 1)^2
+      weights_linear[i, j] <- 1 - abs((i - j)) / (k - 1)
+    }
+  }
+
+  weights_list <- list(weights_linear, weights_quadratic)
+  ac2_list <- NULL
+  for (w in seq_along(weights_list)) {
+    weights <- weights_list[[w]]
+
+    # Agreement
+    p_a <- 0
+    for (i in 1:nrow(reduced_raw_matrix)) {
+      for (j in 1:k) {
+        weighted_count <- 0
+        for (l in 1:k) {
+          weighted_count <- weighted_count + weights[j, l] * reduced_raw_matrix[i, l]
+        }
+        p_a <- p_a + (reduced_raw_matrix[i, j] * (weighted_count - 1)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1))
+      }
+    }
+    p_a <- p_a / nrow(reduced_raw_matrix)
+
+    # Expected
+    p_e <- 0
+    for (j in 1:k) {
+      pi <- 0
+      for (i in 1:nrow(raw_matrix)) {
+        pi <- pi + raw_matrix[i, j] / row_sums[i]
+      }
+      pi <- pi / N
+      p_e <- p_e + pi * (1 - pi)
+    }
+    T_w <- sum(weights)
+    p_e <- p_e * (T_w / (k * (k - 1)))
+
+    ac2_list[w] <- list(
+      (p_a - p_e) / (1 - p_e)
+    )
+  }
+  return(
+    list(
+      ac1 = ac1,
+      ac2_linear = ac2_list[[1]],
+      ac2_quadratic = ac2_list[[2]]
+    )
+  )
 }

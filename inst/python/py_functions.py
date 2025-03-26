@@ -19,7 +19,8 @@ def map_input_to_labels(dataset):
   
 def map_input_to_matrix_form(dataset,times,features):
   sequence=dataset["input"]
-  return {"matrix_form": np.float32(np.squeeze(np.reshape(sequence,newshape=(1,times*features))))}
+  return {"matrix_form": np.float32(np.squeeze(np.reshape(sequence,(1,times*features))))}
+  #return {"matrix_form": np.float32(np.squeeze(np.reshape(sequence,newshape=(1,times*features))))}
 
 def map_labels_to_one_hot(dataset,num_classes):
   label=int(dataset["labels"])
