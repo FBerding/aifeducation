@@ -722,13 +722,13 @@ TextEmbeddingModel <- R6::R6Class(
 
 
       if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == TRUE) {
-        private$transformer_components$model$save_pretrained(
+        private$transformer_components$model_mlm$save_pretrained(
           save_directory = model_dir_data_path,
           safe_serilization = TRUE
         )
         private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
       } else if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
-        private$transformer_components$model$save_pretrained(
+        private$transformer_components$model_mlm$save_pretrained(
           save_directory = model_dir_data_path,
           safe_serilization = FALSE
         )
@@ -736,13 +736,12 @@ TextEmbeddingModel <- R6::R6Class(
         warning("Python library 'safetensors' is not available. Saving model in standard
                   pytorch format.")
       } else if (save_format == "pt") {
-        private$transformer_components$model$save_pretrained(
+        private$transformer_components$model_mlm$save_pretrained(
           save_directory = model_dir_data_path,
           safe_serilization = FALSE
         )
         private$transformer_components$tokenizer$save_pretrained(model_dir_data_path)
       }
-
 
       # Save Sustainability Data
       private$save_sustainability_data(

@@ -24,10 +24,13 @@ editor_options:
 
 - Removed parameter `method` from method `configure`. The method of the model is now 
   detected automatically.
+- Fixed a bug which caused that TextEmbeddingModels saved the model without the mlm head.
 
 **Classifiers**
 
 - Added parameters for determining the learning rate and warm up ratio for training.
+- Added a check for the number of unlabeled cases during training to avoid application
+  of pseudo labeling if there are no unlabeled cases.
   
 **FeatureExtractor**
 
@@ -47,8 +50,8 @@ editor_options:
 **Minor Changes**
 
 - Updated code for newer versions of numpy.
-- Added the function `prepare_python` for a convinent set up of virtual and 
-  conda environments.
+- Added the function `prepare_python` for a convenient set up of virtual and 
+  'conda' environments.
 
 # aifeducation 1.0.2
 

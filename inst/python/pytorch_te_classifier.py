@@ -18,6 +18,28 @@ import numpy as np
 import math
 import safetensors
 
+class dense_layer(torch.nn.Module):
+  def __init__(self,in_features, out_features,bias=True,ort_weights=False,ort_map="householder"):
+    super().__init__()
+    self.in_features=in_features
+    self.out_features=out_features
+    self.bias=bias,
+    self.ort_weights=ort_weights
+    self.ort_map=ort_map
+    self.param_a=torch.nn.Parameter(torch.randn(self.out_features,self.in_features))
+
+    if self.bias==False:
+      self.param_b=torch.nn.prameter(torch.randn(self.out_features))
+    else:
+      self.param_b=None
+    
+    if self.ort_weights==True:
+      torch.nn.utils.parametrizations.orthogonal(self, "param_a",orthogonal_map=self.ort_map)
+  
+  def forward(self,x):
+    return torch.nn.functional.linear(input=x,weight=self.param_a,bias=self.param_b)
+
+
 class LayerNorm_with_Mask_PT(torch.nn.Module):
     def __init__(self, features,eps=1e-5):
       super().__init__()
@@ -193,6 +215,28 @@ class UniDirectionalLSTM_PT(torch.nn.Module):
     result=self.lstm_layer(x)
     return result[0]
 
+class dense_layer(torch.nn.Module):
+  def __init__(self,in_features,out_features,bias=False,ort_weights=False,ort_map="householder"):
+    super().__init__()
+    self.in_features=in_features,
+    self.out_features=out_features,
+    self.bias=bias,
+    self.ort_weights=ort_weights
+    self.ort_map=ort_map
+    
+    self.param_a=torch.nn.Parameter(torch.randn(self.features_out,self.features_in))
+    
+    if self.bias==False:
+      self.param_b=torch.nn.prameter(torch.randn(self.features_out))
+    else:
+      self.param_b=None
+    
+    if self.ort_weights==True:
+      torch.nn.utils.parametrizations.orthogonal(self, "param_a",orthogonal_map="householder")
+  
+  def forward(self,x):
+    return torch.nn.functional.linear(input=x,weight=self.param_a,bias=self.param_b)
+
 class FourierTransformation_PT(torch.nn.Module):
   def __init__(self):
     super().__init__()
@@ -227,7 +271,6 @@ class FourierEncoder_PT(torch.nn.Module):
     proj_input=self.layernorm_1(attention_output)
     proj_output=self.dense_proj(proj_input)
     return self.layernorm_2(proj_input+proj_output)
-  
   
 class TransformerEncoder_PT(torch.nn.Module):
   def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate):

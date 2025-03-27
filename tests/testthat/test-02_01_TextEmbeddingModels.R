@@ -488,6 +488,7 @@ for (framework in ml_frameworks) {
               raw_text = example_data$text[1:10],
               doc_id = example_data$id[1:10]
             )
+
             # compare embeddings
             i <- sample(x = seq.int(from = 1, to = embeddings$n_rows()), size = 1)
             expect_equal(embeddings$embeddings[i, , , drop = FALSE],

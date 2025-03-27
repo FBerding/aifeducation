@@ -259,7 +259,11 @@ DataManagerClassifier <- R6::R6Class(
       if(is.null(self$datasets$data_unlabeled)){
         return(FALSE)
       } else {
-        return(TRUE)
+        if(self$datasets$data_unlabeled$num_rows>0){
+          return(TRUE)
+        } else {
+          return(FALSE)
+        }
       }
     },
 
