@@ -15,6 +15,10 @@ os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
+# ignore warnings
+run_py_file("py_ignore_warnings.py")
+py$ignore_data_collator_warnings()
+
 # config trace
 trace <- FALSE
 
