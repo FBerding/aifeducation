@@ -246,7 +246,7 @@ class FourierTransformation_PT(torch.nn.Module):
     return result
   
 class FourierEncoder_PT(torch.nn.Module):
-  def __init__(self, dense_dim, features, dropout_rate):
+  def __init__(self, dense_dim, features, dropout_rate,bias=True,act_fct="elu",parametrizations="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
@@ -258,9 +258,9 @@ class FourierEncoder_PT(torch.nn.Module):
     self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
     #self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.features)
     self.dense_proj=torch.nn.Sequential(
-      torch.nn.Linear(in_features=self.features,out_features=self.dense_dim),
-      torch.nn.GELU(),
-      torch.nn.Linear(in_features=self.dense_dim,out_features=self.features)
+      torch.nn.Linear(in_features=self.features,out_features=self.dense_dim,bias=self.bias),
+      get_act_fct(act_fct),
+      torch.nn.Linear(in_features=self.dense_dim,out_features=self.features,bias=self.bias)
     )
     self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
     #self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.features)
@@ -273,7 +273,7 @@ class FourierEncoder_PT(torch.nn.Module):
     return self.layernorm_2(proj_input+proj_output)
   
 class TransformerEncoder_PT(torch.nn.Module):
-  def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate):
+  def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate,bias=True,act_fct="elu",parametrizations="None"):
     super().__init__()
     self.embed_dim=embed_dim
     self.dense_dim=dense_dim
@@ -288,9 +288,9 @@ class TransformerEncoder_PT(torch.nn.Module):
     self.dropout=torch.nn.Dropout(p=dropout_rate)
     self.layernorm_1=LayerNorm_with_Mask_PT(features=self.embed_dim)
     self.dense_proj=torch.nn.Sequential(
-      torch.nn.Linear(in_features=self.embed_dim,out_features=self.dense_dim),
-      torch.nn.GELU(),
-      torch.nn.Linear(in_features=self.dense_dim,out_features=self.embed_dim))
+      torch.nn.Linear(in_features=self.embed_dim,out_features=self.dense_dim,bias=self.bias),
+      get_act_fct(act_fct),
+      torch.nn.Linear(in_features=self.dense_dim,out_features=self.embed_dim,bias=self.bias))
     self.layernorm_2=LayerNorm_with_Mask_PT(features=self.embed_dim)
 
   def forward(self,x):
@@ -364,7 +364,7 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
 class TextEmbeddingClassifier_PT(torch.nn.Module):
   def __init__(self,features, times, dense_size,dense_layers,rec_size,rec_layers, rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
-  add_pos_embedding, self_attention_heads, target_levels,classification_head=True):
+  add_pos_embedding, self_attention_heads, target_levels,classification_head=True,bias=True,parametrizations="None",act_fct="elu"):
     
     super().__init__()
     
@@ -388,12 +388,18 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                 embed_dim = features,
                 dense_dim= intermediate_size,
                 num_heads =self_attention_heads,
-                dropout_rate=encoder_dropout)})
+                dropout_rate=encoder_dropout,
+                bias=bias,
+                parametrizations=parametrizations,
+                act_fct=act_fct)})
           else:
             layer_list.update({"encoder_"+str(r+1):
               FourierEncoder_PT(dense_dim=intermediate_size,
                                 features=features,
-                                dropout_rate=encoder_dropout)})
+                                dropout_rate=encoder_dropout,
+                                bias=bias,
+                                parametrizations=parametrizations,
+                                act_fct=act_fct)})
                                 
     if rec_layers>0:
       layer_list.update({"packandmasking":PackAndMasking_PT()})
@@ -429,22 +435,30 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     if dense_layers>0:
       for i in range(dense_layers):
         if i==0:
-          layer_list.update({"dense_"+str(i+1):
-            torch.nn.Linear(
+          tmp_dense_layer=torch.nn.Linear(
               in_features=current_size_2,
-              out_features=dense_size
-            )})
-          layer_list.update({"dense_act_fct_"+str(i+1):
-            torch.nn.GELU()})
+              out_features=dense_size,
+              bias=bias
+              )
         else:
-          layer_list.update({"dense_"+str(i+1):
-            torch.nn.Linear(
+          tmp_dense_layer=torch.nn.Linear(
               in_features=dense_size,
-              out_features=dense_size)})
-          layer_list.update({"dense_act_fct_"+str(i+1):
-            torch.nn.GELU()})
+              out_features=dense_size,
+              bias=bias
+              )
+        if parametrizations=="orthogonal":
+          torch.nn.utils.parametrizations.orthogonal(module=tmp_dense_layer, name='weight')
+        elif parametrizations=="weight_norm":
+          torch.nn.utils.parametrizations.weight_norm(module=tmp_dense_layer, name='weight', dim=0)
+        elif parametrizations=="spectral_norm":
+          torch.nn.utils.spectral_norm(module=tmp_dense_layer, name='weight', n_power_iterations=1, eps=1e-12, dim=None)      
+        layer_list.update({"dense_"+str(i+1): tmp_dense_layer})
+        
+        layer_list.update({"dense_act_fct_"+str(i+1):
+             get_act_fct(act_fct)})
         if i!=(dense_layers-1):
           layer_list.update({"dense_dropout_"+str(i+1):torch.nn.Dropout(p=dense_dropout)})
+      
     
     if dense_layers==0 and rec_layers==0 and repeat_encoder==0 and times==1:
       last_in_features=features*times

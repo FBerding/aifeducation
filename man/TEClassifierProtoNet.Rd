@@ -103,6 +103,8 @@ Creating a new instance of this class.
   intermediate_size = NULL,
   attention_type = "fourier",
   add_pos_embedding = TRUE,
+  act_fct = "elu",
+  parametrizations = "None",
   rec_dropout = 0.1,
   repeat_encoder = 1,
   dense_dropout = 0.4,
@@ -155,15 +157,11 @@ choose \code{fourier} on linux.}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 
-\item{\code{rec_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout between bidirectional
-recurrent layers.}
+\item{\code{act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
 
-\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be added to the network.}
+\item{\code{parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 
-\item{\code{dense_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout between dense layers.}
-
-\item{\code{recurrent_dropout}}{\code{double} ranging between 0 and lower 1, determining the recurrent dropout for each
-recurrent layer. Only relevant for keras models.}
+\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x < 1}}
 
 \item{\code{encoder_dropout}}{\code{double} ranging between 0 and lower 1, determining the dropout for the dense projection
 within the encoder layers.}

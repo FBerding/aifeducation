@@ -162,7 +162,7 @@ TEClassifierRegular <- R6::R6Class(
       }
 
       check_type(self_attention_heads, type = "int", FALSE)
-      if (optimizer %in% c("adam", "rmsprop","adamw") == FALSE) {
+      if (optimizer %in% c("adam", "rmsprop", "adamw") == FALSE) {
         stop("Optimzier must be 'adam', 'adamw' oder 'rmsprop'.")
       }
       if (attention_type %in% c("fourier", "multihead") == FALSE) {
@@ -356,8 +356,8 @@ TEClassifierRegular <- R6::R6Class(
                      log_dir = NULL,
                      log_write_interval = 10,
                      n_cores = auto_n_cores(),
-                     lr_rate=1e-3,
-                     lr_warm_up_ratio=0.02) {
+                     lr_rate = 1e-3,
+                     lr_warm_up_ratio = 0.02) {
       # Checking Arguments------------------------------------------------------
       check_type(data_folds, type = "int", FALSE)
       check_type(data_val_size, type = "double", FALSE)
@@ -427,8 +427,8 @@ TEClassifierRegular <- R6::R6Class(
 
       self$last_training$config$n_cores <- n_cores
 
-      self$last_training$config$lr_rate=lr_rate
-      self$last_training$config$lr_warm_up_ratio=lr_warm_up_ratio
+      self$last_training$config$lr_rate <- lr_rate
+      self$last_training$config$lr_warm_up_ratio <- lr_warm_up_ratio
 
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
@@ -493,11 +493,11 @@ TEClassifierRegular <- R6::R6Class(
       # Save the number of folds
       self$last_training$config$n_folds <- data_manager$get_n_folds()
 
-      #Check if pseudo labeling can be applied
-      if(self$last_training$config$use_pl==TRUE){
-        if(data_manager$contains_unlabeled_data()){
-        warning("There are no cases without labels. Setting 'use_pl' to 'FALSE'.")
-          self$last_training$config$use_pl=FALSE
+      # Check if pseudo labeling can be applied
+      if (self$last_training$config$use_pl == TRUE) {
+        if (data_manager$contains_unlabeled_data()) {
+          warning("There are no cases without labels. Setting 'use_pl' to 'FALSE'.")
+          self$last_training$config$use_pl <- FALSE
         }
       }
 
@@ -516,7 +516,7 @@ TEClassifierRegular <- R6::R6Class(
         }
 
 
-        if(check_versions(a=get_py_package_version("codecarbon"),operator = ">=",b="2.8.0")){
+        if (check_versions(a = get_py_package_version("codecarbon"), operator = ">=", b = "2.8.0")) {
           path_look_file <- codecarbon$lock$LOCKFILE
           if (file.exists(path_look_file)) {
             unlink(path_look_file)
@@ -1586,8 +1586,8 @@ TEClassifierRegular <- R6::R6Class(
         model = self$model,
         loss_fct_name = loss_fct_name,
         optimizer_method = self$model_config$optimizer,
-        lr_rate=self$last_training$config$lr_rate,
-        lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
+        lr_rate = self$last_training$config$lr_rate,
+        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
         use_callback = use_callback,
@@ -1680,26 +1680,152 @@ TEClassifierRegular <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    check_and_adjust_target_levels = function(data_targets) {
-      if (sum(levels(data_targets) %in% self$model_config$target_levels) != self$model_config$n_categories) {
-        warning(
-          paste(
-            "data_targets contains levels that are not defined for the classifier",
-            "Defined levels are", self$model_config$target_levels, ".",
-            "Please check your data or create a new classifier and pass
-                all levels to the classifier's configuration."
-          )
+    set_target_data = function(target_levels, one_hot_encoding = TRUE) {
+      self$model_config["target_levels"] <- list(target_levels)
+      self$model_config["n_categories"] <- list(length(target_levels))
+      self$model_config["require_one_hot"] <- list(one_hot_encoding)
+    },
+    #--------------------------------------------------------------------------
+    set_times_and_features = function(times, features) {
+      self$model_config$features <- features
+      self$model_config$times <- times
+    },
+    #--------------------------------------------------------------------------
+    load_reload_python_scripts = function() {
+      reticulate::py_run_file(
+        system.file("python/py_activation_functions.py",
+          package = "aifeducation"
         )
+      )
+      reticulate::py_run_file(
+        system.file("python/pytorch_te_classifier.py",
+          package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/pytorch_autoencoder.py",
+          package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/py_log.py",
+          package = "aifeducation"
+        )
+      )
+    },
+    #-------------------------------------------------------------------------
+    do_training = function(args) {
+      check_all_args(args = args)
+      private$check_target_levels(args$data_targets)
+      self$check_embedding_model(args$data_embeddings, require_compressed = FALSE)
+
+      # Save args
+      private$save_all_args(args = args, group = "training")
+
+      # Perform additional checks
+      if (is.function(private$check_param_combinations_training)) {
+        private$check_param_combinations_training()
       }
 
-      tmp_data <- as.character(data_targets)
-      tmp_data <- factor(
-        x = tmp_data,
-        levels = self$model_config$target_levels,
-        ordered = TRUE
+      # set up logger
+      private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
+
+      # Prepare Data for Training
+      data_manager <- private$prepare_data_for_training(
+        data_targets = args$data_targets,
+        data_embeddings = args$data_embeddings
       )
-      names(tmp_data) <- names(data_targets)
-      return(tmp_data)
+
+      # Check if data can be used for pseudo labeling
+      private$check_data_for_pseudo_labeling(data_manager)
+
+      # Start-------------------------------------------------------------------
+      if (self$last_training$config$trace == TRUE) {
+        message(paste(
+          date(),
+          "Start"
+        ))
+      }
+
+      # Init Training------------------------------------------------------------
+      private$init_train()
+
+      # config datasets
+      datasets$disable_progress_bars()
+      # datasets$disable_caching()
+
+      # Start Sustainability Tracking-------------------------------------------
+      private$init_and_start_sustainability_tracking()
+
+      # Start Training----------------------------------------------------------
+      # Load Custom Model Scripts
+      private$load_reload_python_scripts()
+
+      # Start Loop inclusive final training
+      for (iter in 1:(self$last_training$config$n_folds + 1)) {
+        base::gc(verbose = FALSE, full = TRUE)
+
+        if (self$last_training$config$use_pl == FALSE) {
+          private$train_standard(
+            iteration = iter,
+            data_manager = data_manager,
+            inc_synthetic = self$last_training$config$use_sc
+          )
+        } else if (self$last_training$config$use_pl == TRUE) {
+          private$train_with_pseudo_labels(
+            init_train = TRUE,
+            iteration = iter,
+            data_manager = data_manager,
+            inc_synthetic = self$last_training$config$use_sc
+          )
+        }
+
+        # Calculate measures on categorical level
+        private$calculate_measures_on_categorical_level(
+          data_manager = data_manager,
+          iteration = iter
+        )
+        gc()
+      }
+
+      # Finalize Training
+      private$finalize_train()
+
+      # Stop sustainability tracking if requested
+      private$stop_sustainability_tracking()
+
+      if (self$last_training$config$trace == TRUE) {
+        message(paste(
+          date(),
+          "Training Complete"
+        ))
+      }
+    },
+    #-------------------------------------------------------------------------
+    load_reliability_data = function(dir_path) {
+      # Load R file with configuration and other data
+      config_file <- load_R_config_state(dir_path)
+
+      self$reliability <- list(
+        test_metric = config_file$public$reliability$test_metric,
+        test_metric_mean = config_file$public$reliability$test_metric_mean,
+        raw_iota_objects = list(
+          iota_objects_end = config_file$public$reliability$raw_iota_objects$iota_objects_end,
+          iota_objects_end_free = config_file$public$reliability$raw_iota_objects$iota_objects_end_free
+        ),
+        iota_object_end = config_file$public$reliability$iota_object_end,
+        iota_object_end_free = config_file$public$reliability$iota_object_end_free,
+        standard_measures_end = config_file$public$reliability$standard_measures_end,
+        standard_measures_mean = config_file$public$reliability$standard_measures_mean
+      )
+    },
+    #---------------------------------------------------------------------------
+    load_FeatureExtractor = function(dir_path = dir_path) {
+      if (self$model_config$use_fe == TRUE) {
+        feature_extractor <- TEFeatureExtractor$new()
+        feature_extractor$load_from_disk(paste0(dir_path, "/feature_extractor"))
+        self$feature_extractor <- feature_extractor
+      }
     }
   )
 )

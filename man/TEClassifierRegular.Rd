@@ -124,6 +124,8 @@ Creating a new instance of this class.
   intermediate_size = NULL,
   attention_type = "fourier",
   add_pos_embedding = TRUE,
+  act_fct = "elu",
+  parametrizations = "None",
   rec_dropout = 0.1,
   repeat_encoder = 1,
   dense_dropout = 0.4,
@@ -173,6 +175,10 @@ Please note that you may see different values for a case for different input ord
 linux.}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
+
+\item{\code{act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+
+\item{\code{parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 
 \item{\code{rec_dropout}}{\code{int} ranging between 0 and lower 1, determining the dropout between bidirectional recurrent
 layers.}
