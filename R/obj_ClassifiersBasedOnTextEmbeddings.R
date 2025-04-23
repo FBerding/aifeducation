@@ -1225,6 +1225,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #--------------------------------------------------------------------------
     load_reload_python_scripts = function() {
       reticulate::py_run_file(
+        system.file("python/py_activation_functions.py",
+                    package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
         system.file("python/pytorch_te_classifier.py",
                     package = "aifeducation"
         )

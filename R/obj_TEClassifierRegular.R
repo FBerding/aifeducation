@@ -54,6 +54,8 @@ TEClassifierRegular <- R6::R6Class(
     #' @param repeat_encoder `r get_param_doc_desc("repeat_encoder")`
     #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
     #' @param add_pos_embedding `r get_param_doc_desc("add_pos_embedding")`
+    #' @param act_fct `r get_param_doc_desc("act_fct")`
+    #' @param parametrizations `r get_param_doc_desc("parametrizations")`
     #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
     #' @param dense_dropout `r get_param_doc_desc("dense_dropout")`
     #' @param rec_dropout `r get_param_doc_desc("rec_dropout")`
@@ -75,6 +77,8 @@ TEClassifierRegular <- R6::R6Class(
                          intermediate_size = NULL,
                          attention_type = "fourier",
                          add_pos_embedding = TRUE,
+                         act_fct="elu",
+                         parametrizations="None",
                          rec_dropout = 0.1,
                          repeat_encoder = 1,
                          dense_dropout = 0.4,
@@ -110,7 +114,9 @@ TEClassifierRegular <- R6::R6Class(
         encoder_dropout = self$model_config$encoder_dropout,
         add_pos_embedding = self$model_config$add_pos_embedding,
         self_attention_heads = as.integer(self$model_config$self_attention_heads),
-        target_levels = self$model_config$target_levels
+        target_levels = self$model_config$target_levels,
+        act_fct=self$model_config$act_fct,
+        parametrizations=self$model_config$parametrizations
       )
     },
     #--------------------------------------------------------------------------

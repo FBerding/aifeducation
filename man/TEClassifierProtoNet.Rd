@@ -104,6 +104,8 @@ Creating a new instance of this class.
   intermediate_size = NULL,
   attention_type = "fourier",
   add_pos_embedding = TRUE,
+  act_fct = "elu",
+  parametrizations = "None",
   rec_dropout = 0.1,
   repeat_encoder = 1,
   dense_dropout = 0.4,
@@ -151,6 +153,10 @@ indicating a higher category/class. For nominal data the order does not matter.}
 values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'fourier', 'multihead'}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
+
+\item{\code{act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+
+\item{\code{parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 
 \item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x < 1}}
 

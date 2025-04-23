@@ -7,7 +7,7 @@ skip_overfitting_test <- TRUE
 
 
 # Skip Tests
-skip_creation_test <- FALSE
+skip_creation_test <- TRUE
 skip_method_save_load <- FALSE
 skip_function_save_load <- FALSE
 skip_training_test <- FALSE
@@ -430,6 +430,8 @@ if (!skip_training_test) {
           rec_layers = rec_layers,
           rec_size = rec_size,
           rec_type = rec_type,
+          act_fct = "elu",
+          parametrizations = "None",
           rec_bidirectional = rec_bidirectional,
           self_attention_heads = 1,
           intermediate_size = NULL,

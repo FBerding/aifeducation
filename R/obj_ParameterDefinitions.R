@@ -16,6 +16,22 @@
 #' @export
 get_param_dict <- function() {
   param <- list(
+    act_fct=list(
+      type="string",
+      min=NULL,
+      max=NULL,
+      allow_null = FALSE,
+      allowed_values = c("elu","leakyrelu","relu","gelu","sigmoid","tanh","prelu"),
+      desc="Activation function for all layers except recurrent layers."
+    ),
+    parametrizations=list(
+      type="string",
+      min=NULL,
+      max=NULL,
+      allow_null = FALSE,
+      allowed_values = c("None","orthogonal","weight_norm","spectral_norm"),
+      desc="Re-Parametrizations for all layers except recurrent layers."
+    ),
     data_embeddings = list(
       type = c("EmbeddedText", "LargeDataSetForTextEmbeddings"),
       allow_null = FALSE,

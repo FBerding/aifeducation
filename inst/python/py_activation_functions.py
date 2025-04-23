@@ -17,17 +17,17 @@ import torch
 def get_act_fct(name):
   if name=="elu":
     return torch.nn.ELU()
-  elif name="leakyrelu":
+  elif name=="leakyrelu":
     return torch.nn.LeakyReLU()
-  elif name="relu":
+  elif name=="relu":
     return torch.nn.ReLU()
-  elif name="gelu":
+  elif name=="gelu":
     return torch.nn.GELU()
-  elif name="sigmoid":
+  elif name=="sigmoid":
     return torch.nn.Sigmoid()
-  elif name="tanh":
+  elif name=="tanh":
     return torch.nn.TanH()
-  elif name="prelu":
+  elif name=="prelu":
     return torch.nn.PReLU()
   
   
