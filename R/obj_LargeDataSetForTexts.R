@@ -246,15 +246,15 @@ LargeDataSetForText <- R6::R6Class(
                                    log_top_total = 1,
                                    log_top_message = NA) {
       # Check
-      check_type(id_column, "string", FALSE)
-      check_type(text_column, "string", FALSE)
-      check_type(bib_entry_column, "string", TRUE)
-      check_type(license_column, "string", TRUE)
-      check_type(url_license_column, "string", TRUE)
-      check_type(text_license_column, "string", TRUE)
-      check_type(url_source_column, "string", TRUE)
-      check_type(trace, "bool", FALSE)
-      check_type(dir_path, "string", FALSE)
+      check_type(object=id_column, type="string", FALSE)
+      check_type(object=text_column, type="string", FALSE)
+      check_type(object=bib_entry_column,type= "string", TRUE)
+      check_type(object=license_column, type="string", TRUE)
+      check_type(object=url_license_column, type="string", TRUE)
+      check_type(object=text_license_column, type="string", TRUE)
+      check_type(object=url_source_column, type="string", TRUE)
+      check_type(object=trace, type="bool", FALSE)
+      check_type(object=dir_path, type="string", FALSE)
 
       # Gather all files
       file_paths <- private$get_file_paths(dir_path, file_type = ".xlsx")

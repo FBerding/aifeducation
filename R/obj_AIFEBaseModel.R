@@ -64,12 +64,6 @@ AIFEBaseModel <- R6::R6Class(
         model_date = private$model_info$model_date
       ))
     },
-    #--------------------------------------------------------------------------
-    #' @description Method for requesting the text embedding model information.
-    #' @return `list` of all relevant model information on the text embedding model underlying the model.
-    get_text_embedding_model = function() {
-      return(private$text_embedding_model)
-    },
     #---------------------------------------------------------------------------
     #' @description Method for setting publication information of the model.
     #' @param authors List of authors.
@@ -267,36 +261,6 @@ AIFEBaseModel <- R6::R6Class(
     get_ml_framework = function() {
       return(private$ml_framework)
     },
-    #--------------------------------------------------------------------------
-    #' @description Method for requesting the name (unique id) of the underlying text embedding model.
-    #' @return Returns a `string` describing name of the text embedding model.
-    get_text_embedding_model_name = function() {
-      return(private$text_embedding_model$model$model_name)
-    },
-    #--------------------------------------------------------------------------
-    # Check Embedding Model compatibility of the text embedding
-    #' @description Method for checking if the provided text embeddings are created with the same [TextEmbeddingModel]
-    #'   as the model.
-    #' @param text_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
-    #' @return `TRUE` if the underlying [TextEmbeddingModel] are the same. `FALSE` if the models differ.
-    check_embedding_model = function(text_embeddings) {
-      # Check object type
-      private$check_embeddings_object_type(text_embeddings, strict = TRUE)
-
-      # Check original text embedding model
-      embedding_model_config <- text_embeddings$get_model_info()
-      check <- c("model_name")
-
-      if (
-        !is.null_or_na(embedding_model_config[[check]]) &
-          !is.null_or_na(private$text_embedding_model$model[[check]])
-      ) {
-        if (embedding_model_config[[check]] != private$text_embedding_model$model[[check]]) {
-          stop("The TextEmbeddingModel that generated the data_embeddings is not
-               the same as the TextEmbeddingModel when generating the classifier.")
-        }
-      }
-    },
     #---------------------------------------------------------------------------
     #' @description Method for counting the trainable parameters of a model.
     #' @return Returns the number of trainable parameters of the model.
@@ -359,7 +323,7 @@ AIFEBaseModel <- R6::R6Class(
   ),
   private = list(
     ml_framework = NA,
-
+    sustainability_tracker=NA,
     # General Information-------------------------------------------------------
     model_info = list(
       model_license = NA,
@@ -369,11 +333,6 @@ AIFEBaseModel <- R6::R6Class(
       name_root = NA,
       model_label = NA,
       model_date = NA
-    ),
-    text_embedding_model = list(
-      model = list(),
-      times = NA,
-      features = NA
     ),
     publication_info = list(
       developed_by = list(
@@ -427,20 +386,18 @@ AIFEBaseModel <- R6::R6Class(
         region = NA
       )
     ),
-    gui = list(
-      shiny_app_active = NA,
-      pgr_value = 0,
-      pgr_max_value = 0
-    ),
     log_config = list(
       log_dir = NULL,
       log_state_file = NULL,
       log_write_intervall = 10
     ),
 
-    # Variable for checking if the object is successfully configured. Only is
+    # Variable for checking if the object is successfully configured. Only if
     # this is TRUE the object can be used
     configured = FALSE,
+
+    #Variable for checking if the object has been successfully trained.
+    trained=FALSE,
 
     #--------------------------------------------------------------------------
     # Method for setting the model info
@@ -481,123 +438,12 @@ AIFEBaseModel <- R6::R6Class(
       )
       return(results)
     },
-    check_embeddings_object_type = function(embeddings, strict = TRUE) {
-      if (strict == TRUE) {
-        if (
-          !("EmbeddedText" %in% class(embeddings)) &
-            !("LargeDataSetForTextEmbeddings" %in% class(embeddings))
-        ) {
-          stop("text_embeddings must be of class EmbeddedText or LargeDataSetForTextEmbeddings.")
-        }
-      } else {
-        if (
-          !("EmbeddedText" %in% class(embeddings)) &
-            !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
-            !("array" %in% class(embeddings)) &
-            !("datasets.arrow_dataset.Dataset" %in% class(embeddings))
-        ) {
-          stop("text_embeddings must be of class EmbeddedText, LargeDataSetForTextEmbeddings,
-               datasets.arrow_dataset.Dataset or array.")
-        }
-      }
-    },
     #------------------------------------------------------------------------
     detach_tensors = function(tensors) {
       if (torch$cuda$is_available()) {
         return(tensors$detach()$cpu()$numpy())
       } else {
         return(tensors$detach()$numpy())
-      }
-    },
-    #-------------------------------------------------------------------------
-    check_single_prediction = function(embeddings) {
-      if (
-        "EmbeddedText" %in% class(embeddings) |
-          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
-      ) {
-        if (embeddings$n_rows() > 1) {
-          single_prediction <- FALSE
-        } else {
-          single_prediction <- TRUE
-        }
-      } else if ("array" %in% class(embeddings)) {
-        if (nrow(embeddings) > 1) {
-          single_prediction <- FALSE
-        } else {
-          single_prediction <- TRUE
-        }
-      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
-        single_prediction <- FALSE
-      }
-      return(single_prediction)
-    },
-    #--------------------------------------------------------------------------
-    prepare_embeddings_as_dataset = function(embeddings) {
-      if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
-        prepared_dataset <- embeddings
-      } else if ("EmbeddedText" %in% class(embeddings)) {
-        prepared_dataset <- datasets$Dataset$from_dict(
-          reticulate::dict(
-            list(
-              id = rownames(embeddings$embeddings),
-              input = np$squeeze(
-                np$split(
-                  reticulate::np_array(embeddings$embeddings),
-                  as.integer(nrow(embeddings$embeddings)),
-                  axis = 0L
-                )
-              )
-            ),
-            convert = FALSE
-          )
-        )
-      } else if ("array" %in% class(embeddings)) {
-        prepared_dataset <- datasets$Dataset$from_dict(
-          reticulate::dict(
-            list(
-              id = rownames(embeddings),
-              input = np$squeeze(np$split(reticulate::np_array(embeddings), as.integer(nrow(embeddings)), axis = 0L))
-            ),
-            convert = FALSE
-          )
-        )
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
-        prepared_dataset <- embeddings$get_dataset()
-      }
-      return(prepared_dataset)
-    },
-    #-------------------------------------------------------------------------
-    prepare_embeddings_as_np_array = function(embeddings) {
-      if ("EmbeddedText" %in% class(embeddings)) {
-        prepared_dataset <- embeddings$embeddings
-        tmp_np_array <- np$array(prepared_dataset)
-      } else if ("array" %in% class(embeddings)) {
-        prepared_dataset <- embeddings
-        tmp_np_array <- np$array(prepared_dataset)
-      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
-        prepared_dataset <- embeddings$set_format("np")
-        tmp_np_array <- prepared_dataset["input"]
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
-        prepared_dataset <- embeddings$get_dataset()
-        prepared_dataset$set_format("np")
-        tmp_np_array <- prepared_dataset["input"]
-      }
-      tmp_np_array <- reticulate::np_array(tmp_np_array)
-      if (numpy_writeable(tmp_np_array) == FALSE) {
-        warning("Numpy array is not writable")
-      }
-      return(tmp_np_array)
-    },
-    #--------------------------------------------------------------------------
-    get_rownames_from_embeddings = function(embeddings) {
-      if ("EmbeddedText" %in% class(embeddings)) {
-        return(rownames(embeddings$embeddings))
-      } else if ("array" %in% class(embeddings)) {
-        return(rownames(embeddings))
-      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
-        return(embeddings["id"])
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
-        embeddings$get_ids()
       }
     },
     #-----------------------------------------------------------------------
@@ -624,16 +470,6 @@ AIFEBaseModel <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    set_text_embedding_model = function(model_info,
-                                        feature_extractor_info,
-                                        times,
-                                        features) {
-      private$text_embedding_model["model"] <- list(model_info)
-      private$text_embedding_model["feature_extractor"] <- feature_extractor_info
-      private$text_embedding_model["times"] <- times
-      private$text_embedding_model["features"] <- features
-    },
-    #--------------------------------------------------------------------------
     set_package_versions = function() {
       private$r_package_versions$aifeducation <- packageVersion("aifeducation")
       private$r_package_versions$reticulate <- packageVersion("reticulate")
@@ -641,26 +477,8 @@ AIFEBaseModel <- R6::R6Class(
       private$py_package_versions$torch <- torch["__version__"]
       private$py_package_versions$numpy <- np$version$short_version
     },
-
-    #--------------------------------------------------------------------------
-    # description Loads configuration and documentation of an object from disk.
-    # param dir_path Path where the object set is stored.
-    # return Method does not return anything. It loads an object from disk.
-    load_config_and_docs = function(dir_path) {
-      if (self$is_configured() == TRUE) {
-        stop("The object has already been configured. Please use the method
-             'load' for loading the weights of a model.")
-      }
-
-      # Load R file
-      config_file <- load_R_config_state(dir_path)
-
-      # Old public state
-      config_public <- config_file$public
-
-      # Old private states
-      config_private <- config_file$private
-
+    #-------------------------------------------------------------------------
+    load_base_config_and_docs_general=function(config_public,config_private){
       # Set ML framework
       private$ml_framework <- config_private$ml_framework
 
@@ -673,14 +491,6 @@ AIFEBaseModel <- R6::R6Class(
         model_id = config_private$model_info$model_id,
         label = config_private$model_info$model_label,
         model_date = config_private$model_info$model_date
-      )
-
-      # Set TextEmbeddingModel
-      private$set_text_embedding_model(
-        model_info = config_private$text_embedding_model$model,
-        feature_extractor_info = config_private$text_embedding_model$feature_extractor,
-        times = config_private$text_embedding_model$times,
-        features = config_private$text_embedding_model$features
       )
 
       # Set last training
@@ -718,11 +528,7 @@ AIFEBaseModel <- R6::R6Class(
 
       private$py_package_versions$torch <- config_private$py_package_versions$torch
       private$py_package_versions$numpy <- config_private$py_package_versions$numpy
-
-      # Finalize config
-      private$set_configuration_to_TRUE()
     },
-
     #-------------------------------------------------------------------------
     prepare_history_data = function(history) {
       # Provide rownames for the history
@@ -751,6 +557,49 @@ AIFEBaseModel <- R6::R6Class(
         }
       }
       return(history)
+    },
+    #--------------------------------------------------------------------------
+    init_and_start_sustainability_tracking=function(){
+      if (self$last_training$config$sustain_track == TRUE) {
+
+      if(check_versions(a=get_py_package_version("codecarbon"),operator = ">=",b="2.8.0")){
+        path_look_file <- codecarbon$lock$LOCKFILE
+        if (file.exists(path_look_file)) {
+          unlink(path_look_file)
+        }
+      }
+
+      private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
+        country_iso_code = self$last_training$config$sustain_iso_code,
+        region = self$last_training$config$sustain_region,
+        tracking_mode = "machine",
+        log_level = "warning",
+        measure_power_secs = self$last_training$config$sustain_interval,
+        save_to_file = FALSE,
+        save_to_api = FALSE
+      )
+      private$sustainability_tracker$start()
+      }
+    },
+    #---------------------------------------------------------------------------
+    stop_sustainability_tracking=function(){
+      if (self$last_training$config$sustain_track == TRUE) {
+        private$sustainability_tracker$stop()
+        private$sustainability <- summarize_tracked_sustainability(private$sustainability_tracker)
+      } else {
+        private$sustainability <- list(
+          sustainability_tracked = FALSE,
+          date = NA,
+          sustainability_data = list(
+            duration_sec = NA,
+            co2eq_kg = NA,
+            cpu_energy_kwh = NA,
+            gpu_energy_kwh = NA,
+            ram_energy_kwh = NA,
+            total_energy_kwh = NA
+          )
+        )
+      }
     }
   )
 )

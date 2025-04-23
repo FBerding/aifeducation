@@ -31,8 +31,9 @@ save_to_disk <- function(object,
                          folder_name) {
   # Check class of object
   check_class(
-    object,
-    c(
+    object=object,
+    object_name="object",
+    classes=c(
       "TEClassifierRegular",
       "TEClassifierProtoNet",
       "TEFeatureExtractor",
@@ -43,8 +44,8 @@ save_to_disk <- function(object,
     ),
     FALSE
   )
-  check_type(dir_path, "string", FALSE)
-  check_type(folder_name, "string", FALSE)
+  check_type(object=dir_path,object_name="dir_path", type="string", FALSE)
+  check_type(object=folder_name,object_name="folder_name", type="string", FALSE)
 
   # Create path to save location
   save_location <- paste0(dir_path, "/", folder_name)

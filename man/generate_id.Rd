@@ -22,6 +22,7 @@ Other Utils:
 \code{\link{clean_pytorch_log_transformers}()},
 \code{\link{create_config_state}()},
 \code{\link{create_dir}()},
+\code{\link{get_called_args}()},
 \code{\link{get_file_extension}()},
 \code{\link{get_py_package_version}()},
 \code{\link{get_py_package_versions}()},

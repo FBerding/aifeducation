@@ -18,28 +18,6 @@ import numpy as np
 import math
 import safetensors
 
-class dense_layer(torch.nn.Module):
-  def __init__(self,in_features, out_features,bias=True,ort_weights=False,ort_map="householder"):
-    super().__init__()
-    self.in_features=in_features
-    self.out_features=out_features
-    self.bias=bias,
-    self.ort_weights=ort_weights
-    self.ort_map=ort_map
-    self.param_a=torch.nn.Parameter(torch.randn(self.out_features,self.in_features))
-
-    if self.bias==False:
-      self.param_b=torch.nn.prameter(torch.randn(self.out_features))
-    else:
-      self.param_b=None
-    
-    if self.ort_weights==True:
-      torch.nn.utils.parametrizations.orthogonal(self, "param_a",orthogonal_map=self.ort_map)
-  
-  def forward(self,x):
-    return torch.nn.functional.linear(input=x,weight=self.param_a,bias=self.param_b)
-
-
 class LayerNorm_with_Mask_PT(torch.nn.Module):
     def __init__(self, features,eps=1e-5):
       super().__init__()
@@ -86,7 +64,7 @@ class PackAndMasking_PT(torch.nn.Module):
     time_sum=torch.sum(x,dim=2)
     time_sum=(time_sum!=0)
     return torch.sum(time_sum,dim=1)
-  
+
 class UnPackAndMasking_PT(torch.nn.Module):
   def __init__(self,sequence_length):
     super().__init__()
@@ -97,9 +75,9 @@ class UnPackAndMasking_PT(torch.nn.Module):
     x,
     total_length=self.sequence_length,
     batch_first=True)[0]
-  
+
 class BiDirectionalGRU_PT(torch.nn.Module):
-  def __init__(self,input_size,hidden_size):
+  def __init__(self,input_size,hidden_size,bias=True):
     super().__init__()
     self.input_size=input_size
     self.hidden_size=hidden_size
@@ -107,7 +85,7 @@ class BiDirectionalGRU_PT(torch.nn.Module):
     self.gru_layer=torch.nn.GRU(
     input_size= self.input_size,
     hidden_size=self.hidden_size,
-    bias=True,
+    bias=bias,
     batch_first=True,
     dropout=0.0,
     bidirectional=True)
@@ -118,19 +96,20 @@ class BiDirectionalGRU_PT(torch.nn.Module):
 
 
 class GRU_PT(torch.nn.Module):
-  def __init__(self,input_size,hidden_size,num_layers,dropout,bidirectional):
+  def __init__(self,input_size,hidden_size,num_layers,dropout,bidirectional,bias=True):
     super().__init__()
     self.input_size=input_size
     self.hidden_size=hidden_size
     self.num_layers=num_layers
     self.dropout=dropout
     self.bidirectional=bidirectional
+    self.bias=bias
     
     self.gru_layer=torch.nn.GRU(
     input_size= self.input_size,
     hidden_size=self.hidden_size,
     num_layers=self.num_layers,
-    bias=True,
+    bias=self.bias,
     batch_first=True,
     dropout=self.dropout,
     bidirectional=self.bidirectional)
@@ -140,19 +119,20 @@ class GRU_PT(torch.nn.Module):
     return result[0]
   
 class LSTM_PT(torch.nn.Module):
-  def __init__(self,input_size,hidden_size,num_layers,dropout,bidirectional):
+  def __init__(self,input_size,hidden_size,num_layers,dropout,bidirectional,bias=True):
     super().__init__()
     self.input_size=input_size
     self.hidden_size=hidden_size
     self.num_layers=num_layers
     self.dropout=dropout
     self.bidirectional=bidirectional
+    self.bias=bias
     
     self.lstm_layer=torch.nn.LSTM(
     input_size= self.input_size,
     hidden_size=self.hidden_size,
     num_layers=self.num_layers,
-    bias=True,
+    bias=self.bias,
     batch_first=True,
     dropout=self.dropout,
     bidirectional=self.bidirectional)
@@ -161,82 +141,6 @@ class LSTM_PT(torch.nn.Module):
     result=self.lstm_layer(x)
     return result[0]
   
-class UniDirectionalGRU_PT(torch.nn.Module):
-  def __init__(self,input_size,hidden_size):
-    super().__init__()
-    self.input_size=input_size
-    self.hidden_size=hidden_size
-    
-    self.gru_layer=torch.nn.GRU(
-    input_size= self.input_size,
-    hidden_size=self.hidden_size,
-    bias=True,
-    batch_first=True,
-    dropout=0.0,
-    bidirectional=False)
-    
-  def forward(self,x):
-    result=self.gru_layer(x)
-    return result[0]
-  
-class BiDirectionalLSTM_PT(torch.nn.Module):
-  def __init__(self,input_size,hidden_size):
-    super().__init__()
-    self.input_size=input_size
-    self.hidden_size=hidden_size
-    
-    self.lstm_layer=torch.nn.LSTM(
-    input_size= self.input_size,
-    hidden_size=self.hidden_size,
-    bias=True,
-    batch_first=True,
-    dropout=0.0,
-    bidirectional=True)
-    
-  def forward(self,x):
-    result=self.lstm_layer(x)
-    return result[0]
-
-class UniDirectionalLSTM_PT(torch.nn.Module):
-  def __init__(self,input_size,hidden_size):
-    super().__init__()
-    self.input_size=input_size
-    self.hidden_size=hidden_size
-    
-    self.lstm_layer=torch.nn.LSTM(
-    input_size= self.input_size,
-    hidden_size=self.hidden_size,
-    bias=True,
-    batch_first=True,
-    dropout=0.0,
-    bidirectional=False)
-    
-  def forward(self,x):
-    result=self.lstm_layer(x)
-    return result[0]
-
-class dense_layer(torch.nn.Module):
-  def __init__(self,in_features,out_features,bias=False,ort_weights=False,ort_map="householder"):
-    super().__init__()
-    self.in_features=in_features,
-    self.out_features=out_features,
-    self.bias=bias,
-    self.ort_weights=ort_weights
-    self.ort_map=ort_map
-    
-    self.param_a=torch.nn.Parameter(torch.randn(self.features_out,self.features_in))
-    
-    if self.bias==False:
-      self.param_b=torch.nn.prameter(torch.randn(self.features_out))
-    else:
-      self.param_b=None
-    
-    if self.ort_weights==True:
-      torch.nn.utils.parametrizations.orthogonal(self, "param_a",orthogonal_map="householder")
-  
-  def forward(self,x):
-    return torch.nn.functional.linear(input=x,weight=self.param_a,bias=self.param_b)
-
 class FourierTransformation_PT(torch.nn.Module):
   def __init__(self):
     super().__init__()
@@ -246,39 +150,51 @@ class FourierTransformation_PT(torch.nn.Module):
     return result
   
 class FourierEncoder_PT(torch.nn.Module):
-  def __init__(self, dense_dim, features, dropout_rate):
+  def __init__(self, dense_dim, features, dropout_rate,bias=True,parametrizations="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
     self.dropout_rate=dropout_rate
     self.features=features
+    self.bias=bias
+    self.parametrizations=parametrizations
    
     self.attention=FourierTransformation_PT()
     self.dropout=torch.nn.Dropout(p=dropout_rate)
     self.layernorm_1=LayerNorm_with_Mask_PT(features=self.features)
-    #self.layernorm_1=torch.nn.LayerNorm(normalized_shape=self.features)
     self.dense_proj=torch.nn.Sequential(
-      torch.nn.Linear(in_features=self.features,out_features=self.dense_dim),
+      torch.nn.Linear(in_features=self.features,out_features=self.dense_dim,bias=self.bias),
       torch.nn.GELU(),
-      torch.nn.Linear(in_features=self.dense_dim,out_features=self.features)
+      torch.nn.Linear(in_features=self.dense_dim,out_features=self.features,bias=self.bias)
     )
     self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
-    #self.layernorm_2=torch.nn.LayerNorm(normalized_shape=self.features)
     
+    if self.parametrizations=="orthogonal":
+      torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[0], name='weight')
+      torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[2], name='weight')
+    elif self.parametrizations=="weight_norm":
+      torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[0], name='weight', dim=0)
+      torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[2], name='weight', dim=0)
+    elif self.parametrizations=="spectral_norm":
+        torch.nn.utils.spectral_norm(module=self.dense_proj[0], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
+        torch.nn.utils.spectral_norm(module=self.dense_proj[2], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
+
   def forward(self,x):
     attention_output=self.attention(x)
     attention_output=self.dropout(attention_output)
     proj_input=self.layernorm_1(attention_output)
     proj_output=self.dense_proj(proj_input)
     return self.layernorm_2(proj_input+proj_output)
-  
+
 class TransformerEncoder_PT(torch.nn.Module):
-  def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate):
+  def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate,bias=True,parametrizations="None"):
     super().__init__()
     self.embed_dim=embed_dim
     self.dense_dim=dense_dim
     self.num_heads=num_heads
     self.dropout_rate=dropout_rate
+    self.bias=bias
+    self.parametrizations=parametrizations
 
     self.attention=torch.nn.MultiheadAttention(
       embed_dim=self.embed_dim,
@@ -288,10 +204,20 @@ class TransformerEncoder_PT(torch.nn.Module):
     self.dropout=torch.nn.Dropout(p=dropout_rate)
     self.layernorm_1=LayerNorm_with_Mask_PT(features=self.embed_dim)
     self.dense_proj=torch.nn.Sequential(
-      torch.nn.Linear(in_features=self.embed_dim,out_features=self.dense_dim),
+      torch.nn.Linear(in_features=self.embed_dim,out_features=self.dense_dim,bias=self.bias),
       torch.nn.GELU(),
-      torch.nn.Linear(in_features=self.dense_dim,out_features=self.embed_dim))
+      torch.nn.Linear(in_features=self.dense_dim,out_features=self.embed_dim,bias=self.bias))
     self.layernorm_2=LayerNorm_with_Mask_PT(features=self.embed_dim)
+  
+    if self.parametrizations=="orthogonal":
+      torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[0], name='weight')
+      torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[2], name='weight')
+    elif self.parametrizations=="weight_norm":
+      torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[0], name='weight', dim=0)
+      torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[2], name='weight', dim=0)
+    elif self.parametrizations=="spectral_norm":
+        torch.nn.utils.spectral_norm(module=self.dense_proj[0], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
+        torch.nn.utils.spectral_norm(module=self.dense_proj[2], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
 
   def forward(self,x):
     attention_output=self.attention(
@@ -360,11 +286,11 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
     length=torch.transpose(length,dim0=0,dim1=1)
     return length
   
-
+#To DO Parametrization einbauen
 class TextEmbeddingClassifier_PT(torch.nn.Module):
   def __init__(self,features, times, dense_size,dense_layers,rec_size,rec_layers, rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
-  add_pos_embedding, self_attention_heads, target_levels,classification_head=True):
+  add_pos_embedding, self_attention_heads, target_levels,classification_head=True,bias=True):
     
     super().__init__()
     
@@ -388,12 +314,14 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                 embed_dim = features,
                 dense_dim= intermediate_size,
                 num_heads =self_attention_heads,
-                dropout_rate=encoder_dropout)})
+                dropout_rate=encoder_dropout,
+                bias=bias)})
           else:
             layer_list.update({"encoder_"+str(r+1):
               FourierEncoder_PT(dense_dim=intermediate_size,
                                 features=features,
-                                dropout_rate=encoder_dropout)})
+                                dropout_rate=encoder_dropout,
+                                bias=bias)})
                                 
     if rec_layers>0:
       layer_list.update({"packandmasking":PackAndMasking_PT()})
@@ -404,7 +332,8 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
               hidden_size=rec_size,
               num_layers=rec_layers,
               dropout=rec_dropout, 
-              bidirectional=rec_bidirectional)})
+              bidirectional=rec_bidirectional,
+              bias=bias)})
       elif rec_type=="lstm":
         layer_list.update({"lstm_bidirectional"+str(rec_bidirectional):
             LSTM_PT(
@@ -412,7 +341,8 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
               hidden_size=rec_size,
               num_layers=rec_layers,
               dropout=rec_dropout, 
-              bidirectional=rec_bidirectional)})
+              bidirectional=rec_bidirectional,
+              bias=bias)})
       layer_list.update({"unpackandmasking":UnPackAndMasking_PT(sequence_length=times)})
 
     layer_list.update({"global_average_pooling":GlobalAveragePooling1D_PT()})
@@ -432,7 +362,8 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
           layer_list.update({"dense_"+str(i+1):
             torch.nn.Linear(
               in_features=current_size_2,
-              out_features=dense_size
+              out_features=dense_size,
+              bias=bias
             )})
           layer_list.update({"dense_act_fct_"+str(i+1):
             torch.nn.GELU()})
@@ -440,7 +371,8 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
           layer_list.update({"dense_"+str(i+1):
             torch.nn.Linear(
               in_features=dense_size,
-              out_features=dense_size)})
+              out_features=dense_size,
+              bias=bias)})
           layer_list.update({"dense_act_fct_"+str(i+1):
             torch.nn.GELU()})
         if i!=(dense_layers-1):

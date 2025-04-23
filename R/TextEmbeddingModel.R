@@ -519,21 +519,21 @@ TextEmbeddingModel <- R6::R6Class(
       ml_framework="pytorch"
 
       # Parameter check---------------------------------------------------------
-      check_type(model_name, "string", FALSE)
-      check_type(model_label, "string", FALSE)
-      check_type(model_language, "string", FALSE)
-      check_type(max_length, "int", FALSE)
+      check_type(object=model_name, type ="string", FALSE)
+      check_type(object=model_label, type ="string", FALSE)
+      check_type(object=model_language, type ="string", FALSE)
+      check_type(object=max_length, type ="int", FALSE)
 
 
-      check_type(chunks, "int", FALSE)
+      check_type(object=chunks, type ="int", FALSE)
       if (chunks < 2) {
         stop("Parameter chunks must be at least 2.")
       }
-      check_type(overlap, "int", FALSE)
+      check_type(object=overlap, type ="int", FALSE)
       # emb_layer_min
       # emb_layer_max
       # emb_pool_type
-      check_type(model_dir, "string", FALSE)
+      check_type(object=model_dir, type ="string", FALSE)
 
       # Set model info
       private$set_model_info(
@@ -683,7 +683,7 @@ TextEmbeddingModel <- R6::R6Class(
     #'
     #' @importFrom utils read.csv
     load = function(dir_path) {
-      check_type(dir_path, "string", FALSE)
+      check_type(object=dir_path, type="string", FALSE)
 
       # Load transformer models and tokenizer
       model_dir_main <- paste0(dir_path, "/", "model_data")
@@ -710,8 +710,8 @@ TextEmbeddingModel <- R6::R6Class(
     #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
-      check_type(dir_path, "string", FALSE)
-      check_type(folder_name, "string", FALSE)
+      check_type(object=dir_path, type="string", FALSE)
+      check_type(object=folder_name, type="string", FALSE)
 
       save_format <- "safetensors"
       save_location <- paste0(dir_path, "/", folder_name)
@@ -779,10 +779,10 @@ TextEmbeddingModel <- R6::R6Class(
                       to_int = TRUE,
                       trace = FALSE) {
       # Checking
-      check_type(raw_text, "vector", FALSE)
-      check_type(token_encodings_only, "bool", FALSE)
-      check_type(to_int, "bool", FALSE)
-      check_type(trace, "bool", FALSE)
+      check_type(object=raw_text, type="vector", FALSE)
+      check_type(object=token_encodings_only, type="bool", FALSE)
+      check_type(object=to_int, type="bool", FALSE)
+      check_type(object=trace, type="bool", FALSE)
 
       # Start
       n_units <- length(raw_text)
@@ -893,8 +893,8 @@ TextEmbeddingModel <- R6::R6Class(
     #' @return `list` of token sequences
     decode = function(int_seqence, to_token = FALSE) {
       # Check
-      check_type(int_seqence, "list", FALSE)
-      check_type(to_token, "bool", FALSE)
+      check_type(object=int_seqence, type="list", FALSE)
+      check_type(object=to_token, type="bool", FALSE)
 
       # Start
       tmp_token_list <- NULL
@@ -963,11 +963,11 @@ TextEmbeddingModel <- R6::R6Class(
     #' model creating the embeddings.
     embed = function(raw_text = NULL, doc_id = NULL, batch_size = 8, trace = FALSE, return_large_dataset = FALSE) {
       # check arguments
-      check_type(raw_text, "vector", FALSE)
-      check_type(doc_id, "vector", FALSE)
-      check_type(batch_size, "int", FALSE)
-      check_type(trace, "bool", FALSE)
-      check_type(return_large_dataset, "bool", FALSE)
+      check_type(object=raw_text, type="vector", FALSE)
+      check_type(object=doc_id, type="vector", FALSE)
+      check_type(object=batch_size, type="int", FALSE)
+      check_type(object=trace, type="bool", FALSE)
+      check_type(object=return_large_dataset, type="bool", FALSE)
 
       # transformer---------------------------------------------------------------------
       n_units <- length(raw_text)
@@ -1179,9 +1179,9 @@ TextEmbeddingModel <- R6::R6Class(
                            log_file = NULL,
                            log_write_interval = 2) {
       # Check arguments
-      check_class(large_datas_set, c("LargeDataSetForText", FALSE))
-      check_type(batch_size, "int", FALSE)
-      check_type(trace, "bool", FALSE)
+      check_class(object=large_datas_set, classes=c("LargeDataSetForText", allow_NULL=FALSE))
+      check_type(object=batch_size, type="int", FALSE)
+      check_type(object=trace, type="bool", FALSE)
 
       # Get total number of batches for the loop
       total_number_of_bachtes <- ceiling(large_datas_set$n_rows() / batch_size)
@@ -1263,8 +1263,8 @@ TextEmbeddingModel <- R6::R6Class(
     #' the score, token id, and token string in the columns.
     fill_mask = function(text, n_solutions = 5) {
       # Arugment checking
-      check_type(text, "string", FALSE)
-      check_type(n_solutions, "int", FALSE)
+      check_type(object=text, type="string", FALSE)
+      check_type(object=n_solutions, type="int", FALSE)
 
 
       framework <- "pt"
