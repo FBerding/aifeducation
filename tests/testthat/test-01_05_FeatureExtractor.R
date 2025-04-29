@@ -69,6 +69,9 @@ for (framework in ml_frameworks) {
           )
         )
 
+        #Check if sustainability data has been tracked
+        expect_true(extractor$get_sustainability_data()$sustainability_tracked)
+
         # Clean Directory
         unlink(
           x = train_path,

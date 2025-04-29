@@ -232,3 +232,27 @@ auto_n_cores <- function() {
   }
   return(n_cores = max(1, n_cores))
 }
+
+#' @title Called arguments
+#' @description Function for receiving all arguments that were called by a method or function.
+#'
+#'@param n `int` level of the nested environments where to extract the arguments.
+#'
+#' @importFrom rlang caller_fn
+#' @importFrom rlang fn_fmls
+#'
+#' @return Returns names `list` of all arguments and their values.
+#'
+#' @family Utils
+#' @export
+get_called_args=function(n=1){
+  fn=rlang::caller_fn(n)
+  formal_args=rlang::fn_fmls(fn)
+  final_args=formal_args
+  for (arguments in names(formal_args)) {
+    final_args[arguments]=list(get(x=arguments,envir = rlang::caller_env(n)))
+  }
+  return(final_args)
+}
+
+

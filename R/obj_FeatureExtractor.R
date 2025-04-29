@@ -36,53 +36,58 @@
 #' @export
 TEFeatureExtractor <- R6::R6Class(
   classname = "TEFeatureExtractor",
-  inherit = AIFEBaseModel,
+  inherit = ModelsBasedOnTextEmbeddings,
   public = list(
     # New-----------------------------------------------------------------------
     #' @description Creating a new instance of this class.
-    #' @param ml_framework `string` Framework to use for training and inference. Currently only `ml_framework="pytorch"`
-    #'   is supported.
-    #' @param name `string` Name of the new classifier. Please refer to common name conventions. Free text can be used
-    #'   with parameter `label`.
-    #' @param label `string` Label for the new classifier. Here you can use free text.
-    #' @param text_embeddings An object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
-    #' @param features `int` determining the number of dimensions to which the dimension of the text embedding should be
-    #'   reduced.
-    #' @param method `string` Method to use for the feature extraction. `"lstm"` for an extractor based on LSTM-layers
-    #' or `"dense"` for dense layers.
-    #' @param noise_factor `double` between 0 and a value lower 1 indicating how much noise should be added for the
-    #'   training of the feature extractor.
-    #' @param optimizer `string` `"adam"`, `"adamw` or `"rmsprop"` .
+    #' @param name `r get_param_doc_desc("name")`
+    #' @param label `r get_param_doc_desc("label")`
+    #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
+    #' @param features `r get_param_doc_desc("features")`
+    #' @param method `r get_param_doc_desc("method")`
+    #' @param noise_factor `r get_param_doc_desc("noise_factor")`
+    #' @param optimizer `r get_param_doc_desc("optimizer")`
+    #' @note `features` refers to the number of features for the compressed text embeddings.
     #' @return Returns an object of class [TEFeatureExtractor] which is ready for training.
-    configure = function(ml_framework = "pytorch",
-                         name = NULL,
+    configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
                          features = 128,
                          method = "lstm",
                          noise_factor = 0.2,
                          optimizer = "adamw") {
-      # Checking of parameters--------------------------------------------------
-      check_type(ml_framework, "string", FALSE)
-      if ((ml_framework %in% c("pytorch")) == FALSE) {
-        stop("ml_framework must be 'pytorch'.")
-      }
-      check_type(name, "string", FALSE)
-      check_type(label, "string", FALSE)
-      check_type(optimizer, "string", FALSE)
-      if (optimizer %in% c("adam", "rmsprop","adamw") == FALSE) {
-        stop("Optimzier must be 'adam', 'adamw' oder 'rmsprop'.")
-      }
-      check_type(method, "string", FALSE)
-      if (method %in% c("lstm", "dense") == FALSE) {
-        stop("Method must be lstm, dense or conv. Please check.")
-      }
-      private$check_embeddings_object_type(text_embeddings, strict = TRUE)
+      args=get_called_args(n=1)
 
-      # Set ML framework------------------------------------------------------------------------
-      private$ml_framework <- ml_framework
+      private$check_config_for_FALSE()
 
-      # Setting Label and Name-------------------------------------------------
+      #Check arguments
+      check_all_args(args=args)
+      private$check_embeddings_object_type(args$text_embeddings, strict = TRUE)
+
+      # Set TextEmbeddingModel
+      private$set_text_embedding_model(
+        model_info = args$text_embeddings$get_model_info(),
+        feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
+        times = args$text_embeddings$get_times(),
+        features = args$text_embeddings$get_features()
+      )
+
+      #save arguments
+      private$save_all_args(args=args,group="configure")
+
+      #Set target data config
+      #private$set_target_data(
+      #  target_levels=args$target_levels,
+      #  one_hot_encoding=TRUE
+      #)
+
+      #Perform additional checks and adjustments
+      #private$check_param_combinations()
+
+      # Set ML framework
+      private$ml_framework <- "pytorch"
+
+      # Setting Label and Name
       private$set_model_info(
         model_name_root = name,
         model_id = generate_id(16),
@@ -90,25 +95,12 @@ TEFeatureExtractor <- R6::R6Class(
         model_date = date()
       )
 
-      # Set TextEmbeddingModel
-      private$set_text_embedding_model(
-        model_info = text_embeddings$get_model_info(),
-        feature_extractor_info = text_embeddings$get_feature_extractor_info(),
-        times = text_embeddings$get_times(),
-        features = text_embeddings$get_features()
-      )
+      # Adjust configuration
+      #private$adjust_configuration()
 
-      # Saving Configuration
-      config <- list(
-        method = method,
-        noise_factor = noise_factor,
-        features = features,
-        times = private$text_embedding_model[["times"]],
-        optimizer = optimizer,
-        require_one_hot = FALSE,
-        require_matrix_map = FALSE
-      )
-      self$model_config <- config
+      # Set FeatureExtractor and adapt config
+      #self$check_feature_extractor_object_type(args$feature_extractor)
+      #private$set_feature_extractor(args$feature_extractor)
 
       # Set package versions
       private$set_package_versions()
@@ -162,38 +154,18 @@ TEFeatureExtractor <- R6::R6Class(
                      log_write_interval = 10,
                      lr_rate=1e-3,
                      lr_warm_up_ratio=0.02) {
-      # Checking Arguments------------------------------------------------------
+      args=get_called_args(n=1)
+      check_all_args(args=args)
       self$check_embedding_model(data_embeddings)
-      check_type(data_val_size, "double", FALSE)
-      check_type(sustain_track, "bool", FALSE)
-      check_type(sustain_iso_code, "string", TRUE)
-      check_type(sustain_region, "string", TRUE)
-      check_type(sustain_interval, "double", FALSE)
-      check_type(epochs, "int", FALSE)
-      check_type(batch_size, "int", FALSE)
-      check_type(dir_checkpoint, "string", FALSE)
-      check_type(trace, "bool", FALSE)
-      check_type(lr_rate, type = "double", FALSE)
-      check_type(lr_warm_up_ratio, type = "double", FALSE)
 
-      # Saving training configuration-------------------------------------------
-      self$last_training$config$data_val_size <- data_val_size
-      self$last_training$config$sustain_track <- sustain_track
-      self$last_training$config$sustain_iso_code <- sustain_iso_code
-      self$last_training$config$sustain_region <- sustain_region
-      self$last_training$config$sustain_interval <- sustain_interval
-      self$last_training$config$epochs <- epochs
-      self$last_training$config$batch_size <- batch_size
-      self$last_training$config$dir_checkpoint <- dir_checkpoint
-      self$last_training$config$trace <- trace
-      self$last_training$config$ml_trace <- ml_trace
+      #Save args
+      private$save_all_args(args=args,group="training")
 
-      self$last_training$config$lr_rate=lr_rate
-      self$last_training$config$lr_warm_up_ratio=lr_warm_up_ratio
+      #Perform additional checks and adjustments
+      #private$check_param_combinations()
 
-      private$log_config$log_dir <- log_dir
-      private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
-      private$log_config$log_write_interval <- log_write_interval
+      #set up logger
+      private$set_up_logger(log_dir=log_dir,log_write_interval=log_write_interval)
 
       # Loading PY Scripts
       private$load_reload_python_scripts()
@@ -238,7 +210,10 @@ TEFeatureExtractor <- R6::R6Class(
       # Split into train and validation data
       extractor_dataset <- extractor_dataset$train_test_split(self$last_training$config$data_val_size)
 
-      # print(extractor_dataset$train)
+      # Start Sustainability Tracking-------------------------------------------
+      private$init_and_start_sustainability_tracking()
+
+      #Start Training----------------------------------------------------------
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
         model = self$model,
         optimizer_method = self$model_config$optimizer,
@@ -252,14 +227,15 @@ TEFeatureExtractor <- R6::R6Class(
         filepath = paste0(self$last_training$config$dir_checkpoint, "/best_weights.pt"),
         use_callback = TRUE,
         log_dir = private$log_config$log_dir,
-        log_write_interval = log_write_interval,
+        log_write_interval = private$log_config$log_write_interval,
         log_top_value = log_top_value,
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
-      #-----------------------------------------------------------------------
-
       rownames(self$last_training$history$loss) <- c("train", "val")
+
+      # Stop sustainability tracking if requested
+        private$stop_sustainability_tracking()
 
       # Set training status value
       private$trained <- TRUE
@@ -267,25 +243,6 @@ TEFeatureExtractor <- R6::R6Class(
       if (self$last_training$config$trace == TRUE) {
         message(paste(date(), "Training finished"))
       }
-    },
-    #--------------------------------------------------------------------------
-    #' @description loads an object from disk and updates the object to the current version of the package.
-    #' @param dir_path Path where the object set is stored.
-    #' @return Method does not return anything. It loads an object from disk.
-    load_from_disk = function(dir_path) {
-      # Call the core method which loads data common for all models
-      private$load_config_and_docs(dir_path = dir_path)
-
-      # Create and load AI model
-      private$create_reset_model()
-      self$load(dir_path = dir_path)
-
-      # Add FeatureExtractor specific data
-      # Load R file
-      config_file <- load_R_config_state(dir_path)
-
-      # Set training status
-      private$trained <- config_file$private$trained
     },
     #---------------------------------------------------------------------------
     #' @description Method for extracting features. Applying this method reduces the number of dimensions of the text
@@ -299,7 +256,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @return Returns an object of class [EmbeddedText] containing the compressed embeddings.
     extract_features = function(data_embeddings, batch_size) {
       # Argument checking
-      check_type(batch_size, "int", FALSE)
+      check_type(object=batch_size, type="int", FALSE)
       # check data_embeddings object
       if ("EmbeddedText" %in% class(data_embeddings) | "LargeDataSetForTextEmbeddings" %in% class(data_embeddings)) {
         self$check_embedding_model(text_embeddings = data_embeddings)
@@ -399,9 +356,9 @@ TEFeatureExtractor <- R6::R6Class(
     #' @return Returns an object of class [LargeDataSetForTextEmbeddings] containing the compressed embeddings.
     extract_features_large = function(data_embeddings, batch_size, trace = FALSE) {
       # Argument checking
-      check_class(data_embeddings, c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
-      check_type(batch_size, "int", FALSE)
-      check_type(trace, "bool", FALSE)
+      check_class(object=data_embeddings,object_name="data_embeddings", classes=c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL=FALSE)
+      check_type(object=batch_size, type="int", FALSE)
+      check_type(object=trace, type="bool", FALSE)
 
       # Get total number of batches for the loop
       total_number_of_bachtes <- ceiling(data_embeddings$n_rows() / batch_size)
@@ -513,32 +470,7 @@ TEFeatureExtractor <- R6::R6Class(
           features_out = as.integer(self$model_config$features),
           noise_factor = self$model_config$noise_factor
         )
-      } else if (self$model_config$method == "conv") {
-        self$model <- feature_extractor <- py$ConvAutoencoder_with_Mask_PT(
-          features_in = as.integer(private$text_embedding_model["features"]),
-          features_out = as.integer(self$model_config$features),
-          noise_factor = self$model_config$noise_factor
-        )
       }
-    },
-    #--------------------------------------------------------------------------
-    init_gui = function(data_manager) {
-      # Check for a running Shiny App and set the configuration
-      # The Gui functions must be set in the server function of shiny globally
-      if (requireNamespace("shiny", quietly = TRUE) & requireNamespace("shinyWidgets", quietly = TRUE)) {
-        if (shiny::isRunning()) {
-          private$gui$shiny_app_active <- TRUE
-        } else {
-          private$gui$shiny_app_active <- FALSE
-        }
-      } else {
-        private$gui$shiny_app_active <- FALSE
-      }
-
-      # SetUp Progressbar for UI
-      private$gui$pgr_value <- -1
-      private$gui$pgr_max_value <- data_manager$get_n_folds() + 1 +
-        (data_manager$get_n_folds() + 1) * self$last_training$config$use_pl * self$last_training$config$pl_max_steps
     }
   )
 )

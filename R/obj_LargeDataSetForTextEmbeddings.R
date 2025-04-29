@@ -434,7 +434,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       private$check_config_for_TRUE()
 
       # Argument Checking
-      check_class(dataset, c("LargeDataSetForTextEmbeddings", FALSE))
+      check_class(object=dataset, classes=c("LargeDataSetForTextEmbeddings", allow_NULL=FALSE))
 
       # Add new data
       if (dataset$get_text_embedding_model_name() == private$model_name) {

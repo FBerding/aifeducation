@@ -152,7 +152,7 @@ LargeDataSetBase <- R6::R6Class(
     #--------------------------------------------------------------------------
     add = function(new_dataset) {
       # Check
-      check_class(new_dataset, "datasets.arrow_dataset.Dataset", allow_NULL = TRUE)
+      check_class(object=new_dataset, classes="datasets.arrow_dataset.Dataset", allow_NULL = TRUE)
 
       if (is.null(private$data)) {
         private$data <- new_dataset

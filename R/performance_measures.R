@@ -30,8 +30,8 @@
 #' @family performance measures
 #' @export
 cohens_kappa <- function(rater_one, rater_two) {
-  check_class(rater_one, "factor", FALSE)
-  check_class(rater_two, "factor", FALSE)
+  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
+  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
   if (sum(levels(rater_one) == levels(rater_two)) != max(length(levels(rater_one)), length(levels(rater_two)))) {
     stop("Levels for values of rater one and two are not identical.")
   }
@@ -96,9 +96,9 @@ cohens_kappa <- function(rater_one, rater_two) {
 #' @family performance measures
 #' @export
 kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(rater_one, "factor", FALSE)
-  check_class(rater_two, "factor", FALSE)
-  check_class(additional_raters, "list", TRUE)
+  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
+  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
+  check_class(object=additional_raters, classes="list", allow_NULL=TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -173,9 +173,9 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @family performance measures
 #' @export
 kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(rater_one, "factor", FALSE)
-  check_class(rater_two, "factor", FALSE)
-  check_class(additional_raters, "list", TRUE)
+  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
+  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
+  check_class(object=additional_raters, classes="list", allow_NULL=TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -299,9 +299,9 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @family performance measures
 #' @export
 fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(rater_one, "factor", FALSE)
-  check_class(rater_two, "factor", FALSE)
-  check_class(additional_raters, "list", TRUE)
+  check_class(rater_one, classes="factor", allow_NULL=FALSE)
+  check_class(rater_two, classes="factor", allow_NULL=FALSE)
+  check_class(additional_raters, classes="list", allow_NULL=TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -375,9 +375,9 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @family performance measures
 #' @export
 gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(rater_one, "factor", FALSE)
-  check_class(rater_two, "factor", FALSE)
-  check_class(additional_raters, "list", TRUE)
+  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
+  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
+  check_class(object=additional_raters, classes="list", allow_NULL=TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)

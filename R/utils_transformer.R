@@ -38,7 +38,7 @@
 #' @noRd
 calc_tokenizer_statistics <- function(dataset, step = "creation") {
   # Argument Checking
-  check_class(dataset, "datasets.arrow_dataset.Dataset", FALSE)
+  check_class(object=dataset, classes="datasets.arrow_dataset.Dataset", allow_NULL=FALSE)
 
   n_sequences <- dataset$num_rows
   n_words <- NA

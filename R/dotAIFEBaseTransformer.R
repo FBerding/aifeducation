@@ -746,7 +746,7 @@
         if (is.function(private$steps_for_creation$check_max_pos_emb)) {
           private$steps_for_creation$check_max_pos_emb(self)
         }
-        check_class(text_dataset, "LargeDataSetForText", FALSE)
+        check_class(object=text_dataset,object_name = "text_dataset", classes="LargeDataSetForText", allow_NULL=FALSE)
         self$temp$raw_text_dataset <- text_dataset$get_dataset()
         if (is.null(self$temp$raw_text_dataset$features$text)) {
           stop("Dataset does not contain a column 'text' storing the raw texts.")
@@ -1035,7 +1035,7 @@
         self$temp$from_tf <- model_files_check$from_tf
         self$temp$load_safe <- model_files_check$load_safe
 
-        check_class(text_dataset, "LargeDataSetForText", FALSE)
+        check_class(object=text_dataset,object_name="text_dataset", classes="LargeDataSetForText", allow_NULL=FALSE)
         self$temp$raw_text_dataset <- text_dataset$get_dataset()
         if (is.null(self$temp$raw_text_dataset$features$text)) {
           stop("Dataset does not contain a column 'text' storing the texts for training.")

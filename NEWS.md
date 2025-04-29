@@ -9,12 +9,13 @@ editor_options:
 **Major Changes**
 
 - Removed support for 'tensorflow'.
+- Refactor of all classifiers and for FeatureExtractor.
 
 **Installation and Configuration**
 
 - Removed functions belonging to 'tensorflow'.
 - Added the possibility to install python packages either to a 'conda' environment
-  or a virtual environment.
+  or a virtual environment. Virtual environment is the new default.
 
 **Ai for Education Studio**
 
@@ -34,8 +35,9 @@ editor_options:
   
 **FeatureExtractor**
 
-- Added the option to choose an optimizer is now working.
+- The option to choose an optimizer is now working.
 - Added parameters for determining the learning rate and warm up ratio for training.
+- Tracking sustainability is now working.
 
 **Minorty Oversamping Techniques**
 

@@ -200,8 +200,7 @@ for (framework in ml_frameworks) {
         attention_type = test_combinations[[i]]$attention,
         rec_dropout = 0.5,
         encoder_dropout = 0.1,
-        repeat_encoder = test_combinations[[i]]$r,
-        recurrent_dropout = 0.4
+        repeat_encoder = test_combinations[[i]]$r
       )
 
       predictions <- classifier$predict(
@@ -441,7 +440,6 @@ if (!skip_training_test) {
           rec_dropout = 0.1,
           repeat_encoder = repeat_encoder,
           dense_dropout = 0.4,
-          recurrent_dropout = 0.4,
           encoder_dropout = 0.1,
           optimizer = "adam"
         )
@@ -518,7 +516,6 @@ if (!skip_training_test) {
         rec_dropout = 0.1,
         repeat_encoder = repeat_encoder,
         dense_dropout = 0.4,
-        recurrent_dropout = 0.4,
         encoder_dropout = 0.1,
         optimizer = "adam"
       )
@@ -621,7 +618,6 @@ if (!skip_method_save_load) {
         rec_dropout = 0.1,
         repeat_encoder = 1,
         dense_dropout = 0.4,
-        recurrent_dropout = 0.4,
         encoder_dropout = 0.1,
         optimizer = "adam"
       )
@@ -707,7 +703,6 @@ if (!skip_function_save_load) {
         rec_dropout = 0.1,
         repeat_encoder = repeat_encoder,
         dense_dropout = 0.4,
-        recurrent_dropout = 0.4,
         encoder_dropout = 0.1,
         optimizer = "adam"
       )
@@ -798,7 +793,6 @@ if (!skip_overfitting_test) {
       rec_dropout = 0.0,
       repeat_encoder = 0,
       dense_dropout = 0.0,
-      recurrent_dropout = 0.0,
       encoder_dropout = 0.0,
       optimizer = "adam"
     )
@@ -917,7 +911,6 @@ if (skip_documentation) {
       rec_dropout = 0.1,
       repeat_encoder = repeat_encoder,
       dense_dropout = 0.4,
-      recurrent_dropout = 0.4,
       encoder_dropout = 0.1,
       optimizer = "adam"
     )

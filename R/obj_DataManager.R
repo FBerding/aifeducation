@@ -60,23 +60,18 @@ DataManagerClassifier <- R6::R6Class(
     samples = NULL,
 
     #' @description Creating a new instance of this class.
-    #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] from which the
-    #'   [DataManagerClassifier] should be created.
-    #' @param data_targets `factor` containing the labels for cases stored in `data_embeddings`. Factor must be named
-    #'   and has to use the same names used in `data_embeddings`. Missing values are supported and should be supplied
-    #'   (e.g., for pseudo labeling).
-    #' @param folds `int` determining the number of cross-fold samples. Value must be at least 2.
-    #' @param val_size `double` between 0 and 1, indicating the proportion of cases of each class which should be used
-    #'   for the validation sample. The remaining cases are part of the training data.
-    #' @param class_levels `vector` containing the possible levels of the labels.
-    #' @param one_hot_encoding `bool` If `TRUE` all labels are converted to one hot encoding.
-    #' @param add_matrix_map `bool` If `TRUE` all embeddings are transformed into a two dimensional matrix. The number
-    #'   of rows equals the number of cases. The number of columns equals `times*features`.
-    #' @param sc_methods `string` determining the technique used for creating synthetic cases.
-    #' @param sc_min_k `int` determining the minimal number of neighbors during the creating of synthetic cases.
-    #' @param sc_max_k `int` determining the minimal number of neighbors during the creating of synthetic cases.
-    #' @param trace `bool` If `TRUE` information on the process are printed to the console.
-    #' @param n_cores `int` Number of cores which should be used during the calculation of synthetic cases.
+    #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
+    #' @param data_targets `r get_param_doc_desc("data_targets")`
+    #' @param folds `r get_param_doc_desc("folds")`
+    #' @param val_size `r get_param_doc_desc("val_size")`
+    #' @param class_levels `r get_param_doc_desc("class_levels")`
+    #' @param one_hot_encoding `r get_param_doc_desc("one_hot_encoding")`
+    #' @param add_matrix_map `r get_param_doc_desc("add_matrix_map")`
+    #' @param sc_methods `r get_param_doc_desc("sc_methods")`
+    #' @param sc_min_k `r get_param_doc_desc("sc_min_k")`
+    #' @param sc_max_k `r get_param_doc_desc("sc_max_k")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param n_cores `r get_param_doc_desc("n_cores")`
     #' @return Method returns an initialized object of class [DataManagerClassifier].
     initialize = function(data_embeddings,
                           data_targets,
@@ -91,24 +86,7 @@ DataManagerClassifier <- R6::R6Class(
                           trace = TRUE,
                           n_cores = auto_n_cores()) {
       # Checking Prerequisites---------------------------------------------------
-      check_class(data_embeddings, c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
-      check_class(data_targets, c("factor"), FALSE)
-      if (is.null(names(data_targets))) {
-        stop("data_targets must be a named factor.")
-      }
-      check_type(folds, "int")
-      if (folds < 2) {
-        stop("folds must be at least 2.")
-      }
-      check_type(val_size, "double")
-      check_type(class_levels, "vector")
-      check_type(one_hot_encoding, "bool")
-      check_type(add_matrix_map, "bool")
-      check_type(sc_methods, "string")
-      check_type(sc_min_k, "int")
-      check_type(sc_max_k, "int")
-      check_type(trace, "bool")
-      check_type(n_cores, "int", FALSE)
+      check_all_args(get_called_args(n=1))
 
       # Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -189,7 +167,7 @@ DataManagerClassifier <- R6::R6Class(
     #'   training is requested with pseudo labels.
     #' @return Method does not return anything. It is used for setting the internal state of the DataManager.
     set_state = function(iteration, step = NULL) {
-      check_type(step, "int", TRUE)
+      check_type(object=step, object_name="step",type="int",min=1,max=Inf, allow_NULL=TRUE,allowed_values = NULL)
 
       if (is.numeric(iteration) == FALSE) {
         if (iteration == "final") {
@@ -282,10 +260,10 @@ DataManagerClassifier <- R6::R6Class(
                            inc_synthetic = FALSE,
                            inc_pseudo_data = FALSE) {
       # Checks
-      check_type(inc_labeled, "bool", FALSE)
-      check_type(inc_unlabeled, "bool", FALSE)
-      check_type(inc_synthetic, "bool", FALSE)
-      check_type(inc_pseudo_data, "bool", FALSE)
+      check_type(object=inc_labeled, type="bool", FALSE)
+      check_type(object=inc_unlabeled, type="bool", FALSE)
+      check_type(object=inc_synthetic, type="bool", FALSE)
+      check_type(object=inc_pseudo_data, type="bool", FALSE)
 
       data <- NULL
 
@@ -362,8 +340,8 @@ DataManagerClassifier <- R6::R6Class(
     create_synthetic = function(trace = TRUE,
                                 inc_pseudo_data = FALSE) {
       # checks
-      check_type(trace, "bool", FALSE)
-      check_type(inc_pseudo_data, "bool", FALSE)
+      check_type(object=trace, type="bool", FALSE)
+      check_type(object=inc_pseudo_data, type="bool", FALSE)
 
       # Print status message to console
       if (trace == TRUE) {
@@ -482,8 +460,8 @@ DataManagerClassifier <- R6::R6Class(
     add_replace_pseudo_data = function(inputs,
                                        labels) {
       # checks
-      check_class(inputs, c("array", "matrix"), FALSE)
-      check_class(labels, c("factor"), FALSE)
+      check_class(object=inputs, classes=c("array", "matrix"), allow_NULL=FALSE)
+      check_class(object=labels, classes=c("factor"), allow_NULL=FALSE)
 
       private$check_labels(labels)
       # Add or replace current dataset for pseudo data
