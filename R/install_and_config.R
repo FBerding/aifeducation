@@ -43,7 +43,6 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 
   install_py_modules(
     envname = "aifeducation",
-    install = "pytorch",
     remove_first = FALSE,
     python_version = python_version,
     use_conda=use_conda

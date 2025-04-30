@@ -783,7 +783,7 @@ class merge_layer(torch.nn.Module):
     final=torch.sum(final,dim=1)
     return final
 
-class multistream_classifier(torch.nn.Module):
+class TEClassifierParallel(torch.nn.Module):
   def __init__(self, times, features, target_features,act_fct="elu", pooling_type="max",
               conv_ks_min=2, conv_ks_max=4, conv_bias=False, conv_parametrizations="None", 
               dense_output_size=25,dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", 

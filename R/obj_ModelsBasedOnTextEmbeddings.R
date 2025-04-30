@@ -55,7 +55,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       if (
         !is.null_or_na(embedding_model_config[[check]]) &
-        !is.null_or_na(private$text_embedding_model$model[[check]])
+          !is.null_or_na(private$text_embedding_model$model[[check]])
       ) {
         if (embedding_model_config[[check]] != private$text_embedding_model$model[[check]]) {
           stop("The TextEmbeddingModel that generated the data_embeddings is not
@@ -68,24 +68,29 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' @param dir_path Path where the object set is stored.
     #' @return Method does not return anything. It loads an object from disk.
     load_from_disk = function(dir_path) {
-      #Set configuration state
+      # Set configuration state
       private$set_configuration_to_TRUE()
 
-      #Load R file with configuration and other data
+      # Load R file with configuration and other data
       config_file <- load_R_config_state(dir_path)
 
       # load information of the text embedding model
       private$load_config_and_docs_textembeddingmodel(
-        config_public=config_file$public,
-        config_private=config_file$private
+        config_public = config_file$public,
+        config_private = config_file$private
       )
 
       # Call the core method which loads data common for all models.
-      #These are documentations, licenses, model's name and label etc.
+      # These are documentations, licenses, model's name and label etc.
       private$load_base_config_and_docs_general(
-        config_public=config_file$public,
-        config_private=config_file$private
+        config_public = config_file$public,
+        config_private = config_file$private
       )
+
+      # Check and update model_config
+      # Call this method to add parameters that where added in later version
+      # which are missing in the old model
+      private$update_model_config()
 
       # Create and load AI model
       private$create_reset_model()
@@ -102,7 +107,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       features = NA
     ),
     #------------------------------------------------------------------------------
-    load_config_and_docs_textembeddingmodel=function(config_public,config_private){
+    load_config_and_docs_textembeddingmodel = function(config_public, config_private) {
       private$set_text_embedding_model(
         model_info = config_private$text_embedding_model$model,
         feature_extractor_info = config_private$text_embedding_model$feature_extractor,
@@ -115,16 +120,16 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       if (strict == TRUE) {
         if (
           !("EmbeddedText" %in% class(embeddings)) &
-          !("LargeDataSetForTextEmbeddings" %in% class(embeddings))
+            !("LargeDataSetForTextEmbeddings" %in% class(embeddings))
         ) {
           stop("text_embeddings must be of class EmbeddedText or LargeDataSetForTextEmbeddings.")
         }
       } else {
         if (
           !("EmbeddedText" %in% class(embeddings)) &
-          !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
-          !("array" %in% class(embeddings)) &
-          !("datasets.arrow_dataset.Dataset" %in% class(embeddings))
+            !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
+            !("array" %in% class(embeddings)) &
+            !("datasets.arrow_dataset.Dataset" %in% class(embeddings))
         ) {
           stop("text_embeddings must be of class EmbeddedText, LargeDataSetForTextEmbeddings,
                datasets.arrow_dataset.Dataset or array.")
@@ -135,7 +140,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     check_single_prediction = function(embeddings) {
       if (
         "EmbeddedText" %in% class(embeddings) |
-        "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
       ) {
         if (embeddings$n_rows() > 1) {
           single_prediction <- FALSE
@@ -232,22 +237,22 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       private$text_embedding_model["times"] <- times
       private$text_embedding_model["features"] <- features
     },
-    save_all_args=function(args,group="training"){
-      if(group%in%c("configure","training")){
-        if(group=="training"){
-          for(arg in names(args)){
-            if(!R6::is.R6(args[[arg]]) &
-               !is.factor(args[[arg]]) &
-               !arg%in%c("log_dir","log_write_interval")){
-              self$last_training$config[arg]=list(args[[arg]])
+    save_all_args = function(args, group = "training") {
+      if (group %in% c("configure", "training")) {
+        if (group == "training") {
+          for (arg in names(args)) {
+            if (!R6::is.R6(args[[arg]]) &
+              !is.factor(args[[arg]]) &
+              !arg %in% c("log_dir", "log_write_interval")) {
+              self$last_training$config[arg] <- list(args[[arg]])
             }
           }
-        } else if(group=="configure"){
-          for(arg in names(args)){
-            if(!R6::is.R6(args[[arg]]) &
-               !is.factor(args[[arg]]) &
-               !arg%in%c("log_dir","log_write_interval")){
-              self$model_config[arg]=list(args[[arg]])
+        } else if (group == "configure") {
+          for (arg in names(args)) {
+            if (!R6::is.R6(args[[arg]]) &
+              !is.factor(args[[arg]]) &
+              !arg %in% c("log_dir", "log_write_interval")) {
+              self$model_config[arg] <- list(args[[arg]])
             }
           }
         }
@@ -255,10 +260,59 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         stop("Argument 'group' must be 'configure' or 'training'.")
       }
     },
-    set_up_logger=function(log_dir,log_write_interval){
+    set_up_logger = function(log_dir, log_write_interval) {
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
       private$log_config$log_write_interval <- log_write_interval
+    },
+    #-------------------------------------------------------------------------
+    # This Method updates the model config in the case that new parameters have been
+    # introduced
+    update_model_config = function() {
+      current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
+      if (is.na(current_pkg_version)) {
+        update <- TRUE
+      } else {
+        if (check_versions(
+          a = packageVersion("aifeducation"),
+          operator = ">",
+          b = self$get_package_versions()$r_package_versions$aifeducation
+        )) {
+          update <- TRUE
+        } else {
+          update <- FALSE
+        }
+      }
+
+      if (update) {
+        param_dict <- get_param_dict()
+        if (is.function(self$configure)) {
+          param_names_new <- rlang::fn_fmls_names(self$configure)
+          for (param in param_names_new) {
+            if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
+              if (is.null(self$model_config[[param]])) {
+                if (!is.null(param_dict[[param]]$default_historic)) {
+                  self$model_config[param] <- list(param_dict[[param]]$default_historic)
+                } else {
+                  stop(paste("Historic default for", param, "is missing in parameter dictionary."))
+                }
+              }
+            }
+          }
+          # Update Package version for the model
+          private$r_package_versions$aifeducation <- packageVersion("aifeducation")
+        } else {
+          warning("Class does not have a method `configure`.")
+        }
+      }
+    },
+    #--------------------------------------------------------------------------
+    generate_model_id = function(name) {
+      if (is.null(name)) {
+        return(paste0("mbote_",generate_id(16)))
+      } else {
+        return(name)
+      }
     }
   )
 )

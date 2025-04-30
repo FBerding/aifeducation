@@ -96,31 +96,11 @@ TextEmbeddingModel <- R6::R6Class(
       keywords_native = NULL,
       license = NA
     ),
-    #---------------------------------------------------------------------------
-    #Method for detecting the name of the architecture of a base model
-    detect_base_model_type=function(model){
-      type_string=model$config$architectures
-      if(stringi::stri_detect(str=tolower(type_string),regex = "^funnel([:alnum:]*)")){
-        return("funnel")
-      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^bert([:alnum:]*)")){
-        return("bert")
-      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^debertav2([:alnum:]*)")){
-        return("deberta_v2")
-      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^mpnet([:alnum:]*)")){
-        return("mpnet")
-      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^longformer([:alnum:]*)")){
-        return("longformer")
-      } else if(stringi::stri_detect(str=tolower(type_string),regex = "^roberta([:alnum:]*)")){
-        return("roberta")
-      } else {
-        stop("Architectue for the model could not be detected.")
-      }
-    },
     #--------------------------------------------------------------------------
     #Method for setting the method of the model
     set_model_method=function(model_dir){
       tmp_model<-transformers$AutoModel$from_pretrained(model_dir)
-      method<-private$detect_base_model_type(tmp_model)
+      method<-detect_base_model_type(tmp_model)
       private$basic_components$method <- method
     },
     #---------------------------------------------------------------------------
@@ -136,11 +116,20 @@ TextEmbeddingModel <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
+    #Method for generating a model id
+    generate_model_id=function(name){
+      if(is.null(name)){
+        return(paste0("tem_",generate_id(16)))
+      } else {
+        return(name)
+      }
+    },
+    #--------------------------------------------------------------------------
     # Method for setting the model info
-    set_model_info = function(model_name_root, model_id, label, model_date, model_language) {
-      private$model_info$model_name_root <- model_name_root
-      private$model_info$model_id <- model_id
-      private$model_info$model_name <- paste0(model_name_root, "_ID_", model_id)
+    set_model_info = function(model_name, label, model_date, model_language) {
+      #private$model_info$model_name_root <- model_name_root
+      #private$model_info$model_id <- model_id
+      private$model_info$model_name <- model_name
       private$model_info$model_label <- label
       private$model_info$model_date <- model_date
       private$model_info$model_language <- model_language
@@ -537,8 +526,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Set model info
       private$set_model_info(
-        model_name_root = model_name,
-        model_id = generate_id(16),
+        model_name=private$generate_model_id(model_name),
         label = model_label,
         model_date = date(),
         model_language = model_language
@@ -626,8 +614,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Set model info
       private$set_model_info(
-        model_name_root = config_file$private$model_info$model_name_root,
-        model_id = config_file$private$model_info$model_id,
+        model_name = config_file$private$model_info$model_name,
         label = config_file$private$model_info$model_label,
         model_date = config_file$private$model_info$model_date,
         model_language = config_file$private$model_info$model_language

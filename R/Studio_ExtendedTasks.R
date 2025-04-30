@@ -150,274 +150,50 @@ long_transform_text_to_embeddings <- function(source_path,
   })
 }
 
-# Classifiers =====================================================================
+# Classifiers ==================================================================
 
-long_classifier <- function(classifier_type,
-                            destination_path,
-                            folder_name,
-                            path_to_embeddings,
-                            path_to_target_data,
-                            target_levels,
-                            path_to_feature_extractor,
-                            target_data_column,
-                            name,
-                            label,
-                            data_folds,
-                            data_val_size,
-                            balance_class_weights,
-                            balance_sequence_length,
-                            use_sc,
-                            sc_method,
-                            sc_min_k,
-                            sc_max_k,
-                            use_pl,
-                            pl_max_steps,
-                            pl_max,
-                            pl_anchor,
-                            pl_min,
-                            sustain_iso_code,
-                            epochs,
-                            batch_size,
-                            log_dir,
-                            dense_layers,
-                            dense_size,
-                            rec_layers,
-                            rec_size,
-                            rec_type,
-                            rec_bidirectional,
-                            self_attention_heads,
-                            intermediate_size,
-                            attention_type,
-                            add_pos_embedding,
-                            rec_dropout,
-                            repeat_encoder,
-                            dense_dropout,
-                            recurrent_dropout,
-                            encoder_dropout,
-                            optimizer,
-                            log_write_interval = 2,
-                            embedding_dim,
-                            Ns,
-                            Nq,
-                            loss_alpha,
-                            loss_margin,
-                            sampling_separate,
-                            sampling_shuffle,
-                            n_cores,
-                            current_conda_env) {
+long_models <- function(args) {
   promises::future_promise({
-    # Set up conda env
-    reticulate::use_condaenv(condaenv = current_conda_env)
 
-    # Load data
-    embeddings <- load_from_disk(path_to_embeddings)
-    target_data <- long_load_target_data(
-      file_path = path_to_target_data,
-      selectet_column = target_data_column
+    # Set up py env
+    prepare_python(
+      env_type=args$configure$meta_args$py_environment_type,
+      envname=args$configure$meta_args$py_env_name
     )
 
-    # Load feature extractor if provided
-    if (!is.null(path_to_feature_extractor)) {
-      feature_extractor <- load_from_disk(path_to_feature_extractor)
-    } else {
-      feature_extractor <- NULL
+    #Create object
+    object=create_object(args$configure$meta_args$object_class)
+
+    requested_methods=names(args)
+    for(method in requested_methods){
+      # add missing objects to arguments by loading them
+      args[[method]]$args=add_missing_args(
+        args=args[[method]]$args,
+        path_args=args[[method]]$path_args,
+        meta_args=args[[method]]$meta_args
+      )
+
+      #Call Method
+      do.call(what = object[[method]],args=args[[method]]$args)
     }
 
-    # Check for valid arguments
-    if (is.null(self_attention_heads)) {
-      self_attention_heads <- 0
-    }
-
-    # Create dir for checkpints
+    # Create dir for saving the object
     dir_destination <- paste0(
-      destination_path, "/",
-      folder_name
-    )
-    dir_checkpoints <- paste0(
-      dir_destination, "/",
-      "checkpoints"
+      args$configure$path_args$destination_path, "/",
+      args$configure$path_args$folder_name
     )
     create_dir(dir_destination, FALSE)
-    create_dir(dir_checkpoints, FALSE)
 
-    if (classifier_type == "regular") {
-      # Create Classifier
-      classifier <- TEClassifierRegular$new()
-      classifier$configure(
-        name = name,
-        label = label,
-        text_embeddings = embeddings,
-        feature_extractor = feature_extractor,
-        target_levels = target_levels,
-        dense_layers = dense_layers,
-        dense_size = dense_size,
-        rec_layers = rec_layers,
-        rec_size = rec_size,
-        rec_type = rec_type,
-        rec_bidirectional = rec_bidirectional,
-        self_attention_heads = self_attention_heads,
-        intermediate_size = intermediate_size,
-        attention_type = attention_type,
-        add_pos_embedding = add_pos_embedding,
-        rec_dropout = rec_dropout,
-        repeat_encoder = repeat_encoder,
-        dense_dropout = dense_dropout,
-        recurrent_dropout = recurrent_dropout,
-        encoder_dropout = encoder_dropout,
-        optimizer = optimizer
-      )
-
-      # Train classifier
-      classifier$train(
-        data_embeddings = embeddings,
-        data_targets = target_data,
-        data_folds = data_folds,
-        data_val_size = data_val_size,
-        balance_class_weights = balance_class_weights,
-        balance_sequence_length = balance_sequence_length,
-        use_sc = use_sc,
-        sc_method = sc_method,
-        sc_min_k = sc_min_k,
-        sc_max_k = sc_max_k,
-        use_pl = use_pl,
-        pl_max_steps = pl_max_steps,
-        pl_max = pl_max,
-        pl_anchor = pl_anchor,
-        pl_min = pl_min,
-        sustain_track = TRUE,
-        sustain_iso_code = sustain_iso_code,
-        sustain_region = NULL,
-        sustain_interval = 15,
-        epochs = epochs,
-        batch_size = batch_size,
-        dir_checkpoint = dir_checkpoints,
-        trace = FALSE,
-        ml_trace = 0,
-        log_dir = log_dir,
-        log_write_interval = log_write_interval,
-        n_cores = n_cores
-      )
-    } else if (classifier_type == "protonet") {
-      # Create
-      classifier <- TEClassifierProtoNet$new()
-      classifier$configure(
-        embedding_dim = embedding_dim,
-        name = name,
-        label = label,
-        text_embeddings = embeddings,
-        feature_extractor = feature_extractor,
-        target_levels = target_levels,
-        dense_layers = dense_layers,
-        dense_size = dense_size,
-        rec_layers = rec_layers,
-        rec_size = rec_size,
-        rec_type = rec_type,
-        rec_bidirectional = rec_bidirectional,
-        self_attention_heads = self_attention_heads,
-        intermediate_size = intermediate_size,
-        attention_type = attention_type,
-        add_pos_embedding = add_pos_embedding,
-        rec_dropout = rec_dropout,
-        repeat_encoder = repeat_encoder,
-        dense_dropout = dense_dropout,
-        recurrent_dropout = recurrent_dropout,
-        encoder_dropout = encoder_dropout,
-        optimizer = optimizer
-      )
-
-      # Train
-      classifier$train(
-        data_embeddings = embeddings,
-        data_targets = target_data,
-        data_folds = data_folds,
-        data_val_size = data_val_size,
-        use_sc = use_sc,
-        sc_method = sc_method,
-        sc_min_k = sc_min_k,
-        sc_max_k = sc_max_k,
-        use_pl = use_pl,
-        pl_max_steps = pl_max_steps,
-        pl_max = pl_max,
-        pl_anchor = pl_anchor,
-        pl_min = pl_min,
-        sustain_track = TRUE,
-        sustain_iso_code = sustain_iso_code,
-        sustain_region = NULL,
-        sustain_interval = 15,
-        epochs = epochs,
-        batch_size = batch_size,
-        dir_checkpoint = dir_checkpoints,
-        trace = FALSE,
-        ml_trace = 0,
-        log_dir = log_dir,
-        log_write_interval = log_write_interval,
-        Ns = Ns,
-        Nq = Nq,
-        loss_alpha = loss_alpha,
-        loss_margin = loss_margin,
-        sampling_separate = sampling_separate,
-        sampling_shuffle = sampling_shuffle,
-        n_cores = n_cores
-      )
-    }
     # Save
     save_to_disk(
-      object = classifier,
-      dir_path = destination_path,
-      folder_name = folder_name
+      object = object,
+      dir_path = args[[1]]$path_args$destination_path,
+      folder_name = args[[1]]$path_args$folder_name
     )
 
     # Returns message
-    return("Classifier trained.")
+    return("Model trained.")
   })
-}
-
-get_arguments_extended_task_TEClassifierRegular <- function() {
-  return(c(
-    "destination_path",
-    "folder_name",
-    "path_to_embeddings",
-    "path_to_target_data",
-    "path_to_feature_extractor",
-    "target_data_column",
-    "name",
-    "label",
-    "data_folds",
-    "data_val_size",
-    "balance_class_weights",
-    "balance_sequence_length",
-    "use_sc",
-    "sc_method",
-    "sc_min_k",
-    "sc_max_k",
-    "use_pl",
-    "pl_max_steps",
-    "pl_max",
-    "pl_anchor",
-    "pl_min",
-    "sustain_iso_code",
-    "epochs",
-    "batch_size",
-    "log_dir",
-    "dense_layers",
-    "dense_size",
-    "rec_layers",
-    "rec_size",
-    "rec_type",
-    "rec_bidirectional",
-    "self_attention_heads",
-    "intermediate_size",
-    "attention_type",
-    "add_pos_embedding",
-    "rec_dropout",
-    "repeat_encoder",
-    "dense_dropout",
-    "recurrent_dropout",
-    "encoder_dropout",
-    "optimizer",
-    "log_write_interval",
-    "n_cores"
-  ))
 }
 
 # Feature extractor --------------------------------------------------------------

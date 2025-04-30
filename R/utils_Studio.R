@@ -908,7 +908,7 @@ create_data_embeddings_description <- function(embeddings) {
 #' @keywords internal
 #' @noRd
 #'
-check_and_prepare_for_studio <- function(env_type="auto") {
+check_and_prepare_for_studio <- function(env_type = "auto") {
   message("Checking R Packages.")
   r_packages <- list(
     "ggplot2" = NULL,
@@ -972,7 +972,7 @@ check_and_prepare_for_studio <- function(env_type="auto") {
     }
   }
 
-  prepare_python(env_type=env_type,envname="aifeducation")
+  prepare_python(env_type = env_type, envname = "aifeducation")
 
   message("Checking pytorch machine learning framework.")
   available_ml_frameworks <- NULL
@@ -1047,19 +1047,350 @@ replace_null_with_na <- function(value) {
   }
 }
 
-#' @title Replace NULL with NA
-#' @description Function replaces `NULL` with `NA`
+#' @title Create widget card
+#' @description This function creates a card which contains a widget for
+#' all arguments of the method determined with `method`.
 #'
-#' @return If value is `NULL` returns `NA`. In all other cases it returns value.
+#' @description In order to include
+#' an argument within the card the argument must be specified in `get_param_dict`.
+#' The entry `gui_box` must be set to a `string`. All argument with the same value
+#' for `gui_box` are grouped within a box of the card. The value of `gui_box` also
+#' functions as header of the box. To exclude an argumet set `gui_box=NULL` in
+#' `get_param_dict`.
+#'
+#' @param id Id of the shiny session.
+#' @param object_class `string` Class of the object.
+#' @param method `string` Method for which the card should be created.
+#' @param box_title `string` Title of the card containing the boxes.
+#'
+#' @return Returns a `bslib::card`.
 #'
 #' @family studio_utils
 #' @keywords internal
 #' @noRd
 #'
-replace_null_with_na <- function(value) {
-  if (is.null(value)) {
-    return(NA)
-  } else {
-    return(value)
+create_widget_card <- function(id,
+                               object_class,
+                               method = "configure",
+                               box_title) {
+  # Create Object
+  object <- create_object(object_class)
+
+  # Get params of the corresponding method
+  params <- rlang::fn_fmls_names(object[[method]])
+
+  # Get param dict
+  param_dict <- get_param_dict()[params]
+
+  tmp_boxes <- list()
+  for (param in params) {
+    dict_entry <- param_dict[[param]]
+    if(!is.null(dict_entry$gui_label)){
+      tmp_label=dict_entry$gui_label
+    } else {
+      tmp_label=param
+    }
+    if (!is.null(dict_entry$gui_box)) {
+      if (dict_entry$type == "int") {
+        if (dict_entry$min == -Inf) {
+          tmp_min <- NA
+        } else {
+          tmp_min <- dict_entry$min
+        }
+
+        if (dict_entry$max == Inf) {
+          tmp_max <- NA
+        } else {
+          tmp_max <- dict_entry$max
+        }
+
+        widget <- shiny::numericInput(
+          inputId = shiny::NS(id, param),
+          label = tmp_label,
+          value = dict_entry$default_value,
+          min = tmp_min,
+          max = tmp_max
+        )
+      } else if (dict_entry$type == "string") {
+        if (param == "sustain_iso_code") {
+          widget <- shiny::selectInput(
+            inputId = shiny::NS(id, param),
+            label = tmp_label,
+            choices = get_alpha_3_codes(),
+            selected = dict_entry$default_value,
+            multiple = FALSE
+          )
+        } else {
+          if (!is.null(dict_entry$allowed_values)) {
+            widget <- shiny::selectInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label,
+              choices = dict_entry$allowed_values,
+              multiple = FALSE
+            )
+          } else {
+            widget <- shiny::textInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label
+            )
+          }
+        }
+      } else if (dict_entry$type == "bool") {
+        widget <- shinyWidgets::materialSwitch(
+          inputId = shiny::NS(id, param),
+          label = tmp_label,
+          value = dict_entry$default_value
+        )
+      } else if (dict_entry$type == "double" |
+        dict_entry$type == "(double" |
+        dict_entry$type == "double)" |
+        dict_entry$type == "(double)") {
+        if (dict_entry$min != -Inf & dict_entry$max != Inf) {
+          if (!is.null(dict_entry$magnitude)) {
+            widget <- shiny::selectInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label,
+              choices = get_magnitude_values(
+                min = dict_entry$min,
+                max = dict_entry$max,
+                magnitude = dict_entry$magnitude,
+                n_elements = 9
+              )
+            )
+          } else {
+            range <- dict_entry$max - dict_entry$min
+
+            if (dict_entry$type == "(double" |
+              dict_entry$type == "(double)") {
+              tmp_min <- dict_entry$min + range * 0.01
+            } else {
+              tmp_min <- dict_entry$min
+            }
+
+            if (dict_entry$type == "double)" |
+              dict_entry$type == "(double)") {
+              tmp_max <- dict_entry$max - range * 0.01
+            } else {
+              tmp_max <- dict_entry$max
+            }
+
+            widget <- shiny::sliderInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label,
+              value = dict_entry$default_value,
+              min = tmp_min,
+              max = tmp_max,
+            )
+          }
+        }
+      }
+
+      # Add widget to the correct box
+      current_box <- tmp_boxes[[dict_entry$gui_box]]
+      current_box[tmp_label] <- list(widget)
+      tmp_boxes[dict_entry$gui_box] <- list(current_box)
+    }
   }
+
+  #Sort Boxes
+  box_names=names(tmp_boxes)
+  if("General Settings"%in%box_names){
+    reduced_names=setdiff(x=box_names,"General Settings")
+    ordered_names=c("General Settings",
+                    reduced_names[order(reduced_names)])
+  } else {
+    ordered_names=box_names[order(box_names)]
+  }
+  tmp_boxes=tmp_boxes[ordered_names]
+
+  #Sort Widgets
+  for(i in 1:length(tmp_boxes)){
+    current_box=tmp_boxes[[i]]
+    tmp_names=names(current_box)
+    #Ensure that parameters starting with use are displayed first
+    is_use_string=stringi::stri_detect(str=tolower(tmp_names),regex = "^use([:alnum:]*)")
+    if(max(is_use_string)>=1){
+      use_string=tmp_names[which(is_use_string)]
+      reduced_names=setdiff(x=tmp_names,y=use_string)
+      ordered_names=c(use_string,
+                      reduced_names[order(reduced_names)])
+    } else {
+      ordered_names=tmp_names[order(tmp_names)]
+    }
+    current_box=current_box[ordered_names]
+    tmp_boxes[i]=list(current_box)
+  }
+
+  # Create boxes with widgets
+  tmp_cards <- list()
+  for (i in 1:length(tmp_boxes)) {
+    tmp_cards[length(tmp_cards) + 1] <- list(
+      bslib::card(
+        bslib::card_header(names(tmp_boxes)[i]),
+        bslib::card_body(
+          bslib::layout_column_wrap(
+            tmp_boxes[[i]]
+          )
+        )
+      )
+    )
+  }
+
+
+
+  # Create Main Card
+  main_card <- bslib::card(
+    bslib::card_header(box_title),
+    bslib::card_body(
+      do.call(
+        what = bslib::layout_column_wrap,
+        args = tmp_cards
+      )
+    )
+  )
+  return(main_card)
+}
+
+#' @title Summarize arguments from shiny input
+#' @description This function extracts the input relevant for a specific
+#' method of a specific class from shiny input.
+#'
+#' @description In addition, it adds the path
+#' to all objects which can not be exported to another R session. These object
+#' must be loaded separately in the new session with the function `add_missing_args`.
+#' The paths are intended to be used with `shiny::ExtendedTask`. The final preparation of the arguments
+#' should be done with
+#'
+#' @description The function can also be used to override the default value of
+#' a method or to add value for arguments which are not part of shiny input
+#' (use parameter `override_args`).
+#'
+#' @param input Shiny input.
+#' @param object_class `string` Class of the object.
+#' @param method `string` Method of the class for which the arguments should
+#' be extracted and prepared.
+#' @param path_args `list` List containing the path to object that can not be exported
+#' to another R session. These must be loaded in the session.
+#' @param override_args `list` List containing all arguments that should be set manually.
+#' The values override default values of the argument and values which are part of `input`.
+#' @param meta_args `list` List containing information that are not relevant for the
+#' arguments of the method but are necessary to set up the `shiny::ExtendedTask`
+#' correctly.
+#'
+#' @note Please not that all list are named list of the format (argument_name=values).
+#'
+#' @return Returns a named `list` with the following entries:
+#' * args: Named `list` of all arguments necessary for the method of the class.
+#' * path_args: Named `list` of all paths for loading the objects missing in args.
+#' * meta_args: Named `list` of all arguments that are not part of the arguments of
+#'   the method but which are necessary to set up the `shiny::ExtendedTask` correctly.
+#'
+#' @family studio_utils
+#' @export
+summarize_args_for_long_task <- function(input,
+                                         object_class,
+                                         method = "configure",
+                                         path_args = list(
+                                           path_to_embeddings = NULL,
+                                           path_to_target_data = NULL,
+                                           path_to_feature_extractor = NULL,
+                                           destination_path = NULL,
+                                           folder_name = NULL
+                                         ),
+                                         override_args = list(),
+                                         meta_args = list(
+                                           py_environment_type=get_py_env_type(),
+                                           py_env_name=get_py_env_name(),
+                                           target_data_column = input$data_target_column,
+                                           object_class=input$classifier_type
+                                         )
+                                         ) {
+  # Create object in order to get relevant arguments
+  object <- create_object(object_class)
+
+  # Get dictionary of all parameters
+  param_dict <- get_param_dict()
+
+  # Create param_list
+  param_list <- rlang::fn_fmls(object[[method]])
+
+  # Get params of the method
+  params <- names(param_list)
+
+  for (param in params) {
+    current_param <- param_dict[[param]]
+    if (max(current_param$type %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")) &
+      !is.null(input[[param]])) {
+      param_list[param] <- list(input[[param]])
+    }
+  }
+
+  # Do type adjustments
+  if ("lr_rate" %in% params) {
+    param_list["lr_rate"] <- list(as.numeric(param_list[["lr_rate"]]))
+  }
+
+  # Override params but only if the argument to override exists
+  for (param in names(override_args)) {
+    if (param %in% params) {
+      param_list[param] <- list(override_args[[param]])
+    }
+  }
+
+  # Add path arguments and further additional arguments
+  return(list(
+    args = param_list,
+    path_args = path_args,
+    meta_args = meta_args
+  ))
+}
+
+#' @title Add missing arguments to a list of arguments
+#' @description This function is designed for taking the output of
+#' `summarize_args_for_long_task` as input. It adds the missing arguments.
+#' In general these are arguments that rely on objects of class [R6] which can not
+#' be exported to a new R session.
+#'
+#' @param args Named `list` List for arguments for the method of a specific class.
+#' @param path_args Named `list` List of paths where the objects are stored on disk.
+#' @param meta_args Named `list` List containing arguments that are necessary in order to
+#' add the missing objects correctly.
+#'
+#' @return Returns a named `list` of all arguments that a method of a specific class
+#' requires.
+#'
+#' @family studio_utils
+#' @export
+#'
+add_missing_args <- function(args, path_args, meta_args) {
+  # Create a copy of all args
+  complete_args <- args
+
+  # Get dictionary of all parameters
+  param_dict <- get_param_dict()
+
+  for (param in names(args)) {
+    current_param <- param_dict[[param]]
+    if ("LargeDataSetForTextEmbeddings" %in% current_param$type) {
+      if (!is.null(path_args$path_to_embeddings)) {
+        complete_args[param] <- list(
+          load_from_disk(path_args$path_to_embeddings)
+        )
+      }
+    } else if ("TEFeatureExtractor" %in% current_param$type) {
+      if (!is.null(path_args$path_to_feature_extractor)) {
+        complete_args[param] <- list(
+          load_from_disk(path_args$path_to_feature_extractor)
+        )
+      }
+    } else if ("factor" %in% current_param$type & !is.null(path_args$path_to_target_data)) {
+      complete_args[param] <- list(
+        long_load_target_data(
+          file_path = path_args$path_to_target_data,
+          selectet_column = meta_args$target_data_column
+        )
+      )
+    }
+  }
+  return(complete_args)
 }

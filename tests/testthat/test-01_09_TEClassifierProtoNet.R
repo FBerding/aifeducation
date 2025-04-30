@@ -490,7 +490,7 @@ if (!skip_training_test) {
               sustain_interval = 15,
               epochs = 20,
               batch_size = 32,
-              dir_checkpoint = train_path,
+
               trace = FALSE,
               sampling_separate = sampling_separate,
               sampling_shuffle = sampling_shuffle,
@@ -783,7 +783,7 @@ if (!skip_training_test) {
         sustain_interval = 15,
         epochs = epochs,
         batch_size = 32,
-        dir_checkpoint = train_path,
+
         log_dir = train_path,
         trace = FALSE,
         ml_trace = 0,
@@ -1062,7 +1062,6 @@ if (!skip_training_test) {
         sustain_interval = 15,
         epochs = epochs,
         batch_size = 32,
-        dir_checkpoint = train_path,
         log_dir = train_path,
         trace = FALSE,
         ml_trace = 0,

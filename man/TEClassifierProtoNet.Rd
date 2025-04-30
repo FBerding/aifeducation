@@ -33,6 +33,7 @@ https://doi.org/10.1007/978-3-030-16145-3_24
 }
 \seealso{
 Other Classification: 
+\code{\link{TEClassifierParallel}},
 \code{\link{TEClassifierRegular}}
 }
 \concept{Classification}
@@ -118,7 +119,8 @@ Creating a new instance of this class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{name}}{\code{string} Name of the new model. Please refer to common name conventions.
-Free text can be used with parameter \code{label}. Allowed values: any}
+Free text can be used with parameter \code{label}. If set to \code{NULL} a unique ID
+is generated automatically. Allowed values: any}
 
 \item{\code{label}}{\code{string} Label for the new model. Here you can use free text. Allowed values: any}
 
@@ -143,7 +145,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
-\item{\code{embedding_dim}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw'}
+\item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the text embedding. Allowed values: \code{1 <= x }}
 
 \item{\code{self_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
 

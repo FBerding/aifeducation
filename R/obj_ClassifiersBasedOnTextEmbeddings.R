@@ -961,7 +961,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Check directory for checkpoints
       create_dir(
-        dir_path = paste0(self$last_training$config$dir_checkpoint, "/checkpoints"),
+        dir_path = private$dir_checkpoint,
         trace = self$last_training$config$trace,
         msg = "Creating Checkpoint Directory"
       )
@@ -1140,8 +1140,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
     # Setting Label and Name
     private$set_model_info(
-      model_name_root = args$name,
-      model_id = generate_id(16),
+      model_name = private$generate_model_id(args$name),
       label = args$label,
       model_date = date()
     )
@@ -1166,11 +1165,22 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     check_param_combinations_training=function(){
-      if (self$last_training$config$pl_anchor < self$last_training$config$pl_min) {
-        stop("pl_anchor must be at least pl_min.")
+      if(self$last_training$config$use_pl==TRUE){
+        if(self$last_training$config$pl_max<self$last_training$config$pl_min){
+          stop("pl_max must be at least pl_min.")
+        }
+        if (self$last_training$config$pl_anchor < self$last_training$config$pl_min) {
+          stop("pl_anchor must be at least pl_min.")
+        }
+        if (self$last_training$config$pl_anchor > self$last_training$config$pl_max) {
+          stop("pl_anchor must be lower or equal to pl_max.")
+        }
       }
-      if (self$last_training$config$pl_anchor > self$last_training$config$pl_max) {
-        stop("pl_anchor must be lower or equal to pl_max.")
+
+      if(self$last_training$config$use_sc==TRUE){
+        if(self$last_training$config$sc_max_k<self$last_training$config$sc_min_k){
+          stop("sc_max_k must be at least sc_min_k")
+        }
       }
     },
     #---------------------------------------------------------------------------
@@ -1276,6 +1286,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     },
     #-------------------------------------------------------------------------
     do_training=function(args){
+      #Check arguments
       check_all_args(args=args)
       private$check_target_levels(args$data_targets)
       self$check_embedding_model(args$data_embeddings, require_compressed = FALSE)
@@ -1299,6 +1310,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       #Check if data can be used for pseudo labeling
       private$check_data_for_pseudo_labeling(data_manager)
+
+      #Check and create temporary directory for checkpoints
+      private$create_checkpoint_directory()
 
       # Start-------------------------------------------------------------------
       if (self$last_training$config$trace == TRUE) {
@@ -1355,6 +1369,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Stop sustainability tracking if requested
       private$stop_sustainability_tracking()
 
+      # Clean temporary directory
+      private$clean_checkpoint_directory()
+
       if (self$last_training$config$trace == TRUE) {
         message(paste(
           date(),
@@ -1387,6 +1404,14 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         feature_extractor <- TEFeatureExtractor$new()
         feature_extractor$load_from_disk(paste0(dir_path, "/feature_extractor"))
         self$feature_extractor <- feature_extractor
+      }
+    },
+    #--------------------------------------------------------------------------
+    generate_model_id=function(name){
+      if(is.null(name)){
+        return(paste0("cls_",generate_id(16)))
+      } else {
+        return(name)
       }
     }
   )

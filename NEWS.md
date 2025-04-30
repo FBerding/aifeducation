@@ -32,12 +32,23 @@ editor_options:
 - Added parameters for determining the learning rate and warm up ratio for training.
 - Added a check for the number of unlabeled cases during training to avoid application
   of pseudo labeling if there are no unlabeled cases.
+- Users can now choose between different activation functions and parametrizations.
+- Removed argument `dir_checkpoint` from training method. Now the training uses 
+  a folder in the regular temp directory of the machine. After a successful training
+  the folder is removed.
+- Parameter 'name' in 'configure' is now optional. If set to `NULL` a unique name is
+  generated automatically. 
   
 **FeatureExtractor**
 
 - The option to choose an optimizer is now working.
 - Added parameters for determining the learning rate and warm up ratio for training.
 - Tracking sustainability is now working.
+- Removed argument 'dir_checkpoint' from training method. Now the training uses 
+  a folder in the regular temp directory of the machine. After a successful training
+  the folder is removed.
+- Parameter 'name' in 'configure' is now optional. If set to `NULL` a unique name is
+  generated automatically. 
 
 **Minorty Oversamping Techniques**
 

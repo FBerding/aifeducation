@@ -37,11 +37,6 @@ FeatureExtractors_Create_UI <- function(id) {
         ),
         shiny::tags$hr(),
         shiny::textInput(
-          inputId = shiny::NS(id, "name"),
-          label = "Model Name",
-          width = "100%"
-        ),
-        shiny::textInput(
           inputId = shiny::NS(id, "label"),
           label = "Model Label",
           width = "100%"
@@ -56,7 +51,7 @@ FeatureExtractors_Create_UI <- function(id) {
       # Main Page---------------------------------------------------------------
       # Content depends in the TextEmbeddingModel of the embeddings
       # Embeddings
-      bslib::layout_column_wrap(
+      #bslib::layout_column_wrap(
         bslib::card(
           bslib::card_header("Input Data"),
           bslib::card_body(
@@ -67,79 +62,10 @@ FeatureExtractors_Create_UI <- function(id) {
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
           )
         ),
-        bslib::card(
-          bslib::card_header(
-            "Architecture"
-          ),
-          bslib::card_body(
-            shiny::sliderInput(
-              inputId = shiny::NS(id, "features"),
-              label = "Target Features",
-              min = 1,
-              value = 128,
-              max = 1024,
-              step = 1,
-              round = TRUE
-            ),
-            shiny::selectInput(
-              inputId = shiny::NS(id, "method"),
-              label = "Method",
-              choices = c("lstm", "dense")
-            ),
-            shiny::sliderInput(
-              inputId = shiny::NS(id, "noise_factor"),
-              label = "Noise Factor",
-              min = 0,
-              value = 0,
-              max = 1,
-              step = .01,
-              round = TRUE
-            ),
-            shiny::selectInput(
-              inputId = shiny::NS(id, "optimizer"),
-              label = "Optimizer",
-              choices = c("adam", "rmsprop")
-            )
-          )
-        ),
-        bslib::card(
-          bslib::card_header(
-            "Training Settings"
-          ),
-          bslib::card_body(
-            shiny::selectInput(
-              inputId = shiny::NS(id, "sustainability_country"),
-              label = "Country for Sustainability Tracking",
-              choices = get_alpha_3_codes(),
-              # choices=NULL,
-              selected = "DEU"
-            ),
-            shiny::sliderInput(
-              inputId = shiny::NS(id, "data_val_size"),
-              label = "Proportion for Validation Sample",
-              min = 0.02,
-              value = 0.25,
-              max = 0.5,
-              step = 0.01
-            ),
-            shiny::numericInput(
-              inputId = shiny::NS(id, "epochs"),
-              label = "Epochs",
-              min = 1,
-              value = 40,
-              step = 1
-            ),
-            shiny::sliderInput(
-              inputId = shiny::NS(id, "batch_size"),
-              label = "Batch Size",
-              min = 2,
-              max = 256,
-              value = 32,
-              step = 1
-            )
-          )
-        )
-      )
+        #Main config Cards
+        shiny::uiOutput(outputId = shiny::NS(id,"model_configuration")),
+        shiny::uiOutput(outputId = shiny::NS(id,"training_setup"))
+      #)
     )
   )
 }
@@ -195,6 +121,25 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
+    #Box for model configuration------------------------------------------------
+    output$model_configuration<-shiny::renderUI({
+      config_box=create_widget_card(
+        id=id,
+        object_class="TEFeatureExtractor",
+        method = "configure",
+        box_title="Model Configuration"
+      )
+    })
+    #Box for training set up---------------------------------------------------
+    output$training_setup<-shiny::renderUI({
+      config_box=create_widget_card(
+        id=id,
+        object_class="TEFeatureExtractor",
+        method = "train",
+        box_title="Training SetUp"
+      )
+    })
+
     # Start screen for choosing the location for storing the data set-----------
     # Create Save Modal
     save_modal <- create_save_modal(
@@ -228,7 +173,6 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     })
 
     # Start training------------------------------------------------------------
-
     shiny::observeEvent(input$save_modal_button_continue, {
       # Remove Save Modal
       shiny::removeModal()
@@ -239,7 +183,6 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
         features = input$features,
-        model_name = input$name,
         model_label = input$label
       )
 
@@ -257,21 +200,52 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "feature_extractor",
           ExtendedTask_arguments = list(
-            name = input$name,
-            label = input$label,
-            destination_path = input$save_modal_directory_path,
-            folder_name = input$save_modal_folder_name,
-            path_to_embeddings = path_to_embeddings(),
-            features = input$features,
-            method = input$method,
-            noise_factor = input$noise_factor,
-            optimizer = input$optimizer,
-            data_val_size = input$data_val_size,
-            epochs = input$epochs,
-            batch_size = input$batch_size,
-            sustain_iso_code = input$sustainability_country,
-            log_dir = log_dir,
-            log_write_interval = 3
+            configure=summarize_args_for_long_task(
+              input=input,
+              object_class="TEFeatureExtractor",
+              method="configure",
+              path_args=list(
+                path_to_embeddings=path_to_embeddings(),
+                path_to_target_data=NULL,
+                path_to_feature_extractor=NULL,
+                destination_path=input$save_modal_directory_path,
+                folder_name=input$save_modal_folder_name
+              ),
+              override_args=list(
+                sustain_track=TRUE
+              ),
+              meta_args=list(
+                py_environment_type=get_py_env_type(),
+                py_env_name=get_py_env_name(),
+                target_data_column = NULL,
+                object_class="TEFeatureExtractor"
+              )
+            ),
+            train=summarize_args_for_long_task(
+              input=input,
+              object_class="TEFeatureExtractor",
+              method="train",
+              path_args=list(
+                path_to_embeddings=path_to_embeddings(),
+                path_to_target_data=NULL,
+                path_to_feature_extractor=NULL,
+                destination_path=input$save_modal_directory_path,
+                folder_name=input$save_modal_folder_name
+              ),
+              override_args=list(
+                sustain_track=TRUE,
+                log_dir = log_dir,
+                trace=FALSE,
+                ml_trace=0,
+                n_cores=auto_n_cores()
+              ),
+              meta_args=list(
+                py_environment_type=get_py_env_type(),
+                py_env_name=get_py_env_name(),
+                target_data_column = NULL,
+                object_class="TEFeatureExtractor"
+              )
+            )
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,

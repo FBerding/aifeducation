@@ -94,7 +94,8 @@ Creating a new instance of this class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{name}}{\code{string} Name of the new model. Please refer to common name conventions.
-Free text can be used with parameter \code{label}. Allowed values: any}
+Free text can be used with parameter \code{label}. If set to \code{NULL} a unique ID
+is generated automatically. Allowed values: any}
 
 \item{\code{label}}{\code{string} Label for the new model. Here you can use free text. Allowed values: any}
 
@@ -122,7 +123,7 @@ Returns an object of class \link{TEFeatureExtractor} which is ready for training
 Method for training a neural net.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$train(
-  data_embeddings,
+  data_embeddings = NULL,
   data_val_size = 0.25,
   sustain_track = TRUE,
   sustain_iso_code = NULL,
@@ -130,7 +131,6 @@ Method for training a neural net.
   sustain_interval = 15,
   epochs = 40,
   batch_size = 32,
-  dir_checkpoint,
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
@@ -163,9 +163,6 @@ sustainability should be tracked. A list can be found on Wikipedia:
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 
 \item{\code{batch_size}}{\code{int} Size of batches.}
-
-\item{\code{dir_checkpoint}}{\code{string} Path to the directory where the checkpoint during training should be saved. If the
-directory does not exist, it is created.}
 
 \item{\code{trace}}{\code{bool} \code{TRUE}, if information about the estimation phase should be printed to the console.}
 

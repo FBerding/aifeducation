@@ -54,7 +54,6 @@ test_that("Setup Classifier Data", {
         sustain_interval = 15,
         epochs = 75,
         batch_size = 100,
-        dir_checkpoint = train_path,
         trace = trace,
         ml_trace = as.numeric(trace)
       )

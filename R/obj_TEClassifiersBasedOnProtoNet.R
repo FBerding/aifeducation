@@ -55,7 +55,6 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
     #' @param epochs `r get_param_doc_desc("epochs")`
     #' @param batch_size `r get_param_doc_desc("batch_size")`
-    #' @param dir_checkpoint `r get_param_doc_desc("dir_checkpoint")`
     #' @param log_dir `r get_param_doc_desc("log_dir")`
     #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @param trace `r get_param_doc_desc("trace")`
@@ -63,20 +62,12 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param n_cores `r get_param_doc_desc("n_cores")`
     #' @param lr_rate `r get_param_doc_desc("lr_rate")`
     #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
-    #' @param Ns `int` Number of cases for every class in the sample.
-    #' @param Nq `int` Number of cases for every class in the query.
-    #' @param loss_alpha `double` Value between 0 and 1 indicating how strong the loss should focus on pulling cases to
-    #'   its corresponding prototypes or pushing cases away from other prototypes. The higher the value the more the
-    #'   loss concentrates on pulling cases to its corresponding prototypes.
-    #' @param loss_margin `double` Value greater 0 indicating the minimal distance of every case from prototypes of
-    #'   other classes
-    #' @param sampling_separate `bool` If `TRUE` the cases for every class are divided into a data set for sample and
-    #'   for query. These are never mixed. If `TRUE` sample and query cases are drawn from the same data pool. That is,
-    #'   a case can be part of sample in one epoch and in another epoch it can be part of query. It is ensured that a
-    #'   case is never part of sample and query at the same time. In addition, it is ensured that every cases exists
-    #'   only once during a training step.
-    #' @param sampling_shuffle `bool` If `TRUE` cases a randomly drawn from the data during every step. If `FALSE` the
-    #'   cases are not shuffled.
+    #' @param Ns `r get_param_doc_desc("Ns")`
+    #' @param Nq `r get_param_doc_desc("Nq")`
+    #' @param loss_alpha `r get_param_doc_desc("loss_alpha")`
+    #' @param loss_margin `r get_param_doc_desc("loss_margin")`
+    #' @param sampling_separate `r get_param_doc_desc("sampling_separate")`
+    #' @param sampling_shuffle `r get_param_doc_desc("sampling_shuffle")`
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -86,8 +77,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' * `pl_anchor:` With the help of this value, the new cases are sorted. For
     #' this aim, the distance from the anchor is calculated and all cases are arranged into an ascending order.
     #'
-    train = function(data_embeddings,
-                     data_targets,
+    train = function(data_embeddings=NULL,
+                     data_targets=NULL,
                      data_folds = 5,
                      data_val_size = 0.25,
                      use_sc = TRUE,
@@ -111,7 +102,6 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      loss_margin = 0.5,
                      sampling_separate = FALSE,
                      sampling_shuffle = TRUE,
-                     dir_checkpoint,
                      trace = TRUE,
                      ml_trace = 1,
                      log_dir = NULL,

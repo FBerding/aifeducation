@@ -324,6 +324,7 @@ AIFEBaseModel <- R6::R6Class(
   private = list(
     ml_framework = NA,
     sustainability_tracker=NA,
+    dir_checkpoint=NULL,
     # General Information-------------------------------------------------------
     model_info = list(
       model_license = NA,
@@ -600,6 +601,25 @@ AIFEBaseModel <- R6::R6Class(
           )
         )
       }
+    },
+    #---------------------------------------------------------------------------
+    create_checkpoint_directory=function(){
+      #Create a directory for the package
+      tmp_dir=create_and_get_tmp_dir()
+
+      #Create a folder for the current task
+      private$dir_checkpoint=paste0(
+        tmp_dir,"/",
+        generate_id(16)
+      )
+      create_dir(dir=private$dir_checkpoint,trace = FALSE)
+    },
+    #--------------------------------------------------------------------------
+    clean_checkpoint_directory=function(){
+      unlink(
+        x=private$dir_checkpoint,
+        recursive=TRUE,
+        force = FALSE)
     }
   )
 )

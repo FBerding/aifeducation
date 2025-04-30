@@ -73,8 +73,8 @@ After training the model with the best values for Average Iota, Accuracy, and Lo
 is used as the final model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnRegular$train(
-  data_embeddings,
-  data_targets,
+  data_embeddings = NULL,
+  data_targets = NULL,
   data_folds = 5,
   data_val_size = 0.25,
   balance_class_weights = TRUE,
@@ -94,7 +94,6 @@ is used as the final model.
   sustain_interval = 15,
   epochs = 40,
   batch_size = 32,
-  dir_checkpoint,
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
@@ -159,9 +158,6 @@ codecarbon for more information. \link{https://mlco2.github.io/codecarbon/parame
 
 \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{dir_checkpoint}}{\code{string} Path to the directory where the checkpoint during training should be saved.
-If the directory does not exist, it is created. Allowed values: any}
-
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
 \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
@@ -174,9 +170,9 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed value
 
 \item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \code{1 <= x }}
 
-\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \code{0 < x }}
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
 
-\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 1}}
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
 }
 \if{html}{\out{</div>}}
 }

@@ -77,8 +77,8 @@ After training the model with the best values for Average Iota, Accuracy, and Lo
 is used as the final model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnProtoNet$train(
-  data_embeddings,
-  data_targets,
+  data_embeddings = NULL,
+  data_targets = NULL,
   data_folds = 5,
   data_val_size = 0.25,
   use_sc = TRUE,
@@ -102,7 +102,6 @@ is used as the final model.
   loss_margin = 0.5,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
-  dir_checkpoint,
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
@@ -160,16 +159,15 @@ codecarbon for more information. \link{https://mlco2.github.io/codecarbon/parame
 
 \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{Ns}}{\code{int} Number of cases for every class in the sample.}
+\item{\code{Ns}}{\code{int} Number of cases for every class in the sample. Allowed values: \code{1 <= x }}
 
-\item{\code{Nq}}{\code{int} Number of cases for every class in the query.}
+\item{\code{Nq}}{\code{int} Number of cases for every class in the query. Allowed values: \code{1 <= x }}
 
 \item{\code{loss_alpha}}{\code{double} Value between 0 and 1 indicating how strong the loss should focus on pulling cases to
 its corresponding prototypes or pushing cases away from other prototypes. The higher the value the more the
-loss concentrates on pulling cases to its corresponding prototypes.}
+loss concentrates on pulling cases to its corresponding prototypes. Allowed values: \verb{0 <= x <= 1}}
 
-\item{\code{loss_margin}}{\code{double} Value greater 0 indicating the minimal distance of every case from prototypes of
-other classes}
+\item{\code{loss_margin}}{\code{double} Value greater 0 indicating the minimal distance of every case from prototypes of other classes. Allowed values: \verb{0 <= x <= 1}}
 
 \item{\code{sampling_separate}}{\code{bool} If \code{TRUE} the cases for every class are divided into a data set for sample and
 for query. These are never mixed. If \code{TRUE} sample and query cases are drawn from the same data pool. That is,
@@ -177,11 +175,8 @@ a case can be part of sample in one epoch and in another epoch it can be part of
 case is never part of sample and query at the same time. In addition, it is ensured that every cases exists
 only once during a training step.}
 
-\item{\code{sampling_shuffle}}{\code{bool} If \code{TRUE} cases a randomly drawn from the data during every step. If \code{FALSE} the
+\item{\code{sampling_shuffle}}{\code{bool} if \code{TRUE} cases a randomly drawn from the data during every step. If \code{FALSE} the
 cases are not shuffled.}
-
-\item{\code{dir_checkpoint}}{\code{string} Path to the directory where the checkpoint during training should be saved.
-If the directory does not exist, it is created. Allowed values: any}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
@@ -195,9 +190,9 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed value
 
 \item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \code{1 <= x }}
 
-\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \code{0 < x }}
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
 
-\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 1}}
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
 
 \item{\code{balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency. If \code{FALSE} each class has the weight 1.}
