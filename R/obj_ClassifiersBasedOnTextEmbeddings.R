@@ -1007,8 +1007,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         model = self$model,
         loss_fct_name = loss_fct_name,
         optimizer_method = self$model_config$optimizer,
-        lr_rate=self$last_training$config$lr_rate,
-        lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
+        lr_rate = self$last_training$config$lr_rate,
+        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
         use_callback = use_callback,
@@ -1066,6 +1066,35 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
                 all levels to the classifier's configuration."
           )
         )
+      )
+      reticulate::py_run_file(
+        system.file("python/pytorch_te_classifier.py",
+          package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/pytorch_autoencoder.py",
+          package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/py_log.py",
+          package = "aifeducation"
+        )
+      )
+    },
+    #-------------------------------------------------------------------------
+    do_training = function(args) {
+      check_all_args(args = args)
+      private$check_target_levels(args$data_targets)
+      self$check_embedding_model(args$data_embeddings, require_compressed = FALSE)
+
+      # Save args
+      private$save_all_args(args = args, group = "training")
+
+      # Perform additional checks
+      if (is.function(private$check_param_combinations_training)) {
+        private$check_param_combinations_training()
       }
     },
     #--------------------------------------------------------------------------
