@@ -233,26 +233,48 @@ auto_n_cores <- function() {
   return(n_cores = max(1, n_cores))
 }
 
-#' @title Called arguments
-#' @description Function for receiving all arguments that were called by a method or function.
+#' @title Create object
 #'
-#'@param n `int` level of the nested environments where to extract the arguments.
+#' @description  Support function for creating objects.
 #'
-#' @importFrom rlang caller_fn
-#' @importFrom rlang fn_fmls
-#'
-#' @return Returns names `list` of all arguments and their values.
+#' @return Returns an object of the requested class.
 #'
 #' @family Utils
 #' @export
-get_called_args=function(n=1){
-  fn=rlang::caller_fn(n)
-  formal_args=rlang::fn_fmls(fn)
-  final_args=formal_args
-  for (arguments in names(formal_args)) {
-    final_args[arguments]=list(get(x=arguments,envir = rlang::caller_env(n)))
+create_object=function(class){
+  if(class=="TEClassifierRegular"){
+    return(TEClassifierRegular$new())
+  } else if(class=="TEClassifierProtoNet"){
+    return(TEClassifierProtoNet$new())
+  } else if(class=="TEFeatureExtractor"){
+    return(TEFeatureExtractor$new())
   }
-  return(final_args)
 }
 
-
+#' @title Detect base model's architecture
+#' @description Function for detecting the base type of a base model.
+#'
+#' @param model A model of the transformer library.
+#'
+#' @return Returns a `string` describing base model's architecture.
+#'
+#' @family Utils
+#' @export
+detect_base_model_type=function(model){
+  type_string=model$config$architectures
+  if(stringi::stri_detect(str=tolower(type_string),regex = "^funnel([:alnum:]*)")){
+    return("funnel")
+  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^bert([:alnum:]*)")){
+    return("bert")
+  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^debertav2([:alnum:]*)")){
+    return("deberta_v2")
+  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^mpnet([:alnum:]*)")){
+    return("mpnet")
+  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^longformer([:alnum:]*)")){
+    return("longformer")
+  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^roberta([:alnum:]*)")){
+    return("roberta")
+  } else {
+    stop("Architectue for the model could not be detected.")
+  }
+}

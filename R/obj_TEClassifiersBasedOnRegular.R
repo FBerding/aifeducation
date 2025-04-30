@@ -54,7 +54,6 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
     #' @param epochs `r get_param_doc_desc("epochs")`
     #' @param batch_size `r get_param_doc_desc("batch_size")`
-    #' @param dir_checkpoint `r get_param_doc_desc("dir_checkpoint")`
     #' @param log_dir `r get_param_doc_desc("log_dir")`
     #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @param trace `r get_param_doc_desc("trace")`
@@ -71,8 +70,8 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' * `pl_anchor`: With the help of this value, the new cases are sorted. For
     #' this aim, the distance from the anchor is calculated and all cases are arranged into an ascending order.
     #'
-    train = function(data_embeddings,
-                     data_targets,
+    train = function(data_embeddings=NULL,
+                     data_targets=NULL,
                      data_folds = 5,
                      data_val_size = 0.25,
                      balance_class_weights = TRUE,
@@ -92,7 +91,6 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      sustain_interval = 15,
                      epochs = 40,
                      batch_size = 32,
-                     dir_checkpoint,
                      trace = TRUE,
                      ml_trace = 1,
                      log_dir = NULL,

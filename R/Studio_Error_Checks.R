@@ -46,11 +46,13 @@ check_errors_create_classifier <- function(classifier_type,
                                            path_to_feature_extractor,
                                            model_name,
                                            model_label,
-                                           Ns,
-                                           Nq,
-                                           loss_alpha,
-                                           loss_margin,
-                                           embedding_dim) {
+                                           use_sc,
+                                           sc_min_k,
+                                           sc_max_k,
+                                           use_pl,
+                                           pl_min,
+                                           pl_max,
+                                           pl_anchor) {
   # List for gathering errors
   error_list <- NULL
 
@@ -66,8 +68,6 @@ check_errors_create_classifier <- function(classifier_type,
       "Folder name is not set."
     ))
   }
-
-
 
   # Embeddings
   if (dir.exists(path_to_embeddings) == FALSE) {
@@ -120,51 +120,28 @@ check_errors_create_classifier <- function(classifier_type,
     }
   }
 
-
-  # Model Nane and Model Label
-  if (check_for_empty_input(model_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Name of the classifier ist not set."
-    ))
-  }
-
   if (check_for_empty_input(model_label)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Label of the classifier ist not set."
+      "Label of the classifier is not set."
     ))
   }
 
-  # ProtoNet specific-----------------------------------------------------------
-  # TODO (Yuliia): input$classifier_type? classifier_type - no visible binding
-  if (classifier_type == "protonet") {
-    if (check_for_empty_input(Ns)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "No value set for the sample. Please add a number."
-      ))
+  # Training conf
+  if (use_pl == TRUE) {
+    if (pl_max < pl_min) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("pl_max must be at least pl_min."))
     }
-
-    if (check_for_empty_input(Nq)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "No value set for the query. Please add a number."
-      ))
+    if (pl_anchor < pl_min) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("pl_anchor must be at least pl_min."))
     }
-
-    if (check_for_empty_input(loss_alpha)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Value for alpha in the loss is missing."
-      ))
+    if (pl_anchor > pl_max) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("pl_anchor must be lower or equal to pl_max."))
     }
+  }
 
-    if (check_for_empty_input(loss_margin)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Value for the margin in the loss is missing."
-      ))
-    }
-
-    if (check_for_empty_input(embedding_dim)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Value for the number of dimensions of the embedding is missing."
-      ))
+  if (use_sc == TRUE) {
+    if (sc_max_k < sc_min_k) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("sc_max_k must be at least sc_min_k"))
     }
   }
 
@@ -288,7 +265,6 @@ check_errors_create_feature_extractor <- function(destination_path,
                                                   folder_name,
                                                   path_to_embeddings,
                                                   features,
-                                                  model_name,
                                                   model_label) {
   # List for gathering errors
   error_list <- NULL
@@ -338,13 +314,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 
 
 
-  # Model Name and Model Label
-  if (check_for_empty_input(model_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Name of the classifier ist not set."
-    ))
-  }
-
+  # Model Label
   if (check_for_empty_input(model_label)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Label of the classifier ist not set."

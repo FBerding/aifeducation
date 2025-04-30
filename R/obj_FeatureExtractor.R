@@ -89,8 +89,7 @@ TEFeatureExtractor <- R6::R6Class(
 
       # Setting Label and Name
       private$set_model_info(
-        model_name_root = name,
-        model_id = generate_id(16),
+        model_name = private$generate_model_id(name),
         label = label,
         model_date = date()
       )
@@ -127,8 +126,6 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param sustain_interval `int` Interval in seconds for measuring power usage.
     #' @param epochs `int` Number of training epochs.
     #' @param batch_size `int` Size of batches.
-    #' @param dir_checkpoint `string` Path to the directory where the checkpoint during training should be saved. If the
-    #'   directory does not exist, it is created.
     #' @param log_dir `string` Path to the directory where the log files should be saved. If no logging is desired set
     #'   this argument to `NULL`.
     #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
@@ -139,7 +136,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param lr_rate `double` Initial learning rate for the training.
     #' @param lr_warm_up_ratio `double` Number of epochs used for warm up.
     #' @return Function does not return a value. It changes the object into a trained classifier.
-    train = function(data_embeddings,
+    train = function(data_embeddings=NULL,
                      data_val_size = 0.25,
                      sustain_track = TRUE,
                      sustain_iso_code = NULL,
@@ -147,7 +144,6 @@ TEFeatureExtractor <- R6::R6Class(
                      sustain_interval = 15,
                      epochs = 40,
                      batch_size = 32,
-                     dir_checkpoint,
                      trace = TRUE,
                      ml_trace = 1,
                      log_dir = NULL,
@@ -192,12 +188,8 @@ TEFeatureExtractor <- R6::R6Class(
       # Copy input as label for training
       extractor_dataset <- data$map(py$map_input_to_labels)
 
-      # Check directory for checkpoints
-      create_dir(
-        dir_path = self$last_training$config$dir_checkpoint,
-        trace = self$last_training$config$trace,
-        msg = "Creating Checkpoint Directory"
-      )
+      #Check and create temporary directory for checkpoints
+      private$create_checkpoint_directory()
 
       # Set up log file
       log_top_value <- 0
@@ -224,7 +216,7 @@ TEFeatureExtractor <- R6::R6Class(
         batch_size = as.integer(self$last_training$config$batch_size),
         train_data = extractor_dataset$train,
         val_data = extractor_dataset$test,
-        filepath = paste0(self$last_training$config$dir_checkpoint, "/best_weights.pt"),
+        filepath = paste0(private$dir_checkpoint, "/best_weights.pt"),
         use_callback = TRUE,
         log_dir = private$log_config$log_dir,
         log_write_interval = private$log_config$log_write_interval,
@@ -239,6 +231,9 @@ TEFeatureExtractor <- R6::R6Class(
 
       # Set training status value
       private$trained <- TRUE
+
+      # Clean temporary directory
+      private$clean_checkpoint_directory()
 
       if (self$last_training$config$trace == TRUE) {
         message(paste(date(), "Training finished"))
@@ -470,6 +465,14 @@ TEFeatureExtractor <- R6::R6Class(
           features_out = as.integer(self$model_config$features),
           noise_factor = self$model_config$noise_factor
         )
+      }
+    },
+    #--------------------------------------------------------------------------
+    generate_model_id=function(name){
+      if(is.null(name)){
+        return(paste0("tefe_",generate_id(16)))
+      } else {
+        return(name)
       }
     }
   )

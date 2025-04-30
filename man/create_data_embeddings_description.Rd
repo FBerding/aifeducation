@@ -18,7 +18,9 @@ give text embeddings.
 }
 \seealso{
 Other studio_utils: 
-\code{\link{long_load_target_data}()}
+\code{\link{add_missing_args}()},
+\code{\link{long_load_target_data}()},
+\code{\link{summarize_args_for_long_task}()}
 }
 \concept{studio_utils}
 \keyword{internal}

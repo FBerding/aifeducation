@@ -22,6 +22,8 @@ Other Utils:
 \code{\link{clean_pytorch_log_transformers}()},
 \code{\link{create_config_state}()},
 \code{\link{create_dir}()},
+\code{\link{create_object}()},
+\code{\link{detect_base_model_type}()},
 \code{\link{generate_id}()},
 \code{\link{get_called_args}()},
 \code{\link{get_file_extension}()},

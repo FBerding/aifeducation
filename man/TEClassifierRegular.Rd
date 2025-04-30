@@ -23,6 +23,7 @@ Abstract class for neural nets with 'pytorch'.
 }
 \seealso{
 Other Classification: 
+\code{\link{TEClassifierParallel}},
 \code{\link{TEClassifierProtoNet}}
 }
 \concept{Classification}
@@ -106,7 +107,8 @@ Creating a new instance of this class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{name}}{\code{string} Name of the new model. Please refer to common name conventions.
-Free text can be used with parameter \code{label}. Allowed values: any}
+Free text can be used with parameter \code{label}. If set to \code{NULL} a unique ID
+is generated automatically. Allowed values: any}
 
 \item{\code{label}}{\code{string} Label for the new model. Here you can use free text. Allowed values: any}
 

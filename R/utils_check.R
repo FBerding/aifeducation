@@ -89,7 +89,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
       }
       #---------------------------
     } else if (type == "double") {
-      if (!is.double(object)) {
+      if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
         if (!(min <= object & object <= max)) {
@@ -97,7 +97,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
         }
       }
     } else if (type == "(double") {
-      if (!is.double(object)) {
+      if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
         if (!(min < object & object <= max)) {
@@ -105,7 +105,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
         }
       }
     } else if (type == "double)") {
-      if (!is.double(object)) {
+      if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
         if (!(min <= object & object <= max)) {
@@ -113,7 +113,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
         }
       }
     } else if (type == "(double)") {
-      if (!is.double(object)) {
+      if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
         if (!(min <= object & object <= max)) {
@@ -184,6 +184,8 @@ numpy_writeable <- function(np_array) {
 #' @noRd
 #'
 check_versions <- function(a, operator = "==", b) {
+  a=as.character(a)
+  b=as.character(b)
   res <- utils::compareVersion(a = a, b = b)
   if (operator == "==") {
     if (res == 0) {
@@ -277,3 +279,12 @@ check_all_args=function(args){
   }
 }
 
+is_valid_and_exportable_param=function(arg_name,param_dict){
+  param_dict_entry=param_dict[[arg_name]]
+  if(max(param_dict_entry$type%in%c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list"))&
+     !arg_name%in%c("log_dir","log_write_interval")){
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}

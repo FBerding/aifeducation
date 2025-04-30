@@ -162,7 +162,8 @@ start_and_monitor_long_task <- function(id,
     if (ExtendedTask_type %in% c("classifier", "feature_extractor")) {
       reset_loss_log(
         log_path = loss_log_path,
-        epochs = ExtendedTask_arguments$epochs
+        #epochs = ExtendedTask_arguments$epochs
+        epochs = 2
       )
     } else if (ExtendedTask_type == "train_transformer") {
       reset_loss_log(
@@ -185,21 +186,19 @@ start_and_monitor_long_task <- function(id,
     # Show modal
     shiny::showModal(progress_modal)
 
-    # Add current conda env to arguments
-    ExtendedTask_arguments["current_conda_env"] <- get_current_conda_env()
+    # Add current env to arguments
+    if(!(ExtendedTask_type %in% c("classifier", "feature_extractor"))){
+      ExtendedTask_arguments["current_conda_env"] <- get_py_env_name()
+    }
 
-
-    # print("log_path")
-    # print(log_path)
-    # print("Argument")
-    # print(ExtendedTask_type)
-    # print(ExtendedTask_arguments)
+    #print(ExtendedTask_arguments)
 
     args <- ExtendedTask_arguments
     save(args,
       file = paste0(getwd(), "/arguments.rda")
     )
     future::plan(future::multisession)
+    #future::plan(future::sequential)
 
     # Start ExtendedTask
     CurrentTask <- NULL
@@ -207,16 +206,20 @@ start_and_monitor_long_task <- function(id,
       CurrentTask <- shiny::ExtendedTask$new(long_add_texts_to_dataset)
     } else if (ExtendedTask_type == "embed_raw_text") {
       CurrentTask <- shiny::ExtendedTask$new(long_transform_text_to_embeddings)
-    } else if (ExtendedTask_type == "classifier") {
-      CurrentTask <- shiny::ExtendedTask$new(long_classifier)
-    } else if (ExtendedTask_type == "feature_extractor") {
-      CurrentTask <- shiny::ExtendedTask$new(long_feature_extractor)
+    } else if (ExtendedTask_type == "classifier"|
+               ExtendedTask_type == "feature_extractor") {
+      CurrentTask <- shiny::ExtendedTask$new(long_models)
     } else if (ExtendedTask_type == "create_transformer") {
       CurrentTask <- shiny::ExtendedTask$new(long_create_transformer)
     } else if (ExtendedTask_type == "train_transformer") {
       CurrentTask <- shiny::ExtendedTask$new(long_train_transformer)
     }
-    if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = args)
+    if(ExtendedTask_type == "classifier"|ExtendedTask_type == "feature_extractor"){
+      CurrentTask$invoke(args)
+    } else {
+      if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments,quote = FALSE)
+    }
+
 
     # Check progress of the task
     progress_bar_status <- shiny::reactive({

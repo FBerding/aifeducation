@@ -1,3 +1,73 @@
+#' @title Check for a virtual python environment
+#' @description This function checks if a virtual python environment is active.
+#'
+#' @return Returns `TRUE` if a virtual python environment is active.
+#' In the case that python is not active the function raises an error.
+#'
+#' @family studio_utils
+#' @keywords internal
+#' @noRd
+#'
+is_venv <- function() {
+  if (reticulate::py_available() == TRUE) {
+    py_config <- reticulate::py_config()
+    if (py_config$conda == "False") {
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  } else {
+    stop("Python session not active.")
+  }
+}
+
+#' @title Get python environment type.
+#' @description This function determines if a 'conda' or a virtual environment is active.
+#'
+#' @return Returns a `string` `"venv"` if a virtual environment is active and `"conda"` if a
+#' 'conda' environment is active. In the case that python is not active the function raises an error.
+#'
+#' @family studio_utils
+#' @keywords internal
+#' @noRd
+#'
+get_py_env_type <- function() {
+  if (reticulate::py_available() == TRUE) {
+    py_config <- reticulate::py_config()
+    if (py_config$conda == "False") {
+      return("venv")
+    } else {
+      return("conda")
+    }
+  } else {
+    stop("Python session not active.")
+  }
+}
+
+#' @title Get name of the active python environment
+#' @description Function for getting the name of active python environment.
+#'
+#' @return Returns the name of the active python environment. If the current
+#' environment is a 'conda' environment the name of this environment is returned.
+#' If the active environment is a virtual environment the name of this environment
+#' is returned. In the case that python is not active the function raises an error.
+#'
+#' @family studio_utils
+#' @keywords internal
+#' @noRd
+#'
+get_py_env_name <- function() {
+  if (reticulate::py_available() == TRUE) {
+    if (is_venv()) {
+      return(get_current_venv())
+    } else {
+      return(get_current_conda_env())
+    }
+  } else {
+    stop("Python session not active.")
+  }
+}
+
 #' @title Get current conda environment
 #' @description Function for getting the active conda environment.
 #'
@@ -28,11 +98,11 @@ get_current_conda_env <- function() {
   }
 }
 
-#' @title Get current conda environment
-#' @description Function for getting the active conda environment.
+#' @title Get current virtual environment
+#' @description Function for getting the active virtual environment.
 #'
-#' @return Returns the name of the current conda environment as a `string`.
-#' In the case that python is not active or conda is not used this function
+#' @return Returns the name of the current virtual environment as a `string`.
+#' In the case that python is not active or a virtual environment is not used this function
 #' raises an error.
 #'
 #' @family studio_utils
@@ -91,7 +161,7 @@ get_py_package_versions <- function() {
   names(versions) <- c("python", list_of_packages)
   versions["python"] <- as.character(reticulate::py_config()$version)
   for (package in list_of_packages) {
-    versions[package] <-get_py_package_version(package)
+    versions[package] <- get_py_package_version(package)
   }
   return(versions)
 }
@@ -104,7 +174,7 @@ get_py_package_versions <- function() {
 #' @family Utils
 #' @importFrom reticulate import
 #' @export
-get_py_package_version<-function(package_name){
+get_py_package_version <- function(package_name) {
   if (reticulate::py_module_available(package_name) == TRUE) {
     tmp_package <- reticulate::import(module = package_name, delay_load = FALSE)
     return(as.character(tmp_package["__version__"]))
