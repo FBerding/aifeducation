@@ -402,10 +402,8 @@ AIFEBaseModel <- R6::R6Class(
 
     #--------------------------------------------------------------------------
     # Method for setting the model info
-    set_model_info = function(model_name_root, model_id, label, model_date) {
-      private$model_info$model_name_root <- model_name_root
-      private$model_info$model_id <- model_id
-      private$model_info$model_name <- paste0(model_name_root, "_ID_", model_id)
+    set_model_info = function(model_name, label, model_date) {
+      private$model_info$model_name <- model_name
       private$model_info$model_label <- label
       private$model_info$model_date <- model_date
     },
@@ -488,8 +486,7 @@ AIFEBaseModel <- R6::R6Class(
 
       # Set model info
       private$set_model_info(
-        model_name_root = config_private$model_info$model_name_root,
-        model_id = config_private$model_info$model_id,
+        model_name = config_private$model_info$model_name,
         label = config_private$model_info$model_label,
         model_date = config_private$model_info$model_date
       )

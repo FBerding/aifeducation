@@ -51,8 +51,6 @@ for (framework in ml_frameworks) {
 
       # Train-----------------------------------------------------------------
       test_that(paste(framework, method, data_type, "train without log"), {
-        train_path <- paste0(root_path_results, "/", "train_", generate_id())
-        create_dir(train_path, FALSE)
         expect_no_error(
           extractor$train(
             data_embeddings = dataset_list[[data_type]],
@@ -63,7 +61,7 @@ for (framework in ml_frameworks) {
             sustain_interval = 15,
             epochs = 2,
             batch_size = 100,
-            dir_checkpoint = train_path,
+
             trace = FALSE,
             ml_trace = 0
           )
@@ -72,11 +70,6 @@ for (framework in ml_frameworks) {
         #Check if sustainability data has been tracked
         expect_true(extractor$get_sustainability_data()$sustainability_tracked)
 
-        # Clean Directory
-        unlink(
-          x = train_path,
-          recursive = TRUE
-        )
       })
       gc()
 
@@ -93,7 +86,6 @@ for (framework in ml_frameworks) {
             sustain_interval = 15,
             epochs = 2,
             batch_size = 100,
-            dir_checkpoint = train_path,
             log_dir = train_path,
             trace = FALSE,
             ml_trace = 0

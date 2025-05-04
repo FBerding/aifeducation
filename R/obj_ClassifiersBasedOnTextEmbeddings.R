@@ -357,11 +357,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #--------------------------------------------------------------------------
     init_train = function() {
       # Setting a new ID for the classifier
-      private$model_info$model_name <- paste0(
-        private$model_info$model_name_root,
-        "_id_",
-        generate_id(16)
-      )
+      private$model_info$model_name <- private$generate_model_id(name=NULL)
 
       # Initializing Objects for Saving Performance
       metric_names <- get_coder_metrics(
@@ -1066,37 +1062,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
                 all levels to the classifier's configuration."
           )
         )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_te_classifier.py",
-          package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_autoencoder.py",
-          package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/py_log.py",
-          package = "aifeducation"
-        )
-      )
-    },
-    #-------------------------------------------------------------------------
-    do_training = function(args) {
-      check_all_args(args = args)
-      private$check_target_levels(args$data_targets)
-      self$check_embedding_model(args$data_embeddings, require_compressed = FALSE)
-
-      # Save args
-      private$save_all_args(args = args, group = "training")
-
-      # Perform additional checks
-      if (is.function(private$check_param_combinations_training)) {
-        private$check_param_combinations_training()
       }
-    },
+      },
     #--------------------------------------------------------------------------
     do_configuration=function(args){
     # Initial checks, adjustments, and preparation----------------------------

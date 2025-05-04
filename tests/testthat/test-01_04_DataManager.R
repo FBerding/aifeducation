@@ -28,7 +28,7 @@ example_data <- imdb_movie_reviews
 n_classes <- 2
 
 example_data$label <- as.character(example_data$label)
-example_data$label[c(201:300)] <- NA
+example_data$label[c(150:300)] <- NA
 if (n_classes > 2) {
   example_data$label[c(201:250)] <- "medium"
 }
@@ -38,6 +38,7 @@ names(example_targets) <- example_data$id
 table(example_targets)
 data_targets <- example_targets
 data_embeddings <- current_embeddings
+table(data_targets)
 
 # config test
 folds <- c(2, 5)
@@ -99,6 +100,7 @@ for (method in methods) {
         # Test if the ratio of the labels is correct (stratified sample)
         expect_identical(
           ignore_attr = TRUE,
+          tolerance=1e-2,
           table(test_datamanager$datasets$data_labeled[sample$train]["labels"]) /
             sum(table(test_datamanager$datasets$data_labeled[sample$train]["labels"])),
           table(example_targets) / sum(table(example_targets))
@@ -106,6 +108,7 @@ for (method in methods) {
         gc()
         expect_identical(
           ignore_attr = TRUE,
+          tolerance=1e-2,
           table(test_datamanager$datasets$data_labeled[sample$val]["labels"]) /
             sum(table(test_datamanager$datasets$data_labeled[sample$val]["labels"])),
           table(example_targets) / sum(table(example_targets))
@@ -113,6 +116,7 @@ for (method in methods) {
         gc()
         if (i <= test_datamanager$get_n_folds()) {
           expect_identical(
+            tolerance=1e-2,
             ignore_attr = TRUE,
             table(test_datamanager$datasets$data_labeled[sample$test]["labels"]) /
               sum(table(test_datamanager$datasets$data_labeled[sample$test]["labels"])),

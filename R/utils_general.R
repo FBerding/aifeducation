@@ -248,6 +248,14 @@ create_object=function(class){
     return(TEClassifierProtoNet$new())
   } else if(class=="TEFeatureExtractor"){
     return(TEFeatureExtractor$new())
+  }  else if (class == "TextEmbeddingModel") {
+    return(TextEmbeddingModel$new())
+  } else if (class == "LargeDataSetForTextEmbeddings") {
+   return(LargeDataSetForTextEmbeddings$new())
+  } else if (class == "LargeDataSetForText") {
+    return(LargeDataSetForText$new())
+  } else if (class == "EmbeddedText") {
+    return(EmbeddedText$new())
   }
 }
 

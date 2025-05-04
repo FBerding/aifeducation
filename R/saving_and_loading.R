@@ -80,25 +80,11 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
+  #load config
   loaded_config <- load_R_config_state(dir_path)
 
-  if (loaded_config$class == "TEClassifierRegular") {
-    model <- TEClassifierRegular$new()
-  } else if (loaded_config$class == "TEClassifierProtoNet") {
-    model <- TEClassifierProtoNet$new()
-  } else if (loaded_config$class == "TEFeatureExtractor") {
-    model <- TEFeatureExtractor$new()
-  } else if (loaded_config$class == "TextEmbeddingModel") {
-    model <- TextEmbeddingModel$new()
-  } else if (loaded_config$class == "LargeDataSetForTextEmbeddings") {
-    model <- LargeDataSetForTextEmbeddings$new()
-  } else if (loaded_config$class == "LargeDataSetForText") {
-    model <- LargeDataSetForText$new()
-  } else if (loaded_config$class == "EmbeddedText") {
-    model <- EmbeddedText$new()
-  } else {
-    stop("Class type not supported.")
-  }
+  #Create object
+  model<-create_object(loaded_config$class)
 
   # load and update model
   model$load_from_disk(dir_path = dir_path)
