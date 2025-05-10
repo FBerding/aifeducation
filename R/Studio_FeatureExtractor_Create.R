@@ -29,12 +29,6 @@ FeatureExtractors_Create_UI <- function(id) {
       sidebar = bslib::sidebar(
         position = "left",
         shiny::tags$h3("Control Panel"),
-        shinyFiles::shinyDirButton(
-          id = shiny::NS(id, "button_select_dataset_for_embeddings"),
-          label = "Choose Embeddings",
-          title = "Please choose a folder",
-          icon = shiny::icon("folder-open")
-        ),
         shiny::tags$hr(),
         shiny::textInput(
           inputId = shiny::NS(id, "label"),
@@ -55,9 +49,16 @@ FeatureExtractors_Create_UI <- function(id) {
         bslib::card(
           bslib::card_header("Input Data"),
           bslib::card_body(
+            shinyFiles::shinyDirButton(
+              id = shiny::NS(id, "button_select_dataset_for_embeddings"),
+              label = "Choose Embeddings",
+              title = "Please choose a folder",
+              icon = shiny::icon("folder-open")
+            ),
             shiny::textInput(
               inputId = shiny::NS(id, "embeddings_dir"),
-              label = shiny::tags$p(shiny::icon("folder"), "Path")
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width="100%"
             ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
           )

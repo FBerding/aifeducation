@@ -1241,6 +1241,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         )
       )
       reticulate::py_run_file(
+        system.file("python/pytorch_te_protonet.py",
+                    package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
         system.file("python/pytorch_autoencoder.py",
                     package = "aifeducation"
         )

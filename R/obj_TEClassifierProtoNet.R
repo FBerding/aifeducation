@@ -38,7 +38,7 @@
 #' @family Classification
 #' @export
 TEClassifierProtoNet <- R6::R6Class(
-  classname = "TextEmbeddingClassifiersProtoNet",
+  classname = "TEClassifierProtoNet",
   inherit = TEClassifiersBasedOnProtoNet,
   public = list(
     # New-----------------------------------------------------------------------
@@ -191,3 +191,6 @@ TEClassifierProtoNet <- R6::R6Class(
     }
   )
 )
+
+#Add Classifier to central index
+TEClassifiers_class_names<-append(x=TEClassifiers_class_names,values = "TEClassifierProtoNet")

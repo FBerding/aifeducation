@@ -75,7 +75,6 @@ pooling_type_list <- list(
 max_layers <- 1:2
 
 # Start tests--------------------------------------------------------------------
-
 for (framework in ml_frameworks) {
   for (base_model in base_model_list[[framework]]) {
 

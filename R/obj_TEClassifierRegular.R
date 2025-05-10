@@ -186,3 +186,6 @@ TEClassifierRegular <- R6::R6Class(
     }
   )
 )
+
+#Add Classifier to central index
+TEClassifiers_class_names<-append(x=TEClassifiers_class_names,values = "TEClassifierRegular")

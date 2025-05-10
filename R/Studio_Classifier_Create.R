@@ -29,29 +29,16 @@ Classifiers_Create_UI <- function(id) {
       sidebar = bslib::sidebar(
         position = "left",
         shiny::tags$h3("Control Panel"),
-        shinyFiles::shinyDirButton(
-          id = shiny::NS(id, "button_select_dataset_for_embeddings"),
-          label = "Choose Embeddings",
-          title = "Please choose a folder",
-          icon = shiny::icon("folder-open")
-        ),
-        shinyFiles::shinyFilesButton(
-          id = shiny::NS(id, "button_select_target_data"),
-          multiple = FALSE,
-          label = "Choose Target Data",
-          title = "Please choose a file",
-          icon = shiny::icon("file")
-        ),
         shiny::tags$hr(),
+        shiny::selectInput(
+          inputId = shiny::NS(id, "classifier_type"),
+          choices = get_TEClassifiers_class_names("ClassifiersBasedOnTextEmbeddings"),
+          label = "Classifier Type"
+        ),
         shiny::textInput(
           inputId = shiny::NS(id, "label"),
           label = "Model Label",
           width = "100%"
-        ),
-        shiny::selectInput(
-          inputId = shiny::NS(id, "classifier_type"),
-          choices = c("TEClassifierRegular", "TEClassifierProtoNet"),
-          label = "Classifier Type"
         ),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "start_SaveModal"),
@@ -77,9 +64,16 @@ Classifiers_Create_UI <- function(id) {
         bslib::card(
           bslib::card_header("Input Data"),
           bslib::card_body(
+            shinyFiles::shinyDirButton(
+              id = shiny::NS(id, "button_select_dataset_for_embeddings"),
+              label = "Choose Embeddings",
+              title = "Please choose a folder",
+              icon = shiny::icon("folder-open")
+            ),
             shiny::textInput(
               inputId = shiny::NS(id, "embeddings_dir"),
-              label = shiny::tags$p(shiny::icon("folder"), "Path")
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width="100%"
             ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
           )
@@ -87,9 +81,17 @@ Classifiers_Create_UI <- function(id) {
         bslib::card(
           bslib::card_header("Target Data"),
           bslib::card_body(
+            shinyFiles::shinyFilesButton(
+              id = shiny::NS(id, "button_select_target_data"),
+              multiple = FALSE,
+              label = "Choose Target Data",
+              title = "Please choose a file",
+              icon = shiny::icon("file")
+            ),
             shiny::textInput(
               inputId = shiny::NS(id, "target_dir"),
-              label = shiny::tags$p(shiny::icon("folder"), "Path")
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width="100%"
             ),
             bslib::layout_column_wrap(
               shiny::uiOutput(outputId = shiny::NS(id, "summary_data_targets")),

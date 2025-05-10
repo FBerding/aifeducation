@@ -38,13 +38,13 @@ Other Classification:
 }
 \concept{Classification}
 \section{Super classes}{
-\code{\link[aifeducation:AIFEBaseModel]{aifeducation::AIFEBaseModel}} -> \code{\link[aifeducation:ModelsBasedOnTextEmbeddings]{aifeducation::ModelsBasedOnTextEmbeddings}} -> \code{\link[aifeducation:ClassifiersBasedOnTextEmbeddings]{aifeducation::ClassifiersBasedOnTextEmbeddings}} -> \code{\link[aifeducation:TEClassifiersBasedOnProtoNet]{aifeducation::TEClassifiersBasedOnProtoNet}} -> \code{TextEmbeddingClassifiersProtoNet}
+\code{\link[aifeducation:AIFEBaseModel]{aifeducation::AIFEBaseModel}} -> \code{\link[aifeducation:ModelsBasedOnTextEmbeddings]{aifeducation::ModelsBasedOnTextEmbeddings}} -> \code{\link[aifeducation:ClassifiersBasedOnTextEmbeddings]{aifeducation::ClassifiersBasedOnTextEmbeddings}} -> \code{\link[aifeducation:TEClassifiersBasedOnProtoNet]{aifeducation::TEClassifiersBasedOnProtoNet}} -> \code{TEClassifierProtoNet}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-TextEmbeddingClassifiersProtoNet-configure}{\code{TEClassifierProtoNet$configure()}}
-\item \href{#method-TextEmbeddingClassifiersProtoNet-clone}{\code{TEClassifierProtoNet$clone()}}
+\item \href{#method-TEClassifierProtoNet-configure}{\code{TEClassifierProtoNet$configure()}}
+\item \href{#method-TEClassifierProtoNet-clone}{\code{TEClassifierProtoNet$clone()}}
 }
 }
 \if{html}{\out{
@@ -83,8 +83,8 @@ Other Classification:
 </details>
 }}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingClassifiersProtoNet-configure"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifiersProtoNet-configure}{}}}
+\if{html}{\out{<a id="method-TEClassifierProtoNet-configure"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-configure}{}}}
 \subsection{Method \code{configure()}}{
 Creating a new instance of this class.
 \subsection{Usage}{
@@ -145,7 +145,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
-\item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the text embedding. Allowed values: \code{1 <= x }}
+\item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the embedding. Allowed values: \code{2 <= x }}
 
 \item{\code{self_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
 
@@ -176,8 +176,8 @@ values for a case for different input orders if you choose \code{fourier} on lin
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingClassifiersProtoNet-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingClassifiersProtoNet-clone}{}}}
+\if{html}{\out{<a id="method-TEClassifierProtoNet-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

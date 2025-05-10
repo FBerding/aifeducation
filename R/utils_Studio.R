@@ -1292,6 +1292,7 @@ summarize_args_for_long_task <- function(input,
                                          method = "configure",
                                          path_args = list(
                                            path_to_embeddings = NULL,
+                                           path_to_textual_dataset=NULL,
                                            path_to_target_data = NULL,
                                            path_to_feature_extractor = NULL,
                                            destination_path = NULL,
@@ -1389,6 +1390,10 @@ add_missing_args <- function(args, path_args, meta_args) {
           file_path = path_args$path_to_target_data,
           selectet_column = meta_args$target_data_column
         )
+      )
+    } else if (max(c("EmbeddedText","LargeDataSetForText") %in% current_param$type)){
+      complete_args[param] <- list(
+        load_from_disk(path_args$path_to_textual_dataset)
       )
     }
   }
