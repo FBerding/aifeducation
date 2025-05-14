@@ -468,12 +468,13 @@ get_stratified_train_test_split <- function(targets, val_size = 0.25) {
 #' @param text_embeddings `data.frame` or `array` containing the text embeddings.
 #' @param features `int` Number of features within each sequence.
 #' @param times `int` Number of sequences.
+#' @param pad_value `r get_param_doc_desc("pad_value")`
 #' @return Named`vector` of integers representing the number of chunks/sequences for every case.
 #'
 #' @family data_management_utils
 #'
 #' @export
-get_n_chunks <- function(text_embeddings, features, times) {
+get_n_chunks <- function(text_embeddings, features, times,pad_value=-100) {
   n_chunks <- vector(length = nrow(text_embeddings))
   n_chunks[] <- 0
 
@@ -482,19 +483,17 @@ get_n_chunks <- function(text_embeddings, features, times) {
       window <- c(1:features) + (i - 1) * features
       sub_matrix <- text_embeddings[, window, drop = FALSE]
       tmp_sums <- rowSums(abs(sub_matrix))
-      n_chunks <- n_chunks + as.numeric(!tmp_sums == 0)
+      n_chunks <- n_chunks + as.numeric(!tmp_sums == times*pad_value)
     }
   } else if (length(dim(text_embeddings)) == 3) {
     for (i in 1:times) {
       sub_matrix <- text_embeddings[, i, , drop = FALSE]
       tmp_sums <- rowSums(abs(sub_matrix))
-      n_chunks <- n_chunks + as.numeric(!tmp_sums == 0)
+      n_chunks <- n_chunks + as.numeric(!tmp_sums == features*pad_value)
     }
   } else {
     stop("Dimensionality of text_embeddings must be 2 (matrix) or 3 (array).")
   }
-
-
   names(n_chunks) <- rownames(text_embeddings)
   return(n_chunks)
 }

@@ -48,6 +48,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
+    #' @note This model requires `pad_value=0`. If this condition is not met the
+    #' padding value is switched automatically.
     #' @return Returns an object of class [TEFeatureExtractor] which is ready for training.
     configure = function(name = NULL,
                          label = NULL,
@@ -57,7 +59,6 @@ TEFeatureExtractor <- R6::R6Class(
                          noise_factor = 0.2,
                          optimizer = "adamw") {
       args=get_called_args(n=1)
-
       private$check_config_for_FALSE()
 
       #Check arguments
@@ -69,7 +70,8 @@ TEFeatureExtractor <- R6::R6Class(
         model_info = args$text_embeddings$get_model_info(),
         feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
         times = args$text_embeddings$get_times(),
-        features = args$text_embeddings$get_features()
+        features = args$text_embeddings$get_features(),
+        pad_value=args$text_embeddings$get_pad_value()
       )
 
       #save arguments
@@ -135,6 +137,8 @@ TEFeatureExtractor <- R6::R6Class(
     #'   the console. \code{ml_trace=1} prints a progress bar.
     #' @param lr_rate `double` Initial learning rate for the training.
     #' @param lr_warm_up_ratio `double` Number of epochs used for warm up.
+    #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
+    #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
     train = function(data_embeddings=NULL,
                      data_val_size = 0.25,
@@ -327,6 +331,7 @@ TEFeatureExtractor <- R6::R6Class(
         param_emb_layer_max = model_info$model$param_emb_layer_max,
         param_emb_pool_type = model_info$model$param_emb_pool_type,
         param_aggregation = model_info$model$param_aggregation,
+        param_pad_value=private$text_embedding_model$pad_value,
         embeddings = reduced_embeddings
       )
 
@@ -389,7 +394,8 @@ TEFeatureExtractor <- R6::R6Class(
             param_emb_layer_min = model_info$model$param_emb_layer_min,
             param_emb_layer_max = model_info$model$param_emb_layer_max,
             param_emb_pool_type = model_info$model$param_emb_pool_type,
-            param_aggregation = model_info$model$param_aggregation
+            param_aggregation = model_info$model$param_aggregation,
+            param_pad_value=private$text_embedding_model$pad_value
           )
           embedded_texts_large$add_feature_extractor_info(
             model_name = private$model_info$model_name,
@@ -457,13 +463,15 @@ TEFeatureExtractor <- R6::R6Class(
           times = as.integer(private$text_embedding_model["times"]),
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(self$model_config$features),
-          noise_factor = self$model_config$noise_factor
+          noise_factor = self$model_config$noise_factor,
+          pad_value=private$text_embedding_model$pad_value
         )
       } else if (self$model_config$method == "dense") {
         self$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(self$model_config$features),
-          noise_factor = self$model_config$noise_factor
+          noise_factor = self$model_config$noise_factor,
+          pad_value=private$text_embedding_model$pad_value
         )
       }
     },

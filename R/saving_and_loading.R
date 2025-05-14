@@ -40,7 +40,8 @@ save_to_disk <- function(object,
       "TextEmbeddingModel",
       "LargeDataSetForTextEmbeddings",
       "LargeDataSetForText",
-      "EmbeddedText"
+      "EmbeddedText",
+      ".AIFEBaseTransformer"
     ),
     FALSE
   )
@@ -57,15 +58,19 @@ save_to_disk <- function(object,
   create_dir(dir_path, FALSE)
   create_dir(save_location, FALSE)
 
-  # Create config and save to disk
-  config_file <- create_config_state(object)
-  save(config_file, file = path_r_config_state)
+  if(!".AIFEBaseTransformer"%in%class(object)){
+    # Create config and save to disk
+    config_file <- create_config_state(object)
+    save(config_file, file = path_r_config_state)
 
-  # Save Python objects and additional files
-  object$save(
-    dir_path = dir_path,
-    folder_name = folder_name
-  )
+    # Save Python objects and additional files
+    object$save(
+      dir_path = dir_path,
+      folder_name = folder_name
+    )
+  } else {
+
+  }
 }
 
 
@@ -80,15 +85,21 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
-  #load config
-  loaded_config <- load_R_config_state(dir_path)
+  #Case for all native ai for education models
+  if(file.exists(paste0(dir_path, "/r_config_state.rda"))){
+    #load config
+    loaded_config <- load_R_config_state(dir_path)
 
-  #Create object
-  model<-create_object(loaded_config$class)
+    #Create object
+    model<-create_object(loaded_config$class)
 
-  # load and update model
-  model$load_from_disk(dir_path = dir_path)
-  return(model)
+    # load and update model
+    model$load_from_disk(dir_path = dir_path)
+    return(model)
+  } else {
+    #Case for base models
+
+  }
 }
 
 

@@ -78,6 +78,8 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     # Type of pooling tokens embeddings within each layer.
     param_emb_pool_type = NA,
 
+    # Value used for indicating padding.
+    param_pad_value=NA,
 
     # Aggregation method of the hidden states. Deprecated. Included for backward compatibility.
     param_aggregation = NA,
@@ -98,6 +100,48 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       if (private$configured == FALSE) {
         stop("The object is not configured. Please call the method configure.")
       }
+    },
+
+    #-------------------------------------------------------------------------
+    # This Method updates the model config in the case that new parameters have been
+    # introduced
+    update_model_config = function() {
+      current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
+      if (is.na(current_pkg_version)) {
+        update <- TRUE
+      } else {
+        if (check_versions(
+          a = packageVersion("aifeducation"),
+          operator = ">",
+          b = self$get_package_versions()$r_package_versions$aifeducation
+        )) {
+          update <- TRUE
+        } else {
+          update <- FALSE
+        }
+      }
+
+      if (update) {
+        param_dict <- get_param_dict()
+        if (is.function(self$configure)) {
+          param_names_new <- rlang::fn_fmls_names(self$configure)
+          for (param in param_names_new) {
+            if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
+              if (is.null(private[[param]])) {
+                if (!is.null(param_dict[[param]]$default_historic)) {
+                  private[param] <- list(param_dict[[param]]$default_historic)
+                } else {
+                  stop(paste("Historic default for", param, "is missing in parameter dictionary."))
+                }
+              }
+            }
+          }
+          # Update Package version for the model
+          private$r_package_versions$aifeducation <- packageVersion("aifeducation")
+        } else {
+          warning("Class does not have a method `configure`.")
+        }
+      }
     }
   ),
   public = list(
@@ -114,13 +158,12 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     #' @param param_features `int` Number of dimensions of the text embeddings.
     #' @param param_overlap `int` Number of tokens that were added at the beginning of the sequence for the next chunk
     #'   by this model.
-    #'
     #' @param param_emb_layer_min `int` or `string` determining the first layer to be included in the creation of
     #'   embeddings.
     #' @param param_emb_layer_max `int` or `string` determining the last layer to be included in the creation of
     #'   embeddings.
     #' @param param_emb_pool_type `string` determining the method for pooling the token embeddings within each layer.
-    #'
+    #' @param param_pad_value `r get_param_doc_desc("param_pad_value")`
     #' @param param_aggregation `string` Aggregation method of the hidden states. Deprecated. Only included for backward
     #'   compatibility.
     #' @return The method returns a new object of this class.
@@ -137,6 +180,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
                          param_emb_layer_min = NULL,
                          param_emb_layer_max = NULL,
                          param_emb_pool_type = NULL,
+                         param_pad_value=-100,
                          param_aggregation = NULL) {
       private$model_name <- model_name
       private$model_label <- model_label
@@ -149,6 +193,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
 
       private$param_features <- param_features
       private$param_chunks <- param_chunks
+      private$param_pad_value=param_pad_value
 
       private$param_emb_layer_min <- param_emb_layer_min
       private$param_emb_layer_max <- param_emb_layer_max
@@ -190,7 +235,8 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         param_emb_layer_min = private$param_emb_layer_min,
         param_emb_layer_max = private$param_emb_layer_max,
         param_emb_pool_type = private$param_emb_pool_type,
-        param_aggregation = private$param_aggregation
+        param_aggregation = private$param_aggregation,
+        param_pad_value=private$param_pad_value
       )
       return(tmp)
     },
@@ -225,8 +271,12 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         param_emb_layer_min = config_file$private$param_emb_layer_min,
         param_emb_layer_max = config_file$private$param_emb_layer_max,
         param_emb_pool_type = config_file$private$param_emb_pool_type,
-        param_aggregation = config_file$private$param_aggregation
+        param_aggregation = config_file$private$param_aggregation,
+        param_pad_value=config_file$private$param_pad_value
       )
+
+      #Update model configuration if necessary
+      private$update_model_config()
 
       # Check for feature extractor and add information
       if (is.null_or_na(config_file$private$feature_extractor$model_name) == FALSE) {
@@ -327,6 +377,13 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       return(private$param_features)
     },
 
+    #-------------------------------------------------------------------------
+    #' @description Value for indicating padding.
+    #' @return Returns an `int` describing the value used for padding.
+    get_pad_value=function(){
+      return(private$param_pad_value)
+    },
+
     #--------------------------------------------------------------------------
     #' @description Method for adding new data to the data set from an `array`. Please note that the method does not
     #'   check if cases already exist in the data set. To reduce the data set to unique cases call the method
@@ -361,7 +418,8 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         length = get_n_chunks(
           text_embeddings = embedding_array,
           features = self$get_features(),
-          times = self$get_times()
+          times = self$get_times(),
+          pad_value=self$get_pad_value()
         )
       )
       # Create new dataset
@@ -412,7 +470,8 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         length = get_n_chunks(
           text_embeddings = embedding_array,
           features = self$get_features(),
-          times = self$get_times()
+          times = self$get_times(),
+          pad_value=self$get_pad_value()
         )
       )
       # Create new dataset
@@ -470,7 +529,8 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         param_emb_layer_max = private$param_emb_layer_max,
         param_emb_pool_type = private$param_emb_pool_type,
         param_aggregation = private$param_aggregation,
-        embeddings = py_dataset_to_embeddings(self$get_dataset())
+        embeddings = py_dataset_to_embeddings(self$get_dataset()),
+        param_pad_value=private$param_pad_value
       )
 
       if (self$is_compressed() == TRUE) {

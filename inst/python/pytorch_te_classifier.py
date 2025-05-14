@@ -18,6 +18,24 @@ import numpy as np
 import math
 import safetensors
 
+
+class layer_switch_pad_values(torch.nn.Module):
+  def __init__(self,pad_value_old,pad_value_new):
+    super().__init__()
+    self.pad_value_old=pad_value_old
+    self.pad_value_new=pad_value_new
+  def forward(self,x):
+    features=x.size(2)
+    time_sums=torch.sum(x,dim=2)
+    mask=(time_sums==features*self.pad_value_old)
+    
+    mask=torch.reshape(torch.repeat_interleave(mask,repeats=features,dim=1),(x.size(dim=0),x.size(dim=1),features))
+    
+    y=torch.clone(x)
+    y[mask]=self.pad_value_new
+    z=torch.where(condition=mask, input=y, other=y)
+    return z
+
 class LayerNorm_with_Mask_PT(torch.nn.Module):
     def __init__(self, features,eps=1e-5):
       super().__init__()
@@ -290,12 +308,15 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
 class TextEmbeddingClassifier_PT(torch.nn.Module):
   def __init__(self,features, times, dense_size,dense_layers,rec_size,rec_layers, rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
-  add_pos_embedding, self_attention_heads, target_levels,classification_head=True,bias=True,parametrizations="None",act_fct="elu"):
+  add_pos_embedding, self_attention_heads, target_levels,pad_value,classification_head=True,bias=True,parametrizations="None",act_fct="elu"):
     
     super().__init__()
     
     self.n_target_levels=len(target_levels)
     layer_list=torch.nn.ModuleDict()
+    
+    if not pad_value==0:
+      layer_list.update({"standardize_pad_values":layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)})
     
     current_size=features
     if rec_layers>0 or repeat_encoder>0:

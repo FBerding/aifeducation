@@ -20,6 +20,8 @@ editor_options:
 **Ai for Education Studio**
 
 - Fixed a bug that prevented classifiers with applied pseudo labeling to visualize training history.
+- Re-created the user interface for classifiers, FeatureExtractor, and base models. Now the user interfaces
+  generates the necessary control widgets for configuration and training automatically depending on the method's arguments. 
 
 **TextEmbeddingModel**
 

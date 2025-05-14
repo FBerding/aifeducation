@@ -480,6 +480,52 @@ load_and_check_embeddings <- function(dir_path) {
   }
 }
 
+load_and_check_dataset_raw_texts <- function(dir_path) {
+  if (!is.null(dir_path)) {
+    if (file.exists(dir_path) == TRUE) {
+      display_processing(
+        title = "Working. Please wait.",
+        size = "l",
+        easy_close = FALSE,
+        message = ""
+      )
+      # Wait for modal
+      Sys.sleep(1)
+      data_set_raw_text <- load_from_disk(dir_path)
+      if ("LargeDataSetForText" %in% class(data_set_raw_text)) {
+        shiny::removeModal()
+        return(data_set_raw_text)
+      } else {
+        shiny::removeModal()
+        display_errors(
+          title = "Error",
+          size = "l",
+          easy_close = TRUE,
+          error_messages = "The file contains data in an unsupported format.
+              A data set for raw texts must be of class 'LargeDataSetForText'. Please
+              check data. A data set for raw texts should always be created via data
+              preparation of this user interfache or with the corresponding
+              method of the LargeDataSetForText."
+        )
+        rm(data_set_raw_text)
+        gc()
+        return(NULL)
+      }
+    } else {
+      shiny::removeModal()
+      display_errors(
+        title = "Error",
+        size = "l",
+        easy_close = TRUE,
+        error_messages = "The file does not exist on the path."
+      )
+      return(NULL)
+    }
+  } else {
+    return(NULL)
+  }
+}
+
 #' @title Load and check target data
 #' @description Function for checking and loading target data in AI for Education - Studio.
 #'
@@ -885,7 +931,24 @@ create_data_embeddings_description <- function(embeddings) {
       colnames = FALSE
     )
   )
+  return(ui)
+}
 
+create_data_raw_texts_description <- function(data_set_for_raw_texts) {
+  ui <- bslib::value_box(
+      value = data_set_for_raw_texts$n_rows(),
+      title = "Number of Cases",
+      showcase = shiny::icon("list")
+    )
+  return(ui)
+}
+
+create_data_base_model_description <- function(base_model) {
+  ui <- bslib::value_box(
+    value = detect_base_model_type(base_model),
+    title = "Number of Cases",
+    showcase = shiny::icon("list")
+  )
   return(ui)
 }
 
@@ -1228,9 +1291,9 @@ create_widget_card <- function(id,
       bslib::card(
         bslib::card_header(names(tmp_boxes)[i]),
         bslib::card_body(
-          bslib::layout_column_wrap(
+          #bslib::layout_column_wrap(
             tmp_boxes[[i]]
-          )
+          #)
         )
       )
     )
@@ -1329,6 +1392,9 @@ summarize_args_for_long_task <- function(input,
   # Do type adjustments
   if ("lr_rate" %in% params) {
     param_list["lr_rate"] <- list(as.numeric(param_list[["lr_rate"]]))
+  }
+  if ("learning_rate" %in%params) {
+    param_list["learning_rate"] <- list(as.numeric(param_list[["learning_rate"]]))
   }
 
   # Override params but only if the argument to override exists

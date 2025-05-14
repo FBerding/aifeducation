@@ -92,6 +92,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       # which are missing in the old model
       private$update_model_config()
 
+      #Check and update pad value if necessary
+      private$update_pad_value()
+
       # Create and load AI model
       private$create_reset_model()
       self$load(dir_path = dir_path)
@@ -112,7 +115,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         model_info = config_private$text_embedding_model$model,
         feature_extractor_info = config_private$text_embedding_model$feature_extractor,
         times = config_private$text_embedding_model$times,
-        features = config_private$text_embedding_model$features
+        features = config_private$text_embedding_model$features,
+        pad_value=config_private$text_embedding_model$pad_value
       )
     },
     #---------------------------------------------------------------------------
@@ -231,11 +235,13 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     set_text_embedding_model = function(model_info,
                                         feature_extractor_info,
                                         times,
-                                        features) {
+                                        features,
+                                        pad_value) {
       private$text_embedding_model["model"] <- list(model_info)
       private$text_embedding_model["feature_extractor"] <- feature_extractor_info
       private$text_embedding_model["times"] <- times
       private$text_embedding_model["features"] <- features
+      private$text_embedding_model["pad_value"] <- pad_value
     },
     save_all_args = function(args, group = "training") {
       if (group %in% c("configure", "training")) {
@@ -303,6 +309,29 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           private$r_package_versions$aifeducation <- packageVersion("aifeducation")
         } else {
           warning("Class does not have a method `configure`.")
+        }
+      }
+    },
+    #-------------------------------------------------------------------------
+    update_pad_value=function(){
+      current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
+      if (is.na(current_pkg_version)) {
+        update <- TRUE
+      } else {
+        if (check_versions(
+          a = packageVersion("aifeducation"),
+          operator = ">",
+          b = self$get_package_versions()$r_package_versions$aifeducation
+        )) {
+          update <- TRUE
+        } else {
+          update <- FALSE
+        }
+      }
+
+      if (update) {
+        if(is.null_or_na(private$text_embedding_model["pad_value"])){
+          private$text_embedding_model["pad_value"] <- 0
         }
       }
     },

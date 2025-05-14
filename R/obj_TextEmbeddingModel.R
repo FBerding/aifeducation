@@ -26,6 +26,7 @@ TextEmbeddingModel <- R6::R6Class(
     # Variable for checking if the object is successfully configured. Only is
     # this is TRUE the object can be used
     configured = FALSE,
+    pad_value=NA,
     r_package_versions = list(
       aifeducation = NA,
       reticulate = NA
@@ -139,10 +140,8 @@ TextEmbeddingModel <- R6::R6Class(
     set_package_versions = function() {
       private$r_package_versions$aifeducation <- packageVersion("aifeducation")
       private$r_package_versions$reticulate <- packageVersion("reticulate")
-
       if (!is.null_or_na(private$ml_framework)) {
         private$py_package_versions$torch <- torch["__version__"]
-
         private$py_package_versions$numpy <- np$version$short_version
       }
     },
@@ -478,6 +477,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' within each layer. If `"cls"` only the embedding of the CLS token is used. If
     #' `"average"` the token embedding of all tokens are averaged (excluding padding tokens).
     #' `"cls` is not supported for `method="funnel"`.
+    #' @param pad_value `r get_param_doc_desc("pad_value")`
     #' @param model_dir `string` path to the directory where the
     #' BERT model is stored.
     #' @param trace `bool` `TRUE` prints information about the progress.
@@ -496,6 +496,7 @@ TextEmbeddingModel <- R6::R6Class(
                          emb_layer_min = "middle",
                          emb_layer_max = "2_3_layer",
                          emb_pool_type = "average",
+                         pad_value=-100,
                          model_dir = NULL,
                          trace = FALSE) {
       # Check if configuration is already set----------------------------------
@@ -512,7 +513,7 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(object=model_label, type ="string", FALSE)
       check_type(object=model_language, type ="string", FALSE)
       check_type(object=max_length, type ="int", FALSE)
-
+      check_type(object=pad_value, type ="int", FALSE)
 
       check_type(object=chunks, type ="int", FALSE)
       if (chunks < 2) {
@@ -523,6 +524,9 @@ TextEmbeddingModel <- R6::R6Class(
       # emb_layer_max
       # emb_pool_type
       check_type(object=model_dir, type ="string", FALSE)
+
+      #Set pad value
+      private$pad_value=pad_value
 
       # Set model info
       private$set_model_info(
@@ -587,6 +591,13 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Load R file
       config_file <- load_R_config_state(dir_path)
+
+      #Set pad value or set historic default if this value is missing
+      if(is.null_or_na(config_file$private$pad_value)){
+        private$pad_value=0
+      } else {
+        private$pad_value=config_file$private$pad_value
+      }
 
       # Set basic configuration
       private$basic_components <- list(
@@ -998,7 +1009,7 @@ TextEmbeddingModel <- R6::R6Class(
         )
 
         text_embedding <- array(
-          data = 0,
+          data = private$pad_value,
           dim = c(
             length(batch),
             private$transformer_components$chunks,
@@ -1047,7 +1058,6 @@ TextEmbeddingModel <- R6::R6Class(
             ))
           }
         }
-
 
         # Sorting the hidden states to the corresponding cases and times
         # If more than one layer is selected the mean is calculated
@@ -1105,8 +1115,6 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Summarizing the results over all batches
       text_embedding <- array_form_bind(batch_results)
-
-
 
       embeddings <- EmbeddedText$new()
       embeddings$configure(
@@ -1207,7 +1215,8 @@ TextEmbeddingModel <- R6::R6Class(
             param_emb_layer_min = private$transformer_components$emb_layer_min,
             param_emb_layer_max = private$transformer_components$emb_layer_max,
             param_emb_pool_type = private$transformer_components$emb_pool_type,
-            param_aggregation = NA
+            param_aggregation = NA,
+            param_pad_value=private$pad_value
           )
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
@@ -1516,6 +1525,12 @@ TextEmbeddingModel <- R6::R6Class(
     #' for the classifier.
     get_ml_framework = function() {
       return(private$transformer_components$ml_framework)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Value for indicating padding.
+    #' @return Returns an `int` describing the value used for padding.
+    get_pad_value=function(){
+      return(private$pad_value)
     },
     #---------------------------------------------------------------------------
     #' @description Method for counting the trainable parameters of a model.

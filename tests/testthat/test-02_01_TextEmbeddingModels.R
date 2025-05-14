@@ -85,6 +85,9 @@ for (framework in ml_frameworks) {
       base_model
     )
 
+    # get a random value for padding
+    random_padding_value=sample(x=seq(from=-200,to=0,by=10),size = 1)
+
     test_that(paste(framework, base_model, "Detection of model type"), {
       text_embedding_model <- TextEmbeddingModel$new()
       text_embedding_model$configure(
@@ -98,7 +101,8 @@ for (framework in ml_frameworks) {
         emb_layer_min = 1,
         emb_layer_max = 1,
         emb_pool_type = "cls",
-        model_dir = model_path
+        model_dir = model_path,
+        pad_value=random_padding_value
       )
 
       expect_equal(text_embedding_model$get_basic_components()$method,base_model)
@@ -266,6 +270,7 @@ for (framework in ml_frameworks) {
             expect_s3_class(embeddings, class = "EmbeddedText")
             expect_false(embeddings$is_compressed())
             expect_equal(embeddings$n_rows(), 10)
+            expect_equal(embeddings$get_pad_value(),random_padding_value)
 
             # Check if embeddings are array with 3 dimensions
             expect_equal(length(dim(embeddings$embeddings)), 3)
@@ -292,7 +297,7 @@ for (framework in ml_frameworks) {
             }
 
             # Check embedding in LargeDataSetForTextEmbeddings
-            embeddings_large <- text_embedding_model$embed(
+            embeddings_large <- text_embedding_model$embed_large(
               raw_text = example_data$text[1:10],
               doc_id = example_data$id[1:10],
               batch_size = 5,
@@ -303,6 +308,7 @@ for (framework in ml_frameworks) {
               embeddings_large$convert_to_EmbeddedText()$embeddings,
               tolerance = 1e-6
             )
+            expect_equal(embeddings_large$get_pad_value(),random_padding_value)
           })
 
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {
@@ -322,6 +328,7 @@ for (framework in ml_frameworks) {
             expect_s3_class(embeddings, class = "LargeDataSetForTextEmbeddings")
             expect_false(embeddings$is_compressed())
             expect_equal(embeddings$n_rows(), nrow(example_data))
+            expect_equal(embeddings$get_pad_value(),random_padding_value)
           })
 
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed_large with log"), {

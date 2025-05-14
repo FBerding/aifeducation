@@ -60,13 +60,13 @@ for (method in methods) {
       sc_min_k = 1,
       sc_max_k = 10,
       trace = FALSE,
-      n_cores = 2
+      n_cores = 2,
+      pad_value = -100
     )
 
     test_that(paste("DataManager - check for unlabeled data"), {
       expect_true(test_datamanager$contains_unlabeled_data())
     })
-
 
     for (i in 1:(test_datamanager$get_n_folds() + 1)) {
       sample <- test_datamanager$get_samples()[[i]]

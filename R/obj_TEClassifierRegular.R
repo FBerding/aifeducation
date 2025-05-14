@@ -60,6 +60,8 @@ TEClassifierRegular <- R6::R6Class(
     #' @param dense_dropout `r get_param_doc_desc("dense_dropout")`
     #' @param rec_dropout `r get_param_doc_desc("rec_dropout")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
+    #' @note This model requires `pad_value=0`. If this condition is not met the
+    #' padding value is switched automatically.
     #' @return Returns an object of class [TEClassifierRegular] which is ready for training.
     configure = function(name = NULL,
                          label = NULL,
@@ -84,7 +86,7 @@ TEClassifierRegular <- R6::R6Class(
                          dense_dropout = 0.4,
                          encoder_dropout = 0.1,
                          optimizer = "adamw") {
-      private$do_configuration(args=get_called_args(n=1))
+       private$do_configuration(args=get_called_args(n=1))
     }
   ),
   #Private---------------------------------------------------------------------
@@ -112,6 +114,7 @@ TEClassifierRegular <- R6::R6Class(
         dense_dropout = self$model_config$dense_dropout,
         rec_dropout = self$model_config$rec_dropout,
         encoder_dropout = self$model_config$encoder_dropout,
+        pad_value=private$text_embedding_model$pad_value,
         add_pos_embedding = self$model_config$add_pos_embedding,
         self_attention_heads = as.integer(self$model_config$self_attention_heads),
         target_levels = self$model_config$target_levels,

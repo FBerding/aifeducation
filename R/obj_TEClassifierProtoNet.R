@@ -27,6 +27,7 @@
 #'   class [EmbeddedText] or [LargeDataSetForTextEmbeddings] has to be used which was created with the same
 #'   [TextEmbeddingModel] as for training.
 #'
+#'
 #' @references Oreshkin, B. N., Rodriguez, P. & Lacoste, A. (2018). TADAM: Task dependent adaptive metric for improved
 #'   few-shot learning. https://doi.org/10.48550/arXiv.1805.10123
 #' @references Snell, J., Swersky, K. & Zemel, R. S. (2017). Prototypical Networks for Few-shot Learning.
@@ -67,6 +68,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param rec_dropout `r get_param_doc_desc("rec_dropout")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
+    #' @note This model requires `pad_value=0`. If this condition is not met the
+    #' padding value is switched automatically.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
@@ -117,6 +120,7 @@ TEClassifierProtoNet <- R6::R6Class(
         rec_dropout = self$model_config$rec_dropout,
         encoder_dropout = self$model_config$encoder_dropout,
         add_pos_embedding = self$model_config$add_pos_embedding,
+        pad_value=private$text_embedding_model$pad_value,
         self_attention_heads = as.integer(self$model_config$self_attention_heads),
         embedding_dim = as.integer(self$model_config$embedding_dim),
         target_levels = reticulate::np_array(seq(from = 0, to = (length(self$model_config$target_levels) - 1))),

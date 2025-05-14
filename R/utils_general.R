@@ -256,6 +256,8 @@ create_object=function(class){
     return(LargeDataSetForText$new())
   } else if (class == "EmbeddedText") {
     return(EmbeddedText$new())
+  } else if(class%in%unlist(AIFETrType)){
+    return(aife_transformer.make(class))
   }
 }
 

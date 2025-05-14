@@ -504,3 +504,62 @@ check_errors_text_embedding_model_create <- function(destination_path,
     return(NULL)
   }
 }
+
+
+check_error_base_model_create_or_train <- function(destination_path,
+                                                   folder_name,
+                                                   path_to_raw_texts) {
+  error_list <- NULL
+
+  # Destination
+  if (!dir.exists(destination_path)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "The target directory does not exist. Please check path."
+    ))
+  }
+
+  if (check_for_empty_input(folder_name)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Folder name is not set."
+    ))
+  }
+
+  if (is.null(path_to_raw_texts)) {
+    path_to_raw_texts <- ""
+  }
+  if (dir.exists(path_to_raw_texts) == FALSE) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Directory which should store the data set with raw texts does not exist."
+    ))
+  } else {
+    raw_texts <- try(load_from_disk(path_to_raw_texts), silent = TRUE)
+    if ("try-error" %in% class(raw_texts)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        raw_texts
+      ))
+    } else if (
+      !("LargeDataSetForText" %in% class(raw_texts))
+    ) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Directory which should store the raw texts does not contain an object of class 'LargeDataSetForText'."
+      ))
+    }
+  }
+
+  if (length(error_list) > 0) {
+    tmp_ui_error <- NULL
+    for (i in seq_len(length(error_list))) {
+      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
+        shiny::tags$p(error_list[i])
+      )
+    }
+    return(tmp_ui_error)
+  } else {
+    return(NULL)
+  }
+}
+
+load_and_check_base_model=function(path){
+  model=transformers$AutoModel$from_pretrained(path)
+  return(model)
+}

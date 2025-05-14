@@ -1082,7 +1082,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       model_info = args$text_embeddings$get_model_info(),
       feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
       times = args$text_embeddings$get_times(),
-      features = args$text_embeddings$get_features()
+      features = args$text_embeddings$get_features(),
+      pad_value=args$text_embeddings$get_pad_value()
     )
 
     #Set Times and Features
@@ -1181,7 +1182,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           sc_min_k = self$last_training$config$sc_min_k,
           sc_max_k = self$last_training$config$sc_max_k,
           trace = self$last_training$config$trace,
-          n_cores = self$last_training$config$n_cores
+          n_cores = self$last_training$config$n_cores,
+          pad_value = private$text_embedding_model$pad_value
         )
       } else {
         data_manager <- DataManagerClassifier$new(
@@ -1196,7 +1198,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           sc_min_k = self$last_training$config$sc_min_k,
           sc_max_k = self$last_training$config$sc_max_k,
           trace = self$last_training$config$trace,
-          n_cores = self$last_training$config$n_cores
+          n_cores = self$last_training$config$n_cores,
+          pad_value=private$text_embedding_model$pad_value
         )
       }
 
@@ -1252,6 +1255,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
       reticulate::py_run_file(
         system.file("python/py_log.py",
+                    package = "aifeducation"
+        )
+      )
+      reticulate::py_run_file(
+        system.file("python/py_functions.py",
                     package = "aifeducation"
         )
       )

@@ -39,6 +39,7 @@ test_data <- get_test_data_for_classifiers(
   class_range = class_range,
   path_test_embeddings = paste0(root_path_general_data, "/imdb_embeddings")
 )
+
 target_data <- test_data$target_data
 target_levels <- test_data$target_levels
 test_embeddings_large <- test_data$test_embeddings_large

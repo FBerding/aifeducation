@@ -33,7 +33,7 @@ def calc_SquaredCovSum(x):
   return cov_sum
 
 class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self,times, features_in,features_out,noise_factor):
+    def __init__(self,times, features_in,features_out,noise_factor,pad_value):
       super().__init__()
       self.features_in=features_in
       self.features_out=features_out
@@ -68,7 +68,18 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         batch_first=True,
         bias=True)
         
+      if not pad_value==0:
+        self.switch_pad_value_start=layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)
+        self.switch_pad_value_final=layer_switch_pad_values(pad_value_old=0,pad_value_new=pad_value)
+      else:
+        self.switch_pad_value_start=None
+        self.switch_pad_value_final=None
+        
     def forward(self, x, encoder_mode=False, return_scs=False):
+      #Swtich padding value if necessary
+      if not self.switch_pad_value_start==None:
+        x=self.switch_pad_value_start(x)
+      
       if encoder_mode==False:
         if self.training==True:
           mask=self.get_mask(x)
@@ -80,6 +91,9 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         x=self.decoder_1(latent_space)[0]
         x=self.output(x)[0]
         x=self.UnPackAndMasking_PT(x)
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
         if return_scs==False:
           return x
         else:
@@ -89,6 +103,9 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         x=self.encoder_1(x)[0]
         x=self.latent_space(x)[0]
         x=self.UnPackAndMasking_PT(x)
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
         return x
     def get_mask(self,x):
       device=('cuda' if torch.cuda.is_available() else 'cpu')
@@ -104,7 +121,7 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       return(noise)
       
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self, features_in,features_out,noise_factor):
+    def __init__(self, features_in,features_out,noise_factor,pad_value):
       super().__init__()
       self.features_in=features_in
       self.features_out=features_out
@@ -118,8 +135,18 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map="householder")
       torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
       torch.nn.utils.parametrizations.orthogonal(self, "param_w3",orthogonal_map="householder")
+      
+      if not pad_value==0:
+        self.switch_pad_value_start=layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)
+        self.switch_pad_value_final=layer_switch_pad_values(pad_value_old=0,pad_value_new=pad_value)
+      else:
+        self.switch_pad_value_start=None
+        self.switch_pad_value_final=None
 
     def forward(self, x, encoder_mode=False, return_scs=False):
+      #Swtich padding value if necessary
+      if not self.switch_pad_value_start==None:
+        x=self.switch_pad_value_start(x)
       if encoder_mode==False:
         #Add noise
         if self.training==True:
@@ -139,6 +166,10 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w2,dim0=1,dim1=0)))
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w1,dim0=1,dim1=0)))
         
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
+        
         if return_scs==False:
           return x
         else:
@@ -150,6 +181,9 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         
         #Latent Space
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w3))
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
         return x
       
     def get_mask(self,x):

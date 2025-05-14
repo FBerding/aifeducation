@@ -41,6 +41,19 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
 #' @export
 get_param_dict <- function() {
   param <- list(
+    pad_value=list(
+      type = "int",
+      min = -Inf,
+      max = 0,
+      allow_null = FALSE,
+      allowed_values = NULL,
+      desc = "Value indicating padding. This value should no be in the range of
+      regluar values for computations. Thus it is not recommended to chance this value.
+      Default is `-100`.",
+      gui_box = NULL,
+      gui_label = NULL,
+      default_value = -100,
+      default_historic = 0),
     act_fct = list(
       type = "string",
       min = NULL,
@@ -494,6 +507,7 @@ get_param_dict <- function() {
   )
 
   param$text_embeddings <- param$data_embeddings
+  param$param_pad_value=param$pad_value
 
   param$feature_extractor <- list(
     type = "TEFeatureExtractor",
@@ -874,7 +888,7 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
   embedding.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Hidden Size",
     default_value = 768
   )
@@ -886,7 +900,7 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = c("gelu", "relu","silu","gelu_new"),
     desc = "Name of the activation function.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Hidden Activation Function",
     default_value = "gelu"
   )
@@ -898,7 +912,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "Number of hidden layers.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Number of Hidden Layers",
     default_value = 7
   )
@@ -910,7 +924,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "Number of decoding layers.",
-    gui_box = "Model Settings",
+    gui_box = "Decoder Layers",
     gui_label = "Number of Decoding Layers",
     default_value = 7
   )
@@ -923,7 +937,7 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Number of neurons in the final layer. This parameter determines the dimensionality of the resulting text
   embedding.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Target Hidden Size",
     default_value = 768
   )
@@ -935,7 +949,7 @@ get_param_dict <- function() {
     max = 1,
     allowed_values = NULL,
     desc = "Ratio of dropout.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Hidden Dropout",
     default_value = 0.5
   )
@@ -947,7 +961,7 @@ get_param_dict <- function() {
     max = 1,
     allowed_values = NULL,
     desc = "Dropout probability between the layers of the feed-forward blocks.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Dropout between the layers of the feed-forward blocks",
     default_value = 0.5
   )
@@ -959,7 +973,7 @@ get_param_dict <- function() {
     max = 1,
     allowed_values = NULL,
     desc = "Ratio of dropout for attention probabilities.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Dropout for Attention Probabilities",
     default_value = 0.1
   )
@@ -995,7 +1009,7 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "`vector` of `int` determining the number and sizes of each block.",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Block Size",
     default_value = 0.1
   )
@@ -1009,7 +1023,7 @@ get_param_dict <- function() {
     desc = "Type of pooling.
   * `\"mean\"` for pooling with mean.
   * `\"max\"` for pooling with maximum values. ",
-    gui_box = "Model Settings",
+    gui_box = "Encoder Layers",
     gui_label = "Pooling Type",
     default_value = "max"
   )
@@ -1029,14 +1043,14 @@ get_param_dict <- function() {
   param$min_seq_len <- list(
     type = "int",
     allow_null = FALSE,
-    min = 2,
+    min = 10,
     max = Inf,
     allowed_values = NULL,
     desc = "Only relevant if `full_sequences_only = FALSE`. Value determines the minimal sequence length included in
   training process. ",
     gui_box = "Sequence Modeling",
     gui_label = "Min Sequence Length",
-    default_value = NULL
+    default_value = 10
   )
 
 

@@ -120,6 +120,29 @@ LargeDataSetBase <- R6::R6Class(
     load = function(dir_path) {
       private$data <- datasets$Dataset$load_from_disk(dataset_path = dir_path)
     },
+    #---------------------------------------------------------------------------
+    # Method for setting package versions
+    set_package_versions = function() {
+      private$r_package_versions$aifeducation <- packageVersion("aifeducation")
+      private$r_package_versions$reticulate <- packageVersion("reticulate")
+      if (!is.null_or_na(private$ml_framework)) {
+        private$py_package_versions$torch <- torch["__version__"]
+        private$py_package_versions$numpy <- np$version$short_version
+      }
+    },
+    #---------------------------------------------------------------------------
+    #' @description Method for requesting a summary of the R and python packages'
+    #' versions used for creating the model.
+    #' @return Returns a `list` containing the versions of the relevant
+    #' R and python packages.
+    get_package_versions = function() {
+      return(
+        list(
+          r_package_versions = private$private$r_package_versions,
+          py_package_versions = private$py_package_versions
+        )
+      )
+    },
     #--------------------------------------------------------------------------
     #' @description Return all fields.
     #' @return Method returns a `list` containing all public and private fields of the object.
@@ -149,6 +172,16 @@ LargeDataSetBase <- R6::R6Class(
   ),
   private = list(
     data = NULL,
+    r_package_versions = list(
+      aifeducation = NA,
+      reticulate = NA
+    ),
+    py_package_versions = list(
+      tensorflow = NA,
+      torch = NA,
+      keras = NA,
+      numpy = NA
+    ),
     #--------------------------------------------------------------------------
     add = function(new_dataset) {
       # Check

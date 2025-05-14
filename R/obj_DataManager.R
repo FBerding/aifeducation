@@ -72,11 +72,13 @@ DataManagerClassifier <- R6::R6Class(
     #' @param sc_max_k `r get_param_doc_desc("sc_max_k")`
     #' @param trace `r get_param_doc_desc("trace")`
     #' @param n_cores `r get_param_doc_desc("n_cores")`
+    #' @param pad_value `r get_param_doc_desc("pad_value")`
     #' @return Method returns an initialized object of class [DataManagerClassifier].
     initialize = function(data_embeddings,
                           data_targets,
                           folds = 5,
                           val_size = 0.25,
+                          pad_value=-100,
                           class_levels,
                           one_hot_encoding = TRUE,
                           add_matrix_map = TRUE,
@@ -114,6 +116,7 @@ DataManagerClassifier <- R6::R6Class(
       self$config$sc$max_k <- sc_max_k
       self$config$sc$min_k <- sc_min_k
       self$config$n_cores <- n_cores
+      self$config$pad_value=pad_value
 
       # Add one hot encoding if necessary
       if (self$config$one_hot_encoding == TRUE) {
@@ -396,7 +399,8 @@ DataManagerClassifier <- R6::R6Class(
       length <- get_n_chunks(
         text_embeddings = embeddings_syntehtic,
         features = self$config$features,
-        times = self$config$times
+        times = self$config$times,
+        pad_value=self$config$pad_value
       )
       idx_non_zero_length <- which(x = (length > 0))
 
@@ -415,7 +419,8 @@ DataManagerClassifier <- R6::R6Class(
               length = get_n_chunks(
                 text_embeddings = embeddings_syntehtic,
                 features = self$config$features,
-                times = self$config$times
+                times = self$config$times,
+                pad_value=self$config$pad_value
               )
             ),
             convert = FALSE
@@ -471,7 +476,11 @@ DataManagerClassifier <- R6::R6Class(
             id = rownames(inputs),
             input = prepare_r_array_for_dataset(inputs),
             labels = as.numeric(labels) - 1,
-            length = get_n_chunks(text_embeddings = inputs, features = self$config$features, times = self$config$times)
+            length = get_n_chunks(
+              text_embeddings = inputs,
+              features = self$config$features,
+              times = self$config$times,
+              pad_value=self$config$pad_value)
           ),
           convert = FALSE
         )
