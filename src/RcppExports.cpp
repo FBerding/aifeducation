@@ -12,15 +12,16 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // knnor
-arma::mat knnor(const Rcpp::List& dataset, size_t k, size_t aug_num);
-RcppExport SEXP _aifeducation_knnor(SEXP datasetSEXP, SEXP kSEXP, SEXP aug_numSEXP) {
+arma::mat knnor(const Rcpp::List& dataset, size_t k, size_t aug_num, size_t cycles_number_limit);
+RcppExport SEXP _aifeducation_knnor(SEXP datasetSEXP, SEXP kSEXP, SEXP aug_numSEXP, SEXP cycles_number_limitSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List& >::type dataset(datasetSEXP);
     Rcpp::traits::input_parameter< size_t >::type k(kSEXP);
     Rcpp::traits::input_parameter< size_t >::type aug_num(aug_numSEXP);
-    rcpp_result_gen = Rcpp::wrap(knnor(dataset, k, aug_num));
+    Rcpp::traits::input_parameter< size_t >::type cycles_number_limit(cycles_number_limitSEXP);
+    rcpp_result_gen = Rcpp::wrap(knnor(dataset, k, aug_num, cycles_number_limit));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -64,7 +65,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 3},
+    {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 4},
     {"_aifeducation_matrix_to_array_c", (DL_FUNC) &_aifeducation_matrix_to_array_c, 3},
     {"_aifeducation_to_categorical_c", (DL_FUNC) &_aifeducation_to_categorical_c, 2},
     {"_aifeducation_tensor_to_matrix_c", (DL_FUNC) &_aifeducation_tensor_to_matrix_c, 3},
