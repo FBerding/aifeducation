@@ -516,7 +516,7 @@ EmbeddedText <- R6::R6Class(
     get_package_versions = function() {
       return(
         list(
-          r_package_versions = private$private$r_package_versions,
+          r_package_versions = private$r_package_versions,
           py_package_versions = private$py_package_versions
         )
       )
