@@ -1063,7 +1063,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           )
         )
       }
-      },
+    },
     #--------------------------------------------------------------------------
     do_configuration=function(args){
     # Initial checks, adjustments, and preparation----------------------------
