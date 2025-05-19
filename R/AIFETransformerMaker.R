@@ -50,14 +50,16 @@ AIFETrType <- list(
 #'   See [.AIFEBaseTransformer] class for details.
 #' @param type `string` A type of the new transformer. Allowed types are `r get_allowed_transformer_types()`. See
 #'   [AIFETrType] list.
+#' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+#'   (`FALSE`) - hidden.
 #' @return If success - a new transformer, otherwise - an error (passed type is invalid).
 #'
 #' @family Transformer
 #' @export
-aife_transformer.make <- function(type) {
+aife_transformer.make <- function(type, init_trace = TRUE) {
   transformer <- NULL
   if (type %in% names(.AIFETrObj)) {
-    transformer <- .AIFETrObj[[type]]()
+    transformer <- .AIFETrObj[[type]](init_trace)
   } else {
     stop(
       paste0(

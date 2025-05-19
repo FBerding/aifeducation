@@ -53,6 +53,7 @@ supported_methods <- list(
 )
 
 example_data <- imdb_movie_reviews
+init_trace <- FALSE
 
 for (ai_method in ai_methods) {
   base::gc(verbose = FALSE, full = TRUE)
@@ -67,7 +68,7 @@ for (ai_method in ai_methods) {
   tmp_ai_train <- paste0(tmp_results_TEM_path, "/", framework, "/", ai_method)
   create_dir(tmp_ai_train, FALSE)
 
-  base_model <- aife_transformer.make(ai_method)
+  base_model <- aife_transformer.make(ai_method, init_trace)
 
   # Creation of the Model ----
   test_that(paste0(ai_method, ": creation of the model with ", framework), {
