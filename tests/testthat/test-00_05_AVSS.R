@@ -24,7 +24,7 @@ load_safe <- TRUE
 from_tf <- FALSE
 
 reticulate::py_run_file(system.file("python/MPNetForMPLM_PT.py",
-                                    package = "aifeducation"
+  package = "aifeducation"
 ))
 
 tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
@@ -35,28 +35,35 @@ model <- transformers$MPNetModel$from_pretrained(
   use_safetensors = load_safe
 )
 
-inputs <- tokenizer(
+texts <- c(
   "This is the first sentance",
-  return_tensors = "pt"
-)$data
+  "This is the second sentance",
+  "This is the third sentance"
+)
 
-with(torch$no_grad(), {
-  outputs <- model$`__call__`(!!!inputs, output_hidden_states = TRUE)
-  hidden_states <- outputs$hidden_states
-})
-
-hidden_states_list <- list()
-for (i in seq_along(hidden_states)) {
-  py_tensor <- hidden_states[[i]]
-  r_array <- reticulate::py_to_r(py_tensor$detach()$cpu()$numpy())
-  hidden_states_list[[i]] <- r_array
-}
-
-e <- 0.5
+# === for one layer
+batch_size <- 2
 layer_index <- 1
-all_layers <- list()
-for (i in seq_along(hidden_states_list)) {
-  all_layers[[i]] <- evaluate_layer_importance(hidden_states_list, i, e)
+e <- 0.5
+
+layer_importance <- evaluate_layer_importance_all_batches(
+  model = model, tokenizer = tokenizer, dataset = texts, batch_size = batch_size,
+  layer_index = layer_index, e = e
+)
+
+layer_importance_df <- as.data.frame(layer_importance)
+layer_importance_df
+
+# === for some layers
+layer_num <- 5
+all_layers <- NULL
+
+for (i in seq_len(layer_num)) {
+  layer_importance <- evaluate_layer_importance_all_batches(
+    model = model, tokenizer = tokenizer, dataset = texts, batch_size = batch_size,
+    layer_index = i, e = e
+  )
+  all_layers[[i]] <- layer_importance
 }
 
 all_layers_df <- do.call(rbind, lapply(all_layers, as.data.frame))
