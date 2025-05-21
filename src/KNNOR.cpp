@@ -28,6 +28,9 @@
 // KNNOR
 arma::mat knnor(const Rcpp::List &, size_t, size_t, size_t);
 
+// KNNOR Validation
+bool knnor_is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, size_t);
+
 // private functions ---------------------------------------------------------------------------------------------------
 // KNN
 Rcpp::List knn(const arma::mat &, size_t);
@@ -46,9 +49,6 @@ arma::mat knnor_augmentation(const arma::mat &, const arma::mat &, const arma::m
 
 double alpha_coefficient(const arma::mat &, const arma::mat &);
 arma::rowvec interpolate_point(const arma::rowvec &, const arma::rowvec &, double);
-
-// KNNOR Validation
-bool is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, size_t);
 // ---------------------------------------------------------------------------------------------------------------------
 
 // ========================================== Function definitions =====================================================
@@ -399,7 +399,7 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
       }
 
       // Validation of new_embedding_point
-      bool is_valid = is_same_class(new_embedding_point, embeddings, labels, k);
+      bool is_valid = knnor_is_same_class(new_embedding_point, embeddings, labels, k);
       if (is_valid)
       {
         embeddings_augmented = arma::join_vert(embeddings_augmented, new_embedding_point);
@@ -467,18 +467,21 @@ arma::rowvec interpolate_point(const arma::rowvec &Xi_new, const arma::rowvec &p
 
 // Algorithm 3 KNNOR Validation ========================================================================================
 
-// Validate a new point
-//
-// Function written in C++ for validating a new point (KNNOR-Validation)
-//
-// @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
-// @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
-// @param labels `1-D array (vector)` of integers with `batch` elements
-// @param k `unsigned integer` number of nearest neighbors
-//
-// @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
-//
-bool is_same_class(const arma::rowvec &new_point, const arma::mat &dataset, const arma::uvec &labels, size_t k)
+//' Validate a new point
+//'
+//' Function written in C++ for validating a new point (KNNOR-Validation)
+//'
+//' @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
+//' @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
+//' @param labels `1-D array (vector)` of integers with `batch` elements
+//' @param k `unsigned integer` number of nearest neighbors
+//'
+//' @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
+//' @family oversampling_approaches
+//'
+//' @export
+// [[Rcpp::export]]
+bool knnor_is_same_class(const arma::rowvec &new_point, const arma::mat &dataset, const arma::uvec &labels, size_t k)
 {
   std::vector<std::pair<double, int>> distances;
 
