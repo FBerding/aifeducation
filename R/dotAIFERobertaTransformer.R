@@ -323,3 +323,7 @@
 )
 
 .AIFETrObj[[AIFETrType$roberta]] <- .AIFERobertaTransformer$new
+.AIFETrTokenizer[[AIFETrType$roberta]] <- "RobertaTokenizerFast"
+.AIFETrConfig[[AIFETrType$roberta]] <- "RobertaConfig"
+.AIFETrModel[[AIFETrType$roberta]] <- "RobertaModel"
+.AIFETrModelMLM[[AIFETrType$roberta]] <- "RobertaForMaskedLM"

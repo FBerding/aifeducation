@@ -328,3 +328,7 @@
 )
 
 .AIFETrObj[[AIFETrType$funnel]] <- .AIFEFunnelTransformer$new
+.AIFETrTokenizer[[AIFETrType$funnel]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$funnel]] <- "FunnelConfig"
+.AIFETrModel[[AIFETrType$funnel]] <- "FunnelBaseModel"
+.AIFETrModelMLM[[AIFETrType$funnel]] <- "FunnelForMaskedLM"

@@ -316,3 +316,7 @@
 )
 
 .AIFETrObj[[AIFETrType$deberta_v2]] <- .AIFEDebertaTransformer$new
+.AIFETrTokenizer[[AIFETrType$deberta_v2]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$deberta_v2]] <- "DebertaV2Config"
+.AIFETrModel[[AIFETrType$deberta_v2]] <- "DebertaV2Model"
+.AIFETrModelMLM[[AIFETrType$deberta_v2]] <- "DebertaForMaskedLM"

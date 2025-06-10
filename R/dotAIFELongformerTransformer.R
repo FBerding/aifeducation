@@ -322,3 +322,7 @@
 )
 
 .AIFETrObj[[AIFETrType$longformer]] <- .AIFELongformerTransformer$new
+.AIFETrTokenizer[[AIFETrType$longformer]] <- "LongformerTokenizerFast"
+.AIFETrConfig[[AIFETrType$longformer]] <- "LongformerConfig"
+.AIFETrModel[[AIFETrType$longformer]] <- "LongformerModel"
+.AIFETrModelMLM[[AIFETrType$longformer]] <- "LongformerForMaskedLM"

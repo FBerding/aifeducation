@@ -100,7 +100,8 @@ TextEmbeddingModel <- R6::R6Class(
     #--------------------------------------------------------------------------
     #Method for setting the method of the model
     set_model_method=function(model_dir){
-      tmp_model<-transformers$AutoModel$from_pretrained(model_dir)
+      tmp_config <- transformers$AutoConfig$from_pretrained(model_dir)
+      tmp_model<-transformers$AutoModel$from_pretrained(model_dir, config = tmp_config, add_pooling_layer = FALSE)
       method<-detect_base_model_type(tmp_model)
       private$basic_components$method <- method
     },
@@ -368,70 +369,24 @@ TextEmbeddingModel <- R6::R6Class(
 
 
       # Load models and tokenizer-----------------------------------------------
+      private$transformer_components$tokenizer <- aife_transformer.load_tokenizer(
+        type = private$basic_components$method,
+        model_dir = model_dir
+      )
 
-      if (private$basic_components$method == "bert") {
-        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        private$transformer_components$model <- transformers$BertModel$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-        private$transformer_components$model_mlm <- transformers$BertForMaskedLM$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-      } else if (private$basic_components$method == "roberta") {
-        private$transformer_components$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(model_dir)
-        private$transformer_components$model <- transformers$RobertaModel$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-        private$transformer_components$model_mlm <- transformers$RobertaForMaskedLM$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-      } else if (private$basic_components$method == "longformer") {
-        private$transformer_components$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(model_dir)
-        private$transformer_components$model <- transformers$LongformerModel$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-        private$transformer_components$model_mlm <- transformers$LongformerForMaskedLM$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-      } else if (private$basic_components$method == "funnel") {
-        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        private$transformer_components$model <- transformers$FunnelBaseModel$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-        private$transformer_components$model_mlm <- transformers$FunnelForMaskedLM$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-      } else if (private$basic_components$method == "deberta_v2") {
-        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
-        private$transformer_components$model <- transformers$DebertaV2Model$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-        private$transformer_components$model_mlm <- transformers$DebertaForMaskedLM$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-      } else if (private$basic_components$method == "mpnet") {
-        private$transformer_components$tokenizer <- transformers$AutoTokenizer$from_pretrained(model_dir)
+      private$transformer_components$model <- aife_transformer.load_model(
+        type = private$basic_components$method,
+        model_dir = model_dir,
+        from_tf = from_tf,
+        load_safe = load_safe
+      )
 
-        private$transformer_components$model <- transformers$MPNetModel$from_pretrained(model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-        private$transformer_components$model_mlm <- py$MPNetForMPLM_PT$from_pretrained(
-          model_dir,
-          from_tf = from_tf,
-          use_safetensors = load_safe
-        )
-      }
+      private$transformer_components$model_mlm <- aife_transformer.load_model_mlm(
+        type = private$basic_components$method,
+        model_dir = model_dir,
+        from_tf = from_tf,
+        load_safe = load_safe
+      )
     }
   ),
   public = list(

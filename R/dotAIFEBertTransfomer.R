@@ -309,3 +309,8 @@
 )
 
 .AIFETrObj[[AIFETrType$bert]] <- .AIFEBertTransformer$new
+.AIFETrTokenizer[[AIFETrType$bert]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$bert]] <- "BertConfig"
+.AIFETrModel[[AIFETrType$bert]] <- "BertModel"
+.AIFETrModelMLM[[AIFETrType$bert]] <- "BertForMaskedLM"
+

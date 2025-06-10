@@ -346,3 +346,7 @@
 )
 
 .AIFETrObj[[AIFETrType$mpnet]] <- .AIFEMpnetTransformer$new
+.AIFETrTokenizer[[AIFETrType$mpnet]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$mpnet]] <- "MPNetConfig"
+.AIFETrModel[[AIFETrType$mpnet]] <- "MPNetModel"
+.AIFETrModelMLM[[AIFETrType$mpnet]] <- "MPNetForMPLM_PT"
