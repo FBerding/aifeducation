@@ -25,6 +25,12 @@ Abstract class for auto encoders with 'pytorch'.
 }
 \note{
 \code{features} refers to the number of features for the compressed text embeddings.
+
+This model requires \code{pad_value=0}. If this condition is not met the
+padding value is switched automatically.
+
+This model requires that the underlying \link{TextEmbeddingModel} uses \code{pad_value=0}. If
+this condition is not met the pad value is switched before training.
 }
 \seealso{
 Other Text Embedding: 

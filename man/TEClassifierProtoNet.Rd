@@ -19,6 +19,10 @@ This object represents in implementation of a prototypical network for few-shot 
 Swersky, and Zemel (2017). The network uses a multi way contrastive loss described by Zhang et al. (2019). The
 network learns to scale the metric as described by Oreshkin, Rodriguez, and Lacoste (2018)
 }
+\note{
+This model requires \code{pad_value=0}. If this condition is not met the
+padding value is switched automatically.
+}
 \references{
 Oreshkin, B. N., Rodriguez, P. & Lacoste, A. (2018). TADAM: Task dependent adaptive metric for improved
 few-shot learning. https://doi.org/10.48550/arXiv.1805.10123

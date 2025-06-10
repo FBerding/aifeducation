@@ -21,6 +21,10 @@ created with the same \link{TextEmbeddingModel} as for training.
 \description{
 Abstract class for neural nets with 'pytorch'.
 }
+\note{
+This model requires \code{pad_value=0}. If this condition is not met the
+padding value is switched automatically.
+}
 \seealso{
 Other Classification: 
 \code{\link{TEClassifierParallel}},

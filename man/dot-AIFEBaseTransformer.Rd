@@ -46,7 +46,12 @@ Other Transformers for developers:
 \code{\link{.AIFELongformerTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
 \code{\link{.AIFERobertaTransformer}},
-\code{\link{.AIFETrObj}}
+\code{\link{.AIFETrConfig}},
+\code{\link{.AIFETrModel}},
+\code{\link{.AIFETrModelMLM}},
+\code{\link{.AIFETrObj}},
+\code{\link{.AIFETrTokenizer}},
+\code{\link{.aife_transformer.check_type}()}
 }
 \concept{Transformers for developers}
 \section{Public fields}{
@@ -132,6 +137,7 @@ For example, it can be a variable \code{tok_new} that stores the tokenizer from
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-.AIFEBaseTransformer-new}{\code{.AIFEBaseTransformer$new()}}
+\item \href{#method-.AIFEBaseTransformer-init_transformer}{\code{.AIFEBaseTransformer$init_transformer()}}
 \item \href{#method-.AIFEBaseTransformer-set_title}{\code{.AIFEBaseTransformer$set_title()}}
 \item \href{#method-.AIFEBaseTransformer-set_model_param}{\code{.AIFEBaseTransformer$set_model_param()}}
 \item \href{#method-.AIFEBaseTransformer-set_model_temp}{\code{.AIFEBaseTransformer$set_model_temp()}}
@@ -161,6 +167,29 @@ An object of this class cannot be created. Thus, method's call will produce an e
 
 \subsection{Returns}{
 This method returns an error.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-.AIFEBaseTransformer-init_transformer"></a>}}
+\if{latex}{\out{\hypertarget{method-.AIFEBaseTransformer-init_transformer}{}}}
+\subsection{Method \code{init_transformer()}}{
+Method to execute while initializing a new transformer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{.AIFEBaseTransformer$init_transformer(title, init_trace)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{title}}{\code{string} A new title.}
+
+\item{\code{init_trace}}{\code{bool} option to show prints. If \code{TRUE} (by default) - messages will be shown, otherwise
+(\code{FALSE}) - hidden.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+This method returns nothing.s
 }
 }
 \if{html}{\out{<hr>}}

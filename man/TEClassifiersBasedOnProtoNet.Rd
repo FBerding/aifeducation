@@ -122,7 +122,7 @@ named and has to use the same names as used in in the embeddings. .}
 
 \item{\code{data_folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \code{1 <= x }}
 
-\item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases of each class which should be
+\item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
 

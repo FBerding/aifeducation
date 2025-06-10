@@ -8,8 +8,9 @@ summarize_args_for_long_task(
   input,
   object_class,
   method = "configure",
-  path_args = list(path_to_embeddings = NULL, path_to_target_data = NULL,
-    path_to_feature_extractor = NULL, destination_path = NULL, folder_name = NULL),
+  path_args = list(path_to_embeddings = NULL, path_to_textual_dataset = NULL,
+    path_to_target_data = NULL, path_to_feature_extractor = NULL, destination_path =
+    NULL, folder_name = NULL),
   override_args = list(),
   meta_args = list(py_environment_type = get_py_env_type(), py_env_name =
     get_py_env_name(), target_data_column = input$data_target_column, object_class =

@@ -24,6 +24,8 @@ of this class are not intended to be used directly. \link{LargeDataSetForTextEmb
 \item \href{#method-LargeDataSetBase-save}{\code{LargeDataSetBase$save()}}
 \item \href{#method-LargeDataSetBase-load_from_disk}{\code{LargeDataSetBase$load_from_disk()}}
 \item \href{#method-LargeDataSetBase-load}{\code{LargeDataSetBase$load()}}
+\item \href{#method-LargeDataSetBase-set_package_versions}{\code{LargeDataSetBase$set_package_versions()}}
+\item \href{#method-LargeDataSetBase-get_package_versions}{\code{LargeDataSetBase$get_package_versions()}}
 \item \href{#method-LargeDataSetBase-get_all_fields}{\code{LargeDataSetBase$get_all_fields()}}
 \item \href{#method-LargeDataSetBase-clone}{\code{LargeDataSetBase$clone()}}
 }
@@ -192,6 +194,30 @@ Loads a data set from disk.
 }
 \subsection{Returns}{
 Method does not return anything. It loads a data set from disk.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetBase-set_package_versions"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetBase-set_package_versions}{}}}
+\subsection{Method \code{set_package_versions()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$set_package_versions()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetBase-get_package_versions"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetBase-get_package_versions}{}}}
+\subsection{Method \code{get_package_versions()}}{
+Method for requesting a summary of the R and python packages'
+versions used for creating the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$get_package_versions()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{list} containing the versions of the relevant
+R and python packages.
 }
 }
 \if{html}{\out{<hr>}}

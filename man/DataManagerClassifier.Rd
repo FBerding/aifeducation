@@ -82,6 +82,7 @@ Creating a new instance of this class.
   data_targets,
   folds = 5,
   val_size = 0.25,
+  pad_value = -100,
   class_levels,
   one_hot_encoding = TRUE,
   add_matrix_map = TRUE,
@@ -103,9 +104,13 @@ named and has to use the same names as used in in the embeddings.}
 
 \item{\code{folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \code{1 <= x }}
 
-\item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases of each class which should be
+\item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
+
+\item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
+regluar values for computations. Thus it is not recommended to chance this value.
+Default is \code{-100}. Allowed values: \code{ x <= 0}}
 
 \item{\code{class_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
