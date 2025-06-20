@@ -43,6 +43,7 @@ Other Classifiers for developers:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_configured"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_configured'><code>aifeducation::AIFEBaseModel$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_trained"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_trained'><code>aifeducation::AIFEBaseModel$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_description'><code>aifeducation::AIFEBaseModel$set_model_description()</code></a></span></li>
@@ -79,6 +80,7 @@ is used as the final model.
   data_val_size = 0.25,
   balance_class_weights = TRUE,
   balance_sequence_length = TRUE,
+  cls_loss_fct_name = "focal_loss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -114,7 +116,7 @@ named and has to use the same names as used in in the embeddings. .}
 
 \item{\code{data_folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \code{1 <= x }}
 
-\item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases of each class which should be
+\item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
 
@@ -124,6 +126,8 @@ training data with the method Inverse Class Frequency. If \code{FALSE} each clas
 \item{\code{balance_sequence_length}}{\code{bool} If \code{TRUE} sample weights are generated for the length of sequences based on
 the frequencies of the training data with the method Inverse Class Frequency.
 If \code{FALSE} each sequences length has the weight 1.}
+
+\item{\code{cls_loss_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'FocalLoss', 'CrossEntropyLoss'}
 
 \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
 

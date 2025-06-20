@@ -25,6 +25,12 @@ Abstract class for auto encoders with 'pytorch'.
 }
 \note{
 \code{features} refers to the number of features for the compressed text embeddings.
+
+This model requires \code{pad_value=0}. If this condition is not met the
+padding value is switched automatically.
+
+This model requires that the underlying \link{TextEmbeddingModel} uses \code{pad_value=0}. If
+this condition is not met the pad value is switched before training.
 }
 \seealso{
 Other Text Embedding: 
@@ -41,7 +47,6 @@ Other Text Embedding:
 \item \href{#method-TEFeatureExtractor-train}{\code{TEFeatureExtractor$train()}}
 \item \href{#method-TEFeatureExtractor-extract_features}{\code{TEFeatureExtractor$extract_features()}}
 \item \href{#method-TEFeatureExtractor-extract_features_large}{\code{TEFeatureExtractor$extract_features_large()}}
-\item \href{#method-TEFeatureExtractor-is_trained}{\code{TEFeatureExtractor$is_trained()}}
 \item \href{#method-TEFeatureExtractor-clone}{\code{TEFeatureExtractor$clone()}}
 }
 }
@@ -60,6 +65,7 @@ Other Text Embedding:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_configured"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_configured'><code>aifeducation::AIFEBaseModel$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_trained"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_trained'><code>aifeducation::AIFEBaseModel$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="save"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-save'><code>aifeducation::AIFEBaseModel$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
@@ -108,7 +114,7 @@ is generated automatically. Allowed values: any}
 \item{\code{noise_factor}}{\code{double} Value between 0 and a value lower 1 indicating how much noise should
 be added to the input during training. Allowed values: \verb{0 <= x <= 1}}
 
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw'}
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }
@@ -240,19 +246,6 @@ embeddings which should be reduced in their dimensions.}
 }
 \subsection{Returns}{
 Returns an object of class \link{LargeDataSetForTextEmbeddings} containing the compressed embeddings.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TEFeatureExtractor-is_trained"></a>}}
-\if{latex}{\out{\hypertarget{method-TEFeatureExtractor-is_trained}{}}}
-\subsection{Method \code{is_trained()}}{
-Check if the \link{TEFeatureExtractor} is trained.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$is_trained()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns \code{TRUE} if the object is trained and \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}

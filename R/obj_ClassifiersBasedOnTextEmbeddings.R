@@ -151,7 +151,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           self$model$eval()
           input <- torch$from_numpy(prediction_data)
           predictions_prob <- self$model(input$to(device, dtype = dtype),
-                                         predication_mode = TRUE
+                                         prediction_mode = TRUE
           )
           predictions_prob <- private$detach_tensors(predictions_prob)
         } else {
@@ -161,7 +161,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           self$model$eval()
           input <- torch$from_numpy(prediction_data)
           predictions_prob <- self$model(input$to(device, dtype = dtype),
-                                         predication_mode = TRUE
+                                         prediction_mode = TRUE
           )
           predictions_prob <- private$detach_tensors(predictions_prob)
         }
@@ -953,7 +953,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # Set loss function
-      loss_fct_name <- "CrossEntropyLoss"
+      cls_loss_fct_name <- "CrossEntropyLoss"
 
       # Check directory for checkpoints
       create_dir(
@@ -999,9 +999,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      history <- py$TeClassifierTrain_PT_with_Datasets(
+      history <- py$TeClassifierTrain(
         model = self$model,
-        loss_fct_name = loss_fct_name,
+        cls_loss_fct_name = self$last_training$config$cls_loss_fct_name,
         optimizer_method = self$model_config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
@@ -1065,7 +1065,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
       },
     #--------------------------------------------------------------------------
-    do_configuration=function(args){
+    do_configuration=function(args,one_hot_encoding=TRUE){
     # Initial checks, adjustments, and preparation----------------------------
     # check if already configured
     private$check_config_for_FALSE()
@@ -1095,7 +1095,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #Set target data config
     private$set_target_data(
       target_levels=args$target_levels,
-      one_hot_encoding=TRUE
+      one_hot_encoding=one_hot_encoding
     )
 
     #Perform additional checks and adjustments
@@ -1233,36 +1233,20 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     load_reload_python_scripts = function() {
-      reticulate::py_run_file(
-        system.file("python/py_activation_functions.py",
-                    package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_te_classifier.py",
-                    package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_te_protonet.py",
-                    package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_autoencoder.py",
-                    package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/py_log.py",
-                    package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/py_functions.py",
-                    package = "aifeducation"
-        )
-      )
+      load_py_scripts(c(
+        "pytorch_act_fct.py",
+        "pytorch_loss_fct.py",
+        "pytorch_layers.py",
+        "pytorch_layers_normalization.py",
+        "pytorch_stack_layers.py",
+        "pytorch_autoencoder.py",
+        "py_log.py",
+        "py_functions.py",
+        "pytorch_classifier_models.py",
+        "pytorch_cls_training_loops.py",
+        "pytorch_predict_batch.py",
+        "pytorch_datacollators.py"
+      ))
     },
     #-------------------------------------------------------------------------
     do_training=function(args){
@@ -1351,6 +1335,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Clean temporary directory
       private$clean_checkpoint_directory()
+
+      #Set trained field
+      private$trained=TRUE
 
       if (self$last_training$config$trace == TRUE) {
         message(paste(

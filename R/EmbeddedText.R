@@ -499,7 +499,10 @@ EmbeddedText <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    # Method for setting package versions
+    #' @description Method for setting the package version for 'aifeducation',
+    #' 'reticulate', 'torch', and 'numpy' to the currently used versions.
+    #' @return Method does not return anything. It is used to set the private
+    #' fields fo package versions.
     set_package_versions = function() {
       private$r_package_versions$aifeducation <- packageVersion("aifeducation")
       private$r_package_versions$reticulate <- packageVersion("reticulate")

@@ -39,6 +39,7 @@ Other Data Management:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_colnames"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_colnames'><code>aifeducation::LargeDataSetBase$get_colnames()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_dataset"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_dataset'><code>aifeducation::LargeDataSetBase$get_dataset()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_ids"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_ids'><code>aifeducation::LargeDataSetBase$get_ids()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="get_package_versions"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-get_package_versions'><code>aifeducation::LargeDataSetBase$get_package_versions()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="load"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-load'><code>aifeducation::LargeDataSetBase$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="load_from_disk"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-load_from_disk'><code>aifeducation::LargeDataSetBase$load_from_disk()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="n_cols"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-n_cols'><code>aifeducation::LargeDataSetBase$n_cols()</code></a></span></li>
@@ -46,6 +47,7 @@ Other Data Management:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="reduce_to_unique_ids"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-reduce_to_unique_ids'><code>aifeducation::LargeDataSetBase$reduce_to_unique_ids()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="save"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-save'><code>aifeducation::LargeDataSetBase$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="select"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-select'><code>aifeducation::LargeDataSetBase$select()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="LargeDataSetBase" data-id="set_package_versions"><a href='../../aifeducation/html/LargeDataSetBase.html#method-LargeDataSetBase-set_package_versions'><code>aifeducation::LargeDataSetBase$set_package_versions()</code></a></span></li>
 </ul>
 </details>
 }}

@@ -4,7 +4,7 @@
 \alias{get_n_chunks}
 \title{Get the number of chunks/sequences for each case}
 \usage{
-get_n_chunks(text_embeddings, features, times)
+get_n_chunks(text_embeddings, features, times, pad_value = -100)
 }
 \arguments{
 \item{text_embeddings}{\code{data.frame} or \code{array} containing the text embeddings.}
@@ -12,6 +12,10 @@ get_n_chunks(text_embeddings, features, times)
 \item{features}{\code{int} Number of features within each sequence.}
 
 \item{times}{\code{int} Number of sequences.}
+
+\item{pad_value}{\code{int} Value indicating padding. This value should no be in the range of
+regluar values for computations. Thus it is not recommended to chance this value.
+Default is \code{-100}. Allowed values: \code{ x <= -100}}
 }
 \value{
 Named\code{vector} of integers representing the number of chunks/sequences for every case.

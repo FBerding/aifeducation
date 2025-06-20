@@ -61,6 +61,7 @@ https://doi.org/10.1016/j.iswa.2024.200335}
 \item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
 \item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
 \item \href{#method-TextEmbeddingModel-get_ml_framework}{\code{TextEmbeddingModel$get_ml_framework()}}
+\item \href{#method-TextEmbeddingModel-get_pad_value}{\code{TextEmbeddingModel$get_pad_value()}}
 \item \href{#method-TextEmbeddingModel-count_parameter}{\code{TextEmbeddingModel$count_parameter()}}
 \item \href{#method-TextEmbeddingModel-is_configured}{\code{TextEmbeddingModel$is_configured()}}
 \item \href{#method-TextEmbeddingModel-get_private}{\code{TextEmbeddingModel$get_private()}}
@@ -84,6 +85,7 @@ Method for creating a new text embedding model
   emb_layer_min = "middle",
   emb_layer_max = "2_3_layer",
   emb_pool_type = "average",
+  pad_value = -100,
   model_dir = NULL,
   trace = FALSE
 )}\if{html}{\out{</div>}}
@@ -123,6 +125,10 @@ layer has the number 1. Instead of an integer the following strings are possible
 within each layer. If \code{"cls"} only the embedding of the CLS token is used. If
 \code{"average"} the token embedding of all tokens are averaged (excluding padding tokens).
 \verb{"cls} is not supported for \code{method="funnel"}.}
+
+\item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
+regluar values for computations. Thus it is not recommended to chance this value.
+Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
 \item{\code{model_dir}}{\code{string} path to the directory where the
 BERT model is stored.}
@@ -642,6 +648,19 @@ for the classifier.
 \subsection{Returns}{
 Returns a \code{string} describing the machine learning framework used
 for the classifier.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_pad_value"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_pad_value}{}}}
+\subsection{Method \code{get_pad_value()}}{
+Value for indicating padding.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_pad_value()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns an \code{int} describing the value used for padding.
 }
 }
 \if{html}{\out{<hr>}}

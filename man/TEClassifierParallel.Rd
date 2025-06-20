@@ -23,8 +23,11 @@ Abstract class for neural nets with 'pytorch'.
 }
 \seealso{
 Other Classification: 
+\code{\link{TEClassifierParallelPrototype}},
 \code{\link{TEClassifierProtoNet}},
-\code{\link{TEClassifierRegular}}
+\code{\link{TEClassifierRegular}},
+\code{\link{TEClassifierSequential}},
+\code{\link{TEClassifierSequentialPrototype}}
 }
 \concept{Classification}
 \section{Super classes}{
@@ -52,6 +55,7 @@ Other Classification:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_configured"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_configured'><code>aifeducation::AIFEBaseModel$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_trained"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_trained'><code>aifeducation::AIFEBaseModel$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_description'><code>aifeducation::AIFEBaseModel$set_model_description()</code></a></span></li>
@@ -82,23 +86,45 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
-  bias = TRUE,
-  dense_size = 4,
-  dense_layers = 0,
-  rec_size = 4,
-  rec_layers = 2,
+  intermediate_features = NULL,
+  cls_pooling_type = "min_max",
+  residual_type = "residual_gate",
+  normalization_type = "layer_nom",
+  feat_act_fct = "elu",
+  feat_size = 50,
+  feat_bias = TRUE,
+  feat_dropout = 0,
+  feat_parametrizations = "None",
+  conv_act_fct = "elu",
+  conv_n_layers = 1,
+  conv_ks_min = 2,
+  conv_ks_max = 4,
+  conv_bias = FALSE,
+  conv_parametrizations = "None",
+  dense_act_fct = "elu",
+  dense_n_layers = 1,
+  dense_dropout = 0,
+  dense_bias = FALSE,
+  dense_parametrizations = "None",
+  rec_act_fct = "tanh",
+  rec_n_layers = 1,
   rec_type = "gru",
   rec_bidirectional = FALSE,
-  self_attention_heads = 0,
-  intermediate_size = NULL,
-  attention_type = "fourier",
-  add_pos_embedding = TRUE,
-  act_fct = "elu",
-  parametrizations = "None",
-  rec_dropout = 0.1,
-  repeat_encoder = 1,
-  dense_dropout = 0.4,
-  encoder_dropout = 0.1,
+  rec_dropout = 0,
+  rec_bias = FALSE,
+  rec_parametrizations = "None",
+  tf_act_fct = "elu",
+  tf_dense_dim = 50,
+  tf_n_layers = 1,
+  tf_dropout_rate_1 = 0,
+  tf_dropout_rate_2 = 0,
+  tf_attention_type = "multihead",
+  tf_embedding_type = "absolute",
+  tf_num_heads = 1,
+  tf_bias = FALSE,
+  tf_parametrizations = "None",
+  merge_attention_type = "multi_head",
+  merge_num_heads = 1,
   optimizer = "adamw"
 )}\if{html}{\out{</div>}}
 }
@@ -121,42 +147,87 @@ the number of dimensions of the text embeddings. If no feature extractor should 
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
 
-\item{\code{bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
+\item{\code{intermediate_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \code{1 <= x }}
 
-\item{\code{dense_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \code{1 <= x }}
+\item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'max', 'min', 'min_max'}
 
-\item{\code{dense_layers}}{\code{int} Number of dense layers. Allowed values: \code{0 <= x }}
+\item{\code{residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'residual_gate', 'addition', 'None'}
 
-\item{\code{rec_size}}{\code{int} Number of neurons for each recurrent layer. Allowed values: \code{1 <= x }}
+\item{\code{normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
 
-\item{\code{rec_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
+\item{\code{feat_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+
+\item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \code{2 <= x }}
+
+\item{\code{feat_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
+
+\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the scaling layer. Allowed values: \verb{0 <= x < 1}}
+
+\item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+
+\item{\code{conv_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+
+\item{\code{conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values: \code{0 <= x }}
+
+\item{\code{conv_ks_min}}{\code{int} determining the minimal window size for n-grams. Allowed values: \code{2 <= x }}
+
+\item{\code{conv_ks_max}}{\code{int} determining the maximal window size for n-grams. Allowed values: \code{2 <= x }}
+
+\item{\code{conv_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
+
+\item{\code{conv_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+
+\item{\code{dense_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+
+\item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \code{0 <= x }}
+
+\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
+
+\item{\code{dense_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
+
+\item{\code{dense_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+
+\item{\code{rec_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+
+\item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
 
 \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'gru', 'lstm'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
-\item{\code{self_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
-
-\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
-
-\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
-values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'fourier', 'multihead'}
-
-\item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
-
-\item{\code{act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
-
-\item{\code{parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
-
 \item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x < 1}}
 
-\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \code{0 <= x }}
+\item{\code{rec_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{rec_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 
-\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the encoder layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{tf_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
 
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw'}
+\item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
+
+\item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \code{0 <= x }}
+
+\item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
+
+\item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
+
+\item{\code{tf_attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
+values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'fourier', 'multihead'}
+
+\item{\code{tf_embedding_type}}{\code{string} Type of processing positional information. Allowed values: 'absolute'}
+
+\item{\code{tf_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
+
+\item{\code{tf_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
+
+\item{\code{tf_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+
+\item{\code{merge_attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
+values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'fourier', 'multihead'}
+
+\item{\code{merge_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
+
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }

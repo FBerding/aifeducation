@@ -123,6 +123,11 @@ TEClassifierRegular <- R6::R6Class(
       )
     },
     #--------------------------------------------------------------------------
+    load_reload_python_scripts=function(){
+      super$load_reload_python_scripts()
+      load_py_scripts(c("pytorch_old_scripts.py"))
+    },
+    #--------------------------------------------------------------------------
     check_param_combinations_configuration=function(){
       if (self$model_config$dense_layers > 0) {
         if (self$model_config$dense_size < 1) {

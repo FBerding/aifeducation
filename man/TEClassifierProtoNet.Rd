@@ -19,6 +19,10 @@ This object represents in implementation of a prototypical network for few-shot 
 Swersky, and Zemel (2017). The network uses a multi way contrastive loss described by Zhang et al. (2019). The
 network learns to scale the metric as described by Oreshkin, Rodriguez, and Lacoste (2018)
 }
+\note{
+This model requires \code{pad_value=0}. If this condition is not met the
+padding value is switched automatically.
+}
 \references{
 Oreshkin, B. N., Rodriguez, P. & Lacoste, A. (2018). TADAM: Task dependent adaptive metric for improved
 few-shot learning. https://doi.org/10.48550/arXiv.1805.10123
@@ -34,7 +38,10 @@ https://doi.org/10.1007/978-3-030-16145-3_24
 \seealso{
 Other Classification: 
 \code{\link{TEClassifierParallel}},
-\code{\link{TEClassifierRegular}}
+\code{\link{TEClassifierParallelPrototype}},
+\code{\link{TEClassifierRegular}},
+\code{\link{TEClassifierSequential}},
+\code{\link{TEClassifierSequentialPrototype}}
 }
 \concept{Classification}
 \section{Super classes}{
@@ -44,6 +51,8 @@ Other Classification:
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TEClassifierProtoNet-configure}{\code{TEClassifierProtoNet$configure()}}
+\item \href{#method-TEClassifierProtoNet-embed}{\code{TEClassifierProtoNet$embed()}}
+\item \href{#method-TEClassifierProtoNet-plot_embeddings}{\code{TEClassifierProtoNet$plot_embeddings()}}
 \item \href{#method-TEClassifierProtoNet-clone}{\code{TEClassifierProtoNet$clone()}}
 }
 }
@@ -62,6 +71,7 @@ Other Classification:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_configured"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_configured'><code>aifeducation::AIFEBaseModel$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_trained"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_trained'><code>aifeducation::AIFEBaseModel$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_description'><code>aifeducation::AIFEBaseModel$set_model_description()</code></a></span></li>
@@ -76,8 +86,8 @@ Other Classification:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="predict"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-predict'><code>aifeducation::ClassifiersBasedOnTextEmbeddings$predict()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="requires_compression"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-requires_compression'><code>aifeducation::ClassifiersBasedOnTextEmbeddings$requires_compression()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="save"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-save'><code>aifeducation::ClassifiersBasedOnTextEmbeddings$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifiersBasedOnProtoNet" data-id="embed"><a href='../../aifeducation/html/TEClassifiersBasedOnProtoNet.html#method-TEClassifiersBasedOnProtoNet-embed'><code>aifeducation::TEClassifiersBasedOnProtoNet$embed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifiersBasedOnProtoNet" data-id="plot_embeddings"><a href='../../aifeducation/html/TEClassifiersBasedOnProtoNet.html#method-TEClassifiersBasedOnProtoNet-plot_embeddings'><code>aifeducation::TEClassifiersBasedOnProtoNet$plot_embeddings()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifiersBasedOnProtoNet" data-id="get_metric_scale_factor"><a href='../../aifeducation/html/TEClassifiersBasedOnProtoNet.html#method-TEClassifiersBasedOnProtoNet-get_metric_scale_factor'><code>aifeducation::TEClassifiersBasedOnProtoNet$get_metric_scale_factor()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifiersBasedOnProtoNet" data-id="predict_with_samples"><a href='../../aifeducation/html/TEClassifiersBasedOnProtoNet.html#method-TEClassifiersBasedOnProtoNet-predict_with_samples'><code>aifeducation::TEClassifiersBasedOnProtoNet$predict_with_samples()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TEClassifiersBasedOnProtoNet" data-id="train"><a href='../../aifeducation/html/TEClassifiersBasedOnProtoNet.html#method-TEClassifiersBasedOnProtoNet-train'><code>aifeducation::TEClassifiersBasedOnProtoNet$train()</code></a></span></li>
 </ul>
 </details>
@@ -166,13 +176,86 @@ values for a case for different input orders if you choose \code{fourier} on lin
 
 \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
 
-\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the encoder layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
 
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw'}
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 
 \item{\code{bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifierProtoNet-embed"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-embed}{}}}
+\subsection{Method \code{embed()}}{
+Method for embedding documents. Please do not confuse this type of embeddings with the embeddings of
+texts created by an object of class \link{TextEmbeddingModel}. These embeddings embed documents according to their
+similarity to specific classes.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$embed(embeddings_q = NULL, batch_size = 32)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{embeddings_q}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings for all cases which should be embedded into the classification space.}
+
+\item{\code{batch_size}}{\code{int} batch size.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{list} containing the following elements
+\itemize{
+\item \code{embeddings_q}: embeddings for the cases (query sample).
+\item \code{embeddings_prototypes}: embeddings of the prototypes which were learned during training. They represents the
+center for the different classes.
+}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifierProtoNet-plot_embeddings"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-plot_embeddings}{}}}
+\subsection{Method \code{plot_embeddings()}}{
+Method for creating a plot to visualize embeddings and their corresponding centers (prototypes).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$plot_embeddings(
+  embeddings_q,
+  classes_q = NULL,
+  batch_size = 12,
+  alpha = 0.5,
+  size_points = 3,
+  size_points_prototypes = 8,
+  inc_unlabeled = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{embeddings_q}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings for all cases which should be embedded into the classification space.}
+
+\item{\code{classes_q}}{Named \code{factor} containg the true classes for every case. Please note that the names must match
+the names/ids in \code{embeddings_q}.}
+
+\item{\code{batch_size}}{\code{int} batch size.}
+
+\item{\code{alpha}}{\code{float} Value indicating how transparent the points should be (important
+if many points overlap). Does not apply to points representing prototypes.}
+
+\item{\code{size_points}}{\code{int} Size of the points excluding the points for prototypes.}
+
+\item{\code{size_points_prototypes}}{\code{int} Size of points representing prototypes.}
+
+\item{\code{inc_unlabeled}}{\code{bool} If \code{TRUE} plot includes unlabeled cases as data points.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a plot of class \code{ggplot}visualizing embeddings.
 }
 }
 \if{html}{\out{<hr>}}

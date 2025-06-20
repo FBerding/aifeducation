@@ -21,10 +21,17 @@ created with the same \link{TextEmbeddingModel} as for training.
 \description{
 Abstract class for neural nets with 'pytorch'.
 }
+\note{
+This model requires \code{pad_value=0}. If this condition is not met the
+padding value is switched automatically.
+}
 \seealso{
 Other Classification: 
 \code{\link{TEClassifierParallel}},
-\code{\link{TEClassifierProtoNet}}
+\code{\link{TEClassifierParallelPrototype}},
+\code{\link{TEClassifierProtoNet}},
+\code{\link{TEClassifierSequential}},
+\code{\link{TEClassifierSequentialPrototype}}
 }
 \concept{Classification}
 \section{Super classes}{
@@ -52,6 +59,7 @@ Other Classification:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_configured"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_configured'><code>aifeducation::AIFEBaseModel$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_trained"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_trained'><code>aifeducation::AIFEBaseModel$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_description'><code>aifeducation::AIFEBaseModel$set_model_description()</code></a></span></li>
@@ -154,9 +162,9 @@ values for a case for different input orders if you choose \code{fourier} on lin
 
 \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
 
-\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the encoder layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
 
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw'}
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }

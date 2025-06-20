@@ -421,38 +421,27 @@ TEFeatureExtractor <- R6::R6Class(
         gc()
       }
       return(embedded_texts_large)
-    },
-    #--------------------------------------------------------------------------
-    #' @description Check if the [TEFeatureExtractor] is trained.
-    #' @return Returns `TRUE` if the object is trained and `FALSE` if not.
-    is_trained = function() {
-      return(private$trained)
     }
   ),
   private = list(
     trained = FALSE,
     #--------------------------------------------------------------------------
     load_reload_python_scripts = function() {
-      reticulate::py_run_file(
-        system.file("python/py_functions.py",
-          package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_te_classifier.py",
-          package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/pytorch_autoencoder.py",
-          package = "aifeducation"
-        )
-      )
-      reticulate::py_run_file(
-        system.file("python/py_log.py",
-          package = "aifeducation"
-        )
-      )
+      load_py_scripts(c(
+        "pytorch_act_fct.py",
+        "pytorch_loss_fct.py",
+        "pytorch_layers.py",
+        "pytorch_layers_normalization.py",
+        "pytorch_stack_layers.py",
+        "pytorch_autoencoder.py",
+        "py_log.py",
+        "py_functions.py",
+        "pytorch_classifier_models.py",
+        "pytorch_cls_training_loops.py",
+        "pytorch_predict_batch.py",
+        "pytorch_datacollators.py",
+        "pytorch_old_scripts.py"
+      ))
     },
     #--------------------------------------------------------------------------
     create_reset_model = function() {

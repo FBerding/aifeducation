@@ -5,7 +5,8 @@ testthat::skip_if_not(
 )
 
 # config------------------------------------------------------------------------
-object_class_names <- get_TEClassifiers_class_names(super_class = "TEClassifiersBasedOnProtoNet")
+#object_class_names <- get_TEClassifiers_class_names(super_class = "TEClassifiersBasedOnProtoNet")
+object_class_names <-"TEClassifierProtoNet"
 max_samples <- 10
 max_samples_CI <- 50
 

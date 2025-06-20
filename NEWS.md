@@ -40,6 +40,7 @@ editor_options:
   the folder is removed.
 - Parameter 'name' in 'configure' is now optional. If set to `NULL` a unique name is
   generated automatically. 
+- Added Focal Loss as a new loss function to sequential classifiers.
   
 **FeatureExtractor**
 

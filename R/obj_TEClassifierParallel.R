@@ -41,50 +41,94 @@ TEClassifierParallel <- R6::R6Class(
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
-    #' @param bias `r get_param_doc_desc("bias")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
-    #' @param dense_layers `r get_param_doc_desc("dense_layers")`
-    #' @param dense_size `r get_param_doc_desc("dense_size")`
-    #' @param rec_layers `r get_param_doc_desc("rec_layers")`
-    #' @param rec_size `r get_param_doc_desc("rec_size")`
+    #' @param intermediate_features `r get_param_doc_desc("intermediate_features")`
+    #' @param cls_pooling_type `r get_param_doc_desc("cls_pooling_type")`
+    #' @param residual_type `r get_param_doc_desc("residual_type")`
+    #' @param normalization_type `r get_param_doc_desc("normalization_type")`
+    #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
+    #' @param feat_size `r get_param_doc_desc("feat_size")`
+    #' @param feat_bias `r get_param_doc_desc("feat_bias")`
+    #' @param feat_dropout `r get_param_doc_desc("feat_dropout")`
+    #' @param feat_parametrizations `r get_param_doc_desc("feat_parametrizations")`
+    #' @param conv_act_fct `r get_param_doc_desc("conv_act_fct")`
+    #' @param conv_n_layers `r get_param_doc_desc("conv_n_layers")`
+    #' @param conv_ks_min `r get_param_doc_desc("conv_ks_min")`
+    #' @param conv_ks_max `r get_param_doc_desc("conv_ks_max")`
+    #' @param conv_bias `r get_param_doc_desc("conv_bias")`
+    #' @param conv_parametrizations `r get_param_doc_desc("conv_parametrizations")`
+    #' @param dense_act_fct `r get_param_doc_desc("dense_act_fct")`
+    #' @param dense_n_layers `r get_param_doc_desc("dense_n_layers")`
+    #' @param dense_dropout `r get_param_doc_desc("dense_dropout")`
+    #' @param dense_bias `r get_param_doc_desc("dense_bias")`
+    #' @param dense_parametrizations `r get_param_doc_desc("dense_parametrizations")`
+    #' @param rec_act_fct `r get_param_doc_desc("rec_act_fct")`
+    #' @param rec_n_layers `r get_param_doc_desc("rec_n_layers")`
     #' @param rec_type `r get_param_doc_desc("rec_type")`
     #' @param rec_bidirectional `r get_param_doc_desc("rec_bidirectional")`
-    #' @param attention_type `r get_param_doc_desc("attention_type")`
-    #' @param self_attention_heads `r get_param_doc_desc("self_attention_heads")`
-    #' @param repeat_encoder `r get_param_doc_desc("repeat_encoder")`
-    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
-    #' @param add_pos_embedding `r get_param_doc_desc("add_pos_embedding")`
-    #' @param act_fct `r get_param_doc_desc("act_fct")`
-    #' @param parametrizations `r get_param_doc_desc("parametrizations")`
-    #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
-    #' @param dense_dropout `r get_param_doc_desc("dense_dropout")`
     #' @param rec_dropout `r get_param_doc_desc("rec_dropout")`
+    #' @param rec_bias `r get_param_doc_desc("rec_bias")`
+    #' @param rec_parametrizations `r get_param_doc_desc("rec_parametrizations")`
+    #' @param tf_act_fct `r get_param_doc_desc("tf_act_fct")`
+    #' @param tf_dense_dim `r get_param_doc_desc("tf_dense_dim")`
+    #' @param tf_n_layers `r get_param_doc_desc("tf_n_layers")`
+    #' @param tf_dropout_rate_1 `r get_param_doc_desc("tf_dropout_rate_1")`
+    #' @param tf_dropout_rate_2 `r get_param_doc_desc("tf_dropout_rate_2")`
+    #' @param tf_attention_type `r get_param_doc_desc("tf_attention_type")`
+    #' @param tf_embedding_type `r get_param_doc_desc("tf_embedding_type")`
+    #' @param tf_num_heads `r get_param_doc_desc("tf_num_heads")`
+    #' @param tf_bias `r get_param_doc_desc("tf_bias")`
+    #' @param tf_parametrizations `r get_param_doc_desc("tf_parametrizations")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
+    #' @param merge_attention_type `r get_param_doc_desc("merge_attention_type")`
+    #' @param merge_num_heads `r get_param_doc_desc("merge_num_heads")`
     #' @return Returns an object of class [TEClassifierRegular] which is ready for training.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         bias=TRUE,
-                         dense_size = 4,
-                         dense_layers = 0,
-                         rec_size = 4,
-                         rec_layers = 2,
-                         rec_type = "gru",
-                         rec_bidirectional = FALSE,
-                         self_attention_heads = 0,
-                         intermediate_size = NULL,
-                         attention_type = "fourier",
-                         add_pos_embedding = TRUE,
-                         act_fct="elu",
-                         parametrizations="None",
-                         rec_dropout = 0.1,
-                         repeat_encoder = 1,
-                         dense_dropout = 0.4,
-                         encoder_dropout = 0.1,
+                         intermediate_features=NULL,
+                         cls_pooling_type="min_max",
+                         residual_type="residual_gate",
+                         normalization_type="layer_nom",
+                         feat_act_fct="elu",
+                         feat_size=50,
+                         feat_bias=TRUE,
+                         feat_dropout=0.0,
+                         feat_parametrizations="None",
+                         conv_act_fct="elu",
+                         conv_n_layers=1,
+                         conv_ks_min=2,
+                         conv_ks_max=4,
+                         conv_bias=FALSE,
+                         conv_parametrizations="None",
+                         dense_act_fct="elu",
+                         dense_n_layers=1,
+                         dense_dropout=0.0,
+                         dense_bias=FALSE,
+                         dense_parametrizations="None",
+                         rec_act_fct="tanh",
+                         rec_n_layers=1,
+                         rec_type="gru",
+                         rec_bidirectional=FALSE,
+                         rec_dropout=0.0,
+                         rec_bias=FALSE,
+                         rec_parametrizations="None",
+                         tf_act_fct="elu",
+                         tf_dense_dim=50,
+                         tf_n_layers=1,
+                         tf_dropout_rate_1=0.0,
+                         tf_dropout_rate_2=0.0,
+                         tf_attention_type="multihead",
+                         tf_embedding_type="absolute",
+                         tf_num_heads=1,
+                         tf_bias=FALSE,
+                         tf_parametrizations="None",
+                         merge_attention_type="multi_head",
+                         merge_num_heads=1,
                          optimizer = "adamw") {
-      private$do_configuration(args=get_called_args(n=1))
+       private$do_configuration(args=get_called_args(n=1))
     }
   ),
   #Private---------------------------------------------------------------------
@@ -96,93 +140,62 @@ TEClassifierParallel <- R6::R6Class(
 
       private$load_reload_python_scripts()
 
-      self$model <- py$TextEmbeddingClassifier_PT(
+      self$model <- py$TEClassifierParallel(
         features = as.integer(self$model_config$features),
         times = as.integer(self$model_config$times),
-        bias=self$model_config$bias,
-        dense_size = as.integer(self$model_config$dense_size),
-        dense_layers = as.integer(self$model_config$dense_layers),
-        rec_size = as.integer(self$model_config$rec_size),
-        rec_layers = as.integer(self$model_config$rec_layers),
-        rec_type = self$model_config$rec_type,
-        rec_bidirectional = self$model_config$rec_bidirectional,
-        intermediate_size = as.integer(self$model_config$intermediate_size),
-        attention_type = self$model_config$attention_type,
-        repeat_encoder = as.integer(self$model_config$repeat_encoder),
-        dense_dropout = self$model_config$dense_dropout,
-        rec_dropout = self$model_config$rec_dropout,
-        encoder_dropout = self$model_config$encoder_dropout,
-        add_pos_embedding = self$model_config$add_pos_embedding,
-        self_attention_heads = as.integer(self$model_config$self_attention_heads),
-        target_levels = self$model_config$target_levels,
-        act_fct=self$model_config$act_fct,
-        parametrizations=self$model_config$parametrizations
+        n_target_levels = as.integer(length(self$model_config$target_levels)),
+        pad_value=as.integer(private$text_embedding_model$pad_value),
+        intermediate_features=as.integer(self$model_config$intermediate_features),
+        pooling_type=self$model_config$cls_pooling_type,
+        residual_type=self$model_config$residual_type,
+        normalization_type=self$model_config$normalization_type,
+        feat_act_fct=self$model_config$feat_act_fct,
+        feat_size=as.integer(self$model_config$feat_size),
+        feat_bias=self$model_config$feat_bias,
+        feat_dropout=self$model_config$feat_dropout,
+        feat_parametrizations=self$model_config$feat_parametrizations,
+        conv_act_fct=self$model_config$conv_act_fct,
+        conv_n_layers=as.integer(self$model_config$conv_n_layers),
+        conv_ks_min=as.integer(self$model_config$conv_ks_min),
+        conv_ks_max=as.integer(self$model_config$conv_ks_max),
+        conv_bias=self$model_config$conv_bias,
+        conv_parametrizations=self$model_config$conv_parametrizations,
+        dense_act_fct=self$model_config$dense_act_fct,
+        dense_n_layers=as.integer(self$model_config$dense_n_layers),
+        dense_dropout=self$model_config$dense_dropout,
+        dense_bias=self$model_config$dense_bias,
+        dense_parametrizations=self$model_config$dense_parametrizations,
+        rec_act_fct=self$model_config$rec_act_fct,
+        rec_n_layers=as.integer(self$model_config$rec_n_layers),
+        rec_type=self$model_config$rec_type,
+        rec_bidirectional=self$model_config$rec_bidirectional,
+        rec_dropout=self$model_config$rec_dropout,
+        rec_bias=self$model_config$rec_bias,
+        rec_parametrizations=self$model_config$rec_parametrizations,
+        tf_act_fct=self$model_config$tf_act_fct,
+        tf_dense_dim=as.integer(self$model_config$tf_dense_dim),
+        tf_n_layers=as.integer(self$model_config$tf_n_layers),
+        tf_dropout_rate_1=self$model_config$tf_dropout_rate_1,
+        tf_dropout_rate_2=self$model_config$tf_dropout_rate_2,
+        tf_attention_type=self$model_config$tf_attention_type,
+        tf_embedding_type=self$model_config$tf_embedding_type,
+        tf_num_heads=as.integer(self$model_config$tf_num_heads),
+        tf_bias=self$model_config$tf_bias,
+        tf_parametrizations=self$model_config$tf_parametrizations,
+        merge_attention_type=self$model_config$merge_attention_type,
+        merge_num_heads=as.integer(self$model_config$merge_num_heads)
       )
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration=function(){
-      if (self$model_config$dense_layers > 0) {
-        if (self$model_config$dense_size < 1) {
-          stop("Dense layers added. Size for dense layers must be at least 1.")
-        }
-      }
 
-      if (self$model_config$rec_layers > 0) {
-        if (self$model_config$rec_size < 1) {
-          stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
-        }
-      }
-
-      if (self$model_config$repeat_encoder > 0 &
-          self$model_config$attention_type == "multihead" &
-          self$model_config$self_attention_heads <= 0) {
-        stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
-      }
-
-      if (self$model_config$rec_layers != 0 & self$model_config$self_attention_heads > 0) {
-        if (self$model_config$features %% 2 != 0) {
-          stop("The number of features of the TextEmbeddingmodel is
-               not a multiple of 2.")
-        }
-      }
     },
     #--------------------------------------------------------------------------
     adjust_configuration = function() {
-      if (is.null(self$model_config$intermediate_size) == TRUE) {
-        if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers > 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$rec_size
-        } else if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers == 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (
-          self$model_config$attention_type == "multihead" &
-          self$model_config$rec_layers > 0 &
-          self$model_config$self_attention_heads > 0
-        ) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else if (
-          self$model_config$attention_type == "multihead" &
-          self$model_config$rec_layers == 0 &
-          self$model_config$self_attention_heads > 0
-        ) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
-        } else {
-          self$model_config$intermediate_size <- NULL
-        }
-      }
 
-      if (self$model_config$rec_layers <= 1) {
-        self$model_config$rec_dropout <- 0.0
-      }
-      if (self$model_config$rec_layers <= 0) {
-        self$model_config$rec_size <- 0
-      }
-
-      if (self$model_config$dense_layers <= 1) {
-        self$model_config$dense_dropout <- 0.0
-      }
-      if (self$model_config$dense_layers <= 0) {
-        self$model_config$dense_size <- 0
-      }
     }
   )
 )
+
+#Add Classifier to central index
+TEClassifiers_class_names<-append(x=TEClassifiers_class_names,values = "TEClassifierParallel")
