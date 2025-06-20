@@ -15,7 +15,7 @@ get_n_chunks(text_embeddings, features, times, pad_value = -100)
 
 \item{pad_value}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= -100}}
+Default is \code{-100}. Allowed values: \code{ x <= 0}}
 }
 \value{
 Named\code{vector} of integers representing the number of chunks/sequences for every case.

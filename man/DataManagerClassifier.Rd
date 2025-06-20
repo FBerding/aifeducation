@@ -110,7 +110,7 @@ The remaining cases are part of the training data. Allowed values: \verb{0 < x <
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= -100}}
+Default is \code{-100}. Allowed values: \code{ x <= 0}}
 
 \item{\code{class_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
