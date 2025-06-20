@@ -288,6 +288,12 @@ AIFEBaseModel <- R6::R6Class(
       return(private$configured)
     },
     #--------------------------------------------------------------------------
+    #' @description Check if the [TEFeatureExtractor] is trained.
+    #' @return Returns `TRUE` if the object is trained and `FALSE` if not.
+    is_trained = function() {
+      return(private$trained)
+    },
+    #--------------------------------------------------------------------------
     #' @description Method for requesting all private fields and methods. Used for loading and updating an object.
     #' @return Returns a `list` with all private fields and methods.
     get_private = function() {
@@ -439,11 +445,24 @@ AIFEBaseModel <- R6::R6Class(
     },
     #------------------------------------------------------------------------
     detach_tensors = function(tensors) {
-      if (torch$cuda$is_available()) {
-        return(tensors$detach()$cpu()$numpy())
+      if("torch.Tensor"%in%class(tensors)){
+        if (torch$cuda$is_available()) {
+          return(tensors$detach()$cpu()$numpy())
+        } else {
+          return(tensors$detach()$numpy())
+        }
       } else {
-        return(tensors$detach()$numpy())
+        return(tensors)
       }
+    },
+    #----------------------------------------------------------------------
+    detach_list_of_tensors=function(tensor_list){
+      for(i in seq_along(tensor_list)){
+        tensor_list[i]<-list(
+          private$detach_tensors(tensor_list[[i]])
+        )
+      }
+      return(tensor_list)
     },
     #-----------------------------------------------------------------------
     load_reload_python_scripts = function() {

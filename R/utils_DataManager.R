@@ -482,13 +482,13 @@ get_n_chunks <- function(text_embeddings, features, times,pad_value=-100) {
     for (i in 1:times) {
       window <- c(1:features) + (i - 1) * features
       sub_matrix <- text_embeddings[, window, drop = FALSE]
-      tmp_sums <- rowSums(abs(sub_matrix))
+      tmp_sums <- rowSums(sub_matrix)
       n_chunks <- n_chunks + as.numeric(!tmp_sums == times*pad_value)
     }
   } else if (length(dim(text_embeddings)) == 3) {
     for (i in 1:times) {
       sub_matrix <- text_embeddings[, i, , drop = FALSE]
-      tmp_sums <- rowSums(abs(sub_matrix))
+      tmp_sums <- rowSums(sub_matrix)
       n_chunks <- n_chunks + as.numeric(!tmp_sums == features*pad_value)
     }
   } else {

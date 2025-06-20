@@ -37,6 +37,7 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param data_targets `r get_param_doc_desc("data_targets")`.
     #' @param data_folds `r get_param_doc_desc("data_folds")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
+    #' @param cls_loss_fct_name `r get_param_doc_desc("cls_loss_fct_name")`
     #' @param balance_class_weights `r get_param_doc_desc("balance_class_weights")`
     #' @param balance_sequence_length `r get_param_doc_desc("balance_sequence_length")`
     #' @param use_sc `r get_param_doc_desc("use_sc")`
@@ -76,6 +77,7 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      data_val_size = 0.25,
                      balance_class_weights = TRUE,
                      balance_sequence_length = TRUE,
+                     cls_loss_fct_name="focal_loss",
                      use_sc = TRUE,
                      sc_method = "knnor",
                      sc_min_k = 1,

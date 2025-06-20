@@ -40,6 +40,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
     #' @param balance_class_weights `r get_param_doc_desc("balance_class_weights")`
     #' @param balance_sequence_length `r get_param_doc_desc("balance_sequence_length")`
+    #' @param pt_loss_fct_name `r get_param_doc_desc("pt_loss_fct_name")`
     #' @param use_sc `r get_param_doc_desc("use_sc")`
     #' @param sc_method `r get_param_doc_desc("sc_method")`
     #' @param sc_min_k `r get_param_doc_desc("sc_min_k")`
@@ -77,10 +78,11 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' * `pl_anchor:` With the help of this value, the new cases are sorted. For
     #' this aim, the distance from the anchor is calculated and all cases are arranged into an ascending order.
     #'
-    train = function(data_embeddings=NULL,
-                     data_targets=NULL,
+    train = function(data_embeddings = NULL,
+                     data_targets = NULL,
                      data_folds = 5,
                      data_val_size = 0.25,
+                     pt_loss_fct_name = "multi_way_contrastive_loss",
                      use_sc = TRUE,
                      sc_method = "knnor",
                      sc_min_k = 1,
@@ -107,10 +109,66 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      log_dir = NULL,
                      log_write_interval = 10,
                      n_cores = auto_n_cores(),
-                     lr_rate=1e-3,
-                     lr_warm_up_ratio=0.02) {
-      private$do_training(args=get_called_args(n=1))
+                     lr_rate = 1e-3,
+                     lr_warm_up_ratio = 0.02) {
+      private$do_training(args = get_called_args(n = 1))
+    },
+    #---------------------------------------------------------------------------
+    #' @description Method for predicting the class of given data (query) based on provided examples (sample).
+    #' @param newdata Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing the text
+    #'   embeddings for all cases which should be predicted. They form the query set.
+    #' @param embeddings_s Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing the text
+    #'   embeddings for all reference examples. They form the sample set.
+    #' @param classes_s Named `factor` containing the classes for every case within `embeddings_s`.
+    #' @param batch_size `int` batch size.
+    #' @param ml_trace `r get_param_doc_desc("ml_trace")`
+    #' @return Returns a `data.frame` containing the predictions and the probabilities of the different labels for each
+    #'   case.
+    predict_with_samples = function(newdata,
+                                    batch_size = 32,
+                                    ml_trace = 1,
+                                    embeddings_s = NULL,
+                                    classes_s = NULL) {
+      forward_results <- private$forward(
+        embeddings_q = newdata,
+        classes_q = NULL,
+        batch_size = batch_size,
+        ml_trace = ml_trace,
+        embeddings_s = embeddings_s,
+        classes_s = classes_s,
+        prediction_mode = TRUE
+      )
 
+      # Ids of the rows of newdata
+      #current_row_names <- forward_results$rownames_q
+
+      # Possible classes
+      class_labels <- forward_results$class_labels
+
+      # Probabilities for every class
+      predictions_prob <- forward_results$results
+
+      # Index with highest probability
+      predictions <- max.col(predictions_prob) - 1
+
+      # Transforming predictions to target levels------------------------------
+      predictions <- as.character(as.vector(predictions))
+      for (i in 0:(length(class_labels) - 1)) {
+        predictions <- replace(
+          x = predictions,
+          predictions == as.character(i),
+          values = class_labels[i + 1]
+        )
+      }
+
+      # Transforming to a factor
+      predictions <- factor(predictions, levels = class_labels)
+
+      #colnames(predictions_prob) <- class_labels
+      predictions_prob <- as.data.frame(predictions_prob)
+      predictions_prob$expected_category <- predictions
+      #rownames(predictions_prob) <- current_row_names
+      return(predictions_prob)
     },
     #---------------------------------------------------------------------------
     #' @description Method for embedding documents. Please do not confuse this type of embeddings with the embeddings of
@@ -118,109 +176,47 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #'   similarity to specific classes.
     #' @param embeddings_q Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing the text
     #'   embeddings for all cases which should be embedded into the classification space.
+    #' @param embeddings_s Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing the text
+    #'   embeddings for all reference examples. They form the sample set. If set to `NULL` the trained prototypes are used.
+    #' @param classes_s Named `factor` containing the classes for every case within `embeddings_s`.
+    #'    If set to `NULL` the trained prototypes are used.
     #' @param batch_size `int` batch size.
+    #' @param ml_trace `r get_param_doc_desc("ml_trace")`
     #' @return Returns a `list` containing the following elements
     #'
     #' * `embeddings_q`: embeddings for the cases (query sample).
+    #' * `distances_q`: `matrix` containing the distance of every query case to every prototype.
     #' * `embeddings_prototypes`: embeddings of the prototypes which were learned during training. They represents the
-    #' center for the different classes.
+    #'    center for the different classes.
     #'
-    embed = function(embeddings_q = NULL, batch_size = 32) {
-      check_class(object=embeddings_q, classes=c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL=FALSE)
-      check_type(object=batch_size, type="int", FALSE)
-
-      # Check input for compatible text embedding models and feature extractors
-      if ("EmbeddedText" %in% class(embeddings_q)) {
-        self$check_embedding_model(text_embeddings = embeddings_q)
-        requires_compression <- self$requires_compression(embeddings_q)
-      } else if ("array" %in% class(embeddings_q)) {
-        requires_compression <- self$requires_compression(embeddings_q)
-      } else {
-        requires_compression <- FALSE
-      }
-
+    embed = function(embeddings_q = NULL, embeddings_s = NULL, classes_s = NULL, batch_size = 32,ml_trace = 1) {
       # Load Custom Model Scripts
       private$load_reload_python_scripts()
 
-      # Check number of cases in the data
-      single_prediction <- private$check_single_prediction(embeddings_q)
-
-      # Get current row names/name of the cases
-      current_row_names <- private$get_rownames_from_embeddings(embeddings_q)
-
-      # Apply feature extractor if it is part of the model
-      if (requires_compression == TRUE) {
-        # Returns a data set
-        embeddings_q <- self$feature_extractor$extract_features(
-          data_embeddings = embeddings_q,
-          batch_size = as.integer(batch_size)
-        )
-      }
-
-
-      # If at least two cases are part of the data set---------------------------
-      if (single_prediction == FALSE) {
-        # Returns a data set object
-        prediction_data_q_embeddings <- private$prepare_embeddings_as_dataset(embeddings_q)
-
-        prediction_data_q_embeddings$set_format("torch")
-        embeddings_and_distances <- py$TeProtoNetBatchEmbedDistance(
-          model = self$model,
-          dataset_q = prediction_data_q_embeddings,
-          batch_size = as.integer(batch_size)
-        )
-        embeddings_tensors_q <- private$detach_tensors(embeddings_and_distances[[1]])
-        distances_tensors_q <- private$detach_tensors(embeddings_and_distances[[2]])
-      } else {
-        prediction_data_q_embeddings <- private$prepare_embeddings_as_np_array(embeddings_q)
-
-        # Apply feature extractor if it is part of the model
-        if (requires_compression == TRUE) {
-          # Returns a data set
-          prediction_data_q <- np$array(self$feature_extractor$extract_features(
-            data_embeddings = prediction_data_q_embeddings,
-            batch_size = as.integer(batch_size)
-          )$embeddings)
-        }
-
-
-        if (torch$cuda$is_available()) {
-          device <- "cuda"
-          dtype <- torch$double
-          self$model$to(device, dtype = dtype)
-          self$model$eval()
-          input <- torch$from_numpy(prediction_data_q_embeddings)
-          embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
-          embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
-          distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
-          distances_tensors_q <- private$detach_tensors(distances_tensors_q)
-        } else {
-          device <- "cpu"
-          dtype <- torch$float
-          self$model$to(device, dtype = dtype)
-          self$model$eval()
-          input <- torch$from_numpy(prediction_data_q_embeddings)
-          embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
-          embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
-          distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
-          distances_tensors_q <- private$detach_tensors(distances_tensors_q)
-        }
-      }
-
-      embeddings_prototypes <- private$detach_tensors(
-        self$model$get_trained_prototypes()
+      #Check arguments and forward
+      forward_results <- private$forward(
+        embeddings_q = embeddings_q,
+        classes_q = NULL,
+        batch_size = batch_size,
+        ml_trace = ml_trace,
+        embeddings_s = embeddings_s,
+        classes_s = classes_s,
+        prediction_mode = FALSE
       )
 
-      # Post processing
-      rownames(embeddings_tensors_q) <- current_row_names
-      rownames(distances_tensors_q) <- current_row_names
-      rownames(embeddings_prototypes) <- self$model_config$target_levels
-
-      return(list(
-        embeddings_q = embeddings_tensors_q,
-        distances_q = distances_tensors_q,
-        embeddings_prototypes = embeddings_prototypes
-      ))
+      return(
+        list(
+        embeddings_q = forward_results$results$embeddings_query,
+        distances_q = forward_results$results$embeddings_query,
+        embeddings_prototypes = forward_results$results$prototype_embeddings
+      )
+      )
+    },
+    #---------------------------------------------------------------------------
+    #' @description Method returns the scaling factor of the metric.
+    #' @return Returns the scaling factor of the metric as `float`.
+    get_metric_scale_factor=function(){
+      return(private$detach_tensors(self$model$get_metric_scale_factor()))
     },
     #---------------------------------------------------------------------------
     #' @description Method for creating a plot to visualize embeddings and their corresponding centers (prototypes).
@@ -228,40 +224,56 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #'   embeddings for all cases which should be embedded into the classification space.
     #' @param classes_q Named `factor` containg the true classes for every case. Please note that the names must match
     #'   the names/ids in `embeddings_q`.
+    #' @param embeddings_s Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing the text
+    #'   embeddings for all reference examples. They form the sample set. If set to `NULL` the trained prototypes are used.
+    #' @param classes_s Named `factor` containing the classes for every case within `embeddings_s`.
+    #'    If set to `NULL` the trained prototypes are used.
     #' @param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
     #' @param size_points `int` Size of the points excluding the points for prototypes.
     #' @param size_points_prototypes `int` Size of points representing prototypes.
     #' @param alpha `float` Value indicating how transparent the points should be (important
     #'   if many points overlap). Does not apply to points representing prototypes.
+    #' @param inc_margin `bool` If `TRUE` plot includes the margin around every prototype. Adding margin
+    #' requires a trained model. If the model is not trained this argument is treated as set to `FALSE`.
     #' @param batch_size `int` batch size.
     #' @return Returns a plot of class `ggplot`visualizing embeddings.
     plot_embeddings = function(embeddings_q,
                                classes_q = NULL,
+                               embeddings_s = NULL,
+                               classes_s = NULL,
                                batch_size = 12,
                                alpha = 0.5,
                                size_points = 3,
                                size_points_prototypes = 8,
-                               inc_unlabeled = TRUE) {
+                               inc_unlabeled = TRUE,
+                               inc_margin=TRUE) {
       # Argument checking-------------------------------------------------------
+      #Do forward
+        forward_results <- private$forward(
+          embeddings_q = embeddings_q,
+          classes_q = NULL,
+          batch_size = batch_size,
+          ml_trace = 0,
+          embeddings_s = embeddings_s,
+          classes_s = classes_s,
+          prediction_mode = FALSE
+        )
 
-
-      embeddings <- self$embed(
-        embeddings_q = embeddings_q,
-        batch_size = batch_size
-      )
-
-      prototypes <- as.data.frame(embeddings$embeddings_prototypes)
-      prototypes$class <- rownames(embeddings$embeddings_prototypes)
-      prototypes$type <- rep("prototype", nrow(embeddings$embeddings_prototypes))
+      prototypes <- as.data.frame(forward_results$results$prototype_embeddings)
+      prototypes$class <- rownames(forward_results$results$prototype_embeddings)
+      prototypes$type <- rep("prototype", nrow(forward_results$results$prototype_embeddings))
       colnames(prototypes) <- c("x", "y", "class", "type")
 
-
       if (!is.null(classes_q)) {
+        #Check classes of q and sample
+        labels_sample_and_query=intersect(x=rownames(forward_results$results$prototype_embeddings),levels(classes_q))
+        classes_q[!(classes_q%in%labels_sample_and_query)]=NA
+
         true_values_names <- intersect(
           x = names(na.omit(classes_q)),
           y = private$get_rownames_from_embeddings(embeddings_q)
         )
-        true_values <- as.data.frame(embeddings$embeddings_q[true_values_names, , drop = FALSE])
+        true_values <- as.data.frame(forward_results$results$embeddings_query[true_values_names, , drop = FALSE])
         true_values$class <- classes_q[true_values_names]
         true_values$type <- rep("labeled", length(true_values_names))
         colnames(true_values) <- c("x", "y", "class", "type")
@@ -278,11 +290,22 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         )
 
         if (length(estimated_values_names) > 0) {
-          estimated_values <- as.data.frame(embeddings$embeddings_q[estimated_values_names, , drop = FALSE])
-          estimated_values$class <- private$calc_classes_on_distance(
-            distance_matrix = embeddings$distances_q[estimated_values_names, , drop = FALSE],
-            prototypes = embeddings$embeddings_prototypes
-          )
+          estimated_values <- as.data.frame(forward_results$results$embeddings_query[estimated_values_names, , drop = FALSE])
+          #Get Classes
+          class_labels <- forward_results$class_labels
+          predictions_prob=forward_results$results$predictions_prob[estimated_values_names, , drop = FALSE]
+          predictions <- max.col(predictions_prob) - 1
+          # Transforming predictions to target levels------------------------------
+          predictions <- as.character(as.vector(predictions))
+          for (i in 0:(length(class_labels) - 1)) {
+            predictions <- replace(
+              x = predictions,
+              predictions == as.character(i),
+              values = class_labels[i + 1]
+            )
+          }
+
+          estimated_values$class <- predictions
           estimated_values$type <- rep("unlabeled", length(estimated_values_names))
           colnames(estimated_values) <- c("x", "y", "class", "type")
         }
@@ -324,23 +347,245 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
           )
         ) +
         ggplot2::theme_classic()
+
+      if(inc_margin==TRUE){
+        margin=self$last_training$config$loss_margin
+        #scaled_margin=margin*self$get_metric_scale_factor()
+        if(!is.null(margin)){
+          for(i in 1:nrow(prototypes)){
+            current_proto=prototypes[i,]
+            plot=plot+ggplot2::annotate(
+              geom="point",
+              x=current_proto$x+margin*cos(seq(from=0,to=2*base::pi,length.out=1000)),
+              y=current_proto$y+margin*sin(seq(from=0,to=2*base::pi,length.out=1000)),
+            )
+          }
+        } else {
+          warning("Last training has not provided a valid margin. Creating plot without margin.")
+        }
+      }
       return(plot)
     }
   ),
   private = list(
-    #-------------------------------------------------------------------------
-    calc_classes_on_distance = function(distance_matrix, prototypes) {
-      index_vector <- vector(length = nrow(distance_matrix))
+    #------------------------------------------------------------------------
+    forward = function(embeddings_q,
+                       classes_q = NULL,
+                       embeddings_s = NULL,
+                       classes_s = NULL,
+                       batch_size = 32,
+                       ml_trace = 1,
+                       prediction_mode = TRUE) {
+      # Check arguments
+      check_class(object = embeddings_q, classes = c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL = FALSE)
+      check_class(object = classes_q, classes = c("factor"), allow_NULL = TRUE)
+      check_class(object = embeddings_s, classes = c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL = TRUE)
+      check_class(object = classes_s, classes = c("factor"), allow_NULL = TRUE)
+      check_type(object = batch_size, object_name = "batch_size", type = "int", FALSE)
+      check_type(object = ml_trace, object_name = "ml_trace", type = "int", FALSE)
+      check_type(object = prediction_mode, object_name = "prediction_mode", type = "bool")
 
-      for (i in seq_len(length(index_vector))) {
-        index_vector[i] <- which.min(distance_matrix[i, ])
+      if((is.null(embeddings_s)& !is.null(classes_s))){
+        warning("embeddings_s is not set but classes_s is set. Conitnue with setting both to NULL")
+        classes_s=NULL
+      }
+      if((!is.null(embeddings_s)& is.null(classes_s))){
+        warning("embeddings_s is set but classes_s is not set. Conitnue with setting both to NULL")
+        embeddings_s=NULL
       }
 
-      classes <- factor(index_vector,
-        levels = seq_len(nrow(prototypes)),
-        labels = rownames(prototypes)
+      # Load Custom Model Scripts
+      private$load_reload_python_scripts()
+
+      # prepare embeddings
+      embeddings_q <- private$prepare_embeddings_for_forward(embeddings_q)
+      if (!is.null(embeddings_s)) {
+        embeddings_s <- private$prepare_embeddings_for_forward(embeddings_s)
+      }
+
+      # Check number of cases in the data
+      single_prediction <- private$check_single_prediction(embeddings_q)
+
+      # Get current row names/name of the cases
+      current_row_names <- private$get_rownames_from_embeddings(embeddings_q)
+
+      # Prepare classes for sample
+      if (!is.null(classes_s)) {
+        class_freq_table=table(na.omit(classes_s))
+        class_freq_table=subset(class_freq_table,class_freq_table>0)
+        class_labels <- names(class_freq_table)
+
+        classes_s <- as.character(classes_s)
+        for(i in seq_along(class_labels)){
+          classes_s[classes_s==class_labels[i]]=i
+        }
+        classes_s=as.numeric(classes_s)-1
+      } else {
+        class_labels <- self$model_config$target_levels
+        classes_s <- NULL
+      }
+
+      # Prepare classes for query
+      if (!is.null(classes_q)) {
+        classes_q <- as.character(classes_q)
+        classes_q <- factor(x = classes_q, levels = class_labels)
+        classes_q <- as.numeric(classes_q) - 1
+      } else {
+        classes_q <- NULL
+      }
+
+      # Prepare data for pytorch
+      if(!is.null(embeddings_s)){
+        embeddings_s <- embeddings_s$get_dataset()
+        embeddings_s$set_format("torch")
+        embeddings_s <- embeddings_s[["input"]]
+      }
+
+      if (!is.null(classes_s)) {
+        classes_s <- torch$from_numpy(prepare_r_array_for_dataset(classes_s))
+      }
+      if (!is.null(classes_q)) {
+        classes_q <- torch$from_numpy(prepare_r_array_for_dataset(classes_q))
+      }
+
+      # If at least two cases are part of the data set---------------------------
+      if (single_prediction == FALSE) {
+        prediction_data <- private$prepare_embeddings_as_dataset(embeddings_q)
+        prediction_data$set_format("torch")
+
+        results <- py$TeProtoNetClassifierBatchPredict(
+          model = self$model,
+          dataset = prediction_data,
+          batch_size = as.integer(batch_size),
+          embeddings_s = embeddings_s,
+          classes_s = classes_s,
+          prediction_mode = prediction_mode
+        )
+
+        # In the case the data has one single row-------------------------------
+      } else {
+        prediction_data <- torch$from_numpy(private$prepare_embeddings_as_np_array(embeddings_q))
+
+        if (torch$cuda$is_available()) {
+          device <- "cuda"
+          dtype <- torch$double
+        } else {
+          device <- "cpu"
+          dtype <- torch$float
+        }
+
+        prediction_data <- prediction_data$to(device, dtype = dtype)
+        if (!is.null(classes_q)) {
+          classes_q <- classes_q$to(device, dtype = dtype)
+        }
+        if (!is.null(classes_s)) {
+          classes_s <- classes_s$to(device, dtype = dtype)
+        }
+        if (!is.null(embeddings_s)) {
+          embeddings_s <- embeddings_s$to(device, dtype = dtype)
+        }
+        self$model$to(device, dtype = dtype)
+        self$model$eval()
+        results <- self$model(
+          input_q = prediction_data$to(device, dtype = dtype),
+          input_s = embeddings_s$to(device, dtype = dtype),
+          classes_s = classes_s$to(device, dtype = dtype),
+          prediction_mode = prediction_mode
+        )
+      }
+
+      if(prediction_mode==TRUE){
+        results<-private$detach_tensors(results)
+        rownames(results)=current_row_names
+        colnames(results)=as.character(class_labels)
+      } else {
+        results<-private$detach_list_of_tensors(results)
+
+        predictions=results[[1]]
+        rownames(predictions)=current_row_names
+        colnames(predictions)=as.character(class_labels)
+
+        distances=results[[2]]
+        rownames(distances)=current_row_names
+        colnames(distances)=as.character(class_labels)
+
+        embeddings_query=results[[4]]
+        rownames(embeddings_query)=current_row_names
+
+        prototype_embeddings=results[[5]]
+        rownames(prototype_embeddings)=as.character(class_labels)
+
+        results=list(
+          predictions_prob=predictions,
+          distances=distances,
+          embeddings_query=embeddings_query,
+          prototype_embeddings=prototype_embeddings
+        )
+      }
+
+      return(list(results = results,
+        class_labels = class_labels#,
+        #rownames_q = current_row_names
       )
-      return(classes)
+      )
+    },
+    #-------------------------------------------------------------------------
+    prepare_embeddings_for_forward = function(embeddings) {
+      # Check if the embeddings must be compressed before passing to the model
+      requires_compression <- self$requires_compression(embeddings)
+
+      # Check input for compatible text embedding models and feature extractors
+      if (
+        "EmbeddedText" %in% class(embeddings) |
+          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+      ) {
+        self$check_embedding_model(text_embeddings = embeddings, require_compressed = FALSE)
+      } else {
+        private$check_embeddings_object_type(embeddings, strict = FALSE)
+        if (requires_compression == TRUE) {
+          stop("Objects of class datasets.arrow_dataset.Dataset must be provided in
+               compressed form.")
+        }
+      }
+
+      # Convert to a LargeDataSetForTextEmbeddings
+      if ("EmbeddedText" %in% class(embeddings)) {
+        embeddings <- embeddings$convert_to_LargeDataSetForTextEmbeddings()
+      } else {
+        embeddings <- embeddings
+      }
+
+      if (requires_compression == TRUE) {
+        # Returns a data set
+        embeddings <- self$feature_extractor$extract_features_large(
+          data_embeddings = embeddings,
+          batch_size = as.integer(batch_size)
+        )
+      }
+
+      return(embeddings)
+    },
+    #-------------------------------------------------------------------------
+    set_random_prototypes=function(){
+      n_row <- length(self$model_config$target_levels)
+      n_col <- self$model_config$embedding_dim
+      self$model$set_trained_prototypes(
+        prototypes = torch$from_numpy(
+          reticulate::np_array(
+            matrix(
+              nrow = n_row,
+              ncol = n_col,
+              data = rnorm(n = n_col * n_row, mean = 0, sd = 1)
+            )
+          )
+        ),
+        class_lables = reticulate::np_array(
+          seq(
+            from = 0,
+            to = (length(self$model_config$target_levels) - 1)
+          )
+        )
+      )
     },
     #--------------------------------------------------------------------------
     basic_train = function(train_data = NULL,
@@ -364,7 +609,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       # Set loss function
-      loss_fct_name <- "ProtoNetworkMargin"
+      cls_loss_fct_name <- "ProtoNetworkMargin"
 
       # Check directory for checkpoints
       create_dir(
@@ -403,12 +648,12 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      history <- py$TeClassifierProtoNetTrain_PT_with_Datasets(
+      history <- py$TeClassifierTrainPrototype(
         model = self$model,
-        loss_fct_name = loss_fct_name,
+        pt_loss_fct_name = self$last_training$config$pt_loss_fct_name,
         optimizer_method = self$model_config$optimizer,
-        lr_rate=self$last_training$config$lr_rate,
-        lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
+        lr_rate = self$last_training$config$lr_rate,
+        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         Ns = as.integer(self$last_training$config$Ns),
         Nq = as.integer(self$last_training$config$Nq),
         loss_alpha = self$last_training$config$loss_alpha,

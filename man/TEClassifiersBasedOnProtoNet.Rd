@@ -27,7 +27,9 @@ Other Classifiers for developers:
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TEClassifiersBasedOnProtoNet-train}{\code{TEClassifiersBasedOnProtoNet$train()}}
+\item \href{#method-TEClassifiersBasedOnProtoNet-predict_with_samples}{\code{TEClassifiersBasedOnProtoNet$predict_with_samples()}}
 \item \href{#method-TEClassifiersBasedOnProtoNet-embed}{\code{TEClassifiersBasedOnProtoNet$embed()}}
+\item \href{#method-TEClassifiersBasedOnProtoNet-get_metric_scale_factor}{\code{TEClassifiersBasedOnProtoNet$get_metric_scale_factor()}}
 \item \href{#method-TEClassifiersBasedOnProtoNet-plot_embeddings}{\code{TEClassifiersBasedOnProtoNet$plot_embeddings()}}
 \item \href{#method-TEClassifiersBasedOnProtoNet-clone}{\code{TEClassifiersBasedOnProtoNet$clone()}}
 }
@@ -47,6 +49,7 @@ Other Classifiers for developers:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_publication_info'><code>aifeducation::AIFEBaseModel$get_publication_info()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-get_sustainability_data'><code>aifeducation::AIFEBaseModel$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_configured"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_configured'><code>aifeducation::AIFEBaseModel$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="is_trained"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-is_trained'><code>aifeducation::AIFEBaseModel$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="load"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-load'><code>aifeducation::AIFEBaseModel$load()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_documentation_license'><code>aifeducation::AIFEBaseModel$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="set_model_description"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-set_model_description'><code>aifeducation::AIFEBaseModel$set_model_description()</code></a></span></li>
@@ -81,6 +84,7 @@ is used as the final model.
   data_targets = NULL,
   data_folds = 5,
   data_val_size = 0.25,
+  pt_loss_fct_name = "multi_way_contrastive_loss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -125,6 +129,8 @@ named and has to use the same names as used in in the embeddings. .}
 \item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
+
+\item{\code{pt_loss_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'MultiWayContrastiveLoss'}
 
 \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
 
@@ -218,6 +224,43 @@ Function does not return a value. It changes the object into a trained classifie
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifiersBasedOnProtoNet-predict_with_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifiersBasedOnProtoNet-predict_with_samples}{}}}
+\subsection{Method \code{predict_with_samples()}}{
+Method for predicting the class of given data (query) based on provided examples (sample).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnProtoNet$predict_with_samples(
+  newdata,
+  batch_size = 32,
+  ml_trace = 1,
+  embeddings_s = NULL,
+  classes_s = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{newdata}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings for all cases which should be predicted. They form the query set.}
+
+\item{\code{batch_size}}{\code{int} batch size.}
+
+\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
+
+\item{\code{embeddings_s}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings for all reference examples. They form the sample set.}
+
+\item{\code{classes_s}}{Named \code{factor} containing the classes for every case within \code{embeddings_s}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{data.frame} containing the predictions and the probabilities of the different labels for each
+case.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TEClassifiersBasedOnProtoNet-embed"></a>}}
 \if{latex}{\out{\hypertarget{method-TEClassifiersBasedOnProtoNet-embed}{}}}
 \subsection{Method \code{embed()}}{
@@ -225,7 +268,13 @@ Method for embedding documents. Please do not confuse this type of embeddings wi
 texts created by an object of class \link{TextEmbeddingModel}. These embeddings embed documents according to their
 similarity to specific classes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnProtoNet$embed(embeddings_q = NULL, batch_size = 32)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnProtoNet$embed(
+  embeddings_q = NULL,
+  embeddings_s = NULL,
+  classes_s = NULL,
+  batch_size = 32,
+  ml_trace = 1
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -234,7 +283,15 @@ similarity to specific classes.
 \item{\code{embeddings_q}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
 embeddings for all cases which should be embedded into the classification space.}
 
+\item{\code{embeddings_s}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings for all reference examples. They form the sample set. If set to \code{NULL} the trained prototypes are used.}
+
+\item{\code{classes_s}}{Named \code{factor} containing the classes for every case within \code{embeddings_s}.
+If set to \code{NULL} the trained prototypes are used.}
+
 \item{\code{batch_size}}{\code{int} batch size.}
+
+\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
 }
 \if{html}{\out{</div>}}
 }
@@ -242,9 +299,23 @@ embeddings for all cases which should be embedded into the classification space.
 Returns a \code{list} containing the following elements
 \itemize{
 \item \code{embeddings_q}: embeddings for the cases (query sample).
+\item \code{distances_q}: \code{matrix} containing the distance of every query case to every prototype.
 \item \code{embeddings_prototypes}: embeddings of the prototypes which were learned during training. They represents the
 center for the different classes.
 }
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifiersBasedOnProtoNet-get_metric_scale_factor"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifiersBasedOnProtoNet-get_metric_scale_factor}{}}}
+\subsection{Method \code{get_metric_scale_factor()}}{
+Method returns the scaling factor of the metric.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnProtoNet$get_metric_scale_factor()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns the scaling factor of the metric as \code{float}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -256,11 +327,14 @@ Method for creating a plot to visualize embeddings and their corresponding cente
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifiersBasedOnProtoNet$plot_embeddings(
   embeddings_q,
   classes_q = NULL,
+  embeddings_s = NULL,
+  classes_s = NULL,
   batch_size = 12,
   alpha = 0.5,
   size_points = 3,
   size_points_prototypes = 8,
-  inc_unlabeled = TRUE
+  inc_unlabeled = TRUE,
+  inc_margin = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -273,6 +347,12 @@ embeddings for all cases which should be embedded into the classification space.
 \item{\code{classes_q}}{Named \code{factor} containg the true classes for every case. Please note that the names must match
 the names/ids in \code{embeddings_q}.}
 
+\item{\code{embeddings_s}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings for all reference examples. They form the sample set. If set to \code{NULL} the trained prototypes are used.}
+
+\item{\code{classes_s}}{Named \code{factor} containing the classes for every case within \code{embeddings_s}.
+If set to \code{NULL} the trained prototypes are used.}
+
 \item{\code{batch_size}}{\code{int} batch size.}
 
 \item{\code{alpha}}{\code{float} Value indicating how transparent the points should be (important
@@ -283,6 +363,9 @@ if many points overlap). Does not apply to points representing prototypes.}
 \item{\code{size_points_prototypes}}{\code{int} Size of points representing prototypes.}
 
 \item{\code{inc_unlabeled}}{\code{bool} If \code{TRUE} plot includes unlabeled cases as data points.}
+
+\item{\code{inc_margin}}{\code{bool} If \code{TRUE} plot includes the margin around every prototype. Adding margin
+requires a trained model. If the model is not trained this argument is treated as set to \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }

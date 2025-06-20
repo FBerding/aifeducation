@@ -1023,6 +1023,9 @@ TextEmbeddingModel <- R6::R6Class(
               layer_int <- as.integer(layer)
               index_int <- as.integer(index)
 
+              #Set values to zero to remove padding value
+              text_embedding[i, j, ]<-0
+
               if (torch$cuda$is_available() == FALSE) {
                 if (private$transformer_components$emb_pool_type == "cls") {
                   # CLS Token is always the first token

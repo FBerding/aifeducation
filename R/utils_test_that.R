@@ -127,7 +127,7 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
   test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
 
   test_embeddings_reduced <- test_embeddings$clone(deep = TRUE)
-  test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[1:5, , ]
+  test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[c(1:5,120:125), , ]
   test_embeddings_reduced_LD <- test_embeddings_reduced$convert_to_LargeDataSetForTextEmbeddings()
 
   test_embeddings_single_case <- test_embeddings$clone(deep = TRUE)
@@ -182,4 +182,103 @@ get_current_args_for_print=function(arg_list){
     stop("arg_list must be a list.")
   }
   return(paste(names(arg_list),arg_list,collapse = ", "))
+}
+
+
+generate_tensors=function(times,
+                          features,
+                          seq_len,
+                          pad_value
+){
+  tensor_data=array(
+    data = pad_value,
+    dim = c(length(seq_len),times,features)
+  )
+  for(i in seq_along(seq_len)){
+    for(j in seq(from=1,to=seq_len[i])){
+      for(f in 1:features){
+        tensor_data[i,j,f]<-runif(n=1,min = -1,max = 1)
+      }
+    }
+  }
+  tensor_np=reticulate::np_array(tensor_data)
+  if (numpy_writeable(tensor_np) == FALSE) {
+    warning("Numpy array is not writable")
+  }
+  tensor=torch$from_numpy(tensor_np)
+  return(tensor)
+}
+
+generate_embeddings=function(times,
+                          features,
+                          seq_len,
+                          pad_value
+){
+  tensor_data=array(
+    data = pad_value,
+    dim = c(length(seq_len),times,features)
+  )
+  for(i in seq_along(seq_len)){
+    for(j in seq(from=1,to=seq_len[i])){
+      for(f in 1:features){
+        tensor_data[i,j,f]<-runif(n=1,min = -1,max = 1)
+      }
+    }
+  }
+  return(tensor_data)
+}
+
+get_fixed_test_tensor=function(pad_value){
+  times=3
+  features=7
+  batch=5
+  seq_len=c(1,2,1,3,2)
+  tensor_data=array(
+    data = pad_value,
+    dim = c(batch,times,features)
+  )
+
+  for(i in seq_along(seq_len)){
+    for(j in seq(from=1,to=seq_len[i])){
+      tensor_data[i,j,]=seq(from=-seq_len[i],to=j*batch,length.out=features)
+    }
+  }
+  #write.csv2(tensor_data,file="tensor_data.csv")
+  tensor_np=reticulate::np_array(tensor_data)
+  if (numpy_writeable(tensor_np) == FALSE) {
+    warning("Numpy array is not writable")
+  }
+  tensor=torch$from_numpy(tensor_np)
+  return(tensor)
+
+}
+
+get_simple_test_tensor=function(pad_value,
+                                times,
+                                features,
+                                seq_len,
+                                labels){
+  batch=length(seq_len)
+  tensor_data=array(
+    data = pad_value,
+    dim = c(batch,times,features)
+  )
+
+  factor_labels=factor(labels)
+  factor_labels=as.numeric(factor_labels)
+
+  for(i in seq_along(seq_len)){
+    for(j in seq(from=1,to=seq_len[i])){
+      tensor_data[i,j,]=(1/(factor_labels[i]+1))^factor_labels[i]
+    }
+  }
+  rownames(tensor_data)=names(labels)
+  #write.csv2(tensor_data,file="tensor_data.csv")
+  #tensor_np=reticulate::np_array(tensor_data)
+  #if (numpy_writeable(tensor_np) == FALSE) {
+  #  warning("Numpy array is not writable")
+  #}
+  #tensor=torch$from_numpy(tensor_np)
+  return(tensor_data)
+
 }

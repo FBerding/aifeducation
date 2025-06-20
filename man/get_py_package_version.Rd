@@ -24,6 +24,8 @@ Other Utils:
 \code{\link{get_file_extension}()},
 \code{\link{get_py_package_versions}()},
 \code{\link{is.null_or_na}()},
+\code{\link{load_all_py_scripts}()},
+\code{\link{load_py_scripts}()},
 \code{\link{output_message}()},
 \code{\link{print_message}()},
 \code{\link{run_py_file}()}

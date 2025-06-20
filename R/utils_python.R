@@ -182,3 +182,46 @@ get_py_package_version <- function(package_name) {
     return(NA)
   }
 }
+
+#' @title Load and re-load python scripts
+#' @description Function loads or re-loads python scripts within the package 'aifeducation'.
+#' @param files `vector` containing the file names of the scripts that should be loaded.
+#' @return Function does nothing return. It loads the requested scripts.
+#'
+#' @family Utils
+#' @importFrom reticulate py_run_file
+#' @export
+load_py_scripts <- function(files) {
+  for (file in files) {
+    file_path <- system.file(
+      paste0("python/", file),
+      package = "aifeducation"
+    )
+    if (file_path != "") {
+      reticulate::py_run_file(file_path)
+    } else {
+      stop(paste(file, "does not exist"))
+    }
+  }
+}
+
+#' @title Load and re-load all python scripts
+#' @description Function loads or re-loads all python scripts within the package 'aifeducation'.
+#' @return Function does nothing return. It loads the requested scripts.
+#'
+#' @family Utils
+#' @importFrom reticulate py_run_file
+#' @export
+load_all_py_scripts <- function(files) {
+  python_dir=system.file(
+    "python",
+    package = "aifeducation"
+  )
+  python_files=list.files(
+    path=python_dir
+  )
+
+  for (file in python_files) {
+      reticulate::py_run_file(python_files)
+  }
+}

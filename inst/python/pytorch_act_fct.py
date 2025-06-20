@@ -13,6 +13,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import torch 
+import numpy as np
+import math
+import safetensors
 
 def get_act_fct(name):
   if name=="elu":
@@ -26,8 +29,10 @@ def get_act_fct(name):
   elif name=="sigmoid":
     return torch.nn.Sigmoid()
   elif name=="tanh":
-    return torch.nn.TanH()
+    return torch.nn.Tanh()
   elif name=="prelu":
     return torch.nn.PReLU()
-  
+  elif name=="None":
+    return  torch.nn.Identity()
+
 

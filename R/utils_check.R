@@ -72,7 +72,6 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
   }
 
   if (!allow_NULL && is.null(object)) {
-
     stop(paste(tmp_name,"is not allowed to be NULL"))
   }
 

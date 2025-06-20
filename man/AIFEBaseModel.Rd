@@ -60,6 +60,7 @@ training. This information will be overwritten if a new training is started.
 \item \href{#method-AIFEBaseModel-get_ml_framework}{\code{AIFEBaseModel$get_ml_framework()}}
 \item \href{#method-AIFEBaseModel-count_parameter}{\code{AIFEBaseModel$count_parameter()}}
 \item \href{#method-AIFEBaseModel-is_configured}{\code{AIFEBaseModel$is_configured()}}
+\item \href{#method-AIFEBaseModel-is_trained}{\code{AIFEBaseModel$is_trained()}}
 \item \href{#method-AIFEBaseModel-get_private}{\code{AIFEBaseModel$get_private()}}
 \item \href{#method-AIFEBaseModel-get_all_fields}{\code{AIFEBaseModel$get_all_fields()}}
 \item \href{#method-AIFEBaseModel-clone}{\code{AIFEBaseModel$clone()}}
@@ -359,6 +360,19 @@ value is \code{TRUE}.
 
 \subsection{Returns}{
 \code{bool} \code{TRUE} if the model is fully configured. \code{FALSE} if not.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-AIFEBaseModel-is_trained"></a>}}
+\if{latex}{\out{\hypertarget{method-AIFEBaseModel-is_trained}{}}}
+\subsection{Method \code{is_trained()}}{
+Check if the \link{TEFeatureExtractor} is trained.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{AIFEBaseModel$is_trained()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns \code{TRUE} if the object is trained and \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}

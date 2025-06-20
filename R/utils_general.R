@@ -246,7 +246,15 @@ create_object=function(class){
     return(TEClassifierRegular$new())
   } else if(class=="TEClassifierProtoNet"){
     return(TEClassifierProtoNet$new())
-  } else if(class=="TEFeatureExtractor"){
+  } else if(class=="TEClassifierSequential"){
+    return(TEClassifierSequential$new())
+  }else if(class=="TEClassifierSequentialPrototype"){
+    return(TEClassifierSequentialPrototype$new())
+  }else if(class=="TEClassifierParallel"){
+    return(TEClassifierParallel$new())
+  }else if(class=="TEClassifierParallelPrototype"){
+    return(TEClassifierParallelPrototype$new())
+  }else if(class=="TEFeatureExtractor"){
     return(TEFeatureExtractor$new())
   }  else if (class == "TextEmbeddingModel") {
     return(TextEmbeddingModel$new())
@@ -258,6 +266,8 @@ create_object=function(class){
     return(EmbeddedText$new())
   } else if(class%in%unlist(AIFETrType)){
     return(aife_transformer.make(class))
+  } else {
+    stop("Object is not implemented in this function.")
   }
 }
 
@@ -271,7 +281,8 @@ create_object=function(class){
 #' @family Utils
 #' @export
 detect_base_model_type=function(model){
-  type_string=model$config$architectures
+  type_string=model$config
+  print(type_string)
   if(stringi::stri_detect(str=tolower(type_string),regex = "^funnel([:alnum:]*)")){
     return("funnel")
   } else if(stringi::stri_detect(str=tolower(type_string),regex = "^bert([:alnum:]*)")){

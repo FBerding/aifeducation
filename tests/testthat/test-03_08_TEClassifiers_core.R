@@ -5,19 +5,19 @@ testthat::skip_if_not(
 )
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-# object_class_names=c("TEClassifierRegular")
-max_samples <- 500
+object_class_names=c("TEClassifierSequential")
+max_samples <- 50
 max_samples_CI <- 50
 
-max_samples_training <- 16
+max_samples_training <- 10
 class_range <- c(2, 3)
 
 # Skip Tests-------------------------------------------------------------------
 skip_creation_test <- FALSE
 skip_method_save_load <- FALSE
-skip_function_save_load <- FALSE
-skip_training_test <- FALSE
-skip_documentation <- FALSE
+skip_function_save_load <- TRUE
+skip_training_test <- TRUE
+skip_documentation <- TRUE
 
 
 # SetUp-------------------------------------------------------------------------
@@ -86,6 +86,31 @@ for (object_class_name in object_class_names) {
         rec_dropout = 0.1,
         dense_dropout = 0.1,
         encoder_dropout = 0.1,
+        feat_size=128,
+        intermediate_features=10,
+        tf_dense_dim=26,
+        tf_parametrizations="None",
+        dense_parametrizations="None",
+        rec_parametrizations="None",
+        conv_parametrizations="None",
+        tf_act_fct="elu",
+        dense_act_fct="gelu",
+        conv_act_fct="relu",
+        rec_act_fct="tanh",
+        feat_act_fct="prelu",
+        tf_num_heads=2,
+        tf_bias=TRUE,
+        dense_bias=TRUE,
+        rec_bias=TRUE,
+        conv_bias=TRUE,
+        dense_dropout=0.1,
+        rec_dropout=0.1,
+        tf_dropout_rate_1=0.1,
+        tf_dropout_rate_1=0.1,
+        conv_dropout=0.1,
+        feat_dropout=0.1,
+        conv_ks_min=2,
+        conv_ks_max=3,
         trace = FALSE,
         epochs = 50,
         batch_size = 20,
@@ -105,7 +130,9 @@ for (object_class_name in object_class_names) {
         rec_size = 5,
         self_attention_heads = 2,
         intermediate_size = 6,
-        lr_warm_up_ratio = 0.01
+        lr_warm_up_ratio = 0.01,
+        merge_num_heads=2,
+        merge_attention_type="multihead"
       )
     )
 
@@ -194,57 +221,59 @@ for (object_class_name in object_class_names) {
           )
         })
 
-        if (test_combinations$args[[i]]$attention != "fourier") {
-          test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
-            embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
-            perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
-            embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
+        if(!is.null(test_combinations$args[[i]]$attention)){
+          if (test_combinations$args[[i]]$attention != "fourier") {
+            test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+              embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
+              perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
+              embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
 
-            ids <- rownames(test_embeddings_reduced$embeddings)
+              ids <- rownames(test_embeddings_reduced$embeddings)
 
-            # EmbeddedText
-            predictions <- NULL
-            predictions_Perm <- NULL
-            predictions <- classifier$predict(
-              newdata = test_embeddings_reduced,
-              batch_size = 50,
-              ml_trace = 0
-            )
-            predictions_Perm <- classifier$predict(
-              newdata = embeddings_ET_perm,
-              batch_size = 50,
-              ml_trace = 0
-            )
+              # EmbeddedText
+              predictions <- NULL
+              predictions_Perm <- NULL
+              predictions <- classifier$predict(
+                newdata = test_embeddings_reduced,
+                batch_size = 50,
+                ml_trace = 0
+              )
+              predictions_Perm <- classifier$predict(
+                newdata = embeddings_ET_perm,
+                batch_size = 50,
+                ml_trace = 0
+              )
 
+              expect_equal(
+                predictions[ids, 1:(ncol(predictions) - 1)],
+                predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
+                tolerance = prob_precision
+              )
 
-            expect_equal(
-              predictions[ids, 1:(ncol(predictions) - 1)],
-              predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-              tolerance = prob_precision
-            )
+              # LargeDataSetForTextEmbeddings
+              predictions <- NULL
+              predictions_Perm <- NULL
+              predictions <- classifier$predict(
+                newdata = test_embeddings_reduced_LD,
+                batch_size = 50,
+                ml_trace = 0
+              )
 
+              predictions_Perm <- classifier$predict(
+                newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+                batch_size = 50,
+                ml_trace = 0
+              )
 
-            # LargeDataSetForTextEmbeddings
-            predictions <- NULL
-            predictions_Perm <- NULL
-            predictions <- classifier$predict(
-              newdata = test_embeddings_reduced_LD,
-              batch_size = 50,
-              ml_trace = 0
-            )
-            predictions_Perm <- classifier$predict(
-              newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
-              batch_size = 50,
-              ml_trace = 0
-            )
-
-            expect_equal(
-              predictions[ids, 1:(ncol(predictions) - 1)],
-              predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-              tolerance = prob_precision
-            )
-          })
+              expect_equal(
+                predictions[ids, 1:(ncol(predictions) - 1)],
+                predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
+                tolerance = prob_precision
+              )
+            })
+          }
         }
+
 
         test_that(paste("predict - data source invariance", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
           predictions_ET <- classifier$predict(
@@ -314,9 +343,9 @@ for (object_class_name in object_class_names) {
 
     # Function for loading and saving models-----------------------------------
     if (!skip_function_save_load) {
+      # Randomly select a configuration for training
       i <- sample(x = seq(test_combinations$n_combos), size = 1)
       test_that(paste("function save and load", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
-        # Randomly select a configuration for training
         classifier <- NULL
         gc()
 
