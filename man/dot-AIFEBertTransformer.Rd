@@ -46,7 +46,12 @@ Other Transformers for developers:
 \code{\link{.AIFELongformerTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
 \code{\link{.AIFERobertaTransformer}},
-\code{\link{.AIFETrObj}}
+\code{\link{.AIFETrConfig}},
+\code{\link{.AIFETrModel}},
+\code{\link{.AIFETrModelMLM}},
+\code{\link{.AIFETrObj}},
+\code{\link{.AIFETrTokenizer}},
+\code{\link{.aife_transformer.check_type}()}
 }
 \concept{Transformers for developers}
 \section{Super class}{
@@ -64,6 +69,7 @@ Other Transformers for developers:
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="init_transformer"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-init_transformer'><code>aifeducation::.AIFEBaseTransformer$init_transformer()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_calculate_vocab"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_calculate_vocab'><code>aifeducation::.AIFEBaseTransformer$set_SFC_calculate_vocab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_check_max_pos_emb"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_check_max_pos_emb'><code>aifeducation::.AIFEBaseTransformer$set_SFC_check_max_pos_emb()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_create_final_tokenizer"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_create_final_tokenizer'><code>aifeducation::.AIFEBaseTransformer$set_SFC_create_final_tokenizer()</code></a></span></li>
@@ -86,9 +92,17 @@ Other Transformers for developers:
 \subsection{Method \code{new()}}{
 Creates a new transformer based on \code{BERT} and sets the title.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{.AIFEBertTransformer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{.AIFEBertTransformer$new(init_trace = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{init_trace}}{\code{bool} option to show prints. If \code{TRUE} (by default) - messages will be shown, otherwise
+(\code{FALSE}) - hidden.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 This method returns nothing.
 }

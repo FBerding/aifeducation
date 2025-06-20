@@ -148,12 +148,12 @@
 
     # New ----
 
-    #' @description Creates a new transformer based on `Longformer` and sets the
-    #' title.
-    #' @return This method returns nothing
-    initialize = function() {
-      super$set_title(private$title)
-      print(paste(private$title, "has been initialized."))
+    #' @description Creates a new transformer based on `Longformer` and sets the title.
+    #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+    #'   (`FALSE`) - hidden.
+    #' @return This method returns nothing.
+    initialize = function(init_trace = TRUE) {
+      super$init_transformer(private$title, init_trace)
     },
 
 
@@ -322,3 +322,7 @@
 )
 
 .AIFETrObj[[AIFETrType$longformer]] <- .AIFELongformerTransformer$new
+.AIFETrTokenizer[[AIFETrType$longformer]] <- "LongformerTokenizerFast"
+.AIFETrConfig[[AIFETrType$longformer]] <- "LongformerConfig"
+.AIFETrModel[[AIFETrType$longformer]] <- "LongformerModel"
+.AIFETrModelMLM[[AIFETrType$longformer]] <- "LongformerForMaskedLM"

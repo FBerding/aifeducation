@@ -146,10 +146,11 @@
     # New ----
 
     #' @description Creates a new transformer based on `Funnel` and sets the title.
+    #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+    #'   (`FALSE`) - hidden.
     #' @return This method returns nothing.
-    initialize = function() {
-      super$set_title(private$title)
-      print(paste(private$title, "has been initialized."))
+    initialize = function(init_trace = TRUE) {
+      super$init_transformer(private$title, init_trace)
     },
 
 
@@ -327,3 +328,7 @@
 )
 
 .AIFETrObj[[AIFETrType$funnel]] <- .AIFEFunnelTransformer$new
+.AIFETrTokenizer[[AIFETrType$funnel]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$funnel]] <- "FunnelConfig"
+.AIFETrModel[[AIFETrType$funnel]] <- "FunnelBaseModel"
+.AIFETrModelMLM[[AIFETrType$funnel]] <- "FunnelForMaskedLM"

@@ -40,6 +40,7 @@ Other AVSS:
 \code{\link{calculate_layer_AV}()},
 \code{\link{calculate_layer_AVSS}()},
 \code{\link{calculate_value}()},
+\code{\link{evaluate_layer_importance_all_batches}()},
 \code{\link{reshape_layer}()}
 }
 \concept{AVSS}

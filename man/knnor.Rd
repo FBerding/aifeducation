@@ -4,7 +4,7 @@
 \alias{knnor}
 \title{K-Nearest Neighbor OveRsampling approach (KNNOR)}
 \usage{
-knnor(dataset, k, aug_num)
+knnor(dataset, k, aug_num, cycles_number_limit = 100L)
 }
 \arguments{
 \item{dataset}{\code{list} containing the following fields:
@@ -16,6 +16,8 @@ knnor(dataset, k, aug_num)
 \item{k}{\verb{unsigned integer} number of nearest neighbors}
 
 \item{aug_num}{\verb{unsigned integer} number of datapoints to be augmented}
+
+\item{cycles_number_limit}{\verb{unsigned integer} number of maximum try cycles}
 }
 \value{
 Returns artificial points (\verb{2-D array (matrix) with size }aug_num\code{x}times*features`)
@@ -27,5 +29,9 @@ K-Nearest Neighbor OveRsampling approach (KNNOR)
 Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
 KNNOR: An oversampling technique for imbalanced datasets.
 Applied Soft Computing, 115, 108288. https://doi.org/10.1016/j.asoc.2021.108288
+}
+\seealso{
+Other oversampling_approaches: 
+\code{\link{knnor_is_same_class}()}
 }
 \concept{oversampling_approaches}

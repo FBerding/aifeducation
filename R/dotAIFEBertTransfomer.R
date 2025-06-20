@@ -141,10 +141,11 @@
     # New ----
 
     #' @description Creates a new transformer based on `BERT` and sets the title.
+    #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+    #'   (`FALSE`) - hidden.
     #' @return This method returns nothing.
-    initialize = function() {
-      super$set_title(private$title)
-      print(paste(private$title, "has been initialized."))
+    initialize = function(init_trace = TRUE) {
+      super$init_transformer(private$title, init_trace)
     },
 
 
@@ -308,3 +309,8 @@
 )
 
 .AIFETrObj[[AIFETrType$bert]] <- .AIFEBertTransformer$new
+.AIFETrTokenizer[[AIFETrType$bert]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$bert]] <- "BertConfig"
+.AIFETrModel[[AIFETrType$bert]] <- "BertModel"
+.AIFETrModelMLM[[AIFETrType$bert]] <- "BertForMaskedLM"
+

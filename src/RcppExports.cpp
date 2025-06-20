@@ -12,15 +12,30 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // knnor
-arma::mat knnor(const Rcpp::List& dataset, size_t k, size_t aug_num);
-RcppExport SEXP _aifeducation_knnor(SEXP datasetSEXP, SEXP kSEXP, SEXP aug_numSEXP) {
+arma::mat knnor(const Rcpp::List& dataset, size_t k, size_t aug_num, size_t cycles_number_limit);
+RcppExport SEXP _aifeducation_knnor(SEXP datasetSEXP, SEXP kSEXP, SEXP aug_numSEXP, SEXP cycles_number_limitSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List& >::type dataset(datasetSEXP);
     Rcpp::traits::input_parameter< size_t >::type k(kSEXP);
     Rcpp::traits::input_parameter< size_t >::type aug_num(aug_numSEXP);
-    rcpp_result_gen = Rcpp::wrap(knnor(dataset, k, aug_num));
+    Rcpp::traits::input_parameter< size_t >::type cycles_number_limit(cycles_number_limitSEXP);
+    rcpp_result_gen = Rcpp::wrap(knnor(dataset, k, aug_num, cycles_number_limit));
+    return rcpp_result_gen;
+END_RCPP
+}
+// knnor_is_same_class
+bool knnor_is_same_class(const arma::rowvec& new_point, const arma::mat& dataset, const arma::uvec& labels, size_t k);
+RcppExport SEXP _aifeducation_knnor_is_same_class(SEXP new_pointSEXP, SEXP datasetSEXP, SEXP labelsSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type new_point(new_pointSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type dataset(datasetSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type labels(labelsSEXP);
+    Rcpp::traits::input_parameter< size_t >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(knnor_is_same_class(new_point, dataset, labels, k));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -64,7 +79,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 3},
+    {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 4},
+    {"_aifeducation_knnor_is_same_class", (DL_FUNC) &_aifeducation_knnor_is_same_class, 4},
     {"_aifeducation_matrix_to_array_c", (DL_FUNC) &_aifeducation_matrix_to_array_c, 3},
     {"_aifeducation_to_categorical_c", (DL_FUNC) &_aifeducation_to_categorical_c, 2},
     {"_aifeducation_tensor_to_matrix_c", (DL_FUNC) &_aifeducation_tensor_to_matrix_c, 3},

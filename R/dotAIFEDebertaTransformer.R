@@ -148,10 +148,11 @@
     # New ----
 
     #' @description Creates a new transformer based on `DeBERTa-V2` and sets the title.
+    #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+    #'   (`FALSE`) - hidden.
     #' @return This method returns nothing.
-    initialize = function() {
-      super$set_title(private$title)
-      print(paste(private$title, "has been initialized."))
+    initialize = function(init_trace = TRUE) {
+      super$init_transformer(private$title, init_trace)
     },
 
 
@@ -315,3 +316,7 @@
 )
 
 .AIFETrObj[[AIFETrType$deberta_v2]] <- .AIFEDebertaTransformer$new
+.AIFETrTokenizer[[AIFETrType$deberta_v2]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$deberta_v2]] <- "DebertaV2Config"
+.AIFETrModel[[AIFETrType$deberta_v2]] <- "DebertaV2Model"
+.AIFETrModelMLM[[AIFETrType$deberta_v2]] <- "DebertaForMaskedLM"

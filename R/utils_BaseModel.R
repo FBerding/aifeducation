@@ -1,3 +1,55 @@
+#' @title Evaluate layer importance relative to all batches
+#' @description Executes [evaluate_layer_importance()] function for every batch
+#'
+#' @param model `transformers.PreTrainedModel` transformer model
+#' @param tokenizer `transformers.PreTrainedTokenizer` tokenizer for a given `model`
+#' @param dataset `vector` character list with the texts
+#' @param batch_size `int` number of batches to split a given `dataset`
+#' @param layer_index `int` the index of the layer that must be evaluated
+#' @param e `double` the threshold for activation
+#'
+#' @returns Returns a `list` with the values: AV, NAV, AS, NAS, AVSS, NAVSS, CAVSS
+#'
+#' @family AVSS
+#' @export
+evaluate_layer_importance_all_batches <- function(
+    model, tokenizer, dataset, batch_size,
+    layer_index, e) {
+
+  batches <- split(dataset, ceiling(seq_along(dataset) / batch_size))
+
+  batch_i <- 1
+  layer_importance_batches <- list()
+
+  for (batch in batches) {
+    inputs <- tokenizer(
+      batch,
+      return_tensors = "pt"
+    )$data
+
+    with(torch$no_grad(), {
+      outputs <- model$`__call__`(!!!inputs, output_hidden_states = TRUE)
+      hidden_states_tmp <- outputs$hidden_states
+    })
+
+    hidden_states_list <- list()
+    for (i in seq_along(hidden_states_tmp)) {
+      py_tensor <- hidden_states_tmp[[i]]
+      r_array <- reticulate::py_to_r(py_tensor$detach()$cpu()$numpy())
+      hidden_states_list[[i]] <- r_array
+    }
+
+    layer_importance_batches[[batch_i]] <- evaluate_layer_importance(hidden_states_list, layer_index, e)
+    batch_i <- batch_i + 1
+  }
+
+  sum_batches <- Reduce(function(x, y) Map(`+`, x, y), layer_importance_batches)
+  avg_batches <- lapply(sum_batches, function(x) x / length(layer_importance_batches))
+
+  return (avg_batches)
+}
+
+
 #' @title Evaluate layer importance
 #' @description Calculates the following values:
 #'   - AV: Activation Variance

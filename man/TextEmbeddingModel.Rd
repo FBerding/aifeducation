@@ -128,7 +128,9 @@ within each layer. If \code{"cls"} only the embedding of the CLS token is used. 
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
+
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
+
 
 \item{\code{model_dir}}{\code{string} path to the directory where the
 BERT model is stored.}

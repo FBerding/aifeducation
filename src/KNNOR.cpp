@@ -26,7 +26,10 @@
 
 // public (exported) function ------------------------------------------------------------------------------------------
 // KNNOR
-arma::mat knnor(const Rcpp::List &, size_t, size_t);
+arma::mat knnor(const Rcpp::List &, size_t, size_t, size_t);
+
+// KNNOR Validation
+bool knnor_is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, size_t);
 
 // private functions ---------------------------------------------------------------------------------------------------
 // KNN
@@ -42,13 +45,10 @@ arma::vec first_derivative(const arma::vec &);
 
 // KNNOR Augmentation
 arma::mat knnor_augmentation(const arma::mat &, const arma::mat &, const arma::mat &, size_t, size_t,
-                             const arma::mat &, const arma::uvec &);
+                             const arma::mat &, const arma::uvec &, size_t);
 
 double alpha_coefficient(const arma::mat &, const arma::mat &);
 arma::rowvec interpolate_point(const arma::rowvec &, const arma::rowvec &, double);
-
-// KNNOR Validation
-bool is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, size_t);
 // ---------------------------------------------------------------------------------------------------------------------
 
 // ========================================== Function definitions =====================================================
@@ -63,6 +63,7 @@ bool is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, 
 //'   - `labels`: an 1-D array (vector) of integers with `batch` elements
 //' @param k `unsigned integer` number of nearest neighbors
 //' @param aug_num `unsigned integer` number of datapoints to be augmented
+//' @param cycles_number_limit `unsigned integer` number of maximum try cycles
 //'
 //' @return Returns artificial points (`2-D array (matrix) with size `aug_num` x `times*features`)
 //'
@@ -74,7 +75,7 @@ bool is_same_class(const arma::rowvec &, const arma::mat &, const arma::uvec &, 
 //'
 //' @export
 // [[Rcpp::export]]
-arma::mat knnor(const Rcpp::List &dataset, size_t k, size_t aug_num)
+arma::mat knnor(const Rcpp::List &dataset, size_t k, size_t aug_num, size_t cycles_number_limit = 100)
 {
   Rcpp::List res = knnor_filter(dataset, k);
 
@@ -84,7 +85,8 @@ arma::mat knnor(const Rcpp::List &dataset, size_t k, size_t aug_num)
       res["embeddings_min_sorted"],
       k, aug_num,
       dataset["embeddings"],
-      dataset["labels"]);
+      dataset["labels"],
+      cycles_number_limit);
 
   return embeddings_augmented;
 }
@@ -354,6 +356,7 @@ arma::vec first_derivative(const arma::vec &y)
 // @param aug_num `unsigned integer` number of datapoints to be augmented
 // @param embeddings `2-D array (matrix)` embeddings (with size `batch` x `times*features`)
 // @param labels `1-D array (vector)` of integers with `batch` elements
+// @param cycles_number_limit `unsigned integer` number of maximum try cycles
 //
 // @return Returns artificial points (`2-D array (matrix) with size `aug_num` x `times*features`)
 //
@@ -362,7 +365,8 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
                              const arma::mat &embeddings_min_sorted,
                              size_t k, size_t aug_num,
                              const arma::mat &embeddings,
-                             const arma::uvec &labels)
+                             const arma::uvec &labels,
+                             size_t cycles_number_limit)
 {
 
   arma::mat embeddings_augmented;
@@ -373,6 +377,7 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
   arma::mat neighbors = res["neighbors"];
   arma::mat distances = res["distances"];
 
+  size_t cycle_number = 0;
   while (aug_num > 0)
   {
     for (size_t i = 0; i < embeddings_min_sorted.n_rows; ++i)
@@ -394,7 +399,7 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
       }
 
       // Validation of new_embedding_point
-      bool is_valid = is_same_class(new_embedding_point, embeddings, labels, k);
+      bool is_valid = knnor_is_same_class(new_embedding_point, embeddings, labels, k);
       if (is_valid)
       {
         embeddings_augmented = arma::join_vert(embeddings_augmented, new_embedding_point);
@@ -403,6 +408,11 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
           break;
       }
     }
+
+    cycle_number++;
+
+    if (cycle_number == cycles_number_limit)
+      break;
   }
   return embeddings_augmented;
 }
@@ -457,18 +467,21 @@ arma::rowvec interpolate_point(const arma::rowvec &Xi_new, const arma::rowvec &p
 
 // Algorithm 3 KNNOR Validation ========================================================================================
 
-// Validate a new point
-//
-// Function written in C++ for validating a new point (KNNOR-Validation)
-//
-// @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
-// @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
-// @param labels `1-D array (vector)` of integers with `batch` elements
-// @param k `unsigned integer` number of nearest neighbors
-//
-// @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
-//
-bool is_same_class(const arma::rowvec &new_point, const arma::mat &dataset, const arma::uvec &labels, size_t k)
+//' Validate a new point
+//'
+//' Function written in C++ for validating a new point (KNNOR-Validation)
+//'
+//' @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
+//' @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
+//' @param labels `1-D array (vector)` of integers with `batch` elements
+//' @param k `unsigned integer` number of nearest neighbors
+//'
+//' @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
+//' @family oversampling_approaches
+//'
+//' @export
+// [[Rcpp::export]]
+bool knnor_is_same_class(const arma::rowvec &new_point, const arma::mat &dataset, const arma::uvec &labels, size_t k)
 {
   std::vector<std::pair<double, int>> distances;
 

@@ -8,6 +8,7 @@
 #'   - `labels`: an 1-D array (vector) of integers with `batch` elements
 #' @param k `unsigned integer` number of nearest neighbors
 #' @param aug_num `unsigned integer` number of datapoints to be augmented
+#' @param cycles_number_limit `unsigned integer` number of maximum try cycles
 #'
 #' @return Returns artificial points (`2-D array (matrix) with size `aug_num` x `times*features`)
 #'
@@ -18,8 +19,25 @@
 #' @family oversampling_approaches
 #'
 #' @export
-knnor <- function(dataset, k, aug_num) {
-    .Call(`_aifeducation_knnor`, dataset, k, aug_num)
+knnor <- function(dataset, k, aug_num, cycles_number_limit = 100L) {
+    .Call(`_aifeducation_knnor`, dataset, k, aug_num, cycles_number_limit)
+}
+
+#' Validate a new point
+#'
+#' Function written in C++ for validating a new point (KNNOR-Validation)
+#'
+#' @param new_point `1-D array (vector)` new data point to be validated before adding (with `times*features` elements)
+#' @param dataset `2-D array (matrix)` current embeddings (with size `batch` x `times*features`)
+#' @param labels `1-D array (vector)` of integers with `batch` elements
+#' @param k `unsigned integer` number of nearest neighbors
+#'
+#' @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
+#' @family oversampling_approaches
+#'
+#' @export
+knnor_is_same_class <- function(new_point, dataset, labels, k) {
+    .Call(`_aifeducation_knnor_is_same_class`, new_point, dataset, labels, k)
 }
 
 #'Reshape matrix to array

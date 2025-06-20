@@ -4,11 +4,14 @@
 \alias{aife_transformer.make}
 \title{Make a transformer}
 \usage{
-aife_transformer.make(type)
+aife_transformer.make(type, init_trace = TRUE)
 }
 \arguments{
 \item{type}{\code{string} A type of the new transformer. Allowed types are bert, roberta, deberta_v2, funnel, longformer, mpnet. See
 \link{AIFETrType} list.}
+
+\item{init_trace}{\code{bool} option to show prints. If \code{TRUE} (by default) - messages will be shown, otherwise
+(\code{FALSE}) - hidden.}
 }
 \value{
 If success - a new transformer, otherwise - an error (passed type is invalid).
@@ -22,6 +25,10 @@ See \link{.AIFEBaseTransformer} class for details.
 }
 \seealso{
 Other Transformer: 
-\code{\link{AIFETrType}}
+\code{\link{AIFETrType}},
+\code{\link{aife_transformer.load_model}()},
+\code{\link{aife_transformer.load_model_config}()},
+\code{\link{aife_transformer.load_model_mlm}()},
+\code{\link{aife_transformer.load_tokenizer}()}
 }
 \concept{Transformer}

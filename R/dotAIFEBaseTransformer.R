@@ -553,6 +553,15 @@
       stop("Cannot create .AIFEBaseTransformer objects.")
     },
 
+    #' @description Method to execute while initializing a new transformer.
+    #' @param title `string` A new title.
+    #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+    #'   (`FALSE`) - hidden.
+    #' @return This method returns nothing.s
+    init_transformer = function(title, init_trace) {
+      self$set_title(title)
+      if (init_trace) print(paste(title, "has been initialized."))
+    },
 
     # Setters ----
 
