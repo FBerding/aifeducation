@@ -117,7 +117,7 @@
           layer_norm_eps = 1e-12
         )
 
-        self$temp$model <- transformers$LongformerModel(configuration)
+        self$temp$model <- transformers$LongformerModel(configuration, add_pooling_layer = FALSE)
       }
     ),
 

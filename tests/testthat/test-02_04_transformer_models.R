@@ -13,6 +13,10 @@ os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
+# ignore warnings
+run_py_file("py_ignore_warnings.py")
+py$ignore_data_collator_warnings()
+
 # config trace
 trace <- FALSE
 
@@ -38,7 +42,9 @@ rows_susatainability <- c(
   "funnel" = 3,
   "roberta" = 2,
   "longformer" = 2,
-  "deberta_v2" = 3
+  "deberta_v2" = 3,
+  "modernbert" = 3#,
+  # "neobert" = 3
 )
 
 supported_methods <- list(
@@ -48,7 +54,9 @@ supported_methods <- list(
     "roberta",
     "longformer",
     "deberta_v2",
-    "mpnet"
+    "mpnet",
+    "modernbert"#,
+    # "neobert"
   )
 )
 
@@ -289,6 +297,90 @@ for (ai_method in ai_methods) {
           text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
           vocab_size = 50000,
           vocab_do_lower_case = FALSE,
+          max_position_embeddings = 512,
+          hidden_size = 256,
+          num_hidden_layer = 2,
+          num_attention_heads = 2,
+          intermediate_size = 256,
+          hidden_act = "gelu",
+          hidden_dropout_prob = 0.1,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace
+        )
+      )
+    } else if (ai_method == AIFETrType$modernbert) {
+      expect_no_error(
+        base_model$create(
+          model_dir = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          vocab_size = 50000,
+          vocab_do_lower_case = FALSE,
+          max_position_embeddings = 512,
+          hidden_size = 256,
+          num_hidden_layer = 2,
+          num_attention_heads = 2,
+          intermediate_size = 256,
+          hidden_act = "gelu",
+          hidden_dropout_prob = 0.1,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace
+        )
+      )
+
+      expect_no_error(
+        base_model$create(
+          model_dir = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          vocab_size = 50000,
+          vocab_do_lower_case = TRUE,
+          max_position_embeddings = 512,
+          hidden_size = 256,
+          num_hidden_layer = 2,
+          num_attention_heads = 2,
+          intermediate_size = 256,
+          hidden_act = "gelu",
+          hidden_dropout_prob = 0.1,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace
+        )
+      )
+    } else if (ai_method == AIFETrType$neobert) {
+      expect_no_error(
+        base_model$create(
+          model_dir = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          vocab_size = 50000,
+          vocab_do_lower_case = FALSE,
+          max_position_embeddings = 512,
+          hidden_size = 256,
+          num_hidden_layer = 2,
+          num_attention_heads = 2,
+          intermediate_size = 256,
+          hidden_act = "gelu",
+          hidden_dropout_prob = 0.1,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace
+        )
+      )
+
+      expect_no_error(
+        base_model$create(
+          model_dir = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          vocab_size = 50000,
+          vocab_do_lower_case = TRUE,
           max_position_embeddings = 512,
           hidden_size = 256,
           num_hidden_layer = 2,
@@ -635,6 +727,140 @@ for (ai_method in ai_methods) {
           val_size = 0.25,
           n_epoch = 2,
           batch_size = 20,
+          chunk_size = 100,
+          n_workers = 1,
+          multi_process = FALSE,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace,
+          keras_trace = as.numeric(trace),
+          pytorch_trace = as.numeric(trace)
+        )
+      )
+    } else if (ai_method == AIFETrType$modernbert) {
+      base_model$create(
+        model_dir = tmp_ai_create,
+        text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+        vocab_size = 50000,
+        vocab_do_lower_case = FALSE,
+        max_position_embeddings = 512,
+        hidden_size = 256,
+        num_hidden_layer = 2,
+        num_attention_heads = 2,
+        intermediate_size = 256,
+        hidden_act = "gelu",
+        hidden_dropout_prob = 0.1,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace
+      )
+      Sys.sleep(5)
+      expect_no_error(
+        base_model$train(
+          output_dir = tmp_ai_train,
+          model_dir_path = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          p_mask = 0.15,
+          whole_word = TRUE,
+          full_sequences_only = TRUE,
+          val_size = 0.25,
+          n_epoch = 2,
+          batch_size = 2,
+          chunk_size = 100,
+          n_workers = 1,
+          multi_process = FALSE,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace,
+          keras_trace = as.numeric(trace),
+          pytorch_trace = as.numeric(trace)
+        )
+      )
+      Sys.sleep(5)
+      expect_no_error(
+        base_model$train(
+          output_dir = tmp_ai_train,
+          model_dir_path = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          p_mask = 0.30,
+          whole_word = FALSE,
+          full_sequences_only = TRUE,
+          val_size = 0.1,
+          n_epoch = 2,
+          batch_size = 1,
+          chunk_size = 100,
+          n_workers = 1,
+          multi_process = FALSE,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace,
+          keras_trace = as.numeric(trace),
+          pytorch_trace = as.numeric(trace)
+        )
+      )
+    } else if (ai_method == AIFETrType$neobert) {
+      base_model$create(
+        model_dir = tmp_ai_create,
+        text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+        vocab_size = 50000,
+        vocab_do_lower_case = FALSE,
+        max_position_embeddings = 512,
+        hidden_size = 256,
+        num_hidden_layer = 2,
+        num_attention_heads = 2,
+        intermediate_size = 256,
+        hidden_act = "gelu",
+        hidden_dropout_prob = 0.1,
+        sustain_track = TRUE,
+        sustain_iso_code = "DEU",
+        sustain_region = NULL,
+        sustain_interval = 15,
+        trace = trace
+      )
+      Sys.sleep(5)
+      expect_no_error(
+        base_model$train(
+          output_dir = tmp_ai_train,
+          model_dir_path = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          p_mask = 0.15,
+          whole_word = TRUE,
+          full_sequences_only = TRUE,
+          val_size = 0.25,
+          n_epoch = 2,
+          batch_size = 2,
+          chunk_size = 100,
+          n_workers = 1,
+          multi_process = FALSE,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = trace,
+          keras_trace = as.numeric(trace),
+          pytorch_trace = as.numeric(trace)
+        )
+      )
+      Sys.sleep(5)
+      expect_no_error(
+        base_model$train(
+          output_dir = tmp_ai_train,
+          model_dir_path = tmp_ai_create,
+          text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
+          p_mask = 0.30,
+          whole_word = FALSE,
+          full_sequences_only = TRUE,
+          val_size = 0.1,
+          n_epoch = 2,
+          batch_size = 1,
           chunk_size = 100,
           n_workers = 1,
           multi_process = FALSE,
