@@ -92,7 +92,7 @@ Other Transformers for developers:
 \if{html}{\out{<a id="method-.AIFENeoBertTransformer-new"></a>}}
 \if{latex}{\out{\hypertarget{method-.AIFENeoBertTransformer-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new transformer based on \code{ModernBERT} and sets the title.
+Creates a new transformer based on \code{NeoBERT} and sets the title.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFENeoBertTransformer$new(init_trace = TRUE)}\if{html}{\out{</div>}}
 }
@@ -113,7 +113,7 @@ This method returns nothing.
 \if{html}{\out{<a id="method-.AIFENeoBertTransformer-create"></a>}}
 \if{latex}{\out{\hypertarget{method-.AIFENeoBertTransformer-create}{}}}
 \subsection{Method \code{create()}}{
-This method creates a transformer configuration based on the \code{ModernBERT} base architecture and a
+This method creates a transformer configuration based on the \code{NeoBERT} base architecture and a
 vocabulary based on \code{WordPiece} by using the python libraries \code{transformers} and \code{tokenizers}.
 
 This method adds the following \emph{'dependent' parameters} to the base class's inherited \code{params} list:
@@ -209,7 +209,7 @@ model to disk.
 \if{html}{\out{<a id="method-.AIFENeoBertTransformer-train"></a>}}
 \if{latex}{\out{\hypertarget{method-.AIFENeoBertTransformer-train}{}}}
 \subsection{Method \code{train()}}{
-This method can be used to train or fine-tune a transformer based on \code{ModernBERT} architecture with
+This method can be used to train or fine-tune a transformer based on \code{NeoBERT} architecture with
 the help of the python libraries \code{transformers}, \code{datasets}, and \code{tokenizers}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFENeoBertTransformer$train(

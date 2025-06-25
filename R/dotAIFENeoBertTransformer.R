@@ -124,7 +124,7 @@
 
     # New ----
 
-    #' @description Creates a new transformer based on `ModernBERT` and sets the title.
+    #' @description Creates a new transformer based on `NeoBERT` and sets the title.
     #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
     #'   (`FALSE`) - hidden.
     #' @return This method returns nothing.
@@ -135,7 +135,7 @@
 
     # Create ----
 
-    #' @description This method creates a transformer configuration based on the `ModernBERT` base architecture and a
+    #' @description This method creates a transformer configuration based on the `NeoBERT` base architecture and a
     #'   vocabulary based on `WordPiece` by using the python libraries `transformers` and `tokenizers`.
     #'
     #'   This method adds the following *'dependent' parameters* to the base class's inherited `params` list:
@@ -213,7 +213,7 @@
 
     # Train ----
 
-    #' @description This method can be used to train or fine-tune a transformer based on `ModernBERT` architecture with
+    #' @description This method can be used to train or fine-tune a transformer based on `NeoBERT` architecture with
     #'   the help of the python libraries `transformers`, `datasets`, and `tokenizers`.
     #'
     #' @param output_dir `r paramDesc.output_dir()`
