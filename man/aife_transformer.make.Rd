@@ -7,7 +7,7 @@
 aife_transformer.make(type, init_trace = TRUE)
 }
 \arguments{
-\item{type}{\code{string} A type of the new transformer. Allowed types are bert, roberta, deberta_v2, funnel, longformer, mpnet. See
+\item{type}{\code{string} A type of the new transformer. Allowed types are bert, roberta, deberta_v2, funnel, longformer, mpnet, modernbert, neobert. See
 \link{AIFETrType} list.}
 
 \item{init_trace}{\code{bool} option to show prints. If \code{TRUE} (by default) - messages will be shown, otherwise

@@ -29,7 +29,9 @@ AIFETrType <- list(
   deberta_v2 = "deberta_v2",
   funnel = "funnel",
   longformer = "longformer",
-  mpnet = "mpnet"
+  mpnet = "mpnet",
+  modernbert = "modernbert",
+  neobert = "neobert"
 )
 
 #' @title Transformer objects
