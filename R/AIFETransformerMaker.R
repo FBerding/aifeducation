@@ -30,8 +30,7 @@ AIFETrType <- list(
   funnel = "funnel",
   longformer = "longformer",
   mpnet = "mpnet",
-  modernbert = "modernbert",
-  neobert = "neobert"
+  modernbert = "modernbert"
 )
 
 #' @title Transformer objects

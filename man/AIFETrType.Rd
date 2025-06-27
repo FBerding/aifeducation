@@ -5,7 +5,7 @@
 \alias{AIFETrType}
 \title{Transformer types}
 \format{
-An object of class \code{list} of length 8.
+An object of class \code{list} of length 7.
 }
 \usage{
 AIFETrType
@@ -23,7 +23,6 @@ It has the following elements:
 \item \code{longformer} = 'longformer'
 \item \code{mpnet} = 'mpnet'
 \item \code{modernbert} = 'modernbert'
-\item \code{neobert} = 'neobert'
 
 Elements can be used like \code{AIFETrType$bert}, \code{AIFETrType$deberta_v2}, \code{AIFETrType$funnel}, etc.
 }

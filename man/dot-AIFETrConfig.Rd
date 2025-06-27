@@ -5,7 +5,7 @@
 \alias{.AIFETrConfig}
 \title{Configuration class names}
 \format{
-An object of class \code{list} of length 8.
+An object of class \code{list} of length 7.
 }
 \usage{
 .AIFETrConfig
@@ -24,7 +24,6 @@ Other Transformers for developers:
 \code{\link{.AIFELongformerTransformer}},
 \code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFENeoBertTransformer}},
 \code{\link{.AIFERobertaTransformer}},
 \code{\link{.AIFETrModel}},
 \code{\link{.AIFETrModelMLM}},

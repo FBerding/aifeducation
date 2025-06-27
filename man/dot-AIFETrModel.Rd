@@ -5,7 +5,7 @@
 \alias{.AIFETrModel}
 \title{Model class names}
 \format{
-An object of class \code{list} of length 8.
+An object of class \code{list} of length 7.
 }
 \usage{
 .AIFETrModel
@@ -23,7 +23,6 @@ Other Transformers for developers:
 \code{\link{.AIFELongformerTransformer}},
 \code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFENeoBertTransformer}},
 \code{\link{.AIFERobertaTransformer}},
 \code{\link{.AIFETrConfig}},
 \code{\link{.AIFETrModelMLM}},
