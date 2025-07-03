@@ -121,7 +121,7 @@
           use_cache = TRUE
         )
 
-        self$temp$model <- transformers$RobertaModel(configuration)
+        self$temp$model <- transformers$RobertaModel(configuration, add_pooling_layer = FALSE)
       }
     ),
 

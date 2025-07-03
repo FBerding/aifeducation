@@ -12,19 +12,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title Child `R6` class for creation and training of `Longformer` transformers
+# requirements: transformers version >= v4.48.0
+
+#' @title Child `R6` class for creation and training of `ModernBERT` transformers
 #'
 #' @description This class has the following methods:
-#'   * `create`: creates a new transformer based on `Longformer`.
-#'   * `train`: trains and fine-tunes a `Longformer` model.
+#'   * `create`: creates a new transformer based on `ModernBERT`.
+#'   * `train`: trains and fine-tunes a `ModernBERT` model.
 #'
-#' @section Create: New models can be created using the `.AIFELongformerTransformer$create` method.
+#' @section Create: New models can be created using the `.AIFEModernBertTransformer$create` method.
 #'
-#' @section Train: To train the model, pass the directory of the model to the method `.AIFELongformerTransformer$train`.
+#' @section Train: To train the model, pass the directory of the model to the method `.AIFEModernBertTransformer$train`.
 #'
-#'   Pre-Trained models which can be fine-tuned with this function are available at <https://huggingface.co/>.
+#'   Pre-Trained models that can be fine-tuned using this method are available at <https://huggingface.co/>.
 #'
-#'   Training of this model makes use of dynamic masking.
+#'   The model is trained using dynamic masking, as opposed to the original paper, which used static masking.
 #'
 #' @param text_dataset `r paramDesc.text_dataset()`
 #' @param sustain_track `r paramDesc.sustain_track()`
@@ -36,30 +38,30 @@
 #' @param log_dir `r paramDesc.log_dir()`
 #' @param log_write_interval `r paramDesc.log_write_interval()`
 #'
-#' @references Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The Long-Document Transformer.
-#'   \doi{10.48550/arXiv.2004.05150}
+#' @note This model uses a `WordPiece` tokenizer like `BERT` and can be trained with whole word masking. The transformer
+#'   library may display a warning, which can be ignored.
 #'
-#' @references Hugging Face Documentation
-#'   * <https://huggingface.co/docs/transformers/model_doc/longformer>
-#'   * <https://huggingface.co/docs/transformers/model_doc/longformer#transformers.LongformerModel>
-#'   * <https://huggingface.co/docs/transformers/model_doc/longformer#transformers.TFLongformerModel>
+#' @references Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
+#'   Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
+#'   Conference of the North (pp. 4171--4186). Association for Computational Linguistics. \doi{10.18653/v1/N19-1423}
 #'
+#' @references Hugging Face documentation
+#'   * <https://huggingface.co/docs/transformers/model_doc/bert>
+#'   * <https://huggingface.co/docs/transformers/model_doc/bert#transformers.BertForMaskedLM>
+#'   * <https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM>
 #'
-#' @family R6 classes for transformers
+#' @family Transformers for developers
 #'
 #' @export
-.AIFELongformerTransformer <- R6::R6Class(
-  classname = ".AIFELongformerTransformer",
+.AIFEModernBertTransformer <- R6::R6Class(
+  classname = ".AIFEModernBertTransformer",
   inherit = .AIFEBaseTransformer,
   private = list(
     # == Attributes ====================================================================================================
 
-    # Transformer's title
-    title = "Longformer Model",
+    title = "ModernBERT Model",
 
-    # steps_for_creation `list()` that stores required and optional steps (functions) for creating a new transformer.
-    #
-    # `create_final_tokenizer()` **adds** temporary `tokenizer` parameter to the inherited `temp` list.
+    # steps_for_creation `list()` that stores required and optional steps (functions) for creation a new transformer.
     #
     # `create_transformer_model()` **uses** `tokenizer` and **adds** `model` temporary parameters to the inherited
     # `temp` list.
@@ -69,55 +71,37 @@
     #
     # Use the `super$set_required_SFC()` method to set all required steps in the base class at once.
     #
-    # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Longformer_like.SFC.*`
-    # functions for details.
+    # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Bert_like.SFC.*` functions
+    # for details.
     steps_for_creation = list(
 
-      # SFC: create_tokenizer_draft ----
-      create_tokenizer_draft = function(self) Longformer_like.SFC.create_tokenizer_draft(self),
+      check_max_pos_emb = function(self) check.max_position_embeddings(self$params$max_position_embeddings),
 
-      # SFC: calculate_vocab ----
-      calculate_vocab = function(self) Longformer_like.SFC.calculate_vocab(self),
+      create_tokenizer_draft = function(self) Bert_like.SFC.create_tokenizer_draft(self),
 
-      # SFC: save_tokenizer_draft ----
-      save_tokenizer_draft = function(self) Longformer_like.SFC.save_tokenizer_draft(self),
+      calculate_vocab = function(self) Bert_like.SFC.calculate_vocab(self),
 
-      # SFC: create_final_tokenizer ----
-      create_final_tokenizer = function(self) {
-        self$temp$tokenizer <- transformers$LongformerTokenizerFast(
-          vocab_file = paste0(self$params$model_dir, "/", "vocab.json"),
-          merges_file = paste0(self$params$model_dir, "/", "merges.txt"),
-          bos_token = "<s>",
-          eos_token = "</s>",
-          sep_token = "</s>",
-          cls_token = "<s>",
-          unk_token = "<unk>",
-          pad_token = "<pad>",
-          mask_token = "<mask>",
-          add_prefix_space = self$params$add_prefix_space,
-          trim_offsets = self$params$trim_offsets
-        )
-      },
+      save_tokenizer_draft = function(self) Bert_like.SFC.save_tokenizer_draft(self),
 
-      # SFC: create_transformer_model ----
+      create_final_tokenizer = function(self) Bert_like.SFC.create_final_tokenizer(self),
+
       create_transformer_model = function(self) {
-        configuration <- transformers$LongformerConfig(
+        configuration <- transformers$ModernBertConfig(
           vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
-          max_position_embeddings = as.integer(self$params$max_position_embeddings),
           hidden_size = as.integer(self$params$hidden_size),
+          intermediate_size = as.integer(self$params$intermediate_size),
           num_hidden_layers = as.integer(self$params$num_hidden_layer),
           num_attention_heads = as.integer(self$params$num_attention_heads),
-          intermediate_size = as.integer(self$params$intermediate_size),
-          hidden_act = self$params$hidden_act,
-          hidden_dropout_prob = self$params$hidden_dropout_prob,
-          attention_probs_dropout_prob = self$params$attention_probs_dropout_prob,
-          attention_window = as.integer(self$params$attention_window),
-          type_vocab_size = as.integer(2),
+          hidden_activation = self$params$hidden_act,
+          max_position_embeddings = as.integer(self$params$max_position_embeddings),
           initializer_range = 0.02,
-          layer_norm_eps = 1e-12
+          norm_eps = 1e-12,
+          pad_token_id = self$temp$tokenizer$pad_token_id,
+          embedding_dropout = self$params$hidden_dropout_prob,
+          mlp_dropout = self$params$hidden_dropout_prob,
+          attention_dropout = self$params$attention_probs_dropout_prob
         )
-
-        self$temp$model <- transformers$LongformerModel(configuration, add_pooling_layer = FALSE)
+        self$temp$model <- transformers$ModernBertModel(configuration)
       }
     ),
 
@@ -129,26 +113,28 @@
     # the name of the step.
     #
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
+
     steps_for_training = list(
 
-      # SFT: load_existing_model ----
       load_existing_model = function(self) {
-        self$temp$model <- transformers$LongformerForMaskedLM$from_pretrained(
+        self$temp$model <- transformers$ModernBertForMaskedLM$from_pretrained(
           self$params$model_dir_path,
           from_tf = self$temp$from_tf,
           use_safetensors = self$temp$load_safe
         )
 
-        self$temp$tokenizer <- transformers$LongformerTokenizerFast$from_pretrained(self$params$model_dir_path)
+        self$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(self$params$model_dir_path)
       }
+
     )
   ),
+
   public = list(
     # == Methods =======================================================================================================
 
     # New ----
 
-    #' @description Creates a new transformer based on `Longformer` and sets the title.
+    #' @description Creates a new transformer based on `ModernBERT` and sets the title.
     #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
     #'   (`FALSE`) - hidden.
     #' @return This method returns nothing.
@@ -159,15 +145,12 @@
 
     # Create ----
 
-    #' @description This method creates a transformer configuration based on the `Longformer` base architecture and a
-    #'   vocabulary based on `Byte-Pair Encoding` (BPE) tokenizer using the python `transformers` and `tokenizers`
-    #'   libraries.
+    #' @description This method creates a transformer configuration based on the `ModernBERT` base architecture and a
+    #'   vocabulary based on `WordPiece` by using the python libraries `transformers` and `tokenizers`.
     #'
     #'   This method adds the following *'dependent' parameters* to the base class's inherited `params` list:
-    #'   * `add_prefix_space`
-    #'   * `trim_offsets`
+    #'   * `vocab_do_lower_case`
     #'   * `num_hidden_layer`
-    #'   * `attention_window`
     #'
     #' @param model_dir `r paramDesc.model_dir()`
     #' @param vocab_size `r paramDesc.vocab_size()`
@@ -179,18 +162,15 @@
     #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
     #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
     #'
-    #' @param add_prefix_space `r paramDesc.add_prefix_space()`
-    #' @param trim_offsets `r paramDesc.trim_offsets()`
+    #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
     #' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
-    #' @param attention_window `r paramDesc.attention_window()`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
     create = function(model_dir,
                       text_dataset,
                       vocab_size = 30522,
-                      add_prefix_space = FALSE,
-                      trim_offsets = TRUE,
+                      vocab_do_lower_case = FALSE,
                       max_position_embeddings = 512,
                       hidden_size = 768,
                       num_hidden_layer = 12,
@@ -199,8 +179,7 @@
                       hidden_act = "gelu",
                       hidden_dropout_prob = 0.1,
                       attention_probs_dropout_prob = 0.1,
-                      attention_window = 512,
-                      sustain_track = TRUE,
+                      sustain_track = FALSE,
                       sustain_iso_code = NULL,
                       sustain_region = NULL,
                       sustain_interval = 15,
@@ -209,12 +188,12 @@
                       log_dir = NULL,
                       log_write_interval = 2) {
       # Init dependent parameters ----
-      super$set_model_param("add_prefix_space", add_prefix_space)
-      super$set_model_param("trim_offsets", trim_offsets)
+      super$set_model_param("vocab_do_lower_case", vocab_do_lower_case)
       super$set_model_param("num_hidden_layer", num_hidden_layer)
-      super$set_model_param("attention_window", attention_window)
 
       # Define steps for creation (SFC) ----
+      # Optional steps
+      super$set_SFC_check_max_pos_emb(private$steps_for_creation$check_max_pos_emb)
       # Required steps
       super$set_required_SFC(private$steps_for_creation)
 
@@ -244,12 +223,13 @@
 
     # Train ----
 
-    #' @description This method can be used to train or fine-tune a transformer based on `Longformer` Transformer
-    #'   architecture with the help of the python libraries `transformers`, `datasets`, and `tokenizers`.
+    #' @description This method can be used to train or fine-tune a transformer based on `ModernBERT` architecture with
+    #'   the help of the python libraries `transformers`, `datasets`, and `tokenizers`.
     #'
     #' @param output_dir `r paramDesc.output_dir()`
     #' @param model_dir_path `r paramDesc.model_dir_path()`
     #' @param p_mask `r paramDesc.p_mask()`
+    #' @param whole_word `r paramDesc.whole_word()`
     #' @param val_size `r paramDesc.val_size()`
     #' @param n_epoch `r paramDesc.n_epoch()`
     #' @param batch_size `r paramDesc.batch_size()`
@@ -267,16 +247,17 @@
                      model_dir_path,
                      text_dataset,
                      p_mask = 0.15,
+                     whole_word = TRUE,
                      val_size = 0.1,
                      n_epoch = 1,
                      batch_size = 12,
                      chunk_size = 250,
                      full_sequences_only = FALSE,
                      min_seq_len = 50,
-                     learning_rate = 3e-2,
+                     learning_rate = 3e-3,
                      n_workers = 1,
                      multi_process = FALSE,
-                     sustain_track = TRUE,
+                     sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15,
@@ -296,7 +277,7 @@
         model_dir_path = model_dir_path,
         text_dataset = text_dataset,
         p_mask = p_mask,
-        whole_word = FALSE,
+        whole_word = whole_word,
         val_size = val_size,
         n_epoch = n_epoch,
         batch_size = batch_size,
@@ -321,8 +302,8 @@
   )
 )
 
-.AIFETrObj[[AIFETrType$longformer]] <- .AIFELongformerTransformer$new
-.AIFETrTokenizer[[AIFETrType$longformer]] <- "LongformerTokenizerFast"
-.AIFETrConfig[[AIFETrType$longformer]] <- "LongformerConfig"
-.AIFETrModel[[AIFETrType$longformer]] <- "LongformerModel"
-.AIFETrModelMLM[[AIFETrType$longformer]] <- "LongformerForMaskedLM"
+.AIFETrObj[[AIFETrType$modernbert]] <- .AIFEModernBertTransformer$new
+.AIFETrTokenizer[[AIFETrType$modernbert]] <- "AutoTokenizer"
+.AIFETrConfig[[AIFETrType$modernbert]] <- "ModernBertConfig"
+.AIFETrModel[[AIFETrType$modernbert]] <- "ModernBertModel"
+.AIFETrModelMLM[[AIFETrType$modernbert]] <- "ModernBertForMaskedLM"
