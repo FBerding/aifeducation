@@ -1,6 +1,21 @@
+
+#'@title Generate combinations of arguments
+#'@description Function generates a specific number of combinations for a method.
+#'These are used for automating tests of objects.
+#'@param object_name `string` Name of the object to generate the arguments for.
+#'@param method `string` Name of the method of the object to generate the arguments for.
+#'@param max_samples `int` Maximal number of combinations.
+#'@param var_objects `list` of other objects which should be combined with the other arguments.
+#'@param necessary_objects `list` of other objects which are part of every combination.
+#'@param var_override Named `list` containing the arguments which should be set to a specific value
+#'for all combinations.
+#'@returns Returns a `list` with combinations of arguments.
+#'@note `var_objects`, `necessary_objects`, and `var_override` the names must exactly match
+#'the name of the parameter. Otherwise they are not applied. Names of arguments which are not part
+#'a a method are ignored. #'
+#' @family Utils TestThat Developers
 generate_args_for_tests <- function(object_name,
                                     method,
-                                    max_samples = 100,
                                     var_objects = list(),
                                     necessary_objects = list(),
                                     var_override = list(
@@ -45,7 +60,7 @@ generate_args_for_tests <- function(object_name,
         }
 
         if (current_entry$max == Inf) {
-          tmp_max <- 2
+          tmp_max <- 3
         } else {
           tmp_max <- current_entry$max
         }
@@ -70,43 +85,44 @@ generate_args_for_tests <- function(object_name,
     arg_value_list[var_object] <- list(c(FALSE, TRUE))
   }
 
-  # create all combinations
-  arg_comb <- expand.grid(arg_value_list, KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+  # create a combination
+  arg_comb=list()
+  for(i in seq_along(arg_value_list)){
+    arg_comb[names(arg_value_list)[i]]=list(sample(
+      x=arg_value_list[[i]],size = 1
+    )
+    )
+  }
 
   # Convert combinations to list and add override parameters and add necessary parameters
   arg_comb_list <- NULL
   override_subset <- intersect(arg_names, names(var_override))
   necessary_subset <- intersect(arg_names, names(necessary_objects))
-  for (i in 1:nrow(arg_comb)) {
-    arg_comb_list[i] <- list(
-      c(
-        arg_comb[i, ],
-        var_override[override_subset],
-        necessary_objects[necessary_subset]
-      )
-    )
-  }
+
+  arg_comb_list=append(x=arg_comb,values = var_override[override_subset])
+  arg_comb_list=append(x=arg_comb_list,values = necessary_objects[necessary_subset])
 
   # add var objects
   # Replace FALSE with NULL and TRUE with the corresponding object
-  for (i in seq_along(arg_comb_list)) {
+  #print(arg_comb_list)
+  #print("---------")
     for (var_object in names(var_objects)) {
-      if (arg_comb_list[[i]][[var_object]] == TRUE) {
-        arg_comb_list[[i]][var_object] <- list(var_objects[[var_object]])
+      if (arg_comb_list[[var_object]] == TRUE) {
+        arg_comb_list[var_object] <- list(var_objects[[var_object]])
       } else {
-        arg_comb_list[[i]][var_object] <- list(NULL)
+        arg_comb_list[var_object] <- list(NULL)
       }
     }
-  }
-  n_all_combos <- length(arg_comb_list)
-  n_samples <- min(max_samples, n_all_combos)
-
-  final_arg_list <- arg_comb_list[sample(x = seq(from = 1, to = n_samples, by = 1), replace = FALSE)]
-
-  return(arg_list = list(args = final_arg_list, n_combos = n_samples))
+return(arg_comb_list)
 }
 
-
+#'@title Set sample size for argument combinations
+#'@description Function adjust the number of samples depending on the test environment.
+#'On continuous integration it is limited to a random sample of combinations.
+#'@param n_samples_requested `int` Number of samples if the test do not run on continuous integration.
+#'@param n_CI `int` Number of samples if the test run on continuous integration.
+#'@return Returns an `int` depending on the test environment.
+#' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
     n_samples_requested,
     n_CI = 50) {
@@ -118,6 +134,12 @@ check_adjust_n_samples_on_CI <- function(
   }
 }
 
+#'@title Get test data
+#'@description Function returns example data for testing the package
+#'@param class_range `vector` containing the number of classes.
+#'@param path_test_embeddings `string` Path to the location where the test data is stored.
+#'@return Returns a `list` with test data.
+#' @family Utils TestThat Developers
 get_test_data_for_classifiers=function(class_range=c(2,3),
                                        path_test_embeddings){
   # Load Embeddings
@@ -177,6 +199,12 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
          )
 }
 
+#'@title Print arguments
+#'@description Functions prints the used arguments. The aim of this function is
+#'to print the arguments to the console that resulted in a failed test.
+#'@param arg_list Named `list` of arguments. The list should be generated with [generate_args_for_tests].
+#'@return Function does nothing return.
+#' @family Utils TestThat Developers
 get_current_args_for_print=function(arg_list){
   if(!is.list(arg_list)){
     stop("arg_list must be a list.")
@@ -184,7 +212,19 @@ get_current_args_for_print=function(arg_list){
   return(paste(names(arg_list),arg_list,collapse = ", "))
 }
 
-
+#'@title Generate test tensors
+#'@description Functions generates a random test tensor that can be used for
+#' testing methods and functions based on 'PyTorch'. The tensors have the shape
+#' (Batch, Times,Features).
+#' @param times `int` Maximal length of a sequence.
+#' @param features `int` Number of features of the sequence.
+#' @param seq_len Numeric `vector` containing the length of the given cases. The
+#' length of this vector determines the value for 'Batch'. Values must be at least 1 and
+#' maximal `times`.
+#' @param pad_value `int` Value used to indicate padding.
+#' @returns Returns an object of class `Tensor` from 'PyTorch'.
+#' @note To request a *R* array please use [generate_embeddings].
+#' @family Utils TestThat Developers
 generate_tensors=function(times,
                           features,
                           seq_len,
@@ -209,6 +249,19 @@ generate_tensors=function(times,
   return(tensor)
 }
 
+#'@title Generate test embeddings
+#'@description Functions generates a random test embedding that can be used for
+#' testing methods and functions. The embeddings have the shape
+#' (Batch, Times,Features).
+#' @param times `int` Maximal length of a sequence.
+#' @param features `int` Number of features of the sequence.
+#' @param seq_len Numeric `vector` containing the length of the given cases. The
+#' length of this vector determines the value for 'Batch'. Values must be at least 1 and
+#' maximal `times`.
+#' @param pad_value `int` Value used to indicate padding.
+#' @returns Returns an `array` with dim `(length(seq_len),times,features)`.
+#' @note To generate a 'PyTorch' object please use [generate_tensors].
+#' @family Utils TestThat Developers
 generate_embeddings=function(times,
                           features,
                           seq_len,
@@ -228,6 +281,12 @@ generate_embeddings=function(times,
   return(tensor_data)
 }
 
+#'@title Generate static test tensor
+#'@description Function generates a static test tensor which is always the same.
+#' @param pad_value `int` Value used to indicate padding.
+#' @returns Returns an object of class `Tensor` which is always the same except padding.
+#' Shape (5,3,7).
+#' @family Utils TestThat Developers
 get_fixed_test_tensor=function(pad_value){
   times=3
   features=7
@@ -243,7 +302,6 @@ get_fixed_test_tensor=function(pad_value){
       tensor_data[i,j,]=seq(from=-seq_len[i],to=j*batch,length.out=features)
     }
   }
-  #write.csv2(tensor_data,file="tensor_data.csv")
   tensor_np=reticulate::np_array(tensor_data)
   if (numpy_writeable(tensor_np) == FALSE) {
     warning("Numpy array is not writable")
@@ -253,32 +311,3 @@ get_fixed_test_tensor=function(pad_value){
 
 }
 
-get_simple_test_tensor=function(pad_value,
-                                times,
-                                features,
-                                seq_len,
-                                labels){
-  batch=length(seq_len)
-  tensor_data=array(
-    data = pad_value,
-    dim = c(batch,times,features)
-  )
-
-  factor_labels=factor(labels)
-  factor_labels=as.numeric(factor_labels)
-
-  for(i in seq_along(seq_len)){
-    for(j in seq(from=1,to=seq_len[i])){
-      tensor_data[i,j,]=(1/(factor_labels[i]+1))^factor_labels[i]
-    }
-  }
-  rownames(tensor_data)=names(labels)
-  #write.csv2(tensor_data,file="tensor_data.csv")
-  #tensor_np=reticulate::np_array(tensor_data)
-  #if (numpy_writeable(tensor_np) == FALSE) {
-  #  warning("Numpy array is not writable")
-  #}
-  #tensor=torch$from_numpy(tensor_np)
-  return(tensor_data)
-
-}

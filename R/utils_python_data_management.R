@@ -1,26 +1,11 @@
-# This file is part of the R package "aifeducation".
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
-#
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>
-
 #' @title Convert data.frame to arrow data set
 #' @description Function for converting a data.frame into a pyarrow data set.
 #'
 #' @param data_frame Object of class `data.frame`.
 #' @return Returns the `data.frame` as a pyarrow data set of class `datasets.arrow_dataset.Dataset`.
 #'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
+#' @family Utils Python Data Management Developers
+#' @export
 data.frame_to_py_dataset <- function(data_frame) {
   if (nrow(data_frame) == 1) {
     data_frame <- rbind(data_frame, data_frame)
@@ -44,9 +29,8 @@ data.frame_to_py_dataset <- function(data_frame) {
 #' @return Returns the data set of class `datasets.arrow_dataset.Dataset` with only two columns ("id","input"). "id"
 #'   stores the name of the cases while "input" stores the embeddings.
 #'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
+#' @family Utils Python Data Management Developers
+#' @export
 py_dataset_to_embeddings <- function(py_dataset) {
   py_dataset$set_format("np")
   embeddings <- py_dataset["input"]
@@ -61,9 +45,8 @@ py_dataset_to_embeddings <- function(py_dataset) {
 #' @param r_array `array` representing embeddings.
 #' @return Returns a numpy array.
 #'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
+#' @family Utils Python Data Management Developers
+#' @export
 prepare_r_array_for_dataset <- function(r_array) {
   if(!is.null(r_array)){
     tmp_np_array <- reticulate::r_to_py(
@@ -78,7 +61,7 @@ prepare_r_array_for_dataset <- function(r_array) {
     return(tmp_np_array)
   } else {
     return(NULL)
-    }
+  }
 }
 
 #' @title Assign cases to batches
@@ -90,9 +73,8 @@ prepare_r_array_for_dataset <- function(r_array) {
 #' @return Returns a `list` of batches. Each entry in the list contains a `vector` of `int` representing the cases
 #'   belonging to that batch.
 #'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
+#' @family Utils Python Data Management Developers
+#' @export
 get_batches_index <- function(number_rows, batch_size, zero_based = FALSE) {
   n_batches <- ceiling(number_rows / batch_size)
   index_list <- NULL
@@ -116,9 +98,8 @@ get_batches_index <- function(number_rows, batch_size, zero_based = FALSE) {
 #' @return Returns a data set of class `datasets.arrow_dataset.Dataset` where the duplicates are removed according to
 #'   the given column.
 #'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
+#' @family Utils Python Data Management Developers
+#' @export
 reduce_to_unique <- function(dataset_to_reduce, column_name) {
   selected_column <- dataset_to_reduce$data$column(column_name)
   unique_values <- pyarrow$compute$unique(selected_column)
@@ -133,9 +114,8 @@ reduce_to_unique <- function(dataset_to_reduce, column_name) {
 #' @param vector `vector` of class indices.
 #' @return Returns a data set of class `datasets.arrow_dataset.Dataset` containing the class indices.
 #'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
+#' @family Utils Python Data Management Developers
+#' @export
 class_vector_to_py_dataset <- function(vector) {
   data_frame <- as.data.frame(vector)
   data_frame$id <- names(vector)
@@ -154,72 +134,4 @@ class_vector_to_py_dataset <- function(vector) {
   return(dataset)
 }
 
-#' @title Combine embeddings in array form
-#' @description Function combines two array by adding an array to another array along the
-#' first dimension.
-#'
-#' @param ... `array` or `list` of `array`s. Arrays to be combined. All array must have row names.
-#'
-#' @return Returns the combined array
-#'
-#' @family Data Management
-#' @keywords internal
-#' @noRd
-array_form_bind <- function(...) {
-  objects <- list(...)
-  arrays <- NULL
 
-  for (object in objects) {
-    if (is.list(object)) {
-      for (j in seq_len(length(object))) {
-        arrays[length(arrays) + 1] <- list(object[[j]])
-      }
-    } else {
-      arrays[length(arrays) + 1] <- list(object)
-    }
-  }
-
-  # arrays <- list(...)
-  if (length(arrays) > 1) {
-    total_rows <- 0
-
-    dimension <- dim(arrays[[1]])
-
-    for (i in seq_len(length(arrays))) {
-      total_rows <- total_rows + dim(arrays[[i]])[1]
-
-      # Check number of dimensions
-      if (sum(dim(arrays[[i]])[-1] != dimension[-1])) {
-        stop("The dimensions of the array differ.")
-      }
-    }
-
-    combined_array <- array(
-      data = NA,
-      dim = c(total_rows, dimension[2], dimension[3])
-    )
-
-    intercept <- 0
-    row_names <- NULL
-
-
-    for (i in seq_len(length(arrays))) {
-      index <- seq.int(
-        from = 1,
-        to = nrow(arrays[[i]]),
-        by = 1
-      ) + intercept
-
-      combined_array[index, , ] <- arrays[[i]]
-
-      intercept <- intercept + length(index)
-
-      row_names <- append(x = row_names, rownames(arrays[[i]]))
-    }
-
-    rownames(combined_array) <- row_names
-    return(combined_array)
-  } else {
-    return(arrays[[1]])
-  }
-}

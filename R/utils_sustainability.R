@@ -20,7 +20,7 @@
 #'   library codecarbon.
 #' @return Returns a `list` which contains the tracked sustainability data.
 #'
-#' @family Auxiliary Functions
+#' @family Utils Sustainability Developers
 #'
 #' @keywords internal
 summarize_tracked_sustainability <- function(sustainability_tracker) {
@@ -76,7 +76,7 @@ summarize_tracked_sustainability <- function(sustainability_tracker) {
 #'
 #' @description Function for requesting a `vector` containing the alpha-3 codes for most countries.
 #' @return Returns a `vector` containing the alpha-3 codes for most countries.
-#' @family Auxiliary Functions
+#' @family Utils Sustainability Developers
 #'
 #' @export
 get_alpha_3_codes <- function() {

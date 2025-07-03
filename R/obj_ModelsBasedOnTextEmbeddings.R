@@ -21,7 +21,7 @@
 #'
 #' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
-#' @family Classifiers for developers
+#' @family R6 Classes for Developers
 #' @export
 ModelsBasedOnTextEmbeddings <- R6::R6Class(
   classname = "ModelsBasedOnTextEmbeddings",
@@ -111,12 +111,18 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     ),
     #------------------------------------------------------------------------------
     load_config_and_docs_textembeddingmodel = function(config_public, config_private) {
+      if(is.null(config_private$text_embedding_model$pad_value)){
+        pad_value=0
+      } else {
+        pad_value=config_private$text_embedding_model$pad_value
+      }
+
       private$set_text_embedding_model(
         model_info = config_private$text_embedding_model$model,
         feature_extractor_info = config_private$text_embedding_model$feature_extractor,
         times = config_private$text_embedding_model$times,
         features = config_private$text_embedding_model$features,
-        pad_value=config_private$text_embedding_model$pad_value
+        pad_value=pad_value
       )
     },
     #---------------------------------------------------------------------------
@@ -276,7 +282,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     # introduced
     update_model_config = function() {
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
-      if (is.na(current_pkg_version)) {
+      if (is.null_or_na(current_pkg_version)) {
         update <- TRUE
       } else {
         if (check_versions(

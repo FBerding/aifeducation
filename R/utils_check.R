@@ -20,7 +20,7 @@
 #' @param allow_NULL `bool` If `TRUE` allow the object to be `NULL`.
 #' @return Function does nothing return. It raises an error if the object is not of the specified class.
 #'
-#' @family Utils
+#' @family Utils Checks Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -60,7 +60,7 @@ check_class <- function(object,object_name=NULL, classes, allow_NULL = FALSE) {
 #' set this argument to `NULL`.
 #' @return Function does nothing return. It raises an error if the object is not of the specified type.
 #'
-#' @family Utils
+#' @family Utils Checks Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -144,24 +144,6 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
   }
 }
 
-#' @title Check numpy array to be writable
-#' @description Function for checking if a numpy array is writable.
-#'
-#' @param np_array A numpy array.
-#' @return Function returns `TRUE` if the numpy array is writable. It returns `FALSE`
-#' if the array is not writable.
-#'
-#' @family Utils
-#' @keywords internal
-#' @noRd
-#'
-numpy_writeable <- function(np_array) {
-  if (!inherits(x = np_array, what = c("numpy.ndarray"))) {
-    stop("Provided object is no numpy array")
-  }
-  return(reticulate::py_to_r(np_array$flags["WRITEABLE"]))
-}
-
 #' @title Compares and checks the versions of packages
 #' @description Function for checking if a package is later as another package.
 #'
@@ -178,7 +160,7 @@ numpy_writeable <- function(np_array) {
 #'
 #' @importFrom utils compareVersion
 #'
-#' @family Utils
+#' @family Utils Checks Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -223,6 +205,7 @@ check_versions <- function(a, operator = "==", b) {
 #' @description Function for checking if an object is of a specific type or class.
 #'
 #' @param object Any R object.
+#' @param object_name `string` Name of the object. This is helpful for debugging.
 #' @param type_classes `vector` of `string`s containing the type or classes which the object should belong to.
 #' @param allow_NULL `bool` If `TRUE` allow the object to be `NULL`.
 #' @param min `double` or `int` Minimal value for the object.
@@ -234,9 +217,8 @@ check_versions <- function(a, operator = "==", b) {
 #' @note parameter `min`, `max`, and `allowed_values` do not apply if `type_classes` is a class.
 #' @note allowed_values does only apply if `type_classes` is `string`.
 #'
-#' @family Utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Checks Developers
+#' @export
 #'
 check_class_and_type <- function(object,object_name=NULL, type_classes = "bool", allow_NULL = FALSE, min = NULL, max = NULL, allowed_values = NULL) {
   if (length(type_classes)==sum(type_classes %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list"))) {
@@ -258,7 +240,15 @@ check_class_and_type <- function(object,object_name=NULL, type_classes = "bool",
   }
 }
 
-#--------------------------------------------------------------------------
+#' @title Check arguments automatically
+#' @description This function performs checks for every provided argument. It can
+#' only check arguments that are defined in the central parameter dictionary. See
+#' [get_param_dict] for more details.
+#' @param args Named `list` containing the arguments and their values.
+#' @return Function does nothing return. It raises an error the arguments are not valid.
+#' @family Utils Checks Developers
+#' @export
+#'
 check_all_args=function(args){
   arg_dict=get_param_dict()
   #Select only arguments that occur in args and var group
@@ -278,12 +268,28 @@ check_all_args=function(args){
   }
 }
 
+#' @title Check for argument type
+#' @description Function performs a test if the argument is of a specific type.
+#' @param arg_name `string` Name of the argument.
+#' @param param_dict `list` Parameter dictionary created with the function [get_param_dict].
+#' @return Returns `TRUE` if the argument is of type "bool", "int", "double", "string","vector" or "list".
+#' It returs `FALSE` in all other cases.
+#' @family Utils Checks Developers
+#' @keywords internal
+#' @noRd
+#'
 is_valid_and_exportable_param=function(arg_name,param_dict){
   param_dict_entry=param_dict[[arg_name]]
-  if(max(param_dict_entry$type%in%c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list"))&
-     !arg_name%in%c("log_dir","log_write_interval")){
-    return(TRUE)
+
+  if(!is.null(param_dict_entry$type)){
+    if(max(param_dict_entry$type%in%c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")) &
+       !arg_name%in%c("log_dir","log_write_interval")){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
   } else {
     return(FALSE)
   }
+
 }

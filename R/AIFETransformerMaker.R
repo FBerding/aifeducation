@@ -128,7 +128,7 @@ aife_transformer.make <- function(type, init_trace = TRUE) {
 #' @param model_dir `r paramDesc.model_dir_path()`
 #' @return If success - a tokenizer, otherwise - an error (passed type is invalid).
 #'
-#' @family Transformer
+#' @family Transformers for developers
 #' @export
 aife_transformer.load_tokenizer <- function(type, model_dir) {
   .aife_transformer.check_type(type)
@@ -147,7 +147,8 @@ aife_transformer.load_tokenizer <- function(type, model_dir) {
 #' @param model_dir `r paramDesc.model_dir_path()`
 #' @return If success - a model configuration, otherwise - an error (passed type is invalid).
 #'
-#' @family Transformer
+#' @family Transformers for developers
+#' @keywords internal
 #' @export
 aife_transformer.load_model_config <- function(type, model_dir) {
   .aife_transformer.check_type(type)
@@ -169,7 +170,8 @@ aife_transformer.load_model_config <- function(type, model_dir) {
 #' @param add_pooler `bool` Whether to add a pooling layer, `FALSE` by default.
 #' @return If success - a transformer model, otherwise - an error (passed type is invalid).
 #'
-#' @family Transformer
+#' @family Transformers for developers
+#' @keywords internal
 #' @export
 aife_transformer.load_model <- function(type, model_dir, from_tf, load_safe, add_pooler = FALSE) {
   .aife_transformer.check_type(type)
@@ -198,7 +200,7 @@ aife_transformer.load_model <- function(type, model_dir, from_tf, load_safe, add
 #' @param load_safe `bool` Whether or not to use safetensors checkpoints.
 #' @return If success - a MLM-model, otherwise - an error (passed type is invalid).
 #'
-#' @family Transformer
+#' @family Transformers for developers
 #' @export
 aife_transformer.load_model_mlm <- function(type, model_dir, from_tf, load_safe) {
   .aife_transformer.check_type(type)

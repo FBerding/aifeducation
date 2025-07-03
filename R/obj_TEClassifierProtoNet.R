@@ -42,6 +42,11 @@ TEClassifierProtoNet <- R6::R6Class(
   classname = "TEClassifierProtoNet",
   inherit = TEClassifiersBasedOnProtoNet,
   public = list(
+    #' @description Creating a new instance of this class.
+    #' @return Returns an object of class [TEClassifierProtoNet] which is ready for configuration.
+    initialize=function(){
+      message("TEClassifierProtoNet is deprecated. Please use TEClassifierSequentialPrototype.")
+    },
     # New-----------------------------------------------------------------------
     #' @description Creating a new instance of this class.
     #' @param name `r get_param_doc_desc("name")`
@@ -66,7 +71,6 @@ TEClassifierProtoNet <- R6::R6Class(
     #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
     #' @param dense_dropout `r get_param_doc_desc("dense_dropout")`
     #' @param rec_dropout `r get_param_doc_desc("rec_dropout")`
-    #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
     #' @note This model requires `pad_value=0`. If this condition is not met the
     #' padding value is switched automatically.
@@ -91,8 +95,7 @@ TEClassifierProtoNet <- R6::R6Class(
                          rec_dropout = 0.1,
                          repeat_encoder = 1,
                          dense_dropout = 0.4,
-                         encoder_dropout = 0.1,
-                         optimizer = "adamw") {
+                         encoder_dropout = 0.1) {
       private$do_configuration(args=get_called_args(n=1),one_hot_encoding=FALSE)
     },
     #---------------------------------------------------------------------------
@@ -369,7 +372,7 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       # Set loss function
-      cls_loss_fct_name <- "ProtoNetworkMargin"
+      loss_cls_fct_name <- "ProtoNetworkMargin"
 
       # Check directory for checkpoints
       create_dir(
@@ -410,7 +413,7 @@ TEClassifierProtoNet <- R6::R6Class(
 
       history <- py$TeClassifierProtoNetTrain_PT_with_Datasets(
         model = self$model,
-        cls_loss_fct_name = self$last_training$config$pt_loss_fct_name,
+        loss_cls_fct_name = self$last_training$config$loss_pt_fct_name,
         optimizer_method = self$model_config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,

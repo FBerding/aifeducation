@@ -88,7 +88,7 @@ class stack_dense_layer(torch.nn.Module):
 
 #Recurrent Layer stack with mask
 class stack_recurrent_layers(torch.nn.Module): 
-  def __init__(self,times,hidden_size,n_layers,rec_type,rec_bidirectional,pad_value,dropout,bias=True,return_sequence=False,parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,times,hidden_size,n_layers,rec_type,rec_bidirectional,pad_value,dropout,bias=True,return_sequence=False,parametrizations="None",device=None, dtype=None,residual_type="None",normalization_type="layer_norm"):
     super().__init__()
     self.hidden_size=hidden_size
     self.n_layers=n_layers
@@ -140,6 +140,7 @@ class stack_recurrent_layers(torch.nn.Module):
         parametrizations="None",
         device=device, 
         dtype=dtype,
+        normalization_type="None",
         residual_type="None"
       )
 
@@ -151,8 +152,8 @@ class stack_recurrent_layers(torch.nn.Module):
   def forward(self,x,seq_len,mask_times,mask_features):
     y=self.pack_and_masking(x,seq_len,mask_times,mask_features)
     y=self.rec_layers(y[0])
+    y=self.unpack(y[0],seq_len,mask_times,mask_features)
     if self.return_sequence==True:
-      y=self.unpack(y[0],seq_len,mask_times,mask_features)
       if self.rec_bidirectional==True:
         new_mask_features=self.calc_new_mask(mask_features)
         y=self.compression_layer(y[0],seq_len,mask_times,new_mask_features)
@@ -165,7 +166,7 @@ class stack_recurrent_layers(torch.nn.Module):
     tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1))
     mask_features_new=tmp_mask.repeat(1,1,2*self.hidden_size)
     return mask_features_new
-
+  
 #stack_tf_encoder_layer--------------------------------
 class stack_tf_encoder_layer(torch.nn.Module):
   def __init__(self,dense_dim,n_layers,times, features,pad_value,dropout_rate_1,dropout_rate_2,act_fct="elu",attention_type="multihead",positional_embedding="absolute",num_heads=1,bias=True,parametrizations="None",normalization_type="layer_norm",device=None, dtype=None,residual_type="None"):
@@ -195,7 +196,7 @@ class stack_tf_encoder_layer(torch.nn.Module):
     if self.positional_embedding=="absolute":
        self.positional_embedding_layer=layer_abs_positional_embedding(sequence_length=self.times,embedding_dim=self.features)
     elif self.positional_embedding=="None":
-      self.positional_embedding_layer=identity_layer()
+      self.positional_embedding_layer=identity_layer(pad_value=self.pad_value,apply_masking=True)
     
     for r in range(self.n_layers):
       self.layer_list.append(
@@ -237,7 +238,7 @@ class stack_tf_encoder_layer(torch.nn.Module):
 
 #stack_n_gram_convolution--------------------------------
 class stack_n_gram_convolution(torch.nn.Module):
-  def __init__(self,ks_min,ks_max,times,features,n_layers,pad_value,bias=True,parametrizations="None",device=None,dtype=None,act_fct="elu",residual_type="None"):
+  def __init__(self,ks_min,ks_max,times,features,n_layers,pad_value,bias=True,dropout=0.1,parametrizations="None",device=None,dtype=None,act_fct="elu",residual_type="None",normalization_type="layer_norm"):
     super().__init__()
     
     self.features=features
@@ -266,7 +267,10 @@ class stack_n_gram_convolution(torch.nn.Module):
           pad_value=self.pad_value,
           bias=self.bias,
           parametrizations=self.parametrizations,
-          act_fct=self.act_fct,
+          act_fct_name=self.act_fct,
+          residual_type=residual_type,
+          normalization_type=normalization_type,
+          dropout=dropout,
           device=device, 
           dtype=dtype,
          ))

@@ -33,7 +33,7 @@ knnor <- function(dataset, k, aug_num, cycles_number_limit = 100L) {
 #' @param k `unsigned integer` number of nearest neighbors
 #'
 #' @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
-#' @family oversampling_approaches
+#' @family oversampling_approaches Developers
 #'
 #' @export
 knnor_is_same_class <- function(new_point, dataset, labels, k) {
@@ -53,7 +53,7 @@ knnor_is_same_class <- function(new_point, dataset, labels, k) {
 #'
 #'@import Rcpp
 #'@useDynLib aifeducation, .registration = TRUE
-#'@family Auxiliary Functions
+#'@family Utils Developers
 #'@export
 matrix_to_array_c <- function(matrix, times, features) {
     .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)
@@ -72,7 +72,7 @@ matrix_to_array_c <- function(matrix, times, features) {
 #'
 #'@import Rcpp
 #'@useDynLib aifeducation, .registration = TRUE
-#'@family Auxiliary Functions
+#'@family Utils Developers
 #'@export
 to_categorical_c <- function(class_vector, n_classes) {
     .Call(`_aifeducation_to_categorical_c`, class_vector, n_classes)
@@ -88,7 +88,7 @@ to_categorical_c <- function(class_vector, n_classes) {
 #' @param features `unsigned integer` features number
 #'
 #' @return Returns matrix (with size batch x times*features)
-#'
+#' @family Utils Developers
 #' @export
 tensor_to_matrix_c <- function(tensor, times, features) {
     .Call(`_aifeducation_tensor_to_matrix_c`, tensor, times, features)

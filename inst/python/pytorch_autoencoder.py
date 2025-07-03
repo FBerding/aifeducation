@@ -40,7 +40,6 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       self.sequence_length=times
       self.noise_factor=noise_factor
       self.difference=self.features_in-self.features_out
-      
       self.PackAndMasking_PT=PackAndMasking_PT()
       self.UnPackAndMasking_PT=UnPackAndMasking_PT(sequence_length=self.sequence_length)
       
@@ -79,7 +78,6 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       #Swtich padding value if necessary
       if not self.switch_pad_value_start==None:
         x=self.switch_pad_value_start(x)
-      
       if encoder_mode==False:
         if self.training==True:
           mask=self.get_mask(x)
@@ -98,15 +96,16 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
           return x
         else:
           return x, calc_SquaredCovSum(self.UnPackAndMasking_PT(latent_space))
+      
       elif encoder_mode==True:
         x=self.PackAndMasking_PT(x)
         x=self.encoder_1(x)[0]
         x=self.latent_space(x)[0]
         x=self.UnPackAndMasking_PT(x)
         #Switch padding value back if necessary
-        if not self.switch_pad_value_start==None:
-          x=self.switch_pad_value_final(x)
-        return x
+      if not self.switch_pad_value_start==None:
+        x=self.switch_pad_value_final(x)
+      return x
     def get_mask(self,x):
       device=('cuda' if torch.cuda.is_available() else 'cpu')
       time_sums=torch.sum(x,dim=2)

@@ -11,11 +11,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-
+#' @title Class names of all classifier models based on text embeddings
+#' @description `vector` containing all class names as a string.
 #' @family Parameter Dictionary
 #' @keywords internal
 TEClassifiers_class_names <- c()
 
+#' @title Get names of classifiers
+#' @description Function returns the names of all classifiers which
+#' are child classes of a specific super class.
+#' @param super_class `string` Name of the super class the classifiers should
+#' be child of. To request the names of all classifiers set this argument to `NULL`.
+#' @return Returns a vector containing the names of the classifiers.
 #' @family Parameter Dictionary
 #' @export
 get_TEClassifiers_class_names <- function(super_class = NULL) {
@@ -36,9 +43,33 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
   }
 }
 
-
+#' @title Get dictionary of all parameters
+#' @description Function provides a `list` containing important characteristics
+#' of the parameter used in the models. The `list` does contain only the definition of
+#' arguments for transformer models and all classifiers. The arguments of other functions
+#' in this package are documented separately.
+#'
+#' The aim of this list is to automatize argument checking and widget generation for
+#' *AI for Education - Studio*.
+#'
+#' @return Returns a  named `list`. The names correspond to specific arguments.
+#' The `list` contains a `list` for every argument with the following components:
+#'
+#' * type: The type of allowed values.
+#' * allow_null: A `bool` indicating if the argument can be set to `NULL`.
+#' * min: The minimal value the argument can be. Set to `NULL` if not relevant. Set to `-Inf` if there is no minimum.
+#' * max: The maximal value the argument can be. Set to `NULL` if not relevant. Set to `Inf` if there is no Minimum.
+#' * desc: A `string` which includes the description of the argument written in markdown. This string is for the documentation the parameter.
+#' * allowed_values: `vector` of allowed values. This is only relevant if the argument is not numeric. During the checking of the arguments
+#'   it is checked if the provided values can be found in this vector. If all values are allowed set to `NULL`.
+#' * default_value: The default value of the argument. If there is no default set to `NULL`.
+#' * default_historic: Historic default value. This can be necessary for backward compatibility.
+#' * gui_box: `string` Name of the box in AI for Education - Studio where the argument appears. If it should not appear set to `NULL`.
+#' * gui_label: `string` Label of the controlling widget in AI for Education - Studio.
+#'
 #' @family Parameter Dictionary
 #' @export
+#'
 get_param_dict <- function() {
   param <- list()
   #General---------------------------------------------------------------------
@@ -456,7 +487,7 @@ get_param_dict <- function() {
     )
   param$val_size <- param$data_val_size
 
-  param$balance_class_weights = list(
+  param$loss_balance_class_weights = list(
       type = c("bool"),
       allow_null = FALSE,
       desc = "If `TRUE` class weights are generated based on the frequencies of the
@@ -465,7 +496,7 @@ get_param_dict <- function() {
       gui_label = "Balance Class Weights",
       default_value = TRUE
     )
-  param$balance_sequence_length = list(
+  param$loss_balance_sequence_length = list(
       type = c("bool"),
       allow_null = FALSE,
       desc = "If `TRUE` sample weights are generated for the length of sequences based on
@@ -610,7 +641,7 @@ get_param_dict <- function() {
       allowed_values = NULL,
       desc = "ISO code (Alpha-3-Code) for the country. This variable must be set if
       sustainability should be tracked. A list can be found on Wikipedia:
-      [https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes].",
+      <https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes>.",
       gui_box = "Sustainability",
       gui_label = "Alpha-3-Code",
       default_value = "DEU"
@@ -620,7 +651,7 @@ get_param_dict <- function() {
       allow_null = TRUE,
       allowed_values = NULL,
       desc = "Region within a country. Only available for USA and Canada See the documentation of
-      codecarbon for more information. [https://mlco2.github.io/codecarbon/parameters.html]",
+      codecarbon for more information. <https://mlco2.github.io/codecarbon/parameters.html>",
       gui_box = NULL,
       default_value = NULL
     )
@@ -635,7 +666,7 @@ get_param_dict <- function() {
     )
 
   #Training related------------------------------------------------------------
-  param$cls_loss_fct_name<- list(
+  param$loss_cls_fct_name<- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
@@ -646,10 +677,10 @@ get_param_dict <- function() {
     gui_label = "Loss Function",
     default_value = "FocalLoss"
   )
-  param$pt_loss_fct_name= param$cls_loss_fct_name
-  param$pt_loss_fct_name$allowed_values=c("MultiWayContrastiveLoss")
-  param$pt_loss_fct_name$default_value=c("MultiWayContrastiveLoss")
-  param$pt_loss_fct_name$gui_box = "General Settings"
+  param$loss_pt_fct_name= param$loss_cls_fct_name
+  param$loss_pt_fct_name$allowed_values=c("MultiWayContrastiveLoss")
+  param$loss_pt_fct_name$default_value=c("MultiWayContrastiveLoss")
+  param$loss_pt_fct_name$gui_box = "General Settings"
 
   param$optimizer <- list(
     type = "string",
@@ -898,6 +929,34 @@ get_param_dict <- function() {
     default_historic = NULL
   )
 
+  param$skip_connection_type = list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("residual_gate", "addition","None"),
+    desc = "Type residual connenction for the complete model.",
+    gui_box = "General Settings",
+    gui_label = "Residual Connection",
+    default_value = "residual_gate",
+    default_historic = NULL
+  )
+
+  param$skip_connection_type=param$residual_type
+  param$skip_connection_type$gui_box="General Settings"
+
+  param$tf_residual_type=param$residual_type
+  param$tf_residual_type$gui_box="Transformer Encoder Layers"
+
+  param$rec_residual_type=param$residual_type
+  param$rec_residual_type$gui_box="Recurrent Layers"
+
+  param$dense_residual_type=param$residual_type
+  param$dense_residual_type$gui_box="Dense Layers"
+
+  param$ng_conv_residual_type=param$residual_type
+  param$ng_conv_residual_type$gui_box="N-Gram Layers"
+
   param$normalization_type = list(
     type = "string",
     min = NULL,
@@ -906,20 +965,38 @@ get_param_dict <- function() {
     allowed_values = c("layer_norm", "None"),
     desc = "Type of normalization applied to all layers and stack layers.",
     gui_box = "General Settings",
-    gui_label = "Residual Connection",
+    gui_label = "Normalization",
     default_value = "layer_norm",
     default_historic = NULL
   )
 
+  param$feat_normalization_type=param$normalization_type
+  param$feat_normalization_type$gui_box="Scaling Layer"
+
+  param$tf_normalization_type=param$normalization_type
+  param$tf_normalization_type$gui_box="Transformer Encoder Layers"
+
+  param$rec_normalization_type=param$normalization_type
+  param$rec_normalization_type$gui_box="Recurrent Layers"
+
+  param$dense_normalization_type=param$normalization_type
+  param$dense_normalization_type$gui_box="Dense Layers"
+
+  param$ng_conv_normalization_type=param$normalization_type
+  param$ng_conv_normalization_type$gui_box="N-Gram Layers"
+
+  param$merge_normalization_type=param$normalization_type
+  param$merge_normalization_type$gui_box="Merge Layer"
+
   #Intermediate Feature--------------------------------------------------------
-  param$intermediate_features<-list(
+  param$cls_pooling_features<-list(
     type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
     allowed_values = NULL,
     desc = "Number of features to be extracted at the end of the model.",
-    gui_box = "Intermediate Features",
+    gui_box = "Pooling Layer",
     gui_label = "Size",
     default_value = 32
   )
@@ -931,7 +1008,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     allowed_values = c("max", "min", "min_max"),
     desc = "Type of extracting intermediate features.",
-    gui_box = "Intermediate Features",
+    gui_box = "Pooling Layer",
     gui_label = "Feature Extraction Method",
     default_value = "min_max",
     default_historic = NULL
@@ -960,11 +1037,11 @@ get_param_dict <- function() {
   param$dense_parametrizations=param$parametrizations
   param$dense_parametrizations$gui_box="Dense Layers"
 
-  param$conv_parametrizations=param$parametrizations
-  param$conv_parametrizations$gui_box="N-Gram Layers"
+  param$ng_conv_parametrizations=param$parametrizations
+  param$ng_conv_parametrizations$gui_box="N-Gram Layers"
 
   param$feat_parametrizations=param$parametrizations
-  param$feat_parametrizations$gui_box="Intermediate Features"
+  param$feat_parametrizations$gui_box="Pooling Layer"
 
   #Bias------------------------------------------------------------------------
   param$bias <- list(
@@ -985,10 +1062,10 @@ get_param_dict <- function() {
   param$tf_bias$gui_box="Transformer Encoder Layers"
   param$dense_bias=param$bias
   param$dense_bias$gui_box="Dense Layers"
-  param$conv_bias=param$bias
-  param$conv_bias$gui_box="N-Gram Layers"
+  param$ng_conv_bias=param$bias
+  param$ng_conv_bias$gui_box="N-Gram Layers"
   param$feat_bias=param$bias
-  param$feat_bias$gui_box="Intermediate Features"
+  param$feat_bias$gui_box= "Pooling Layer"
 
   #Activation functions---------------------------------------------------------
   param$act_fct = list(
@@ -1004,9 +1081,9 @@ get_param_dict <- function() {
     default_historic = "gelu"
   )
   param$feat_act_fct=param$act_fct
-  param$feat_act_fct$gui_box="Intermediate Features"
-  param$conv_act_fct=param$act_fct
-  param$conv_act_fct$gui_box="N-Gram Layers"
+  param$feat_act_fct$gui_box="Pooling Layer"
+  param$ng_conv_act_fct=param$act_fct
+  param$ng_conv_act_fct$gui_box="N-Gram Layers"
   param$dense_act_fct=param$act_fct
   param$dense_act_fct$gui_box="Dense Layers"
   param$rec_act_fct=param$act_fct
@@ -1179,6 +1256,10 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = c("fourier", "multihead"),
+    values_desc=list(
+      multihead="The original multi-head attention as described by Vaswani et al. (2017).",
+      fourier="Attention with fourier transformation as described by Lee-Thorp et al. (2021)."
+    ),
     desc = "Choose the relevant attention type. Please note that you may see different
     values for a case for different input orders if you choose `fourier` on linux.",
     gui_box = "Transformer Encoder Layers",
@@ -1225,7 +1306,19 @@ get_param_dict <- function() {
   param$tf_n_layers=param$repeat_encoder
 
   #Conv Layer-------------------------------------------------------------------
-  param$conv_n_layers<- list(
+  param$ng_conv_dropout <- list(
+    type = "double)",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "determining the dropout for n-gram convolution layers.",
+    gui_box = "N-Gram Layers",
+    gui_label = "Dropout",
+    default_value = 0.1
+  )
+
+  param$ng_conv_n_layers<- list(
     type = "int",
     allow_null = FALSE,
     min = 0,
@@ -1236,7 +1329,7 @@ get_param_dict <- function() {
     gui_label = "Number of Layers",
     default_value = 0
   )
-  param$conv_ks_min<- list(
+  param$ng_conv_ks_min<- list(
     type = "int",
     allow_null = FALSE,
     min = 2,
@@ -1247,7 +1340,7 @@ get_param_dict <- function() {
     gui_label = "Smallest N-Gram",
     default_value = 2
   )
-  param$conv_ks_max<- list(
+  param$ng_conv_ks_max<- list(
     type = "int",
     allow_null = FALSE,
     min = 2,
@@ -1283,12 +1376,25 @@ get_param_dict <- function() {
   return(param)
 }
 
+#' @title Definition of an argument
+#' @description Function returns the definition of an argument. Please note that
+#' only definitions of arguments can be requested which are used for transformers or
+#' classifier models.
+#' @param param_name `string` Name of the parameter to request its definition.
+#' @returns Returns a `list` with the definition of the argument. See [get_param_dict]
+#' for more details.
 #' @family Parameter Dictionary
 #' @export
 get_param_def <- function(param_name) {
   return(get_param_dict()[[param_name]])
 }
 
+#' @title Description of an argument
+#' @description Function provides the description of an argument in markdown.
+#' Its aim is to be used for documenting the parameter of functions.
+#' @param param_name `string` Name of the parameter to request its definition.
+#' @return Returns a string which contains the description of the argument in markdown.
+#' The concrete format depends on the type of the argument.
 #' @family Parameter Dictionary
 #' @export
 get_param_doc_desc <- function(param_name) {
@@ -1378,7 +1484,7 @@ get_param_doc_desc <- function(param_name) {
 #' @importFrom rlang caller_fn
 #' @importFrom rlang fn_fmls
 #'
-#' @return Returns names `list` of all arguments and their values.
+#' @return Returns a named `list` of all arguments and their values.
 #'
 #' @family Parameter Dictionary
 #' @export
@@ -1392,10 +1498,21 @@ get_called_args <- function(n = 1) {
   return(final_args)
 }
 
-get_magnitude_values <- function(min, max, magnitude, n_elements = 9) {
+#' @title Magnitudes of an argument
+#' @description Function calculates different magnitude for a numeric argument.
+#' @param max `double` The maximal value.
+#' @param min `double` The minimal value.
+#' @param magnitude `double` Factor using for creating the magnitude.
+#' @param n_elements `int` Number of values to return.
+#' @return Returns a numeric `vector` with the generated values.
+#' The values are calculated with the following formula:
+#' max * magnitude^i for i=1,...,n_elements.
+#' Only values equal or creater `min` are returned.
+#' @family Parameter Dictionary
+get_magnitude_values <- function(magnitude, n_elements = 9,max,min) {
   value_vector <- vector(length = n_elements)
   for (i in seq_along(value_vector)) {
-    value_vector[i] <- max * magnitude^i
+    value_vector[i] <- max(min,max * magnitude^i)
   }
-  return(value_vector)
+  return(unique(value_vector))
 }

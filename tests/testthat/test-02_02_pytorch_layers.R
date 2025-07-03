@@ -112,7 +112,7 @@ test_that("identity layer", {
   masking_layer <- py$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
-  layer <- py$identity_layer()
+  layer <- py$identity_layer(apply_masking=FALSE)
   y <- layer(
     x = values[[1]],
     seq_len = values[[2]],
@@ -261,6 +261,7 @@ test_that("LayerNorm with Mask", {
 # Dense Layer with Mask-----------------------------------------------------------
 test_that("DenseLayer with Mask", {
   normalization_types <- c("None", "layer_norm")
+  residual_types=c("None", "addition", "residual_gate")
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -281,6 +282,9 @@ test_that("DenseLayer with Mask", {
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
   for (norm_types in normalization_types) {
+    for (res_types in residual_types){
+
+
     for (target_features in features_output) {
       # Create layer
       layer <- py$dense_layer_with_mask(
@@ -333,18 +337,13 @@ test_that("DenseLayer with Mask", {
       )
       expect_equal(y_1[[1]]$detach()$numpy(), y_2[[1]]$detach()$numpy())
     }
+    }
   }
 })
 
 # layer_tf_encoder-------------------------------------------------------
 test_that("layer_tf_encoder", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
-
-  attention_types <- c("multi_head", "fourier")
+  attention_types <- c("multihead", "fourier")
 
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -422,11 +421,6 @@ test_that("layer_tf_encoder", {
 
 # exreme_pooling_over_time------------------------------------------------------------
 test_that("exreme_pooling_over_time", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
 
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -459,12 +453,6 @@ test_that("exreme_pooling_over_time", {
 
 # layer_adaptive_extreme_pooling_1d---------------------------------------------
 test_that("layer_adaptive_extreme_pooling_1d", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
-
   tensor <- torch$rand(30L, 768L)
   output_size <- 10
 
@@ -512,11 +500,6 @@ test_that("layer_adaptive_extreme_pooling_1d", {
 
 # Layer layer_n_gram_convolution--------------------------------------------------
 test_that("layer_n_gram_convolution", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
 
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -586,11 +569,6 @@ test_that("layer_n_gram_convolution", {
 
 # Layer layer_mutiple_n_gram_convolution--------------------------------------------------
 test_that("layer_mutiple_n_gram_convolution", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
 
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -616,7 +594,7 @@ test_that("layer_mutiple_n_gram_convolution", {
       parametrizations = "None",
       dtype = values[[1]]$dtype,
       device = "cpu",
-      act_fct = "elu"
+      act_fct_name = "elu"
     )
     layer$eval()
 
@@ -662,11 +640,6 @@ test_that("layer_mutiple_n_gram_convolution", {
 
 # Layer merge leyer---------------------------------------
 test_that("merge_layer", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
 
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -690,7 +663,7 @@ test_that("merge_layer", {
       n_input_streams = as.integer(n_input_streams),
       pad_value = as.integer(pad_value),
       pooling_type = pooling_type,
-      attention_type = "multi_head",
+      attention_type = "multihead",
       num_heads = 1L,
       dtype = values[[1]]$dtype,
       device = "cpu"
@@ -709,12 +682,6 @@ test_that("merge_layer", {
 
 # Layer rnn preparation Layer---------------------------------------
 test_that("rnn_preparation", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-      package = "aifeducation"
-    )
-  )
-
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -766,11 +733,6 @@ test_that("rnn_preparation", {
 })
 
 test_that("layer_class_mean", {
-  reticulate::py_run_file(
-    system.file("python/pytorch_te_parallel.py",
-                package = "aifeducation"
-    )
-  )
 
   layer=py$layer_class_mean()
 
@@ -808,5 +770,42 @@ test_that("layer_class_mean", {
     expected = result_matrix,
     tolerance = 1e-5
     )
+})
+
+#layer_global_average_pooling_1d------------------------------------------------
+test_that("layer_global_average_pooling_1d", {
+pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
+features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
+sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
+example_tensor <- generate_tensors(
+  times = times,
+  features = features,
+  seq_len = sequence_length,
+  pad_value = pad_value
+)
+masking_layer <- py$masking_layer(pad_value)
+values <- masking_layer(example_tensor)
+
+layer=py$layer_global_average_pooling_1d(mask_type="mask")
+
+results=layer(x=values[[1]],mask=values[[3]])
+
+true_mean_source=example_tensor$numpy()
+true_mean_source=replace(x=true_mean_source,true_mean_source==pad_value,values=0)
+true_mean=matrix(data=0,nrow = 30,ncol = features)
+for(b in seq(30)){
+  for (t in 1:times){
+    for(f in 1:features){
+      true_mean[b,f]=true_mean_source[b,t,f]+true_mean[b,f]
+    }
+  }
+}
+true_mean=true_mean/sequence_length
+
+expect_equal(
+  object = results$numpy(),
+  expected = true_mean,
+  tolerance = 1e-7)
 })
 

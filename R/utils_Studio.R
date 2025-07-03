@@ -20,7 +20,7 @@
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface. The content of the list
 #'   depends on the kind of model passed to this function.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -151,9 +151,6 @@ generate_sidebar_information <- function(model) {
       )
     }
   }
-
-
-
   return(ui)
 }
 
@@ -168,7 +165,7 @@ generate_sidebar_information <- function(model) {
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface. The content of the list
 #'   depends on the kind of model passed to this function. If the `model` is `NULL` function returns `NULL`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -210,7 +207,7 @@ generate_model_description <- function(model, eng) {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -260,7 +257,7 @@ generate_model_bib_description <- function(model) {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -345,7 +342,7 @@ generate_doc_input_developers <- function(ns, model, type = "developers") {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -427,7 +424,7 @@ generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "
 #'   errors the function returns embeddings as an object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText]. In
 #'   the case of erros the function returns `NULL`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -538,7 +535,7 @@ load_and_check_dataset_raw_texts <- function(dir_path) {
 #' @importFrom stringi stri_split_fixed
 #' @importFrom stringi stri_trans_tolower
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 load_and_check_target_data <- function(file_path) {
@@ -640,7 +637,7 @@ load_and_check_target_data <- function(file_path) {
 #'
 #' @return Returns the object. Only in the case that the object is `NULL` or `object == ""` the function returns `NULL`
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -658,7 +655,7 @@ transform_input <- function(object) {
 #'
 #' @return Returns `TRUE` if input is `NULL` or `""`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -674,7 +671,7 @@ check_for_empty_input <- function(input) {
 #'
 #' @return Returns the input as a numeric input or `NULL` if input is `NULL` or `""`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -695,7 +692,7 @@ check_numeric_input <- function(input) {
 #'
 #' @return Returns a named factor containing the target data.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @export
 long_load_target_data <- function(file_path, selectet_column) {
   extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
@@ -763,7 +760,7 @@ long_load_target_data <- function(file_path, selectet_column) {
 #' @return Returns a named `list` with the training history data of the model. The
 #' reported measures depend on the provided model.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -891,7 +888,7 @@ prepare_training_history <- function(model,
 #' @param embeddings Object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText].
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #'
 create_data_embeddings_description <- function(embeddings) {
@@ -967,7 +964,8 @@ create_data_base_model_description <- function(base_model) {
 #' @return Function does not return anything. It is used for preparing python and R
 #' in order to run AI for Education - Studio.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
+#' @importFrom utils packageVersion
 #' @keywords internal
 #' @noRd
 #'
@@ -998,12 +996,12 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
     } else {
       if (!is.null(r_packages[[i]])) {
         if (!check_versions(
-          a = as.character(packageVersion(names(r_packages)[[i]])),
+          a = as.character(utils::packageVersion(names(r_packages)[[i]])),
           operator = ">=",
           b = r_packages[[i]]
         )) {
           cat(paste(
-            "version of", names(r_packages)[i], "is", packageVersion(names(r_packages)[i]),
+            "version of", names(r_packages)[i], "is", utils::packageVersion(names(r_packages)[i]),
             "but must be at least", r_packages[[i]], "."
           ))
           missing_r_packages <- append(
@@ -1061,7 +1059,7 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -1098,7 +1096,7 @@ generate_doc_input_licensing_editor <- function(ns, model) {
 #'
 #' @return If value is `NULL` returns `NA`. In all other cases it returns value.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -1128,7 +1126,7 @@ replace_null_with_na <- function(value) {
 #'
 #' @return Returns a `bslib::card`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -1348,7 +1346,7 @@ create_widget_card <- function(id,
 #' * meta_args: Named `list` of all arguments that are not part of the arguments of
 #'   the method but which are necessary to set up the `shiny::ExtendedTask` correctly.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @export
 summarize_args_for_long_task <- function(input,
                                          object_class,
@@ -1426,7 +1424,7 @@ summarize_args_for_long_task <- function(input,
 #' @return Returns a named `list` of all arguments that a method of a specific class
 #' requires.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @export
 #'
 add_missing_args <- function(args, path_args, meta_args) {

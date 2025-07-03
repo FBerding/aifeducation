@@ -13,17 +13,28 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 #' @title Install aifeducation on a machine
-#' @description Function for installing 'aifeducation' on a machine. This functions assumes that not 'python' and no
-#'   'miniconda' is installed. Only'pytorch' is installed.
+#' @description Function for installing 'aifeducation' on a machine.
+#'
+#' Using a virtual environment (`use_conda=FALSE`)
+#' If 'python' is already installed the installed version is used. In the case that
+#' the required version of 'python' is different from the existing version the new
+#' version is installed. In all other cases python will be installed on the system.
+#'
+#' #' Using a conda environment (`use_conda=TRUE`)
+#' If 'miniconda' is already existing on the machine no installation of 'miniconda'
+#' is applied. In this case the system checks for update and updates 'miniconda' to
+#' the newest version. If 'miniconda' is not found on the system it will be installed.
 #'
 #' @param install_aifeducation_studio `bool` If `TRUE` all necessary R packages are installed for using AI for Education
 #'   Studio.
 #' @param use_conda `bool` If `TRUE` installation installs 'miniconda' and uses 'conda' as package manager. If `FALSE`
 #' installation installs python and uses virtual environments for package management.
 #' @param `string` for selecting the version of python to be installed.
-#'
+#' @param python_version `string` Python version to use.
 #' @return Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
 #'   machine.
+#'
+#' @note On MAC OS torch will be installed without support for cuda.
 #'
 #' @importFrom reticulate install_python
 #' @importFrom reticulate install_miniconda
@@ -33,37 +44,140 @@
 #'
 #' @export
 install_aifeducation <- function(install_aifeducation_studio = TRUE,
-                                 python_version="3.12",
-                                 use_conda=FALSE) {
-  if(use_conda==FALSE){
-    reticulate::install_python(version = python_version)
-  } else {
-    reticulate::install_miniconda()
+                                 python_version = "3.12",
+                                 use_conda = FALSE) {
+  if (install_aifeducation_studio == TRUE) {
+    install_aifeducation_studio()
+  }
+
+    if (use_conda == FALSE) {
+      # install request version of python
+      reticulate::install_python(
+        version = python_version,
+        force = FALSE
+      )
+    } else {
+      reticulate::install_miniconda(
+        update = TRUE,
+        force = FALSE
+      )
+    }
+
+    install_py_modules(
+      envname = "aifeducation",
+      remove_first = FALSE,
+      python_version = python_version,
+      use_conda = use_conda
+    )
+
+    cat("\n======================================================")
+    cat("\n Installation successful. Please restart R/R Studio.")
+    cat("\n======================================================\n")
+
+}
+
+#' @title Updates an existing installation of 'aifeducation' on a machine
+#' @description Function for updating 'aifeducation' on a machine.
+#'
+#' The function tries to find an existing environment on the machine, removes the
+#' environment and installs the environment with the new python modules.
+#'
+#' In the case `env_type = "auto"` the function tries to update an existing virtual environment.
+#' If no virtual environment exits it tries to update a conda environment.
+#'
+#' @param update_aifeducation_studio `bool` If `TRUE` all necessary R packages are installed for using AI for Education
+#'   Studio.
+#' @param envname `string` Name of the environment where the packages should be installed.
+#' @param env_type `string` If set to `"venv"`  virtual environment is requested. If set to
+#' `"conda"` a 'conda' environment is requested. If set to `"auto"` the function tries to
+#' use a virtual environment with the given name. If this environment does not exist
+#' it tries to activate a conda environment with the given name. If this fails
+#' the default virtual environment is used.'
+#' @return Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
+#'   machine.
+#'
+#' @note On MAC OS torch will be installed without support for cuda.
+#'
+#' @importFrom reticulate virtualenv_exists
+#' @importFrom reticulate condaenv_exists
+#'
+#' @family Installation and Configuration
+#' @export
+update_aifeducation=function(update_aifeducation_studio = TRUE,
+                             env_type = "auto",
+                             envname = "aifeducation"){
+  #Search for environment
+  if (env_type == "auto") {
+    message(paste0("Try to use virtual environment '", envname, "'."))
+    if (reticulate::virtualenv_exists("aifeducation") == TRUE) {
+      message(paste0("Use virtual environment'", envname, "'."))
+      use_conda=FALSE
+    } else {
+      message(paste0("There is no virtual environment '", envname, "'. Try to use a conda environment with the same name."))
+      if (reticulate::condaenv_exists("aifeducation") == TRUE) {
+        message(paste("USe conda environment'", envname, "'."))
+        use_conda=TRUE
+      } else {
+        message("The requestet environment does not exists. Neither as virtual environment nor as conda environment.")
+        current_env <- get_current_venv()
+        message(paste("Use the standard virtual environment", current_env))
+        use_conda=FALSE
+      }
+    }
+  } else if (env_type == "venv") {
+    if (reticulate::virtualenv_exists("aifeducation") == TRUE) {
+      message(paste0("Use virtual environment'", envname, "'."))
+      use_conda=FALSE
+    } else {
+      stop("The requestet environment does not exists.")
+    }
+  } else if (env_type == "conda") {
+    if (reticulate::condaenv_exists("aifeducation") == TRUE) {
+      message(paste0("Use conda environment'", envname, "'."))
+      use_conda=TRUE
+    } else {
+      stop("The requestet environment does not exists.")
+    }
   }
 
   install_py_modules(
-    envname = "aifeducation",
-    remove_first = FALSE,
-    python_version = python_version,
+    envname=envname,
+    remove_first=TRUE,
     use_conda=use_conda
   )
 
-  if (install_aifeducation_studio == TRUE) {
-    utils::install.packages(
-      "ggplot2",
-      "rlang",
-      "shiny",
-      "shinyFiles",
-      "shinyWidgets",
-      "sortable",
-      "bslib",
-      "future",
-      "promises",
-      "DT",
-      "readtext",
-      "readxl"
-    )
+  if(update_aifeducation_studio==TRUE){
+    install_aifeducation_studio()
   }
+
+  cat("\n======================================================")
+  cat("\n Update successful. Please restart R/R Studio.")
+  cat("\n======================================================\n")
+}
+
+#' @title Install 'AI for Education - Studio' on a machine
+#' @description Function installs/updates all relevant R packages necessary
+#' to run the shiny app ''AI for Education - Studio'.
+#' @return Function does nothing return. It installs/updates R packages.
+#'
+#' @family Installation and Configuration
+#'
+#' @export
+install_aifeducation_studio=function(){
+  utils::install.packages(
+    "ggplot2",
+    "rlang",
+    "shiny",
+    "shinyFiles",
+    "shinyWidgets",
+    "sortable",
+    "bslib",
+    "future",
+    "promises",
+    "DT",
+    "readtext",
+    "readxl"
+  )
 }
 
 #' @title Installing necessary python modules to an environment
@@ -79,6 +193,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' @param torcheval_version `string` determining the desired version of the python library 'torcheval'.
 #' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.
 #' @param pytorch_cuda_version `string` determining the desired version of 'cuda' for 'PyTorch'.
+#' To install 'PyTorch' without cuda set to `NULL`.
 #' @param python_version `string` Python version to use.
 #' @param remove_first `bool` If `TRUE` removes the environment completely before recreating the environment and
 #'   installing the packages. If `FALSE` the packages are installed in the existing environment without any prior
@@ -87,6 +202,9 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' package management.
 #' @return Returns no values or objects. Function is used for installing the necessary python libraries in a conda
 #'   environment.
+#' @note Function tries to identify the type of operating system. In the case that
+#' MAC OS is detected 'PyTorch' is installed without support for cuda.
+#'
 #' @importFrom reticulate conda_create
 #' @importFrom reticulate conda_remove
 #' @importFrom reticulate condaenv_exists
@@ -95,14 +213,14 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=4.49.0",
+                               transformer_version = "<=4.52.4",
                                tokenizers_version = "<=0.21.1",
-                               pandas_version = "<=2.2.3",
-                               datasets_version = "<=3.4.1",
-                               codecarbon_version = "<=2.8.3",
+                               pandas_version = "<=2.3.0",
+                               datasets_version = "<=3.6.0",
+                               codecarbon_version = "<=3.0.2",
                                safetensors_version = "<=0.5.3",
                                torcheval_version = "<=0.0.7",
-                               accelerate_version = "<=1.5.2",
+                               accelerate_version = "<=1.8.1",
                                pytorch_cuda_version = "12.6",
                                python_version = "3.12",
                                remove_first = FALSE,
@@ -120,17 +238,33 @@ install_py_modules <- function(envname = "aifeducation",
     paste0("torcheval", torcheval_version),
     paste0("accelerate", accelerate_version)
   )
-  pip_cuda=paste0("--index-url https://download.pytorch.org/whl/cu",stringi::stri_replace(str=pytorch_cuda_version,
-                                                                                          regex = "[:punct:]",
-                                                                                          replacement = ""))
 
+  if (detec_os() == "mac") {
+    message(paste("Operating Systen:", "mac", "Cuda is not requested."))
+    pytorch_cuda_version <- NULL
+  } else {
+    message(paste("Operating Systen:", detec_os(), "Cuda is requested."))
+  }
+
+  if (!is.null(pytorch_cuda_version)) {
+    pip_cuda <- paste0(
+      "--index-url https://download.pytorch.org/whl/cu",
+      stringi::stri_replace(
+        str = pytorch_cuda_version,
+        regex = "[:punct:]",
+        replacement = ""
+      )
+    )
+  } else {
+    pip_cuda <- NULL
+  }
 
   if (use_conda == FALSE) {
     # Use virtualenv
 
     if (reticulate::virtualenv_exists(envname = envname) == TRUE) {
       if (remove_first == TRUE) {
-        reticulate::virtualenv_remove(envname = envname,confirm=FALSE)
+        reticulate::virtualenv_remove(envname = envname, confirm = FALSE)
         Sys.sleep(5)
         reticulate::virtualenv_create(
           envname = envname,
@@ -148,7 +282,7 @@ install_py_modules <- function(envname = "aifeducation",
     reticulate::virtualenv_install(
       envname = envname,
       packages = c("torch"),
-      pip_options=pip_cuda
+      pip_options = pip_cuda
     )
     reticulate::virtualenv_install(
       envname = envname,
@@ -196,7 +330,7 @@ install_py_modules <- function(envname = "aifeducation",
 }
 
 #' @title Check if all necessary python modules are available
-#' @description This function checks if all  python modules necessary for the package aifeducation to work are
+#' @description This function checks if all  python modules necessary for the package 'aifeducation' to work are
 #'   available.
 #'
 #' @param trace `bool` `TRUE` if a list with all modules and their availability should be printed to the console.
@@ -272,47 +406,47 @@ set_transformers_logger <- function(level = "ERROR") {
 #' @description This functions checks for python and a specified environment. If the environment exists
 #' it will be activated. If python is already initialized it uses the current environment.
 #'
-#' @param `string` envname name of the requested environment.
+#' @param envname `string` envname name of the requested environment.
 #' @param env_type `string` If set to `"venv"`  virtual environment is requested. If set to
 #' `"conda"` a 'conda' environment is requested. If set to `"auto"` the function tries to
 #' activate a virtual environment with the given name. If this environment does not exist
 #' it tries to activate a conda environment with the given name. If this fails
 #' the default virtual environment is used.
 #'
-#' @return Function does not return anything. It is used for preparing python and R
+#' @return Function does not return anything. It is used for preparing python and R.
 #'
 #' @family Installation and Configuration
 #' @export
-prepare_python<-function(env_type="auto",envname="aifeducation"){
+prepare_python <- function(env_type = "auto", envname = "aifeducation") {
   if (!reticulate::py_available(FALSE)) {
     message("Python is not initalized.")
-    if(env_type=="auto"){
-      message(paste0("Try to use virtual environment '",envname,"'."))
-      if(reticulate::virtualenv_exists("aifeducation")==TRUE){
-        message(paste0("Set virtual environment to '",envname,"'."))
+    if (env_type == "auto") {
+      message(paste0("Try to use virtual environment '", envname, "'."))
+      if (reticulate::virtualenv_exists("aifeducation") == TRUE) {
+        message(paste0("Set virtual environment to '", envname, "'."))
         reticulate::use_virtualenv("aifeducation")
       } else {
-        message(paste0("There is no virtual environment '",envname,"'. Try to use a conda environment with the same name."))
-        if(reticulate::condaenv_exists("aifeducation")==TRUE){
-          message(paste("Set conda environment to '",envname,"'."))
+        message(paste0("There is no virtual environment '", envname, "'. Try to use a conda environment with the same name."))
+        if (reticulate::condaenv_exists("aifeducation") == TRUE) {
+          message(paste("Set conda environment to '", envname, "'."))
           reticulate::use_condaenv("aifeducation")
         } else {
           message("The requestet environment does not exists. Neither as virtual environment nor as conda environment.")
-          current_env=get_current_venv()
-          message(paste("Set the standard virtual environment",current_env))
+          current_env <- get_current_venv()
+          message(paste("Set the standard virtual environment", current_env))
           reticulate::use_virtualenv(current_env)
         }
       }
-    } else if(env_type=="venv"){
-      if(reticulate::virtualenv_exists("aifeducation")==TRUE){
-        message(paste0("Set virtual environment to '",envname,"'."))
+    } else if (env_type == "venv") {
+      if (reticulate::virtualenv_exists("aifeducation") == TRUE) {
+        message(paste0("Set virtual environment to '", envname, "'."))
         reticulate::use_virtualenv("aifeducation")
       } else {
         stop("The requestet environment does not exists.")
       }
-    } else if(env_type=="conda"){
-      if(reticulate::condaenv_exists("aifeducation")==TRUE){
-        message(paste0("Set virtual environment to '",envname,"'."))
+    } else if (env_type == "conda") {
+      if (reticulate::condaenv_exists("aifeducation") == TRUE) {
+        message(paste0("Set conda environment to '", envname, "'."))
         reticulate::use_virtualenv("aifeducation")
       } else {
         stop("The requestet environment does not exists.")
@@ -323,22 +457,42 @@ prepare_python<-function(env_type="auto",envname="aifeducation"){
     if (!reticulate::py_available(TRUE)) {
       stop("Python cannot be initalized. Please check your installation of python.")
     }
-
   } else {
     current_sessions <- reticulate::py_config()
-    if(current_sessions$conda == "True"){
-      current_conda<-get_current_conda_env()
+    if (current_sessions$conda == "True") {
+      current_conda <- get_current_conda_env()
       message(paste(
         "Python is already initalized with the conda environment",
         "'", current_conda, "'."
       ))
     } else {
-      current_venv<-get_current_venv()
+      current_venv <- get_current_venv()
       message(paste(
         "Python is already initalized with the virtual environment",
         "'", current_venv, "'."
       ))
     }
     message("Try to use this environment.")
+  }
+}
+
+#' @title Function for detecting the OS..
+#' @description This functions tries to detect the operating system.
+#'
+#' @return Function returns a string with the name of the operation system.
+#'
+#' @family Installation and Configuration
+#' @keywords internal
+#' @noRd
+detec_os <- function() {
+  sys_name <- tolower(Sys.info()["sysname"])
+  if (sys_name == "windows") {
+    return("windows")
+  } else if (sys_name == "unix" | sys_name == "linux") {
+    return("linux")
+  } else if (sys_name == "Darwin") {
+    return("mac")
+  } else {
+    return(sys_name)
   }
 }

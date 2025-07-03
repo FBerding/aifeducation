@@ -107,7 +107,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     # introduced
     update_model_config = function() {
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
-      if (is.na(current_pkg_version)) {
+      if (is.null_or_na(current_pkg_version)) {
         update <- TRUE
       } else {
         if (check_versions(

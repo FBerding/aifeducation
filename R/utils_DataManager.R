@@ -14,9 +14,7 @@
 
 #-----------------------------------------------------------------------------
 #' @title Create synthetic cases for balancing training data
-#' @description This function creates synthetic cases for balancing the training with an object of the class
-#'   [TEClassifierRegular] or [TEClassifierProtoNet].
-#'
+#' @description This function creates synthetic cases for balancing the training with classifier models.
 #' @param matrix_form Named `matrix` containing the text embeddings in a matrix form.
 #' @param target Named `factor` containing the labels of the corresponding embeddings.
 #' @param times `int` for the number of sequences/times.
@@ -31,7 +29,7 @@
 #'   * `syntetic_targets`: Named `factor` containing the labels of the corresponding synthetic cases.
 #'   * `n_syntetic_units`: `table` showing the number of synthetic cases for every label/category.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #'
 #' @export
 #' @import foreach
@@ -196,10 +194,9 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #' @return Returns a `list` which contains the text embeddings of the new synthetic cases as a named `data.frame` and
 #'   their labels as a named `factor`.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #'
 #' @export
-
 # TODO (Yuliia): k_s and max_k parameters can be removed
 create_synthetic_units_from_matrix <- function(matrix_form,
                                                target,
@@ -271,7 +268,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
 #'   * `target_test`: Named `factor` containing the labels of the validation sample.
 #'   * `embeddings_test`: Object of class [EmbeddedText] containing the text embeddings for the validation sample.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #' @keywords internal
 #' @noRd
 get_train_test_split <- function(embedding = NULL,
@@ -335,7 +332,7 @@ get_train_test_split <- function(embedding = NULL,
 #'   sufficient to ensure at least four cases in every fold, the number of folds is adjusted. In these cases, a warning
 #'   is printed to the console. At least four cases per fold are necessary to ensure that the training of
 #'   [TEClassifierRegular] or [TEClassifierProtoNet] works well with all options turned on.
-#' @family data_management_utils
+#' @family Utils Developers
 #' @keywords internal
 #' @noRd
 get_folds <- function(target,
@@ -434,7 +431,7 @@ get_folds <- function(target,
 #' @param val_size `double` Value between 0 and 1 indicating how many cases of each label/category should be part of the
 #'   validation sample.
 #' @return `list` which contains the names of the cases belonging to the train sample and to the validation sample.
-#' @family data_management_utils
+#' @family Utils Developers
 #' @keywords internal
 #' @noRd
 get_stratified_train_test_split <- function(targets, val_size = 0.25) {
@@ -471,7 +468,7 @@ get_stratified_train_test_split <- function(targets, val_size = 0.25) {
 #' @param pad_value `r get_param_doc_desc("pad_value")`
 #' @return Named`vector` of integers representing the number of chunks/sequences for every case.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #'
 #' @export
 get_n_chunks <- function(text_embeddings, features, times,pad_value=-100) {

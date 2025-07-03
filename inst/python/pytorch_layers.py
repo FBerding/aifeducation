@@ -50,6 +50,23 @@ class masking_layer(torch.nn.Module):
     mask_features=mask_features.to(device)
     return x, seq_len, mask_times, mask_features
 
+#Dropout layer with mask
+class layer_dropout_with_mask(torch.nn.Module):
+  def __init__(self,p=0.2, pad_value=-100):
+      super().__init__()
+      self.p=p
+      self.dropout_layer=torch.nn.Dropout(p=self.p)
+      
+      if isinstance(pad_value, torch.Tensor):
+        self.pad_value=pad_value.detach()
+      else:
+        self.pad_value=torch.tensor(pad_value)
+  def forward(self,x,seq_len,mask_times,mask_features):
+    y=self.dropout_layer(x)
+    y_padded=torch.where(condition=mask_features,input=self.pad_value,other=y)
+    return y_padded,seq_len,mask_times,mask_features
+      
+      
 
 
 #Residual Connection layer----------------------------------------------------
@@ -80,9 +97,17 @@ class layer_residual_connection(torch.nn.Module):
         return z, seq_len,mask_times,mask_features
 
 class identity_layer(torch.nn.Module):
-  def __init__(self):
+  def __init__(self,pad_value=None,apply_masking=True):
     super().__init__()
+    if not pad_value==None:
+      if isinstance(pad_value, torch.Tensor):
+        self.pad_value=pad_value.detach()
+      else:
+        self.pad_value=torch.tensor(pad_value)
+    self.apply_masking=apply_masking
   def forward(self,x,seq_len,mask_times,mask_features):
+    if self.apply_masking==True:
+      x=torch.where(condition=mask_features,input=self.pad_value,other=x)
     return x,seq_len,mask_times,mask_features
 
 #DenseLayer_with_mask-----------------------------------------------------------
@@ -130,10 +155,11 @@ class dense_layer_with_mask(torch.nn.Module):
       torch.nn.utils.spectral_norm(module=self.dense, name='weight', n_power_iterations=1, eps=1e-12, dim=None)
     
     self.act_fct=get_act_fct(self.act_fct_name)
+    
     if self.dropout >0:
-      self.dropout=torch.nn.Dropout(p=self.dropout)
+      self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
     else:
-      self.dropout=None
+      self.dropout=identity_layer(pad_value=self.pad_value,apply_masking=True)
     
     self.residual_connection=layer_residual_connection(residual_type,self.pad_value)  
       
@@ -145,19 +171,14 @@ class dense_layer_with_mask(torch.nn.Module):
     y=self.dense(x)
     y=self.normalization_layer(y,seq_len,mask_times,mask_features_new)
     y_activation=self.act_fct(y[0])
-    y=self.residual_connection(x=x,y=y_activation,seq_len=y[1],mask_times=y[2],mask_features=y[3])
+    y=self.dropout(x=y_activation,seq_len=y[1],mask_times=y[2],mask_features=y[3])
+    y=self.residual_connection(x=x,y=y[0],seq_len=y[1],mask_times=y[2],mask_features=y[3])
     
-    #Add dropout
-    if not self.dropout==None:
-      y_dropout=self.dropout(y_activation)
-    else:
-      y_dropout=y[0]
-
     #insert pad values
-    y_padded=torch.where(condition=mask_features_new,input=self.pad_value,other=y_dropout)
+    #y_padded=torch.where(condition=mask_features_new,input=self.pad_value,other=y_dropout)
     
     #Return values
-    return y_padded,seq_len,mask_times,mask_features_new
+    return y[0],y[1],y[2],mask_features_new
   
   def calc_new_mask(self,mask_features):
     if self.input_size>self.output_size:
@@ -178,8 +199,8 @@ class dense_layer_with_mask(torch.nn.Module):
 #Input args:
 #pooling_type: string Pooling type
 #
-#Returns a tensor with shape (Batch,Features) representing the min/max values over time 
-#for every feature.
+#Returns a tensor with shape (Batch,Features) for "min" and "max" representing the min/max values over time 
+#for every feature. If pooling type ="min_max" shape is (Batch, 2*Features).
 #Padding values cannot occure in the features and are not considered.
 class exreme_pooling_over_time(torch.nn.Module):
   def __init__(self,times,features,pad_value,pooling_type="max"):
@@ -357,7 +378,7 @@ class layer_n_gram_convolution(torch.nn.Module):
 # of further computations. 
 #
 class layer_mutiple_n_gram_convolution(torch.nn.Module):
-  def __init__(self,ks_min,ks_max,times,features,pad_value,bias=True,parametrizations="None",device=None,dtype=None,act_fct="elu"):
+  def __init__(self,ks_min,ks_max,times,features,pad_value,bias=True,dropout=0.1,parametrizations="None",device=None,dtype=None,act_fct_name="elu",residual_type="residual_gate",normalization_type="layer_norm"):
     super().__init__() 
     self.ks_min=ks_min
     self.ks_max=ks_max
@@ -368,7 +389,6 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
       self.pad_value=pad_value.detach()
     else:
       self.pad_value=torch.tensor(pad_value)
-    self.act_fct=act_fct
 
     self.filters_per_ks=math.ceil(self.features/self.num_n_grams)
     self.n_filters_min=self.features-(self.num_n_grams-1)*self.filters_per_ks
@@ -397,11 +417,30 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
           bias=self.bias,
           pad_value=self.pad_value,
           parametrizations=self.parametrizations,
-          act_fct=self.act_fct
+          act_fct="None"
         )
       )
+    
+    self.act_fct_name=act_fct_name
+    self.act_fct=get_act_fct(self.act_fct_name)
+    self.normalization_layer=get_layer_normalization(
+      name=normalization_type,
+      times=self.times,
+      features=self.features,
+      pad_value= self.pad_value,
+      eps=1e-5)
+    
+    self.dropout=dropout
+    if self.dropout >0:
+      self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
+    else:
+      self.dropout=identity_layer(pad_value=self.pad_value,apply_masking=True)
+    
+    self.residual_connection=layer_residual_connection(residual_type,self.pad_value) 
       
   def forward(self, x,seq_len,mask_times,mask_features):
+    #Extract Features
+    #Padding is insert within the layers. No Post-Processing required.
     for i in range(len(self.layer_list)):
       current_layer=self.layer_list[i]
       tmp=current_layer(x,seq_len,mask_times,mask_features)[0]
@@ -409,8 +448,13 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
         y=tmp
       else:
         y=torch.cat((y,tmp),dim=2)
-    #Padding is insert within the layers. No Post-Processing required.
-    return y,seq_len,mask_times,mask_features
+    
+    y=self.normalization_layer(x=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)    
+    y_activation=self.act_fct(y[0])
+    y=self.dropout(x=y_activation,seq_len=y[1],mask_times=y[2],mask_features=y[3])
+    y=self.residual_connection(x=x,y=y[0],seq_len=y[1],mask_times=y[2],mask_features=y[3])
+    
+    return y[0],y[1],y[2],y[3]
 
 #Pack and unpack layers
 class layer_pack_and_masking(torch.nn.Module):
@@ -509,7 +553,7 @@ class layer_tf_encoder(torch.nn.Module):
     self.num_heads=num_heads
    
     #Attention
-    if self.attention_type=="multi_head":
+    if self.attention_type=="multihead":
       self.attention=torch.nn.MultiheadAttention(
       embed_dim=self.features,
       num_heads=self.num_heads,
@@ -574,7 +618,7 @@ class layer_tf_encoder(torch.nn.Module):
     #Sub-Layer 1
     if self.attention_type=="fourier":
       y=self.attention(x*(~mask_features))
-    elif self.attention_type=="multi_head":
+    elif self.attention_type=="multihead":
       y=self.attention(
         query=x,
         key=x,
@@ -601,7 +645,7 @@ class layer_tf_encoder(torch.nn.Module):
 
 #Merge Leyer
 class merge_layer(torch.nn.Module):
-  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="max",attention_type="multi_head",num_heads=1,device=None,dtype=None):
+  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="max",attention_type="multihead",num_heads=1,device=None,dtype=None):
     super().__init__()
     
     self.times=times
@@ -666,11 +710,11 @@ class merge_layer(torch.nn.Module):
       else:
         extracted=torch.cat((extracted,torch.unsqueeze(self.pooling_layer(tmp_tensor,mask_features),dim=1)),dim=1)
       
-      # calculate weights for merging
-      attn=self.attention_layer(extracted,extracted,extracted)[0]
-      attn=torch.flatten(input=attn, start_dim=1, end_dim=-1)
-      weights=self.act_fct(self.dense_weights(attn))
-      weights=torch.unsqueeze(weights,dim=1)
+    # calculate weights for merging
+    attn=self.attention_layer(extracted,extracted,extracted)[0]
+    attn=torch.flatten(input=attn, start_dim=1, end_dim=-1)
+    weights=self.act_fct(self.dense_weights(attn))
+    weights=torch.unsqueeze(weights,dim=1)
 
     #Calculate finale representation
     final=torch.matmul(input=weights, other=extracted)
@@ -720,3 +764,27 @@ class layer_protonet_metric(torch.nn.Module):
     return self.get_scaling_factor()*distance_matrix
   def get_scaling_factor(self):
     return torch.sqrt(torch.square(self.alpha+1e-8))
+
+#Global Pooling layer----------------------------------------------------------
+class layer_global_average_pooling_1d(torch.nn.Module):
+  def __init__(self,mask_type="attention"):
+    super().__init__()
+    self.mask_type=mask_type
+
+  def forward(self,x,mask=None):
+    if not mask is None:
+      if not self.mask_type=="attention":
+        applied_mask=~mask
+      else:
+        applied_mask=mask
+      mask_r=applied_mask.reshape(applied_mask.size()[0],applied_mask.size()[1],1)
+      x=torch.mul(x,mask_r)
+    x=torch.sum(x,dim=1)*(1/self.get_length(x))
+    return x
+  
+  def get_length(self,x):
+    length=torch.sum(x,dim=2)
+    length=(length!=0)
+    length=torch.sum(length,dim=1).repeat(x.size(2),1)
+    length=torch.transpose(length,dim0=0,dim1=1)
+    return length

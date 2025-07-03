@@ -40,7 +40,7 @@ test_that("Setup Classifier Data", {
         name = "Test_extractor",
         label = "Test Extractor",
         text_embeddings = dataset_list[["LargeDataSetForTextEmbeddings"]],
-        features = 128,
+        features = 32,
         method = method,
         noise_factor = 0.002,
         optimizer = "adam"

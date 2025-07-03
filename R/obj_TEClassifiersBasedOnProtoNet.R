@@ -19,7 +19,7 @@
 #'
 #' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
-#' @family Classifiers for developers
+#' @family R6 Classes for Developers
 #' @export
 TEClassifiersBasedOnProtoNet <- R6::R6Class(
   classname = "TEClassifiersBasedOnProtoNet",
@@ -38,9 +38,9 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param data_targets `r get_param_doc_desc("data_targets")`.
     #' @param data_folds `r get_param_doc_desc("data_folds")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
-    #' @param balance_class_weights `r get_param_doc_desc("balance_class_weights")`
-    #' @param balance_sequence_length `r get_param_doc_desc("balance_sequence_length")`
-    #' @param pt_loss_fct_name `r get_param_doc_desc("pt_loss_fct_name")`
+    #' @param loss_balance_class_weights `r get_param_doc_desc("loss_balance_class_weights")`
+    #' @param loss_balance_sequence_length `r get_param_doc_desc("loss_balance_sequence_length")`
+    #' @param loss_pt_fct_name `r get_param_doc_desc("loss_pt_fct_name")`
     #' @param use_sc `r get_param_doc_desc("use_sc")`
     #' @param sc_method `r get_param_doc_desc("sc_method")`
     #' @param sc_min_k `r get_param_doc_desc("sc_min_k")`
@@ -63,6 +63,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param n_cores `r get_param_doc_desc("n_cores")`
     #' @param lr_rate `r get_param_doc_desc("lr_rate")`
     #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
+    #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param Ns `r get_param_doc_desc("Ns")`
     #' @param Nq `r get_param_doc_desc("Nq")`
     #' @param loss_alpha `r get_param_doc_desc("loss_alpha")`
@@ -82,12 +83,12 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      data_targets = NULL,
                      data_folds = 5,
                      data_val_size = 0.25,
-                     pt_loss_fct_name = "multi_way_contrastive_loss",
-                     use_sc = TRUE,
+                     loss_pt_fct_name = "MultiWayContrastiveLoss",
+                     use_sc = FALSE,
                      sc_method = "knnor",
                      sc_min_k = 1,
                      sc_max_k = 10,
-                     use_pl = TRUE,
+                     use_pl = FALSE,
                      pl_max_steps = 3,
                      pl_max = 1.00,
                      pl_anchor = 1.00,
@@ -110,7 +111,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      log_write_interval = 10,
                      n_cores = auto_n_cores(),
                      lr_rate = 1e-3,
-                     lr_warm_up_ratio = 0.02) {
+                     lr_warm_up_ratio = 0.02,
+                     optimizer="adamw") {
       private$do_training(args = get_called_args(n = 1))
     },
     #---------------------------------------------------------------------------
@@ -609,7 +611,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       # Set loss function
-      cls_loss_fct_name <- "ProtoNetworkMargin"
+      loss_cls_fct_name <- "ProtoNetworkMargin"
 
       # Check directory for checkpoints
       create_dir(
@@ -650,8 +652,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
 
       history <- py$TeClassifierTrainPrototype(
         model = self$model,
-        pt_loss_fct_name = self$last_training$config$pt_loss_fct_name,
-        optimizer_method = self$model_config$optimizer,
+        loss_pt_fct_name = self$last_training$config$loss_pt_fct_name,
+        optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         Ns = as.integer(self$last_training$config$Ns),

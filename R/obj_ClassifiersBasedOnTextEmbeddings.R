@@ -17,7 +17,7 @@
 #'
 #' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
-#' @family Classifiers for developers
+#' @family R6 Classes for Developers
 #' @export
 ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
   classname = "ClassifiersBasedOnTextEmbeddings",
@@ -920,7 +920,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
 
       # Generating class weights
-      if (self$last_training$config$balance_class_weights == TRUE) {
+      if (self$last_training$config$loss_balance_class_weights == TRUE) {
         abs_freq_classes <- table(train_data["labels"])
         class_weights <- as.vector(sum(abs_freq_classes) / (length(abs_freq_classes) * abs_freq_classes))
       } else {
@@ -928,7 +928,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # Generating weights for sequence length
-      if (self$last_training$config$balance_sequence_length == TRUE) {
+      if (self$last_training$config$loss_balance_sequence_length == TRUE) {
         sequence_length <- train_data["length"]
         abs_freq_length <- table(sequence_length)
 
@@ -953,7 +953,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # Set loss function
-      cls_loss_fct_name <- "CrossEntropyLoss"
+      loss_cls_fct_name <- "CrossEntropyLoss"
 
       # Check directory for checkpoints
       create_dir(
@@ -1001,8 +1001,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       history <- py$TeClassifierTrain(
         model = self$model,
-        cls_loss_fct_name = self$last_training$config$cls_loss_fct_name,
-        optimizer_method = self$model_config$optimizer,
+        loss_cls_fct_name = self$last_training$config$loss_cls_fct_name,
+        optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),

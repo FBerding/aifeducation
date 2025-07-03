@@ -49,7 +49,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/deberta-v2#transformers.DebertaV2ForMaskedLM>
 #'   * <https://huggingface.co/docs/transformers/model_doc/deberta-v2#transformers.TFDebertaV2ForMaskedLM>
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFEDebertaTransformer <- R6::R6Class(

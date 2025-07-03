@@ -51,7 +51,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/funnel#transformers.FunnelModel>
 #'   * <https://huggingface.co/docs/transformers/model_doc/funnel#transformers.TFFunnelModel>
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFEFunnelTransformer <- R6::R6Class(

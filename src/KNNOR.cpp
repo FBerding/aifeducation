@@ -477,7 +477,7 @@ arma::rowvec interpolate_point(const arma::rowvec &Xi_new, const arma::rowvec &p
 //' @param k `unsigned integer` number of nearest neighbors
 //'
 //' @return Returns `TRUE` if a new point can be added, otherwise - `FALSE`
-//' @family oversampling_approaches
+//' @family oversampling_approaches Developers
 //'
 //' @export
 // [[Rcpp::export]]

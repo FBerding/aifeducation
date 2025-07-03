@@ -18,6 +18,27 @@ import numpy as np
 import math
 import safetensors
 
+class GlobalAveragePooling1D_PT(torch.nn.Module):
+  def __init__(self):
+    super().__init__()
+
+  def forward(self,x,mask=None):
+    print("test")
+    if not mask is None:
+      mask_r=mask.reshape(mask.size()[0],mask.size()[1],1)
+      print(mask)
+      x=torch.mul(x,mask_r)
+    x=torch.sum(x,dim=1)*(1/self.get_length(x))
+    return x
+  
+  def get_length(self,x):
+    length=torch.sum(x,dim=2)
+    length=(length!=0)
+    length=torch.sum(length,dim=1).repeat(x.size(2),1)
+    length=torch.transpose(length,dim0=0,dim1=1)
+    print(length)
+    return length
+
 class layer_switch_pad_values(torch.nn.Module):
   def __init__(self,pad_value_old,pad_value_new):
     super().__init__()

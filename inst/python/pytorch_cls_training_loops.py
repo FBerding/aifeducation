@@ -18,7 +18,7 @@ import numpy as np
 import math
 import safetensors
 
-def TeClassifierTrain(model,cls_loss_fct_name, optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,batch_size,
+def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
@@ -50,11 +50,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   class_weights=class_weights.clone()
   class_weights=class_weights.to(device)
   
-  if cls_loss_fct_name=="CrossEntropyLoss":
+  if loss_cls_fct_name =="CrossEntropyLoss":
     loss_fct=torch.nn.CrossEntropyLoss(
         reduction="none",
         weight = class_weights)
-  elif cls_loss_fct_name=="FocalLoss":
+  elif loss_cls_fct_name =="FocalLoss":
     loss_fct=focal_loss(
       gamma=2,
       class_weights = class_weights
@@ -371,7 +371,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     "avg_iota":history_avg_iota.numpy()} 
   return history
 
-def TeClassifierTrainPrototype(model,pt_loss_fct_name, optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,Ns,Nq,
+def TeClassifierTrainPrototype(model,loss_pt_fct_name , optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,Ns,Nq,
 loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
@@ -390,6 +390,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters())
   elif optimizer_method=="adamw":
     optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="sgd":
+    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
   
   warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
   main_steps=epochs-warm_up_steps
@@ -398,7 +400,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
      
     
-  if pt_loss_fct_name=="MultiWayContrastiveLoss":
+  if loss_pt_fct_name =="MultiWayContrastiveLoss":
     loss_fct=multi_way_contrastive_loss(
       alpha=loss_alpha,
       margin=loss_margin)
@@ -540,7 +542,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     
     #running_class_mean=None
     #running_class_freq=None
-    running_class_values=torch.zeros(n_classes)
+    running_class_values=torch.zeros((n_classes,model.get_embedding_dim()))
     running_class_freq=torch.zeros(n_classes)
     
     for batch in trainloader:
@@ -554,8 +556,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       inputs = inputs.to(device,dtype=dtype)
       labels=labels.to(device,dtype=dtype)
       labels_one_hot=torch.nn.functional.one_hot(labels.to(dtype=torch.long),num_classes=n_classes)
-      
+      #print(running_class_values.size())
+      #print(labels_one_hot.size())
       embeddings=model.embed(inputs)
+      #print(embeddings.size())
       running_class_values=running_class_values+torch.matmul(
         torch.transpose(labels_one_hot.to(dtype=embeddings.dtype),dim0=1,dim1=0),
         embeddings
@@ -577,7 +581,19 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       #  
       #  running_class_mean=weighted_mean_old+weighted_mean_new
       #  running_class_freq=running_class_freq+new_class_freq
+
+    running_class_freq=torch.unsqueeze(running_class_freq,-1)
+    running_class_freq=running_class_freq.repeat((1,model.get_embedding_dim()))
     
+    #print("n_classes")
+    #print(n_classes)
+    
+    #print("class_freq")
+    #print(running_class_freq)
+    
+    #print("values")
+    #print(running_class_values)
+
     class_mean_prototypes=running_class_values/running_class_freq
     model.set_trained_prototypes(
       prototypes=class_mean_prototypes,

@@ -47,11 +47,6 @@ test_that("Focal Loss", {
 
 # Multi-way contrastive loss----------------------------------------------------
 test_that("Multi-way contrastive loss", {
-  reticulate::py_run_file(
-    system.file("python/py_activation_functions.py",
-      package = "aifeducation"
-    )
-  )
   layer <- py$multi_way_contrastive_loss(alpha = 0.2, margin = 0.9)
 
   test_classes <- torch$from_numpy(reticulate::np_array(c(0, 0, 0, 1, 1, 1, 2, 2, 2)))

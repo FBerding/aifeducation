@@ -75,4 +75,4 @@ def get_layer_normalization(name,times, features,pad_value,eps=1e-5):
   if name=="layer_norm":
     return LayerNorm_with_Mask(times=times,features=features,pad_value=pad_value,eps=eps)
   elif name=="None":
-    return identity_layer()
+    return identity_layer(pad_value=pad_value,apply_masking=True)

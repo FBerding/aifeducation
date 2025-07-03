@@ -44,7 +44,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/roberta#transformers.RobertaModel>
 #'   * <https://huggingface.co/docs/transformers/model_doc/roberta#transformers.TFRobertaModel>
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFERobertaTransformer <- R6::R6Class(

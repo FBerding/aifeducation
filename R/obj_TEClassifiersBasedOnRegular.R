@@ -18,7 +18,7 @@
 #'
 #' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
-#' @family Classifiers for developers
+#' @family R6 Classes for Developers
 #' @export
 TEClassifiersBasedOnRegular <- R6::R6Class(
   classname = "TEClassifiersBasedOnRegular",
@@ -37,9 +37,9 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param data_targets `r get_param_doc_desc("data_targets")`.
     #' @param data_folds `r get_param_doc_desc("data_folds")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
-    #' @param cls_loss_fct_name `r get_param_doc_desc("cls_loss_fct_name")`
-    #' @param balance_class_weights `r get_param_doc_desc("balance_class_weights")`
-    #' @param balance_sequence_length `r get_param_doc_desc("balance_sequence_length")`
+    #' @param loss_cls_fct_name `r get_param_doc_desc("loss_cls_fct_name")`
+    #' @param loss_balance_class_weights `r get_param_doc_desc("loss_balance_class_weights")`
+    #' @param loss_balance_sequence_length `r get_param_doc_desc("loss_balance_sequence_length")`
     #' @param use_sc `r get_param_doc_desc("use_sc")`
     #' @param sc_method `r get_param_doc_desc("sc_method")`
     #' @param sc_min_k `r get_param_doc_desc("sc_min_k")`
@@ -62,6 +62,7 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param n_cores `r get_param_doc_desc("n_cores")`
     #' @param lr_rate `r get_param_doc_desc("lr_rate")`
     #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
+    #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -75,14 +76,14 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      data_targets=NULL,
                      data_folds = 5,
                      data_val_size = 0.25,
-                     balance_class_weights = TRUE,
-                     balance_sequence_length = TRUE,
-                     cls_loss_fct_name="focal_loss",
-                     use_sc = TRUE,
+                     loss_balance_class_weights = TRUE,
+                     loss_balance_sequence_length = TRUE,
+                     loss_cls_fct_name="FocalLoss",
+                     use_sc = FALSE,
                      sc_method = "knnor",
                      sc_min_k = 1,
                      sc_max_k = 10,
-                     use_pl = TRUE,
+                     use_pl = FALSE,
                      pl_max_steps = 3,
                      pl_max = 1.00,
                      pl_anchor = 1.00,
@@ -99,7 +100,8 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      log_write_interval = 10,
                      n_cores = auto_n_cores(),
                      lr_rate=1e-3,
-                     lr_warm_up_ratio=0.02) {
+                     lr_warm_up_ratio=0.02,
+                     optimizer="adamw") {
       private$do_training(args=get_called_args(n=1))
     }
     ),

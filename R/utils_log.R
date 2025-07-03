@@ -41,9 +41,8 @@
 #'   when the log file was successfully updated. If the initial attempt for writing log fails the function returns the
 #'   value of `last_log` which is `NULL` by default.
 #'
-#' @family log_utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Log Developers
+#' @export
 #'
 write_log <- function(log_file,
                       value_top = 0, total_top = 1, message_top = NA,
@@ -99,9 +98,8 @@ write_log <- function(log_file,
 #'
 #' @return Returns a matrix containing the log file.
 #'
-#' @family log_utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Log Developers
+#' @export
 #'
 read_log <- function(file_path) {
   res <- NULL
@@ -121,9 +119,8 @@ read_log <- function(file_path) {
 #'
 #' @return Function does nothing return. It is used to write an "empty" log file.
 #'
-#' @family log_utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Log Developers
+#' @export
 #'
 reset_log <- function(log_path) {
   if (is.null(log_path)) {
@@ -155,9 +152,8 @@ reset_log <- function(log_path) {
 #' the third row represents the values for test data. All Columns represent the
 #' epochs.
 #'
-#' @family log_utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Log Developers
+#' @export
 #'
 read_loss_log <- function(path_loss) {
   if (!file.exists(path_loss)) {
@@ -203,9 +199,8 @@ read_loss_log <- function(path_loss) {
 #' value for the training, the second for the validation, and the third row for the
 #' test data. The columns represent epochs.
 #'
-#' @family log_utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Log Developers
+#' @export
 #'
 reset_loss_log <- function(log_path, epochs) {
   if (is.null(log_path)) {
@@ -227,4 +222,81 @@ reset_loss_log <- function(log_path, epochs) {
     ),
     silent = TRUE
   )
+}
+
+#' @title Print message
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date with `message()` or `cat()`
+#'   function.
+#'
+#' @param msg `string` Message that should be printed.
+#' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
+#' @param msg_fun `bool` value that determines what function should be used. `TRUE` for `message()`, `FALSE` for
+#'   `cat()`.
+#'
+#' @return This function returns nothing.
+#' @family Utils Log Developers
+#' @export
+output_message <- function(msg, trace, msg_fun) {
+  fun <- ifelse(msg_fun, message, cat)
+  if (trace) fun(paste(date(), msg))
+}
+
+#' @title Print message (`message()`)
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date with `message()` function.
+#'
+#' @param msg `string` Message that should be printed.
+#' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
+#'
+#' @return This function returns nothing.
+#' @family Utils Log Developers
+#' @export
+print_message <- function(msg, trace) {
+  output_message(msg, trace, TRUE)
+}
+
+#' @title Print message  (`cat()`)
+#' @description Prints a message `msg` if `trace` parameter is `TRUE` with current date with `cat()` function.
+#'
+#' @param msg `string` Message that should be printed.
+#' @param trace `bool` Silent printing (`FALSE`) or not (`TRUE`).
+#'
+#' @return This function returns nothing.
+#' @family Utils Log Developers
+#' @export
+cat_message <- function(msg, trace) {
+  output_message(msg, trace, FALSE)
+}
+
+#' @title Clean pytorch log of transformers
+#' @description Function for preparing and cleaning the log created by an object of class Trainer from the python
+#'   library 'transformer's.
+#'
+#' @param log `data.frame` containing the log.
+#' @return Returns a `data.frame` containing epochs, loss, and val_loss.
+#'
+#' @family Utils Log Developers
+#' @export
+clean_pytorch_log_transformers <- function(log) {
+  max_epochs <- max(log$epoch)
+
+  cols <- c("epoch", "loss", "val_loss")
+
+  cleaned_log <- matrix(
+    data = NA,
+    nrow = max_epochs,
+    ncol = length(cols)
+  )
+  colnames(cleaned_log) <- cols
+  for (i in 1:max_epochs) {
+    cleaned_log[i, "epoch"] <- i
+
+    tmp_loss <- subset(log, log$epoch == i & is.na(log$loss) == FALSE)
+    tmp_loss <- tmp_loss[1, "loss"]
+    cleaned_log[i, "loss"] <- tmp_loss
+
+    tmp_val_loss <- subset(log, log$epoch == i & is.na(log$eval_loss) == FALSE)
+    tmp_val_loss <- tmp_val_loss[1, "eval_loss"]
+    cleaned_log[i, "val_loss"] <- tmp_val_loss
+  }
+  return(as.data.frame(cleaned_log))
 }

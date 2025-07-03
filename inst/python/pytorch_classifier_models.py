@@ -18,12 +18,12 @@ import math
 import safetensors
 
 class TEClassifierSequential(torch.nn.Module):
-  def __init__(self,times, features, intermediate_features, pad_value,n_target_levels,inc_cls_head=True,cls_type="regular",pooling_type="min_max", residual_type="residual_gate",normalization_type="layer_nom",
-              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",
-              conv_act_fct="elu",conv_n_layers=0,conv_ks_min=2, conv_ks_max=4, conv_bias=False, conv_parametrizations="None", 
-              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", 
-              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", 
-              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multihead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",
+  def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,skip_connection_type="residual_gate",cls_type="regular",cls_pooling_type="min_max", 
+              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="layer_norm",
+              ng_conv_act_fct="elu",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="residual_gate",ng_conv_normalization_type="layer_norm",
+              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="residual_gate",dense_normalization_type="layer_norm",
+              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None",rec_residual_type="residual_gate",rec_normalization_type="layer_norm", 
+              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multihead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="residual_gate",tf_normalization_type="layer_norm",
               device=None, dtype=None):
       super().__init__()
       self.inc_cls_head=inc_cls_head
@@ -33,7 +33,7 @@ class TEClassifierSequential(torch.nn.Module):
       )
       
       if features==feat_size:
-        self.features_resize_layer=identity_layer()
+        self.features_resize_layer=identity_layer(pad_value=pad_value,apply_masking=True)
       else:
         self.features_resize_layer=dense_layer_with_mask(
           input_size=features,
@@ -46,7 +46,8 @@ class TEClassifierSequential(torch.nn.Module):
           parametrizations=feat_parametrizations,
           device=device, 
           dtype=dtype,
-          residual_type="None"
+          residual_type="None",
+          normalization_type=feat_normalization_type
       )
       
       
@@ -65,13 +66,13 @@ class TEClassifierSequential(torch.nn.Module):
           num_heads=tf_num_heads,
           bias=tf_bias,
           parametrizations=tf_parametrizations,
-          normalization_type=normalization_type,
+          normalization_type=tf_normalization_type,
           device=device, 
           dtype=dtype,
-          residual_type=residual_type
+          residual_type=tf_residual_type
         )
       else:
-        self.stack_tf_encoder_layer=identity_layer()
+        self.stack_tf_encoder_layer=identity_layer(pad_value=pad_value,apply_masking=True)
       
       if rec_n_layers>0:
         self.stack_recurrent_layers=stack_recurrent_layers(
@@ -87,28 +88,30 @@ class TEClassifierSequential(torch.nn.Module):
           parametrizations=rec_parametrizations,
           device=device, 
           dtype=dtype,
-          residual_type=residual_type
+          residual_type=rec_residual_type,
+          normalization_type=rec_normalization_type
         )
       else:
-        self.stack_recurrent_layers=identity_layer()
+        self.stack_recurrent_layers=identity_layer(pad_value=pad_value,apply_masking=True)
           
-      if conv_n_layers>0:
+      if ng_conv_n_layers>0:
         self.stack_n_gram_convolution=stack_n_gram_convolution(
-          ks_min=conv_ks_min,
-          ks_max=conv_ks_max,
+          ks_min=ng_conv_ks_min,
+          ks_max=ng_conv_ks_max,
           times=times,
-          act_fct=conv_act_fct,
+          act_fct=ng_conv_act_fct,
           features=feat_size,
           pad_value=pad_value,
-          n_layers=conv_n_layers,
-          bias=conv_bias,
-          parametrizations=conv_parametrizations,
+          n_layers=ng_conv_n_layers,
+          bias=ng_conv_bias,
+          parametrizations=ng_conv_parametrizations,
           device=device,
           dtype=dtype,
-          residual_type=residual_type
+          residual_type=ng_conv_residual_type,
+          normalization_type=ng_conv_normalization_type
         )
       else:
-        self.stack_n_gram_convolution=identity_layer()
+        self.stack_n_gram_convolution=identity_layer(pad_value=pad_value,apply_masking=True)
         
       if dense_n_layers>0:
         self.stack_dense_layer=stack_dense_layer(
@@ -119,32 +122,32 @@ class TEClassifierSequential(torch.nn.Module):
             dropout=dense_dropout,
             act_fct=dense_act_fct,
             bias=dense_bias,
-            normalization_type=normalization_type,
+            normalization_type=dense_normalization_type,
             parametrizations=dense_parametrizations,
             device=device, 
             dtype=dtype,
-            residual_type=residual_type
+            residual_type=dense_residual_type
             )
       else:
-        self.stack_dense_layer=identity_layer()
+        self.stack_dense_layer=identity_layer(pad_value=pad_value,apply_masking=True)
         
       self.summarize_layer_time=exreme_pooling_over_time(
         times=times,
         features=feat_size,
-        pooling_type=pooling_type,
+        pooling_type=cls_pooling_type,
         pad_value=pad_value)
         
       self.summarize_layer_features=layer_adaptive_extreme_pooling_1d(
-        output_size=intermediate_features,
-        pooling_type=pooling_type
+        output_size=cls_pooling_features,
+        pooling_type=cls_pooling_type
       )
       
-      self.residual_connection=layer_residual_connection(residual_type,pad_value)  
+      self.residual_connection=layer_residual_connection(skip_connection_type,pad_value)  
       
       if inc_cls_head==True:
         if cls_type=="regular":
           self.classification_head=torch.nn.Linear(
-                in_features=intermediate_features,
+                in_features=cls_pooling_features,
                 out_features=n_target_levels)
 
   def forward(self,x,prediction_mode=True):
@@ -166,13 +169,13 @@ class TEClassifierSequential(torch.nn.Module):
 
 
 class TEClassifierParallel(torch.nn.Module):
-  def __init__(self,times, features, intermediate_features, pad_value,n_target_levels,inc_cls_head=True,cls_type="regular",pooling_type="min_max", residual_type="residual_gate",normalization_type="layer_nom",
-              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",
-              conv_act_fct="elu",conv_n_layers=0,conv_ks_min=2, conv_ks_max=4, conv_bias=False, conv_parametrizations="None", 
-              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", 
-              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", 
-              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multi_head",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",
-              merge_attention_type="multi_head",merge_num_heads=1,
+  def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,cls_type="regular",cls_pooling_type="min_max", 
+              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="layer_norm",
+              ng_conv_act_fct="elu",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="residual_gate",ng_conv_normalization_type="layer_norm",
+              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="residual_gate",dense_normalization_type="layer_norm",
+              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="residual_gate",rec_normalization_type="layer_norm",
+              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multi_head",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="residual_gate",tf_normalization_type="layer_norm",
+              merge_attention_type="multi_head",merge_num_heads=1,merge_normalization_type="layer_norm",
               device=None, dtype=None):
       super().__init__()
       self.inc_cls_head=inc_cls_head
@@ -183,7 +186,7 @@ class TEClassifierParallel(torch.nn.Module):
       )
       
       if features==feat_size:
-        self.features_resize_layer=identity_layer()
+        self.features_resize_layer=identity_layer(pad_value=pad_value,apply_masking=True)
       else:
         self.features_resize_layer=dense_layer_with_mask(
           input_size=features,
@@ -196,8 +199,17 @@ class TEClassifierParallel(torch.nn.Module):
           parametrizations=feat_parametrizations,
           device=device, 
           dtype=dtype,
-          residual_type="None"
+          residual_type="None",
+          normalization_type=feat_normalization_type
       )
+      self.original_normalizer=get_layer_normalization(
+          name=merge_normalization_type,
+          times=times, 
+          features=feat_size,
+          pad_value=pad_value,
+          eps=1e-5
+      )
+      
       
       if tf_n_layers >0:
         self.n_streams+=1
@@ -214,14 +226,14 @@ class TEClassifierParallel(torch.nn.Module):
           num_heads=tf_num_heads,
           bias=tf_bias,
           parametrizations=tf_parametrizations,
-          normalization_type=normalization_type,
+          normalization_type=tf_normalization_type,
           pad_value=pad_value,
           device=device, 
           dtype=dtype,
-          residual_type=residual_type
+          residual_type=tf_residual_type
         )
         self.tf_normalizer=get_layer_normalization(
-          name=normalization_type,
+          name=merge_normalization_type,
           times=times, 
           features=feat_size,
           pad_value=pad_value,
@@ -229,7 +241,7 @@ class TEClassifierParallel(torch.nn.Module):
         )
         
         if features==feat_size:
-          self.features_resize_layer_tf=identity_layer()
+          self.features_resize_layer_tf=identity_layer(pad_value=pad_value,apply_masking=True)
         else:
           self.features_resize_layer_tf=dense_layer_with_mask(
             input_size=features,
@@ -242,7 +254,8 @@ class TEClassifierParallel(torch.nn.Module):
             pad_value=pad_value,
             device=device, 
             dtype=dtype,
-            residual_type="None"
+            residual_type="None",
+            normalization_type=feat_normalization_type
         )        
       else:
         self.stack_tf_encoder_layer=None
@@ -263,17 +276,18 @@ class TEClassifierParallel(torch.nn.Module):
           parametrizations=rec_parametrizations,
           device=device, 
           dtype=dtype,
-          residual_type=residual_type
+          residual_type=rec_residual_type,
+          normalization_type=rec_normalization_type
         )
         self.rec_normalizer=get_layer_normalization(
-          name=normalization_type,
+          name=merge_normalization_type,
           times=times, 
           features=feat_size,
           pad_value=pad_value,
           eps=1e-5
         )        
         if features==feat_size:
-          self.features_resize_layer_rec=identity_layer()
+          self.features_resize_layer_rec=identity_layer(pad_value=pad_value,apply_masking=True)
         else:
           self.features_resize_layer_rec=dense_layer_with_mask(
             input_size=features,
@@ -286,50 +300,54 @@ class TEClassifierParallel(torch.nn.Module):
             pad_value=pad_value,
             device=device, 
             dtype=dtype,
-            residual_type="None"
+            residual_type="None",
+            normalization_type=feat_normalization_type
         )        
       else:
         self.stack_recurrent_layers=None
         self.features_resize_layer_rec=None
           
-      if conv_n_layers>0:
+      if ng_conv_n_layers>0:
         self.n_streams+=1
         self.stack_n_gram_convolution=stack_n_gram_convolution(
-          ks_min=conv_ks_min,
-          ks_max=conv_ks_max,
+          ks_min=ng_conv_ks_min,
+          ks_max=ng_conv_ks_max,
           times=times,
-          act_fct=conv_act_fct,
+          act_fct=ng_conv_act_fct,
           features=feat_size,
-          n_layers=conv_n_layers,
-          bias=conv_bias,
-          parametrizations=conv_parametrizations,
+          n_layers=ng_conv_n_layers,
+          bias=ng_conv_bias,
+          parametrizations=ng_conv_parametrizations,
           device=device,
           dtype=dtype,
           pad_value=pad_value,
-          residual_type=residual_type
+          dropout=ng_conv_dropout,
+          residual_type=ng_conv_residual_type,
+          normalization_type=ng_conv_normalization_type
         )
         self.conv_normalizer=get_layer_normalization(
-          name=normalization_type,
+          name=merge_normalization_type,
           times=times, 
           features=feat_size,
           pad_value=pad_value,
           eps=1e-5
         )
         if features==feat_size:
-          self.features_resize_layer_conv=identity_layer()
+          self.features_resize_layer_conv=identity_layer(pad_value=pad_value,apply_masking=True)
         else:
           self.features_resize_layer_conv=dense_layer_with_mask(
             input_size=features,
             output_size=feat_size,
             times=times,
-            act_fct=conv_act_fct,
+            act_fct=ng_conv_act_fct,
             dropout=feat_dropout,
             bias=feat_bias,
             parametrizations=feat_parametrizations,
             device=device, 
             dtype=dtype,
             pad_value=pad_value,
-            residual_type="None"
+            residual_type="None",
+            normalization_type=feat_normalization_type
         )        
       else:
         self.stack_n_gram_convolution=None
@@ -344,22 +362,22 @@ class TEClassifierParallel(torch.nn.Module):
             dropout=dense_dropout,
             act_fct=dense_act_fct,
             bias=dense_bias,
-            normalization_type=normalization_type,
+            normalization_type=dense_normalization_type,
             parametrizations=dense_parametrizations,
             device=device, 
             pad_value=pad_value,
             dtype=dtype,
-            residual_type=residual_type
+            residual_type=dense_residual_type
             )
         self.dense_normalizer=get_layer_normalization(
-          name=normalization_type,
+          name=merge_normalization_type,
           times=times, 
           features=feat_size,
           pad_value=pad_value,
           eps=1e-5
         )
         if features==feat_size:
-          self.features_resize_layer_dense=None
+          self.features_resize_layer_dense=identity_layer(pad_value=pad_value,apply_masking=True)
         else:
           self.features_resize_layer_dense=dense_layer_with_mask(
             input_size=features,
@@ -372,7 +390,8 @@ class TEClassifierParallel(torch.nn.Module):
             pad_value=pad_value,
             device=device, 
             dtype=dtype,
-            residual_type="None"
+            residual_type="None",
+            normalization_type=feat_normalization_type
         )            
       else:
         self.stack_dense_layer=None
@@ -381,9 +400,9 @@ class TEClassifierParallel(torch.nn.Module):
       self.merge_layer=merge_layer(
         times=times,
         features=feat_size,
-        n_extracted_features=intermediate_features,
+        n_extracted_features=cls_pooling_features,
         n_input_streams=self.n_streams,
-        pooling_type=pooling_type,
+        pooling_type=cls_pooling_type,
         pad_value=pad_value,
         attention_type=merge_attention_type,
         num_heads=merge_num_heads,
@@ -394,13 +413,16 @@ class TEClassifierParallel(torch.nn.Module):
       if inc_cls_head==True:
         if cls_type=="regular":
           self.classification_head=torch.nn.Linear(
-                in_features=intermediate_features,
+                in_features=cls_pooling_features,
                 out_features=n_target_levels)
 
   def forward(self,x,prediction_mode=True):
     y=self.masking_layer(x)
+    
     y_original=self.features_resize_layer(y[0],y[1],y[2],y[3])
+    y_original=self.original_normalizer(y_original[0],y_original[1],y_original[2],y_original[3])
     tensor_list=[y_original[0].clone()]
+    
     if not self.stack_tf_encoder_layer==None:
       tmp=self.features_resize_layer_tf(y[0],y[1],y[2],y[3])
       tmp=self.stack_tf_encoder_layer(tmp[0],tmp[1],tmp[2],tmp[3])
@@ -433,95 +455,52 @@ class TEClassifierParallel(torch.nn.Module):
 
 
 class TEClassifierPrototype(torch.nn.Module):
-  def __init__(self,times, features, intermediate_features, pad_value,target_levels,core_net_type,inc_cls_head=True,cls_type="regular",pooling_type="min_max", residual_type="residual_gate",normalization_type="layer_nom",
-              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",embedding_dim=2,
-              conv_act_fct="elu",conv_n_layers=0,conv_ks_min=2, conv_ks_max=4, conv_bias=False, conv_parametrizations="None", 
-              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", 
-              rec_act_fct="elu",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", 
-              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multihead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",
+  def __init__(self,times, features, cls_pooling_features, pad_value,target_levels,core_net_type,embedding_dim=2,skip_connection_type="residual_gate",inc_cls_head=True,cls_type="regular",cls_pooling_type="min_max", 
+              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="layer_norm",
+              ng_conv_act_fct="elu",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="residual_gate",ng_conv_normalization_type="layer_norm",
+              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="residual_gate",dense_normalization_type="layer_norm",
+              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="residual_gate",rec_normalization_type="layer_norm",
+              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multi_head",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="residual_gate",tf_normalization_type="layer_norm",
+              merge_attention_type="multi_head",merge_num_heads=1,merge_normalization_type="layer_norm",
               metric_type="euclidean",
-              merge_attention_type=None,merge_num_heads=None,
               device=None, dtype=None):
     super().__init__()
-    
+
     n_target_levels=len(target_levels)
 
     if core_net_type=="sequential":
       self.core_net=TEClassifierSequential(
         times=times, 
         features=features, 
-        intermediate_features=intermediate_features, 
         pad_value=pad_value,
         n_target_levels=n_target_levels,
         inc_cls_head=False,
+        skip_connection_type=skip_connection_type,
         cls_type="regular",
-        pooling_type=pooling_type,
-        residual_type=residual_type,
-        normalization_type=normalization_type,
+        cls_pooling_type=cls_pooling_type,
+        cls_pooling_features=cls_pooling_features, 
         feat_act_fct=feat_act_fct,
         feat_size=feat_size,
         feat_bias=feat_bias,
         feat_dropout=feat_dropout,
         feat_parametrizations=feat_parametrizations,
-        conv_act_fct=conv_act_fct,
-        conv_n_layers=conv_n_layers,
-        conv_ks_min=conv_ks_min, 
-        conv_ks_max=conv_ks_max, 
-        conv_bias=conv_bias, 
-        conv_parametrizations=conv_parametrizations,
-        dense_act_fct=dense_act_fct,
-        dense_n_layers=dense_n_layers,
-        dense_dropout=dense_dropout,
-        dense_bias=dense_bias,
-        dense_parametrizations=dense_parametrizations, 
-        rec_act_fct=rec_act_fct,
-        rec_n_layers=rec_n_layers,
-        rec_type=rec_type,
-        rec_bidirectional=rec_bidirectional,
-        rec_dropout=rec_dropout,
-        rec_bias=rec_bias,
-        rec_parametrizations=rec_parametrizations, 
-        tf_act_fct=tf_act_fct,
-        tf_dense_dim=tf_dense_dim,
-        tf_n_layers=tf_n_layers,
-        tf_dropout_rate_1=tf_dropout_rate_1,
-        tf_dropout_rate_2=tf_dropout_rate_2,
-        tf_attention_type=tf_attention_type,
-        tf_embedding_type=tf_embedding_type,
-        tf_num_heads=tf_num_heads,
-        tf_bias=tf_bias,
-        tf_parametrizations=tf_parametrizations,
-        device=device, 
-        dtype=dtype
-      )
-    elif core_net_type=="parallel":
-      self.core_net=TEClassifierParallel(
-        times=times, 
-        features=features, 
-        intermediate_features=intermediate_features, 
-        pad_value=pad_value,
-        n_target_levels=n_target_levels,
-        inc_cls_head=False,
-        cls_type="regular",
-        pooling_type=pooling_type,
-        residual_type=residual_type,
-        normalization_type=normalization_type,
-        feat_act_fct=feat_act_fct,
-        feat_size=feat_size,
-        feat_bias=feat_bias,
-        feat_dropout=feat_dropout,
-        feat_parametrizations=feat_parametrizations,
-        conv_act_fct=conv_act_fct,
-        conv_n_layers=conv_n_layers,
-        conv_ks_min=conv_ks_min, 
-        conv_ks_max=conv_ks_max, 
-        conv_bias=conv_bias, 
-        conv_parametrizations=conv_parametrizations, 
+        feat_normalization_type=feat_normalization_type,
+        ng_conv_act_fct=ng_conv_act_fct,
+        ng_conv_n_layers=ng_conv_n_layers,
+        ng_conv_ks_min=ng_conv_ks_min, 
+        ng_conv_ks_max=ng_conv_ks_max, 
+        ng_conv_bias=ng_conv_bias, 
+        ng_conv_dropout=ng_conv_dropout,
+        ng_conv_residual_type=ng_conv_residual_type,
+        ng_conv_parametrizations=ng_conv_parametrizations,
+        ng_conv_normalization_type=ng_conv_normalization_type,
         dense_act_fct=dense_act_fct,
         dense_n_layers=dense_n_layers,
         dense_dropout=dense_dropout,
         dense_bias=dense_bias,
         dense_parametrizations=dense_parametrizations,
+        dense_residual_type=dense_residual_type,
+        dense_normalization_type=dense_normalization_type,
         rec_act_fct=rec_act_fct,
         rec_n_layers=rec_n_layers,
         rec_type=rec_type,
@@ -529,6 +508,8 @@ class TEClassifierPrototype(torch.nn.Module):
         rec_dropout=rec_dropout,
         rec_bias=rec_bias,
         rec_parametrizations=rec_parametrizations,
+        rec_residual_type=rec_residual_type,
+        rec_normalization_type=rec_normalization_type,
         tf_act_fct=tf_act_fct,
         tf_dense_dim=tf_dense_dim,
         tf_n_layers=tf_n_layers,
@@ -539,10 +520,68 @@ class TEClassifierPrototype(torch.nn.Module):
         tf_num_heads=tf_num_heads,
         tf_bias=tf_bias,
         tf_parametrizations=tf_parametrizations,
+        tf_residual_type=tf_residual_type,
+        tf_normalization_type=tf_normalization_type,
+        device=device, 
+        dtype=dtype
+      )
+    elif core_net_type=="parallel":
+      self.core_net=TEClassifierParallel(
+        times=times, 
+        features=features, 
+        pad_value=pad_value,
+        n_target_levels=n_target_levels,
+        inc_cls_head=False,
+        cls_pooling_type=cls_pooling_type,
+        cls_pooling_features=cls_pooling_features, 
+        feat_act_fct=feat_act_fct,
+        feat_size=feat_size,
+        feat_bias=feat_bias,
+        feat_dropout=feat_dropout,
+        feat_parametrizations=feat_parametrizations,
+        feat_normalization_type=feat_normalization_type,
+        ng_conv_act_fct=ng_conv_act_fct,
+        ng_conv_n_layers=ng_conv_n_layers,
+        ng_conv_ks_min=ng_conv_ks_min, 
+        ng_conv_ks_max=ng_conv_ks_max, 
+        ng_conv_bias=ng_conv_bias,
+        ng_conv_dropout=ng_conv_dropout,
+        ng_conv_residual_type=ng_conv_residual_type,
+        ng_conv_parametrizations=ng_conv_parametrizations,
+        ng_conv_normalization_type=ng_conv_normalization_type,
+        dense_act_fct=dense_act_fct,
+        dense_n_layers=dense_n_layers,
+        dense_dropout=dense_dropout,
+        dense_bias=dense_bias,
+        dense_parametrizations=dense_parametrizations,
+        dense_residual_type=dense_residual_type,
+        dense_normalization_type=dense_normalization_type,
+        rec_act_fct=rec_act_fct,
+        rec_n_layers=rec_n_layers,
+        rec_type=rec_type,
+        rec_bidirectional=rec_bidirectional,
+        rec_dropout=rec_dropout,
+        rec_bias=rec_bias,
+        rec_parametrizations=rec_parametrizations,
+        rec_residual_type=rec_residual_type,
+        rec_normalization_type=rec_normalization_type,
+        tf_act_fct=tf_act_fct,
+        tf_dense_dim=tf_dense_dim,
+        tf_n_layers=tf_n_layers,
+        tf_dropout_rate_1=tf_dropout_rate_1,
+        tf_dropout_rate_2=tf_dropout_rate_2,
+        tf_attention_type=tf_attention_type,
+        tf_embedding_type=tf_embedding_type,
+        tf_num_heads=tf_num_heads,
+        tf_bias=tf_bias,
+        tf_parametrizations=tf_parametrizations,
+        tf_residual_type=tf_residual_type,
+        tf_normalization_type=tf_normalization_type,
         device=device, 
         dtype=dtype,
         merge_attention_type=merge_attention_type,
-        merge_num_heads=merge_num_heads
+        merge_num_heads=merge_num_heads,
+        merge_normalization_type=merge_normalization_type
       )
       
     self.embedding_dim=embedding_dim
@@ -553,7 +592,7 @@ class TEClassifierPrototype(torch.nn.Module):
     self.class_labels=torch.ones(1)
     
     self.embedding_head=torch.nn.Linear(
-      in_features=intermediate_features,
+      in_features=cls_pooling_features,
       out_features=self.embedding_dim,
       bias=True)
     
@@ -626,3 +665,6 @@ class TEClassifierPrototype(torch.nn.Module):
   
   def get_trained_class_labels(self):
     return self.class_labels
+  
+  def get_embedding_dim(self):
+    return self.embedding_dim

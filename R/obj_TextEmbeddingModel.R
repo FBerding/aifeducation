@@ -464,11 +464,11 @@ TextEmbeddingModel <- R6::R6Class(
       ml_framework="pytorch"
 
       # Parameter check---------------------------------------------------------
-      check_type(object=model_name, type ="string", FALSE)
-      check_type(object=model_label, type ="string", FALSE)
-      check_type(object=model_language, type ="string", FALSE)
-      check_type(object=max_length, type ="int", FALSE)
-      check_type(object=pad_value, type ="int", FALSE)
+      check_type(object=model_name,object_name = "model_name", type ="string", TRUE)
+      check_type(object=model_label,,object_name = "model_label", type ="string", FALSE)
+      check_type(object=model_language,,object_name = "model_language", type ="string", FALSE)
+      check_type(object=max_length,,object_name = "max_length", type ="int", FALSE)
+      check_type(object=pad_value,,object_name = "pad_value", type ="int", FALSE)
 
       check_type(object=chunks, type ="int", FALSE)
       if (chunks < 2) {
@@ -501,13 +501,14 @@ TextEmbeddingModel <- R6::R6Class(
       # Must be called after setting private$set_model_method
       private$load_reload_python_scripts()
 
+      # Load transformer models and tokenizer
+      private$load_transformer_and_tokenizer(model_dir = model_dir)
+
       # transformer_components
       private$transformer_components$ml_framework <- ml_framework
       private$transformer_components$chunks <- chunks
+      private$transformer_components$features <-private$transformer_components$model$config$hidden_size
       private$transformer_components$overlap <- overlap
-
-      # Load transformer models and tokenizer
-      private$load_transformer_and_tokenizer(model_dir = model_dir)
 
       # Check max length
       private$check_and_set_max_length(max_length)
@@ -932,10 +933,10 @@ TextEmbeddingModel <- R6::R6Class(
       batch_results <- NULL
 
       if (private$transformer_components$emb_pool_type == "average") {
-        reticulate::py_run_file(system.file("python/pytorch_te_classifier.py",
+        reticulate::py_run_file(system.file("python/pytorch_old_scripts.py",
           package = "aifeducation"
         ))
-        pooling <- py$GlobalAveragePooling1D_PT()
+        pooling <- py$layer_global_average_pooling_1d(mask_type="attention")
         pooling$eval()
       }
 
@@ -1007,6 +1008,11 @@ TextEmbeddingModel <- R6::R6Class(
         if (private$transformer_components$emb_pool_type == "average") {
           # Average Pooling over all tokens of a layer
           for (i in tmp_selected_layer) {
+            #abc=pooling(
+            #  x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
+            #  mask = tokens$encodings["attention_mask"]$to(pytorch_device)
+            #)
+            #print(abc)
             tensor_embeddings[i] <- list(pooling(
               x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
               mask = tokens$encodings["attention_mask"]$to(pytorch_device)
@@ -1088,6 +1094,7 @@ TextEmbeddingModel <- R6::R6Class(
         param_emb_layer_min = private$transformer_components$emb_layer_min,
         param_emb_layer_max = private$transformer_components$emb_layer_max,
         param_emb_pool_type = private$transformer_components$emb_pool_type,
+        param_pad_value=private$pad_value,
         param_aggregation = NA,
         embeddings = text_embedding
       )
@@ -1109,6 +1116,7 @@ TextEmbeddingModel <- R6::R6Class(
           param_emb_layer_min = private$transformer_components$emb_layer_min,
           param_emb_layer_max = private$transformer_components$emb_layer_max,
           param_emb_pool_type = private$transformer_components$emb_pool_type,
+          param_pad_value=private$pad_value,
           param_aggregation = NA
         )
         # Add new data

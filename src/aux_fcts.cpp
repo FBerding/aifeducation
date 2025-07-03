@@ -36,7 +36,7 @@
 //'
 //'@import Rcpp
 //'@useDynLib aifeducation, .registration = TRUE
-//'@family Auxiliary Functions
+//'@family Utils Developers
 //'@export
 // [[Rcpp::export]]
 arma::cube matrix_to_array_c(arma::mat matrix,
@@ -81,7 +81,7 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 //'
 //'@import Rcpp
 //'@useDynLib aifeducation, .registration = TRUE
-//'@family Auxiliary Functions
+//'@family Utils Developers
 //'@export
 // [[Rcpp::export]]
  arma::mat to_categorical_c(arma::vec class_vector,
@@ -106,7 +106,7 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 //' @param features `unsigned integer` features number
 //'
 //' @return Returns matrix (with size batch x times*features)
-//'
+//' @family Utils Developers
 //' @export
 // [[Rcpp::export]]
 arma::mat tensor_to_matrix_c(arma::cube tensor,

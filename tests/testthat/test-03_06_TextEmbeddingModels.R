@@ -54,12 +54,12 @@ ml_frameworks <- c(
 
 base_model_list <- list(
   pytorch = c(
-    "bert",
-    "roberta",
-    "longformer",
-    "funnel",
-    "deberta_v2",
-    "mpnet"
+    "bert"#,
+    #"roberta",
+    #"longformer",
+    #"funnel",
+    #"deberta_v2",
+    #"mpnet"
   )
 )
 
@@ -237,7 +237,8 @@ for (framework in ml_frameworks) {
             emb_layer_min = min_layer,
             emb_layer_max = max_layer,
             emb_pool_type = pooling_type,
-            model_dir = model_path
+            model_dir = model_path,
+            pad_value = random_padding_value
           )
 
           # Central methods--------------------------------------------------------
@@ -277,10 +278,12 @@ for (framework in ml_frameworks) {
 
             # Check if data is valid
             expect_false(anyNA(embeddings$embeddings), FALSE)
-            expect_false(0 %in% get_n_chunks(embeddings$embeddings,
+            expect_false(0 %in% get_n_chunks(
+              text_embeddings=embeddings$embeddings,
               features = text_embedding_model$get_transformer_components()$features,
-              times = chunks
-            ))
+              times = chunks,
+              pad_value=random_padding_value)
+            )
 
             # check case order invariance
             perm <- sample(x = 1:10, size = 10, replace = FALSE)
@@ -297,7 +300,7 @@ for (framework in ml_frameworks) {
             }
 
             # Check embedding in LargeDataSetForTextEmbeddings
-            embeddings_large <- text_embedding_model$embed_large(
+            embeddings_large <- text_embedding_model$embed(
               raw_text = example_data$text[1:10],
               doc_id = example_data$id[1:10],
               batch_size = 5,

@@ -132,6 +132,7 @@ test_that("stack_rec_layers", {
       # Test that masking values are the same
       expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
       expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
+      expect_equal(y[[4]]$numpy(), values[[4]]$numpy())
 
       # Test that padding is not destroyed
       y_2 <- masking_layer(y[[1]])
@@ -157,9 +158,10 @@ test_that("stack_rec_layers", {
   }
 })
 
+
 #stack_tf_encoder_layer----------------------------------------------------
 test_that("stack_tf_encoder_layer", {
-  attention_types=c("multi_head","fourier")
+  attention_types=c("multihead","fourier")
   pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)

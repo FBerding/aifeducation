@@ -19,7 +19,7 @@
 #'
 #' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
-#' @family Classifiers for developers
+#' @family R6 Classes for Developers
 #' @export
 AIFEBaseModel <- R6::R6Class(
   classname = "AIFEBaseModel",

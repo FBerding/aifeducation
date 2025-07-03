@@ -42,7 +42,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/mpnet#transformers.MPNetForMaskedLM>
 #'   * <https://huggingface.co/docs/transformers/model_doc/mpnet#transformers.TFMPNetForMaskedLM>
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFEMpnetTransformer <- R6::R6Class(

@@ -5,18 +5,21 @@ testthat::skip_if_not(
 )
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-object_class_names=c("TEClassifierSequential")
-max_samples <- 50
+#object_class_names=c("TEClassifierSequential")
+#object_class_names="TEClassifierParallelPrototype"
+object_class_names="TEClassifierSequentialPrototype"
+
+max_samples <- 2
 max_samples_CI <- 50
 
-max_samples_training <- 10
+max_samples_training <- 2
 class_range <- c(2, 3)
 
 # Skip Tests-------------------------------------------------------------------
-skip_creation_test <- FALSE
-skip_method_save_load <- FALSE
+skip_creation_test <- TRUE
+skip_method_save_load <- TRUE
 skip_function_save_load <- TRUE
-skip_training_test <- TRUE
+skip_training_test <- FALSE
 skip_documentation <- TRUE
 
 
@@ -50,6 +53,7 @@ test_embeddings_single_case <- test_data$test_embeddings_single_case
 test_embeddings_single_case_LD <- test_data$test_embeddings_single_case_LD
 
 # Load feature extractors-------------------------------------------------------
+#devtools::load_all()
 feature_extractor <- NULL
 if (file.exists(root_path_feature_extractor)) {
   feature_extractor <- load_from_disk(root_path_feature_extractor)
@@ -57,89 +61,71 @@ if (file.exists(root_path_feature_extractor)) {
   feature_extractor <- NULL
 }
 
+#feature_extractor$extract_features_large(data_embeddings = test_embeddings$convert_to_LargeDataSetForTextEmbeddings(),batch_size = 2,trace=TRUE)
+#feature_extractor$extract_features_large()
+
 # Tests------------------------------------------------------------------------
 for (object_class_name in object_class_names) {
+  print(object_class_name)
   # Test for different number of classes
   for (n_classes in class_range) {
-    # Create a List of all relevant combinations of arguments and reduce the number
-    # to the desired sample size.
-    # These are available for all tests.
-    test_combinations <- generate_args_for_tests(
-      object_name = object_class_name,
-      method = "configure",
-      max_samples = check_adjust_n_samples_on_CI(
-        n_samples_requested = max_samples,
-        n_CI = max_samples_CI
-      ),
-      var_objects = list(
-        feature_extractor = feature_extractor
-      ),
-      necessary_objects = list(
-        text_embeddings = test_embeddings,
-        target_levels = target_levels[[n_classes]]
-      ),
-      var_override = list(
-        name = NULL,
-        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-        sustain_interval = 30,
-        act_fct = "elu",
-        rec_dropout = 0.1,
-        dense_dropout = 0.1,
-        encoder_dropout = 0.1,
-        feat_size=128,
-        intermediate_features=10,
-        tf_dense_dim=26,
-        tf_parametrizations="None",
-        dense_parametrizations="None",
-        rec_parametrizations="None",
-        conv_parametrizations="None",
-        tf_act_fct="elu",
-        dense_act_fct="gelu",
-        conv_act_fct="relu",
-        rec_act_fct="tanh",
-        feat_act_fct="prelu",
-        tf_num_heads=2,
-        tf_bias=TRUE,
-        dense_bias=TRUE,
-        rec_bias=TRUE,
-        conv_bias=TRUE,
-        dense_dropout=0.1,
-        rec_dropout=0.1,
-        tf_dropout_rate_1=0.1,
-        tf_dropout_rate_1=0.1,
-        conv_dropout=0.1,
-        feat_dropout=0.1,
-        conv_ks_min=2,
-        conv_ks_max=3,
-        trace = FALSE,
-        epochs = 50,
-        batch_size = 20,
-        ml_trace = 0,
-        n_cores = 2,
-        data_folds = 2,
-        pl_max_steps = 2,
-        pl_max = 1,
-        pl_anchor = 1,
-        pl_min = 0,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        data_val_size = 0.25,
-        lr_rate = 1e-3,
-        optimizer = "adamw",
-        dense_size = 5,
-        rec_size = 5,
-        self_attention_heads = 2,
-        intermediate_size = 6,
-        lr_warm_up_ratio = 0.01,
-        merge_num_heads=2,
-        merge_attention_type="multihead"
-      )
-    )
-
-
-    for (i in seq(test_combinations$n_combos)) {
+    for (i in 1:check_adjust_n_samples_on_CI(n_samples_requested=max_samples,
+                                             n_CI = 50)) {
       # Core Tests of the models-------------------------------------------------
       if (!skip_creation_test) {
+        # Create a List of all relevant combinations of arguments and reduce the number
+        # to the desired sample size.
+        # These are available for all tests.
+        test_combination <- generate_args_for_tests(
+          object_name = object_class_name,
+          method = "configure",
+          var_objects = list(
+            feature_extractor = feature_extractor
+          ),
+          necessary_objects = list(
+            text_embeddings = test_embeddings,
+            target_levels = target_levels[[n_classes]]
+          ),
+          var_override = list(
+            name = NULL,
+            label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+            sustain_interval = 30,
+            act_fct = "elu",
+            feat_size=64,
+            intermediate_features=10,
+            tf_dense_dim=26,
+            tf_parametrizations="None",
+            dense_parametrizations="None",
+            rec_parametrizations="None",
+            conv_parametrizations="None",
+            tf_num_heads=2,
+            ng_conv_ks_min=2,
+            ng_conv_ks_max=3,
+            trace = FALSE,
+            epochs = 10,
+            batch_size = 20,
+            ml_trace = 0,
+            n_cores = 2,
+            data_folds = 2,
+            pl_max_steps = 2,
+            pl_max = 1,
+            pl_anchor = 1,
+            pl_min = 0,
+            sustain_track = TRUE,
+            sustain_iso_code = "DEU",
+            data_val_size = 0.25,
+            lr_rate = 1e-3,
+            dense_size = 5,
+            rec_size = 5,
+            self_attention_heads = 2,
+            intermediate_size = 6,
+            lr_warm_up_ratio = 0.01,
+            merge_num_heads=2,
+            merge_attention_type="multihead"
+          )
+        )
+
+
         classifier <- NULL
         gc()
 
@@ -147,11 +133,11 @@ for (object_class_name in object_class_names) {
         classifier <- create_object(object_class_name)
         do.call(
           what = classifier$configure,
-          args = test_combinations$args[[i]]
+          args = test_combination
         )
 
 
-        test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+        test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combination)), {
           predictions <- classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 2,
@@ -185,7 +171,7 @@ for (object_class_name in object_class_names) {
           )
         })
 
-        test_that(paste("predict - randomness", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+        test_that(paste("predict - randomness", object_class_name, get_current_args_for_print(test_combination)), {
           # EmbeddedText
           predictions <- NULL
           predictions_2 <- NULL
@@ -221,9 +207,9 @@ for (object_class_name in object_class_names) {
           )
         })
 
-        if(!is.null(test_combinations$args[[i]]$attention)){
-          if (test_combinations$args[[i]]$attention != "fourier") {
-            test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+        if(!is.null(test_combination$attention)){
+          if (test_combination$attention != "fourier") {
+            test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combination)), {
               embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
               perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
               embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
@@ -275,7 +261,7 @@ for (object_class_name in object_class_names) {
         }
 
 
-        test_that(paste("predict - data source invariance", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+        test_that(paste("predict - data source invariance", object_class_name, get_current_args_for_print(test_combination)), {
           predictions_ET <- classifier$predict(
             newdata = test_embeddings_reduced,
             batch_size = 2,
@@ -295,11 +281,11 @@ for (object_class_name in object_class_names) {
 
       # Save and load tests-------------------------------------------------------
       if (!skip_method_save_load) {
-        test_that(paste("method save and load", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+        test_that(paste("method save and load", object_class_name, get_current_args_for_print(test_combination)), {
           classifier <- create_object(object_class_name)
           do.call(
             what = classifier$configure,
-            args = test_combinations$args[[i]]
+            args = test_combination
           )
 
           # Predictions before saving and loading
@@ -343,17 +329,65 @@ for (object_class_name in object_class_names) {
 
     # Function for loading and saving models-----------------------------------
     if (!skip_function_save_load) {
-      # Randomly select a configuration for training
-      i <- sample(x = seq(test_combinations$n_combos), size = 1)
-      test_that(paste("function save and load", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+
+      test_that(paste("function save and load", object_class_name, get_current_args_for_print(test_combination)), {
         classifier <- NULL
         gc()
+        # Randomly select a configuration for training
+        test_combination <- generate_args_for_tests(
+          object_name = object_class_name,
+          method = "configure",
+          var_objects = list(
+            feature_extractor = feature_extractor
+          ),
+          necessary_objects = list(
+            text_embeddings = test_embeddings,
+            target_levels = target_levels[[n_classes]]
+          ),
+          var_override = list(
+            name = NULL,
+            label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+            sustain_interval = 30,
+            act_fct = "elu",
+            feat_size=64,
+            intermediate_features=10,
+            tf_dense_dim=26,
+            tf_parametrizations="None",
+            dense_parametrizations="None",
+            rec_parametrizations="None",
+            conv_parametrizations="None",
+            tf_num_heads=2,
+            ng_conv_ks_min=2,
+            ng_conv_ks_max=3,
+            trace = FALSE,
+            epochs = 10,
+            batch_size = 20,
+            ml_trace = 0,
+            n_cores = 2,
+            data_folds = 2,
+            pl_max_steps = 2,
+            pl_max = 1,
+            pl_anchor = 1,
+            pl_min = 0,
+            sustain_track = TRUE,
+            sustain_iso_code = "DEU",
+            data_val_size = 0.25,
+            lr_rate = 1e-3,
+            dense_size = 5,
+            rec_size = 5,
+            self_attention_heads = 2,
+            intermediate_size = 6,
+            lr_warm_up_ratio = 0.01,
+            merge_num_heads=2,
+            merge_attention_type="multihead"
+          )
+        )
 
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
         do.call(
           what = classifier$configure,
-          args = test_combinations$args[[i]]
+          args = test_combination
         )
 
         # Predictions before saving and loading
@@ -398,10 +432,59 @@ for (object_class_name in object_class_names) {
     }
 
     # Documentation--------------------------------------------------------------
-    if (skip_documentation) {
-      i <- sample(x = seq(test_combinations$n_combos), size = 1)
-      test_that(paste("Documentation", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
-        # Randomly select a configuration for training
+    if (!skip_documentation) {
+      test_that(paste("Documentation", object_class_name, get_current_args_for_print(test_combination)), {
+
+
+        # Randomly select a configuration
+        test_combination <- generate_args_for_tests(
+          object_name = object_class_name,
+          method = "configure",
+          var_objects = list(
+            feature_extractor = feature_extractor
+          ),
+          necessary_objects = list(
+            text_embeddings = test_embeddings,
+            target_levels = target_levels[[n_classes]]
+          ),
+          var_override = list(
+            name = NULL,
+            label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+            sustain_interval = 30,
+            act_fct = "elu",
+            feat_size=64,
+            intermediate_features=10,
+            tf_dense_dim=26,
+            tf_parametrizations="None",
+            dense_parametrizations="None",
+            rec_parametrizations="None",
+            conv_parametrizations="None",
+            tf_num_heads=2,
+            ng_conv_ks_min=2,
+            ng_conv_ks_max=3,
+            trace = FALSE,
+            epochs = 10,
+            batch_size = 20,
+            ml_trace = 0,
+            n_cores = 2,
+            data_folds = 2,
+            pl_max_steps = 2,
+            pl_max = 1,
+            pl_anchor = 1,
+            pl_min = 0,
+            sustain_track = TRUE,
+            sustain_iso_code = "DEU",
+            data_val_size = 0.25,
+            lr_rate = 1e-3,
+            dense_size = 5,
+            rec_size = 5,
+            self_attention_heads = 2,
+            intermediate_size = 6,
+            lr_warm_up_ratio = 0.01,
+            merge_num_heads=2,
+            merge_attention_type="multihead"
+          )
+        )
         classifier <- NULL
         gc()
 
@@ -409,7 +492,7 @@ for (object_class_name in object_class_names) {
         classifier <- create_object(object_class_name)
         do.call(
           what = classifier$configure,
-          args = test_combinations$args[[i]]
+          args = test_combination
         )
 
         classifier$set_model_description(
@@ -497,68 +580,119 @@ for (object_class_name in object_class_names) {
       log_dir <- paste0(root_path_results, "/", generate_id(5))
       create_dir(log_dir, trace = FALSE)
 
-      train_args_combinations <- generate_args_for_tests(
-        object_name = object_class_name,
-        method = "train",
-        max_samples = max_samples_training,
-        var_objects = list(),
-        necessary_objects = list(
-          data_embeddings = test_embeddings,
-          data_targets = target_data[[n_classes]]
-        ),
-        var_override = list(
-          name = NULL,
-          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-          sustain_interval = 30,
-          act_fct = "elu",
-          rec_dropout = 0.1,
-          dense_dropout = 0.1,
-          encoder_dropout = 0.1,
-          trace = FALSE,
-          epochs = 20,
-          batch_size = 20,
-          ml_trace = 0,
-          n_cores = 2,
-          data_folds = 2,
-          pl_max_steps = 2,
-          pl_max = 1,
-          pl_anchor = 1,
-          pl_min = 0,
-          sc_min_k = 1,
-          sc_max_k = 2,
-          sustain_track = TRUE,
-          sustain_iso_code = "DEU",
-          data_val_size = 0.25,
-          lr_rate = 1e-3,
-          dense_size = 5,
-          rec_size = 5,
-          self_attention_heads = 2,
-          intermediate_size = 6,
-          lr_warm_up_ratio = 0.01,
-          log_dir = log_dir
+      for (j in 1:max_samples_training) {
+        #Config sample
+        test_combination <- generate_args_for_tests(
+          object_name = object_class_name,
+          method = "configure",
+          var_objects = list(
+            feature_extractor = feature_extractor
+          ),
+          necessary_objects = list(
+            text_embeddings = test_embeddings,
+            target_levels = target_levels[[n_classes]]
+          ),
+          var_override = list(
+            name = NULL,
+            label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+            sustain_interval = 30,
+            act_fct = "elu",
+            feat_size=64,
+            intermediate_features=10,
+            tf_dense_dim=26,
+            tf_parametrizations="None",
+            dense_parametrizations="None",
+            rec_parametrizations="None",
+            conv_parametrizations="None",
+            tf_num_heads=2,
+            ng_conv_ks_min=2,
+            ng_conv_ks_max=3,
+            trace = FALSE,
+            epochs = 10,
+            batch_size = 20,
+            ml_trace = 0,
+            n_cores = 2,
+            data_folds = 2,
+            pl_max_steps = 2,
+            pl_max = 1,
+            pl_anchor = 1,
+            pl_min = 0,
+            sustain_track = TRUE,
+            sustain_iso_code = "DEU",
+            data_val_size = 0.25,
+            lr_rate = 1e-3,
+            dense_size = 5,
+            rec_size = 5,
+            self_attention_heads = 2,
+            intermediate_size = 6,
+            lr_warm_up_ratio = 0.01,
+            merge_num_heads=2,
+            merge_attention_type="multihead"
+          )
         )
-      )
 
-      for (j in seq(train_args_combinations$n_combos)) {
+        #traing config sample
+        train_args_combinations <- generate_args_for_tests(
+          object_name = object_class_name,
+          method = "train",
+          var_objects = list(),
+          necessary_objects = list(
+            data_embeddings = test_embeddings,
+            data_targets = target_data[[n_classes]]
+          ),
+          var_override = list(
+            name = NULL,
+            label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+            sustain_interval = 30,
+            act_fct = "elu",
+            rec_dropout = 0.1,
+            dense_dropout = 0.1,
+            encoder_dropout = 0.1,
+            trace = FALSE,
+            epochs = 20,
+            batch_size = 20,
+            ml_trace = 0,
+            n_cores = 2,
+            data_folds = 2,
+            use_pl=FALSE,
+            pl_max_steps = 2,
+            pl_max = 1,
+            pl_anchor = 1,
+            pl_min = 0,
+            use_sc=FALSE,
+            sc_min_k = 1,
+            sc_max_k = 2,
+            sustain_track = TRUE,
+            sustain_iso_code = "DEU",
+            data_val_size = 0.25,
+            lr_rate = 1e-3,
+            dense_size = 5,
+            rec_size = 5,
+            self_attention_heads = 2,
+            intermediate_size = 6,
+            lr_warm_up_ratio = 0.01,
+            log_dir = log_dir
+          )
+        )
+
         # Create test object with a given combination of args
         classifier <- NULL
         gc()
-        i <- sample(x = seq(test_combinations$n_combos), size = 1)
         classifier <- create_object(object_class_name)
         do.call(
           what = classifier$configure,
-          args = test_combinations$args[[i]]
+          args = test_combination
         )
 
         test_that(paste(
           "training", object_class_name,
-          get_current_args_for_print(test_combinations$args[[i]]),
-          get_current_args_for_print(train_args_combinations$args[[j]])
+          get_current_args_for_print(test_combination),
+          get_current_args_for_print(train_args_combinations)
         ), {
           expect_no_error(
             do.call(
               what = classifier$train,
-              args = train_args_combinations$args[[j]]
+              args = train_args_combinations
             )
           )
 

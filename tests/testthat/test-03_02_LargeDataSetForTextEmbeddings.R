@@ -4,6 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+load_all_py_scripts()
+
 # SetUp Test---------------------------------------------------------------------
 root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)

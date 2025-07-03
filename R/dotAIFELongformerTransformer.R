@@ -45,7 +45,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/longformer#transformers.TFLongformerModel>
 #'
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFELongformerTransformer <- R6::R6Class(

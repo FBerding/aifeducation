@@ -48,7 +48,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/bert#transformers.BertForMaskedLM>
 #'   * <https://huggingface.co/docs/transformers/model_doc/bert#transformers.TFBertForMaskedLM>
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFEBertTransformer <- R6::R6Class(

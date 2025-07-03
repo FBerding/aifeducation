@@ -49,7 +49,7 @@
 #'   * [RoBERTa](https://huggingface.co/docs/transformers/model_doc/roberta)
 #'   * [MPNet](https://huggingface.co/docs/transformers/model_doc/mpnet)
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #' @export
 .AIFEBaseTransformer <- R6::R6Class( # nolint
   classname = ".AIFEBaseTransformer",

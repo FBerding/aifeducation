@@ -35,6 +35,11 @@ TEClassifierRegular <- R6::R6Class(
   classname = "TEClassifierRegular",
   inherit = TEClassifiersBasedOnRegular,
   public = list(
+    #' @description Creating a new instance of this class.
+    #' @return Returns an object of class [TEClassifierRegular] which is ready for configuration.
+    initialize=function(){
+      message("TEClassifierRegular is deprecated. Please use TEClassifierSequential.")
+    },
     # New-----------------------------------------------------------------------
     #' @description Creating a new instance of this class.
     #' @param name `r get_param_doc_desc("name")`
@@ -59,7 +64,6 @@ TEClassifierRegular <- R6::R6Class(
     #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
     #' @param dense_dropout `r get_param_doc_desc("dense_dropout")`
     #' @param rec_dropout `r get_param_doc_desc("rec_dropout")`
-    #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @note This model requires `pad_value=0`. If this condition is not met the
     #' padding value is switched automatically.
     #' @return Returns an object of class [TEClassifierRegular] which is ready for training.
@@ -84,8 +88,7 @@ TEClassifierRegular <- R6::R6Class(
                          rec_dropout = 0.1,
                          repeat_encoder = 1,
                          dense_dropout = 0.4,
-                         encoder_dropout = 0.1,
-                         optimizer = "adamw") {
+                         encoder_dropout = 0.1) {
        private$do_configuration(args=get_called_args(n=1))
     }
   ),
