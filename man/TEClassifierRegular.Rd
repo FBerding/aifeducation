@@ -40,6 +40,7 @@ Other Classification:
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-TEClassifierRegular-new}{\code{TEClassifierRegular$new()}}
 \item \href{#method-TEClassifierRegular-configure}{\code{TEClassifierRegular$configure()}}
 \item \href{#method-TEClassifierRegular-clone}{\code{TEClassifierRegular$clone()}}
 }
@@ -79,6 +80,19 @@ Other Classification:
 </details>
 }}
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifierRegular-new"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierRegular-new}{}}}
+\subsection{Method \code{new()}}{
+Creating a new instance of this class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierRegular$new()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns an object of class \link{TEClassifierRegular} which is ready for configuration.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TEClassifierRegular-configure"></a>}}
 \if{latex}{\out{\hypertarget{method-TEClassifierRegular-configure}{}}}
 \subsection{Method \code{configure()}}{
@@ -106,8 +120,7 @@ Creating a new instance of this class.
   rec_dropout = 0.1,
   repeat_encoder = 1,
   dense_dropout = 0.4,
-  encoder_dropout = 0.1,
-  optimizer = "adamw"
+  encoder_dropout = 0.1
 )}\if{html}{\out{</div>}}
 }
 
@@ -163,8 +176,6 @@ values for a case for different input orders if you choose \code{fourier} on lin
 \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
 
 \item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
-
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }

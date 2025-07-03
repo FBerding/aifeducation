@@ -26,7 +26,9 @@ many raters. Psychological Bulletin, 76(5), 378–382. \url{doi:10.1037/h0031619
 }
 \seealso{
 Other performance measures: 
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{cohens_kappa}()},
+\code{\link{get_coder_metrics}()},
 \code{\link{gwet_ac}()},
 \code{\link{kendalls_w}()},
 \code{\link{kripp_alpha}()}

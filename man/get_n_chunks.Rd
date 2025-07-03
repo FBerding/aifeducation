@@ -15,7 +15,7 @@ get_n_chunks(text_embeddings, features, times, pad_value = -100)
 
 \item{pad_value}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= 0}}
+Default is \code{-100}. Allowed values: \code{ x <= -100}}
 }
 \value{
 Named\code{vector} of integers representing the number of chunks/sequences for every case.
@@ -24,8 +24,14 @@ Named\code{vector} of integers representing the number of chunks/sequences for e
 Function for calculating the number of chunks/sequences for every case.
 }
 \seealso{
-Other data_management_utils: 
+Other Utils Developers: 
+\code{\link{auto_n_cores}()},
+\code{\link{create_object}()},
 \code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{get_synthetic_cases_from_matrix}()}
+\code{\link{generate_id}()},
+\code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{data_management_utils}
+\concept{Utils Developers}

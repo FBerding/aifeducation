@@ -37,8 +37,10 @@ The definitive guide to measuring the extent of agreement among raters
 }
 \seealso{
 Other performance measures: 
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{cohens_kappa}()},
 \code{\link{fleiss_kappa}()},
+\code{\link{get_coder_metrics}()},
 \code{\link{kendalls_w}()},
 \code{\link{kripp_alpha}()}
 }

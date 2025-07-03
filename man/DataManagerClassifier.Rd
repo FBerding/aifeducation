@@ -12,13 +12,7 @@ techniques.
 Abstract class for managing the data and samples during training a classifier. DataManagerClassifier is
 used with \link{TEClassifierRegular} and \link{TEClassifierProtoNet}.
 }
-\seealso{
-Other Data Management: 
-\code{\link{EmbeddedText}},
-\code{\link{LargeDataSetForText}},
-\code{\link{LargeDataSetForTextEmbeddings}}
-}
-\concept{Data Management}
+\concept{Data Management Developers}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -110,7 +104,7 @@ The remaining cases are part of the training data. Allowed values: \verb{0 < x <
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= 0}}
+Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
 \item{\code{class_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels

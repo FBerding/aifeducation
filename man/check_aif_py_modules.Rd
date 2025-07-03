@@ -15,14 +15,16 @@ The function prints a table with all relevant packages and shows which modules a
 If all relevant modules are available, the functions returns \code{TRUE}. In all other cases it returns \code{FALSE}
 }
 \description{
-This function checks if all  python modules necessary for the package aifeducation to work are
+This function checks if all  python modules necessary for the package 'aifeducation' to work are
 available.
 }
 \seealso{
 Other Installation and Configuration: 
 \code{\link{install_aifeducation}()},
+\code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},
 \code{\link{prepare_python}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{set_transformers_logger}()},
+\code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

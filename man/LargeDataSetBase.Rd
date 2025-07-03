@@ -10,7 +10,15 @@ Returns a new object of this class.
 This object contains public and private methods which may be useful for every large data sets. Objects
 of this class are not intended to be used directly. \link{LargeDataSetForTextEmbeddings} or \link{LargeDataSetForText}.
 }
-\concept{LargeDataSets for developers}
+\seealso{
+Other R6 Classes for Developers: 
+\code{\link{AIFEBaseModel}},
+\code{\link{ClassifiersBasedOnTextEmbeddings}},
+\code{\link{ModelsBasedOnTextEmbeddings}},
+\code{\link{TEClassifiersBasedOnProtoNet}},
+\code{\link{TEClassifiersBasedOnRegular}}
+}
+\concept{R6 Classes for Developers}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -200,10 +208,16 @@ Method does not return anything. It loads a data set from disk.
 \if{html}{\out{<a id="method-LargeDataSetBase-set_package_versions"></a>}}
 \if{latex}{\out{\hypertarget{method-LargeDataSetBase-set_package_versions}{}}}
 \subsection{Method \code{set_package_versions()}}{
+Method for setting the package version for 'aifeducation',
+'reticulate', 'torch', and 'numpy' to the currently used versions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$set_package_versions()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Method does not return anything. It is used to set the private
+fields fo package versions.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LargeDataSetBase-get_package_versions"></a>}}

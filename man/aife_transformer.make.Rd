@@ -25,10 +25,6 @@ See \link{.AIFEBaseTransformer} class for details.
 }
 \seealso{
 Other Transformer: 
-\code{\link{AIFETrType}},
-\code{\link{aife_transformer.load_model}()},
-\code{\link{aife_transformer.load_model_config}()},
-\code{\link{aife_transformer.load_model_mlm}()},
-\code{\link{aife_transformer.load_tokenizer}()}
+\code{\link{AIFETrType}}
 }
 \concept{Transformer}

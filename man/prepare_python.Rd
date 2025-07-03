@@ -13,10 +13,10 @@ activate a virtual environment with the given name. If this environment does not
 it tries to activate a conda environment with the given name. If this fails
 the default virtual environment is used.}
 
-\item{`string`}{envname name of the requested environment.}
+\item{envname}{\code{string} envname name of the requested environment.}
 }
 \value{
-Function does not return anything. It is used for preparing python and R
+Function does not return anything. It is used for preparing python and R.
 }
 \description{
 This functions checks for python and a specified environment. If the environment exists
@@ -26,7 +26,9 @@ it will be activated. If python is already initialized it uses the current envir
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_aifeducation}()},
+\code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{set_transformers_logger}()},
+\code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

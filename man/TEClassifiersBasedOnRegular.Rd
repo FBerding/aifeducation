@@ -11,13 +11,14 @@ is \strong{not} designed for a direct application and should only be used by dev
 Abstract class for all regular classifiers that use numerical representations of texts instead of words.
 }
 \seealso{
-Other Classifiers for developers: 
+Other R6 Classes for Developers: 
 \code{\link{AIFEBaseModel}},
 \code{\link{ClassifiersBasedOnTextEmbeddings}},
+\code{\link{LargeDataSetBase}},
 \code{\link{ModelsBasedOnTextEmbeddings}},
 \code{\link{TEClassifiersBasedOnProtoNet}}
 }
-\concept{Classifiers for developers}
+\concept{R6 Classes for Developers}
 \section{Super classes}{
 \code{\link[aifeducation:AIFEBaseModel]{aifeducation::AIFEBaseModel}} -> \code{\link[aifeducation:ModelsBasedOnTextEmbeddings]{aifeducation::ModelsBasedOnTextEmbeddings}} -> \code{\link[aifeducation:ClassifiersBasedOnTextEmbeddings]{aifeducation::ClassifiersBasedOnTextEmbeddings}} -> \code{TEClassifiersBasedOnRegular}
 }
@@ -78,9 +79,9 @@ is used as the final model.
   data_targets = NULL,
   data_folds = 5,
   data_val_size = 0.25,
-  balance_class_weights = TRUE,
-  balance_sequence_length = TRUE,
-  cls_loss_fct_name = "focal_loss",
+  loss_balance_class_weights = TRUE,
+  loss_balance_sequence_length = TRUE,
+  loss_cls_fct_name = "focal_loss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -102,7 +103,8 @@ is used as the final model.
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 0.001,
-  lr_warm_up_ratio = 0.02
+  lr_warm_up_ratio = 0.02,
+  optimizer = "adamW"
 )}\if{html}{\out{</div>}}
 }
 
@@ -120,14 +122,14 @@ named and has to use the same names as used in in the embeddings. .}
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
 
-\item{\code{balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
+\item{\code{loss_balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency. If \code{FALSE} each class has the weight 1.}
 
-\item{\code{balance_sequence_length}}{\code{bool} If \code{TRUE} sample weights are generated for the length of sequences based on
+\item{\code{loss_balance_sequence_length}}{\code{bool} If \code{TRUE} sample weights are generated for the length of sequences based on
 the frequencies of the training data with the method Inverse Class Frequency.
 If \code{FALSE} each sequences length has the weight 1.}
 
-\item{\code{cls_loss_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'FocalLoss', 'CrossEntropyLoss'}
+\item{\code{loss_cls_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'FocalLoss', 'CrossEntropyLoss'}
 
 \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
 
@@ -151,10 +153,10 @@ If \code{FALSE} each sequences length has the weight 1.}
 
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\link{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
 
 \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. \link{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
+codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
 \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
 
@@ -177,6 +179,8 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed value
 \item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
 
 \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
+
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }

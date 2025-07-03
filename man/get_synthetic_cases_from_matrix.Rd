@@ -42,12 +42,17 @@ get_synthetic_cases_from_matrix(
 }
 }
 \description{
-This function creates synthetic cases for balancing the training with an object of the class
-\link{TEClassifierRegular} or \link{TEClassifierProtoNet}.
+This function creates synthetic cases for balancing the training with classifier models.
 }
 \seealso{
-Other data_management_utils: 
+Other Utils Developers: 
+\code{\link{auto_n_cores}()},
+\code{\link{create_object}()},
 \code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{get_n_chunks}()}
+\code{\link{generate_id}()},
+\code{\link{get_n_chunks}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{data_management_utils}
+\concept{Utils Developers}

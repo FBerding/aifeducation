@@ -21,8 +21,4 @@ Returns \code{TRUE} if a new point can be added, otherwise - \code{FALSE}
 \description{
 Function written in C++ for validating a new point (KNNOR-Validation)
 }
-\seealso{
-Other oversampling_approaches: 
-\code{\link{knnor}()}
-}
-\concept{oversampling_approaches}
+\concept{oversampling_approaches Developers}

@@ -6,14 +6,14 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  transformer_version = "<=4.49.0",
+  transformer_version = "<=4.52.4",
   tokenizers_version = "<=0.21.1",
-  pandas_version = "<=2.2.3",
-  datasets_version = "<=3.4.1",
-  codecarbon_version = "<=2.8.3",
+  pandas_version = "<=2.3.0",
+  datasets_version = "<=3.6.0",
+  codecarbon_version = "<=3.0.2",
   safetensors_version = "<=0.5.3",
   torcheval_version = "<=0.0.7",
-  accelerate_version = "<=1.5.2",
+  accelerate_version = "<=1.8.1",
   pytorch_cuda_version = "12.6",
   python_version = "3.12",
   remove_first = FALSE,
@@ -39,7 +39,8 @@ install_py_modules(
 
 \item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.}
 
-\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for 'PyTorch'.}
+\item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for 'PyTorch'.
+To install 'PyTorch' without cuda set to \code{NULL}.}
 
 \item{python_version}{\code{string} Python version to use.}
 
@@ -57,11 +58,17 @@ environment.
 \description{
 Function for installing the necessary python modules.
 }
+\note{
+Function tries to identify the type of operating system. In the case that
+MAC OS is detected 'PyTorch' is installed without support for cuda.
+}
 \seealso{
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_aifeducation}()},
+\code{\link{install_aifeducation_studio}()},
 \code{\link{prepare_python}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{set_transformers_logger}()},
+\code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

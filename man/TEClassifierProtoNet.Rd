@@ -50,6 +50,7 @@ Other Classification:
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-TEClassifierProtoNet-new}{\code{TEClassifierProtoNet$new()}}
 \item \href{#method-TEClassifierProtoNet-configure}{\code{TEClassifierProtoNet$configure()}}
 \item \href{#method-TEClassifierProtoNet-embed}{\code{TEClassifierProtoNet$embed()}}
 \item \href{#method-TEClassifierProtoNet-plot_embeddings}{\code{TEClassifierProtoNet$plot_embeddings()}}
@@ -93,6 +94,19 @@ Other Classification:
 </details>
 }}
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEClassifierProtoNet-new"></a>}}
+\if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-new}{}}}
+\subsection{Method \code{new()}}{
+Creating a new instance of this class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$new()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns an object of class \link{TEClassifierProtoNet} which is ready for configuration.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TEClassifierProtoNet-configure"></a>}}
 \if{latex}{\out{\hypertarget{method-TEClassifierProtoNet-configure}{}}}
 \subsection{Method \code{configure()}}{
@@ -120,8 +134,7 @@ Creating a new instance of this class.
   rec_dropout = 0.1,
   repeat_encoder = 1,
   dense_dropout = 0.4,
-  encoder_dropout = 0.1,
-  optimizer = "adamw"
+  encoder_dropout = 0.1
 )}\if{html}{\out{</div>}}
 }
 
@@ -177,8 +190,6 @@ values for a case for different input orders if you choose \code{fourier} on lin
 \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
 
 \item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
-
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 
 \item{\code{bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 }

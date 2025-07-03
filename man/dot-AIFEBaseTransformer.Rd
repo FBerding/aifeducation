@@ -39,21 +39,15 @@ Hugging Face transformers documantation:
 }
 }
 \seealso{
-Other Transformers for developers: 
+Other R6 classes for transformers: 
 \code{\link{.AIFEBertTransformer}},
 \code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFELongformerTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFERobertaTransformer}},
-\code{\link{.AIFETrConfig}},
-\code{\link{.AIFETrModel}},
-\code{\link{.AIFETrModelMLM}},
-\code{\link{.AIFETrObj}},
-\code{\link{.AIFETrTokenizer}},
-\code{\link{.aife_transformer.check_type}()}
+\code{\link{.AIFERobertaTransformer}}
 }
-\concept{Transformers for developers}
+\concept{R6 classes for transformers}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{

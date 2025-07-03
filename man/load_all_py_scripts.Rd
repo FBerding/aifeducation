@@ -4,7 +4,7 @@
 \alias{load_all_py_scripts}
 \title{Load and re-load all python scripts}
 \usage{
-load_all_py_scripts(files)
+load_all_py_scripts()
 }
 \value{
 Function does nothing return. It loads the requested scripts.
@@ -13,21 +13,10 @@ Function does nothing return. It loads the requested scripts.
 Function loads or re-loads all python scripts within the package 'aifeducation'.
 }
 \seealso{
-Other Utils: 
-\code{\link{auto_n_cores}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_config_state}()},
-\code{\link{create_dir}()},
-\code{\link{create_object}()},
-\code{\link{detect_base_model_type}()},
-\code{\link{generate_id}()},
-\code{\link{get_file_extension}()},
+Other Utils Python Developers: 
 \code{\link{get_py_package_version}()},
 \code{\link{get_py_package_versions}()},
-\code{\link{is.null_or_na}()},
 \code{\link{load_py_scripts}()},
-\code{\link{output_message}()},
-\code{\link{print_message}()},
 \code{\link{run_py_file}()}
 }
-\concept{Utils}
+\concept{Utils Python Developers}

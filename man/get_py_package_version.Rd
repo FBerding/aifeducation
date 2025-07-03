@@ -6,6 +6,9 @@
 \usage{
 get_py_package_version(package_name)
 }
+\arguments{
+\item{package_name}{\code{string} Name of the package.}
+}
 \value{
 Returns the version as \code{string} or \code{NA} if the package does not exist.
 }
@@ -13,21 +16,10 @@ Returns the version as \code{string} or \code{NA} if the package does not exist.
 Function for requesting the version of a specific python package.
 }
 \seealso{
-Other Utils: 
-\code{\link{auto_n_cores}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_config_state}()},
-\code{\link{create_dir}()},
-\code{\link{create_object}()},
-\code{\link{detect_base_model_type}()},
-\code{\link{generate_id}()},
-\code{\link{get_file_extension}()},
+Other Utils Python Developers: 
 \code{\link{get_py_package_versions}()},
-\code{\link{is.null_or_na}()},
 \code{\link{load_all_py_scripts}()},
 \code{\link{load_py_scripts}()},
-\code{\link{output_message}()},
-\code{\link{print_message}()},
 \code{\link{run_py_file}()}
 }
-\concept{Utils}
+\concept{Utils Python Developers}

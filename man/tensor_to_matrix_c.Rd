@@ -20,3 +20,15 @@ Returns matrix (with size batch x times*features)
 Function written in C++ for transformation the tensor (with size batch x times x features) to the matrix (with
 size batch x times*features)
 }
+\seealso{
+Other Utils Developers: 
+\code{\link{auto_n_cores}()},
+\code{\link{create_object}()},
+\code{\link{create_synthetic_units_from_matrix}()},
+\code{\link{generate_id}()},
+\code{\link{get_n_chunks}()},
+\code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{to_categorical_c}()}
+}
+\concept{Utils Developers}

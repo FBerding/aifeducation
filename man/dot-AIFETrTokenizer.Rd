@@ -17,18 +17,15 @@ used directly.
 }
 \seealso{
 Other Transformers for developers: 
-\code{\link{.AIFEBaseTransformer}},
-\code{\link{.AIFEBertTransformer}},
-\code{\link{.AIFEDebertaTransformer}},
-\code{\link{.AIFEFunnelTransformer}},
-\code{\link{.AIFELongformerTransformer}},
-\code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFERobertaTransformer}},
 \code{\link{.AIFETrConfig}},
 \code{\link{.AIFETrModel}},
 \code{\link{.AIFETrModelMLM}},
 \code{\link{.AIFETrObj}},
-\code{\link{.aife_transformer.check_type}()}
+\code{\link{.aife_transformer.check_type}()},
+\code{\link{aife_transformer.load_model}()},
+\code{\link{aife_transformer.load_model_config}()},
+\code{\link{aife_transformer.load_model_mlm}()},
+\code{\link{aife_transformer.load_tokenizer}()}
 }
 \concept{Transformers for developers}
 \keyword{internal}

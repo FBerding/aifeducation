@@ -13,13 +13,14 @@ All models of this class require text embeddings as input. These are provided as
 objects of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.
 }
 \seealso{
-Other Classifiers for developers: 
+Other R6 Classes for Developers: 
 \code{\link{AIFEBaseModel}},
 \code{\link{ClassifiersBasedOnTextEmbeddings}},
+\code{\link{LargeDataSetBase}},
 \code{\link{TEClassifiersBasedOnProtoNet}},
 \code{\link{TEClassifiersBasedOnRegular}}
 }
-\concept{Classifiers for developers}
+\concept{R6 Classes for Developers}
 \section{Super class}{
 \code{\link[aifeducation:AIFEBaseModel]{aifeducation::AIFEBaseModel}} -> \code{ModelsBasedOnTextEmbeddings}
 }

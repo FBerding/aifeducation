@@ -6,28 +6,24 @@
 \usage{
 create_object(class)
 }
+\arguments{
+\item{class}{\code{string} Name of the class to be created.#'}
+}
 \value{
-Returns an object of the requested class.
+Returns an object of the requested class.#'
 }
 \description{
 Support function for creating objects.
 }
 \seealso{
-Other Utils: 
+Other Utils Developers: 
 \code{\link{auto_n_cores}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_config_state}()},
-\code{\link{create_dir}()},
-\code{\link{detect_base_model_type}()},
+\code{\link{create_synthetic_units_from_matrix}()},
 \code{\link{generate_id}()},
-\code{\link{get_file_extension}()},
-\code{\link{get_py_package_version}()},
-\code{\link{get_py_package_versions}()},
-\code{\link{is.null_or_na}()},
-\code{\link{load_all_py_scripts}()},
-\code{\link{load_py_scripts}()},
-\code{\link{output_message}()},
-\code{\link{print_message}()},
-\code{\link{run_py_file}()}
+\code{\link{get_n_chunks}()},
+\code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{Utils}
+\concept{Utils Developers}

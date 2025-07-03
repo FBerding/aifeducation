@@ -21,7 +21,6 @@ embedding model are used for training and predicting.
 }
 \seealso{
 Other Data Management: 
-\code{\link{DataManagerClassifier}},
 \code{\link{EmbeddedText}},
 \code{\link{LargeDataSetForText}}
 }
@@ -129,7 +128,7 @@ embeddings.}
 
 \item{\code{param_pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= 0}}
+Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
 \item{\code{param_aggregation}}{\code{string} Aggregation method of the hidden states. Deprecated. Only included for backward
 compatibility.}

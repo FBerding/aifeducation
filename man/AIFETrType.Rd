@@ -28,10 +28,6 @@ Elements can be used like \code{AIFETrType$bert}, \code{AIFETrType$deberta_v2}, 
 }
 \seealso{
 Other Transformer: 
-\code{\link{aife_transformer.load_model}()},
-\code{\link{aife_transformer.load_model_config}()},
-\code{\link{aife_transformer.load_model_mlm}()},
-\code{\link{aife_transformer.load_tokenizer}()},
 \code{\link{aife_transformer.make}()}
 }
 \concept{Transformer}

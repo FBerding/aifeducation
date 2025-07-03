@@ -14,6 +14,8 @@ install_aifeducation(
 \item{install_aifeducation_studio}{\code{bool} If \code{TRUE} all necessary R packages are installed for using AI for Education
 Studio.}
 
+\item{python_version}{\code{string} Python version to use.}
+
 \item{use_conda}{\code{bool} If \code{TRUE} installation installs 'miniconda' and uses 'conda' as package manager. If \code{FALSE}
 installation installs python and uses virtual environments for package management.}
 
@@ -24,14 +26,28 @@ Function does nothing return. It installs python, optional R packages, and neces
 machine.
 }
 \description{
-Function for installing 'aifeducation' on a machine. This functions assumes that not 'python' and no
-'miniconda' is installed. Only'pytorch' is installed.
+Function for installing 'aifeducation' on a machine.
+
+Using a virtual environment (\code{use_conda=FALSE})
+If 'python' is already installed the installed version is used. In the case that
+the required version of 'python' is different from the existing version the new
+version is installed. In all other cases python will be installed on the system.
+
+#' Using a conda environment (\code{use_conda=TRUE})
+If 'miniconda' is already existing on the machine no installation of 'miniconda'
+is applied. In this case the system checks for update and updates 'miniconda' to
+the newest version. If 'miniconda' is not found on the system it will be installed.
+}
+\note{
+On MAC OS torch will be installed without support for cuda.
 }
 \seealso{
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
+\code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},
 \code{\link{prepare_python}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{set_transformers_logger}()},
+\code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

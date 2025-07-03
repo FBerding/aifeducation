@@ -19,11 +19,15 @@ If success - a tokenizer, otherwise - an error (passed type is invalid).
 Loads a tokenizer for a transformer with the passed type.
 }
 \seealso{
-Other Transformer: 
-\code{\link{AIFETrType}},
+Other Transformers for developers: 
+\code{\link{.AIFETrConfig}},
+\code{\link{.AIFETrModel}},
+\code{\link{.AIFETrModelMLM}},
+\code{\link{.AIFETrObj}},
+\code{\link{.AIFETrTokenizer}},
+\code{\link{.aife_transformer.check_type}()},
 \code{\link{aife_transformer.load_model}()},
 \code{\link{aife_transformer.load_model_config}()},
-\code{\link{aife_transformer.load_model_mlm}()},
-\code{\link{aife_transformer.make}()}
+\code{\link{aife_transformer.load_model_mlm}()}
 }
-\concept{Transformer}
+\concept{Transformers for developers}

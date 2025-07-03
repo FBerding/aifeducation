@@ -34,21 +34,15 @@ Hugging Face Documentation
 }
 }
 \seealso{
-Other Transformers for developers: 
+Other R6 classes for transformers: 
 \code{\link{.AIFEBaseTransformer}},
 \code{\link{.AIFEBertTransformer}},
 \code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFERobertaTransformer}},
-\code{\link{.AIFETrConfig}},
-\code{\link{.AIFETrModel}},
-\code{\link{.AIFETrModelMLM}},
-\code{\link{.AIFETrObj}},
-\code{\link{.AIFETrTokenizer}},
-\code{\link{.aife_transformer.check_type}()}
+\code{\link{.AIFERobertaTransformer}}
 }
-\concept{Transformers for developers}
+\concept{R6 classes for transformers}
 \section{Super class}{
 \code{\link[aifeducation:.AIFEBaseTransformer]{aifeducation::.AIFEBaseTransformer}} -> \code{.AIFELongformerTransformer}
 }

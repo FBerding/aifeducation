@@ -19,11 +19,16 @@ If success - a model configuration, otherwise - an error (passed type is invalid
 Loads a configuration for a transformer with the passed type.
 }
 \seealso{
-Other Transformer: 
-\code{\link{AIFETrType}},
+Other Transformers for developers: 
+\code{\link{.AIFETrConfig}},
+\code{\link{.AIFETrModel}},
+\code{\link{.AIFETrModelMLM}},
+\code{\link{.AIFETrObj}},
+\code{\link{.AIFETrTokenizer}},
+\code{\link{.aife_transformer.check_type}()},
 \code{\link{aife_transformer.load_model}()},
 \code{\link{aife_transformer.load_model_mlm}()},
-\code{\link{aife_transformer.load_tokenizer}()},
-\code{\link{aife_transformer.make}()}
+\code{\link{aife_transformer.load_tokenizer}()}
 }
-\concept{Transformer}
+\concept{Transformers for developers}
+\keyword{internal}

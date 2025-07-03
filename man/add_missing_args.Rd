@@ -25,9 +25,9 @@ In general these are arguments that rely on objects of class \link{R6} which can
 be exported to a new R session.
 }
 \seealso{
-Other studio_utils: 
+Other Utils Studio Developers: 
 \code{\link{create_data_embeddings_description}()},
 \code{\link{long_load_target_data}()},
 \code{\link{summarize_args_for_long_task}()}
 }
-\concept{studio_utils}
+\concept{Utils Studio Developers}

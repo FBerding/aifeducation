@@ -12,7 +12,6 @@ mapping these objects allow to work with data sets which do not fit into memory/
 }
 \seealso{
 Other Data Management: 
-\code{\link{DataManagerClassifier}},
 \code{\link{EmbeddedText}},
 \code{\link{LargeDataSetForTextEmbeddings}}
 }

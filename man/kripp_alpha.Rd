@@ -30,8 +30,10 @@ Its Methodology (4th Ed.). SAGE
 }
 \seealso{
 Other performance measures: 
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{cohens_kappa}()},
 \code{\link{fleiss_kappa}()},
+\code{\link{get_coder_metrics}()},
 \code{\link{gwet_ac}()},
 \code{\link{kendalls_w}()}
 }

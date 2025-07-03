@@ -11,13 +11,14 @@ is \strong{not} designed for a direct application and should only be used by dev
 Abstract class for all models that do not rely on the python library 'transformers'.
 }
 \seealso{
-Other Classifiers for developers: 
+Other R6 Classes for Developers: 
 \code{\link{ClassifiersBasedOnTextEmbeddings}},
+\code{\link{LargeDataSetBase}},
 \code{\link{ModelsBasedOnTextEmbeddings}},
 \code{\link{TEClassifiersBasedOnProtoNet}},
 \code{\link{TEClassifiersBasedOnRegular}}
 }
-\concept{Classifiers for developers}
+\concept{R6 Classes for Developers}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{

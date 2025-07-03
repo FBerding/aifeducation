@@ -11,13 +11,14 @@ is \strong{not} designed for a direct application and should only be used by dev
 Base class for classifiers relying on \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} generated with a \link{TextEmbeddingModel}.
 }
 \seealso{
-Other Classifiers for developers: 
+Other R6 Classes for Developers: 
 \code{\link{AIFEBaseModel}},
+\code{\link{LargeDataSetBase}},
 \code{\link{ModelsBasedOnTextEmbeddings}},
 \code{\link{TEClassifiersBasedOnProtoNet}},
 \code{\link{TEClassifiersBasedOnRegular}}
 }
-\concept{Classifiers for developers}
+\concept{R6 Classes for Developers}
 \section{Super classes}{
 \code{\link[aifeducation:AIFEBaseModel]{aifeducation::AIFEBaseModel}} -> \code{\link[aifeducation:ModelsBasedOnTextEmbeddings]{aifeducation::ModelsBasedOnTextEmbeddings}} -> \code{ClassifiersBasedOnTextEmbeddings}
 }
