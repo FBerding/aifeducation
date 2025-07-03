@@ -109,7 +109,7 @@
           is_decoder = FALSE,
           use_cache = TRUE
         )
-        self$temp$model <- transformers$BertModel(configuration)
+        self$temp$model <- transformers$BertModel(configuration, add_pooling_layer = FALSE)
       }
     ),
 

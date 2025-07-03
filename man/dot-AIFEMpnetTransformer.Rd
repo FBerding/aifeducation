@@ -39,6 +39,7 @@ Other Transformers for developers:
 \code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFELongformerTransformer}},
+\code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFERobertaTransformer}},
 \code{\link{.AIFETrConfig}},
 \code{\link{.AIFETrModel}},
