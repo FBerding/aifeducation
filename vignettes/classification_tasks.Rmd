@@ -831,6 +831,12 @@ within a layer are averaged except padding tokens.
 
 After deciding about the configuration, you can use your model.
 
+You can see the number of learnable parameters of the underlying base model with
+
+```{r, include = TRUE, eval = TRUE}
+bert_modeling$count_parameter()
+```
+
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
 To transform raw text into a numeric representation, you only have to
@@ -1061,6 +1067,11 @@ That is, the 30 highest and the 30 lowest features are used for calculating
 the classes/labels. The number of values can be determined with `intermediate_features=30`.
 
 After you have created a new classifier, you can begin training.
+
+You can see the number of learnable parameters of your model with:
+```{r, include = TRUE, eval = TRUE}
+classifier$count_parameter()
+```
 
 ## 5.3 Training a Classifier
 

@@ -17,8 +17,11 @@
 #' @description Base class for classifiers relying on [EmbeddedText] or [LargeDataSetForTextEmbeddings] as input
 #' which use the architecture of Protonets and its corresponding training techniques.
 #'
-#' @return Objects of this class containing fields and methods used in several other classes in 'AI for Education'. This class
-#'   is **not** designed for a direct application and should only be used by developers.
+#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+#'
+#'This class is **not** designed for a direct application and should only be used by developers.
+#'
+#' @return A new object of this class.
 #' @family R6 Classes for Developers
 #' @export
 TEClassifiersBasedOnProtoNet <- R6::R6Class(

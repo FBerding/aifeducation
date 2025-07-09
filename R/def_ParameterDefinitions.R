@@ -17,6 +17,12 @@
 #' @keywords internal
 TEClassifiers_class_names <- c()
 
+#' @title Class names of all deprecated objects
+#' @description `vector` containing all class names as a string.
+#' @family Parameter Dictionary
+#' @keywords internal
+DeprecatedObjects<-c("TEClassifierProtoNet","TEClassifierRegular")
+
 #' @title Get names of classifiers
 #' @description Function returns the names of all classifiers which
 #' are child classes of a specific super class.

@@ -19,8 +19,11 @@
 #' All models of this class require text embeddings as input. These are provided as
 #' objects of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
 #'
-#' @return Objects of this class containing fields and methods used in several other classes in 'AI for education'. This class
-#'   is **not** designed for a direct application and should only be used by developers.
+#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+#'
+#'This class is **not** designed for a direct application and should only be used by developers.
+#'
+#' @return A new object of this class.
 #' @family R6 Classes for Developers
 #' @export
 ModelsBasedOnTextEmbeddings <- R6::R6Class(

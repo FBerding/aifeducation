@@ -131,9 +131,9 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       self.param_w2=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/3)),math.ceil(self.features_in-self.difference*(2/3))))
       self.param_w3=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/3))))
       
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map=None)
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map=None)
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w3",orthogonal_map=None)
+      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w1",orthogonal_map="matrix_exp")
+      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w2",orthogonal_map="matrix_exp")
+      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w3",orthogonal_map="matrix_exp")
       
       if not pad_value==0:
         self.switch_pad_value_start=layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)
@@ -154,12 +154,7 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
           x=~mask*x
         
         #Encoder
-        print("---")
-        #print(x)
-        print(self.param_w1)
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w1))
-        #print(x)
-        print("---")
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w2))
         
         #Latent Space

@@ -16,9 +16,11 @@
 
 #' @title Base class for models using neural nets
 #' @description Abstract class for all models that do not rely on the python library 'transformers'.
+#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
 #'
-#' @return Objects of this class containing fields and methods used in several other classes in 'AI for Education'. This class
-#'   is **not** designed for a direct application and should only be used by developers.
+#'This class is **not** designed for a direct application and should only be used by developers.
+#'
+#' @return A new object of this class.
 #' @family R6 Classes for Developers
 #' @export
 AIFEBaseModel <- R6::R6Class(
