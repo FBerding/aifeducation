@@ -424,7 +424,7 @@ TEClassifierProtoNet <- R6::R6Class(
         epochs = as.integer(self$last_training$config$epochs),
         sampling_separate = self$last_training$config$sampling_separate,
         sampling_shuffle = self$last_training$config$sampling_shuffle,
-        filepath = paste0(self$last_training$config$dir_checkpoint, "/best_weights.pt"),
+        filepath = paste0(private$dir_checkpoint, "/best_weights.pt"),
         n_classes = as.integer(length(self$model_config$target_levels)),
         log_dir = log_dir,
         log_write_interval = log_write_interval,

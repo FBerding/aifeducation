@@ -1015,7 +1015,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         train_data = pytorch_train_data,
         val_data = pytorch_val_data,
         test_data = pytorch_test_data,
-        filepath = paste0(self$last_training$config$dir_checkpoint, "/best_weights.pt"),
+        filepath = paste0(private$dir_checkpoint, "/best_weights.pt"),
         n_classes = as.integer(length(self$model_config$target_levels)),
         class_weights = torch$tensor(np$array(class_weights)),
         log_dir = log_dir,
