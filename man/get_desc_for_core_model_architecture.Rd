@@ -11,11 +11,11 @@ get_desc_for_core_model_architecture(
 )
 }
 \arguments{
+\item{name}{\code{string} Name of the core model.}
+
 \item{title_format}{\code{string} Kind of format of the title.}
 
 \item{inc_img}{\code{bool} Include a visualization of the layer.}
-
-\item{layer_name}{\code{string} Name of the core model.}
 }
 \value{
 Returns a \code{string} containing the description written in rmarkdown.

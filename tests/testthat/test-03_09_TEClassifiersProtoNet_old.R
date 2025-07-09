@@ -51,57 +51,52 @@ if (file.exists(root_path_feature_extractor)) {
 
 for (object_class_name in object_class_names) {
   for (n_classes in class_range) {
-    test_combinations <- generate_args_for_tests(
-      object_name = object_class_name,
-      method = "configure",
-      max_samples = check_adjust_n_samples_on_CI(
-        n_samples_requested = max_samples,
-        n_CI = max_samples_CI
-      ),
-      var_objects = list(
-        feature_extractor = feature_extractor
-      ),
-      necessary_objects = list(
-        text_embeddings = test_embeddings,
-        target_levels = target_levels[[n_classes]]
-      ),
-      var_override = list(
-        name = NULL,
-        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-        sustain_interval = 30,
-        act_fct = "elu",
-        rec_dropout = 0.1,
-        dense_dropout = 0.1,
-        encoder_dropout = 0.1,
-        trace = FALSE,
-        epochs = 50,
-        batch_size = 20,
-        ml_trace = 0,
-        n_cores = 2,
-        data_folds = 2,
-        pl_max_steps = 2,
-        pl_max = 1,
-        pl_anchor = 1,
-        pl_min = 0,
-        embedding_dim = 2,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        data_val_size = 0.25,
-        lr_rate = 1e-3,
-        optimizer = "adamw",
-        dense_size = 5,
-        rec_size = 5,
-        self_attention_heads = 2,
-        intermediate_size = 6,
-        lr_warm_up_ratio = 0.01
-      )
-    )
-
-
 
     # Embed----------------------------------------------------------------------
-    for (i in seq(test_combinations$n_combos)) {
+    for (i in 1:check_adjust_n_samples_on_CI(max_samples,max_samples_CI) ) {
       # Create test object with a given combination of args
+      test_combinations <- generate_args_for_tests(
+        object_name = object_class_name,
+        method = "configure",
+        var_objects = list(
+          feature_extractor = feature_extractor
+        ),
+        necessary_objects = list(
+          text_embeddings = test_embeddings,
+          target_levels = target_levels[[n_classes]]
+        ),
+        var_override = list(
+          name = NULL,
+          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+          sustain_interval = 30,
+          act_fct = "elu",
+          rec_dropout = 0.1,
+          dense_dropout = 0.1,
+          encoder_dropout = 0.1,
+          trace = FALSE,
+          epochs = 50,
+          batch_size = 20,
+          ml_trace = 0,
+          n_cores = 2,
+          data_folds = 2,
+          pl_max_steps = 2,
+          pl_max = 1,
+          pl_anchor = 1,
+          pl_min = 0,
+          embedding_dim = 2,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          data_val_size = 0.25,
+          lr_rate = 1e-3,
+          optimizer = "adamw",
+          dense_size = 5,
+          rec_size = 5,
+          self_attention_heads = 2,
+          intermediate_size = 6,
+          lr_warm_up_ratio = 0.01
+        )
+      )
+
       classifier <- create_object(object_class_name)
       do.call(
         what = classifier$configure,

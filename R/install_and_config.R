@@ -29,8 +29,7 @@
 #'   Studio.
 #' @param use_conda `bool` If `TRUE` installation installs 'miniconda' and uses 'conda' as package manager. If `FALSE`
 #' installation installs python and uses virtual environments for package management.
-#' @param `string` for selecting the version of python to be installed.
-#' @param python_version `string` Python version to use.
+#' @param python_version `string` Python version to use/install.
 #' @return Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
 #'   machine.
 #'

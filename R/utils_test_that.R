@@ -4,7 +4,6 @@
 #'These are used for automating tests of objects.
 #'@param object_name `string` Name of the object to generate the arguments for.
 #'@param method `string` Name of the method of the object to generate the arguments for.
-#'@param max_samples `int` Maximal number of combinations.
 #'@param var_objects `list` of other objects which should be combined with the other arguments.
 #'@param necessary_objects `list` of other objects which are part of every combination.
 #'@param var_override Named `list` containing the arguments which should be set to a specific value

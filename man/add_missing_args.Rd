@@ -21,7 +21,7 @@ requires.
 \description{
 This function is designed for taking the output of
 \code{summarize_args_for_long_task} as input. It adds the missing arguments.
-In general these are arguments that rely on objects of class \link{R6} which can not
+In general these are arguments that rely on objects of class R6 which can not
 be exported to a new R session.
 }
 \seealso{

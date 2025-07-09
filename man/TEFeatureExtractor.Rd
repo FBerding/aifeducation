@@ -93,6 +93,7 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   features = 128,
   method = "lstm",
+  orthogonal_method = "matrix_exp",
   noise_factor = 0.2
 )}\if{html}{\out{</div>}}
 }
@@ -111,6 +112,8 @@ is generated automatically. Allowed values: any}
 \item{\code{features}}{\code{int} Number of features the model should use. Allowed values: \code{1 <= x }}
 
 \item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'dense'} for dense layers. Allowed values: 'dense', 'lstm'}
+
+\item{\code{orthogonal_method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'dense'} for dense layers. Allowed values: 'dense', 'lstm'}
 
 \item{\code{noise_factor}}{\code{double} Value between 0 and a value lower 1 indicating how much noise should
 be added to the input during training. Allowed values: \verb{0 <= x <= 1}}

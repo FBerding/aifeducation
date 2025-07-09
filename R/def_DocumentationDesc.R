@@ -355,7 +355,7 @@ get_layer_documentation <- function(layer_name, title_format="bold",subtitle_for
 
 #' @title Generate documentation for core models
 #' @description Function for generating the documentation of a specific core model.
-#' @param layer_name `string` Name of the core model.
+#' @param name `string` Name of the core model.
 #' @param title_format `string` Kind of format of the title.
 #' @param inc_img `bool` Include a visualization of the layer.
 #'
@@ -511,4 +511,40 @@ build_layer_stack_documentation_for_vignette=function(){
   )
 
   return(markdown_syntax)
+}
+
+#' @title Build a homepage for the package
+#' @description Function build the homepage of the package. In order to use python
+#' the build process is run in the current environment.
+#' @return Function does nothing return. It builds the homepage for the package.
+#' @importFrom stringi stri_replace_all
+#' @family Parameter Dictionary
+#' @noRd
+#' @keywords internal
+build_aife_site=function(){
+  requireNamespace("pkgdown")
+  pkgdown::clean_site()
+  pkgdown::init_site()
+  pkgdown::build_home()
+  pkgdown::build_redirects()
+
+  #build site for articles
+  articles=list.files(
+    path = "vignettes",
+    pattern = "*.Rmd",
+    full.names = FALSE
+  )
+  articles=stringi::stri_replace_all(str=articles,regex = ".Rmd",replacement="")
+  for(article in articles){
+    pkgdown::build_article(
+      name=article,
+      new_process = FALSE,
+      quiet = FALSE
+    )
+  }
+
+  pkgdown::build_news()
+  pkgdown::build_redirects()
+
+  pkgdown::preview_site()
 }

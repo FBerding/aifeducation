@@ -16,12 +16,15 @@ editor_options:
 - Removed functions belonging to 'tensorflow'.
 - Added the possibility to install python packages either to a 'conda' environment
   or a virtual environment. Virtual environment is the new default.
+- Added functions for a more convenient preparation of a new session and for installing/updating python packages. 
 
 **Ai for Education Studio**
 
+- Implemented popovers to explain the different widgets. This feature will be extended in the future. 
 - Fixed a bug that prevented classifiers with applied pseudo labeling to visualize training history.
 - Re-created the user interface for classifiers, FeatureExtractor, and base models. Now the user interfaces
   generates the necessary control widgets for configuration and training automatically depending on the method's arguments. 
+- Added loading animations for the time widgets are generated.
 
 **TextEmbeddingModel**
 
@@ -41,6 +44,7 @@ editor_options:
 - Parameter 'name' in 'configure' is now optional. If set to `NULL` a unique name is
   generated automatically. 
 - Added Focal Loss as a new loss function to sequential classifiers.
+- Added four new classes of classifiers.
   
 **FeatureExtractor**
 

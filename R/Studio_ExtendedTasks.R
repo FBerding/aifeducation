@@ -156,7 +156,7 @@ long_models <- function(args) {
   promises::future_promise({
 
     # Set up py env
-    prepare_python(
+    prepare_session(
       env_type=args$configure$meta_args$py_environment_type,
       envname=args$configure$meta_args$py_env_name
     )
@@ -201,7 +201,7 @@ long_models <- function(args) {
 long_transformers <- function(args) {
   promises::future_promise({
     # Set up py env
-    prepare_python(
+    prepare_session(
       env_type=args[[1]]$meta_args$py_environment_type,
       envname=args[[1]]$meta_args$py_env_name
     )

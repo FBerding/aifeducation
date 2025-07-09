@@ -14,12 +14,10 @@ install_aifeducation(
 \item{install_aifeducation_studio}{\code{bool} If \code{TRUE} all necessary R packages are installed for using AI for Education
 Studio.}
 
-\item{python_version}{\code{string} Python version to use.}
+\item{python_version}{\code{string} Python version to use/install.}
 
 \item{use_conda}{\code{bool} If \code{TRUE} installation installs 'miniconda' and uses 'conda' as package manager. If \code{FALSE}
 installation installs python and uses virtual environments for package management.}
-
-\item{`string`}{for selecting the version of python to be installed.}
 }
 \value{
 Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a

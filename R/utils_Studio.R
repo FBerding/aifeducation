@@ -1149,7 +1149,7 @@ create_widget_card <- function(id,
     dict_entry <- param_dict[[param]]
     if (!is.null(dict_entry$gui_label)) {
       tmp_label <- dict_entry$gui_label
-      if (!is.null(dict_entry$values_desc)) {
+      #if (!is.null(dict_entry$values_desc)) {
         tmp_label_with_icon <- shiny::tags$p(
           bslib::popover(
             trigger = shiny::icon("info-circle"),
@@ -1160,13 +1160,17 @@ create_widget_card <- function(id,
                 inc_param_name=FALSE,
                 as_list = FALSE
               )
+            ),
+            options = list(
+              "trigger"="hover"#,
+              #"delay"="{'show': 0, 'hide': 500}"
             )
           ),
           dict_entry$gui_label
         )
-      } else {
-        tmp_label_with_icon <- dict_entry$gui_label
-      }
+      #} else {
+      #  tmp_label_with_icon <- dict_entry$gui_label
+      #}
     } else {
       tmp_label <- param
       tmp_label_with_icon <- param
@@ -1436,7 +1440,7 @@ summarize_args_for_long_task <- function(input,
 #' @title Add missing arguments to a list of arguments
 #' @description This function is designed for taking the output of
 #' `summarize_args_for_long_task` as input. It adds the missing arguments.
-#' In general these are arguments that rely on objects of class [R6] which can not
+#' In general these are arguments that rely on objects of class R6 which can not
 #' be exported to a new R session.
 #'
 #' @param args Named `list` List for arguments for the method of a specific class.

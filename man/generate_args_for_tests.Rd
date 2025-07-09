@@ -26,8 +26,6 @@ generate_args_for_tests(
 
 \item{var_override}{Named \code{list} containing the arguments which should be set to a specific value
 for all combinations.}
-
-\item{max_samples}{\code{int} Maximal number of combinations.}
 }
 \value{
 Returns a \code{list} with combinations of arguments.

@@ -47,6 +47,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param features `r get_param_doc_desc("features")`
     #' @param method `r get_param_doc_desc("method")`
+    #' @param orthogonal_method `r get_param_doc_desc("method")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
     #' @note This model requires `pad_value=0`. If this condition is not met the
@@ -57,6 +58,7 @@ TEFeatureExtractor <- R6::R6Class(
                          text_embeddings = NULL,
                          features = 128,
                          method = "lstm",
+                         orthogonal_method="matrix_exp",
                          noise_factor = 0.2) {
       args=get_called_args(n=1)
       private$check_config_for_FALSE()
@@ -467,7 +469,8 @@ TEFeatureExtractor <- R6::R6Class(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(self$model_config$features),
           noise_factor = self$model_config$noise_factor,
-          pad_value=private$text_embedding_model$pad_value
+          pad_value=private$text_embedding_model$pad_value,
+          orthogonal_method=self$model_config$orthogonal_method
         )
       }
     },

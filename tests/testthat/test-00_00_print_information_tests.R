@@ -18,4 +18,11 @@ if (Sys.getenv("CI") == "true") {
 }
 
 # Print python versions of the test system
-print(get_py_package_versions())
+if (Sys.getenv("CI") == "true") {
+  prepare_session(env_type ="conda",env_type = "r-reticulate")
+} else {
+  prepare_session()
+}
+
+#print(get_py_package_versions())
+

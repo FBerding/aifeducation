@@ -15,6 +15,7 @@ The \code{list} contains a \code{list} for every argument with the following com
 \item min: The minimal value the argument can be. Set to \code{NULL} if not relevant. Set to \code{-Inf} if there is no minimum.
 \item max: The maximal value the argument can be. Set to \code{NULL} if not relevant. Set to \code{Inf} if there is no Minimum.
 \item desc: A \code{string} which includes the description of the argument written in markdown. This string is for the documentation the parameter.
+\item values_desc: A named \code{list} containing a description of every possible value. The names must exactly match the strings in allowed_values. Descriptions should be written in markdown.
 \item allowed_values: \code{vector} of allowed values. This is only relevant if the argument is not numeric. During the checking of the arguments
 it is checked if the provided values can be found in this vector. If all values are allowed set to \code{NULL}.
 \item default_value: The default value of the argument. If there is no default set to \code{NULL}.
@@ -34,8 +35,6 @@ The aim of this list is to automatize argument checking and widget generation fo
 }
 \seealso{
 Other Parameter Dictionary: 
-\code{\link{DeprecatedObjects}},
-\code{\link{TEClassifiers_class_names}},
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
 \code{\link{get_deprecated_object_names}()},

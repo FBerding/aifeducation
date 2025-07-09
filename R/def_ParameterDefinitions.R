@@ -15,6 +15,7 @@
 #' @description `vector` containing all class names as a string.
 #' @family Parameter Dictionary
 #' @keywords internal
+#' @noRd
 TEClassifiers_class_names <- c()
 
 #' @title Get names of classifiers
@@ -47,6 +48,7 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
 #' @description `vector` containing all class names as a string.
 #' @family Parameter Dictionary
 #' @keywords internal
+#' @noRd
 DeprecatedObjects<-c("TEClassifierProtoNet","TEClassifierRegular")
 
 #' @title Get names of deprecated objects
@@ -75,6 +77,7 @@ return(DeprecatedObjects)
 #' * min: The minimal value the argument can be. Set to `NULL` if not relevant. Set to `-Inf` if there is no minimum.
 #' * max: The maximal value the argument can be. Set to `NULL` if not relevant. Set to `Inf` if there is no Minimum.
 #' * desc: A `string` which includes the description of the argument written in markdown. This string is for the documentation the parameter.
+#' * values_desc: A named `list` containing a description of every possible value. The names must exactly match the strings in allowed_values. Descriptions should be written in markdown.
 #' * allowed_values: `vector` of allowed values. This is only relevant if the argument is not numeric. During the checking of the arguments
 #'   it is checked if the provided values can be found in this vector. If all values are allowed set to `NULL`.
 #' * default_value: The default value of the argument. If there is no default set to `NULL`.
@@ -912,6 +915,21 @@ get_param_dict <- function() {
       gui_box = "General Settings",
       gui_label = "Method"
   )
+
+  param$orthogonal_method = list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c(" matrix_exp", "cayley","householder"),
+    desc = "Method for ensuring orthogonality of weights.",
+    default_historic="householder",
+    default_value = " matrix_exp",
+    gui_box = "General Settings",
+    gui_label = "Method"
+  )
+
+
   param$noise_factor = list(
       type = "double",
       allow_null = FALSE,
@@ -1558,3 +1576,6 @@ get_magnitude_values <- function(magnitude, n_elements = 9,max,min) {
   }
   return(unique(value_vector))
 }
+
+
+

@@ -14,8 +14,6 @@ Function returns the names of all objects that are deprecated.
 }
 \seealso{
 Other Parameter Dictionary: 
-\code{\link{DeprecatedObjects}},
-\code{\link{TEClassifiers_class_names}},
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
 \code{\link{get_magnitude_values}()},
