@@ -4,11 +4,14 @@
 \alias{ClassifiersBasedOnTextEmbeddings}
 \title{Abstract class for all classifiers that use numerical representations of texts instead of words.}
 \value{
-Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
-is \strong{not} designed for a direct application and should only be used by developers.
+A new object of this class.
 }
 \description{
 Base class for classifiers relying on \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} generated with a \link{TextEmbeddingModel}.
+
+Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+
+This class is \strong{not} designed for a direct application and should only be used by developers.
 }
 \seealso{
 Other R6 Classes for Developers: 

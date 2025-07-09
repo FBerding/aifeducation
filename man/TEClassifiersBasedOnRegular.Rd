@@ -4,11 +4,14 @@
 \alias{TEClassifiersBasedOnRegular}
 \title{Base class for regular classifiers relying on \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} as input}
 \value{
-Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
-is \strong{not} designed for a direct application and should only be used by developers.
+A new object of this class.
 }
 \description{
 Abstract class for all regular classifiers that use numerical representations of texts instead of words.
+
+Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+
+This class is \strong{not} designed for a direct application and should only be used by developers.
 }
 \seealso{
 Other R6 Classes for Developers: 

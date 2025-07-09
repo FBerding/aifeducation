@@ -8,7 +8,7 @@ Returns a new object of this class.
 }
 \description{
 This object contains public and private methods which may be useful for every large data sets. Objects
-of this class are not intended to be used directly. \link{LargeDataSetForTextEmbeddings} or \link{LargeDataSetForText}.
+of this class are not intended to be used directly.
 }
 \seealso{
 Other R6 Classes for Developers: 

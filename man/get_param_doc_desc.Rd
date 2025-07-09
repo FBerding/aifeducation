@@ -19,9 +19,11 @@ Its aim is to be used for documenting the parameter of functions.
 }
 \seealso{
 Other Parameter Dictionary: 
+\code{\link{DeprecatedObjects}},
 \code{\link{TEClassifiers_class_names}},
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
+\code{\link{get_deprecated_object_names}()},
 \code{\link{get_magnitude_values}()},
 \code{\link{get_param_def}()},
 \code{\link{get_param_dict}()}

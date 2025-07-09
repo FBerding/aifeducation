@@ -38,7 +38,7 @@ get_layer_dict <- function(layer) {
     img = "layers_tf_encoder.png",
     references = c(
       "Chollet, F., Kalinowski, T. & Allaire, J. J. (2022). Deep learning with R (Second edition). Manning Publications Co. <https://learning.oreilly.com/library/view/-/9781633439849/?ar>",
-      "Devlin, J., Chang, M.‑W., Lee, K. & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. Doran & T. Solorio (Hrsg.), Proceedings of the 2019 Conference of the North (S. 4171–4186). Association for Computational Linguistics. <https://doi.org/10.18653/v1/N19-1423>"
+      "Devlin, J., Chang, M.-W., Lee, K. & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. Doran & T. Solorio (Hrsg.), Proceedings of the 2019 Conference of the North (S. 4171-4186). Association for Computational Linguistics. <https://doi.org/10.18653/v1/N19-1423>"
     ),
     param_prefix = "tf_"
   )
@@ -77,7 +77,7 @@ get_layer_dict <- function(layer) {
     img = "layers_ng_conv.png",
     references = c(
       "Jacovi, A., Shalom, O. S. & Goldberg, Y. (2018). Understanding Convolutional Neural Networks for Text Classification. https://doi.org/10.48550/arXiv.1809.08037",
-      "Pham, N.‑Q., Kruszewski, G. & Boleda, G. (2016). Convolutional Neural Network Language Models. In J. Su, K. Duh & X. Carreras (Hrsg.), Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (S. 1153–1162). Association for Computational Linguistics. https://doi.org/10.18653/v1/D16-1123"
+      "Pham, N.-Q., Kruszewski, G. & Boleda, G. (2016). Convolutional Neural Network Language Models. In J. Su, K. Duh & X. Carreras (Hrsg.), Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (S. 1153-1162). Association for Computational Linguistics. https://doi.org/10.18653/v1/D16-1123"
     ),
     param_prefix = "ng_conv_"
   )

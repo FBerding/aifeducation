@@ -4,6 +4,11 @@
 \alias{TEFeatureExtractor}
 \title{Feature extractor for reducing the number for dimensions of text embeddings.}
 \value{
+A new instances of this class.
+}
+\description{
+Abstract class for auto encoders with 'pytorch'.
+
 Objects of this class are used for reducing the number of dimensions of text embeddings created by an object
 of class \link{TextEmbeddingModel}.
 
@@ -19,9 +24,6 @@ orthogonal weights. In addition, training tries to train the model to achieve un
 
 Objects of class \link{TEFeatureExtractor} are designed to be used with classifiers such as \link{TEClassifierRegular} and
 \link{TEClassifierProtoNet}.
-}
-\description{
-Abstract class for auto encoders with 'pytorch'.
 }
 \note{
 \code{features} refers to the number of features for the compressed text embeddings.
@@ -91,8 +93,7 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   features = 128,
   method = "lstm",
-  noise_factor = 0.2,
-  optimizer = "adamw"
+  noise_factor = 0.2
 )}\if{html}{\out{</div>}}
 }
 
@@ -113,8 +114,6 @@ is generated automatically. Allowed values: any}
 
 \item{\code{noise_factor}}{\code{double} Value between 0 and a value lower 1 indicating how much noise should
 be added to the input during training. Allowed values: \verb{0 <= x <= 1}}
-
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }
@@ -142,7 +141,8 @@ Method for training a neural net.
   log_dir = NULL,
   log_write_interval = 10,
   lr_rate = 0.001,
-  lr_warm_up_ratio = 0.02
+  lr_warm_up_ratio = 0.02,
+  optimizer = "adamw"
 )}\if{html}{\out{</div>}}
 }
 
@@ -184,6 +184,8 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
 \item{\code{lr_rate}}{\code{double} Initial learning rate for the training.}
 
 \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up.}
+
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
 }
 \if{html}{\out{</div>}}
 }

@@ -20,6 +20,8 @@ created with the same \link{TextEmbeddingModel} as for training.
 }
 \description{
 Abstract class for neural nets with 'pytorch'.
+
+This class is \strong{deprecated}. Please use an Object of class \link{TEClassifierSequential} instead.
 }
 \note{
 This model requires \code{pad_value=0}. If this condition is not met the

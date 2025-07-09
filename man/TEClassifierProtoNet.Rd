@@ -15,6 +15,8 @@ class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} has to be used
 \description{
 Abstract class for neural nets with 'pytorch'.
 
+This class is \strong{deprecated}. Please use an Object of class \link{TEClassifierSequentialPrototype} instead.
+
 This object represents in implementation of a prototypical network for few-shot learning as described by Snell,
 Swersky, and Zemel (2017). The network uses a multi way contrastive loss described by Zhang et al. (2019). The
 network learns to scale the metric as described by Oreshkin, Rodriguez, and Lacoste (2018)

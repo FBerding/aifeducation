@@ -13,11 +13,13 @@ objects allow to work with data sets which do not fit into memory/RAM.
 
 \link{LargeDataSetForTextEmbeddings} are used for storing and managing the text embeddings created with objects of class
 \link{TextEmbeddingModel}. Objects of class \link{LargeDataSetForTextEmbeddings} serve as input for objects of class
-\link{TEClassifierRegular}, \link{TEClassifierProtoNet}, and \link{TEFeatureExtractor}. The main aim of this class is to provide a
+\link{ClassifiersBasedOnTextEmbeddings} and \link{TEFeatureExtractor}. The main aim of this class is to provide a
 structured link between embedding models and classifiers. Since objects of this class save information on the text
-embedding model that created the text embedding it ensures that only embedding generated with same embedding model
+embedding model that created the text embedding it ensures that only embeddings generated with same embedding model
 are combined. Furthermore, the stored information allows objects to check if embeddings of the correct text
 embedding model are used for training and predicting.
+
+This class is not designed for a direct use.
 }
 \seealso{
 Other Data Management: 
