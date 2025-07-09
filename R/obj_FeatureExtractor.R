@@ -192,7 +192,12 @@ TEFeatureExtractor <- R6::R6Class(
       data <- reduce_to_unique(data, "id")
 
       # Copy input as label for training
-      extractor_dataset <- data$map(py$map_input_to_labels)
+      extractor_dataset <- data$map(
+        py$map_input_to_labels,
+        load_from_cache_file=FALSE,
+        keep_in_memory=FALSE,
+        cache_file_name=paste0(create_and_get_tmp_dir(),"/",generate_id(15))
+        )
 
       #Check and create temporary directory for checkpoints
       private$create_checkpoint_directory()

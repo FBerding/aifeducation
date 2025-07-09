@@ -583,10 +583,15 @@ DataManagerClassifier <- R6::R6Class(
     add_matrix_form = function(dataset) {
       if (!is.null(dataset)) {
         private$load_reload_python_scripts()
-        dataset <- dataset$map(py$map_input_to_matrix_form, fn_kwargs = list(
+        dataset <- dataset$map(py$map_input_to_matrix_form,
+                               fn_kwargs = list(
           times = as.integer(self$config$times),
           features = as.integer(self$config$features)
-        ))
+        ),
+        load_from_cache_file=FALSE,
+        keep_in_memory=FALSE,
+        cache_file_name=paste0(create_and_get_tmp_dir(),"/",generate_id(15))
+        )
         return(dataset)
       } else {
         return(NULL)
@@ -596,7 +601,10 @@ DataManagerClassifier <- R6::R6Class(
       if (!is.null(dataset)) {
         private$load_reload_python_scripts()
         dataset <- dataset$map(py$map_labels_to_one_hot,
-          fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes)))
+          fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes))),
+          load_from_cache_file=FALSE,
+          keep_in_memory=FALSE,
+          cache_file_name=paste0(create_and_get_tmp_dir(),"/",generate_id(15))
         )
         return(dataset)
       } else {

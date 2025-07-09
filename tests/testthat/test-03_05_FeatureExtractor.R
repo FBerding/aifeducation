@@ -45,8 +45,7 @@ for (framework in ml_frameworks) {
         text_embeddings = dataset_list[[data_type]],
         features = 128,
         method = method,
-        noise_factor = 0.2,
-        optimizer = "adam"
+        noise_factor = 0.2
       )
 
       # Train-----------------------------------------------------------------
@@ -61,7 +60,7 @@ for (framework in ml_frameworks) {
             sustain_interval = 15,
             epochs = 2,
             batch_size = 100,
-
+            optimizer = "adam",
             trace = FALSE,
             ml_trace = 0
           )

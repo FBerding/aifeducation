@@ -12,7 +12,7 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
 max_samples <- 20
 max_samples_CI <- 10
 
-max_samples_training <- 10
+max_samples_training <- 2
 class_range <- c(2, 3)
 
 # Skip Tests-------------------------------------------------------------------

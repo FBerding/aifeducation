@@ -933,10 +933,10 @@ create_data_embeddings_description <- function(embeddings) {
 
 create_data_raw_texts_description <- function(data_set_for_raw_texts) {
   ui <- bslib::value_box(
-      value = data_set_for_raw_texts$n_rows(),
-      title = "Number of Cases",
-      showcase = shiny::icon("list")
-    )
+    value = data_set_for_raw_texts$n_rows(),
+    title = "Number of Cases",
+    showcase = shiny::icon("list")
+  )
   return(ui)
 }
 
@@ -977,7 +977,7 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
     "shiny" = "1.9.0",
     "shinyFiles" = NULL,
     "shinyWidgets" = NULL,
-    "shinycssloaders"=NULL,
+    "shinycssloaders" = NULL,
     "sortable" = NULL,
     "bslib" = NULL,
     "future" = NULL,
@@ -1147,10 +1147,22 @@ create_widget_card <- function(id,
   tmp_boxes <- list()
   for (param in params) {
     dict_entry <- param_dict[[param]]
-    if(!is.null(dict_entry$gui_label)){
-      tmp_label=dict_entry$gui_label
+    if (!is.null(dict_entry$gui_label)) {
+      tmp_label <- dict_entry$gui_label
+      if (!is.null(dict_entry$values_desc)) {
+        tmp_label_with_icon <- shiny::tags$p(
+          bslib::popover(
+            trigger = shiny::icon("info-circle"),
+            shiny::includeMarkdown(dict_entry$values_desc)
+          ),
+          dict_entry$gui_label
+        )
+      } else {
+        tmp_label_with_icon <- dict_entry$gui_label
+      }
     } else {
-      tmp_label=param
+      tmp_label <- param
+      tmp_label_with_icon <- param
     }
     if (!is.null(dict_entry$gui_box)) {
       if (dict_entry$type == "int") {
@@ -1168,7 +1180,7 @@ create_widget_card <- function(id,
 
         widget <- shiny::numericInput(
           inputId = shiny::NS(id, param),
-          label = tmp_label,
+          label = tmp_label_with_icon,
           value = dict_entry$default_value,
           min = tmp_min,
           max = tmp_max
@@ -1177,7 +1189,7 @@ create_widget_card <- function(id,
         if (param == "sustain_iso_code") {
           widget <- shiny::selectInput(
             inputId = shiny::NS(id, param),
-            label = tmp_label,
+            label = tmp_label_with_icon,
             choices = get_alpha_3_codes(),
             selected = dict_entry$default_value,
             multiple = FALSE
@@ -1186,21 +1198,21 @@ create_widget_card <- function(id,
           if (!is.null(dict_entry$allowed_values)) {
             widget <- shiny::selectInput(
               inputId = shiny::NS(id, param),
-              label = tmp_label,
+              label = tmp_label_with_icon,
               choices = dict_entry$allowed_values,
               multiple = FALSE
             )
           } else {
             widget <- shiny::textInput(
               inputId = shiny::NS(id, param),
-              label = tmp_label
+              label = tmp_label_with_icon
             )
           }
         }
       } else if (dict_entry$type == "bool") {
         widget <- shinyWidgets::materialSwitch(
           inputId = shiny::NS(id, param),
-          label = tmp_label,
+          label = tmp_label_with_icon,
           value = dict_entry$default_value
         )
       } else if (dict_entry$type == "double" |
@@ -1211,7 +1223,7 @@ create_widget_card <- function(id,
           if (!is.null(dict_entry$magnitude)) {
             widget <- shiny::selectInput(
               inputId = shiny::NS(id, param),
-              label = tmp_label,
+              label = tmp_label_with_icon,
               choices = get_magnitude_values(
                 min = dict_entry$min,
                 max = dict_entry$max,
@@ -1238,7 +1250,7 @@ create_widget_card <- function(id,
 
             widget <- shiny::sliderInput(
               inputId = shiny::NS(id, param),
-              label = tmp_label,
+              label = tmp_label_with_icon,
               value = dict_entry$default_value,
               min = tmp_min,
               max = tmp_max,
@@ -1254,33 +1266,37 @@ create_widget_card <- function(id,
     }
   }
 
-  #Sort Boxes
-  box_names=names(tmp_boxes)
-  if("General Settings"%in%box_names){
-    reduced_names=setdiff(x=box_names,"General Settings")
-    ordered_names=c("General Settings",
-                    reduced_names[order(reduced_names)])
+  # Sort Boxes
+  box_names <- names(tmp_boxes)
+  if ("General Settings" %in% box_names) {
+    reduced_names <- setdiff(x = box_names, "General Settings")
+    ordered_names <- c(
+      "General Settings",
+      reduced_names[order(reduced_names)]
+    )
   } else {
-    ordered_names=box_names[order(box_names)]
+    ordered_names <- box_names[order(box_names)]
   }
-  tmp_boxes=tmp_boxes[ordered_names]
+  tmp_boxes <- tmp_boxes[ordered_names]
 
-  #Sort Widgets
-  for(i in 1:length(tmp_boxes)){
-    current_box=tmp_boxes[[i]]
-    tmp_names=names(current_box)
-    #Ensure that parameters starting with use are displayed first
-    is_use_string=stringi::stri_detect(str=tolower(tmp_names),regex = "^use([:alnum:]*)")
-    if(max(is_use_string)>=1){
-      use_string=tmp_names[which(is_use_string)]
-      reduced_names=setdiff(x=tmp_names,y=use_string)
-      ordered_names=c(use_string,
-                      reduced_names[order(reduced_names)])
+  # Sort Widgets
+  for (i in 1:length(tmp_boxes)) {
+    current_box <- tmp_boxes[[i]]
+    tmp_names <- names(current_box)
+    # Ensure that parameters starting with use are displayed first
+    is_use_string <- stringi::stri_detect(str = tolower(tmp_names), regex = "^use([:alnum:]*)")
+    if (max(is_use_string) >= 1) {
+      use_string <- tmp_names[which(is_use_string)]
+      reduced_names <- setdiff(x = tmp_names, y = use_string)
+      ordered_names <- c(
+        use_string,
+        reduced_names[order(reduced_names)]
+      )
     } else {
-      ordered_names=tmp_names[order(tmp_names)]
+      ordered_names <- tmp_names[order(tmp_names)]
     }
-    current_box=current_box[ordered_names]
-    tmp_boxes[i]=list(current_box)
+    current_box <- current_box[ordered_names]
+    tmp_boxes[i] <- list(current_box)
   }
 
   # Create boxes with widgets
@@ -1290,9 +1306,9 @@ create_widget_card <- function(id,
       bslib::card(
         bslib::card_header(names(tmp_boxes)[i]),
         bslib::card_body(
-          #bslib::layout_column_wrap(
-            tmp_boxes[[i]]
-          #)
+          # bslib::layout_column_wrap(
+          tmp_boxes[[i]]
+          # )
         )
       )
     )
@@ -1354,7 +1370,7 @@ summarize_args_for_long_task <- function(input,
                                          method = "configure",
                                          path_args = list(
                                            path_to_embeddings = NULL,
-                                           path_to_textual_dataset=NULL,
+                                           path_to_textual_dataset = NULL,
                                            path_to_target_data = NULL,
                                            path_to_feature_extractor = NULL,
                                            destination_path = NULL,
@@ -1362,12 +1378,11 @@ summarize_args_for_long_task <- function(input,
                                          ),
                                          override_args = list(),
                                          meta_args = list(
-                                           py_environment_type=get_py_env_type(),
-                                           py_env_name=get_py_env_name(),
+                                           py_environment_type = get_py_env_type(),
+                                           py_env_name = get_py_env_name(),
                                            target_data_column = input$data_target_column,
-                                           object_class=input$classifier_type
-                                         )
-                                         ) {
+                                           object_class = input$classifier_type
+                                         )) {
   # Create object in order to get relevant arguments
   object <- create_object(object_class)
 
@@ -1392,7 +1407,7 @@ summarize_args_for_long_task <- function(input,
   if ("lr_rate" %in% params) {
     param_list["lr_rate"] <- list(as.numeric(param_list[["lr_rate"]]))
   }
-  if ("learning_rate" %in%params) {
+  if ("learning_rate" %in% params) {
     param_list["learning_rate"] <- list(as.numeric(param_list[["learning_rate"]]))
   }
 
@@ -1456,7 +1471,7 @@ add_missing_args <- function(args, path_args, meta_args) {
           selectet_column = meta_args$target_data_column
         )
       )
-    } else if (max(c("EmbeddedText","LargeDataSetForText") %in% current_param$type)){
+    } else if (max(c("EmbeddedText", "LargeDataSetForText") %in% current_param$type)) {
       complete_args[param] <- list(
         load_from_disk(path_args$path_to_textual_dataset)
       )

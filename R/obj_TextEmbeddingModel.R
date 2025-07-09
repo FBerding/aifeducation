@@ -103,7 +103,7 @@ TextEmbeddingModel <- R6::R6Class(
       tmp_config <- transformers$AutoConfig$from_pretrained(model_dir)
       method<-detect_base_model_type(tmp_config)
       private$basic_components$method <- method
-      if(method=="modernbert"|method=="funnel"){
+      if(method=="modernbert"|method=="funnel"|method=="deberta_v2"){
         tmp_model<-transformers$AutoModel$from_pretrained(model_dir, config = tmp_config)
       } else {
         tmp_model<-transformers$AutoModel$from_pretrained(model_dir, config = tmp_config, add_pooling_layer = FALSE)
