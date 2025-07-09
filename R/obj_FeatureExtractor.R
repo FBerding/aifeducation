@@ -48,7 +48,6 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param features `r get_param_doc_desc("features")`
     #' @param method `r get_param_doc_desc("method")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
-    #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
     #' @note This model requires `pad_value=0`. If this condition is not met the
     #' padding value is switched automatically.
@@ -58,8 +57,7 @@ TEFeatureExtractor <- R6::R6Class(
                          text_embeddings = NULL,
                          features = 128,
                          method = "lstm",
-                         noise_factor = 0.2,
-                         optimizer = "adamw") {
+                         noise_factor = 0.2) {
       args=get_called_args(n=1)
       private$check_config_for_FALSE()
 
@@ -139,6 +137,7 @@ TEFeatureExtractor <- R6::R6Class(
     #'   the console. \code{ml_trace=1} prints a progress bar.
     #' @param lr_rate `double` Initial learning rate for the training.
     #' @param lr_warm_up_ratio `double` Number of epochs used for warm up.
+    #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
@@ -155,7 +154,8 @@ TEFeatureExtractor <- R6::R6Class(
                      log_dir = NULL,
                      log_write_interval = 10,
                      lr_rate=1e-3,
-                     lr_warm_up_ratio=0.02) {
+                     lr_warm_up_ratio=0.02,
+                     optimizer = "adamw") {
       args=get_called_args(n=1)
       check_all_args(args=args)
       self$check_embedding_model(data_embeddings)
@@ -214,7 +214,7 @@ TEFeatureExtractor <- R6::R6Class(
       #Start Training----------------------------------------------------------
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
         model = self$model,
-        optimizer_method = self$model_config$optimizer,
+        optimizer_method = self$last_training$config$optimizer,
         lr_rate=self$last_training$config$lr_rate,
         lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),

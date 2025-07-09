@@ -148,7 +148,7 @@ class dense_layer_with_mask(torch.nn.Module):
             dtype=dtype
             )
     if self.parametrizations=="orthogonal":
-      torch.nn.utils.parametrizations.orthogonal(module=self.dense, name='weight')
+      torch.nn.utils.parametrizations.orthogonal(module=self.dense, name='weight',orthogonal_map="matrix_exp")
     elif self.parametrizations=="weight_norm":
       torch.nn.utils.parametrizations.weight_norm(module=self.dense, name='weight', dim=0)
     elif self.parametrizations=="spectral_norm":
@@ -324,7 +324,7 @@ class layer_n_gram_convolution(torch.nn.Module):
     self.act_fct=get_act_fct(self.act_fct_name)
     
     if self.parametrizations=="orthogonal":
-      torch.nn.utils.parametrizations.orthogonal(module=self.conv_layer, name='weight')
+      torch.nn.utils.parametrizations.orthogonal(module=self.conv_layer, name='weight',orthogonal_map="matrix_exp")
     elif self.parametrizations=="weight_norm":
       torch.nn.utils.parametrizations.weight_norm(module=self.conv_layer, name='weight', dim=0)
     elif self.parametrizations=="spectral_norm":

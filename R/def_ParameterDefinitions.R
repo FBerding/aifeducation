@@ -1057,7 +1057,7 @@ get_param_dict <- function() {
     desc = "Re-Parametrizations for all layers except recurrent layers.",
     values_desc=list(
       "None"="Does not apply any re-parametrizations.",
-      "orthogonal"="Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function.",
+      "orthogonal"="Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
       "weight_norm"="Applies a weight norm with the default settings of PyTorch's corresponding function.Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
       "spectral_norm"="Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
     ),
