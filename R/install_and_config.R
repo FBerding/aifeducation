@@ -170,6 +170,7 @@ install_aifeducation_studio=function(){
     "shiny",
     "shinyFiles",
     "shinyWidgets",
+    "shinycssloaders",
     "sortable",
     "bslib",
     "future",

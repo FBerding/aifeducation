@@ -70,6 +70,7 @@ Suggests:
     shiny(>= 1.9.0),
     shinyFiles,
     shinyWidgets,
+    shinycssloaders,
     sortable,
     testthat (>= 3.0.0)
 LinkingTo: 

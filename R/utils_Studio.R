@@ -977,6 +977,7 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
     "shiny" = "1.9.0",
     "shinyFiles" = NULL,
     "shinyWidgets" = NULL,
+    "shinycssloaders"=NULL,
     "sortable" = NULL,
     "bslib" = NULL,
     "future" = NULL,
@@ -1033,7 +1034,7 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
     }
   }
 
-  prepare_python(env_type = env_type, envname = "aifeducation")
+  prepare_session(env_type = env_type, envname = "aifeducation")
 
   message("Checking pytorch machine learning framework.")
   available_ml_frameworks <- NULL

@@ -196,18 +196,14 @@ Training_Server <- function(id, model) {
 
           # Plot for classifiers-----------------------------------------------
         } else if (
-          "TEClassifierRegular" %in% class(model()) ||
-            "TEClassifierProtoNet" %in% class(model()) ||
+          ClassifiersBasedOnTextEmbeddings %in% class(model()) ||
             "TEFeatureExtractor" %in% class(model())
         ) {
           # Necessary input
           shiny::req(input$measure)
 
           # Get data for plotting
-          if (
-            "TEClassifierRegular" %in% class(model()) ||
-              "TEClassifierProtoNet" %in% class(model())
-          ) {
+          if ("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
             plot_data <- prepare_training_history(
               model = model(),
               final = input$training_phase,

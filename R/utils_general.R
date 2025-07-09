@@ -211,7 +211,7 @@ create_object=function(class){
   } else if (class == "EmbeddedText") {
     return(EmbeddedText$new())
   } else if(class%in%unlist(AIFETrType)){
-    return(aife_transformer.make(class))
+    return(aife_transformer.make(type=class,init_trace = FALSE))
   } else {
     stop("Object is not implemented in this function.")
   }

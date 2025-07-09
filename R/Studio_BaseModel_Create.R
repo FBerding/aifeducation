@@ -48,7 +48,9 @@ BaseModel_Create_UI <- function(id) {
             label = shiny::tags$p(shiny::icon("folder"), "Path"),
             width="100%"
           ),
-          shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
+          shinycssloaders::withSpinner(
+            shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
+          )
         )
       ),
       #Main config Cards

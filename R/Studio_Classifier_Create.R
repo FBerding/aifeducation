@@ -119,8 +119,12 @@ Classifiers_Create_UI <- function(id) {
         )
       ),
       #Main config Cards
-      shiny::uiOutput(outputId = shiny::NS(id,"model_configuration")),
+      shinycssloaders::withSpinner(
+      shiny::uiOutput(outputId = shiny::NS(id,"model_configuration"))
+      ),
+      shinycssloaders::withSpinner(
       shiny::uiOutput(outputId = shiny::NS(id,"training_setup"))
+      )
     )
   )
 }
