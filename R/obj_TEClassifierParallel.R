@@ -80,7 +80,7 @@ TEClassifierParallel <- R6::R6Class(
     #' @param merge_attention_type `r get_param_doc_desc("merge_attention_type")`
     #' @param merge_num_heads `r get_param_doc_desc("merge_num_heads")`
     #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
-    #' @return Returns an object of class [TEClassifierRegular] which is ready for training.
+    #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,

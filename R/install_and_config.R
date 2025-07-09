@@ -150,9 +150,9 @@ update_aifeducation=function(update_aifeducation_studio = TRUE,
     install_aifeducation_studio()
   }
 
-  cat("\n======================================================")
-  cat("\n Update successful. Please restart R/R Studio.")
   cat("\n======================================================\n")
+  cat(" Update successful. Please restart R/R Studio.\n")
+  cat("======================================================\n")
 }
 
 #' @title Install 'AI for Education - Studio' on a machine
@@ -417,7 +417,7 @@ set_transformers_logger <- function(level = "ERROR") {
 #'
 #' @family Installation and Configuration
 #' @export
-prepare_python <- function(env_type = "auto", envname = "aifeducation") {
+prepare_session <- function(env_type = "auto", envname = "aifeducation") {
   if (!reticulate::py_available(FALSE)) {
     message("Python is not initalized.")
     if (env_type == "auto") {
@@ -474,6 +474,20 @@ prepare_python <- function(env_type = "auto", envname = "aifeducation") {
     }
     message("Try to use this environment.")
   }
+
+  #Print information
+  message(paste0("Detected OS: ",detec_os()))
+  message("Checking python packages. This can take a moment.")
+  if(check_aif_py_modules(trace = FALSE)){
+    message("All necessary python packages are available.")
+  } else {
+    stop("Not all required python packages are available. Call check_aif_py_modules for details.")
+  }
+
+  pkg_versions=get_py_package_versions()
+  message(paste(paste0(names(pkg_versions),":"),pkg_versions,collapse = "\n"))
+  message("GPU Acceleration: ",torch$cuda$is_available())
+  message(paste("Location for Temporary Files:"),create_and_get_tmp_dir())
 }
 
 #' @title Function for detecting the OS..

@@ -7,12 +7,12 @@ testthat::skip_if_not(
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
 #object_class_names=c("TEClassifierSequential")
 #object_class_names="TEClassifierParallelPrototype"
-object_class_names="TEClassifierSequentialPrototype"
+#object_class_names="TEClassifierSequentialPrototype"
 
-max_samples <- 2
-max_samples_CI <- 50
+max_samples <- 20
+max_samples_CI <- 10
 
-max_samples_training <- 2
+max_samples_training <- 10
 class_range <- c(2, 3)
 
 # Skip Tests-------------------------------------------------------------------
@@ -70,7 +70,7 @@ for (object_class_name in object_class_names) {
   # Test for different number of classes
   for (n_classes in class_range) {
     for (i in 1:check_adjust_n_samples_on_CI(n_samples_requested=max_samples,
-                                             n_CI = 50)) {
+                                             n_CI = max_samples_CI)) {
       # Core Tests of the models-------------------------------------------------
       if (!skip_creation_test) {
         # Create a List of all relevant combinations of arguments and reduce the number

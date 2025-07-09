@@ -221,11 +221,16 @@ tokenize_dataset <- function(dataset, tokenizer, max_length,
 
   batch_size <- 2L
 
+  id=as.character(generate_id(16))
+
   tokenized_texts_raw <- dataset$map(
     py$tokenize_raw_text,
     batched = TRUE,
     batch_size = batch_size,
     load_from_cache_file=FALSE,
+    keep_in_memory=FALSE,
+    cache_file_name=paste0(create_and_get_tmp_dir(),"/",id),
+    new_fingerprint=id,
     fn_kwargs = reticulate::dict(
       list(
         tokenizer = tokenizer,

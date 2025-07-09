@@ -15,10 +15,10 @@
 #' @title Data manager for classification tasks
 #'
 #' @description Abstract class for managing the data and samples during training a classifier. DataManagerClassifier is
-#'   used with [TEClassifierRegular] and [TEClassifierProtoNet].
+#'   used with all classifiers based on text embeddings.
 #'
 #' @return Objects of this class are used for ensuring the correct data management for training different types of
-#'   classifiers. Objects of this class are also used for data augmentation by creating synthetic cases with different
+#'   classifiers. They are also used for data augmentation by creating synthetic cases with different
 #'   techniques.
 #' @family Data Management Developers
 #' @export

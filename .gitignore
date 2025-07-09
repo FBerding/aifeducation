@@ -19,6 +19,9 @@ tests/testthat/test_data/bert/
 tests/testthat/test_artefacts/
 tests/testthat/test_data/roberta/
 tests/testthat/test_data/longformer/
+
+vignettes/examples
+
 cran-comments.md
 /doc/
 /Meta/

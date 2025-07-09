@@ -21,6 +21,8 @@ navbar:
         href: "articles/model_configuration.html"
       - text: "05 Sharing and Using Trained AI/Models"
         href: "articles/sharing_and_publishing.html"
+      - text: "Appendix 01 Layers and Stacks"
+        href: "articles/a01_layers_stacks.html"
       - text: -------
       - text: "For developers"
       - text: "01 Transformers"
@@ -104,6 +106,10 @@ reference:
 - subtitle: Utils General
 - contents:
   - has_concept("Utils Developers")
+
+- subtitle: Utils Documentation
+- contents:
+  - has_concept("Utils Documentation")
 
 - subtitle: Utils Python
 - contents:

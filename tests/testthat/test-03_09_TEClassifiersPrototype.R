@@ -52,87 +52,67 @@ if (file.exists(root_path_feature_extractor)) {
 
 for (object_class_name in object_class_names) {
   for (n_classes in class_range) {
-    test_combinations <- generate_args_for_tests(
-      object_name = object_class_name,
-      method = "configure",
-      max_samples = check_adjust_n_samples_on_CI(
-        n_samples_requested = max_samples,
-        n_CI = max_samples_CI
-      ),
-      var_objects = list(
-        feature_extractor = feature_extractor
-      ),
-      necessary_objects = list(
-        text_embeddings = test_embeddings,
-        target_levels = target_levels[[n_classes]]
-      ),
-      var_override = list(
-        name = NULL,
-        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-        sustain_interval = 30,
-        act_fct = "elu",
-        rec_dropout = 0.1,
-        dense_dropout = 0.1,
-        encoder_dropout = 0.1,
-        feat_size=128,
-        intermediate_features=10,
-        tf_dense_dim=26,
-        tf_parametrizations="None",
-        dense_parametrizations="None",
-        rec_parametrizations="None",
-        conv_parametrizations="None",
-        tf_act_fct="elu",
-        dense_act_fct="gelu",
-        conv_act_fct="relu",
-        rec_act_fct="tanh",
-        feat_act_fct="prelu",
-        tf_num_heads=2,
-        tf_bias=TRUE,
-        dense_bias=TRUE,
-        rec_bias=TRUE,
-        conv_bias=TRUE,
-        dense_dropout=0.1,
-        rec_dropout=0.1,
-        tf_dropout_rate_1=0.1,
-        tf_dropout_rate_1=0.1,
-        conv_dropout=0.1,
-        feat_dropout=0.1,
-        conv_ks_min=2,
-        conv_ks_max=3,
-        trace = FALSE,
-        epochs = 50,
-        batch_size = 20,
-        ml_trace = 0,
-        n_cores = 2,
-        data_folds = 2,
-        pl_max_steps = 2,
-        pl_max = 1,
-        pl_anchor = 1,
-        pl_min = 0,
-        sustain_track = TRUE,
-        sustain_iso_code = "DEU",
-        data_val_size = 0.25,
-        lr_rate = 1e-3,
-        optimizer = "adamw",
-        dense_size = 5,
-        rec_size = 5,
-        self_attention_heads = 2,
-        intermediate_size = 6,
-        lr_warm_up_ratio = 0.01,
-        merge_num_heads=2,
-        merge_attention_type="multihead"
-      )
-    )
 
-    for (i in seq(test_combinations$n_combos)) {
+    for (i in 1:check_adjust_n_samples_on_CI(n_samples_requested=max_samples,
+                                             n_CI = max_samples_CI)) {
+      test_combination <- generate_args_for_tests(
+        object_name = object_class_name,
+        method = "configure",
+        var_objects = list(
+          feature_extractor = feature_extractor
+        ),
+        necessary_objects = list(
+          text_embeddings = test_embeddings,
+          target_levels = target_levels[[n_classes]]
+        ),
+        var_override = list(
+          name = NULL,
+          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+          sustain_interval = 30,
+          act_fct = "elu",
+          feat_size=64,
+          intermediate_features=10,
+          tf_dense_dim=26,
+          tf_parametrizations="None",
+          dense_parametrizations="None",
+          rec_parametrizations="None",
+          conv_parametrizations="None",
+          tf_num_heads=2,
+          ng_conv_ks_min=2,
+          ng_conv_ks_max=3,
+          trace = FALSE,
+          epochs = 10,
+          batch_size = 20,
+          ml_trace = 0,
+          n_cores = 2,
+          data_folds = 2,
+          pl_max_steps = 2,
+          pl_max = 1,
+          pl_anchor = 1,
+          pl_min = 0,
+          sustain_track = TRUE,
+          sustain_iso_code = "DEU",
+          data_val_size = 0.25,
+          lr_rate = 1e-3,
+          dense_size = 5,
+          rec_size = 5,
+          self_attention_heads = 2,
+          intermediate_size = 6,
+          lr_warm_up_ratio = 0.01,
+          merge_num_heads=2,
+          merge_attention_type="multihead"
+        )
+      )
+
+
       # Create test object with a given combination of args
       classifier <- create_object(object_class_name)
       do.call(
         what = classifier$configure,
-        args = test_combinations$args[[i]]
+        args = test_combination
       )
       #Predict with sample cases-------------------------------------------------
-      test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combination)), {
         predictions <- classifier$predict_with_samples(
           newdata = test_embeddings,
           embeddings_s = test_embeddings_reduced,
@@ -172,7 +152,7 @@ for (object_class_name in object_class_names) {
         )
       })
 
-      test_that(paste(" - randomness", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste(" - randomness", object_class_name, get_current_args_for_print(test_combination)), {
         # EmbeddedText
         predictions <- NULL
         predictions_2 <- NULL
@@ -216,9 +196,9 @@ for (object_class_name in object_class_names) {
         )
       })
 
-      if(!is.null(test_combinations$args[[i]]$attention)){
-        if (test_combinations$args[[i]]$attention != "fourier") {
-          test_that(paste(" - order invariance", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      if(!is.null(test_combination$attention)){
+        if (test_combination$attention != "fourier") {
+          test_that(paste(" - order invariance", object_class_name, get_current_args_for_print(test_combination)), {
             embeddings_ET_perm <- test_embeddings$clone(deep = TRUE)
             perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
             embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
@@ -276,7 +256,7 @@ for (object_class_name in object_class_names) {
       }
 
       # Embed----------------------------------------------------------------------
-      test_that(paste("embed without sample cases", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("embed without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
         # Predictions
         embeddings <- classifier$embed(
           embeddings_q = test_embeddings_reduced,
@@ -302,7 +282,7 @@ for (object_class_name in object_class_names) {
       })
       gc()
 
-      test_that(paste("embed with sample cases", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("embed with sample cases", object_class_name, get_current_args_for_print(test_combination)), {
         # Predictions
         embeddings <- classifier$embed(
           embeddings_q = test_embeddings,
@@ -329,12 +309,12 @@ for (object_class_name in object_class_names) {
         }
       })
 
-      test_that(paste("plot without sample cases", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("plot without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
         # plot
         classifier <- create_object(object_class_name)
         do.call(
           what = classifier$configure,
-          args = test_combinations$args[[i]]
+          args = test_combination
         )
         plot <- classifier$plot_embeddings(
           embeddings_q = test_embeddings_reduced,
@@ -347,7 +327,7 @@ for (object_class_name in object_class_names) {
         expect_s3_class(plot, "ggplot")
       })
 
-      test_that(paste("plot with sample cases", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("plot with sample cases", object_class_name, get_current_args_for_print(test_combination)), {
         # plot
         plot <- classifier$plot_embeddings(
           embeddings_q = test_embeddings,

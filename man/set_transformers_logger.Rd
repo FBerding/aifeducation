@@ -23,7 +23,7 @@ Other Installation and Configuration:
 \code{\link{install_aifeducation}()},
 \code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},
-\code{\link{prepare_python}()},
+\code{\link{prepare_session}()},
 \code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

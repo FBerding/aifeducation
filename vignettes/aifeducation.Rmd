@@ -124,11 +124,11 @@ directly after starting a *R* session.
 
 ```{r, include = TRUE, eval=FALSE}
 library(aifeducation)
-aifeducation::prepare_python()
+aifeducation::prepare_session()
 ```
 
 > **Note:** Please remember: Every time you start a new session in *R,*
-> you have to call the funcion `aifeducation::prepare_python`. This is not
+> you have to call the funcion `aifeducation::prepare_session`. This is not
 > necessary if you use *AI for Education - Studio*.
 
 # 3) Tutorials and Guides

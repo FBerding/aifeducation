@@ -91,8 +91,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
     #' @param metric_type `r get_param_doc_desc("metric_type")`
     #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
-    #' @note This model requires `pad_value=0`. If this condition is not met the
-    #' padding value is switched automatically.
+    #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,

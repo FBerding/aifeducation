@@ -24,6 +24,7 @@ Loads a MLM-model for a transformer with the passed type.
 }
 \seealso{
 Other Transformers for developers: 
+\code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFETrConfig}},
 \code{\link{.AIFETrModel}},
 \code{\link{.AIFETrModelMLM}},

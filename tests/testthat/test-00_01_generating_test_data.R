@@ -40,7 +40,7 @@ create_dir(path_test_data, FALSE)
 test_that("Generating Test Data", {
   train_data <- LargeDataSetForText$new(imdb_movie_reviews)
 
-  base_model <- aife_transformer.make(ai_method)
+  base_model <- aife_transformer.make(ai_method,init_trace = trace)
   base_model$create(
     model_dir = test_path_create,
     text_dataset = train_data,

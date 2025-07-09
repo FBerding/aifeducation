@@ -14,7 +14,7 @@
 
 #' @title Abstract base class for large data sets
 #' @description This object contains public and private methods which may be useful for every large data sets. Objects
-#'   of this class are not intended to be used directly. [LargeDataSetForTextEmbeddings] or [LargeDataSetForText].
+#'   of this class are not intended to be used directly.
 #'
 #' @return Returns a new object of this class.
 #' @export

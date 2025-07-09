@@ -16,7 +16,7 @@
 #' @description Abstract class for all regular classifiers that use numerical representations of texts instead of words.
 #'
 #'
-#' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
+#' @return Objects of this class containing fields and methods used in several other classes in 'AI for Education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
 #' @family R6 Classes for Developers
 #' @export

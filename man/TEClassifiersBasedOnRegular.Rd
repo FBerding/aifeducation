@@ -81,12 +81,12 @@ is used as the final model.
   data_val_size = 0.25,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
-  loss_cls_fct_name = "focal_loss",
-  use_sc = TRUE,
+  loss_cls_fct_name = "FocalLoss",
+  use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
-  use_pl = TRUE,
+  use_pl = FALSE,
   pl_max_steps = 3,
   pl_max = 1,
   pl_anchor = 1,
@@ -104,7 +104,7 @@ is used as the final model.
   n_cores = auto_n_cores(),
   lr_rate = 0.001,
   lr_warm_up_ratio = 0.02,
-  optimizer = "adamW"
+  optimizer = "adamw"
 )}\if{html}{\out{</div>}}
 }
 

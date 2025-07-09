@@ -286,9 +286,9 @@
           )
           logger <- do.call(create_logger, logger_args)
 
-          if(check_versions(a=get_py_package_version("transformers"),operator = ">=",b="4.46.0")){
+          if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.46.0")) {
             training_args <- transformers$TrainingArguments(
-              output_dir = paste0(self$params$output_dir, "/checkpoints"),
+              output_dir = private$dir_checkpoint,
               overwrite_output_dir = TRUE,
               eval_strategy = "epoch",
               num_train_epochs = as.integer(self$params$n_epoch),
@@ -304,11 +304,12 @@
               auto_find_batch_size = FALSE,
               report_to = "none",
               log_level = "error",
-              disable_tqdm = !self$params$pytorch_trace
+              disable_tqdm = !self$params$pytorch_trace,
+              dataloader_pin_memory = torch$cuda$is_available()
             )
           } else {
             training_args <- transformers$TrainingArguments(
-              output_dir = paste0(self$params$output_dir, "/checkpoints"),
+              output_dir = private$dir_checkpoint,
               overwrite_output_dir = TRUE,
               evaluation_strategy = "epoch",
               num_train_epochs = as.integer(self$params$n_epoch),
@@ -328,7 +329,7 @@
             )
           }
 
-          if(check_versions(a=get_py_package_version("transformers"),operator = ">=",b="4.46.0")){
+          if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.46.0")) {
             self$temp$trainer <- transformers$Trainer(
               model = self$temp$model,
               train_dataset = self$temp$tokenized_dataset$train,
@@ -366,10 +367,11 @@
           if (is.function(private$steps_for_training$cuda_empty_cache)) {
             private$steps_for_training$cuda_empty_cache()
           }
+          private$create_checkpoint_directory()
           self$temp$trainer$train()
+          private$clean_checkpoint_directory()
         }
       }
-
 
       # SFT: save_model -------------------------------------------------------------
       if (!is.function(private$steps_for_training$save_model)) {
@@ -395,7 +397,7 @@
 
     # Creates a sustainability tracker and stores it in the private `sustainability_tracker` attribute
     create_sustain_tracker = function() {
-      if(check_versions(a=get_py_package_version("codecarbon"),operator = ">=",b="2.8.0")){
+      if (check_versions(a = get_py_package_version("codecarbon"), operator = ">=", b = "2.8.0")) {
         path_look_file <- codecarbon$lock$LOCKFILE
         if (file.exists(path_look_file)) {
           unlink(path_look_file)
@@ -408,7 +410,8 @@
         log_level = "warning",
         measure_power_secs = self$params$sustain_interval,
         save_to_file = FALSE,
-        save_to_api = FALSE
+        save_to_api = FALSE,
+        allow_multiple_runs = FALSE
       )
     },
 
@@ -469,6 +472,31 @@
           dataset = dataset,
           step = step
         )
+      )
+    },
+
+    # Field for saving the path to the folder string temp files
+    dir_checkpoint = NULL,
+
+    # Create directory in temp files of saving checkpoints
+    create_checkpoint_directory = function() {
+      # Create a directory for the package
+      tmp_dir <- create_and_get_tmp_dir()
+
+      # Create a folder for the current task
+      private$dir_checkpoint <- paste0(
+        tmp_dir, "/",
+        generate_id(16)
+      )
+      create_dir(dir = private$dir_checkpoint, trace = FALSE)
+    },
+
+    # Clean directory for temp files
+    clean_checkpoint_directory = function() {
+      unlink(
+        x = private$dir_checkpoint,
+        recursive = TRUE,
+        force = FALSE
       )
     }
   ),
@@ -755,7 +783,7 @@
         if (is.function(private$steps_for_creation$check_max_pos_emb)) {
           private$steps_for_creation$check_max_pos_emb(self)
         }
-        check_class(object=text_dataset,object_name = "text_dataset", classes="LargeDataSetForText", allow_NULL=FALSE)
+        check_class(object = text_dataset, object_name = "text_dataset", classes = "LargeDataSetForText", allow_NULL = FALSE)
         self$temp$raw_text_dataset <- text_dataset$get_dataset()
         if (is.null(self$temp$raw_text_dataset$features$text)) {
           stop("Dataset does not contain a column 'text' storing the raw texts.")
@@ -1044,7 +1072,7 @@
         self$temp$from_tf <- model_files_check$from_tf
         self$temp$load_safe <- model_files_check$load_safe
 
-        check_class(object=text_dataset,object_name="text_dataset", classes="LargeDataSetForText", allow_NULL=FALSE)
+        check_class(object = text_dataset, object_name = "text_dataset", classes = "LargeDataSetForText", allow_NULL = FALSE)
         self$temp$raw_text_dataset <- text_dataset$get_dataset()
         if (is.null(self$temp$raw_text_dataset$features$text)) {
           stop("Dataset does not contain a column 'text' storing the texts for training.")
@@ -1131,7 +1159,7 @@
         )
 
         create_dir(output_dir, trace, "Creating Output Directory")
-        create_dir(paste0(output_dir, "/checkpoints"), trace, "Creating Checkpoint Directory")
+        #create_dir(paste0(output_dir, "/checkpoints"), trace, "Creating Checkpoint Directory")
 
         private$steps_for_training$prepare_train_tune(self)
 

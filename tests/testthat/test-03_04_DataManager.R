@@ -28,7 +28,7 @@ example_data <- imdb_movie_reviews
 n_classes <- 2
 
 example_data$label <- as.character(example_data$label)
-example_data$label[c(150:300)] <- NA
+example_data$label[c(251:300)] <- NA
 if (n_classes > 2) {
   example_data$label[c(201:250)] <- "medium"
 }

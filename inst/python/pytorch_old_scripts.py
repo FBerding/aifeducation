@@ -42,8 +42,17 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
 class layer_switch_pad_values(torch.nn.Module):
   def __init__(self,pad_value_old,pad_value_new):
     super().__init__()
-    self.pad_value_old=pad_value_old
-    self.pad_value_new=pad_value_new
+    
+    if isinstance(pad_value_old, torch.Tensor):
+      self.pad_value_old=pad_value_old.detach()
+    else:
+      self.pad_value_old=torch.tensor(pad_value_old)
+      
+    if isinstance(pad_value_new, torch.Tensor):
+      self.pad_value_new=pad_value_new.detach()
+    else:
+      self.pad_value_new=torch.tensor(pad_value_new)
+    
   def forward(self,x):
     features=x.size(2)
     time_sums=torch.sum(x,dim=2)
@@ -51,9 +60,9 @@ class layer_switch_pad_values(torch.nn.Module):
     
     mask=torch.reshape(torch.repeat_interleave(mask,repeats=features,dim=1),(x.size(dim=0),x.size(dim=1),features))
     
-    y=torch.clone(x)
-    y[mask]=self.pad_value_new
-    z=torch.where(condition=mask, input=y, other=y)
+    #y=torch.clone(x)
+    #y[mask]=self.pad_value_new
+    z=torch.where(condition=mask, input=self.pad_value_new, other=x)
     return z
 
 class LayerNorm_with_Mask_PT(torch.nn.Module):

@@ -1,5 +1,32 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
+#' @title Dictionary of layers
+#' @description Function for receiving a `list` containing a description of all layers
+#' user of the package can apply.
+#' @param layer `string` Name of the layer that should be returned. If `layer="all"`
+#' all layers are returned as a `list`.
+#' @returns Returns a `list` with the following entries:
+#'
+#' * title: `string` Name of the layer.
+#' * desc: `string`Description of the layer written in rmarkdown.
+#' * img: `string` Name of the image used to illustrate the layer. File extension must be '.png'.
+#' * references: `vector` of `strings`. Every entry contains the literature reference in rmarkdown if relevant.
+#' * param_prefix: `string` Prefix used for all parameters to configure the specific layer.
+#'
 #' @family Utils Documentation
-get_layer_description <- function(layer) {
+#' @keywords internal
+get_layer_dict <- function(layer) {
   documentation <- list()
 
   documentation$tf_layers <- list(
@@ -8,8 +35,11 @@ get_layer_description <- function(layer) {
     used in transformer models. A single layer is designed as described by Chollet, Kalinowski, and Allaire (2022, p.373) with
     the exception that single components of the layers (such as the activation function,
     the kind of residual connection, the kind of normalization or the kind of attention) can be freely chosen.",
-    img = NULL,
-    references = NULL,
+    img = "layers_tf_encoder.png",
+    references = c(
+      "Chollet, F., Kalinowski, T. & Allaire, J. J. (2022). Deep learning with R (Second edition). Manning Publications Co. <https://learning.oreilly.com/library/view/-/9781633439849/?ar>",
+      "Devlin, J., Chang, M.‑W., Lee, K. & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In J. Burstein, C. Doran & T. Solorio (Hrsg.), Proceedings of the 2019 Conference of the North (S. 4171–4186). Association for Computational Linguistics. <https://doi.org/10.18653/v1/N19-1423>"
+    ),
     param_prefix = "tf_"
   )
 
@@ -19,7 +49,7 @@ get_layer_description <- function(layer) {
     increase or decrease the number of features of the input data before passing the
     data into your model. The aim of this layer is to increase or reduce the complexity of the data for your model.
     The output size of this layer determines the number of features for all following layers.",
-    img = NULL,
+    img = "layers_feature.png",
     references = NULL,
     param_prefix = "feat_"
   )
@@ -27,7 +57,7 @@ get_layer_description <- function(layer) {
   documentation$dense_layers <- list(
     title = "Dense Layers",
     desc = "A fully connected layer. The layer is applied to every step of a sequence.",
-    img = NULL,
+    img = "layers_dense.png",
     references = NULL,
     param_prefix = "dense_"
   )
@@ -44,7 +74,7 @@ get_layer_description <- function(layer) {
     also masked in the output.
     \n The output of this layer can be understand as the results of the n-gram filters. Stacking this layer
     allows the model to perform n-gram detection of n-grams (meta perspective).",
-    img = NULL,
+    img = "layers_ng_conv.png",
     references = c(
       "Jacovi, A., Shalom, O. S. & Goldberg, Y. (2018). Understanding Convolutional Neural Networks for Text Classification. https://doi.org/10.48550/arXiv.1809.08037",
       "Pham, N.‑Q., Kruszewski, G. & Boleda, G. (2016). Convolutional Neural Network Language Models. In J. Su, K. Duh & X. Carreras (Hrsg.), Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (S. 1153–1162). Association for Computational Linguistics. https://doi.org/10.18653/v1/D16-1123"
@@ -71,7 +101,7 @@ get_layer_description <- function(layer) {
     features are concatenated to the tensor resulting the in the shape (Batch, Times, 2*Features). In the second step the
     number of requested features is halved. The first half is used for the maximal features and the second for the minimal
     features.",
-    img = NULL,
+    img = "layers_cls_pooling.png",
     references = NULL,
     param_prefix = "cls_pooling_"
   )
@@ -83,7 +113,7 @@ get_layer_description <- function(layer) {
     Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
     to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
     Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features.",
-    img = NULL,
+    img = "layers_merge.png",
     references = NULL,
     param_prefix = "merge_"
   )
@@ -93,10 +123,57 @@ get_layer_description <- function(layer) {
   } else {
     return(documentation)
   }
-
 }
 
-get_desc_cls_type=function(cls_type){
+#' @title Dictionary of core models
+#' @description Function for receiving a `list` containing a description of all core models
+#' user of the package can apply.
+#' @param model `string` Name of the model that should be returned. If `model="all"`
+#' all models are returned as a `list`.
+#' @returns Returns a `list` with the following entries:
+#'
+#' * title: `string` Name of the model.
+#' * desc: `string`Description of the model written in rmarkdown.
+#' * img: `string` Name of the image used to illustrate the model. File extension must be '.png'.
+#'
+#' @family Utils Documentation
+#' @keywords internal
+get_dict_core_models=function(model){
+  dictionary=NULL
+
+  dictionary$sequential <- list(
+    title = "Sequential Core Architecture",
+    desc = "This model is based on a sequential architecture.
+  The input is passed to a specific number of layers step by step.
+  All layers are grouped by the kind of layers into stacks.",
+    img="core_arch_sequential.png"
+  )
+
+  dictionary$parallel <- list(
+    title = "Parallel Core Architecture",
+    desc = "This model is based on a parallel architecture.
+  An input is passed to different types of layers separately. At the end the outputs
+  are combined to create the final output of the whole model.",
+    img="core_arch_parallel.png"
+  )
+
+  if(model=="all"){
+    return(dictionary)
+  } else {
+    return(dictionary[[model]])
+  }
+}
+
+
+#' @title Dictionary of classifier types
+#' @description Function for receiving a `list` containing a description of all types of classifiers
+#' user of the package can apply.
+#' @param cls_type `string` Classification type
+#' @returns Returns a `string` containing the description written in rmarkdown.
+#'
+#' @family Utils Documentation
+#' @keywords internal
+get_dict_cls_type=function(cls_type){
   if(cls_type=="prob"){
     desc="This is a probability classifier that predicts a probability distribution for
     different classes/categories. This is the standard case most common in literature."
@@ -109,7 +186,15 @@ get_desc_cls_type=function(cls_type){
   return(desc)
 }
 
-get_input_desc=function(input_type){
+#' @title Dictionary of input types
+#' @description Function for receiving a `list` containing a description of the input types necessary
+#' for specific models.
+#' @param input_type `string` Input type
+#' @returns Returns a `string` containing the description of the required input written in rmarkdown.
+#'
+#' @family Utils Documentation
+#' @keywords internal
+get_dict_input_types=function(input_type){
   if(input_type=="text_embeddings"){
     desc="For the creation and training of a
    classifier an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] on the one hand and a [factor] on
@@ -124,10 +209,23 @@ get_input_desc=function(input_type){
   }
 }
 
-#-------------------------------------------------------------------------------
+
+
+#===============================================================================
+#' @title Generate layer documentation
+#' @description Function for generating the documentation of a specific layer.
+#' @param layer_name `string` Name of the layer.
+#' @param title_format `string` Kind of format of the title.
+#' @param subtitle_format `string` Kind of format for all sub-titles.
+#' @param inc_img `bool` Include a visualization of the layer.
+#' @param inc_params `bool` Include a description of every parameter of the layer.
+#' @param inc_references `bool` Include a list of literature references for the layer.
+#'
+#' @returns Returns a `string` containing the description written in rmarkdown.
 #' @family Utils Documentation
-get_layer_documentation <- function(layer_name, inc_img = FALSE, inc_params = FALSE, inc_references = FALSE) {
-  current_doc <- get_layer_description(layer_name)
+#' @export
+get_layer_documentation <- function(layer_name, title_format="bold",subtitle_format="italic",inc_img = FALSE, inc_params = FALSE, inc_references = FALSE) {
+  current_doc <- get_layer_dict(layer_name)
   param_dict <- get_param_dict()
 
   relevant_params_index <- stringi::stri_detect(
@@ -138,17 +236,48 @@ get_layer_documentation <- function(layer_name, inc_img = FALSE, inc_params = FA
 
   # General description--------------------------------------------------------
   # Title
-  title <- paste0("**", current_doc$title, "**\n\n")
+  if(title_format=="bold"){
+    title_format_1="**"
+    title_format_2=title_format_1
+  } else if (title_format=="header"){
+    title_format_1="## "
+    title_format_2=""
+  }
+
+  title <- paste0(title_format_1, current_doc$title, title_format_2,"\n\n")
+
+
+  if(subtitle_format=="italic"){
+    subtitle_format1="*"
+  } else if(subtitle_format=="bold"){
+    subtitle_format1="**"
+  }
+  subtitle_format2=subtitle_format1
+
   # Description general
   desc <- paste0(
+    subtitle_format1,"Description",subtitle_format2,"\n\n",
     current_doc$desc," ",
     "All parameters with the prefix *", current_doc$param_prefix, "* can be used to configure this layer.",
-    "\n"
+    "\n\n"
   )
+
+  #Image of the layer
+  if(inc_img==TRUE){
+    img_block=paste0(subtitle_format1,"Visualization",subtitle_format1,"\n\n")
+    img_block=paste0(
+      img_block,
+      "![",current_doc$title,"](",current_doc$img,"){width='100%'}\n\n"
+    )
+  } else {
+    img_block=NULL
+  }
+
   # Description of all parameters
-  param_desc <- NULL
+  param_desc=NULL
   # Parameter Documentation---------------------------------------------------
   if (inc_params == TRUE) {
+    param_desc <- paste0(subtitle_format1,"Parameters",subtitle_format1,"\n\n")
     for (i in seq_along(relevant_params)) {
       selected_param <- relevant_params[[i]]
       tmp_layer_desc <- NULL
@@ -168,7 +297,7 @@ get_layer_documentation <- function(layer_name, inc_img = FALSE, inc_params = FA
         for (j in seq_along(param_dict[[selected_param]]$values_desc)) {
           tmp_layer_desc <- paste0(
             tmp_layer_desc,
-            "\t - ",
+            "\t\t - ",
             "`", names(param_dict[[selected_param]]$values_desc)[j], "`", ": ",
             param_dict[[selected_param]]$values_desc[[j]], "\n"
           )
@@ -186,42 +315,68 @@ get_layer_documentation <- function(layer_name, inc_img = FALSE, inc_params = FA
   markdown_doc <- paste0(
     "\n",
     title,
+    img_block,
     desc,
     param_desc
   )
   return(markdown_doc)
 }
 
+
+
+#' @title Generate documentation for core models
+#' @description Function for generating the documentation of a specific core model.
+#' @param layer_name `string` Name of the core model.
+#' @param title_format `string` Kind of format of the title.
+#' @param inc_img `bool` Include a visualization of the layer.
+#'
+#' @returns Returns a `string` containing the description written in rmarkdown.
 #' @family Utils Documentation
-get_desc_for_core_model_architecture <- function(name) {
-  documentation <- list()
+#' @export
+get_desc_for_core_model_architecture <- function(name,title_format="bold",inc_img=FALSE) {
+  documentation <- get_dict_core_models(name)
 
-  documentation$sequential <- list(
-    title = "Sequential Core Architecture",
-    desc = "This model is based on a sequential architecture.
-  The input is passed to a specific number of layers step by step.
-  All layers are grouped by the kind of layers into stacks."
-  )
+  if(inc_img==TRUE){
+    img_block="**Visualization**\n\n"
+    img_block=paste0(
+      img_block,
+      "![",documentation$title,"](",documentation$img,"){width='100%'}\n\n"
+    )
+  } else {
+    img_block=NULL
+  }
 
-  documentation$parallel <- list(
-    title = "Parallel Core Architecture",
-    desc = "This model is based on a parallel architecture.
-  An input is passed to different types of layers separately. At the end the outputs
-  are combined to create the final output of the whole model."
-  )
+  if(title_format=="bold"){
+    title_format1="**"
+    title_format2=title_format1
+  } else if(title_format=="header") {
+    title_format1="## "
+    title_format2=""
+  }
 
   markdown_doc <- paste0(
     "\n",
-    "**", documentation[[name]]$title, "**\n\n",
-    documentation[[name]]$desc, "\n"
+    title_format1, documentation$title, title_format2,"\n\n",
+    img_block,"\n\n",
+    documentation$desc, "\n"
   )
 
   return(markdown_doc)
 }
 
+#' @title Generate documentation for a classifier class
+#' @description Function for generating the documentation of a model.
+#' @param model_name `string` Name of the model.
+#' @param cls_type `string` Type of classification
+#' @param core_type `string` Name of the core type.
+#' @param input_type `bool` Name of the input type necessary for training and predicting.
+#'
+#' @returns Returns a `string` containing the description written in rmarkdown.
+#' @note Function is designed to be used with roxygen2 in the regular documentation.
 #' @family Utils Documentation
+#' @export
 build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NULL,input_type="text_embeddings") {
-  layer_dict=get_layer_description("all")
+  layer_dict=get_layer_dict("all")
   prefixes=NULL
   for(i in seq_along(layer_dict)){
     prefixes=append(x=prefixes,values = layer_dict[[i]]$param_prefix)
@@ -248,7 +403,7 @@ build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NUL
   desc_cls_type=NULL
   if(!is.null(cls_type)){
     model_documentation=paste0("**Classification Type**\n\n",
-    desc_cls_type=get_desc_cls_type(cls_type)
+    desc_cls_type=get_dict_cls_type(cls_type)
     )
   }
 
@@ -265,7 +420,7 @@ build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NUL
     if(layer_included[i]==TRUE){
       model_documentation=paste0(
         model_documentation,"\n",
-        get_layer_documentation(names(layer_included)[i])
+        get_layer_documentation(names(layer_included)[i],subtitle_format = "italic")
       )
     }
   }
@@ -275,7 +430,7 @@ build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NUL
   if(!is.null(input_type)){
     desc_input_and_predict=paste0(
       "**Training and Prediction**\n\n",
-      get_input_desc(input_type)
+      get_dict_input_types(input_type)
     )
   }
   model_documentation=paste0(
@@ -284,4 +439,47 @@ build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NUL
   )
   return(model_documentation)
 
+}
+
+#' @title Generate documentation of all layers for an vignette or article
+#' @description Function for generating the whole documentation for an article
+#' used on the packages home page.
+#' @returns Returns a `string` containing the description written in rmarkdown.
+#' @note Function is designed to be used with inline r code in rmarkdown vignettes/articles.
+#' @family Utils Documentation
+#' @export
+build_layer_stack_documentation_for_vignette=function(){
+  # layer documentation
+  layer_dict=get_layer_dict(layer="all")
+
+  layer_doc="# Layers"
+  for(layer in names(layer_dict)){
+    layer_doc=paste0(
+      layer_doc,"\n",
+      get_layer_documentation(
+        layer_name = layer,
+        title_format="header",
+        subtitle_format="bold",
+        inc_img = TRUE,
+        inc_params = TRUE,
+        inc_references = TRUE
+      )
+    )
+  }
+
+  core_model_dict=get_dict_core_models("all")
+  core_models_doc="# Core Models"
+  for(core_model in names(core_model_dict)){
+    core_models_doc=paste0(
+      core_models_doc,"\n",
+      get_desc_for_core_model_architecture(core_model,title_format="header",inc_img = TRUE)
+    )
+  }
+
+  markdown_syntax=paste0(
+    layer_doc,"\n",
+    core_models_doc
+  )
+
+  return(markdown_syntax)
 }

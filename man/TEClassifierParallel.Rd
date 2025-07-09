@@ -10,7 +10,7 @@ a saved classifier.
 \description{
 \strong{Classification Type}
 
-This is a probability classifiers that predicts a probability distribution for
+This is a probability classifier that predicts a probability distribution for
 different classes/categories. This is the standard case most common in literature.
 
 \strong{Parallel Core Architecture}
@@ -21,12 +21,16 @@ are combined to create the final output of the whole model.
 
 \strong{Transformer Encoder Layers}
 
+\emph{Description}
+
 The transformer encoder layers follow the structure of the encoder layers
 used in transformer models. A single layer is designed as described by Chollet, Kalinowski, and Allaire (2022, p.373) with
 the exception that single components of the layers (such as the activation function,
 the kind of residual connection, the kind of normalization or the kind of attention) can be freely chosen. All parameters with the prefix \emph{tf_} can be used to configure this layer.
 
 \strong{Feature Layer}
+
+\emph{Description}
 
 The feature layer is a dense layer that can be used to
 increase or decrease the number of features of the input data before passing the
@@ -35,9 +39,13 @@ The output size of this layer determines the number of features for all followin
 
 \strong{Dense Layers}
 
+\emph{Description}
+
 A fully connected layer. The layer is applied to every step of a sequence. All parameters with the prefix \emph{dense_} can be used to configure this layer.
 
 \strong{Multiple N-Gram Layers}
+
+\emph{Description}
 
 This type of layer focuses on sub-sequence and performs an 1d convolutional operation. On a word and token level
 these sub-sequences can be interpreted as n-grams (Jacovi, Shalom & Goldberg 2018). The convolution is done across all features.
@@ -55,10 +63,14 @@ allows the model to perform n-gram detection of n-grams (meta perspective). All 
 
 \strong{Recurrent Layers}
 
+\emph{Description}
+
 A regular recurrent layer either as Gated Recurrent Unit (GRU) or Long Short-Term Memory (LSTM) layer. Uses
 PyTorchs implementation. All parameters with the prefix \emph{rec_} can be used to configure this layer.
 
 \strong{Classifiction Pooling Layer}
+
+\emph{Description}
 
 Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It
 performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
@@ -71,6 +83,8 @@ number of requested features is halved. The first half is used for the maximal f
 features. All parameters with the prefix \emph{cls_pooling_} can be used to configure this layer.
 
 \strong{Merge Layer}
+
+\emph{Description}
 
 Layer for combining the output of different layers. All inputs must be sequential data of shape (Batch, Times, Features).
 First, pooling over time is applied extracting the minimal and/or maximal features.
@@ -159,7 +173,7 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
-  cls_pooling_features = NULL,
+  cls_pooling_features = 50,
   cls_pooling_type = "min_max",
   feat_act_fct = "elu",
   feat_size = 50,
@@ -178,7 +192,7 @@ Creating a new instance of this class.
   ng_conv_residual_type = "residual_gate",
   dense_act_fct = "elu",
   dense_n_layers = 1,
-  dense_dropout = 0,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "layer_norm",
@@ -187,7 +201,7 @@ Creating a new instance of this class.
   rec_n_layers = 1,
   rec_type = "gru",
   rec_bidirectional = FALSE,
-  rec_dropout = 0,
+  rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
   rec_normalization_type = "layer_norm",
@@ -195,8 +209,8 @@ Creating a new instance of this class.
   tf_act_fct = "elu",
   tf_dense_dim = 50,
   tf_n_layers = 1,
-  tf_dropout_rate_1 = 0,
-  tf_dropout_rate_2 = 0,
+  tf_dropout_rate_1 = 0.1,
+  tf_dropout_rate_2 = 0.5,
   tf_attention_type = "multihead",
   tf_embedding_type = "absolute",
   tf_num_heads = 1,
@@ -329,7 +343,7 @@ values for a case for different input orders if you choose \code{fourier} on lin
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Returns an object of class \link{TEClassifierRegular} which is ready for training.
+Function does nothing return. It modifies the current object.
 }
 }
 \if{html}{\out{<hr>}}

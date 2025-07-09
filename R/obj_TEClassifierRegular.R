@@ -15,6 +15,8 @@
 #' @title Text embedding classifier with a neural net
 #' @description Abstract class for neural nets with 'pytorch'.
 #'
+#' This class is **deprecated**. Please use an Object of class [TEClassifierSequential] instead.
+#'
 #' @return Objects of this class are used for assigning texts to classes/categories. For the creation and training of a
 #'   classifier an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] on the one hand and a [factor] on
 #'   the other hand are necessary.

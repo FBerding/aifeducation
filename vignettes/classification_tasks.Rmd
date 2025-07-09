@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-library(aifeducation)
 running_num_figures=1
 ```
 
@@ -188,14 +187,14 @@ available.  In case you installed
 python as suggested in vignette [01 Get started](aifeducation.html) you
 may start a new session like this:
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 library(aifeducation)
-prepare_python()
+prepare_session()
 ```
 
 > **Note:** Please remember: Every time you start a new session in *R,*
 > you have to load the library `aifeducation` and to configure python. 
-> We recommend to use the function `prepare_python` because it performs all
+> We recommend to use the function `prepare_session` because it performs all
 > necessary steps for setting up python correctly.
 
 Now you can start your work.
@@ -428,7 +427,7 @@ would be:
 ```{r, include = TRUE, eval = FALSE}
 save_to_disk(
   object = raw_texts,
-  dir_path = "C:/",
+  dir_path = "examples",
   folder_name = "raw_texts"
 )
 ```
@@ -444,7 +443,7 @@ with the directory path where you stored the data. In our case this
 would be.
 
 ```{r, include = TRUE, eval = FALSE}
-raw_text_dataset <- load_from_disk("C:/raw_texts")
+raw_text_dataset <- load_from_disk("examples/raw_texts")
 ```
 
 Now you can work with your data.
@@ -469,16 +468,16 @@ Let us assume that we have a `LargeDataSetForTextEmbeddings`
 ```{r, include = TRUE, eval = FALSE}
 save_to_disk(
   object = text_embeddings,
-  dir_path = "C:/",
+  dir_path = "examples",
   folder_name = "text_embeddings"
 )
 ```
 
-The data set will be saved at `C:/text_embeddings`. Loading this data
+The data set will be saved at `examples/text_embeddings`. Loading this data
 set may look like:
 
 ```{r, include = TRUE, eval = FALSE}
-new_text_embeddings <- load_from_disk("C:/text_embeddings")
+new_text_embeddings <- load_from_disk("examples/text_embeddings")
 ```
 
 ### 2.2.4 Target Data
@@ -540,7 +539,7 @@ colnames(example_data)
 Now the `data.frame` is ready as input for our data set. The "label"
 column will not be included in this data set.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 data_set_reviews_text <- LargeDataSetForText$new()
 data_set_reviews_text$add_from_data.frame(example_data)
 ```
@@ -590,7 +589,7 @@ with the function `aife_transformer.make`.
 > See p. 3 Transformer Maker [01 Transformers for
 > Developers](transformers.html) for details.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 base_model <- aife_transformer.make("bert")
 base_model$create(
   model_dir = "examples/my_own_transformer",
@@ -657,7 +656,7 @@ allows you to estimate its ecological impact with help of the python
 library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
 If you use the sustainability tracker you must provide the alpha-3 code
 for the country where your computer is located (e.g., "CAN"="Canada",
-"Deu"="Germany"). A list with the codes can be found on
+"DEU"="Germany"). A list with the codes can be found on
 [Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). The
 reason is that different countries use different sources and techniques
 for generating their energy resulting in a specific impact on CO2
@@ -677,7 +676,7 @@ language or task, you can call the corresponding `train`-method.
 > See p. 3 Transformer Maker [01 Transformers for
 > Developers](transformers.html) for details.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE, results='hide'}
 base_model <- aife_transformer.make("bert")
 base_model$train(
   output_dir = "examples/my_own_transformer_trained",
@@ -707,7 +706,7 @@ provide *another* directory where your trained transformer should be
 saved to avoid reading and writing collisions.
 
 Now, the provided raw data is used to train your model. In case of a
-BERT model, the learning objective is *Masked Language Modeling*. Other
+Bert model, the learning objective is *Masked Language Modeling*. Other
 models may use other learning objectives. Please refer to the
 documentation for more details on every model.
 
@@ -761,11 +760,11 @@ the same.
 First you have to choose the base model that forms the foundation of
 your new text embedding model. In order to illustrate its use we 
 apply a pre-trained model from [Hugging Face](https://huggingface.co/) called 
-[Bert base model (uncased)][https://huggingface.co/google-bert/bert-base-uncased].
-Download all files into a new folder. Here we store the model in at 'examples/bert_uncased'.
+[BERT base model (uncased) ][https://huggingface.co/google-bert/bert-base-uncased] published by
+Devlin et al. (2019). Download all files into a new folder. Here we store the model in at 'examples/bert_uncased'.
 
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 bert_modeling <- TextEmbeddingModel$new()
 bert_modeling$configure(
   model_label = "Text Embedding via BERT",
@@ -839,7 +838,7 @@ use the `embed_large` method of your model. To do this, you must provide
 a `LargeDataSetForText` to `large_datas_set`. Relying on the sample data
 from section 2.3, we can use the movie reviews as raw texts.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 review_embeddings <- bert_modeling$embed_large(
   large_datas_set = data_set_reviews_text,
   trace = TRUE
@@ -864,17 +863,17 @@ we recommend to save them to disk in order to use the embeddings for further tas
 
 To save the them just call the function `save_to_disk` as shown below.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 save_to_disk(
   object = review_embeddings,
-  dir_path = "C:/text_embeddings",
+  dir_path = "examples",
   folder_name = "imdb_movie_reviews"
 )
 ```
 
 To load the embeddings you can call the function `load_from_disk`.
-```{r, include = TRUE, eval = FALSE}
-load_from_disk("C:/text_embeddings/imdb_movie_reviews")
+```{r, include = TRUE, eval = TRUE}
+review_embeddings<-load_from_disk("examples/imdb_movie_reviews")
 ```
 
 ## 4.5 Saving and Loading Text Embedding Models
@@ -886,20 +885,20 @@ pass your model to `object` and the directory where to save the model to
 `dir_path`. With `folder_name` you can determine the name of the folder
 that should be created in that directory to store the model.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 save_to_disk(
   object = bert_modeling,
-  dir_path = "C:/text_embedding_models",
-  folder_name = "bert_model"
+  dir_path = "examples",
+  folder_name = "bert_te_model"
 )
 ```
 
 In this example the model is saved in a folder at the location
-`C:/text_embedding_models/bert_model`. If you want to load your model
+`examples/bert_te_model`. If you want to load your model
 you can call `load_from_disk`.
 
-```{r, include = TRUE, eval = FALSE}
-bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
+```{r, include = TRUE, eval = TRUE}
+bert_modeling <- load_from_disk("examples/bert_te_model")
 ```
 
 ## 4.6 Sustainability
@@ -922,7 +921,7 @@ First, you choose a core model. It determines
 where different layers are located and how the outputs of the different layers are
 combined into the final output of the model. 
   
-![Figure `r running_num_figures`: Basic Architecture of a Sequential Classifier](Model_Sequential.png){width="100%"}
+![Figure `r running_num_figures`: Basic Architecture of a Sequential Classifier](core_arch_sequential.png){width="100%"}
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1
 ```
@@ -934,7 +933,7 @@ In contrast, the parallel architecture offers a model where
 an input is passed to different types of layers separately. At the end the outputs 
 are combined to create the final output of the whole model. 
 
-![Figure `r running_num_figures`: Basic Architecture of a Parallel Classifier](Model_Parallel.png){width="100%"}
+![Figure `r running_num_figures`: Basic Architecture of a Parallel Classifier](core_arch_parallel.png){width="100%"}
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1
 ```
@@ -961,6 +960,9 @@ a probability and metric based classifier is possible.
   to the case is assigned to that case. In contrast to the probability classifiers
   these models can handle classes/categories that were not part of the training. For more details
   please refer to section 6.1.
+  
+> Please note that creating, training, and predicting works for all types of classifiers 
+> as described in the sections below.
 
 ## 5.2 Create a Classifier
 
@@ -968,7 +970,7 @@ To show you how to create a classifier we use a classifier of class `TEClassifie
 as an example. With the sample data from section 2.3 and the text embeddings from
 section 4.3, the creation of a new classifier may look like:
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 classifier <- TEClassifierSequential$new()
 classifier$configure(
   label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
@@ -1082,7 +1084,7 @@ classifier refer to the test sample. This data has never been used
 during training and provides a more realistic estimation of a
 classifier's performance.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
@@ -1091,23 +1093,23 @@ classifier$train(
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name="FocalLoss",
-  use_sc = TRUE,
+  use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
-  use_pl = TRUE,
+  use_pl = FALSE,
   pl_max_steps = 3,
   pl_max = 1.00,
   pl_anchor = 1.00,
   pl_min = 0.00,
   sustain_track = TRUE,
-  sustain_iso_code = NULL,
+  sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 150,
   batch_size = 32,
   trace = TRUE,
-  ml_trace = 1,
+  ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
@@ -1115,10 +1117,6 @@ classifier$train(
   lr_warm_up_ratio=0.02,
   optimizer="adamw"
 )
-```
-
-```{r, include = FALSE, eval = TRUE}
-classifier <- vignette_classifier
 ```
 
 You can further modify the training process with different arguments.
@@ -1216,7 +1214,7 @@ you to estimate its ecological impact with the help of the python
 library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
 If you use the sustainability tracker you must provide the alpha-3 code
 for the country where your computer is located (e.g., "CAN"="Canada",
-"Deu"="Germany"). A list with the codes can be found on
+"DEU"="Germany"). A list with the codes can be found on
 [Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). The
 reason is that different countries use different sources and techniques
 for generating their energy resulting in a specific impact on CO2
@@ -1330,19 +1328,19 @@ Saving and loading follows the same pattern as for the other objects in
 *aifeducation*. You can save the classifier by calling `save_to_disk`.
 In our example this may be:
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 save_to_disk(
   object = classifier,
-  dir_path = "C:/classifiers",
-  folder_name = "imdb_movie_reviews"
+  dir_path = "examples",
+  folder_name = "cls_imdb_movie_reviews"
 )
 ```
 
-The classifier is saved to `C:/classifiers/imdb_movie_reviews`. To load
+The classifier is saved to `examples/cls_imdb_movie_reviews`. To load
 the model call `load_from_disk`.
 
-```{r, include = TRUE, eval = FALSE}
-classifier <- load_from_disk("C:/classifiers/imdb_movie_reviews")
+```{r, include = TRUE, eval = TRUE}
+classifier <- load_from_disk("examples/cls_imdb_movie_reviews")
 ```
 
 ## 5.7 Predicting New Data
@@ -1353,7 +1351,7 @@ expression by using *exactly* the same text embedding model that was
 used to train your classifier (see section 4). In the case of our
 example classifier, we use our BERT model.
 
-```{r, include = TRUE, eval = FALSE}
+```{r, include = TRUE, eval = TRUE}
 # If our mode is not loaded
 bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
 
@@ -1388,6 +1386,9 @@ predicted_categories <- classifier$predict(
   newdata = review_embeddings,
   batch_size = 8
 )
+
+# Show predicted categories
+predicted_categories
 ```
 
 After the classifier finishes the prediction, the estimated
@@ -1457,29 +1458,61 @@ determined by `embedding_dim`. In case `embedding_dim` is set to 1,2 or
 visualized. For this example we use the same data as in section 5. Let
 us first create and configure the new classifier.
 
-```{r, include = TRUE, eval=FALSE}
-classifier <- TEClassifierProtoNet$new()
-classifier$configure(
-  name = "proto_net_movie_review_classifier",
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype <- TEClassifierSequentialPrototype$new()
+classifier_prototype$configure(
   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
-  hidden = c(5),
-  rec = c(6, 6),
+  skip_connection_type = "residual_gate",
+  cls_pooling_features = 50,
+  cls_pooling_type = "min_max",
+  metric_type = "euclidean",
+  feat_act_fct = "elu",
+  feat_size = 256,
+  feat_bias = TRUE,
+  feat_dropout = 0.0,
+  feat_parametrizations = "None",
+  feat_normalization_type = "layer_norm",
+  ng_conv_act_fct = "elu",
+  ng_conv_n_layers = 0,
+  ng_conv_ks_min = 2,
+  ng_conv_ks_max = 4,
+  ng_conv_bias = FALSE,
+  ng_conv_dropout = 0.1,
+  ng_conv_parametrizations = "None",
+  ng_conv_normalization_type = "layer_norm",
+  ng_conv_residual_type = "residual_gate",
+  dense_act_fct = "elu",
+  dense_n_layers = 1,
+  dense_dropout = 0.2,
+  dense_bias = FALSE,
+  dense_parametrizations = "None",
+  dense_normalization_type = "layer_norm",
+  dense_residual_type = "residual_gate",
+  rec_act_fct = "tanh",
+  rec_n_layers = 2,
   rec_type = "gru",
   rec_bidirectional = FALSE,
-  embedding_dim = 2,
-  self_attention_heads = 0,
-  intermediate_size = NULL,
-  attention_type = "fourier",
-  add_pos_embedding = TRUE,
-  rec_dropout = 0.3,
-  repeat_encoder = 0,
-  dense_dropout = 0.4,
-  recurrent_dropout = 0.4,
-  encoder_dropout = 0.1,
-  optimizer = "adam"
+  rec_dropout = 0.2,
+  rec_bias = FALSE,
+  rec_parametrizations = "None",
+  rec_normalization_type = "layer_norm",
+  rec_residual_type = "residual_gate",
+  tf_act_fct = "elu",
+  tf_dense_dim = 512,
+  tf_n_layers = 0,
+  tf_dropout_rate_1 = 0.1,
+  tf_dropout_rate_2 = 0.2,
+  tf_attention_type = "multihead",
+  tf_embedding_type = "absolute",
+  tf_num_heads = 1,
+  tf_bias = FALSE,
+  tf_parametrizations = "None",
+  tf_normalization_type = "layer_norm",
+  tf_residual_type = "residual_gate",
+  embedding_dim = 2
 )
 ```
 
@@ -1491,15 +1524,14 @@ case you have the true classes for all or some of the cases, you can add
 them to the plot by using the argument `classes_q`. The resulting plot
 is shown in the following Figure.
 
-```{r, include = TRUE, eval=FALSE}
-plot_untrained <- classifier$plot_embeddings(
+```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embeddings of an untrained classifier of type 'ProtoNet'"}
+plot_untrained <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
+  inc_margin = FALSE
 )
 plot_untrained
 ```
-
-![Figure `r running_num_figures`: Embedding of an untrained classifier of type "ProtoNet"](classif_fig_protonet_emb_1.png){width="100%"}
 
 The large triangles represent the prototypes for every class while the
 dots refer to the labeled cases in the data set. For these, the color
@@ -1508,18 +1540,19 @@ Here, the color indicates the class of the estimates. As you can see,
 all cases are located very similarly and there seems to be no clear
 structure. Let us see how this changes when we train the model.
 
-```{r, include = TRUE, eval=FALSE}
-classifier$train(
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
   data_folds = 5,
   data_val_size = 0.25,
-  use_sc = TRUE,
+  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
-  use_pl = TRUE,
-  pl_max_steps = 5,
+  use_pl = FALSE,
+  pl_max_steps = 3,
   pl_max = 1.00,
   pl_anchor = 1.00,
   pl_min = 0.00,
@@ -1527,22 +1560,28 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 400,
-  batch_size = 32,
-  Ns = 2,
-  Nq = 10,
+  epochs = 150,
+  batch_size = 35,
+  Ns = 5,
+  Nq = 3,
   loss_alpha = 0.5,
-  loss_margin = 0.5,
+  loss_margin = 0.05,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
-  ml_trace = 1
+  ml_trace = 0,
+  log_dir = NULL,
+  log_write_interval = 10,
+  n_cores = auto_n_cores(),
+  lr_rate = 1e-3,
+  lr_warm_up_ratio = 0.02,
+  optimizer = "adamw"
 )
 ```
 
 While there are no arguments for requesting a balance of the class
-weights (`balance_class_weights`) or balancing the sequence length
-(`balance_sequence_length`), four new arguments are available. With `Ns`
+weights (`loss_balance_class_weights`) or balancing the sequence length
+(`loss_balance_sequence_length`), four new arguments are available. With `Ns`
 you determine how many examples of *every* class should be used during
 training within the support sample. These examples are used to calculate
 the prototypes for every class. With `Nq` you determine how many
@@ -1586,14 +1625,19 @@ After training we can request a visualization of the data again. We
 first omit all unlabeled cases by setting `inc_unlabeled=FALSE` in order
 to get an impression of the quality of training.
 
-```{r, include = TRUE, eval=FALSE}
-plot_trained_1 <- classifier$plot_embeddings(
+```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases"}
+plot_trained_1 <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
   inc_unlabeled = FALSE
 )
 plot_trained_1
 ```
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
 
 As shown in the figure, all cases are now sorted. Cases of the class
 "neg" are located close to the prototype for "neg", while cases of the
@@ -1603,23 +1647,8 @@ small number of cases is located near the wrong prototype. This can be
 seen if a red dot is close to the prototype for "pos" and a green dot is
 close to the red prototype for "neg".
 
-```{r, include = FALSE}
-running_num_figures=running_num_figures+1
-```
-
-![Figure `r running_num_figures`: Embedding of a trained classifier of type "ProtoNet" without unlabeled cases](classif_fig_protonet_emb_2.png){width="100%"}
-
 Let us now add the unlabeled cases to the plot by setting
 `inc_unlabeled=TRUE`.
-
-```{r, include = TRUE, eval=FALSE}
-plot_trained_2 <- classifier$plot_embeddings(
-  embeddings_q = review_embeddings,
-  classes_q = review_labels,
-  inc_unlabeled = FALSE
-)
-plot_trained_2
-```
 
 As the following figure shows, the model estimates the class of these
 cases according to their distance to the two prototypes. Cases that are
@@ -1630,16 +1659,19 @@ the prototype for "neg" are assigned to "neg".
 running_num_figures=running_num_figures+1
 ```
 
-![Figure `r running_num_figures`: Embedding of a trained classifier of type "ProtoNet" including unlabeled cases](classif_fig_protonet_emb_3.png){width="100%"}
-
-```{r, include = FALSE, eval=TRUE}
-classifier <- vignette_classifier_ProtoNet
+```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases"}
+plot_trained_2 <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_unlabeled = TRUE
+)
+plot_trained_2
 ```
 
 Finally, let us report the reliability of this classifier.
 
 ```{r, include = TRUE, eval=TRUE}
-classifier$reliability$test_metric_mean
+classifier_prototype$reliability$test_metric_mean
 ```
 
 ### 6.1.3 Application with Sample Data
@@ -1656,46 +1688,79 @@ as "very negative". Thus, we increase the number of classes/categories from 2 to
 ``` {r, include =TRUE, eval=TRUE }
 example_data <- imdb_movie_reviews
 example_data$label <- as.character(example_data$label)
-example_data$label[c(1:15)] <- "very positive"
+example_data$label[c(1:15)] <- "very negative"
 example_data$label[c(76:100)] <- NA
 example_data$label[c(201:250)] <- NA
-example_data$label[c(251:260)] <- "very negative"
+example_data$label[c(251:260)] <- "very positive"
 example_data$label=factor(example_data$label)
 table(example_data$label,useNA="ifany")
 ```
 Our aim is now to predict the 75 cases with no labels with the help of our trained 
-model although the model was trained only for two classes. Thus, we first have to plsit the data.
-The cases with classes/categories form the sample set and the cases without any classes/categories
-form the query set.
+model although the model was trained only for two and different classes. Thus, we first have to split the data.
+The cases with classes/categories form the *sample set* and the cases without any classes/categories
+form the *query set*.
 
 ``` {r, include =TRUE, eval=TRUE }
 sample_set_raw=subset(example_data,!is.na(example_data$label))
-sample_classes=na.omit(example_data$label)
+sample_classes=sample_set_raw$label
+table(sample_classes,useNA="ifany")
 
+sample_texts=LargeDataSetForText$new()
+sample_texts$add_from_data.frame(sample_set_raw)
+```
+
+``` {r, include =TRUE, eval=TRUE }
 query_set_raw=subset(example_data,is.na(example_data$label))
+table(query_set_raw$label,useNA="ifany")
+
+query_texts=LargeDataSetForText$new()
+query_texts$add_from_data.frame(query_set_raw)
 ```
 
 Now we must create text embeddings for the query and the sample data set. We have
 to use the same embedding model as we used during training the classifier.
 
 ``` {r, include =TRUE, eval=TRUE }
-sample_texts=LargeDataSetForText$new()
-sample_texts$add_from_data.frame(sample_set_raw)
-
 sample_embeddings <- bert_modeling$embed_large(
   large_datas_set = sample_texts,
   trace = TRUE
 )
 
-query_texts=LargeDataSetForText$new()
-query_texts$add_from_data.frame(query_set_raw)
 query_embeddings <- bert_modeling$embed_large(
   large_datas_set = query_texts,
   trace = TRUE
 )
 ```
 
-Now we are ready to use our classifier.
+Now we are ready to use our classifier. First we predict the classes of the query sample.
+
+``` {r, include =TRUE, eval=TRUE }
+new_predictions=classifier_prototype$predict_with_samples(
+  newdata = query_embeddings,
+  embeddings_s = sample_embeddings,
+  classes_s = sample_classes
+)
+new_predictions
+table(new_predictions)
+```
+
+Although we trained our classifier for two classes we can now use it to predict
+other classes. Next, we plot the results.
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+``` {r, include =TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes." }
+plot_with_samples<-classifier_prototype$plot_embeddings(
+  embeddings_q = query_embeddings,
+  embeddings_s = sample_embeddings,
+  classes_s = sample_classes,
+  inc_unlabeled = TRUE,
+  inc_margin = FALSE
+)
+plot_with_samples
+```
 
 ## 6.2 Feature Extractors
 
@@ -1728,9 +1793,10 @@ information from the compressed information of the latent space (Frochte
 After training, the hidden representation of the latent space is used as
 a compression of the original input.
 
-You can create a feature extractor as follows.
+You can create a feature extractor as follows. In this example we use the
+text embeddings from section 4.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval=TRUE}
 feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
   name = "feature_extractor_bert_movie_reviews",
@@ -1739,16 +1805,16 @@ feature_extractor$configure(
   features = 128,
   method = "lstm",
   noise_factor = 0.2,
-  optimizer = "adam"
+  optimizer = "adamw"
 )
 ```
 
-Similarly to the other models, you can use `name` for the model's name
-and `label` for the model's label. The argument `text_embeddings` takes
+Similarly to the other models, you can use  `label` for the model's label. 
+The argument `text_embeddings` takes
 on object of class `EmbeddedText` or `LargeDataSetForTextEmbeddings`.
 With this object you connect your feature extractor with a specific
 TextEmbeddingModel. That is, the feature extractor works only with
-embeddings from exactly the same TextEmbeddingModel.
+embeddings from exactly the same `TextEmbeddingModel`.
 
 `features` determines the number of features for the compressed
 representation. The lower the number, the higher the requested
@@ -1776,7 +1842,7 @@ Training the extractor is identical to the other models in
 `data_embeddings` must be generated with the same TextEmbeddingModels as
 the embeddings provided during the configuration of your model.
 
-```{r, include = TRUE, eval=FALSE}
+```{r, include = TRUE, eval=TRUE, results='hide'}
 feature_extractor$train(
   data_embeddings = review_embeddings,
   data_val_size = 0.25,
@@ -1784,69 +1850,125 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 40,
+  epochs = 500,
   batch_size = 32,
   trace = TRUE,
-  ml_trace = 1,
+  ml_trace = 0,
 )
 ```
+
+> In this example we use the same text embeddings as we use to traing the classifier.
+> It can be beneficial if you use a larger sample of text for training a `TEFeatureExtractor`
+> to improve performance and/or to allow a broad application of the feature extractor. 
 
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor to `feature_extractor`
 during configuration of the classifier. For the classifier described in
 section 5 this would look like:
 
-```{r, include = TRUE, eval=FALSE}
-classifier <- TEClassifierSequential$new()
-classifier$configure(
+```{r, include = TRUE, eval=TRUE}
+classifier_with_fe <- TEClassifierSequential$new()
+classifier_with_fe$configure(
   label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
   feature_extractor = feature_extractor,
   target_levels = c("neg", "pos"),
-  intermediate_features = 30,
-  cls_pooling_type = "min_max",
-  residual_type = "residual_gate",
-  normalization_type = "layer_norm",
-  feat_act_fct = "elu",
-  feat_size = 50,
-  feat_bias = TRUE,
-  feat_dropout = 0.0,
-  feat_parametrizations = "None",
-  conv_act_fct = "elu",
-  conv_n_layers = 0,
-  conv_ks_min = 2,
-  conv_ks_max = 4,
-  conv_bias = FALSE,
-  conv_parametrizations = "None",
-  dense_act_fct = "elu",
-  dense_n_layers = 1,
-  dense_dropout = 0.0,
-  dense_bias = FALSE,
-  dense_parametrizations = "None",
-  rec_act_fct = "tanh",
-  rec_n_layers = 2,
-  rec_type = "gru",
-  rec_bidirectional = FALSE,
-  rec_dropout = 0.0,
-  rec_bias = FALSE,
-  rec_parametrizations = "None",
-  tf_act_fct = "elu",
-  tf_dense_dim = 50,
-  tf_n_layers = 0,
-  tf_dropout_rate_1 = 0.0,
-  tf_dropout_rate_2 = 0.0,
-  tf_attention_type = "multihead",
-  tf_embedding_type = "absolute",
-  tf_num_heads = 1,
-  tf_bias = FALSE,
-  tf_parametrizations = "None",
+  skip_connection_type="residual_gate",
+  cls_pooling_features=50,
+  cls_pooling_type="min_max",
+  feat_act_fct="elu",
+  feat_size=256,
+  feat_bias=TRUE,
+  feat_dropout=0.0,
+  feat_parametrizations="None",
+  feat_normalization_type="layer_norm",
+  ng_conv_act_fct="elu",
+  ng_conv_n_layers=0,
+  ng_conv_ks_min=2,
+  ng_conv_ks_max=4,
+  ng_conv_bias=FALSE,
+  ng_conv_dropout=0.1,
+  ng_conv_parametrizations="None",
+  ng_conv_normalization_type="layer_norm",
+  ng_conv_residual_type="residual_gate",
+  dense_act_fct="elu",
+  dense_n_layers=1,
+  dense_dropout=0.5,
+  dense_bias=FALSE,
+  dense_parametrizations="None",
+  dense_normalization_type="layer_norm",
+  dense_residual_type="residual_gate",
+  rec_act_fct="tanh",
+  rec_n_layers=2,
+  rec_type="gru",
+  rec_bidirectional=FALSE,
+  rec_dropout=0.2,
+  rec_bias=FALSE,
+  rec_parametrizations="None",
+  rec_normalization_type="layer_norm",
+  rec_residual_type="residual_gate",
+  tf_act_fct="elu",
+  tf_dense_dim=512,
+  tf_n_layers=0,
+  tf_dropout_rate_1=0.2,
+  tf_dropout_rate_2=0.5,
+  tf_attention_type="multihead",
+  tf_embedding_type="absolute",
+  tf_num_heads=1,
+  tf_bias=FALSE,
+  tf_parametrizations="None",
+  tf_normalization_type="layer_norm",
+  tf_residual_type="residual_gate"
+)
+```
+
+```{r, include = TRUE, eval=TRUE}
+classifier_with_fe$train(
+  data_embeddings = review_embeddings,
+  data_targets = review_labels,
+  data_folds = 5,
+  data_val_size = 0.25,
+  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  use_sc = FALSE,
+  sc_method = "knnor",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = FALSE,
+  pl_max_steps = 3,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  epochs = 150,
+  batch_size = 35,
+  Ns = 5,
+  Nq = 3,
+  loss_alpha = 0.5,
+  loss_margin = 0.05,
+  sampling_separate = FALSE,
+  sampling_shuffle = TRUE,
+  trace = TRUE,
+  ml_trace = 0,
+  log_dir = NULL,
+  log_write_interval = 10,
+  n_cores = auto_n_cores(),
+  lr_rate = 1e-3,
+  lr_warm_up_ratio = 0.02,
   optimizer = "adamw"
 )
 ```
 
-That is all. Now you can use and train the classifier in the same way
+That is all. Now you can use and train the classifier in the same way as
 you did without a feature extractor. Even saving and loading is done
 automatically.
+
+If you would like to save and load a `TEFeatureExtractor` independently from a classifier
+you can use the function pair `save_to_disk` and `load_from_disk` as with the other objects
+of this package. This is useful if you would like to use the `TEFeatureExtractor`
+at a later time point. 
 
 # References
 

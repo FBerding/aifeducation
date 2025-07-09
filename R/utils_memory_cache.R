@@ -10,7 +10,25 @@
 #' @noRd
 #'
 create_and_get_tmp_dir=function(){
-  tempdir=paste0(tempdir(),"/r_aifeducation")
-  create_dir(dir_path = tempdir,trace=FALSE)
-  return(tempdir)
+  temp_dir=paste0(tempdir(),"/r_aifeducation")
+  create_dir(dir_path = temp_dir,trace=FALSE)
+  return(temp_dir)
+}
+
+#' @title Clean Temporary directory
+#' @description Function deleting all files stored in the temporary folder of 'aifeducation'.
+#'
+#'@return Returns nothing. It used to clean temporary files.
+#'
+#' @family dev_memory_cache
+#' @keywords internal
+#' @noRd
+#'
+clean_tmp_dir=function(){
+  temp_dir=paste0(tempdir(),"/r_aifeducation")
+  if(dir.exists(temp_dir)){
+    unlink(x=temp_dir)
+  } else {
+    message(paste(tempdir,"does not exist."))
+  }
 }

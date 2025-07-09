@@ -44,7 +44,6 @@ Other R6 classes for transformers:
 \code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFELongformerTransformer}},
-\code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
 \code{\link{.AIFERobertaTransformer}}
 }

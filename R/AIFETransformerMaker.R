@@ -180,13 +180,24 @@ aife_transformer.load_model <- function(type, model_dir, from_tf, load_safe, add
   config <- aife_transformer.load_model_config(type, model_dir)
 
   model_str <- .AIFETrModel[[type]]
-  model <- transformers[[model_str]]$from_pretrained(
-    model_dir,
-    from_tf = from_tf,
-    use_safetensors = load_safe,
-    add_pooling_layer = add_pooler,
-    config = config
-  )
+  if(type=="modernbert"|type=="funnel"){
+    model <- transformers[[model_str]]$from_pretrained(
+      model_dir,
+      from_tf = from_tf,
+      use_safetensors = load_safe,
+      #add_pooling_layer = add_pooler,
+      config = config
+    )
+  } else {
+    model <- transformers[[model_str]]$from_pretrained(
+      model_dir,
+      from_tf = from_tf,
+      use_safetensors = load_safe,
+      add_pooling_layer = add_pooler,
+      config = config
+    )
+  }
+
 
   return(model)
 }

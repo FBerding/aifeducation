@@ -13,11 +13,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 #' @title Base class for classifiers relying on numerical representations of texts instead of words that use
-#' the architecture of Protonet and its corresponding training techniques.
+#' the architecture of Protonets and its corresponding training techniques.
 #' @description Base class for classifiers relying on [EmbeddedText] or [LargeDataSetForTextEmbeddings] as input
-#' which use the architecture of Protonet and its corresponding training techniques.
+#' which use the architecture of Protonets and its corresponding training techniques.
 #'
-#' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
+#' @return Objects of this class containing fields and methods used in several other classes in 'AI for Education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
 #' @family R6 Classes for Developers
 #' @export
@@ -102,7 +102,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      Ns = 5,
                      Nq = 3,
                      loss_alpha = 0.5,
-                     loss_margin = 0.5,
+                     loss_margin = 0.05,
                      sampling_separate = FALSE,
                      sampling_shuffle = TRUE,
                      trace = TRUE,
@@ -400,9 +400,9 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       private$load_reload_python_scripts()
 
       # prepare embeddings
-      embeddings_q <- private$prepare_embeddings_for_forward(embeddings_q)
+      embeddings_q <- private$prepare_embeddings_for_forward(embeddings_q,batch_size = batch_size)
       if (!is.null(embeddings_s)) {
-        embeddings_s <- private$prepare_embeddings_for_forward(embeddings_s)
+        embeddings_s <- private$prepare_embeddings_for_forward(embeddings_s,batch_size = batch_size)
       }
 
       # Check number of cases in the data
@@ -532,7 +532,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       )
     },
     #-------------------------------------------------------------------------
-    prepare_embeddings_for_forward = function(embeddings) {
+    prepare_embeddings_for_forward = function(embeddings,batch_size) {
       # Check if the embeddings must be compressed before passing to the model
       requires_compression <- self$requires_compression(embeddings)
 

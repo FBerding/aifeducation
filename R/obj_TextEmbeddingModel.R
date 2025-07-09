@@ -101,9 +101,13 @@ TextEmbeddingModel <- R6::R6Class(
     #Method for setting the method of the model
     set_model_method=function(model_dir){
       tmp_config <- transformers$AutoConfig$from_pretrained(model_dir)
-      tmp_model<-transformers$AutoModel$from_pretrained(model_dir, config = tmp_config, add_pooling_layer = FALSE)
-      method<-detect_base_model_type(tmp_model)
+      method<-detect_base_model_type(tmp_config)
       private$basic_components$method <- method
+      if(method=="modernbert"|method=="funnel"){
+        tmp_model<-transformers$AutoModel$from_pretrained(model_dir, config = tmp_config)
+      } else {
+        tmp_model<-transformers$AutoModel$from_pretrained(model_dir, config = tmp_config, add_pooling_layer = FALSE)
+      }
     },
     #---------------------------------------------------------------------------
     # Method for setting configured to TRUE
@@ -148,6 +152,9 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #-------------------------------------------------------------------------
     load_reload_python_scripts = function() {
+      load_py_scripts(files = c(
+        "pytorch_layers.py"
+      ))
       if (private$basic_components$method == "mpnet") {
         reticulate::py_run_file(system.file("python/MPNetForMPLM_PT.py",
           package = "aifeducation"
@@ -989,6 +996,12 @@ TextEmbeddingModel <- R6::R6Class(
           data = torch$no_grad(),
           {
             if (private$basic_components$method == AIFETrType$mpnet) {
+              tensor_embeddings <- private$transformer_components$model(
+                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
+                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
+                output_hidden_states = TRUE
+              )$hidden_states
+            } else if(private$basic_components$method == AIFETrType$modernbert){
               tensor_embeddings <- private$transformer_components$model(
                 input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
                 attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),

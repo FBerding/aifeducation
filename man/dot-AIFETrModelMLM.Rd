@@ -5,7 +5,7 @@
 \alias{.AIFETrModelMLM}
 \title{MLM-Model class names}
 \format{
-An object of class \code{list} of length 6.
+An object of class \code{list} of length 7.
 }
 \usage{
 .AIFETrModelMLM
@@ -16,6 +16,7 @@ to get a transformer MLM-model. This list is not designed to be used directly.
 }
 \seealso{
 Other Transformers for developers: 
+\code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFETrConfig}},
 \code{\link{.AIFETrModel}},
 \code{\link{.AIFETrObj}},

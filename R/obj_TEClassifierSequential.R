@@ -77,7 +77,7 @@ TEClassifierSequential <- R6::R6Class(
     #' @param tf_parametrizations `r get_param_doc_desc("tf_parametrizations")`
     #' @param tf_normalization_type `r get_param_doc_desc("tf_normalization_type")`
     #' @param tf_residual_type `r get_param_doc_desc("tf_residual_type")`
-    #' @return Returns an object of class [TEClassifierRegular] which is ready for training.
+    #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,

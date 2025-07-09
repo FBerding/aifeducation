@@ -17,7 +17,7 @@
 #' @title Base class for models using neural nets
 #' @description Abstract class for all models that do not rely on the python library 'transformers'.
 #'
-#' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
+#' @return Objects of this class containing fields and methods used in several other classes in 'AI for Education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
 #' @family R6 Classes for Developers
 #' @export
@@ -593,7 +593,8 @@ AIFEBaseModel <- R6::R6Class(
         log_level = "warning",
         measure_power_secs = self$last_training$config$sustain_interval,
         save_to_file = FALSE,
-        save_to_api = FALSE
+        save_to_api = FALSE,
+        allow_multiple_runs=FALSE
       )
       private$sustainability_tracker$start()
       }

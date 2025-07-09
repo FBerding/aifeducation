@@ -5,7 +5,7 @@
 \alias{.AIFETrTokenizer}
 \title{Tokenizer class names}
 \format{
-An object of class \code{list} of length 6.
+An object of class \code{list} of length 7.
 }
 \usage{
 .AIFETrTokenizer
@@ -17,6 +17,7 @@ used directly.
 }
 \seealso{
 Other Transformers for developers: 
+\code{\link{.AIFEModernBertTransformer}},
 \code{\link{.AIFETrConfig}},
 \code{\link{.AIFETrModel}},
 \code{\link{.AIFETrModelMLM}},

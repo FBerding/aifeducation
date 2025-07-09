@@ -48,8 +48,8 @@ test_that("Focal Loss", {
 # Multi-way contrastive loss----------------------------------------------------
 test_that("Multi-way contrastive loss", {
   layer <- py$multi_way_contrastive_loss(alpha = 0.2, margin = 0.9)
-
-  test_classes <- torch$from_numpy(reticulate::np_array(c(0, 0, 0, 1, 1, 1, 2, 2, 2)))
+  np_array=reticulate::np_array(c(0, 0, 0, 1, 1, 1, 2, 2, 2))
+  test_classes <- torch$from_numpy(np_array$copy())
 
   distance_matrix <- matrix(data = c(
     1.214546097,        1.049661321,    1.167033276,

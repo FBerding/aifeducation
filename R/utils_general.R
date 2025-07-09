@@ -189,9 +189,9 @@ auto_n_cores <- function() {
 #' @export
 create_object=function(class){
   if(class=="TEClassifierRegular"){
-    return(TEClassifierRegular$new())
+    return(suppressMessages(TEClassifierRegular$new()))
   } else if(class=="TEClassifierProtoNet"){
-    return(TEClassifierProtoNet$new())
+    return(suppressMessages(TEClassifierProtoNet$new()))
   } else if(class=="TEClassifierSequential"){
     return(TEClassifierSequential$new())
   }else if(class=="TEClassifierSequentialPrototype"){
@@ -228,7 +228,12 @@ create_object=function(class){
 #' @keywords internal
 #' @noRd
 detect_base_model_type=function(model){
-  type_string=model$config
+  if(("transformers.configuration_utils.PretrainedConfig")%in%class(model)){
+    type_string=model$architectures
+  } else {
+    type_string=model$config
+  }
+
   if(stringi::stri_detect(str=tolower(type_string),regex = "^funnel([:alnum:]*)")){
     return("funnel")
   } else if(stringi::stri_detect(str=tolower(type_string),regex = "^bert([:alnum:]*)")){
@@ -241,6 +246,8 @@ detect_base_model_type=function(model){
     return("longformer")
   } else if(stringi::stri_detect(str=tolower(type_string),regex = "^roberta([:alnum:]*)")){
     return("roberta")
+  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^modernbert([:alnum:]*)")){
+    return("modernbert")
   } else {
     stop("Architectue for the model could not be detected.")
   }

@@ -19,7 +19,7 @@
 #' All models of this class require text embeddings as input. These are provided as
 #' objects of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
 #'
-#' @return Objects of this containing fields and methods used in several other classes in 'ai for education'. This class
+#' @return Objects of this class containing fields and methods used in several other classes in 'AI for education'. This class
 #'   is **not** designed for a direct application and should only be used by developers.
 #' @family R6 Classes for Developers
 #' @export

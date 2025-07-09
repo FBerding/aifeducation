@@ -4,6 +4,7 @@ Appendix_A01_Supported_Frameworks.Rmd
 model_configuration.Rmd
 sharing_and_publishing.Rmd
 transformers.Rmd
+a01_layers_stacks.Rmd
 For Later use
 examples
 
@@ -24,6 +25,7 @@ docs
 vignettes/img_articles
 ^vignettes/.*\.png
 vignettes/.jpg
+vignettes/examples
 ^\.github$
 checkpoints
 cran-comments.md

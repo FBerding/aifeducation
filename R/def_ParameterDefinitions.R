@@ -673,12 +673,19 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = c("FocalLoss", "CrossEntropyLoss"),
     desc = "Name of the loss function to use during training.",
+    values_desc=list(
+      "CrossEntropyLoss"="Applies the a cross cross entropy loss.",
+      "FocalLoss"="Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
+    ),
     gui_box = "General Settings",
     gui_label = "Loss Function",
     default_value = "FocalLoss"
   )
   param$loss_pt_fct_name= param$loss_cls_fct_name
   param$loss_pt_fct_name$allowed_values=c("MultiWayContrastiveLoss")
+  param$loss_pt_fct_name$values_desc=list(
+    "MultiWayContrastiveLoss"="Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24)."
+  )
   param$loss_pt_fct_name$default_value=c("MultiWayContrastiveLoss")
   param$loss_pt_fct_name$gui_box = "General Settings"
 
@@ -935,6 +942,12 @@ get_param_dict <- function() {
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("residual_gate", "addition","None"),
+    values_desc=list(
+      "None"="Add no residual connection.",
+      "addition"="Adds a residual connection by adding the original input to the output.",
+      "residual_gate"="Adds a residucal connection by creating a weightes sum from the original input and the output.
+                      The weight is a learnable parameter. This type of residual connection is described by [Savarese and Figueiredo (2017)](https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf)."
+    ),
     desc = "Type residual connenction for the complete model.",
     gui_box = "General Settings",
     gui_label = "Residual Connection",
@@ -963,6 +976,10 @@ get_param_dict <- function() {
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("layer_norm", "None"),
+    values_desc=list(
+      "layer_norm"="Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450).",
+      "None"="Applies no normalization. "
+    ),
     desc = "Type of normalization applied to all layers and stack layers.",
     gui_box = "General Settings",
     gui_label = "Normalization",
@@ -1023,6 +1040,12 @@ get_param_dict <- function() {
     allow_null = FALSE,
     allowed_values = c("None", "orthogonal", "weight_norm", "spectral_norm"),
     desc = "Re-Parametrizations for all layers except recurrent layers.",
+    values_desc=list(
+      "None"="Does not apply any re-parametrizations.",
+      "orthogonal"="Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function.",
+      "weight_norm"="Applies a weight norm with the default settings of PyTorch's corresponding function.Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
+      "spectral_norm"="Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
+    ),
     gui_box = "General Settings",
     gui_label = "Re-Parametrization",
     default_value = "None",
@@ -1257,8 +1280,8 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = c("fourier", "multihead"),
     values_desc=list(
-      multihead="The original multi-head attention as described by Vaswani et al. (2017).",
-      fourier="Attention with fourier transformation as described by Lee-Thorp et al. (2021)."
+      multihead="The original multi-head attention as described by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762).",
+      fourier="Attention with fourier transformation as described by [Lee-Thorp et al. (2021)](https://doi.org/10.48550/arXiv.2105.03824)."
     ),
     desc = "Choose the relevant attention type. Please note that you may see different
     values for a case for different input orders if you choose `fourier` on linux.",
@@ -1286,6 +1309,10 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = c("absolute"),
+    values_desc=list(
+      "absolute"="Adds positional information by using an embedding matrix as described by Chollet, Kalinowski, and Allaire (2022, pp. 378-379).
+                  This implementation is different to the original work by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762)."
+    ),
     desc = "Type of processing positional information.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Positional Information",

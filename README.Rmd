@@ -141,7 +141,7 @@ already trained models work with future versions of this package.
 
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports new
-approaches such as ModernBERT (Warner et al. 2024), MPNet (Song et al. 2020), BERT (Devlin et al.
+approaches such as modernBERT (Warner et al. 2024), MPNet (Song et al. 2020), BERT (Devlin et al.
 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
 Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
 Cohan 2020).

@@ -67,7 +67,7 @@ Other Installation and Configuration:
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_aifeducation}()},
 \code{\link{install_aifeducation_studio}()},
-\code{\link{prepare_python}()},
+\code{\link{prepare_session}()},
 \code{\link{set_transformers_logger}()},
 \code{\link{update_aifeducation}()}
 }

@@ -54,12 +54,13 @@ ml_frameworks <- c(
 
 base_model_list <- list(
   pytorch = c(
-    "bert"#,
-    #"roberta",
-    #"longformer",
-    #"funnel",
-    #"deberta_v2",
-    #"mpnet"
+    "bert",
+    "roberta",
+    "longformer",
+    "funnel",
+    "deberta_v2",
+    "mpnet",
+    "modernbert"
   )
 )
 
@@ -69,7 +70,8 @@ pooling_type_list <- list(
   "roberta" = c("cls", "average"),
   "longformer" = c("cls", "average"),
   "deberta_v2" = c("cls", "average"),
-  "mpnet" = c("cls", "average")
+  "mpnet" = c("cls", "average"),
+  "modernbert"=c("cls", "average")
 )
 
 max_layers <- 1:2
