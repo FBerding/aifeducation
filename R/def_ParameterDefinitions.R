@@ -17,12 +17,6 @@
 #' @keywords internal
 TEClassifiers_class_names <- c()
 
-#' @title Class names of all deprecated objects
-#' @description `vector` containing all class names as a string.
-#' @family Parameter Dictionary
-#' @keywords internal
-DeprecatedObjects<-c("TEClassifierProtoNet","TEClassifierRegular")
-
 #' @title Get names of classifiers
 #' @description Function returns the names of all classifiers which
 #' are child classes of a specific super class.
@@ -47,6 +41,21 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
     }
     return(class_names)
   }
+}
+
+#' @title Class names of all deprecated objects
+#' @description `vector` containing all class names as a string.
+#' @family Parameter Dictionary
+#' @keywords internal
+DeprecatedObjects<-c("TEClassifierProtoNet","TEClassifierRegular")
+
+#' @title Get names of deprecated objects
+#' @description Function returns the names of all objects that are deprecated.
+#' @return Returns a vector containing the names.
+#' @family Parameter Dictionary
+#' @export
+get_deprecated_object_names <- function() {
+return(DeprecatedObjects)
 }
 
 #' @title Get dictionary of all parameters

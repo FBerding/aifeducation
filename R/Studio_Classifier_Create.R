@@ -32,7 +32,9 @@ Classifiers_Create_UI <- function(id) {
         shiny::tags$hr(),
         shiny::selectInput(
           inputId = shiny::NS(id, "classifier_type"),
-          choices = get_TEClassifiers_class_names("ClassifiersBasedOnTextEmbeddings"),
+          choices = setdiff(
+            x=get_TEClassifiers_class_names("ClassifiersBasedOnTextEmbeddings"),
+            y=get_deprecated_object_names()),
           label = "Classifier Type"
         ),
         shiny::textInput(
