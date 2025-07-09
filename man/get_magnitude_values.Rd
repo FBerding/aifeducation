@@ -19,7 +19,7 @@ get_magnitude_values(magnitude, n_elements = 9, max, min)
 Returns a numeric \code{vector} with the generated values.
 The values are calculated with the following formula:
 max * magnitude^i for i=1,...,n_elements.
-Only values equal or creater \code{min} are returned.
+Only values equal or greater \code{min} are returned.
 }
 \description{
 Function calculates different magnitude for a numeric argument.

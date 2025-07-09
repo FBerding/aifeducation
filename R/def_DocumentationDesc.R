@@ -214,6 +214,57 @@ get_dict_input_types=function(input_type){
 #===============================================================================
 #' @title Generate layer documentation
 #' @description Function for generating the documentation of a specific layer.
+#' @param param_name `string` Name of the parameter.
+#' @param inc_param_name `bool` If `TRUE` the documentation includes the name of the parameter.
+#' @param param_dict `list` storing the parameter description.
+#' @param as_list `bool` If `TRUE` returns the element as part of a list.
+#'
+#' @returns Returns a `string` containing the description written in rmarkdown.
+#' @family Utils Documentation
+#' @export
+get_parameter_documentation=function(param_name,param_dict,as_list=TRUE,inc_param_name=TRUE){
+    selected_param <- param_name
+
+    # Add description
+    if(as_list==TRUE){
+      prefix="- *"
+      suffix="*: "
+      list_level="\t"
+    } else {
+      prefix=""
+      suffix=": "
+      list_level=""
+    }
+
+    if(inc_param_name==TRUE){
+      param_desc=paste0(prefix, param_name, suffix)
+    } else{
+      param_desc=NULL
+    }
+    param_desc <- paste0(
+      param_desc,
+      param_dict[[param_name]]$desc, "\n"
+    )
+
+    if (!is.null(param_dict[[param_name]]$values_desc)) {
+      param_desc <- paste0(
+        param_desc,
+        "Allowed values:\n\n"
+      )
+      for (j in seq_along(param_dict[[param_name]]$values_desc)) {
+        param_desc <- paste0(
+          param_desc,
+          list_level,"- ",
+          "`'", names(param_dict[[param_name]]$values_desc)[j], "'`", ": ",
+          param_dict[[param_name]]$values_desc[[j]], "\n"
+        )
+      }
+    }
+  return(param_desc)
+}
+
+#' @title Generate layer documentation
+#' @description Function for generating the documentation of a specific layer.
 #' @param layer_name `string` Name of the layer.
 #' @param title_format `string` Kind of format of the title.
 #' @param subtitle_format `string` Kind of format for all sub-titles.
@@ -267,7 +318,7 @@ get_layer_documentation <- function(layer_name, title_format="bold",subtitle_for
     img_block=paste0(subtitle_format1,"Visualization",subtitle_format1,"\n\n")
     img_block=paste0(
       img_block,
-      "![",current_doc$title,"](",current_doc$img,"){width='100%'}\n\n"
+      "![Figure: ",current_doc$title,"](",current_doc$img,"){width='100%'}\n\n"
     )
   } else {
     img_block=NULL
@@ -280,32 +331,10 @@ get_layer_documentation <- function(layer_name, title_format="bold",subtitle_for
     param_desc <- paste0(subtitle_format1,"Parameters",subtitle_format1,"\n\n")
     for (i in seq_along(relevant_params)) {
       selected_param <- relevant_params[[i]]
-      tmp_layer_desc <- NULL
-      # Add description
-      tmp_layer_desc <- paste0(
-        tmp_layer_desc,
-        "- *", selected_param, "*: ",
-        param_dict[[selected_param]]$desc, "\n"
-      )
 
-
-      if (!is.null(param_dict[[selected_param]]$values_desc)) {
-        tmp_layer_desc <- paste0(
-          tmp_layer_desc,
-          "Allowed values:\n\n"
-        )
-        for (j in seq_along(param_dict[[selected_param]]$values_desc)) {
-          tmp_layer_desc <- paste0(
-            tmp_layer_desc,
-            "\t\t - ",
-            "`", names(param_dict[[selected_param]]$values_desc)[j], "`", ": ",
-            param_dict[[selected_param]]$values_desc[[j]], "\n"
-          )
-        }
-      }
       param_desc <- paste0(
         param_desc, "\n",
-        tmp_layer_desc
+        get_parameter_documentation(param_name = selected_param,param_dict = param_dict)
       )
     }
   }

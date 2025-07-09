@@ -1058,7 +1058,7 @@ get_param_dict <- function() {
     values_desc=list(
       "None"="Does not apply any re-parametrizations.",
       "orthogonal"="Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
-      "weight_norm"="Applies a weight norm with the default settings of PyTorch's corresponding function.Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
+      "weight_norm"="Applies a weight norm with the default settings of PyTorch's corresponding function. Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
       "spectral_norm"="Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
     ),
     gui_box = "General Settings",
@@ -1549,7 +1549,7 @@ get_called_args <- function(n = 1) {
 #' @return Returns a numeric `vector` with the generated values.
 #' The values are calculated with the following formula:
 #' max * magnitude^i for i=1,...,n_elements.
-#' Only values equal or creater `min` are returned.
+#' Only values equal or greater `min` are returned.
 #' @family Parameter Dictionary
 get_magnitude_values <- function(magnitude, n_elements = 9,max,min) {
   value_vector <- vector(length = n_elements)

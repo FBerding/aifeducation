@@ -1153,7 +1153,14 @@ create_widget_card <- function(id,
         tmp_label_with_icon <- shiny::tags$p(
           bslib::popover(
             trigger = shiny::icon("info-circle"),
-            shiny::includeMarkdown(dict_entry$values_desc)
+            shiny::includeMarkdown(
+              get_parameter_documentation(
+                param_name = param,
+                param_dict = param_dict,
+                inc_param_name=FALSE,
+                as_list = FALSE
+              )
+            )
           ),
           dict_entry$gui_label
         )

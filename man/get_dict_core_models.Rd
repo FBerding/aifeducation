@@ -30,7 +30,8 @@ Other Utils Documentation:
 \code{\link{get_dict_cls_type}()},
 \code{\link{get_dict_input_types}()},
 \code{\link{get_layer_dict}()},
-\code{\link{get_layer_documentation}()}
+\code{\link{get_layer_documentation}()},
+\code{\link{get_parameter_documentation}()}
 }
 \concept{Utils Documentation}
 \keyword{internal}
