@@ -252,7 +252,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{feat_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the scaling layer. Allowed values: \verb{0 <= x < 1}}
+\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \verb{0 <= x < 1}}
 
 \item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 

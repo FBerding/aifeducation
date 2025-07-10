@@ -626,7 +626,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     dtype=torch.double
     model.to(device,dtype=dtype)
   
-if optimizer_method=="adam":
+  if optimizer_method=="adam":
     optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
   elif optimizer_method=="rmsprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
