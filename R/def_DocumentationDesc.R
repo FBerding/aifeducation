@@ -118,7 +118,7 @@ get_layer_dict <- function(layer) {
     param_prefix = "merge_"
   )
 
-  if(layer!="all"){
+  if (layer != "all") {
     return(documentation[[layer]])
   } else {
     return(documentation)
@@ -138,15 +138,15 @@ get_layer_dict <- function(layer) {
 #'
 #' @family Utils Documentation
 #' @keywords internal
-get_dict_core_models=function(model){
-  dictionary=NULL
+get_dict_core_models <- function(model) {
+  dictionary <- NULL
 
   dictionary$sequential <- list(
     title = "Sequential Core Architecture",
     desc = "This model is based on a sequential architecture.
   The input is passed to a specific number of layers step by step.
   All layers are grouped by the kind of layers into stacks.",
-    img="core_arch_sequential.png"
+    img = "core_arch_sequential.png"
   )
 
   dictionary$parallel <- list(
@@ -154,10 +154,10 @@ get_dict_core_models=function(model){
     desc = "This model is based on a parallel architecture.
   An input is passed to different types of layers separately. At the end the outputs
   are combined to create the final output of the whole model.",
-    img="core_arch_parallel.png"
+    img = "core_arch_parallel.png"
   )
 
-  if(model=="all"){
+  if (model == "all") {
     return(dictionary)
   } else {
     return(dictionary[[model]])
@@ -173,12 +173,12 @@ get_dict_core_models=function(model){
 #'
 #' @family Utils Documentation
 #' @keywords internal
-get_dict_cls_type=function(cls_type){
-  if(cls_type=="prob"){
-    desc="This is a probability classifier that predicts a probability distribution for
+get_dict_cls_type <- function(cls_type) {
+  if (cls_type == "prob") {
+    desc <- "This is a probability classifier that predicts a probability distribution for
     different classes/categories. This is the standard case most common in literature."
-  } else if (cls_type=="prototype"){
-    desc="This object is a metric based classifer and represents in implementation of a prototypical network for
+  } else if (cls_type == "prototype") {
+    desc <- "This object is a metric based classifer and represents in implementation of a prototypical network for
     few-shot learning as described by Snell,
    Swersky, and Zemel (2017). The network uses a multi way contrastive loss described by Zhang et al. (2019). The
    network learns to scale the metric as described by Oreshkin, Rodriguez, and Lacoste (2018)."
@@ -194,9 +194,9 @@ get_dict_cls_type=function(cls_type){
 #'
 #' @family Utils Documentation
 #' @keywords internal
-get_dict_input_types=function(input_type){
-  if(input_type=="text_embeddings"){
-    desc="For the creation and training of a
+get_dict_input_types <- function(input_type) {
+  if (input_type == "text_embeddings") {
+    desc <- "For the creation and training of a
    classifier an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] on the one hand and a [factor] on
    the other hand are necessary.
    \n The object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]  contains the numerical text representations
@@ -211,7 +211,7 @@ get_dict_input_types=function(input_type){
 
 
 
-#===============================================================================
+# ===============================================================================
 #' @title Generate layer documentation
 #' @description Function for generating the documentation of a specific layer.
 #' @param param_name `string` Name of the parameter.
@@ -222,44 +222,44 @@ get_dict_input_types=function(input_type){
 #' @returns Returns a `string` containing the description written in rmarkdown.
 #' @family Utils Documentation
 #' @export
-get_parameter_documentation=function(param_name,param_dict,as_list=TRUE,inc_param_name=TRUE){
-    selected_param <- param_name
+get_parameter_documentation <- function(param_name, param_dict, as_list = TRUE, inc_param_name = TRUE) {
+  selected_param <- param_name
 
-    # Add description
-    if(as_list==TRUE){
-      prefix="- *"
-      suffix="*: "
-      list_level="\t"
-    } else {
-      prefix=""
-      suffix=": "
-      list_level=""
-    }
+  # Add description
+  if (as_list == TRUE) {
+    prefix <- "- *"
+    suffix <- "*: "
+    list_level <- "\t"
+  } else {
+    prefix <- ""
+    suffix <- ": "
+    list_level <- ""
+  }
 
-    if(inc_param_name==TRUE){
-      param_desc=paste0(prefix, param_name, suffix)
-    } else{
-      param_desc=NULL
-    }
+  if (inc_param_name == TRUE) {
+    param_desc <- paste0(prefix, param_name, suffix)
+  } else {
+    param_desc <- NULL
+  }
+  param_desc <- paste0(
+    param_desc,
+    param_dict[[param_name]]$desc, "\n"
+  )
+
+  if (!is.null(param_dict[[param_name]]$values_desc)) {
     param_desc <- paste0(
       param_desc,
-      param_dict[[param_name]]$desc, "\n"
+      "Allowed values:\n\n"
     )
-
-    if (!is.null(param_dict[[param_name]]$values_desc)) {
+    for (j in seq_along(param_dict[[param_name]]$values_desc)) {
       param_desc <- paste0(
         param_desc,
-        "Allowed values:\n\n"
+        list_level, "- ",
+        "`'", names(param_dict[[param_name]]$values_desc)[j], "'`", ": ",
+        param_dict[[param_name]]$values_desc[[j]], "\n"
       )
-      for (j in seq_along(param_dict[[param_name]]$values_desc)) {
-        param_desc <- paste0(
-          param_desc,
-          list_level,"- ",
-          "`'", names(param_dict[[param_name]]$values_desc)[j], "'`", ": ",
-          param_dict[[param_name]]$values_desc[[j]], "\n"
-        )
-      }
     }
+  }
   return(param_desc)
 }
 
@@ -275,7 +275,7 @@ get_parameter_documentation=function(param_name,param_dict,as_list=TRUE,inc_para
 #' @returns Returns a `string` containing the description written in rmarkdown.
 #' @family Utils Documentation
 #' @export
-get_layer_documentation <- function(layer_name, title_format="bold",subtitle_format="italic",inc_img = FALSE, inc_params = FALSE, inc_references = FALSE) {
+get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_format = "italic", inc_img = FALSE, inc_params = FALSE, inc_references = FALSE) {
   current_doc <- get_layer_dict(layer_name)
   param_dict <- get_param_dict()
 
@@ -287,54 +287,54 @@ get_layer_documentation <- function(layer_name, title_format="bold",subtitle_for
 
   # General description--------------------------------------------------------
   # Title
-  if(title_format=="bold"){
-    title_format_1="**"
-    title_format_2=title_format_1
-  } else if (title_format=="header"){
-    title_format_1="## "
-    title_format_2=""
+  if (title_format == "bold") {
+    title_format_1 <- "**"
+    title_format_2 <- title_format_1
+  } else if (title_format == "header") {
+    title_format_1 <- "## "
+    title_format_2 <- ""
   }
 
-  title <- paste0(title_format_1, current_doc$title, title_format_2,"\n\n")
+  title <- paste0(title_format_1, current_doc$title, title_format_2, "\n\n")
 
 
-  if(subtitle_format=="italic"){
-    subtitle_format1="*"
-  } else if(subtitle_format=="bold"){
-    subtitle_format1="**"
+  if (subtitle_format == "italic") {
+    subtitle_format1 <- "*"
+  } else if (subtitle_format == "bold") {
+    subtitle_format1 <- "**"
   }
-  subtitle_format2=subtitle_format1
+  subtitle_format2 <- subtitle_format1
 
   # Description general
   desc <- paste0(
-    subtitle_format1,"Description",subtitle_format2,"\n\n",
-    current_doc$desc," ",
+    subtitle_format1, "Description", subtitle_format2, "\n\n",
+    current_doc$desc, " ",
     "All parameters with the prefix *", current_doc$param_prefix, "* can be used to configure this layer.",
     "\n\n"
   )
 
-  #Image of the layer
-  if(inc_img==TRUE){
-    img_block=paste0(subtitle_format1,"Visualization",subtitle_format1,"\n\n")
-    img_block=paste0(
+  # Image of the layer
+  if (inc_img == TRUE) {
+    img_block <- paste0(subtitle_format1, "Visualization", subtitle_format1, "\n\n")
+    img_block <- paste0(
       img_block,
-      "![Figure: ",current_doc$title,"](",current_doc$img,"){width='100%'}\n\n"
+      "![Figure: ", current_doc$title, "](", current_doc$img, "){width='100%'}\n\n"
     )
   } else {
-    img_block=NULL
+    img_block <- NULL
   }
 
   # Description of all parameters
-  param_desc=NULL
+  param_desc <- NULL
   # Parameter Documentation---------------------------------------------------
   if (inc_params == TRUE) {
-    param_desc <- paste0(subtitle_format1,"Parameters",subtitle_format1,"\n\n")
+    param_desc <- paste0(subtitle_format1, "Parameters", subtitle_format1, "\n\n")
     for (i in seq_along(relevant_params)) {
       selected_param <- relevant_params[[i]]
 
       param_desc <- paste0(
         param_desc, "\n",
-        get_parameter_documentation(param_name = selected_param,param_dict = param_dict)
+        get_parameter_documentation(param_name = selected_param, param_dict = param_dict)
       )
     }
   }
@@ -362,31 +362,31 @@ get_layer_documentation <- function(layer_name, title_format="bold",subtitle_for
 #' @returns Returns a `string` containing the description written in rmarkdown.
 #' @family Utils Documentation
 #' @export
-get_desc_for_core_model_architecture <- function(name,title_format="bold",inc_img=FALSE) {
+get_desc_for_core_model_architecture <- function(name, title_format = "bold", inc_img = FALSE) {
   documentation <- get_dict_core_models(name)
 
-  if(inc_img==TRUE){
-    img_block="**Visualization**\n\n"
-    img_block=paste0(
+  if (inc_img == TRUE) {
+    img_block <- "**Visualization**\n\n"
+    img_block <- paste0(
       img_block,
-      "![",documentation$title,"](",documentation$img,"){width='100%'}\n\n"
+      "![", documentation$title, "](", documentation$img, "){width='100%'}\n\n"
     )
   } else {
-    img_block=NULL
+    img_block <- NULL
   }
 
-  if(title_format=="bold"){
-    title_format1="**"
-    title_format2=title_format1
-  } else if(title_format=="header") {
-    title_format1="## "
-    title_format2=""
+  if (title_format == "bold") {
+    title_format1 <- "**"
+    title_format2 <- title_format1
+  } else if (title_format == "header") {
+    title_format1 <- "## "
+    title_format2 <- ""
   }
 
   markdown_doc <- paste0(
     "\n",
-    title_format1, documentation$title, title_format2,"\n\n",
-    img_block,"\n\n",
+    title_format1, documentation$title, title_format2, "\n\n",
+    img_block, "\n\n",
     documentation$desc, "\n"
   )
 
@@ -404,70 +404,69 @@ get_desc_for_core_model_architecture <- function(name,title_format="bold",inc_im
 #' @note Function is designed to be used with roxygen2 in the regular documentation.
 #' @family Utils Documentation
 #' @export
-build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NULL,input_type="text_embeddings") {
-  layer_dict=get_layer_dict("all")
-  prefixes=NULL
-  for(i in seq_along(layer_dict)){
-    prefixes=append(x=prefixes,values = layer_dict[[i]]$param_prefix)
+build_documentation_for_model <- function(model_name, cls_type = NULL, core_type = NULL, input_type = "text_embeddings") {
+  layer_dict <- get_layer_dict("all")
+  prefixes <- NULL
+  for (i in seq_along(layer_dict)) {
+    prefixes <- append(x = prefixes, values = layer_dict[[i]]$param_prefix)
   }
 
-  layer_included=vector(length = length(prefixes))
-  names(layer_included)=names(layer_dict)
+  layer_included <- vector(length = length(prefixes))
+  names(layer_included) <- names(layer_dict)
 
-  model=create_object(model_name)
-  params=rlang::fn_fmls_names(model$configure)
+  model <- create_object(model_name)
+  params <- rlang::fn_fmls_names(model$configure)
 
-  for(i in seq_along(layer_included)){
-    check_inlucded=stringi::stri_detect(str = params,regex = paste0("^", prefixes[i]))
-    if(sum(check_inlucded)>0){
-      layer_included[i]=TRUE
+  for (i in seq_along(layer_included)) {
+    check_inlucded <- stringi::stri_detect(str = params, regex = paste0("^", prefixes[i]))
+    if (sum(check_inlucded) > 0) {
+      layer_included[i] <- TRUE
     } else {
-      layer_included[i]=FALSE
+      layer_included[i] <- FALSE
     }
   }
 
-  model_documentation=NULL
+  model_documentation <- NULL
 
-  #CLS Type
-  desc_cls_type=NULL
-  if(!is.null(cls_type)){
-    model_documentation=paste0("**Classification Type**\n\n",
-    desc_cls_type=get_dict_cls_type(cls_type)
+  # CLS Type
+  desc_cls_type <- NULL
+  if (!is.null(cls_type)) {
+    model_documentation <- paste0("**Classification Type**\n\n",
+      desc_cls_type = get_dict_cls_type(cls_type)
     )
   }
 
-  #Core Architecture
-  if(!is.null(core_type)){
-    model_documentation=paste0(
-      model_documentation,"\n\n",
+  # Core Architecture
+  if (!is.null(core_type)) {
+    model_documentation <- paste0(
+      model_documentation, "\n\n",
       get_desc_for_core_model_architecture(core_type)
     )
   }
 
-  #Layer Description
-  for(i in seq_along(layer_included)){
-    if(layer_included[i]==TRUE){
-      model_documentation=paste0(
-        model_documentation,"\n",
-        get_layer_documentation(names(layer_included)[i],subtitle_format = "italic")
+  # Layer Description
+  for (i in seq_along(layer_included)) {
+    if (layer_included[i] == TRUE) {
+      model_documentation <- paste0(
+        model_documentation, "\n",
+        get_layer_documentation(names(layer_included)[i], subtitle_format = "italic")
       )
     }
   }
 
-  #Input and Prediction
-  desc_input_and_predict=NULL
-  if(!is.null(input_type)){
-    desc_input_and_predict=paste0(
+  # Input and Prediction
+  desc_input_and_predict <- NULL
+  if (!is.null(input_type)) {
+    desc_input_and_predict <- paste0(
       "**Training and Prediction**\n\n",
       get_dict_input_types(input_type)
     )
   }
-  model_documentation=paste0(
-    model_documentation,"\n",
+  model_documentation <- paste0(
+    model_documentation, "\n",
     desc_input_and_predict
   )
   return(model_documentation)
-
 }
 
 #' @title Generate documentation of all layers for an vignette or article
@@ -477,18 +476,18 @@ build_documentation_for_model <- function(model_name,cls_type=NULL,core_type=NUL
 #' @note Function is designed to be used with inline r code in rmarkdown vignettes/articles.
 #' @family Utils Documentation
 #' @export
-build_layer_stack_documentation_for_vignette=function(){
+build_layer_stack_documentation_for_vignette <- function() {
   # layer documentation
-  layer_dict=get_layer_dict(layer="all")
+  layer_dict <- get_layer_dict(layer = "all")
 
-  layer_doc="# Layers"
-  for(layer in names(layer_dict)){
-    layer_doc=paste0(
-      layer_doc,"\n",
+  layer_doc <- "# Layers"
+  for (layer in names(layer_dict)) {
+    layer_doc <- paste0(
+      layer_doc, "\n",
       get_layer_documentation(
         layer_name = layer,
-        title_format="header",
-        subtitle_format="bold",
+        title_format = "header",
+        subtitle_format = "bold",
         inc_img = TRUE,
         inc_params = TRUE,
         inc_references = TRUE
@@ -496,17 +495,17 @@ build_layer_stack_documentation_for_vignette=function(){
     )
   }
 
-  core_model_dict=get_dict_core_models("all")
-  core_models_doc="# Core Models"
-  for(core_model in names(core_model_dict)){
-    core_models_doc=paste0(
-      core_models_doc,"\n",
-      get_desc_for_core_model_architecture(core_model,title_format="header",inc_img = TRUE)
+  core_model_dict <- get_dict_core_models("all")
+  core_models_doc <- "# Core Models"
+  for (core_model in names(core_model_dict)) {
+    core_models_doc <- paste0(
+      core_models_doc, "\n",
+      get_desc_for_core_model_architecture(core_model, title_format = "header", inc_img = TRUE)
     )
   }
 
-  markdown_syntax=paste0(
-    layer_doc,"\n",
+  markdown_syntax <- paste0(
+    layer_doc, "\n",
     core_models_doc
   )
 
@@ -521,23 +520,23 @@ build_layer_stack_documentation_for_vignette=function(){
 #' @family Parameter Dictionary
 #' @noRd
 #' @keywords internal
-build_aife_site=function(){
+build_aife_site <- function() {
   requireNamespace("pkgdown")
   pkgdown::clean_site()
   pkgdown::init_site()
   pkgdown::build_home()
   pkgdown::build_redirects()
 
-  #build site for articles
-  articles=list.files(
+  # build site for articles
+  articles <- list.files(
     path = "vignettes",
     pattern = "*.Rmd",
     full.names = FALSE
   )
-  articles=stringi::stri_replace_all(str=articles,regex = ".Rmd",replacement="")
-  for(article in articles){
+  articles <- stringi::stri_replace_all(str = articles, regex = ".Rmd", replacement = "")
+  for (article in articles) {
     pkgdown::build_article(
-      name=article,
+      name = article,
       new_process = FALSE,
       quiet = FALSE
     )

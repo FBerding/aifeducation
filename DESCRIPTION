@@ -63,6 +63,7 @@ Suggests:
     future,
     ggplot2,
     knitr,
+    pkgdown,
     promises,
     readtext,
     readxl,

@@ -14,7 +14,7 @@ imdb_movie_reviews
 A \link{data.frame} consisting of a subset of 100 negative and 200 positive movie reviews from the
 dataset provided by Maas et al. (2011). The \link{data.frame} consists of three columns. The first column 'text'
 stores the movie review. The second stores the labels (0 = negative, 1 = positive). The last column stores the id.
-The purpose of the data is for illustration in vignettes.
+The purpose of the data is for illustration in vignettes and for tests.
 }
 \references{
 Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011). Learning Word Vectors
@@ -23,4 +23,4 @@ the Association for Computational Linguistics: Human Language Technologies (pp. 
 Computational Linguistics. \url{https://aclanthology.org/P11-1015}
 }
 \concept{Data Sets}
-\keyword{internal}
+\keyword{datasets}

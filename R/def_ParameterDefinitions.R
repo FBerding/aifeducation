@@ -44,12 +44,16 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
   }
 }
 
-#' @title Class names of all deprecated objects
+
+#' @title Names of all deprecated objects
+#'
 #' @description `vector` containing all class names as a string.
+#'
 #' @family Parameter Dictionary
 #' @keywords internal
 #' @noRd
-DeprecatedObjects<-c("TEClassifierProtoNet","TEClassifierRegular")
+DeprecatedObjects <- c("TEClassifierProtoNet", "TEClassifierRegular")
+
 
 #' @title Get names of deprecated objects
 #' @description Function returns the names of all objects that are deprecated.
@@ -57,7 +61,7 @@ DeprecatedObjects<-c("TEClassifierProtoNet","TEClassifierRegular")
 #' @family Parameter Dictionary
 #' @export
 get_deprecated_object_names <- function() {
-return(DeprecatedObjects)
+  return(DeprecatedObjects)
 }
 
 #' @title Get dictionary of all parameters
@@ -90,7 +94,7 @@ return(DeprecatedObjects)
 #'
 get_param_dict <- function() {
   param <- list()
-  #General---------------------------------------------------------------------
+  # General---------------------------------------------------------------------
   param$name <- list(
     type = "string",
     allow_null = TRUE,
@@ -112,21 +116,22 @@ get_param_dict <- function() {
     desc = "Label for the new model. Here you can use free text.",
     default_value = NULL
   )
-  #Transformer related---------------------------------------------------------
-  param$pad_value=list(
-      type = "int",
-      min = -Inf,
-      max = -100,
-      allow_null = FALSE,
-      allowed_values = NULL,
-      desc = "Value indicating padding. This value should no be in the range of
+  # Transformer related---------------------------------------------------------
+  param$pad_value <- list(
+    type = "int",
+    min = -Inf,
+    max = -100,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Value indicating padding. This value should no be in the range of
       regluar values for computations. Thus it is not recommended to chance this value.
       Default is `-100`.",
-      gui_box = NULL,
-      gui_label = NULL,
-      default_value = -100,
-      default_historic = 0)
-  param$param_pad_value=param$pad_value
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = -100,
+    default_historic = 0
+  )
+  param$param_pad_value <- param$pad_value
 
   # Transformer related parameters
   param$pytorch_safetensors <- list(
@@ -296,7 +301,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("gelu", "relu","silu","gelu_new"),
+    allowed_values = c("gelu", "relu", "silu", "gelu_new"),
     desc = "Name of the activation function.",
     gui_box = "Encoder Layers",
     gui_label = "Hidden Activation Function",
@@ -388,7 +393,7 @@ get_param_dict <- function() {
     default_value = 0.4
   )
 
-  param$p_perm<- list(
+  param$p_perm <- list(
     type = "(double)",
     allow_null = FALSE,
     min = 0,
@@ -451,20 +456,20 @@ get_param_dict <- function() {
     default_value = 10
   )
 
-  #Data related-----------------------------------------------------------------
-  param$data_embeddings = list(
-      type = c("EmbeddedText", "LargeDataSetForTextEmbeddings"),
-      allow_null = FALSE,
-      desc = "Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]."
-    )
+  # Data related-----------------------------------------------------------------
+  param$data_embeddings <- list(
+    type = c("EmbeddedText", "LargeDataSetForTextEmbeddings"),
+    allow_null = FALSE,
+    desc = "Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]."
+  )
   param$text_embeddings <- param$data_embeddings
 
-  param$data_targets = list(
-      type = c("factor"),
-      allow_null = FALSE,
-      desc = "containing the labels for cases stored in embeddings. Factor must be
+  param$data_targets <- list(
+    type = c("factor"),
+    allow_null = FALSE,
+    desc = "containing the labels for cases stored in embeddings. Factor must be
       named and has to use the same names as used in in the embeddings."
-    )
+  )
   param$target_levels <- list(
     type = "vector",
     allow_null = FALSE,
@@ -479,52 +484,52 @@ get_param_dict <- function() {
   )
   param$class_levels <- param$target_levels
 
-  param$data_folds = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "determining the number of cross-fold samples.",
-      gui_box = "General Settings",
-      gui_label = "Number of Folds",
-      default_value = 5
-    )
+  param$data_folds <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "determining the number of cross-fold samples.",
+    gui_box = "General Settings",
+    gui_label = "Number of Folds",
+    default_value = 5
+  )
   param$folds <- param$data_folds
 
-  param$data_val_size = list(
-      type = c("(double)"),
-      allow_null = FALSE,
-      min = 0,
-      max = 1,
-      desc = "between 0 and 1, indicating the proportion of cases which should be
+  param$data_val_size <- list(
+    type = c("(double)"),
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    desc = "between 0 and 1, indicating the proportion of cases which should be
       used for the validation sample during the estimation of the model.
       The remaining cases are part of the training data.",
-      gui_box = "General Settings",
-      gui_label = "Size of Validation Data Set",
-      default_value = 0.1
-    )
+    gui_box = "General Settings",
+    gui_label = "Size of Validation Data Set",
+    default_value = 0.1
+  )
   param$val_size <- param$data_val_size
 
-  param$loss_balance_class_weights = list(
-      type = c("bool"),
-      allow_null = FALSE,
-      desc = "If `TRUE` class weights are generated based on the frequencies of the
+  param$loss_balance_class_weights <- list(
+    type = c("bool"),
+    allow_null = FALSE,
+    desc = "If `TRUE` class weights are generated based on the frequencies of the
       training data with the method Inverse Class Frequency. If `FALSE` each class has the weight 1.",
-      gui_box = "Loss",
-      gui_label = "Balance Class Weights",
-      default_value = TRUE
-    )
-  param$loss_balance_sequence_length = list(
-      type = c("bool"),
-      allow_null = FALSE,
-      desc = "If `TRUE` sample weights are generated for the length of sequences based on
+    gui_box = "Loss",
+    gui_label = "Balance Class Weights",
+    default_value = TRUE
+  )
+  param$loss_balance_sequence_length <- list(
+    type = c("bool"),
+    allow_null = FALSE,
+    desc = "If `TRUE` sample weights are generated for the length of sequences based on
       the frequencies of the training data with the method Inverse Class Frequency.
       If `FALSE` each sequences length has the weight 1.",
-      gui_box = "Loss",
-      gui_label = "Balance Sequence Length",
-      default_value = TRUE
-    )
-  param$one_hot_encoding = list(
+    gui_box = "Loss",
+    gui_label = "Balance Sequence Length",
+    default_value = TRUE
+  )
+  param$one_hot_encoding <- list(
     type = "bool",
     allow_null = FALSE,
     min = NULL,
@@ -533,7 +538,7 @@ get_param_dict <- function() {
     desc = "If `TRUE` all labels are converted to one hot encoding.",
     default_value = NULL
   )
-  param$add_matrix_map = list(
+  param$add_matrix_map <- list(
     type = "bool",
     allow_null = FALSE,
     min = NULL,
@@ -545,47 +550,47 @@ get_param_dict <- function() {
   )
 
   # Synthetic cases-------------------------------------------------------------
-  param$use_sc = list(
-      type = c("bool"),
-      allow_null = FALSE,
-      desc = "`TRUE` if the estimation should integrate synthetic cases. `FALSE` if not.",
-      gui_box = "Synthetic Cases",
-      gui_label = "Use Synthetic Cases",
-      default_value = FALSE
-    )
-  param$sc_method = list(
-      type = c("string"),
-      allow_null = FALSE,
-      allowed_values = c("knnor"),
-      desc = "containing the method for generating synthetic cases.",
-      gui_box = "Synthetic Cases",
-      gui_label = "Method for Creating Synthetic Cases",
-      default_value = "knnor"
-    )
+  param$use_sc <- list(
+    type = c("bool"),
+    allow_null = FALSE,
+    desc = "`TRUE` if the estimation should integrate synthetic cases. `FALSE` if not.",
+    gui_box = "Synthetic Cases",
+    gui_label = "Use Synthetic Cases",
+    default_value = FALSE
+  )
+  param$sc_method <- list(
+    type = c("string"),
+    allow_null = FALSE,
+    allowed_values = c("knnor"),
+    desc = "containing the method for generating synthetic cases.",
+    gui_box = "Synthetic Cases",
+    gui_label = "Method for Creating Synthetic Cases",
+    default_value = "knnor"
+  )
   param$sc_methods <- param$sc_method
 
-  param$sc_min_k = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "determining the minimal number of k which is used for creating synthetic units.",
-      gui_box = "Synthetic Cases",
-      gui_label = "Min k",
-      default_value = 1
-    )
-  param$sc_max_k = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "determining the maximal number of k which is used for creating synthetic units.",
-      gui_box = "Synthetic Cases",
-      gui_label = "Max k",
-      default_value = 1
-    )
+  param$sc_min_k <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "determining the minimal number of k which is used for creating synthetic units.",
+    gui_box = "Synthetic Cases",
+    gui_label = "Min k",
+    default_value = 1
+  )
+  param$sc_max_k <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "determining the maximal number of k which is used for creating synthetic units.",
+    gui_box = "Synthetic Cases",
+    gui_label = "Max k",
+    default_value = 1
+  )
 
-  param$n_cores = list(
+  param$n_cores <- list(
     type = c("int"),
     allow_null = FALSE,
     min = 1,
@@ -595,153 +600,153 @@ get_param_dict <- function() {
   )
 
   # Pseudo labeling------------------------------------------------------------
-  param$use_pl = list(
-      type = c("bool"),
-      allow_null = FALSE,
-      desc = "`TRUE` if the estimation should integrate pseudo-labeling. `FALSE` if not.",
-      gui_box = "Pseudo Labeling",
-      gui_label = "Use Pseudo Labeling",
-      default_value = FALSE
-    )
-  param$pl_max_steps = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "determining the maximum number of steps during pseudo-labeling.",
-      gui_box = "Pseudo Labeling",
-      gui_label = "Number of Steps",
-      default_value = 5
-    )
-  param$pl_anchor = list(
-      type = "double",
-      min = 0,
-      max = 1,
-      allow_null = FALSE,
-      allowed_values = NULL,
-      desc = "indicating the reference point for sorting the new cases of every label.",
-      gui_box = "Pseudo Labeling",
-      gui_label = "Certainty Anchor Value",
-      default_value = 1
-    )
-  param$pl_max = list(
-      type = c("(double"),
-      allow_null = FALSE,
-      min = 0,
-      max = 1,
-      desc = "setting the maximal level of confidence for considering a case for pseudo-labeling.",
-      gui_box = "Pseudo Labeling",
-      gui_label = "Max Certainty",
-      default_value = 1
-    )
-  param$pl_min = list(
-      type = c("double)"),
-      allow_null = FALSE,
-      min = 0,
-      max = 1,
-      desc = "setting the mnimal level of confidence for considering a case for pseudo-labeling.",
-      gui_box = "Pseudo Labeling",
-      gui_label = "Min Certainty",
-      default_value = 0
-    )
+  param$use_pl <- list(
+    type = c("bool"),
+    allow_null = FALSE,
+    desc = "`TRUE` if the estimation should integrate pseudo-labeling. `FALSE` if not.",
+    gui_box = "Pseudo Labeling",
+    gui_label = "Use Pseudo Labeling",
+    default_value = FALSE
+  )
+  param$pl_max_steps <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "determining the maximum number of steps during pseudo-labeling.",
+    gui_box = "Pseudo Labeling",
+    gui_label = "Number of Steps",
+    default_value = 5
+  )
+  param$pl_anchor <- list(
+    type = "double",
+    min = 0,
+    max = 1,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "indicating the reference point for sorting the new cases of every label.",
+    gui_box = "Pseudo Labeling",
+    gui_label = "Certainty Anchor Value",
+    default_value = 1
+  )
+  param$pl_max <- list(
+    type = c("(double"),
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    desc = "setting the maximal level of confidence for considering a case for pseudo-labeling.",
+    gui_box = "Pseudo Labeling",
+    gui_label = "Max Certainty",
+    default_value = 1
+  )
+  param$pl_min <- list(
+    type = c("double)"),
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    desc = "setting the mnimal level of confidence for considering a case for pseudo-labeling.",
+    gui_box = "Pseudo Labeling",
+    gui_label = "Min Certainty",
+    default_value = 0
+  )
 
-  #Sustainability--------------------------------------------------------------
-  param$sustain_track = list(
-      type = c("bool"),
-      allow_null = FALSE,
-      desc = "If `TRUE` energy consumption is tracked during training via the python library 'codecarbon'.",
-      gui_box = NULL,
-      default_value = TRUE
-    )
-  param$sustain_iso_code = list(
-      type = c("string"),
-      allow_null = FALSE,
-      allowed_values = NULL,
-      desc = "ISO code (Alpha-3-Code) for the country. This variable must be set if
+  # Sustainability--------------------------------------------------------------
+  param$sustain_track <- list(
+    type = c("bool"),
+    allow_null = FALSE,
+    desc = "If `TRUE` energy consumption is tracked during training via the python library 'codecarbon'.",
+    gui_box = NULL,
+    default_value = TRUE
+  )
+  param$sustain_iso_code <- list(
+    type = c("string"),
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "ISO code (Alpha-3-Code) for the country. This variable must be set if
       sustainability should be tracked. A list can be found on Wikipedia:
       <https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes>.",
-      gui_box = "Sustainability",
-      gui_label = "Alpha-3-Code",
-      default_value = "DEU"
-    )
-  param$sustain_region = list(
-      type = c("string"),
-      allow_null = TRUE,
-      allowed_values = NULL,
-      desc = "Region within a country. Only available for USA and Canada See the documentation of
+    gui_box = "Sustainability",
+    gui_label = "Alpha-3-Code",
+    default_value = "DEU"
+  )
+  param$sustain_region <- list(
+    type = c("string"),
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Region within a country. Only available for USA and Canada See the documentation of
       codecarbon for more information. <https://mlco2.github.io/codecarbon/parameters.html>",
-      gui_box = NULL,
-      default_value = NULL
-    )
-  param$sustain_interval = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "Interval in seconds for measuring power usage.",
-      gui_box = NULL,
-      default_value = 15
-    )
+    gui_box = NULL,
+    default_value = NULL
+  )
+  param$sustain_interval <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "Interval in seconds for measuring power usage.",
+    gui_box = NULL,
+    default_value = 15
+  )
 
-  #Training related------------------------------------------------------------
-  param$loss_cls_fct_name<- list(
+  # Training related------------------------------------------------------------
+  param$loss_cls_fct_name <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
     allowed_values = c("FocalLoss", "CrossEntropyLoss"),
     desc = "Name of the loss function to use during training.",
-    values_desc=list(
-      "CrossEntropyLoss"="Applies the a cross cross entropy loss.",
-      "FocalLoss"="Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
+    values_desc = list(
+      "CrossEntropyLoss" = "Applies the a cross cross entropy loss.",
+      "FocalLoss" = "Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
     ),
     gui_box = "General Settings",
     gui_label = "Loss Function",
     default_value = "FocalLoss"
   )
-  param$loss_pt_fct_name= param$loss_cls_fct_name
-  param$loss_pt_fct_name$allowed_values=c("MultiWayContrastiveLoss")
-  param$loss_pt_fct_name$values_desc=list(
-    "MultiWayContrastiveLoss"="Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24)."
+  param$loss_pt_fct_name <- param$loss_cls_fct_name
+  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss")
+  param$loss_pt_fct_name$values_desc <- list(
+    "MultiWayContrastiveLoss" = "Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24)."
   )
-  param$loss_pt_fct_name$default_value=c("MultiWayContrastiveLoss")
-  param$loss_pt_fct_name$gui_box = "General Settings"
+  param$loss_pt_fct_name$default_value <- c("MultiWayContrastiveLoss")
+  param$loss_pt_fct_name$gui_box <- "General Settings"
 
   param$optimizer <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("adam", "rmsprop", "adamw","sgd"),
+    allowed_values = c("adam", "rmsprop", "adamw", "sgd"),
     desc = "determining the optimizer used for training.",
     gui_box = "General Settings",
     gui_label = "Optimizer",
     default_value = "adamw"
   )
 
-  param$epochs = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "Number of training epochs.",
-      gui_box = "General Settings",
-      gui_label = "Epochs",
-      default_value = 100
-    )
+  param$epochs <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "Number of training epochs.",
+    gui_box = "General Settings",
+    gui_label = "Epochs",
+    default_value = 100
+  )
   param$n_epoch <- param$epochs
 
-  param$batch_size = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "Size of the batches for training.",
-      gui_box = "General Settings",
-      gui_label = "Batch Size",
-      default_value = 32
-    )
-  param$lr_rate = list(
+  param$batch_size <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "Size of the batches for training.",
+    gui_box = "General Settings",
+    gui_label = "Batch Size",
+    default_value = 32
+  )
+  param$lr_rate <- list(
     type = c("(double"),
     allow_null = FALSE,
     min = 0,
@@ -754,7 +759,7 @@ get_param_dict <- function() {
   )
   param$learning_rate <- param$lr_rate
 
-  param$lr_warm_up_ratio = list(
+  param$lr_warm_up_ratio <- list(
     type = c("(double)"),
     allow_null = FALSE,
     min = 0,
@@ -764,184 +769,184 @@ get_param_dict <- function() {
     gui_label = "Warm Up Ratio",
     default_value = 0.01
   )
-  param$dir_checkpoint = list(
-      type = c("string"),
-      allow_null = FALSE,
-      allowed_values = NULL,
-      desc = "Path to the directory where the checkpoint during training should be saved.
+  param$dir_checkpoint <- list(
+    type = c("string"),
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Path to the directory where the checkpoint during training should be saved.
       If the directory does not exist, it is created."
-    )
+  )
 
-  #Logging related-------------------------------------------------------------
-  param$log_dir = list(
-      type = c("string"),
-      allow_null = TRUE,
-      allowed_values = NULL,
-      desc = "Path to the directory where the log files should be saved.
+  # Logging related-------------------------------------------------------------
+  param$log_dir <- list(
+    type = c("string"),
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Path to the directory where the log files should be saved.
       If no logging is desired set this argument to `NULL`.",
-      default_value = NULL
-    )
-  param$log_write_interval = list(
-      type = c("int"),
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      desc = "Time in seconds determining the interval in which the logger should try to update
+    default_value = NULL
+  )
+  param$log_write_interval <- list(
+    type = c("int"),
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    desc = "Time in seconds determining the interval in which the logger should try to update
       the log files. Only relevant if `log_dir` is not `NULL`.",
-      default_value = 60
-    )
-  param$trace = list(
-      type = c("bool"),
-      allow_null = FALSE,
-      desc = "`TRUE` if information about the estimation phase should be printed to the console.",
-      default_value = FALSE
-    )
-  param$ml_trace = list(
-      type = "int",
-      min = 0,
-      max = 1,
-      allow_null = FALSE,
-      allowed_values = NULL,
-      desc = "`ml_trace=0` does not print any information about the training process from pytorch on the console.",
-      default_value = 0
-    )
+    default_value = 60
+  )
+  param$trace <- list(
+    type = c("bool"),
+    allow_null = FALSE,
+    desc = "`TRUE` if information about the estimation phase should be printed to the console.",
+    default_value = FALSE
+  )
+  param$ml_trace <- list(
+    type = "int",
+    min = 0,
+    max = 1,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "`ml_trace=0` does not print any information about the training process from pytorch on the console.",
+    default_value = 0
+  )
   param$pytorch_trace <- param$ml_trace
 
-  #Meta Learning related--------------------------------------------------------
-  param$embedding_dim = list(
-      desc = " determining the number of dimensions for the embedding.",
-      type = "int",
-      max = Inf,
-      min = 2,
-      allow_null = FALSE,
-      gui_box = "General Settings",
-      gui_label = "Number of Dimensions for Embeddings",
-      default_value = 2
-    )
-  param$Ns = list(
-      type = "int",
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      allowed_values = NULL,
-      desc = "Number of cases for every class in the sample.",
-      gui_label = "Number of Cases in the Sample",
-      gui_box = "Sampling",
-      default_value = 5
-    )
-  param$Nq = list(
-      type = "int",
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      allowed_values = NULL,
-      desc = "Number of cases for every class in the query.",
-      gui_label = "Number of Cases in the Query",
-      gui_box = "Sampling",
-      default_value = 3
-    )
-  param$loss_alpha = list(
-      type = "double",
-      allow_null = FALSE,
-      min = 0,
-      max = 1,
-      allowed_values = NULL,
-      desc = "Value between 0 and 1 indicating how strong the loss should focus on pulling cases to
+  # Meta Learning related--------------------------------------------------------
+  param$embedding_dim <- list(
+    desc = " determining the number of dimensions for the embedding.",
+    type = "int",
+    max = Inf,
+    min = 2,
+    allow_null = FALSE,
+    gui_box = "General Settings",
+    gui_label = "Number of Dimensions for Embeddings",
+    default_value = 2
+  )
+  param$Ns <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Number of cases for every class in the sample.",
+    gui_label = "Number of Cases in the Sample",
+    gui_box = "Sampling",
+    default_value = 5
+  )
+  param$Nq <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Number of cases for every class in the query.",
+    gui_label = "Number of Cases in the Query",
+    gui_box = "Sampling",
+    default_value = 3
+  )
+  param$loss_alpha <- list(
+    type = "double",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "Value between 0 and 1 indicating how strong the loss should focus on pulling cases to
       its corresponding prototypes or pushing cases away from other prototypes. The higher the value the more the
       loss concentrates on pulling cases to its corresponding prototypes.",
-      gui_box = "Loss",
-      gui_label = "Alpha",
-      default_value = 0.6
-    )
-  param$loss_margin = list(
-      type = "double",
-      allow_null = FALSE,
-      min = 0,
-      max = 1,
-      allowed_values = NULL,
-      desc = "Value greater 0 indicating the minimal distance of every case from prototypes of other classes.",
-      gui_box = "Loss",
-      gui_label = "Margin",
-      default_value = 0.05
-    )
-  param$sampling_separate = list(
-      type = "bool",
-      allow_null = FALSE,
-      min = NULL,
-      max = NULL,
-      allowed_values = NULL,
-      desc = "If `TRUE` the cases for every class are divided into a data set for sample and
+    gui_box = "Loss",
+    gui_label = "Alpha",
+    default_value = 0.6
+  )
+  param$loss_margin <- list(
+    type = "double",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "Value greater 0 indicating the minimal distance of every case from prototypes of other classes.",
+    gui_box = "Loss",
+    gui_label = "Margin",
+    default_value = 0.05
+  )
+  param$sampling_separate <- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "If `TRUE` the cases for every class are divided into a data set for sample and
       for query. These are never mixed. If `TRUE` sample and query cases are drawn from the same data pool. That is,
       a case can be part of sample in one epoch and in another epoch it can be part of query. It is ensured that a
       case is never part of sample and query at the same time. In addition, it is ensured that every cases exists
       only once during a training step.",
-      gui_box = "Sampling",
-      gui_label = "Strictly Separte Sample and Query",
-      default_value = FALSE
-    )
-  param$sampling_shuffle = list(
-      type = "bool",
-      allow_null = FALSE,
-      min = NULL,
-      max = NULL,
-      allowed_values = NULL,
-      desc = "if `TRUE` cases a randomly drawn from the data during every step. If `FALSE` the
+    gui_box = "Sampling",
+    gui_label = "Strictly Separte Sample and Query",
+    default_value = FALSE
+  )
+  param$sampling_shuffle <- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "if `TRUE` cases a randomly drawn from the data during every step. If `FALSE` the
       cases are not shuffled.",
-      gui_box = "Sampling",
-      gui_label = "Shuffle Order of Cases",
-      default_value = TRUE
-    )
-
-  #FeatureExtractor related-----------------------------------------------------
-  param$features = list(
-      type = "int",
-      allow_null = FALSE,
-      min = 1,
-      max = Inf,
-      allowed_values = NULL,
-      desc = "Number of features the model should use.",
-      gui_box = "General Settings",
-      gui_label = "Number of Features",
-      default_value = 64
-    )
-  param$method = list(
-      type = "string",
-      allow_null = FALSE,
-      min = NULL,
-      max = NULL,
-      allowed_values = c("dense", "lstm"),
-      desc = "Method to use for the feature extraction. `'lstm'` for an extractor based on LSTM-layers or `'dense'` for dense layers.",
-      default_value = "dense",
-      gui_box = "General Settings",
-      gui_label = "Method"
+    gui_box = "Sampling",
+    gui_label = "Shuffle Order of Cases",
+    default_value = TRUE
   )
 
-  param$orthogonal_method = list(
+  # FeatureExtractor related-----------------------------------------------------
+  param$features <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Number of features the model should use.",
+    gui_box = "General Settings",
+    gui_label = "Number of Features",
+    default_value = 64
+  )
+  param$method <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("matrix_exp", "cayley","householder"),
+    allowed_values = c("dense", "lstm"),
+    desc = "Method to use for the feature extraction. `'lstm'` for an extractor based on LSTM-layers or `'dense'` for dense layers.",
+    default_value = "dense",
+    gui_box = "General Settings",
+    gui_label = "Method"
+  )
+
+  param$orthogonal_method <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("matrix_exp", "cayley", "householder"),
     desc = "Method for ensuring orthogonality of weights.",
-    default_historic="householder",
+    default_historic = "householder",
     default_value = " matrix_exp",
     gui_box = "General Settings",
     gui_label = "Method"
   )
 
 
-  param$noise_factor = list(
-      type = "double",
-      allow_null = FALSE,
-      min = 0,
-      max = 1,
-      allowed_values = NULL,
-      desc = "Value between 0 and a value lower 1 indicating how much noise should
+  param$noise_factor <- list(
+    type = "double",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "Value between 0 and a value lower 1 indicating how much noise should
       be added to the input during training.",
-      default_value = 1e-2,
-      gui_box = "General Settings",
-      gui_label = "Noise Factor"
-    )
+    default_value = 1e-2,
+    gui_box = "General Settings",
+    gui_label = "Noise Factor"
+  )
   param$feature_extractor <- list(
     type = "TEFeatureExtractor",
     allow_null = TRUE,
@@ -954,14 +959,14 @@ get_param_dict <- function() {
     default_value = NULL
   )
 
-  #Layer configuration=========================================================
+  # Layer configuration=========================================================
   # Global settings------------------------------------------------------------
-  param$residual_type = list(
+  param$residual_type <- list(
     type = "string",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("residual_gate", "addition","None"),
+    allowed_values = c("residual_gate", "addition", "None"),
     desc = "Type residual connenction for all layers and stack of layers.",
     gui_box = "General Settings",
     gui_label = "Residual Connection",
@@ -969,16 +974,16 @@ get_param_dict <- function() {
     default_historic = NULL
   )
 
-  param$skip_connection_type = list(
+  param$skip_connection_type <- list(
     type = "string",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("residual_gate", "addition","None"),
-    values_desc=list(
-      "None"="Add no residual connection.",
-      "addition"="Adds a residual connection by adding the original input to the output.",
-      "residual_gate"="Adds a residucal connection by creating a weightes sum from the original input and the output.
+    allowed_values = c("residual_gate", "addition", "None"),
+    values_desc = list(
+      "None" = "Add no residual connection.",
+      "addition" = "Adds a residual connection by adding the original input to the output.",
+      "residual_gate" = "Adds a residucal connection by creating a weightes sum from the original input and the output.
                       The weight is a learnable parameter. This type of residual connection is described by [Savarese and Figueiredo (2017)](https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf)."
     ),
     desc = "Type residual connenction for the complete model.",
@@ -988,30 +993,30 @@ get_param_dict <- function() {
     default_historic = NULL
   )
 
-  param$skip_connection_type=param$residual_type
-  param$skip_connection_type$gui_box="General Settings"
+  param$skip_connection_type <- param$residual_type
+  param$skip_connection_type$gui_box <- "General Settings"
 
-  param$tf_residual_type=param$residual_type
-  param$tf_residual_type$gui_box="Transformer Encoder Layers"
+  param$tf_residual_type <- param$residual_type
+  param$tf_residual_type$gui_box <- "Transformer Encoder Layers"
 
-  param$rec_residual_type=param$residual_type
-  param$rec_residual_type$gui_box="Recurrent Layers"
+  param$rec_residual_type <- param$residual_type
+  param$rec_residual_type$gui_box <- "Recurrent Layers"
 
-  param$dense_residual_type=param$residual_type
-  param$dense_residual_type$gui_box="Dense Layers"
+  param$dense_residual_type <- param$residual_type
+  param$dense_residual_type$gui_box <- "Dense Layers"
 
-  param$ng_conv_residual_type=param$residual_type
-  param$ng_conv_residual_type$gui_box="N-Gram Layers"
+  param$ng_conv_residual_type <- param$residual_type
+  param$ng_conv_residual_type$gui_box <- "N-Gram Layers"
 
-  param$normalization_type = list(
+  param$normalization_type <- list(
     type = "string",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("layer_norm", "None"),
-    values_desc=list(
-      "layer_norm"="Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450).",
-      "None"="Applies no normalization. "
+    values_desc = list(
+      "layer_norm" = "Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450).",
+      "None" = "Applies no normalization. "
     ),
     desc = "Type of normalization applied to all layers and stack layers.",
     gui_box = "General Settings",
@@ -1020,26 +1025,26 @@ get_param_dict <- function() {
     default_historic = NULL
   )
 
-  param$feat_normalization_type=param$normalization_type
-  param$feat_normalization_type$gui_box="Scaling Layer"
+  param$feat_normalization_type <- param$normalization_type
+  param$feat_normalization_type$gui_box <- "Scaling Layer"
 
-  param$tf_normalization_type=param$normalization_type
-  param$tf_normalization_type$gui_box="Transformer Encoder Layers"
+  param$tf_normalization_type <- param$normalization_type
+  param$tf_normalization_type$gui_box <- "Transformer Encoder Layers"
 
-  param$rec_normalization_type=param$normalization_type
-  param$rec_normalization_type$gui_box="Recurrent Layers"
+  param$rec_normalization_type <- param$normalization_type
+  param$rec_normalization_type$gui_box <- "Recurrent Layers"
 
-  param$dense_normalization_type=param$normalization_type
-  param$dense_normalization_type$gui_box="Dense Layers"
+  param$dense_normalization_type <- param$normalization_type
+  param$dense_normalization_type$gui_box <- "Dense Layers"
 
-  param$ng_conv_normalization_type=param$normalization_type
-  param$ng_conv_normalization_type$gui_box="N-Gram Layers"
+  param$ng_conv_normalization_type <- param$normalization_type
+  param$ng_conv_normalization_type$gui_box <- "N-Gram Layers"
 
-  param$merge_normalization_type=param$normalization_type
-  param$merge_normalization_type$gui_box="Merge Layer"
+  param$merge_normalization_type <- param$normalization_type
+  param$merge_normalization_type$gui_box <- "Merge Layer"
 
-  #Intermediate Feature--------------------------------------------------------
-  param$cls_pooling_features<-list(
+  # Intermediate Feature--------------------------------------------------------
+  param$cls_pooling_features <- list(
     type = "int",
     allow_null = FALSE,
     min = 1,
@@ -1051,7 +1056,7 @@ get_param_dict <- function() {
     default_value = 32
   )
 
-  param$cls_pooling_type = list(
+  param$cls_pooling_type <- list(
     type = "string",
     min = NULL,
     max = NULL,
@@ -1066,40 +1071,40 @@ get_param_dict <- function() {
 
 
   # Parametrizations------------------------------------------------------------
-  param$parametrizations = list(
+  param$parametrizations <- list(
     type = "string",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("None", "orthogonal", "weight_norm", "spectral_norm"),
     desc = "Re-Parametrizations for all layers except recurrent layers.",
-    values_desc=list(
-      "None"="Does not apply any re-parametrizations.",
-      "orthogonal"="Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
-      "weight_norm"="Applies a weight norm with the default settings of PyTorch's corresponding function. Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
-      "spectral_norm"="Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
+    values_desc = list(
+      "None" = "Does not apply any re-parametrizations.",
+      "orthogonal" = "Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
+      "weight_norm" = "Applies a weight norm with the default settings of PyTorch's corresponding function. Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
+      "spectral_norm" = "Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
     ),
     gui_box = "General Settings",
     gui_label = "Re-Parametrization",
     default_value = "None",
     default_historic = "None"
   )
-  param$rec_parametrizations=param$parametrizations
-  param$rec_parametrizations$gui_box="Recurrent Layers"
+  param$rec_parametrizations <- param$parametrizations
+  param$rec_parametrizations$gui_box <- "Recurrent Layers"
 
-  param$tf_parametrizations=param$parametrizations
-  param$tf_parametrizations$gui_box="Transformer Encoder Layers"
+  param$tf_parametrizations <- param$parametrizations
+  param$tf_parametrizations$gui_box <- "Transformer Encoder Layers"
 
-  param$dense_parametrizations=param$parametrizations
-  param$dense_parametrizations$gui_box="Dense Layers"
+  param$dense_parametrizations <- param$parametrizations
+  param$dense_parametrizations$gui_box <- "Dense Layers"
 
-  param$ng_conv_parametrizations=param$parametrizations
-  param$ng_conv_parametrizations$gui_box="N-Gram Layers"
+  param$ng_conv_parametrizations <- param$parametrizations
+  param$ng_conv_parametrizations$gui_box <- "N-Gram Layers"
 
-  param$feat_parametrizations=param$parametrizations
-  param$feat_parametrizations$gui_box="Pooling Layer"
+  param$feat_parametrizations <- param$parametrizations
+  param$feat_parametrizations$gui_box <- "Pooling Layer"
 
-  #Bias------------------------------------------------------------------------
+  # Bias------------------------------------------------------------------------
   param$bias <- list(
     type = "bool",
     allow_null = FALSE,
@@ -1112,19 +1117,19 @@ get_param_dict <- function() {
     default_value = FALSE,
     default_historic = TRUE
   )
-  param$rec_bias=param$bias
-  param$rec_bias$gui_box="Recurrent Layers"
-  param$tf_bias=param$bias
-  param$tf_bias$gui_box="Transformer Encoder Layers"
-  param$dense_bias=param$bias
-  param$dense_bias$gui_box="Dense Layers"
-  param$ng_conv_bias=param$bias
-  param$ng_conv_bias$gui_box="N-Gram Layers"
-  param$feat_bias=param$bias
-  param$feat_bias$gui_box= "Pooling Layer"
+  param$rec_bias <- param$bias
+  param$rec_bias$gui_box <- "Recurrent Layers"
+  param$tf_bias <- param$bias
+  param$tf_bias$gui_box <- "Transformer Encoder Layers"
+  param$dense_bias <- param$bias
+  param$dense_bias$gui_box <- "Dense Layers"
+  param$ng_conv_bias <- param$bias
+  param$ng_conv_bias$gui_box <- "N-Gram Layers"
+  param$feat_bias <- param$bias
+  param$feat_bias$gui_box <- "Pooling Layer"
 
-  #Activation functions---------------------------------------------------------
-  param$act_fct = list(
+  # Activation functions---------------------------------------------------------
+  param$act_fct <- list(
     type = "string",
     min = NULL,
     max = NULL,
@@ -1136,18 +1141,18 @@ get_param_dict <- function() {
     default_value = "elu",
     default_historic = "gelu"
   )
-  param$feat_act_fct=param$act_fct
-  param$feat_act_fct$gui_box="Pooling Layer"
-  param$ng_conv_act_fct=param$act_fct
-  param$ng_conv_act_fct$gui_box="N-Gram Layers"
-  param$dense_act_fct=param$act_fct
-  param$dense_act_fct$gui_box="Dense Layers"
-  param$rec_act_fct=param$act_fct
-  param$rec_act_fct$gui_box="Recurrent Layers"
-  param$tf_act_fct=param$act_fct
-  param$tf_act_fct$gui_box="Transformer Encoder Layers"
+  param$feat_act_fct <- param$act_fct
+  param$feat_act_fct$gui_box <- "Pooling Layer"
+  param$ng_conv_act_fct <- param$act_fct
+  param$ng_conv_act_fct$gui_box <- "N-Gram Layers"
+  param$dense_act_fct <- param$act_fct
+  param$dense_act_fct$gui_box <- "Dense Layers"
+  param$rec_act_fct <- param$act_fct
+  param$rec_act_fct$gui_box <- "Recurrent Layers"
+  param$tf_act_fct <- param$act_fct
+  param$tf_act_fct$gui_box <- "Transformer Encoder Layers"
 
-  #Recurrent Layer--------------------------------------------------------------
+  # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(
     type = "double)",
     allow_null = FALSE,
@@ -1207,9 +1212,9 @@ get_param_dict <- function() {
     gui_label = "Number of Layers",
     default_value = 1
   )
-  param$rec_n_layers=param$rec_layers
+  param$rec_n_layers <- param$rec_layers
 
-  #Dense Layer------------------------------------------------------------------
+  # Dense Layer------------------------------------------------------------------
   param$dense_dropout <- list(
     type = "double)",
     allow_null = FALSE,
@@ -1244,9 +1249,9 @@ get_param_dict <- function() {
     gui_label = "Number of Layers",
     default_value = 0
   )
-  param$dense_n_layers=param$dense_layers
+  param$dense_n_layers <- param$dense_layers
 
-  #Scaling Layer----------------------------------------------------------------
+  # Scaling Layer----------------------------------------------------------------
   param$feat_dropout <- list(
     type = "double)",
     allow_null = FALSE,
@@ -1259,10 +1264,10 @@ get_param_dict <- function() {
     default_value = 0.1
   )
 
-  param$feat_size=param$dense_size
-  param$feat_size$min=2
+  param$feat_size <- param$dense_size
+  param$feat_size$min <- 2
 
-  #Transformer Layer------------------------------------------------------------
+  # Transformer Layer------------------------------------------------------------
   param$encoder_dropout <- list(
     type = "double)",
     allow_null = FALSE,
@@ -1274,10 +1279,10 @@ get_param_dict <- function() {
     gui_label = "Dense Dropout",
     default_value = 0.1
   )
-  param$tf_dropout_rate_1=param$encoder_dropout
-  param$tf_dropout_rate_1$desc="determining the dropout after the attention mechanism within the transformer encoder layers."
-  param$tf_dropout_rate_1$gui_label="Attention Dropout"
-  param$tf_dropout_rate_2=param$encoder_dropout
+  param$tf_dropout_rate_1 <- param$encoder_dropout
+  param$tf_dropout_rate_1$desc <- "determining the dropout after the attention mechanism within the transformer encoder layers."
+  param$tf_dropout_rate_1$gui_label <- "Attention Dropout"
+  param$tf_dropout_rate_2 <- param$encoder_dropout
 
   param$self_attention_heads <- list(
     type = "int",
@@ -1291,7 +1296,7 @@ get_param_dict <- function() {
     default_value = 2
   )
   param$num_attention_heads <- param$self_attention_head
-  param$tf_num_heads=param$self_attention_head
+  param$tf_num_heads <- param$self_attention_head
 
   param$intermediate_size <- list(
     type = "int",
@@ -1304,7 +1309,7 @@ get_param_dict <- function() {
     gui_label = "Intermediate Size",
     default_value = 128
   )
-  param$tf_dense_dim=param$intermediate_size
+  param$tf_dense_dim <- param$intermediate_size
 
   param$attention_type <- list(
     type = "string",
@@ -1312,9 +1317,9 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = c("fourier", "multihead"),
-    values_desc=list(
-      multihead="The original multi-head attention as described by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762).",
-      fourier="Attention with fourier transformation as described by [Lee-Thorp et al. (2021)](https://doi.org/10.48550/arXiv.2105.03824)."
+    values_desc = list(
+      multihead = "The original multi-head attention as described by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762).",
+      fourier = "Attention with fourier transformation as described by [Lee-Thorp et al. (2021)](https://doi.org/10.48550/arXiv.2105.03824)."
     ),
     desc = "Choose the relevant attention type. Please note that you may see different
     values for a case for different input orders if you choose `fourier` on linux.",
@@ -1322,7 +1327,7 @@ get_param_dict <- function() {
     gui_label = "Attention Type",
     default_value = "fourier"
   )
-  param$tf_attention_type=param$attention_type
+  param$tf_attention_type <- param$attention_type
 
   param$add_pos_embedding <- list(
     type = "bool",
@@ -1336,14 +1341,14 @@ get_param_dict <- function() {
     default_value = FALSE
   )
 
-  param$tf_embedding_type=list(
+  param$tf_embedding_type <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
     allowed_values = c("absolute"),
-    values_desc=list(
-      "absolute"="Adds positional information by using an embedding matrix as described by Chollet, Kalinowski, and Allaire (2022, pp. 378-379).
+    values_desc = list(
+      "absolute" = "Adds positional information by using an embedding matrix as described by Chollet, Kalinowski, and Allaire (2022, pp. 378-379).
                   This implementation is different to the original work by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762)."
     ),
     desc = "Type of processing positional information.",
@@ -1363,9 +1368,9 @@ get_param_dict <- function() {
     gui_label = "Number of Layers",
     default_value = 0
   )
-  param$tf_n_layers=param$repeat_encoder
+  param$tf_n_layers <- param$repeat_encoder
 
-  #Conv Layer-------------------------------------------------------------------
+  # Conv Layer-------------------------------------------------------------------
   param$ng_conv_dropout <- list(
     type = "double)",
     allow_null = FALSE,
@@ -1378,7 +1383,7 @@ get_param_dict <- function() {
     default_value = 0.1
   )
 
-  param$ng_conv_n_layers<- list(
+  param$ng_conv_n_layers <- list(
     type = "int",
     allow_null = FALSE,
     min = 0,
@@ -1389,7 +1394,7 @@ get_param_dict <- function() {
     gui_label = "Number of Layers",
     default_value = 0
   )
-  param$ng_conv_ks_min<- list(
+  param$ng_conv_ks_min <- list(
     type = "int",
     allow_null = FALSE,
     min = 2,
@@ -1400,7 +1405,7 @@ get_param_dict <- function() {
     gui_label = "Smallest N-Gram",
     default_value = 2
   )
-  param$ng_conv_ks_max<- list(
+  param$ng_conv_ks_max <- list(
     type = "int",
     allow_null = FALSE,
     min = 2,
@@ -1412,15 +1417,15 @@ get_param_dict <- function() {
     default_value = 2
   )
 
-  #Parallel specific-----------------------------------------------------------
-  param$merge_attention_type=param$attention_type
-  param$merge_attention_type$gui_box = "Merge Layer"
+  # Parallel specific-----------------------------------------------------------
+  param$merge_attention_type <- param$attention_type
+  param$merge_attention_type$gui_box <- "Merge Layer"
 
-  param$merge_num_heads=param$self_attention_head
-  param$merge_num_heads$gui_box = "Merge Layer"
+  param$merge_num_heads <- param$self_attention_head
+  param$merge_num_heads$gui_box <- "Merge Layer"
 
-  #Prototpye specific----------------------------------------------------------
-  param$metric_type=list(
+  # Prototpye specific----------------------------------------------------------
+  param$metric_type <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
@@ -1432,7 +1437,7 @@ get_param_dict <- function() {
     default_value = "euclidean"
   )
 
-  #============================================================================
+  # ============================================================================
   return(param)
 }
 
@@ -1569,13 +1574,10 @@ get_called_args <- function(n = 1) {
 #' max * magnitude^i for i=1,...,n_elements.
 #' Only values equal or greater `min` are returned.
 #' @family Parameter Dictionary
-get_magnitude_values <- function(magnitude, n_elements = 9,max,min) {
+get_magnitude_values <- function(magnitude, n_elements = 9, max, min) {
   value_vector <- vector(length = n_elements)
   for (i in seq_along(value_vector)) {
-    value_vector[i] <- max(min,max * magnitude^i)
+    value_vector[i] <- max(min, max * magnitude^i)
   }
   return(unique(value_vector))
 }
-
-
-
