@@ -137,7 +137,6 @@ check_adjust_n_samples_on_CI <- function(
 #'@description Function returns example data for testing the package
 #'@param class_range `vector` containing the number of classes.
 #'@param path_test_embeddings `string` Path to the location where the test data is stored.
-#'@importFrom rlang .env
 #'@return Returns a `list` with test data.
 #' @family Utils TestThat Developers
 get_test_data_for_classifiers=function(class_range=c(2,3),
@@ -162,7 +161,10 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
   target_data <- NULL
   target_levels <- NULL
   for (n_classes in class_range) {
-    example_data <- rlang::.env$imdb_movie_reviews
+    #Load raw text and labels
+    #imdb_movie_reviews
+    load(testthat::test_path("test_data/imdb_movie_reviews.rda"))
+    example_data <- imdb_movie_reviews
 
     rownames(example_data) <- rownames(test_embeddings$embeddings)
     example_data$id <- rownames(test_embeddings$embeddings)

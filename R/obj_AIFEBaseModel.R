@@ -16,9 +16,9 @@
 
 #' @title Base class for models using neural nets
 #' @description Abstract class for all models that do not rely on the python library 'transformers'.
-#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+#' Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
 #'
-#'This class is **not** designed for a direct application and should only be used by developers.
+#' This class is **not** designed for a direct application and should only be used by developers.
 #'
 #' @return A new object of this class.
 #' @family R6 Classes for Developers
@@ -331,8 +331,8 @@ AIFEBaseModel <- R6::R6Class(
   ),
   private = list(
     ml_framework = NA,
-    sustainability_tracker=NA,
-    dir_checkpoint=NULL,
+    sustainability_tracker = NA,
+    dir_checkpoint = NULL,
     # General Information-------------------------------------------------------
     model_info = list(
       model_license = NA,
@@ -405,8 +405,8 @@ AIFEBaseModel <- R6::R6Class(
     # this is TRUE the object can be used
     configured = FALSE,
 
-    #Variable for checking if the object has been successfully trained.
-    trained=FALSE,
+    # Variable for checking if the object has been successfully trained.
+    trained = FALSE,
 
     #--------------------------------------------------------------------------
     # Method for setting the model info
@@ -447,7 +447,7 @@ AIFEBaseModel <- R6::R6Class(
     },
     #------------------------------------------------------------------------
     detach_tensors = function(tensors) {
-      if("torch.Tensor"%in%class(tensors)){
+      if ("torch.Tensor" %in% class(tensors)) {
         if (torch$cuda$is_available()) {
           return(tensors$detach()$cpu()$numpy())
         } else {
@@ -458,9 +458,9 @@ AIFEBaseModel <- R6::R6Class(
       }
     },
     #----------------------------------------------------------------------
-    detach_list_of_tensors=function(tensor_list){
-      for(i in seq_along(tensor_list)){
-        tensor_list[i]<-list(
+    detach_list_of_tensors = function(tensor_list) {
+      for (i in seq_along(tensor_list)) {
+        tensor_list[i] <- list(
           private$detach_tensors(tensor_list[[i]])
         )
       }
@@ -498,7 +498,7 @@ AIFEBaseModel <- R6::R6Class(
       private$py_package_versions$numpy <- np$version$short_version
     },
     #-------------------------------------------------------------------------
-    load_base_config_and_docs_general=function(config_public,config_private){
+    load_base_config_and_docs_general = function(config_public, config_private) {
       # Set ML framework
       private$ml_framework <- config_private$ml_framework
 
@@ -578,31 +578,30 @@ AIFEBaseModel <- R6::R6Class(
       return(history)
     },
     #--------------------------------------------------------------------------
-    init_and_start_sustainability_tracking=function(){
+    init_and_start_sustainability_tracking = function() {
       if (self$last_training$config$sustain_track == TRUE) {
-
-      if(check_versions(a=get_py_package_version("codecarbon"),operator = ">=",b="2.8.0")){
-        path_look_file <- codecarbon$lock$LOCKFILE
-        if (file.exists(path_look_file)) {
-          unlink(path_look_file)
+        if (check_versions(a = get_py_package_version("codecarbon"), operator = ">=", b = "2.8.0")) {
+          path_look_file <- codecarbon$lock$LOCKFILE
+          if (file.exists(path_look_file)) {
+            unlink(path_look_file)
+          }
         }
-      }
 
-      private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
-        country_iso_code = self$last_training$config$sustain_iso_code,
-        region = self$last_training$config$sustain_region,
-        tracking_mode = "machine",
-        log_level = "warning",
-        measure_power_secs = self$last_training$config$sustain_interval,
-        save_to_file = FALSE,
-        save_to_api = FALSE,
-        allow_multiple_runs=FALSE
-      )
-      private$sustainability_tracker$start()
+        private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
+          country_iso_code = self$last_training$config$sustain_iso_code,
+          region = self$last_training$config$sustain_region,
+          tracking_mode = "machine",
+          log_level = "warning",
+          measure_power_secs = self$last_training$config$sustain_interval,
+          save_to_file = FALSE,
+          save_to_api = FALSE,
+          allow_multiple_runs = FALSE
+        )
+        private$sustainability_tracker$start()
       }
     },
     #---------------------------------------------------------------------------
-    stop_sustainability_tracking=function(){
+    stop_sustainability_tracking = function() {
       if (self$last_training$config$sustain_track == TRUE) {
         private$sustainability_tracker$stop()
         private$sustainability <- summarize_tracked_sustainability(private$sustainability_tracker)
@@ -622,23 +621,24 @@ AIFEBaseModel <- R6::R6Class(
       }
     },
     #---------------------------------------------------------------------------
-    create_checkpoint_directory=function(){
-      #Create a directory for the package
-      tmp_dir=create_and_get_tmp_dir()
+    create_checkpoint_directory = function() {
+      # Create a directory for the package
+      tmp_dir <- create_and_get_tmp_dir()
 
-      #Create a folder for the current task
-      private$dir_checkpoint=paste0(
-        tmp_dir,"/",
+      # Create a folder for the current task
+      private$dir_checkpoint <- paste0(
+        tmp_dir, "/",
         generate_id(16)
       )
-      create_dir(dir=private$dir_checkpoint,trace = FALSE)
+      create_dir(dir = private$dir_checkpoint, trace = FALSE)
     },
     #--------------------------------------------------------------------------
-    clean_checkpoint_directory=function(){
+    clean_checkpoint_directory = function() {
       unlink(
-        x=private$dir_checkpoint,
-        recursive=TRUE,
-        force = FALSE)
+        x = private$dir_checkpoint,
+        recursive = TRUE,
+        force = FALSE
+      )
     }
   )
 )

@@ -351,6 +351,13 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
             "unlabeled" = alpha
           )
         ) +
+        ggplot2::scale_shape_manual(
+          values = c(
+            "prototype" = 17,
+            "labeled" = 16,
+            "unlabeled" = 15
+          )
+        )+
         ggplot2::theme_classic()
 
       if(inc_margin==TRUE){

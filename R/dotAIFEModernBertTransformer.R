@@ -58,7 +58,6 @@
   inherit = .AIFEBaseTransformer,
   private = list(
     # == Attributes ====================================================================================================
-
     title = "ModernBERT Model",
 
     # steps_for_creation `list()` that stores required and optional steps (functions) for creation a new transformer.
@@ -74,17 +73,11 @@
     # See the private `steps_for_creation` list in the base class `.AIFEBaseTransformer`, `Bert_like.SFC.*` functions
     # for details.
     steps_for_creation = list(
-
       check_max_pos_emb = function(self) check.max_position_embeddings(self$params$max_position_embeddings),
-
       create_tokenizer_draft = function(self) Bert_like.SFC.create_tokenizer_draft(self),
-
       calculate_vocab = function(self) Bert_like.SFC.calculate_vocab(self),
-
       save_tokenizer_draft = function(self) Bert_like.SFC.save_tokenizer_draft(self),
-
       create_final_tokenizer = function(self) Bert_like.SFC.create_final_tokenizer(self),
-
       create_transformer_model = function(self) {
         configuration <- transformers$ModernBertConfig(
           vocab_size = as.integer(length(self$temp$tokenizer$get_vocab())),
@@ -115,7 +108,6 @@
     # See the private `steps_for_training` list in the base class `.AIFEBaseTransformer` for details.
 
     steps_for_training = list(
-
       load_existing_model = function(self) {
         self$temp$model <- transformers$ModernBertForMaskedLM$from_pretrained(
           self$params$model_dir_path,
@@ -125,10 +117,8 @@
 
         self$temp$tokenizer <- transformers$AutoTokenizer$from_pretrained(self$params$model_dir_path)
       }
-
     )
   ),
-
   public = list(
     # == Methods =======================================================================================================
 

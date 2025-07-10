@@ -78,7 +78,7 @@ DataManagerClassifier <- R6::R6Class(
                           data_targets,
                           folds = 5,
                           val_size = 0.25,
-                          pad_value=-100,
+                          pad_value = -100,
                           class_levels,
                           one_hot_encoding = TRUE,
                           add_matrix_map = TRUE,
@@ -88,7 +88,7 @@ DataManagerClassifier <- R6::R6Class(
                           trace = TRUE,
                           n_cores = auto_n_cores()) {
       # Checking Prerequisites---------------------------------------------------
-      check_all_args(get_called_args(n=1))
+      check_all_args(get_called_args(n = 1))
 
       # Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -116,7 +116,7 @@ DataManagerClassifier <- R6::R6Class(
       self$config$sc$max_k <- sc_max_k
       self$config$sc$min_k <- sc_min_k
       self$config$n_cores <- n_cores
-      self$config$pad_value=pad_value
+      self$config$pad_value <- pad_value
 
       # Add one hot encoding if necessary
       if (self$config$one_hot_encoding == TRUE) {
@@ -170,7 +170,7 @@ DataManagerClassifier <- R6::R6Class(
     #'   training is requested with pseudo labels.
     #' @return Method does not return anything. It is used for setting the internal state of the DataManager.
     set_state = function(iteration, step = NULL) {
-      check_type(object=step, object_name="step",type="int",min=1,max=Inf, allow_NULL=TRUE,allowed_values = NULL)
+      check_type(object = step, object_name = "step", type = "int", min = 1, max = Inf, allow_NULL = TRUE, allowed_values = NULL)
 
       if (is.numeric(iteration) == FALSE) {
         if (iteration == "final") {
@@ -236,11 +236,11 @@ DataManagerClassifier <- R6::R6Class(
     #' @description Method for checking if the dataset contains cases without labels.
     #' @return Returns `TRUE` if the dataset contains cases without labels. Returns `FALSE`
     #' if all cases have labels.
-    contains_unlabeled_data=function(){
-      if(is.null(self$datasets$data_unlabeled)){
+    contains_unlabeled_data = function() {
+      if (is.null(self$datasets$data_unlabeled)) {
         return(FALSE)
       } else {
-        if(self$datasets$data_unlabeled$num_rows>0){
+        if (self$datasets$data_unlabeled$num_rows > 0) {
           return(TRUE)
         } else {
           return(FALSE)
@@ -263,10 +263,10 @@ DataManagerClassifier <- R6::R6Class(
                            inc_synthetic = FALSE,
                            inc_pseudo_data = FALSE) {
       # Checks
-      check_type(object=inc_labeled, type="bool", FALSE)
-      check_type(object=inc_unlabeled, type="bool", FALSE)
-      check_type(object=inc_synthetic, type="bool", FALSE)
-      check_type(object=inc_pseudo_data, type="bool", FALSE)
+      check_type(object = inc_labeled, type = "bool", FALSE)
+      check_type(object = inc_unlabeled, type = "bool", FALSE)
+      check_type(object = inc_synthetic, type = "bool", FALSE)
+      check_type(object = inc_pseudo_data, type = "bool", FALSE)
 
       data <- NULL
 
@@ -343,8 +343,8 @@ DataManagerClassifier <- R6::R6Class(
     create_synthetic = function(trace = TRUE,
                                 inc_pseudo_data = FALSE) {
       # checks
-      check_type(object=trace, type="bool", FALSE)
-      check_type(object=inc_pseudo_data, type="bool", FALSE)
+      check_type(object = trace, type = "bool", FALSE)
+      check_type(object = inc_pseudo_data, type = "bool", FALSE)
 
       # Print status message to console
       if (trace == TRUE) {
@@ -400,7 +400,7 @@ DataManagerClassifier <- R6::R6Class(
         text_embeddings = embeddings_syntehtic,
         features = self$config$features,
         times = self$config$times,
-        pad_value=self$config$pad_value
+        pad_value = self$config$pad_value
       )
       idx_non_zero_length <- which(x = (length > 0))
 
@@ -420,7 +420,7 @@ DataManagerClassifier <- R6::R6Class(
                 text_embeddings = embeddings_syntehtic,
                 features = self$config$features,
                 times = self$config$times,
-                pad_value=self$config$pad_value
+                pad_value = self$config$pad_value
               )
             ),
             convert = FALSE
@@ -465,8 +465,8 @@ DataManagerClassifier <- R6::R6Class(
     add_replace_pseudo_data = function(inputs,
                                        labels) {
       # checks
-      check_class(object=inputs, classes=c("array", "matrix"), allow_NULL=FALSE)
-      check_class(object=labels, classes=c("factor"), allow_NULL=FALSE)
+      check_class(object = inputs, classes = c("array", "matrix"), allow_NULL = FALSE)
+      check_class(object = labels, classes = c("factor"), allow_NULL = FALSE)
 
       private$check_labels(labels)
       # Add or replace current dataset for pseudo data
@@ -480,7 +480,8 @@ DataManagerClassifier <- R6::R6Class(
               text_embeddings = inputs,
               features = self$config$features,
               times = self$config$times,
-              pad_value=self$config$pad_value)
+              pad_value = self$config$pad_value
+            )
           ),
           convert = FALSE
         )
@@ -584,13 +585,13 @@ DataManagerClassifier <- R6::R6Class(
       if (!is.null(dataset)) {
         private$load_reload_python_scripts()
         dataset <- dataset$map(py$map_input_to_matrix_form,
-                               fn_kwargs = list(
-          times = as.integer(self$config$times),
-          features = as.integer(self$config$features)
-        ),
-        load_from_cache_file=FALSE,
-        keep_in_memory=FALSE,
-        cache_file_name=paste0(create_and_get_tmp_dir(),"/",generate_id(15))
+          fn_kwargs = list(
+            times = as.integer(self$config$times),
+            features = as.integer(self$config$features)
+          ),
+          load_from_cache_file = FALSE,
+          keep_in_memory = FALSE,
+          cache_file_name = paste0(create_and_get_tmp_dir(), "/", generate_id(15))
         )
         return(dataset)
       } else {
@@ -602,9 +603,9 @@ DataManagerClassifier <- R6::R6Class(
         private$load_reload_python_scripts()
         dataset <- dataset$map(py$map_labels_to_one_hot,
           fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes))),
-          load_from_cache_file=FALSE,
-          keep_in_memory=FALSE,
-          cache_file_name=paste0(create_and_get_tmp_dir(),"/",generate_id(15))
+          load_from_cache_file = FALSE,
+          keep_in_memory = FALSE,
+          cache_file_name = paste0(create_and_get_tmp_dir(), "/", generate_id(15))
         )
         return(dataset)
       } else {

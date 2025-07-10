@@ -66,6 +66,7 @@ https://doi.org/10.1016/j.iswa.2024.200335}
 \item \href{#method-TextEmbeddingModel-is_configured}{\code{TextEmbeddingModel$is_configured()}}
 \item \href{#method-TextEmbeddingModel-get_private}{\code{TextEmbeddingModel$get_private()}}
 \item \href{#method-TextEmbeddingModel-get_all_fields}{\code{TextEmbeddingModel$get_all_fields()}}
+\item \href{#method-TextEmbeddingModel-plot_training_history}{\code{TextEmbeddingModel$plot_training_history()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
@@ -725,6 +726,29 @@ Return all fields.
 \subsection{Returns}{
 Method returns a \code{list} containing all public and private fields
 of the object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-plot_training_history"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-plot_training_history}{}}}
+\subsection{Method \code{plot_training_history()}}{
+Method for requesting a plot of the training history.
+This method requires the \emph{R} package 'ggplot2' to work.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$plot_training_history(y_min = NULL, y_max = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a plot of class \code{ggplot} visualizing the training process.
 }
 }
 \if{html}{\out{<hr>}}

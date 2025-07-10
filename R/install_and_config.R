@@ -49,30 +49,29 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
     install_aifeducation_studio()
   }
 
-    if (use_conda == FALSE) {
-      # install request version of python
-      reticulate::install_python(
-        version = python_version,
-        force = FALSE
-      )
-    } else {
-      reticulate::install_miniconda(
-        update = TRUE,
-        force = FALSE
-      )
-    }
-
-    install_py_modules(
-      envname = "aifeducation",
-      remove_first = FALSE,
-      python_version = python_version,
-      use_conda = use_conda
+  if (use_conda == FALSE) {
+    # install request version of python
+    reticulate::install_python(
+      version = python_version,
+      force = FALSE
     )
+  } else {
+    reticulate::install_miniconda(
+      update = TRUE,
+      force = FALSE
+    )
+  }
 
-    cat("\n======================================================")
-    cat("\n Installation successful. Please restart R/R Studio.")
-    cat("\n======================================================\n")
+  install_py_modules(
+    envname = "aifeducation",
+    remove_first = FALSE,
+    python_version = python_version,
+    use_conda = use_conda
+  )
 
+  cat("\n======================================================")
+  cat("\n Installation successful. Please restart R/R Studio.")
+  cat("\n======================================================\n")
 }
 
 #' @title Updates an existing installation of 'aifeducation' on a machine
@@ -102,50 +101,50 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #'
 #' @family Installation and Configuration
 #' @export
-update_aifeducation=function(update_aifeducation_studio = TRUE,
-                             env_type = "auto",
-                             envname = "aifeducation"){
-  #Search for environment
+update_aifeducation <- function(update_aifeducation_studio = TRUE,
+                                env_type = "auto",
+                                envname = "aifeducation") {
+  # Search for environment
   if (env_type == "auto") {
     message(paste0("Try to use virtual environment '", envname, "'."))
     if (reticulate::virtualenv_exists("aifeducation") == TRUE) {
       message(paste0("Use virtual environment'", envname, "'."))
-      use_conda=FALSE
+      use_conda <- FALSE
     } else {
       message(paste0("There is no virtual environment '", envname, "'. Try to use a conda environment with the same name."))
       if (reticulate::condaenv_exists("aifeducation") == TRUE) {
         message(paste("USe conda environment'", envname, "'."))
-        use_conda=TRUE
+        use_conda <- TRUE
       } else {
         message("The requestet environment does not exists. Neither as virtual environment nor as conda environment.")
         current_env <- get_current_venv()
         message(paste("Use the standard virtual environment", current_env))
-        use_conda=FALSE
+        use_conda <- FALSE
       }
     }
   } else if (env_type == "venv") {
     if (reticulate::virtualenv_exists("aifeducation") == TRUE) {
       message(paste0("Use virtual environment'", envname, "'."))
-      use_conda=FALSE
+      use_conda <- FALSE
     } else {
       stop("The requestet environment does not exists.")
     }
   } else if (env_type == "conda") {
     if (reticulate::condaenv_exists("aifeducation") == TRUE) {
       message(paste0("Use conda environment'", envname, "'."))
-      use_conda=TRUE
+      use_conda <- TRUE
     } else {
       stop("The requestet environment does not exists.")
     }
   }
 
   install_py_modules(
-    envname=envname,
-    remove_first=TRUE,
-    use_conda=use_conda
+    envname = envname,
+    remove_first = TRUE,
+    use_conda = use_conda
   )
 
-  if(update_aifeducation_studio==TRUE){
+  if (update_aifeducation_studio == TRUE) {
     install_aifeducation_studio()
   }
 
@@ -162,7 +161,7 @@ update_aifeducation=function(update_aifeducation_studio = TRUE,
 #' @family Installation and Configuration
 #'
 #' @export
-install_aifeducation_studio=function(){
+install_aifeducation_studio <- function() {
   utils::install.packages(
     "ggplot2",
     "rlang",
@@ -475,19 +474,19 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation") {
     message("Try to use this environment.")
   }
 
-  #Print information
-  message(paste0("Detected OS: ",detec_os()))
+  # Print information
+  message(paste0("Detected OS: ", detec_os()))
   message("Checking python packages. This can take a moment.")
-  if(check_aif_py_modules(trace = FALSE)){
+  if (check_aif_py_modules(trace = FALSE)) {
     message("All necessary python packages are available.")
   } else {
     stop("Not all required python packages are available. Call check_aif_py_modules for details.")
   }
 
-  pkg_versions=get_py_package_versions()
-  message(paste(paste0(names(pkg_versions),":"),pkg_versions,collapse = "\n"))
-  message("GPU Acceleration: ",torch$cuda$is_available())
-  message(paste("Location for Temporary Files:"),create_and_get_tmp_dir())
+  pkg_versions <- get_py_package_versions()
+  message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
+  message("GPU Acceleration: ", torch$cuda$is_available())
+  message(paste("Location for Temporary Files:"), create_and_get_tmp_dir())
 }
 
 #' @title Function for detecting the OS..

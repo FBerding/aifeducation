@@ -29,16 +29,16 @@
 EmbeddedText <- R6::R6Class(
   classname = "EmbeddedText",
   private = list(
-      r_package_versions = list(
-        aifeducation = NA,
-        reticulate = NA
-      ),
-      py_package_versions = list(
-        tensorflow = NA,
-        torch = NA,
-        keras = NA,
-        numpy = NA
-      ),
+    r_package_versions = list(
+      aifeducation = NA,
+      reticulate = NA
+    ),
+    py_package_versions = list(
+      tensorflow = NA,
+      torch = NA,
+      keras = NA,
+      numpy = NA
+    ),
 
     # model_name string Name of the model that generates this embedding.
     model_name = NA,
@@ -78,7 +78,7 @@ EmbeddedText <- R6::R6Class(
     param_features = NA,
 
     # Value used for indicating padding.
-    param_pad_value=NA,
+    param_pad_value = NA,
 
     # Minimal layer to be included in the creation of embeddings.
     param_emb_layer_min = NA,
@@ -137,7 +137,7 @@ EmbeddedText <- R6::R6Class(
         param_dict <- get_param_dict()
         if (is.function(self$configure)) {
           param_names_new <- rlang::fn_fmls_names(self$configure)
-          param_names_new<-intersect(param_names_new,names(param_dict))
+          param_names_new <- intersect(param_names_new, names(param_dict))
           for (param in param_names_new) {
             if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
               if (is.null(private[[param]])) {
@@ -200,7 +200,7 @@ EmbeddedText <- R6::R6Class(
                          param_emb_layer_max = NULL,
                          param_emb_pool_type = NULL,
                          param_aggregation = NULL,
-                         param_pad_value=-100,
+                         param_pad_value = -100,
                          embeddings) {
       private$model_name <- model_name
       private$model_label <- model_label
@@ -211,7 +211,7 @@ EmbeddedText <- R6::R6Class(
       private$param_seq_length <- param_seq_length
       private$param_chunks <- param_chunks
       private$param_features <- param_features
-      private$param_pad_value=param_pad_value
+      private$param_pad_value <- param_pad_value
       private$param_overlap <- param_overlap
 
 
@@ -283,11 +283,11 @@ EmbeddedText <- R6::R6Class(
         param_emb_layer_max = config_file$private$param_emb_layer_max,
         param_emb_pool_type = config_file$private$param_emb_pool_type,
         param_aggregation = config_file$private$param_aggregation,
-        param_pad_value=config_file$private$param_pad_value,
+        param_pad_value = config_file$private$param_pad_value,
         embeddings = NULL
       )
 
-      #Update model configuration if necessary
+      # Update model configuration if necessary
       private$update_model_config()
 
       # Check for feature extractor and add information
@@ -326,7 +326,7 @@ EmbeddedText <- R6::R6Class(
         param_emb_layer_max = private$param_emb_layer_max,
         param_emb_pool_type = private$param_emb_pool_type,
         param_aggregation = private$param_aggregation,
-        param_pad_value=private$param_pad_value
+        param_pad_value = private$param_pad_value
       )
       return(tmp)
     },
@@ -371,7 +371,7 @@ EmbeddedText <- R6::R6Class(
     #-------------------------------------------------------------------------
     #' @description Value for indicating padding.
     #' @return Returns an `int` describing the value used for padding.
-    get_pad_value=function(){
+    get_pad_value = function() {
       return(private$param_pad_value)
     },
 
@@ -448,7 +448,7 @@ EmbeddedText <- R6::R6Class(
         param_emb_layer_max = private$param_emb_layer_max,
         param_emb_pool_type = private$param_emb_pool_type,
         param_aggregation = private$param_aggregation,
-        param_pad_value=private$param_pad_value
+        param_pad_value = private$param_pad_value
       )
 
       if (self$is_compressed() == TRUE) {

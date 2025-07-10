@@ -180,12 +180,12 @@ aife_transformer.load_model <- function(type, model_dir, from_tf, load_safe, add
   config <- aife_transformer.load_model_config(type, model_dir)
 
   model_str <- .AIFETrModel[[type]]
-  if(type=="modernbert"|type=="funnel"){
+  if (type == "modernbert" | type == "funnel"|type == "deberta_v2") {
     model <- transformers[[model_str]]$from_pretrained(
       model_dir,
       from_tf = from_tf,
       use_safetensors = load_safe,
-      #add_pooling_layer = add_pooler,
+      # add_pooling_layer = add_pooler,
       config = config
     )
   } else {
@@ -221,8 +221,11 @@ aife_transformer.load_model_mlm <- function(type, model_dir, from_tf, load_safe)
 
   model_mlm_str <- .AIFETrModelMLM[[type]]
   model_mlm_class <- NULL
-  if (is_py) model_mlm_class <- py[[model_mlm_str]]
-  else model_mlm_class <- transformers[[model_mlm_str]]
+  if (is_py) {
+    model_mlm_class <- py[[model_mlm_str]]
+  } else {
+    model_mlm_class <- transformers[[model_mlm_str]]
+  }
 
   model_mlm <- model_mlm_class$from_pretrained(
     model_dir,

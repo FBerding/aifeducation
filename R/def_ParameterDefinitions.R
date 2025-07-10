@@ -1006,7 +1006,7 @@ get_param_dict <- function() {
   param$dense_residual_type$gui_box <- "Dense Layers"
 
   param$ng_conv_residual_type <- param$residual_type
-  param$ng_conv_residual_type$gui_box <- "N-Gram Layers"
+  param$ng_conv_residual_type$gui_box <- "Multiple N-Gram Layers"
 
   param$normalization_type <- list(
     type = "string",
@@ -1026,7 +1026,7 @@ get_param_dict <- function() {
   )
 
   param$feat_normalization_type <- param$normalization_type
-  param$feat_normalization_type$gui_box <- "Scaling Layer"
+  param$feat_normalization_type$gui_box <- "Feature Layer"
 
   param$tf_normalization_type <- param$normalization_type
   param$tf_normalization_type$gui_box <- "Transformer Encoder Layers"
@@ -1038,7 +1038,7 @@ get_param_dict <- function() {
   param$dense_normalization_type$gui_box <- "Dense Layers"
 
   param$ng_conv_normalization_type <- param$normalization_type
-  param$ng_conv_normalization_type$gui_box <- "N-Gram Layers"
+  param$ng_conv_normalization_type$gui_box <- "Multiple N-Gram Layers"
 
   param$merge_normalization_type <- param$normalization_type
   param$merge_normalization_type$gui_box <- "Merge Layer"
@@ -1051,7 +1051,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "Number of features to be extracted at the end of the model.",
-    gui_box = "Pooling Layer",
+    gui_box = "Classifiction Pooling Layer",
     gui_label = "Size",
     default_value = 32
   )
@@ -1063,7 +1063,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     allowed_values = c("max", "min", "min_max"),
     desc = "Type of extracting intermediate features.",
-    gui_box = "Pooling Layer",
+    gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
     default_value = "min_max",
     default_historic = NULL
@@ -1099,10 +1099,10 @@ get_param_dict <- function() {
   param$dense_parametrizations$gui_box <- "Dense Layers"
 
   param$ng_conv_parametrizations <- param$parametrizations
-  param$ng_conv_parametrizations$gui_box <- "N-Gram Layers"
+  param$ng_conv_parametrizations$gui_box <- "Multiple N-Gram Layers"
 
   param$feat_parametrizations <- param$parametrizations
-  param$feat_parametrizations$gui_box <- "Pooling Layer"
+  param$feat_parametrizations$gui_box <- "Classifiction Pooling Layer"
 
   # Bias------------------------------------------------------------------------
   param$bias <- list(
@@ -1124,9 +1124,9 @@ get_param_dict <- function() {
   param$dense_bias <- param$bias
   param$dense_bias$gui_box <- "Dense Layers"
   param$ng_conv_bias <- param$bias
-  param$ng_conv_bias$gui_box <- "N-Gram Layers"
+  param$ng_conv_bias$gui_box <- "Multiple N-Gram Layers"
   param$feat_bias <- param$bias
-  param$feat_bias$gui_box <- "Pooling Layer"
+  param$feat_bias$gui_box <- "Classifiction Pooling Layer"
 
   # Activation functions---------------------------------------------------------
   param$act_fct <- list(
@@ -1142,9 +1142,9 @@ get_param_dict <- function() {
     default_historic = "gelu"
   )
   param$feat_act_fct <- param$act_fct
-  param$feat_act_fct$gui_box <- "Pooling Layer"
+  param$feat_act_fct$gui_box <- "Classifiction Pooling Layer"
   param$ng_conv_act_fct <- param$act_fct
-  param$ng_conv_act_fct$gui_box <- "N-Gram Layers"
+  param$ng_conv_act_fct$gui_box <- "Multiple N-Gram Layers"
   param$dense_act_fct <- param$act_fct
   param$dense_act_fct$gui_box <- "Dense Layers"
   param$rec_act_fct <- param$act_fct
@@ -1251,15 +1251,15 @@ get_param_dict <- function() {
   )
   param$dense_n_layers <- param$dense_layers
 
-  # Scaling Layer----------------------------------------------------------------
+  # Feature Layer----------------------------------------------------------------
   param$feat_dropout <- list(
     type = "double)",
     allow_null = FALSE,
     min = 0,
     max = 1,
     allowed_values = NULL,
-    desc = "determining the dropout for the dense projection of the scaling layer.",
-    gui_box = "Scaling Layer",
+    desc = "determining the dropout for the dense projection of the feature layer.",
+    gui_box = "Feature Layer",
     gui_label = "Dropout",
     default_value = 0.1
   )
@@ -1378,7 +1378,7 @@ get_param_dict <- function() {
     max = 1,
     allowed_values = NULL,
     desc = "determining the dropout for n-gram convolution layers.",
-    gui_box = "N-Gram Layers",
+    gui_box = "Multiple N-Gram Layers",
     gui_label = "Dropout",
     default_value = 0.1
   )
@@ -1390,7 +1390,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "determining how many times the n-gram layers should be added to the network.",
-    gui_box = "N-Gram Layers",
+    gui_box = "Multiple N-Gram Layers",
     gui_label = "Number of Layers",
     default_value = 0
   )
@@ -1401,7 +1401,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "determining the minimal window size for n-grams.",
-    gui_box = "N-Gram Layers",
+    gui_box = "Multiple N-Gram Layers",
     gui_label = "Smallest N-Gram",
     default_value = 2
   )
@@ -1412,7 +1412,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "determining the maximal window size for n-grams.",
-    gui_box = "N-Gram Layers",
+    gui_box = "Multiple N-Gram Layers",
     gui_label = "Biggest N-Gram",
     default_value = 2
   )

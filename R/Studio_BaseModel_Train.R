@@ -160,7 +160,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
       model=base_model()
       if(!is.null(model)){
         model_type=try(detect_base_model_type(model),silent = TRUE)
-        if(class(model_type)=="try-error"){
+        if(inherits(x=model_type,what = "try-error")){
           display_errors(error_messages="Type of transformer model not supported.")
           return(NULL)
         } else {

@@ -15,9 +15,9 @@
 #' @title Abstract class for all classifiers that use numerical representations of texts instead of words.
 #' @description Base class for classifiers relying on [EmbeddedText] or [LargeDataSetForTextEmbeddings] generated with a [TextEmbeddingModel].
 #'
-#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+#' Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
 #'
-#'This class is **not** designed for a direct application and should only be used by developers.
+#' This class is **not** designed for a direct application and should only be used by developers.
 #'
 #' @return A new object of this class.
 #' @family R6 Classes for Developers
@@ -85,8 +85,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
                        batch_size = 32,
                        ml_trace = 1) {
       # Check arguments
-      check_type(object=batch_size,object_name="batch_size", type="int", FALSE)
-      check_type(object=ml_trace,object_name="ml_trace", type="int", FALSE)
+      check_type(object = batch_size, object_name = "batch_size", type = "int", FALSE)
+      check_type(object = ml_trace, object_name = "ml_trace", type = "int", FALSE)
 
       # Check if the embeddings must be compressed before passing to the model
       requires_compression <- self$requires_compression(newdata)
@@ -94,7 +94,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Check input for compatible text embedding models and feature extractors
       if (
         "EmbeddedText" %in% class(newdata) |
-        "LargeDataSetForTextEmbeddings" %in% class(newdata)
+          "LargeDataSetForTextEmbeddings" %in% class(newdata)
       ) {
         self$check_embedding_model(text_embeddings = newdata, require_compressed = FALSE)
       } else {
@@ -154,7 +154,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           self$model$eval()
           input <- torch$from_numpy(prediction_data)
           predictions_prob <- self$model(input$to(device, dtype = dtype),
-                                         prediction_mode = TRUE
+            prediction_mode = TRUE
           )
           predictions_prob <- private$detach_tensors(predictions_prob)
         } else {
@@ -164,7 +164,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           self$model$eval()
           input <- torch$from_numpy(prediction_data)
           predictions_prob <- self$model(input$to(device, dtype = dtype),
-                                         prediction_mode = TRUE
+            prediction_mode = TRUE
           )
           predictions_prob <- private$detach_tensors(predictions_prob)
         }
@@ -208,7 +208,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       if (
         !is.null_or_na(embedding_model_config[[check]]) &
-        !is.null_or_na(private$text_embedding_model$model[[check]])
+          !is.null_or_na(private$text_embedding_model$model[[check]])
       ) {
         if (embedding_model_config[[check]] != private$text_embedding_model$model[[check]]) {
           stop("The TextEmbeddingModel that generated the data_embeddings is not
@@ -272,16 +272,17 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     requires_compression = function(text_embeddings) {
       # Check arguments
       check_class(
-        object=text_embeddings,
+        object = text_embeddings,
         object_name = "text_embeddings",
-                  classes=c(
-        "EmbeddedText", "LargeDataSetForTextEmbeddings",
-        "array", "datasets.arrow_dataset.Dataset"
-      ), FALSE)
+        classes = c(
+          "EmbeddedText", "LargeDataSetForTextEmbeddings",
+          "array", "datasets.arrow_dataset.Dataset"
+        ), FALSE
+      )
 
       if (
         "EmbeddedText" %in% class(text_embeddings) |
-        "LargeDataSetForTextEmbeddings" %in% class(text_embeddings)
+          "LargeDataSetForTextEmbeddings" %in% class(text_embeddings)
       ) {
         if (self$model_config$use_fe == TRUE & text_embeddings$is_compressed() == FALSE) {
           return(TRUE)
@@ -330,14 +331,14 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' @param dir_path Path where the object set is stored.
     #' @return Method does not return anything. It loads an object from disk.
     load_from_disk = function(dir_path) {
-      #Load common data for these class of models
-      super$load_from_disk(dir_path=dir_path)
+      # Load common data for these class of models
+      super$load_from_disk(dir_path = dir_path)
 
       # Load reliability data
-      private$load_reliability_data(dir_path=dir_path)
+      private$load_reliability_data(dir_path = dir_path)
 
-      #load FeatureExtractor if it is part of the classifier
-      private$load_FeatureExtractor(dir_path=dir_path)
+      # load FeatureExtractor if it is part of the classifier
+      private$load_FeatureExtractor(dir_path = dir_path)
     },
     #--------------------------------------------------------------------------
     #' @description Method transforms the levels of a factor into numbers corresponding
@@ -360,7 +361,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #--------------------------------------------------------------------------
     init_train = function() {
       # Setting a new ID for the classifier
-      private$model_info$model_name <- private$generate_model_id(name=NULL)
+      private$model_info$model_name <- private$generate_model_id(name = NULL)
 
       # Initializing Objects for Saving Performance
       metric_names <- get_coder_metrics(
@@ -511,8 +512,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       self$last_training$learning_time <- as.numeric(
         difftime(Sys.time(),
-                 self$last_training$start_time,
-                 units = "mins"
+          self$last_training$start_time,
+          units = "mins"
         )
       )
 
@@ -816,7 +817,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       new_categories[, 2] <- abs(
         self$last_training$config$pl_anchor -
           (as.numeric(new_categories[, 2]) - 1 / length(self$model_config$target_levels)) /
-          (1 - 1 / length(self$model_config$target_levels))
+            (1 - 1 / length(self$model_config$target_levels))
       )
       new_categories <- as.data.frame(new_categories)
 
@@ -1033,7 +1034,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #--------------------------------------------------------------------------
     set_feature_extractor = function(feature_extractor) {
       # Check
-      check_class(object=feature_extractor,object_name = "feature_extractor", classes="TEFeatureExtractor", allow_NULL=TRUE)
+      check_class(object = feature_extractor, object_name = "feature_extractor", classes = "TEFeatureExtractor", allow_NULL = TRUE)
       if (!is.null(feature_extractor)) {
         if (feature_extractor$get_ml_framework() != private$ml_framework) {
           stop("The machine learning framework of the feature extractior and
@@ -1068,76 +1069,76 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    do_configuration=function(args,one_hot_encoding=TRUE){
-    # Initial checks, adjustments, and preparation----------------------------
-    # check if already configured
-    private$check_config_for_FALSE()
+    do_configuration = function(args, one_hot_encoding = TRUE) {
+      # Initial checks, adjustments, and preparation----------------------------
+      # check if already configured
+      private$check_config_for_FALSE()
 
-    #Check arguments
-    check_all_args(args=args)
-    private$check_embeddings_object_type(args$text_embeddings, strict = TRUE)
+      # Check arguments
+      check_all_args(args = args)
+      private$check_embeddings_object_type(args$text_embeddings, strict = TRUE)
 
-    #save arguments
-    private$save_all_args(args=args,group="configure")
+      # save arguments
+      private$save_all_args(args = args, group = "configure")
 
-    # Set TextEmbeddingModel
-    private$set_text_embedding_model(
-      model_info = args$text_embeddings$get_model_info(),
-      feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
-      times = args$text_embeddings$get_times(),
-      features = args$text_embeddings$get_features(),
-      pad_value=args$text_embeddings$get_pad_value()
-    )
-
-    #Set Times and Features
-    private$set_times_and_features(
-      times=args$text_embeddings$get_times(),
-      features=args$text_embeddings$get_features()
+      # Set TextEmbeddingModel
+      private$set_text_embedding_model(
+        model_info = args$text_embeddings$get_model_info(),
+        feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
+        times = args$text_embeddings$get_times(),
+        features = args$text_embeddings$get_features(),
+        pad_value = args$text_embeddings$get_pad_value()
       )
 
-    #Set target data config
-    private$set_target_data(
-      target_levels=args$target_levels,
-      one_hot_encoding=one_hot_encoding
-    )
+      # Set Times and Features
+      private$set_times_and_features(
+        times = args$text_embeddings$get_times(),
+        features = args$text_embeddings$get_features()
+      )
 
-    #Perform additional checks and adjustments
-    if(is.function(private$check_param_combinations_configuration)){
-      private$check_param_combinations_configuration()
-    }
+      # Set target data config
+      private$set_target_data(
+        target_levels = args$target_levels,
+        one_hot_encoding = one_hot_encoding
+      )
 
-    # Set ML framework
-    private$ml_framework <- "pytorch"
+      # Perform additional checks and adjustments
+      if (is.function(private$check_param_combinations_configuration)) {
+        private$check_param_combinations_configuration()
+      }
 
-    # Setting Label and Name
-    private$set_model_info(
-      model_name = private$generate_model_id(args$name),
-      label = args$label,
-      model_date = date()
-    )
+      # Set ML framework
+      private$ml_framework <- "pytorch"
 
-    # Adjust configuration
-    if(is.function(private$adjust_configuration())){
-      private$adjust_configuration()
-    }
+      # Setting Label and Name
+      private$set_model_info(
+        model_name = private$generate_model_id(args$name),
+        label = args$label,
+        model_date = date()
+      )
 
-    # Set FeatureExtractor and adapt config
-    self$check_feature_extractor_object_type(args$feature_extractor)
-    private$set_feature_extractor(args$feature_extractor)
+      # Adjust configuration
+      if (is.function(private$adjust_configuration())) {
+        private$adjust_configuration()
+      }
 
-    # Set package versions
-    private$set_package_versions()
+      # Set FeatureExtractor and adapt config
+      self$check_feature_extractor_object_type(args$feature_extractor)
+      private$set_feature_extractor(args$feature_extractor)
 
-    # Finalize configuration
-    private$set_configuration_to_TRUE()
+      # Set package versions
+      private$set_package_versions()
 
-    # Create_Model
-    private$create_reset_model()
+      # Finalize configuration
+      private$set_configuration_to_TRUE()
+
+      # Create_Model
+      private$create_reset_model()
     },
     #---------------------------------------------------------------------------
-    check_param_combinations_training=function(){
-      if(self$last_training$config$use_pl==TRUE){
-        if(self$last_training$config$pl_max<self$last_training$config$pl_min){
+    check_param_combinations_training = function() {
+      if (self$last_training$config$use_pl == TRUE) {
+        if (self$last_training$config$pl_max < self$last_training$config$pl_min) {
           stop("pl_max must be at least pl_min.")
         }
         if (self$last_training$config$pl_anchor < self$last_training$config$pl_min) {
@@ -1148,15 +1149,15 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
-      if(self$last_training$config$use_sc==TRUE){
-        if(self$last_training$config$sc_max_k<self$last_training$config$sc_min_k){
+      if (self$last_training$config$use_sc == TRUE) {
+        if (self$last_training$config$sc_max_k < self$last_training$config$sc_min_k) {
           stop("sc_max_k must be at least sc_min_k")
         }
       }
     },
     #---------------------------------------------------------------------------
-    prepare_data_for_training=function(data_targets,data_embeddings){
-      #Transform target data
+    prepare_data_for_training = function(data_targets, data_embeddings) {
+      # Transform target data
       data_targets <- self$adjust_target_levels(data_targets)
 
       # Set up data
@@ -1202,7 +1203,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           sc_max_k = self$last_training$config$sc_max_k,
           trace = self$last_training$config$trace,
           n_cores = self$last_training$config$n_cores,
-          pad_value=private$text_embedding_model$pad_value
+          pad_value = private$text_embedding_model$pad_value
         )
       }
 
@@ -1215,24 +1216,24 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       return(data_manager)
     },
     #--------------------------------------------------------------------------
-    check_data_for_pseudo_labeling=function(data_manager){
-      if(self$last_training$config$use_pl==TRUE){
-        if(!data_manager$contains_unlabeled_data()){
+    check_data_for_pseudo_labeling = function(data_manager) {
+      if (self$last_training$config$use_pl == TRUE) {
+        if (!data_manager$contains_unlabeled_data()) {
           warning("There are no cases without labels. Setting 'use_pl' to 'FALSE'.")
-          self$last_training$config$use_pl=FALSE
+          self$last_training$config$use_pl <- FALSE
         }
       }
     },
     #--------------------------------------------------------------------------
-    set_target_data=function(target_levels,one_hot_encoding=TRUE){
+    set_target_data = function(target_levels, one_hot_encoding = TRUE) {
       self$model_config["target_levels"] <- list(target_levels)
       self$model_config["n_categories"] <- list(length(target_levels))
-      self$model_config["require_one_hot"]<-list(one_hot_encoding)
+      self$model_config["require_one_hot"] <- list(one_hot_encoding)
     },
     #--------------------------------------------------------------------------
-    set_times_and_features=function(times,features){
-      self$model_config$features=features
-      self$model_config$times=times
+    set_times_and_features = function(times, features) {
+      self$model_config$features <- features
+      self$model_config$times <- times
     },
     #--------------------------------------------------------------------------
     load_reload_python_scripts = function() {
@@ -1252,33 +1253,33 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       ))
     },
     #-------------------------------------------------------------------------
-    do_training=function(args){
-      #Check arguments
-      check_all_args(args=args)
+    do_training = function(args) {
+      # Check arguments
+      check_all_args(args = args)
       private$check_target_levels(args$data_targets)
       self$check_embedding_model(args$data_embeddings, require_compressed = FALSE)
 
-      #Save args
-      private$save_all_args(args=args,group="training")
+      # Save args
+      private$save_all_args(args = args, group = "training")
 
-      #Perform additional checks
-      if(is.function(private$check_param_combinations_training)){
+      # Perform additional checks
+      if (is.function(private$check_param_combinations_training)) {
         private$check_param_combinations_training()
       }
 
-      #set up logger
-      private$set_up_logger(log_dir=args$log_dir,log_write_interval=args$log_write_interval)
+      # set up logger
+      private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
 
-      #Prepare Data for Training
+      # Prepare Data for Training
       data_manager <- private$prepare_data_for_training(
-        data_targets=args$data_targets,
-        data_embeddings=args$data_embeddings
+        data_targets = args$data_targets,
+        data_embeddings = args$data_embeddings
       )
 
-      #Check if data can be used for pseudo labeling
+      # Check if data can be used for pseudo labeling
       private$check_data_for_pseudo_labeling(data_manager)
 
-      #Check and create temporary directory for checkpoints
+      # Check and create temporary directory for checkpoints
       private$create_checkpoint_directory()
 
       # Start-------------------------------------------------------------------
@@ -1339,8 +1340,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Clean temporary directory
       private$clean_checkpoint_directory()
 
-      #Set trained field
-      private$trained=TRUE
+      # Set trained field
+      private$trained <- TRUE
 
       if (self$last_training$config$trace == TRUE) {
         message(paste(
@@ -1350,9 +1351,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    load_reliability_data=function(dir_path){
-
-      #Load R file with configuration and other data
+    load_reliability_data = function(dir_path) {
+      # Load R file with configuration and other data
       config_file <- load_R_config_state(dir_path)
 
       self$reliability <- list(
@@ -1369,7 +1369,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
-    load_FeatureExtractor=function(dir_path=dir_path){
+    load_FeatureExtractor = function(dir_path = dir_path) {
       if (self$model_config$use_fe == TRUE) {
         feature_extractor <- TEFeatureExtractor$new()
         feature_extractor$load_from_disk(paste0(dir_path, "/feature_extractor"))
@@ -1377,9 +1377,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    generate_model_id=function(name){
-      if(is.null(name)){
-        return(paste0("cls_",generate_id(16)))
+    generate_model_id = function(name) {
+      if (is.null(name)) {
+        return(paste0("cls_", generate_id(16)))
       } else {
         return(name)
       }

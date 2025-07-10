@@ -313,4 +313,3 @@
 .AIFETrConfig[[AIFETrType$bert]] <- "BertConfig"
 .AIFETrModel[[AIFETrType$bert]] <- "BertModel"
 .AIFETrModelMLM[[AIFETrType$bert]] <- "BertForMaskedLM"
-

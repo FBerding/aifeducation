@@ -1152,7 +1152,8 @@ create_widget_card <- function(id,
       #if (!is.null(dict_entry$values_desc)) {
         tmp_label_with_icon <- shiny::tags$p(
           bslib::popover(
-            trigger = shiny::icon("info-circle"),
+            #trigger = shiny::icon("info-circle"),
+            trigger = dict_entry$gui_label,
             shiny::includeMarkdown(
               get_parameter_documentation(
                 param_name = param,
@@ -1165,8 +1166,7 @@ create_widget_card <- function(id,
               "trigger"="hover"#,
               #"delay"="{'show': 0, 'hide': 500}"
             )
-          ),
-          dict_entry$gui_label
+          )
         )
       #} else {
       #  tmp_label_with_icon <- dict_entry$gui_label
@@ -1312,10 +1312,29 @@ create_widget_card <- function(id,
 
   # Create boxes with widgets
   tmp_cards <- list()
+  layer_dict=get_layer_dict("all")
+  layer_labels=vector(length = length(layer_dict))
+  names(layer_labels)=names(layer_dict)
+  for(layer in names(layer_labels)){
+    layer_labels[layer]=layer_dict[[layer]]$title
+  }
+
   for (i in 1:length(tmp_boxes)) {
+    if(names(tmp_boxes)[i]%in%layer_labels){
+      idx_current_layer=which(x=layer_labels==names(tmp_boxes)[i])
+      current_layer_name=names(layer_labels)[idx_current_layer]
+      popover_text=layer_dict[[current_layer_name]]$desc
+      current_popover=bslib::popover(
+        trigger =   shiny::icon("info-circle"),
+          shiny::includeMarkdown(popover_text)
+      )
+    } else {
+      current_popover=""
+    }
+
     tmp_cards[length(tmp_cards) + 1] <- list(
       bslib::card(
-        bslib::card_header(names(tmp_boxes)[i]),
+        bslib::card_header(current_popover,names(tmp_boxes)[i]),
         bslib::card_body(
           # bslib::layout_column_wrap(
           tmp_boxes[[i]]
