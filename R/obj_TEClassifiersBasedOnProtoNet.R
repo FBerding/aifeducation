@@ -616,13 +616,6 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       # Set loss function
       loss_cls_fct_name <- "ProtoNetworkMargin"
 
-      # Check directory for checkpoints
-      create_dir(
-        dir_path = paste0(self$last_training$config$dir_checkpoint, "/checkpoints"),
-        trace = self$last_training$config$trace,
-        msg = "Creating Checkpoint Directory"
-      )
-
       # Set target column
       if (self$model_config$require_one_hot == FALSE) {
         target_column <- "labels"

@@ -57,7 +57,7 @@ TEFeatureExtractor <- R6::R6Class(
                          label = NULL,
                          text_embeddings = NULL,
                          features = 128,
-                         method = "lstm",
+                         method = "dense",
                          orthogonal_method="matrix_exp",
                          noise_factor = 0.2) {
       args=get_called_args(n=1)

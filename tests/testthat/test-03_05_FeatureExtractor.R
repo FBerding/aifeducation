@@ -45,6 +45,7 @@ for (framework in ml_frameworks) {
         text_embeddings = dataset_list[[data_type]],
         features = 128,
         method = method,
+        orthogonal_method = "matrix_exp",
         noise_factor = 0.2
       )
 

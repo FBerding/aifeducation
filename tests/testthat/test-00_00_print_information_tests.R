@@ -19,7 +19,7 @@ if (Sys.getenv("CI") == "true") {
 
 # Print python versions of the test system
 if (Sys.getenv("CI") == "true") {
-  prepare_session(env_type ="conda",env_type = "r-reticulate")
+  prepare_session(env_type ="conda",envname = "r-reticulate")
 } else {
   prepare_session()
 }

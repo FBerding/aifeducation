@@ -921,7 +921,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c(" matrix_exp", "cayley","householder"),
+    allowed_values = c("matrix_exp", "cayley","householder"),
     desc = "Method for ensuring orthogonality of weights.",
     default_historic="householder",
     default_value = " matrix_exp",

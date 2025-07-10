@@ -42,8 +42,8 @@ test_that("Setup Classifier Data", {
         text_embeddings = dataset_list[["LargeDataSetForTextEmbeddings"]],
         features = 32,
         method = method,
-        noise_factor = 0.002,
-        optimizer = "adam"
+        orthogonal_method = "matrix_exp",
+        noise_factor = 0.002
       )
       extractor$train(
         data_embeddings = dataset_list[["LargeDataSetForTextEmbeddings"]],
@@ -54,6 +54,7 @@ test_that("Setup Classifier Data", {
         sustain_interval = 15,
         epochs = 75,
         batch_size = 100,
+        optimizer = "adam",
         trace = trace,
         ml_trace = as.numeric(trace)
       )
