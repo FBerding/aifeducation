@@ -37,7 +37,7 @@ The aim of this list is to automatize argument checking and widget generation fo
 Other Parameter Dictionary: 
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
-\code{\link{get_deprecated_object_names}()},
+\code{\link{get_depr_obj_names}()},
 \code{\link{get_magnitude_values}()},
 \code{\link{get_param_def}()},
 \code{\link{get_param_doc_desc}()}

@@ -57,10 +57,10 @@ DeprecatedObjects <- c("TEClassifierProtoNet", "TEClassifierRegular")
 
 #' @title Get names of deprecated objects
 #' @description Function returns the names of all objects that are deprecated.
-#' @return Returns a vector containing the names.
+#' @return Returns a `vector` containing the names.
 #' @family Parameter Dictionary
 #' @export
-get_deprecated_object_names <- function() {
+get_depr_obj_names <- function() {
   return(DeprecatedObjects)
 }
 
