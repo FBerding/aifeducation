@@ -8,6 +8,8 @@ a01_layers_stacks.Rmd
 For Later use
 examples
 
+trainer_output
+
 ^.*\.Rproj$
 ^\.Rproj\.user$
 Trial

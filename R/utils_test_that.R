@@ -163,7 +163,8 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
   for (n_classes in class_range) {
     #Load raw text and labels
     #imdb_movie_reviews
-    load(testthat::test_path("test_data/imdb_movie_reviews.rda"))
+    obj_name=load(testthat::test_path("test_data/imdb_movie_reviews.rda"))
+    imdb_movie_reviews=get(x=obj_name)
     example_data <- imdb_movie_reviews
 
     rownames(example_data) <- rownames(test_embeddings$embeddings)
