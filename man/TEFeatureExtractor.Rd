@@ -49,6 +49,7 @@ Other Text Embedding:
 \item \href{#method-TEFeatureExtractor-train}{\code{TEFeatureExtractor$train()}}
 \item \href{#method-TEFeatureExtractor-extract_features}{\code{TEFeatureExtractor$extract_features()}}
 \item \href{#method-TEFeatureExtractor-extract_features_large}{\code{TEFeatureExtractor$extract_features_large()}}
+\item \href{#method-TEFeatureExtractor-plot_training_history}{\code{TEFeatureExtractor$plot_training_history()}}
 \item \href{#method-TEFeatureExtractor-clone}{\code{TEFeatureExtractor$clone()}}
 }
 }
@@ -251,6 +252,35 @@ embeddings which should be reduced in their dimensions.}
 }
 \subsection{Returns}{
 Returns an object of class \link{LargeDataSetForTextEmbeddings} containing the compressed embeddings.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEFeatureExtractor-plot_training_history"></a>}}
+\if{latex}{\out{\hypertarget{method-TEFeatureExtractor-plot_training_history}{}}}
+\subsection{Method \code{plot_training_history()}}{
+Method for requesting a plot of the training history.
+This method requires the \emph{R} package 'ggplot2' to work.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$plot_training_history(
+  y_min = NULL,
+  y_max = NULL,
+  text_size = 10
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{text_size}}{Size of the text.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a plot of class \code{ggplot} visualizing the training process.
 }
 }
 \if{html}{\out{<hr>}}

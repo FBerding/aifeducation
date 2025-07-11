@@ -58,7 +58,7 @@ base_model_list <- list(
     "roberta",
     "longformer",
     "funnel",
-    "deberta_v2",
+    #"deberta_v2",
     "mpnet",
     "modernbert"
   )
@@ -314,6 +314,19 @@ for (framework in ml_frameworks) {
               tolerance = 1e-6
             )
             expect_equal(embeddings_large$get_pad_value(),random_padding_value)
+
+            #Check absence of randrom variation
+            embeddings_2 <- text_embedding_model$embed(
+              raw_text = example_data$text[1:10],
+              doc_id = example_data$id[1:10],
+              batch_size = 5
+            )
+            for (i in 1:10) {
+              expect_equal(embeddings$embeddings[i, , , drop = FALSE],
+                           embeddings_2$embeddings[i, , , drop = FALSE],
+                           tolerance = 1e-2
+              )
+            }
           })
 
           test_that(paste(framework, base_model, pooling_type, max_layer, min_layer, "embed single case", "chunks", chunks), {

@@ -34,6 +34,7 @@ Other R6 Classes for Developers:
 \item \href{#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model_name}{\code{ModelsBasedOnTextEmbeddings$get_text_embedding_model_name()}}
 \item \href{#method-ModelsBasedOnTextEmbeddings-check_embedding_model}{\code{ModelsBasedOnTextEmbeddings$check_embedding_model()}}
 \item \href{#method-ModelsBasedOnTextEmbeddings-load_from_disk}{\code{ModelsBasedOnTextEmbeddings$load_from_disk()}}
+\item \href{#method-ModelsBasedOnTextEmbeddings-plot_training_history}{\code{ModelsBasedOnTextEmbeddings$plot_training_history()}}
 \item \href{#method-ModelsBasedOnTextEmbeddings-clone}{\code{ModelsBasedOnTextEmbeddings$clone()}}
 }
 }
@@ -127,6 +128,60 @@ loads an object from disk and updates the object to the current version of the p
 }
 \subsection{Returns}{
 Method does not return anything. It loads an object from disk.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ModelsBasedOnTextEmbeddings-plot_training_history"></a>}}
+\if{latex}{\out{\hypertarget{method-ModelsBasedOnTextEmbeddings-plot_training_history}{}}}
+\subsection{Method \code{plot_training_history()}}{
+Method for requesting a plot of the training history.
+This method requires the \emph{R} package 'ggplot2' to work.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelsBasedOnTextEmbeddings$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = TRUE,
+  text_size = 10
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{final_training}}{\code{bool} If \code{FALSE} the values of the performance estimation are used. If \code{TRUE} only
+the epochs of the final training are used.}
+
+\item{\code{pl_step}}{\code{int} Number of the step during pseudo labeling to plot. Only relevant if the model was trained
+with active pseudo labeling.}
+
+\item{\code{measure}}{Measure to plot.}
+
+\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{add_min_max}}{\code{bool} If \code{TRUE} the minimal and maximal values during performance estimation are port of the plot.
+If \code{FALSE} only the mean values are shown. Parameter is ignored if \code{final_training=TRUE}.}
+
+\item{\code{text_size}}{Size of the text.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a plot of class \code{ggplot} visualizing the training process.
+Prepare history data of objects
+Function for preparing the history data of a model in order to be plotted in AI for Education - Studio.
+
+final \code{bool} If \code{TRUE} the history data of the final training is used for the data set.
+pl_step \code{int} If \code{use_pl=TRUE} select the step within pseudo labeling for which the data should be prepared.
+Returns a named \code{list} with the training history data of the model. The
+reported measures depend on the provided model.
+
+Utils Studio Developers
+internal
 }
 }
 \if{html}{\out{<hr>}}

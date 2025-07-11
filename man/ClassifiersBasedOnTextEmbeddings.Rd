@@ -69,6 +69,8 @@ recall, and f1 for every fold.
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-save}{\code{ClassifiersBasedOnTextEmbeddings$save()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-load_from_disk}{\code{ClassifiersBasedOnTextEmbeddings$load_from_disk()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-adjust_target_levels}{\code{ClassifiersBasedOnTextEmbeddings$adjust_target_levels()}}
+\item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_training_history}{\code{ClassifiersBasedOnTextEmbeddings$plot_training_history()}}
+\item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream}{\code{ClassifiersBasedOnTextEmbeddings$plot_coding_stream()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-clone}{\code{ClassifiersBasedOnTextEmbeddings$clone()}}
 }
 }
@@ -269,6 +271,87 @@ named and has to use the same names as used in in the embeddings.}
 \subsection{Returns}{
 Method returns a \code{factor} containing the numerical representation of
 categories/classes.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ClassifiersBasedOnTextEmbeddings-plot_training_history"></a>}}
+\if{latex}{\out{\hypertarget{method-ClassifiersBasedOnTextEmbeddings-plot_training_history}{}}}
+\subsection{Method \code{plot_training_history()}}{
+Method for requesting a plot of the training history.
+This method requires the \emph{R} package 'ggplot2' to work.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ClassifiersBasedOnTextEmbeddings$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = TRUE,
+  text_size = 10
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{final_training}}{\code{bool} If \code{FALSE} the values of the performance estimation are used. If \code{TRUE} only
+the epochs of the final training are used.}
+
+\item{\code{pl_step}}{\code{int} Number of the step during pseudo labeling to plot. Only relevant if the model was trained
+with active pseudo labeling.}
+
+\item{\code{measure}}{\code{string} Measure to plot. Allowed values:
+\itemize{
+\item \code{"avg_iota"} = Average Iota
+\item \code{"loss"} = Loss
+\item \code{"accuracy"} = Accuracy
+\item \code{"balanced_accuracy"} = Balanced Accuracy
+}}
+
+\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+
+\item{\code{add_min_max}}{\code{bool} If \code{TRUE} the minimal and maximal values during performance estimation are port of the plot.
+If \code{FALSE} only the mean values are shown. Parameter is ignored if \code{final_training=TRUE}.}
+
+\item{\code{text_size}}{Size of the text.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a plot of class \code{ggplot} visualizing the training process.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream"></a>}}
+\if{latex}{\out{\hypertarget{method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream}{}}}
+\subsection{Method \code{plot_coding_stream()}}{
+Method for requesting a plot the coding stream.
+The plot shows how the cases of different categories/classes are
+assigned to a the available classes/categories. The visualization
+is helpful for analyzing the consequences of coding errors.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ClassifiersBasedOnTextEmbeddings$plot_coding_stream(
+  label_categories_size = 3,
+  key_size = 0.5,
+  text_size = 10
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{label_categories_size}}{\code{double} determining the size of the label for each true and assigned category within the plot.}
+
+\item{\code{key_size}}{\code{double} determining the size of the legend.}
+
+\item{\code{text_size}}{\code{double} determining the size of the text within the legend.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a plot of class \code{ggplot} visualizing the training process.
 }
 }
 \if{html}{\out{<hr>}}

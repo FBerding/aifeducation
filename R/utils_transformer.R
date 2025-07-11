@@ -86,7 +86,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation") {
 #' @title Check `max_position_embeddings` argument of transformer
 #' @description Used when creating and training transformers.
 #'
-#' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
+#' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
 #' @return Warning if `max_position_embeddings` greater than 512.
 #'
 #' @family Utils Transformers Developers
@@ -105,7 +105,7 @@ check.max_position_embeddings <- function(max_position_embeddings) { # nolint
 #' @title Check `hidden_act` argument of transformer
 #' @description Used when creating and training transformers.
 #'
-#' @param hidden_act `r paramDesc.hidden_act()`
+#' @param hidden_act `r get_param_doc_desc("hidden_act")`
 #' @return Error if `hidden_act` is not `"gelu"`, `"relu"`, `"silu"` or `"gelu_new"`.
 #'
 #' @family Utils Transformers Developers
@@ -120,8 +120,8 @@ check.hidden_act <- function(hidden_act) { # nolint
 #' @title Check `sustain_iso_code` argument of transformer
 #' @description Used when creating and training transformers.
 #'
-#' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
-#' @param sustain_track `r paramDesc.sustain_track()`
+#' @param sustain_iso_code `r `r get_param_doc_desc("sustain_iso_code")`()`
+#' @param sustain_track `r `r get_param_doc_desc("sustain_track")`()`
 #' @return Error if `sustain_track` is `TRUE` and `sustain_iso_code` is missing (`NULL`).
 #'
 #' @family Utils Transformers Developers
@@ -137,7 +137,7 @@ check.sustain_iso_code <- function(sustain_iso_code, sustain_track) { # nolint
 #' @title Check possible save formats
 #' @description Used when creating and training transformers.
 #'
-#' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
+#' @param pytorch_safetensors `r get_param_doc_desc("pytorch_safetensors")`
 #' @return Whether to save the model using `safetensors` or the traditional `pytorch` way.
 #'
 #' @importFrom reticulate py_module_available
@@ -159,7 +159,7 @@ check.possible_save_formats <- function(pytorch_safetensors) { # nolint
 #' @description Used when creating and training transformers. Checks `pytorch_model.bin`, `model.safetensors` and
 #'   `tf_model.h5` files.
 #'
-#' @param model_dir_path `r paramDesc.model_dir_path()`
+#' @param model_dir_path `r get_param_doc_desc("model_dir_path")`
 #' @return A list with the variables `from_tf` and `load_safe`.
 #'
 #' @importFrom reticulate py_module_available
@@ -196,7 +196,7 @@ check.model_files <- function(model_dir_path) { # nolint
 #' @title Create `WordPiece` tokenizer
 #' @description Used when creating transformers.
 #'
-#' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
+#' @param vocab_do_lower_case `r get_param_doc_desc("vocab_do_lower_case")`
 #' @param sep_token `string` Representation of the SEP token.
 #' @param sep_id `int` ID of the SEP token.
 #' @param cls_token `string` Representation of the CLS token.
@@ -235,9 +235,9 @@ create_WordPiece_tokenizer <- function(# nolint
 #' @title Create `ByteLevelBPE` tokenizer
 #' @description Used when creating transformers.
 #'
-#' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
-#' @param add_prefix_space `r paramDesc.add_prefix_space()`
-#' @param trim_offsets `r paramDesc.trim_offsets()`
+#' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+#' @param add_prefix_space `r get_param_doc_desc("add_prefix_space")`
+#' @param trim_offsets `r get_param_doc_desc("trim_offsets")`
 #' @return A new tokenizer object (`tokenizers.Tokenizer`) based on `tokenizers.models.ByteLevel` model.
 #'
 #' @family Utils Transformers Developers

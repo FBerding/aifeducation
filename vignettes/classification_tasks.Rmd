@@ -915,6 +915,19 @@ energy consumption, CO2 emissions, and hardware used during training by
 calling the method `get_sustainability_data()`. For our example this
 would be `bert_modeling$get_sustainability_data()`.
 
+## 4.7 Training History
+
+If you would like to see the training history of the underlying base model you
+can call a special method.
+
+```{r, include = TRUE, eval = TRUE}
+bert_modeling$plot_training_history()
+```
+
+Please note that this plot is not available for this example since the necessary
+data is not directly available for this model on hugging face. If you traing a 
+model with this package the training history is always saved.
+
 # 5 Classifiers
 
 ## 5.1 Overview
@@ -1063,7 +1076,7 @@ dense layer (`dense_n_layers=1`). All other layers are omitted from the model
 by setting the number of layers to zero (`conv_n_layers=0`,`tf_n_layers=0`).
 
 As pooling method we use minimum and maximum (`cls_pooling_type="min_max"`). 
-That is, the 30 highest and the 30 lowest features are used for calculating
+That is, the 15 highest and the 15 lowest features are used for calculating
 the classes/labels. The number of values can be determined with `intermediate_features=30`.
 
 After you have created a new classifier, you can begin training.
@@ -1241,6 +1254,30 @@ Please note that after performance estimation, the final training of the
 classifier makes use of all data available. That is, the test sample is
 left empty.
 
+In order to visualize the progress of training you can request a plot 
+which shows how important performance measures develop over epochs.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier"),fig.align="center"}}
+classifier$plot_training_history(
+  final_training=FALSE,
+  pl_step=NULL,
+  measure="loss",
+  y_min=NULL,
+  y_max=NULL,
+  add_min_max=TRUE,
+  text_size=10)
+```
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+For this method it is important to decide which performance measure you would like to
+plot. For classifiers loss (`"loss"`), accuracy (`"accuracy"`), and 
+balanced accuracy(`"balanced_accuracy"`) are possible. If you would like to see only the 
+development of the last training phase set `final_training=FALSE`. If this parameter
+is `TRUE` the plot uses the data generated during the performance estimation phase.
+
 ## 5.4 Evaluating Classifier's Performance
 
 After finishing training, you can evaluate the performance of the
@@ -1301,11 +1338,10 @@ classifier$reliability$standard_measures_mean
 ```
 
 Finally, you can plot a coding stream scheme showing how the cases of
-different classes are labeled. Here we use the package *iotarelr*.
+different classes are labeled. 
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Coding Stream of the Classifier"),fig.align="center"}
-library(iotarelr)
-iotarelr::plot_iota2_alluvial(classifier$reliability$iota_object_end_free)
+classifier$plot_coding_stream()
 ```
 
 ```{r, include = FALSE}
@@ -1871,6 +1907,17 @@ feature_extractor$train(
 > In this example we use the same text embeddings as we use to traing the classifier.
 > It can be beneficial if you use a larger sample of text for training a `TEFeatureExtractor`
 > to improve performance and/or to allow a broad application of the feature extractor. 
+
+You can plot the training history of the model with:
+
+```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Training History of a Feature Extractor." }
+feature_extractor$plot_training_history()
+```
+
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor to `feature_extractor`

@@ -66,7 +66,6 @@ if (file.exists(root_path_feature_extractor)) {
 
 # Tests------------------------------------------------------------------------
 for (object_class_name in object_class_names) {
-  print(object_class_name)
   # Test for different number of classes
   for (n_classes in class_range) {
     for (i in 1:check_adjust_n_samples_on_CI(n_samples_requested=max_samples,

@@ -38,5 +38,5 @@
   "sparse_prediction": false,
   "torch_dtype": "float32",
   "transformers_version": "4.52.4",
-  "vocab_size": 6003
+  "vocab_size": 6005
 }

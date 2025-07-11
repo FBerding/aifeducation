@@ -37,16 +37,6 @@ TextEmbeddingModel <- R6::R6Class(
       keras = NA,
       numpy = NA
     ),
-    supported_transformers = list(
-      pytorch = c(
-        "bert",
-        "roberta",
-        "longformer",
-        "funnel",
-        "deberta_v2",
-        "mpnet"
-      )
-    ),
     basic_components = list(
       method = NULL,
       max_length = NULL
@@ -381,12 +371,21 @@ TextEmbeddingModel <- R6::R6Class(
         model_dir = model_dir
       )
 
-      private$transformer_components$model <- aife_transformer.load_model(
-        type = private$basic_components$method,
-        model_dir = model_dir,
-        from_tf = from_tf,
-        load_safe = load_safe
-      )
+      if(private$basic_components$method=="deberta"){
+        private$transformer_components$model<- aife_transformer.load_model_mlm(
+          type = private$basic_components$method,
+          model_dir = model_dir,
+          from_tf = from_tf,
+          load_safe = load_safe
+        )
+      } else {
+        private$transformer_components$model <- aife_transformer.load_model(
+          type = private$basic_components$method,
+          model_dir = model_dir,
+          from_tf = from_tf,
+          load_safe = load_safe
+        )
+      }
 
       private$transformer_components$model_mlm <- aife_transformer.load_model_mlm(
         type = private$basic_components$method,
@@ -952,10 +951,12 @@ TextEmbeddingModel <- R6::R6Class(
         private$transformer_components$model$eval()
         if (torch$cuda$is_available()) {
           pytorch_device <- "cuda"
+          pytorch_dtype=torch$float
         } else {
           pytorch_device <- "cpu"
+          pytorch_dtype=torch$double
         }
-        private$transformer_components$model$to(pytorch_device)
+        private$transformer_components$model$to(pytorch_device,dtype=pytorch_dtype)
         if (private$transformer_components$emb_pool_type == "average") {
           pooling$to(pytorch_device)
         }

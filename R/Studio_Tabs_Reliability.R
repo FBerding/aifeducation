@@ -236,8 +236,7 @@ Reliability_Server <- function(id, model) {
     output$coding_stream_plot <- shiny::renderPlot(
       expr = {
         classifier <- model()
-        plot <- iotarelr::plot_iota2_alluvial(
-          object = classifier$reliability$iota_object_end_free,
+        plot <- classifier$plot_coding_stream(
           label_categories_size = input$codings_stream_labels_size,
           key_size = input$codings_stream_key_size,
           text_size = input$codings_stream_text_size

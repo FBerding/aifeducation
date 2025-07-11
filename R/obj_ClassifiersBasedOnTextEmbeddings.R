@@ -355,6 +355,53 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
       names(tmp_data) <- names(data_targets)
       return(tmp_data)
+    },
+    #---------------------------------------------------------------------------
+    #' @description Method for requesting a plot of the training history.
+    #' This method requires the *R* package 'ggplot2' to work.
+    #' @param final_training `bool` If `FALSE` the values of the performance estimation are used. If `TRUE` only
+    #' the epochs of the final training are used.
+    #' @param add_min_max `bool` If `TRUE` the minimal and maximal values during performance estimation are port of the plot.
+    #' If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.
+    #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
+    #' with active pseudo labeling.
+    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
+    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
+    #' @param text_size Size of the text.
+    #' @param measure `string` Measure to plot. Allowed values:
+    #' * `"avg_iota"` = Average Iota
+    #' * `"loss"` = Loss
+    #' * `"accuracy"` = Accuracy
+    #' * `"balanced_accuracy"` = Balanced Accuracy
+    #' @return Returns a plot of class `ggplot` visualizing the training process.
+    plot_training_history=function(final_training=FALSE,pl_step=NULL,measure="loss",y_min=NULL,y_max=NULL,add_min_max=TRUE,text_size=10){
+      plot=super$plot_training_history(
+        final_training=final_training,
+        pl_step=pl_step,
+        measure=measure,
+        y_min=y_min,
+        y_max=y_max,
+        add_min_max=add_min_max,
+        text_size=text_size
+      )
+      return(plot)
+    },
+    #' @description Method for requesting a plot the coding stream.
+    #' The plot shows how the cases of different categories/classes are
+    #' assigned to a the available classes/categories. The visualization
+    #' is helpful for analyzing the consequences of coding errors.
+    #' @param label_categories_size `double` determining the size of the label for each true and assigned category within the plot.
+    #' @param key_size `double` determining the size of the legend.
+    #' @param text_size `double` determining the size of the text within the legend.
+    #' @return Returns a plot of class `ggplot` visualizing the training process.
+    plot_coding_stream=function(label_categories_size = 3, key_size = 0.5,text_size = 10){
+      plot <- iotarelr::plot_iota2_alluvial(
+        object = self$reliability$iota_object_end_free,
+        label_categories_size = label_categories_size,
+        key_size = key_size,
+        text_size = text_size
+      )
+      return(plot)
     }
   ),
   private = list(

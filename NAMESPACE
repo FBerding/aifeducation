@@ -2,7 +2,6 @@
 
 export(.AIFEBaseTransformer)
 export(.AIFEBertTransformer)
-export(.AIFEDebertaTransformer)
 export(.AIFEFunnelTransformer)
 export(.AIFELongformerTransformer)
 export(.AIFEModernBertTransformer)

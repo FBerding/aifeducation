@@ -158,22 +158,24 @@ Training_Server <- function(id, model) {
       {
         shiny::req(model)
         if ("TextEmbeddingModel" %in% class(model())) {
-          # Plot for TextEmbeddingModels-----------------------------------------
-          model()$plot_training_history(
+          plot=model()$plot_training_history(
             y_min=input$y_min,
             y_max=input$y_max
           )
-
-          # Plot for classifiers-----------------------------------------------
-        } else if (
-          ClassifiersBasedOnTextEmbeddings %in% class(model()) ||
-            "TEFeatureExtractor" %in% class(model())
-        ) {
+        } else if("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
           # Necessary input
           shiny::req(input$measure)
 
-          # Get data for plotting
-          if ("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
+          plot=model()$plot_training_history(
+            y_min=input$y_min,
+            y_max=input$y_max,
+            final_training=input$training_phase,
+            pl_step=input$classifier_pl_step,
+            measure=input$measure,
+            add_min_max=input$training_min_max,
+            text_size=input$text_size
+          )
+
             plot_data <- prepare_training_history(
               model = model(),
               final = input$training_phase,
@@ -181,96 +183,12 @@ Training_Server <- function(id, model) {
               pl_step = input$classifier_pl_step
             )
           } else if ("TEFeatureExtractor" %in% class(model())) {
-            plot_data <- prepare_training_history(
-              model = model(),
-              final = FALSE,
-              use_pl = FALSE,
-              pl_step = NULL
+            plot=model()$plot_training_history(
+              y_min=input$y_min,
+              y_max=input$y_max,
+              text_size=input$text_size
             )
           }
-
-          # Select the performance measure to display
-          plot_data <- plot_data[[input$measure]]
-
-          # Create Plot
-          y_min <- input$y_min
-          y_max <- input$y_max
-          if (input$measure == "loss") {
-            y_label <- "loss"
-          } else if (input$measure == "accuracy") {
-            y_label <- "Accuracy"
-          } else if (input$measure == "balanced_accuracy") {
-            y_label <- "Balanced Accuracy"
-          } else if (input$measure == "avg_iota") {
-            y_label <- "Average Iota"
-          }
-
-
-          # TODO (Yuliia): .data has no visible binding
-          plot <- ggplot2::ggplot(data = plot_data) +
-            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_mean, color = "train")) +
-            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_mean, color = "validation"))
-
-          if (input$training_min_max == TRUE) {
-            plot <- plot +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_min, color = "train")) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_max, color = "train")) +
-              ggplot2::geom_ribbon(
-                ggplot2::aes(
-                  x = .data$epoch,
-                  ymin = .data$train_min,
-                  ymax = .data$train_max
-                ),
-                alpha = 0.25,
-                fill = "red"
-              ) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_min, color = "validation")) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_max, color = "validation")) +
-              ggplot2::geom_ribbon(
-                ggplot2::aes(
-                  x = .data$epoch,
-                  ymin = .data$validation_min,
-                  ymax = .data$validation_max
-                ),
-                alpha = 0.25,
-                fill = "blue"
-              )
-          }
-          # TODO (Yuliia): .data has no visible binding
-          if ("test_mean" %in% colnames(plot_data)) {
-            plot <- plot +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_mean, color = "test"))
-            if (input$training_min_max == TRUE) {
-              plot <- plot +
-                ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_min, color = "test")) +
-
-                ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_max, color = "test")) +
-                ggplot2::geom_ribbon(
-                  ggplot2::aes(
-                    x = .data$epoch,
-                    ymin = .data$test_min,
-                    ymax = .data$test_max
-                  ),
-                  alpha = 0.25,
-                  fill = "darkgreen"
-                )
-            }
-          }
-
-          plot <- plot + ggplot2::theme_classic() +
-            ggplot2::ylab(y_label) +
-            ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
-            ggplot2::xlab("epoch") +
-            ggplot2::scale_color_manual(values = c(
-              "train" = "red",
-              "validation" = "blue",
-              "test" = "darkgreen"
-            )) +
-            ggplot2::theme(
-              text = ggplot2::element_text(size = input$text_size),
-              legend.position = "bottom"
-            )
-        }
         return(plot)
       },
       res = 72 * 2

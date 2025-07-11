@@ -104,6 +104,106 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Set training status
       private$trained <- config_file$private$trained
+    },
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting a plot of the training history.
+    #' This method requires the *R* package 'ggplot2' to work.
+    #' @param final_training `bool` If `FALSE` the values of the performance estimation are used. If `TRUE` only
+    #' the epochs of the final training are used.
+    #' @param add_min_max `bool` If `TRUE` the minimal and maximal values during performance estimation are port of the plot.
+    #' If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.
+    #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
+    #' with active pseudo labeling.
+    #' @param measure Measure to plot.
+    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
+    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
+    #' @param text_size Size of the text.
+    #' @return Returns a plot of class `ggplot` visualizing the training process.
+    plot_training_history=function(final_training=FALSE,pl_step=NULL,measure="loss",y_min=NULL,y_max=NULL,add_min_max=TRUE,text_size=10){
+        requireNamespace("ggplot2")
+        plot_data <- private$prepare_training_history(
+          final = final_training,
+          pl_step = pl_step
+        )
+
+      # Select the performance measure to display
+      plot_data <- plot_data[[measure]]
+
+      # Create Plot
+      if (measure == "loss") {
+        y_label <- "loss"
+      } else if (measure == "accuracy") {
+        y_label <- "Accuracy"
+      } else if (measure == "balanced_accuracy") {
+        y_label <- "Balanced Accuracy"
+      } else if (measure == "avg_iota") {
+        y_label <- "Average Iota"
+      }
+
+      plot <- ggplot2::ggplot(data = plot_data) +
+        ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_mean, color = "train")) +
+        ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_mean, color = "validation"))
+
+      if (add_min_max == TRUE) {
+        plot <- plot +
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_min, color = "train")) +
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_max, color = "train")) +
+          ggplot2::geom_ribbon(
+            ggplot2::aes(
+              x = .data$epoch,
+              ymin = .data$train_min,
+              ymax = .data$train_max
+            ),
+            alpha = 0.25,
+            fill = "red"
+          ) +
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_min, color = "validation")) +
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_max, color = "validation")) +
+          ggplot2::geom_ribbon(
+            ggplot2::aes(
+              x = .data$epoch,
+              ymin = .data$validation_min,
+              ymax = .data$validation_max
+            ),
+            alpha = 0.25,
+            fill = "blue"
+          )
+      }
+
+      if ("test_mean" %in% colnames(plot_data)) {
+        plot <- plot +
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_mean, color = "test"))
+        if (add_min_max == TRUE) {
+          plot <- plot +
+            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_min, color = "test")) +
+
+            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_max, color = "test")) +
+            ggplot2::geom_ribbon(
+              ggplot2::aes(
+                x = .data$epoch,
+                ymin = .data$test_min,
+                ymax = .data$test_max
+              ),
+              alpha = 0.25,
+              fill = "darkgreen"
+            )
+        }
+      }
+
+      plot <- plot + ggplot2::theme_classic() +
+        ggplot2::ylab(y_label) +
+        ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
+        ggplot2::xlab("epoch") +
+        ggplot2::scale_color_manual(values = c(
+          "train" = "red",
+          "validation" = "blue",
+          "test" = "darkgreen"
+        )) +
+        ggplot2::theme(
+          text = ggplot2::element_text(size = text_size),
+          legend.position = "bottom"
+        )
+      return(plot)
     }
   ),
   private = list(
@@ -309,7 +409,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                 if (!is.null(param_dict[[param]]$default_historic)) {
                   self$model_config[param] <- list(param_dict[[param]]$default_historic)
                 } else {
-                  stop(paste("Historic default for", param, "is missing in parameter dictionary."))
+                  warning(paste("Historic default for", param, "is missing in parameter dictionary."))
                 }
               }
             }
@@ -351,6 +451,150 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       } else {
         return(name)
       }
+    },
+    #--------------------------------------------------------------------------
+    #'  Prepare history data of objects
+    #'  Function for preparing the history data of a model in order to be plotted in AI for Education - Studio.
+    #'
+    #'  final `bool` If `TRUE` the history data of the final training is used for the data set.
+    #'  pl_step `int` If `use_pl=TRUE` select the step within pseudo labeling for which the data should be prepared.
+    #'  Returns a named `list` with the training history data of the model. The
+    #' reported measures depend on the provided model.
+    #'
+    #'  Utils Studio Developers
+    #'  internal
+    prepare_training_history=function(final = FALSE,
+                                      pl_step = NULL) {
+      plot_data <- self$last_training$history
+
+      if(length(plot_data)<=1){
+        plot_data[[1]] <- list(loss = plot_data[[1]])
+      }
+
+      #if ("TEFeatureExtractor" %in% class(model)) {
+      #  plot_data[[1]] <- list(loss = plot_data[[1]])
+      #}
+
+      if (is.null_or_na(final)) final <- FALSE
+
+      if(is.null_or_na(self$last_training$config$use_pl)){
+        use_pl=FALSE
+      } else {
+        use_pl=self$last_training$config$use_pl
+      }
+
+      if(use_pl==TRUE & is.null_or_na(pl_step)){
+        stop("Model was trained with pseudo labeling. Please provide a pl_step.")
+      }
+
+      # Get standard statistics
+      n_epochs <- self$last_training$config$epochs
+      index_final <- length(self$last_training$history)
+
+      # Get information about the existence of a training, validation, and test data set
+      # Get Number of folds for the request
+      if (final == FALSE) {
+        n_folds <- length(self$last_training$history)
+        if (n_folds > 1) {
+          n_folds <- n_folds - 1
+        }
+
+        if (!use_pl) {
+          measures <- names(plot_data[[1]])
+          n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
+        } else {
+          measures <- names(plot_data[[1]][[1]])
+          n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]][[measures[1]]])
+        }
+      } else {
+        n_folds <- 1
+        measures <- names(plot_data[[index_final]])
+        if (use_pl == FALSE) {
+          n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
+        } else {
+          n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
+        }
+      }
+
+      if (n_sample_type == 3) {
+        sample_type_name <- c("train", "validation", "test")
+      } else {
+        sample_type_name <- c("train", "validation")
+      }
+
+      # Create array for saving the data-------------------------------------------
+      result_list <- NULL
+      for (j in seq_len(length(measures))) {
+        measure <- measures[j]
+        measure_array <- array(
+          dim = c(
+            n_folds,
+            n_sample_type,
+            n_epochs
+          ),
+          dimnames = list(fold = NULL, sample_type = sample_type_name, epoch = NULL)
+        )
+
+        final_data_measure <- matrix(
+          data = NA,
+          nrow = n_epochs,
+          ncol = 3 * n_sample_type + 1
+        )
+        colnames(final_data_measure) <- c(
+          "epoch",
+          paste0(
+            sample_type_name,
+            c(
+              rep("_min", times = n_sample_type),
+              rep("_mean", times = n_sample_type),
+              rep("_max", times = n_sample_type)
+            )
+          )
+        )
+        final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
+
+        if (final == FALSE) {
+          for (i in 1:n_folds) {
+            if (use_pl == FALSE) {
+              measure_array[i, , ] <- plot_data[[i]][[measure]]
+            } else {
+              print(plot_data)
+              print(i)
+              print(pl_step)
+              print(measure)
+              print(dim(measure_array))
+              measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
+            }
+          }
+        } else {
+          if (!use_pl) {
+            measure_array[1, , ] <- plot_data[[index_final]][[measure]]
+          } else {
+            measure_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
+          }
+        }
+
+        for (i in 1:n_epochs) {
+          final_data_measure[i, "train_min"] <- min(measure_array[, "train", i])
+          final_data_measure[i, "train_mean"] <- mean(measure_array[, "train", i])
+          final_data_measure[i, "train_max"] <- max(measure_array[, "train", i])
+
+          final_data_measure[i, "validation_min"] <- min(measure_array[, "validation", i])
+          final_data_measure[i, "validation_mean"] <- mean(measure_array[, "validation", i])
+          final_data_measure[i, "validation_max"] <- max(measure_array[, "validation", i])
+
+          if (n_sample_type == 3) {
+            final_data_measure[i, "test_min"] <- min(measure_array[, "test", i])
+            final_data_measure[i, "test_mean"] <- mean(measure_array[, "test", i])
+            final_data_measure[i, "test_max"] <- max(measure_array[, "test", i])
+          }
+        }
+        result_list[j] <- list(final_data_measure)
+      }
+
+      # Finalize data---------------------------------------------------------------
+      names(result_list) <- measures
+      return(result_list)
     }
   )
 )

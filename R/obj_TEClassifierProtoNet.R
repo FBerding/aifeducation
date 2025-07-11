@@ -409,7 +409,7 @@ TEClassifierProtoNet <- R6::R6Class(
       history <- py$TeClassifierProtoNetTrain_PT_with_Datasets(
         model = self$model,
         loss_fct_name = self$last_training$config$loss_pt_fct_name,
-        optimizer_method = self$model_config$optimizer,
+        optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         Ns = as.integer(self$last_training$config$Ns),

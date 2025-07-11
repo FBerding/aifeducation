@@ -5,7 +5,7 @@
 \alias{.AIFETrModelMLM}
 \title{MLM-Model class names}
 \format{
-An object of class \code{list} of length 7.
+An object of class \code{list} of length 6.
 }
 \usage{
 .AIFETrModelMLM

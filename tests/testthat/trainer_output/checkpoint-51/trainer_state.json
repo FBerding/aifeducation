@@ -1,6 +1,6 @@
 {
   "best_global_step": 51,
-  "best_metric": 6.80143928527832,
+  "best_metric": 6.857831001281738,
   "best_model_checkpoint": "trainer_output\\checkpoint-51",
   "epoch": 1.0,
   "eval_steps": 500,
@@ -11,17 +11,17 @@
   "log_history": [
     {
       "epoch": 1.0,
-      "grad_norm": 3.015458106994629,
+      "grad_norm": 3.42513108253479,
       "learning_rate": 0.0015294117647058822,
-      "loss": 7.1377,
+      "loss": 7.1413,
       "step": 51
     },
     {
       "epoch": 1.0,
-      "eval_loss": 6.80143928527832,
-      "eval_runtime": 0.1902,
-      "eval_samples_per_second": 183.975,
-      "eval_steps_per_second": 94.615,
+      "eval_loss": 6.857831001281738,
+      "eval_runtime": 0.1962,
+      "eval_samples_per_second": 178.386,
+      "eval_steps_per_second": 91.741,
       "step": 51
     }
   ],
@@ -42,7 +42,7 @@
       "attributes": {}
     }
   },
-  "total_flos": 59410966104.0,
+  "total_flos": 59411086056.0,
   "train_batch_size": 2,
   "trial_name": null,
   "trial_params": null

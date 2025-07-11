@@ -512,6 +512,32 @@ build_layer_stack_documentation_for_vignette <- function() {
   return(markdown_syntax)
 }
 
+#' @keywords internal
+get_allowed_transformer_types <- function(in_quotation_marks = FALSE) {
+  res_str <- ""
+  if (in_quotation_marks) {
+    for (i in seq_len(length(AIFETrType))) {
+      tr_name <- names(AIFETrType)[i]
+      if (i != 1) res_str <- paste0(res_str, ", ")
+      res_str <- paste0(res_str, "'", tr_name, "'")
+    }
+  } else {
+    res_str <- paste(unname(AIFETrType), collapse = ", ")
+  }
+  return(res_str)
+}
+
+#' @keywords internal
+get_tr_types_list_decsription <- function() {
+  list_description <- ""
+  for (i in seq_len(length(AIFETrType))) {
+    tr_name <- names(AIFETrType)[i]
+    list_element <- paste0("* `", tr_name, "` = '", tr_name, "'")
+    list_description <- paste0(list_description, "\n", list_element)
+  }
+  return(list_description)
+}
+
 #' @title Build a homepage for the package
 #' @description Function build the homepage of the package. In order to use python
 #' the build process is run in the current environment.

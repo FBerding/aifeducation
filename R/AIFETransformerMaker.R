@@ -126,7 +126,7 @@ aife_transformer.make <- function(type, init_trace = TRUE) {
 #'
 #' @param type `string` A type of the transformer. Allowed types are `r get_allowed_transformer_types()`. See
 #'   [AIFETrType] list.
-#' @param model_dir `r paramDesc.model_dir_path()`
+#' @param model_dir `r get_param_doc_desc("model_dir_path")`
 #' @return If success - a tokenizer, otherwise - an error (passed type is invalid).
 #'
 #' @family Transformers for developers
@@ -145,7 +145,7 @@ aife_transformer.load_tokenizer <- function(type, model_dir) {
 #'
 #' @param type `string` A type of the transformer. Allowed types are `r get_allowed_transformer_types()`. See
 #'   [AIFETrType] list.
-#' @param model_dir `r paramDesc.model_dir_path()`
+#' @param model_dir `r get_param_doc_desc("model_dir_path")`
 #' @return If success - a model configuration, otherwise - an error (passed type is invalid).
 #'
 #' @family Transformers for developers
@@ -165,7 +165,7 @@ aife_transformer.load_model_config <- function(type, model_dir) {
 #'
 #' @param type `string` A type of the transformer. Allowed types are `r get_allowed_transformer_types()`. See
 #'   [AIFETrType] list.
-#' @param model_dir `r paramDesc.model_dir_path()`
+#' @param model_dir `r get_param_doc_desc("model_dir_path")`
 #' @param from_tf `bool` Whether to load the model weights from a TensorFlow checkpoint save file.
 #' @param load_safe `bool` Whether or not to use safetensors checkpoints.
 #' @param add_pooler `bool` Whether to add a pooling layer, `FALSE` by default.
@@ -207,7 +207,7 @@ aife_transformer.load_model <- function(type, model_dir, from_tf, load_safe, add
 #'
 #' @param type `string` A type of the transformer. Allowed types are `r get_allowed_transformer_types()`. See
 #'   [AIFETrType] list.
-#' @param model_dir `r paramDesc.model_dir_path()`
+#' @param model_dir `r get_param_doc_desc("model_dir_path")`
 #' @param from_tf `bool` Whether to load the model weights from a TensorFlow checkpoint save file.
 #' @param load_safe `bool` Whether or not to use safetensors checkpoints.
 #' @return If success - a MLM-model, otherwise - an error (passed type is invalid).

@@ -430,6 +430,23 @@ TEFeatureExtractor <- R6::R6Class(
         gc()
       }
       return(embedded_texts_large)
+    },
+    #' @description Method for requesting a plot of the training history.
+    #' This method requires the *R* package 'ggplot2' to work.
+    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
+    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
+    #' @param text_size Size of the text.
+    #' @return Returns a plot of class `ggplot` visualizing the training process.
+    plot_training_history=function(y_min=NULL,y_max=NULL,text_size=10){
+      plot=super$plot_training_history(
+        final_training=FALSE,
+        pl_step=NULL,
+        measure="loss",
+        y_min=y_min,
+        y_max=y_max,
+        add_min_max=FALSE,
+        text_size=text_size)
+      return(plot)
     }
   ),
   private = list(

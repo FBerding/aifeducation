@@ -46,18 +46,6 @@ rows_susatainability <- c(
   "modernbert" = 3
 )
 
-supported_methods <- list(
-  pytorch = list(
-    "bert",
-    "funnel",
-    "roberta",
-    "longformer",
-    "deberta_v2",
-    "mpnet",
-    "modernbert"
-  )
-)
-
 example_data <- imdb_movie_reviews
 init_trace <- FALSE
 
@@ -74,11 +62,10 @@ for (ai_method in ai_methods) {
   tmp_ai_train <- paste0(tmp_results_TEM_path, "/", framework, "/", ai_method)
   create_dir(tmp_ai_train, FALSE)
 
-  base_model <- aife_transformer.make(ai_method, init_trace)
-
-  # Creation of the Model ----
+   # Creation of the Model ----
   test_that(paste0(ai_method, ": creation of the model with ", framework), {
     if (ai_method == AIFETrType$bert) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -100,6 +87,7 @@ for (ai_method in ai_methods) {
         )
       )
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -121,6 +109,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$roberta) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -142,6 +131,7 @@ for (ai_method in ai_methods) {
         )
       )
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -163,6 +153,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$deberta_v2) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -184,6 +175,7 @@ for (ai_method in ai_methods) {
         )
       )
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -205,6 +197,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$funnel) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -226,6 +219,7 @@ for (ai_method in ai_methods) {
         )
       )
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -246,6 +240,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$longformer) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -268,6 +263,7 @@ for (ai_method in ai_methods) {
         )
       )
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -290,6 +286,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$mpnet) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -470,6 +467,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$deberta_v2) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -538,6 +536,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$funnel) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -608,6 +607,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$longformer) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -652,6 +652,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$mpnet) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -697,6 +698,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$modernbert) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),

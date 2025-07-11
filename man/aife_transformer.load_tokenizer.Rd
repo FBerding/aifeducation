@@ -10,7 +10,7 @@ aife_transformer.load_tokenizer(type, model_dir)
 \item{type}{\code{string} A type of the transformer. Allowed types are bert, roberta, deberta_v2, funnel, longformer, mpnet, modernbert. See
 \link{AIFETrType} list.}
 
-\item{model_dir}{\code{string} Path to the directory where the original model is stored.}
+\item{model_dir}{\code{string} Path to the directory where the original model is stored. Allowed values: any}
 }
 \value{
 If success - a tokenizer, otherwise - an error (passed type is invalid).

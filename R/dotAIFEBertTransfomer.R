@@ -26,15 +26,15 @@
 #'
 #'   The model is trained using dynamic masking, as opposed to the original paper, which used static masking.
 #'
-#' @param text_dataset `r paramDesc.text_dataset()`
-#' @param sustain_track `r paramDesc.sustain_track()`
-#' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
-#' @param sustain_region `r paramDesc.sustain_region()`
-#' @param sustain_interval `r paramDesc.sustain_interval()`
-#' @param trace `r paramDesc.trace()`
-#' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
-#' @param log_dir `r paramDesc.log_dir()`
-#' @param log_write_interval `r paramDesc.log_write_interval()`
+#' @param text_dataset `r get_param_doc_desc("text_dataset")`
+#' @param sustain_track `r get_param_doc_desc("sustain_track")`
+#' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+#' @param sustain_region `r get_param_doc_desc("sustain_region")`
+#' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+#' @param trace `r get_param_doc_desc("trace")`
+#' @param pytorch_safetensors `r get_param_doc_desc("pytorch_safetensors")`
+#' @param log_dir `r get_param_doc_desc("log_dir")`
+#' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
 #'
 #' @note This model uses a `WordPiece` tokenizer like `BERT` and can be trained with whole word masking. The transformer
 #'   library may display a warning, which can be ignored.
@@ -158,18 +158,18 @@
     #'   * `vocab_do_lower_case`
     #'   * `num_hidden_layer`
     #'
-    #' @param model_dir `r paramDesc.model_dir()`
-    #' @param vocab_size `r paramDesc.vocab_size()`
-    #' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
-    #' @param hidden_size `r paramDesc.hidden_size()`
-    #' @param num_attention_heads `r paramDesc.num_attention_heads()`
-    #' @param intermediate_size `r paramDesc.intermediate_size()`
-    #' @param hidden_act `r paramDesc.hidden_act()`
-    #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
-    #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
+    #' @param model_dir `r get_param_doc_desc("model_dir")`
+    #' @param vocab_size `r get_param_doc_desc("vocab_size")`
+    #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+    #' @param hidden_size `r get_param_doc_desc("hidden_size")`
+    #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
     #'
-    #' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
-    #' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
+    #' @param vocab_do_lower_case `r get_param_doc_desc("vocab_do_lower_case")`
+    #' @param num_hidden_layer `r get_param_doc_desc("num_hidden_layer")`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
@@ -232,21 +232,21 @@
     #' @description This method can be used to train or fine-tune a transformer based on `BERT` architecture with the
     #'   help of the python libraries `transformers`, `datasets`, and `tokenizers`.
     #'
-    #' @param output_dir `r paramDesc.output_dir()`
-    #' @param model_dir_path `r paramDesc.model_dir_path()`
-    #' @param p_mask `r paramDesc.p_mask()`
-    #' @param whole_word `r paramDesc.whole_word()`
-    #' @param val_size `r paramDesc.val_size()`
-    #' @param n_epoch `r paramDesc.n_epoch()`
-    #' @param batch_size `r paramDesc.batch_size()`
-    #' @param chunk_size `r paramDesc.chunk_size()`
-    #' @param full_sequences_only `r paramDesc.full_sequences_only()`
-    #' @param min_seq_len `r paramDesc.min_seq_len()`
-    #' @param learning_rate `r paramDesc.learning_rate()`
-    #' @param n_workers `r paramDesc.n_workers()`
-    #' @param multi_process `r paramDesc.multi_process()`
-    #' @param keras_trace `r paramDesc.keras_trace()`
-    #' @param pytorch_trace `r paramDesc.pytorch_trace()`
+    #' @param output_dir `r get_param_doc_desc("output_dir")`
+    #' @param model_dir_path `r get_param_doc_desc("model_dir_path")`
+    #' @param p_mask `r get_param_doc_desc("p_mask")`
+    #' @param whole_word `r get_param_doc_desc("whole_word")`
+    #' @param val_size `r get_param_doc_desc("val_size")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param chunk_size `r get_param_doc_desc("chunk_size")`
+    #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
+    #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
+    #' @param learning_rate `r get_param_doc_desc("learning_rate")`
+    #' @param n_workers `r get_param_doc_desc("n_workers")`
+    #' @param multi_process `r get_param_doc_desc("multi_process")`
+    #' @param keras_trace `r get_param_doc_desc("keras_trace")`
+    #' @param pytorch_trace `r get_param_doc_desc("pytorch_trace")`
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
     train = function(output_dir,
