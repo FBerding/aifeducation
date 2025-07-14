@@ -52,6 +52,7 @@ jobs:
           channel-priority: flexible
           show-channel-urls: true
           use-only-tar-bz2: true
+          conda-remove-defaults: "true"
 
       - name: setup r-reticulate conda
         shell: Rscript {0}

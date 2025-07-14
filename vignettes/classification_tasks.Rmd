@@ -688,8 +688,6 @@ base_model$train(
   n_epoch = 1,
   batch_size = 12,
   chunk_size = 250,
-  n_workers = 1,
-  multi_process = FALSE,
   sustain_track = TRUE,
   sustain_iso_code = "DEU",
   sustain_region = NULL,

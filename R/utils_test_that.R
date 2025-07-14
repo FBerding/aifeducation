@@ -142,8 +142,8 @@ check_adjust_n_samples_on_CI <- function(
 get_test_data_for_classifiers=function(class_range=c(2,3),
                                        path_test_embeddings){
   # Load Embeddings
-  imdb_embeddings <- load_from_disk(path_test_embeddings)
-
+  imdb_embeddings_name <- load_from_disk(path_test_embeddings)
+  imdb_embeddings=get(x=imdb_embeddings_name)
   test_embeddings_large <- imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
   test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
 

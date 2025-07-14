@@ -88,13 +88,13 @@ test_that("Masking Layer", {
   y <- layer(example_tensor)
 
   # Check if input is the same as the output
-  expect_equal(y[[1]]$numpy(), example_tensor$numpy())
+  expect_equal(tensor_to_numpy(y[[1]]), example_tensor$numpy())
 
   # Check sequence length
-  expect_equal(as.numeric(y[[2]]$numpy()), sequence_length)
+  expect_equal(as.numeric(tensor_to_numpy(y[[2]])), sequence_length)
 
   # Check Masking times
-  expect_equal(rowSums(y[[3]]$numpy()), times - sequence_length)
+  expect_equal(rowSums(tensor_to_numpy(y[[3]])), times - sequence_length)
 })
 
 # Identity Layer----------------------------------------------------------------
@@ -121,16 +121,16 @@ test_that("identity layer", {
   )
 
   # Test that  values are the same
-  expect_equal(y[[1]]$numpy(), values[[1]]$numpy())
-  expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
-  expect_equal(y[[4]]$numpy(), values[[4]]$numpy())
+  expect_equal(tensor_to_numpy(y[[1]]), tensor_to_numpy(values[[1]]))
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(values[[4]]))
 
   # Test that padding is not destroyed
   y_2 <- masking_layer(y[[1]])
-  expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-  expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 })
 # Residual connection with Mask-----------------------------------------------------------
 test_that("residual connection with Mask", {
@@ -163,15 +163,15 @@ test_that("residual connection with Mask", {
     layer$eval()
 
     # Test that masking values are the same
-    expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-    expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
-    expect_equal(y[[4]]$numpy(), values[[4]]$numpy())
+    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+    expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(values[[4]]))
 
     # Test that padding is not destroyed
     y_2 <- masking_layer(y[[1]])
-    expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-    expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-    expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+    expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
     # Test that values do not change at random for same input
     y_1 <- layer(
@@ -220,15 +220,15 @@ test_that("LayerNorm with Mask", {
   )
 
   # Test that masking values are the same
-  expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
-  expect_equal(y[[4]]$numpy(), values[[4]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(values[[4]]))
 
   # Test that padding is not destroyed
   y_2 <- masking_layer(y[[1]])
-  expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-  expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
   # Test that the computations are correct for sequences with full length
   example_tensor <- generate_tensors(
@@ -309,17 +309,17 @@ test_that("DenseLayer with Mask", {
       )
 
       # Test that masking values are the same
-      expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-      expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
+      expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+      expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
 
       # Test the correct size of the new masking on feature level
-      expect_equal(dim(y[[4]]$numpy())[3], target_features)
+      expect_equal(dim(tensor_to_numpy(y[[4]]))[3], target_features)
 
       # Test that padding is not destroyed
       y_2 <- masking_layer(y[[1]])
-      expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-      expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-      expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+      expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+      expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+      expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
       # Test that values do not change at random for same input
       y_1 <- layer(
@@ -392,14 +392,14 @@ test_that("layer_tf_encoder", {
     )
 
     # Test that masking values are the same
-    expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-    expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
+    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
 
     # Test that padding is not destroyed
     y_2 <- masking_layer(y[[1]])
-    expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-    expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-    expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+    expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
     # Test that values do not change at random for same input
     y_1 <- layer(
@@ -463,11 +463,11 @@ test_that("layer_adaptive_extreme_pooling_1d", {
     result <- layer(tensor)
 
     # Check the corres output shape
-    expect_equal(ncol(result$numpy()), output_size)
+    expect_equal(ncol(tensor_to_numpy(result)), output_size)
 
 
     # Check if the correct values are selected
-    result_matrix <- result$numpy()
+    result_matrix <- tensor_to_numpy(result)
     tensor_matrix <- tensor$numpy()
     for (i in 1:nrow(result_matrix)) {
       if (pooling_type == "max") {
@@ -535,17 +535,17 @@ test_that("layer_n_gram_convolution", {
   )
 
   # Test that masking values are the same
-  expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
 
   # Test the correct size of the new masking on feature level
-  expect_equal(dim(y[[4]]$numpy())[3], n_filter)
+  expect_equal(dim(tensor_to_numpy(y[[4]]))[3], n_filter)
 
   # Test that padding is not destroyed
   y_2 <- masking_layer(y[[1]])
-  expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-  expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
   # Test that values do not change at random for same input
   y_1 <- layer(
@@ -605,17 +605,17 @@ test_that("layer_mutiple_n_gram_convolution", {
     )
 
     # Test that masking values are the same
-    expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-    expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
+    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
 
     # Test the correct size of the new masking on feature level
-    expect_equal(dim(y[[4]]$numpy())[3], features)
+    expect_equal(dim(tensor_to_numpy(y[[4]]))[3], features)
 
     # Test that padding is not destroyed
     y_2 <- masking_layer(y[[1]])
-    expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-    expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-    expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+    expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
     # Test that values do not change at random for same input
     y_1 <- layer(
@@ -718,17 +718,17 @@ test_that("rnn_preparation", {
   )
 
   # Test that masking values are the same
-  expect_equal(y[[2]]$numpy(), values[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), values[[3]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
 
   # Test the correct size of the new masking on feature level
-  expect_equal(dim(y[[4]]$numpy())[3], features)
+  expect_equal(dim(tensor_to_numpy(y[[4]]))[3], features)
 
   # Test that padding is not destroyed
   y_2 <- masking_layer(y[[1]])
-  expect_equal(y[[2]]$numpy(), y_2[[2]]$numpy())
-  expect_equal(y[[3]]$numpy(), y_2[[3]]$numpy())
-  expect_equal(y[[4]]$numpy(), y_2[[4]]$numpy())
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 })
 
 test_that("layer_class_mean", {

@@ -117,48 +117,6 @@ get_param_dict <- function() {
     default_value = NULL
   )
   # Transformer related---------------------------------------------------------
-  #Keras related
-  param$n_workers <- list(
-    type = "int",
-    min = 1,
-    max = Inf,
-    allow_null = FALSE,
-    allowed_values = NULL,
-    desc = "Number of workers. Only relevant if `ml_framework = \"tensorflow\"`." ,
-    gui_box = NULL,
-    gui_label = NULL,
-    default_value = 1,
-    default_historic = 1
-  )
-
-  param$multi_process <- list(
-    type = "bool",
-    min = NULL,
-    max = NULL,
-    allow_null = FALSE,
-    allowed_values = NULL,
-    desc = "`TRUE` if multiple processes should be activated. Only relevant if `ml_framework = \"tensorflow\"`. ",
-    gui_box = NULL,
-    gui_label = NULL,
-    default_value = FALSE,
-    default_historic = FALSE
-  )
-
-  param$keras_trace <- list(
-    type = "int",
-    min = 0,
-    max = 2,
-    allow_null = FALSE,
-    allowed_values = NULL,
-    desc =   "* `keras_trace = 0`: does not print any information about the training process from keras on the console.
-    * `keras_trace = 1`: prints a progress bar.
-    * `keras_trace = 2`: prints one line of information for every epoch. Only relevant if `ml_framework = \"tensorflow\"`." ,
-    gui_box = NULL,
-    gui_label = NULL,
-    default_value = 1,
-    default_historic = 1
-  )
-  #------------
 
   param$pad_value <- list(
     type = "int",
