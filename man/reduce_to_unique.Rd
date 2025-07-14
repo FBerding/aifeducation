@@ -24,6 +24,8 @@ Other Utils Python Data Management Developers:
 \code{\link{data.frame_to_py_dataset}()},
 \code{\link{get_batches_index}()},
 \code{\link{prepare_r_array_for_dataset}()},
-\code{\link{py_dataset_to_embeddings}()}
+\code{\link{py_dataset_to_embeddings}()},
+\code{\link{tensor_list_to_numpy}()},
+\code{\link{tensor_to_numpy}()}
 }
 \concept{Utils Python Data Management Developers}

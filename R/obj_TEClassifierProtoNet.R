@@ -158,8 +158,8 @@ TEClassifierProtoNet <- R6::R6Class(
             dataset_q = prediction_data_q_embeddings,
             batch_size = as.integer(batch_size)
           )
-          embeddings_tensors_q <- private$detach_tensors(embeddings_and_distances[[1]])
-          distances_tensors_q <- private$detach_tensors(embeddings_and_distances[[2]])
+          embeddings_tensors_q <- tensor_to_numpy(embeddings_and_distances[[1]])
+          distances_tensors_q <- tensor_to_numpy(embeddings_and_distances[[2]])
         }
       } else {
         prediction_data_q_embeddings <- private$prepare_embeddings_as_np_array(embeddings_q)
@@ -181,9 +181,9 @@ TEClassifierProtoNet <- R6::R6Class(
             self$model$eval()
             input <- torch$from_numpy(prediction_data_q_embeddings)
             embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
-            embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+            embeddings_tensors_q <- tensor_to_numpy(embeddings_tensors_q)
             distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
-            distances_tensors_q <- private$detach_tensors(distances_tensors_q)
+            distances_tensors_q <- tensor_to_numpy(distances_tensors_q)
           } else {
             device <- "cpu"
             dtype <- torch$float
@@ -191,15 +191,15 @@ TEClassifierProtoNet <- R6::R6Class(
             self$model$eval()
             input <- torch$from_numpy(prediction_data_q_embeddings)
             embeddings_tensors_q <- self$model$embed(input$to(device, dtype = dtype))
-            embeddings_tensors_q <- private$detach_tensors(embeddings_tensors_q)
+            embeddings_tensors_q <- tensor_to_numpy(embeddings_tensors_q)
             distances_tensors_q <- self$model$get_distances(input$to(device, dtype = dtype))
-            distances_tensors_q <- private$detach_tensors(distances_tensors_q)
+            distances_tensors_q <- tensor_to_numpy(distances_tensors_q)
           }
         }
       }
 
       if (private$ml_framework == "pytorch") {
-        embeddings_prototypes <- private$detach_tensors(
+        embeddings_prototypes <- tensor_to_numpy(
           self$model$get_trained_prototypes()
         )
       }

@@ -100,9 +100,9 @@ for (object_class_name in object_class_names) {
       classifier <- create_object(object_class_name)
       do.call(
         what = classifier$configure,
-        args = test_combinations$args[[i]]
+        args = test_combinations
       )
-      test_that(paste("embed", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("embed", object_class_name, get_current_args_for_print(test_combinations)), {
         # Predictions
         embeddings <- classifier$embed(
           embeddings_q = test_embeddings_reduced,
@@ -126,7 +126,7 @@ for (object_class_name in object_class_names) {
       })
       gc()
 
-      test_that(paste("plot", object_class_name, get_current_args_for_print(test_combinations$args[[i]])), {
+      test_that(paste("plot", object_class_name, get_current_args_for_print(test_combinations)), {
         # plot
         plot <- classifier$plot_embeddings(
           embeddings_q = test_embeddings_reduced,

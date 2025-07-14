@@ -152,7 +152,7 @@ for (ai_method in ai_methods) {
           trace = trace
         )
       )
-    } else if (ai_method == AIFETrType$deberta_v2) {
+    } else if (ai_method == "deactivated"){ #AIFETrType$deberta_v2) {
       base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
@@ -308,6 +308,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$modernbert) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -329,6 +330,7 @@ for (ai_method in ai_methods) {
         )
       )
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$create(
           model_dir = tmp_ai_create,
@@ -357,6 +359,7 @@ for (ai_method in ai_methods) {
   # Training of the Model ----
   test_that(paste0(ai_method, ": training of the model with ", framework), {
     if (ai_method == AIFETrType$bert) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -375,7 +378,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(5)
+
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -399,7 +403,8 @@ for (ai_method in ai_methods) {
           pytorch_trace = as.numeric(trace)
         )
       )
-      Sys.sleep(5)
+
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -424,6 +429,7 @@ for (ai_method in ai_methods) {
         )
       )
     } else if (ai_method == AIFETrType$roberta) {
+      base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
         text_dataset = LargeDataSetForText$new(example_data[1:50, ]),
@@ -442,8 +448,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(5)
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -466,7 +472,7 @@ for (ai_method in ai_methods) {
           pytorch_trace = as.numeric(trace)
         )
       )
-    } else if (ai_method == AIFETrType$deberta_v2) {
+    } else if (ai_method == "deactivated"){#AIFETrType$deberta_v2) {
       base_model <- aife_transformer.make(ai_method, init_trace)
       base_model$create(
         model_dir = tmp_ai_create,
@@ -486,8 +492,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(3)
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -511,7 +517,8 @@ for (ai_method in ai_methods) {
           pytorch_trace = as.numeric(trace)
         )
       )
-      Sys.sleep(2)
+
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -555,8 +562,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(3)
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -581,7 +588,8 @@ for (ai_method in ai_methods) {
           pytorch_trace = as.numeric(trace)
         )
       )
-      Sys.sleep(2)
+
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -627,8 +635,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(3)
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -671,8 +679,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(3)
 
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -717,7 +725,8 @@ for (ai_method in ai_methods) {
         sustain_interval = 15,
         trace = trace
       )
-      Sys.sleep(5)
+
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,
@@ -741,7 +750,8 @@ for (ai_method in ai_methods) {
           pytorch_trace = as.numeric(trace)
         )
       )
-      Sys.sleep(5)
+
+      base_model <- aife_transformer.make(ai_method, init_trace)
       expect_no_error(
         base_model$train(
           output_dir = tmp_ai_train,

@@ -20,7 +20,7 @@ tests/testthat/test_artefacts/
 tests/testthat/test_data/roberta/
 tests/testthat/test_data/longformer/
 
-trainer_output
+trainer_output/
 
 vignettes/examples
 

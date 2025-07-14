@@ -221,7 +221,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @description Method returns the scaling factor of the metric.
     #' @return Returns the scaling factor of the metric as `float`.
     get_metric_scale_factor=function(){
-      return(private$detach_tensors(self$model$get_metric_scale_factor()))
+      return(tensor_to_numpy(self$model$get_metric_scale_factor()))
     },
     #---------------------------------------------------------------------------
     #' @description Method for creating a plot to visualize embeddings and their corresponding centers (prototypes).
@@ -507,11 +507,11 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       if(prediction_mode==TRUE){
-        results<-private$detach_tensors(results)
+        results<-tensor_to_numpy(results)
         rownames(results)=current_row_names
         colnames(results)=as.character(class_labels)
       } else {
-        results<-private$detach_list_of_tensors(results)
+        results<-tensor_list_to_numpy(results)
 
         predictions=results[[1]]
         rownames(predictions)=current_row_names

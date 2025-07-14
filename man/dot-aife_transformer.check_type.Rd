@@ -7,7 +7,7 @@
 .aife_transformer.check_type(type)
 }
 \arguments{
-\item{type}{\code{string} A type of the new transformer. Allowed types are bert, roberta, deberta_v2, funnel, longformer, mpnet, modernbert. See
+\item{type}{\code{string} A type of the new transformer. Allowed types are bert, roberta, funnel, longformer, mpnet, modernbert. See
 \link{AIFETrType} list.}
 }
 \value{

@@ -139,7 +139,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           dataset = prediction_data,
           batch_size = as.integer(batch_size)
         )
-        predictions_prob <- private$detach_tensors(predictions_prob)
+        predictions_prob <- tensor_to_numpy(predictions_prob)
         predictions <- max.col(predictions_prob) - 1
 
 
@@ -156,7 +156,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           predictions_prob <- self$model(input$to(device, dtype = dtype),
             prediction_mode = TRUE
           )
-          predictions_prob <- private$detach_tensors(predictions_prob)
+          predictions_prob <- tensor_to_numpy(predictions_prob)
         } else {
           device <- "cpu"
           dtype <- torch$float
@@ -166,7 +166,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           predictions_prob <- self$model(input$to(device, dtype = dtype),
             prediction_mode = TRUE
           )
-          predictions_prob <- private$detach_tensors(predictions_prob)
+          predictions_prob <- tensor_to_numpy(predictions_prob)
         }
         predictions <- max.col(predictions_prob) - 1
       }

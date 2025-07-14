@@ -65,7 +65,7 @@ test_that("Prototype Metric", {
 
   distances <- layer(x = samples, prototypes = prototypes)
   expect_equal(
-    object = distances$detach()$numpy(),
+    object = tensor_to_numpy(distances),
     expected = result_matrix,
     tolerance = 1e-6
   )
@@ -188,7 +188,7 @@ test_that("residual connection with Mask", {
       mask_times = values[[3]],
       mask_features = values[[4]]
     )
-    expect_equal(y_1[[1]]$detach()$numpy(), y_2[[1]]$detach()$numpy())
+    expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
   }
 })
 
@@ -245,17 +245,16 @@ test_that("LayerNorm with Mask", {
     device = NULL,
     dtype = example_tensor$dtype
   )
-  res_expected <- comparison_layer(example_tensor)$detach()
+  res_expected <- tensor_to_numpy(comparison_layer(example_tensor))
   values <- masking_layer(example_tensor)
-  results <- layer(
+
+  results <- tensor_to_numpy(layer(
     x = values[[1]],
     seq_len = values[[2]],
     mask_times = values[[3]],
     mask_features = values[[4]]
-  )[[1]]$detach()
-  expect_equal(results$numpy(), res_expected$numpy(),
-    tolerance = 1e-5
-  )
+  )[[1]])
+  expect_equal(results, res_expected, tolerance = 1e-5)
 })
 
 # Dense Layer with Mask-----------------------------------------------------------
@@ -335,7 +334,7 @@ test_that("DenseLayer with Mask", {
         mask_times = values[[3]],
         mask_features = values[[4]]
       )
-      expect_equal(y_1[[1]]$detach()$numpy(), y_2[[1]]$detach()$numpy())
+      expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
     }
     }
   }
@@ -415,7 +414,7 @@ test_that("layer_tf_encoder", {
       mask_times = values[[3]],
       mask_features = values[[4]]
     )
-    expect_equal(y_1[[1]]$detach()$numpy(), y_2[[1]]$detach()$numpy())
+    expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
   }
 })
 
@@ -444,9 +443,9 @@ test_that("exreme_pooling_over_time", {
     )
     y_1 <- layer(values[[1]], values[[4]])
     if (pooling_type != "min_max") {
-      expect_equal(dim(y_1$detach()$numpy()), c(length(sequence_length), features))
+      expect_equal(dim(tensor_to_numpy(y_1)), c(length(sequence_length), features))
     } else {
-      expect_equal(dim(y_1$detach()$numpy()), c(length(sequence_length), 2 * features))
+      expect_equal(dim(tensor_to_numpy(y_1)), c(length(sequence_length), 2 * features))
     }
   }
 })
@@ -561,10 +560,10 @@ test_that("layer_n_gram_convolution", {
     mask_times = values[[3]],
     mask_features = values[[4]]
   )
-  expect_equal(y_1[[1]]$detach()$numpy(), y_2[[1]]$detach()$numpy())
+  expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
 
   # Test method return shape
-  expect_equal(dim(y_1[[1]]$detach()$numpy()), c(length(sequence_length), times, n_filter))
+  expect_equal(dim(tensor_to_numpy(y_1[[1]])), c(length(sequence_length), times, n_filter))
 })
 
 # Layer layer_mutiple_n_gram_convolution--------------------------------------------------
@@ -631,10 +630,10 @@ test_that("layer_mutiple_n_gram_convolution", {
       mask_times = values[[3]],
       mask_features = values[[4]]
     )
-    expect_equal(y_1[[1]]$detach()$numpy(), y_2[[1]]$detach()$numpy())
+    expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
 
     # Test method return shape
-    expect_equal(dim(y_1[[1]]$detach()$numpy()), c(length(sequence_length), times, features))
+    expect_equal(dim(tensor_to_numpy(y_1[[1]])), c(length(sequence_length), times, features))
   }
 })
 
@@ -676,7 +675,7 @@ test_that("merge_layer", {
     )
 
     # Test the correct shape
-    expect_equal(dim(y$detach()$numpy()), c(length(sequence_length), n_extracted_features))
+    expect_equal(dim(tensor_to_numpy(y)), c(length(sequence_length), n_extracted_features))
   }
 })
 

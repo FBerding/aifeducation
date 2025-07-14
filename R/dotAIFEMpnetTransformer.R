@@ -272,9 +272,6 @@
     #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
     #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
     #' @param learning_rate `r get_param_doc_desc("learning_rate")`
-    #' @param n_workers `r get_param_doc_desc("n_workers")`
-    #' @param multi_process `r get_param_doc_desc("multi_process")`
-    #' @param keras_trace `r get_param_doc_desc("keras_trace")`
     #' @param pytorch_trace `r get_param_doc_desc("pytorch_trace")`
     #'
     #' @param p_perm `double` Ratio that determines the number of words/tokens used for permutation.
@@ -293,14 +290,11 @@
                      full_sequences_only = FALSE,
                      min_seq_len = 50,
                      learning_rate = 3e-3,
-                     n_workers = 1,
-                     multi_process = FALSE,
                      sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15,
                      trace = TRUE,
-                     keras_trace = 1,
                      pytorch_trace = 1,
                      pytorch_safetensors = TRUE,
                      log_dir = NULL,

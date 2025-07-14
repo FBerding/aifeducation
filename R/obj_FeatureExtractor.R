@@ -291,11 +291,11 @@ TEFeatureExtractor <- R6::R6Class(
           dataset = prepared_embeddings,
           batch_size = as.integer(batch_size)
         )
-        reduced_embeddings <- private$detach_tensors(reduced_tensors)
-
+        reduced_embeddings <- tensor_to_numpy(reduced_tensors)
         #---------------------------------------------------------------------
       } else {
         prepared_embeddings <- private$prepare_embeddings_as_np_array(data_embeddings)
+
         if (torch$cuda$is_available()) {
           device <- "cuda"
           dtype <- torch$double
@@ -305,7 +305,7 @@ TEFeatureExtractor <- R6::R6Class(
           reduced_tensors <- self$model(input$to(device, dtype = dtype),
             encoder_mode = TRUE
           )
-          reduced_embeddings <- private$detach_tensors(reduced_tensors)
+          reduced_embeddings <- tensor_to_numpy(reduced_tensors)
         } else {
           device <- "cpu"
           dtype <- torch$float
@@ -315,7 +315,7 @@ TEFeatureExtractor <- R6::R6Class(
           reduced_tensors <- self$model(input$to(device, dtype = dtype),
             encoder_mode = TRUE
           )
-          reduced_embeddings <- private$detach_tensors(reduced_tensors)
+          reduced_embeddings <- tensor_to_numpy(reduced_tensors)
         }
       }
 

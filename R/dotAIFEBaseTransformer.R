@@ -979,9 +979,6 @@
     #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
     #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
     #' @param learning_rate `r get_param_doc_desc("learning_rate")`
-    #' @param n_workers `r get_param_doc_desc("n_workers")`
-    #' @param multi_process `r get_param_doc_desc("multi_process")`
-    #' @param keras_trace `r get_param_doc_desc("keras_trace")`
     #' @param pytorch_trace ``r get_param_doc_desc("pytorch_trace")`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
@@ -1001,14 +998,11 @@
                      full_sequences_only,
                      min_seq_len,
                      learning_rate,
-                     n_workers,
-                     multi_process,
                      sustain_track,
                      sustain_iso_code,
                      sustain_region,
                      sustain_interval,
                      trace,
-                     keras_trace,
                      pytorch_trace,
                      pytorch_safetensors,
                      log_dir,

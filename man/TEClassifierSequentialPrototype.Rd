@@ -266,7 +266,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{feat_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \verb{0 <= x < 1}}
+\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \verb{0 <= x < 0.5}}
 
 \item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 
@@ -282,7 +282,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{ng_conv_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values: \verb{0 <= x < 0.5}}
 
 \item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
 
@@ -294,7 +294,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \code{0 <= x }}
 
-\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x < 0.5}}
 
 \item{\code{dense_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
@@ -312,7 +312,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
-\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x < 0.5}}
 
 \item{\code{rec_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
@@ -328,9 +328,9 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \code{0 <= x }}
 
-\item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \verb{0 <= x < 0.5}}
 
-\item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 1}}
+\item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x < 0.5}}
 
 \item{\code{tf_attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
 values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'fourier', 'multihead'}

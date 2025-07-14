@@ -167,9 +167,9 @@ embedding. Allowed values: \verb{1 <= x <= 2048}}
 
 \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x < 1}}
+\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x < 0.5}}
 
-\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x < 1}}
+\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x < 0.5}}
 
 \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
@@ -223,14 +223,11 @@ the help of the python libraries \code{transformers}, \code{datasets}, and \code
   full_sequences_only = FALSE,
   min_seq_len = 50,
   learning_rate = 0.003,
-  n_workers = 1,
-  multi_process = FALSE,
   sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15,
   trace = TRUE,
-  keras_trace = 1,
   pytorch_trace = 1,
   pytorch_safetensors = TRUE,
   log_dir = NULL,
@@ -270,10 +267,6 @@ The remaining cases are part of the training data. Allowed values: \verb{0 < x <
 
 \item{\code{learning_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
 
-\item{\code{n_workers}}{\code{int} Number of workers. Only relevant if \code{ml_framework = "tensorflow"}. Allowed values: \code{1 <= x }}
-
-\item{\code{multi_process}}{\code{bool} \code{TRUE} if multiple processes should be activated. Only relevant if \code{ml_framework = "tensorflow"}.}
-
 \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
@@ -286,10 +279,6 @@ codecarbon for more information. \url{https://mlco2.github.io/codecarbon/paramet
 \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
-
-\item{\code{keras_trace}}{\code{int} * \code{keras_trace = 0}: does not print any information about the training process from keras on the console.
-* \code{keras_trace = 1}: prints a progress bar.
-* \code{keras_trace = 2}: prints one line of information for every epoch. Only relevant if \code{ml_framework = "tensorflow"}. Allowed values: \verb{0 <= x <= 2}}
 
 \item{\code{pytorch_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
 

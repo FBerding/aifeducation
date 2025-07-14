@@ -14,7 +14,7 @@ An object of class \code{list} of length 6.
 This list contains transformer objects. Elements of the list can be used in \code{\link[=aife_transformer.make]{aife_transformer.make()}}
 function as input parameter \code{type}. This list is not designed to be used directly.
 
-It has the following elements: bert, roberta, deberta_v2, funnel, longformer, mpnet, modernbert
+It has the following elements: bert, roberta, funnel, longformer, mpnet, modernbert
 }
 \seealso{
 Other Transformers for developers: 

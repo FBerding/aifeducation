@@ -742,7 +742,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       classes_q=query_classes,
       input_s=sample_inputs,
       classes_s=sample_classes,
-      predication_mode=False)
+      prediction_mode=False)
       
       loss=loss_fct(classes_q=query_classes,distance_matrix=outputs[1])
       loss.backward()
@@ -832,7 +832,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         
         inputs = inputs.to(device,dtype=dtype)
         labels=labels.to(device,dtype=dtype)
-        outputs=model(inputs,predication_mode=False)
+        outputs=model(inputs,prediction_mode=False)
 
         loss=loss_fct(classes_q=labels,distance_matrix=outputs[1])
         val_loss +=loss.item()
@@ -879,7 +879,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           inputs = inputs.to(device,dtype=dtype)
           labels=labels.to(device,dtype=dtype)
         
-          outputs=model(inputs,predication_mode=False)
+          outputs=model(inputs,prediction_mode=False)
  
           loss=loss_fct(classes_q=labels,distance_matrix=outputs[1])
           test_loss +=loss.item()

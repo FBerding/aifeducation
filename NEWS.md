@@ -10,6 +10,11 @@ editor_options:
 
 - Removed support for 'tensorflow'.
 - Refactor of all classifiers and for FeatureExtractor.
+- Added support for modernBERT.
+- Removed support for DeBERTa_V2. Implementation of this model changed from transformer
+  version 4.46.3 to 4.47.1. This causes that the model does not produce the same results 
+  for the same data after saving and loading a model.Reproducibility is not guaranteed. In the
+  case that this is fixed in the future the model support will be re-implemented.
 
 **Installation and Configuration**
 

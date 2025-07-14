@@ -8,6 +8,7 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
 #object_class_names=c("TEClassifierSequential")
 #object_class_names="TEClassifierParallelPrototype"
 #object_class_names="TEClassifierSequentialPrototype"
+#object_class_names="TEClassifierRegular"
 
 max_samples <- 20
 max_samples_CI <- 10
@@ -15,12 +16,14 @@ max_samples_CI <- 10
 max_samples_training <- 2
 class_range <- c(2, 3)
 
+prob_precision=1e-6
+
 # Skip Tests-------------------------------------------------------------------
-skip_creation_test <- TRUE
-skip_method_save_load <- TRUE
-skip_function_save_load <- TRUE
+skip_creation_test <- FALSE
+skip_method_save_load <- FALSE
+skip_function_save_load <- FALSE
 skip_training_test <- FALSE
-skip_documentation <- TRUE
+skip_documentation <- FALSE
 
 
 # SetUp-------------------------------------------------------------------------

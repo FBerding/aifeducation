@@ -19,14 +19,14 @@
 #'   It has the following elements:
 #'   `r get_tr_types_list_decsription()`
 #'
-#'   Elements can be used like `AIFETrType$bert`, `AIFETrType$deberta_v2`, `AIFETrType$funnel`, etc.
+#'   Elements can be used like `AIFETrType$bert`, `AIFETrType$modernbert`, `AIFETrType$funnel`, etc.
 #'
 #' @family Transformer
 #' @export
 AIFETrType <- list(
   bert = "bert",
   roberta = "roberta",
-  deberta_v2 = "deberta_v2",
+  #deberta_v2 = "deberta_v2",
   funnel = "funnel",
   longformer = "longformer",
   mpnet = "mpnet",

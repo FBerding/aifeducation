@@ -445,27 +445,6 @@ AIFEBaseModel <- R6::R6Class(
       )
       return(results)
     },
-    #------------------------------------------------------------------------
-    detach_tensors = function(tensors) {
-      if ("torch.Tensor" %in% class(tensors)) {
-        if (torch$cuda$is_available()) {
-          return(tensors$detach()$cpu()$numpy())
-        } else {
-          return(tensors$detach()$numpy())
-        }
-      } else {
-        return(tensors)
-      }
-    },
-    #----------------------------------------------------------------------
-    detach_list_of_tensors = function(tensor_list) {
-      for (i in seq_along(tensor_list)) {
-        tensor_list[i] <- list(
-          private$detach_tensors(tensor_list[[i]])
-        )
-      }
-      return(tensor_list)
-    },
     #-----------------------------------------------------------------------
     load_reload_python_scripts = function() {
       return(NULL)

@@ -135,3 +135,49 @@ class_vector_to_py_dataset <- function(vector) {
 }
 
 
+#' @title Tensor_to_numpy
+#' @description Function converts a tensor into a numpy array in order to allow further operations in *R*.
+#'
+#' @param object Object of any class.
+#' @return In the case the object is of class `torch.Tensor` it returns a numpy error.
+#' If the tensor requires a gradient and/or is on gpu it is detached and converted.
+#' If the object is not of class `torch.Tensor` the original object is returned.
+#'
+#' @family Utils Python Data Management Developers
+#' @export
+tensor_to_numpy = function(object) {
+  if ("torch.Tensor" %in% class(object)) {
+    if(object$requires_grad==TRUE){
+      if(object$is_cuda==TRUE){
+        return(object$detach()$cpu()$numpy())
+      } else {
+        return(object$detach()$numpy())
+      }
+    } else if (object$is_cuda==TRUE){
+      return(object$detach()$cpu()$numpy())
+    } else {
+      return(object$numpy())
+    }
+  } else {
+    return(object)
+  }
+}
+
+#' @title Convert list of tensors into numpy arrays
+#' @description Function converts tensors within a `list` into numpy arrays in order to allow further operations in *R*.
+#'
+#' @param tensor_list `list` of objects.
+#' @return Returns the same `list` with the exception that objects of class `torch.Tensor` are transformed into numpy arrays.
+#' If the tensor requires a gradient and/or is on gpu it is detached and converted.
+#' If the object in a list is not of this class the original object is returned.
+#'
+#' @family Utils Python Data Management Developers
+#' @export
+tensor_list_to_numpy = function(tensor_list) {
+  for (i in seq_along(tensor_list)) {
+    tensor_list[i] <- list(
+      tensor_to_numpy(tensor_list[[i]])
+    )
+  }
+  return(tensor_list)
+}
