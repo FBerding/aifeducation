@@ -73,7 +73,7 @@ test_that("Prototype Metric", {
 
 # Masking Layer-----------------------------------------------------------------
 test_that("Masking Layer", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -99,7 +99,7 @@ test_that("Masking Layer", {
 
 # Identity Layer----------------------------------------------------------------
 test_that("identity layer", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -134,7 +134,7 @@ test_that("identity layer", {
 })
 # Residual connection with Mask-----------------------------------------------------------
 test_that("residual connection with Mask", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -194,7 +194,7 @@ test_that("residual connection with Mask", {
 
 # LayerNorm with Mask-----------------------------------------------------------
 test_that("LayerNorm with Mask", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -261,7 +261,7 @@ test_that("LayerNorm with Mask", {
 test_that("DenseLayer with Mask", {
   normalization_types <- c("None", "layer_norm")
   residual_types=c("None", "addition", "residual_gate")
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -344,7 +344,7 @@ test_that("DenseLayer with Mask", {
 test_that("layer_tf_encoder", {
   attention_types <- c("multihead", "fourier")
 
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -421,7 +421,7 @@ test_that("layer_tf_encoder", {
 # exreme_pooling_over_time------------------------------------------------------------
 test_that("exreme_pooling_over_time", {
 
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -500,7 +500,7 @@ test_that("layer_adaptive_extreme_pooling_1d", {
 # Layer layer_n_gram_convolution--------------------------------------------------
 test_that("layer_n_gram_convolution", {
 
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -569,7 +569,7 @@ test_that("layer_n_gram_convolution", {
 # Layer layer_mutiple_n_gram_convolution--------------------------------------------------
 test_that("layer_mutiple_n_gram_convolution", {
 
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -640,7 +640,7 @@ test_that("layer_mutiple_n_gram_convolution", {
 # Layer merge leyer---------------------------------------
 test_that("merge_layer", {
 
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 52, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -681,7 +681,7 @@ test_that("merge_layer", {
 
 # Layer rnn preparation Layer---------------------------------------
 test_that("rnn_preparation", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -773,7 +773,7 @@ test_that("layer_class_mean", {
 
 #layer_global_average_pooling_1d------------------------------------------------
 test_that("layer_global_average_pooling_1d", {
-pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
 times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
 features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
 sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)

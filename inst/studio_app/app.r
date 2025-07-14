@@ -2,7 +2,11 @@
 ui <- bslib::page_navbar(
   title = "AI for Education - Studio",
   theme = bslib::bs_theme(
-    bootswatch = "flatly"
+    bootswatch = "flatly",
+    #bg="white",
+    #fg="",
+    primary = "black"#,
+    #secondary ="#325b66"
   ),
   bslib::nav_panel(
     title = "Home",

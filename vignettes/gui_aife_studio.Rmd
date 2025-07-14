@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(aifeducation)
+running_num_figures=1
 ```
 
 # 1 Introduction and Overview
@@ -89,11 +90,14 @@ Before we start, it is necessary to introduce a definition of our
 understanding of some basic concepts, since applying AI to educational
 contexts means to combine the knowledge of different scientific
 disciplines using different, sometimes overlapping concepts. Even within
-a single research area, concepts are not unified. Figure 1 illustrates
+a single research area, concepts are not unified. Figure `r running_num_figures` illustrates
 this package's understanding.
 
-![Figure 1: Understanding of Central
-Concepts](classif_fig_01.png){width="100%"}
+![Figure `r running_num_figures`: Understanding of Central Concepts](classif_fig_01.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 Since *aifeducation* looks at the application of AI for classification
 tasks from the perspective of the empirical method of content analysis,
@@ -110,12 +114,15 @@ Kalinowski & Allaire 2022, p. 114).
 
 With these clarifications, classification means that a text is assigned
 to the correct category of a scale or, respectively, that the text is
-labeled with the correct class. As Figure 2 illustrates, two kinds of
+labeled with the correct class. As Figure `r running_num_figures` illustrates, two kinds of
 data are necessary to train an AI to classify text in line with
 supervised machine learning principles.
 
-![Figure 2: Basic Structure of Supervised Machine
-Learning](classif_fig_02.png){width="100%"}
+![Figure `r running_num_figures`: Basic Structure of Supervised Machine Learning](classif_fig_02.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 By providing AI with both the textual data as input data and the
 corresponding information about the class as target data, AI can learn
@@ -147,10 +154,13 @@ the words or text embeddings can be used as input data and the labels as
 target data for training AI to classify a text.
 
 In *aifeducation,* these steps are covered with three different types of
-models, as shown in Figure 3.
+models, as shown in Figure `r running_num_figures`.
 
-![Figure 3: Modells Types in
-aifeducation](classif_model_hierachy.png){width="100%"}
+![Figure `r running_num_figures`: Modells Types in aifeducation](classif_model_hierachy.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 -   **Base Models:** The base models are the models which contain the
     capacities to understand natural language. In general, these are
@@ -184,9 +194,13 @@ aifeducation::start_aifeducation_studio()
 
 Please note that this can take a moment.
 
-At the beginning you will see the home page (Figure 4).
+At the beginning you will see the home page (Figure `r running_num_figures`).
 
-![Figure 4: Home Page](home.png){width="100%"}
+![Figure `r running_num_figures`: Home Page](home.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 
 # 3 Using Aifeducation Studio
@@ -203,22 +217,29 @@ texts, sequences of numbers representing the texts (text embeddings) or
 texts' labels.
 
 Collections of raw texts are necessary in two cases: First, to train or
-to fine-tune base models. Second, to transform texts into texts
-embeddings which can be used as input for training a classifier or for
-predicting the texts' labels via classifiers.
+to fine-tune base models. Second, to transform texts into numerical representations (texts
+embeddings) which can be used as input for training a classifier or for
+predicting texts' labels via classifiers.
 
 To create a collection of raw texts, you have to choose the *Data
-Management* page on the top panel as shown in Figure 5.
+Management* page on the top panel as shown in Figure `r running_num_figures`.
 
-![Figure 5: Data Management Page](DM_Create.png){width="100%"}
+![Figure `r running_num_figures`: Data Management Page](DM_Create.png){width="100%"}
 
-On the resulting page (see Figure 6), you first have to choose the
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+On the resulting page (see Figure `r running_num_figures`), you first have to choose the
 directory where the texts are stored (box *Text Sources*). We recommend
 that you store all texts you would like to use in a single folder.
 Within this folder, you can structure your data with sub-folders.
 
-![Figure 6: Data Preparation
-Page](DM_Create_Fill_fields.png){width="100%"}
+![Figure `r running_num_figures`: Data Preparation Page](DM_Create_Fill_fields.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 In the next step, you can decide which file formats should be included
 (box *File Types*). Currently, *aifeducation* supports .txt, .pdf, and
@@ -273,7 +294,7 @@ Applying these rules may result in a data structure as follows:
         -   url_source.txt
 
 Please note, that adding a `bib_entry.txt`, `license.txt`,
-`url_license.txt`, `text_license.txt`, and `url_soruce.text` to every
+`url_license.txt`, `text_license.txt`, and `url_source.text` to every
 folder is optional. If there is no such a file in the corresponding
 folder, there will be an empty entry in the data set. However, against
 the backdrop of the European AI Act, we recommend to provide license and
@@ -293,7 +314,7 @@ Here the necessary structure is similar to .txt files.
 Please note that all files except the text file must be .txt, not .pdf.
 
 As stated above `bib_entry.txt`, `license.txt`, `url_license.txt`,
-`text_license.txt`, and `url_soruce.text` are optional.
+`text_license.txt`, and `url_source.text` are optional.
 
 **.xlsx files**
 
@@ -324,52 +345,66 @@ structure:
 
 Your .xlsx file may look like
 
-| id | text | bib | license | url_license | text_license | url_source |
-|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| z3 | This is an example. | Author (2019) | CC BY | Example url | Text | Example url |
-| a3 | This is a second example. | Author (2022) | CC BY | Example url | Text | Example url |
-| ... | ... | ... | ... |  |  |  |
+![Figure `r running_num_figures`: Structure of Raw Texts within an Excel Sheet](DM_Create_Excel_file.png){width="75%"}
 
-![Figure 7: Structure of Raw Texts within an Excel
-Sheet](DM_Create_Excel_file.png){width="75%"}
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 The last step is to choose a folder where your collection of raw texts
 should be saved. Please select a path and a folder name for your
-LargeDataSet (*Create Data Set* button on the *Control Panel*) (Figure
-8). In the *Directory* field you specify the location where to save the
+LargeDataSet (*Create Data Set* button on the *Control Panel*) (Figure `r running_num_figures`). 
+In the *Directory* field you specify the location where to save the
 object and with *Folder Name* you define the name of the folder that
 will be created within that directory. In this folder the data set is
 saved.
 
-![Figure 8: Selecting a path for a data
-set](DM_Create_Start_creation.png){width="100%"}
+![Figure `r running_num_figures`: Selecting a path for a data set](DM_Create_Start_creation.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 Finally, you can start creating the collection (*Continue* button in
-Figure 8). Please note that this can take some time. You can see the
+Figure `r running_num_figures-1`). Please note that this can take some time. You can see the
 creation progress in the progress bars (Figure 9).
 
-![Figure 9: Progress of Dataset creation
-process](DM_Create_Progress.png){width="100%"}
+![Figure `r running_num_figures`: Progress of Dataset creation process](DM_Create_Progress.png){width="100%"}
 
-When the process finishes you can see a message like in Figure 10 (if
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+When the process finishes you can see a message like in Figure `r running_num_figures` (if
 the process has completed without any errors).
 
-![Figure 10: Progress of Dataset creation
-process](DM_Create_Success.png){width="100%"}
+![Figure `r running_num_figures`: Progress of Dataset creation process](DM_Create_Success.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 You now have a folder with the files that can be used for further tasks
 like creation and training/tuning the transformers (*Base Models* tab on
 the top panel), etc. The object contains a `dataset` that stores the
-texts together with their IDs. In case of .xlsx files, the texts' IDs
+texts together with their IDs. 
+
+In case of .xlsx files, the texts' IDs
 are set to the IDs stored in the corresponding column for ID. In case of
 .pdf and .txt files, the file names are used as ID (without the file
-extension, see Figure 11).
-
-![Figure 11: Filnames as IDs](DM_Create_Text_sources.png){width="75%"}
+extension).
 
 > Please note that a consequence of this is that two files *text_01.txt*
-> and *text_01.pdf* have the same ID, which is not allowed. Please
+> and *text_01.pdf* have the same ID (see Figure `r running_num_figures`), which is not allowed. Please
 > ensure that you use unique IDs across file formats.
+
+![Figure `r running_num_figures`: Filnames as IDs](DM_Create_Text_sources.png){width="75%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+
 
 The IDs are very important since they are used to match the
 corresponding class/category, if available.
@@ -379,7 +414,11 @@ corresponding class/category, if available.
 To explore a large dataset for raw texts which is saved on the disk you can use
 the *DataSetExplorer*. The *DataSetExplorer* can be found on the tab *Data Management*.
 
-![Figure 12: DataExplorer](DM_DataExplorer.png){width="50%"}
+![Figure `r running_num_figures`: DataExplorer](DM_DataExplorer.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 On the rights side (*Control Panel*) you can choose a folder where the dataset is stored. After
 loading you can explore the texts by using the widgets within the 
@@ -396,9 +435,13 @@ Labels are necessary if you would like to train a classifier. The
 easiest way is to create a table that contains a column for the texts'
 ID and one or multiple columns that contain the texts'
 categories/classes. Supported file formats are .xlsx, .csv, and
-.rda/.rdata. Figure 13 illustrates an example for a .xslx file.
+.rda/.rdata. Figure `r running_num_figures` illustrates an example for a .xslx file.
 
-![Figure 13: Target Data in Excel Files](CF_Create_Targets.png){width="50%"}
+![Figure `r running_num_figures`: Target Data in Excel Files](CF_Create_Targets.png){width="50%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 > In any case, the table must contain a column with the name "id" which
 > contains the texts' IDs. All other columns must also have unique
@@ -407,7 +450,11 @@ categories/classes. Supported file formats are .xlsx, .csv, and
 If you would like to create a dataset for labels without using Excel you can use
 the *TableEditor*. The *TableEditor* is located in the tab *Data Management*.
 
-![Figure 14: TableEditor](DM_TableEditor.png){width="50%"}
+![Figure `r running_num_figures`: TableEditor](DM_TableEditor.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 On the right side you can either create a new empty table or load and edit an existing table.
 The *TableEditor* can be used with .csv files and with .rda or .rdata files that
@@ -432,9 +479,9 @@ To save the table to disk you can click on *Save As*.
 
 Base models are the foundation of all further models in *aifeducation*.
 At the moment, these are transformer models such as BERT (Devlin et al.
-2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
+2019), RoBERTa (Liu et al. 2019), modernBERT (Warner et al. 2024), 
 Funnel-Transformer (Dai et al. 2020), Longformer (Beltagy, Peters &
-Cohan 2020), and MPNet. As a general first step, these models are
+Cohan 2020), and MPNet (Song et al. 2020). As a general first step, these models are
 trained on a large corpus of general texts. In the next step, the models
 are fine-tuned to domain-specific texts and/or fine-tuned for specific
 tasks. Since the creation of base models requires a huge number of texts
@@ -448,12 +495,16 @@ train/fine-tune base models.
 ### 3.2.2 Creation of Base Models
 
 In order to create a new base model you have to choose the option (tab)
-*Create* on the tab *Base Models* on the top panel of the app. Figure 13
+*Create* on the tab *Base Models* on the top panel of the app. Figure `r running_num_figures`
 shows the corresponding page.
 
-[![Figure 15: Base Models - Create
+[![Figure `r running_num_figures`: Base Models - Create
 Transformer](BM_Create_Fill_fields.png){width="100%"}](BM_Create_Fill_fields.png)
-Figure 15: Base Models - Create Transformer (click image to enlarge)
+Figure `r running_num_figures`: Base Models - Create Transformer (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 Every transformer model is composed of two parts: 1) the tokenizer which
 splits raw texts into smaller pieces to model a large number of words
@@ -461,18 +512,20 @@ with a limited, small number of tokens and 2) the neural network that is
 used to model the capabilities for understanding natural language.
 
 At the beginning you can choose between the different supported
-transformer architectures (*Base Architecture* combobox in the section
-*Model-based parameters* of the box *Model Architecture*). Depending on
-the architecture, you have different options determining the shape of
-your neural network. You also have independent (general) options for all
-the transformers (box *General parameters*).
+transformer architectures (*Base Model Type* combobox in *Control Panel*). 
 
-On the right-bottom side of the box *Model Architecture*, you find a box
-named *Vocabulary*. Here you must provide the path to a folder which
-contains files with data for LargeDataSet. This data set is used to
+Depending on
+the architecture, you have different options determining the shape of
+your neural network. 
+
+You find a box named *Input Data* at the top. Here you must provide the path to a folder which
+contains a LargeDataSetForTexts. This data set is used to
 calculate the vocabulary of the transformer. This file should be created
 with *Aifeducation Studio* (tab *Data Management*) to ensure
-compatibility. See section 3.1.1 for more details. It is very important
+compatibility. See section 3.1.1 for more details. 
+
+In addition you find a box *Vocabulary*. Here you can configure the vocabulary that the transformer 
+should use. It is very important
 that you provide a number of how many tokens the vocabulary should
 include. Depending on the transformer method, you can set additional
 options, affecting a transformer's vocabulary.
@@ -492,11 +545,11 @@ options, affecting a transformer's vocabulary.
 -   **Trim Offsets:** If this option is enabled, the white spaces of the
     produced offsets are trimmed.
 
-The last step is to choose a folder where the new base model should be
-saved (*Choose Folder* button on the *Control Panel*). Finally, you can
-start the creation of your model by clicking on the button "Start
-Creation". The creation of the model may take some time. You can see the
-progress of a creation with progress bars.
+Finally, you can
+start the creation of your model by clicking on the button "Create
+Model". Here you have to select a directory and folder to save the resulting model.
+The creation of the model may take some time. You can see the
+progress of creation with progress bars.
 
 ### 3.2.3 Train/Tune a Base Model
 
@@ -505,9 +558,13 @@ first time or want to adapt a pre-trained model to a domain-specific
 language or task, you have to click on the *Train* section on the *Base
 Models* tab.
 
-[![Figure 16: Base Models - Train/Tune
+[![Figure `r running_num_figures`: Base Models - Train/Tune
 Transformer](BM_Train_Fill_fields.png){width="100%"}](BM_Train_Fill_fields.png)
-Figure 16: Base Models - Train/Tune Transformer (click image to enlarge)
+Figure `r running_num_figures`: Base Models - Train/Tune Transformer (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 In the first step, you have to choose the base model you would like to
 train/tune (box *Base Model*). Please note that every base model
@@ -518,17 +575,16 @@ entire model.
 Compatible models are all base models that you have created with
 *Aifeducation Studio*. In addition you can use any model from
 [Huggingface](https://huggingface.co/) that uses an architecture
-implemented in *aifeducation* such as BERT, DeBERTa, etc.
+implemented in *aifeducation* such as BERT, modernBERT, etc.
 
-After choosing a base model, new boxes appear as shown in Figure 14. To
-train a model, you must first provide a folder to a dataset (collection
-of raw texts) (box *Dataset*). We recommend that you create this
+Second, you have to provide a LargeDataSetForTexts representing the raw texts
+which should be used for training/tuning (box *Input Data*). We recommend that you create this
 collection of texts as described in section 3.1.1.
 
-Next you can configure the training of your base model (box *Train and
-Tune Settings*). Possible options depend on the kind of model.
+After choosing a base model, new boxes appear as shown in Figure `r running_num_figures`.  
+Possible options depend on the kind of model.
 
--   **Chunk Size:** For training and validating a base model, the raw
+-   **Size of Every Chunk:** For training and validating a base model, the raw
     texts are split into several smaller texts. This value determines
     the maximum length of these smaller text pieces in number of tokens.
     This value cannot exceed the maximum size set during creation of the
@@ -553,7 +609,7 @@ Tune Settings*). Possible options depend on the kind of model.
     belonging to a single word are masked. If this options is disabled
     or not available token masking is used.
 
--   **Validation Size:** This option determines how many sequences
+-   **Size of Validation Data Set:** This option determines how many sequences
     should be used for validating the performance of the base model.
     Sequences used for validation are not available for training.
 
@@ -561,25 +617,27 @@ Tune Settings*). Possible options depend on the kind of model.
     processed at the same time. Please adjust this value to the
     computation capacities of your machine.
 
--   **n Epochs:** The maximum number of epochs for training. During
+-   **Epochs:** The maximum number of epochs for training. During
     training, the model that has the best validation loss is saved on
     disk an will be used for the final model.
 
 -   **Learning Rate:** The initial learning rate.
 
-In the last step, you have to provide the directory where your trained
-model should be saved after training (*Choose Folder* button on the
-*Control Panel*). The corresponding folder will also contain the
-checkpoints during training. It is very important that this directory is
-not the same directory as the one you stored the original model in. By
-clicking the button "Start Training/Tuning", the training starts. Please
-note that the training of a base model can last days or even weeks,
+You can start training the model by clicking on the button *Start Training*. 
+In this step, you have to provide the directory where your trained
+model should be saved after training. It is very important that this directory is
+not the same directory as the one you stored the original model in. 
+
+Please note that the training of a base model can last days or even weeks,
 depending on the size and the kind of model, the amount of data, and the
 capacities of your machine. You can see the training progress with the
-progress bars and plot (Figure 17).
+progress bars and plot (Figure `r running_num_figures`).
 
-![Figure 17: Progress of training the
-transformer](BM_Train_Progress.png){width="100%"}
+![Figure `r running_num_figures`: Progress of training the transformer](BM_Train_Progress.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 ## 3.3 Text Embedding Models
 
@@ -603,11 +661,15 @@ computational intensity. Finally, this approach allows the analysis of
 long documents by applying the same algorithm to different parts.
 
 You can open the creation page by clicking on the "Create" tab in the
-section "Text Embedding Models". Figure 18 shows the corresponding page.
+section "Text Embedding Models". Figure `r running_num_figures` shows the corresponding page.
 
-[![Figure 18: Text Embedding Model -
+[![Figure `r running_num_figures`: Text Embedding Model -
 Create](TEM_Create_Fill_fields.png){width="100%"}](TEM_Create_Fill_fields.png)
-Figure 18: Text Embedding Model - Create (click image to enlarge)
+Figure `r running_num_figures`: Text Embedding Model - Create (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 First you have to choose the base model that should form the foundation
 of your new text embedding model. Please select the folder that contains
@@ -679,18 +741,22 @@ folder that contains the entire model instead of selecting single files
 box appears that shows you the different aspects of the model and how
 you can use it.
 
-The tab *Description* (Figure 19) provides you with the documentation of
+The tab *Description* (Figure `r running_num_figures`) provides you with the documentation of
 the model.
 
-[![Figure 19: Text Embedding Model -
+[![Figure `r running_num_figures`: Text Embedding Model -
 Description](TEM_Use_Fill_fields.png){width="100%"}](TEM_Use_Fill_fields.png)
-Figure 19: Text Embedding Model - Description (click image to enlarge)
+Figure `r running_num_figures`: Text Embedding Model - Description (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 The tab *Training* shows the development of the loss and the validation
 loss during the last training of the corresponding base model. If no
 plot is displayed, no history data is available.
 
-The tab *Embedd Text* (Figure 20) allows you to transform raw texts into
+The tab *Embed Text* (Figure `r running_num_figures`) allows you to transform raw texts into
 a numerical representation of these texts, called text embeddings. These
 text embeddings can be used in downstream tasks such as classifying
 texts. In order to transform raw texts into embedded texts, you first
@@ -702,11 +768,15 @@ many raw texts should be processed simultaneously. Please adjust this
 value to your machine's capacities. By clicking on the button "Save
 Embeddings" the transformation of texts begins.
 
-[![Figure 20: Text Embedding Model -
+[![Figure `r running_num_figures`: Text Embedding Model -
 Embeddings](TEM_Use_Embedd_text.png){width="100%"}](TEM_Use_Embedd_text.png)
-Figure 20: Text Embedding Model - Embeddings (click image to enlarge)
+Figure `r running_num_figures`: Text Embedding Model - Embeddings (click image to enlarge)
 
-The tab *Tokenize/Encode/Decode* (Figure 21) offers you insights into
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+The tab *Tokenize/Encode/Decode* (Figure `r running_num_figures`) offers you insights into
 the way your text embedding model processes data. In the box *Encode*
 you can insert a raw text and after clicking on *Encode,* you can see
 how the text is divided into tokens and their corresponding IDs. The IDs
@@ -716,12 +786,16 @@ process. There you can insert a sequence of numbers (separated with a
 comma or with spaces) and after clicking on *Decode*, the corresponding
 tokens and the raw text appear.
 
-[![Figure 21: Text Embedding Model -
+[![Figure `r running_num_figures`: Text Embedding Model -
 Tokenize/Encode/Decode](TEM_Use_TED_Encode.png){width="100%"}](TEM_Use_TED_Encode.png)
-Figure 21: Text Embedding Model - Tokenize/Encode/Decode (click image to
+Figure `r running_num_figures`: Text Embedding Model - Tokenize/Encode/Decode (click image to
 enlarge)
 
-Finally, the tab *Fill Mask* (Figure 22) allows you to request the
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+Finally, the tab *Fill Mask* (Figure `r running_num_figures`) allows you to request the
 underlying base model of your text embedding model to calculate a
 solution to a fill-in-the-blank text. In the box *Text* you can insert a
 raw text. A gap is signaled when you insert the corresponding masking
@@ -735,9 +809,13 @@ are ordered by certainty; from the perspective of the model, the most
 reasonable tokens are at the top and the less reasonable tokens are at
 the bottom.
 
-[![Figure 22: Text Embedding Model - Fill
+[![Figure `r running_num_figures`: Text Embedding Model - Fill
 Mask](TEM_Use_Fill_mask.png){width="100%"}](TEM_Use_Fill_mask.png)
-Figure 22: Text Embedding Model - Fill Mask (click image to enlarge)
+Figure `r running_num_figures`: Text Embedding Model - Fill Mask (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 ### 3.3.3 Documenting a Text Embedding Model
 
@@ -761,14 +839,18 @@ can provide the names and email addresses of all relevant contributors.
 refers to the people who adapted a pre-trained model to another domain
 or task.
 
-[![Figure 23: Text Embedding Model -
+[![Figure `r running_num_figures`: Text Embedding Model -
 Documentation](TEM_Document_Desc_english.png){width="100%"}](TEM_Document_Desc_english.png)
-Figure 23: Text Embedding Model - Documentation (click image to enlarge)
+Figure `r running_num_figures`: Text Embedding Model - Documentation (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 In the tabs *Abstract* and *Description*, you can provide an abstract
 and a detailed description of your work in English and/or in the native
 language of your text embedding model (e.g., French, German, etc.),
-allowing you to reach a broader audience (Figure 23). In all four tabs
+allowing you to reach a broader audience (Figure `r running_num_figures`). In all four tabs
 you can provide your documentation in plain text, html, and/or markdown
 allowing you to insert tables or to highlight parts of your
 documentation. If you would like to see what your documentation will
@@ -784,12 +866,60 @@ your changes is possible by clicking on *Save*.
 ### 3.4.1 Create a Classifier
 
 Classifiers are built on top of a text embedding model. To create a
-classifier, click on *Create* in the tab *Classifiers*. Figure 22 shows
+classifier, click on *Create* in the tab *Classifiers*. Figure `r running_num_figures` shows
 the corresponding page.
 
-[![Figure 24: Classifier - Creation Part
+[![Figure `r running_num_figures`: Classifier - Creation Part
 1](CF_Create_Fill_fields_1.png){width="100%"}](CF_Create_Fill_fields_1.png)
-Figure 24: Classifier - Creation Part 1 (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Creation Part 1 (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+First, you choose a core model within the *Control Panel* on the left side. It determines
+where different layers are located and how the outputs of the different layers are
+combined into the final output of the model. 
+  
+The sequential architecture (see Figure `r running_num_figures`) provides models where the input is passed to a specific number 
+of layers step by step. All layers are grouped by the kind of layer into stacks.
+
+![Figure `r running_num_figures`: Basic Architecture of a Sequential Classifier](core_arch_sequential.png){width="100%"}
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+In contrast, the parallel architecture (see `r running_num_figures`) offers a model where 
+an input is passed to different types of layers separately. At the end the outputs 
+are combined to create the final output of the whole model. 
+
+![Figure `r running_num_figures`: Basic Architecture of a Parallel Classifier](core_arch_parallel.png){width="100%"}
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+You can find the name of the used core model in the name of the classifier. For
+example `TEClassifierSequential` uses a *sequential* core model while
+`TEClassifierParallel` uses a *parallel* core model.
+
+In general, all layers within a core model allow further customization allowing you
+to build a high number of different models (see box *Model Configuration* in Figure `r running_num_figures-2`).
+
+Second, you can choose how the core model is used for classification. At the moment
+a probability and metric based classifier is possible. 
+
+- **Probability Classifiers:**  Probability classifiers are used to predict a 
+  probability distribution for different classes/categories. This is the standard case most common
+  in literature.
+- **Prototype Based Classifiers:** Prototype based classifiers are a kind of metric
+  based classifiers. Here the classifiers do not predict a probability distribution. Instead
+  it calculates a prototype for every class/category and measures the distance
+  between a case and all prototypes. The class/category of the prototype with the smallest distance
+  to the case is assigned to that case. In contrast to the probability classifiers
+  these models can handle classes/categories that were not part of the training. 
+  
+> Please note that creating, training, and predicting works for all types of classifiers 
+> as described in the sections below.
 
 Creating a classifier requires two kinds of data. First, a text
 embedding of a collection of texts. These embeddings should be created
@@ -821,54 +951,29 @@ frequencies of the single classes/categories.
 > particular, you can use the same text embeddings for training
 > different classifiers.
 
-It is very important that you provide the model's name and label in the
-*Control Panel*. The *Model Name* is used for internal purposes by the
-machine while the *Model Label* is used as a title of your classifiers
-for other users. Thus, the *Model Name* should not contain any spaces or
-special characters. For *Model Label,* there are no restrictions.
+It is very important that you provide the model's label in the
+*Control Panel*. *Model Label* is used as a title of your classifiers
+for other users. 
 
-In the third box (*Architecture*) you create the architecture of your
-neural network (Figure 25).
+In the third box (*Model Configuration*) you customize the architecture of your
+neural network (Figure `r running_num_figures`).
 
-[![Figure 25: Classifier - Creation Part
+[![Figure `r running_num_figures`: Classifier - Creation Part
 2](CF_Create_Fill_fields_2.png){width="100%"}](CF_Create_Fill_fields_2.png)
-Figure 25: Classifier - Creation Part 2 (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Creation Part 2 (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 Since a detailed explanation of every option is beyond the scope of this
-introduction, we will give you the short version:
+introduction, we refer to the detailed description of all layers in vignette [A01 Layers and Stack of Layers](https://fberding.github.io/aifeducation/articles/a01_layers_and_stack_layers.html).
 
--   **Positional Embedding:** By activating this option, you add
-    positional embedding to your classifier. This provides the neural
-    network with the ability to take into account the order within a
-    sequence.
+> If you hover over a widget or a question mark you get additional information!
 
--   **Encoding Layers:** These layers are similar to encoding layers
-    used in some transformer models, allowing to calculate
-    context-sensitive text embeddings. They provide your classifier with
-    the ability to take the surrounding text chunks (see section 3.3.1)
-    of the sequences into account.
-
--   **Recurrent Layers:** This section allows you to add recurrent
-    layers to your classifier. These layers are able to account for the
-    order within a sequence. In order to add these layers, just pass the
-    numbers to the input field *Reccurent Layers* and separate them with
-    a comma or space. Every number represents a layer and the number
-    determines the number of neurons. Below the field you can see what
-    *Aifeducation Studio* does with your input. This is helpful to avoid
-    invalid specifications of layers.
-
--   **Dense Layers:** In this section you can add dense layers to your
-    network. The process to add layers is similar to the process of
-    recurrent layers.
-
--   **Optimizer:** Here you can choose between different optimizers for
-    training.
-
-The next box (*Training Settings*) contains the setting for training
-your classifier (Figure 26). Going into detail is again beyond the scope
+The next box (*Training SetUp*) contains the setting for training
+your classifier (Figure `r running_num_figures`). Going into detail is again beyond the scope
 of this introduction. Here we can only provide an overview.
-
-**Section: General Setting**
 
 -   **Balance Class Weights**: If this option is enabled, the loss is
     adjusted to the absolute frequencies of the classes/categories
@@ -951,13 +1056,17 @@ al. (2020). Therefore, the following parameters have to be set:
 -   Certainty Anchor = 1.00
 -   Min Certainty Value = 0.00
 
-[![Figure 26: Classifier - Creation Part
+[![Figure `r running_num_figures`: Classifier - Creation Part
 3](CF_Create_Fill_fields_3.png){width="100%"}](CF_Create_Fill_fields_3.png)
-Figure 26: Classifier - Creation Part 3 (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Creation Part 3 (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 Before you start training, you can check how many cases can be matched
 between the text embeddings and the target data by clicking on the
-button *Test Data Matching* (*Control Panel* in Figure 22). This allows
+button *Test Data Matching* (*Control Panel* in Figure `r running_num_figures`). This allows
 you to check if the structure of the data is working. If everything is
 okay you can provide the directory where you would like to save the
 model and start training the model by clicking on *Train Model*.
@@ -979,35 +1088,47 @@ Please note that a classifier is made up of several files. Thus,
 files and not single files. After loading a classifier, a new box
 appears.
 
-In the first tab, *Description* (Figure 27), you will find the
+In the first tab, *Description* (Figure `r running_num_figures`), you will find the
 documentation of the model.
 
-[![Figure 27: Classifier -
+[![Figure `r running_num_figures`: Classifier -
 Description](CF_Use_Fill_fields.png){width="100%"}](CF_Use_Fill_fields.png)
-Figure 27: Classifier - Description (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Description (click image to enlarge)
 
-In the second tab, *Training* (Figure 28), you receive a summary of the
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+In the second tab, *Training* (Figure `r running_num_figures`), you receive a summary of the
 training process of the model. This includes a visualization of the
 loss, the accuracy, and the balanced accuracy for every fold and every
 epoch. Depending on the applied training techniques (such as *Balanced
 Pseudo-Labeling*), you can request additional images.
 
-[![Figure 28: Classifier -
+[![Figure `r running_num_figures`: Classifier -
 Training](CF_Use_Training.png){width="100%"}](CF_Use_Training.png)
-Figure 28: Classifier - Training (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Training (click image to enlarge)
 
-The third tab, *Reliability* (Figure 27), provides you with the
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+The third tab, *Reliability* (Figure `r running_num_figures`), provides you with the
 information on the model's quality. Here you can find visualizations
 giving you insights into how the classifier is able to generate reliable
 results. In addition, measures from content analysis as well as machine
 learning allow you to analyze specific aspects of the model's
 performance.
 
-[![Figure 29: Classifier -
+[![Figure `r running_num_figures`: Classifier -
 Reliability](CF_Use_Reliability.png){width="100%"}](CF_Use_Reliability.png)
-Figure 29: Classifier - Reliability (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Reliability (click image to enlarge)
 
-The last tab, *Prediction* (Figure 30), allows you to apply a trained
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+The last tab, *Prediction* (Figure `r running_num_figures`), allows you to apply a trained
 model to new data. Here you can use the trained model to assign
 classes/categories to new texts. For this purpose, you must first
 provide the file that contains the text embeddings of the documents you
@@ -1015,9 +1136,13 @@ would like to classify. You can create these embeddings with the text
 embedding model used for providing the training data of the classifier.
 The necessary steps are described in section 3.3.2.
 
-[![Figure 30: Classifier -
+[![Figure `r running_num_figures`: Classifier -
 Prediction](CF_Use_Prediction_1.png){width="100%"}](CF_Use_Prediction_1.png)
-Figure 30: Classifier - Prediction (click image to enlarge)
+Figure `r running_num_figures`: Classifier - Prediction (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 > These embeddings must be created with the same text embedding model
 > that created the text embeddings for training. If not, an error will
@@ -1026,15 +1151,19 @@ Figure 30: Classifier - Prediction (click image to enlarge)
 The next step is to provide the folder where you would like to save the
 predictions and to provide a file name. The default case is to store the
 predictions in an .csv file. The resulting data table may look like
-shown in Figure 31.
+shown in Figure `r running_num_figures`.
 
-![Figure 31: Classifier - Prediction
+![Figure `r running_num_figures`: Classifier - Prediction
 Results](CF_Use_Prediction_Result.png){width="50%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 ### 3.4.3 Documenting a Classifier
 
 Documenting a classifier is similar to the documentation of a text
-embedding model (section 3.3.3, see Figure 22).
+embedding model (section 3.3.3).
 
 To support developers in documenting their work, *Aifeducation Studio*
 provides an easy way to add a comprehensive description. You find this
@@ -1063,26 +1192,52 @@ clicking on *Save*
 
 ### 3.5.1 Feature Extractors
 
-Another option to increase the model's performance and/or to increase
+Another option to increase a model's performance and/or to increase
 computational speed is to apply a feature extractor. For example, the
 work by Ganesan et al. (2021) indicates that a reduction of the hidden
-size can increase model accuracy. In *aifeducation,* a feature extractor
-is a model that tries to reduce the number of features of given text
-embeddings before feeding the embeddings as input to a classifier.
+size can increase a model's accuracy. In *aifeducation,* a feature
+extractor is a model that tries to reduce the number of features of
+given text embeddings before feeding the embeddings as input to a
+classifier.
 
-You can create a feature extractor as follows in Figure 30 (*Create* tab
+The feature extractors implemented in *aifeducation* are auto-encoders
+that support sequential data and sequences of different length. The
+basic architecture of all extractors is shown in the following figure.
+
+![Figure `r running_num_figures`: Basic architecture of feature extractors](classif_feature_extractor.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+The learning objective of the feature extractors is first to compress
+information by reducing the number of features to the number of features
+of the latent space (Frochte 2019, p.281). In the figure above, this
+would mean to reduce the number of features from 8 to 4 and to store as
+much information as possible from the 8 dimensions in only 4 dimensions.
+In the next step, the extractor tries to reconstruct the original
+information from the compressed information of the latent space (Frochte
+2019, pp.280-281). The information is extended from 4 dimensions to 8.
+After training, the hidden representation of the latent space is used as
+a compression of the original input.
+
+You can create a feature extractor as follows in Figure `r running_num_figures` (*Create* tab
 in the tab *Feature Extractors*).
 
-![Figure 32: Basic architecure of feature
+![Figure `r running_num_figures`: Basic architecure of feature
 extractors](FE_Create_Fill_fields.png){width="100%"}
 
-First, you need to choose embeddings that you can see after choosing the
-box *Input Data* (*Choose Embeddings* button on the *Control Panel*).
-You can specify the name and label of the model in the *Model Name* and
-*Model Label* fields, respectively.
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
-Specify an architecture and training settings in *Architecture* and
-*Training Settings* boxes.
+First, you need to choose embeddings by using the box *Input Data*.
+
+
+You can specify the label of the model in the *Model Label* field within the *Control Panel*.
+
+Specify an architecture and training settings in *Model Configuration* and
+*Training SetUp* boxes.
 
 -   *Target Features* determines the number of features for the
     compressed representation. The lower the number, the higher the
@@ -1102,12 +1257,12 @@ When you are ready to start training, just click on the *Train Model*
 button. Then you have to choose a path to a folder and a folder name
 where you want to store the model.
 
-Please note that training a classifier can take up to several hours. You
+Please note that training a feature extractor can take up to several hours. You
 can see your progress in the progress bars.
 
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor path to *Feature Extractor*
-during configuration of the classifier (Figure 25).
+during configuration of the classifier (Figure `r running_num_figures`).
 
 That is all. Now you can use and train the classifier in the same way as
 without a feature extractor.
@@ -1146,6 +1301,9 @@ Proceedings of the 2019 Conference of the North (pp. 4171--4186).
 Association for Computational Linguistics.
 <https://doi.org/10.18653/v1/N19-1423>
 
+Frochte, J. (2019). Maschinelles Lernen: Grundlagen und Algorithmen in
+Python (2., aktualisierte Auflage). Hanser.
+
 He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
 BERT with Disentangled Attention.
 <https://doi.org/10.48550/arXiv.2006.03654>
@@ -1165,3 +1323,13 @@ Optimized BERT Pretraining Approach.
 
 Schreier, M. (2012). Qualitative Content Analysis in Practice. Los
 Angeles: SAGE.
+
+Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked
+and Permuted Pre-training for Language Understanding.
+<https://doi.org/10.48550/arXiv.2004.09297>
+
+Warner, B., Chaffin, A., Clavié, B., Weller, O., Hallström, O., Taghadouini, S., 
+Gallagher, A., Biswas, R., Ladhak, F., Aarsen, T., Cooper, N., Adams, G., 
+Howard, J. & Poli, I. (2024). Smarter, Better, Faster, Longer: A Modern Bidirectional 
+Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference.
+<https://doi.org/10.48550/arXiv.2412.13663>

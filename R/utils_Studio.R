@@ -943,8 +943,8 @@ create_data_raw_texts_description <- function(data_set_for_raw_texts) {
 create_data_base_model_description <- function(base_model) {
   ui <- bslib::value_box(
     value = detect_base_model_type(base_model),
-    title = "Number of Cases",
-    showcase = shiny::icon("list")
+    title = "Base Model Type",
+    showcase = shiny::icon("brain")
   )
   return(ui)
 }

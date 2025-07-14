@@ -73,14 +73,11 @@ test_that("Generating Test Data", {
     n_epoch = 10,
     batch_size = 25,
     chunk_size = 512,
-    n_workers = 1,
-    multi_process = FALSE,
     sustain_track = TRUE,
     sustain_iso_code = "DEU",
     sustain_region = NULL,
     sustain_interval = 15,
     trace = trace,
-    keras_trace = as.numeric(trace),
     pytorch_trace = as.numeric(trace)
   )
   Sys.sleep(5)

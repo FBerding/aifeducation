@@ -56,7 +56,7 @@ TextEmbeddingModel_Use_UI <- function(id) {
           Tokenize_Encode_Decode_UI(id = shiny::NS(id, "TextEmbeddingModel_TokEnDe"))
         ),
         bslib::nav_panel(
-          title = "Embedd Text",
+          title = "Embed Text",
           Embed_UI(id = shiny::NS(id, "TextEmbeddingModel_Embed"))
         )
       )

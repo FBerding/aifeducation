@@ -9,7 +9,7 @@ load_all_py_scripts()
 
 # stack_dense_layer----------------------------------------------------
 test_that("stack_dense_layer", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -83,7 +83,7 @@ test_that("stack_dense_layer", {
 test_that("stack_rec_layers", {
   rec_types=c("gru","lstm")
   bidirectional_types=c(TRUE,FALSE)
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -162,7 +162,7 @@ test_that("stack_rec_layers", {
 #stack_tf_encoder_layer----------------------------------------------------
 test_that("stack_tf_encoder_layer", {
   attention_types=c("multihead","fourier")
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
@@ -239,7 +239,7 @@ test_that("stack_tf_encoder_layer", {
 
 #stack_n_gram_convolution----------------------------------------------------
 test_that("stack_n_gram_convolution", {
-  pad_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)

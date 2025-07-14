@@ -392,14 +392,11 @@ for (ai_method in ai_methods) {
           n_epoch = 2,
           batch_size = 2,
           chunk_size = 100,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -417,14 +414,11 @@ for (ai_method in ai_methods) {
           n_epoch = 2,
           batch_size = 1,
           chunk_size = 100,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -461,14 +455,11 @@ for (ai_method in ai_methods) {
           batch_size = 1,
           chunk_size = 70,
           full_sequences_only = TRUE,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -506,14 +497,11 @@ for (ai_method in ai_methods) {
           batch_size = 2,
           chunk_size = 100,
           full_sequences_only = FALSE,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -531,14 +519,11 @@ for (ai_method in ai_methods) {
           batch_size = 2,
           chunk_size = 100,
           full_sequences_only = FALSE,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -577,14 +562,12 @@ for (ai_method in ai_methods) {
           min_seq_len = 50,
           full_sequences_only = TRUE,
           chunk_size = 250,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
+
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -603,14 +586,12 @@ for (ai_method in ai_methods) {
           min_seq_len = 50,
           full_sequences_only = TRUE,
           chunk_size = 250,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
+
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -648,14 +629,12 @@ for (ai_method in ai_methods) {
           batch_size = 1,
           chunk_size = 512,
           full_sequences_only = FALSE,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
+
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -694,14 +673,12 @@ for (ai_method in ai_methods) {
           n_epoch = 2,
           batch_size = 20,
           chunk_size = 100,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
+
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -739,14 +716,12 @@ for (ai_method in ai_methods) {
           n_epoch = 2,
           batch_size = 2,
           chunk_size = 100,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
+
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -764,14 +739,12 @@ for (ai_method in ai_methods) {
           n_epoch = 2,
           batch_size = 1,
           chunk_size = 100,
-          n_workers = 1,
-          multi_process = FALSE,
           sustain_track = TRUE,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = trace,
-          keras_trace = as.numeric(trace),
+
           pytorch_trace = as.numeric(trace)
         )
       )

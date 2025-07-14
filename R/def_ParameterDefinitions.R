@@ -1200,7 +1200,7 @@ get_param_dict <- function() {
     type = "double",
     allow_null = FALSE,
     min = 0,
-    max =0.5,
+    max =0.6,
     allowed_values = NULL,
     desc = "determining the dropout between recurrent layers.",
     gui_box = "Recurrent Layers",

@@ -20,9 +20,9 @@ BaseModel_Train_UI <- function(id) {
         shiny::tags$hr(),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "start_SaveModal"),
-          label = "Create Model",
+          label = "Start Training",
           title = "Choose Destination",
-          icon = shiny::icon("floppy-disk")
+          icon = shiny::icon("paper-plane")
         )
       ),
       # Main Page---------------------------------------------------------------
