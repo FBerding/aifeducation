@@ -1029,9 +1029,6 @@
         self$set_model_param("full_sequences_only", full_sequences_only)
         self$set_model_param("min_seq_len", min_seq_len)
         self$set_model_param("learning_rate", learning_rate)
-        self$set_model_param("n_workers", n_workers)
-        self$set_model_param("multi_process", multi_process)
-        self$set_model_param("keras_trace", keras_trace)
         self$set_model_param("pytorch_trace", pytorch_trace)
 
         # Check defining of required functions ----
