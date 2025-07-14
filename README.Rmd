@@ -57,7 +57,7 @@ special conditions of the educational and social sciences.
     sets.
 -   Uses safetensors for saving models in 'PyTorch'.
 -   Supports pre-trained language models from Hugging Face.
--   Supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, Longformer, and Funnel
+-   Supports ModernBERT, MPNet, BERT, RoBERTa, Longformer, and Funnel
     Transformer for creating context-sensitive text embedding.
 -   Makes sharing pre-trained models very easy.
 -   Integrates sustainability tracking.
@@ -345,10 +345,6 @@ synthetic sampling approach for imbalanced learning. In 2008 IEEE
 International Joint Conference on Neural Networks (IEEE World Congress
 on Computational Intelligence) (pp. 1322--1328). IEEE.
 <https://doi.org/10.1109/IJCNN.2008.4633969>
-
-He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
-BERT with Disentangled Attention.
-<https://doi.org/10.48550/arXiv.2006.03654>
 
 Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022). 
 KNNOR: An oversampling technique for imbalanced datasets. 

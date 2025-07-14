@@ -389,10 +389,10 @@ get_param_dict <- function() {
   )
 
   param$hidden_dropout_prob <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "Ratio of dropout.",
     gui_box = "Encoder Layers",
@@ -401,10 +401,10 @@ get_param_dict <- function() {
   )
 
   param$activation_dropout <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "Dropout probability between the layers of the feed-forward blocks.",
     gui_box = "Encoder Layers",
@@ -413,10 +413,10 @@ get_param_dict <- function() {
   )
 
   param$attention_probs_dropout_prob <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "Ratio of dropout for attention probabilities.",
     gui_box = "Encoder Layers",
@@ -899,7 +899,7 @@ get_param_dict <- function() {
       loss concentrates on pulling cases to its corresponding prototypes.",
     gui_box = "Loss",
     gui_label = "Alpha",
-    default_value = 0.6
+    default_value = 0.5
   )
   param$loss_margin <- list(
     type = "double",
@@ -1197,7 +1197,7 @@ get_param_dict <- function() {
 
   # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
     max =0.5,
@@ -1259,10 +1259,10 @@ get_param_dict <- function() {
 
   # Dense Layer------------------------------------------------------------------
   param$dense_dropout <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "determining the dropout between dense layers.",
     gui_box = "Dense Layers",
@@ -1296,10 +1296,10 @@ get_param_dict <- function() {
 
   # Feature Layer----------------------------------------------------------------
   param$feat_dropout <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "determining the dropout for the dense projection of the feature layer.",
     gui_box = "Feature Layer",
@@ -1312,10 +1312,10 @@ get_param_dict <- function() {
 
   # Transformer Layer------------------------------------------------------------
   param$encoder_dropout <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "determining the dropout for the dense projection within the transformer encoder layers.",
     gui_box = "Transformer Encoder Layers",
@@ -1415,10 +1415,10 @@ get_param_dict <- function() {
 
   # Conv Layer-------------------------------------------------------------------
   param$ng_conv_dropout <- list(
-    type = "double)",
+    type = "double",
     allow_null = FALSE,
     min = 0,
-    max = 0.5,
+    max = 0.6,
     allowed_values = NULL,
     desc = "determining the dropout for n-gram convolution layers.",
     gui_box = "Multiple N-Gram Layers",
