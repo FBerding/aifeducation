@@ -314,3 +314,23 @@ get_fixed_test_tensor=function(pad_value){
 
 }
 
+#'@title Test if running on Continuous Integration (CI)
+#'@description Function checks if it is called on CI.
+#' @returns Returns `TRUE` if the following variables are set to "true"
+#' * `"CI"`
+#' * `"NOT_CRAN"`
+#' * `"_R_CHECK_LIMIT_CORES_"`
+#' @family Utils TestThat Developers
+#' @noRd
+#' @keywords internal
+is_on_CI=function(){
+  if (
+    Sys.getenv("CI") == "true" ||
+    Sys.getenv("NOT_CRAN") == "true" ||
+    Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
+  ) {
+    return(TRUE)
+  } else {
+  return(FALSE)
+  }
+}

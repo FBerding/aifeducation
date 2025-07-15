@@ -72,26 +72,37 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
         min_k_final <- min_k
       }
 
+      max_k_final=as.numeric(max_k_final)
+      min_k_final=as.numeric(min_k_final)
+
       # Check k and adjust according to the difference to the major category
-      required_cases <- max_freq - cat_freq[cat]
+      required_cases <- as.numeric(max_freq - cat_freq[cat])
       n_k <- length(min_k_final:max_k_final)
       if (required_cases < n_k) {
         difference <- n_k - required_cases
         min_k_final <- min_k_final + difference
       }
 
-      if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3) {
+      if (cat_freq[cat] < max_freq & min_k > 0 & cat_freq[cat] > 3 & required_cases>0) {
         for (m in seq_len(length(method))) {
           for (k in min_k_final:max_k_final) {
+            if(length(max_k_final)>1){
+              stop("length")
+            }
+            if(max_k_final<0){
+              stop("max smaller 0")
+            }
+            #print(as.numeric(max_k_final))
+            #print(class(max_k_final))
             input[[index]] <- list(
-              cat = cat,
-              required_cases = required_cases,
-              k = k,
-              method = method[m],
+              cat = as.character(cat),
+              required_cases = as.numeric(required_cases),
+              k = as.numeric(k),
+              method = as.character(method[m]),
               selected_cases = idx,
-              chunks = current_seq_length,
+              chunks = as.character(current_seq_length),
               k_s = length(min_k_final:max_k_final),
-              max_k = max_k_final
+              max_k = as.numeric(max_k_final)
             )
             index <- index + 1
           }
@@ -99,6 +110,9 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
       }
     }
   }
+  #print(input)
+  #return(input)
+
 
   result_list <- foreach::foreach(
     index = seq_len(length(input)),

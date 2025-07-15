@@ -159,7 +159,7 @@ generate_id <- function(length = 16) {
 #' @description Function for getting the number of cores that should be used
 #' for parallel processing of tasks. The number of cores is set to 75 % of the
 #' available cores. If the environment variable `CI` is set to `"true"` or if the
-#' process is running on cran `1` is returned.
+#' process is running on cran `2` is returned.
 #'
 #' @importFrom parallel detectCores
 #'
@@ -173,8 +173,8 @@ auto_n_cores <- function() {
       Sys.getenv("NOT_CRAN") == "true" ||
       Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
-    #n_cores <- min(2, parallel::detectCores())
-    n_cores<-1
+    n_cores <- min(2, parallel::detectCores())
+
   } else {
     n_cores <- floor(parallel::detectCores() * 0.75)
   }

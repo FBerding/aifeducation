@@ -184,11 +184,11 @@ embedding. Allowed values: \code{1 <= x }}
 
 \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x < 0.5}}
+\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x < 0.5}}
+\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{activation_dropout}}{\code{double} Dropout probability between the layers of the feed-forward blocks. Allowed values: \verb{0 <= x < 0.5}}
+\item{\code{activation_dropout}}{\code{double} Dropout probability between the layers of the feed-forward blocks. Allowed values: \verb{0 <= x <= 0.6}}
 
 \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 

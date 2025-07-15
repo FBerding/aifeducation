@@ -164,9 +164,9 @@ embedding. Allowed values: \verb{1 <= x <= 2048}}
 
 \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x < 0.5}}
+\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x < 0.5}}
+\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x <= 0.6}}
 
 \item{\code{attention_window}}{\code{int} Size of the window around each token for attention mechanism in every layer. Allowed values: \code{2 <= x }}
 

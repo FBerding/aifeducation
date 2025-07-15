@@ -372,8 +372,14 @@ DataManagerClassifier <- R6::R6Class(
 
       # Set up parallel processing
       requireNamespace(package = "foreach", quietly = TRUE)
+      #if(is_on_CI()==FALSE){
       cl <- parallel::makeCluster(self$config$n_cores)
       doParallel::registerDoParallel(cl)
+      #} else {
+      #  foreach::registerDoSEQ()
+      #  cl=NULL
+      #}
+
 
       # Create Synthetic Cases
       data$set_format("np")
@@ -389,7 +395,9 @@ DataManagerClassifier <- R6::R6Class(
       )
 
       # Unload cluster for parallel processing
-      parallel::stopCluster(cl)
+      if(!is.null(cl)){
+        parallel::stopCluster(cl)
+      }
 
       # Post-process synthetic cases
       embeddings_syntehtic <- syn_cases$syntetic_embeddings

@@ -102,28 +102,31 @@ for (object_class_name in object_class_names) {
         what = classifier$configure,
         args = test_combinations
       )
-      test_that(paste("embed", object_class_name, get_current_args_for_print(test_combinations)), {
-        # Predictions
-        embeddings <- classifier$embed(
-          embeddings_q = test_embeddings_reduced,
-          batch_size = 50
-        )
 
-        # check case order invariance
-        perm <- sample(x = seq.int(from = 1, to = nrow(test_embeddings_reduced$embeddings)))
-        test_embeddings_reduced_perm <- test_embeddings_reduced$clone(deep = TRUE)
-        test_embeddings_reduced_perm$embeddings <- test_embeddings_reduced_perm$embeddings[perm, , ]
-        embeddings_perm <- classifier$embed(
-          embeddings_q = test_embeddings_reduced_perm,
-          batch_size = 50
-        )
-        for (j in seq_len(nrow(embeddings$embeddings_q))) {
-          expect_equal(embeddings$embeddings_q[j, ],
-            embeddings_perm$embeddings_q[which(perm == j), ],
-            tolerance = 1e-5
+      if(test_combinations$attention_type!="fourier"){
+        test_that(paste("embed", object_class_name, get_current_args_for_print(test_combinations)), {
+          # Predictions
+          embeddings <- classifier$embed(
+            embeddings_q = test_embeddings_reduced,
+            batch_size = 50
           )
-        }
-      })
+
+          # check case order invariance
+          perm <- sample(x = seq.int(from = 1, to = nrow(test_embeddings_reduced$embeddings)))
+          test_embeddings_reduced_perm <- test_embeddings_reduced$clone(deep = TRUE)
+          test_embeddings_reduced_perm$embeddings <- test_embeddings_reduced_perm$embeddings[perm, , ]
+          embeddings_perm <- classifier$embed(
+            embeddings_q = test_embeddings_reduced_perm,
+            batch_size = 50
+          )
+          for (j in seq_len(nrow(embeddings$embeddings_q))) {
+            expect_equal(embeddings$embeddings_q[j, ],
+                         embeddings_perm$embeddings_q[which(perm == j), ],
+                         tolerance = 1e-5
+            )
+          }
+        })
+      }
       gc()
 
       test_that(paste("plot", object_class_name, get_current_args_for_print(test_combinations)), {
