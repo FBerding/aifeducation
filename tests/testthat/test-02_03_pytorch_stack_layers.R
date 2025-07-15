@@ -41,7 +41,7 @@ test_that("stack_dense_layer", {
     pad_value=as.integer(pad_value),
     parametrizations = "None",
     dtype=values[[1]]$dtype,
-    device="cpu",
+    device = device,
     residual_type="residual_gate"
   )$to(device)
   layer$eval()
@@ -118,7 +118,7 @@ test_that("stack_rec_layers", {
         bias = TRUE,
         parametrizations = "None",
         dtype=values[[1]]$dtype,
-        device="cpu",
+        device = device,
         residual_type="residual_gate",
         return_sequence=TRUE
       )$to(device)
@@ -200,7 +200,7 @@ test_that("stack_tf_encoder_layer", {
       bias = TRUE,
       parametrizations = "None",
       dtype=values[[1]]$dtype,
-      device="cpu",
+      device = device,
       residual_type="residual_gate"
     )$to(device)
     layer$eval()
@@ -274,7 +274,7 @@ test_that("stack_n_gram_convolution", {
       bias=TRUE,
       parametrizations="None",
       dtype=values[[1]]$dtype,
-      device="cpu",
+      device = device,
       act_fct="elu",
       residual_type="residual_gate"
     )$to(device)
