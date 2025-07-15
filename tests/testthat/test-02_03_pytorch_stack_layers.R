@@ -43,7 +43,7 @@ test_that("stack_dense_layer", {
     dtype=values[[1]]$dtype,
     device="cpu",
     residual_type="residual_gate"
-  )
+  )$to(device)
   layer$eval()
 
   y <- layer(
@@ -121,7 +121,7 @@ test_that("stack_rec_layers", {
         device="cpu",
         residual_type="residual_gate",
         return_sequence=TRUE
-      )
+      )$to(device)
       layer$eval()
 
       y <- layer(
@@ -202,7 +202,7 @@ test_that("stack_tf_encoder_layer", {
       dtype=values[[1]]$dtype,
       device="cpu",
       residual_type="residual_gate"
-    )
+    )$to(device)
     layer$eval()
 
     y <- layer(
@@ -277,7 +277,7 @@ test_that("stack_n_gram_convolution", {
       device="cpu",
       act_fct="elu",
       residual_type="residual_gate"
-    )
+    )$to(device)
     layer$eval()
 
     y <- layer(

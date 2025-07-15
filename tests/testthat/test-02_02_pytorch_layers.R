@@ -10,7 +10,7 @@ load_all_py_scripts()
 #Prototyp Metric---------------------------------------------------------------
 test_that("Prototype Metric", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  layer <- py$layer_protonet_metric()
+  layer <- py$layer_protonet_metric()$to(device)
 
   samples <- matrix(
     data = c(
@@ -64,7 +64,7 @@ test_that("Prototype Metric", {
 
   scaling_factor <- layer$get_scaling_factor()
 
-  distances <- layer(x = samples, prototypes = prototypes)
+  distances <- layer(x = samples$to(device), prototypes = prototypes$to(device))
   expect_equal(
     object = tensor_to_numpy(distances),
     expected = result_matrix,
@@ -86,7 +86,7 @@ test_that("Masking Layer", {
     pad_value = pad_value
   )
 
-  layer <- py$masking_layer(pad_value)
+  layer <- py$masking_layer(pad_value)$to(device)
   y <- layer(example_tensor)
 
   # Check if input is the same as the output
@@ -111,11 +111,11 @@ test_that("identity layer", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )
-  masking_layer <- py$masking_layer(pad_value)
+  )$to(device)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$identity_layer(apply_masking=FALSE)
+  layer <- py$identity_layer(apply_masking=FALSE)$to(device)
   y <- layer(
     x = values[[1]],
     seq_len = values[[2]],
@@ -149,14 +149,14 @@ test_that("residual connection with Mask", {
     pad_value = pad_value
   )$to(device)
   types <- c("None", "addition", "residual_gate")
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (type in types) {
     layer <- py$layer_residual_connection(
       type = type,
       pad_value = as.integer(pad_value)
-    )
+    )$to(device)
     y <- layer(
       x = values[[1]],
       y = values[[1]],
@@ -209,14 +209,14 @@ test_that("LayerNorm with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   layer <- py$LayerNorm_with_Mask(
     times = as.integer(times),
     features = as.integer(features),
     pad_value = as.integer(pad_value)
-  )
+  )$to(device)
   y <- layer(
     x = values[[1]],
     seq_len = values[[2]],
@@ -277,7 +277,7 @@ test_that("DenseLayer with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -304,7 +304,7 @@ test_that("DenseLayer with Mask", {
         dtype = values[[1]]$dtype,
         residual_type = "None",
         normalization_type = norm_types
-      )
+      )$to(device)
       layer$eval()
 
       y <- layer(
@@ -361,7 +361,7 @@ test_that("layer_tf_encoder", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -388,7 +388,7 @@ test_that("layer_tf_encoder", {
       bias = TRUE,
       parametrizations = "None",
       dtype = values[[1]]$dtype,
-    )
+    )$to(device)
     layer$eval()
 
     y <- layer(
@@ -438,7 +438,7 @@ test_that("exreme_pooling_over_time", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (pooling_type in c("max", "min", "min_max")) {
@@ -447,7 +447,7 @@ test_that("exreme_pooling_over_time", {
       features = as.integer(features),
       pad_value = as.integer(pad_value),
       pooling_type = pooling_type
-    )
+    )$to(device)
     y_1 <- layer(values[[1]], values[[4]])
     if (pooling_type != "min_max") {
       expect_equal(dim(tensor_to_numpy(y_1)), c(length(sequence_length), features))
@@ -460,14 +460,14 @@ test_that("exreme_pooling_over_time", {
 # layer_adaptive_extreme_pooling_1d---------------------------------------------
 test_that("layer_adaptive_extreme_pooling_1d", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  tensor <- torch$rand(30L, 768L)
+  tensor <- torch$rand(30L, 768L)$to(device)
   output_size <- 10
 
   for (pooling_type in c("max", "min", "min_max")) {
     layer <- py$layer_adaptive_extreme_pooling_1d(
       output_size = as.integer(output_size),
       pooling_type = pooling_type
-    )
+    )$to(device)
     result <- layer(tensor)
 
     # Check the corres output shape
@@ -518,7 +518,7 @@ test_that("layer_n_gram_convolution", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   n_filter <- sample(x = seq(from = 2, to = features, by = 1), size = 1)
@@ -532,7 +532,7 @@ test_that("layer_n_gram_convolution", {
     parametrizations = "None",
     dtype = values[[1]]$dtype,
     device = "cpu"
-  )
+  )$to(device)
   layer$eval()
 
   y <- layer(
@@ -587,7 +587,7 @@ test_that("layer_mutiple_n_gram_convolution", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (max_n_gram in 3:times) {
@@ -602,7 +602,7 @@ test_that("layer_mutiple_n_gram_convolution", {
       dtype = values[[1]]$dtype,
       device = "cpu",
       act_fct_name = "elu"
-    )
+    )$to(device)
     layer$eval()
 
     y <- layer(
@@ -674,7 +674,7 @@ test_that("merge_layer", {
       num_heads = 1L,
       dtype = values[[1]]$dtype,
       device = "cpu"
-    )
+    )$to(device)
     layer$eval()
 
     y <- layer(
@@ -700,17 +700,17 @@ test_that("rnn_preparation", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
 
-  layer_do <- py$layer_pack_and_masking()
+  layer_do <- py$layer_pack_and_masking()$to(device)
   layer_do$eval()
 
   layer_undo <- py$layer_unpack_and_masking(
     sequence_length = as.integer(times),
     pad_value = pad_value
-  )
+  )$to(device)
   layer_undo$eval()
 
   y <- layer_do(
@@ -742,7 +742,7 @@ test_that("rnn_preparation", {
 
 test_that("layer_class_mean", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  layer=py$layer_class_mean()
+  layer=py$layer_class_mean()$to(device)
 
 
   test_tensor=matrix(
@@ -770,8 +770,8 @@ test_that("layer_class_mean", {
   ),
   nrow=3,ncol=3,byrow=TRUE)
 
-  cls_means=layer(x=test_tensor,
-                  classes=test_classes,
+  cls_means=layer(x=test_tensor$to(device),
+                  classes=test_classes$to(device),
                   total_classes=3L)
   expect_equal(
     object = cls_means$numpy(),
@@ -793,10 +793,10 @@ example_tensor <- generate_tensors(
   seq_len = sequence_length,
   pad_value = pad_value
 )$to(device)
-masking_layer <- py$masking_layer(pad_value)
+masking_layer <- py$masking_layer(pad_value)$to(device)
 values <- masking_layer(example_tensor)
 
-layer=py$layer_global_average_pooling_1d(mask_type="mask")
+layer=py$layer_global_average_pooling_1d(mask_type="mask")$to(device)
 
 results=layer(x=values[[1]],mask=values[[3]])
 
@@ -813,7 +813,7 @@ for(b in seq(30)){
 true_mean=true_mean/sequence_length
 
 expect_equal(
-  object = results$numpy(),
+  object =tensor_to_numpy(results),
   expected = true_mean,
   tolerance = 1e-7)
 })
