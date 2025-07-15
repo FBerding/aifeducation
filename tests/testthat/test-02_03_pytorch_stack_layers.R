@@ -9,6 +9,7 @@ load_all_py_scripts()
 
 # stack_dense_layer----------------------------------------------------
 test_that("stack_dense_layer", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -18,7 +19,7 @@ test_that("stack_dense_layer", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )
+  )$to(device)
   masking_layer <- py$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
@@ -81,6 +82,7 @@ test_that("stack_dense_layer", {
 
 #Stack Reccurent layers----------------------------------------------------
 test_that("stack_rec_layers", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   rec_types=c("gru","lstm")
   bidirectional_types=c(TRUE,FALSE)
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
@@ -92,7 +94,7 @@ test_that("stack_rec_layers", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )
+  )$to(device)
   masking_layer <- py$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
@@ -161,6 +163,7 @@ test_that("stack_rec_layers", {
 
 #stack_tf_encoder_layer----------------------------------------------------
 test_that("stack_tf_encoder_layer", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   attention_types=c("multihead","fourier")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -171,7 +174,7 @@ test_that("stack_tf_encoder_layer", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )
+  )$to(device)
   masking_layer <- py$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
@@ -239,6 +242,7 @@ test_that("stack_tf_encoder_layer", {
 
 #stack_n_gram_convolution----------------------------------------------------
 test_that("stack_n_gram_convolution", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
@@ -248,7 +252,7 @@ test_that("stack_n_gram_convolution", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )
+  )$to(device)
   masking_layer <- py$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
