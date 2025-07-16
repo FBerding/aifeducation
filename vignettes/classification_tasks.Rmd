@@ -918,7 +918,7 @@ would be `bert_modeling$get_sustainability_data()`.
 If you would like to see the training history of the underlying base model you
 can call a special method.
 
-```{r, include = TRUE, eval = TRUE}
+```{r, include = TRUE, eval = FALSE}
 bert_modeling$plot_training_history()
 ```
 
@@ -1398,7 +1398,7 @@ example classifier, we use our BERT model.
 
 ```{r, include = TRUE, eval = TRUE}
 # If our mode is not loaded
-bert_modeling <- load_from_disk("C:/text_embedding_models/bert_model")
+bert_modeling <- load_from_disk("examples/bert_te_model")
 
 # Create a numerical representation of the text
 review_embeddings <- bert_modeling$embed_large(
@@ -1424,7 +1424,7 @@ certainty for each class/category.
 
 ```{r, include = TRUE, eval = FALSE}
 # If your classifier is not loaded
-classifier <- load_from_disk("C:/classifiers/imdb_movie_reviews")
+classifier <- load_from_disk("examples/cls_imdb_movie_reviews")
 
 # Predict the classes of new texts
 predicted_categories <- classifier$predict(
@@ -1433,7 +1433,7 @@ predicted_categories <- classifier$predict(
 )
 
 # Show predicted categories
-predicted_categories
+head(predicted_categories)
 ```
 
 After the classifier finishes the prediction, the estimated
@@ -1589,7 +1589,7 @@ structure. Let us see how this changes when we train the model.
 classifier_prototype$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 5,
+  data_folds = 10,
   data_val_size = 0.25,
   loss_pt_fct_name = "MultiWayContrastiveLoss",
   use_sc = FALSE,
@@ -1770,7 +1770,9 @@ sample_embeddings <- bert_modeling$embed_large(
   large_datas_set = sample_texts,
   trace = TRUE
 )
+``` 
 
+``` {r, include =TRUE, eval=TRUE }
 query_embeddings <- bert_modeling$embed_large(
   large_datas_set = query_texts,
   trace = TRUE
@@ -1785,8 +1787,8 @@ new_predictions=classifier_prototype$predict_with_samples(
   embeddings_s = sample_embeddings,
   classes_s = sample_classes
 )
-new_predictions
-table(new_predictions)
+head(new_predictions)
+table(new_predictions$expected_category)
 ```
 
 Although we trained our classifier for two classes we can now use it to predict
@@ -1847,8 +1849,8 @@ feature_extractor$configure(
   name = "feature_extractor_bert_movie_reviews",
   label = "Feature extractor for Text Embeddings via BERT",
   text_embeddings = review_embeddings,
-  features = 128,
-  method = "lstm",
+  features = 576,
+  method = "dense",
   noise_factor = 0.2
 )
 ```
@@ -1982,9 +1984,11 @@ classifier_with_fe$configure(
 classifier_with_fe$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 5,
+  data_folds = 10,
   data_val_size = 0.25,
-  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  loss_balance_class_weights = TRUE,
+  loss_balance_sequence_length = TRUE,
+  loss_cls_fct_name="FocalLoss",
   use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -1999,27 +2003,25 @@ classifier_with_fe$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 150,
-  batch_size = 35,
-  Ns = 5,
-  Nq = 3,
-  loss_alpha = 0.5,
-  loss_margin = 0.05,
-  sampling_separate = FALSE,
-  sampling_shuffle = TRUE,
+  batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-3,
-  lr_warm_up_ratio = 0.02,
-  optimizer = "adamw"
+  lr_rate=1e-3,
+  lr_warm_up_ratio=0.02,
+  optimizer="adamw"
 )
 ```
 
 That is all. Now you can use and train the classifier in the same way as
 you did without a feature extractor. Even saving and loading is done
-automatically.
+automatically. For example, let us explore the performance of the classifier.
+
+```{r, include = TRUE, eval=TRUE}
+classifier_with_fe$reliability$test_metric_mean
+```
 
 If you would like to save and load a `TEFeatureExtractor` independently from a classifier
 you can use the function pair `save_to_disk` and `load_from_disk` as with the other objects

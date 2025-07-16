@@ -182,9 +182,9 @@ class dense_layer_with_mask(torch.nn.Module):
   
   def calc_new_mask(self,mask_features):
     if self.input_size>self.output_size:
-      mask_features_new=torch.index_select(mask_features,2,torch.arange(start=0, end=self.output_size))
+      mask_features_new=torch.index_select(mask_features,2,torch.arange(start=0, end=self.output_size).to(device=mask_features.device))
     elif self.input_size<self.output_size:
-      tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1))
+      tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1).to(device=mask_features.device))
       mask_features_new=tmp_mask.repeat(1,1,self.output_size)
     else:
       mask_features_new=mask_features
@@ -256,7 +256,7 @@ class layer_adaptive_extreme_pooling_1d(torch.nn.Module):
     
   def get_max_n_values(self,x,n):
     y=x.sort(dim=1,descending=True)[0]
-    y=torch.index_select(input=y,dim=1,index=torch.arange(start=0,end=n,step=1))
+    y=torch.index_select(input=y,dim=1,index=torch.arange(start=0,end=n,step=1).to(device=y.device))
     return y
   def forward(self,x):
     y=x
@@ -350,9 +350,9 @@ class layer_n_gram_convolution(torch.nn.Module):
   
   def calc_new_mask(self,mask_features):
     if self.features>self.n_filters:
-      mask_features_new=torch.index_select(mask_features,2,torch.arange(start=0, end=self.n_filters))
+      mask_features_new=torch.index_select(mask_features,2,torch.arange(start=0, end=self.n_filters).to(device=mask_features.device))
     elif self.features<self.n_filters:
-      tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1))
+      tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1).to(device=mask_features.device))
       mask_features_new=tmp_mask.repeat(1,1,self.n_filters)
     else:
       mask_features_new=mask_features
@@ -751,7 +751,7 @@ class layer_class_mean(torch.nn.Module):
 class layer_protonet_metric(torch.nn.Module):
   def __init__(self,metric_type="euclidean"):
     super().__init__()
-    self.alpha=torch.nn.Parameter(torch.ones(1))-1e-8
+    self.alpha=torch.nn.Parameter((torch.ones(1)-1e-8))
     self.metric_type=metric_type
   
   def forward(self,x,prototypes):

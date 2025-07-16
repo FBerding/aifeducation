@@ -542,8 +542,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     
     #running_class_mean=None
     #running_class_freq=None
-    running_class_values=torch.zeros((n_classes,model.get_embedding_dim()))
-    running_class_freq=torch.zeros(n_classes)
+    running_class_values=torch.zeros((n_classes,model.get_embedding_dim())).to(device)
+    running_class_freq=torch.zeros(n_classes).to(device)
     
     for batch in trainloader:
       #assign colums of the batch
@@ -558,7 +558,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       labels_one_hot=torch.nn.functional.one_hot(labels.to(dtype=torch.long),num_classes=n_classes)
       #print(running_class_values.size())
       #print(labels_one_hot.size())
-      embeddings=model.embed(inputs)
+      embeddings=model.embed(inputs).to(device)
       #print(embeddings.size())
       running_class_values=running_class_values+torch.matmul(
         torch.transpose(labels_one_hot.to(dtype=embeddings.dtype),dim0=1,dim1=0),

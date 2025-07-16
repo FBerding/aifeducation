@@ -249,7 +249,7 @@ test_that("LayerNorm with Mask", {
     bias = TRUE,
     device = NULL,
     dtype = example_tensor$dtype
-  )
+  )$to(device)
   res_expected <- tensor_to_numpy(comparison_layer(example_tensor))
   values <- masking_layer(example_tensor)
 
@@ -760,7 +760,7 @@ test_that("layer_class_mean", {
   test_tensor=torch$from_numpy(
     test_tensor
   )
-  test_classes=torch$from_numpy(reticulate::np_array(c(0,0,0,1,1,1,2,2,2)))
+  test_classes=torch$from_numpy(reticulate::np_array(c(0,0,0,1,1,1,2,2,2))$copy())
   num_classes=3
 
   result_matrix=matrix(data=c(

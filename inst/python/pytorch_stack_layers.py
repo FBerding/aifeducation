@@ -163,7 +163,7 @@ class stack_recurrent_layers(torch.nn.Module):
       return y[1][-1,:,:]
     
   def calc_new_mask(self,mask_features):
-    tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1))
+    tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1).to(device=mask_features.device))
     mask_features_new=tmp_mask.repeat(1,1,2*self.hidden_size)
     return mask_features_new
   
