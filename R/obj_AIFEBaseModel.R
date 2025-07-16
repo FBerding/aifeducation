@@ -415,36 +415,6 @@ AIFEBaseModel <- R6::R6Class(
       private$model_info$model_label <- label
       private$model_info$model_date <- model_date
     },
-    #--------------------------------------------------------------------------
-    # Method for summarizing sustainability data for this classifier
-    # List for results must correspond to the private fields of the classifier
-    summarize_tracked_sustainability = function(sustainability_tracker) {
-      results <- list(
-        sustainability_tracked = TRUE,
-        sustainability_data = list(
-          co2eq_kg = sustainability_tracker$final_emissions_data$emissions,
-          cpu_energy_kwh = sustainability_tracker$final_emissions_data$cpu_energy,
-          gpu_energy_kwh = sustainability_tracker$final_emissions_data$gpu_energy,
-          ram_energy_kwh = sustainability_tracker$final_emissions_data$ram_energy,
-          total_energy_kwh = sustainability_tracker$final_emissions_data$energy_consumed
-        ),
-        technical = list(
-          tracker = "codecarbon",
-          py_package_version = codecarbon$"__version__",
-          cpu_count = sustainability_tracker$final_emissions_data$cpu_count,
-          cpu_model = sustainability_tracker$final_emissions_data$cpu_model,
-          gpu_count = sustainability_tracker$final_emissions_data$gpu_count,
-          gpu_model = sustainability_tracker$final_emissions_data$gpu_model,
-          ram_total_size = sustainability_tracker$final_emissions_data$ram_total_size
-        ),
-        region = list(
-          country_name = sustainability_tracker$final_emissions_data$country_name,
-          country_iso_code = sustainability_tracker$final_emissions_data$country_iso_code,
-          region = sustainability_tracker$final_emissions_data$region
-        )
-      )
-      return(results)
-    },
     #-----------------------------------------------------------------------
     load_reload_python_scripts = function() {
       return(NULL)

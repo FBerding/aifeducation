@@ -28,7 +28,7 @@ skip_documentation <- FALSE
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TEClassifiers_core")
@@ -137,6 +137,10 @@ for (object_class_name in object_class_names) {
           what = classifier$configure,
           args = test_combination
         )
+
+        test_that(paste("count parameter", object_class_name, get_current_args_for_print(test_combination)), {
+          expect_gte(object=classifier$count_parameter(),expected = 0)
+        })
 
 
         test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combination)), {
@@ -599,7 +603,7 @@ for (object_class_name in object_class_names) {
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
             act_fct = "elu",
-            feat_size=64,
+            feat_size=32,
             intermediate_features=10,
             tf_dense_dim=26,
             tf_parametrizations="None",
@@ -651,17 +655,17 @@ for (object_class_name in object_class_names) {
             dense_dropout = 0.1,
             encoder_dropout = 0.1,
             trace = FALSE,
-            epochs = 20,
+            epochs = 5,
             batch_size = 20,
             ml_trace = 0,
             n_cores = 2,
             data_folds = 2,
-            use_pl=FALSE,
+            #use_pl=FALSE,
             pl_max_steps = 2,
             pl_max = 1,
             pl_anchor = 1,
             pl_min = 0,
-            use_sc=FALSE,
+            #use_sc=FALSE,
             sc_min_k = 1,
             sc_max_k = 2,
             sustain_track = TRUE,
@@ -719,6 +723,23 @@ for (object_class_name in object_class_names) {
             expect_gte(nrow(log_loss), 2)
             unlink(paste0(log_dir, "/aifeducation_loss.log"))
           }
+        })
+
+        #Plot training history
+        test_that(paste(
+          "plot_training_history", object_class_name,
+          get_current_args_for_print(test_combination),
+          get_current_args_for_print(train_args_combinations)
+        ), {
+          expect_s4_class(object = classifier$plot_training_history(),class="ggplot")
+        })
+
+        test_that(paste(
+          "plot_coding_stream", object_class_name,
+          get_current_args_for_print(test_combination),
+          get_current_args_for_print(train_args_combinations)
+        ), {
+          expect_s4_class(object = classifier$plot_coding_stream(),class="ggplot")
         })
         gc()
       }
