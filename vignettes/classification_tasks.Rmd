@@ -1255,7 +1255,7 @@ left empty.
 In order to visualize the progress of training you can request a plot 
 which shows how important performance measures develop over epochs.
 
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier"),fig.align="center"}}
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier"),fig.align="center"}
 classifier$plot_training_history(
   final_training=FALSE,
   pl_step=NULL,
@@ -1849,8 +1849,7 @@ feature_extractor$configure(
   text_embeddings = review_embeddings,
   features = 128,
   method = "lstm",
-  noise_factor = 0.2,
-  optimizer = "adamw"
+  noise_factor = 0.2
 )
 ```
 
@@ -1899,6 +1898,7 @@ feature_extractor$train(
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
+  optimizer = "adamw"
 )
 ```
 

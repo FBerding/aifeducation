@@ -49,7 +49,7 @@ get_layer_dict <- function(layer) {
     increase or decrease the number of features of the input data before passing the
     data into your model. The aim of this layer is to increase or reduce the complexity of the data for your model.
     The output size of this layer determines the number of features for all following layers.",
-    img = "layers_feature.png",
+    img = "layers_features.png",
     references = NULL,
     param_prefix = "feat_"
   )

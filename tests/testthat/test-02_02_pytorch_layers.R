@@ -90,7 +90,7 @@ test_that("Masking Layer", {
   y <- layer(example_tensor)
 
   # Check if input is the same as the output
-  expect_equal(tensor_to_numpy(y[[1]]), example_tensor$numpy())
+  expect_equal(tensor_to_numpy(y[[1]]), tensor_to_numpy(example_tensor))
 
   # Check sequence length
   expect_equal(as.numeric(tensor_to_numpy(y[[2]])), sequence_length)
@@ -476,7 +476,7 @@ test_that("layer_adaptive_extreme_pooling_1d", {
 
     # Check if the correct values are selected
     result_matrix <- tensor_to_numpy(result)
-    tensor_matrix <- tensor$numpy()
+    tensor_matrix <- tensor_to_numpy(tensor)
     for (i in 1:nrow(result_matrix)) {
       if (pooling_type == "max") {
         ordered_values <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = TRUE)]
@@ -531,7 +531,7 @@ test_that("layer_n_gram_convolution", {
     bias = TRUE,
     parametrizations = "None",
     dtype = values[[1]]$dtype,
-    device = "cpu"
+    device = device
   )$to(device)
   layer$eval()
 
@@ -600,7 +600,7 @@ test_that("layer_mutiple_n_gram_convolution", {
       bias = TRUE,
       parametrizations = "None",
       dtype = values[[1]]$dtype,
-      device = "cpu",
+      device = device,
       act_fct_name = "elu"
     )$to(device)
     layer$eval()
@@ -660,7 +660,7 @@ test_that("merge_layer", {
   )$to(device)
   n_input_streams <- sample(seq(from = 2, to = 10, by = 1), size = 1)
   n_extracted_features <- sample(seq(from = 2, to = features, by = 1), size = 1)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
   for (pooling_type in c("max", "min", "min_max")) {
     layer <- py$merge_layer(
@@ -673,7 +673,7 @@ test_that("merge_layer", {
       attention_type = "multihead",
       num_heads = 1L,
       dtype = values[[1]]$dtype,
-      device = "cpu"
+      device = device
     )$to(device)
     layer$eval()
 
@@ -774,7 +774,7 @@ test_that("layer_class_mean", {
                   classes=test_classes$to(device),
                   total_classes=3L)
   expect_equal(
-    object = cls_means$numpy(),
+    object = tensor_to_numpy(cls_means),
     expected = result_matrix,
     tolerance = 1e-5
     )
