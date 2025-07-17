@@ -1473,6 +1473,13 @@ TextEmbeddingModel <- R6::R6Class(
       )
     },
     #---------------------------------------------------------------------------
+    #' @description Method for requesting the number of features.
+    #' @return Returns a `double` which represents the number of features. This number represents the
+    #' hidden size of the embeddings for every chunk or time.
+    get_n_features=function(){
+      return(private$transformer_components$features)
+    },
+    #---------------------------------------------------------------------------
     #' @description Method for requesting the part of interface's configuration that is
     #' necessary for transformer models.
     #' @return Returns a `list`.

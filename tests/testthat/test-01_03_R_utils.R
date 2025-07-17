@@ -20,3 +20,42 @@ test_that("get_n_chunks", {
 
   expect_equal(seq_len,calculated_times)
 })
+
+test_that("get_file_extension", {
+path_test_data=testthat::test_path("test_data/LargeDataSetForTexts/single_text")
+
+#Txt files
+files=list.files(path_test_data,full.names = TRUE,
+                 pattern=".txt")
+for(file in files){
+  expect_equal(get_file_extension(file),"txt")
+}
+
+#Pdf files
+files=list.files(path_test_data,full.names = TRUE,
+                 pattern=".pdf")
+for(file in files){
+  expect_equal(get_file_extension(file),"pdf")
+}
+
+#Xlsx files
+files=list.files(path_test_data,full.names = TRUE,
+                 pattern=".xlsx")
+for(file in files){
+  expect_equal(get_file_extension(file),"xlsx")
+}
+
+})
+
+test_that("tmp_dir", {
+  expect_no_error(create_and_get_tmp_dir())
+  expect_no_error(clean_tmp_dir())
+})
+
+test_that("get_alpha_3_codes", {
+expect_vector(get_alpha_3_codes())
+})
+
+
+
+

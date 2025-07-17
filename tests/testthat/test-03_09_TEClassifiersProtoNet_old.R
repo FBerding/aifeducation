@@ -15,7 +15,7 @@ class_range <- c(2, 3)
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
-root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
 create_dir(root_path_results, FALSE)

@@ -799,7 +799,7 @@ calculated. As a result, you receive a sequence of embeddings. The first
 embedding characterizes the first part of the text and the second
 embedding characterizes the second part of the text (and so on). Thus,
 our sample text embedding model is able to process texts with about
-4*512=2048 tokens. This approach is inspired by the work by Pappagari
+$4*512=2048$ tokens. This approach is inspired by the work by Pappagari
 et al. (2019).
 
 Since transformers are able to account for the context, it may be useful
@@ -809,7 +809,7 @@ prior chunk should be added to the next. In our example the last 30
 tokens of the prior chunks are added at the beginning of the following
 chunk. This can help to add the correct context of the text sections
 into the analysis. Altogether, this model can analyse a maximum
-of $$512+(4-1)*(512-30)=1958$$ tokens of a text.
+of $512+(4-1)*(512-30)=1958$ tokens of a text.
 
 Finally, you have to decide from which hidden layer(s) the embeddings
 should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide
@@ -834,6 +834,17 @@ You can see the number of learnable parameters of the underlying base model with
 ```{r, include = TRUE, eval = TRUE}
 bert_modeling$count_parameter()
 ```
+Another important value is the number of features which you can request by calling `get_n_features`.
+```{r, include = TRUE, eval = TRUE}
+bert_modeling$get_n_features()
+```
+
+This number describes the number of dimensions for a text embedding. That is, the number
+of dimensions which is used to characterize the content
+of every chunk of text. This value is important as it determines the complexity 
+a classifier of feature extractor has to deal with. Some of classifier's and
+feature extractor's parameters depend on this value. We elaborate this at the relevant point
+for the different models. 
 
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
@@ -1065,6 +1076,24 @@ embeddings to the classifier. You can read more on this in Section 6.2.
 
 With the help of the other parameters you can define the complexity and abilities of your model.
 A description of the different models can be found in [A01 Layers and Stack of Layers](https://fberding.github.io/aifeducation/articles/a01_layers_and_stack_layers.html). 
+
+Please note that you have to choose the parameter `feat_size` depending on the 
+number of features of the underlying text embedding model. You can request this number by 
+calling the method `get_n_features` of the used text embedding model. In our example
+this would be:
+
+```{r, include = TRUE, eval = TRUE}
+bert_modeling$get_n_features()
+```
+
+The number for `feat_size` should be equal or lesser as this value since this layer
+tries to compress the text embedding to a lower number of dimensions. While this reduces the number
+of parameters for all following layers and decreases the time to train and use the model it can cost information.
+You can experiment with this value to find a good balance between speed and performance.
+
+In addition, the parameter `cls_pooling_features` should be equal or less the number you used
+for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features sould be used
+for classification. Thus, this value acts as a filter.
 
 > The vignette [04 Model configuration](model_configuration.html)
 > provides details on how to configure a classifier.
@@ -1683,10 +1712,11 @@ plot_trained_1
 running_num_figures=running_num_figures+1
 ```
 
-
 As shown in the figure, all cases are now sorted. Cases of the class
 "neg" are located close to the prototype for "neg", while cases of the
-class "pos" are located near the prototype for "pos". Since we use the
+class "pos" are located near the prototype for "pos". The black cycle around the
+prototpyes represent the margin used during training (`loss_margin`). 
+Since we use the
 same data as during training, this result has to be expected. Only a
 small number of cases is located near the wrong prototype. This can be
 seen if a red dot is close to the prototype for "pos" and a green dot is
@@ -1867,6 +1897,15 @@ representation. The lower the number, the higher the requested
 compression. This value corresponds to the features of the latent space
 in the figure above.
 
+You should use this value depending on the number of features of the underlying text
+embedding model. You can request this value by calling the method `get_n_features` like this:
+
+```{r, include = TRUE, eval = TRUE}
+bert_modeling$get_n_features()
+```
+
+In our example we reduce the number of dimensions by 75 %. 
+
 With `method` you determine the type of layer the feature extractor
 should use. If set `method="lstm"`, all layers of the model are long
 short-term memory layers. If set `method="dense"` all layers are
@@ -1921,8 +1960,13 @@ running_num_figures=running_num_figures+1
 
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor to `feature_extractor`
-during configuration of the classifier. For the classifier described in
-section 5 this would look like:
+during configuration of the classifier. Please note that you now have to set the 
+values for `feat_size` and `cls_pooling_features` depending on the number of features
+of the feature extractor and *not* depending on the number of features of the text embedding
+model since the aim of the feature extractor is reduced this number. `feat_size`
+should be equal or less the number for features of the feature extractor and
+`cls_pooling_features` should be equal or less the value for `feat_size`. 
+For the classifier described in section 5 this would look like:
 
 ```{r, include = TRUE, eval=TRUE}
 classifier_with_fe <- TEClassifierSequential$new()

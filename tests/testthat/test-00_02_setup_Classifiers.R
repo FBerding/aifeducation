@@ -9,7 +9,7 @@ testthat::skip_if_not(
 
 test_that("Setup Classifier Data", {
   # Config-------------------------------------------------------------------------
-  root_path_data <- testthat::test_path("test_data_tmp/Embeddings")
+  root_path_data <- testthat::test_path("test_data/Embeddings")
   create_dir(root_path_data, FALSE)
 
   root_path_results <- testthat::test_path("test_data_tmp")

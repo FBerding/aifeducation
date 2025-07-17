@@ -5,7 +5,7 @@ testthat::skip_if_not(
 )
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-object_class_names=c("TEClassifierSequential")
+#object_class_names=c("TEClassifierSequential")
 #object_class_names="TEClassifierParallelPrototype"
 #object_class_names="TEClassifierSequentialPrototype"
 #object_class_names="TEClassifierRegular"
@@ -731,7 +731,15 @@ for (object_class_name in object_class_names) {
           get_current_args_for_print(test_combination),
           get_current_args_for_print(train_args_combinations)
         ), {
-          expect_s4_class(object = classifier$plot_training_history(),class="ggplot")
+          if(train_args_combinations$use_pl==TRUE){
+            pl_step=1
+          } else {
+            pl_step=NULL
+          }
+          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="loss"),class="ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="avg_iota"),class="ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="accuracy"),class="ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="balanced_accuracy"),class="ggplot")
         })
 
         test_that(paste(
@@ -739,7 +747,7 @@ for (object_class_name in object_class_names) {
           get_current_args_for_print(test_combination),
           get_current_args_for_print(train_args_combinations)
         ), {
-          expect_s4_class(object = classifier$plot_coding_stream(),class="ggplot")
+          expect_s3_class(object = classifier$plot_coding_stream(),class="ggplot")
         })
         gc()
       }

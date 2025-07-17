@@ -58,6 +58,7 @@ https://doi.org/10.1016/j.iswa.2024.200335}
 \item \href{#method-TextEmbeddingModel-get_model_info}{\code{TextEmbeddingModel$get_model_info()}}
 \item \href{#method-TextEmbeddingModel-get_package_versions}{\code{TextEmbeddingModel$get_package_versions()}}
 \item \href{#method-TextEmbeddingModel-get_basic_components}{\code{TextEmbeddingModel$get_basic_components()}}
+\item \href{#method-TextEmbeddingModel-get_n_features}{\code{TextEmbeddingModel$get_n_features()}}
 \item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
 \item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
 \item \href{#method-TextEmbeddingModel-get_ml_framework}{\code{TextEmbeddingModel$get_ml_framework()}}
@@ -604,6 +605,20 @@ necessary for all models.
 
 \subsection{Returns}{
 Returns a \code{list}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_n_features"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_n_features}{}}}
+\subsection{Method \code{get_n_features()}}{
+Method for requesting the number of features.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_n_features()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{double} which represents the number of features. This number represents the
+hidden size of the embeddings for every chunk or time.
 }
 }
 \if{html}{\out{<hr>}}
