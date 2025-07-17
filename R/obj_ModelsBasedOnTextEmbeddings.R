@@ -558,11 +558,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             if (use_pl == FALSE) {
               measure_array[i, , ] <- plot_data[[i]][[measure]]
             } else {
-              print(plot_data)
-              print(i)
-              print(pl_step)
-              print(measure)
-              print(dim(measure_array))
               measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
             }
           }
