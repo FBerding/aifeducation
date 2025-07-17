@@ -645,7 +645,7 @@ class layer_tf_encoder(torch.nn.Module):
 
 #Merge Leyer
 class merge_layer(torch.nn.Module):
-  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="max",attention_type="multihead",num_heads=1,device=None,dtype=None):
+  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="max",normalization_type="None",attention_type="multihead",num_heads=1,device=None,dtype=None):
     super().__init__()
     
     self.times=times
@@ -660,6 +660,13 @@ class merge_layer(torch.nn.Module):
     self.pooling_type=pooling_type
     self.attention_type=attention_type
     self.num_heads=num_heads
+    
+    self.normalization_type=normalization_type
+    self.norm_layer_list=torch.nn.ModuleList()
+    for r in range(self.n_input_streams):
+      self.norm_layer_list.append(
+        get_layer_normalization(name= self.normalization_type,times=self.times, features=self.features,pad_value=self.pad_value,eps=1e-5)
+        )
     
     if pooling_type=="min_max":
       self.n_pooling_features=2*self.features
@@ -698,26 +705,31 @@ class merge_layer(torch.nn.Module):
     self.pooling_over_features=layer_adaptive_extreme_pooling_1d(
       output_size=self.n_extracted_features,
       pooling_type=self.pooling_type)
+      
+      
 
-  def forward(self,tensor_list,mask_features):
+  def forward(self,tensor_list,seq_len,mask_times,mask_features):
     #Extract features by pooling and conotate to a new sequence
 
     for r in range(self.n_input_streams):
       tmp_tensor=tensor_list[r]
+      tmp_norm_layer=self.norm_layer_list[r]
+      extracted=tmp_norm_layer(x=tmp_tensor,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+      extracted=self.pooling_layer(extracted[0],extracted[3])
+      extracted=torch.unsqueeze(extracted,dim=1)
       if r==0:
-        extracted=self.pooling_layer(tmp_tensor,mask_features)
-        extracted=torch.unsqueeze(extracted,dim=1)
+        extracted_seq=extracted
       else:
-        extracted=torch.cat((extracted,torch.unsqueeze(self.pooling_layer(tmp_tensor,mask_features),dim=1)),dim=1)
+        extracted_seq=torch.cat((extracted_seq,extracted),dim=1)
       
     # calculate weights for merging
-    attn=self.attention_layer(extracted,extracted,extracted)[0]
+    attn=self.attention_layer(extracted_seq,extracted_seq,extracted_seq)[0]
     attn=torch.flatten(input=attn, start_dim=1, end_dim=-1)
     weights=self.act_fct(self.dense_weights(attn))
     weights=torch.unsqueeze(weights,dim=1)
 
     #Calculate finale representation
-    final=torch.matmul(input=weights, other=extracted)
+    final=torch.matmul(input=weights, other=extracted_seq)
     final=torch.squeeze(final,dim=1)
     final=self.pooling_over_features(final)
     return final

@@ -679,6 +679,8 @@ test_that("merge_layer", {
 
     y <- layer(
       tensor_list = rep(values[1], times = n_input_streams),
+      seq_len=values[[2]],
+      mask_times=values[[3]],
       mask_features = values[[4]]
     )
 

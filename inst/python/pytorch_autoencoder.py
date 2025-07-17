@@ -78,6 +78,7 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       #Swtich padding value if necessary
       if not self.switch_pad_value_start==None:
         x=self.switch_pad_value_start(x)
+        
       if encoder_mode==False:
         if self.training==True:
           mask=self.get_mask(x)

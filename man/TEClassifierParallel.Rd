@@ -68,20 +68,6 @@ allows the model to perform n-gram detection of n-grams (meta perspective). All 
 A regular recurrent layer either as Gated Recurrent Unit (GRU) or Long Short-Term Memory (LSTM) layer. Uses
 PyTorchs implementation. All parameters with the prefix \emph{rec_} can be used to configure this layer.
 
-\strong{Classifiction Pooling Layer}
-
-\emph{Description}
-
-Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It
-performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
-and/or minimal features. Second, it performs pooling over the remaining features selecting a speficifc number of
-the heighest and/or lowest features.
-
-In the case of selecting the minmal \emph{and} maximal features at the same time in the first step the minmal
-features are concatenated to the tensor resulting the in the shape (Batch, Times, 2*Features). In the second step the
-number of requested features is halved. The first half is used for the maximal features and the second for the minimal
-features. All parameters with the prefix \emph{cls_pooling_} can be used to configure this layer.
-
 \strong{Merge Layer}
 
 \emph{Description}
@@ -175,8 +161,7 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
-  cls_pooling_features = 50,
-  cls_pooling_type = "min_max",
+  shared_feat_layer = TRUE,
   feat_act_fct = "elu",
   feat_size = 50,
   feat_bias = TRUE,
@@ -222,7 +207,9 @@ Creating a new instance of this class.
   tf_residual_type = "residual_gate",
   merge_attention_type = "multi_head",
   merge_num_heads = 1,
-  merge_normalization_type = "layer_norm"
+  merge_normalization_type = "layer_norm",
+  merge_pooling_features = 50,
+  merge_pooling_type = "min_max"
 )}\if{html}{\out{</div>}}
 }
 
@@ -244,9 +231,7 @@ the number of dimensions of the text embeddings. If no feature extractor should 
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
 
-\item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \code{1 <= x }}
-
-\item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'max', 'min', 'min_max'}
+\item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
 
@@ -341,6 +326,10 @@ values for a case for different input orders if you choose \code{fourier} on lin
 \item{\code{merge_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
 
 \item{\code{merge_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
+
+\item{\code{merge_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \code{1 <= x }}
+
+\item{\code{merge_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'max', 'min', 'min_max'}
 }
 \if{html}{\out{</div>}}
 }

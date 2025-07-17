@@ -32,8 +32,7 @@ TEClassifierParallel <- R6::R6Class(
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
-    #' @param cls_pooling_features `r get_param_doc_desc("cls_pooling_features")`
-    #' @param cls_pooling_type `r get_param_doc_desc("cls_pooling_type")`
+    #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`
@@ -80,14 +79,15 @@ TEClassifierParallel <- R6::R6Class(
     #' @param merge_attention_type `r get_param_doc_desc("merge_attention_type")`
     #' @param merge_num_heads `r get_param_doc_desc("merge_num_heads")`
     #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
+    #' @param merge_pooling_features `r get_param_doc_desc("merge_pooling_features")`
+    #' @param merge_pooling_type `r get_param_doc_desc("merge_pooling_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         cls_pooling_features=50,
-                         cls_pooling_type="min_max",
+                         shared_feat_layer=TRUE,
                          feat_act_fct="elu",
                          feat_size=50,
                          feat_bias=TRUE,
@@ -133,7 +133,9 @@ TEClassifierParallel <- R6::R6Class(
                          tf_residual_type="residual_gate",
                          merge_attention_type = "multi_head",
                          merge_num_heads = 1,
-                         merge_normalization_type="layer_norm") {
+                         merge_normalization_type="layer_norm",
+                         merge_pooling_features=50,
+                         merge_pooling_type="min_max") {
        private$do_configuration(args=get_called_args(n=1))
     }
   ),
@@ -151,8 +153,7 @@ TEClassifierParallel <- R6::R6Class(
         times = as.integer(self$model_config$times),
         n_target_levels = as.integer(length(self$model_config$target_levels)),
         pad_value=as.integer(private$text_embedding_model$pad_value),
-        cls_pooling_features=as.integer(self$model_config$cls_pooling_features),
-        cls_pooling_type=self$model_config$cls_pooling_type,
+        shared_feat_layer=self$model_config$shared_feat_layer,
         feat_act_fct=self$model_config$feat_act_fct,
         feat_size=as.integer(self$model_config$feat_size),
         feat_bias=self$model_config$feat_bias,
@@ -198,7 +199,9 @@ TEClassifierParallel <- R6::R6Class(
         tf_residual_type=self$model_config$tf_residual_type,
         merge_attention_type=self$model_config$merge_attention_type,
         merge_normalization_type=self$model_config$merge_normalization_type,
-        merge_num_heads=as.integer(self$model_config$merge_num_heads)
+        merge_num_heads=as.integer(self$model_config$merge_num_heads),
+        merge_pooling_features=as.integer(self$model_config$merge_pooling_features),
+        merge_pooling_type=self$model_config$merge_pooling_type
       )
     },
     #--------------------------------------------------------------------------

@@ -116,6 +116,16 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
 
     data_raw_texts <- shiny::reactive({
       if (!is.null(path_to_raw_texts())) {
+        shinyWidgets::show_alert(
+          title = "Loading",
+          text = "Please wait",
+          type = "info",
+          closeOnClickOutside = FALSE,
+          showCloseButton = FALSE,
+          btn_labels=NA
+        )
+        shinyWidgets::closeSweetAlert()
+        shinyWidgets::closeSweetAlert()
         return(load_and_check_dataset_raw_texts(path_to_raw_texts()))
       } else {
         return(NULL)
@@ -148,7 +158,17 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
 
     base_model=shiny::reactive({
       if(!is.null(path_to_base_model())){
+        shinyWidgets::show_alert(
+          title = "Loading",
+          text = "Please wait",
+          type = "info",
+          closeOnClickOutside = FALSE,
+          showCloseButton = FALSE,
+          btn_labels=NA
+        )
         model=load_and_check_base_model(path_to_base_model())
+        shinyWidgets::closeSweetAlert()
+        shinyWidgets::closeSweetAlert()
         return(model)
       } else {
         return(NULL)

@@ -41,8 +41,9 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
-    #' @param cls_pooling_features `r get_param_doc_desc("cls_pooling_features")`
-    #' @param cls_pooling_type `r get_param_doc_desc("cls_pooling_type")`
+    #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
+    #' @param merge_pooling_features `r get_param_doc_desc("merge_pooling_features")`
+    #' @param merge_pooling_type `r get_param_doc_desc("merge_pooling_type")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`
@@ -97,9 +98,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         cls_pooling_features = 50,
-                         cls_pooling_type = "min_max",
                          metric_type = "euclidean",
+                         shared_feat_layer=TRUE,
                          feat_act_fct="elu",
                          feat_size=50,
                          feat_bias=TRUE,
@@ -146,6 +146,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          merge_attention_type = "multi_head",
                          merge_num_heads = 1,
                          merge_normalization_type="layer_norm",
+                         merge_pooling_features = 50,
+                         merge_pooling_type = "min_max",
                          embedding_dim = 2) {
       arguments <- get_called_args(n = 1)
       arguments$core_net_type <- "parallel"
@@ -165,9 +167,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
         target_levels = reticulate::np_array(seq(from = 0, to = (length(self$model_config$target_levels) - 1))),
         pad_value = as.integer(private$text_embedding_model$pad_value),
         skip_connection_type="None",
-        cls_pooling_features = as.integer(self$model_config$cls_pooling_features),
-        cls_pooling_type = self$model_config$cls_pooling_type,
         metric_type = self$model_config$metric_type,
+        shared_feat_layer=self$model_config$shared_feat_layer,
         feat_act_fct=self$model_config$feat_act_fct,
         feat_size=as.integer(self$model_config$feat_size),
         feat_bias=self$model_config$feat_bias,
@@ -213,6 +214,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
         tf_residual_type=self$model_config$tf_residual_type,
         merge_attention_type=self$model_config$merge_attention_type,
         merge_normalization_type=self$model_config$merge_normalization_type,
+        merge_pooling_features = as.integer(self$model_config$merge_pooling_features),
+        merge_pooling_type = self$model_config$merge_pooling_type,
         embedding_dim = as.integer(self$model_config$embedding_dim),
         core_net_type = self$model_config$core_net_type
       )

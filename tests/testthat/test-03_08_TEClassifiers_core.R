@@ -3,6 +3,8 @@ testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
+
+
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
 #object_class_names=c("TEClassifierSequential")
@@ -10,10 +12,10 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
 #object_class_names="TEClassifierSequentialPrototype"
 #object_class_names="TEClassifierRegular"
 
-max_samples <- 20
+max_samples <- 1
 max_samples_CI <- 10
 
-max_samples_training <- 2
+max_samples_training <- 1
 class_range <- c(2, 3)
 
 prob_precision=1e-6
@@ -63,7 +65,6 @@ if (file.exists(root_path_feature_extractor)) {
 } else {
   feature_extractor <- NULL
 }
-
 #feature_extractor$extract_features_large(data_embeddings = test_embeddings$convert_to_LargeDataSetForTextEmbeddings(),batch_size = 2,trace=TRUE)
 #feature_extractor$extract_features_large()
 

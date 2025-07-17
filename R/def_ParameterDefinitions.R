@@ -292,7 +292,7 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
   embedding.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Size",
     default_value = 768
   )
@@ -304,7 +304,7 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = c("gelu", "relu", "silu", "gelu_new"),
     desc = "Name of the activation function.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Activation Function",
     default_value = "gelu"
   )
@@ -316,7 +316,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "Number of hidden layers.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Hidden Layers",
     default_value = 7
   )
@@ -341,7 +341,7 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Number of neurons in the final layer. This parameter determines the dimensionality of the resulting text
   embedding.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Target Hidden Size",
     default_value = 768
   )
@@ -353,7 +353,7 @@ get_param_dict <- function() {
     max = 0.6,
     allowed_values = NULL,
     desc = "Ratio of dropout.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Dropout",
     default_value = 0.5
   )
@@ -365,7 +365,7 @@ get_param_dict <- function() {
     max = 0.6,
     allowed_values = NULL,
     desc = "Dropout probability between the layers of the feed-forward blocks.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Dropout between the layers of the feed-forward blocks",
     default_value = 0.5
   )
@@ -377,7 +377,7 @@ get_param_dict <- function() {
     max = 0.6,
     allowed_values = NULL,
     desc = "Ratio of dropout for attention probabilities.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Dropout for Attention Probabilities",
     default_value = 0.1
   )
@@ -413,7 +413,7 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "`vector` of `int` determining the number and sizes of each block.",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Block Size",
     default_value = 0.1
   )
@@ -427,7 +427,7 @@ get_param_dict <- function() {
     desc = "Type of pooling.
   * `\"mean\"` for pooling with mean.
   * `\"max\"` for pooling with maximum values. ",
-    gui_box = "Encoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Pooling Type",
     default_value = "max"
   )
@@ -1056,6 +1056,8 @@ get_param_dict <- function() {
     gui_label = "Size",
     default_value = 32
   )
+  param$merge_pooling_features= param$cls_pooling_features
+  param$merge_pooling_features$gui_box="Merge Layer"
 
   param$cls_pooling_type <- list(
     type = "string",
@@ -1069,6 +1071,8 @@ get_param_dict <- function() {
     default_value = "min_max",
     default_historic = NULL
   )
+  param$merge_pooling_type=param$cls_pooling_type
+  param$merge_pooling_type$gui_box="Merge Layer"
 
 
   # Parametrizations------------------------------------------------------------
@@ -1253,6 +1257,18 @@ get_param_dict <- function() {
   param$dense_n_layers <- param$dense_layers
 
   # Feature Layer----------------------------------------------------------------
+  param$shared_feat_layer <- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "If `TRUE` all streams use the same feature layer. If `FALSE` all streams use their own feature layer.",
+    gui_box = "General Settings",
+    gui_label = "Shared Feature Layer",
+    default_value = TRUE
+  )
+
   param$feat_dropout <- list(
     type = "double",
     allow_null = FALSE,

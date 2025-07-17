@@ -112,7 +112,8 @@ get_layer_dict <- function(layer) {
     First, pooling over time is applied extracting the minimal and/or maximal features.
     Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
     to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
-    Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features.",
+    Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features. A normalization of all input
+    at the begining of the layer is possible.",
     img = "layers_merge.png",
     references = NULL,
     param_prefix = "merge_"
