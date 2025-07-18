@@ -8,7 +8,7 @@
 **GitHub** [![Project Status: Active - The project has reached a stable,
 usable state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![](https://img.shields.io/badge/devel%20version-1.0.2-green.svg)](https://github.com/fberding/aifeducation)
+[![](https://img.shields.io/badge/devel%20version-1.1.0-green.svg)](https://github.com/fberding/aifeducation)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 [![CodeFactor](https://www.codefactor.io/repository/github/fberding/aifeducation/badge)](https://www.codefactor.io/repository/github/fberding/aifeducation)
 [![Codecov test
@@ -43,8 +43,8 @@ special conditions of the educational and social sciences.
   computational speed and allowing the use of very large data sets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
-- Supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, Longformer, and
-  Funnel Transformer for creating context-sensitive text embedding.
+- Supports ModernBERT, MPNet, BERT, RoBERTa, Longformer, and Funnel
+  Transformer for creating context-sensitive text embedding.
 - Makes sharing pre-trained models very easy.
 - Integrates sustainability tracking.
 - Integrates special statistical techniques for dealing with data
@@ -134,7 +134,7 @@ already trained models work with future versions of this package.
 
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports new
-approaches such as ModernBERT (Warner et al. 2024), MPNet (Song et
+approaches such as modernBERT (Warner et al. 2024), MPNet (Song et
 al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa
 version 2 (He et al. 2020), Funnel-Transformer (Dai et al. 2020), and
 Longformer (Beltagy, Peters & Cohan 2020).
@@ -348,10 +348,6 @@ synthetic sampling approach for imbalanced learning. In 2008 IEEE
 International Joint Conference on Neural Networks (IEEE World Congress
 on Computational Intelligence) (pp. 1322–1328). IEEE.
 <https://doi.org/10.1109/IJCNN.2008.4633969>
-
-He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
-BERT with Disentangled Attention.
-<https://doi.org/10.48550/arXiv.2006.03654>
 
 Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
 KNNOR: An oversampling technique for imbalanced datasets. Applied Soft

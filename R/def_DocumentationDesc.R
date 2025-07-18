@@ -542,14 +542,17 @@ get_tr_types_list_decsription <- function() {
 #' @title Build a homepage for the package
 #' @description Function build the homepage of the package. In order to use python
 #' the build process is run in the current environment.
+#' @param clear_docs `bool` If `TRUE` the docs folder will be completely cleared.
 #' @return Function does nothing return. It builds the homepage for the package.
 #' @importFrom stringi stri_replace_all
 #' @family Parameter Dictionary
 #' @noRd
 #' @keywords internal
-build_aife_site <- function() {
+build_aife_site <- function(clear_docs=FALSE) {
   requireNamespace("pkgdown")
-  pkgdown::clean_site()
+  if(clear_docs==TRUE){
+    pkgdown::clean_site()
+  }
   pkgdown::init_site()
   pkgdown::build_home()
   pkgdown::build_redirects()

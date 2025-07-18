@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>01 Transformers • aifeducation</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -26,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,17 +39,16 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>For users</h6></li>
+    <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
     <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
     <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
     <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
-    <li><a class="dropdown-item" href="../articles/Appendix_A01_Supported_Frameworks.html">A01 Supported Machine Learning Frameworks</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -882,8 +880,7 @@ Transformer for Developers</a> for details.</p>
 <h5 id="create">Create<a class="anchor" aria-label="anchor" href="#create"></a>
 </h5>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                   model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>                   text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                   vocab_size <span class="op">=</span> <span class="fl">30522</span>,</span>
 <span>                   vocab_do_lower_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -908,8 +905,7 @@ Transformer for Developers</a> for details.</p>
 <h5 id="train">Train<a class="anchor" aria-label="anchor" href="#train"></a>
 </h5>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                  output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
 <span>                  model_dir_path <span class="op">=</span> <span class="va">model_dir_path</span>,</span>
 <span>                  text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
@@ -949,8 +945,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="create-1">Create<a class="anchor" aria-label="anchor" href="#create-1"></a>
 </h5>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                   model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>                   text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                   vocab_size <span class="op">=</span> <span class="fl">128100</span>,</span>
 <span>                   vocab_do_lower_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -975,8 +970,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="train-1">Train<a class="anchor" aria-label="anchor" href="#train-1"></a>
 </h5>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                  output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
 <span>                  model_dir_path <span class="op">=</span> <span class="va">model_dir_path</span>,</span>
 <span>                  text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
@@ -1016,8 +1010,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="create-2">Create<a class="anchor" aria-label="anchor" href="#create-2"></a>
 </h5>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                   model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>                   text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                   vocab_size <span class="op">=</span> <span class="fl">30522</span>,</span>
 <span>                   add_prefix_space <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1043,8 +1036,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="train-2">Train<a class="anchor" aria-label="anchor" href="#train-2"></a>
 </h5>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                  output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
 <span>                  model_dir_path <span class="op">=</span> <span class="va">model_dir_path</span>,</span>
 <span>                  text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
@@ -1083,8 +1075,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="create-3">Create<a class="anchor" aria-label="anchor" href="#create-3"></a>
 </h5>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                   model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>                   text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                   vocab_size <span class="op">=</span> <span class="fl">30522</span>,</span>
 <span>                   vocab_do_lower_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1113,8 +1104,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="train-3">Train<a class="anchor" aria-label="anchor" href="#train-3"></a>
 </h5>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                  output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
 <span>                  model_dir_path <span class="op">=</span> <span class="va">model_dir_path</span>,</span>
 <span>                  text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
@@ -1154,8 +1144,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="create-4">Create<a class="anchor" aria-label="anchor" href="#create-4"></a>
 </h5>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                   model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>                   text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                   vocab_size <span class="op">=</span> <span class="fl">30522</span>,</span>
 <span>                   add_prefix_space <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1182,8 +1171,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="train-4">Train<a class="anchor" aria-label="anchor" href="#train-4"></a>
 </h5>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                  output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
 <span>                  model_dir_path <span class="op">=</span> <span class="va">model_dir_path</span>,</span>
 <span>                  text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
@@ -1222,8 +1210,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="create-5">Create<a class="anchor" aria-label="anchor" href="#create-5"></a>
 </h5>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                   model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span>model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>                   text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                   vocab_size <span class="op">=</span> <span class="fl">30522</span>,</span>
 <span>                   vocab_do_lower_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1248,8 +1235,7 @@ Transformer for Develovers</a> for details.</p>
 <h5 id="train-5">Train<a class="anchor" aria-label="anchor" href="#train-5"></a>
 </h5>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
-<span>                  output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
+<code class="sourceCode R"><span><span class="va">transformer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span>output_dir <span class="op">=</span> <span class="va">output_dir</span>,</span>
 <span>                  model_dir_path <span class="op">=</span> <span class="va">model_dir_path</span>,</span>
 <span>                  text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>                  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
@@ -1436,7 +1422,6 @@ all the input parameters <strong>(2)</strong>.</p>
 <span>    initialize <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span> <span class="op">}</span>,</span>
 <span>    <span class="co"># (1)</span></span>
 <span>    create <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="co"># (2) --------------------------</span></span>
-<span>                      <span class="va">ml_framework</span>,</span>
 <span>                      <span class="va">model_dir</span>,</span>
 <span>                      <span class="va">text_dataset</span>,</span>
 <span>                      <span class="va">vocab_size</span>,</span>
@@ -1464,7 +1449,6 @@ all the input parameters <strong>(2)</strong>.</p>
 <span></span>
 <span>      <span class="co"># (6) -----------------------------------------</span></span>
 <span>      <span class="va">super</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span></span>
-<span>        ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
 <span>        model_dir <span class="op">=</span> <span class="va">model_dir</span>,</span>
 <span>        text_dataset <span class="op">=</span> <span class="va">text_dataset</span>,</span>
 <span>        vocab_size <span class="op">=</span> <span class="va">vocab_size</span>,</span>
@@ -1530,7 +1514,6 @@ class with all the (input) parameters <strong>(3)</strong>.</p>
 <span></span>
 <span>    <span class="co"># (1)</span></span>
 <span>    train <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="co"># (3) --------</span></span>
-<span>                     <span class="va">ml_framework</span>,</span>
 <span>                     <span class="co"># ...</span></span>
 <span></span>
 <span>                     <span class="co"># (4) --------</span></span>
@@ -1550,7 +1533,6 @@ class with all the (input) parameters <strong>(3)</strong>.</p>
 <span></span>
 <span>      <span class="co"># (7) -----------------------------------------</span></span>
 <span>      <span class="va">super</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
-<span>        ml_framework <span class="op">=</span> <span class="va">ml_framework</span>,</span>
 <span>        <span class="co"># ...</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
@@ -1596,7 +1578,7 @@ like in p. 3.2.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
