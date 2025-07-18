@@ -7,10 +7,10 @@ testthat::skip_if_not(
 
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-#object_class_names=c("TEClassifierSequential")
-#object_class_names="TEClassifierParallelPrototype"
-#object_class_names="TEClassifierSequentialPrototype"
-#object_class_names="TEClassifierRegular"
+# object_class_names=c("TEClassifierSequential")
+# object_class_names="TEClassifierParallelPrototype"
+# object_class_names="TEClassifierSequentialPrototype"
+# object_class_names="TEClassifierRegular"
 
 max_samples <- 1
 max_samples_CI <- 10
@@ -18,7 +18,7 @@ max_samples_CI <- 10
 max_samples_training <- 1
 class_range <- c(2, 3)
 
-prob_precision=1e-6
+prob_precision <- 1e-6
 
 # Skip Tests-------------------------------------------------------------------
 skip_creation_test <- FALSE
@@ -58,22 +58,24 @@ test_embeddings_single_case <- test_data$test_embeddings_single_case
 test_embeddings_single_case_LD <- test_data$test_embeddings_single_case_LD
 
 # Load feature extractors-------------------------------------------------------
-#devtools::load_all()
+# devtools::load_all()
 feature_extractor <- NULL
 if (file.exists(root_path_feature_extractor)) {
   feature_extractor <- load_from_disk(root_path_feature_extractor)
 } else {
   feature_extractor <- NULL
 }
-#feature_extractor$extract_features_large(data_embeddings = test_embeddings$convert_to_LargeDataSetForTextEmbeddings(),batch_size = 2,trace=TRUE)
-#feature_extractor$extract_features_large()
+# feature_extractor$extract_features_large(data_embeddings = test_embeddings$convert_to_LargeDataSetForTextEmbeddings(),batch_size = 2,trace=TRUE)
+# feature_extractor$extract_features_large()
 
 # Tests------------------------------------------------------------------------
 for (object_class_name in object_class_names) {
   # Test for different number of classes
   for (n_classes in class_range) {
-    for (i in 1:check_adjust_n_samples_on_CI(n_samples_requested=max_samples,
-                                             n_CI = max_samples_CI)) {
+    for (i in 1:check_adjust_n_samples_on_CI(
+      n_samples_requested = max_samples,
+      n_CI = max_samples_CI
+    )) {
       # Core Tests of the models-------------------------------------------------
       if (!skip_creation_test) {
         # Create a List of all relevant combinations of arguments and reduce the number
@@ -94,16 +96,16 @@ for (object_class_name in object_class_names) {
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
             act_fct = "elu",
-            feat_size=64,
-            intermediate_features=10,
-            tf_dense_dim=26,
-            tf_parametrizations="None",
-            dense_parametrizations="None",
-            rec_parametrizations="None",
-            conv_parametrizations="None",
-            tf_num_heads=2,
-            ng_conv_ks_min=2,
-            ng_conv_ks_max=3,
+            feat_size = 64,
+            intermediate_features = 10,
+            tf_dense_dim = 26,
+            tf_parametrizations = "None",
+            dense_parametrizations = "None",
+            rec_parametrizations = "None",
+            conv_parametrizations = "None",
+            tf_num_heads = 2,
+            ng_conv_ks_min = 2,
+            ng_conv_ks_max = 3,
             trace = FALSE,
             epochs = 10,
             batch_size = 20,
@@ -123,8 +125,8 @@ for (object_class_name in object_class_names) {
             self_attention_heads = 2,
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
-            merge_num_heads=2,
-            merge_attention_type="multihead"
+            merge_num_heads = 2,
+            merge_attention_type = "multihead"
           )
         )
 
@@ -140,7 +142,7 @@ for (object_class_name in object_class_names) {
         )
 
         test_that(paste("count parameter", object_class_name, get_current_args_for_print(test_combination)), {
-          expect_gte(object=classifier$count_parameter(),expected = 0)
+          expect_gte(object = classifier$count_parameter(), expected = 0)
         })
 
 
@@ -214,7 +216,7 @@ for (object_class_name in object_class_names) {
           )
         })
 
-        if(!is.null(test_combination$attention)){
+        if (!is.null(test_combination$attention)) {
           if (test_combination$attention != "fourier") {
             test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combination)), {
               embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
@@ -336,7 +338,6 @@ for (object_class_name in object_class_names) {
 
     # Function for loading and saving models-----------------------------------
     if (!skip_function_save_load) {
-
       test_that(paste("function save and load", object_class_name, get_current_args_for_print(test_combination)), {
         classifier <- NULL
         gc()
@@ -356,16 +357,16 @@ for (object_class_name in object_class_names) {
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
             act_fct = "elu",
-            feat_size=64,
-            intermediate_features=10,
-            tf_dense_dim=26,
-            tf_parametrizations="None",
-            dense_parametrizations="None",
-            rec_parametrizations="None",
-            conv_parametrizations="None",
-            tf_num_heads=2,
-            ng_conv_ks_min=2,
-            ng_conv_ks_max=3,
+            feat_size = 64,
+            intermediate_features = 10,
+            tf_dense_dim = 26,
+            tf_parametrizations = "None",
+            dense_parametrizations = "None",
+            rec_parametrizations = "None",
+            conv_parametrizations = "None",
+            tf_num_heads = 2,
+            ng_conv_ks_min = 2,
+            ng_conv_ks_max = 3,
             trace = FALSE,
             epochs = 10,
             batch_size = 20,
@@ -385,8 +386,8 @@ for (object_class_name in object_class_names) {
             self_attention_heads = 2,
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
-            merge_num_heads=2,
-            merge_attention_type="multihead"
+            merge_num_heads = 2,
+            merge_attention_type = "multihead"
           )
         )
 
@@ -441,8 +442,6 @@ for (object_class_name in object_class_names) {
     # Documentation--------------------------------------------------------------
     if (!skip_documentation) {
       test_that(paste("Documentation", object_class_name, get_current_args_for_print(test_combination)), {
-
-
         # Randomly select a configuration
         test_combination <- generate_args_for_tests(
           object_name = object_class_name,
@@ -459,16 +458,16 @@ for (object_class_name in object_class_names) {
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
             act_fct = "elu",
-            feat_size=64,
-            intermediate_features=10,
-            tf_dense_dim=26,
-            tf_parametrizations="None",
-            dense_parametrizations="None",
-            rec_parametrizations="None",
-            conv_parametrizations="None",
-            tf_num_heads=2,
-            ng_conv_ks_min=2,
-            ng_conv_ks_max=3,
+            feat_size = 64,
+            intermediate_features = 10,
+            tf_dense_dim = 26,
+            tf_parametrizations = "None",
+            dense_parametrizations = "None",
+            rec_parametrizations = "None",
+            conv_parametrizations = "None",
+            tf_num_heads = 2,
+            ng_conv_ks_min = 2,
+            ng_conv_ks_max = 3,
             trace = FALSE,
             epochs = 10,
             batch_size = 20,
@@ -488,8 +487,8 @@ for (object_class_name in object_class_names) {
             self_attention_heads = 2,
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
-            merge_num_heads=2,
-            merge_attention_type="multihead"
+            merge_num_heads = 2,
+            merge_attention_type = "multihead"
           )
         )
         classifier <- NULL
@@ -588,7 +587,7 @@ for (object_class_name in object_class_names) {
       create_dir(log_dir, trace = FALSE)
 
       for (j in 1:max_samples_training) {
-        #Config sample
+        # Config sample
         test_combination <- generate_args_for_tests(
           object_name = object_class_name,
           method = "configure",
@@ -604,16 +603,16 @@ for (object_class_name in object_class_names) {
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
             act_fct = "elu",
-            feat_size=32,
-            intermediate_features=10,
-            tf_dense_dim=26,
-            tf_parametrizations="None",
-            dense_parametrizations="None",
-            rec_parametrizations="None",
-            conv_parametrizations="None",
-            tf_num_heads=2,
-            ng_conv_ks_min=2,
-            ng_conv_ks_max=3,
+            feat_size = 32,
+            intermediate_features = 10,
+            tf_dense_dim = 26,
+            tf_parametrizations = "None",
+            dense_parametrizations = "None",
+            rec_parametrizations = "None",
+            conv_parametrizations = "None",
+            tf_num_heads = 2,
+            ng_conv_ks_min = 2,
+            ng_conv_ks_max = 3,
             trace = FALSE,
             epochs = 10,
             batch_size = 20,
@@ -633,12 +632,24 @@ for (object_class_name in object_class_names) {
             self_attention_heads = 2,
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
-            merge_num_heads=2,
-            merge_attention_type="multihead"
+            merge_num_heads = 2,
+            merge_attention_type = "multihead"
           )
         )
 
-        #traing config sample
+        if (object_class_name == "TEClassifierSequentialPrototype" & j <= 1) {
+          use_pl <- TRUE
+        } else {
+          use_pl <- FALSE
+        }
+
+        if (object_class_name == "TEClassifierSequential" & j <= 1) {
+          use_sc <- TRUE
+        } else {
+          use_sc <- FALSE
+        }
+
+        # traing config sample
         train_args_combinations <- generate_args_for_tests(
           object_name = object_class_name,
           method = "train",
@@ -661,12 +672,12 @@ for (object_class_name in object_class_names) {
             ml_trace = 0,
             n_cores = 2,
             data_folds = 2,
-            #use_pl=FALSE,
+            use_pl = use_pl,
             pl_max_steps = 2,
             pl_max = 1,
             pl_anchor = 1,
             pl_min = 0,
-            #use_sc=FALSE,
+            use_sc = use_sc,
             sc_min_k = 1,
             sc_max_k = 2,
             sustain_track = TRUE,
@@ -726,21 +737,21 @@ for (object_class_name in object_class_names) {
           }
         })
 
-        #Plot training history
+        # Plot training history
         test_that(paste(
           "plot_training_history", object_class_name,
           get_current_args_for_print(test_combination),
           get_current_args_for_print(train_args_combinations)
         ), {
-          if(train_args_combinations$use_pl==TRUE){
-            pl_step=1
+          if (train_args_combinations$use_pl == TRUE) {
+            pl_step <- 1
           } else {
-            pl_step=NULL
+            pl_step <- NULL
           }
-          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="loss"),class="ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="avg_iota"),class="ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="accuracy"),class="ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step=pl_step,measure="balanced_accuracy"),class="ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss"), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota"), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy"), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy"), class = "ggplot")
         })
 
         test_that(paste(
@@ -748,7 +759,7 @@ for (object_class_name in object_class_names) {
           get_current_args_for_print(test_combination),
           get_current_args_for_print(train_args_combinations)
         ), {
-          expect_s3_class(object = classifier$plot_coding_stream(),class="ggplot")
+          expect_s3_class(object = classifier$plot_coding_stream(), class = "ggplot")
         })
         gc()
       }

@@ -191,13 +191,14 @@ start_and_monitor_long_task <- function(id,
       "classifier",
       "feature_extractor",
       "create_transformer",
-      "train_transformer"))){
+      "train_transformer",
+      "raw_texts",
+      "embed_raw_text"))){
       ExtendedTask_arguments["current_conda_env"] <- get_py_env_name()
     }
 
-    print(ExtendedTask_arguments)
-
     args <- ExtendedTask_arguments
+    print(args)
     save(args,
       file = paste0(getwd(), "/arguments.rda")
     )

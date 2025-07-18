@@ -28,10 +28,15 @@ long_add_texts_to_dataset <- function(source_path,
                                       excel_text_license_column,
                                       excel_url_source_column,
                                       log_write_interval = 2,
-                                      current_conda_env) {
+                                      py_environment_type,
+                                      py_env_name) {
   promises::future_promise({
-    # Set up conda env
-    reticulate::use_condaenv(condaenv = current_conda_env)
+    requireNamespace("aifeducation")
+    # Set up py env
+    prepare_session(
+      env_type=py_environment_type,
+      envname=py_env_name
+    )
 
     # Set up top level progress monitoring
     top_total <- include_txt + include_pdf + include_xlsx
@@ -113,10 +118,16 @@ long_transform_text_to_embeddings <- function(source_path,
                                               batch_size,
                                               model_path,
                                               log_write_interval = 2,
-                                              current_conda_env) {
+                                              current_conda_env,
+                                              py_environment_type,
+                                              py_env_name) {
   promises::future_promise({
-    # Set up conda env
-    reticulate::use_condaenv(condaenv = current_conda_env)
+
+    # Set up py env
+    prepare_session(
+      env_type=py_environment_type,
+      envname=py_env_name
+    )
 
     # Read the large data set for raw texts
     raw_texts <- load_from_disk(source_path)

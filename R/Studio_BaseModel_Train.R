@@ -283,6 +283,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
         )
       } else {
         # Start task and monitor
+        print(path_to_raw_texts())
         start_and_monitor_long_task(
           id = id,
           ExtendedTask_type = "train_transformer",

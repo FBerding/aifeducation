@@ -76,7 +76,8 @@ Layer for combining the output of different layers. All inputs must be sequentia
 First, pooling over time is applied extracting the minimal and/or maximal features.
 Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
 to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
-Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features. All parameters with the prefix \emph{merge_} can be used to configure this layer.
+Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features. A normalization of all input
+at the begining of the layer is possible. All parameters with the prefix \emph{merge_} can be used to configure this layer.
 
 \strong{Training and Prediction}
 

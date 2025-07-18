@@ -254,7 +254,8 @@ The remaining cases are part of the training data. Allowed values: \verb{0 < x <
 
 \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{chunk_size}}{\code{int} Size of every chunk for training.  Allowed values: \code{1 <= x }}
+\item{\code{chunk_size}}{\code{int} Maximum length of every sequence. Must be equal or less the global maximum size
+allowed by the model. Allowed values: \code{100 <= x }}
 
 \item{\code{full_sequences_only}}{\code{bool} \code{TRUE} for using only chunks with a sequence length equal to \code{chunk_size}.}
 

@@ -435,13 +435,14 @@ get_param_dict <- function() {
   param$chunk_size <- list(
     type = "int",
     allow_null = FALSE,
-    min = 1,
+    min = 100,
     max = Inf,
     allowed_values = NULL,
-    desc = "Size of every chunk for training. ",
+    desc = "Maximum length of every sequence. Must be equal or less the global maximum size
+    allowed by the model.",
     gui_box = "Sequence Modeling",
-    gui_label = "Size of every Chunk",
-    default_value = 4
+    gui_label = "Max Sequence Length",
+    default_value = 256
   )
 
   param$min_seq_len <- list(

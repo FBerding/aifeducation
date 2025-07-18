@@ -154,7 +154,9 @@ Embed_Server <- function(id, model, model_path, log_dir, volumes) {
             log_path = log_path,
             batch_size = input$batch_size,
             model_path = model_path,
-            log_write_interval = 2
+            log_write_interval = 2,
+            py_environment_type=get_py_env_type(),
+            py_env_name=get_py_env_name()
           ),
           log_path = log_path,
           pgr_use_middle = FALSE,

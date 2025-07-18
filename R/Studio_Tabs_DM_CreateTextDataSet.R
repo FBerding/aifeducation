@@ -256,6 +256,8 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
             excel_url_license_column = input$excel_url_license_column,
             excel_text_license_column = input$excel_text_license_column,
             excel_url_source_column = input$excel_url_source_column,
+              py_environment_type=get_py_env_type(),
+              py_env_name=get_py_env_name(),
             log_write_interval = 2
           ),
           log_path = log_path,

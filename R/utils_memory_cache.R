@@ -34,7 +34,7 @@ create_and_get_tmp_dir=function(){
 #' @noRd
 #'
 clean_tmp_dir=function(){
-  temp_dir=paste0(tempdir(),"/r_aifeducation")
+  temp_dir=create_and_get_tmp_dir()
   if(dir.exists(temp_dir)){
     unlink(x=temp_dir)
   } else {
