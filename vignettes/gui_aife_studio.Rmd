@@ -404,8 +404,6 @@ extension).
 running_num_figures=running_num_figures+1
 ```
 
-
-
 The IDs are very important since they are used to match the
 corresponding class/category, if available.
 
@@ -498,8 +496,7 @@ In order to create a new base model you have to choose the option (tab)
 *Create* on the tab *Base Models* on the top panel of the app. Figure `r running_num_figures`
 shows the corresponding page.
 
-[![Figure `r running_num_figures`: Base Models - Create
-Transformer](BM_Create_Fill_fields.png){width="100%"}](BM_Create_Fill_fields.png)
+[![Figure `r running_num_figures`: Base Models - Create Transformer](BM_Create_Fill_fields.png){width="100%"}](BM_Create_Fill_fields.png)
 Figure `r running_num_figures`: Base Models - Create Transformer (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -558,8 +555,7 @@ first time or want to adapt a pre-trained model to a domain-specific
 language or task, you have to click on the *Train* section on the *Base
 Models* tab.
 
-[![Figure `r running_num_figures`: Base Models - Train/Tune
-Transformer](BM_Train_Fill_fields.png){width="100%"}](BM_Train_Fill_fields.png)
+[![Figure `r running_num_figures`: Base Models - Train/Tune Transformer](BM_Train_Fill_fields.png){width="100%"}](BM_Train_Fill_fields.png)
 Figure `r running_num_figures`: Base Models - Train/Tune Transformer (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -663,8 +659,7 @@ long documents by applying the same algorithm to different parts.
 You can open the creation page by clicking on the "Create" tab in the
 section "Text Embedding Models". Figure `r running_num_figures` shows the corresponding page.
 
-[![Figure `r running_num_figures`: Text Embedding Model -
-Create](TEM_Create_Fill_fields.png){width="100%"}](TEM_Create_Fill_fields.png)
+[![Figure `r running_num_figures`: Text Embedding Model - Create](TEM_Create_Fill_fields.png){width="100%"}](TEM_Create_Fill_fields.png)
 Figure `r running_num_figures`: Text Embedding Model - Create (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -744,8 +739,7 @@ you can use it.
 The tab *Description* (Figure `r running_num_figures`) provides you with the documentation of
 the model.
 
-[![Figure `r running_num_figures`: Text Embedding Model -
-Description](TEM_Use_Fill_fields.png){width="100%"}](TEM_Use_Fill_fields.png)
+[![Figure `r running_num_figures`: Text Embedding Model - Description](TEM_Use_Fill_fields.png){width="100%"}](TEM_Use_Fill_fields.png)
 Figure `r running_num_figures`: Text Embedding Model - Description (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -768,8 +762,7 @@ many raw texts should be processed simultaneously. Please adjust this
 value to your machine's capacities. By clicking on the button "Save
 Embeddings" the transformation of texts begins.
 
-[![Figure `r running_num_figures`: Text Embedding Model -
-Embeddings](TEM_Use_Embedd_text.png){width="100%"}](TEM_Use_Embedd_text.png)
+[![Figure `r running_num_figures`: Text Embedding Model - Embeddings](TEM_Use_Embedd_text.png){width="100%"}](TEM_Use_Embedd_text.png)
 Figure `r running_num_figures`: Text Embedding Model - Embeddings (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -786,8 +779,7 @@ process. There you can insert a sequence of numbers (separated with a
 comma or with spaces) and after clicking on *Decode*, the corresponding
 tokens and the raw text appear.
 
-[![Figure `r running_num_figures`: Text Embedding Model -
-Tokenize/Encode/Decode](TEM_Use_TED_Encode.png){width="100%"}](TEM_Use_TED_Encode.png)
+[![Figure `r running_num_figures`: Text Embedding Model - Tokenize/Encode/Decode](TEM_Use_TED_Encode.png){width="100%"}](TEM_Use_TED_Encode.png)
 Figure `r running_num_figures`: Text Embedding Model - Tokenize/Encode/Decode (click image to
 enlarge)
 
@@ -809,8 +801,7 @@ are ordered by certainty; from the perspective of the model, the most
 reasonable tokens are at the top and the less reasonable tokens are at
 the bottom.
 
-[![Figure `r running_num_figures`: Text Embedding Model - Fill
-Mask](TEM_Use_Fill_mask.png){width="100%"}](TEM_Use_Fill_mask.png)
+[![Figure `r running_num_figures`: Text Embedding Model - Fill Mask](TEM_Use_Fill_mask.png){width="100%"}](TEM_Use_Fill_mask.png)
 Figure `r running_num_figures`: Text Embedding Model - Fill Mask (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -839,8 +830,7 @@ can provide the names and email addresses of all relevant contributors.
 refers to the people who adapted a pre-trained model to another domain
 or task.
 
-[![Figure `r running_num_figures`: Text Embedding Model -
-Documentation](TEM_Document_Desc_english.png){width="100%"}](TEM_Document_Desc_english.png)
+[![Figure `r running_num_figures`: Text Embedding Model - Documentation](TEM_Document_Desc_english.png){width="100%"}](TEM_Document_Desc_english.png)
 Figure `r running_num_figures`: Text Embedding Model - Documentation (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -869,11 +859,11 @@ Classifiers are built on top of a text embedding model. To create a
 classifier, click on *Create* in the tab *Classifiers*. Figure `r running_num_figures` shows
 the corresponding page.
 
-[![Figure `r running_num_figures`: Classifier - Creation Part
-1](CF_Create_Fill_fields_1.png){width="100%"}](CF_Create_Fill_fields_1.png)
+[![Figure `r running_num_figures`: Classifier - Creation Part 1](CF_Create_Fill_fields_1.png){width="100%"}](CF_Create_Fill_fields_1.png)
 Figure `r running_num_figures`: Classifier - Creation Part 1 (click image to enlarge)
 
 ```{r, include = FALSE}
+first_classifier_image=running_num_figures
 running_num_figures=running_num_figures+1
 ```
 
@@ -958,8 +948,7 @@ for other users.
 In the third box (*Model Configuration*) you customize the architecture of your
 neural network (Figure `r running_num_figures`).
 
-[![Figure `r running_num_figures`: Classifier - Creation Part
-2](CF_Create_Fill_fields_2.png){width="100%"}](CF_Create_Fill_fields_2.png)
+[![Figure `r running_num_figures`: Classifier - Creation Part 2](CF_Create_Fill_fields_2.png){width="100%"}](CF_Create_Fill_fields_2.png)
 Figure `r running_num_figures`: Classifier - Creation Part 2 (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -1056,8 +1045,7 @@ al. (2020). Therefore, the following parameters have to be set:
 -   Certainty Anchor = 1.00
 -   Min Certainty Value = 0.00
 
-[![Figure `r running_num_figures`: Classifier - Creation Part
-3](CF_Create_Fill_fields_3.png){width="100%"}](CF_Create_Fill_fields_3.png)
+[![Figure `r running_num_figures`: Classifier - Creation Part 3](CF_Create_Fill_fields_3.png){width="100%"}](CF_Create_Fill_fields_3.png)
 Figure `r running_num_figures`: Classifier - Creation Part 3 (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -1091,8 +1079,7 @@ appears.
 In the first tab, *Description* (Figure `r running_num_figures`), you will find the
 documentation of the model.
 
-[![Figure `r running_num_figures`: Classifier -
-Description](CF_Use_Fill_fields.png){width="100%"}](CF_Use_Fill_fields.png)
+[![Figure `r running_num_figures`: Classifier - Description](CF_Use_Fill_fields.png){width="100%"}](CF_Use_Fill_fields.png)
 Figure `r running_num_figures`: Classifier - Description (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -1105,8 +1092,7 @@ loss, the accuracy, and the balanced accuracy for every fold and every
 epoch. Depending on the applied training techniques (such as *Balanced
 Pseudo-Labeling*), you can request additional images.
 
-[![Figure `r running_num_figures`: Classifier -
-Training](CF_Use_Training.png){width="100%"}](CF_Use_Training.png)
+[![Figure `r running_num_figures`: Classifier - Training](CF_Use_Training.png){width="100%"}](CF_Use_Training.png)
 Figure `r running_num_figures`: Classifier - Training (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -1120,8 +1106,7 @@ results. In addition, measures from content analysis as well as machine
 learning allow you to analyze specific aspects of the model's
 performance.
 
-[![Figure `r running_num_figures`: Classifier -
-Reliability](CF_Use_Reliability.png){width="100%"}](CF_Use_Reliability.png)
+[![Figure `r running_num_figures`: Classifier - Reliability](CF_Use_Reliability.png){width="100%"}](CF_Use_Reliability.png)
 Figure `r running_num_figures`: Classifier - Reliability (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -1136,8 +1121,7 @@ would like to classify. You can create these embeddings with the text
 embedding model used for providing the training data of the classifier.
 The necessary steps are described in section 3.3.2.
 
-[![Figure `r running_num_figures`: Classifier -
-Prediction](CF_Use_Prediction_1.png){width="100%"}](CF_Use_Prediction_1.png)
+[![Figure `r running_num_figures`: Classifier - Prediction](CF_Use_Prediction_1.png){width="100%"}](CF_Use_Prediction_1.png)
 Figure `r running_num_figures`: Classifier - Prediction (click image to enlarge)
 
 ```{r, include = FALSE}
@@ -1153,8 +1137,7 @@ predictions and to provide a file name. The default case is to store the
 predictions in an .csv file. The resulting data table may look like
 shown in Figure `r running_num_figures`.
 
-![Figure `r running_num_figures`: Classifier - Prediction
-Results](CF_Use_Prediction_Result.png){width="50%"}
+![Figure `r running_num_figures`: Classifier - Prediction Results](CF_Use_Prediction_Result.png){width="50%"}
 
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1
@@ -1224,8 +1207,7 @@ a compression of the original input.
 You can create a feature extractor as follows in Figure `r running_num_figures` (*Create* tab
 in the tab *Feature Extractors*).
 
-![Figure `r running_num_figures`: Basic architecure of feature
-extractors](FE_Create_Fill_fields.png){width="100%"}
+![Figure `r running_num_figures`: Feature Extractors - Create](FE_Create_Fill_fields.png){width="100%"}
 
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1
@@ -1233,13 +1215,12 @@ running_num_figures=running_num_figures+1
 
 First, you need to choose embeddings by using the box *Input Data*.
 
-
 You can specify the label of the model in the *Model Label* field within the *Control Panel*.
 
 Specify an architecture and training settings in *Model Configuration* and
 *Training SetUp* boxes.
 
--   *Target Features* determines the number of features for the
+-   *Number of Features* determines the number of features for the
     compressed representation. The lower the number, the higher the
     requested compression. This value corresponds with the features of
     the latent space in the figure above.
@@ -1262,10 +1243,20 @@ can see your progress in the progress bars.
 
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor path to *Feature Extractor*
-during configuration of the classifier (Figure `r running_num_figures`).
+during configuration of the classifier (Figure `r first_classifier_image`).
 
 That is all. Now you can use and train the classifier in the same way as
 without a feature extractor.
+
+You can explore and document the model similar to all other models. Figure `r running_num_figures`
+shows an example for exploring training. 
+
+[![Figure `r running_num_figures`: Feature Extractor - Training](FE_Use_Training.png){width="100%"}](FE_Use_Training.png)
+Figure `r running_num_figures`: Classifier - Prediction (click image to enlarge)
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
 
 # References
 

@@ -131,7 +131,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
             if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
               if (is.null(private[[param]])) {
                 if (!is.null(param_dict[[param]]$default_historic)) {
-                  private[param] <- list(param_dict[[param]]$default_historic)
+                  private[[param]] <- list(param_dict[[param]]$default_historic)
                 } else {
                   stop(paste("Historic default for", param, "is missing in parameter dictionary."))
                 }

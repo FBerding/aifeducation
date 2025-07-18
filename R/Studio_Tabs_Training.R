@@ -76,10 +76,7 @@ Training_Server <- function(id, model) {
 
     # Control widgets for classifiers--------------------------------------------
     output$classifier_specific <- shiny::renderUI({
-      if (
-        "TEClassifierRegular" %in% class(model()) |
-          "TEClassifierProtoNet" %in% class(model())
-      ) {
+      if ("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
         ui <- shiny::tagList(
           shinyWidgets::radioGroupButtons(
             inputId = ns("training_phase"),
@@ -133,9 +130,7 @@ Training_Server <- function(id, model) {
 
 
     output$widget_classifier_pl_step <- shiny::renderUI({
-      if (
-        "TEClassifierRegular" %in% class(model()) | "TEClassifierProtoNet" %in% class(model())
-      ) {
+      if (sum(get_TEClassifiers_class_names() %in% class(model))>0) {
         if (model()$last_training$config$use_pl == TRUE) {
           n_steps <- model()$last_training$config$pl_max_steps
           return(

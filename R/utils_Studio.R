@@ -92,10 +92,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
     )
-  } else if (
-    "TEClassifierRegular" %in% class(model) ||
-      "TEClassifierProtoNet" %in% class(model)
-  ) {
+  } else if ("ClassifiersBasedOnTextEmbeddings" %in% class(model)) {
     if (is.null(model)) {
       model_label <- NULL
     } else {
