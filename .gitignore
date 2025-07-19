@@ -25,7 +25,7 @@ trainer_output/
 vignettes/examples
 
 cran-comments.md
-/doc/
+
 /Meta/
 intel_power_gadget_log.csv
 aifeducation_loss.log
@@ -34,5 +34,5 @@ arguments.rda
 intel_power_gadget_log.csv
 Deprecated
 CRAN-SUBMISSION
-docs/
+
 examples

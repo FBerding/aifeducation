@@ -1519,7 +1519,7 @@ replaces the original loss function with the loss function suggested by
 Zhang et al. (2019) and adds the learnable metric described by Oreshkin,
 Rodriguez, and Lacoste (2019) to increase performance.
 
-### 6.1.2 Configuration, Traning, and Application without Sample Data
+### 6.1.2 Configuration, Training, and Application without Sample Data
 
 The application of a classifier based on ProtoNet is similar to the
 regular classifiers. The only difference is `embedding_dim`. A ProtoNet
