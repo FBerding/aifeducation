@@ -65,13 +65,13 @@ base_model_list <- list(
 )
 
 pooling_type_list <- list(
-  "funnel" = c("cls"),
-  "bert" = c("cls", "average"),
-  "roberta" = c("cls", "average"),
-  "longformer" = c("cls", "average"),
-  "deberta_v2" = c("cls", "average"),
-  "mpnet" = c("cls", "average"),
-  "modernbert"=c("cls", "average")
+  "funnel" = c("CLS"),
+  "bert" = c("CLS", "Average"),
+  "roberta" = c("CLS", "Average"),
+  "longformer" = c("CLS", "Average"),
+  "deberta_v2" = c("CLS", "Average"),
+  "mpnet" = c("CLS", "Average"),
+  "modernbert"=c("CLS", "Average")
 )
 
 max_layers <- 1:2
@@ -102,7 +102,7 @@ for (framework in ml_frameworks) {
         overlap = 10,
         emb_layer_min = 1,
         emb_layer_max = 1,
-        emb_pool_type = "cls",
+        emb_pool_type = "CLS",
         model_dir = model_path,
         pad_value=random_padding_value
       )
@@ -122,7 +122,7 @@ for (framework in ml_frameworks) {
         overlap = 10,
         emb_layer_min = 1,
         emb_layer_max = 1,
-        emb_pool_type = "cls",
+        emb_pool_type = "CLS",
         model_dir = model_path
       )
 

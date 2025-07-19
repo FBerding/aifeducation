@@ -423,13 +423,13 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("mean", "max"),
+    allowed_values = c("Mean", "Max"),
     desc = "Type of pooling.
   * `\"mean\"` for pooling with mean.
   * `\"max\"` for pooling with maximum values. ",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Pooling Type",
-    default_value = "max"
+    default_value = "Max"
   )
 
   param$chunk_size <- list(
@@ -719,11 +719,11 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("adam", "rmsprop", "adamw", "sgd"),
+    allowed_values = c("Adam", "RMSprop", "AdamW", "SGD"),
     desc = "determining the optimizer used for training.",
     gui_box = "General Settings",
     gui_label = "Optimizer",
-    default_value = "adamw"
+    default_value = "AdamW"
   )
 
   param$epochs <- list(
@@ -968,11 +968,11 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("residual_gate", "addition", "None"),
+    allowed_values = c("ResidualGate", "Addition", "None"),
     desc = "Type residual connenction for all layers and stack of layers.",
     gui_box = "General Settings",
     gui_label = "Residual Connection",
-    default_value = "residual_gate",
+    default_value = "ResidualGate",
     default_historic = NULL
   )
 
@@ -981,17 +981,17 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("residual_gate", "addition", "None"),
+    allowed_values = c("ResidualGate", "Addition", "None"),
     values_desc = list(
       "None" = "Add no residual connection.",
-      "addition" = "Adds a residual connection by adding the original input to the output.",
-      "residual_gate" = "Adds a residucal connection by creating a weightes sum from the original input and the output.
+      "Addition" = "Adds a residual connection by adding the original input to the output.",
+      "ResidualGate" = "Adds a residucal connection by creating a weightes sum from the original input and the output.
                       The weight is a learnable parameter. This type of residual connection is described by [Savarese and Figueiredo (2017)](https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf)."
     ),
     desc = "Type residual connenction for the complete model.",
     gui_box = "General Settings",
     gui_label = "Residual Connection",
-    default_value = "residual_gate",
+    default_value = "ResidualGate",
     default_historic = NULL
   )
 
@@ -1015,15 +1015,15 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("layer_norm", "None"),
+    allowed_values = c("LayerNorm", "None"),
     values_desc = list(
-      "layer_norm" = "Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450).",
+      "LayerNorm" = "Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450).",
       "None" = "Applies no normalization. "
     ),
     desc = "Type of normalization applied to all layers and stack layers.",
     gui_box = "General Settings",
     gui_label = "Normalization",
-    default_value = "layer_norm",
+    default_value = "LayerNorm",
     default_historic = NULL
   )
 
@@ -1065,11 +1065,11 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("max", "min", "min_max"),
+    allowed_values = c("Max", "Min", "MinMax"),
     desc = "Type of extracting intermediate features.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
-    default_value = "min_max",
+    default_value = "MinMax",
     default_historic = NULL
   )
   param$merge_pooling_type=param$cls_pooling_type
@@ -1082,13 +1082,13 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("None", "orthogonal", "weight_norm", "spectral_norm"),
+    allowed_values = c("None", "OrthogonalWeights", "WeightNorm", "SpectralNorm"),
     desc = "Re-Parametrizations for all layers except recurrent layers.",
     values_desc = list(
       "None" = "Does not apply any re-parametrizations.",
-      "orthogonal" = "Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
-      "weight_norm" = "Applies a weight norm with the default settings of PyTorch's corresponding function. Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
-      "spectral_norm" = "Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
+      "OrthogonalWeights" = "Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
+      "WeightNorm" = "Applies a weight norm with the default settings of PyTorch's corresponding function. Weight norm is described by [Salimans and Kingma 2016](https://doi.org/10.48550/arXiv.1602.07868).",
+      "SpectralNorm" = "Applies a spectral norm with the default settings of PyTorch's corresponding function. The norm is described by [Miyato et al. 2018](https://doi.org/10.48550/arXiv.1802.05957)."
     ),
     gui_box = "General Settings",
     gui_label = "Re-Parametrization",
@@ -1140,12 +1140,12 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("elu", "leakyrelu", "relu", "gelu", "sigmoid", "tanh", "prelu"),
+    allowed_values = c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU"),
     desc = "Activation function for all layers except recurrent layers.",
     gui_box = "General Settings",
     gui_label = "Activation Function",
-    default_value = "elu",
-    default_historic = "gelu"
+    default_value = "ELU",
+    default_historic = "GELU"
   )
   param$feat_act_fct <- param$act_fct
   param$feat_act_fct$gui_box <- "Classifiction Pooling Layer"
@@ -1334,7 +1334,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("fourier", "multihead"),
+    allowed_values = c("Fourier", "MultiHead"),
     values_desc = list(
       multihead = "The original multi-head attention as described by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762).",
       fourier = "Attention with fourier transformation as described by [Lee-Thorp et al. (2021)](https://doi.org/10.48550/arXiv.2105.03824)."
@@ -1343,7 +1343,7 @@ get_param_dict <- function() {
     values for a case for different input orders if you choose `fourier` on linux.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Attention Type",
-    default_value = "fourier"
+    default_value = "Fourier"
   )
   param$tf_attention_type <- param$attention_type
 

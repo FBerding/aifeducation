@@ -27,7 +27,7 @@ import safetensors
 # True indicates that the sequence or is padded. If True these values should not be part 
 # of further computations. mask_features is adapted to the new output size
 class stack_dense_layer(torch.nn.Module):
-  def __init__(self,times,hidden_size,n_layers,pad_value,dropout,act_fct="elu",bias=True,normalization_type="layer_norm",parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,times,hidden_size,n_layers,pad_value,dropout,act_fct="ELU",bias=True,normalization_type="LayerNorm",parametrizations="None",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.hidden_size=hidden_size
@@ -88,7 +88,7 @@ class stack_dense_layer(torch.nn.Module):
 
 #Recurrent Layer stack with mask
 class stack_recurrent_layers(torch.nn.Module): 
-  def __init__(self,times,hidden_size,n_layers,rec_type,rec_bidirectional,pad_value,dropout,bias=True,return_sequence=False,parametrizations="None",device=None, dtype=None,residual_type="None",normalization_type="layer_norm"):
+  def __init__(self,times,hidden_size,n_layers,rec_type,rec_bidirectional,pad_value,dropout,bias=True,return_sequence=False,parametrizations="None",device=None, dtype=None,residual_type="None",normalization_type="LayerNorm"):
     super().__init__()
     self.hidden_size=hidden_size
     self.n_layers=n_layers
@@ -133,7 +133,7 @@ class stack_recurrent_layers(torch.nn.Module):
         input_size=2*self.hidden_size,
         output_size=hidden_size,
         times=self.times,
-        act_fct="elu",
+        act_fct="ELU",
         dropout=0.0,
         bias=True,
         pad_value=self.pad_value,
@@ -169,7 +169,7 @@ class stack_recurrent_layers(torch.nn.Module):
   
 #stack_tf_encoder_layer--------------------------------
 class stack_tf_encoder_layer(torch.nn.Module):
-  def __init__(self,dense_dim,n_layers,times, features,pad_value,dropout_rate_1,dropout_rate_2,act_fct="elu",attention_type="multihead",positional_embedding="absolute",num_heads=1,bias=True,parametrizations="None",normalization_type="layer_norm",device=None, dtype=None,residual_type="None"):
+  def __init__(self,dense_dim,n_layers,times, features,pad_value,dropout_rate_1,dropout_rate_2,act_fct="ELU",attention_type="MultiHead",positional_embedding="absolute",num_heads=1,bias=True,parametrizations="None",normalization_type="LayerNorm",device=None, dtype=None,residual_type="None"):
     super().__init__()
     self.features=features
     self.dense_dim=dense_dim
@@ -238,7 +238,7 @@ class stack_tf_encoder_layer(torch.nn.Module):
 
 #stack_n_gram_convolution--------------------------------
 class stack_n_gram_convolution(torch.nn.Module):
-  def __init__(self,ks_min,ks_max,times,features,n_layers,pad_value,bias=True,dropout=0.1,parametrizations="None",device=None,dtype=None,act_fct="elu",residual_type="None",normalization_type="layer_norm"):
+  def __init__(self,ks_min,ks_max,times,features,n_layers,pad_value,bias=True,dropout=0.1,parametrizations="None",device=None,dtype=None,act_fct="ELU",residual_type="None",normalization_type="LayerNorm"):
     super().__init__()
     
     self.features=features

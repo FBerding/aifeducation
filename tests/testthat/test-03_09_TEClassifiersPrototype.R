@@ -69,7 +69,7 @@ for (object_class_name in object_class_names) {
           name = NULL,
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           sustain_interval = 30,
-          act_fct = "elu",
+          act_fct = "ELU",
           feat_size=64,
           intermediate_features=10,
           tf_dense_dim=26,
@@ -100,7 +100,7 @@ for (object_class_name in object_class_names) {
           intermediate_size = 6,
           lr_warm_up_ratio = 0.01,
           merge_num_heads=2,
-          merge_attention_type="multihead"
+          merge_attention_type="MultiHead"
         )
       )
 

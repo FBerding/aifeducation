@@ -119,7 +119,7 @@ is used as the final model.
   n_cores = auto_n_cores(),
   lr_rate = 0.001,
   lr_warm_up_ratio = 0.02,
-  optimizer = "adamw"
+  optimizer = "AdamW"
 )}\if{html}{\out{</div>}}
 }
 
@@ -207,7 +207,7 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed value
 
 \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
 
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
 
 \item{\code{loss_balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency. If \code{FALSE} each class has the weight 1.}

@@ -197,7 +197,7 @@ class FourierTransformation_PT(torch.nn.Module):
     return result
   
 class FourierEncoder_PT(torch.nn.Module):
-  def __init__(self, dense_dim, features, dropout_rate,bias=True,act_fct="elu",parametrizations="None"):
+  def __init__(self, dense_dim, features, dropout_rate,bias=True,act_fct="ELU",parametrizations="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
@@ -216,13 +216,13 @@ class FourierEncoder_PT(torch.nn.Module):
     )
     self.layernorm_2=LayerNorm_with_Mask_PT(features=self.features)
     
-    if self.parametrizations=="orthogonal":
+    if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[0], name='weight')
       torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[2], name='weight')
-    elif self.parametrizations=="weight_norm":
+    elif self.parametrizations=="WeightNorm":
       torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[0], name='weight', dim=0)
       torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[2], name='weight', dim=0)
-    elif self.parametrizations=="spectral_norm":
+    elif self.parametrizations=="SpectralNorm":
         torch.nn.utils.spectral_norm(module=self.dense_proj[0], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
         torch.nn.utils.spectral_norm(module=self.dense_proj[2], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
 
@@ -234,7 +234,7 @@ class FourierEncoder_PT(torch.nn.Module):
     return self.layernorm_2(proj_input+proj_output)
 
 class TransformerEncoder_PT(torch.nn.Module):
-  def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate,bias=True,act_fct="elu",parametrizations="None"):
+  def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate,bias=True,act_fct="ELU",parametrizations="None"):
     super().__init__()
     self.embed_dim=embed_dim
     self.dense_dim=dense_dim
@@ -256,13 +256,13 @@ class TransformerEncoder_PT(torch.nn.Module):
       torch.nn.Linear(in_features=self.dense_dim,out_features=self.embed_dim,bias=self.bias))
     self.layernorm_2=LayerNorm_with_Mask_PT(features=self.embed_dim)
   
-    if self.parametrizations=="orthogonal":
+    if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[0], name='weight')
       torch.nn.utils.parametrizations.orthogonal(module=self.dense_proj[2], name='weight')
-    elif self.parametrizations=="weight_norm":
+    elif self.parametrizations=="WeightNorm":
       torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[0], name='weight', dim=0)
       torch.nn.utils.parametrizations.weight_norm(module=self.dense_proj[2], name='weight', dim=0)
-    elif self.parametrizations=="spectral_norm":
+    elif self.parametrizations=="SpectralNorm":
         torch.nn.utils.spectral_norm(module=self.dense_proj[0], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
         torch.nn.utils.spectral_norm(module=self.dense_proj[2], name='weight', n_power_iterations=1, eps=1e-12, dim=None)
 
@@ -337,7 +337,7 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
 class TextEmbeddingClassifier_PT(torch.nn.Module):
   def __init__(self,features, times, dense_size,dense_layers,rec_size,rec_layers, rec_type,rec_bidirectional, intermediate_size,
   attention_type, repeat_encoder, dense_dropout,rec_dropout, encoder_dropout,
-  add_pos_embedding, self_attention_heads, target_levels,pad_value,classification_head=True,bias=True,parametrizations="None",act_fct="elu"):
+  add_pos_embedding, self_attention_heads, target_levels,pad_value,classification_head=True,bias=True,parametrizations="None",act_fct="ELU"):
     
     super().__init__()
     
@@ -358,7 +358,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
     
     if repeat_encoder>0:
         for r in range(repeat_encoder):
-          if attention_type=="multihead":
+          if attention_type=="MultiHead":
             layer_list.update({"encoder_"+str(r+1):
               TransformerEncoder_PT(
                 embed_dim = features,
@@ -424,11 +424,11 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
               out_features=dense_size,
               bias=bias
               )
-        if parametrizations=="orthogonal":
+        if parametrizations=="OrthogonalWeights":
           torch.nn.utils.parametrizations.orthogonal(module=tmp_dense_layer, name='weight')
-        elif parametrizations=="weight_norm":
+        elif parametrizations=="WeightNorm":
           torch.nn.utils.parametrizations.weight_norm(module=tmp_dense_layer, name='weight', dim=0)
-        elif parametrizations=="spectral_norm":
+        elif parametrizations=="SpectralNorm":
           torch.nn.utils.spectral_norm(module=tmp_dense_layer, name='weight', n_power_iterations=1, eps=1e-12, dim=None)      
         layer_list.update({"dense_"+str(i+1): tmp_dense_layer})
         
@@ -626,13 +626,13 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     dtype=torch.double
     model.to(device,dtype=dtype)
   
-  if optimizer_method=="adam":
+  if optimizer_method=="Adam":
     optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
-  elif optimizer_method=="rmsprop":
+  elif optimizer_method=="RMSprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
   elif optimizer_method=="adamw":
     optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
-  elif optimizer_method=="sgd":
+  elif optimizer_method=="SGD":
     optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
   
   warm_up_steps=math.floor(epochs*lr_warm_up_ratio)

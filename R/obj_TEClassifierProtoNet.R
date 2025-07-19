@@ -90,9 +90,9 @@ TEClassifierProtoNet <- R6::R6Class(
                          embedding_dim = 2,
                          self_attention_heads = 0,
                          intermediate_size = NULL,
-                         attention_type = "fourier",
+                         attention_type = "Fourier",
                          add_pos_embedding = TRUE,
-                         act_fct="elu",
+                         act_fct="ELU",
                          parametrizations="None",
                          rec_dropout = 0.1,
                          repeat_encoder = 1,
@@ -458,7 +458,7 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       if (self$model_config$repeat_encoder > 0 &
-          self$model_config$attention_type == "multihead" &
+          self$model_config$attention_type == "MultiHead" &
           self$model_config$self_attention_heads <= 0) {
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
@@ -473,18 +473,18 @@ TEClassifierProtoNet <- R6::R6Class(
     #--------------------------------------------------------------------------
     adjust_configuration = function() {
       if (is.null(self$model_config$intermediate_size) == TRUE) {
-        if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers > 0) {
+        if (self$model_config$attention_type == "Fourier" & self$model_config$rec_layers > 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$rec_size
-        } else if (self$model_config$attention_type == "fourier" & self$model_config$rec_layers == 0) {
+        } else if (self$model_config$attention_type == "Fourier" & self$model_config$rec_layers == 0) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
         } else if (
-          self$model_config$attention_type == "multihead" &
+          self$model_config$attention_type == "MultiHead" &
           self$model_config$rec_layers > 0 &
           self$model_config$self_attention_heads > 0
         ) {
           self$model_config$intermediate_size <- 2 * self$model_config$features
         } else if (
-          self$model_config$attention_type == "multihead" &
+          self$model_config$attention_type == "MultiHead" &
           self$model_config$rec_layers == 0 &
           self$model_config$self_attention_heads > 0
         ) {

@@ -106,7 +106,7 @@ check.max_position_embeddings <- function(max_position_embeddings) { # nolint
 #' @description Used when creating and training transformers.
 #'
 #' @param hidden_act `r get_param_doc_desc("hidden_act")`
-#' @return Error if `hidden_act` is not `"gelu"`, `"relu"`, `"silu"` or `"gelu_new"`.
+#' @return Error if `hidden_act` is not `"GELU"`, `"ReLU"`, `"silu"` or `"gelu_new"`.
 #'
 #' @family Utils Transformers Developers
 #' @keywords internal

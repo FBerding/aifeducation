@@ -183,53 +183,53 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
-  skip_connection_type = "residual_gate",
+  skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
-  cls_pooling_type = "min_max",
+  cls_pooling_type = "MinMax",
   metric_type = "euclidean",
-  feat_act_fct = "elu",
+  feat_act_fct = "ELU",
   feat_size = 50,
   feat_bias = TRUE,
   feat_dropout = 0,
   feat_parametrizations = "None",
-  feat_normalization_type = "layer_norm",
-  ng_conv_act_fct = "elu",
+  feat_normalization_type = "LayerNorm",
+  ng_conv_act_fct = "ELU",
   ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
   ng_conv_dropout = 0.1,
   ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "layer_norm",
-  ng_conv_residual_type = "residual_gate",
-  dense_act_fct = "elu",
+  ng_conv_normalization_type = "LayerNorm",
+  ng_conv_residual_type = "ResidualGate",
+  dense_act_fct = "ELU",
   dense_n_layers = 1,
   dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "layer_norm",
-  dense_residual_type = "residual_gate",
-  rec_act_fct = "tanh",
+  dense_normalization_type = "LayerNorm",
+  dense_residual_type = "ResidualGate",
+  rec_act_fct = "Tanh",
   rec_n_layers = 1,
   rec_type = "gru",
   rec_bidirectional = FALSE,
   rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
-  rec_normalization_type = "layer_norm",
-  rec_residual_type = "residual_gate",
-  tf_act_fct = "elu",
+  rec_normalization_type = "LayerNorm",
+  rec_residual_type = "ResidualGate",
+  tf_act_fct = "ELU",
   tf_dense_dim = 50,
   tf_n_layers = 1,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.5,
-  tf_attention_type = "multihead",
+  tf_attention_type = "MultiHead",
   tf_embedding_type = "absolute",
   tf_num_heads = 1,
   tf_bias = FALSE,
   tf_parametrizations = "None",
-  tf_normalization_type = "layer_norm",
-  tf_residual_type = "residual_gate",
+  tf_normalization_type = "LayerNorm",
+  tf_residual_type = "ResidualGate",
   embedding_dim = 2
 )}\if{html}{\out{</div>}}
 }
@@ -252,15 +252,15 @@ the number of dimensions of the text embeddings. If no feature extractor should 
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
 
-\item{\code{skip_connection_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'residual_gate', 'addition', 'None'}
+\item{\code{skip_connection_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
 \item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \code{1 <= x }}
 
-\item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'max', 'min', 'min_max'}
+\item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
 
 \item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'euclidean'}
 
-\item{\code{feat_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+\item{\code{feat_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
 \item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \code{2 <= x }}
 
@@ -268,11 +268,11 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+\item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
-\item{\code{feat_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
+\item{\code{feat_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{ng_conv_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+\item{\code{ng_conv_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
 \item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values: \code{0 <= x }}
 
@@ -284,13 +284,13 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+\item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
-\item{\code{ng_conv_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
+\item{\code{ng_conv_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{ng_conv_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'residual_gate', 'addition', 'None'}
+\item{\code{ng_conv_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
-\item{\code{dense_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+\item{\code{dense_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
 \item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \code{0 <= x }}
 
@@ -298,13 +298,13 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{dense_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{dense_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+\item{\code{dense_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
-\item{\code{dense_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
+\item{\code{dense_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{dense_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'residual_gate', 'addition', 'None'}
+\item{\code{dense_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
-\item{\code{rec_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+\item{\code{rec_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
 \item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
 
@@ -316,13 +316,13 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{rec_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+\item{\code{rec_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
-\item{\code{rec_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
+\item{\code{rec_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{rec_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'residual_gate', 'addition', 'None'}
+\item{\code{rec_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
-\item{\code{tf_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'elu', 'leakyrelu', 'relu', 'gelu', 'sigmoid', 'tanh', 'prelu'}
+\item{\code{tf_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
 \item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
 
@@ -333,7 +333,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x <= 0.6}}
 
 \item{\code{tf_attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
-values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'fourier', 'multihead'}
+values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'Fourier', 'MultiHead'}
 
 \item{\code{tf_embedding_type}}{\code{string} Type of processing positional information. Allowed values: 'absolute'}
 
@@ -341,11 +341,11 @@ values for a case for different input orders if you choose \code{fourier} on lin
 
 \item{\code{tf_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{tf_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'orthogonal', 'weight_norm', 'spectral_norm'}
+\item{\code{tf_parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
-\item{\code{tf_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'layer_norm', 'None'}
+\item{\code{tf_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{tf_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'residual_gate', 'addition', 'None'}
+\item{\code{tf_residual_type}}{\code{string} Type residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
 \item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the embedding. Allowed values: \code{2 <= x }}
 }

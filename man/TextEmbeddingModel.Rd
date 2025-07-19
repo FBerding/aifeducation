@@ -84,9 +84,9 @@ Method for creating a new text embedding model
   max_length = 0,
   chunks = 2,
   overlap = 0,
-  emb_layer_min = "middle",
+  emb_layer_min = "Middle",
   emb_layer_max = "2_3_layer",
-  emb_pool_type = "average",
+  emb_pool_type = "Average",
   pad_value = -100,
   model_dir = NULL,
   trace = FALSE
@@ -114,18 +114,18 @@ at the beginning of the next chunk. Only relevant for transformer models.}
 \item{\code{emb_layer_min}}{\code{int} or \code{string} determining the first layer to be included
 in the creation of embeddings. An integer correspondents to the layer number. The first
 layer has the number 1. Instead of an integer the following strings are possible:
-\code{"start"} for the first layer, \code{"middle"} for the middle layer,
-\code{"2_3_layer"} for the layer two-third layer, and \code{"last"} for the last layer.}
+\code{"start"} for the first layer, \code{"Middle"} for the middle layer,
+\code{"2_3_layer"} for the layer two-third layer, and \code{"Last"} for the last layer.}
 
 \item{\code{emb_layer_max}}{\code{int} or \code{string} determining the last layer to be included
 in the creation of embeddings. An integer correspondents to the layer number. The first
 layer has the number 1. Instead of an integer the following strings are possible:
-\code{"start"} for the first layer, \code{"middle"} for the middle layer,
-\code{"2_3_layer"} for the layer two-third layer, and \code{"last"} for the last layer.}
+\code{"start"} for the first layer, \code{"Middle"} for the middle layer,
+\code{"2_3_layer"} for the layer two-third layer, and \code{"Last"} for the last layer.}
 
 \item{\code{emb_pool_type}}{\code{string} determining the method for pooling the token embeddings
-within each layer. If \code{"cls"} only the embedding of the CLS token is used. If
-\code{"average"} the token embedding of all tokens are averaged (excluding padding tokens).
+within each layer. If \code{"CLS"} only the embedding of the CLS token is used. If
+\code{"Average"} the token embedding of all tokens are averaged (excluding padding tokens).
 \verb{"cls} is not supported for \code{method="funnel"}.}
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of

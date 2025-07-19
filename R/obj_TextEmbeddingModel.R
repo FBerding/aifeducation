@@ -234,43 +234,43 @@ TextEmbeddingModel <- R6::R6Class(
             private$transformer_components$model$config$block_sizes
         )
 
-        if (emb_layer_min == "first") {
+        if (emb_layer_min == "First") {
           emb_layer_min <- 1
-        } else if (emb_layer_min == "middle") {
+        } else if (emb_layer_min == "Middle") {
           emb_layer_min <- floor(0.5 * max_layers_funnel)
         } else if (emb_layer_min == "2_3_layer") {
           emb_layer_min <- floor(2 / 3 * max_layers_funnel)
-        } else if (emb_layer_min == "last") {
+        } else if (emb_layer_min == "Last") {
           emb_layer_min <- max_layers_funnel
         }
 
-        if (emb_layer_max == "first") {
+        if (emb_layer_max == "First") {
           emb_layer_max <- 1
-        } else if (emb_layer_max == "middle") {
+        } else if (emb_layer_max == "Middle") {
           emb_layer_max <- floor(0.5 * max_layers_funnel)
         } else if (emb_layer_max == "2_3_layer") {
           emb_layer_max <- floor(2 / 3 * max_layers_funnel)
-        } else if (emb_layer_max == "last") {
+        } else if (emb_layer_max == "Last") {
           emb_layer_max <- max_layers_funnel
         }
       } else {
-        if (emb_layer_min == "first") {
+        if (emb_layer_min == "First") {
           emb_layer_min <- 1
-        } else if (emb_layer_min == "middle") {
+        } else if (emb_layer_min == "Middle") {
           emb_layer_min <- floor(0.5 * private$transformer_components$model$config$num_hidden_layers)
         } else if (emb_layer_min == "2_3_layer") {
           emb_layer_min <- floor(2 / 3 * private$transformer_components$model$config$num_hidden_layers)
-        } else if (emb_layer_min == "last") {
+        } else if (emb_layer_min == "Last") {
           emb_layer_min <- private$transformer_components$model$config$num_hidden_layers
         }
 
-        if (emb_layer_max == "first") {
+        if (emb_layer_max == "First") {
           emb_layer_max <- 1
-        } else if (emb_layer_max == "middle") {
+        } else if (emb_layer_max == "Middle") {
           emb_layer_max <- floor(0.5 * private$transformer_components$model$config$num_hidden_layers)
         } else if (emb_layer_max == "2_3_layer") {
           emb_layer_max <- floor(2 / 3 * private$transformer_components$model$config$num_hidden_layers)
-        } else if (emb_layer_max == "last") {
+        } else if (emb_layer_max == "Last") {
           emb_layer_max <- private$transformer_components$model$config$num_hidden_layers
         }
       }
@@ -309,10 +309,10 @@ TextEmbeddingModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for checking and setting pooling type
     check_and_set_pooling_type = function(emb_pool_type) {
-      if (emb_pool_type %in% c("cls", "average") == FALSE) {
+      if (emb_pool_type %in% c("CLS", "Average") == FALSE) {
         stop("emb_pool_type must be 'cls' or 'average'.")
       }
-      if (private$basic_components$method == "funnel" & emb_pool_type != "cls") {
+      if (private$basic_components$method == "funnel" & emb_pool_type != "CLS") {
         stop("Funnel currently supports only cls as pooling type.")
       }
       private$transformer_components$emb_pool_type <- emb_pool_type
@@ -427,16 +427,16 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param emb_layer_min `int` or `string` determining the first layer to be included
     #' in the creation of embeddings. An integer correspondents to the layer number. The first
     #' layer has the number 1. Instead of an integer the following strings are possible:
-    #' `"start"` for the first layer, `"middle"` for the middle layer,
-    #' `"2_3_layer"` for the layer two-third layer, and `"last"` for the last layer.
+    #' `"start"` for the first layer, `"Middle"` for the middle layer,
+    #' `"2_3_layer"` for the layer two-third layer, and `"Last"` for the last layer.
     #' @param emb_layer_max `int` or `string` determining the last layer to be included
     #' in the creation of embeddings. An integer correspondents to the layer number. The first
     #' layer has the number 1. Instead of an integer the following strings are possible:
-    #' `"start"` for the first layer, `"middle"` for the middle layer,
-    #' `"2_3_layer"` for the layer two-third layer, and `"last"` for the last layer.
+    #' `"start"` for the first layer, `"Middle"` for the middle layer,
+    #' `"2_3_layer"` for the layer two-third layer, and `"Last"` for the last layer.
     #' @param emb_pool_type `string` determining the method for pooling the token embeddings
-    #' within each layer. If `"cls"` only the embedding of the CLS token is used. If
-    #' `"average"` the token embedding of all tokens are averaged (excluding padding tokens).
+    #' within each layer. If `"CLS"` only the embedding of the CLS token is used. If
+    #' `"Average"` the token embedding of all tokens are averaged (excluding padding tokens).
     #' `"cls` is not supported for `method="funnel"`.
     #' @param pad_value `r get_param_doc_desc("pad_value")`
     #' @param model_dir `string` path to the directory where the
@@ -454,9 +454,9 @@ TextEmbeddingModel <- R6::R6Class(
                          max_length = 0,
                          chunks = 2,
                          overlap = 0,
-                         emb_layer_min = "middle",
+                         emb_layer_min = "Middle",
                          emb_layer_max = "2_3_layer",
-                         emb_pool_type = "average",
+                         emb_pool_type = "Average",
                          pad_value=-100,
                          model_dir = NULL,
                          trace = FALSE) {
@@ -938,7 +938,7 @@ TextEmbeddingModel <- R6::R6Class(
       n_batches <- ceiling(n_units / batch_size)
       batch_results <- NULL
 
-      if (private$transformer_components$emb_pool_type == "average") {
+      if (private$transformer_components$emb_pool_type == "Average") {
         reticulate::py_run_file(system.file("python/pytorch_old_scripts.py",
           package = "aifeducation"
         ))
@@ -957,7 +957,7 @@ TextEmbeddingModel <- R6::R6Class(
           pytorch_dtype=torch$double
         }
         private$transformer_components$model$to(pytorch_device,dtype=pytorch_dtype)
-        if (private$transformer_components$emb_pool_type == "average") {
+        if (private$transformer_components$emb_pool_type == "Average") {
           pooling$to(pytorch_device)
         }
 
@@ -1019,7 +1019,7 @@ TextEmbeddingModel <- R6::R6Class(
           }
         )
 
-        if (private$transformer_components$emb_pool_type == "average") {
+        if (private$transformer_components$emb_pool_type == "Average") {
           # Average Pooling over all tokens of a layer
           for (i in tmp_selected_layer) {
             #abc=pooling(
@@ -1047,23 +1047,23 @@ TextEmbeddingModel <- R6::R6Class(
               text_embedding[i, j, ]<-0
 
               if (torch$cuda$is_available() == FALSE) {
-                if (private$transformer_components$emb_pool_type == "cls") {
+                if (private$transformer_components$emb_pool_type == "CLS") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
                     tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$numpy()
                   )
-                } else if (private$transformer_components$emb_pool_type == "average") {
+                } else if (private$transformer_components$emb_pool_type == "Average") {
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
                     tensor_embeddings[[layer_int]][[index_int]]$detach()$numpy()
                   )
                 }
               } else {
-                if (private$transformer_components$emb_pool_type == "cls") {
+                if (private$transformer_components$emb_pool_type == "CLS") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
                     tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$cpu()$numpy()
                   )
-                } else if (private$transformer_components$emb_pool_type == "average") {
+                } else if (private$transformer_components$emb_pool_type == "Average") {
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
                     tensor_embeddings[[layer_int]][[index_int]]$detach()$cpu()$numpy()
                   )

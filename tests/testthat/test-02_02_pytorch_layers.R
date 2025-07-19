@@ -148,7 +148,7 @@ test_that("residual connection with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  types <- c("None", "addition", "residual_gate")
+  types <- c("None", "Addition", "ResidualGate")
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
@@ -265,8 +265,8 @@ test_that("LayerNorm with Mask", {
 # Dense Layer with Mask-----------------------------------------------------------
 test_that("DenseLayer with Mask", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  normalization_types <- c("None", "layer_norm")
-  residual_types=c("None", "addition", "residual_gate")
+  normalization_types <- c("None", "LayerNorm")
+  residual_types=c("None", "Addition", "ResidualGate")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -297,7 +297,7 @@ test_that("DenseLayer with Mask", {
         output_size = as.integer(target_features),
         times = as.integer(times),
         pad_value = as.integer(pad_value),
-        act_fct = "elu",
+        act_fct = "ELU",
         dropout = 0.3,
         bias = TRUE,
         parametrizations = "None",
@@ -349,7 +349,7 @@ test_that("DenseLayer with Mask", {
 # layer_tf_encoder-------------------------------------------------------
 test_that("layer_tf_encoder", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  attention_types <- c("multihead", "fourier")
+  attention_types <- c("MultiHead", "Fourier")
 
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -379,10 +379,10 @@ test_that("layer_tf_encoder", {
       pad_value = as.integer(pad_value),
       attention_type = attention_type,
       features = as.integer(features),
-      normalization_type = "layer_norm",
-      residual_type = "residual_gate",
+      normalization_type = "LayerNorm",
+      residual_type = "ResidualGate",
       num_heads = as.integer(2),
-      act_fct = "elu",
+      act_fct = "ELU",
       dropout_rate_1 = 0.3,
       dropout_rate_2 = 0.3,
       bias = TRUE,
@@ -441,7 +441,7 @@ test_that("exreme_pooling_over_time", {
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  for (pooling_type in c("max", "min", "min_max")) {
+  for (pooling_type in c("Max", "Min", "MinMax")) {
     layer <- py$exreme_pooling_over_time(
       times = as.integer(times),
       features = as.integer(features),
@@ -449,7 +449,7 @@ test_that("exreme_pooling_over_time", {
       pooling_type = pooling_type
     )$to(device)
     y_1 <- layer(values[[1]], values[[4]])
-    if (pooling_type != "min_max") {
+    if (pooling_type != "MinMax") {
       expect_equal(dim(tensor_to_numpy(y_1)), c(length(sequence_length), features))
     } else {
       expect_equal(dim(tensor_to_numpy(y_1)), c(length(sequence_length), 2 * features))
@@ -463,7 +463,7 @@ test_that("layer_adaptive_extreme_pooling_1d", {
   tensor <- torch$rand(30L, 768L)$to(device)
   output_size <- 10
 
-  for (pooling_type in c("max", "min", "min_max")) {
+  for (pooling_type in c("Max", "Min", "MinMax")) {
     layer <- py$layer_adaptive_extreme_pooling_1d(
       output_size = as.integer(output_size),
       pooling_type = pooling_type
@@ -478,11 +478,11 @@ test_that("layer_adaptive_extreme_pooling_1d", {
     result_matrix <- tensor_to_numpy(result)
     tensor_matrix <- tensor_to_numpy(tensor)
     for (i in 1:nrow(result_matrix)) {
-      if (pooling_type == "max") {
+      if (pooling_type == "Max") {
         ordered_values <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = TRUE)]
         relevant_values <- ordered_values[seq(from = 1, to = output_size)]
         expect_equal(sum(round(result_matrix[i,],digits=5) %in% round(relevant_values,digits=5)), output_size)
-      } else if (pooling_type == "min") {
+      } else if (pooling_type == "Min") {
         ordered_values <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = FALSE)]
         relevant_values <- ordered_values[seq(from = 1, to = output_size)]
         expect_equal(sum(round(result_matrix[i,],digits=5) %in% round(relevant_values,digits=5)), output_size)
@@ -601,7 +601,7 @@ test_that("layer_mutiple_n_gram_convolution", {
       parametrizations = "None",
       dtype = values[[1]]$dtype,
       device = device,
-      act_fct_name = "elu"
+      act_fct_name = "ELU"
     )$to(device)
     layer$eval()
 
@@ -662,7 +662,7 @@ test_that("merge_layer", {
   n_extracted_features <- sample(seq(from = 2, to = features, by = 1), size = 1)
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
-  for (pooling_type in c("max", "min", "min_max")) {
+  for (pooling_type in c("Max", "Min", "MinMax")) {
     layer <- py$merge_layer(
       times = as.integer(times),
       features = as.integer(features),

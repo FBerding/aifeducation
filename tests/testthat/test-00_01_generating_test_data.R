@@ -101,7 +101,7 @@ test_that("Generating Test Data", {
     overlap = 10,
     emb_layer_min = 1,
     emb_layer_max = 2,
-    emb_pool_type = "average",
+    emb_pool_type = "Average",
     model_dir = test_path_train
   )
 

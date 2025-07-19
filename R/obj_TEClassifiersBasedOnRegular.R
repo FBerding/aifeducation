@@ -103,7 +103,7 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      n_cores = auto_n_cores(),
                      lr_rate=1e-3,
                      lr_warm_up_ratio=0.02,
-                     optimizer="adamw") {
+                     optimizer="AdamW") {
       private$do_training(args=get_called_args(n=1))
     }
     ),

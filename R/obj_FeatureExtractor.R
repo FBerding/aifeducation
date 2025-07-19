@@ -157,7 +157,7 @@ TEFeatureExtractor <- R6::R6Class(
                      log_write_interval = 10,
                      lr_rate=1e-3,
                      lr_warm_up_ratio=0.02,
-                     optimizer = "adamw") {
+                     optimizer = "AdamW") {
       args=get_called_args(n=1)
       check_all_args(args=args)
       self$check_embedding_model(data_embeddings)

@@ -61,7 +61,7 @@ for (framework in ml_frameworks) {
             sustain_interval = 15,
             epochs = 2,
             batch_size = 100,
-            optimizer = "adam",
+            optimizer = "Adam",
             trace = FALSE,
             ml_trace = 0
           )

@@ -69,7 +69,7 @@ for (object_class_name in object_class_names) {
           name = NULL,
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
           sustain_interval = 30,
-          act_fct = "elu",
+          act_fct = "ELU",
           rec_dropout = 0.1,
           dense_dropout = 0.1,
           encoder_dropout = 0.1,

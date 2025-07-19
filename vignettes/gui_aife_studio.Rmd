@@ -709,7 +709,7 @@ interface should process raw text:
 
 -   **Pooling Type**: With this option you can decide if only the hidden
     states of the cls-token should be used for the embedding. If you set
-    this option to "average", the hidden states of all tokens are
+    this option to "Average", the hidden states of all tokens are
     averaged within each layer except the hidden states for padding
     tokens.
 

@@ -54,7 +54,7 @@ test_that("Setup Classifier Data", {
         sustain_interval = 15,
         epochs = 75,
         batch_size = 100,
-        optimizer = "adam",
+        optimizer = "Adam",
         trace = trace,
         ml_trace = as.numeric(trace)
       )

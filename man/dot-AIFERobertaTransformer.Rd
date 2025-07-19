@@ -121,7 +121,7 @@ This method adds the following \emph{'dependent' parameters} to the base class' 
   num_hidden_layer = 12,
   num_attention_heads = 12,
   intermediate_size = 3072,
-  hidden_act = "gelu",
+  hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1,
   sustain_track = TRUE,

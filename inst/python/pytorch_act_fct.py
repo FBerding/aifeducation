@@ -18,19 +18,19 @@ import math
 import safetensors
 
 def get_act_fct(name):
-  if name=="elu":
+  if name=="ELU":
     return torch.nn.ELU()
-  elif name=="leakyrelu":
+  elif name=="LeakyReLU":
     return torch.nn.LeakyReLU()
-  elif name=="relu":
+  elif name=="ReLU":
     return torch.nn.ReLU()
   elif name=="gelu":
     return torch.nn.GELU()
-  elif name=="sigmoid":
+  elif name=="Sigmoid":
     return torch.nn.Sigmoid()
-  elif name=="tanh":
+  elif name=="Tanh":
     return torch.nn.Tanh()
-  elif name=="prelu":
+  elif name=="PReLU":
     return torch.nn.PReLU()
   elif name=="None":
     return  torch.nn.Identity()

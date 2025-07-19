@@ -80,17 +80,17 @@ class layer_residual_connection(torch.nn.Module):
       else:
         self.pad_value=torch.tensor(pad_value)
       
-      if self.type=="residual_gate":
+      if self.type=="ResidualGate":
         self.gate_param=torch.nn.Parameter(torch.ones(1))
       
     def forward(self, x,y,seq_len,mask_times,mask_features):
       if self.type=="None":
         return y, seq_len,mask_times,mask_features
-      elif self.type=="addition":
+      elif self.type=="Addition":
         z=x+y
         z=torch.where(condition=mask_features,input=self.pad_value,other=z)
         return z, seq_len,mask_times,mask_features
-      elif self.type=="residual_gate":
+      elif self.type=="ResidualGate":
         weight=torch.nn.functional.sigmoid(self.gate_param)
         z=(1-weight)*x+weight*y
         torch.where(condition=mask_features,input=self.pad_value,other=z)
@@ -120,7 +120,7 @@ class identity_layer(torch.nn.Module):
 # True indicates that the sequence or is padded. If True these values should not be part 
 # of further computations. mask_features is adapted to the new output size
 class dense_layer_with_mask(torch.nn.Module):
-  def __init__(self,input_size,output_size,times,pad_value,act_fct="elu",normalization_type="layer_norm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,input_size,output_size,times,pad_value,act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.input_size=input_size
@@ -147,11 +147,11 @@ class dense_layer_with_mask(torch.nn.Module):
             device=device, 
             dtype=dtype
             )
-    if self.parametrizations=="orthogonal":
+    if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.dense, name='weight',orthogonal_map="matrix_exp")
-    elif self.parametrizations=="weight_norm":
+    elif self.parametrizations=="WeightNorm":
       torch.nn.utils.parametrizations.weight_norm(module=self.dense, name='weight', dim=0)
-    elif self.parametrizations=="spectral_norm":
+    elif self.parametrizations=="SpectralNorm":
       torch.nn.utils.spectral_norm(module=self.dense, name='weight', n_power_iterations=1, eps=1e-12, dim=None)
     
     self.act_fct=get_act_fct(self.act_fct_name)
@@ -199,11 +199,11 @@ class dense_layer_with_mask(torch.nn.Module):
 #Input args:
 #pooling_type: string Pooling type
 #
-#Returns a tensor with shape (Batch,Features) for "min" and "max" representing the min/max values over time 
-#for every feature. If pooling type ="min_max" shape is (Batch, 2*Features).
+#Returns a tensor with shape (Batch,Features) for "Min" and "Max" representing the min/max values over time 
+#for every feature. If pooling type ="MinMax" shape is (Batch, 2*Features).
 #Padding values cannot occure in the features and are not considered.
 class exreme_pooling_over_time(torch.nn.Module):
-  def __init__(self,times,features,pad_value,pooling_type="max"):
+  def __init__(self,times,features,pad_value,pooling_type="Max"):
     super().__init__()
     self.features=features
     self.kernel_size_times=times
@@ -226,18 +226,18 @@ class exreme_pooling_over_time(torch.nn.Module):
       ceil_mode=False)
 
   def forward(self,x,mask_features):
-    if self.pooling_type=="max" or self.pooling_type=="min_max":
+    if self.pooling_type=="Max" or self.pooling_type=="MinMax":
       result_max=torch.squeeze(self.pool_layer(x),dim=1)
-    if self.pooling_type=="min" or self.pooling_type=="min_max":
+    if self.pooling_type=="Min" or self.pooling_type=="MinMax":
       tmp=(-1)*x
       tmp=torch.where(condition=mask_features,input=self.pad_value,other=tmp)
       result_min=torch.squeeze((-1)*self.pool_layer(tmp),dim=1)
     
-    if self.pooling_type=="max":
+    if self.pooling_type=="Max":
       return result_max
-    elif self.pooling_type=="min":
+    elif self.pooling_type=="Min":
       return result_min
-    elif self.pooling_type=="min_max":
+    elif self.pooling_type=="MinMax":
       return torch.cat((result_max,result_min),dim=1)
 
 
@@ -245,7 +245,7 @@ class exreme_pooling_over_time(torch.nn.Module):
 #Expects tensor of shape (Batch, Features)
 #Returns tensor of shape (Bath, output_size)
 class layer_adaptive_extreme_pooling_1d(torch.nn.Module):
-  def __init__(self,output_size,pooling_type="max"):
+  def __init__(self,output_size,pooling_type="Max"):
     super().__init__()
     
     self.output_size=output_size
@@ -260,10 +260,10 @@ class layer_adaptive_extreme_pooling_1d(torch.nn.Module):
     return y
   def forward(self,x):
     y=x
-    if self.pooling_type=="max":
+    if self.pooling_type=="Max":
       z=self.get_max_n_values(y,self.output_size)
       return z
-    elif self.pooling_type=="min":
+    elif self.pooling_type=="Min":
       z=(-1)*self.get_max_n_values((-1)*y,self.output_size)
       return z
     else:
@@ -287,7 +287,7 @@ class layer_adaptive_extreme_pooling_1d(torch.nn.Module):
 # of further computations. mask_features is adapted to the new output size
 #
 class layer_n_gram_convolution(torch.nn.Module):
-  def __init__(self, kernel_size_times, times, pad_value, n_filter, features, device=None, dtype=None,bias=True,parametrizations="None",act_fct="elu"):
+  def __init__(self, kernel_size_times, times, pad_value, n_filter, features, device=None, dtype=None,bias=True,parametrizations="None",act_fct="ELU"):
     super().__init__()
     self.times=times
     self.features=features
@@ -323,11 +323,11 @@ class layer_n_gram_convolution(torch.nn.Module):
       dtype=self.dtype)
     self.act_fct=get_act_fct(self.act_fct_name)
     
-    if self.parametrizations=="orthogonal":
+    if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.conv_layer, name='weight',orthogonal_map="matrix_exp")
-    elif self.parametrizations=="weight_norm":
+    elif self.parametrizations=="WeightNorm":
       torch.nn.utils.parametrizations.weight_norm(module=self.conv_layer, name='weight', dim=0)
-    elif self.parametrizations=="spectral_norm":
+    elif self.parametrizations=="SpectralNorm":
       torch.nn.utils.spectral_norm(module=self.conv_layer, name='weight', n_power_iterations=1, eps=1e-12, dim=None)
   
   def forward(self, x,seq_len,mask_times,mask_features):
@@ -378,7 +378,7 @@ class layer_n_gram_convolution(torch.nn.Module):
 # of further computations. 
 #
 class layer_mutiple_n_gram_convolution(torch.nn.Module):
-  def __init__(self,ks_min,ks_max,times,features,pad_value,bias=True,dropout=0.1,parametrizations="None",device=None,dtype=None,act_fct_name="elu",residual_type="residual_gate",normalization_type="layer_norm"):
+  def __init__(self,ks_min,ks_max,times,features,pad_value,bias=True,dropout=0.1,parametrizations="None",device=None,dtype=None,act_fct_name="ELU",residual_type="ResidualGate",normalization_type="LayerNorm"):
     super().__init__() 
     self.ks_min=ks_min
     self.ks_max=ks_max
@@ -531,7 +531,7 @@ class layer_abs_positional_embedding(torch.nn.Module):
 
 #layer tf_encoder
 class layer_tf_encoder(torch.nn.Module):
-  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="multi_head",num_heads=2,act_fct="elu",bias=True,parametrizations="None",normalization_type="layer_norm",device=None, dtype=None,residual_type="None"):
+  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
@@ -553,7 +553,7 @@ class layer_tf_encoder(torch.nn.Module):
     self.num_heads=num_heads
    
     #Attention
-    if self.attention_type=="multihead":
+    if self.attention_type=="MultiHead":
       self.attention=torch.nn.MultiheadAttention(
       embed_dim=self.features,
       num_heads=self.num_heads,
@@ -561,7 +561,7 @@ class layer_tf_encoder(torch.nn.Module):
       batch_first=True,
       device=device, 
       dtype=dtype)
-    elif self.attention_type=="fourier":
+    elif self.attention_type=="Fourier":
       self.attention=layer_fourier_transformation()
     
     #Dropout Layer
@@ -616,9 +616,9 @@ class layer_tf_encoder(torch.nn.Module):
 
   def forward(self,x,seq_len,mask_times,mask_features):
     #Sub-Layer 1
-    if self.attention_type=="fourier":
+    if self.attention_type=="Fourier":
       y=self.attention(x*(~mask_features))
-    elif self.attention_type=="multihead":
+    elif self.attention_type=="MultiHead":
       y=self.attention(
         query=x,
         key=x,
@@ -645,7 +645,7 @@ class layer_tf_encoder(torch.nn.Module):
 
 #Merge Leyer
 class merge_layer(torch.nn.Module):
-  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="max",normalization_type="None",attention_type="multihead",num_heads=1,device=None,dtype=None):
+  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="Max",normalization_type="None",attention_type="MultiHead",num_heads=1,device=None,dtype=None):
     super().__init__()
     
     self.times=times
@@ -668,7 +668,7 @@ class merge_layer(torch.nn.Module):
         get_layer_normalization(name= self.normalization_type,times=self.times, features=self.features,pad_value=self.pad_value,eps=1e-5)
         )
     
-    if pooling_type=="min_max":
+    if pooling_type=="MinMax":
       self.n_pooling_features=2*self.features
     else:
       self.n_pooling_features=self.features

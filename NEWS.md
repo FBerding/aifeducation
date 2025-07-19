@@ -250,7 +250,7 @@ The following changes have been made:
 -   Replaced the parameter 'aggregation' with three new parameters
     allowing to explicitly choose the start and end layer to be included
     in the creation of embeddings. Furthermore, two options for the
-    pooling method within each layer is added ("cls" and "average").
+    pooling method within each layer is added ("CLS" and "Average").
 -   Added support for reporting the training and validation loss during
     training the corresponding base model.
 

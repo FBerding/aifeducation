@@ -35,14 +35,14 @@ test_that("stack_dense_layer", {
     hidden_size = as.integer(features),
     n_layers = 3L,
     dropout = 0.3,
-    act_fct = "elu",
+    act_fct = "ELU",
     bias = TRUE,
-    normalization_type = "layer_norm",
+    normalization_type = "LayerNorm",
     pad_value=as.integer(pad_value),
     parametrizations = "None",
     dtype=values[[1]]$dtype,
     device = device,
-    residual_type="residual_gate"
+    residual_type="ResidualGate"
   )$to(device)
   layer$eval()
 
@@ -119,7 +119,7 @@ test_that("stack_rec_layers", {
         parametrizations = "None",
         dtype=values[[1]]$dtype,
         device = device,
-        residual_type="residual_gate",
+        residual_type="ResidualGate",
         return_sequence=TRUE
       )$to(device)
       layer$eval()
@@ -164,7 +164,7 @@ test_that("stack_rec_layers", {
 #stack_tf_encoder_layer----------------------------------------------------
 test_that("stack_tf_encoder_layer", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  attention_types=c("multihead","fourier")
+  attention_types=c("MultiHead","Fourier")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
@@ -201,7 +201,7 @@ test_that("stack_tf_encoder_layer", {
       parametrizations = "None",
       dtype=values[[1]]$dtype,
       device = device,
-      residual_type="residual_gate"
+      residual_type="ResidualGate"
     )$to(device)
     layer$eval()
 
@@ -275,8 +275,8 @@ test_that("stack_n_gram_convolution", {
       parametrizations="None",
       dtype=values[[1]]$dtype,
       device = device,
-      act_fct="elu",
-      residual_type="residual_gate"
+      act_fct="ELU",
+      residual_type="ResidualGate"
     )$to(device)
     layer$eval()
 

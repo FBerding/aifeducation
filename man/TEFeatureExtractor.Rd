@@ -146,7 +146,7 @@ Method for training a neural net.
   log_write_interval = 10,
   lr_rate = 0.001,
   lr_warm_up_ratio = 0.02,
-  optimizer = "adamw"
+  optimizer = "AdamW"
 )}\if{html}{\out{</div>}}
 }
 
@@ -189,7 +189,7 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
 
 \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up.}
 
-\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'adam', 'rmsprop', 'adamw', 'sgd'}
+\item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
 }
 \if{html}{\out{</div>}}
 }

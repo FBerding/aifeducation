@@ -18,12 +18,12 @@ import math
 import safetensors
 
 class TEClassifierSequential(torch.nn.Module):
-  def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,skip_connection_type="residual_gate",cls_type="regular",cls_pooling_type="min_max", 
-              feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="layer_norm",
-              ng_conv_act_fct="elu",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="residual_gate",ng_conv_normalization_type="layer_norm",
-              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="residual_gate",dense_normalization_type="layer_norm",
-              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None",rec_residual_type="residual_gate",rec_normalization_type="layer_norm", 
-              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multihead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="residual_gate",tf_normalization_type="layer_norm",
+  def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,skip_connection_type="ResidualGate",cls_type="regular",cls_pooling_type="MinMax", 
+              feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
+              ng_conv_act_fct="ELU",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="ResidualGate",ng_conv_normalization_type="LayerNorm",
+              dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
+              rec_act_fct="Tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None",rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm", 
+              tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm",
               device=None, dtype=None):
       super().__init__()
       self.inc_cls_head=inc_cls_head
@@ -170,12 +170,12 @@ class TEClassifierSequential(torch.nn.Module):
 
 class TEClassifierParallel(torch.nn.Module):
   def __init__(self,times, features, pad_value,n_target_levels,inc_cls_head=True,cls_type="regular", 
-              shared_feat_layer=True,feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="layer_norm",
-              ng_conv_act_fct="elu",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="residual_gate",ng_conv_normalization_type="layer_norm",
-              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="residual_gate",dense_normalization_type="layer_norm",
-              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="residual_gate",rec_normalization_type="layer_norm",
-              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multi_head",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="residual_gate",tf_normalization_type="layer_norm",
-              merge_attention_type="multi_head",merge_num_heads=1,merge_normalization_type="layer_norm",merge_pooling_type="min_max",merge_pooling_features=2,
+              shared_feat_layer=True,feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
+              ng_conv_act_fct="ELU",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="ResidualGate",ng_conv_normalization_type="LayerNorm",
+              dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
+              rec_act_fct="Tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm",
+              tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm",
+              merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_type="MinMax",merge_pooling_features=2,
               device=None, dtype=None):
       super().__init__()
       self.inc_cls_head=inc_cls_head
@@ -445,14 +445,14 @@ class TEClassifierParallel(torch.nn.Module):
 
 
 class TEClassifierPrototype(torch.nn.Module):
-  def __init__(self,times, features, pad_value,target_levels,core_net_type,embedding_dim=2,skip_connection_type="residual_gate",inc_cls_head=True,cls_type="regular", 
-              shared_feat_layer=True, feat_act_fct="elu",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="layer_norm",
-              ng_conv_act_fct="elu",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="residual_gate",ng_conv_normalization_type="layer_norm",
-              dense_act_fct="elu",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="residual_gate",dense_normalization_type="layer_norm",
-              rec_act_fct="tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="residual_gate",rec_normalization_type="layer_norm",
-              tf_act_fct="elu",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="multi_head",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="residual_gate",tf_normalization_type="layer_norm",
-              merge_attention_type="multi_head",merge_num_heads=1,merge_normalization_type="layer_norm",merge_pooling_features=2,merge_pooling_type="min_max",
-              cls_pooling_features=2,cls_pooling_type="min_max",
+  def __init__(self,times, features, pad_value,target_levels,core_net_type,embedding_dim=2,skip_connection_type="ResidualGate",inc_cls_head=True,cls_type="regular", 
+              shared_feat_layer=True, feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
+              ng_conv_act_fct="ELU",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="ResidualGate",ng_conv_normalization_type="LayerNorm",
+              dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
+              rec_act_fct="Tanh",rec_n_layers=0,rec_type="gru",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm",
+              tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_embedding_type="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm",
+              merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_features=2,merge_pooling_type="MinMax",
+              cls_pooling_features=2,cls_pooling_type="MinMax",
               metric_type="euclidean",
               device=None, dtype=None):
     super().__init__()

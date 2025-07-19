@@ -132,8 +132,8 @@ This method adds the following \emph{'dependent' parameters} to the base class's
   num_attention_heads = 12,
   intermediate_size = 3072,
   num_decoder_layers = 2,
-  pooling_type = "mean",
-  hidden_act = "gelu",
+  pooling_type = "Mean",
+  hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1,
   activation_dropout = 0,
@@ -179,7 +179,7 @@ embedding. Allowed values: \code{1 <= x }}
 \item{\code{pooling_type}}{\code{string} Type of pooling.
 \itemize{
 \item \code{"mean"} for pooling with mean.
-\item \code{"max"} for pooling with maximum values.  Allowed values: 'mean', 'max'
+\item \code{"max"} for pooling with maximum values.  Allowed values: 'Mean', 'Max'
 }}
 
 \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}

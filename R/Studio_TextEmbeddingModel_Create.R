@@ -190,9 +190,9 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
         max_layer_transformer <- interface_architecture()[[3]]
 
         if (interface_architecture()[[1]] == "funnel") {
-          pool_type_choices <- c("cls")
+          pool_type_choices <- c("CLS")
         } else {
-          pool_type_choices <- c("average", "cls")
+          pool_type_choices <- c("Average", "CLS")
         }
 
         ui <- shiny::tagList(
