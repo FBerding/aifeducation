@@ -1598,7 +1598,7 @@ case you have the true classes for all or some of the cases, you can add
 them to the plot by using the argument `classes_q`. The resulting plot
 is shown in the following Figure.
 
-```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embeddings of an untrained classifier of type 'ProtoNet'"}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embeddings of an untrained classifier of type 'ProtoNet'")}
 plot_untrained <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
@@ -1699,7 +1699,7 @@ After training we can request a visualization of the data again. We
 first omit all unlabeled cases by setting `inc_unlabeled=FALSE` in order
 to get an impression of the quality of training.
 
-```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases"}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases")}
 plot_trained_1 <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
@@ -1734,7 +1734,7 @@ the prototype for "neg" are assigned to "neg".
 running_num_figures=running_num_figures+1
 ```
 
-```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases"}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases")}
 plot_trained_2 <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
@@ -1828,7 +1828,7 @@ other classes. Next, we plot the results.
 running_num_figures=running_num_figures+1
 ```
 
-``` {r, include =TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes." }
+``` {r, include =TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes.")}
 plot_with_samples<-classifier_prototype$plot_embeddings(
   embeddings_q = query_embeddings,
   embeddings_s = sample_embeddings,
@@ -1949,7 +1949,7 @@ feature_extractor$train(
 
 You can plot the training history of the model with:
 
-```{r, include = TRUE, eval=TRUE, fig.cap="Figure `r running_num_figures`: Training History of a Feature Extractor." }
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Training History of a Feature Extractor.")}
 feature_extractor$plot_training_history()
 ```
 

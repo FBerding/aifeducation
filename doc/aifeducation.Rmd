@@ -1,0 +1,155 @@
+---
+title: "01 Get started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{01 Get started}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# 1) Installation and Technical Requirements
+
+## Introduction
+
+In terms of natural language processing (NLP), state-of-the-art approaches rely on neural nets
+with multiple layers and consist of a huge number of parameters making
+them computationally demanding. With specialized libraries such as
+*PyTorch*, graphical processing units (gpu)
+can help to speed up computations significantly. However, many of these
+specialized libraries for machine learning are written in python.
+Fortunately, an interface to python is provided via the *R* package
+[reticulate](https://cran.r-project.org/package=reticulate).
+
+The R package *Artificial Intelligence for Education (aifeducation)*
+aims to provide educators, educational researchers, and social
+researchers with a convincing interface to these state-of-the-art models
+for natural language processing and tries to address the special needs
+and challenges of the educational and social sciences. The package
+currently supports the application of Artificial Intelligence (AI) for
+tasks such as text embedding and classification.
+
+Since state-of-the-art approaches in natural language processing rely on
+large models compared to classical statistical methods (e.g., latent
+class analysis, structural equation modeling) and are based largely on
+python, some additional installation steps are necessary.
+
+If you would like to train and to develop your own models and AIs, a
+compatible graphic device is necessary. Even a low performing graphic
+device can speed up computations significantly. If you prefer to use
+pre-trained models however, this is **not** necessary. In this case, a
+'normal' office computer without a graphic device should be sufficient
+in most cases. To get ready for using the package, two steps are
+necessary.
+
+## Step 1 - Install the R package
+
+First you need to install the package. This can be done by:
+
+```{r, include = TRUE, eval=FALSE}
+install.packages("aifeducation")
+```
+
+With this command, `aifeducation` is installed on your machine.
+
+## Step 2 - Install Python and optional R packages
+
+Since natural language processing with neural nets is based on models
+which are computationally intensive, *PyTorch* is used within this
+package together with some other specialized python libraries.
+
+The most straightforward method for getting started is to call the
+function `install_aifeducation` as follows:
+
+```{r, include = TRUE, eval=FALSE}
+aifeducation::install_aifeducation(
+  install_aifeducation_studio = TRUE,
+  python_version = "3.12",
+  use_conda = FALSE)
+```
+
+This function will install python, and all relevant python
+libraries into a virtual environment called "aifeducation".
+
+In addition, we recommend to set `install_aifeducation_studio=TRUE`
+since this will install the optional *R* packages necessary to use *AI
+for Education - Studio*. *AI for Education - Studio* is a graphical user
+interface for applying these packages. We recommend to use it for
+everyone who is unfamiliar with *R* or machine learning. If you do not
+want use the studio, you can set the argument to `FALSE`. In this case
+you have to use the package with *R* syntax.
+
+If you have a suitable machine and would like to use a graphic card for
+computations you need to install some further software. You can find
+further information here: <https://pytorch.org/get-started/locally/>
+
+You can check if python is working by using the function
+`reticulate::py_available()`. This should return `TRUE`.
+
+```{r, include = TRUE, eval=FALSE}
+reticulate::py_available(initialize = TRUE)
+```
+
+You can check if all necessary python packages are successfully
+installed by calling the function `check_aif_py_modules`
+
+```{r, include = TRUE, eval=FALSE}
+aifeducation::check_aif_py_modules()
+```
+
+Now everything is ready to use the package.
+
+# 2) Starting a new session
+
+The most convenient way to work with the package is to use *AI for
+Education - Studio* which you can start by calling
+`aifeducation::start_aifeducation_studio()`.
+
+```{r, include = TRUE, eval=FALSE}
+aifeducation::start_aifeducation_studio()
+```
+
+In case you do not want to use the graphical user interface, you have to
+prepare your *R* sessions. The easiest way is to call the following function
+directly after starting a *R* session.
+
+```{r, include = TRUE, eval=FALSE}
+library(aifeducation)
+aifeducation::prepare_python()
+```
+
+> **Note:** Please remember: Every time you start a new session in *R,*
+> you have to call the funcion `aifeducation::prepare_python`. This is not
+> necessary if you use *AI for Education - Studio*.
+
+# 3) Tutorials and Guides
+
+A guide on how to use the graphical user interface can be found in
+vignette [02 Using the graphical user interface Aifeducation -
+Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
+
+A short introduction into the package with *R* syntax can be found in vignette [03 Using R
+syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+
+Documenting and sharing your work is described in vignette [04 Sharing
+and using trained AI/models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html).
+
+# 4) Update *aifeducation*
+
+In case you already use *aifeducation* and you want to update to a newer
+version of this package, it is recommended to update the used python
+libraries as well. The easiest way is to call the following function:
+
+```{r, include = TRUE, eval=FALSE}
+aifeducation::update_aifeducation()
+```
+

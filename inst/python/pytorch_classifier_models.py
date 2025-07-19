@@ -179,6 +179,7 @@ class TEClassifierParallel(torch.nn.Module):
               device=None, dtype=None):
       super().__init__()
       self.inc_cls_head=inc_cls_head
+      self.shared_feat_layer=shared_feat_layer
       self.n_streams=1
  
       self.masking_layer=masking_layer(
@@ -224,7 +225,7 @@ class TEClassifierParallel(torch.nn.Module):
           dtype=dtype,
           residual_type=tf_residual_type
         )
-        if shared_feat_layer==False:
+        if self.shared_feat_layer==False:
           if features==feat_size:
             self.features_resize_layer_tf=identity_layer(pad_value=pad_value,apply_masking=True)
           else:
@@ -243,11 +244,10 @@ class TEClassifierParallel(torch.nn.Module):
               normalization_type=feat_normalization_type
           )        
         else:
-          self.features_resize_layer_tf=self.features_resize_layer
+          self.features_resize_layer_tf=None
       else:
         self.stack_tf_encoder_layer=None
         self.features_resize_layer_tf=None
-      
       
       if rec_n_layers>0:
         self.n_streams+=1
@@ -267,7 +267,7 @@ class TEClassifierParallel(torch.nn.Module):
           residual_type=rec_residual_type,
           normalization_type=rec_normalization_type
         )
-        if shared_feat_layer==False:
+        if self.shared_feat_layer==False:
           if features==feat_size:
             self.features_resize_layer_rec=identity_layer(pad_value=pad_value,apply_masking=True)
           else:
@@ -286,7 +286,7 @@ class TEClassifierParallel(torch.nn.Module):
               normalization_type=feat_normalization_type
               )   
         else:
-          self.features_resize_layer_rec=self.features_resize_layer
+          self.features_resize_layer_rec=None
       else:
         self.stack_recurrent_layers=None
         self.features_resize_layer_rec=None
@@ -310,7 +310,7 @@ class TEClassifierParallel(torch.nn.Module):
           normalization_type=ng_conv_normalization_type
         )
 
-        if shared_feat_layer==False:        
+        if self.shared_feat_layer==False:        
           if features==feat_size:
             self.features_resize_layer_conv=identity_layer(pad_value=pad_value,apply_masking=True)
           else:
@@ -329,7 +329,7 @@ class TEClassifierParallel(torch.nn.Module):
               normalization_type=feat_normalization_type
           )        
         else:
-          self.features_resize_layer_conv=self.features_resize_layer
+          self.features_resize_layer_conv=None
       else:
         self.stack_n_gram_convolution=None
         self.features_resize_layer_conv=None
@@ -351,7 +351,7 @@ class TEClassifierParallel(torch.nn.Module):
             residual_type=dense_residual_type
             )
 
-        if shared_feat_layer==False:            
+        if self.shared_feat_layer==False:            
           if features==feat_size:
             self.features_resize_layer_dense=identity_layer(pad_value=pad_value,apply_masking=True)
           else:
@@ -370,7 +370,7 @@ class TEClassifierParallel(torch.nn.Module):
               normalization_type=feat_normalization_type
           )
         else:
-          self.features_resize_layer_dense=self.features_resize_layer
+          self.features_resize_layer_dense=None
       else:
         self.stack_dense_layer=None
         self.features_resize_layer_dense=None
@@ -403,19 +403,34 @@ class TEClassifierParallel(torch.nn.Module):
     tensor_list=[y_original[0].clone()]
     
     if not self.stack_tf_encoder_layer==None:
-      tmp=self.features_resize_layer_tf(y[0],y[1],y[2],y[3])
+      if self.shared_feat_layer==False:
+        tmp=self.features_resize_layer_tf(y[0],y[1],y[2],y[3])
+      else:
+        tmp=self.features_resize_layer(y[0],y[1],y[2],y[3])
       tmp=self.stack_tf_encoder_layer(tmp[0],tmp[1],tmp[2],tmp[3])
       tensor_list.append(tmp[0].clone())
+      
     if not self.stack_recurrent_layers==None:
-      tmp=self.features_resize_layer_rec(y[0],y[1],y[2],y[3])
+      if self.shared_feat_layer==False:
+        tmp=self.features_resize_layer_rec(y[0],y[1],y[2],y[3])
+      else:
+        tmp=self.features_resize_layer(y[0],y[1],y[2],y[3])
       tmp=self.stack_recurrent_layers(tmp[0],tmp[1],tmp[2],tmp[3])
       tensor_list.append(tmp[0].clone())
+      
     if not self.stack_n_gram_convolution==None:
-      tmp=self.features_resize_layer_conv(y[0],y[1],y[2],y[3])
+      if self.shared_feat_layer==False:
+        tmp=self.features_resize_layer_conv(y[0],y[1],y[2],y[3])
+      else:
+        tmp=self.features_resize_layer(y[0],y[1],y[2],y[3])
       tmp=self.stack_n_gram_convolution(tmp[0],tmp[1],tmp[2],tmp[3])
       tensor_list.append(tmp[0].clone())
+      
     if not self.stack_dense_layer==None:
-      tmp=self.features_resize_layer_dense(y[0],y[1],y[2],y[3])
+      if self.shared_feat_layer==False:
+        tmp=self.features_resize_layer_dense(y[0],y[1],y[2],y[3])
+      else:
+        tmp=self.features_resize_layer(y[0],y[1],y[2],y[3])
       tmp=self.stack_dense_layer(tmp[0],tmp[1],tmp[2],tmp[3])
       tensor_list.append(tmp[0].clone())
     

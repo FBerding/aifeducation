@@ -8,7 +8,7 @@ testthat::skip_if_not(
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
 # object_class_names=c("TEClassifierSequential")
-# object_class_names="TEClassifierParallelPrototype"
+# object_class_names="TEClassifierParallel"
 # object_class_names="TEClassifierSequentialPrototype"
 # object_class_names="TEClassifierRegular"
 
