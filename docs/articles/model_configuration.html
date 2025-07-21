@@ -301,7 +301,7 @@ of the dimensions were sufficient (Ganesan et al. 2021, p. 4522).</li>
 <p>Ganesan et al. (2021) work shows that a reduction of the dimensions
 is necessary in case that the transformer model uses a large hidden
 size. Since most models in <em>aifeducation</em> work with sequential
-data, the package contains an LSTM (<code>fe_method="lstm"</code>) and a
+data, the package contains an LSTM (<code>fe_method="LSTM"</code>) and a
 dense feature extractor (<code>fe_method="dense"</code>). To use it for
 classifier training, set <code>use_fe=TRUE</code> during the creation of
 the object and specify the desired number of dimensions with

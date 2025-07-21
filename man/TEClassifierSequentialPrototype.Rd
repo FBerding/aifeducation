@@ -186,7 +186,7 @@ Creating a new instance of this class.
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  metric_type = "euclidean",
+  metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 50,
   feat_bias = TRUE,
@@ -211,7 +211,7 @@ Creating a new instance of this class.
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 1,
-  rec_type = "gru",
+  rec_type = "GRU",
   rec_bidirectional = FALSE,
   rec_dropout = 0.2,
   rec_bias = FALSE,
@@ -258,7 +258,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
 
-\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'euclidean'}
+\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
@@ -308,7 +308,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
 
-\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'gru', 'lstm'}
+\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 

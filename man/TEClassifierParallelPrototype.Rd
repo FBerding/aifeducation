@@ -180,7 +180,7 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
-  metric_type = "euclidean",
+  metric_type = "Euclidean",
   shared_feat_layer = TRUE,
   feat_act_fct = "ELU",
   feat_size = 50,
@@ -206,7 +206,7 @@ Creating a new instance of this class.
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 1,
-  rec_type = "gru",
+  rec_type = "GRU",
   rec_bidirectional = FALSE,
   rec_dropout = 0.2,
   rec_bias = FALSE,
@@ -252,7 +252,7 @@ the number of dimensions of the text embeddings. If no feature extractor should 
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
 
-\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'euclidean'}
+\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean'}
 
 \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
 
@@ -304,7 +304,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
 
-\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'gru', 'lstm'}
+\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 

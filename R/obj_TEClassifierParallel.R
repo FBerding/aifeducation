@@ -112,7 +112,7 @@ TEClassifierParallel <- R6::R6Class(
                          dense_residual_type="ResidualGate",
                          rec_act_fct="Tanh",
                          rec_n_layers=1,
-                         rec_type="gru",
+                         rec_type="GRU",
                          rec_bidirectional=FALSE,
                          rec_dropout=0.2,
                          rec_bias=FALSE,

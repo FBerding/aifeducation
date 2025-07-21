@@ -19,7 +19,7 @@ For prediction an ob object class \link{EmbeddedText} or \link{LargeDataSetForTe
 with the same \link{TextEmbeddingModel} as during training. Prediction outputs a new object of class \link{EmbeddedText} or
 \link{LargeDataSetForTextEmbeddings} which contains a text embedding with a lower number of dimensions.
 
-All models use tied weights for the encoder and decoder layers (except \code{method="lstm"}) and apply the estimation of
+All models use tied weights for the encoder and decoder layers (except \code{method="LSTM"}) and apply the estimation of
 orthogonal weights. In addition, training tries to train the model to achieve uncorrelated features.
 
 Objects of class \link{TEFeatureExtractor} are designed to be used with classifiers such as \link{TEClassifierRegular} and
@@ -112,9 +112,9 @@ is generated automatically. Allowed values: any}
 
 \item{\code{features}}{\code{int} Number of features the model should use. Allowed values: \code{1 <= x }}
 
-\item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'dense'} for dense layers. Allowed values: 'dense', 'lstm'}
+\item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values: 'Dense', 'LSTM'}
 
-\item{\code{orthogonal_method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'dense'} for dense layers. Allowed values: 'dense', 'lstm'}
+\item{\code{orthogonal_method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values: 'Dense', 'LSTM'}
 
 \item{\code{noise_factor}}{\code{double} Value between 0 and a value lower 1 indicating how much noise should
 be added to the input during training. Allowed values: \verb{0 <= x <= 1}}

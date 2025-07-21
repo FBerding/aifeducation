@@ -88,7 +88,7 @@ for (object_class_name in object_class_names) {
           sustain_iso_code = "DEU",
           data_val_size = 0.25,
           lr_rate = 1e-3,
-          optimizer = "adamw",
+          optimizer = "AdamW",
           dense_size = 5,
           rec_size = 5,
           self_attention_heads = 2,
@@ -103,7 +103,7 @@ for (object_class_name in object_class_names) {
         args = test_combinations
       )
 
-      if(test_combinations$attention_type!="fourier"){
+      if(test_combinations$attention_type!="Fourier"){
         test_that(paste("embed", object_class_name, get_current_args_for_print(test_combinations)), {
           # Predictions
           embeddings <- classifier$embed(

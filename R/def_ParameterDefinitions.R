@@ -916,9 +916,9 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("dense", "lstm"),
-    desc = "Method to use for the feature extraction. `'lstm'` for an extractor based on LSTM-layers or `'dense'` for dense layers.",
-    default_value = "dense",
+    allowed_values = c("Dense", "LSTM"),
+    desc = "Method to use for the feature extraction. `'lstm'` for an extractor based on LSTM-layers or `'Dense'` for dense layers.",
+    default_value = "Dense",
     gui_box = "General Settings",
     gui_label = "Method"
   )
@@ -1176,11 +1176,11 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("gru", "lstm"),
+    allowed_values = c("GRU", "LSTM"),
     desc = "Type of the recurrent layers. `rec_type='gru'` for Gated Recurrent Unit and `rec_type='lstm'` for Long Short-Term Memory.",
     gui_box = "Recurrent Layers",
     gui_label = "Type",
-    default_value = "gru"
+    default_value = "GRU"
   )
 
   param$rec_bidirectional <- list(
@@ -1448,11 +1448,11 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("euclidean"),
+    allowed_values = c("Euclidean"),
     desc = "Type of metric used for calculating the distance.",
     gui_box = "Loss",
     gui_label = "Metric Type",
-    default_value = "euclidean"
+    default_value = "Euclidean"
   )
 
   # ============================================================================

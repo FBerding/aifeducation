@@ -106,7 +106,7 @@ class stack_recurrent_layers(torch.nn.Module):
     
     self.pack_and_masking=layer_pack_and_masking()
 
-    if rec_type=="gru":
+    if rec_type=="GRU":
        self.rec_layers=torch.nn.GRU(
             input_size=self.hidden_size,
             hidden_size=self.hidden_size,
@@ -117,7 +117,7 @@ class stack_recurrent_layers(torch.nn.Module):
             device=device, 
             dtype=dtype,
             batch_first=True)
-    elif rec_type=="lstm":
+    elif rec_type=="LSTM":
        self.rec_layers=torch.nn.LSTM(
             input_size=self.hidden_size,
             hidden_size=self.hidden_size,

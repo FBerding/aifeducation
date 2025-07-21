@@ -126,7 +126,7 @@ for (object_class_name in object_class_names) {
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
             merge_num_heads = 2,
-            merge_attention_type = "multihead"
+            merge_attention_type = "MultiHead"
           )
         )
 
@@ -387,7 +387,7 @@ for (object_class_name in object_class_names) {
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
             merge_num_heads = 2,
-            merge_attention_type = "multihead"
+            merge_attention_type = "MultiHead"
           )
         )
 
@@ -488,7 +488,7 @@ for (object_class_name in object_class_names) {
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
             merge_num_heads = 2,
-            merge_attention_type = "multihead"
+            merge_attention_type = "MultiHead"
           )
         )
         classifier <- NULL
@@ -633,7 +633,7 @@ for (object_class_name in object_class_names) {
             intermediate_size = 6,
             lr_warm_up_ratio = 0.01,
             merge_num_heads = 2,
-            merge_attention_type = "multihead"
+            merge_attention_type = "MultiHead"
           )
         )
 

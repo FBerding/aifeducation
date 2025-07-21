@@ -126,7 +126,7 @@ Creating a new instance of this class.
   dense_layers = 0,
   rec_size = 4,
   rec_layers = 2,
-  rec_type = "gru",
+  rec_type = "GRU",
   rec_bidirectional = FALSE,
   embedding_dim = 2,
   self_attention_heads = 0,
@@ -168,7 +168,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
 
-\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'gru', 'lstm'}
+\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 

@@ -1226,7 +1226,7 @@ Specify an architecture and training settings in *Model Configuration* and
     the latent space in the figure above.
 
 -   With *Method* you determine the type of layer the feature extractor
-    should use. If set "lstm", all layers of the model are long
+    should use. If set "LSTM", all layers of the model are long
     short-term memory layers. If set "dense", all layers are standard
     dense layers. 
 

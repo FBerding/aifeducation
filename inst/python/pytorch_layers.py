@@ -761,13 +761,13 @@ class layer_class_mean(torch.nn.Module):
 # * prototypes Tensor of shape (num_classes, Features)
 #Output Tensor of Shape (Batch, num_classes)
 class layer_protonet_metric(torch.nn.Module):
-  def __init__(self,metric_type="euclidean"):
+  def __init__(self,metric_type="Euclidean"):
     super().__init__()
     self.alpha=torch.nn.Parameter((torch.ones(1)-1e-8))
     self.metric_type=metric_type
   
   def forward(self,x,prototypes):
-    if self.metric_type=="euclidean":
+    if self.metric_type=="Euclidean":
       distance_matrix=torch.cdist(
         x1=x,
         x2=prototypes,

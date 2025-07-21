@@ -83,7 +83,7 @@ test_that("stack_dense_layer", {
 #Stack Reccurent layers----------------------------------------------------
 test_that("stack_rec_layers", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  rec_types=c("gru","lstm")
+  rec_types=c("GRU","LSTM")
   bidirectional_types=c(TRUE,FALSE)
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)

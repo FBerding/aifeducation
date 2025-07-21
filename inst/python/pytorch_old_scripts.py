@@ -379,7 +379,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
                                 
     if rec_layers>0:
       layer_list.update({"packandmasking":PackAndMasking_PT()})
-      if rec_type=="gru":
+      if rec_type=="GRU":
         layer_list.update({"gru_bidirectional"+str(rec_bidirectional):
             GRU_PT(
               input_size=current_size,
@@ -388,7 +388,7 @@ class TextEmbeddingClassifier_PT(torch.nn.Module):
               dropout=rec_dropout, 
               bidirectional=rec_bidirectional,
               bias=bias)})
-      elif rec_type=="lstm":
+      elif rec_type=="LSTM":
         layer_list.update({"lstm_bidirectional"+str(rec_bidirectional):
             LSTM_PT(
               input_size=current_size,
@@ -630,11 +630,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
   elif optimizer_method=="RMSprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
-  elif optimizer_method=="adamw":
+  elif optimizer_method=="AdamW":
     optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
   elif optimizer_method=="SGD":
     optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
-  
+    
   warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
   main_steps=epochs-warm_up_steps
   scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)

@@ -36,7 +36,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
   elif optimizer_method=="RMSprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
-  elif optimizer_method=="adamw":
+  elif optimizer_method=="AdamW":
     optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
   elif optimizer_method=="SGD":
     optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
@@ -388,7 +388,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
   elif optimizer_method=="RMSprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters())
-  elif optimizer_method=="adamw":
+  elif optimizer_method=="AdamW":
     optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
   elif optimizer_method=="SGD":
     optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)

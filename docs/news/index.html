@@ -51,7 +51,8 @@
 <ul><li>Removed support for ‘tensorflow’.</li>
 <li>Refactor of all classifiers and for FeatureExtractor.</li>
 <li>Added support for modernBERT.</li>
-<li>Removed support for DeBERTa_V2. Implementation of this model changed from transformer version 4.46.3 to 4.47.1. This causes that the model does not produce the same results for the same data after saving and loading a model. Reproducibility is not guaranteed. In the case that this is fixed in the future the model support will be re-implemented.</li>
+<li>Removed support for DeBERTa_V2. Implementation of this model changed from ‘transformer’ version 4.46.3 to 4.47.1. This causes that the model does not produce the same results for the same data after saving and loading a model. Reproducibility is not guaranteed. In the case that this is fixed in the future the model support will be re-implemented.</li>
+<li>Changed the strings for a high numbers of arguments (e.g., “lstm” into “LSTM”) in order to be more in line with <code>PyTorch</code>. Old models are updated automatically.</li>
 </ul><p><strong>Installation and Configuration</strong></p>
 <ul><li>Removed functions belonging to ‘tensorflow’.</li>
 <li>Added the possibility to install python packages either to a ‘conda’ environment or a virtual environment. Virtual environment is the new default.</li>
@@ -157,7 +158,7 @@
 <ul><li>Fixed a bug in GlobalAveragePooling1D_PT. Now the layer makes a correct pooling. <strong>This change has an effect on PyTorch models trained with version 0.3.1.</strong>
 </li>
 </ul><p><strong>TextEmbeddingModel</strong></p>
-<ul><li>Replaced the parameter ‘aggregation’ with three new parameters allowing to explicitly choose the start and end layer to be included in the creation of embeddings. Furthermore, two options for the pooling method within each layer is added (“cls” and “average”).</li>
+<ul><li>Replaced the parameter ‘aggregation’ with three new parameters allowing to explicitly choose the start and end layer to be included in the creation of embeddings. Furthermore, two options for the pooling method within each layer is added (“CLS” and “Average”).</li>
 <li>Added support for reporting the training and validation loss during training the corresponding base model.</li>
 </ul><p><strong>Transformer Models</strong></p>
 <ul><li>Fixed a bug in the creation of all transformer models except funnel. Now choosing the number of layers is working.</li>

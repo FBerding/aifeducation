@@ -20,7 +20,7 @@ test_that("Setup Classifier Data", {
   ml_frameworks <- c("pytorch")
   trace <- FALSE
 
-  method_list <- "lstm"
+  method_list <- "LSTM"
 
   imdb_embeddings <- load_from_disk(paste0(root_path_data, "/imdb_embeddings"))
 

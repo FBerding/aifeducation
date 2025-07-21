@@ -770,7 +770,7 @@ bert_modeling$configure(
   max_length = 512,
   chunks = 4,
   overlap = 30,
-  emb_layer_min = "middle",
+  emb_layer_min = "Middle",
   emb_layer_max = "2_3_layer",
   emb_pool_type = "Average",
   model_dir = "examples/bert_uncased"
@@ -1007,7 +1007,7 @@ classifier$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type="ResidualGate",
   cls_pooling_features=50,
-  cls_pooling_type="min_max",
+  cls_pooling_type="MinMax",
   feat_act_fct="ELU",
   feat_size=256,
   feat_bias=TRUE,
@@ -1032,7 +1032,7 @@ classifier$configure(
   dense_residual_type="ResidualGate",
   rec_act_fct="Tanh",
   rec_n_layers=2,
-  rec_type="gru",
+  rec_type="GRU",
   rec_bidirectional=FALSE,
   rec_dropout=0.2,
   rec_bias=FALSE,
@@ -1044,7 +1044,7 @@ classifier$configure(
   tf_n_layers=0,
   tf_dropout_rate_1=0.2,
   tf_dropout_rate_2=0.5,
-  tf_attention_type="multihead",
+  tf_attention_type="MultiHead",
   tf_embedding_type="absolute",
   tf_num_heads=1,
   tf_bias=FALSE,
@@ -1102,7 +1102,7 @@ In our example we use only two recurrent layers (`rec_n_layers=2`) and one
 dense layer (`dense_n_layers=1`). All other layers are omitted from the model
 by setting the number of layers to zero (`conv_n_layers=0`,`tf_n_layers=0`).
 
-As pooling method we use minimum and maximum (`cls_pooling_type="min_max"`). 
+As pooling method we use minimum and maximum (`cls_pooling_type="MinMax"`). 
 That is, the 15 highest and the 15 lowest features are used for calculating
 the classes/labels. The number of values can be determined with `intermediate_features=30`.
 
@@ -1166,7 +1166,7 @@ classifier$train(
   n_cores = auto_n_cores(),
   lr_rate=1e-3,
   lr_warm_up_ratio=0.02,
-  optimizer="adamw"
+  optimizer="AdamW"
 )
 ```
 
@@ -1541,8 +1541,8 @@ classifier_prototype$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
-  cls_pooling_type = "min_max",
-  metric_type = "euclidean",
+  cls_pooling_type = "MinMax",
+  metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 256,
   feat_bias = TRUE,
@@ -1567,7 +1567,7 @@ classifier_prototype$configure(
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 2,
-  rec_type = "gru",
+  rec_type = "GRU",
   rec_bidirectional = FALSE,
   rec_dropout = 0.2,
   rec_bias = FALSE,
@@ -1579,7 +1579,7 @@ classifier_prototype$configure(
   tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.2,
-  tf_attention_type = "multihead",
+  tf_attention_type = "MultiHead",
   tf_embedding_type = "absolute",
   tf_num_heads = 1,
   tf_bias = FALSE,
@@ -1598,7 +1598,7 @@ case you have the true classes for all or some of the cases, you can add
 them to the plot by using the argument `classes_q`. The resulting plot
 is shown in the following Figure.
 
-```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embeddings of an untrained classifier of type 'ProtoNet'")}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of an untrained classifier of type 'ProtoNet'")}
 plot_untrained <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
@@ -1649,7 +1649,7 @@ classifier_prototype$train(
   n_cores = auto_n_cores(),
   lr_rate = 1e-3,
   lr_warm_up_ratio = 0.02,
-  optimizer = "adamw"
+  optimizer = "AdamW"
 )
 ```
 
@@ -1699,7 +1699,7 @@ After training we can request a visualization of the data again. We
 first omit all unlabeled cases by setting `inc_unlabeled=FALSE` in order
 to get an impression of the quality of training.
 
-```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases")}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases")}
 plot_trained_1 <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
@@ -1734,7 +1734,7 @@ the prototype for "neg" are assigned to "neg".
 running_num_figures=running_num_figures+1
 ```
 
-```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases")}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases")}
 plot_trained_2 <- classifier_prototype$plot_embeddings(
   embeddings_q = review_embeddings,
   classes_q = review_labels,
@@ -1828,7 +1828,7 @@ other classes. Next, we plot the results.
 running_num_figures=running_num_figures+1
 ```
 
-``` {r, include =TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes.")}
+``` {r, include =TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes.")}
 plot_with_samples<-classifier_prototype$plot_embeddings(
   embeddings_q = query_embeddings,
   embeddings_s = sample_embeddings,
@@ -1880,7 +1880,7 @@ feature_extractor$configure(
   label = "Feature extractor for Text Embeddings via BERT",
   text_embeddings = review_embeddings,
   features = 576,
-  method = "dense",
+  method = "Dense",
   noise_factor = 0.2
 )
 ```
@@ -1907,14 +1907,14 @@ bert_modeling$get_n_features()
 In our example we reduce the number of dimensions by 75 %. 
 
 With `method` you determine the type of layer the feature extractor
-should use. If set `method="lstm"`, all layers of the model are long
+should use. If set `method="LSTM"`, all layers of the model are long
 short-term memory layers. If set `method="dense"` all layers are
 standard dense layers. 
 
 Independently from your choice, all models try to generate the latent
 space such that the co-variance of the features to be zero. Thus, all
 features represent unique information. In addition, all methods except
-`"lstm"` use an orthogonal parameterization to prevent over-fitting and
+`"LSTM"` use an orthogonal parameterization to prevent over-fitting and
 apply parameter sharing. The opposite layers use the same parameters.
 For more details please refer to Ranjan (2019).
 
@@ -1935,11 +1935,11 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 500,
+  epochs = 200,
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
-  optimizer = "adamw"
+  optimizer = "AdamW"
 )
 ```
 
@@ -1949,7 +1949,7 @@ feature_extractor$train(
 
 You can plot the training history of the model with:
 
-```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",`r running_num_figures`,": Training History of a Feature Extractor.")}
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Training History of a Feature Extractor.")}
 feature_extractor$plot_training_history()
 ```
 
@@ -1977,7 +1977,7 @@ classifier_with_fe$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type="ResidualGate",
   cls_pooling_features=50,
-  cls_pooling_type="min_max",
+  cls_pooling_type="MinMax",
   feat_act_fct="ELU",
   feat_size=256,
   feat_bias=TRUE,
@@ -2002,7 +2002,7 @@ classifier_with_fe$configure(
   dense_residual_type="ResidualGate",
   rec_act_fct="Tanh",
   rec_n_layers=2,
-  rec_type="gru",
+  rec_type="GRU",
   rec_bidirectional=FALSE,
   rec_dropout=0.2,
   rec_bias=FALSE,
@@ -2014,7 +2014,7 @@ classifier_with_fe$configure(
   tf_n_layers=0,
   tf_dropout_rate_1=0.2,
   tf_dropout_rate_2=0.5,
-  tf_attention_type="multihead",
+  tf_attention_type="MultiHead",
   tf_embedding_type="absolute",
   tf_num_heads=1,
   tf_bias=FALSE,
@@ -2055,7 +2055,7 @@ classifier_with_fe$train(
   n_cores = auto_n_cores(),
   lr_rate=1e-3,
   lr_warm_up_ratio=0.02,
-  optimizer="adamw"
+  optimizer="AdamW"
 )
 ```
 

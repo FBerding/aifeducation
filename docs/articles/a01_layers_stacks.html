@@ -111,7 +111,7 @@ layers and stack of layers.</p></li>
 all layers and stack layers. Allowed values:</p>
 <ul>
 <li>
-<code>'layer_norm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
+<code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -124,16 +124,16 @@ except recurrent layers. Allowed values:</p>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
 <li>
-<code>'orthogonal'</code>: Applies an orthogonal re-parametrizations
-of the weights with PyTorchs implemented function using
-orthogonal_map=‘matrix_exp’.</li>
+<code>'OrthogonalWeights'</code>: Applies an orthogonal
+re-parametrizations of the weights with PyTorchs implemented function
+using orthogonal_map=‘matrix_exp’.</li>
 <li>
-<code>'weight_norm'</code>: Applies a weight norm with the default
+<code>'WeightNorm'</code>: Applies a weight norm with the default
 settings of PyTorch’s corresponding function. Weight norm is described
 by <a href="https://doi.org/10.48550/arXiv.1602.07868" class="external-link">Salimans and
 Kingma 2016</a>.</li>
 <li>
-<code>'spectral_norm'</code>: Applies a spectral norm with the
+<code>'SpectralNorm'</code>: Applies a spectral norm with the
 default settings of PyTorch’s corresponding function. The norm is
 described by <a href="https://doi.org/10.48550/arXiv.1802.05957" class="external-link">Miyato
 et al. 2018</a>.</li>
@@ -207,7 +207,7 @@ layer.</p>
 to all layers and stack layers. Allowed values:</p>
 <ul>
 <li>
-<code>'layer_norm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
+<code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -220,16 +220,16 @@ layers except recurrent layers. Allowed values:</p>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
 <li>
-<code>'orthogonal'</code>: Applies an orthogonal re-parametrizations
-of the weights with PyTorchs implemented function using
-orthogonal_map=‘matrix_exp’.</li>
+<code>'OrthogonalWeights'</code>: Applies an orthogonal
+re-parametrizations of the weights with PyTorchs implemented function
+using orthogonal_map=‘matrix_exp’.</li>
 <li>
-<code>'weight_norm'</code>: Applies a weight norm with the default
+<code>'WeightNorm'</code>: Applies a weight norm with the default
 settings of PyTorch’s corresponding function. Weight norm is described
 by <a href="https://doi.org/10.48550/arXiv.1602.07868" class="external-link">Salimans and
 Kingma 2016</a>.</li>
 <li>
-<code>'spectral_norm'</code>: Applies a spectral norm with the
+<code>'SpectralNorm'</code>: Applies a spectral norm with the
 default settings of PyTorch’s corresponding function. The norm is
 described by <a href="https://doi.org/10.48550/arXiv.1802.05957" class="external-link">Miyato
 et al. 2018</a>.</li>
@@ -266,7 +266,7 @@ layers and stack of layers.</p></li>
 to all layers and stack layers. Allowed values:</p>
 <ul>
 <li>
-<code>'layer_norm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
+<code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -279,16 +279,16 @@ layers except recurrent layers. Allowed values:</p>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
 <li>
-<code>'orthogonal'</code>: Applies an orthogonal re-parametrizations
-of the weights with PyTorchs implemented function using
-orthogonal_map=‘matrix_exp’.</li>
+<code>'OrthogonalWeights'</code>: Applies an orthogonal
+re-parametrizations of the weights with PyTorchs implemented function
+using orthogonal_map=‘matrix_exp’.</li>
 <li>
-<code>'weight_norm'</code>: Applies a weight norm with the default
+<code>'WeightNorm'</code>: Applies a weight norm with the default
 settings of PyTorch’s corresponding function. Weight norm is described
 by <a href="https://doi.org/10.48550/arXiv.1602.07868" class="external-link">Salimans and
 Kingma 2016</a>.</li>
 <li>
-<code>'spectral_norm'</code>: Applies a spectral norm with the
+<code>'SpectralNorm'</code>: Applies a spectral norm with the
 default settings of PyTorch’s corresponding function. The norm is
 described by <a href="https://doi.org/10.48550/arXiv.1802.05957" class="external-link">Miyato
 et al. 2018</a>.</li>
@@ -341,7 +341,7 @@ layers and stack of layers.</p></li>
 applied to all layers and stack layers. Allowed values:</p>
 <ul>
 <li>
-<code>'layer_norm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
+<code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -354,16 +354,16 @@ layers except recurrent layers. Allowed values:</p>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
 <li>
-<code>'orthogonal'</code>: Applies an orthogonal re-parametrizations
-of the weights with PyTorchs implemented function using
-orthogonal_map=‘matrix_exp’.</li>
+<code>'OrthogonalWeights'</code>: Applies an orthogonal
+re-parametrizations of the weights with PyTorchs implemented function
+using orthogonal_map=‘matrix_exp’.</li>
 <li>
-<code>'weight_norm'</code>: Applies a weight norm with the default
+<code>'WeightNorm'</code>: Applies a weight norm with the default
 settings of PyTorch’s corresponding function. Weight norm is described
 by <a href="https://doi.org/10.48550/arXiv.1602.07868" class="external-link">Salimans and
 Kingma 2016</a>.</li>
 <li>
-<code>'spectral_norm'</code>: Applies a spectral norm with the
+<code>'SpectralNorm'</code>: Applies a spectral norm with the
 default settings of PyTorch’s corresponding function. The norm is
 described by <a href="https://doi.org/10.48550/arXiv.1802.05957" class="external-link">Miyato
 et al. 2018</a>.</li>
@@ -405,7 +405,7 @@ layers and stack of layers.</p></li>
 all layers and stack layers. Allowed values:</p>
 <ul>
 <li>
-<code>'layer_norm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
+<code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -418,16 +418,16 @@ except recurrent layers. Allowed values:</p>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
 <li>
-<code>'orthogonal'</code>: Applies an orthogonal re-parametrizations
-of the weights with PyTorchs implemented function using
-orthogonal_map=‘matrix_exp’.</li>
+<code>'OrthogonalWeights'</code>: Applies an orthogonal
+re-parametrizations of the weights with PyTorchs implemented function
+using orthogonal_map=‘matrix_exp’.</li>
 <li>
-<code>'weight_norm'</code>: Applies a weight norm with the default
+<code>'WeightNorm'</code>: Applies a weight norm with the default
 settings of PyTorch’s corresponding function. Weight norm is described
 by <a href="https://doi.org/10.48550/arXiv.1602.07868" class="external-link">Salimans and
 Kingma 2016</a>.</li>
 <li>
-<code>'spectral_norm'</code>: Applies a spectral norm with the
+<code>'SpectralNorm'</code>: Applies a spectral norm with the
 default settings of PyTorch’s corresponding function. The norm is
 described by <a href="https://doi.org/10.48550/arXiv.1802.05957" class="external-link">Miyato
 et al. 2018</a>.</li>
@@ -506,7 +506,7 @@ layer.</p>
 to all layers and stack layers. Allowed values:</p>
 <ul>
 <li>
-<code>'layer_norm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
+<code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>

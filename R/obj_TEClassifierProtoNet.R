@@ -85,7 +85,7 @@ TEClassifierProtoNet <- R6::R6Class(
                          dense_layers = 0,
                          rec_size = 4,
                          rec_layers = 2,
-                         rec_type = "gru",
+                         rec_type = "GRU",
                          rec_bidirectional = FALSE,
                          embedding_dim = 2,
                          self_attention_heads = 0,

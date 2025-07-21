@@ -384,6 +384,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     # This Method updates the model config in the case that new parameters have been
     # introduced
     update_model_config = function() {
+
+      #Check if an update is necessary
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
       if (is.null_or_na(current_pkg_version)) {
         update <- TRUE
@@ -399,6 +401,23 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
+      #check if an update of values is necessary. This is the case if the model
+      #was created with an older version of aifeducation compared to 1.1.0
+      #Update values to the new values introduced in version 1.1.0
+      if (is.null_or_na(current_pkg_version)) {
+        update_values <- TRUE
+      } else {
+        if (check_versions(
+          a = "1.1.0",
+          operator = ">",
+          b = self$get_package_versions()$r_package_versions$aifeducation
+        )) {
+          update_values <- TRUE
+        } else {
+          update_values <- FALSE
+        }
+      }
+
       if (update) {
         param_dict <- get_param_dict()
         if (is.function(self$configure)) {
@@ -408,6 +427,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
               if (is.null(self$model_config[[param]])) {
                 if (!is.null(param_dict[[param]]$default_historic)) {
                   self$model_config[param] <- list(param_dict[[param]]$default_historic)
+                  if(update_values){
+                    self$model_config[param]=update_values_to_new_1.1.0(self$model_config[param])
+                  }
                 } else {
                   warning(paste("Historic default for", param, "is missing in parameter dictionary."))
                 }
@@ -420,6 +442,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           warning("Class does not have a method `configure`.")
         }
       }
+
+
+
     },
     #-------------------------------------------------------------------------
     update_pad_value=function(){

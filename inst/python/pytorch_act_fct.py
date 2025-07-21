@@ -24,7 +24,7 @@ def get_act_fct(name):
     return torch.nn.LeakyReLU()
   elif name=="ReLU":
     return torch.nn.ReLU()
-  elif name=="gelu":
+  elif name=="GELU":
     return torch.nn.GELU()
   elif name=="Sigmoid":
     return torch.nn.Sigmoid()

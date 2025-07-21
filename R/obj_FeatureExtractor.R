@@ -26,7 +26,7 @@
 #'   with the same [TextEmbeddingModel] as during training. Prediction outputs a new object of class [EmbeddedText] or
 #'   [LargeDataSetForTextEmbeddings] which contains a text embedding with a lower number of dimensions.
 #'
-#'   All models use tied weights for the encoder and decoder layers (except `method="lstm"`) and apply the estimation of
+#'   All models use tied weights for the encoder and decoder layers (except `method="LSTM"`) and apply the estimation of
 #'   orthogonal weights. In addition, training tries to train the model to achieve uncorrelated features.
 #'
 #'   Objects of class [TEFeatureExtractor] are designed to be used with classifiers such as [TEClassifierRegular] and
@@ -473,7 +473,7 @@ TEFeatureExtractor <- R6::R6Class(
     create_reset_model = function() {
       private$load_reload_python_scripts()
       private$check_config_for_TRUE()
-      if (self$model_config$method == "lstm") {
+      if (self$model_config$method == "LSTM") {
         self$model <- py$LSTMAutoencoder_with_Mask_PT(
           times = as.integer(private$text_embedding_model["times"]),
           features_in = as.integer(private$text_embedding_model["features"]),
@@ -481,7 +481,7 @@ TEFeatureExtractor <- R6::R6Class(
           noise_factor = self$model_config$noise_factor,
           pad_value=private$text_embedding_model$pad_value
         )
-      } else if (self$model_config$method == "dense") {
+      } else if (self$model_config$method == "Dense") {
         self$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(self$model_config$features),
