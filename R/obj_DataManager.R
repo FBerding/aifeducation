@@ -580,7 +580,7 @@ DataManagerClassifier <- R6::R6Class(
                    6 cases are necessary. Consider to remove this category/class."))
       } else {
         if (min_freq / folds < 3) {
-          fin_k_folds <- min_freq
+          fin_k_folds <- floor(min_freq/3)
           warning(paste("Frequency of the smallest category/class is not sufficent to ensure
                     at least 3 cases per fold. Adjusting number of folds from ", folds, "to", fin_k_folds, "."))
         } else {
