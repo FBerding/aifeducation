@@ -17,6 +17,7 @@ long_add_texts_to_dataset <- function(source_path,
                                       destination_path,
                                       destination_folder,
                                       log_path,
+                                      clean_text,
                                       include_txt,
                                       include_pdf,
                                       include_xlsx,
@@ -58,6 +59,7 @@ long_add_texts_to_dataset <- function(source_path,
         log_top_total = top_total,
         log_top_message = total_message,
         log_write_interval = log_write_interval,
+        clean_text=clean_text,
         trace = FALSE
       )
     }
@@ -73,6 +75,7 @@ long_add_texts_to_dataset <- function(source_path,
         log_top_total = top_total,
         log_top_message = total_message,
         log_write_interval = log_write_interval,
+        clean_text=clean_text,
         trace = FALSE
       )
     }

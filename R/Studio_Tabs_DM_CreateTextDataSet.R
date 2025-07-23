@@ -54,6 +54,15 @@ DataManagement_RawTextsUI <- function(id) {
                   label = shiny::tags$p(shiny::icon("folder"), "Path to Folder")
                 )
               )
+            ),
+            bslib::card(
+              bslib::card_header("Text Processing"),
+              bslib::card_body(
+                shinyWidgets::materialSwitch(
+                  inputId = shiny::NS(id,"clean_text"),
+                  label = "Clean text from .txt and .pdf files",
+                  value = TRUE)
+              )
             )
           ),
           shiny::column(
@@ -246,6 +255,7 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
             destination_path = input$save_modal_directory_path,
             destination_folder = input$save_modal_folder_name,
             log_path = log_path,
+            clean_text = input$clean_text,
             include_txt = input$include_txt,
             include_pdf = input$include_pdf,
             include_xlsx = input$include_xlsx,
