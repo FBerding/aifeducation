@@ -83,7 +83,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
 
@@ -105,7 +105,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else if (ai_method == AIFETrType$roberta) {
@@ -127,7 +127,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
 
@@ -149,7 +149,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else if (ai_method == "deactivated"){ #AIFETrType$deberta_v2) {
@@ -171,7 +171,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
 
@@ -193,7 +193,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else if (ai_method == AIFETrType$funnel) {
@@ -215,7 +215,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
 
@@ -236,7 +236,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else if (ai_method == AIFETrType$longformer) {
@@ -259,7 +259,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
 
@@ -282,7 +282,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else if (ai_method == AIFETrType$mpnet) {
@@ -304,7 +304,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else if (ai_method == AIFETrType$modernbert) {
@@ -326,7 +326,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
 
@@ -348,7 +348,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace
+          trace = random_bool_on_CI()
         )
       )
     } else {
@@ -376,7 +376,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -396,7 +396,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -418,7 +418,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -440,7 +440,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -459,7 +459,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -481,7 +481,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -501,7 +501,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -523,7 +523,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
           pytorch_trace = as.numeric(trace)
         )
       )
@@ -545,7 +545,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -566,7 +566,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
 
           pytorch_trace = as.numeric(trace)
         )
@@ -590,7 +590,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
 
           pytorch_trace = as.numeric(trace)
         )
@@ -614,7 +614,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -633,7 +633,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
 
           pytorch_trace = as.numeric(trace)
         )
@@ -656,7 +656,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -677,7 +677,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
 
           pytorch_trace = as.numeric(trace)
         )
@@ -700,7 +700,7 @@ for (ai_method in ai_methods) {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = trace
+        trace = random_bool_on_CI()
       )
 
       base_model <- aife_transformer.make(ai_method, init_trace)
@@ -720,7 +720,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
 
           pytorch_trace = as.numeric(trace)
         )
@@ -743,7 +743,7 @@ for (ai_method in ai_methods) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = trace,
+          trace = random_bool_on_CI(),
 
           pytorch_trace = as.numeric(trace)
         )

@@ -62,7 +62,7 @@ for (framework in ml_frameworks) {
             epochs = 2,
             batch_size = 100,
             optimizer = "Adam",
-            trace = FALSE,
+            trace = random_bool_on_CI(),
             ml_trace = 0
           )
         )
@@ -87,7 +87,7 @@ for (framework in ml_frameworks) {
             epochs = 2,
             batch_size = 100,
             log_dir = train_path,
-            trace = FALSE,
+            trace = random_bool_on_CI(),
             ml_trace = 0
           )
         )

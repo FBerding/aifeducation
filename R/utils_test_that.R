@@ -26,6 +26,7 @@
 #'the name of the parameter. Otherwise they are not applied. Names of arguments which are not part
 #'a a method are ignored. #'
 #' @family Utils TestThat Developers
+#' @export
 generate_args_for_tests <- function(object_name,
                                     method,
                                     var_objects = list(),
@@ -152,6 +153,7 @@ check_adjust_n_samples_on_CI <- function(
 #'@param path_test_embeddings `string` Path to the location where the test data is stored.
 #'@return Returns a `list` with test data.
 #' @family Utils TestThat Developers
+#' @export
 get_test_data_for_classifiers=function(class_range=c(2,3),
                                        path_test_embeddings){
   # Load Embeddings
@@ -221,6 +223,7 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
 #'@param arg_list Named `list` of arguments. The list should be generated with [generate_args_for_tests].
 #'@return Function does nothing return.
 #' @family Utils TestThat Developers
+#' @export
 get_current_args_for_print=function(arg_list){
   if(!is.list(arg_list)){
     stop("arg_list must be a list.")
@@ -241,6 +244,7 @@ get_current_args_for_print=function(arg_list){
 #' @returns Returns an object of class `Tensor` from 'PyTorch'.
 #' @note To request a *R* array please use [generate_embeddings].
 #' @family Utils TestThat Developers
+#' @export
 generate_tensors=function(times,
                           features,
                           seq_len,
@@ -278,6 +282,7 @@ generate_tensors=function(times,
 #' @returns Returns an `array` with dim `(length(seq_len),times,features)`.
 #' @note To generate a 'PyTorch' object please use [generate_tensors].
 #' @family Utils TestThat Developers
+#' @export
 generate_embeddings=function(times,
                           features,
                           seq_len,
@@ -303,6 +308,7 @@ generate_embeddings=function(times,
 #' @returns Returns an object of class `Tensor` which is always the same except padding.
 #' Shape (5,3,7).
 #' @family Utils TestThat Developers
+#' @export
 get_fixed_test_tensor=function(pad_value){
   times=3
   features=7
@@ -345,5 +351,24 @@ is_on_CI=function(){
     return(TRUE)
   } else {
   return(FALSE)
+  }
+}
+
+#'@title Random bool on Continuous Integration
+#'@description Function returns randomly `TRUE` or `FALSE` if on CI. It returns `FALSE` if it is
+#'not on CI.
+#'@return Returns a `bool`.
+#' @family Utils TestThat Developers
+#' @export
+random_bool_on_CI=function(){
+  if(is_on_CI==TRUE){
+    rnd=sample(x=c(0,1),replace = FALSE,size = 1)
+    if(rnd==0){
+      return(FALSE)
+    } else {
+      return(TRUE)
+    }
+  } else {
+    return(FALSE)
   }
 }
