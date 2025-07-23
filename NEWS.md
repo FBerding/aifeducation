@@ -25,6 +25,11 @@ editor_options:
   or a virtual environment. Virtual environment is the new default.
 - Added functions for a more convenient preparation of a new session and for installing/updating python packages. 
 
+**LargeDataSetForText**
+
+- Added an algorithm cleaning raw texts in order to improve the performance of the following analysis.
+  See the method's documentation for more details. Currently only available for .pdf and .txt files.
+
 **Ai for Education Studio**
 
 - Implemented popovers to explain the different widgets. This feature will be extended in the future. 
@@ -44,6 +49,8 @@ editor_options:
 - Added parameters for determining the learning rate and warm up ratio for training.
 - Added a check for the number of unlabeled cases during training to avoid application
   of pseudo labeling if there are no unlabeled cases.
+- Fixed an error in calculating the number of folds if the number of requested folds is greater
+  as the minimal frequency of all classes/categories.
 - Users can now choose between different activation functions and parametrizations.
 - Removed argument `dir_checkpoint` from training method. Now the training uses 
   a folder in the regular temp directory of the machine. After a successful training

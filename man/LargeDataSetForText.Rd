@@ -97,6 +97,7 @@ names. Id and raw texts are mandatory, bibliographic and license information are
   log_top_value = 0,
   log_top_total = 1,
   log_top_message = NA,
+  clean_text = TRUE,
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -119,6 +120,18 @@ the log files. Only relevant if \code{log_file} is not \code{NULL}.}
 \item{\code{log_top_total}}{\code{int} determining the maximal number of iterations.}
 
 \item{\code{log_top_message}}{\code{string} providing additional information of the process.}
+
+\item{\code{clean_text}}{\code{bool} If \code{TRUE} the text is modified to improve the quality of the following analysis:
+\itemize{
+\item Some special symbols are removed.
+\item All spaces at the beginning and the end of a row are removed.
+\item Multiple spaces are reduced to single space.
+\item All rows with a number from 1 to 999 at the beginning or at the end are removed (header and footer).
+\item List of content is removed.
+\item Hyphenation is made undone.
+\item Line breaks within a paragraph are removed.
+\item Multiple line breaks are reduced to a single line break.
+}}
 
 \item{\code{trace}}{\code{bool} If \code{TRUE} information on the progress is printed to the console.}
 }
@@ -156,6 +169,7 @@ names. Id and raw texts are mandatory, bibliographic and license information are
   log_top_value = 0,
   log_top_total = 1,
   log_top_message = NA,
+  clean_text = TRUE,
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -178,6 +192,18 @@ the log files. Only relevant if \code{log_file} is not \code{NULL}.}
 \item{\code{log_top_total}}{\code{int} determining the maximal number of iterations.}
 
 \item{\code{log_top_message}}{\code{string} providing additional information of the process.}
+
+\item{\code{clean_text}}{\code{bool} If \code{TRUE} the text is modified to improve the quality of the following analysis:
+\itemize{
+\item Some special symbols are removed.
+\item All spaces at the beginning and the end of a row are removed.
+\item Multiple spaces are reduced to single space.
+\item All rows with a number from 1 to 999 at the beginning or at the end are removed (header and footer).
+\item List of content is removed.
+\item Hyphenation is made undone.
+\item Line breaks within a paragraph are removed.
+\item Multiple line breaks are reduced to a single line break.
+}}
 
 \item{\code{trace}}{\code{bool} If \code{TRUE} information on the progress is printed to the console.}
 }

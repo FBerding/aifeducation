@@ -427,22 +427,23 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
               if (is.null(self$model_config[[param]])) {
                 if (!is.null(param_dict[[param]]$default_historic)) {
                   self$model_config[param] <- list(param_dict[[param]]$default_historic)
-                  if(update_values){
-                    self$model_config[param]=update_values_to_new_1.1.0(self$model_config[param])
-                  }
                 } else {
                   warning(paste("Historic default for", param, "is missing in parameter dictionary."))
                 }
               }
             }
+            if(update_values){
+              self$model_config[param]=list(update_values_to_new_1.1.0(self$model_config[[param]]))
+            }
           }
+
           # Update Package version for the model
           private$r_package_versions$aifeducation <- packageVersion("aifeducation")
         } else {
           warning("Class does not have a method `configure`.")
         }
       }
-
+      #print(self$model_config)
 
 
     },

@@ -56,6 +56,15 @@ LargeDataSetForText <- R6::R6Class(
     #' @param log_top_total `int` determining the maximal number of iterations.
     #' @param log_top_message `string` providing additional information of the process.
     #' @param trace `bool` If `TRUE` information on the progress is printed to the console.
+    #' @param clean_text `bool` If `TRUE` the text is modified to improve the quality of the following analysis:
+    #'  * Some special symbols are removed.
+    #'  * All spaces at the beginning and the end of a row are removed.
+    #'  * Multiple spaces are reduced to single space.
+    #'  * All rows with a number from 1 to 999 at the beginning or at the end are removed (header and footer).
+    #'  * List of content is removed.
+    #'  * Hyphenation is made undone.
+    #'  * Line breaks within a paragraph are removed.
+    #'  * Multiple line breaks are reduced to a single line break.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_txt = function(dir_path,
                                   batch_size = 500,
@@ -64,6 +73,7 @@ LargeDataSetForText <- R6::R6Class(
                                   log_top_value = 0,
                                   log_top_total = 1,
                                   log_top_message = NA,
+                                  clean_text=TRUE,
                                   trace = TRUE) {
       # Gather all text files
       file_paths <- private$get_file_paths(dir_path, ".txt")
@@ -84,7 +94,7 @@ LargeDataSetForText <- R6::R6Class(
         for (i in 1:n_batches) {
           chunk <- private$get_batch(batches[[i]],
             file_paths = file_paths,
-            clean_text = TRUE
+            clean_text = clean_text
           )
           chunk_dataset <- data.frame_to_py_dataset(chunk)
           list_datasets[i] <- list(chunk_dataset)
@@ -136,6 +146,15 @@ LargeDataSetForText <- R6::R6Class(
     #' @param dir_path Path to the directory where the files are stored.
     #' @param batch_size `int` determining the number of files to process at once.
     #' @param trace `bool` If `TRUE` information on the progress is printed to the console.
+    #' @param clean_text `bool` If `TRUE` the text is modified to improve the quality of the following analysis:
+    #'  * Some special symbols are removed.
+    #'  * All spaces at the beginning and the end of a row are removed.
+    #'  * Multiple spaces are reduced to single space.
+    #'  * All rows with a number from 1 to 999 at the beginning or at the end are removed (header and footer).
+    #'  * List of content is removed.
+    #'  * Hyphenation is made undone.
+    #'  * Line breaks within a paragraph are removed.
+    #'  * Multiple line breaks are reduced to a single line break.
     #' @param log_top_value `int` indicating the current iteration of the process.
     #' @param log_top_total `int` determining the maximal number of iterations.
     #' @param log_top_message `string` providing additional information of the process.
@@ -151,6 +170,7 @@ LargeDataSetForText <- R6::R6Class(
                                   log_top_value = 0,
                                   log_top_total = 1,
                                   log_top_message = NA,
+                                  clean_text=TRUE,
                                   trace = TRUE) {
       # Gather all files
       file_paths <- private$get_file_paths(dir_path, ".pdf")
@@ -171,7 +191,7 @@ LargeDataSetForText <- R6::R6Class(
         for (i in 1:n_batches) {
           chunk <- private$get_batch(batches[[i]],
             file_paths = file_paths,
-            clean_text = TRUE
+            clean_text = clean_text
           )
           chunk_dataset <- data.frame_to_py_dataset(chunk)
           list_datasets[i] <- list(chunk_dataset)
@@ -542,10 +562,45 @@ LargeDataSetForText <- R6::R6Class(
       return(as.data.frame(data))
     },
     clean_text = function(text) {
-      # text <- stringr::str_replace_all(text, pattern = "[:space:]{1,}", replacement = " ")
-      # text <- stringr::str_replace_all(text, pattern = "-(?=[:space:])", replacement = "")
-      text <- stringi::stri_replace_all(text, regex = "[:space:]{1,}", replacement = " ")
-      text <- stringi::stri_replace_all(text, regex = "-(?=[:space:])", replacement = "")
+      #Remove some special symbols-------------------------------------------------
+      text <- stringi::stri_replace_all(text, regex = "\\|", replacement = "")
+      text <- stringi::stri_replace_all(text, regex = "([:blank:]*)-([:blank:]*)", replacement = "-")
+
+      #Normalization of blank positions and new lines---------------------------------------------
+      #Entferne alle Leerstellen zu beginn einer Zeile
+      text <- stringi::stri_replace_all(text, regex = "\\n([:blank:]{1,})", replacement = "\n")
+
+      #Entferne alle Leerstellen zum Ende einer Zeile
+      text <- stringi::stri_replace_all(text, regex = "([:blank:]{1,})\\n", replacement = "\n")
+
+      #Entferne alle Leerzeichen, die mehrfach vorkommen
+      text <- stringi::stri_replace_all(text, regex = "[:blank:]{2,}", replacement = " ")
+
+      #Remove running heads---------------------------------------------------------
+      #Entferne alle Zeilen, die mit einer Zahl bis 999 beginnen oder mit einer Gliederungsnummer (z. B 1.2)
+      text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:blank:])*\\n", replacement = "\n")
+
+      #Entferne alle Zeilen, die mit einer Zahl bis 999 enden
+      text <- stringi::stri_replace_all(text, regex = "\\n[:alpha:]([:digit:]|[:alpha:]|[:punct:]|[:blank:])*([:digit:]{1,10})\\n", replacement = "\n")
+
+      #Remove list of contents------------------------------------------------------
+      text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:digit:]|[:blank:])*(([:punct:]|[:blank:]){2,})([:digit:]{1,10})\\n", replacement = "\n")
+      text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:digit:]|[:blank:])*(([:punct:]|[:blank:]){2,})([:digit:]{1,10})\\n", replacement = "\n")
+      text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:digit:]|[:blank:])*(([:punct:]|[:blank:]){2,})([:digit:]{1,10})\\n", replacement = "\n")
+      #text <- stringi::stri_replace_all(text, regex = "\\n(([:graph:]|[:blank]){1,})([:punct:]{5,})([:graph:]|[:blank:])*\\n", replacement = "\n")
+
+      #Normalization of paragraphs-------------------------------------------------
+      #Mache Silbentrennung rückgängig
+      text <- stringi::stri_replace_all(text, regex = "-\\n([:space:]*)", replacement = "")
+
+      #Entferne Zeilenumbrüche innerhalb von Absätzen
+      text <- stringi::stri_replace_all(text, regex = "(?<![:space:])\\n(?![:space:])", replacement = " ")
+
+      #Finale Textbereinigungen----------------------------------------------------
+      #Entferne alle Zeilenumbrüche, die mehrfach vorkommen
+      #text <- stringi::stri_replace_all(text, regex = "\\n{2,}", replacement = "")
+      text <- stringi::stri_replace_all(text, regex = "\\n([:space:]*)\\n", replacement = "\n")
+
       return(text)
     },
     remove_file_extenstion = function(file) {
