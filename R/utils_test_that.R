@@ -361,7 +361,7 @@ is_on_CI=function(){
 #' @family Utils TestThat Developers
 #' @export
 random_bool_on_CI=function(){
-  if(is_on_CI==TRUE){
+  if(is_on_CI()==TRUE){
     rnd=sample(x=c(0,1),replace = FALSE,size = 1)
     if(rnd==0){
       return(FALSE)
