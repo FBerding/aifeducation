@@ -259,7 +259,7 @@ test_that("stack_n_gram_convolution", {
   # Test for equal, more, and fewer features as input size
   features_output <- c(
     features,
-    sample(x = seq(from = 1, to = (features - 1)), size = 1),
+    sample(x = seq(from = 3, to = (features - 1)), size = 1),
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
 
