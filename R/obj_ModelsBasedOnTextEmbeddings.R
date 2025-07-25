@@ -534,10 +534,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       } else {
         n_folds <- 1
-        measures <- names(plot_data[[index_final]])
         if (use_pl == FALSE) {
+          measures <- names(plot_data[[index_final]])
           n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
         } else {
+          measures <- names(plot_data[[index_final]][[1]])
           n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
         }
       }

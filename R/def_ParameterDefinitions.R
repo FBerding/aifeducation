@@ -1275,8 +1275,8 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "If `TRUE` all streams use the same feature layer. If `FALSE` all streams use their own feature layer.",
-    gui_box = "General Settings",
-    gui_label = "Shared Feature Layer",
+    gui_box = "Feature Layer",
+    gui_label = "Shared Layer",
     default_value = TRUE
   )
 
