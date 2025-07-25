@@ -680,18 +680,21 @@ class merge_layer(torch.nn.Module):
       pad_value=self.pad_value
       )
       
-    self.attention_layer=torch.nn.MultiheadAttention(
-      embed_dim=self.n_pooling_features, 
-      num_heads=self.num_heads, 
-      dropout=0.0, 
-      bias=True, 
-      add_bias_kv=False, 
-      add_zero_attn=False, 
-      kdim=None, 
-      vdim=None, 
-      batch_first=True, 
-      device=device, 
-      dtype=dtype)
+    if self.attention_type=="MultiHead":  
+      self.attention_layer=torch.nn.MultiheadAttention(
+        embed_dim=self.n_pooling_features, 
+        num_heads=self.num_heads, 
+        dropout=0.0, 
+        bias=True, 
+        add_bias_kv=False, 
+        add_zero_attn=False, 
+        kdim=None, 
+        vdim=None, 
+        batch_first=True, 
+        device=device, 
+        dtype=dtype)
+    elif self.attention_type=="Fourier":
+      self.attention_layer=layer_fourier_transformation()
       
     self.act_fct=torch.nn.Softmax(dim=1)
     
@@ -723,7 +726,10 @@ class merge_layer(torch.nn.Module):
         extracted_seq=torch.cat((extracted_seq,extracted),dim=1)
       
     # calculate weights for merging
-    attn=self.attention_layer(extracted_seq,extracted_seq,extracted_seq)[0]
+    if self.attention_type=="MultiHead":
+      attn=self.attention_layer(extracted_seq,extracted_seq,extracted_seq)[0]
+    elif self.attention_type=="Fourier":
+      attn=self.attention_layer(extracted_seq)
     attn=torch.flatten(input=attn, start_dim=1, end_dim=-1)
     weights=self.act_fct(self.dense_weights(attn))
     weights=torch.unsqueeze(weights,dim=1)

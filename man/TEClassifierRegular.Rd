@@ -156,7 +156,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
 
-\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='gru'} for Gated Recurrent Unit and \code{rec_type='lstm'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
+\item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='GRU'} for Gated Recurrent Unit and \code{rec_type='LSTM'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
@@ -169,9 +169,9 @@ values for a case for different input orders if you choose \code{fourier} on lin
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 
-\item{\code{act_fct}}{\code{string} Activation function for all layers except recurrent layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
+\item{\code{act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
-\item{\code{parametrizations}}{\code{string} Re-Parametrizations for all layers except recurrent layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
+\item{\code{parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
 \item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x <= 0.6}}
 

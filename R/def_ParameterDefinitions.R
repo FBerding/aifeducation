@@ -866,7 +866,9 @@ get_param_dict <- function() {
     min = 0,
     max = 1,
     allowed_values = NULL,
-    desc = "Value greater 0 indicating the minimal distance of every case from prototypes of other classes.",
+    desc = "Value greater 0 indicating the minimal distance of every case from prototypes of other classes. Please note that
+    in contrast to the orginal work by [Zhang et al. (2019)](https://doi.org/10.1007/978-3-030-16145-3_24) this implementation
+    reaches better performance if the margin is a magnitude lower (e.g. 0.05 instead of 0.5).",
     gui_box = "Loss",
     gui_label = "Margin",
     default_value = 0.05
@@ -969,7 +971,13 @@ get_param_dict <- function() {
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("ResidualGate", "Addition", "None"),
-    desc = "Type residual connenction for all layers and stack of layers.",
+    values_desc = list(
+      "None" = "Add no residual connection.",
+      "Addition" = "Adds a residual connection by adding the original input to the output.",
+      "ResidualGate" = "Adds a residucal connection by creating a weightes sum from the original input and the output.
+                      The weight is a learnable parameter. This type of residual connection is described by [Savarese and Figueiredo (2017)](https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf)."
+    ),
+    desc = "Type of residual connenction for all layers and stack of layers.",
     gui_box = "General Settings",
     gui_label = "Residual Connection",
     default_value = "ResidualGate",
@@ -988,7 +996,7 @@ get_param_dict <- function() {
       "ResidualGate" = "Adds a residucal connection by creating a weightes sum from the original input and the output.
                       The weight is a learnable parameter. This type of residual connection is described by [Savarese and Figueiredo (2017)](https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf)."
     ),
-    desc = "Type residual connenction for the complete model.",
+    desc = "Type of residual connenction for the complete model.",
     gui_box = "General Settings",
     gui_label = "Residual Connection",
     default_value = "ResidualGate",
@@ -1083,7 +1091,7 @@ get_param_dict <- function() {
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("None", "OrthogonalWeights", "WeightNorm", "SpectralNorm"),
-    desc = "Re-Parametrizations for all layers except recurrent layers.",
+    desc = "Re-Parametrizations of the weights of layers.",
     values_desc = list(
       "None" = "Does not apply any re-parametrizations.",
       "OrthogonalWeights" = "Applies an orthogonal re-parametrizations of the weights with PyTorchs implemented function using orthogonal_map='matrix_exp'.",
@@ -1096,6 +1104,7 @@ get_param_dict <- function() {
     default_historic = "None"
   )
   param$rec_parametrizations <- param$parametrizations
+  param$rec_parametrizations$allowed_values = c("None")
   param$rec_parametrizations$gui_box <- "Recurrent Layers"
 
   param$tf_parametrizations <- param$parametrizations
@@ -1141,7 +1150,7 @@ get_param_dict <- function() {
     max = NULL,
     allow_null = FALSE,
     allowed_values = c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU"),
-    desc = "Activation function for all layers except recurrent layers.",
+    desc = "Activation function for all layers.",
     gui_box = "General Settings",
     gui_label = "Activation Function",
     default_value = "ELU",
@@ -1154,6 +1163,7 @@ get_param_dict <- function() {
   param$dense_act_fct <- param$act_fct
   param$dense_act_fct$gui_box <- "Dense Layers"
   param$rec_act_fct <- param$act_fct
+  param$rec_act_fct$allowed_values=c("Tanh")
   param$rec_act_fct$gui_box <- "Recurrent Layers"
   param$tf_act_fct <- param$act_fct
   param$tf_act_fct$gui_box <- "Transformer Encoder Layers"
@@ -1177,7 +1187,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = c("GRU", "LSTM"),
-    desc = "Type of the recurrent layers. `rec_type='gru'` for Gated Recurrent Unit and `rec_type='lstm'` for Long Short-Term Memory.",
+    desc = "Type of the recurrent layers. `rec_type='GRU'` for Gated Recurrent Unit and `rec_type='LSTM'` for Long Short-Term Memory.",
     gui_box = "Recurrent Layers",
     gui_label = "Type",
     default_value = "GRU"
@@ -1359,7 +1369,7 @@ get_param_dict <- function() {
     default_value = FALSE
   )
 
-  param$tf_embedding_type <- list(
+  param$tf_positional_type <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
@@ -1437,6 +1447,7 @@ get_param_dict <- function() {
 
   # Parallel specific-----------------------------------------------------------
   param$merge_attention_type <- param$attention_type
+  param$merge_attention_type$allowed_values = c("Fourier", "MultiHead")
   param$merge_attention_type$gui_box <- "Merge Layer"
 
   param$merge_num_heads <- param$self_attention_head

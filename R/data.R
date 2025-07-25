@@ -25,6 +25,6 @@
 #' @references Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011). Learning Word Vectors
 #'   for Sentiment Analysis. In D. Lin, Y. Matsumoto, & R. Mihalcea (Eds.), Proceedings of the 49th Annual Meeting of
 #'   the Association for Computational Linguistics: Human Language Technologies (pp. 142–150). Association for
-#'   Computational Linguistics. <https://aclanthology.org/P11-1015>
+#'   Computational Linguistics. <doi: 10.5555/2002472.2002491>
 #'
 "imdb_movie_reviews"

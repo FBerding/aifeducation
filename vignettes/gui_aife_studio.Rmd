@@ -28,7 +28,7 @@ This vignette introduces *Aifeducation - Studio* which is a graphical
 user interface for creating, training, documenting, analyzing, and
 applying artificial intelligence (AI). It is made for users unfamiliar
 with *R* or those who do not have coding skills in relevant languages
-(e.g., python). For more experienced users, the interface provides a
+(e.g. python). For more experienced users, the interface provides a
 convenient way for working with AI in an educational context.
 
 This article overlaps with vignette [03 Using R
@@ -81,10 +81,6 @@ and prerequisites.
 AI can be a helpful assistant in analyzing textual data since the
 analysis of textual data is a challenging and time-consuming task for
 humans.
-
-> Please note that an introduction to content analysis, natural language
-> processing or machine learning is beyond the scope of this vignette.
-> If you would like to learn more, please refer to the cited literature.
 
 Before we start, it is necessary to introduce a definition of our
 understanding of some basic concepts, since applying AI to educational
@@ -166,7 +162,7 @@ running_num_figures=running_num_figures+1
     capacities to understand natural language. In general, these are
     transformers such as BERT, RoBERTa, etc. A huge number of
     pre-trained models can be found on
-    [Huggingface](https://huggingface.co/).
+    [Hugging Face](https://huggingface.co/).
 
 -   **Text Embedding Models:** The modes are built on top of base models
     and store directions on how to use these base models for converting
@@ -183,10 +179,14 @@ running_num_figures=running_num_figures+1
 With the help of this overview we can start the introduction of
 *Aifeducation Studio*.
 
+> Please note that an introduction to content analysis, natural language
+> processing or machine learning is beyond the scope of this vignette.
+> If you would like to learn more, please refer to the cited literature.
+
 # 2 Starting Aifeducation Studio
 
 We recommend to start with a clean *R* session. Then you can start
-Aifeducation Studio by entering the following into the console:
+*AI for Education - Studio* by entering the following into the console:
 
 ```{r, include = TRUE,eval=FALSE}
 aifeducation::start_aifeducation_studio()
@@ -235,17 +235,6 @@ directory where the texts are stored (box *Text Sources*). We recommend
 that you store all texts you would like to use in a single folder.
 Within this folder, you can structure your data with sub-folders.
 
-![Figure `r running_num_figures`: Data Preparation Page](DM_Create_Fill_fields.png){width="100%"}
-
-```{r, include = FALSE}
-running_num_figures=running_num_figures+1
-```
-
-In the next step, you can decide which file formats should be included
-(box *File Types*). Currently, *aifeducation* supports .txt, .pdf, and
-.xlsx files. If enabled, all files of the requested file format are
-included in your data collection.
-
 **.txt files**
 
 The first alternative is to store raw texts in .txt files. To use these
@@ -261,7 +250,7 @@ you have to structure your data in a specific way:
     contains a short statement for the license of the text such as "CC
     BY".
 -   Add an additional .txt file to the folder named `url_license.txt`
-    which contains the URL/link to the license' text such as
+    which contains the URL/link to the license's text such as
     "<https://creativecommons.org/licenses/by/4.0/>".
 -   Add an additional .txt file to the folder named `text_license.txt`
     which contains the full license in raw texts.
@@ -343,13 +332,41 @@ structure:
 -   Every .xslx file can contain an additional column for the source's
     URL.
 
-Your .xlsx file may look like
+Figure `r running_num_figures` shows an example.
 
 ![Figure `r running_num_figures`: Structure of Raw Texts within an Excel Sheet](DM_Create_Excel_file.png){width="75%"}
 
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1
 ```
+
+
+![Figure `r running_num_figures`: Data Preparation Page](DM_Create_Fill_fields.png){width="100%"}
+
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+In the next step, you can decide which file formats should be included
+(box *File Types*). Currently, *aifeducation* supports .txt, .pdf, and
+.xlsx files. If enabled, all files of the requested file format are
+included in your data collection.
+
+Within the box *Text Processing* you can activate an algorithm that cleans
+the text stored in all .txt. and .pdfs files. If you active this option creating the
+data set changes the texts in the following aspects:
+
+* Some special symbols are removed.
+* All spaces at the beginning and the end of a row are removed.
+* Multiple spaces are reduced to single space.
+* All rows with a number from 1 to 999 at the beginning or at the end are removed (header and footer).
+* List of content is removed.
+* Hyphenation is made undone.
+* Line breaks within a paragraph are removed.
+* Multiple line breaks are reduced to a single line break.
+
+The aim of these changes is to provide a clean plain text in order to increase
+the performance and quality of all analyses. 
 
 The last step is to choose a folder where your collection of raw texts
 should be saved. Please select a path and a folder name for your
@@ -385,7 +402,7 @@ running_num_figures=running_num_figures+1
 ```
 
 You now have a folder with the files that can be used for further tasks
-like creation and training/tuning the transformers (*Base Models* tab on
+like creating and training/tuning the transformers (*Base Models* tab on
 the top panel), etc. The object contains a `dataset` that stores the
 texts together with their IDs. 
 
@@ -485,9 +502,9 @@ are fine-tuned to domain-specific texts and/or fine-tuned for specific
 tasks. Since the creation of base models requires a huge number of texts
 resulting in high computational time, it is recommended to use
 pre-trained models. These can be found on
-[Huggingface](https://huggingface.co/). Sometimes, however, it is more
+[Hugging Face](https://huggingface.co/). Sometimes, however, it is more
 straightforward to create a new model to fit a specific purpose.
-Aifeducation Studio supports the opportunity to both create and
+*AI for Education - Studio* supports the opportunity to both create and
 train/fine-tune base models.
 
 ### 3.2.2 Creation of Base Models
@@ -503,13 +520,16 @@ Figure `r running_num_figures`: Base Models - Create Transformer (click image to
 running_num_figures=running_num_figures+1
 ```
 
-Every transformer model is composed of two parts: 1) the tokenizer which
-splits raw texts into smaller pieces to model a large number of words
-with a limited, small number of tokens and 2) the neural network that is
-used to model the capabilities for understanding natural language.
+Every transformer model is composed of two parts: 
+
+1. the tokenizer which
+  splits raw texts into smaller pieces to model a large number of words
+  with a limited, small number of tokens and 
+2. the neural network that is
+  used to model the capabilities for understanding natural language.
 
 At the beginning you can choose between the different supported
-transformer architectures (*Base Model Type* combobox in *Control Panel*). 
+transformer architectures (*Base Model Type* combo box in *Control Panel*, left side). 
 
 Depending on
 the architecture, you have different options determining the shape of
@@ -518,7 +538,7 @@ your neural network.
 You find a box named *Input Data* at the top. Here you must provide the path to a folder which
 contains a LargeDataSetForTexts. This data set is used to
 calculate the vocabulary of the transformer. This file should be created
-with *Aifeducation Studio* (tab *Data Management*) to ensure
+with **AI for Education - Studio* (tab *Data Management*) to ensure
 compatibility. See section 3.1.1 for more details. 
 
 In addition you find a box *Vocabulary*. Here you can configure the vocabulary that the transformer 
@@ -569,8 +589,8 @@ multiple files. Instead you have to provide the folder that stores the
 entire model.
 
 Compatible models are all base models that you have created with
-*Aifeducation Studio*. In addition you can use any model from
-[Huggingface](https://huggingface.co/) that uses an architecture
+*AI for Education - Studio*. In addition you can use any model from
+[Hugging Face](https://huggingface.co/) that uses an architecture
 implemented in *aifeducation* such as BERT, modernBERT, etc.
 
 Second, you have to provide a LargeDataSetForTexts representing the raw texts
@@ -580,7 +600,7 @@ collection of texts as described in section 3.1.1.
 After choosing a base model, new boxes appear as shown in Figure `r running_num_figures`.  
 Possible options depend on the kind of model.
 
--   **Size of Every Chunk:** For training and validating a base model, the raw
+-   **Minimal Sequence Length:** For training and validating a base model, the raw
     texts are split into several smaller texts. This value determines
     the maximum length of these smaller text pieces in number of tokens.
     This value cannot exceed the maximum size set during creation of the
@@ -626,8 +646,8 @@ not the same directory as the one you stored the original model in.
 
 Please note that the training of a base model can last days or even weeks,
 depending on the size and the kind of model, the amount of data, and the
-capacities of your machine. You can see the training progress with the
-progress bars and plot (Figure `r running_num_figures`).
+capacities of your machine. You can see the training progress with 
+progress bars and a plot (Figure `r running_num_figures`).
 
 ![Figure `r running_num_figures`: Progress of training the transformer](BM_Train_Progress.png){width="100%"}
 
@@ -639,11 +659,10 @@ running_num_figures=running_num_figures+1
 
 ### 3.3.1 Create a Text Embedding Model
 
-The text embedding model is the interface to *R* in *aifeducation*. In
+The text embedding model is the model that transforms raw texts into a numerical 
+representation. In
 order to create a new model, you need a base model that provides the
-ability to understand natural language. This object contains all
-relevant information for transforming raw texts into a numeric
-representation that can be used for machine learning.
+ability to understand natural language. 
 
 In *aifedcuation*, the transformation of raw texts into numbers is a
 separate step from downstream tasks such as classification. This is to
@@ -654,7 +673,7 @@ time. Another advantage is that the training of the downstream tasks
 involves only the downstream tasks and not the parameters of the
 embedding model, making training less time-consuming, thus decreasing
 computational intensity. Finally, this approach allows the analysis of
-long documents by applying the same algorithm to different parts.
+long documents by applying the same algorithm to different parts of a long document.
 
 You can open the creation page by clicking on the "Create" tab in the
 section "Text Embedding Models". Figure `r running_num_figures` shows the corresponding page.
@@ -689,7 +708,7 @@ interface should process raw text:
 -   **N chunks:** Sometimes texts are very long. With this value, you
     can decide into how many chunks longer texts should be divided. The
     maximum length of every chunk is determined by the value provided at
-    "Maximum Sequence Length". Minimum if chunks is two.
+    "Maximum Sequence Length". The number of chunks must be at least two.
 
 -   **Maximal Sequence Length:** This value determines the maximum
     number of tokens your model processes for every chunk.
@@ -698,7 +717,7 @@ interface should process raw text:
     prior chunk should be included in the current chunk. An overlap can
     be useful to provide the correct context for every chunk.
 
--   **Layers for Embeddings - Min**: Base models transform raw data into
+-   **Layers for Embeddings - Min**: Text embedding models transform raw data into
     a sequence of numbers by using the different layers' hidden states.
     With this option you can decide which layer to use first.
 
@@ -715,7 +734,10 @@ interface should process raw text:
 
 The maximum number of tokens your model can process and provide for
 downstream tasks can be calculated as
-$$Max Tokens = NChunks*MaximalSequenceLength-(NChunks-1)*NOverlap$$ If
+
+$$Tokens_{Max} = N_{Chunks}*MaximalSequenceLength-(N_{Chunks}-1)*N_{Overlap}$$ 
+
+If
 the text is longer, the remaining tokens are ignored and lost for
 further analysis.
 
@@ -754,9 +776,11 @@ The tab *Embed Text* (Figure `r running_num_figures`) allows you to transform ra
 a numerical representation of these texts, called text embeddings. These
 text embeddings can be used in downstream tasks such as classifying
 texts. In order to transform raw texts into embedded texts, you first
-have to select a collection of raw texts (a folder containing several
-files). We recommend that you create this collection according to
-section 3.1.1. Next you have to provide the folder where the embeddings
+have to select a data set containing raw texts. W
+e recommend that you create this collection according to
+section 3.1.1 in order to ensure compatibility. 
+
+Next you have to provide the folder where the embeddings
 should be stored and name it. With *Batch Size* you can determine how
 many raw texts should be processed simultaneously. Please adjust this
 value to your machine's capacities. By clicking on the button "Save
@@ -770,7 +794,7 @@ running_num_figures=running_num_figures+1
 ```
 
 The tab *Tokenize/Encode/Decode* (Figure `r running_num_figures`) offers you insights into
-the way your text embedding model processes data. In the box *Encode*
+the way your text embedding model processes texts. In the box *Encode*
 you can insert a raw text and after clicking on *Encode,* you can see
 how the text is divided into tokens and their corresponding IDs. The IDs
 are passed to the base model and are used to generate the numeric
@@ -812,12 +836,12 @@ running_num_figures=running_num_figures+1
 
 Creating "good" AI models requires a lot of effort. Thus, sharing work
 with other users is very important to support progress in a discipline.
-Thus, meaningful documentation is required. In addition, a well written
+Meaningful documentation is required. In addition, a well written
 documentation makes an AI model more transparent, allowing others to
 understand how the AI model generated a solution. This is also very
 important in order to judge the limitations of a model.
 
-To support developers in documenting their work, *Aifeducation Studio*
+To support developers in documenting their work, *AI for Education - Studio*
 provides an easy way to add a comprehensive description. You find this
 part of the app by clicking on "Document" in the tab *Text Embedding
 Models*. First, you have to choose the text embedding model you would
@@ -840,7 +864,7 @@ running_num_figures=running_num_figures+1
 In the tabs *Abstract* and *Description*, you can provide an abstract
 and a detailed description of your work in English and/or in the native
 language of your text embedding model (e.g., French, German, etc.),
-allowing you to reach a broader audience (Figure `r running_num_figures`). In all four tabs
+allowing you to reach a broader audience (Figure `r running_num_figures-1`). In all four tabs
 you can provide your documentation in plain text, html, and/or markdown
 allowing you to insert tables or to highlight parts of your
 documentation. If you would like to see what your documentation will
@@ -872,14 +896,14 @@ where different layers are located and how the outputs of the different layers a
 combined into the final output of the model. 
   
 The sequential architecture (see Figure `r running_num_figures`) provides models where the input is passed to a specific number 
-of layers step by step. All layers are grouped by the kind of layer into stacks.
+of layers step by step. All layers are grouped by their kind into stacks.
 
 ![Figure `r running_num_figures`: Basic Architecture of a Sequential Classifier](core_arch_sequential.png){width="100%"}
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1
 ```
 
-In contrast, the parallel architecture (see `r running_num_figures`) offers a model where 
+In contrast, the parallel architecture (see Figure `r running_num_figures`) offers a model where 
 an input is passed to different types of layers separately. At the end the outputs 
 are combined to create the final output of the whole model. 
 
@@ -893,7 +917,7 @@ example `TEClassifierSequential` uses a *sequential* core model while
 `TEClassifierParallel` uses a *parallel* core model.
 
 In general, all layers within a core model allow further customization allowing you
-to build a high number of different models (see box *Model Configuration* in Figure `r running_num_figures-2`).
+to build a high number of different models (see box *Model Configuration* in Figure `r running_num_figures`).
 
 Second, you can choose how the core model is used for classification. At the moment
 a probability and metric based classifier is possible. 
@@ -902,7 +926,7 @@ a probability and metric based classifier is possible.
   probability distribution for different classes/categories. This is the standard case most common
   in literature.
 - **Prototype Based Classifiers:** Prototype based classifiers are a kind of metric
-  based classifiers. Here the classifiers do not predict a probability distribution. Instead
+  based classifiers. Here, the classifiers do not predict a probability distribution. Instead
   it calculates a prototype for every class/category and measures the distance
   between a case and all prototypes. The class/category of the prototype with the smallest distance
   to the case is assigned to that case. In contrast to the probability classifiers
@@ -1008,7 +1032,7 @@ of this introduction. Here we can only provide an overview.
 
 The algorithm will generate a number of synthetic cases for every class
 to ensure that the number of cases for every class equals the number of
-cases of the majority class. The synthetic cases for every class a
+cases of the majority class. The synthetic cases for every class are
 generated for all *k* between *Min k* and *Max k*. Every *k* contributes
 proportional to the synthetic cases.
 
@@ -1020,10 +1044,10 @@ proportional to the synthetic cases.
     parameters:
 
     -   **Max Steps:** The number of steps during pseudo-labeling. For
-        example, in the first step, 1/Max Steps pseudo-labeled cases are
-        added, in the second step, 2/Max Steps pseudo-labeled cases are
-        added, etc.. Which cases are added can be influenced by *Balance
-        Pseudo-Labels*, *Certainty Anchor*, *Max Certainty Value*, and
+        example, in the first step, $1/{Max Steps}$ pseudo-labeled cases are
+        added, in the second step, $2/{Max Steps}$ pseudo-labeled cases are
+        added, etc.. Which cases are added can be influenced by 
+        *Certainty Anchor*, *Max Certainty Value*, and
         *Min Certainty Value*.
 
     -   **Certainty Anchor:** This value determines the reference point
@@ -1054,7 +1078,7 @@ running_num_figures=running_num_figures+1
 
 Before you start training, you can check how many cases can be matched
 between the text embeddings and the target data by clicking on the
-button *Test Data Matching* (*Control Panel* in Figure `r running_num_figures`). This allows
+button *Test Data Matching* (*Control Panel* in Figure `r running_num_figures-5`). This allows
 you to check if the structure of the data is working. If everything is
 okay you can provide the directory where you would like to save the
 model and start training the model by clicking on *Train Model*.
@@ -1072,7 +1096,7 @@ tab *Classifiers*.
 Similar to the other functions of this app, you first have to select the
 classifier by providing the folder that contains the entire model.
 Please note that a classifier is made up of several files. Thus,
-*Aifeducation Studio* asks you to select the folder containing these
+*AI for Education - Studio* asks you to select the folder containing these
 files and not single files. After loading a classifier, a new box
 appears.
 
@@ -1089,8 +1113,8 @@ running_num_figures=running_num_figures+1
 In the second tab, *Training* (Figure `r running_num_figures`), you receive a summary of the
 training process of the model. This includes a visualization of the
 loss, the accuracy, and the balanced accuracy for every fold and every
-epoch. Depending on the applied training techniques (such as *Balanced
-Pseudo-Labeling*), you can request additional images.
+epoch. Depending on the applied training techniques (such as *Pseudo-Labeling*), 
+you can request additional images.
 
 [![Figure `r running_num_figures`: Classifier - Training](CF_Use_Training.png){width="100%"}](CF_Use_Training.png)
 Figure `r running_num_figures`: Classifier - Training (click image to enlarge)
@@ -1148,7 +1172,7 @@ running_num_figures=running_num_figures+1
 Documenting a classifier is similar to the documentation of a text
 embedding model (section 3.3.3).
 
-To support developers in documenting their work, *Aifeducation Studio*
+To support developers in documenting their work, *AI for Education - Studio*
 provides an easy way to add a comprehensive description. You find this
 part of the app by clicking on *Document* tab in the tab *Classifiers*.
 First, you have to choose the classifier you would like to document.
@@ -1220,17 +1244,17 @@ You can specify the label of the model in the *Model Label* field within the *Co
 Specify an architecture and training settings in *Model Configuration* and
 *Training SetUp* boxes.
 
--   *Number of Features* determines the number of features for the
+-   **Number of Features** determines the number of features for the
     compressed representation. The lower the number, the higher the
     requested compression. This value corresponds with the features of
     the latent space in the figure above.
 
--   With *Method* you determine the type of layer the feature extractor
+-   With **Method** you determine the type of layer the feature extractor
     should use. If set "LSTM", all layers of the model are long
-    short-term memory layers. If set "dense", all layers are standard
+    short-term memory layers. If set "Dense", all layers are standard
     dense layers. 
 
--   With *Noise Factor* you can add some noise during training, making
+-   With **Noise Factor** you can add some noise during training, making
     the feature extractor do a denoising auto encoder, which can provide
     more robust generalizations.
 
@@ -1242,17 +1266,17 @@ Please note that training a feature extractor can take up to several hours. You
 can see your progress in the progress bars.
 
 After you have trained your feature extractor, you can use it for every
-classifier. Just pass the feature extractor path to *Feature Extractor*
-during configuration of the classifier (Figure `r first_classifier_image`).
+classifier. Just select the feature extractor during configuration of a 
+classifier (Figure `r first_classifier_image`).
 
 That is all. Now you can use and train the classifier in the same way as
 without a feature extractor.
 
 You can explore and document the model similar to all other models. Figure `r running_num_figures`
-shows an example for exploring training. 
+shows an example for exploring the training and validation loss. 
 
 [![Figure `r running_num_figures`: Feature Extractor - Training](FE_Use_Training.png){width="100%"}](FE_Use_Training.png)
-Figure `r running_num_figures`: Classifier - Prediction (click image to enlarge)
+Figure `r running_num_figures`: Feature Extractor - Training (click image to enlarge)
 
 ```{r, include = FALSE}
 running_num_figures=running_num_figures+1

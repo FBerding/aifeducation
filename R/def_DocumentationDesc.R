@@ -32,9 +32,9 @@ get_layer_dict <- function(layer) {
   documentation$tf_layers <- list(
     title = "Transformer Encoder Layers",
     desc = "The transformer encoder layers follow the structure of the encoder layers
-    used in transformer models. A single layer is designed as described by Chollet, Kalinowski, and Allaire (2022, p.373) with
+    used in transformer models. A single layer is designed as described by Chollet, Kalinowski, and Allaire (2022, p. 373) with
     the exception that single components of the layers (such as the activation function,
-    the kind of residual connection, the kind of normalization or the kind of attention) can be freely chosen.",
+    the kind of residual connection, the kind of normalization or the kind of attention) can be customized.",
     img = "layers_tf_encoder.png",
     references = c(
       "Chollet, F., Kalinowski, T. & Allaire, J. J. (2022). Deep learning with R (Second edition). Manning Publications Co. <https://learning.oreilly.com/library/view/-/9781633439849/?ar>",
@@ -69,7 +69,7 @@ get_layer_dict <- function(layer) {
     The number of filters equals the number of features of the input tensor. Thus, the shape of the tensor is retained (Pham, Kruszewski & Boleda 2016).
     \n The layer is able to consider multiple n-grams at the same time. In this case the convolution of the n-grams is done
     seprately and the resulting tensors are concatenated along the feature dimension. The number of filters for every n-gram
-    is set to num_features/num_n-grams. Thus, the resulting tensor has the same shape as the input tensor.
+    is set to $num_features/{num_n-grams}$. Thus, the resulting tensor has the same shape as the input tensor.
     \n Sub-sequences that are masked in the input are
     also masked in the output.
     \n The output of this layer can be understand as the results of the n-gram filters. Stacking this layer
@@ -97,8 +97,9 @@ get_layer_dict <- function(layer) {
     performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
     and/or minimal features. Second, it performs pooling over the remaining features selecting a speficifc number of
     the heighest and/or lowest features.
-    \n In the case of selecting the minmal *and* maximal features at the same time in the first step the minmal
-    features are concatenated to the tensor resulting the in the shape (Batch, Times, 2*Features). In the second step the
+    \n In the case of selecting the minmal *and* maximal features at the same time the minmal
+    features are concatenated to the tensor of the maximal features resulting the in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
+    In the second step the
     number of requested features is halved. The first half is used for the maximal features and the second for the minimal
     features.",
     img = "layers_cls_pooling.png",
@@ -146,7 +147,7 @@ get_dict_core_models <- function(model) {
     title = "Sequential Core Architecture",
     desc = "This model is based on a sequential architecture.
   The input is passed to a specific number of layers step by step.
-  All layers are grouped by the kind of layers into stacks.",
+  All layers are grouped by their kind into stacks.",
     img = "core_arch_sequential.png"
   )
 

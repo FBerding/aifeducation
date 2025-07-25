@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+running_num_figures=1
 ```
 
 ```{r setup, include = FALSE}
@@ -35,64 +36,17 @@ make the sharing process as convenient as possible.
 
 For this aim, every model generated with *aifeducation* can be prepared
 for publication in a few basic steps. In this vignette, we would like to
-show you how to make your AI ready for publication and how to use models
-from others. How to save, load, and apply these models is described in
-[02 Using the graphical user interface Aifeducation -
-Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
-and [03 Using R syntax](classification_tasks.html).
+show you how to make your AI ready for publication. 
 
-# 2 Creating Documentation with AI for Education - Studio
+A explanation how to document a model with *AI for Education - Studio* can be 
+found in the vignette [02 Using the graphical user interface Aifeducation -
+Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
+In this vignette we describe how to document a model with *R* syntax and provide some
+hints for the content of documentation. 
 
-The most convenience way to document your work is to use *AI for
-Education - Studio*. In a first step you have to start the user
-interface by calling `start_aifeducation_studio`:
+# 2 Creating Documentation with *R* Syntax
 
-```{r, include = TRUE, eval=FALSE}
-start_aifeducation_studio()
-```
-
-The next steps depend on the model you would like to document. In case
-you would like to document a `TextEmbeddingModel,` you first have to
-select *TextEmbeddingModels* at the top of the app. In the next window,
-please select the tab *Document*. Now you can load the model you would
-like to document by clicking on the button "Choose a Model".
-
-After loading the model you can see different tabs for different parts
-of the documentation. The first tab is *Developer*. Here you can add the
-names and e-mail addresses of the model's developers. In addition, you
-can add a suggested citation and a URL as a link to relevant sites of
-the model.
-
-With help of the other tabs you can write an abstract in English, an
-abstract in the native language of the model such as French or German,
-and you can add a detailed description in both languages. The tab for
-the abstracts allows you to set keywords for your work, which help
-others to find your work through search engines.
-
-Your documentation goes into the corresponding text field on the left
-side within a tab. If you click on the button "Preview", you will see a
-preview of the documentation on the right side. When you finished
-documenting a part of your model, please click on the "Save" button to
-save your changes.
-
-The last tab allows you to set the license for your model and for your
-documentation.
-
-The documentation for all other models such as `TEFeautreExtractor`s,
-`TEClassifierRegular`, and `TEClassifierProtoNet` works exactly the
-same. The only difference is that you have to select the corresponding
-tab at the top of the app.
-
-For `TextEmbeddingModels` there is an additional tab called "Modifiers".
-This tab is relevant if you do not develop your own base model but
-rather modify a base model created by other. Such a modification can be
-an adaption to specific tasks or specific domains. In this case we
-recommend to add the people who developed the base model via the tab
-"Developers" and your research group via the tab "Modifiers".
-
-# 3 Creating Documentation with *R* Syntax
-
-The process for documenting a model is similar for all models in
+The process for documenting a model with *R* syntax is similar for all models in
 *aifeducation,* since all models use the same methods. Here, we will
 illustrate the process for a `TextEmbeddingModel`.
 
@@ -142,7 +96,7 @@ example_model$set_publication_info(
 ```
 
 First of all, you have to decide the type of information you would like
-to add. You have two choices: "developer", and "modifier", which you set
+to add. You have two choices: "developer" and "modifier", which you set
 with `type`.
 
 -   `type="developer"` stores all information about the people involved
@@ -156,7 +110,7 @@ with `type`.
     be the case if you use a transformer model and you adapt the model
     to a specific domain or task. In this case you rely on the work of
     other people and modify their work. As such, you can describe your
-    modifications by setting `type=modifier`.
+    modifications by setting `type="modifier"`.
 
 For every type of contributor you can add the relevant individuals via
 `authors`. Please use the *R* function `personList()` for this. With
@@ -178,7 +132,7 @@ example_model$set_model_license("GPL-3")
 ```
 
 The documentation of your work is not part of the software. Here you can
-set another as for your software. You can set the license for your
+set another license as for your software. You can set the license for your
 documentation by using the method `set_documentation_license`.
 
 ```{r, include = TRUE, eval=FALSE}
@@ -189,9 +143,7 @@ Now you are able to share your work. Please remember to save your now
 fully described object as described in the vignette [03 Using R
 syntax](classification_tasks.html).
 
-The documentation process is the same for all other models such as
-`TEFeautreExtractor`s, `TEClassifierRegular`, and
-`TEClassifierProtoNet`. There is only one difference. For
+The documentation process is the same for all models. There is only one difference. For
 `TextEmbeddingModels`you can differentiate between "developers" and
 "modifiers". This is not possible for the other models. For these models
 you do not need the argument `type`. Calling this method would look
@@ -242,7 +194,7 @@ descriptions:
 -   A description of the kind and quantity of data used for training.
 -   Information on potential bias in the data.
 -   If possible, information about the inter-coder-reliability of the
-    coding process of the data.
+    coding process of the training data.
 -   If possible, provide a link to the corresponding text embedding
     model or at least state where potential users can get the text
     embedding model.
@@ -250,118 +202,8 @@ descriptions:
 The statement where to get the text embedding model is important since a
 classifier can only be used with the corresponding text embedding model.
 
-> Please do not report the performance values of your classifier in the
-> description.\*\* These are displayed automatically in *AI for
+> Please do *not* report the performance values of your classifier in the
+> description. These are displayed automatically in *AI for
 > Education - Studio* or can be accessed directly via
 > `example_classifier$reliability$test_metric_mean`.
 
-Please consider this native language example for a classifier:
-
-```{r, include = FALSE, eval=FALSE}
-"Dieser Klassifizierer kann dazu verwendet werden, um Unterrichtsentwürfe,
-Unterrichtsmaterial und Aufgaben in Bezug auf die Erfüllung des Bedürfnisses nach
-Kompetenzerleben einzuschätzen.
-Das Trainingsmaterial stellen 1.069 Unterrichtsentwürfe und das dazugehörige Material dar, die von Studierenden für das
-Lehramt an berufsbildenden Schulen in der Fachrichtung Wirtschaftswissenschaften entwickelt wurden.
-Zudem wurde frei um die anonyme Zusendung weiterer
-Unterrichtsentwürfe und Unterrichtsmaterialien geworben.
-
-## Theoretischer Hintergrund
-
-Dieser Klassifizierer erlaubt die Kodierung von Unterrichtsentwürfen sowie
-von Unterrichtsmaterialien und Aufgaben in Bezug auf Erfüllung des Bedürfnisses nach
-Komptenzerleben aus der Selbstbestimmungstheorie der Motivation von Deci und Ryan (2002).
-Das Kompetenzerleben wird in dieser Theorie verstanden als das Bedürfnis, sich bei
-der Durchführung von Aktivität als wirksam wahrzunehmen. Der Kodierleitfaden
-wurde neu für diesen Klassifizierer entwickelt.
-
-## Kategorien
-
-<div class='documentation_table'>
-
-|Wert|Bezeichnung|Definition|
-|----|----|----|
-|0|Keine Möglichkeit, sich selbst als kompetent zu erleben.|Der Unterricht gibt den Lernenden keinen Raum, sich selbst kompetent zu fühlen.|
-|1|Der Kompetenzzuwachs wird jedem Lernenden implizit aufgezeigt.|Kompetenzzuwachs wird lediglich dadurch aufgezeigt, dass die Problemstellung bzw. die Aufgabe gelöst werden kann.|
-|2|Der Kompetenzzuwachs wird jedem Lernenden explizit aufgezeigt.|Die Lernenden erhalten einen objektiven, expliziten Überblick über ihren individuellen Kompetenzzuwachs.|
-
-</div>
-
-## Generierung des Datenmaterials
-
-Bei dem Datenmaterial handelt es sich um Unterrichtsentwürfe sowie die dazugehörigen Unterrichtsmaterialien
-von Studierenden aus Bachelor- bzw. Masterstudiengängen für das Lehramt an berufsbildenden Schulen.
-Darüber hinaus wurde öffentlich für die Bereitsstellung weiterer, anonymisierter Unterrichtsentwürfe und
-Unterrichtsmaterialien geworben, die über eine Plattform bereitgestellt werden konnten.
-Ein Teil der Unterichtsentwürfe stammt aus der Studie von Riebenbauer (2022). Unterrichtsentwürfe
-und Materialien wurden getrennt ausgewertet.
-Insgesamt konnten
-auf diese Weise 1.069 Datensätze gesammelt werden.
-
-<div class='documentation_table'>
-
-|Quelle | Entwürfe | Material|
-|:---|:---|:---|
-|Riebenbauer (2022) | 456 | 0|
-|Neu | 311 | 304|
-
-</div>
-
-Für die Generierung der Klassen/Kategorien wurden zwei Personen geschult, die
-sich in einem Studiengang für das Lehramt an berufsbildenden Schulen befanden.
-Das Kodierteam hat zunächst 25 Unterrichtsentwurfe und 25 Unterrichtsmaterialien
-unabhhängig voneinander anhand des Kategoriensystems bewertet. Auf dieser
-Datengrundlage wurden Reliabilitätswerte ermittelt und Abweichungen
-besprochen. Der Prozess wurde an 12 Unterrichtsentwürfen und 12 Unterrichtsmaterialien
-wiederholt. Nach dieser Schulung wurden die restlichen Entwürfe und Materialien
-aufgeteilt und jeweils nur von einer einzigen Person kodiert. Die Reliabilitätswerte
-können der nachfolgenden Tabelle entnommen werden.
-
-**Ebene der einzelnen Kategorien**
-
-Die Werte in der Tabelle stellen die Alpha-Werte aus dem Iota-Konzept
-von Berding und Pargmann (2022) dar.
-
-<div class='documentation_table'>
-
-|Kat. 0|Kat. 1| Kat. 2|
-|------|------|------|
-|.69|.88|.67|
-|.87|.94|n.b.|
-
-</div>
-
-**Ebene der Skala**
-
-<div class='documentation_table'>
-
-|Dyn. Iota Index|Prozentuale Übereinstimmung|Krippendorffs Alpha|Gwets AC|
-|---------|---------|---------|---------|
-|.62|.66|.52|.53|
-|.65|.80|.48|.66|
-
-</div>
-
-## Text Embedding Model
-
-Das dazugehörige Model zur Transformation von Text in eine numerische Darstellung
-kann per Mail an die Autoren angefordert werden.
-
-## Potentielle Verzerrungen
-
-Das Ausmaß potentieller Verzerrungen kann aktuell für das Trainingsmaterial nicht
-genau abgeschätzt werden, da alle Dokumente vollständig anonym in die Bewertung
-und das Training der KI eingeflossen sind.
-
-## Literatur
-
-Berding, F. & Pargmann, J. (2022). Iota Reliability Concept of the
-Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
-
-Deci, E. L. & Ryan, R. M. (Hrsg.) (2002). Handbook of self-determination research. Rochester: University of Rochester
-Press.
-
-Riebenbauer, E. (2022). Kompetenzentwicklung im Masterstudium Wirtschaftspädagogik. Bielefeld: wbv.
-<https://doi.org/10.3278/9783763970216>
-
-```

@@ -405,9 +405,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       alpha=loss_alpha,
       margin=loss_margin)
     
-  #Set furhter necessary functions
-  get_class_mean=layer_class_mean()
-    
   #Tensor for Saving Training History
   if not (test_data is None):
     history_loss=torch.ones(size=(3,epochs),requires_grad=False)*-100
@@ -550,51 +547,23 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       inputs=batch["input"]
       labels=batch["labels"]
       
-      #inputs=inputs[0:(n_classes*Ns)].clone()
-      #labels=labels[0:(n_classes*Ns)].clone()
-      
       inputs = inputs.to(device,dtype=dtype)
       labels=labels.to(device,dtype=dtype)
       labels_one_hot=torch.nn.functional.one_hot(labels.to(dtype=torch.long),num_classes=n_classes)
-      #print(running_class_values.size())
-      #print(labels_one_hot.size())
+
       embeddings=model.embed(inputs).to(device)
-      #print(embeddings.size())
+
       running_class_values=running_class_values+torch.matmul(
         torch.transpose(labels_one_hot.to(dtype=embeddings.dtype),dim0=1,dim1=0),
         embeddings
       )
       running_class_freq=running_class_freq+torch.sum(labels_one_hot,dim=0)
       
-      #new_class_means=get_class_mean(x=embeddings,classes=labels,total_classes=n_classes)
-      #new_class_freq=torch.bincount(input=labels.int(),minlength=n_classes)
-
-      #if running_class_mean is None:
-      #  running_class_mean=new_class_means
-      #  running_class_freq=new_class_freq
-      #else:
-      #  w_old=(running_class_freq/(running_class_freq+new_class_freq))
-      #  w_new=(new_class_freq/(running_class_freq+new_class_freq))
-      #  
-      #  weighted_mean_old=torch.matmul(torch.diag(w_old).to(device,dtype=float),running_class_mean.to(device,dtype=float))
-      #  weighted_mean_new=torch.matmul(torch.diag(w_new).to(device,dtype=float),new_class_means.to(device,dtype=float))
-      #  
-      #  running_class_mean=weighted_mean_old+weighted_mean_new
-      #  running_class_freq=running_class_freq+new_class_freq
-
     running_class_freq=torch.unsqueeze(running_class_freq,-1)
     running_class_freq=running_class_freq.repeat((1,model.get_embedding_dim()))
     
-    #print("n_classes")
-    #print(n_classes)
-    
-    #print("class_freq")
-    #print(running_class_freq)
-    
-    #print("values")
-    #print(running_class_values)
-
     class_mean_prototypes=running_class_values/running_class_freq
+    
     model.set_trained_prototypes(
       prototypes=class_mean_prototypes,
       class_lables=torch.arange(start=0, end=n_classes, step=1)

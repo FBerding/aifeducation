@@ -1,3 +1,10 @@
+testthat::skip_on_cran()
+
+testthat::skip_if_not(
+  condition = check_aif_py_modules(trace = FALSE),
+  message = "Necessary python modules not available"
+)
+
 # SetUp-------------------------------------------------------------------------
 root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
 

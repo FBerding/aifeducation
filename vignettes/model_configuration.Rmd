@@ -67,16 +67,16 @@ revealed that for small and medium data sizes, a vocabulary of 8,000
 tokens provides good performance. While a large vocabulary is able to
 represent rare words better, words with a higher frequency even are
 covered well with a smaller vocabulary (Ganesh et al. 2021, p. 1070).
-Thus, we recommend to try a the vocabulary size of 10,000.
+Thus, we recommend to try a vocabulary size of 10,000.
 
 It is important to note that the vocabulary size has in impact on how
 words are split into tokens. As Kaya and Tantug (2024, p. 5) illustrate,
 a higher vocabulary size allows a tokenizer to split words into a
-smaller number of tokens while a smaller number requires the tokenizer
+smaller number of tokens while a smaller vocabulary size requires the tokenizer
 to use more tokens. Thus, the length of the token sequence generated for
 a given chunk of text is longer for a tokenizer with a small vocabulary
 compared to a tokenizer with a large vocabulary. In order to describe
-the effect, Kaya and Tantug (2024, p. 5) propose the *tokenization
+this effect, Kaya and Tantug (2024, p. 5) propose the *tokenization
 granularity rate,* which is calculated as the number of all tokens
 divided by all words. As a consequence, reducing the vocabulary size
 requires an increase of the maximal sequence length of a transformer in
@@ -198,16 +198,16 @@ pooling.
 
 Classifiers are built on top of a text embedding model and represent the
 final step for classification tasks. Although the underlying transformer
-is not part of training, a classifier is still a challenge in the
-approach used by *aifeducation* transformers' hidden size. For example,
+is not part of training, a classifier is still a challenge since the training relies
+on the transformers' hidden size. For example,
 the hidden size in the original BERT model is 768 for the base and 1024
-for the large variation (Devlin et al. 2019, p. 4173). Since data
+for the large version (Devlin et al. 2019, p. 4173). Since data
 availability is low in educational and social sciences, low performance
-is to be expected.
+is possible.
 
-A solution to solve this problem is to reduce the dimensions, as
+A solution to solve this problem is to reduce the number of dimensions, as
 proposed by Ganesan et al. (2021). In their study they investigate the
-relationship between the sample size, dimension, and dimension reduction
+relationship between the sample size, dimension, and a dimension reduction
 method. The text representations were built by calculating the mean over
 all tokens of the second to last layer (Ganesan et al. 2021, p. 4517).
 Their central findings are
@@ -227,9 +227,11 @@ Ganesan et al. (2021) work shows that a reduction of the dimensions is
 necessary in case that the transformer model uses a large hidden size.
 Since most models in *aifeducation* work with sequential data, the
 package contains an LSTM (`fe_method="LSTM"`) and a dense feature
-extractor (`fe_method="dense"`). To use it for classifier training, set
-`use_fe=TRUE` during the creation of the object and specify the desired
-number of dimensions with `fe_features`.
+extractor (`fe_method="Dense"`). To use it for classifier training, create a
+`TEFeatureExtractor` and provide the trained extractor during the 
+configuration of the classifier. See section "Extension" in vignette [03 Using R
+syntax](classification_tasks.html) or [02 Using the graphical user interface
+Aifeducation - Studio](gui_aife_studio.html) for more details.
 
 # 5 Limitations
 

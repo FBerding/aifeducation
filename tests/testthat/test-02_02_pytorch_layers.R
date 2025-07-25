@@ -662,30 +662,33 @@ test_that("merge_layer", {
   n_extracted_features <- sample(seq(from = 2, to = features, by = 1), size = 1)
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
-  for (pooling_type in c("Max", "Min", "MinMax")) {
-    layer <- py$merge_layer(
-      times = as.integer(times),
-      features = as.integer(features),
-      n_extracted_features = as.integer(n_extracted_features),
-      n_input_streams = as.integer(n_input_streams),
-      pad_value = as.integer(pad_value),
-      pooling_type = pooling_type,
-      attention_type = "multihead",
-      num_heads = 1L,
-      dtype = values[[1]]$dtype,
-      device = device
-    )$to(device)
-    layer$eval()
 
-    y <- layer(
-      tensor_list = rep(values[1], times = n_input_streams),
-      seq_len=values[[2]],
-      mask_times=values[[3]],
-      mask_features = values[[4]]
-    )
+  for(attention_type in c("MultiHead","Fourier")){
+    for (pooling_type in c("Max", "Min", "MinMax")) {
+      layer <- py$merge_layer(
+        times = as.integer(times),
+        features = as.integer(features),
+        n_extracted_features = as.integer(n_extracted_features),
+        n_input_streams = as.integer(n_input_streams),
+        pad_value = as.integer(pad_value),
+        pooling_type = pooling_type,
+        attention_type = attention_type,
+        num_heads = 1L,
+        dtype = values[[1]]$dtype,
+        device = device
+      )$to(device)
+      layer$eval()
 
-    # Test the correct shape
-    expect_equal(dim(tensor_to_numpy(y)), c(length(sequence_length), n_extracted_features))
+      y <- layer(
+        tensor_list = rep(values[1], times = n_input_streams),
+        seq_len=values[[2]],
+        mask_times=values[[3]],
+        mask_features = values[[4]]
+      )
+
+      # Test the correct shape
+      expect_equal(dim(tensor_to_numpy(y)), c(length(sequence_length), n_extracted_features))
+    }
   }
 })
 

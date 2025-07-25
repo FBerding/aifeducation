@@ -70,7 +70,7 @@ TEClassifierParallel <- R6::R6Class(
     #' @param tf_dropout_rate_1 `r get_param_doc_desc("tf_dropout_rate_1")`
     #' @param tf_dropout_rate_2 `r get_param_doc_desc("tf_dropout_rate_2")`
     #' @param tf_attention_type `r get_param_doc_desc("tf_attention_type")`
-    #' @param tf_embedding_type `r get_param_doc_desc("tf_embedding_type")`
+    #' @param tf_positional_type `r get_param_doc_desc("tf_positional_type")`
     #' @param tf_num_heads `r get_param_doc_desc("tf_num_heads")`
     #' @param tf_bias `r get_param_doc_desc("tf_bias")`
     #' @param tf_parametrizations `r get_param_doc_desc("tf_parametrizations")`
@@ -125,7 +125,7 @@ TEClassifierParallel <- R6::R6Class(
                          tf_dropout_rate_1=0.1,
                          tf_dropout_rate_2=0.5,
                          tf_attention_type="MultiHead",
-                         tf_embedding_type="absolute",
+                         tf_positional_type="absolute",
                          tf_num_heads=1,
                          tf_bias=FALSE,
                          tf_parametrizations="None",
@@ -191,7 +191,7 @@ TEClassifierParallel <- R6::R6Class(
         tf_dropout_rate_1=self$model_config$tf_dropout_rate_1,
         tf_dropout_rate_2=self$model_config$tf_dropout_rate_2,
         tf_attention_type=self$model_config$tf_attention_type,
-        tf_embedding_type=self$model_config$tf_embedding_type,
+        tf_positional_type=self$model_config$tf_positional_type,
         tf_num_heads=as.integer(self$model_config$tf_num_heads),
         tf_bias=self$model_config$tf_bias,
         tf_parametrizations=self$model_config$tf_parametrizations,

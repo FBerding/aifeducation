@@ -82,10 +82,6 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 > Started](https://fberding.github.io/aifeducation/articles/aifeducation.html)
 > for more details.
 
-How to use the package with *R* syntax is described in vignette [03
-Using R
-syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
-
 ## Graphical User Interface *AI for Education - Studio*
 
 The package ships with a shiny app that serves as a graphical user
@@ -135,9 +131,9 @@ already trained models work with future versions of this package.
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports new
 approaches such as modernBERT (Warner et al. 2024), MPNet (Song et
-al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa
-version 2 (He et al. 2020), Funnel-Transformer (Dai et al. 2020), and
-Longformer (Beltagy, Peters & Cohan 2020).
+al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019),
+Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
+Cohan 2020).
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
@@ -342,12 +338,6 @@ Haixiang, G., Yijing, L., Shang, J., Mingyun, G., Yuanyue, H., & Bing,
 G. (2017). Learning from class-imbalanced data: Review of methods and
 applications. Expert Systems with Applications, 73, 220–239.
 <https://doi.org/10.1016/j.eswa.2016.12.035>
-
-He, H., Bai, Y., Garcia, E. A., & Li, S. (2008). ADASYN: Adaptive
-synthetic sampling approach for imbalanced learning. In 2008 IEEE
-International Joint Conference on Neural Networks (IEEE World Congress
-on Computational Intelligence) (pp. 1322–1328). IEEE.
-<https://doi.org/10.1109/IJCNN.2008.4633969>
 
 Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
 KNNOR: An oversampling technique for imbalanced datasets. Applied Soft

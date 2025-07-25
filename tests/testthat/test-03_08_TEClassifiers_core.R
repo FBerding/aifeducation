@@ -748,10 +748,25 @@ for (object_class_name in object_class_names) {
           } else {
             pl_step <- NULL
           }
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss"), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota"), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy"), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy"), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
+
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 2), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 1), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 1), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 1), class = "ggplot")
+
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
+
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=TRUE), class = "ggplot")
         })
 
         test_that(paste(

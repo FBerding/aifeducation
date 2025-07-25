@@ -27,8 +27,6 @@ them computationally demanding. With specialized libraries such as
 *PyTorch*, graphical processing units (gpu)
 can help to speed up computations significantly. However, many of these
 specialized libraries for machine learning are written in python.
-Fortunately, an interface to python is provided via the *R* package
-[reticulate](https://cran.r-project.org/package=reticulate).
 
 The R package *Artificial Intelligence for Education (aifeducation)*
 aims to provide educators, educational researchers, and social
@@ -83,9 +81,9 @@ libraries into a virtual environment called "aifeducation".
 In addition, we recommend to set `install_aifeducation_studio=TRUE`
 since this will install the optional *R* packages necessary to use *AI
 for Education - Studio*. *AI for Education - Studio* is a graphical user
-interface for applying these packages. We recommend to use it for
+interface for using this package. We recommend to use it for
 everyone who is unfamiliar with *R* or machine learning. If you do not
-want use the studio, you can set the argument to `FALSE`. In this case
+want use studio, you can set the argument to `FALSE`. In this case
 you have to use the package with *R* syntax.
 
 If you have a suitable machine and would like to use a graphic card for
