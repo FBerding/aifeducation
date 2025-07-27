@@ -867,7 +867,7 @@ get_param_dict <- function() {
     max = 1,
     allowed_values = NULL,
     desc = "Value greater 0 indicating the minimal distance of every case from prototypes of other classes. Please note that
-    in contrast to the orginal work by [Zhang et al. (2019)](https://doi.org/10.1007/978-3-030-16145-3_24) this implementation
+    in contrast to the orginal work by Zhang et al. (2019) this implementation
     reaches better performance if the margin is a magnitude lower (e.g. 0.05 instead of 0.5).",
     gui_box = "Loss",
     gui_label = "Margin",

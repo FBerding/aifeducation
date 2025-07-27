@@ -69,7 +69,7 @@ get_layer_dict <- function(layer) {
     The number of filters equals the number of features of the input tensor. Thus, the shape of the tensor is retained (Pham, Kruszewski & Boleda 2016).
     \n The layer is able to consider multiple n-grams at the same time. In this case the convolution of the n-grams is done
     seprately and the resulting tensors are concatenated along the feature dimension. The number of filters for every n-gram
-    is set to $num_features/{num_n-grams}$. Thus, the resulting tensor has the same shape as the input tensor.
+    is set to num_features/num_n-grams. Thus, the resulting tensor has the same shape as the input tensor.
     \n Sub-sequences that are masked in the input are
     also masked in the output.
     \n The output of this layer can be understand as the results of the n-gram filters. Stacking this layer

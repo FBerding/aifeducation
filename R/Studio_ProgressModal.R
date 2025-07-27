@@ -151,7 +151,7 @@ start_and_monitor_long_task <- function(id,
                                         pgr_use_middle = FALSE,
                                         pgr_use_bottom = FALSE,
                                         pgr_use_graphic = FALSE,
-                                        update_intervall = 300,
+                                        update_intervall = 30,
                                         success_type = "data_sets") {
   shiny::moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------

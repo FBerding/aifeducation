@@ -1633,7 +1633,7 @@ classifier_prototype$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 150,
+  epochs = 300,
   batch_size = 35,
   Ns = 5,
   Nq = 3,

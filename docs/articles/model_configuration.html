@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,19 +130,20 @@ revealed that for small and medium data sizes, a vocabulary of 8,000
 tokens provides good performance. While a large vocabulary is able to
 represent rare words better, words with a higher frequency even are
 covered well with a smaller vocabulary (Ganesh et al. 2021, p. 1070).
-Thus, we recommend to try a the vocabulary size of 10,000.</p>
+Thus, we recommend to try a vocabulary size of 10,000.</p>
 <p>It is important to note that the vocabulary size has in impact on how
 words are split into tokens. As Kaya and Tantug (2024, p. 5) illustrate,
 a higher vocabulary size allows a tokenizer to split words into a
-smaller number of tokens while a smaller number requires the tokenizer
-to use more tokens. Thus, the length of the token sequence generated for
-a given chunk of text is longer for a tokenizer with a small vocabulary
-compared to a tokenizer with a large vocabulary. In order to describe
-the effect, Kaya and Tantug (2024, p. 5) propose the <em>tokenization
-granularity rate,</em> which is calculated as the number of all tokens
-divided by all words. As a consequence, reducing the vocabulary size
-requires an increase of the maximal sequence length of a transformer in
-order to allow the transformer to process the same number of words.</p>
+smaller number of tokens while a smaller vocabulary size requires the
+tokenizer to use more tokens. Thus, the length of the token sequence
+generated for a given chunk of text is longer for a tokenizer with a
+small vocabulary compared to a tokenizer with a large vocabulary. In
+order to describe this effect, Kaya and Tantug (2024, p. 5) propose the
+<em>tokenization granularity rate,</em> which is calculated as the
+number of all tokens divided by all words. As a consequence, reducing
+the vocabulary size requires an increase of the maximal sequence length
+of a transformer in order to allow the transformer to process the same
+number of words.</p>
 <p>The study by Wies et al. (2021) investigates the relationship between
 the vocabulary size, the dimension of the embedding matrix, and the
 width/depth of a transformer model (hidden size and number of layers).
@@ -272,17 +273,17 @@ pooling.</p>
 <p>Classifiers are built on top of a text embedding model and represent
 the final step for classification tasks. Although the underlying
 transformer is not part of training, a classifier is still a challenge
-in the approach used by <em>aifeducation</em> transformers’ hidden size.
-For example, the hidden size in the original BERT model is 768 for the
-base and 1024 for the large variation (Devlin et al. 2019, p. 4173).
-Since data availability is low in educational and social sciences, low
-performance is to be expected.</p>
-<p>A solution to solve this problem is to reduce the dimensions, as
-proposed by Ganesan et al. (2021). In their study they investigate the
-relationship between the sample size, dimension, and dimension reduction
-method. The text representations were built by calculating the mean over
-all tokens of the second to last layer (Ganesan et al. 2021, p. 4517).
-Their central findings are</p>
+since the training relies on the transformers’ hidden size. For example,
+the hidden size in the original BERT model is 768 for the base and 1024
+for the large version (Devlin et al. 2019, p. 4173). Since data
+availability is low in educational and social sciences, low performance
+is possible.</p>
+<p>A solution to solve this problem is to reduce the number of
+dimensions, as proposed by Ganesan et al. (2021). In their study they
+investigate the relationship between the sample size, dimension, and a
+dimension reduction method. The text representations were built by
+calculating the mean over all tokens of the second to last layer
+(Ganesan et al. 2021, p. 4517). Their central findings are</p>
 <ul>
 <li>that fine-tuning a transformer with only a few training examples
 (10,000) results in a lower performance than using a not fine-tuned
@@ -302,10 +303,11 @@ of the dimensions were sufficient (Ganesan et al. 2021, p. 4522).</li>
 is necessary in case that the transformer model uses a large hidden
 size. Since most models in <em>aifeducation</em> work with sequential
 data, the package contains an LSTM (<code>fe_method="LSTM"</code>) and a
-dense feature extractor (<code>fe_method="dense"</code>). To use it for
-classifier training, set <code>use_fe=TRUE</code> during the creation of
-the object and specify the desired number of dimensions with
-<code>fe_features</code>.</p>
+dense feature extractor (<code>fe_method="Dense"</code>). To use it for
+classifier training, create a <code>TEFeatureExtractor</code> and
+provide the trained extractor during the configuration of the
+classifier. See section “Extension” in vignette <a href="classification_tasks.html">03 Using R syntax</a> or <a href="gui_aife_studio.html">02 Using the graphical user interface
+Aifeducation - Studio</a> for more details.</p>
 </div>
 <div class="section level2">
 <h2 id="limitations">5 Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>

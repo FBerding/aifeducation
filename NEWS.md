@@ -75,6 +75,7 @@ editor_options:
 
 - Added K-Nearest Neighbor OveRsampling approach (KNNOR) in C++ as new oversampling technique.
 - Removed support for all other oversampling techniques. No dependency to the package 'smotefamily'.
+- Changed update intervall of most processes within AI for Education - Studio from 300 to 30 seconds.
 
 **Performance Measures**
 

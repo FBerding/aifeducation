@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,8 +91,8 @@ Riebenbauer, Karin Rebmann</h4>
 <p>This vignette introduces the package <em>aifeducation</em> and its
 usage with <em>R</em> syntax. For users who are unfamiliar with
 <em>R</em> or those who do not have coding skills in relevant languages
-(e.g., python), we recommend to start with the graphical user interface
-<em>Aifeducation - Studio,</em> which is described in the vignette <a href="gui_aife_studio.html">02 Using the graphical user interface
+(e.g. python), we recommend to start with the graphical user interface
+<em>AI for Education - Studio</em> which is described in the vignette <a href="gui_aife_studio.html">02 Using the graphical user interface
 Aifeducation - Studio</a>.</p>
 <p>We assume that <em>aifeducation</em> is installed as described in
 vignette <a href="https://fberding.github.io/aifeducation/articles/aifeducation.html">01
@@ -260,13 +260,13 @@ like this:</p>
 <span><span class="co">#&gt; accelerate: 1.8.1</span></span>
 <span><span class="co">#&gt; numpy: 2.2.6</span></span>
 <span><span class="co">#&gt; GPU Acceleration: TRUE</span></span>
-<span><span class="co">#&gt; Location for Temporary Files:C:\Users\User\AppData\Local\Temp\RtmpQ1G8eg/r_aifeducation</span></span></code></pre></div>
+<span><span class="co">#&gt; Location for Temporary Files:C:\Users\User\AppData\Local\Temp\RtmpCs5iEs/r_aifeducation</span></span></code></pre></div>
 <blockquote>
-<p><strong>Note:</strong> Please remember: Every time you start a new
-session in <em>R,</em> you have to load the library
-<code>aifeducation</code> and to configure python. We recommend to use
-the function <code>prepare_session</code> because it performs all
-necessary steps for setting up python correctly.</p>
+<p>Please remember: Every time you start a new session in <em>R,</em>
+you have to load the library <code>aifeducation</code> and to configure
+python. We recommend to use the function <code>prepare_session</code>
+because it performs all necessary steps for setting up python
+correctly.</p>
 </blockquote>
 <p>Now you can start your work.</p>
 </div>
@@ -296,12 +296,11 @@ raw texts into text embeddings later.</p>
 <p>The creation of a <code>LargeDataSetForText</code> is necessary if
 you would like to create or train a base model or to generate text
 embeddings. In case you would like to create such a data set for the
-first time you have to call the method:</p>
+first time you have to create an empty data set first:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_texts</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Now you have an empty data set. To fill this object with raw texts
-different methods are available depending on the file type you use for
-storing raw texts.</p>
+<p>To fill this object with raw texts different methods are available
+depending on the file type you use for storing raw texts.</p>
 <p><strong>.txt files</strong></p>
 <p>The first alternative is to store raw texts in .txt files. To use
 these you have to structure your data in a specific way:</p>
@@ -317,8 +316,8 @@ for the raw text.</li>
 <code>license.txt</code> which contains a short statement for the
 license of the text such as “CC BY”.</li>
 <li>Add an additional .txt file to the folder named
-<code>url_license.txt</code> which contains the url/link to the license’
-text such as “<a href="https://creativecommons.org/licenses/by/4.0/" class="external-link uri">https://creativecommons.org/licenses/by/4.0/</a>”.</li>
+<code>url_license.txt</code> which contains the url/link to the
+license’s text such as “<a href="https://creativecommons.org/licenses/by/4.0/" class="external-link uri">https://creativecommons.org/licenses/by/4.0/</a>”.</li>
 <li>Add an additional .txt file to the folder named
 <code>text_license.txt</code> which contains the full license in raw
 texts.</li>
@@ -368,10 +367,11 @@ passing the path to the directory of the main folder to
 <code>dir_path</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_texts</span><span class="op">$</span><span class="fu">add_from_files_txt</span><span class="op">(</span></span>
-<span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span></span>
+<span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span>,</span>
+<span>  clean_text<span class="op">=</span><span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The data set will now read all the raw texts in the main folder and
-will assign every text the corresponding bib entry and license. Please
+will assign every text the corresponding bib entry, license, etc. Please
 note that adding a <code>bib_entry.txt</code>, <code>license.txt</code>,
 <code>url_license.txt</code>, <code>text_license.txt</code>, and
 <code>url_soruce.text</code> to every folder is optional. If there is no
@@ -400,8 +400,8 @@ for the raw text.</li>
 <code>license.txt</code> which contains a short statement for the
 license of the text such as “CC BY”.</li>
 <li>Add an additional .txt file to the folder named
-<code>url_license.txt</code> which contains the URL/link to the license
-text such as “<a href="https://creativecommons.org/licenses/by/4.0/" class="external-link uri">https://creativecommons.org/licenses/by/4.0/</a>”.</li>
+<code>url_license.txt</code> which contains the URL/link to the
+license’s text such as “<a href="https://creativecommons.org/licenses/by/4.0/" class="external-link uri">https://creativecommons.org/licenses/by/4.0/</a>”.</li>
 <li>Add an additional .txt file to the folder named
 <code>text_license.txt</code> which contains the full license in raw
 texts.</li>
@@ -453,7 +453,8 @@ passing the path to the directory of the main folder to
 <code>dir_path</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_texts</span><span class="op">$</span><span class="fu">add_from_files_pdf</span><span class="op">(</span></span>
-<span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span></span>
+<span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span>,</span>
+<span>  clean_text<span class="op">=</span><span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>As stated above, <code>bib_entry.txt</code>,
 <code>license.txt</code>, <code>url_license.txt</code>,
@@ -481,7 +482,7 @@ entry.</li>
 license.</li>
 <li>Every .xslx file can contain an additional column for the license’s
 URL.</li>
-<li>Every .xslx file can contain an additional column for the license
+<li>Every .xslx file can contain an additional column for the license’s
 text.</li>
 <li>Every .xslx file can contain an additional column for the source’s
 URL.</li>
@@ -539,7 +540,7 @@ URL.</li>
 <p>Now you can call the method <code>add_from_files_xlsx</code> by
 passing the path to the directory of the main folder to
 <code>dir_path</code>. Please do not forget to specify the column names
-for ID, text as well as bibliographic and license information.</p>
+for ID and text as well as for the other columns.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_texts</span><span class="op">$</span><span class="fu">add_from_files_xlsx</span><span class="op">(</span></span>
 <span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span>,</span>
@@ -551,6 +552,33 @@ for ID, text as well as bibliographic and license information.</p>
 <span>  text_license_column <span class="op">=</span> <span class="st">"text_license"</span>,</span>
 <span>  url_source_column <span class="op">=</span> <span class="st">"url_source"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p><strong>Cleant text</strong></p>
+<p>For .txt and .pdf files you can set the argument
+<code>clean_text=TRUE</code>. This requests an algorithm that should
+pre-process the raw texts and applies the following modifications:</p>
+<ul>
+<li>Some special symbols are removed.</li>
+<li>All spaces at the beginning and the end of a row are removed.</li>
+<li>Multiple spaces are reduced to single space.</li>
+<li>All rows with a number from 1 to 999 at the beginning or at the end
+are removed (header and footer).</li>
+<li>List of content is removed.</li>
+<li>Hyphenation is made undone.</li>
+<li>Line breaks within a paragraph are removed.</li>
+<li>Multiple line breaks are reduced to a single line break.</li>
+</ul>
+<p>The aim of these changes is to provide a clean plain text in order to
+increase the performance and quality of all analyses.</p>
+<p><strong>IDs</strong> In case of .xlsx files, the texts’ IDs are set
+to the IDs stored in the corresponding column for ID. In case of .pdf
+and .txt files, the file names are used as ID (without the file
+extension).</p>
+<blockquote>
+<p>Please note that a consequence of this is that two files
+<em>text_01.txt</em> and <em>text_01.pdf</em> have the same ID, which is
+not allowed. Please ensure that you use unique IDs across file
+formats.</p>
+</blockquote>
 <p><strong>Saving and loading a data set</strong></p>
 <p>Once you have create a <code>LargeDataSetForText</code> you can save
 your data to disk by calling the function <code>save_to_disk</code>. In
@@ -569,7 +597,7 @@ will be created within that directory. In this folder the data set is
 saved.</p>
 <p>To load an existing data set, you can call the function
 <code>load_from_disk</code> with the directory path where you stored the
-data. In our case this would be.</p>
+data. In our case this would be:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_text_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/raw_texts"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you can work with your data.</p>
@@ -588,8 +616,8 @@ advantageous to save already transformed data. You can save and load an
 object of this class with the functions <code>save_to_disk</code> and
 <code>load_from_disk</code>.</p>
 <p>Let us assume that we have a
-<code>LargeDataSetForTextEmbeddings</code> <em>text_embeddings</em>.
-Saving this object may look like:</p>
+<code>LargeDataSetForTextEmbeddings</code> called
+<em>text_embeddings</em>. Saving this object may look like:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_to_disk.html">save_to_disk</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">text_embeddings</span>,</span>
@@ -656,7 +684,7 @@ practice.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "text"      "label"     "id"        "bib_entry" "license"</span></span></code></pre></div>
 <p>Now the <code>data.frame</code> is ready as input for our data set.
-The “label” column will not be included in this data set.</p>
+The “label” column will not be included.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_set_reviews_text</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">data_set_reviews_text</span><span class="op">$</span><span class="fu">add_from_data.frame</span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span></code></pre></div>
@@ -676,36 +704,34 @@ objects and functions in <em>aifeducation</em>.</p>
 </h3>
 <p>Base models are the foundation of all further models in
 <em>aifeducation</em>. At the moment, these are transformer models such
-modernBERT (Warner et al. 2024), MPNet(Song et al. 2020), BERT (Devlin
-et al. 2019), RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et
-al. 2020), Funnel-Transformer (Dai et al. 2020), and Longformer
-(Beltagy, Peters &amp; Cohan 2020). In general, these models are trained
-on a large corpus of general texts in the first step. In the next step,
-the models are fine-tuned to domain-specific texts and/or fine-tuned for
-specific tasks. Since the creation of base models requires a huge number
-of texts resulting in high computational time, it is recommended to use
-pre-trained models. These can be found on <a href="https://huggingface.co/" class="external-link">Hugging Face</a>. Sometimes, however, it
-is more straightforward to create a new model to fit a specific purpose.
-<em>aifeducation</em> supports the option to both create and
-train/fine-tune base models.</p>
+modernBERT (Warner et al. 2024), MPNet (Song et al. 2020), BERT (Devlin
+et al. 2019), RoBERTa (Liu et al. 2019), Funnel-Transformer (Dai et
+al. 2020), and Longformer (Beltagy, Peters &amp; Cohan 2020). In
+general, these models are trained on a large corpus of general texts in
+the first step. In the next step, the models are fine-tuned to
+domain-specific texts and/or fine-tuned for specific tasks. Since the
+creation of base models requires a huge number of texts resulting in
+high computational time, it is recommended to use pre-trained models.
+These can be found on <a href="https://huggingface.co/" class="external-link">Hugging
+Face</a>. Sometimes, however, it is more straightforward to create a new
+model to fit a specific purpose. <em>aifeducation</em> supports the
+option to both create and train/fine-tune base models.</p>
 </div>
 <div class="section level3">
 <h3 id="creation-of-base-models">3.2 Creation of Base Models<a class="anchor" aria-label="anchor" href="#creation-of-base-models"></a>
 </h3>
-<p>Every transformer model is composed of two parts: 1) the tokenizer
-which splits raw texts into smaller pieces to model a large number of
-words with a limited, small number of tokens and 2) the neural network
-that is used to model the capabilities for understanding natural
-language.</p>
+<p>Every transformer model is composed of two parts:</p>
+<ol style="list-style-type: decimal">
+<li>the tokenizer which splits raw texts into smaller pieces to model a
+large number of words with a limited, small number of tokens and</li>
+<li>the neural network that is used to model the capabilities for
+understanding natural language.</li>
+</ol>
 <p>At the beginning you can choose between the different supported
 transformer architectures. Depending on the architecture, you have
 different options determining the shape of your neural network. For this
 vignette we use a BERT (Devlin et al. 2019) model which can be created
 with the function <code>aife_transformer.make</code>.</p>
-<blockquote>
-<p>See p. 3 Transformer Maker <a href="transformers.html">01
-Transformers for Developers</a> for details.</p>
-</blockquote>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aife_transformer.make.html">aife_transformer.make</a></span><span class="op">(</span><span class="st">"bert"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "BERT Model has been initialized."</span></span>
@@ -729,18 +755,18 @@ Transformers for Developers</a> for details.</p>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:20 2025 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:22 2025 Creating Tokenizer Draft</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:22 2025 Start Computing Vocabulary</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:22 2025 Start Computing Vocabulary - Done</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:22 2025 Saving Draft</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:23 2025 Creating Tokenizer</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:23 2025 Creating Tokenizer - Done</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:26 2025 Creating Transformer Model</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:28 2025 Saving BERT Model</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:29 2025 Saving Tokenizer Model</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:29 2025 Saving Sustainability Data</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:29 2025 Done</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:04:12 2025 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:14 2025 Creating Tokenizer Draft</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:14 2025 Start Computing Vocabulary</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:14 2025 Start Computing Vocabulary - Done</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:14 2025 Saving Draft</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:15 2025 Creating Tokenizer</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:15 2025 Creating Tokenizer - Done</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:17 2025 Creating Transformer Model</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:18 2025 Saving BERT Model</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:18 2025 Saving Tokenizer Model</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:18 2025 Saving Sustainability Data</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:18 2025 Done</span></span></code></pre></div>
 <p>For this function to work, you must provide a path to a directory
 where your new transformer should be saved (<code>model_dir</code>).</p>
 <p>Furthermore, you must provide raw texts to <code>text_dataset</code>.
@@ -773,8 +799,8 @@ significantly because the computational time does not increase in a
 linear way but quadratic (Beltagy, Peters &amp; Cohan 2020). For long
 documents you can use another architecture of BERT (e.g. Longformer from
 Beltagy, Peters &amp; Cohan 2020) or split a long document into several
-chunks which are used sequentially for classification (e.g., Pappagari
-et al. 2019). Using chunks is supported by <em>aifedcuation</em> for all
+chunks which are used sequentially for classification (e.g. Pappagari et
+al. 2019). Using chunks is supported by <em>aifedcuation</em> for all
 models.</p>
 <p>Since creating a transformer model is energy consuming,
 <em>aifeducation</em> allows you to estimate its ecological impact with
@@ -798,10 +824,6 @@ model directory.</p>
 first time or want to adapt a pre-trained model to a domain-specific
 language or task, you can call the corresponding
 <code>train</code>-method.</p>
-<blockquote>
-<p>See p. 3 Transformer Maker <a href="transformers.html">01
-Transformers for Developers</a> for details.</p>
-</blockquote>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aife_transformer.make.html">aife_transformer.make</a></span><span class="op">(</span><span class="st">"bert"</span><span class="op">)</span></span>
 <span><span class="va">base_model</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
@@ -822,17 +844,17 @@ Transformers for Developers</a> for details.</p>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:29 2025 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:30 2025 Loading Existing Model</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:30 2025 Creating Chunks of Sequences for Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:31 2025 459 Chunks Created</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:31 2025 Using Whole Word Masking</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:31 2025 Preparing Training of the Model</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:31 2025 Start Fine Tuning</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:39 2025 Saving BERT Model</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:40 2025 Saving Tokenizer</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:40 2025 Saving Sustainability Data</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:40 2025 Done</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:04:19 2025 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:20 2025 Loading Existing Model</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:20 2025 Creating Chunks of Sequences for Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:21 2025 459 Chunks Created</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:21 2025 Using Whole Word Masking</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:21 2025 Preparing Training of the Model</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:21 2025 Start Fine Tuning</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:29 2025 Saving BERT Model</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:29 2025 Saving Tokenizer</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:29 2025 Saving Sustainability Data</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:29 2025 Done</span></span></code></pre></div>
 <p>Here it is important that you provide the path to the directory where
 your new transformer is stored. Furthermore, it is important that you
 provide <em>another</em> directory where your trained transformer should
@@ -843,7 +865,7 @@ Other models may use other learning objectives. Please refer to the
 documentation for more details on every model.</p>
 <p>First, you can set the length of token sequences with
 <code>chunk_size</code> leading the tokenizer to split long texts into
-several chunks with the given size. with <code>val_size</code>, you set
+several chunks with the given size. With <code>val_size</code>, you set
 how many of these chunks should be used for the validation sample. With
 <code>whole_word</code> you can choose between masking single tokens or
 masking complete words (Please remember that modern tokenizers split
@@ -866,13 +888,11 @@ embedding model.</p>
 <div class="section level3">
 <h3 id="introduction">4.1 Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h3>
-<p>The text embedding model is the interface to <em>R</em> in
-<em>aifeducation</em>. In order to create a new model, you need a base
-model that provides the ability to understand natural language. A text
-embedding model is stored as an object of class
-<code>TextEmbeddingModel</code>. This object contains all relevant
-information for transforming raw texts into a numeric representation
-that can be used for machine learning.</p>
+<p>The text embedding model is used to transform raw texts into
+numerical representations. In order to create a new model, you need a
+base model that provides the ability to understand natural language. A
+text embedding model is stored as an object of class
+<code>TextEmbeddingModel</code>.</p>
 <p>In <em>aifedcuation</em>, the transformation of raw texts into
 numbers is a separate step from downstream tasks such as classification.
 This is to reduce computational time on machines with low performance.
@@ -894,9 +914,10 @@ the same.</p>
 <p>First you have to choose the base model that forms the foundation of
 your new text embedding model. In order to illustrate its use we apply a
 pre-trained model from <a href="https://huggingface.co/" class="external-link">Hugging
-Face</a> called [BERT base model (uncased) ][<a href="https://huggingface.co/google-bert/bert-base-uncased" class="external-link uri">https://huggingface.co/google-bert/bert-base-uncased</a>]
-published by Devlin et al. (2019). Download all files into a new folder.
-Here we store the model in at ‘examples/bert_uncased’.</p>
+Face</a> called <a href="https://huggingface.co/google-bert/bert-base-uncased" class="external-link">BERT base
+model (uncased)</a> published by Devlin et al. (2019). Download all
+files into a new folder. Here we store the model in
+<code>"examples/bert_uncased"</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bert_modeling</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/TextEmbeddingModel.html">TextEmbeddingModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">bert_modeling</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
@@ -912,9 +933,9 @@ Here we store the model in at ‘examples/bert_uncased’.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Next, you have to provide the directory where your base model is
 stored. In this example this would be
-<code>model_dir="my_own_transformer_trained</code>. Of course you can
-use any other pre-trained model from Hugging Face which addresses your
-needs.</p>
+<code>model_dir="examples/bert_uncased"</code>. Of course you can use
+any other pre-trained model from Hugging Face which addresses your needs
+and is supported by <em>aifeducation</em>.</p>
 <p>Using a BERT model for text embedding is not a problem since your
 text does not provide more tokens than the transformer can process. This
 maximum value is set in the configuration of the transformer (see
@@ -976,7 +997,7 @@ request by calling <code>get_n_features</code>.</p>
 <p>This number describes the number of dimensions for a text embedding.
 That is, the number of dimensions which is used to characterize the
 content of every chunk of text. This value is important as it determines
-the complexity a classifier of feature extractor has to deal with. Some
+the complexity a classifier or feature extractor has to deal with. Some
 of classifier’s and feature extractor’s parameters depend on this value.
 We elaborate this at the relevant point for the different models.</p>
 </div>
@@ -993,16 +1014,16 @@ must provide a <code>LargeDataSetForText</code> to
 <span>  large_datas_set <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:45 2025 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:47 2025 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:48 2025 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:49 2025 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:49 2025 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:50 2025 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:51 2025 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:52 2025 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:53 2025 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:54 2025 Batch 10 / 10 done</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:04:31 2025 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:32 2025 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:33 2025 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:34 2025 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:35 2025 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:36 2025 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:38 2025 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:39 2025 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:40 2025 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:41 2025 Batch 10 / 10 done</span></span></code></pre></div>
 <p>The method <code>embed_large</code>creates an object of class
 <code>LargeDataSetForTextEmbeddings</code>. This is just a data set
 consisting of the embeddings of every text. The embeddings are an array,
@@ -1074,8 +1095,8 @@ model you can call a special method.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">$</span><span class="fu">plot_training_history</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Please note that this plot is not available for this example since
-the necessary data is not directly available for this model on hugging
-face. If you traing a model with this package the training history is
+the necessary data is not directly available for this model on Hugging
+Face. If you train a model with this package the training history is
 always saved.</p>
 </div>
 </div>
@@ -1096,12 +1117,13 @@ into the final output of the model.</p>
 <img src="core_arch_sequential.png" style="width:100.0%" alt="Figure 4: Basic Architecture of a Sequential Classifier"><div class="figcaption">Figure 4: Basic Architecture of a Sequential
 Classifier</div>
 </div>
-<p>The sequential architecture provides models where the input is passed
-to a specific number of layers step by step. All layers are grouped by
-the kind of layer into stacks.</p>
-<p>In contrast, the parallel architecture offers a model where an input
-is passed to different types of layers separately. At the end the
-outputs are combined to create the final output of the whole model.</p>
+<p>The sequential architecture (Figure 4) provides models where the
+input is passed to a specific number of layers step by step. All layers
+are grouped by their kind into stacks.</p>
+<p>In contrast, the parallel architecture (Figure 5) offers a model
+where an input is passed to different types of layers separately. At the
+end the outputs are combined to create the final output of the whole
+model.</p>
 <div class="float">
 <img src="core_arch_parallel.png" style="width:100.0%" alt="Figure 5: Basic Architecture of a Parallel Classifier"><div class="figcaption">Figure 5: Basic Architecture of a Parallel
 Classifier</div>
@@ -1195,7 +1217,7 @@ of a new classifier may look like:</p>
 <span>  tf_dropout_rate_1<span class="op">=</span><span class="fl">0.2</span>,</span>
 <span>  tf_dropout_rate_2<span class="op">=</span><span class="fl">0.5</span>,</span>
 <span>  tf_attention_type<span class="op">=</span><span class="st">"MultiHead"</span>,</span>
-<span>  tf_embedding_type<span class="op">=</span><span class="st">"absolute"</span>,</span>
+<span>  tf_positional_type <span class="op">=</span><span class="st">"absolute"</span>,</span>
 <span>  tf_num_heads<span class="op">=</span><span class="fl">1</span>,</span>
 <span>  tf_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>  tf_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
@@ -1207,7 +1229,7 @@ of a new classifier may look like:</p>
 <code>text_embeddings</code> you have to provide a
 <code>LargeDataSetForTextEmbeddings</code>. The data set is created with
 a <code>TextEmbeddingModel</code> as described in section 4. We here
-continue our example and use the embedding produced by our BERT
+continue our example and use the embeddings produced by our BERT
 model.</p>
 <p><code>target_levels</code> take the categories/classes you classifier
 should predict. This can be numbers or even words.</p>
@@ -1215,12 +1237,12 @@ should predict. This can be numbers or even words.</p>
 <p>In case you would like to use ordinal data, it is very important that
 you provide the classes/categories in the correct order. That is,
 classes/categories representing a “higher” level must be stated after
-categories/classes with a lower level. If you provide the wrong order,
+categories/classes with a “lower” level. If you provide the wrong order,
 the performance indices are not valid. In case of nominal data the order
 does not matter.</p>
 </blockquote>
 <p>With <code>feature_extractor</code> you can add a feature extractor
-that tries to reduce the number of features of your text embedding
+that tries to reduce the number of features of your text embeddings
 before passing the embeddings to the classifier. You can read more on
 this in Section 6.2.</p>
 <p>With the help of the other parameters you can define the complexity
@@ -1236,7 +1258,7 @@ In our example this would be:</p>
 <code class="sourceCode R"><span><span class="va">bert_modeling</span><span class="op">$</span><span class="fu">get_n_features</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 768</span></span></code></pre></div>
 <p>The number for <code>feat_size</code> should be equal or lesser as
-this value since this layer tries to compress the text embedding to a
+this value since this layer tries to compress the text embeddings to a
 lower number of dimensions. While this reduces the number of parameters
 for all following layers and decreases the time to train and use the
 model it can cost information. You can experiment with this value to
@@ -1260,9 +1282,8 @@ model by setting the number of layers to zero
 the 15 lowest features are used for calculating the classes/labels. The
 number of values can be determined with
 <code>intermediate_features=30</code>.</p>
-<p>After you have created a new classifier, you can begin training.</p>
-<p>You can see the number of learnable parameters of your model
-with:</p>
+<p>After you have created a new classifier, you can begin training. You
+can see the number of learnable parameters of your model with:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="fu">count_parameter</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1049450</span></span></code></pre></div>
@@ -1272,7 +1293,7 @@ with:</p>
 </h3>
 <p>To start the training of your classifier, you have to call the
 <code>train</code> method. Similarly, for the creation of the
-classifier, you must provide the text embedding to
+classifier, you must provide the text embeddings to
 <code>data_embeddings</code> and the categories/classes as target data
 to <code>data_targets</code>. Please remember that
 <code>data_targets</code> expects a <strong>named</strong> factor where
@@ -1323,31 +1344,31 @@ estimation of a classifier’s performance.</p>
 <span>  lr_warm_up_ratio<span class="op">=</span><span class="fl">0.02</span>,</span>
 <span>  optimizer<span class="op">=</span><span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:56 2025 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:56 2025 Start</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:57 2025 | Iteration 1 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:02:57 2025 | Iteration 1 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:03:13 2025 | Iteration 2 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:03:13 2025 | Iteration 2 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:03:29 2025 | Iteration 3 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:03:29 2025 | Iteration 3 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:03:46 2025 | Iteration 4 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:03:46 2025 | Iteration 4 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:03 2025 | Iteration 5 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:03 2025 | Iteration 5 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:20 2025 | Iteration 6 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:20 2025 | Iteration 6 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:37 2025 | Iteration 7 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:37 2025 | Iteration 7 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:54 2025 | Iteration 8 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:04:54 2025 | Iteration 8 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:05:12 2025 | Iteration 9 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:05:12 2025 | Iteration 9 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:05:29 2025 | Iteration 10 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:05:29 2025 | Iteration 10 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:05:46 2025 | Final training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:05:46 2025 | Final training | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:04 2025 Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:04:43 2025 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:43 2025 Start</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:44 2025 | Iteration 1 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:04:44 2025 | Iteration 1 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:02 2025 | Iteration 2 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:02 2025 | Iteration 2 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:19 2025 | Iteration 3 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:19 2025 | Iteration 3 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:36 2025 | Iteration 4 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:36 2025 | Iteration 4 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:53 2025 | Iteration 5 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:05:53 2025 | Iteration 5 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:06:10 2025 | Iteration 6 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:06:10 2025 | Iteration 6 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:06:27 2025 | Iteration 7 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:06:27 2025 | Iteration 7 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:06:45 2025 | Iteration 8 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:06:45 2025 | Iteration 8 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:02 2025 | Iteration 9 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:02 2025 | Iteration 9 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:19 2025 | Iteration 10 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:19 2025 | Iteration 10 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:36 2025 | Final training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:36 2025 | Final training | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:54 2025 Training Complete</span></span></code></pre></div>
 <p>You can further modify the training process with different arguments.
 With <code>loss_balance_class_weights=TRUE</code> the absolute
 frequencies of the classes/categories are adjusted according to the
@@ -1375,8 +1396,8 @@ number of synthetic units is created via different techniques. Currently
 you can request the <em>K-Nearest Neighbor OveRsampling Approach
 (KNNOR)</em> developed by Islam et al. (2022). The aim is to create new
 cases that fill the gap to the majority class. Multi-class problems are
-reduced to a two class problem (class under investigation vs. each
-other) for generating these units. If the technique allows to set the
+reduced to a two class problem (class under investigation vs. all
+others) for generating these units. If the technique allows to set the
 number of neighbors during generation, you can configure the data
 generation with <code>sc_min_k</code> and <code>sc_max_k</code>. The
 synthetic cases for every class are generated for all <em>k</em> between
@@ -1396,7 +1417,8 @@ distance to <code>pl_anchor</code> is calculated for every case. Then,
 they are sorted with an increasing distance from <code>pl_anchor</code>.
 The proportion of added pseudo-labeled data into training increases with
 every step. The maximum number of steps is determined with
-<code>pl_max_steps</code>.</p></li>
+<code>pl_max_steps</code>. Cases close to <code>pl_anchor</code> are
+included first.</p></li>
 </ul>
 <p>Figure 6 illustrates the training loop for the cases that all options
 are set to <code>TRUE</code>.</p>
@@ -1422,15 +1444,13 @@ and trained again until the maximum number of steps for pseudo labeling
 (<code>pl_max_steps</code>) is reached. After this, the logarithm is
 restated for the next fold until the number of folds
 (<code>data_folds</code>) is reached. All of these steps are only used
-to estimate the performance of the classifier to evaluate for the
-classifier’s unknown data.</p>
+to estimate the performance of the classifier to evaluate for unknown
+data.</p>
 <p>The last phase of the training begins after the last fold. In the
 final training, the data set is split only into a training and
 validation set without a test set to provide the maximum amount of data
-for the best performance in final training.</p>
-<p>In case options like the generation of synthetic cases
-(<code>use_sc</code>) or pseudo-labeling (<code>use_pl</code>) are
-disabled, the training process is shorter.</p>
+for the best performance in final training. All configurations of the
+performance estimation phase are used in the final training phase.</p>
 <p>Since training a neural net is energy consuming,
 <em>aifeducation</em> allows you to estimate its ecological impact with
 the help of the python library <code>codecarbon</code>. Thus,
@@ -1442,11 +1462,14 @@ The reason is that different countries use different sources and
 techniques for generating their energy resulting in a specific impact on
 CO2 emissions. For the USA and Canada, you can additionally specify a
 region by setting <code>sustain_region</code>. Please refer to the
-documentation of codecarbon for more information.</p>
-<p>Finally, <code>trace</code>, and <code>ml_trace</code> allow you to
+documentation of ‘codecarbon’ for more information.</p>
+<p>Finally, <code>trace</code> and <code>ml_trace</code> allow you to
 control how much information about the training progress is printed to
-the console. Please note that training the classifier can take some
-time.</p>
+the console.</p>
+<p>Please note that training the classifier can take some time. In case
+options like the generation of synthetic cases (<code>use_sc</code>) or
+pseudo-labeling (<code>use_pl</code>) are disabled, the training process
+is shorter.</p>
 <p>Please note that after performance estimation, the final training of
 the classifier makes use of all data available. That is, the test sample
 is left empty.</p>
@@ -1471,8 +1494,8 @@ you would like to plot. For classifiers loss (<code>"loss"</code>),
 accuracy (<code>"accuracy"</code>), and balanced
 accuracy(<code>"balanced_accuracy"</code>) are possible. If you would
 like to see only the development of the last training phase set
-<code>final_training=FALSE</code>. If this parameter is
-<code>TRUE</code> the plot uses the data generated during the
+<code>final_training=TRUE</code>. If this parameter is
+<code>FALSE</code> the plot uses the data generated during the
 performance estimation phase.</p>
 </div>
 <div class="section level3">
@@ -1499,12 +1522,8 @@ content analysis. These are</p>
 <li>Fleiss’ Kappa for multiple raters without exact estimation (Fleiss
 1971).</li>
 </ul>
-<p>You can access the concrete values by accessing the field
-<code>reliability,</code> which stores all relevant information. In this
-list you will find the reliability values for every fold. In addition,
-the reliability of every step within pseudo-labeling is reported.</p>
-<p>The central estimates for the reliability values can be found via
-<code>reliability$test_metric_mean</code>. In our example this would
+<p>You can access the concrete values as mean values across all folds
+via <code>reliability$test_metric_mean</code>. In our example this would
 be:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
@@ -1524,17 +1543,6 @@ be:</p>
 <span><span class="co">#&gt;            0.6218700            0.6218700            0.6218700 </span></span>
 <span><span class="co">#&gt;        avg_precision           avg_recall               avg_f1 </span></span>
 <span><span class="co">#&gt;            0.7780917            0.7543452            0.7530696</span></span></code></pre></div>
-<p>Of particular interest are the values for alpha from the Iota
-Concept, since they represent a measure of reliability which is
-independent from the frequency distribution of the classes/categories.
-The alpha values describe the probability that a case of a specific
-class is recognized as that specific class. As you can see, compared to
-the baseline model, applying <em>Balanced Synthetic Cases increased</em>
-increases the minimal value of alpha, reducing the risk to miss cases
-which belong to a rare class (see row with “BSC”). On the contrary, the
-alpha values for the major category decrease slightly, thus losing its
-unjustified bonus from a high number of cases in the training set. This
-provides a more realistic performance estimation of the classifier.</p>
 <p>An addition, standard measures from machine learning are reported.
 These are</p>
 <ul>
@@ -1557,11 +1565,6 @@ different classes are labeled.</p>
 Figure 8: Coding Stream of the Classifier
 </p>
 </div>
-<p>Here you can see that a small number of negative reviews is treated
-as a good review, while a larger number of positive reviews is treated
-as a bad review. Thus, the data for the major class (negative reviews)
-is more reliable and valid as the the data for the minor class (positive
-reviews).</p>
 <p>Evaluating the performance of a classifier is a complex task and and
 beyond the scope of this vignette. Instead, we would like to refer to
 the cited literature of content analysis and machine learning if you
@@ -1579,26 +1582,26 @@ tracker, you can receive information on sustainability by calling
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $date</span></span>
-<span><span class="co">#&gt; [1] "Mon Jul 21 20:06:04 2025"</span></span>
+<span><span class="co">#&gt; [1] "Sat Jul 26 11:07:54 2025"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sustainability_data</span></span>
 <span><span class="co">#&gt; $sustainability_data$duration_sec</span></span>
-<span><span class="co">#&gt; [1] 186.6927</span></span>
+<span><span class="co">#&gt; [1] 189.7205</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sustainability_data$co2eq_kg</span></span>
-<span><span class="co">#&gt; [1] 0.001574029</span></span>
+<span><span class="co">#&gt; [1] 0.001590867</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sustainability_data$cpu_energy_kwh</span></span>
-<span><span class="co">#&gt; [1] 0.002203519</span></span>
+<span><span class="co">#&gt; [1] 0.00223927</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sustainability_data$gpu_energy_kwh</span></span>
-<span><span class="co">#&gt; [1] 0.001409932</span></span>
+<span><span class="co">#&gt; [1] 0.001409967</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sustainability_data$ram_energy_kwh</span></span>
-<span><span class="co">#&gt; [1] 0.0005184001</span></span>
+<span><span class="co">#&gt; [1] 0.0005268151</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sustainability_data$total_energy_kwh</span></span>
-<span><span class="co">#&gt; [1] 0.004131851</span></span>
+<span><span class="co">#&gt; [1] 0.004176052</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $technical</span></span>
@@ -1657,9 +1660,9 @@ in <em>aifeducation</em>. You can save the classifier by calling
 </h3>
 <p>If you would like to apply your classifier to new data, two steps are
 necessary. You must first transform the raw text into a numerical
-expression by using <em>exactly</em> the same text embedding model that
-was used to train your classifier (see section 4). In the case of our
-example classifier, we use our BERT model.</p>
+representation by using <em>exactly</em> the same text embedding model
+that was used to train your classifier (see section 4). In the case of
+our example classifier, we use our BERT model.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If our mode is not loaded</span></span>
 <span><span class="va">bert_modeling</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/bert_te_model"</span><span class="op">)</span></span>
@@ -1669,27 +1672,21 @@ example classifier, we use our BERT model.</p>
 <span>  large_datas_set <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:07 2025 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:08 2025 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:09 2025 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:10 2025 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:11 2025 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:12 2025 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:12 2025 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:13 2025 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:14 2025 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:15 2025 Batch 10 / 10 done</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:07:57 2025 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:58 2025 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:07:59 2025 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:00 2025 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:01 2025 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:02 2025 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:03 2025 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:04 2025 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:05 2025 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:06 2025 Batch 10 / 10 done</span></span></code></pre></div>
 <p>To transform raw texts into a numeric representation just pass the
 raw texts to the method <code>embed_large</code> of the loaded model.
 The raw texts should be an object of class
 <code>LargeDataSetForText</code>. To create such a data set, please
 refer to section 2.</p>
-<p>In the example above, the text embeddings are stored in
-<code>review_embeddings</code>. Since embedding texts may take some
-time, it is a good idea to save the embeddings for future analysis (see
-section 2 for more details). This allows you to load the embeddings
-without the need to apply the text embedding model on the same raw texts
-again.</p>
 <p>The resulting object can then be passed to the method
 <code>predict</code> of our classifier and you will get the predictions
 together with an estimate of certainty for each class/category.</p>
@@ -1704,7 +1701,20 @@ together with an estimate of certainty for each class/category.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Show predicted categories</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">predicted_categories</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">predicted_categories</span><span class="op">)</span></span>
+<span><span class="co">#&gt;             neg       pos expected_category</span></span>
+<span><span class="co">#&gt; 11329 0.5059361 0.4940639               neg</span></span>
+<span><span class="co">#&gt; 10460 0.7263541 0.2736459               neg</span></span>
+<span><span class="co">#&gt; 10536 0.7444522 0.2555478               neg</span></span>
+<span><span class="co">#&gt; 12035 0.7413885 0.2586115               neg</span></span>
+<span><span class="co">#&gt; 7267  0.5032131 0.4967869               neg</span></span>
+<span><span class="co">#&gt; 4761  0.7389779 0.2610221               neg</span></span>
+<span></span>
+<span><span class="co"># Count frequencies</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">predicted_categories</span><span class="op">$</span><span class="va">expected_category</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; neg pos </span></span>
+<span><span class="co">#&gt; 115 185</span></span></code></pre></div>
 <p>After the classifier finishes the prediction, the estimated
 categories/classes are stored as <code>predicted_categories</code>. This
 object is a <code>data.frame</code> containing texts’ IDs in the rows
@@ -1824,7 +1834,7 @@ classifier.</p>
 <span>  tf_dropout_rate_1 <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  tf_dropout_rate_2 <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  tf_attention_type <span class="op">=</span> <span class="st">"MultiHead"</span>,</span>
-<span>  tf_embedding_type <span class="op">=</span> <span class="st">"absolute"</span>,</span>
+<span>  tf_positional_type  <span class="op">=</span> <span class="st">"absolute"</span>,</span>
 <span>  tf_num_heads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  tf_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tf_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
@@ -1855,8 +1865,8 @@ Figure 9: Embeddings of an untrained classifier of type ‘ProtoNet’
 <p>The large triangles represent the prototypes for every class while
 the dots refer to the labeled cases in the data set. For these, the
 color represents their true class. For unlabeled cases, a square is
-used. Here, the color indicates the class of the estimates. As you can
-see, all cases are located very similarly and there seems to be no clear
+used. Here, the color indicates the estimated class. As you can see, all
+cases are located very similarly and there seems to be no clear
 structure. Let us see how this changes when we train the model.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_prototype</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
@@ -1878,7 +1888,7 @@ structure. Let us see how this changes when we train the model.</p>
 <span>  sustain_iso_code <span class="op">=</span> <span class="st">"DEU"</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  epochs <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  epochs <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">35</span>,</span>
 <span>  Ns <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  Nq <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -1895,31 +1905,31 @@ structure. Let us see how this changes when we train the model.</p>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:16 2025 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:16 2025 Start</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:17 2025 | Iteration 1 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:18 2025 | Iteration 1 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:37 2025 | Iteration 2 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:37 2025 | Iteration 2 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:51 2025 | Iteration 3 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:06:51 2025 | Iteration 3 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:07:14 2025 | Iteration 4 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:07:14 2025 | Iteration 4 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:07:26 2025 | Iteration 5 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:07:26 2025 | Iteration 5 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:07:40 2025 | Iteration 6 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:07:40 2025 | Iteration 6 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:08:01 2025 | Iteration 7 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:08:01 2025 | Iteration 7 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:08:27 2025 | Iteration 8 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:08:27 2025 | Iteration 8 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:08:41 2025 | Iteration 9 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:08:41 2025 | Iteration 9 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:01 2025 | Iteration 10 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:01 2025 | Iteration 10 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:21 2025 | Final training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:21 2025 | Final training | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:40 2025 Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:08:08 2025 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:08 2025 Start</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:09 2025 | Iteration 1 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:09 2025 | Iteration 1 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:32 2025 | Iteration 2 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:32 2025 | Iteration 2 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:44 2025 | Iteration 3 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:08:44 2025 | Iteration 3 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:09:08 2025 | Iteration 4 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:09:08 2025 | Iteration 4 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:09:41 2025 | Iteration 5 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:09:41 2025 | Iteration 5 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:09:53 2025 | Iteration 6 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:09:53 2025 | Iteration 6 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:10:08 2025 | Iteration 7 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:10:08 2025 | Iteration 7 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:10:38 2025 | Iteration 8 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:10:38 2025 | Iteration 8 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:10:56 2025 | Iteration 9 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:10:56 2025 | Iteration 9 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:00 2025 | Iteration 10 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:00 2025 | Iteration 10 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:17 2025 | Final training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:17 2025 | Final training | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:34 2025 Training Complete</span></span></code></pre></div>
 <p>While there are no arguments for requesting a balance of the class
 weights (<code>loss_balance_class_weights</code>) or balancing the
 sequence length (<code>loss_balance_sequence_length</code>), four new
@@ -1928,26 +1938,27 @@ examples of <em>every</em> class should be used during training within
 the support sample. These examples are used to calculate the prototypes
 for every class. With <code>Nq</code> you determine how many examples of
 <em>every</em> class should be part of the query sample. During training
-the network tries to predict the correct classes of the examples.</p>
+the network tries to predict the correct classes of query sample.</p>
 <p>The arguments <code>loss_alpha</code> and <code>loss_margin</code>
 refer to the configuration of the loss function describes by Zhang et
 al. (2019). <code>loss_margin</code> refers to the minimal distance all
-examples of the query sample should have to all prototypes that do no
-represent their class. <code>loss_alpha</code> determines if the loss
-should pay more attention to minimize the distance between the examples
-to their corresponding prototype or if it should pay more attention to
-maximize the distance to the prototypes that do not represent their
-class. If you set <code>loss_alpha=1,</code> the loss tries to minimize
-the distance of the examples to their corresponding prototype. If you
-set <code>loss_alpha=0,</code> loss pays tries to maximize the distance
-of all examples to all prototypes that do not reflect their class.</p>
+examples of the query sample should have to all prototypes that do
+<em>not</em> represent their class. <code>loss_alpha</code> determines
+if the loss should pay more attention to minimize the distance between
+the examples to their corresponding prototype or if it should pay more
+attention to maximize the distance to the prototypes that do not
+represent their class. If you set <code>loss_alpha=1,</code> the loss
+tries to minimize the distance of the examples to their corresponding
+prototype. If you set <code>loss_alpha=0,</code> loss tries to maximize
+the distance of all examples to all prototypes that do not reflect their
+class.</p>
 <p>The next two important arguments refer to the sampling strategies
 during training. With <code>sampling_separate=TRUE</code>, cases for
 sample and query a drawn from the same pool of cases. Thus, a specific
 case can be a sample case in one epoch and a query case in another
 epoch. However, it is ensured that a specific cases never occurs as a
-sample <strong>and</strong> a query during the same training step. In
-addition, it is ensured that every case exists only once during a
+sample <strong>and</strong> a query case during the same training step.
+In addition, it is ensured that every case exists only once during a
 training step. If you set <code>sampling_separate=FALSE</code>, the
 training data set is split into one data pool for sample and one data
 pool for query. Thus, a case can only be a sample case
@@ -1959,8 +1970,9 @@ query cases. For the training we highly recommend to set
 classifiers.</p>
 <blockquote>
 <p>During training the model generates prototpyes based on all available
-data and classes of the training data set. These classes and prototypes
-are used for the case that no sample data is provided.</p>
+data and classes of the training data set (sample and query). These
+classes and prototypes are used for the case that no sample data is
+provided.</p>
 </blockquote>
 <p>After training we can request a visualization of the data again. We
 first omit all unlabeled cases by setting
@@ -1986,7 +1998,7 @@ around the prototpyes represent the margin used during training
 (<code>loss_margin</code>). Since we use the same data as during
 training, this result has to be expected. Only a small number of cases
 is located near the wrong prototype. This can be seen if a red dot is
-close to the prototype for “pos” and a green dot is close to the red
+close to the prototype for “pos” and a blue dot is close to the red
 prototype for “neg”.</p>
 <p>Let us now add the unlabeled cases to the plot by setting
 <code>inc_unlabeled=TRUE</code>.</p>
@@ -2011,21 +2023,21 @@ including unlabeled cases
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_prototype</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;           iota_index            min_iota2            avg_iota2 </span></span>
-<span><span class="co">#&gt;            0.6616601            0.6100541            0.6946330 </span></span>
+<span><span class="co">#&gt;            0.6731225            0.6205375            0.7017015 </span></span>
 <span><span class="co">#&gt;            max_iota2            min_alpha            avg_alpha </span></span>
-<span><span class="co">#&gt;            0.7792118            0.7015476            0.8069643 </span></span>
+<span><span class="co">#&gt;            0.7828655            0.7279762            0.8205952 </span></span>
 <span><span class="co">#&gt;            max_alpha    static_iota_index   dynamic_iota_index </span></span>
-<span><span class="co">#&gt;            0.9123810            0.3691780            0.5736048 </span></span>
+<span><span class="co">#&gt;            0.9132143            0.3505739            0.5784623 </span></span>
 <span><span class="co">#&gt;       kalpha_nominal       kalpha_ordinal              kendall </span></span>
-<span><span class="co">#&gt;            0.6239497            0.6239497            0.8155116 </span></span>
+<span><span class="co">#&gt;            0.6407910            0.6407910            0.8232339 </span></span>
 <span><span class="co">#&gt;   c_kappa_unweighted       c_kappa_linear      c_kappa_squared </span></span>
-<span><span class="co">#&gt;            0.6219786            0.6219786            0.6219786 </span></span>
+<span><span class="co">#&gt;            0.6360612            0.6360612            0.6360612 </span></span>
 <span><span class="co">#&gt;         kappa_fleiss percentage_agreement    balanced_accuracy </span></span>
-<span><span class="co">#&gt;            0.6153840            0.8308300            0.8069643 </span></span>
+<span><span class="co">#&gt;            0.6326775            0.8365613            0.8205952 </span></span>
 <span><span class="co">#&gt;     gwet_ac1_nominal      gwet_ac2_linear   gwet_ac2_quadratic </span></span>
-<span><span class="co">#&gt;            0.6955060            0.6955060            0.6955060 </span></span>
+<span><span class="co">#&gt;            0.7042844            0.7042844            0.7042844 </span></span>
 <span><span class="co">#&gt;        avg_precision           avg_recall               avg_f1 </span></span>
-<span><span class="co">#&gt;            0.8259615            0.8069643            0.8076920</span></span></code></pre></div>
+<span><span class="co">#&gt;            0.8286150            0.8205952            0.8163388</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="application-with-sample-data">6.1.3 Application with Sample Data<a class="anchor" aria-label="anchor" href="#application-with-sample-data"></a>
@@ -2083,23 +2095,23 @@ the classifier.</p>
 <span>  large_datas_set <span class="op">=</span> <span class="va">sample_texts</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:43 2025 Batch 1 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:43 2025 Batch 2 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:44 2025 Batch 3 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:45 2025 Batch 4 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:46 2025 Batch 5 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:47 2025 Batch 6 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:48 2025 Batch 7 / 8 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:49 2025 Batch 8 / 8 done</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:12:36 2025 Batch 1 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:37 2025 Batch 2 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:38 2025 Batch 3 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:39 2025 Batch 4 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:40 2025 Batch 5 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:41 2025 Batch 6 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:42 2025 Batch 7 / 8 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:43 2025 Batch 8 / 8 done</span></span></code></pre></div>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">query_embeddings</span> <span class="op">&lt;-</span> <span class="va">bert_modeling</span><span class="op">$</span><span class="fu">embed_large</span><span class="op">(</span></span>
 <span>  large_datas_set <span class="op">=</span> <span class="va">query_texts</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:50 2025 Batch 1 / 3 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:51 2025 Batch 2 / 3 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:51 2025 Batch 3 / 3 done</span></span></code></pre></div>
-<p>Now we are ready to use our classifier. First we predict the classes
+<span><span class="co">#&gt; Sat Jul 26 11:12:44 2025 Batch 1 / 3 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:45 2025 Batch 2 / 3 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:12:46 2025 Batch 3 / 3 done</span></span></code></pre></div>
+<p>Now we are ready to use our classifier. First, we predict the classes
 of the query sample.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_predictions</span><span class="op">=</span><span class="va">classifier_prototype</span><span class="op">$</span><span class="fu">predict_with_samples</span><span class="op">(</span></span>
@@ -2109,16 +2121,16 @@ of the query sample.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">new_predictions</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            neg       pos very negative very positive expected_category</span></span>
-<span><span class="co">#&gt; 8016 0.2540384 0.2466857     0.2532511     0.2460248               neg</span></span>
-<span><span class="co">#&gt; 9118 0.2562909 0.2438422     0.2566554     0.2432115     very negative</span></span>
-<span><span class="co">#&gt; 6376 0.2540419 0.2467364     0.2531370     0.2460847               neg</span></span>
-<span><span class="co">#&gt; 5766 0.2565490 0.2438955     0.2562973     0.2432582               neg</span></span>
-<span><span class="co">#&gt; 5942 0.2561368 0.2437437     0.2569975     0.2431220     very negative</span></span>
-<span><span class="co">#&gt; 478  0.2562481 0.2437577     0.2568662     0.2431280     very negative</span></span>
+<span><span class="co">#&gt; 8016 0.2545253 0.2450940     0.2551192     0.2452614     very negative</span></span>
+<span><span class="co">#&gt; 9118 0.2546990 0.2456401     0.2538508     0.2458101               neg</span></span>
+<span><span class="co">#&gt; 6376 0.2544617 0.2450445     0.2552831     0.2452107     very negative</span></span>
+<span><span class="co">#&gt; 5766 0.2544981 0.2449839     0.2553656     0.2451523     very negative</span></span>
+<span><span class="co">#&gt; 5942 0.2544968 0.2450003     0.2553333     0.2451696     very negative</span></span>
+<span><span class="co">#&gt; 478  0.2548592 0.2452956     0.2543800     0.2454651               neg</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">new_predictions</span><span class="op">$</span><span class="va">expected_category</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           neg           pos very negative very positive </span></span>
-<span><span class="co">#&gt;            17            27             8            23</span></span></code></pre></div>
+<span><span class="co">#&gt;            13            37            11            14</span></span></code></pre></div>
 <p>Although we trained our classifier for two classes we can now use it
 to predict other classes. Next, we plot the results.</p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
@@ -2179,7 +2191,7 @@ the text embeddings from section 4.</p>
 <span>  noise_factor <span class="op">=</span> <span class="fl">0.2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Similarly to the other models, you can use <code>label</code> for the
-model’s label. The argument <code>text_embeddings</code> takes on object
+model’s label. The argument <code>text_embeddings</code> takes an object
 of class <code>EmbeddedText</code> or
 <code>LargeDataSetForTextEmbeddings</code>. With this object you connect
 your feature extractor with a specific TextEmbeddingModel. That is, the
@@ -2199,7 +2211,7 @@ the method <code>get_n_features</code> like this:</p>
 <p>With <code>method</code> you determine the type of layer the feature
 extractor should use. If set <code>method="LSTM"</code>, all layers of
 the model are long short-term memory layers. If set
-<code>method="dense"</code> all layers are standard dense layers.</p>
+<code>method="Dense"</code> all layers are standard dense layers.</p>
 <p>Independently from your choice, all models try to generate the latent
 space such that the co-variance of the features to be zero. Thus, all
 features represent unique information. In addition, all methods except
@@ -2212,8 +2224,8 @@ provide more robust generalizations.</p>
 <p>Training the extractor is identical to the other models in
 <em>aifeducation</em>. Please note that the text embeddings provided to
 <code>data_embeddings</code> must be generated with the same
-TextEmbeddingModels as the embeddings provided during the configuration
-of your model.</p>
+<code>TextEmbeddingModel</code> as the embeddings provided during the
+configuration of your model.</p>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">feature_extractor</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>  data_embeddings <span class="op">=</span> <span class="va">review_embeddings</span>,</span>
@@ -2222,17 +2234,17 @@ of your model.</p>
 <span>  sustain_iso_code <span class="op">=</span> <span class="st">"DEU"</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  epochs <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  epochs <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ml_trace <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 20:09:52 2025 Start</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:33 2025 Training finished</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:12:47 2025 Start</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:32 2025 Training finished</span></span></code></pre></div>
 <blockquote>
 <p>In this example we use the same text embeddings as we use to traing
-the classifier. It can be beneficial if you use a larger sample of text
+the classifier. It can be beneficial if you use a larger sample of texts
 for training a <code>TEFeatureExtractor</code> to improve performance
 and/or to allow a broad application of the feature extractor.</p>
 </blockquote>
@@ -2251,7 +2263,7 @@ Please note that you now have to set the values for
 <code>feat_size</code> and <code>cls_pooling_features</code> depending
 on the number of features of the feature extractor and <em>not</em>
 depending on the number of features of the text embedding model since
-the aim of the feature extractor is reduced this number.
+the aim of the feature extractor is to reduce this number.
 <code>feat_size</code> should be equal or less the number for features
 of the feature extractor and <code>cls_pooling_features</code> should be
 equal or less the value for <code>feat_size</code>. For the classifier
@@ -2303,7 +2315,7 @@ described in section 5 this would look like:</p>
 <span>  tf_dropout_rate_1<span class="op">=</span><span class="fl">0.2</span>,</span>
 <span>  tf_dropout_rate_2<span class="op">=</span><span class="fl">0.5</span>,</span>
 <span>  tf_attention_type<span class="op">=</span><span class="st">"MultiHead"</span>,</span>
-<span>  tf_embedding_type<span class="op">=</span><span class="st">"absolute"</span>,</span>
+<span>  tf_positional_type <span class="op">=</span><span class="st">"absolute"</span>,</span>
 <span>  tf_num_heads<span class="op">=</span><span class="fl">1</span>,</span>
 <span>  tf_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>  tf_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
@@ -2343,68 +2355,70 @@ described in section 5 this would look like:</p>
 <span>  lr_warm_up_ratio<span class="op">=</span><span class="fl">0.02</span>,</span>
 <span>  optimizer<span class="op">=</span><span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:33 2025 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:34 2025 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:34 2025 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:35 2025 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:35 2025 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:35 2025 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:35 2025 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:36 2025 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:36 2025 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:36 2025 Batch 10 / 10 done</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:37 2025 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:37 2025 Start</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:38 2025 | Iteration 1 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:38 2025 | Iteration 1 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:57 2025 | Iteration 2 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:22:57 2025 | Iteration 2 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:23:13 2025 | Iteration 3 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:23:13 2025 | Iteration 3 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:23:30 2025 | Iteration 4 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:23:30 2025 | Iteration 4 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:23:47 2025 | Iteration 5 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:23:47 2025 | Iteration 5 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:04 2025 | Iteration 6 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:04 2025 | Iteration 6 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:20 2025 | Iteration 7 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:20 2025 | Iteration 7 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:37 2025 | Iteration 8 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:37 2025 | Iteration 8 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:54 2025 | Iteration 9 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:24:54 2025 | Iteration 9 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:25:10 2025 | Iteration 10 from 10</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:25:10 2025 | Iteration 10 from 10 | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:25:26 2025 | Final training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:25:26 2025 | Final training | Training</span></span>
-<span><span class="co">#&gt; Mon Jul 21 21:25:44 2025 Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; Sat Jul 26 11:39:33 2025 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:33 2025 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:34 2025 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:34 2025 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:35 2025 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:35 2025 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:35 2025 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:36 2025 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:36 2025 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:36 2025 Batch 10 / 10 done</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:37 2025 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:37 2025 Start</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:38 2025 | Iteration 1 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:38 2025 | Iteration 1 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:55 2025 | Iteration 2 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:39:55 2025 | Iteration 2 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:40:12 2025 | Iteration 3 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:40:12 2025 | Iteration 3 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:40:28 2025 | Iteration 4 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:40:28 2025 | Iteration 4 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:40:45 2025 | Iteration 5 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:40:45 2025 | Iteration 5 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:02 2025 | Iteration 6 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:02 2025 | Iteration 6 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:18 2025 | Iteration 7 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:18 2025 | Iteration 7 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:35 2025 | Iteration 8 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:35 2025 | Iteration 8 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:51 2025 | Iteration 9 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:41:51 2025 | Iteration 9 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:42:08 2025 | Iteration 10 from 10</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:42:08 2025 | Iteration 10 from 10 | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:42:25 2025 | Final training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:42:25 2025 | Final training | Training</span></span>
+<span><span class="co">#&gt; Sat Jul 26 11:42:42 2025 Training Complete</span></span></code></pre></div>
 <p>That is all. Now you can use and train the classifier in the same way
-as you did without a feature extractor. Even saving and loading is done
-automatically. For example, let us explore the performance of the
-classifier.</p>
+as you did without a feature extractor. You even do not need to save and
+load the feature extractor manually. This is done automatically for all
+classifiers.</p>
+<p>For example, let us explore the performance of the classifier.</p>
 <div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_with_fe</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;           iota_index            min_iota2            avg_iota2 </span></span>
-<span><span class="co">#&gt;            0.4486166            0.4197280            0.5312641 </span></span>
+<span><span class="co">#&gt;            0.5416996            0.4618898            0.5779117 </span></span>
 <span><span class="co">#&gt;            max_iota2            min_alpha            avg_alpha </span></span>
-<span><span class="co">#&gt;            0.6428001            0.5992857            0.6886905 </span></span>
+<span><span class="co">#&gt;            0.6939337            0.5655952            0.7169048 </span></span>
 <span><span class="co">#&gt;            max_alpha    static_iota_index   dynamic_iota_index </span></span>
-<span><span class="co">#&gt;            0.7780952            0.1019799            0.3825965 </span></span>
+<span><span class="co">#&gt;            0.8682143            0.2782546            0.4608339 </span></span>
 <span><span class="co">#&gt;       kalpha_nominal       kalpha_ordinal              kendall </span></span>
-<span><span class="co">#&gt;            0.3777857            0.3777857            0.6879698 </span></span>
+<span><span class="co">#&gt;            0.4402654            0.4402654            0.7287288 </span></span>
 <span><span class="co">#&gt;   c_kappa_unweighted       c_kappa_linear      c_kappa_squared </span></span>
-<span><span class="co">#&gt;            0.3699955            0.3699955            0.3699955 </span></span>
+<span><span class="co">#&gt;            0.4384357            0.4384357            0.4384357 </span></span>
 <span><span class="co">#&gt;         kappa_fleiss percentage_agreement    balanced_accuracy </span></span>
-<span><span class="co">#&gt;            0.3636101            0.7152174            0.6886905 </span></span>
+<span><span class="co">#&gt;            0.4274902            0.7549407            0.7169048 </span></span>
 <span><span class="co">#&gt;     gwet_ac1_nominal      gwet_ac2_linear   gwet_ac2_quadratic </span></span>
-<span><span class="co">#&gt;            0.4806008            0.4806008            0.4806008 </span></span>
+<span><span class="co">#&gt;            0.5651404            0.5651404            0.5651404 </span></span>
 <span><span class="co">#&gt;        avg_precision           avg_recall               avg_f1 </span></span>
-<span><span class="co">#&gt;            0.6885651            0.6886905            0.6818050</span></span></code></pre></div>
+<span><span class="co">#&gt;            0.7504277            0.7169048            0.7137451</span></span></code></pre></div>
 <p>If you would like to save and load a <code>TEFeatureExtractor</code>
 independently from a classifier you can use the function pair
 <code>save_to_disk</code> and <code>load_from_disk</code> as with the
 other objects of this package. This is useful if you would like to use
-the <code>TEFeatureExtractor</code> at a later time point.</p>
+the <code>TEFeatureExtractor</code> at a later time point in combination
+with other models.</p>
 </div>
 </div>
 <div class="section level2">

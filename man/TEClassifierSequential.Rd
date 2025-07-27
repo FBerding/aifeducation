@@ -53,7 +53,7 @@ The number of filters equals the number of features of the input tensor. Thus, t
 
 The layer is able to consider multiple n-grams at the same time. In this case the convolution of the n-grams is done
 seprately and the resulting tensors are concatenated along the feature dimension. The number of filters for every n-gram
-is set to $num_features/{num_n-grams}$. Thus, the resulting tensor has the same shape as the input tensor.
+is set to num_features/num_n-grams. Thus, the resulting tensor has the same shape as the input tensor.
 
 Sub-sequences that are masked in the input are
 also masked in the output.

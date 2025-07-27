@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,15 +97,29 @@ Riebenbauer, Karin Rebmann</h4>
 <p><strong>Description</strong></p>
 <p>The transformer encoder layers follow the structure of the encoder
 layers used in transformer models. A single layer is designed as
-described by Chollet, Kalinowski, and Allaire (2022, p.373) with the
+described by Chollet, Kalinowski, and Allaire (2022, p. 373) with the
 exception that single components of the layers (such as the activation
 function, the kind of residual connection, the kind of normalization or
-the kind of attention) can be freely chosen. All parameters with the
-prefix <em>tf_</em> can be used to configure this layer.</p>
+the kind of attention) can be customized. All parameters with the prefix
+<em>tf_</em> can be used to configure this layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><p><em>tf_residual_type</em>: Type residual connenction for all
-layers and stack of layers.</p></li>
+<li>
+<p><em>tf_residual_type</em>: Type of residual connenction for all
+layers and stack of layers. Allowed values:</p>
+<ul>
+<li>
+<code>'None'</code>: Add no residual connection.</li>
+<li>
+<code>'Addition'</code>: Adds a residual connection by adding the
+original input to the output.</li>
+<li>
+<code>'ResidualGate'</code>: Adds a residucal connection by creating
+a weightes sum from the original input and the output. The weight is a
+learnable parameter. This type of residual connection is described by <a href="https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf" class="external-link">Savarese
+and Figueiredo (2017)</a>.</li>
+</ul>
+</li>
 <li>
 <p><em>tf_normalization_type</em>: Type of normalization applied to
 all layers and stack layers. Allowed values:</p>
@@ -118,8 +132,8 @@ all layers and stack layers. Allowed values:</p>
 </ul>
 </li>
 <li>
-<p><em>tf_parametrizations</em>: Re-Parametrizations for all layers
-except recurrent layers. Allowed values:</p>
+<p><em>tf_parametrizations</em>: Re-Parametrizations of the weights
+of layers. Allowed values:</p>
 <ul>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
@@ -142,8 +156,7 @@ et al. 2018</a>.</li>
 <li><p><em>tf_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>tf_act_fct</em>: Activation function for all layers except
-recurrent layers.</p></li>
+<li><p><em>tf_act_fct</em>: Activation function for all layers.</p></li>
 <li><p><em>tf_dropout_rate_1</em>: determining the dropout after the
 attention mechanism within the transformer encoder layers.</p></li>
 <li><p><em>tf_dropout_rate_2</em>: determining the dropout for the dense
@@ -170,7 +183,7 @@ al. (2021)</a>.</li>
 </ul>
 </li>
 <li>
-<p><em>tf_embedding_type</em>: Type of processing positional
+<p><em>tf_positional_type</em>: Type of processing positional
 information. Allowed values:</p>
 <ul>
 <li>
@@ -214,8 +227,8 @@ to all layers and stack layers. Allowed values:</p>
 </ul>
 </li>
 <li>
-<p><em>feat_parametrizations</em>: Re-Parametrizations for all
-layers except recurrent layers. Allowed values:</p>
+<p><em>feat_parametrizations</em>: Re-Parametrizations of the
+weights of layers. Allowed values:</p>
 <ul>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
@@ -238,8 +251,8 @@ et al. 2018</a>.</li>
 <li><p><em>feat_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>feat_act_fct</em>: Activation function for all layers except
-recurrent layers.</p></li>
+<li><p><em>feat_act_fct</em>: Activation function for all
+layers.</p></li>
 <li><p><em>feat_dropout</em>: determining the dropout for the dense
 projection of the feature layer.</p></li>
 <li><p><em>feat_size</em>: Number of neurons for each dense
@@ -259,8 +272,22 @@ sequence. All parameters with the prefix <em>dense_</em> can be used to
 configure this layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><p><em>dense_residual_type</em>: Type residual connenction for all
-layers and stack of layers.</p></li>
+<li>
+<p><em>dense_residual_type</em>: Type of residual connenction for
+all layers and stack of layers. Allowed values:</p>
+<ul>
+<li>
+<code>'None'</code>: Add no residual connection.</li>
+<li>
+<code>'Addition'</code>: Adds a residual connection by adding the
+original input to the output.</li>
+<li>
+<code>'ResidualGate'</code>: Adds a residucal connection by creating
+a weightes sum from the original input and the output. The weight is a
+learnable parameter. This type of residual connection is described by <a href="https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf" class="external-link">Savarese
+and Figueiredo (2017)</a>.</li>
+</ul>
+</li>
 <li>
 <p><em>dense_normalization_type</em>: Type of normalization applied
 to all layers and stack layers. Allowed values:</p>
@@ -273,8 +300,8 @@ to all layers and stack layers. Allowed values:</p>
 </ul>
 </li>
 <li>
-<p><em>dense_parametrizations</em>: Re-Parametrizations for all
-layers except recurrent layers. Allowed values:</p>
+<p><em>dense_parametrizations</em>: Re-Parametrizations of the
+weights of layers. Allowed values:</p>
 <ul>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
@@ -297,8 +324,8 @@ et al. 2018</a>.</li>
 <li><p><em>dense_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>dense_act_fct</em>: Activation function for all layers except
-recurrent layers.</p></li>
+<li><p><em>dense_act_fct</em>: Activation function for all
+layers.</p></li>
 <li><p><em>dense_dropout</em>: determining the dropout between dense
 layers.</p></li>
 <li><p><em>dense_size</em>: Number of neurons for each dense
@@ -334,8 +361,22 @@ detection of n-grams (meta perspective). All parameters with the prefix
 <em>ng_conv_</em> can be used to configure this layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><p><em>ng_conv_residual_type</em>: Type residual connenction for all
-layers and stack of layers.</p></li>
+<li>
+<p><em>ng_conv_residual_type</em>: Type of residual connenction for
+all layers and stack of layers. Allowed values:</p>
+<ul>
+<li>
+<code>'None'</code>: Add no residual connection.</li>
+<li>
+<code>'Addition'</code>: Adds a residual connection by adding the
+original input to the output.</li>
+<li>
+<code>'ResidualGate'</code>: Adds a residucal connection by creating
+a weightes sum from the original input and the output. The weight is a
+learnable parameter. This type of residual connection is described by <a href="https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf" class="external-link">Savarese
+and Figueiredo (2017)</a>.</li>
+</ul>
+</li>
 <li>
 <p><em>ng_conv_normalization_type</em>: Type of normalization
 applied to all layers and stack layers. Allowed values:</p>
@@ -348,8 +389,8 @@ applied to all layers and stack layers. Allowed values:</p>
 </ul>
 </li>
 <li>
-<p><em>ng_conv_parametrizations</em>: Re-Parametrizations for all
-layers except recurrent layers. Allowed values:</p>
+<p><em>ng_conv_parametrizations</em>: Re-Parametrizations of the
+weights of layers. Allowed values:</p>
 <ul>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
@@ -372,8 +413,8 @@ et al. 2018</a>.</li>
 <li><p><em>ng_conv_bias</em>: If <code>TRUE</code> a bias term is added
 to all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>ng_conv_act_fct</em>: Activation function for all layers
-except recurrent layers.</p></li>
+<li><p><em>ng_conv_act_fct</em>: Activation function for all
+layers.</p></li>
 <li><p><em>ng_conv_dropout</em>: determining the dropout for n-gram
 convolution layers.</p></li>
 <li><p><em>ng_conv_n_layers</em>: determining how many times the n-gram
@@ -398,8 +439,22 @@ parameters with the prefix <em>rec_</em> can be used to configure this
 layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><p><em>rec_residual_type</em>: Type residual connenction for all
-layers and stack of layers.</p></li>
+<li>
+<p><em>rec_residual_type</em>: Type of residual connenction for all
+layers and stack of layers. Allowed values:</p>
+<ul>
+<li>
+<code>'None'</code>: Add no residual connection.</li>
+<li>
+<code>'Addition'</code>: Adds a residual connection by adding the
+original input to the output.</li>
+<li>
+<code>'ResidualGate'</code>: Adds a residucal connection by creating
+a weightes sum from the original input and the output. The weight is a
+learnable parameter. This type of residual connection is described by <a href="https://home.ttic.edu/~savarese/savarese_files/Residual_Gates.pdf" class="external-link">Savarese
+and Figueiredo (2017)</a>.</li>
+</ul>
+</li>
 <li>
 <p><em>rec_normalization_type</em>: Type of normalization applied to
 all layers and stack layers. Allowed values:</p>
@@ -412,8 +467,8 @@ all layers and stack layers. Allowed values:</p>
 </ul>
 </li>
 <li>
-<p><em>rec_parametrizations</em>: Re-Parametrizations for all layers
-except recurrent layers. Allowed values:</p>
+<p><em>rec_parametrizations</em>: Re-Parametrizations of the weights
+of layers. Allowed values:</p>
 <ul>
 <li>
 <code>'None'</code>: Does not apply any re-parametrizations.</li>
@@ -436,13 +491,13 @@ et al. 2018</a>.</li>
 <li><p><em>rec_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>rec_act_fct</em>: Activation function for all layers except
-recurrent layers.</p></li>
+<li><p><em>rec_act_fct</em>: Activation function for all
+layers.</p></li>
 <li><p><em>rec_dropout</em>: determining the dropout between recurrent
 layers.</p></li>
 <li><p><em>rec_type</em>: Type of the recurrent layers.
-<code>rec_type='gru'</code> for Gated Recurrent Unit and
-<code>rec_type='lstm'</code> for Long Short-Term Memory.</p></li>
+<code>rec_type='GRU'</code> for Gated Recurrent Unit and
+<code>rec_type='LSTM'</code> for Long Short-Term Memory.</p></li>
 <li><p><em>rec_bidirectional</em>: If <code>TRUE</code> a bidirectional
 version of the recurrent layers is used.</p></li>
 <li><p><em>rec_size</em>: Number of neurons for each recurrent
@@ -466,12 +521,13 @@ and/or minimal features. Second, it performs pooling over the remaining
 features selecting a speficifc number of the heighest and/or lowest
 features.</p>
 <p>In the case of selecting the minmal <em>and</em> maximal features at
-the same time in the first step the minmal features are concatenated to
-the tensor resulting the in the shape (Batch, Times, 2<em>Features). In
-the second step the number of requested features is halved. The first
-half is used for the maximal features and the second for the minimal
-features. All parameters with the prefix </em>cls_pooling_* can be used
-to configure this layer.</p>
+the same time the minmal features are concatenated to the tensor of the
+maximal features resulting the in the shape
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
+at the end of the first step. In the second step the number of requested
+features is halved. The first half is used for the maximal features and
+the second for the minimal features. All parameters with the prefix
+<em>cls_pooling_</em> can be used to configure this layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li><p><em>cls_pooling_features</em>: Number of features to be extracted
@@ -550,7 +606,7 @@ heads for a self-attention layer. Only relevant if
 </div>
 <p>This model is based on a sequential architecture. The input is passed
 to a specific number of layers step by step. All layers are grouped by
-the kind of layers into stacks.</p>
+their kind into stacks.</p>
 </div>
 <div class="section level3">
 <h3 id="parallel-core-architecture">Parallel Core Architecture<a class="anchor" aria-label="anchor" href="#parallel-core-architecture"></a>

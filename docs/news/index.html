@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,8 @@
 <ul><li>Removed functions belonging to ‘tensorflow’.</li>
 <li>Added the possibility to install python packages either to a ‘conda’ environment or a virtual environment. Virtual environment is the new default.</li>
 <li>Added functions for a more convenient preparation of a new session and for installing/updating python packages.</li>
+</ul><p><strong>LargeDataSetForText</strong></p>
+<ul><li>Added an algorithm cleaning raw texts in order to improve the performance of the following analysis. See the method’s documentation for more details. Currently only available for .pdf and .txt files.</li>
 </ul><p><strong>Ai for Education Studio</strong></p>
 <ul><li>Implemented popovers to explain the different widgets. This feature will be extended in the future.</li>
 <li>Fixed a bug that prevented classifiers with applied pseudo labeling to visualize training history.</li>
@@ -68,6 +70,7 @@
 </ul><p><strong>Classifiers</strong></p>
 <ul><li>Added parameters for determining the learning rate and warm up ratio for training.</li>
 <li>Added a check for the number of unlabeled cases during training to avoid application of pseudo labeling if there are no unlabeled cases.</li>
+<li>Fixed an error in calculating the number of folds if the number of requested folds is greater as the minimal frequency of all classes/categories.</li>
 <li>Users can now choose between different activation functions and parametrizations.</li>
 <li>Removed argument <code>dir_checkpoint</code> from training method. Now the training uses a folder in the regular temp directory of the machine. After a successful training the folder is removed.</li>
 <li>Parameter ‘name’ in ‘configure’ is now optional. If set to <code>NULL</code> a unique name is generated automatically.</li>
@@ -82,6 +85,7 @@
 </ul><p><strong>Minorty Oversamping Techniques</strong></p>
 <ul><li>Added K-Nearest Neighbor OveRsampling approach (KNNOR) in C++ as new oversampling technique.</li>
 <li>Removed support for all other oversampling techniques. No dependency to the package ‘smotefamily’.</li>
+<li>Changed update intervall of most processes within AI for Education - Studio from 300 to 30 seconds.</li>
 </ul><p><strong>Performance Measures</strong></p>
 <ul><li>Added an own implementation of Gwet’s AC1 and AC2 according to Gwet(2021).</li>
 <li>Removed dependency to package ‘irrCAC’.</li>

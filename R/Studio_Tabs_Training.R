@@ -130,7 +130,7 @@ Training_Server <- function(id, model) {
 
 
     output$widget_classifier_pl_step <- shiny::renderUI({
-      if (sum(get_TEClassifiers_class_names() %in% class(model))>0) {
+      if (sum(get_TEClassifiers_class_names() %in% class(model)) > 0) {
         if (model()$last_training$config$use_pl == TRUE) {
           n_steps <- model()$last_training$config$pl_max_steps
           return(
@@ -153,37 +153,30 @@ Training_Server <- function(id, model) {
       {
         shiny::req(model)
         if ("TextEmbeddingModel" %in% class(model())) {
-          plot=model()$plot_training_history(
-            y_min=input$y_min,
-            y_max=input$y_max
+          plot <- model()$plot_training_history(
+            y_min = input$y_min,
+            y_max = input$y_max
           )
-        } else if("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
+        } else if ("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
           # Necessary input
           shiny::req(input$measure)
 
-          plot=model()$plot_training_history(
-            y_min=input$y_min,
-            y_max=input$y_max,
-            final_training=input$training_phase,
-            pl_step=input$classifier_pl_step,
-            measure=input$measure,
-            add_min_max=input$training_min_max,
-            text_size=input$text_size
+          plot <- model()$plot_training_history(
+            y_min = input$y_min,
+            y_max = input$y_max,
+            final_training = input$training_phase,
+            pl_step = input$classifier_pl_step,
+            measure = input$measure,
+            add_min_max = input$training_min_max,
+            text_size = input$text_size
           )
-
-            plot_data <- prepare_training_history(
-              model = model(),
-              final = input$training_phase,
-              use_pl = model()$last_training$config$use_pl,
-              pl_step = input$classifier_pl_step
-            )
-          } else if ("TEFeatureExtractor" %in% class(model())) {
-            plot=model()$plot_training_history(
-              y_min=input$y_min,
-              y_max=input$y_max,
-              text_size=input$text_size
-            )
-          }
+        } else if ("TEFeatureExtractor" %in% class(model())) {
+          plot <- model()$plot_training_history(
+            y_min = input$y_min,
+            y_max = input$y_max,
+            text_size = input$text_size
+          )
+        }
         return(plot)
       },
       res = 72 * 2

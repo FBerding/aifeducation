@@ -181,7 +181,7 @@ its corresponding prototypes or pushing cases away from other prototypes. The hi
 loss concentrates on pulling cases to its corresponding prototypes. Allowed values: \verb{0 <= x <= 1}}
 
 \item{\code{loss_margin}}{\code{double} Value greater 0 indicating the minimal distance of every case from prototypes of other classes. Please note that
-in contrast to the orginal work by \href{https://doi.org/10.1007/978-3-030-16145-3_24}{Zhang et al. (2019)} this implementation
+in contrast to the orginal work by Zhang et al. (2019) this implementation
 reaches better performance if the margin is a magnitude lower (e.g. 0.05 instead of 0.5). Allowed values: \verb{0 <= x <= 1}}
 
 \item{\code{sampling_separate}}{\code{bool} If \code{TRUE} the cases for every class are divided into a data set for sample and

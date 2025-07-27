@@ -198,7 +198,8 @@ jobs:
             "long_models",
             "long_transformers",
             "Description_UI",
-            "Description_Server"
+            "Description_Server",
+            "long_train_transformer"
           )
 
           cov <- covr::package_coverage(
