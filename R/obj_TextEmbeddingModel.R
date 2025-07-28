@@ -393,6 +393,34 @@ TextEmbeddingModel <- R6::R6Class(
         from_tf = from_tf,
         load_safe = load_safe
       )
+    },
+    update_model_config = function() {
+      #check if an update of values is necessary. This is the case if the model
+      #was created with an older version of aifeducation compared to 1.1.0
+      #Update values to the new values introduced in version 1.1.0
+
+      current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
+      if (is.null_or_na(current_pkg_version)) {
+        update_values <- TRUE
+      } else {
+        if (check_versions(
+          a = "1.1.0",
+          operator = ">",
+          b = self$get_package_versions()$r_package_versions$aifeducation
+        )) {
+          update_values <- TRUE
+        } else {
+          update_values <- FALSE
+        }
+      }
+
+      tmp_model_config_params=names(private$transformer_components)
+      if(update_values){
+        for(param in tmp_model_config_params){
+          private$transformer_components[param]=list(update_values_to_new_1.1.0(private$transformer_components[[param]]))
+        }
+      }
+      private$r_package_versions$aifeducation <- packageVersion("aifeducation")
     }
   ),
   public = list(
@@ -584,6 +612,9 @@ TextEmbeddingModel <- R6::R6Class(
         overlap = config_file$private$transformer_components$overlap,
         ml_framework = config_file$private$transformer_components$ml_framework
       )
+
+      # Update config if necessary
+      private$update_model_config()
 
       # Set model info
       private$set_model_info(

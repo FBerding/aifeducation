@@ -7,6 +7,7 @@
 update_aifeducation(
   update_aifeducation_studio = TRUE,
   env_type = "auto",
+  cuda_version = "12.4",
   envname = "aifeducation"
 )
 }
@@ -19,6 +20,8 @@ Studio.}
 use a virtual environment with the given name. If this environment does not exist
 it tries to activate a conda environment with the given name. If this fails
 the default virtual environment is used.'}
+
+\item{cuda_version}{\code{string} determining the requested version of cuda.}
 
 \item{envname}{\code{string} Name of the environment where the packages should be installed.}
 }

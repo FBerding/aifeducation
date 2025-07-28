@@ -7,6 +7,7 @@
 install_aifeducation(
   install_aifeducation_studio = TRUE,
   python_version = "3.12",
+  cuda_version = "12.4",
   use_conda = FALSE
 )
 }
@@ -15,6 +16,8 @@ install_aifeducation(
 Studio.}
 
 \item{python_version}{\code{string} Python version to use/install.}
+
+\item{cuda_version}{\code{string} determining the requested version of cuda.}
 
 \item{use_conda}{\code{bool} If \code{TRUE} installation installs 'miniconda' and uses 'conda' as package manager. If \code{FALSE}
 installation installs python and uses virtual environments for package management.}

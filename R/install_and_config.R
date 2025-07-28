@@ -29,6 +29,7 @@
 #'   Studio.
 #' @param use_conda `bool` If `TRUE` installation installs 'miniconda' and uses 'conda' as package manager. If `FALSE`
 #' installation installs python and uses virtual environments for package management.
+#' @param cuda_version `string` determining the requested version of cuda.
 #' @param python_version `string` Python version to use/install.
 #' @return Function does nothing return. It installs python, optional R packages, and necessary 'python' packages on a
 #'   machine.
@@ -44,6 +45,7 @@
 #' @export
 install_aifeducation <- function(install_aifeducation_studio = TRUE,
                                  python_version = "3.12",
+                                 cuda_version = "12.4",
                                  use_conda = FALSE) {
   if (install_aifeducation_studio == TRUE) {
     install_aifeducation_studio()
@@ -56,17 +58,18 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
       force = FALSE
     )
   } else {
-    reticulate::install_miniconda(
+    try(reticulate::install_miniconda(
       update = TRUE,
       force = FALSE
-    )
+    ), silent = TRUE)
   }
 
   install_py_modules(
     envname = "aifeducation",
     remove_first = FALSE,
     python_version = python_version,
-    use_conda = use_conda
+    use_conda = use_conda,
+    pytorch_cuda_version = cuda_version
   )
 
   cat("\n======================================================")
@@ -86,6 +89,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' @param update_aifeducation_studio `bool` If `TRUE` all necessary R packages are installed for using AI for Education
 #'   Studio.
 #' @param envname `string` Name of the environment where the packages should be installed.
+#' @param cuda_version `string` determining the requested version of cuda.
 #' @param env_type `string` If set to `"venv"`  virtual environment is requested. If set to
 #' `"conda"` a 'conda' environment is requested. If set to `"auto"` the function tries to
 #' use a virtual environment with the given name. If this environment does not exist
@@ -103,6 +107,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' @export
 update_aifeducation <- function(update_aifeducation_studio = TRUE,
                                 env_type = "auto",
+                                cuda_version = "12.4",
                                 envname = "aifeducation") {
   # Search for environment
   if (env_type == "auto") {
@@ -141,7 +146,8 @@ update_aifeducation <- function(update_aifeducation_studio = TRUE,
   install_py_modules(
     envname = envname,
     remove_first = TRUE,
-    use_conda = use_conda
+    use_conda = use_conda,
+    pytorch_cuda_version = cuda_version
   )
 
   if (update_aifeducation_studio == TRUE) {

@@ -72,6 +72,7 @@ function `install_aifeducation` as follows:
 aifeducation::install_aifeducation(
   install_aifeducation_studio = TRUE,
   python_version = "3.12",
+  cuda_version = "12.4",
   use_conda = FALSE)
 ```
 
@@ -148,6 +149,10 @@ version of this package, it is recommended to update the used python
 libraries as well. The easiest way is to call the following function:
 
 ```{r, include = TRUE, eval=FALSE}
-aifeducation::update_aifeducation()
+aifeducation::update_aifeducation(
+  update_aifeducation_studio = TRUE,
+  env_type = "auto",
+  cuda_version = "12.4",
+  envname = "aifeducation")
 ```
 
