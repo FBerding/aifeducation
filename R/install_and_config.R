@@ -58,10 +58,13 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
       force = FALSE
     )
   } else {
-    try(reticulate::install_miniconda(
+    miniconda=try(reticulate::install_miniconda(
       update = TRUE,
       force = FALSE
     ), silent = TRUE)
+    if(is(object=miniconda,class2 = "try-error")){
+      message("Minicond is neither installed nor updated.")
+    }
   }
 
   install_py_modules(

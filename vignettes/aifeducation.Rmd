@@ -65,6 +65,9 @@ Since natural language processing with neural nets is based on models
 which are computationally intensive, *PyTorch* is used within this
 package together with some other specialized python libraries.
 
+> Before you start installing python or updating python packages, please
+> ensure that you have the newest version of the *R* package 'reticulate' installed.
+
 The most straightforward method for getting started is to call the
 function `install_aifeducation` as follows:
 

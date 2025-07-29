@@ -127,12 +127,18 @@ machine.</p>
 <p>Since natural language processing with neural nets is based on models
 which are computationally intensive, <em>PyTorch</em> is used within
 this package together with some other specialized python libraries.</p>
+<blockquote>
+<p>Before you start installing python or updating python packages,
+please ensure that you have the newest version of the <em>R</em> package
+‘reticulate’ installed.</p>
+</blockquote>
 <p>The most straightforward method for getting started is to call the
 function <code>install_aifeducation</code> as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/install_aifeducation.html">install_aifeducation</a></span><span class="op">(</span></span>
 <span>  install_aifeducation_studio <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  python_version <span class="op">=</span> <span class="st">"3.12"</span>,</span>
+<span>  cuda_version <span class="op">=</span> <span class="st">"12.4"</span>,</span>
 <span>  use_conda <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>This function will install python, and all relevant python libraries
 into a virtual environment called “aifeducation”.</p>
@@ -200,7 +206,11 @@ to a newer version of this package, it is recommended to update the used
 python libraries as well. The easiest way is to call the following
 function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/update_aifeducation.html">update_aifeducation</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/update_aifeducation.html">update_aifeducation</a></span><span class="op">(</span></span>
+<span>  update_aifeducation_studio <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  env_type <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  cuda_version <span class="op">=</span> <span class="st">"12.4"</span>,</span>
+<span>  envname <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

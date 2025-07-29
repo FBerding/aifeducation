@@ -52,7 +52,7 @@ Imports:
     methods,
     Rcpp (>= 1.0.10),
     reshape2,
-    reticulate (>= 1.34.0),
+    reticulate (>= 1.42.0),
     rlang,
     stringi,
     utils
