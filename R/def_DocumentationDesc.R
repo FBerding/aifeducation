@@ -48,7 +48,9 @@ get_layer_dict <- function(layer) {
     desc = "The feature layer is a dense layer that can be used to
     increase or decrease the number of features of the input data before passing the
     data into your model. The aim of this layer is to increase or reduce the complexity of the data for your model.
-    The output size of this layer determines the number of features for all following layers.",
+    The output size of this layer determines the number of features for all following layers. In the special case that
+    the requested number of features equals the number of features of the text embeddings this layer
+    is reduced to a dropout layer with masking capabilities.",
     img = "layers_features.png",
     references = NULL,
     param_prefix = "feat_"

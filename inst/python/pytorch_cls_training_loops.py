@@ -444,6 +444,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       test_data,
       batch_size=Ns+Nq,
       shuffle=False)
+      
+  loader_for_trained_prototpyes=torch.utils.data.DataLoader(
+    train_data,
+    batch_size=Ns+Nq,
+    shuffle=False)    
   
   #Log file
   if not (log_dir is None):
@@ -537,36 +542,17 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Calculate trained prototypes----------------------------------------------
     model.eval()
     
-    #running_class_mean=None
-    #running_class_freq=None
-    running_class_values=torch.zeros((n_classes,model.get_embedding_dim())).to(device)
-    running_class_freq=torch.zeros(n_classes).to(device)
-    
-    for batch in trainloader:
-      #assign colums of the batch
-      inputs=batch["input"]
-      labels=batch["labels"]
-      
-      inputs = inputs.to(device,dtype=dtype)
-      labels=labels.to(device,dtype=dtype)
-      labels_one_hot=torch.nn.functional.one_hot(labels.to(dtype=torch.long),num_classes=n_classes)
-
-      embeddings=model.embed(inputs).to(device)
-
-      running_class_values=running_class_values+torch.matmul(
-        torch.transpose(labels_one_hot.to(dtype=embeddings.dtype),dim0=1,dim1=0),
-        embeddings
+    class_mean_prototypes,class_label=calc_trained_prototypes_batch(
+      n_classes=n_classes,
+      model=model,
+      trainloader=loader_for_trained_prototpyes,
+      device=device,
+      dtype=dtype
       )
-      running_class_freq=running_class_freq+torch.sum(labels_one_hot,dim=0)
-      
-    running_class_freq=torch.unsqueeze(running_class_freq,-1)
-    running_class_freq=running_class_freq.repeat((1,model.get_embedding_dim()))
-    
-    class_mean_prototypes=running_class_values/running_class_freq
     
     model.set_trained_prototypes(
       prototypes=class_mean_prototypes,
-      class_lables=torch.arange(start=0, end=n_classes, step=1)
+      class_lables=class_label
       )
 
     #Validation----------------------------------------------------------------
@@ -775,3 +761,35 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     "avg_iota":history_avg_iota.numpy()} 
 
   return history
+
+
+def calc_trained_prototypes_batch(n_classes,model,data_loader,device,dtype):
+    model.eval()
+    
+    running_class_values=torch.zeros((n_classes,model.get_embedding_dim())).to(device)
+    running_class_freq=torch.zeros(n_classes).to(device)
+    
+    for batch in data_loader:
+      #assign colums of the batch
+      inputs=batch["input"]
+      labels=batch["labels"]
+      
+      inputs = inputs.to(device,dtype=dtype)
+      labels=labels.to(device,dtype=dtype)
+      labels_one_hot=torch.nn.functional.one_hot(labels.to(dtype=torch.long),num_classes=n_classes)
+
+      embeddings=model.embed(inputs).to(device)
+
+      running_class_values=running_class_values+torch.matmul(
+        torch.transpose(labels_one_hot.to(dtype=embeddings.dtype),dim0=1,dim1=0),
+        embeddings
+      )
+      running_class_freq=running_class_freq+torch.sum(labels_one_hot,dim=0)
+      
+    running_class_freq=torch.unsqueeze(running_class_freq,-1)
+    running_class_freq=running_class_freq.repeat((1,model.get_embedding_dim()))
+    
+    class_mean_prototypes=running_class_values/running_class_freq
+    
+    class_labels=torch.arange(start=0, end=n_classes, step=1)
+    return class_mean_prototypes, class_labels

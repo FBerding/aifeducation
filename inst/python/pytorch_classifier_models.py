@@ -33,7 +33,7 @@ class TEClassifierSequential(torch.nn.Module):
       )
       
       if features==feat_size:
-        self.features_resize_layer=identity_layer(pad_value=pad_value,apply_masking=True)
+        self.features_resize_layer=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
       else:
         self.features_resize_layer=dense_layer_with_mask(
           input_size=features,
@@ -187,7 +187,7 @@ class TEClassifierParallel(torch.nn.Module):
       )
       
       if features==feat_size:
-        self.features_resize_layer=identity_layer(pad_value=pad_value,apply_masking=True)
+        self.features_resize_layer=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
       else:
         self.features_resize_layer=dense_layer_with_mask(
           input_size=features,
@@ -227,7 +227,7 @@ class TEClassifierParallel(torch.nn.Module):
         )
         if self.shared_feat_layer==False:
           if features==feat_size:
-            self.features_resize_layer_tf=identity_layer(pad_value=pad_value,apply_masking=True)
+            self.features_resize_layer_tf=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
           else:
             self.features_resize_layer_tf=dense_layer_with_mask(
               input_size=features,
@@ -269,7 +269,7 @@ class TEClassifierParallel(torch.nn.Module):
         )
         if self.shared_feat_layer==False:
           if features==feat_size:
-            self.features_resize_layer_rec=identity_layer(pad_value=pad_value,apply_masking=True)
+            self.features_resize_layer_rec=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
           else:
             self.features_resize_layer_rec=dense_layer_with_mask(
               input_size=features,
@@ -312,7 +312,7 @@ class TEClassifierParallel(torch.nn.Module):
 
         if self.shared_feat_layer==False:        
           if features==feat_size:
-            self.features_resize_layer_conv=identity_layer(pad_value=pad_value,apply_masking=True)
+            self.features_resize_layer_conv=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
           else:
             self.features_resize_layer_conv=dense_layer_with_mask(
               input_size=features,
@@ -353,7 +353,7 @@ class TEClassifierParallel(torch.nn.Module):
 
         if self.shared_feat_layer==False:            
           if features==feat_size:
-            self.features_resize_layer_dense=identity_layer(pad_value=pad_value,apply_masking=True)
+            self.features_resize_layer_dense=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
           else:
             self.features_resize_layer_dense=dense_layer_with_mask(
               input_size=features,
