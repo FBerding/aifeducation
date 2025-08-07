@@ -445,10 +445,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       batch_size=Ns+Nq,
       shuffle=False)
       
-  loader_for_trained_prototpyes=torch.utils.data.DataLoader(
-    train_data,
-    batch_size=Ns+Nq,
-    shuffle=False)    
+  #loader_for_trained_prototpyes=torch.utils.data.DataLoader(
+  #  train_data,
+  #  batch_size=Ns+Nq,
+  #  shuffle=False)    
   
   #Log file
   if not (log_dir is None):
@@ -545,7 +545,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     class_mean_prototypes,class_label=calc_trained_prototypes_batch(
       n_classes=n_classes,
       model=model,
-      trainloader=loader_for_trained_prototpyes,
+      data_loader=trainloader,
       device=device,
       dtype=dtype
       )

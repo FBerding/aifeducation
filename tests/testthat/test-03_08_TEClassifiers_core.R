@@ -12,10 +12,12 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
 # object_class_names="TEClassifierSequentialPrototype"
 # object_class_names="TEClassifierRegular"
 
-max_samples <- 1
+max_samples <- 20
 max_samples_CI <- 10
 
-max_samples_training <- 1
+max_samples_training <- 2
+max_samples_training_CI<-1
+
 class_range <- c(2, 3)
 
 prob_precision <- 1e-6
@@ -586,7 +588,7 @@ for (object_class_name in object_class_names) {
       log_dir <- paste0(root_path_results, "/", generate_id(5))
       create_dir(log_dir, trace = FALSE)
 
-      for (j in 1:max_samples_training) {
+      for (j in 1:check_adjust_n_samples_on_CI(n_samples_requested = max_samples_training,n_CI=max_samples_training_CI) ) {
         # Config sample
         test_combination <- generate_args_for_tests(
           object_name = object_class_name,

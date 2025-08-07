@@ -210,9 +210,11 @@ should be added to the network.</p></li>
 decrease the number of features of the input data before passing the
 data into your model. The aim of this layer is to increase or reduce the
 complexity of the data for your model. The output size of this layer
-determines the number of features for all following layers. All
-parameters with the prefix <em>feat_</em> can be used to configure this
-layer.</p>
+determines the number of features for all following layers. In the
+special case that the requested number of features equals the number of
+features of the text embeddings this layer is reduced to a dropout layer
+with masking capabilities. All parameters with the prefix <em>feat_</em>
+can be used to configure this layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li>
