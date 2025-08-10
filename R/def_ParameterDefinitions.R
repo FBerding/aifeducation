@@ -1349,8 +1349,7 @@ get_param_dict <- function() {
       multihead = "The original multi-head attention as described by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762).",
       fourier = "Attention with fourier transformation as described by [Lee-Thorp et al. (2021)](https://doi.org/10.48550/arXiv.2105.03824)."
     ),
-    desc = "Choose the relevant attention type. Please note that you may see different
-    values for a case for different input orders if you choose `fourier` on linux.",
+    desc = "Choose the attention type.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Attention Type",
     default_value = "Fourier"

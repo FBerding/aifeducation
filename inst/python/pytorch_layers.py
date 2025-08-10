@@ -490,9 +490,10 @@ class layer_unpack_and_masking(torch.nn.Module):
 class layer_fourier_transformation(torch.nn.Module):
   def __init__(self):
     super().__init__()
+    self.fourier_batch=torch.vmap(func=torch.fft.fft2,in_dims=0,out_dims=0)
     
   def forward(self,x):
-    result=torch.fft.fft2(x,norm="backward").real
+    result=self.fourier_batch(x,norm="backward").real
     return result
 
 #----------------

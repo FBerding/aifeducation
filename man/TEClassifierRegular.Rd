@@ -164,8 +164,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
 
-\item{\code{attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
-values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'Fourier', 'MultiHead'}
+\item{\code{attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
 
 \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
 

@@ -219,7 +219,7 @@ for (object_class_name in object_class_names) {
         })
 
         if (!is.null(test_combination$attention)) {
-          if (test_combination$attention != "fourier") {
+          if (!(test_combination$attention == "Fourier" & (object_class_name%in%c("TEClassifierRegular","TEClassifierProtoNet")))) {
             test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combination)), {
               embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
               perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)

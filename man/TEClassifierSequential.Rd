@@ -35,7 +35,9 @@ the kind of residual connection, the kind of normalization or the kind of attent
 The feature layer is a dense layer that can be used to
 increase or decrease the number of features of the input data before passing the
 data into your model. The aim of this layer is to increase or reduce the complexity of the data for your model.
-The output size of this layer determines the number of features for all following layers. All parameters with the prefix \emph{feat_} can be used to configure this layer.
+The output size of this layer determines the number of features for all following layers. In the special case that
+the requested number of features equals the number of features of the text embeddings this layer
+is reduced to a dropout layer with masking capabilities. All parameters with the prefix \emph{feat_} can be used to configure this layer.
 
 \strong{Dense Layers}
 
@@ -311,8 +313,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{tf_attention_type}}{\code{string} Choose the relevant attention type. Please note that you may see different
-values for a case for different input orders if you choose \code{fourier} on linux. Allowed values: 'Fourier', 'MultiHead'}
+\item{\code{tf_attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
 
 \item{\code{tf_positional_type}}{\code{string} Type of processing positional information. Allowed values: 'absolute'}
 

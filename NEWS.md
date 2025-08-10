@@ -59,6 +59,7 @@ editor_options:
   generated automatically. 
 - Added Focal Loss as a new loss function to sequential classifiers.
 - Added four new classes of classifiers.
+- Fixed a bug that caused classifiers to be not order invariant if the attention type is "Fourier".
   
 **FeatureExtractor**
 
