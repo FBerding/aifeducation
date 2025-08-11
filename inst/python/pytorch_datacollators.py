@@ -87,10 +87,17 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
             for c in self.classes:
               #Calculate permutations for the random sample for each class
               permutations=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
-              
+
               #Calculat the indexes for selecting the first Ns+Nq indices
-              ids_sample=np.array(range(0,self.Ns))
-              ids_query=np.array(range(self.Ns,(self.Ns+self.Nq)))
+              if(self.cases_per_class[c]>=self.Ns+self.Nq):
+                ids_sample=np.array(range(0,self.Ns))
+                ids_query=np.array(range(self.Ns,(self.Ns+self.Nq)))
+              else:
+                #For the case that the number of cases is lower as Ns+Nq adjust proportional
+                tmp_Ns=max(1,math.floor(self.cases_per_class[c]*self.Ns/(self.Ns+self.Nq)))
+                tmp_Nq=self.cases_per_class[c]-tmp_Ns
+                ids_sample=np.array(range(0,tmp_Ns))
+                ids_query=np.array(range(tmp_Ns,(tmp_Ns+tmp_Nq)))
 
               #Extract the final indices
               perm_sample=permutations[ids_sample].numpy()
