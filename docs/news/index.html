@@ -76,6 +76,7 @@
 <li>Parameter ‘name’ in ‘configure’ is now optional. If set to <code>NULL</code> a unique name is generated automatically.</li>
 <li>Added Focal Loss as a new loss function to sequential classifiers.</li>
 <li>Added four new classes of classifiers.</li>
+<li>Fixed a bug that caused classifiers to be not order invariant if the attention type is “Fourier”.</li>
 </ul><p><strong>FeatureExtractor</strong></p>
 <ul><li>The option to choose an optimizer is now working.</li>
 <li>Added parameters for determining the learning rate and warm up ratio for training.</li>

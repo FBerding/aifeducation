@@ -167,9 +167,7 @@ for a self-attention layer. Only relevant if
 <li><p><em>tf_dense_dim</em>: determining the size of the projection
 layer within a each transformer encoder.</p></li>
 <li>
-<p><em>tf_attention_type</em>: Choose the relevant attention type.
-Please note that you may see different values for a case for different
-input orders if you choose <code>fourier</code> on linux. Allowed
+<p><em>tf_attention_type</em>: Choose the attention type. Allowed
 values:</p>
 <ul>
 <li>
@@ -575,10 +573,8 @@ extracted at the end of the model.</p></li>
 <li><p><em>merge_pooling_type</em>: Type of extracting intermediate
 features.</p></li>
 <li>
-<p><em>merge_attention_type</em>: Choose the relevant attention
-type. Please note that you may see different values for a case for
-different input orders if you choose <code>fourier</code> on linux.
-Allowed values:</p>
+<p><em>merge_attention_type</em>: Choose the attention type. Allowed
+values:</p>
 <ul>
 <li>
 <code>'multihead'</code>: The original multi-head attention as
