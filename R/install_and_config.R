@@ -39,6 +39,7 @@
 #' @importFrom reticulate install_python
 #' @importFrom reticulate install_miniconda
 #' @importFrom utils install.packages
+#' @importFrom methods is
 #'
 #' @family Installation and Configuration
 #'
@@ -62,7 +63,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
       update = TRUE,
       force = FALSE
     ), silent = TRUE)
-    if(is(object=miniconda,class2 = "try-error")){
+    if(methods::is(object=miniconda,class2 = "try-error")){
       message("Minicond is neither installed nor updated.")
     }
   }
