@@ -11,25 +11,24 @@ An object of class \code{list} of length 6.
 AIFETrType
 }
 \description{
-This list contains transformer types. Elements of the list can be used in the public \code{make} of the
-\link{AIFETransformerMaker} \code{R6} class as input parameter \code{type}.
+This list contains transformer types. Elements of the list can be used in \code{\link[=aife_transformer.make]{aife_transformer.make()}}
+function as input parameter \code{type}.
 
 It has the following elements:
 \itemize{
 \item \code{bert} = 'bert'
 \item \code{roberta} = 'roberta'
-\item \code{deberta_v2} = 'deberta_v2'
 \item \code{funnel} = 'funnel'
 \item \code{longformer} = 'longformer'
 \item \code{mpnet} = 'mpnet'
+\item \code{modernbert} = 'modernbert'
 
-Elements can be used like \code{AIFETrType$bert}, \code{AIFETrType$deberta_v2}, \code{AIFETrType$funnel}, etc.
+Elements can be used like \code{AIFETrType$bert}, \code{AIFETrType$modernbert}, \code{AIFETrType$funnel}, etc.
 }
 }
 \seealso{
 Other Transformer: 
-\code{\link{AIFETransformerMaker}},
-\code{\link{aife_transformer_maker}}
+\code{\link{aife_transformer.make}()}
 }
 \concept{Transformer}
 \keyword{datasets}

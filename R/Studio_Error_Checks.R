@@ -46,11 +46,13 @@ check_errors_create_classifier <- function(classifier_type,
                                            path_to_feature_extractor,
                                            model_name,
                                            model_label,
-                                           Ns,
-                                           Nq,
-                                           loss_alpha,
-                                           loss_margin,
-                                           embedding_dim) {
+                                           use_sc,
+                                           sc_min_k,
+                                           sc_max_k,
+                                           use_pl,
+                                           pl_min,
+                                           pl_max,
+                                           pl_anchor) {
   # List for gathering errors
   error_list <- NULL
 
@@ -67,8 +69,6 @@ check_errors_create_classifier <- function(classifier_type,
     ))
   }
 
-
-
   # Embeddings
   if (dir.exists(path_to_embeddings) == FALSE) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
@@ -80,8 +80,9 @@ check_errors_create_classifier <- function(classifier_type,
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
-      "EmbeddedText" %in% class(embeddings))) {
+    } else if (
+      !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+    ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
         or 'EmbeddedText'."
@@ -119,57 +120,34 @@ check_errors_create_classifier <- function(classifier_type,
     }
   }
 
-
-  # Model Nane and Model Label
-  if (check_for_empty_input(model_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Name of the classifier ist not set."
-    ))
-  }
-
   if (check_for_empty_input(model_label)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Label of the classifier ist not set."
+      "Label of the classifier is not set."
     ))
   }
 
-  # ProtoNet specific-----------------------------------------------------------
-  # TODO (Yuliia): input$classifier_type? classifier_type - no visible binding
-  if (classifier_type == "protonet") {
-    if (check_for_empty_input(Ns)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "No value set for the sample. Please add a number."
-      ))
+  # Training conf
+  if (use_pl == TRUE) {
+    if (pl_max < pl_min) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("pl_max must be at least pl_min."))
     }
-
-    if (check_for_empty_input(Nq)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "No value set for the query. Please add a number."
-      ))
+    if (pl_anchor < pl_min) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("pl_anchor must be at least pl_min."))
     }
-
-    if (check_for_empty_input(loss_alpha)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Value for alpha in the loss is missing."
-      ))
+    if (pl_anchor > pl_max) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("pl_anchor must be lower or equal to pl_max."))
     }
+  }
 
-    if (check_for_empty_input(loss_margin)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Value for the margin in the loss is missing."
-      ))
-    }
-
-    if (check_for_empty_input(embedding_dim)) {
-      error_list[length(error_list) + 1] <- list(shiny::tags$p(
-        "Value for the number of dimensions of the embedding is missing."
-      ))
+  if (use_sc == TRUE) {
+    if (sc_max_k < sc_min_k) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p("sc_max_k must be at least sc_min_k"))
     }
   }
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -237,13 +215,15 @@ check_errors_create_dataset_raw_texts <- function(source_path,
       at least one file type."
   }
   if (include_xlsx) {
-    excel_columns <- c(excel_id_column,
-                       excel_text_column,
-                       excel_license_column,
-                       excel_bib_entry_column,
-                       excel_url_license_column,
-                       excel_text_license_column,
-                       excel_url_source_column)
+    excel_columns <- c(
+      excel_id_column,
+      excel_text_column,
+      excel_license_column,
+      excel_bib_entry_column,
+      excel_url_license_column,
+      excel_text_license_column,
+      excel_url_source_column
+    )
     if (sum(excel_columns %in% "") != 0) {
       # if there is any empty column name
       error_list[length(error_list) + 1] <- "All column names for excel file must be specified."
@@ -252,7 +232,7 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 
   tmp_ui_error <- NULL
   if (length(error_list) > 0) {
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -285,7 +265,6 @@ check_errors_create_feature_extractor <- function(destination_path,
                                                   folder_name,
                                                   path_to_embeddings,
                                                   features,
-                                                  model_name,
                                                   model_label) {
   # List for gathering errors
   error_list <- NULL
@@ -316,8 +295,9 @@ check_errors_create_feature_extractor <- function(destination_path,
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
-    } else if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
-      "EmbeddedText" %in% class(embeddings))) {
+    } else if (
+      !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+    ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
         or 'EmbeddedText'."
@@ -334,13 +314,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 
 
 
-  # Model Name and Model Label
-  if (check_for_empty_input(model_name)) {
-    error_list[length(error_list) + 1] <- list(shiny::tags$p(
-      "Name of the classifier ist not set."
-    ))
-  }
-
+  # Model Label
   if (check_for_empty_input(model_label)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Label of the classifier ist not set."
@@ -349,7 +323,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -382,8 +356,9 @@ check_errors_predict_classifier <- function(embeddings,
   error_list <- NULL
 
   # Embeddings
-  if (!("LargeDataSetForTextEmbeddings" %in% class(embeddings) ||
-    "EmbeddedText" %in% class(embeddings))) {
+  if (
+    !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+  ) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
         or 'EmbeddedText'."
@@ -402,7 +377,7 @@ check_errors_predict_classifier <- function(embeddings,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -463,7 +438,7 @@ check_errors_text_embedding_model_embed <- function(destination_path,
   # summary
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -509,15 +484,17 @@ check_errors_text_embedding_model_create <- function(destination_path,
   }
 
   if (!identical(path_to_base_model, character(0))) {
-    if (is.null(interface_architecture[[1]]) &&
-      is.null(interface_architecture[[2]])) {
+    if (
+      is.null(interface_architecture[[1]]) &&
+        is.null(interface_architecture[[2]])
+    ) {
       error_list[length(error_list) + 1] <- "There is no model to load in the directory."
     }
   }
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in 1:length(error_list)) {
+    for (i in seq_len(length(error_list))) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -526,4 +503,63 @@ check_errors_text_embedding_model_create <- function(destination_path,
   } else {
     return(NULL)
   }
+}
+
+
+check_error_base_model_create_or_train <- function(destination_path,
+                                                   folder_name,
+                                                   path_to_raw_texts) {
+  error_list <- NULL
+
+  # Destination
+  if (!dir.exists(destination_path)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "The target directory does not exist. Please check path."
+    ))
+  }
+
+  if (check_for_empty_input(folder_name)) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Folder name is not set."
+    ))
+  }
+
+  if (is.null(path_to_raw_texts)) {
+    path_to_raw_texts <- ""
+  }
+  if (dir.exists(path_to_raw_texts) == FALSE) {
+    error_list[length(error_list) + 1] <- list(shiny::tags$p(
+      "Directory which should store the data set with raw texts does not exist."
+    ))
+  } else {
+    raw_texts <- try(load_from_disk(path_to_raw_texts), silent = TRUE)
+    if ("try-error" %in% class(raw_texts)) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        raw_texts
+      ))
+    } else if (
+      !("LargeDataSetForText" %in% class(raw_texts))
+    ) {
+      error_list[length(error_list) + 1] <- list(shiny::tags$p(
+        "Directory which should store the raw texts does not contain an object of class 'LargeDataSetForText'."
+      ))
+    }
+  }
+
+  if (length(error_list) > 0) {
+    tmp_ui_error <- NULL
+    for (i in seq_len(length(error_list))) {
+      tmp_ui_error[length(tmp_ui_error) + 1] <- list(
+        shiny::tags$p(error_list[i])
+      )
+    }
+    return(tmp_ui_error)
+  } else {
+    return(NULL)
+  }
+}
+
+load_and_check_base_model=function(path){
+  model=transformers$AutoModel$from_pretrained(path)
+  return(model)
 }

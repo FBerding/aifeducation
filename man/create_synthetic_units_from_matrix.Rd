@@ -27,7 +27,7 @@ investigation and the major class.}
 \item{k}{\code{int} The number of nearest neighbors during sampling process.}
 
 \item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently
-"smote","dbsmote", and "adas" from the package smotefamily are available.}
+"knnor" from this package is available.}
 
 \item{cat}{\code{string} The category for which new cases should be created.}
 
@@ -41,12 +41,18 @@ their labels as a named \code{factor}.
 }
 \description{
 Function for creating synthetic cases in order to balance the data for training with
-\link{TEClassifierRegular} or \link{TEClassifierProtoNet}]. This is an auxiliary function for use with \link{get_synthetic_cases_from_matrix} to allow
-parallel computations.
+\link{TEClassifierRegular} or \link{TEClassifierProtoNet}]. This is an auxiliary function for use with
+\link{get_synthetic_cases_from_matrix} to allow parallel computations.
 }
 \seealso{
-Other data_management_utils: 
+Other Utils Developers: 
+\code{\link{auto_n_cores}()},
+\code{\link{create_object}()},
+\code{\link{generate_id}()},
 \code{\link{get_n_chunks}()},
-\code{\link{get_synthetic_cases_from_matrix}()}
+\code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{data_management_utils}
+\concept{Utils Developers}

@@ -17,16 +17,14 @@ Function for generating an ID suffix for objects of class \link{TextEmbeddingMod
 \link{TEClassifierRegular}, and \link{TEClassifierProtoNet}.
 }
 \seealso{
-Other Utils: 
+Other Utils Developers: 
 \code{\link{auto_n_cores}()},
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_config_state}()},
-\code{\link{create_dir}()},
-\code{\link{get_file_extension}()},
-\code{\link{get_py_package_versions}()},
-\code{\link{is.null_or_na}()},
-\code{\link{output_message}()},
-\code{\link{print_message}()},
-\code{\link{run_py_file}()}
+\code{\link{create_object}()},
+\code{\link{create_synthetic_units_from_matrix}()},
+\code{\link{get_n_chunks}()},
+\code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{Utils}
+\concept{Utils Developers}

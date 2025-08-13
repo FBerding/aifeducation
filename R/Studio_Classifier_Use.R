@@ -75,8 +75,6 @@ Classifiers_Use_UI <- function(id) {
 Classifiers_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
-    ns <- session$ns
 
     # File system management----------------------------------------------------
     shinyFiles::shinyDirChoose(
@@ -111,8 +109,7 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
         model <- try(load_from_disk(model_path), silent = TRUE)
 
         if ("try-error" %in% class(model) == FALSE) {
-          if ("TEClassifierRegular" %in% class(model) |
-            "TEClassifierProtoNet" %in% class(model)) {
+          if ("ClassifiersBasedOnTextEmbeddings" %in% class(model)) {
             shiny::removeModal()
             return(model)
           } else {
@@ -121,7 +118,7 @@ Classifiers_Use_Server <- function(id, log_dir, volumes) {
               size = "l",
               easy_close = TRUE,
               error_messages = "The file does not contain an object of
-                                class TEClassifierRegular or TEClassifierProtoNet."
+                                class ClassifiersBasedOnTextEmbeddings."
             )
             return(NULL)
           }

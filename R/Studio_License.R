@@ -50,10 +50,6 @@ License_UI <- function(id) {
 #'
 License_Server <- function(id) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # TODO (Yuliia): remove? Variable is not used
-    ns <- session$ns
-
     output$gpl3_license <- shiny::renderUI(
       shiny::markdown(
         mds = readLines(

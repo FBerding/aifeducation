@@ -21,6 +21,9 @@ output printed to console for creating and training transformer models as well a
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
 \code{\link{install_aifeducation}()},
-\code{\link{install_py_modules}()}
+\code{\link{install_aifeducation_studio}()},
+\code{\link{install_py_modules}()},
+\code{\link{prepare_session}()},
+\code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

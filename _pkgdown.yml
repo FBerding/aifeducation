@@ -10,6 +10,7 @@ navbar:
     articles:
       text: "Articles"
       menu:
+      - text: "For users"
       - text: "01 Get started"
         href: "articles/aifeducation.html"
       - text: "02 Aifeducation Studio"
@@ -20,82 +21,129 @@ navbar:
         href: "articles/model_configuration.html"
       - text: "05 Sharing and Using Trained AI/Models"
         href: "articles/sharing_and_publishing.html"
+      - text: "Appendix 01 Layers and Stacks"
+        href: "articles/a01_layers_stacks.html"
       - text: -------
       - text: "For developers"
       - text: "01 Transformers"
         href: "articles/transformers.html"
 
 reference:
-- title: Installation and Configuration
+- title: For Users
+- subtitle: Installation and Configuration
 - contents:
   - has_concept("Installation and Configuration")
 
-- title: AI for Education Studio
+- subtitle: AI for Education Studio
 - contents:
   - has_concept("Graphical User Interface")
   - has_concept("Auxiliary GUI Functions")
 
-- title: Saving and Loading
+- subtitle: Saving and Loading
 - contents:
   - has_concept("Saving and Loading")
-#- subtitle: Deprecated
-#- contents:
-#  - has_concept("Saving and Loading Deprecated")
 
-- title: Data Management
+- subtitle: Data Management
 - contents:
   - has_concept("Data Management")
 
-- title: Base Models and Transformers
+- subtitle: Base Models and Transformers
 - contents:
   - has_concept("Transformer")
-#- subtitle: Deprecated
-#- contents:
-#  - has_concept("Deprecated transformer")
 
-- title: Text Embedding
+- subtitle: Text Embedding Models
 - contents:
   - has_concept("Text Embedding")
-#- subtitle: Deprecated
-#- contents:
-#  - has_concept("combine_embeddings")
 
-- title: Classification
+- subtitle: Classification models based on text embeddings
 - contents:
   - has_concept("Classification")
-#- subtitle: Deprecated
-#- contents:
-#  - has_concept("Classification Deprecated")
 
-- title: Auxiliary Functions
-- subtitle: Data Management
+- subtitle: Oversampling Approaches
 - contents:
-  - has_concept("data_management_utils")
-  - has_concept("Auxiliary Functions")
-
-- subtitle: Classification
-- contents:
-  - has_concept("classifier_utils")
+  - has_concept("oversampling_approaches")
 
 - subtitle: Performance Measures
 - contents:
   - has_concept("performance measures")
 
-- title: For developers
-- subtitle: Transformers
+- title: For Developers
+- subtitle: R6 Classes (except transformers)
+- contents:
+  - has_concept("R6 Classes for Developers")
+
+- subtitle: R6 Classes for Data Management
+- contents:
+  - has_concept("Data Management Developers")
+
+- subtitle: R6 Classes for Language Models/Transformers
+- contents:
+  - has_concept("R6 classes for transformers")
+
+- subtitle: Functions for Loading
 - contents:
   - has_concept("Transformers for developers")
-- subtitle: Large Data Sets
+
+- subtitle: Utils for Transformers
 - contents:
-  - has_concept("LargeDataSets for developers")
-- subtitle: Classifiers
+  - has_concept("Utils Transformers Developers")
+
+#- subtitle: Utils for creating transformers
+#  - has_concept("Utils Transformers Creation Developers")
+
+- subtitle: Oversampling Approaches
 - contents:
-  - has_concept("Classifiers for developers")
-- subtitle: Utils
+  - has_concept("oversampling_approaches Developers")
+
+- subtitle: Parameter Management
 - contents:
-  - has_concept("Utils")
-- subtitle: AI for Education Studio
+  - has_concept("Parameter Dictionary")
+
+- subtitle: File Management
 - contents:
-  - has_concept("studio_utils")
+  - has_concept("Utils File Management Developers")
+
+- subtitle: Utils General
+- contents:
+  - has_concept("Utils Developers")
+
+- subtitle: Utils Documentation
+- contents:
+  - has_concept("Utils Documentation")
+
+- subtitle: Utils Python
+- contents:
+  - has_concept("Utils Python Developers")
+
+- subtitle: Utils Python for Data Management
+- contents:
+  - has_concept("Utils Python Data Management Developers")
+
+- subtitle: Utils Logging
+- contents:
+  - has_concept("Utils Log Developers")
+
+- subtitle: Utils Sustainability Tracking
+- contents:
+  - has_concept("Utils Sustainability Developers")
+
+- subtitle: Utils Argument Checks
+- contents:
+  - has_concept("Utils Checks Developers")
+
+- subtitle: Utils for AI for Education Studio
+- contents:
+  - has_concept("Utils Studio Developers")
+
+- subtitle: Utils Test of the Package
+- contents:
+  - has_concept("Utils TestThat Developers")
+
+
+
+
+
+
+
 
 

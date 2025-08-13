@@ -29,34 +29,18 @@ Classifiers_Create_UI <- function(id) {
       sidebar = bslib::sidebar(
         position = "left",
         shiny::tags$h3("Control Panel"),
-        shinyFiles::shinyDirButton(
-          id = shiny::NS(id, "button_select_dataset_for_embeddings"),
-          label = "Choose Embeddings",
-          title = "Please choose a folder",
-          icon = shiny::icon("folder-open")
-        ),
-        shinyFiles::shinyFilesButton(
-          id = shiny::NS(id, "button_select_target_data"),
-          multiple = FALSE,
-          label = "Choose Target Data",
-          title = "Please choose a file",
-          icon = shiny::icon("file")
-        ),
         shiny::tags$hr(),
-        shiny::textInput(
-          inputId = shiny::NS(id, "name"),
-          label = "Model Name",
-          width = "100%"
+        shiny::selectInput(
+          inputId = shiny::NS(id, "classifier_type"),
+          choices = setdiff(
+            x=get_TEClassifiers_class_names("ClassifiersBasedOnTextEmbeddings"),
+            y=get_depr_obj_names()),
+          label = "Classifier Type"
         ),
         shiny::textInput(
           inputId = shiny::NS(id, "label"),
           label = "Model Label",
           width = "100%"
-        ),
-        shiny::selectInput(
-          inputId = shiny::NS(id, "classifier_type"),
-          choices = c("regular", "protonet"),
-          label = "Classifier Type"
         ),
         shinyFiles::shinyDirButton(
           id = shiny::NS(id, "start_SaveModal"),
@@ -82,9 +66,16 @@ Classifiers_Create_UI <- function(id) {
         bslib::card(
           bslib::card_header("Input Data"),
           bslib::card_body(
+            shinyFiles::shinyDirButton(
+              id = shiny::NS(id, "button_select_dataset_for_embeddings"),
+              label = "Choose Embeddings",
+              title = "Please choose a folder",
+              icon = shiny::icon("folder-open")
+            ),
             shiny::textInput(
               inputId = shiny::NS(id, "embeddings_dir"),
-              label = shiny::tags$p(shiny::icon("folder"), "Path")
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width="100%"
             ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
           )
@@ -92,9 +83,17 @@ Classifiers_Create_UI <- function(id) {
         bslib::card(
           bslib::card_header("Target Data"),
           bslib::card_body(
+            shinyFiles::shinyFilesButton(
+              id = shiny::NS(id, "button_select_target_data"),
+              multiple = FALSE,
+              label = "Choose Target Data",
+              title = "Please choose a file",
+              icon = shiny::icon("file")
+            ),
             shiny::textInput(
               inputId = shiny::NS(id, "target_dir"),
-              label = shiny::tags$p(shiny::icon("folder"), "Path")
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width="100%"
             ),
             bslib::layout_column_wrap(
               shiny::uiOutput(outputId = shiny::NS(id, "summary_data_targets")),
@@ -103,288 +102,30 @@ Classifiers_Create_UI <- function(id) {
           )
         )
       ),
+      #FeatureExtractor
       bslib::card(
         bslib::card_header(
-          "Architecture"
+          "Feature Extractor"
         ),
         bslib::card_body(
-          bslib::layout_column_wrap(
-            bslib::card(
-              bslib::card_header(
-                "Feature Extractor"
-              ),
-              bslib::card_body(
-                shinyFiles::shinyDirButton(
-                  id = shiny::NS(id, "button_select_feature_extractor"),
-                  label = "Choose TEFeatureExtractor",
-                  title = "Please choose a folder",
-                  icon = shiny::icon("folder-open")
-                ),
-                shiny::textInput(
-                  inputId = shiny::NS(id, "feature_extractor_dir"),
-                  label = shiny::tags$p(shiny::icon("folder"), "Path")
-                )
-              )
-            ),
-            bslib::card(
-              bslib::card_header(
-                "Positional Embedding"
-              ),
-              bslib::card_body(
-                shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id, "add_pos_embedding"),
-                  label = "Add Positional Embedding",
-                  value = FALSE,
-                  status = "primary"
-                )
-              )
-            ),
-            bslib::card(
-              bslib::card_header(
-                "Optimizer"
-              ),
-              bslib::card_body(
-                shiny::selectInput(
-                  inputId = shiny::NS(id, "optimizer"),
-                  label = "Optimizer",
-                  choices = c("adam", "rmsprop")
-                )
-              )
-            )
+          shinyFiles::shinyDirButton(
+            id = shiny::NS(id, "button_select_feature_extractor"),
+            label = "Choose TEFeatureExtractor",
+            title = "Please choose a folder",
+            icon = shiny::icon("folder-open")
           ),
-          bslib::layout_column_wrap(
-            bslib::card(
-              bslib::card_header(
-                "Encoder Layers"
-              ),
-              bslib::card_body(
-                shiny::selectInput(
-                  inputId = shiny::NS(id, "attention_type"),
-                  choices = c("fourier", "multihead"),
-                  label = "Attention Type"
-                ),
-                shiny::uiOutput(outputId = shiny::NS(id, "attention_layers_for_training")),
-                shiny::sliderInput(
-                  inputId = "intermediate_size",
-                  label = "Intermediate Size",
-                  min = 0,
-                  value = 512,
-                  max = 8096,
-                  step = 1,
-                  round = TRUE
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "repeat_encoder"),
-                  label = "Number Encoding Layers",
-                  value = 0,
-                  min = 0,
-                  max = 48,
-                  step = 1,
-                  round = TRUE
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "encoder_dropout"),
-                  label = "Encoder Layers Dropout",
-                  value = 0.1,
-                  min = 0,
-                  max = 0.99,
-                  step = 0.01
-                )
-              )
-            ),
-            bslib::card(
-              bslib::card_header(
-                "Recurrent Layers"
-              ),
-              bslib::card_body(
-                shiny::sliderInput(
-                  value=1,
-                  min=0,
-                  max=20,
-                  step=1,
-                  inputId = shiny::NS(id, "rec_layers"),
-                  label = "Reccurrent Layers"
-                ),
-                shiny::sliderInput(
-                  value=1,
-                  min=1,
-                  max=20,
-                  step=1,
-                  inputId = shiny::NS(id, "rec_size"),
-                  label = "Reccurrent Layers Size"
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "rec_dropout"),
-                  label = "Reccurent Layers Dropout",
-                  value = 0.1,
-                  min = 0,
-                  max = 0.99,
-                  step = 0.01
-                ),
-                shiny::selectInput(
-                  inputId = shiny::NS(id, "rec_type"),
-                  label = "Type",
-                  choices = c("gru", "lstm")
-                ),
-                shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id, "rec_bidirectional"),
-                  value = FALSE,
-                  label = "Bidirectional",
-                  status = "primary"
-                )
-              )
-            ),
-            bslib::card(
-              bslib::card_header(
-                "Dense Layers"
-              ),
-              bslib::card_body(
-                shiny::sliderInput(
-                  value=0,
-                  min=0,
-                  max=20,
-                  step=1,
-                  inputId = shiny::NS(id, "dense_layers"),
-                  label = "Dense Layers",
-                  width = "100%"
-                ),
-                shiny::sliderInput(
-                  value=1,
-                  min=1,
-                  max=20,
-                  step=1,
-                  inputId = shiny::NS(id, "dense_size"),
-                  label = "Dense Layers Size",
-                  width = "100%"
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "dense_dropout"),
-                  label = "Dense Dropout",
-                  value = 0.4,
-                  min = 0,
-                  max = 0.99,
-                  step = 0.01
-                )
-              )
-            ),
-            shiny::uiOutput(outputId = shiny::NS(id, "protonet_embedding_layer"))
+          shiny::textInput(
+            inputId = shiny::NS(id, "feature_extractor_dir"),
+            label = shiny::tags$p(shiny::icon("folder"), "Path")
           )
         )
       ),
-      bslib::card(
-        bslib::card_header(
-          "Training Settings"
-        ),
-        bslib::card_body(
-          bslib::layout_column_wrap(
-            bslib::card(
-              bslib::card_header(
-                "General Settings"
-              ),
-              bslib::card_body(
-                shiny::selectInput(
-                  inputId = shiny::NS(id, "sustainability_country"),
-                  label = "Country for Sustainability Tracking",
-                  choices = get_alpha_3_codes(),
-                  # choices=NULL,
-                  selected = "DEU"
-                ),
-                shiny::uiOutput(outputId = shiny::NS(id, "regular_train")),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "data_folds"),
-                  label = "Number of Folds",
-                  value = 5,
-                  min = 1,
-                  max = 25,
-                  round = TRUE,
-                  step = 1
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "val_size"),
-                  label = "Proportion for Validation Sample",
-                  min = 0.02,
-                  value = 0.25,
-                  max = 0.5,
-                  step = 0.01
-                ),
-                shiny::numericInput(
-                  inputId = shiny::NS(id, "epochs"),
-                  label = "Epochs",
-                  min = 1,
-                  value = 40,
-                  step = 1
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "batch_size"),
-                  label = "Batch Size",
-                  min = 1,
-                  max = 256,
-                  value = 32,
-                  step = 1
-                )
-              )
-            ),
-            bslib::card(
-              bslib::card_header(
-                "Synthetic Cases"
-              ),
-              bslib::card_body(
-                shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id, "use_sc"),
-                  value = FALSE,
-                  label = "Add Synthetic Cases",
-                  status = "primary"
-                ),
-                shiny::selectInput(
-                  inputId = shiny::NS(id, "sc_method"),
-                  label = "Method",
-                  choices = c("dbsmote", "adas", "smote")
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "sc_min_max_k"),
-                  label = "Min k",
-                  value = c(1, 10),
-                  min = 1,
-                  max = 20,
-                  step = 1,
-                  round = TRUE
-                )
-              )
-            ),
-            bslib::card(
-              bslib::card_header(
-                "Pseudo Labeling"
-              ),
-              bslib::card_body(
-                shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id, "use_pl"),
-                  value = FALSE,
-                  label = "Add Pseudo Labeling",
-                  status = "primary"
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "pl_max_steps"),
-                  label = "Max Steps",
-                  value = 5,
-                  min = 1,
-                  max = 20,
-                  step = 1,
-                  round = TRUE
-                ),
-                shiny::sliderInput(
-                  inputId = shiny::NS(id, "pl_anchor"),
-                  label = "Certainty Anchor",
-                  value = 1,
-                  max = 1,
-                  min = 0,
-                  step = 0.01
-                ),
-                shiny::uiOutput(outputId = shiny::NS(id, "dynamic_sample_weights"))
-              )
-            ),
-            shiny::uiOutput(outputId = shiny::NS(id, "protonet_train")),
-          )
-        )
+      #Main config Cards
+      shinycssloaders::withSpinner(
+      shiny::uiOutput(outputId = shiny::NS(id,"model_configuration"))
+      ),
+      shinycssloaders::withSpinner(
+      shiny::uiOutput(outputId = shiny::NS(id,"training_setup"))
       )
     )
   )
@@ -483,6 +224,25 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
+    #Box for model configuration------------------------------------------------
+    output$model_configuration<-shiny::renderUI({
+      config_box=create_widget_card(
+        id=id,
+        object_class=input$classifier_type,
+        method = "configure",
+        box_title="Model Configuration"
+      )
+    })
+    #Box for training set up---------------------------------------------------
+    output$training_setup<-shiny::renderUI({
+      config_box=create_widget_card(
+        id=id,
+        object_class=input$classifier_type,
+        method = "train",
+        box_title="Training SetUp"
+      )
+    })
+
     # FeatureExtractor
     shinyFiles::shinyDirChoose(
       input = input,
@@ -510,7 +270,7 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
     # Create Save Modal
     save_modal <- create_save_modal(
       id = id,
-      # ns=session$ns,
+      # ns = session$ns,
       title = "Choose Destination",
       easy_close = FALSE,
       size = "l"
@@ -541,24 +301,24 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
 
     # Start training------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       # Check vor valid arguments
-      if (identical(as.double(input$alpha), numeric(0))) {
+      if (identical(as.double(input$loss_alpha), numeric(0))) {
         loss_alpha <- NULL
       } else {
-        loss_alpha <- as.double(input$alpha)
+        loss_alpha <- as.double(input$loss_alpha)
       }
-      if (identical(as.double(input$margin), numeric(0))) {
+      if (identical(as.double(input$loss_margin), numeric(0))) {
         loss_margin <- NULL
       } else {
-        loss_margin <- as.double(input$margin)
+        loss_margin <- as.double(input$loss_margin)
       }
 
       # Check for errors
       errors <- check_errors_create_classifier(
-        classifier_type=input$classifier_type,
+        classifier_type = input$classifier_type,
         destination_path = input$save_modal_directory_path,
         folder_name = input$save_modal_folder_name,
         path_to_embeddings = path_to_embeddings(),
@@ -566,11 +326,13 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
         path_to_feature_extractor = path_to_feature_extractor(),
         model_name = input$name,
         model_label = input$label,
-        Ns = input$n_sample,
-        Nq = input$n_query,
-        loss_alpha = loss_alpha,
-        loss_margin = loss_margin,
-        embedding_dim = input$protonet_embedding_dim
+        use_sc=input$use_sc,
+        sc_min_k=input$sc_min_k,
+        sc_max_k=input$sc_max_k,
+        use_pl=input$use_pl,
+        pl_min=input$pl_min,
+        pl_max=input$pl_max,
+        pl_anchor=input$pl_anchor
       )
 
       # If there are errors display them. If not start running task.
@@ -587,78 +349,58 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "classifier",
           ExtendedTask_arguments = list(
-            classifier_type = input$classifier_type,
-            destination_path = input$save_modal_directory_path,
-            folder_name = input$save_modal_folder_name,
-            path_to_embeddings = path_to_embeddings(),
-            path_to_target_data = path_to_target_data(),
-            target_levels = input$target_levels,
-            target_data_column = input$data_target_column,
-            path_to_feature_extractor = path_to_feature_extractor(),
-            name = input$name,
-            label = input$label,
-            # text_embeddings=NULL,
-            # feature_extractor=NULL,
-            # targets=NULL,
-            dense_layers = input$dense_layers,
-            dense_size=input$dense_size,
-            rec_layers = input$rec_layers,
-            rec_size=input$rec_size,
-            rec_type = input$rec_type,
-            rec_bidirectional = input$rec_bidirectional,
-            self_attention_heads = input$self_attention_heads,
-            intermediate_size = input$intermediate_size,
-            attention_type = input$attention_type,
-            add_pos_embedding = input$add_pos_embedding,
-            rec_dropout = input$rec_dropout,
-            repeat_encoder = input$repeat_encoder,
-            dense_dropout = input$dense_dropout,
-            recurrent_dropout = 0,
-            encoder_dropout = input$encoder_dropout,
-            optimizer = input$optimizer,
-
-            # data_embeddings,
-            # data_targets,
-
-            data_folds = input$data_folds,
-            data_val_size = as.double(input$val_size),
-            balance_class_weights = input$balance_class_weights,
-            balance_sequence_length = input$balance_sequence_length,
-            use_sc = input$use_sc,
-            sc_method = input$sc_method,
-            sc_min_k = input$sc_min_max_k[1],
-            sc_max_k = input$sc_min_max_k[2],
-            use_pl = input$use_pl,
-            pl_max_steps = input$pl_max_steps,
-            pl_max = as.double(input$pl_max),
-            pl_anchor = as.double(input$pl_anchor),
-            pl_min = as.double(input$pl_min),
-            # sustain_track = TRUE,
-            sustain_iso_code = input$sustainability_country,
-            # sustain_region = NULL,
-            # sustain_interval = 15,
-            epochs = input$epochs,
-            batch_size = input$batch_size,
-            # dir_checkpoint,
-            # trace=TRUE,
-            # keras_trace=0,
-            # pytorch_trace=0,
-            log_dir = log_dir,
-            log_write_interval = 3,
-            Ns = input$n_sample,
-            Nq = input$n_query,
-            loss_alpha = loss_alpha,
-            loss_margin = loss_margin,
-            sampling_separate=input$sampling_separate,
-            sampling_shuffle=input$sampling_shuffle,
-            embedding_dim = input$protonet_embedding_dim,
-            n_cores=auto_n_cores()
+            configure=summarize_args_for_long_task(
+              input=input,
+              object_class=input$classifier_type,
+              method="configure",
+              path_args=list(
+                path_to_embeddings=path_to_embeddings(),
+                path_to_target_data=NULL,
+                path_to_feature_extractor=path_to_feature_extractor(),
+                destination_path=input$save_modal_directory_path,
+                folder_name=input$save_modal_folder_name
+              ),
+              override_args=list(
+                sustain_track=TRUE
+              ),
+              meta_args=list(
+                py_environment_type=get_py_env_type(),
+                py_env_name=get_py_env_name(),
+                target_data_column = input$data_target_column,
+                object_class=input$classifier_type
+              )
+            ),
+            train=summarize_args_for_long_task(
+              input=input,
+              object_class=input$classifier_type,
+              method="train",
+              path_args=list(
+                path_to_embeddings=path_to_embeddings(),
+                path_to_target_data=path_to_target_data(),
+                path_to_feature_extractor=path_to_feature_extractor(),
+                destination_path=input$save_modal_directory_path,
+                folder_name=input$save_modal_folder_name
+              ),
+              override_args=list(
+                sustain_track=TRUE,
+                log_dir = log_dir,
+                trace=FALSE,
+                ml_trace=0,
+                n_cores=auto_n_cores()
+              ),
+              meta_args=list(
+                py_environment_type=get_py_env_type(),
+                py_env_name=get_py_env_name(),
+                target_data_column = input$data_target_column,
+                object_class=input$classifier_type
+              )
+            )
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,
           pgr_use_bottom = TRUE,
           pgr_use_graphic = TRUE,
-          update_intervall = 300,
+          update_intervall = 30,
           success_type = "classifier"
         )
       }
@@ -743,160 +485,6 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
         return(NULL)
       }
     })
-
-    # Pseudo labeling specific--------------------------------------------------
-    output$dynamic_sample_weights <- shiny::renderUI({
-      ui <- list(
-        shiny::sliderInput(
-          inputId = session$ns("pl_max"),
-          label = "Max Certainty Value",
-          value = 1,
-          max = 1,
-          min = input$pl_anchor,
-          step = 0.01
-        ),
-        shiny::sliderInput(
-          inputId = session$ns("pl_min"),
-          label = "Min Certainty Value",
-          value = 0,
-          max = input$pl_anchor,
-          min = 0,
-          step = 0.01
-        )
-      )
-      return(ui)
-    })
-
-    # Attention specific---------------------------------------------------------
-    output$attention_layers_for_training <- shiny::renderUI({
-      if (input$attention_type == "multihead") {
-        ui <- list(
-          shiny::sliderInput(
-            inputId = session$ns("self_attention_heads"),
-            label = "Number of Self Attention Heads",
-            min = 1,
-            value = 4,
-            max = 48,
-            step = 1,
-            round = TRUE
-          )
-        )
-        return(ui)
-      } else {
-        return(NULL)
-      }
-    })
-
-
-    # Regular specific elements-------------------------------------------------
-    output$regular_train <- shiny::renderUI({
-      if (input$classifier_type == "regular") {
-        ui <- shiny::tagList(
-          shinyWidgets::materialSwitch(
-            inputId = session$ns("balance_class_weights"),
-            label = "Balance Class Weights",
-            value = TRUE,
-            status = "primary"
-          ),
-          shinyWidgets::materialSwitch(
-            inputId = session$ns("balance_sequence_length"),
-            label = "Balance Sequnce Length",
-            value = TRUE,
-            status = "primary"
-          )
-        )
-      } else {
-        ui <- NULL
-      }
-      return(ui)
-    })
-
-    # ProtoNet specific elements------------------------------------------------
-    output$protonet_embedding_layer <- shiny::renderUI({
-      if (input$classifier_type == "protonet") {
-        ui <- bslib::card(
-          bslib::card_header(
-            "ProtoNet Embedding Layer"
-          ),
-          bslib::card_body(
-            shiny::sliderInput(
-              inputId = session$ns("protonet_embedding_dim"),
-              label = "Dimension",
-              value = 2,
-              min = 1,
-              max = 64,
-              step = 1
-            )
-          )
-        )
-      } else {
-        ui <- NULL
-      }
-
-      return(ui)
-    })
-
-    output$protonet_train <- shiny::renderUI({
-      if (input$classifier_type == "protonet") {
-        ui <- shiny::tagList(
-          bslib::card(
-            bslib::card_header(
-              "ProtoNet Specific"
-            ),
-            bslib::card_body(
-              shiny::sliderInput(
-                inputId = session$ns("n_sample"),
-                label = "N Sample",
-                min = 1,
-                max = 256,
-                value = 5,
-                step = 1
-              ),
-              shiny::sliderInput(
-                inputId = session$ns("n_query"),
-                label = "N Query",
-                min = 1,
-                max = 256,
-                value = 2,
-                step = 1
-              ),
-              shiny::sliderInput(
-                inputId = session$ns("alpha"),
-                label = "Alpha",
-                min = 0,
-                max = 1,
-                value = 0.5,
-                step = 0.1
-              ),
-              shiny::sliderInput(
-                inputId = session$ns("margin"),
-                label = "Margin",
-                min = 0,
-                max = 1,
-                value = 0.5,
-                step = 0.1
-              ),
-              shinyWidgets::materialSwitch(
-                inputId = shiny::NS(id, "sampling_separate"),
-                label = "Separate Sample and Query",
-                value = FALSE,
-                status = "primary"
-              ),
-              shinyWidgets::materialSwitch(
-                inputId = shiny::NS(id, "sampling_shuffle"),
-                label = "Shuffle",
-                value = TRUE,
-                status = "primary"
-              )
-            )
-          )
-        )
-      } else {
-        ui <- NULL
-      }
-      return(ui)
-    })
-
 
     # Test Data matching--------------------------------------------------------
     # Data Sets

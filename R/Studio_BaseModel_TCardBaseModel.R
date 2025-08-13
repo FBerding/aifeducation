@@ -39,9 +39,6 @@ BaseModel_UI <- function(id) {
 #'
 BaseModel_Server <- function(id, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # Global variables -----------------------------------------------------------
-    ns <- session$ns
-
     # Control Panel --------------------------------------------------------------
     shinyFiles::shinyDirChoose(
       input = input,

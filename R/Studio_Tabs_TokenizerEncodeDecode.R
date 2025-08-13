@@ -145,20 +145,16 @@ Tokenize_Encode_Decode_UI <- function(id) {
 #'
 Tokenize_Encode_Decode_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
-    ns <- session$ns
-
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)
       model()$get_special_tokens()
     })
 
-    #Render Tokenizer Statistics-----------------------------------------------
-    output$tokenizer_statistics<-shiny::renderTable({
+    # Render Tokenizer Statistics-----------------------------------------------
+    output$tokenizer_statistics <- shiny::renderTable({
       shiny::req(model)
-       return(model()$tokenizer_statistics)
+      return(model()$tokenizer_statistics)
     })
 
     # Encode-------------------------------------------------------------------
@@ -174,7 +170,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
       )[[1]]
 
       integer_output <- NULL
-      for (i in 1:length(integer_sequence)) {
+      for (i in seq_len(length(integer_sequence))) {
         tmp_sequence <- paste(integer_sequence[[i]], collapse = " ")
         integer_output[length(integer_output) + 1] <- list(shiny::tags$p(shiny::tags$b(paste("Chunk", i))))
         integer_output[length(integer_output) + 1] <- list(shiny::tags$p(tmp_sequence))
@@ -188,7 +184,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
       )[[1]]
 
       token_output <- NULL
-      for (i in 1:length(token_sequence)) {
+      for (i in seq_len(length(token_sequence))) {
         tmp_sequence <- paste(token_sequence[[i]], collapse = " ")
         token_output[length(token_output) + 1] <- list(shiny::tags$p(shiny::tags$b(paste("Chunk", i))))
         token_output[length(token_output) + 1] <- list(shiny::tags$p(tmp_sequence))
@@ -216,8 +212,8 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     decodings <- shiny::eventReactive(input$decode_start, {
       shiny::req(model)
 
-      #int_sequence <- stringr::str_extract_all(input$ids_for_decode, "\\d+")
-      int_sequence <- stringi::stri_extract_all_regex(str=input$ids_for_decode, pattern="\\d+")
+      # int_sequence <- stringr::str_extract_all(input$ids_for_decode, "\\d+")
+      int_sequence <- stringi::stri_extract_all_regex(str = input$ids_for_decode, pattern = "\\d+")
 
       output_list_text <- model()$decode(int_sequence, to_token = FALSE)
 
@@ -226,7 +222,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
       text_list <- NULL
       token_list <- NULL
 
-      for (i in 1:length(output_list_text)) {
+      for (i in seq_len(length(output_list_text))) {
         text_list[length(text_list) + 1] <- list(shiny::tags$p(paste("Chunk", i)))
         text_list[length(text_list) + 1] <- list(shiny::tags$p(output_list_text[[i]]))
 

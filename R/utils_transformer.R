@@ -33,12 +33,11 @@
 #' @references Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish large language
 #' models. Intelligent Systems with Applications, 21, 200335. https://doi.org/10.1016/j.iswa.2024.200335
 #'
-#' @family Transformer utils
-#' @keywords internal
-#' @noRd
+#' @family Utils Transformers Developers
+#' @export
 calc_tokenizer_statistics <- function(dataset, step = "creation") {
   # Argument Checking
-  check_class(dataset, "datasets.arrow_dataset.Dataset", FALSE)
+  check_class(object=dataset, classes="datasets.arrow_dataset.Dataset", allow_NULL=FALSE)
 
   n_sequences <- dataset$num_rows
   n_words <- NA
@@ -87,10 +86,10 @@ calc_tokenizer_statistics <- function(dataset, step = "creation") {
 #' @title Check `max_position_embeddings` argument of transformer
 #' @description Used when creating and training transformers.
 #'
-#' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
+#' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
 #' @return Warning if `max_position_embeddings` greater than 512.
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
 check.max_position_embeddings <- function(max_position_embeddings) { # nolint
@@ -106,10 +105,10 @@ check.max_position_embeddings <- function(max_position_embeddings) { # nolint
 #' @title Check `hidden_act` argument of transformer
 #' @description Used when creating and training transformers.
 #'
-#' @param hidden_act `r paramDesc.hidden_act()`
-#' @return Error if `hidden_act` is not `"gelu"`, `"relu"`, `"silu"` or `"gelu_new"`.
+#' @param hidden_act `r get_param_doc_desc("hidden_act")`
+#' @return Error if `hidden_act` is not `"GELU"`, `"ReLU"`, `"silu"` or `"gelu_new"`.
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
 check.hidden_act <- function(hidden_act) { # nolint
@@ -118,29 +117,14 @@ check.hidden_act <- function(hidden_act) { # nolint
   }
 }
 
-#' @title Check `ml_framework` argument of transformer
-#' @description Used when creating and training transformers.
-#'
-#' @param ml_framework `r paramDesc.ml_framework()`
-#' @return Error if `ml_framework` is not `"pytorch"`, `"tensorflow"`, or `"not_specified"`.
-#'
-#' @family Transformer utils
-#' @keywords internal
-#' @noRd
-check.ml_framework <- function(ml_framework) { # nolint
-  if ((ml_framework %in% c("pytorch", "tensorflow")) == FALSE) {
-    stop("ml_framework must be 'tensorflow' or 'pytorch'.")
-  }
-}
-
 #' @title Check `sustain_iso_code` argument of transformer
 #' @description Used when creating and training transformers.
 #'
-#' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
-#' @param sustain_track `r paramDesc.sustain_track()`
+#' @param sustain_iso_code `r `r get_param_doc_desc("sustain_iso_code")`()`
+#' @param sustain_track `r `r get_param_doc_desc("sustain_track")`()`
 #' @return Error if `sustain_track` is `TRUE` and `sustain_iso_code` is missing (`NULL`).
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
 check.sustain_iso_code <- function(sustain_iso_code, sustain_track) { # nolint
@@ -153,20 +137,18 @@ check.sustain_iso_code <- function(sustain_iso_code, sustain_track) { # nolint
 #' @title Check possible save formats
 #' @description Used when creating and training transformers.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
-#' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
+#' @param pytorch_safetensors `r get_param_doc_desc("pytorch_safetensors")`
 #' @return Whether to save the model using `safetensors` or the traditional `pytorch` way.
 #'
 #' @importFrom reticulate py_module_available
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
-check.possible_save_formats <- function(ml_framework, pytorch_safetensors) { # nolint
-  is_pt <- ml_framework == "pytorch"
+check.possible_save_formats <- function(pytorch_safetensors) { # nolint
   safetensors_available <- reticulate::py_module_available("safetensors")
-  pt_safe_save <- is_pt && pytorch_safetensors && safetensors_available
-  if (is_pt && pytorch_safetensors && !safetensors_available) {
+  pt_safe_save <- pytorch_safetensors && safetensors_available
+  if (pytorch_safetensors && !safetensors_available) {
     warning("Python library 'safetensors' not available. Model will be saved
             in the standard pytorch format.")
   }
@@ -177,16 +159,15 @@ check.possible_save_formats <- function(ml_framework, pytorch_safetensors) { # n
 #' @description Used when creating and training transformers. Checks `pytorch_model.bin`, `model.safetensors` and
 #'   `tf_model.h5` files.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
-#' @param model_dir_path `r paramDesc.model_dir_path()`
-#' @return A list with the variables `from_pt`, `from_tf` and `load_safe`.
+#' @param model_dir_path `r get_param_doc_desc("model_dir_path")`
+#' @return A list with the variables `from_tf` and `load_safe`.
 #'
 #' @importFrom reticulate py_module_available
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
-check.model_files <- function(ml_framework, model_dir_path) { # nolint
+check.model_files <- function(model_dir_path) { # nolint
   bin_exists <- file.exists(paste0(model_dir_path, "/pytorch_model.bin"))
   safetensors_exists <- file.exists(paste0(model_dir_path, "/model.safetensors"))
   h5_exists <- file.exists(paste0(model_dir_path, "/tf_model.h5"))
@@ -196,21 +177,16 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
          a model.safetensors file.")
   }
 
-  is_tf <- ml_framework == "tensorflow"
+  from_tf <- !bin_exists && !safetensors_exists && h5_exists
 
-  from_pt <- is_tf && !h5_exists && (bin_exists || safetensors_exists)
-  from_tf <- !is_tf && !bin_exists && !safetensors_exists && h5_exists
-
-  # In the case of pytorch
   # Check to load from pt/bin or safetensors
   # Use safetensors as preferred method
 
   safetensors_available <- reticulate::py_module_available("safetensors")
-  load_safe <- !is_tf && (safetensors_exists || from_tf) && safetensors_available
+  load_safe <- (safetensors_exists || from_tf) && safetensors_available
 
   return(
     list(
-      from_pt = from_pt,
       from_tf = from_tf,
       load_safe = load_safe
     )
@@ -220,7 +196,7 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
 #' @title Create `WordPiece` tokenizer
 #' @description Used when creating transformers.
 #'
-#' @param vocab_do_lower_case `r paramDesc.vocab_do_lower_case()`
+#' @param vocab_do_lower_case `r get_param_doc_desc("vocab_do_lower_case")`
 #' @param sep_token `string` Representation of the SEP token.
 #' @param sep_id `int` ID of the SEP token.
 #' @param cls_token `string` Representation of the CLS token.
@@ -230,10 +206,10 @@ check.model_files <- function(ml_framework, model_dir_path) { # nolint
 #'
 #' @importFrom reticulate tuple
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
-create_WordPiece_tokenizer <- function( # nolint
+create_WordPiece_tokenizer <- function(# nolint
     vocab_do_lower_case,
     sep_token = "[SEP]",
     sep_id = 1,
@@ -259,16 +235,15 @@ create_WordPiece_tokenizer <- function( # nolint
 #' @title Create `ByteLevelBPE` tokenizer
 #' @description Used when creating transformers.
 #'
-#' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
-#' @param add_prefix_space `r paramDesc.add_prefix_space()`
-#' @param trim_offsets `r paramDesc.trim_offsets()`
+#' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+#' @param add_prefix_space `r get_param_doc_desc("add_prefix_space")`
+#' @param trim_offsets `r get_param_doc_desc("trim_offsets")`
 #' @return A new tokenizer object (`tokenizers.Tokenizer`) based on `tokenizers.models.ByteLevel` model.
 #'
-#' @family Transformer utils
+#' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
-create_ByteLevelBPE_tokenizer <- function(
-    # nolint
+create_ByteLevelBPE_tokenizer <- function(# nolint
     max_position_embeddings,
     add_prefix_space,
     trim_offsets) {
@@ -283,253 +258,3 @@ create_ByteLevelBPE_tokenizer <- function(
   return(tok_new)
 }
 
-#' @title BERT-like creation step `create_tokenizer_draft`
-#' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
-#'
-#'   This function **adds** `special_tokens`, `tok_new`, `trainer` parameters into the `temp` list.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @param sep_token `string` Representation of the SEP token.
-#' @param sep_id `int` ID of the SEP token.
-#' @param cls_token `string` Representation of the CLS token.
-#' @param cls_id `int` ID of the CLS token.
-#' @param unk_token `string` Representation of the UNK token.
-#' @param special_tokens `list` Special tokens for a trainer (`tokenizers.trainers.WordPieceTrainer`).
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Bert_like.SFC.create_tokenizer_draft <- function(
-    self,
-    sep_token = "[SEP]",
-    sep_id = 1,
-    cls_token = "[CLS]",
-    cls_id = 0,
-    unk_token = "[UNK]",
-    special_tokens = c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")) { # nolint
-
-  self$temp$special_tokens <- special_tokens
-  self$temp$tok_new <- create_WordPiece_tokenizer(
-    self$params$vocab_do_lower_case,
-    sep_token = sep_token,
-    sep_id = sep_id,
-    cls_token = cls_token,
-    cls_id = cls_id,
-    unk_token = unk_token
-  )
-
-  self$temp$trainer <- tok$trainers$WordPieceTrainer(
-    vocab_size = as.integer(self$params$vocab_size),
-    special_tokens = self$temp$special_tokens,
-    show_progress = self$params$trace
-  )
-}
-
-#' @title BERT-like creation step `calculate_vocab`
-#' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
-#'
-#'   This function **uses** `tok_new`, `raw_text_dataset`, `trainer` parameters from the `temp` list.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Bert_like.SFC.calculate_vocab <- function(self) { # nolint
-  run_py_file("datasets_transformer_compute_vocabulary.py")
-
-  self$temp$tok_new$train_from_iterator(
-    py$batch_iterator(
-      batch_size = as.integer(200),
-      dataset = self$temp$raw_text_dataset,
-      log_file = self$temp$log_file,
-      write_interval = self$params$log_write_interval,
-      value_top = self$temp$value_top,
-      total_top = self$temp$total_top,
-      message_top = self$temp$message_top
-    ),
-    trainer = self$temp$trainer,
-    length = length(self$temp$raw_text_dataset)
-  )
-}
-
-#' @title BERT-like creation step `save_tokenizer_draft`
-#' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
-#'
-#'   This function **uses** `special_tokens`, `tok_new` parameters from the `temp` list.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Bert_like.SFC.save_tokenizer_draft <- function(self) { # nolint
-  write(c(self$temp$special_tokens, names(self$temp$tok_new$get_vocab())),
-    file = paste0(self$params$model_dir, "/", "vocab.txt")
-  )
-}
-
-#' @title BERT-like creation steps
-#' @description Relevant only for transformer classes (BERT, DeBERTa, Funnel, etc.). Do not use outside the classes.
-#'
-#'   This function **adds** `tokenizer` parameter into the `temp` list and **uses** from it `tok_new`.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Bert_like.SFC.create_final_tokenizer <- function(self) { # nolint
-  self$temp$tokenizer <- transformers$PreTrainedTokenizerFast(
-    tokenizer_object = self$temp$tok_new,
-    unk_token = "[UNK]",
-    sep_token = "[SEP]",
-    pad_token = "[PAD]",
-    cls_token = "[CLS]",
-    mask_token = "[MASK]",
-    bos_token = "[CLS]",
-    eos_token = "[SEP]"
-  )
-}
-
-#' @title Longformer-like creation step `create_tokenizer_draft`
-#' @description Relevant only for transformer classes (Longformer, RoBERTa, etc.). Do not use outside the classes.
-#'
-#'   This function **adds** `tok_new` parameter into the `temp` list.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Longformer_like.SFC.create_tokenizer_draft <- function(self) { # nolint
-  self$temp$tok_new <- create_ByteLevelBPE_tokenizer(
-    self$params$max_position_embeddings,
-    self$params$add_prefix_space,
-    self$params$trim_offsets
-  )
-}
-
-#' @title Longformer-like creation step `calculate_vocab`
-#' @description Relevant only for transformer classes (Longformer, RoBERTa, etc.). Do not use outside the classes.
-#'
-#'   This function **uses** `tok_new` parameter from the `temp` list.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
-  run_py_file("datasets_transformer_compute_vocabulary.py")
-  self$temp$tok_new$train_from_iterator(
-    py$batch_iterator(
-      batch_size = as.integer(200),
-      dataset = self$temp$raw_text_dataset,
-      log_file = self$temp$log_file,
-      write_interval = self$params$log_write_interval,
-      value_top = self$temp$value_top,
-      total_top = self$temp$total_top,
-      message_top = self$temp$message_top
-    ),
-    length = length(self$temp$raw_text_dataset),
-    vocab_size = as.integer(self$params$vocab_size),
-    special_tokens = c("<s>", "<pad>", "</s>", "<unk>", "<mask>")
-  )
-}
-
-#' @title Longformer-like creation step `save_tokenizer_draft`
-#' @description Relevant only for transformer classes (Longformer, RoBERTa, etc.). Do not use outside the classes.
-#'
-#'   This function **uses** `tok_new` parameter from the `temp` list.
-#'
-#'   See private list `steps_for_creation` of [.AIFEBaseTransformer] class for details. This list has the elements
-#'   as already defined functions that can add some temporary parameters into the `temp` list of the base class
-#'   [.AIFEBaseTransformer] or use these temporary parameters.
-#'
-#' @param self Transformer `self`-object.
-#' @return This function returns nothing.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
-  self$temp$tok_new$save_model(self$params$model_dir)
-}
-
-#' @title Dataset tokenization
-#' @description A given dataset must contain a column 'text' storing raw texts.
-#'
-#' @param dataset `datasets.arrow_dataset.Dataset` Dataset that contains a column 'text' storing the raw texts.
-#' @param tokenizer `transformers.Tokenizer()` Tokenizer.
-#' @param max_length `integer` Max length for a given tokenizer.
-#'
-#' @return Tokenized dataset with a given tokenizer.
-#'
-#' @family Defined steps for creation
-#' @keywords internal
-#' @noRd
-tokenize_dataset <- function(dataset, tokenizer, max_length,
-                             log_file = NULL, write_interval = 2,
-                             value_top = 0, total_top = 1, message_top = "NA") {
-  run_py_file("datasets_transformer_prepare_data.py")
-
-  batch_size = 2L
-
-  tokenized_texts_raw <- dataset$map(
-    py$tokenize_raw_text,
-    batched = TRUE,
-    batch_size = batch_size,
-    fn_kwargs = reticulate::dict(
-      list(
-        tokenizer = tokenizer,
-        truncation = TRUE,
-        padding = FALSE,
-        max_length = as.integer(max_length),
-        return_overflowing_tokens = TRUE,
-        return_length = TRUE,
-        return_special_tokens_mask = TRUE,
-        return_offsets_mapping = FALSE,
-        return_attention_mask = TRUE,
-        return_tensors = "np",
-        request_word_ids = TRUE,
-        log_file = log_file,
-        write_interval = write_interval,
-        value_top = value_top, total_top = total_top, message_top = message_top,
-        total_middle = floor(dataset$num_rows / batch_size)
-      )
-    ),
-    remove_columns = dataset$column_names
-  )
-  return(tokenized_texts_raw)
-}

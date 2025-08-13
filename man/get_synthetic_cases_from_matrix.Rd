@@ -10,7 +10,7 @@ get_synthetic_cases_from_matrix(
   features,
   target,
   sequence_length,
-  method = c("smote"),
+  method = c("knnor"),
   min_k = 1,
   max_k = 6
 )
@@ -26,8 +26,8 @@ get_synthetic_cases_from_matrix(
 
 \item{sequence_length}{\code{int} Length of the text embedding sequences.}
 
-\item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently "smote",
-"dbsmote", and "adas" from the package smotefamily are available.}
+\item{method}{\code{vector} containing strings of the requested methods for generating new cases. Currently
+"knnor" from this package is available.}
 
 \item{min_k}{\code{int} The minimal number of nearest neighbors during sampling process.}
 
@@ -42,12 +42,17 @@ get_synthetic_cases_from_matrix(
 }
 }
 \description{
-This function creates synthetic cases for balancing the training with an object of the class
-\link{TEClassifierRegular} or \link{TEClassifierProtoNet}.
+This function creates synthetic cases for balancing the training with classifier models.
 }
 \seealso{
-Other data_management_utils: 
+Other Utils Developers: 
+\code{\link{auto_n_cores}()},
+\code{\link{create_object}()},
 \code{\link{create_synthetic_units_from_matrix}()},
-\code{\link{get_n_chunks}()}
+\code{\link{generate_id}()},
+\code{\link{get_n_chunks}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{data_management_utils}
+\concept{Utils Developers}

@@ -76,8 +76,7 @@ Training_Server <- function(id, model) {
 
     # Control widgets for classifiers--------------------------------------------
     output$classifier_specific <- shiny::renderUI({
-      if ("TEClassifierRegular" %in% class(model()) |
-        "TEClassifierProtoNet" %in% class(model())) {
+      if ("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
         ui <- shiny::tagList(
           shinyWidgets::radioGroupButtons(
             inputId = ns("training_phase"),
@@ -92,7 +91,7 @@ Training_Server <- function(id, model) {
             label = "Measures",
             choices = list(
               "Loss" = "loss",
-              "Average Iota"="avg_iota",
+              "Average Iota" = "avg_iota",
               "Accuracy" = "accuracy",
               "Balanced Accuracy" = "balanced_accuracy"
             )
@@ -131,8 +130,7 @@ Training_Server <- function(id, model) {
 
 
     output$widget_classifier_pl_step <- shiny::renderUI({
-      if ("TEClassifierRegular" %in% class(model()) |
-        "TEClassifierProtoNet" %in% class(model())) {
+      if (sum(get_TEClassifiers_class_names() %in% class(model)) > 0) {
         if (model()$last_training$config$use_pl == TRUE) {
           n_steps <- model()$last_training$config$pl_max_steps
           return(
@@ -155,148 +153,29 @@ Training_Server <- function(id, model) {
       {
         shiny::req(model)
         if ("TextEmbeddingModel" %in% class(model())) {
-          # Plot for TextEmbeddingModels-----------------------------------------
-          plot_data <- model()$last_training$history
-
-          colnames <- c("epoch", "val_loss", "loss")
-          cols_exist <- sum(colnames %in% colnames(plot_data)) == length(colnames)
-
-          if (cols_exist) {
-            y_min <- input$y_min
-            y_max <- input$y_max
-
-            val_loss_min <- min(plot_data$val_loss)
-            best_model_epoch <- which(x = (plot_data$val_loss) == val_loss_min)
-
-            plot <- ggplot2::ggplot(data = plot_data) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$loss, color = "train")) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation")) +
-              ggplot2::geom_vline(
-                xintercept = best_model_epoch,
-                linetype = "dashed"
-              )
-
-            plot <- plot + ggplot2::theme_classic() +
-              ggplot2::ylab("value") +
-              ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
-              ggplot2::xlab("epoch") +
-              ggplot2::scale_color_manual(values = c(
-                "train" = "red",
-                "validation" = "blue",
-                "test" = "darkgreen"
-              )) +
-              ggplot2::theme(
-                text = ggplot2::element_text(size = input$text_size),
-                legend.position = "bottom"
-              )
-          }
-
-          # Plot for classifiers-----------------------------------------------
-        } else if ("TEClassifierRegular" %in% class(model()) ||
-          "TEClassifierProtoNet" %in% class(model()) ||
-          "TEFeatureExtractor" %in% class(model())) {
+          plot <- model()$plot_training_history(
+            y_min = input$y_min,
+            y_max = input$y_max
+          )
+        } else if ("ClassifiersBasedOnTextEmbeddings" %in% class(model())) {
           # Necessary input
           shiny::req(input$measure)
 
-          # Get data for plotting
-          if ("TEClassifierRegular" %in% class(model()) ||
-            "TEClassifierProtoNet" %in% class(model())) {
-            plot_data <- prepare_training_history(
-              model = model(),
-              final = input$training_phase,
-              use_pl = model()$last_training$config$use_pl,
-              pl_step = input$classifier_pl_step
-            )
-          } else if ("TEFeatureExtractor" %in% class(model())) {
-            plot_data <- prepare_training_history(
-              model = model(),
-              final = FALSE,
-              use_pl = FALSE,
-              pl_step = NULL
-            )
-          }
-
-          # Select the performance measure to display
-          plot_data <- plot_data[[input$measure]]
-
-          # Create Plot
-          y_min <- input$y_min
-          y_max <- input$y_max
-          if (input$measure == "loss") {
-            y_label <- "loss"
-          } else if (input$measure == "accuracy") {
-            y_label <- "Accuracy"
-          } else if (input$measure == "balanced_accuracy") {
-            y_label <- "Balanced Accuracy"
-          } else if (input$measure == "avg_iota") {
-            y_label <- "Average Iota"
-          }
-
-
-          # TODO (Yuliia): .data has no visible binding
-          plot <- ggplot2::ggplot(data = plot_data) +
-            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_mean, color = "train")) +
-            ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_mean, color = "validation"))
-
-          if (input$training_min_max == TRUE) {
-            plot <- plot +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_min, color = "train")) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_max, color = "train")) +
-              ggplot2::geom_ribbon(
-                ggplot2::aes(
-                  x = .data$epoch,
-                  ymin = .data$train_min,
-                  ymax = .data$train_max
-                ),
-                alpha = 0.25,
-                fill = "red"
-              ) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_min, color = "validation")) +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_max, color = "validation")) +
-              ggplot2::geom_ribbon(
-                ggplot2::aes(
-                  x = .data$epoch,
-                  ymin = .data$validation_min,
-                  ymax = .data$validation_max
-                ),
-                alpha = 0.25,
-                fill = "blue"
-              )
-          }
-          # TODO (Yuliia): .data has no visible binding
-          if ("test_mean" %in% colnames(plot_data)) {
-            plot <- plot +
-              ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_mean, color = "test"))
-            if (input$training_min_max == TRUE) {
-              plot <- plot +
-                ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_min, color = "test")) +
-
-                ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_max, color = "test")) +
-                ggplot2::geom_ribbon(
-                  ggplot2::aes(
-                    x = .data$epoch,
-                    ymin = .data$test_min,
-                    ymax = .data$test_max
-                  ),
-                  alpha = 0.25,
-                  fill = "darkgreen"
-                )
-            }
-          }
-
-          plot <- plot + ggplot2::theme_classic() +
-            ggplot2::ylab(y_label) +
-            ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
-            ggplot2::xlab("epoch") +
-            ggplot2::scale_color_manual(values = c(
-              "train" = "red",
-              "validation" = "blue",
-              "test" = "darkgreen"
-            )) +
-            ggplot2::theme(
-              text = ggplot2::element_text(size = input$text_size),
-              legend.position = "bottom"
-            )
+          plot <- model()$plot_training_history(
+            y_min = input$y_min,
+            y_max = input$y_max,
+            final_training = input$training_phase,
+            pl_step = input$classifier_pl_step,
+            measure = input$measure,
+            add_min_max = input$training_min_max,
+            text_size = input$text_size
+          )
+        } else if ("TEFeatureExtractor" %in% class(model())) {
+          plot <- model()$plot_training_history(
+            y_min = input$y_min,
+            y_max = input$y_max,
+            text_size = input$text_size
+          )
         }
         return(plot)
       },

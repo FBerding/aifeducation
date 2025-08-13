@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>05 Sharing and Using Trained AI/Models • aifeducation</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -26,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,17 +39,16 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>For users</h6></li>
+    <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
     <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
     <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
     <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
-    <li><a class="dropdown-item" href="../articles/Appendix_A01_Supported_Frameworks.html">A01 Supported Machine Learning Frameworks</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -98,65 +96,24 @@ purposes. Thus, <em>aifeducation</em> aims to make the sharing process
 as convenient as possible.</p>
 <p>For this aim, every model generated with <em>aifeducation</em> can be
 prepared for publication in a few basic steps. In this vignette, we
-would like to show you how to make your AI ready for publication and how
-to use models from others. How to save, load, and apply these models is
-described in <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html">02
-Using the graphical user interface Aifeducation - Studio</a> and <a href="classification_tasks.html">03 Using R syntax</a>.</p>
+would like to show you how to make your AI ready for publication.</p>
+<p>A explanation how to document a model with <em>AI for Education -
+Studio</em> can be found in the vignette <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html">02
+Using the graphical user interface Aifeducation - Studio</a>. In this
+vignette we describe how to document a model with <em>R</em> syntax and
+provide some hints for the content of documentation.</p>
 </div>
 <div class="section level2">
-<h2 id="creating-documentation-with-ai-for-education---studio">2 Creating Documentation with AI for Education - Studio<a class="anchor" aria-label="anchor" href="#creating-documentation-with-ai-for-education---studio"></a>
+<h2 id="creating-documentation-with-r-syntax">2 Creating Documentation with <em>R</em> Syntax<a class="anchor" aria-label="anchor" href="#creating-documentation-with-r-syntax"></a>
 </h2>
-<p>The most convenience way to document your work is to use <em>AI for
-Education - Studio</em>. In a first step you have to start the user
-interface by calling <code>start_aifeducation_studio</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/start_aifeducation_studio.html">start_aifeducation_studio</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>The next steps depend on the model you would like to document. In
-case you would like to document a <code>TextEmbeddingModel,</code> you
-first have to select <em>TextEmbeddingModels</em> at the top of the app.
-In the next window, please select the tab <em>Document</em>. Now you can
-load the model you would like to document by clicking on the button
-“Choose a Model”.</p>
-<p>After loading the model you can see different tabs for different
-parts of the documentation. The first tab is <em>Developer</em>. Here
-you can add the names and e-mail addresses of the model’s developers. In
-addition, you can add a suggested citation and a URL as a link to
-relevant sites of the model.</p>
-<p>With help of the other tabs you can write an abstract in English, an
-abstract in the native language of the model such as French or German,
-and you can add a detailed description in both languages. The tab for
-the abstracts allows you to set keywords for your work, which help
-others to find your work through search engines.</p>
-<p>Your documentation goes into the corresponding text field on the left
-side within a tab. If you click on the button “Preview”, you will see a
-preview of the documentation on the right side. When you finished
-documenting a part of your model, please click on the “Save” button to
-save your changes.</p>
-<p>The last tab allows you to set the license for your model and for
-your documentation.</p>
-<p>The documentation for all other models such as
-<code>TEFeautreExtractor</code>s, <code>TEClassifierRegular</code>, and
-<code>TEClassifierProtoNet</code> works exactly the same. The only
-difference is that you have to select the corresponding tab at the top
-of the app.</p>
-<p>For <code>TextEmbeddingModels</code> there is an additional tab
-called “Modifiers”. This tab is relevant if you do not develop your own
-base model but rather modify a base model created by other. Such a
-modification can be an adaption to specific tasks or specific domains.
-In this case we recommend to add the people who developed the base model
-via the tab “Developers” and your research group via the tab
-“Modifiers”.</p>
-</div>
-<div class="section level2">
-<h2 id="creating-documentation-with-r-syntax">3 Creating Documentation with <em>R</em> Syntax<a class="anchor" aria-label="anchor" href="#creating-documentation-with-r-syntax"></a>
-</h2>
-<p>The process for documenting a model is similar for all models in
-<em>aifeducation,</em> since all models use the same methods. Here, we
-will illustrate the process for a <code>TextEmbeddingModel</code>.</p>
+<p>The process for documenting a model with <em>R</em> syntax is similar
+for all models in <em>aifeducation,</em> since all models use the same
+methods. Here, we will illustrate the process for a
+<code>TextEmbeddingModel</code>.</p>
 <p>First, every model needs a clear description of how it was developed,
 modified and how it can be used. You can add a description via the
 method <code>set_model_description</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_model_description</span><span class="op">(</span></span>
 <span>  eng <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  native <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -176,12 +133,12 @@ vector of keywords, which helps others to find your work through search
 engines.</p>
 <p>You can access a model’s description by using the method
 <code>get_model_description</code></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">get_model_description</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Besides a description of your work, it is necessary to provide
 information on other people who were involved in creating the model.
 This can be done with the method <code>set_publication_info</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
 <span>  <span class="va">type</span>,</span>
 <span>  <span class="va">authors</span>,</span>
@@ -189,8 +146,8 @@ This can be done with the method <code>set_publication_info</code>.</p>
 <span>  url <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>First of all, you have to decide the type of information you would
-like to add. You have two choices: “developer”, and “modifier”, which
-you set with <code>type</code>.</p>
+like to add. You have two choices: “developer” and “modifier”, which you
+set with <code>type</code>.</p>
 <ul>
 <li><p><code>type="developer"</code> stores all information about the
 people involved in the process of developing the model. If you use a
@@ -202,7 +159,7 @@ providing a description of how you developed the model.</p></li>
 might be the case if you use a transformer model and you adapt the model
 to a specific domain or task. In this case you rely on the work of other
 people and modify their work. As such, you can describe your
-modifications by setting <code>type=modifier</code>.</p></li>
+modifications by setting <code>type="modifier"</code>.</p></li>
 </ul>
 <p>For every type of contributor you can add the relevant individuals
 via <code>authors</code>. Please use the <em>R</em> function
@@ -212,29 +169,27 @@ contributors. With <code>url</code> you can provide a link to relevant
 sites of the model.</p>
 <p>You can access the information by using
 <code>get_publication_info</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">get_publication_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Finally, you must provide a license for using your model. This can be
 done with <code>set_model_license</code> and
 <code>get_model_license</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_model_license</span><span class="op">(</span><span class="st">"GPL-3"</span><span class="op">)</span></span></code></pre></div>
 <p>The documentation of your work is not part of the software. Here you
-can set another as for your software. You can set the license for your
-documentation by using the method
+can set another license as for your software. You can set the license
+for your documentation by using the method
 <code>set_documentation_license</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_documentation_license</span><span class="op">(</span><span class="st">"CC BY-SA"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you are able to share your work. Please remember to save your now
 fully described object as described in the vignette <a href="classification_tasks.html">03 Using R syntax</a>.</p>
-<p>The documentation process is the same for all other models such as
-<code>TEFeautreExtractor</code>s, <code>TEClassifierRegular</code>, and
-<code>TEClassifierProtoNet</code>. There is only one difference. For
-<code>TextEmbeddingModels</code>you can differentiate between
-“developers” and “modifiers”. This is not possible for the other models.
-For these models you do not need the argument <code>type</code>. Calling
-this method would look like:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p>The documentation process is the same for all models. There is only
+one difference. For <code>TextEmbeddingModels</code>you can
+differentiate between “developers” and “modifiers”. This is not possible
+for the other models. For these models you do not need the argument
+<code>type</code>. Calling this method would look like:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_model</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span></span>
 <span>  <span class="va">authors</span>,</span>
 <span>  <span class="va">citation</span>,</span>
@@ -277,7 +232,7 @@ category/class.</li>
 training.</li>
 <li>Information on potential bias in the data.</li>
 <li>If possible, information about the inter-coder-reliability of the
-coding process of the data.</li>
+coding process of the training data.</li>
 <li>If possible, provide a link to the corresponding text embedding
 model or at least state where potential users can get the text embedding
 model.</li>
@@ -286,12 +241,11 @@ model.</li>
 since a classifier can only be used with the corresponding text
 embedding model.</p>
 <blockquote>
-<p>Please do not report the performance values of your classifier in the
-description.** These are displayed automatically in <em>AI for Education
-- Studio</em> or can be accessed directly via
+<p>Please do <em>not</em> report the performance values of your
+classifier in the description. These are displayed automatically in
+<em>AI for Education - Studio</em> or can be accessed directly via
 <code>example_classifier$reliability$test_metric_mean</code>.</p>
 </blockquote>
-<p>Please consider this native language example for a classifier:</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -304,7 +258,7 @@ description.** These are displayed automatically in <em>AI for Education
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

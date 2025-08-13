@@ -34,16 +34,14 @@ Hugging Face Documentation
 }
 }
 \seealso{
-Other Transformers for developers: 
+Other R6 classes for transformers: 
 \code{\link{.AIFEBaseTransformer}},
 \code{\link{.AIFEBertTransformer}},
-\code{\link{.AIFEDebertaTransformer}},
 \code{\link{.AIFEFunnelTransformer}},
 \code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFERobertaTransformer}},
-\code{\link{.AIFETrObj}}
+\code{\link{.AIFERobertaTransformer}}
 }
-\concept{Transformers for developers}
+\concept{R6 classes for transformers}
 \section{Super class}{
 \code{\link[aifeducation:.AIFEBaseTransformer]{aifeducation::.AIFEBaseTransformer}} -> \code{.AIFELongformerTransformer}
 }
@@ -59,6 +57,7 @@ Other Transformers for developers:
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="init_transformer"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-init_transformer'><code>aifeducation::.AIFEBaseTransformer$init_transformer()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_calculate_vocab"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_calculate_vocab'><code>aifeducation::.AIFEBaseTransformer$set_SFC_calculate_vocab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_check_max_pos_emb"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_check_max_pos_emb'><code>aifeducation::.AIFEBaseTransformer$set_SFC_check_max_pos_emb()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic=".AIFEBaseTransformer" data-id="set_SFC_create_final_tokenizer"><a href='../../aifeducation/html/.AIFEBaseTransformer.html#method-.AIFEBaseTransformer-set_SFC_create_final_tokenizer'><code>aifeducation::.AIFEBaseTransformer$set_SFC_create_final_tokenizer()</code></a></span></li>
@@ -79,14 +78,21 @@ Other Transformers for developers:
 \if{html}{\out{<a id="method-.AIFELongformerTransformer-new"></a>}}
 \if{latex}{\out{\hypertarget{method-.AIFELongformerTransformer-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new transformer based on \code{Longformer} and sets the
-title.
+Creates a new transformer based on \code{Longformer} and sets the title.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{.AIFELongformerTransformer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{.AIFELongformerTransformer$new(init_trace = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{init_trace}}{\code{bool} option to show prints. If \code{TRUE} (by default) - messages will be shown, otherwise
+(\code{FALSE}) - hidden.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-This method returns nothing
+This method returns nothing.
 }
 }
 \if{html}{\out{<hr>}}
@@ -106,7 +112,6 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 }
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFELongformerTransformer$create(
-  ml_framework = "pytorch",
   model_dir,
   text_dataset,
   vocab_size = 30522,
@@ -117,7 +122,7 @@ This method adds the following \emph{'dependent' parameters} to the base class's
   num_hidden_layer = 12,
   num_attention_heads = 12,
   intermediate_size = 3072,
-  hidden_act = "gelu",
+  hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1,
   attention_window = 512,
@@ -135,64 +140,60 @@ This method adds the following \emph{'dependent' parameters} to the base class's
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\itemize{
-\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
-\item \code{ml_framework = "pytorch"}: for 'pytorch'.
-}}
+\item{\code{model_dir}}{\code{string} Path to the directory where the model should be saved. Allowed values: any}
 
-\item{\code{model_dir}}{\code{string} Path to the directory where the model should be saved.}
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
-
-\item{\code{vocab_size}}{\code{int} Size of the vocabulary.}
+\item{\code{vocab_size}}{\code{int} Size of the vocabulary. Allowed values: \verb{1000 <= x <= 5e+05}}
 
 \item{\code{add_prefix_space}}{\code{bool} \code{TRUE} if an additional space should be inserted to the leading words.}
 
 \item{\code{trim_offsets}}{\code{bool} \code{TRUE} trims the whitespaces from the produced offsets.}
 
 \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model.}
+can be processed with the model. Allowed values: \verb{10 <= x <= 4048}}
 
 \item{\code{hidden_size}}{\code{int} Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding.}
+embedding. Allowed values: \verb{1 <= x <= 2048}}
 
-\item{\code{num_hidden_layer}}{\code{int} Number of hidden layers.}
+\item{\code{num_hidden_layer}}{\code{int} Number of hidden layers. Allowed values: \code{1 <= x }}
 
-\item{\code{num_attention_heads}}{\code{int} Number of attention heads.}
+\item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
 
-\item{\code{intermediate_size}}{\code{int} Number of neurons in the intermediate layer of the attention mechanism.}
+\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
 
-\item{\code{hidden_act}}{\code{string} Name of the activation function.}
+\item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout.}
+\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities.}
+\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{attention_window}}{\code{int} Size of the window around each token for attention mechanism in every layer.}
+\item{\code{attention_window}}{\code{int} Size of the window around each token for attention mechanism in every layer. Allowed values: \code{2 <= x }}
 
-\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library codecarbon.}
+\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
-\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
-list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
+sustainability should be tracked. A list can be found on Wikipedia:
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
 
-\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
-information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
 
-\item{\code{trace}}{\code{bool} \code{TRUE} if information about the progress should be printed to the console.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{pytorch_safetensors}}{\code{bool} Only relevant for pytorch models.
+\item{\code{pytorch_safetensors}}{\code{bool}
 \itemize{
 \item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
 \item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
 }}
 
-\item{\code{log_dir}}{Path to the directory where the log files should be saved.}
+\item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
+If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
-\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
-if \code{log_dir} is not \code{NULL}.}
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
 }
 \if{html}{\out{</div>}}
 }
@@ -209,7 +210,6 @@ This method can be used to train or fine-tune a transformer based on \code{Longf
 architecture with the help of the python libraries \code{transformers}, \code{datasets}, and \code{tokenizers}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{.AIFELongformerTransformer$train(
-  ml_framework = "pytorch",
   output_dir,
   model_dir_path,
   text_dataset,
@@ -221,14 +221,11 @@ architecture with the help of the python libraries \code{transformers}, \code{da
   full_sequences_only = FALSE,
   min_seq_len = 50,
   learning_rate = 0.03,
-  n_workers = 1,
-  multi_process = FALSE,
   sustain_track = TRUE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15,
   trace = TRUE,
-  keras_trace = 1,
   pytorch_trace = 1,
   pytorch_safetensors = TRUE,
   log_dir = NULL,
@@ -239,75 +236,58 @@ architecture with the help of the python libraries \code{transformers}, \code{da
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ml_framework}}{\code{string} Framework to use for training and inference.
-\itemize{
-\item \code{ml_framework = "tensorflow"}: for 'tensorflow'.
-\item \code{ml_framework = "pytorch"}: for 'pytorch'.
-}}
+\item{\code{output_dir}}{\code{string} Path to the directory where the model should be saved. Allowed values: any}
 
-\item{\code{output_dir}}{\code{string} Path to the directory where the final model should be saved. If the directory does not exist, it will be
-created.}
+\item{\code{model_dir_path}}{\code{string} Path to the directory where the original model is stored. Allowed values: any}
 
-\item{\code{model_dir_path}}{\code{string} Path to the directory where the original model is stored.}
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{text_dataset}}{Object of class \link{LargeDataSetForText}.}
+\item{\code{p_mask}}{\code{double} Ratio that determines the number of words/tokens used for masking. Allowed values: \verb{0 < x < 1}}
 
-\item{\code{p_mask}}{\code{double} Ratio that determines the number of words/tokens used for masking.}
+\item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
+used for the validation sample during the estimation of the model.
+The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
 
-\item{\code{val_size}}{\code{double} Ratio that determines the amount of token chunks used for validation.}
+\item{\code{n_epoch}}{\code{int} Number of training epochs. Allowed values: \code{1 <= x }}
 
-\item{\code{n_epoch}}{\code{int} Number of epochs for training.}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{batch_size}}{\code{int} Size of batches.}
-
-\item{\code{chunk_size}}{\code{int} Size of every chunk for training.}
+\item{\code{chunk_size}}{\code{int} Maximum length of every sequence. Must be equal or less the global maximum size
+allowed by the model. Allowed values: \code{100 <= x }}
 
 \item{\code{full_sequences_only}}{\code{bool} \code{TRUE} for using only chunks with a sequence length equal to \code{chunk_size}.}
 
 \item{\code{min_seq_len}}{\code{int} Only relevant if \code{full_sequences_only = FALSE}. Value determines the minimal sequence length included in
-training process.}
+training process.  Allowed values: \code{10 <= x }}
 
-\item{\code{learning_rate}}{\code{double} Learning rate for adam optimizer.}
+\item{\code{learning_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
 
-\item{\code{n_workers}}{\code{int} Number of workers. Only relevant if \code{ml_framework = "tensorflow"}.}
+\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
-\item{\code{multi_process}}{\code{bool} \code{TRUE} if multiple processes should be activated. Only relevant if \code{ml_framework = "tensorflow"}.}
+\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
+sustainability should be tracked. A list can be found on Wikipedia:
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
 
-\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library codecarbon.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if sustainability should be tracked. A
-list can be found on Wikipedia: \url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
 
-\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada. See the documentation of codecarbon for more
-information \url{https://mlco2.github.io/codecarbon/parameters.html}.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{sustain_interval}}{\code{integer} Interval in seconds for measuring power usage.}
+\item{\code{pytorch_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
 
-\item{\code{trace}}{\code{bool} \code{TRUE} if information about the progress should be printed to the console.}
-
-\item{\code{keras_trace}}{\code{int}
-\itemize{
-\item \code{keras_trace = 0}: does not print any information about the training process from keras on the console.
-\item \code{keras_trace = 1}: prints a progress bar.
-\item \code{keras_trace = 2}: prints one line of information for every epoch. Only relevant if \code{ml_framework = "tensorflow"}.
-}}
-
-\item{\code{pytorch_trace}}{\code{int}
-\itemize{
-\item \code{pytorch_trace = 0}: does not print any information about the training process from pytorch on the console.
-\item \code{pytorch_trace = 1}: prints a progress bar.
-}}
-
-\item{\code{pytorch_safetensors}}{\code{bool} Only relevant for pytorch models.
+\item{\code{pytorch_safetensors}}{\code{bool}
 \itemize{
 \item \code{TRUE}: a 'pytorch' model is saved in safetensors format.
 \item \code{FALSE} (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin).
 }}
 
-\item{\code{log_dir}}{Path to the directory where the log files should be saved.}
+\item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
+If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
-\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update the log files. Only relevant
-if \code{log_dir} is not \code{NULL}.}
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
 }
 \if{html}{\out{</div>}}
 }

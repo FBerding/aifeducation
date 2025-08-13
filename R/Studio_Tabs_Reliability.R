@@ -9,8 +9,7 @@
 #'
 Reliability_UI <- function(id) {
   bslib::page(
-    shiny::uiOutput(outputId = shiny::NS(id, "ui_relability")
-    )
+    shiny::uiOutput(outputId = shiny::NS(id, "ui_relability"))
   )
 }
 
@@ -47,7 +46,10 @@ Reliability_Server <- function(id, model) {
       kappa_fleiss = "Fleiss' Kappa for Multiple Raters (Without Exact Estimation)",
       percentage_agreement = "Percentage Agreement",
       balanced_accuracy = "Average Accuracy within each Class",
-      gwet_ac = "Gwet's AC1/AC2 Agreement Coefficient"
+      gwet_ac = "Gwet's AC1/AC2 Agreement Coefficient",
+      gwet_ac1_nominal="Gwet's AC1 (Nominal)",
+      gwet_ac2_linear="Gwet's AC2 (Linear Weights, Ordinal)",
+      gwet_ac2_quadratic="Gwet's AC2 (Quadratic Weights, Ordinal)"
     )
     measures_scale_level <- c(
       "dynamic_iota_index",
@@ -60,7 +62,10 @@ Reliability_Server <- function(id, model) {
       "kappa_fleiss",
       "percentage_agreement",
       "balanced_accuracy",
-      "gwet_ac"
+      "gwet_ac",
+      "gwet_ac1_nominal",
+      "gwet_ac2_linear",
+      "gwet_ac2_quadratic"
     )
     #-------------
     output$ui_relability <- shiny::renderUI({
@@ -155,8 +160,8 @@ Reliability_Server <- function(id, model) {
               ),
               shiny::plotOutput(outputId = ns("coding_spectral_plot")),
               shiny::tags$p("Note: Plot is calculated based on a freely estimated Assignment-Error-Matrix.
-                                          The categorical sizes are based on the relative frequencies of the training data.
-                                          These sizes are not identical with the sizes of field samples.")
+                            The categorical sizes are based on the relative frequencies of the training data.
+                            These sizes are not identical with the sizes of field samples.")
             )
           )
         ),
@@ -175,7 +180,8 @@ Reliability_Server <- function(id, model) {
                     rownames = TRUE,
                     colnames = FALSE
                   ),
-                  shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted Assignment-Error-Matrix.")
+                  shiny::tags$p("Note: Values for Dynamic Iota Index are calculated based on a restricted
+                                Assignment-Error-Matrix.")
                 )
               ),
               bslib::card(
@@ -184,16 +190,29 @@ Reliability_Server <- function(id, model) {
                 ),
                 bslib::card_body(
                   shiny::tags$p(shiny::tags$b("Assignment-Error-Matrix")),
-                  shiny::renderTable(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
+                  shiny::renderTable(
+                    classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$assignment_error_matrix,
                     rownames = TRUE,
                     colnames = TRUE
                   ),
                   shiny::tags$p(shiny::tags$b("Iota")),
-                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota))),
+                  shiny::renderTable(
+                    t(as.matrix(
+                      classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$iota
+                    ))
+                  ),
                   shiny::tags$p(shiny::tags$b("Alpha Reliability")),
-                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability))),
+                  shiny::renderTable(
+                    t(as.matrix(
+                      classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$alpha_reliability
+                    ))
+                  ),
                   shiny::tags$p(shiny::tags$b("Beta Reliability")),
-                  shiny::renderTable(t(as.matrix(classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability))),
+                  shiny::renderTable(
+                    t(as.matrix(
+                      classifier$reliability$iota_object_end_free$categorical_level$raw_estimates$beta_reliability
+                    ))
+                  ),
                   shiny::tags$p("Note: All values are calculated based on a freely estimated Assignment-Error-Matrix.")
                 )
               ),
@@ -202,21 +221,22 @@ Reliability_Server <- function(id, model) {
                   "Measures - Machine Learning"
                 ),
                 bslib::card_body(
-                  shiny::renderTable(classifier$reliability$standard_measures_mean,rownames = TRUE)
+                  shiny::renderTable(classifier$reliability$standard_measures_mean, rownames = TRUE)
                 )
               )
             )
           )
         )
       )
+
+      return(ui)
     })
 
     # Render Plots-------------------------------------------------------------
     output$coding_stream_plot <- shiny::renderPlot(
       expr = {
         classifier <- model()
-        plot <- iotarelr::plot_iota2_alluvial(
-          object = classifier$reliability$iota_object_end_free,
+        plot <- classifier$plot_coding_stream(
           label_categories_size = input$codings_stream_labels_size,
           key_size = input$codings_stream_key_size,
           text_size = input$codings_stream_text_size

@@ -26,16 +26,15 @@
 #'
 #'   Training of this model makes use of dynamic masking.
 #'
-#' @param ml_framework `r paramDesc.ml_framework()`
-#' @param text_dataset `r paramDesc.text_dataset()`
-#' @param sustain_track `r paramDesc.sustain_track()`
-#' @param sustain_iso_code `r paramDesc.sustain_iso_code()`
-#' @param sustain_region `r paramDesc.sustain_region()`
-#' @param sustain_interval `r paramDesc.sustain_interval()`
-#' @param trace `r paramDesc.trace()`
-#' @param pytorch_safetensors `r paramDesc.pytorch_safetensors()`
-#' @param log_dir `r paramDesc.log_dir()`
-#' @param log_write_interval `r paramDesc.log_write_interval()`
+#' @param text_dataset `r get_param_doc_desc("text_dataset")`
+#' @param sustain_track `r get_param_doc_desc("sustain_track")`
+#' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+#' @param sustain_region `r get_param_doc_desc("sustain_region")`
+#' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+#' @param trace `r get_param_doc_desc("trace")`
+#' @param pytorch_safetensors `r get_param_doc_desc("pytorch_safetensors")`
+#' @param log_dir `r get_param_doc_desc("log_dir")`
+#' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
 #'
 #' @references Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &
 #'   Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \doi{10.48550/arXiv.1907.11692}
@@ -45,7 +44,7 @@
 #'   * <https://huggingface.co/docs/transformers/model_doc/roberta#transformers.RobertaModel>
 #'   * <https://huggingface.co/docs/transformers/model_doc/roberta#transformers.TFRobertaModel>
 #'
-#' @family Transformers for developers
+#' @family R6 classes for transformers
 #'
 #' @export
 .AIFERobertaTransformer <- R6::R6Class(
@@ -122,11 +121,7 @@
           use_cache = TRUE
         )
 
-        if (self$params$ml_framework == "tensorflow") {
-          self$temp$model <- transformers$TFRobertaModel(configuration)
-        } else {
-          self$temp$model <- transformers$RobertaModel(configuration)
-        }
+        self$temp$model <- transformers$RobertaModel(configuration, add_pooling_layer = FALSE)
       }
     ),
 
@@ -142,18 +137,11 @@
 
       # SFT: load_existing_model ----
       load_existing_model = function(self) {
-        if (self$params$ml_framework == "tensorflow") {
-          self$temp$model <- transformers$TFRobertaForMaskedLM$from_pretrained(
-            self$params$model_dir_path,
-            from_pt = self$temp$from_pt
-          )
-        } else {
-          self$temp$model <- transformers$RobertaForMaskedLM$from_pretrained(
-            self$params$model_dir_path,
-            from_tf = self$temp$from_tf,
-            use_safetensors = self$temp$load_safe
-          )
-        }
+        self$temp$model <- transformers$RobertaForMaskedLM$from_pretrained(
+          self$params$model_dir_path,
+          from_tf = self$temp$from_tf,
+          use_safetensors = self$temp$load_safe
+        )
 
         self$temp$tokenizer <- transformers$RobertaTokenizerFast$from_pretrained(self$params$model_dir_path)
       }
@@ -165,10 +153,11 @@
     # New ----
 
     #' @description Creates a new transformer based on `RoBERTa` and sets the title.
+    #' @param init_trace `bool` option to show prints. If `TRUE` (by default) - messages will be shown, otherwise
+    #'   (`FALSE`) - hidden.
     #' @return This method returns nothing.
-    initialize = function() {
-      super$set_title(private$title)
-      print(paste(private$title, "has been initialized."))
+    initialize = function(init_trace = TRUE) {
+      super$init_transformer(private$title, init_trace)
     },
 
 
@@ -183,24 +172,23 @@
     #'   * `trim_offsets`
     #'   * `num_hidden_layer`
     #'
-    #' @param model_dir `r paramDesc.model_dir()`
-    #' @param vocab_size `r paramDesc.vocab_size()`
-    #' @param max_position_embeddings `r paramDesc.max_position_embeddings()`
-    #' @param hidden_size `r paramDesc.hidden_size()`
-    #' @param num_attention_heads `r paramDesc.num_attention_heads()`
-    #' @param intermediate_size `r paramDesc.intermediate_size()`
-    #' @param hidden_act `r paramDesc.hidden_act()`
-    #' @param hidden_dropout_prob `r paramDesc.hidden_dropout_prob()`
-    #' @param attention_probs_dropout_prob `r paramDesc.attention_probs_dropout_prob()`
+    #' @param model_dir `r get_param_doc_desc("model_dir")`
+    #' @param vocab_size `r get_param_doc_desc("vocab_size")`
+    #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+    #' @param hidden_size `r get_param_doc_desc("hidden_size")`
+    #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
     #'
-    #' @param add_prefix_space `r paramDesc.add_prefix_space()`
-    #' @param trim_offsets `r paramDesc.trim_offsets()`
-    #' @param num_hidden_layer `r paramDesc.num_hidden_layer()`
+    #' @param add_prefix_space `r get_param_doc_desc("add_prefix_space")`
+    #' @param trim_offsets `r get_param_doc_desc("trim_offsets")`
+    #' @param num_hidden_layer `r get_param_doc_desc("num_hidden_layer")`
     #'
     #' @return This method does not return an object. Instead, it saves the configuration and vocabulary of the new
     #'   model to disk.
-    create = function(ml_framework = "pytorch",
-                      model_dir,
+    create = function(model_dir,
                       text_dataset,
                       vocab_size = 30522,
                       add_prefix_space = FALSE,
@@ -210,7 +198,7 @@
                       num_hidden_layer = 12,
                       num_attention_heads = 12,
                       intermediate_size = 3072,
-                      hidden_act = "gelu",
+                      hidden_act = "GELU",
                       hidden_dropout_prob = 0.1,
                       attention_probs_dropout_prob = 0.1,
                       sustain_track = TRUE,
@@ -233,7 +221,6 @@
 
       # Create method of super ----
       super$create(
-        ml_framework = ml_framework,
         model_dir = model_dir,
         text_dataset = text_dataset,
         vocab_size = vocab_size,
@@ -261,24 +248,20 @@
     #' @description This method can be used to train or fine-tune a transformer based on `RoBERTa` Transformer
     #'   architecture with the help of the python libraries `transformers`, `datasets`, and `tokenizers`.
     #'
-    #' @param output_dir `r paramDesc.output_dir()`
-    #' @param model_dir_path `r paramDesc.model_dir_path()`
-    #' @param p_mask `r paramDesc.p_mask()`
-    #' @param val_size `r paramDesc.val_size()`
-    #' @param n_epoch `r paramDesc.n_epoch()`
-    #' @param batch_size `r paramDesc.batch_size()`
-    #' @param chunk_size `r paramDesc.chunk_size()`
-    #' @param full_sequences_only `r paramDesc.full_sequences_only()`
-    #' @param min_seq_len `r paramDesc.min_seq_len()`
-    #' @param learning_rate `r paramDesc.learning_rate()`
-    #' @param n_workers `r paramDesc.n_workers()`
-    #' @param multi_process `r paramDesc.multi_process()`
-    #' @param keras_trace `r paramDesc.keras_trace()`
-    #' @param pytorch_trace `r paramDesc.pytorch_trace()`
+    #' @param output_dir `r get_param_doc_desc("output_dir")`
+    #' @param model_dir_path `r get_param_doc_desc("model_dir_path")`
+    #' @param p_mask `r get_param_doc_desc("p_mask")`
+    #' @param val_size `r get_param_doc_desc("val_size")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param chunk_size `r get_param_doc_desc("chunk_size")`
+    #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
+    #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
+    #' @param learning_rate `r get_param_doc_desc("learning_rate")`
+    #' @param pytorch_trace `r get_param_doc_desc("pytorch_trace")`
     #'
     #' @return This method does not return an object. Instead the trained or fine-tuned model is saved to disk.
-    train = function(ml_framework = "pytorch",
-                     output_dir,
+    train = function(output_dir,
                      model_dir_path,
                      text_dataset,
                      p_mask = 0.15,
@@ -289,14 +272,11 @@
                      full_sequences_only = FALSE,
                      min_seq_len = 50,
                      learning_rate = 3e-2,
-                     n_workers = 1,
-                     multi_process = FALSE,
                      sustain_track = TRUE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15,
                      trace = TRUE,
-                     keras_trace = 1,
                      pytorch_trace = 1,
                      pytorch_safetensors = TRUE,
                      log_dir = NULL,
@@ -307,7 +287,6 @@
 
       # Train method of super ----
       super$train(
-        ml_framework = ml_framework,
         output_dir = output_dir,
         model_dir_path = model_dir_path,
         text_dataset = text_dataset,
@@ -320,14 +299,11 @@
         full_sequences_only = full_sequences_only,
         min_seq_len = min_seq_len,
         learning_rate = learning_rate,
-        n_workers = n_workers,
-        multi_process = multi_process,
         sustain_track = sustain_track,
         sustain_iso_code = sustain_iso_code,
         sustain_region = sustain_region,
         sustain_interval = sustain_interval,
         trace = trace,
-        keras_trace = keras_trace,
         pytorch_trace = pytorch_trace,
         pytorch_safetensors = pytorch_safetensors,
         log_dir = log_dir,
@@ -338,3 +314,7 @@
 )
 
 .AIFETrObj[[AIFETrType$roberta]] <- .AIFERobertaTransformer$new
+.AIFETrTokenizer[[AIFETrType$roberta]] <- "RobertaTokenizerFast"
+.AIFETrConfig[[AIFETrType$roberta]] <- "RobertaConfig"
+.AIFETrModel[[AIFETrType$roberta]] <- "RobertaModel"
+.AIFETrModelMLM[[AIFETrType$roberta]] <- "RobertaForMaskedLM"

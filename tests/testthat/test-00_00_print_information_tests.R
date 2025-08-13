@@ -5,15 +5,24 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-if(Sys.getenv("CI")=="true"){
-  print("---------------------------------------------------------")
-  print("On Continuous Integreation")
-  print("---------------------------------------------------------")
+if (Sys.getenv("CI") == "true") {
+  cat("\n")
+  cat("---------------------------------------------------------\n")
+  cat("On Continuous Integreation\n")
+  cat("---------------------------------------------------------\n")
 } else {
-  print("---------------------------------------------------------")
-  print("Not On Continuous Integreation")
-  print("---------------------------------------------------------")
+  cat("\n")
+  cat("---------------------------------------------------------\n")
+  cat("Not On Continuous Integreation\n")
+  cat("---------------------------------------------------------\n")
 }
 
-#Print python versions of the test system
-print(get_py_package_versions())
+# Print python versions of the test system
+if (Sys.getenv("CI") == "true") {
+  prepare_session(env_type ="conda",envname = "r-reticulate")
+} else {
+  prepare_session()
+}
+
+#print(get_py_package_versions())
+

@@ -31,20 +31,21 @@ save_to_disk <- function(object,
                          folder_name) {
   # Check class of object
   check_class(
-    object,
-    c(
-      "TEClassifierRegular",
-      "TEClassifierProtoNet",
+    object=object,
+    object_name="object",
+    classes=c(
+      TEClassifiers_class_names,
       "TEFeatureExtractor",
       "TextEmbeddingModel",
       "LargeDataSetForTextEmbeddings",
       "LargeDataSetForText",
-      "EmbeddedText"
+      "EmbeddedText",
+      ".AIFEBaseTransformer"
     ),
     FALSE
   )
-  check_type(dir_path, "string", FALSE)
-  check_type(folder_name, "string", FALSE)
+  check_type(object=dir_path,object_name="dir_path", type="string", FALSE)
+  check_type(object=folder_name,object_name="folder_name", type="string", FALSE)
 
   # Create path to save location
   save_location <- paste0(dir_path, "/", folder_name)
@@ -56,15 +57,19 @@ save_to_disk <- function(object,
   create_dir(dir_path, FALSE)
   create_dir(save_location, FALSE)
 
-  # Create config and save to disk
-  config_file <- create_config_state(object)
-  save(config_file, file = path_r_config_state)
+  if(!".AIFEBaseTransformer"%in%class(object)){
+    # Create config and save to disk
+    config_file <- create_config_state(object)
+    save(config_file, file = path_r_config_state)
 
-  # Save Python objects and additional files
-  object$save(
-    dir_path = dir_path,
-    folder_name = folder_name
-  )
+    # Save Python objects and additional files
+    object$save(
+      dir_path = dir_path,
+      folder_name = folder_name
+    )
+  } else {
+
+  }
 }
 
 
@@ -79,29 +84,21 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
-  loaded_config <- load_R_config_state(dir_path)
+  #Case for all native ai for education models
+  if(file.exists(paste0(dir_path, "/r_config_state.rda"))){
+    #load config
+    loaded_config <- load_R_config_state(dir_path)
 
-  if (loaded_config$class == "TEClassifierRegular") {
-    model <- TEClassifierRegular$new()
-  } else if (loaded_config$class == "TEClassifierProtoNet") {
-    model <- TEClassifierProtoNet$new()
-  } else if (loaded_config$class == "TEFeatureExtractor") {
-    model <- TEFeatureExtractor$new()
-  } else if (loaded_config$class == "TextEmbeddingModel") {
-    model <- TextEmbeddingModel$new()
-  } else if (loaded_config$class == "LargeDataSetForTextEmbeddings") {
-    model <- LargeDataSetForTextEmbeddings$new()
-  } else if (loaded_config$class == "LargeDataSetForText") {
-    model <- LargeDataSetForText$new()
-  } else if (loaded_config$class == "EmbeddedText") {
-    model <- EmbeddedText$new()
+    #Create object
+    model<-create_object(loaded_config$class)
+
+    # load and update model
+    model$load_from_disk(dir_path = dir_path)
+    return(model)
   } else {
-    stop("Class type not supported.")
-  }
+    #Case for base models
 
-  # load and update model
-  model$load_from_disk(dir_path = dir_path)
-  return(model)
+  }
 }
 
 
@@ -141,9 +138,9 @@ create_config_state <- function(object) {
   config <- object$get_all_fields()
   config["class"] <- class(object)[1]
 
-  #Remove embeddings to avoid duplicate data storage
-  if(config["class"]=="EmbeddedText"){
-    config$public$embeddings=NA
+  # Remove embeddings to avoid duplicate data storage
+  if (config["class"] == "EmbeddedText") {
+    config$public$embeddings <- NA
   }
 
   return(config)

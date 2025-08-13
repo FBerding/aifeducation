@@ -13,58 +13,61 @@ BaseModel_Train_UI <- function(id) {
 
   shiny::tagList(
     bslib::page_sidebar(
-      # Sidebar ------------------------------------------------------------------
+      # Sidebar------------------------------------------------------------------
       sidebar = bslib::sidebar(
         position = "left",
         shiny::tags$h3("Control Panel"),
+        shiny::tags$hr(),
         shinyFiles::shinyDirButton(
-          id = ns("button_select_output_model_dir"),
-          label = "Choose Folder",
+          id = shiny::NS(id, "start_SaveModal"),
+          label = "Start Training",
           title = "Choose Destination",
-          icon = shiny::icon("folder-open")
-        ),
-        shiny::textInput(
-          inputId = ns("output_model_dir_path"),
-          label = shiny::tags$p(shiny::icon("folder"), "Path for saiving the trained Base Model"),
-          width = "100%"
-        ),
-        shiny::actionButton(
-          inputId = ns("button_train_tune"),
-          label = "Start Training/Tuning",
           icon = shiny::icon("paper-plane")
-        ),
-        shiny::uiOutput(outputId = ns("sidebar_description"))
+        )
       ),
-      # Main panel ------------------------------------------------------------------
-      bslib::page(
-        bslib::layout_column_wrap(
-          bslib::card(
-            bslib::card_header(
-              "Base Model"
+      # Main Page---------------------------------------------------------------
+      bslib::layout_column_wrap(
+        #Base Model
+        bslib::card(
+          bslib::card_header("Base Model"),
+          bslib::card_body(
+            shinyFiles::shinyDirButton(
+              id = shiny::NS(id, "button_select_base_model"),
+              label = "Select a Base Model",
+              title = "Please choose a folder",
+              icon = shiny::icon("folder-open")
             ),
-            bslib::card_body(
-              BaseModel_UI(id = ns("BaseModel_BaseModel"))
-            )
-          ),
-          bslib::card(
-            bslib::card_header(
-              "Dataset"
+            shiny::textInput(
+              inputId = shiny::NS(id, "base_model_dir"),
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width="100%"
             ),
-            bslib::card_body(
-              Dataset_UI(id = ns("BaseModel_Dataset"))
-            )
+            shiny::uiOutput(outputId = shiny::NS(id, "summary_base_model"))
           )
         ),
-        bslib::card(
-          bslib::card_header(
-            "Train and Tune Settings"
+        #Raw Texts
+      bslib::card(
+        bslib::card_header("Input Data"),
+        bslib::card_body(
+          shinyFiles::shinyDirButton(
+            id = shiny::NS(id, "button_select_dataset_for_raw_texts"),
+            label = "Choose Collection of Raw Texts",
+            title = "Please choose a folder",
+            icon = shiny::icon("folder-open")
           ),
-          bslib::card_body(
-            TrainTuneSettings_UI(id = ns("BaseModel_TrainTuneSettings"))
-          )
+          shiny::textInput(
+            inputId = shiny::NS(id, "raw_text_dir"),
+            label = shiny::tags$p(shiny::icon("folder"), "Path"),
+            width="100%"
+          ),
+          shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
         )
       )
+      ),
+      #Main config Cards
+      shiny::uiOutput(outputId = shiny::NS(id,"base_model_train"))
     )
+    #)
   )
 }
 
@@ -81,125 +84,243 @@ BaseModel_Train_UI <- function(id) {
 #' @keywords internal
 #' @noRd
 #'
-BaseModel_Train_Server <- function(id, log_dir, volumes, sustain_tracking) {
+BaseModel_Train_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # Global variables -----------------------------------------------------------
-    ns <- session$ns
+    # global variables-----------------------------------------------------------
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
-    # Control Panel --------------------------------------------------------------
+    # File system management----------------------------------------------------
+    #Raw Texts
     shinyFiles::shinyDirChoose(
       input = input,
-      id = "button_select_output_model_dir",
+      id = "button_select_dataset_for_raw_texts",
       roots = volumes,
-      allowDirCreate = TRUE
+      # session = session,
+      allowDirCreate = FALSE
     )
-    shiny::observeEvent(input$button_select_output_model_dir, {
-      path <- shinyFiles::parseDirPath(volumes, input$button_select_output_model_dir)
+    shiny::observeEvent(input$button_select_dataset_for_raw_texts, {
+      path <- shinyFiles::parseDirPath(volumes, input$button_select_dataset_for_raw_texts)
       shiny::updateTextInput(
-        inputId = "output_model_dir_path",
+        inputId = "raw_text_dir",
         value = path
       )
     })
 
-    # Main Panel ------------------------------------------------------------------
-    model_architecture_reactive <- BaseModel_Server(
-      id = "BaseModel_BaseModel",
-      volumes = volumes
-    )
-    dataset_dir_path_reactive <- Dataset_Server(
-      id = "BaseModel_Dataset",
-      volumes = volumes
-    )
-    params_reactive <- TrainTuneSettings_Server(
-      id = "BaseModel_TrainTuneSettings",
-      model_architecture = model_architecture_reactive
-    )
-
-    shiny::observeEvent(input$button_train_tune, {
-      model_architecture <- model_architecture_reactive()
-
-      dataset_dir_path <- dataset_dir_path_reactive()
-
-      # Checking ------------------------------------------------------------------
-
-      errors <- c()
-
-      if (dataset_dir_path == "") {
-        errors <- append(errors, "Please specify a path to the dataset for the training.")
-      } else if (!dir.exists(dataset_dir_path)) {
-        errors <- append(errors, paste(
-          "Path to the raw texts for the training is not valid - there is no such directory path",
-          dQuote(dataset_dir_path)
-        ))
+    path_to_raw_texts <- shiny::eventReactive(input$raw_text_dir, {
+      if (input$raw_text_dir != "") {
+        return(input$raw_text_dir)
+      } else {
+        return(NULL)
       }
+    })
 
-      if (input$output_model_dir_path == "") {
-        errors <- append(errors, "Please specify a directory path for saiving the trained Base Model.")
+    data_raw_texts <- shiny::reactive({
+      if (!is.null(path_to_raw_texts())) {
+        shinyWidgets::show_alert(
+          title = "Loading",
+          text = "Please wait",
+          type = "info",
+          closeOnClickOutside = FALSE,
+          showCloseButton = FALSE,
+          btn_labels=NA
+        )
+        shinyWidgets::closeSweetAlert()
+        shinyWidgets::closeSweetAlert()
+        return(load_and_check_dataset_raw_texts(path_to_raw_texts()))
+      } else {
+        return(NULL)
       }
+    })
 
-      if (inherits(x=model_architecture,what = "errors")) {
-        errors <- append(errors, model_architecture)
-      } else if (inherits(x=model_architecture,what= "params")) {
-        if (!model_architecture$model_exists) {
-          errors <- append(errors, paste(
-            "There is no model to load in the directory",
-            model_architecture$model_dir_path
-          ))
+    #Base model
+    shinyFiles::shinyDirChoose(
+      input = input,
+      id = "button_select_base_model",
+      roots = volumes,
+      # session = session,
+      allowDirCreate = FALSE
+    )
+    shiny::observeEvent(input$button_select_base_model, {
+      path <- shinyFiles::parseDirPath(volumes, input$button_select_base_model)
+      shiny::updateTextInput(
+        inputId = "base_model_dir",
+        value = path
+      )
+    })
+
+    path_to_base_model <- shiny::eventReactive(input$base_model_dir, {
+      if (input$base_model_dir != "") {
+        return(input$base_model_dir)
+      } else {
+        return(NULL)
+      }
+    })
+
+    base_model=shiny::reactive({
+      if(!is.null(path_to_base_model())){
+        shinyWidgets::show_alert(
+          title = "Loading",
+          text = "Please wait",
+          type = "info",
+          closeOnClickOutside = FALSE,
+          showCloseButton = FALSE,
+          btn_labels=NA
+        )
+        model=load_and_check_base_model(path_to_base_model())
+        shinyWidgets::closeSweetAlert()
+        shinyWidgets::closeSweetAlert()
+        return(model)
+      } else {
+        return(NULL)
+      }
+    })
+
+    # Detect type of model
+    base_model_type=shiny::reactive({
+      model=base_model()
+      if(!is.null(model)){
+        model_type=try(detect_base_model_type(model),silent = TRUE)
+        if(inherits(x=model_type,what = "try-error")){
+          display_errors(error_messages="Type of transformer model not supported.")
+          return(NULL)
+        } else {
+          return(model_type)
+        }
+      } else {
+        return(NULL)
+      }
+    })
+
+    #Card of Model Configuration------------------------------------------------
+    output$base_model_train<-shiny::renderUI({
+      if(!is.null(base_model_type())){
+        config_box=create_widget_card(
+          id=id,
+          object_class=base_model_type(),
+          method = "train",
+          box_title="Training Settings"
+        )
+        return(config_box)
+      } else {
+        return(NULL)
+      }
+    })
+
+    # Start screen for choosing the location for storing the data set-----------
+    # Create Save Modal
+    save_modal <- create_save_modal(
+      id = id,
+      # ns = session$ns,
+      title = "Choose Destination",
+      easy_close = FALSE,
+      size = "l"
+    )
+
+    # Implement file connection
+    shinyFiles::shinyDirChoose(
+      input = input,
+      id = "start_SaveModal",
+      roots = volumes,
+      allowDirCreate = TRUE
+    )
+
+    # show save_modal
+    shiny::observeEvent(input$start_SaveModal, {
+      path <- shinyFiles::parseDirPath(volumes, input$start_SaveModal)
+      if (!is.null(path) & !identical(path, character(0))) {
+        if (path != "") {
+          shiny::showModal(save_modal)
+          shiny::updateTextInput(
+            inputId = "save_modal_directory_path",
+            value = path
+          )
         }
       }
+    })
 
-      # If there is an error -------------------------------------------------------
-      if (length(errors) != 0) {
-        error_msg <- paste(errors, collapse = "<br>")
+    # Display Data Summary------------------------------------------------------
+    output$summary_data_raw_texts <- shiny::renderUI({
+      data_set_raw_texts <- data_raw_texts()
+      # shiny::req(data_set_raw_texts)
+      if (!is.null(data_set_raw_texts)) {
+        ui <- create_data_raw_texts_description(data_set_raw_texts)
+        return(ui)
+      } else {
+        return(NULL)
+      }
+    })
 
-        shinyWidgets::show_alert(
-          title = "Train error(s)",
-          text = shiny::HTML(error_msg),
-          html = TRUE,
-          type = "error"
+    output$summary_base_model <- shiny::renderUI({
+      model <- base_model()
+      # shiny::req(data_set_raw_texts)
+      if (!is.null(model)) {
+        ui <- create_data_base_model_description(model)
+        return(ui)
+      } else {
+        return(NULL)
+      }
+    })
+
+    #Start creation-------------------------------------------------------------
+    shiny::observeEvent(input$save_modal_button_continue, {
+      # Remove Save Modal
+      shiny::removeModal()
+
+      # Check for errors
+      errors <- check_error_base_model_create_or_train(
+        destination_path=input$save_modal_directory_path,
+        folder_name=input$save_modal_folder_name,
+        path_to_raw_texts=path_to_raw_texts()
+      )
+
+      # If there are errors display them. If not start running task.
+      if (!is.null(errors)) {
+        display_errors(
+          title = "Error",
+          size = "l",
+          easy_close = TRUE,
+          error_messages = errors
         )
-      } else { # No errors ----------------------------------------------------------
-        sustain_tracking <- sustain_tracking()
-
-        TransformerType <- list(
-          BertModel = "bert",
-          DebertaV2ForMaskedLM = "deberta_v2",
-          FunnelModel = "funnel",
-          LongformerModel = "longformer",
-          MPNetForMPLM_PT = "mpnet",
-          RobertaModel = "roberta"
-        )
-        transformer_type <- TransformerType[[model_architecture$model_architecture]]
-
-        model_params <- params_reactive()
-
-        model_params[["ml_framework"]] <- "pytorch"
-        model_params[["output_dir"]] <- input$output_model_dir_path
-        model_params[["model_dir_path"]] <- model_architecture$model_dir_path
-        model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
-        model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
-        model_params[["n_workers"]] <- 1
-        model_params[["multi_process"]] <- FALSE
-        model_params[["keras_trace"]] <- 0
-        model_params[["pytorch_trace"]] <- 0
-        model_params[["log_dir"]] <- log_dir
-        model_params[["log_write_interval"]] <- 2
-
+      } else {
+        # Start task and monitor
+        print(path_to_raw_texts())
         start_and_monitor_long_task(
           id = id,
           ExtendedTask_type = "train_transformer",
           ExtendedTask_arguments = list(
-            transformer_type = transformer_type,
-            dataset_dir_path = dataset_dir_path,
-            params = model_params
+            train=summarize_args_for_long_task(
+              input=input,
+              object_class=base_model_type(),
+              method="train",
+              path_args=list(
+                path_to_embeddings=NULL,
+                path_to_target_data=NULL,
+                path_to_textual_dataset=path_to_raw_texts(),
+                path_to_feature_extractor=NULL,
+                destination_path=input$save_modal_directory_path,
+                folder_name=input$save_modal_folder_name
+              ),
+              override_args=list(
+                output_dir=paste0(input$save_modal_directory_path,"/",input$save_modal_folder_name),
+                model_dir_path=path_to_base_model(),
+                sustain_track=TRUE,
+                log_dir = log_dir,
+                trace=FALSE,
+                pytorch_safetensors=TRUE
+              ),
+              meta_args=list(
+                py_environment_type=get_py_env_type(),
+                py_env_name=get_py_env_name(),
+                object_class=base_model_type()
+              )
+            )
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,
           pgr_use_bottom = TRUE,
           pgr_use_graphic = TRUE,
-          success_type = "train_transformer",
-          update_intervall = 2
+          update_intervall = 2,
+          success_type = "train_transformer"
         )
       }
     })

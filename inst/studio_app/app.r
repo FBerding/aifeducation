@@ -2,7 +2,11 @@
 ui <- bslib::page_navbar(
   title = "AI for Education - Studio",
   theme = bslib::bs_theme(
-    bootswatch = "flatly"
+    bootswatch = "flatly",
+    #bg="white",
+    #fg="",
+    primary = "black"#,
+    #secondary ="#325b66"
   ),
   bslib::nav_panel(
     title = "Home",
@@ -27,25 +31,7 @@ ui <- bslib::page_navbar(
   ),
   bslib::nav_panel(
     title = "Base Models",
-    bslib::page_sidebar(
-      sidebar = bslib::sidebar(
-        position = "left",
-        shiny::tags$h4("Sustainability Tracking"),
-        shinyWidgets::materialSwitch(
-          inputId = "is_sustainability_tracked",
-          label = "Activate",
-          value = TRUE,
-          right = TRUE,
-          status = "success"
-        ),
-        shiny::selectInput(
-          inputId = "sustainability_country",
-          label = "Country",
-          choices = aifeducation::get_alpha_3_codes(),
-          selected = "DEU"
-        )
-      ),
-      bslib::navset_underline(
+    bslib::navset_tab(
         bslib::nav_panel(
           title = "Create",
           aifeducation:::BaseModel_Create_UI("BaseModel_Create")
@@ -55,7 +41,6 @@ ui <- bslib::page_navbar(
           aifeducation:::BaseModel_Train_UI("BaseModel_Train")
         )
       )
-    )
   ),
   bslib::nav_panel(
     title = "TextEmbeddingModels",
@@ -157,14 +142,12 @@ server <- function(input, output, session) {
   aifeducation:::BaseModel_Create_Server(
     id = "BaseModel_Create",
     log_dir = log_dir,
-    volumes = volumes,
-    sustain_tracking = sustain_tracking
+    volumes = volumes
   )
   aifeducation:::BaseModel_Train_Server(
     id = "BaseModel_Train",
     log_dir = log_dir,
-    volumes = volumes,
-    sustain_tracking = sustain_tracking
+    volumes = volumes
   )
 
   # TextEmbeddingModels
