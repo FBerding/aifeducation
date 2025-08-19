@@ -36,7 +36,7 @@
 //'
 //'@import Rcpp
 //'@useDynLib aifeducation, .registration = TRUE
-//'@family Auxiliary Functions
+//'@family Utils Developers
 //'@export
 // [[Rcpp::export]]
 arma::cube matrix_to_array_c(arma::mat matrix,
@@ -81,7 +81,7 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 //'
 //'@import Rcpp
 //'@useDynLib aifeducation, .registration = TRUE
-//'@family Auxiliary Functions
+//'@family Utils Developers
 //'@export
 // [[Rcpp::export]]
  arma::mat to_categorical_c(arma::vec class_vector,
@@ -96,3 +96,36 @@ arma::cube matrix_to_array_c(arma::mat matrix,
    return binary_class_rep;
  }
 
+//' Transform tensor to matrix
+//'
+//' Function written in C++ for transformation the tensor (with size batch x times x features) to the matrix (with
+//'   size batch x times*features)
+//'
+//' @param tensor `3-D array (cube)` data as tensor (with size batch x times x features)
+//' @param times `unsigned integer` times number
+//' @param features `unsigned integer` features number
+//'
+//' @return Returns matrix (with size batch x times*features)
+//' @family Utils Developers
+//' @export
+// [[Rcpp::export]]
+arma::mat tensor_to_matrix_c(arma::cube tensor,
+                             arma::uword times,
+                             arma::uword features)
+{
+  arma::mat output_matrix(tensor.n_rows,
+                          times * features);
+
+  for(arma::uword batch_i = 0; batch_i < tensor.n_rows; ++batch_i)
+  {
+    for(arma::uword time_i = 0; time_i < times; ++time_i)
+    {
+      arma::uword index = time_i * features;
+
+      for(arma::uword feature_i = 0; feature_i < features; ++feature_i)
+        output_matrix(batch_i, index + feature_i) = tensor(batch_i, time_i, feature_i);
+
+    }
+  }
+  return output_matrix;
+}

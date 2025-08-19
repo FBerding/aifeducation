@@ -1,19 +1,28 @@
 testthat::skip_on_cran()
 
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
-if(Sys.getenv("CI")=="true"){
-  print("---------------------------------------------------------")
-  print("On Continuous Integreation")
-  print("---------------------------------------------------------")
+if (Sys.getenv("CI") == "true") {
+  cat("\n")
+  cat("---------------------------------------------------------\n")
+  cat("On Continuous Integreation\n")
+  cat("---------------------------------------------------------\n")
 } else {
-  print("---------------------------------------------------------")
-  print("Not On Continuous Integreation")
-  print("---------------------------------------------------------")
+  cat("\n")
+  cat("---------------------------------------------------------\n")
+  cat("Not On Continuous Integreation\n")
+  cat("---------------------------------------------------------\n")
 }
 
-#Print python versions of the test system
-print(get_py_package_versions())
+# Print python versions of the test system
+if (Sys.getenv("CI") == "true") {
+  prepare_session(env_type ="conda",envname = "r-reticulate")
+} else {
+  prepare_session()
+}
+
+#print(get_py_package_versions())
+

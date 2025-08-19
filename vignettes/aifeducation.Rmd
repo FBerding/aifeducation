@@ -21,25 +21,12 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-Several packages allow users to use machine learning directly in *R*
-such as [nnet](https://cran.r-project.org/package=nnet) for single layer
-neural nets, [rpart](https://CRAN.R-project.org/package=rpart) for
-decision trees, and [ranger](https://CRAN.R-project.org/package=ranger)
-for random forests. Furthermore, with
-[mlr3verse](https://CRAN.R-project.org/package=mlr3verse) a series of
-packages exists for managing different algorithms with a unified
-interface.
-
-These packages can be used with a 'normal' computer and provide an easy
-installation. In terms of natural language processing, these approaches
-are currently limited. State-of-the-art approaches rely on neural nets
+In terms of natural language processing (NLP), state-of-the-art approaches rely on neural nets
 with multiple layers and consist of a huge number of parameters making
 them computationally demanding. With specialized libraries such as
-*keras*, *PyTorch* and *tensorflow*, graphical processing units (gpu)
+*PyTorch*, graphical processing units (gpu)
 can help to speed up computations significantly. However, many of these
 specialized libraries for machine learning are written in python.
-Fortunately, an interface to python is provided via the *R* package
-[reticulate](https://cran.r-project.org/package=reticulate).
 
 The R package *Artificial Intelligence for Education (aifeducation)*
 aims to provide educators, educational researchers, and social
@@ -78,24 +65,29 @@ Since natural language processing with neural nets is based on models
 which are computationally intensive, *PyTorch* is used within this
 package together with some other specialized python libraries.
 
+> Before you start installing python or updating python packages, please
+> ensure that you have the newest version of the *R* package 'reticulate' installed.
+
 The most straightforward method for getting started is to call the
 function `install_aifeducation` as follows:
 
 ```{r, include = TRUE, eval=FALSE}
-install_aifeducation(
-  install_aifeducation_studio = TRUE
-)
+aifeducation::install_aifeducation(
+  install_aifeducation_studio = TRUE,
+  python_version = "3.12",
+  cuda_version = "12.4",
+  use_conda = FALSE)
 ```
 
-This function will install python, miniconda, and all relevant python
-libraries into a conda environment called "aifeducation".
+This function will install python, and all relevant python
+libraries into a virtual environment called "aifeducation".
 
 In addition, we recommend to set `install_aifeducation_studio=TRUE`
 since this will install the optional *R* packages necessary to use *AI
 for Education - Studio*. *AI for Education - Studio* is a graphical user
-interface for applying these packages. We recommend to use it for
+interface for using this package. We recommend to use it for
 everyone who is unfamiliar with *R* or machine learning. If you do not
-want use the studio, you can set the argument to `FALSE`. In this case
+want use studio, you can set the argument to `FALSE`. In this case
 you have to use the package with *R* syntax.
 
 If you have a suitable machine and would like to use a graphic card for
@@ -124,22 +116,22 @@ The most convenient way to work with the package is to use *AI for
 Education - Studio* which you can start by calling
 `aifeducation::start_aifeducation_studio()`.
 
+```{r, include = TRUE, eval=FALSE}
+aifeducation::start_aifeducation_studio()
+```
+
 In case you do not want to use the graphical user interface, you have to
-prepare your *R* sessions. First, it is necessary that you set up python
-via 'reticulate' and choose the conda environment where all necessary
-python libraries are available. Then you can load `aifeducation`. In
-case you installed python as suggested in this vignette, you may start a
-new session like this:
+prepare your *R* sessions. The easiest way is to call the following function
+directly after starting a *R* session.
 
 ```{r, include = TRUE, eval=FALSE}
-reticulate::use_condaenv(condaenv = "aifeducation")
 library(aifeducation)
+aifeducation::prepare_session()
 ```
 
 > **Note:** Please remember: Every time you start a new session in *R,*
-> you have to to set the correct conda environment and load the library
-> `aifeducation`. This is not necessary if you use *AI for Education -
-> Studio*.
+> you have to call the funcion `aifeducation::prepare_session`. This is not
+> necessary if you use *AI for Education - Studio*.
 
 # 3) Tutorials and Guides
 
@@ -147,8 +139,7 @@ A guide on how to use the graphical user interface can be found in
 vignette [02 Using the graphical user interface Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 
-A short introduction into the package with examples for classification
-tasks can be found in vignette [03 Using R
+A short introduction into the package with *R* syntax can be found in vignette [03 Using R
 syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
 
 Documenting and sharing your work is described in vignette [04 Sharing
@@ -158,12 +149,13 @@ and using trained AI/models](https://fberding.github.io/aifeducation/articles/sh
 
 In case you already use *aifeducation* and you want to update to a newer
 version of this package, it is recommended to update the used python
-libraries as well. The easiest way is to remove the conda environment
-"aifeducation" and to install the libraries into a fresh environment.
-This can be done by setting `remove_first=TRUE` in `install_py_modules`.
+libraries as well. The easiest way is to call the following function:
 
 ```{r, include = TRUE, eval=FALSE}
-aifeducation::install_py_modules(
-  remove_first = TRUE
-)
+aifeducation::update_aifeducation(
+  update_aifeducation_studio = TRUE,
+  env_type = "auto",
+  cuda_version = "12.4",
+  envname = "aifeducation")
 ```
+

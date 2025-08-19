@@ -56,7 +56,7 @@ TextEmbeddingModel_Use_UI <- function(id) {
           Tokenize_Encode_Decode_UI(id = shiny::NS(id, "TextEmbeddingModel_TokEnDe"))
         ),
         bslib::nav_panel(
-          title = "Embedd Text",
+          title = "Embed Text",
           Embed_UI(id = shiny::NS(id, "TextEmbeddingModel_Embed"))
         )
       )
@@ -78,10 +78,6 @@ TextEmbeddingModel_Use_UI <- function(id) {
 #'
 TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
-    ns <- session$ns
-
     # File system management----------------------------------------------------
     shinyFiles::shinyDirChoose(
       input = input,

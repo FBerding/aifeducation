@@ -97,10 +97,6 @@ Fill_Mask_UI <- function(id) {
 #'
 Fill_Mask_Server <- function(id, model) {
   shiny::moduleServer(id, function(input, output, session) {
-    # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
-    ns <- session$ns
-
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)

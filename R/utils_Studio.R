@@ -20,7 +20,7 @@
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface. The content of the list
 #'   depends on the kind of model passed to this function.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -35,9 +35,9 @@ generate_sidebar_information <- function(model) {
       model_label <- model$get_model_info()$model_label
     }
 
-    max_tokens <- (model$get_basic_components()$max_length - model$get_transformer_components()$overlap) * model$get_transformer_components()$chunks + model$get_basic_components()$max_length
+    max_tokens <- (model$get_basic_components()$max_length - model$get_transformer_components()$overlap) *
+      model$get_transformer_components()$chunks + model$get_basic_components()$max_length
 
-    # TODO (Yuliia): remove? Variable is not used
     if (!is.null(model$get_transformer_components()$aggregation)) {
       aggegation <- shiny::tags$p("Hidden States Aggregation: ", model$get_transformer_components()$aggregation)
     } else {
@@ -80,6 +80,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$hr(),
       shiny::tags$p("# Parameter: ", model$count_parameter()),
       shiny::tags$p("Method: ", model$get_basic_components()$method),
+      aggegation,
       shiny::tags$p("Max Tokens per Chunk: ", model$get_basic_components()$max_length),
       shiny::tags$p("Max Chunks: ", model$get_transformer_components()$chunks),
       shiny::tags$p("Token Overlap: ", model$get_transformer_components()$overlap),
@@ -91,8 +92,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
     )
-  } else if ("TEClassifierRegular" %in% class(model) ||
-    "TEClassifierProtoNet" %in% class(model)) {
+  } else if ("ClassifiersBasedOnTextEmbeddings" %in% class(model)) {
     if (is.null(model)) {
       model_label <- NULL
     } else {
@@ -148,9 +148,6 @@ generate_sidebar_information <- function(model) {
       )
     }
   }
-
-
-
   return(ui)
 }
 
@@ -165,7 +162,7 @@ generate_sidebar_information <- function(model) {
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface. The content of the list
 #'   depends on the kind of model passed to this function. If the `model` is `NULL` function returns `NULL`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -207,7 +204,7 @@ generate_model_description <- function(model, eng) {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -257,7 +254,7 @@ generate_model_bib_description <- function(model) {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -342,7 +339,7 @@ generate_doc_input_developers <- function(ns, model, type = "developers") {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -424,7 +421,7 @@ generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "
 #'   errors the function returns embeddings as an object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText]. In
 #'   the case of erros the function returns `NULL`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -440,8 +437,10 @@ load_and_check_embeddings <- function(dir_path) {
       # Wait for modal
       Sys.sleep(1)
       embeddings <- load_from_disk(dir_path)
-      if (("EmbeddedText" %in% class(embeddings)) == TRUE ||
-        "LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+      if (
+        "EmbeddedText" %in% class(embeddings) ||
+          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+      ) {
         shiny::removeModal()
         return(embeddings)
       } else {
@@ -475,6 +474,52 @@ load_and_check_embeddings <- function(dir_path) {
   }
 }
 
+load_and_check_dataset_raw_texts <- function(dir_path) {
+  if (!is.null(dir_path)) {
+    if (file.exists(dir_path) == TRUE) {
+      display_processing(
+        title = "Working. Please wait.",
+        size = "l",
+        easy_close = FALSE,
+        message = ""
+      )
+      # Wait for modal
+      Sys.sleep(1)
+      data_set_raw_text <- load_from_disk(dir_path)
+      if ("LargeDataSetForText" %in% class(data_set_raw_text)) {
+        shiny::removeModal()
+        return(data_set_raw_text)
+      } else {
+        shiny::removeModal()
+        display_errors(
+          title = "Error",
+          size = "l",
+          easy_close = TRUE,
+          error_messages = "The file contains data in an unsupported format.
+              A data set for raw texts must be of class 'LargeDataSetForText'. Please
+              check data. A data set for raw texts should always be created via data
+              preparation of this user interfache or with the corresponding
+              method of the LargeDataSetForText."
+        )
+        rm(data_set_raw_text)
+        gc()
+        return(NULL)
+      }
+    } else {
+      shiny::removeModal()
+      display_errors(
+        title = "Error",
+        size = "l",
+        easy_close = TRUE,
+        error_messages = "The file does not exist on the path."
+      )
+      return(NULL)
+    }
+  } else {
+    return(NULL)
+  }
+}
+
 #' @title Load and check target data
 #' @description Function for checking and loading target data in AI for Education - Studio.
 #'
@@ -487,7 +532,7 @@ load_and_check_embeddings <- function(dir_path) {
 #' @importFrom stringi stri_split_fixed
 #' @importFrom stringi stri_trans_tolower
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 load_and_check_target_data <- function(file_path) {
@@ -500,9 +545,9 @@ load_and_check_target_data <- function(file_path) {
         message = ""
       )
 
-      # extension=stringr::str_split_fixed(file_path,pattern="\\.",n=Inf)
-      # extension=extension[1,ncol(extension)]
-      # extension=stringr::str_to_lower(extension)
+      # extension <- stringr::str_split_fixed(file_path, pattern = "\\.", n = Inf)
+      # extension <- extension[1, ncol(extension)]
+      # extension <- stringr::str_to_lower(extension)
       extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
       extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
 
@@ -589,7 +634,7 @@ load_and_check_target_data <- function(file_path) {
 #'
 #' @return Returns the object. Only in the case that the object is `NULL` or `object == ""` the function returns `NULL`
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -607,7 +652,7 @@ transform_input <- function(object) {
 #'
 #' @return Returns `TRUE` if input is `NULL` or `""`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -623,7 +668,7 @@ check_for_empty_input <- function(input) {
 #'
 #' @return Returns the input as a numeric input or `NULL` if input is `NULL` or `""`.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -644,7 +689,7 @@ check_numeric_input <- function(input) {
 #'
 #' @return Returns a named factor containing the target data.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @export
 long_load_target_data <- function(file_path, selectet_column) {
   extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
@@ -700,137 +745,6 @@ long_load_target_data <- function(file_path, selectet_column) {
   return(target_factor)
 }
 
-#' @title Prepare history data of objects
-#' @description Function for preparing the history data of a model in order to be plotted in AI for Education - Studio.
-#'
-#' @param model Model for which the data should be prepared.
-#' @param final `bool` If `TRUE` the history data of the final training is used for the data set.
-#' @param use_pl `bool` If `TRUE` data preparation assumes that pseudo labeling was applied during the training of the
-#'   model.
-#' @param pl_step `int` If `use_pl=TRUE` select the step within pseudo labeling for which the data should be prepared.
-
-#' @return Returns a named `list` with the training history data of the model. The
-#' reported measures depend on the provided model.
-#'
-#' @family studio_utils
-#' @keywords internal
-#' @noRd
-#'
-prepare_training_history <- function(model,
-                                     final = FALSE,
-                                     use_pl = FALSE,
-                                     pl_step = NULL) {
-  plot_data <- model$last_training$history
-
-  if ("TEFeatureExtractor" %in% class(model)) {
-    plot_data[[1]] <- list(loss = plot_data[[1]])
-  }
-
-  if (is.null_or_na(final)) final <- FALSE
-
-  # Get standard statistics
-  n_epochs <- model$last_training$config$epochs
-  index_final <- length(model$last_training$history)
-
-  # Get information about the existence of a training, validation, and test data set
-  # Get Number of folds for the request
-  if (final == FALSE) {
-    n_folds <- length(model$last_training$history)
-    if (n_folds > 1) {
-      n_folds <- n_folds - 1
-    }
-    measures <- names(plot_data[[1]])
-    if (!use_pl) {
-      n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
-    } else {
-      n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]][[measures[1]]])
-    }
-  } else {
-    n_folds <- 1
-    measures <- names(plot_data[[index_final]])
-    if (use_pl == FALSE) {
-      n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
-    } else {
-      n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
-    }
-  }
-
-  if (n_sample_type == 3) {
-    sample_type_name <- c("train", "validation", "test")
-  } else {
-    sample_type_name <- c("train", "validation")
-  }
-
-  # Create array for saving the data-------------------------------------------
-  result_list <- NULL
-  for (j in 1:length(measures)) {
-    measure <- measures[j]
-    measure_array <- array(
-      dim = c(
-        n_folds,
-        n_sample_type,
-        n_epochs
-      ),
-      dimnames = list(fold = NULL, sample_type = sample_type_name, epoch = NULL)
-    )
-
-    final_data_measure <- matrix(
-      data = NA,
-      nrow = n_epochs,
-      ncol = 3 * n_sample_type + 1
-    )
-    colnames(final_data_measure) <- c(
-      "epoch",
-      paste0(
-        sample_type_name,
-        c(
-          rep("_min", times = n_sample_type),
-          rep("_mean", times = n_sample_type),
-          rep("_max", times = n_sample_type)
-        )
-      )
-    )
-    final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
-
-    if (final == FALSE) {
-      for (i in 1:n_folds) {
-        if (use_pl == FALSE) {
-          measure_array[i, , ] <- plot_data[[i]][[measure]]
-        } else {
-          measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
-        }
-      }
-    } else {
-      if (!use_pl) {
-        measure_array[1, , ] <- plot_data[[index_final]][[measure]]
-      } else {
-        measure_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
-      }
-    }
-
-    for (i in 1:n_epochs) {
-      final_data_measure[i, "train_min"] <- min(measure_array[, "train", i])
-      final_data_measure[i, "train_mean"] <- mean(measure_array[, "train", i])
-      final_data_measure[i, "train_max"] <- max(measure_array[, "train", i])
-
-      final_data_measure[i, "validation_min"] <- min(measure_array[, "validation", i])
-      final_data_measure[i, "validation_mean"] <- mean(measure_array[, "validation", i])
-      final_data_measure[i, "validation_max"] <- max(measure_array[, "validation", i])
-
-      if (n_sample_type == 3) {
-        final_data_measure[i, "test_min"] <- min(measure_array[, "test", i])
-        final_data_measure[i, "test_mean"] <- mean(measure_array[, "test", i])
-        final_data_measure[i, "test_max"] <- max(measure_array[, "test", i])
-      }
-    }
-    result_list[j] <- list(final_data_measure)
-  }
-
-  # Finalize data---------------------------------------------------------------
-  names(result_list) <- measures
-  return(result_list)
-}
-
 #' @title Generate description for text embeddings
 #' @description Function generates a description for the underling [TextEmbeddingModel] of
 #' give text embeddings.
@@ -838,7 +752,7 @@ prepare_training_history <- function(model,
 #' @param embeddings Object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText].
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #'
 create_data_embeddings_description <- function(embeddings) {
@@ -878,93 +792,117 @@ create_data_embeddings_description <- function(embeddings) {
       colnames = FALSE
     )
   )
+  return(ui)
+}
 
+create_data_raw_texts_description <- function(data_set_for_raw_texts) {
+  ui <- bslib::value_box(
+    value = data_set_for_raw_texts$n_rows(),
+    title = "Number of Cases",
+    showcase = shiny::icon("list")
+  )
+  return(ui)
+}
+
+create_data_base_model_description <- function(base_model) {
+  ui <- bslib::value_box(
+    value = detect_base_model_type(base_model),
+    title = "Base Model Type",
+    showcase = shiny::icon("brain")
+  )
   return(ui)
 }
 
 #' @title Function for setting up AI for Education - Studio
-#' @description This functions checks if all nevessary R packages and python packages are available for using AI for
-#'   Education - Studio. In the case python is not initialized it will set the conda environment to `"aifeducation"`. In
+#' @description This functions checks if all necessary R packages and python packages are available for using AI for
+#'   Education - Studio. In the case python is not initialized it will first try to set a virtual environment `"aifeducation"`. If
+#'   this does not exist it tries to use a 'conda' environment `"aifeducation"`. In
 #'   the case python is already initialized it checks if the app can be run within the current environment.
+#'
+#' @param env_type `string` If set to `"venv"`  virtual environment is requested. If set to
+#' `"conda"` a 'conda' environment is requested. If set to `"auto"` the function tries to
+#' activate a virtual environment with the given name. If this environment does not exist
+#' it tries to activate a conda environment with the given name. If this fails
+#' the default virtual environment is used.
 #'
 #' @return Function does not return anything. It is used for preparing python and R
 #' in order to run AI for Education - Studio.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
+#' @importFrom utils packageVersion
 #' @keywords internal
 #' @noRd
 #'
-check_and_prepare_for_studio <- function() {
+check_and_prepare_for_studio <- function(env_type = "auto") {
   message("Checking R Packages.")
-  r_packages <- c(
-    "ggplot2",
-    "rlang",
-    "shiny",
-    "shinyFiles",
-    "shinyWidgets",
-    "sortable",
-    "bslib",
-    "future",
-    "promises",
-    "DT",
-    "readtext",
-    "readxl"
+  r_packages <- list(
+    "ggplot2" = NULL,
+    "rlang" = NULL,
+    "shiny" = "1.9.0",
+    "shinyFiles" = NULL,
+    "shinyWidgets" = NULL,
+    "shinycssloaders" = NULL,
+    "sortable" = NULL,
+    "bslib" = NULL,
+    "future" = NULL,
+    "promises" = NULL,
+    "DT" = NULL,
+    "readtext" = NULL,
+    "readxl" = NULL
   )
 
   missing_r_packages <- NULL
-  for (i in 1:length(r_packages)) {
-    if (!requireNamespace(r_packages[i], quietly = TRUE, )) {
+  for (i in seq_len(length(r_packages))) {
+    if (!requireNamespace(names(r_packages)[i], quietly = TRUE, )) {
       missing_r_packages <- append(
         x = missing_r_packages,
-        values = r_packages[i]
+        values = names(r_packages)[i]
       )
+    } else {
+      if (!is.null(r_packages[[i]])) {
+        if (!check_versions(
+          a = as.character(utils::packageVersion(names(r_packages)[[i]])),
+          operator = ">=",
+          b = r_packages[[i]]
+        )) {
+          cat(paste(
+            "version of", names(r_packages)[i], "is", utils::packageVersion(names(r_packages)[i]),
+            "but must be at least", r_packages[[i]], "."
+          ))
+          missing_r_packages <- append(
+            x = missing_r_packages,
+            values = names(r_packages)[i]
+          )
+        }
+      }
     }
   }
 
   if (length(missing_r_packages) > 0) {
     install_now <- utils::askYesNo(
       msg = paste(
-        "The following R packages are missing for Aifeducation Studio.",
-        "'",paste(missing_r_packages,collapse = ","),"'.",
+        "The following R packages are missing or need a newer version for Aifeducation Studio.",
+        "'", paste(missing_r_packages, collapse = ","), "'.",
         "Do you want to install them now?"
       ),
       default = TRUE,
       prompts = getOption("askYesNo", gettext(c("Yes", "No")))
     )
     if (install_now) {
-      utils::install.packages(missing_r_packages)
+      utils::install.packages(
+        pkgs = missing_r_packages,
+        dependencies = c("Depends", "Imports", "LinkingTo")
+      )
     } else {
       stop("Some necessary R Packages are missing.")
     }
   }
 
-  message("Setting the correct conda environment.")
-  if (!reticulate::py_available(FALSE)) {
-    message("Python is not initalized.")
-    if (!reticulate::condaenv_exists("aifeducation")) {
-      stop("Aifeducation studio requires a conda environment 'aifeducation' with
-      specific python libraries. Please install this. Please refer to the corresponding
-      vignette for more details.")
-    } else {
-      message("Setting conda environment to 'aifeducation'.")
-      reticulate::use_condaenv("aifeducation")
-      message("Initializing python.")
-      if (!reticulate::py_available(TRUE)) {
-        stop("Python cannot be initalized. Please check your installation of python.")
-      }
-    }
-  } else {
-    current_conda_session <- get_current_conda_env()
-    message(paste(
-      "Python is already initalized with the conda environment",
-      "'", current_conda_session, "'.",
-      "Try to start Aifeducation Studio with the current environment."
-    ))
-  }
+  prepare_session(env_type = env_type, envname = "aifeducation")
 
   message("Checking pytorch machine learning framework.")
   available_ml_frameworks <- NULL
-  if (check_aif_py_modules(trace = FALSE, check = "pytorch")) {
+  if (check_aif_py_modules(trace = FALSE)) {
     available_ml_frameworks <- append(available_ml_frameworks, values = "pytorch")
   }
   if (is.null(available_ml_frameworks)) {
@@ -986,7 +924,7 @@ check_and_prepare_for_studio <- function() {
 #'
 #' @return Returns a `shiny::tagList` containing the html elements for the user interface.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -1023,7 +961,7 @@ generate_doc_input_licensing_editor <- function(ns, model) {
 #'
 #' @return If value is `NULL` returns `NA`. In all other cases it returns value.
 #'
-#' @family studio_utils
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
@@ -1035,19 +973,403 @@ replace_null_with_na <- function(value) {
   }
 }
 
-#' @title Replace NULL with NA
-#' @description Function replaces `NULL` with `NA`
+#' @title Create widget card
+#' @description This function creates a card which contains a widget for
+#' all arguments of the method determined with `method`.
 #'
-#' @return If value is `NULL` returns `NA`. In all other cases it returns value.
+#' @description In order to include
+#' an argument within the card the argument must be specified in `get_param_dict`.
+#' The entry `gui_box` must be set to a `string`. All argument with the same value
+#' for `gui_box` are grouped within a box of the card. The value of `gui_box` also
+#' functions as header of the box. To exclude an argumet set `gui_box=NULL` in
+#' `get_param_dict`.
 #'
-#' @family studio_utils
+#' @param id Id of the shiny session.
+#' @param object_class `string` Class of the object.
+#' @param method `string` Method for which the card should be created.
+#' @param box_title `string` Title of the card containing the boxes.
+#'
+#' @return Returns a `bslib::card`.
+#'
+#' @family Utils Studio Developers
 #' @keywords internal
 #' @noRd
 #'
-replace_null_with_na <- function(value) {
-  if (is.null(value)) {
-    return(NA)
-  } else {
-    return(value)
+create_widget_card <- function(id,
+                               object_class,
+                               method = "configure",
+                               box_title) {
+  # Create Object
+  object <- create_object(object_class)
+
+  # Get params of the corresponding method
+  params <- rlang::fn_fmls_names(object[[method]])
+
+  # Get param dict
+  param_dict <- get_param_dict()[params]
+
+  tmp_boxes <- list()
+  for (param in params) {
+    dict_entry <- param_dict[[param]]
+    if (!is.null(dict_entry$gui_label)) {
+      tmp_label <- dict_entry$gui_label
+      #if (!is.null(dict_entry$values_desc)) {
+        tmp_label_with_icon <- shiny::tags$p(
+          bslib::popover(
+            #trigger = shiny::icon("info-circle"),
+            trigger = dict_entry$gui_label,
+            shiny::includeMarkdown(
+              get_parameter_documentation(
+                param_name = param,
+                param_dict = param_dict,
+                inc_param_name=FALSE,
+                as_list = FALSE
+              )
+            ),
+            options = list(
+              "trigger"="hover"#,
+              #"delay"="{'show': 0, 'hide': 500}"
+            )
+          )
+        )
+      #} else {
+      #  tmp_label_with_icon <- dict_entry$gui_label
+      #}
+    } else {
+      tmp_label <- param
+      tmp_label_with_icon <- param
+    }
+    if (!is.null(dict_entry$gui_box)) {
+      if (dict_entry$type == "int") {
+        if (dict_entry$min == -Inf) {
+          tmp_min <- NA
+        } else {
+          tmp_min <- dict_entry$min
+        }
+
+        if (dict_entry$max == Inf) {
+          tmp_max <- NA
+        } else {
+          tmp_max <- dict_entry$max
+        }
+
+        widget <- shiny::numericInput(
+          inputId = shiny::NS(id, param),
+          label = tmp_label_with_icon,
+          value = dict_entry$default_value,
+          min = tmp_min,
+          max = tmp_max
+        )
+      } else if (dict_entry$type == "string") {
+        if (param == "sustain_iso_code") {
+          widget <- shiny::selectInput(
+            inputId = shiny::NS(id, param),
+            label = tmp_label_with_icon,
+            choices = get_alpha_3_codes(),
+            selected = dict_entry$default_value,
+            multiple = FALSE
+          )
+        } else {
+          if (!is.null(dict_entry$allowed_values)) {
+            widget <- shiny::selectInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label_with_icon,
+              choices = dict_entry$allowed_values,
+              multiple = FALSE
+            )
+          } else {
+            widget <- shiny::textInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label_with_icon
+            )
+          }
+        }
+      } else if (dict_entry$type == "bool") {
+        widget <- shinyWidgets::materialSwitch(
+          inputId = shiny::NS(id, param),
+          label = tmp_label_with_icon,
+          value = dict_entry$default_value
+        )
+      } else if (dict_entry$type == "double" |
+        dict_entry$type == "(double" |
+        dict_entry$type == "double)" |
+        dict_entry$type == "(double)") {
+        if (dict_entry$min != -Inf & dict_entry$max != Inf) {
+          if (!is.null(dict_entry$magnitude)) {
+            widget <- shiny::selectInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label_with_icon,
+              choices = get_magnitude_values(
+                min = dict_entry$min,
+                max = dict_entry$max,
+                magnitude = dict_entry$magnitude,
+                n_elements = 9
+              )
+            )
+          } else {
+            range <- dict_entry$max - dict_entry$min
+
+            if (dict_entry$type == "(double" |
+              dict_entry$type == "(double)") {
+              tmp_min <- dict_entry$min + range * 0.01
+            } else {
+              tmp_min <- dict_entry$min
+            }
+
+            if (dict_entry$type == "double)" |
+              dict_entry$type == "(double)") {
+              tmp_max <- dict_entry$max - range * 0.01
+            } else {
+              tmp_max <- dict_entry$max
+            }
+
+            widget <- shiny::sliderInput(
+              inputId = shiny::NS(id, param),
+              label = tmp_label_with_icon,
+              value = dict_entry$default_value,
+              min = tmp_min,
+              max = tmp_max,
+            )
+          }
+        }
+      }
+
+      # Add widget to the correct box
+      current_box <- tmp_boxes[[dict_entry$gui_box]]
+      current_box[tmp_label] <- list(widget)
+      tmp_boxes[dict_entry$gui_box] <- list(current_box)
+    }
   }
+
+  # Sort Boxes
+  box_names <- names(tmp_boxes)
+  if ("General Settings" %in% box_names) {
+    reduced_names <- setdiff(x = box_names, "General Settings")
+    ordered_names <- c(
+      "General Settings",
+      reduced_names[order(reduced_names)]
+    )
+  } else {
+    ordered_names <- box_names[order(box_names)]
+  }
+  tmp_boxes <- tmp_boxes[ordered_names]
+
+  # Sort Widgets
+  for (i in 1:length(tmp_boxes)) {
+    current_box <- tmp_boxes[[i]]
+    tmp_names <- names(current_box)
+    # Ensure that parameters starting with use are displayed first
+    is_use_string <- stringi::stri_detect(str = tolower(tmp_names), regex = "^use([:alnum:]*)")
+    if (max(is_use_string) >= 1) {
+      use_string <- tmp_names[which(is_use_string)]
+      reduced_names <- setdiff(x = tmp_names, y = use_string)
+      ordered_names <- c(
+        use_string,
+        reduced_names[order(reduced_names)]
+      )
+    } else {
+      ordered_names <- tmp_names[order(tmp_names)]
+    }
+    current_box <- current_box[ordered_names]
+    tmp_boxes[i] <- list(current_box)
+  }
+
+  # Create boxes with widgets
+  tmp_cards <- list()
+  layer_dict=get_layer_dict("all")
+  layer_labels=vector(length = length(layer_dict))
+  names(layer_labels)=names(layer_dict)
+  for(layer in names(layer_labels)){
+    layer_labels[layer]=layer_dict[[layer]]$title
+  }
+
+  for (i in 1:length(tmp_boxes)) {
+    if(names(tmp_boxes)[i]%in%layer_labels){
+      idx_current_layer=which(x=layer_labels==names(tmp_boxes)[i])
+      current_layer_name=names(layer_labels)[idx_current_layer]
+      popover_text=layer_dict[[current_layer_name]]$desc
+      current_popover=bslib::popover(
+        trigger =   shiny::icon("info-circle"),
+          shiny::includeMarkdown(popover_text)
+      )
+    } else {
+      current_popover=""
+    }
+
+    tmp_cards[length(tmp_cards) + 1] <- list(
+      bslib::card(
+        bslib::card_header(current_popover,names(tmp_boxes)[i]),
+        bslib::card_body(
+          # bslib::layout_column_wrap(
+          tmp_boxes[[i]]
+          # )
+        )
+      )
+    )
+  }
+
+
+
+  # Create Main Card
+  main_card <- bslib::card(
+    bslib::card_header(box_title),
+    bslib::card_body(
+      do.call(
+        what = bslib::layout_column_wrap,
+        args = tmp_cards
+      )
+    )
+  )
+  return(main_card)
+}
+
+#' @title Summarize arguments from shiny input
+#' @description This function extracts the input relevant for a specific
+#' method of a specific class from shiny input.
+#'
+#' @description In addition, it adds the path
+#' to all objects which can not be exported to another R session. These object
+#' must be loaded separately in the new session with the function `add_missing_args`.
+#' The paths are intended to be used with `shiny::ExtendedTask`. The final preparation of the arguments
+#' should be done with
+#'
+#' @description The function can also be used to override the default value of
+#' a method or to add value for arguments which are not part of shiny input
+#' (use parameter `override_args`).
+#'
+#' @param input Shiny input.
+#' @param object_class `string` Class of the object.
+#' @param method `string` Method of the class for which the arguments should
+#' be extracted and prepared.
+#' @param path_args `list` List containing the path to object that can not be exported
+#' to another R session. These must be loaded in the session.
+#' @param override_args `list` List containing all arguments that should be set manually.
+#' The values override default values of the argument and values which are part of `input`.
+#' @param meta_args `list` List containing information that are not relevant for the
+#' arguments of the method but are necessary to set up the `shiny::ExtendedTask`
+#' correctly.
+#'
+#' @note Please not that all list are named list of the format (argument_name=values).
+#'
+#' @return Returns a named `list` with the following entries:
+#' * args: Named `list` of all arguments necessary for the method of the class.
+#' * path_args: Named `list` of all paths for loading the objects missing in args.
+#' * meta_args: Named `list` of all arguments that are not part of the arguments of
+#'   the method but which are necessary to set up the `shiny::ExtendedTask` correctly.
+#'
+#' @family Utils Studio Developers
+#' @export
+summarize_args_for_long_task <- function(input,
+                                         object_class,
+                                         method = "configure",
+                                         path_args = list(
+                                           path_to_embeddings = NULL,
+                                           path_to_textual_dataset = NULL,
+                                           path_to_target_data = NULL,
+                                           path_to_feature_extractor = NULL,
+                                           destination_path = NULL,
+                                           folder_name = NULL
+                                         ),
+                                         override_args = list(),
+                                         meta_args = list(
+                                           py_environment_type = get_py_env_type(),
+                                           py_env_name = get_py_env_name(),
+                                           target_data_column = input$data_target_column,
+                                           object_class = input$classifier_type
+                                         )) {
+  # Create object in order to get relevant arguments
+  object <- create_object(object_class)
+
+  # Get dictionary of all parameters
+  param_dict <- get_param_dict()
+
+  # Create param_list
+  param_list <- rlang::fn_fmls(object[[method]])
+
+  # Get params of the method
+  params <- names(param_list)
+
+  for (param in params) {
+    current_param <- param_dict[[param]]
+    if (max(current_param$type %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")) &
+      !is.null(input[[param]])) {
+      param_list[param] <- list(input[[param]])
+    }
+  }
+
+  # Do type adjustments
+  if ("lr_rate" %in% params) {
+    param_list["lr_rate"] <- list(as.numeric(param_list[["lr_rate"]]))
+  }
+  if ("learning_rate" %in% params) {
+    param_list["learning_rate"] <- list(as.numeric(param_list[["learning_rate"]]))
+  }
+
+  # Override params but only if the argument to override exists
+  for (param in names(override_args)) {
+    if (param %in% params) {
+      param_list[param] <- list(override_args[[param]])
+    }
+  }
+
+  # Add path arguments and further additional arguments
+  return(list(
+    args = param_list,
+    path_args = path_args,
+    meta_args = meta_args
+  ))
+}
+
+#' @title Add missing arguments to a list of arguments
+#' @description This function is designed for taking the output of
+#' `summarize_args_for_long_task` as input. It adds the missing arguments.
+#' In general these are arguments that rely on objects of class R6 which can not
+#' be exported to a new R session.
+#'
+#' @param args Named `list` List for arguments for the method of a specific class.
+#' @param path_args Named `list` List of paths where the objects are stored on disk.
+#' @param meta_args Named `list` List containing arguments that are necessary in order to
+#' add the missing objects correctly.
+#'
+#' @return Returns a named `list` of all arguments that a method of a specific class
+#' requires.
+#'
+#' @family Utils Studio Developers
+#' @export
+#'
+add_missing_args <- function(args, path_args, meta_args) {
+  # Create a copy of all args
+  complete_args <- args
+
+  # Get dictionary of all parameters
+  param_dict <- get_param_dict()
+
+  for (param in names(args)) {
+    current_param <- param_dict[[param]]
+    if ("LargeDataSetForTextEmbeddings" %in% current_param$type) {
+      if (!is.null(path_args$path_to_embeddings)) {
+        complete_args[param] <- list(
+          load_from_disk(path_args$path_to_embeddings)
+        )
+      }
+    } else if ("TEFeatureExtractor" %in% current_param$type) {
+      if (!is.null(path_args$path_to_feature_extractor)) {
+        complete_args[param] <- list(
+          load_from_disk(path_args$path_to_feature_extractor)
+        )
+      }
+    } else if ("factor" %in% current_param$type & !is.null(path_args$path_to_target_data)) {
+      complete_args[param] <- list(
+        long_load_target_data(
+          file_path = path_args$path_to_target_data,
+          selectet_column = meta_args$target_data_column
+        )
+      )
+    } else if (max(c("EmbeddedText", "LargeDataSetForText") %in% current_param$type)) {
+      complete_args[param] <- list(
+        load_from_disk(path_args$path_to_textual_dataset)
+      )
+    }
+  }
+  return(complete_args)
 }

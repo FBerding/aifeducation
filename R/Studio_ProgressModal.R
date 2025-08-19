@@ -36,7 +36,7 @@
 
 # TODO (Yuliia): session has no visible binding
 create_process_modal <- function(ns,
-                                 string_update_interval="",
+                                 string_update_interval = "",
                                  title = "In progress. Please wait.",
                                  inc_middle = TRUE,
                                  inc_bottom = TRUE,
@@ -44,11 +44,15 @@ create_process_modal <- function(ns,
                                  easy_close = FALSE,
                                  size = "l") {
   prograssbars_list <- shiny::tagList(
-    shiny::tags$p("Report chart updates every",
-                  string_update_interval,
-                  "seconds."),
-    shiny::actionButton(inputId = ns("force_update"),
-                        label = "Update Now")
+    shiny::tags$p(
+      "Report chart updates every",
+      string_update_interval,
+      "seconds."
+    ),
+    shiny::actionButton(
+      inputId = ns("force_update"),
+      label = "Update Now"
+    )
   )
   prograssbars_list[length(prograssbars_list) + 1] <- shiny::tagList(
     shinyWidgets::progressBar(
@@ -147,7 +151,7 @@ start_and_monitor_long_task <- function(id,
                                         pgr_use_middle = FALSE,
                                         pgr_use_bottom = FALSE,
                                         pgr_use_graphic = FALSE,
-                                        update_intervall = 300,
+                                        update_intervall = 30,
                                         success_type = "data_sets") {
   shiny::moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------
@@ -155,17 +159,18 @@ start_and_monitor_long_task <- function(id,
     # Reset log
     reset_log(log_path = log_path)
     loss_log_path <- paste0(dirname(log_path), "/aifeducation_loss.log")
-    if (ExtendedTask_type %in% c("classifier", "feature_extractor")) {
+    #if (ExtendedTask_type %in% c("classifier", "feature_extractor")) {
       reset_loss_log(
         log_path = loss_log_path,
-        epochs = ExtendedTask_arguments$epochs
+        #epochs = ExtendedTask_arguments$epochs
+        epochs = 2
       )
-    } else if (ExtendedTask_type == "train_transformer") {
-      reset_loss_log(
-        log_path = loss_log_path,
-        epochs = ExtendedTask_arguments$params$n_epoch
-      )
-    }
+    #} else if (ExtendedTask_type == "train_transformer") {
+    #  reset_loss_log(
+    #    log_path = loss_log_path,
+    #    epochs = ExtendedTask_arguments$params$n_epoch
+      #)
+    #}
 
     # Create progress modal
     progress_modal <- create_process_modal(
@@ -181,21 +186,24 @@ start_and_monitor_long_task <- function(id,
     # Show modal
     shiny::showModal(progress_modal)
 
-    #Add current conda env to arguments
-    ExtendedTask_arguments["current_conda_env"]=get_current_conda_env()
-
-
-    #print("log_path")
-    #print(log_path)
-    #print("Argument")
-    #print(ExtendedTask_type)
-    #print(ExtendedTask_arguments)
+    # Add current env to arguments
+    if(!(ExtendedTask_type %in% c(
+      "classifier",
+      "feature_extractor",
+      "create_transformer",
+      "train_transformer",
+      "raw_texts",
+      "embed_raw_text"))){
+      ExtendedTask_arguments["current_conda_env"] <- get_py_env_name()
+    }
 
     args <- ExtendedTask_arguments
+    print(args)
     save(args,
       file = paste0(getwd(), "/arguments.rda")
     )
     future::plan(future::multisession)
+    #future::plan(future::sequential)
 
     # Start ExtendedTask
     CurrentTask <- NULL
@@ -203,24 +211,31 @@ start_and_monitor_long_task <- function(id,
       CurrentTask <- shiny::ExtendedTask$new(long_add_texts_to_dataset)
     } else if (ExtendedTask_type == "embed_raw_text") {
       CurrentTask <- shiny::ExtendedTask$new(long_transform_text_to_embeddings)
-    } else if (ExtendedTask_type == "classifier") {
-      CurrentTask <- shiny::ExtendedTask$new(long_classifier)
-    } else if (ExtendedTask_type == "feature_extractor") {
-      CurrentTask <- shiny::ExtendedTask$new(long_feature_extractor)
-    } else if (ExtendedTask_type == "create_transformer") {
-      CurrentTask <- shiny::ExtendedTask$new(long_create_transformer)
-    } else if (ExtendedTask_type == "train_transformer") {
-      CurrentTask <- shiny::ExtendedTask$new(long_train_transformer)
+    } else if (ExtendedTask_type == "classifier"|
+               ExtendedTask_type == "feature_extractor") {
+      CurrentTask <- shiny::ExtendedTask$new(long_models)
+    } else if (ExtendedTask_type == "create_transformer"|
+               ExtendedTask_type == "train_transformer") {
+      CurrentTask <- shiny::ExtendedTask$new(long_transformers)
     }
-    if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = args)
+
+    if(ExtendedTask_type == "classifier"|
+       ExtendedTask_type == "feature_extractor"|
+       ExtendedTask_type == "create_transformer"|
+       ExtendedTask_type == "train_transformer"){
+      CurrentTask$invoke(args)
+    } else {
+      if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments,quote = FALSE)
+    }
 
     # Check progress of the task
     progress_bar_status <- shiny::reactive({
       # Do periodical checks only if the task is actual running
       if (CurrentTask$status() == "running") {
         shiny::invalidateLater(millis = update_intervall * 1000)
-        force_update<-input$force_update
-        #print(date())
+        # TODO (Yuliia): force_update assigned but may not be used
+        force_update <- input$force_update
+        # print(date())
 
         log <- NULL
         if (!is.null(log_path)) log <- read_log(log_path)
@@ -284,7 +299,7 @@ start_and_monitor_long_task <- function(id,
               legend.position = "bottom"
             )
           return(plot)
-          }
+        }
       },
       res = 2 * 72
     )
@@ -296,7 +311,7 @@ start_and_monitor_long_task <- function(id,
       prgbars_status <- progress_bar_status()
       prgbars <- list(prgbars_status$top, prgbars_status$middle, prgbars_status$bottom)
 
-      for (i in 1:length(ids)) {
+      for (i in seq_len(length(ids))) {
         if (!is.null(prgbars[[i]])) {
           shinyWidgets::updateProgressBar(
             id = ids[i],

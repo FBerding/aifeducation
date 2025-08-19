@@ -4,17 +4,10 @@
 \alias{check_aif_py_modules}
 \title{Check if all necessary python modules are available}
 \usage{
-check_aif_py_modules(trace = TRUE, check = "pytorch")
+check_aif_py_modules(trace = TRUE)
 }
 \arguments{
 \item{trace}{\code{bool} \code{TRUE} if a list with all modules and their availability should be printed to the console.}
-
-\item{check}{\code{string} determining the machine learning framework to check for.
-\itemize{
-\item \code{check = "pytorch"}: for 'pytorch'.
-\item \code{check = "tensorflow"}: for 'tensorflow'.
-\item \code{check = "all"}: for both frameworks.
-}}
 }
 \value{
 The function prints a table with all relevant packages and shows which modules are available or unavailable.
@@ -22,13 +15,16 @@ The function prints a table with all relevant packages and shows which modules a
 If all relevant modules are available, the functions returns \code{TRUE}. In all other cases it returns \code{FALSE}
 }
 \description{
-This function checks if all  python modules necessary for the package aifeducation to work are
+This function checks if all  python modules necessary for the package 'aifeducation' to work are
 available.
 }
 \seealso{
 Other Installation and Configuration: 
 \code{\link{install_aifeducation}()},
+\code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},
-\code{\link{set_transformers_logger}()}
+\code{\link{prepare_session}()},
+\code{\link{set_transformers_logger}()},
+\code{\link{update_aifeducation}()}
 }
 \concept{Installation and Configuration}

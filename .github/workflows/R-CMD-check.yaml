@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, version_1_0_1_dev]
+    branches: [main, master, version_1_1_0]
   pull_request:
-    branches: [main, master, version_1_0_1_dev]
+    branches: [main, master, version_1_1_0]
 
 name: R-CMD-check
 
@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          #- {os: macos-latest,   r: 'release'}
-          #- {os: macos-latest,   r: 'devel'}
+         # - {os: macos-latest,   r: 'release'}
+        #  - {os: macos-latest,   r: 'devel'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'devel'}
     env:
@@ -52,6 +52,7 @@ jobs:
           channel-priority: flexible
           show-channel-urls: true
           use-only-tar-bz2: true
+          conda-remove-defaults: "true"
 
       - name: setup r-reticulate conda
         shell: Rscript {0}
@@ -61,14 +62,17 @@ jobs:
 
          envname<-"r-reticulate"
 
-         transformer_version = "<=4.46"
-         tokenizers_version = "<=0.20.4"
-         pandas_version = "<=2.2.3"
-         datasets_version = "<=3.1.0"
-         codecarbon_version = "<=2.8.2"
-         safetensors_version = "<=0.4.5"
+
+
+         transformer_version = "<=4.52.4"
+         tokenizers_version = "<=0.21.1"
+         pandas_version = "<=2.3.0"
+         datasets_version = "<=3.6.0"
+         codecarbon_version = "<=3.0.2"
+         safetensors_version = "<=0.5.3"
          torcheval_version = "<=0.0.7"
-         accelerate_version = "<=1.1.1"
+         accelerate_version = "<=1.8.1"
+         pytorch_cuda_version = "12.6"
          pytorch_cuda_version = "12.1"
 
           relevant_modules <- c(

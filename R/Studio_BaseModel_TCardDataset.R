@@ -10,7 +10,6 @@
 #'
 Dataset_UI <- function(id) {
   ns <- shiny::NS(id)
-
   bslib::page(
     shinyFiles::shinyDirButton(
       id = ns("button_select_dataset_dir"),
@@ -39,9 +38,6 @@ Dataset_UI <- function(id) {
 #'
 Dataset_Server <- function(id, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # Global variables -----------------------------------------------------------
-    ns <- session$ns
-
     # Control Panel --------------------------------------------------------------
     shinyFiles::shinyDirChoose(
       input = input,

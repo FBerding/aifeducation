@@ -33,14 +33,13 @@ def calc_SquaredCovSum(x):
   return cov_sum
 
 class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self,times, features_in,features_out,noise_factor):
+    def __init__(self,times, features_in,features_out,noise_factor,pad_value):
       super().__init__()
       self.features_in=features_in
       self.features_out=features_out
       self.sequence_length=times
       self.noise_factor=noise_factor
       self.difference=self.features_in-self.features_out
-      
       self.PackAndMasking_PT=PackAndMasking_PT()
       self.UnPackAndMasking_PT=UnPackAndMasking_PT(sequence_length=self.sequence_length)
       
@@ -68,7 +67,18 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         batch_first=True,
         bias=True)
         
+      if not pad_value==0:
+        self.switch_pad_value_start=layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)
+        self.switch_pad_value_final=layer_switch_pad_values(pad_value_old=0,pad_value_new=pad_value)
+      else:
+        self.switch_pad_value_start=None
+        self.switch_pad_value_final=None
+        
     def forward(self, x, encoder_mode=False, return_scs=False):
+      #Swtich padding value if necessary
+      if not self.switch_pad_value_start==None:
+        x=self.switch_pad_value_start(x)
+        
       if encoder_mode==False:
         if self.training==True:
           mask=self.get_mask(x)
@@ -80,16 +90,23 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         x=self.decoder_1(latent_space)[0]
         x=self.output(x)[0]
         x=self.UnPackAndMasking_PT(x)
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
         if return_scs==False:
           return x
         else:
           return x, calc_SquaredCovSum(self.UnPackAndMasking_PT(latent_space))
+      
       elif encoder_mode==True:
         x=self.PackAndMasking_PT(x)
         x=self.encoder_1(x)[0]
         x=self.latent_space(x)[0]
         x=self.UnPackAndMasking_PT(x)
-        return x
+        #Switch padding value back if necessary
+      if not self.switch_pad_value_start==None:
+        x=self.switch_pad_value_final(x)
+      return x
     def get_mask(self,x):
       device=('cuda' if torch.cuda.is_available() else 'cpu')
       time_sums=torch.sum(x,dim=2)
@@ -104,7 +121,7 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
       return(noise)
       
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self, features_in,features_out,noise_factor):
+    def __init__(self, features_in,features_out,noise_factor,pad_value,orthogonal_method):
       super().__init__()
       self.features_in=features_in
       self.features_out=features_out
@@ -115,11 +132,21 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       self.param_w2=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/3)),math.ceil(self.features_in-self.difference*(2/3))))
       self.param_w3=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/3))))
       
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map="householder")
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w3",orthogonal_map="householder")
+      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w1",orthogonal_map=orthogonal_method)
+      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w2",orthogonal_map=orthogonal_method)
+      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w3",orthogonal_map=orthogonal_method)
+      
+      if not pad_value==0:
+        self.switch_pad_value_start=layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)
+        self.switch_pad_value_final=layer_switch_pad_values(pad_value_old=0,pad_value_new=pad_value)
+      else:
+        self.switch_pad_value_start=None
+        self.switch_pad_value_final=None
 
     def forward(self, x, encoder_mode=False, return_scs=False):
+      #Swtich padding value if necessary
+      if not self.switch_pad_value_start==None:
+        x=self.switch_pad_value_start(x)
       if encoder_mode==False:
         #Add noise
         if self.training==True:
@@ -133,12 +160,17 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         
         #Latent Space
         latent_space=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w3))
-        
+
         #Decoder
         x=torch.nn.functional.tanh(torch.nn.functional.linear(latent_space,weight=torch.transpose(self.param_w3,dim0=1,dim1=0)))
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w2,dim0=1,dim1=0)))
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=torch.transpose(self.param_w1,dim0=1,dim1=0)))
+
         
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
+
         if return_scs==False:
           return x
         else:
@@ -150,6 +182,9 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         
         #Latent Space
         x=torch.nn.functional.tanh(torch.nn.functional.linear(x,weight=self.param_w3))
+        #Switch padding value back if necessary
+        if not self.switch_pad_value_start==None:
+          x=self.switch_pad_value_final(x)
         return x
       
     def get_mask(self,x):
@@ -247,7 +282,7 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       return(noise)
 
     
-def AutoencoderTrain_PT_with_Datasets(model,epochs, trace,batch_size,
+def AutoencoderTrain_PT_with_Datasets(model,optimizer_method, lr_rate, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
@@ -260,8 +295,22 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     dtype=torch.double
     model.to(device,dtype=dtype)
   
-  optimizer=torch.optim.Adam(params=model.parameters(),weight_decay=0)
+  if optimizer_method=="Adam":
+    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
+  elif optimizer_method=="RMSprop":
+    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
+  elif optimizer_method=="AdamW":
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="SGD":
+    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
   
+  
+  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
+  main_steps=epochs-warm_up_steps
+  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
+  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
+ 
   loss_fct=torch.nn.MSELoss()
 
   trainloader=torch.utils.data.DataLoader(
@@ -319,6 +368,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
                   total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
                   message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
         last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
+    
+    #Update learning rate
+    scheduler.step()
     
     #Validation----------------------------------------------------------------
     val_loss=0.0

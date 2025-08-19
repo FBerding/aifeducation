@@ -149,41 +149,23 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     # Load the model and extract information
     interface_architecture <- shiny::eventReactive(path_to_base_model(), {
       model_path <- path_to_base_model()
-      if (file.exists(paste0(
-        model_path,
-        "/",
-        "tf_model.h5"
-      ))) {
-        model <- transformers$TFAutoModel$from_pretrained(model_path)
-        model_architecture <- model$config$architectures
-        max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "FunnelForMaskedLM") {
-          max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
-        } else {
-          max_layer <- model$config$num_hidden_layers
-        }
-      } else if (file.exists(paste0(
-        model_path,
-        "/",
-        "pytorch_model.bin"
-      ))) {
+
+      path_bin=paste0(model_path,"/","pytorch_model.bin")
+      path_safetensor=paste0(model_path,"/","model.safetensors")
+
+      if (file.exists(path_safetensor)) {
+       valid_path= path_safetensor
+      } else if(file.exists(path_bin)) {
+        valid_path=path_bin
+      } else {
+        valid_path=NA
+      }
+
+      if(!is.na(valid_path)){
         model <- transformers$AutoModel$from_pretrained(model_path)
-        model_architecture <- model$config$architectures
+        model_architecture <-detect_base_model_type(model)
         max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "FunnelForMaskedLM") {
-          max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
-        } else {
-          max_layer <- model$config$num_hidden_layers
-        }
-      } else if (file.exists(paste0(
-        model_path,
-        "/",
-        "model.safetensors"
-      ))) {
-        model <- transformers$AutoModel$from_pretrained(model_path)
-        model_architecture <- model$config$architectures
-        max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "FunnelForMaskedLM") {
+        if (model_architecture == "funnel") {
           max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
         } else {
           max_layer <- model$config$num_hidden_layers
@@ -207,11 +189,10 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
       if (length(interface_architecture()[[2]]) > 0) {
         max_layer_transformer <- interface_architecture()[[3]]
 
-        if (interface_architecture()[[1]] == "FunnelForMaskedLM" |
-          interface_architecture()[[1]] == "FunnelModel") {
-          pool_type_choices <- c("cls")
+        if (interface_architecture()[[1]] == "funnel") {
+          pool_type_choices <- c("CLS")
         } else {
-          pool_type_choices <- c("average", "cls")
+          pool_type_choices <- c("Average", "CLS")
         }
 
         ui <- shiny::tagList(
@@ -265,26 +246,10 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
 
     # Save the model to disk----------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       model_architecture <- interface_architecture()[[1]]
-      if (model_architecture == "BertForMaskedLM" |
-        model_architecture == "BertModel") {
-        method <- "bert"
-      } else if (model_architecture == "FunnelForMaskedLM" |
-        model_architecture == "FunnelModel") {
-        method <- "funnel"
-      } else if (model_architecture == "LongformerForMaskedLM" |
-        model_architecture == "LongformerModel") {
-        method <- "longformer"
-      } else if (model_architecture == "RobertaForMaskedLM" |
-        model_architecture == "RobertaModel") {
-        method <- "roberta"
-      } else if (model_architecture == "DebertaV2ForMaskedLM" |
-        model_architecture == "DebertaV2Model") {
-        method <- "deberta_v2"
-      }
 
       # Check for errors
       errors <- check_errors_text_embedding_model_create(
@@ -293,7 +258,6 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
         path_to_base_model = path_to_base_model(),
         interface_architecture = interface_architecture()
       )
-
 
       if (length(errors) == 0) {
         shinyWidgets::show_alert(
@@ -313,9 +277,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           emb_layer_min = input$lm_emb_layers[1],
           emb_layer_max = input$lm_emb_layers[2],
           emb_pool_type = input$lm_emb_pool_type,
-          ml_framework = "pytorch",
-          model_dir = path_to_base_model(),
-          method = method
+          model_dir = path_to_base_model()
         )
 
         save_to_disk(
@@ -340,8 +302,10 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     # Error handling-----------------------------------------------------------
     shiny::observe({
       if (!identical(path_to_base_model(), character(0))) {
-        if (is.null(interface_architecture()[[1]]) &
-          is.null(interface_architecture()[[2]])) {
+        if (
+          is.null(interface_architecture()[[1]]) &
+            is.null(interface_architecture()[[2]])
+        ) {
           display_errors(
             title = "Error",
             size = "l",

@@ -15,7 +15,7 @@ fleiss_kappa(rater_one, rater_two, additional_raters = NULL)
 there are no additional raters set to \code{NULL}.}
 }
 \value{
-Retuns the value for Fleiss' Kappa.
+Returns the value for Fleiss' Kappa.
 }
 \description{
 This function calculates Fleiss' Kappa.
@@ -26,7 +26,10 @@ many raters. Psychological Bulletin, 76(5), 378–382. \url{doi:10.1037/h0031619
 }
 \seealso{
 Other performance measures: 
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{cohens_kappa}()},
+\code{\link{get_coder_metrics}()},
+\code{\link{gwet_ac}()},
 \code{\link{kendalls_w}()},
 \code{\link{kripp_alpha}()}
 }

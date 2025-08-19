@@ -4,6 +4,91 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.0
+
+**Major Changes**
+
+- Removed support for 'tensorflow'.
+- Refactor of all classifiers and for FeatureExtractor.
+- Added support for modernBERT.
+- Removed support for DeBERTa_V2. Implementation of this model changed from 'transformer'
+  version 4.46.3 to 4.47.1. This causes that the model does not produce the same results 
+  for the same data after saving and loading a model. Reproducibility is not guaranteed. In the
+  case that this is fixed in the future the model support will be re-implemented.
+- Changed the strings for a high numbers of arguments (e.g., "lstm" into "LSTM") 
+  in order to be more in line with `PyTorch`. Old models are updated automatically.
+
+**Installation and Configuration**
+
+- Removed functions belonging to 'tensorflow'.
+- Added the possibility to install python packages either to a 'conda' environment
+  or a virtual environment. Virtual environment is the new default.
+- Added functions for a more convenient preparation of a new session and for installing/updating python packages. 
+
+**LargeDataSetForText**
+
+- Added an algorithm cleaning raw texts in order to improve the performance of the following analysis.
+  See the method's documentation for more details. Currently only available for .pdf and .txt files.
+
+**Ai for Education Studio**
+
+- Implemented popovers to explain the different widgets. This feature will be extended in the future. 
+- Fixed a bug that prevented classifiers with applied pseudo labeling to visualize training history.
+- Re-created the user interface for classifiers, FeatureExtractor, and base models. Now the user interfaces
+  generates the necessary control widgets for configuration and training automatically depending on the method's arguments. 
+- Added loading animations for the time widgets are generated.
+
+**TextEmbeddingModel**
+
+- Removed parameter `method` from method `configure`. The method of the model is now 
+  detected automatically.
+- Fixed a bug which caused that TextEmbeddingModels saved the model without the mlm head.
+
+**Classifiers**
+
+- Added parameters for determining the learning rate and warm up ratio for training.
+- Added a check for the number of unlabeled cases during training to avoid application
+  of pseudo labeling if there are no unlabeled cases.
+- Fixed an error in calculating the number of folds if the number of requested folds is greater
+  as the minimal frequency of all classes/categories.
+- Users can now choose between different activation functions and parametrizations.
+- Removed argument `dir_checkpoint` from training method. Now the training uses 
+  a folder in the regular temp directory of the machine. After a successful training
+  the folder is removed.
+- Parameter 'name' in 'configure' is now optional. If set to `NULL` a unique name is
+  generated automatically. 
+- Added Focal Loss as a new loss function to sequential classifiers.
+- Added four new classes of classifiers.
+- Fixed a bug that caused classifiers to be not order invariant if the attention type is "Fourier".
+  
+**FeatureExtractor**
+
+- The option to choose an optimizer is now working.
+- Added parameters for determining the learning rate and warm up ratio for training.
+- Tracking sustainability is now working.
+- Removed argument 'dir_checkpoint' from training method. Now the training uses 
+  a folder in the regular temp directory of the machine. After a successful training
+  the folder is removed.
+- Parameter 'name' in 'configure' is now optional. If set to `NULL` a unique name is
+  generated automatically. 
+
+**Minorty Oversamping Techniques**
+
+- Added K-Nearest Neighbor OveRsampling approach (KNNOR) in C++ as new oversampling technique.
+- Removed support for all other oversampling techniques. No dependency to the package 'smotefamily'.
+- Changed update intervall of most processes within AI for Education - Studio from 300 to 30 seconds.
+
+**Performance Measures**
+
+- Added an own implementation of Gwet's AC1 and AC2 according to Gwet(2021).
+- Removed dependency to package 'irrCAC'.
+
+**Minor Changes**
+
+- Updated code for newer versions of numpy.
+- Added the function `prepare_python` for a convenient set up of virtual and 
+  'conda' environments.
+
 # aifeducation 1.0.2
 
 - Fixed a bug with alpha 3 codes for sustainability tracking preventing
@@ -176,7 +261,7 @@ The following changes have been made:
 -   Replaced the parameter 'aggregation' with three new parameters
     allowing to explicitly choose the start and end layer to be included
     in the creation of embeddings. Furthermore, two options for the
-    pooling method within each layer is added ("cls" and "average").
+    pooling method within each layer is added ("CLS" and "Average").
 -   Added support for reporting the training and validation loss during
     training the corresponding base model.
 

@@ -11,34 +11,52 @@
 BaseModel_Create_UI <- function(id) {
   ns <- shiny::NS(id)
 
+  # Sidebar------------------------------------------------------------------
   shiny::tagList(
     bslib::page_sidebar(
-      # Sidebar ------------------------------------------------------------------
+      # Sidebar------------------------------------------------------------------
       sidebar = bslib::sidebar(
         position = "left",
         shiny::tags$h3("Control Panel"),
+        shiny::tags$hr(),
+        shiny::selectInput(
+          inputId = shiny::NS(id, "base_model_type"),
+          choices = unlist(AIFETrType),
+          label = "Base Model Type"
+        ),
+        shiny::tags$hr(),
         shinyFiles::shinyDirButton(
-          id = ns("button_select_output_model_dir"),
-          label = "Choose Folder",
+          id = shiny::NS(id, "start_SaveModal"),
+          label = "Create Model",
           title = "Choose Destination",
-          icon = shiny::icon("folder-open")
-        ),
-        shiny::textInput(
-          inputId = ns("output_model_dir_path"),
-          label = shiny::tags$p(shiny::icon("folder"), "Path for saiving the created Base Model"),
-          width = "100%"
-        ),
-        shiny::actionButton(
-          inputId = ns("button_create"),
-          label = "Start Creation",
-          icon = shiny::icon("paper-plane")
+          icon = shiny::icon("floppy-disk")
         )
       ),
-      # Main panel ------------------------------------------------------------------
-      bslib::page(
-        ModelArchitecture_UI(id = ns("BaseModel_ModelArchitecture"))
+      # Main Page---------------------------------------------------------------
+      #bslib::layout_column_wrap(
+      bslib::card(
+        bslib::card_header("Input Data"),
+        bslib::card_body(
+          shinyFiles::shinyDirButton(
+            id = shiny::NS(id, "button_select_dataset_for_raw_texts"),
+            label = "Choose Collection of Raw Texts",
+            title = "Please choose a folder",
+            icon = shiny::icon("folder-open")
+          ),
+          shiny::textInput(
+            inputId = shiny::NS(id, "raw_text_dir"),
+            label = shiny::tags$p(shiny::icon("folder"), "Path"),
+            width="100%"
+          ),
+          shinycssloaders::withSpinner(
+            shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
+          )
+        )
+      ),
+      #Main config Cards
+      shiny::uiOutput(outputId = shiny::NS(id,"base_model_create"))
       )
-    )
+    #)
   )
 }
 
@@ -55,89 +73,159 @@ BaseModel_Create_UI <- function(id) {
 #' @keywords internal
 #' @noRd
 #'
-BaseModel_Create_Server <- function(id, log_dir, volumes, sustain_tracking) {
+BaseModel_Create_Server <- function(id, log_dir, volumes) {
   shiny::moduleServer(id, function(input, output, session) {
-    # Global variables -----------------------------------------------------------
-    ns <- session$ns
+    # global variables-----------------------------------------------------------
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
-    # Control Panel --------------------------------------------------------------
+    # File system management----------------------------------------------------
+    #Raw Texts
     shinyFiles::shinyDirChoose(
       input = input,
-      id = "button_select_output_model_dir",
+      id = "button_select_dataset_for_raw_texts",
       roots = volumes,
-      allowDirCreate = TRUE
+      # session = session,
+      allowDirCreate = FALSE
     )
-    shiny::observeEvent(input$button_select_output_model_dir, {
-      path <- shinyFiles::parseDirPath(volumes, input$button_select_output_model_dir)
+    shiny::observeEvent(input$button_select_dataset_for_raw_texts, {
+      path <- shinyFiles::parseDirPath(volumes, input$button_select_dataset_for_raw_texts)
       shiny::updateTextInput(
-        inputId = "output_model_dir_path",
+        inputId = "raw_text_dir",
         value = path
       )
     })
 
-    # Main Panel ------------------------------------------------------------------
-    params_reactive <- ModelArchitecture_Server(
-      id = "BaseModel_ModelArchitecture",
-      volumes = volumes
+    path_to_raw_texts <- shiny::eventReactive(input$raw_text_dir, {
+      if (input$raw_text_dir != "") {
+        return(input$raw_text_dir)
+      } else {
+        return(NULL)
+      }
+    })
+
+    data_raw_texts <- shiny::reactive({
+      if (!is.null(path_to_raw_texts())) {
+        return(load_and_check_dataset_raw_texts(path_to_raw_texts()))
+      } else {
+        return(NULL)
+      }
+    })
+
+    #Card of Model Configuration------------------------------------------------
+    output$base_model_create<-shiny::renderUI({
+      config_box=create_widget_card(
+        id=id,
+        object_class=input$base_model_type,
+        method = "create",
+        box_title="Model Configuration"
+      )
+    })
+
+    # Start screen for choosing the location for storing the data set-----------
+    # Create Save Modal
+    save_modal <- create_save_modal(
+      id = id,
+      # ns = session$ns,
+      title = "Choose Destination",
+      easy_close = FALSE,
+      size = "l"
     )
 
-    shiny::observeEvent(input$button_create, {
-      params <- params_reactive()
-      sustain_tracking <- sustain_tracking()
+    # Implement file connection
+    shinyFiles::shinyDirChoose(
+      input = input,
+      id = "start_SaveModal",
+      roots = volumes,
+      allowDirCreate = TRUE
+    )
 
-      # Checking ------------------------------------------------------------------
-
-      errors <- c()
-
-      if (params$dataset_dir_path == "") {
-        errors <- append(errors, "Please specify a path to the dataset for a vocabulary.")
-      } else if (!dir.exists(params$dataset_dir_path)) {
-        errors <- append(errors, paste(
-          "Path to the dataset for a vocabulary is not valid - there is no such directory path",
-          dQuote(params$dataset_dir_path)
-        ))
+    # show save_modal
+    shiny::observeEvent(input$start_SaveModal, {
+      path <- shinyFiles::parseDirPath(volumes, input$start_SaveModal)
+      if (!is.null(path) & !identical(path, character(0))) {
+        if (path != "") {
+          shiny::showModal(save_modal)
+          shiny::updateTextInput(
+            inputId = "save_modal_directory_path",
+            value = path
+          )
+        }
       }
+    })
 
-      if (input$output_model_dir_path == "") {
-        errors <- append(errors, "Please specify a directory path for saving the model.")
-      }
+    #Start creation-------------------------------------------------------------
+    shiny::observeEvent(input$save_modal_button_continue, {
+      # Remove Save Modal
+      shiny::removeModal()
 
-      # If there is an error -------------------------------------------------------
-      if (length(errors) != 0) {
-        error_msg <- paste(errors, collapse = "<br>")
-
-        shinyWidgets::show_alert(
-          title = "Creation error(s)",
-          text = shiny::HTML(error_msg),
-          html = TRUE,
-          type = "error"
+      # Check for errors
+      errors <- check_error_base_model_create_or_train(
+        destination_path=input$save_modal_directory_path,
+        folder_name=input$save_modal_folder_name,
+        path_to_raw_texts=path_to_raw_texts()
         )
-      } else { # No errors ----------------------------------------------------------
-        model_params <- params
-        # Remove ai_method and dataset_dir_path from model_params list
-        model_params <- model_params[!names(model_params) %in% c("ai_method", "dataset_dir_path")]
-        model_params[["ml_framework"]] <- "pytorch"
-        model_params[["model_dir"]] <- input$output_model_dir_path
-        model_params[["sustain_track"]] <- sustain_tracking$is_sustainability_tracked
-        model_params[["sustain_iso_code"]] <- sustain_tracking$sustainability_country
-        model_params[["log_dir"]] <- log_dir
-        model_params[["log_write_interval"]] <- 2
 
+      # If there are errors display them. If not start running task.
+      if (!is.null(errors)) {
+        display_errors(
+          title = "Error",
+          size = "l",
+          easy_close = TRUE,
+          error_messages = errors
+        )
+      } else {
+        # Start task and monitor
         start_and_monitor_long_task(
           id = id,
           ExtendedTask_type = "create_transformer",
           ExtendedTask_arguments = list(
-            transformer_type = params$ai_method,
-            dataset_dir_path = params$dataset_dir_path,
-            params = model_params
+            create=summarize_args_for_long_task(
+              input=input,
+              object_class=input$base_model_type,
+              method="create",
+              path_args=list(
+                path_to_embeddings=NULL,
+                path_to_target_data=NULL,
+                path_to_textual_dataset=path_to_raw_texts(),
+                path_to_feature_extractor=NULL,
+                destination_path=input$save_modal_directory_path,
+                folder_name=input$save_modal_folder_name
+              ),
+              override_args=list(
+                model_dir=paste0(input$save_modal_directory_path,"/",input$save_modal_folder_name),
+                sustain_track=TRUE,
+                log_dir = log_dir,
+                trace=FALSE,
+                pytorch_safetensors=TRUE
+              ),
+              meta_args=list(
+                py_environment_type=get_py_env_type(),
+                py_env_name=get_py_env_name(),
+                object_class=input$base_model_type
+              )
+            )
           ),
           log_path = log_path,
           pgr_use_middle = TRUE,
-          success_type = "create_transformer",
-          update_intervall = 2
+          pgr_use_bottom = FALSE,
+          pgr_use_graphic = FALSE,
+          update_intervall = 2,
+          success_type = "classifier"
         )
       }
     })
+
+    # Display Data Summary------------------------------------------------------
+    output$summary_data_raw_texts <- shiny::renderUI({
+      data_set_raw_texts <- data_raw_texts()
+      # shiny::req(data_set_raw_texts)
+      if (!is.null(data_set_raw_texts)) {
+        ui <- create_data_raw_texts_description(data_set_raw_texts)
+        return(ui)
+      } else {
+        return(NULL)
+      }
+    })
+
   })
 }

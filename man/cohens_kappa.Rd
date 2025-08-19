@@ -30,7 +30,10 @@ Educational and Psychological Measurement, 20(1), 37–46. \url{doi:10.1177/0013
 }
 \seealso{
 Other performance measures: 
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{fleiss_kappa}()},
+\code{\link{get_coder_metrics}()},
+\code{\link{gwet_ac}()},
 \code{\link{kendalls_w}()},
 \code{\link{kripp_alpha}()}
 }

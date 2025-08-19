@@ -23,8 +23,11 @@ This function calculates Kendall's coefficient of concordance w with and without
 }
 \seealso{
 Other performance measures: 
+\code{\link{calc_standard_classification_measures}()},
 \code{\link{cohens_kappa}()},
 \code{\link{fleiss_kappa}()},
+\code{\link{get_coder_metrics}()},
+\code{\link{gwet_ac}()},
 \code{\link{kripp_alpha}()}
 }
 \concept{performance measures}

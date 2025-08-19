@@ -49,7 +49,7 @@ ModelArchitecture_UI <- function(id) {
               shiny::selectInput(
                 inputId = ns("hidden_act"),
                 label = "Activation Function",
-                choices = c("gelu", "relu", "silu", "gelu_new")
+                choices = c("GELU", "ReLU", "silu", "gelu_new")
               ),
               shiny::sliderInput(
                 inputId = ns("hidden_dropout_prob"),

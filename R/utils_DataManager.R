@@ -14,16 +14,14 @@
 
 #-----------------------------------------------------------------------------
 #' @title Create synthetic cases for balancing training data
-#' @description This function creates synthetic cases for balancing the training with an object of the class
-#'   [TEClassifierRegular] or [TEClassifierProtoNet].
-#'
+#' @description This function creates synthetic cases for balancing the training with classifier models.
 #' @param matrix_form Named `matrix` containing the text embeddings in a matrix form.
 #' @param target Named `factor` containing the labels of the corresponding embeddings.
 #' @param times `int` for the number of sequences/times.
 #' @param features `int` for the number of features within each sequence.
 #' @param sequence_length `int` Length of the text embedding sequences.
-#' @param method `vector` containing strings of the requested methods for generating new cases. Currently "smote",
-#'   "dbsmote", and "adas" from the package smotefamily are available.
+#' @param method `vector` containing strings of the requested methods for generating new cases. Currently
+#'   "knnor" from this package is available.
 #' @param min_k `int` The minimal number of nearest neighbors during sampling process.
 #' @param max_k `int` The maximum number of nearest neighbors during sampling process.
 #' @return `list` with the following components:
@@ -31,7 +29,7 @@
 #'   * `syntetic_targets`: Named `factor` containing the labels of the corresponding synthetic cases.
 #'   * `n_syntetic_units`: `table` showing the number of synthetic cases for every label/category.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #'
 #' @export
 #' @import foreach
@@ -41,7 +39,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
                                             features,
                                             target,
                                             sequence_length,
-                                            method = c("smote"),
+                                            method = c("knnor"),
                                             min_k = 1,
                                             max_k = 6) {
   # get possible seq lengthes in order to group the cases by sequence length
@@ -74,40 +72,37 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
         min_k_final <- min_k
       }
 
+      max_k_final=as.numeric(max_k_final)
+      min_k_final=as.numeric(min_k_final)
+
       # Check k and adjust according to the difference to the major category
-      required_cases <- max_freq - cat_freq[cat]
+      required_cases <- as.numeric(max_freq - cat_freq[cat])
       n_k <- length(min_k_final:max_k_final)
       if (required_cases < n_k) {
         difference <- n_k - required_cases
         min_k_final <- min_k_final + difference
       }
 
-      if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3) {
-        for (m in 1:length(method)) {
-          if (method[m] != "dbsmote") {
-            for (k in min_k_final:max_k_final) {
-              input[[index]] <- list(
-                cat = cat,
-                required_cases = required_cases,
-                k = k,
-                method = method[m],
-                selected_cases = idx,
-                chunks = current_seq_length,
-                k_s = length(min_k_final:max_k_final),
-                max_k = max_k_final
-              )
-              index <- index + 1
+      if (cat_freq[cat] < max_freq & min_k > 0 & cat_freq[cat] > 3 & required_cases>0) {
+        for (m in seq_len(length(method))) {
+          for (k in min_k_final:max_k_final) {
+            if(length(max_k_final)>1){
+              stop("length")
             }
-          } else {
+            if(max_k_final<0){
+              stop("max smaller 0")
+            }
+            #print(as.numeric(max_k_final))
+            #print(class(max_k_final))
             input[[index]] <- list(
-              cat = cat,
-              required_cases = required_cases,
-              k = 0,
-              method = method[m],
+              cat = as.character(cat),
+              required_cases = as.numeric(required_cases),
+              k = as.numeric(k),
+              method = as.character(method[m]),
               selected_cases = idx,
-              chunks = current_seq_length,
-              k_s = 1,
-              max_k = 0
+              chunks = as.character(current_seq_length),
+              k_s = length(min_k_final:max_k_final),
+              max_k = as.numeric(max_k_final)
             )
             index <- index + 1
           }
@@ -115,11 +110,16 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
       }
     }
   }
+  #print(input)
+  #return(input)
 
-  result_list <- foreach::foreach(index = 1:length(input),
-                                  .export = "create_synthetic_units_from_matrix",
-                                  .errorhandling="pass") %dopar% {
-    # index=1
+
+  result_list <- foreach::foreach(
+    index = seq_len(length(input)),
+    .export = "create_synthetic_units_from_matrix",
+    .errorhandling = "pass"
+  ) %dopar% {
+    # index <- 1
     create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
         input[[index]]$selected_cases,
@@ -137,7 +137,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 
   # get number of synthetic cases
   n_syn_cases <- 0
-  for (i in 1:length(result_list)) {
+  for (i in seq_len(length(result_list))) {
     if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
       n_syn_cases <- n_syn_cases + nrow(result_list[[i]]$syntetic_embeddings)
     }
@@ -154,12 +154,12 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 
   n_row <- 0
   names_vector <- NULL
-  for (i in 1:length(result_list)) {
+  for (i in seq_len(length(result_list))) {
     if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
       syntetic_embeddings[
         (n_row + 1):(n_row + nrow(result_list[[i]]$syntetic_embeddings)),
-        c(1:ncol(result_list[[i]]$syntetic_embeddings))
-      ] <- result_list[[i]]$syntetic_embeddings[, c(1:ncol(result_list[[i]]$syntetic_embeddings))]
+        c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))
+      ] <- result_list[[i]]$syntetic_embeddings[, c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))]
       syntetic_targets <- append(syntetic_targets, values = result_list[[i]]$syntetic_targets)
       n_row <- n_row + nrow(result_list[[i]]$syntetic_embeddings)
       names_vector <- append(
@@ -176,7 +176,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     features = features
   )
   rownames(syntetic_embeddings) <- names_vector
-  # dimnames(syntetic_embeddings)[3]<-feature_names
+  # dimnames(syntetic_embeddings)[3] <- feature_names
 
   n_syntetic_units <- table(syntetic_targets)
 
@@ -191,8 +191,8 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #---------------------------------------------
 #' @title Create synthetic units
 #' @description Function for creating synthetic cases in order to balance the data for training with
-#'   [TEClassifierRegular] or [TEClassifierProtoNet]]. This is an auxiliary function for use with [get_synthetic_cases_from_matrix] to allow
-#'   parallel computations.
+#'   [TEClassifierRegular] or [TEClassifierProtoNet]]. This is an auxiliary function for use with
+#'   [get_synthetic_cases_from_matrix] to allow parallel computations.
 #'
 #' @param matrix_form Named `matrix` containing the text embeddings in matrix form. In most cases this object is taken
 #'   from [EmbeddedText]$embeddings.
@@ -203,14 +203,15 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #' @param max_k `int` The maximum number of nearest neighbors during sampling process.
 #' @param k_s `int` Number of ks in the complete generation process.
 #' @param method `vector` containing strings of the requested methods for generating new cases. Currently
-#'   "smote","dbsmote", and "adas" from the package smotefamily are available.
+#'   "knnor" from this package is available.
 #' @param cat `string` The category for which new cases should be created.
 #' @return Returns a `list` which contains the text embeddings of the new synthetic cases as a named `data.frame` and
 #'   their labels as a named `factor`.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #'
 #' @export
+# TODO (Yuliia): k_s and max_k parameters can be removed
 create_synthetic_units_from_matrix <- function(matrix_form,
                                                target,
                                                required_cases,
@@ -222,58 +223,27 @@ create_synthetic_units_from_matrix <- function(matrix_form,
   # Transform to a binary problem
   tmp_target <- (target == cat)
 
-  n_minor <- sum(tmp_target)
-
-  # Calculate n of all other cases
-  n_major <- sum(!tmp_target)
-
-  # Adept the number of cases for every k in the loop
-  min_k <- max_k - k_s + 1
-
-  if (k < (min_k + max_k) / 2) {
-    requested_number_cases <- max(1, floor(required_cases / k_s))
-  } else {
-    requested_number_cases <- ceiling(required_cases / k_s)
-  }
-
-  dup_size <- n_major / n_minor
-
   syn_data <- NULL
-  if (method == "smote") {
+  if (method == "knnor") {
     syn_data <- try(
-      smotefamily::SMOTE(
-        X = as.data.frame(matrix_form),
-        target = tmp_target,
-        K = k,
-        dup_size = dup_size
-      ),
-      silent = TRUE
-    )
-  } else if (method == "adas") {
-    syn_data <- try(
-      smotefamily::ADAS(
-        X = as.data.frame(matrix_form),
-        target = tmp_target,
-        K = k
-      ),
-      silent = TRUE
-    )
-  } else if (method == "dbsmote") {
-    syn_data <- try(
-      smotefamily::DBSMOTE(
-        X = as.data.frame(matrix_form),
-        target = tmp_target,
-        dupSize = dup_size,
-        MinPts = NULL,
-        eps = NULL
+      knnor(
+        dataset = list(
+          embeddings = matrix_form,
+          labels = tmp_target
+        ),
+        k = k,
+        aug_num = required_cases
       ),
       silent = TRUE
     )
   }
 
-  if (inherits(x = syn_data, what = "try-error") == FALSE & (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)) {
+  if (
+    inherits(x = syn_data, what = "try-error") == FALSE &&
+      (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)
+  ) {
     n_cols_embedding <- ncol(matrix_form)
-    tmp_data <- syn_data$syn_data[1:requested_number_cases, -ncol(syn_data$syn_data)]
+    tmp_data <- syn_data$syn_data[1:required_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(
       method, "_", cat, "_", k, "_", n_cols_embedding, "_",
       seq(from = 1, to = nrow(tmp_data), by = 1)
@@ -312,7 +282,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
 #'   * `target_test`: Named `factor` containing the labels of the validation sample.
 #'   * `embeddings_test`: Object of class [EmbeddedText] containing the text embeddings for the validation sample.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #' @keywords internal
 #' @noRd
 get_train_test_split <- function(embedding = NULL,
@@ -376,7 +346,7 @@ get_train_test_split <- function(embedding = NULL,
 #'   sufficient to ensure at least four cases in every fold, the number of folds is adjusted. In these cases, a warning
 #'   is printed to the console. At least four cases per fold are necessary to ensure that the training of
 #'   [TEClassifierRegular] or [TEClassifierProtoNet] works well with all options turned on.
-#' @family data_management_utils
+#' @family Utils Developers
 #' @keywords internal
 #' @noRd
 get_folds <- function(target,
@@ -418,7 +388,7 @@ get_folds <- function(target,
     }
 
     possible_assignments <- NULL
-    for (i in 1:length(cases_per_fold)) {
+    for (i in seq_len(length(cases_per_fold))) {
       possible_assignments <- append(
         x = possible_assignments,
         values = rep.int(
@@ -475,7 +445,7 @@ get_folds <- function(target,
 #' @param val_size `double` Value between 0 and 1 indicating how many cases of each label/category should be part of the
 #'   validation sample.
 #' @return `list` which contains the names of the cases belonging to the train sample and to the validation sample.
-#' @family data_management_utils
+#' @family Utils Developers
 #' @keywords internal
 #' @noRd
 get_stratified_train_test_split <- function(targets, val_size = 0.25) {
@@ -509,12 +479,13 @@ get_stratified_train_test_split <- function(targets, val_size = 0.25) {
 #' @param text_embeddings `data.frame` or `array` containing the text embeddings.
 #' @param features `int` Number of features within each sequence.
 #' @param times `int` Number of sequences.
+#' @param pad_value `r get_param_doc_desc("pad_value")`
 #' @return Named`vector` of integers representing the number of chunks/sequences for every case.
 #'
-#' @family data_management_utils
+#' @family Utils Developers
 #'
 #' @export
-get_n_chunks <- function(text_embeddings, features, times) {
+get_n_chunks <- function(text_embeddings, features, times,pad_value=-100) {
   n_chunks <- vector(length = nrow(text_embeddings))
   n_chunks[] <- 0
 
@@ -522,20 +493,18 @@ get_n_chunks <- function(text_embeddings, features, times) {
     for (i in 1:times) {
       window <- c(1:features) + (i - 1) * features
       sub_matrix <- text_embeddings[, window, drop = FALSE]
-      tmp_sums <- rowSums(abs(sub_matrix))
-      n_chunks <- n_chunks + as.numeric(!tmp_sums == 0)
+      tmp_sums <- rowSums(sub_matrix)
+      n_chunks <- n_chunks + as.numeric(!tmp_sums == times*pad_value)
     }
   } else if (length(dim(text_embeddings)) == 3) {
     for (i in 1:times) {
       sub_matrix <- text_embeddings[, i, , drop = FALSE]
-      tmp_sums <- rowSums(abs(sub_matrix))
-      n_chunks <- n_chunks + as.numeric(!tmp_sums == 0)
+      tmp_sums <- rowSums(sub_matrix)
+      n_chunks <- n_chunks + as.numeric(!tmp_sums == features*pad_value)
     }
   } else {
     stop("Dimensionality of text_embeddings must be 2 (matrix) or 3 (array).")
   }
-
-
   names(n_chunks) <- rownames(text_embeddings)
   return(n_chunks)
 }

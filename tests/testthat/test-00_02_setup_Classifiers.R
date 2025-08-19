@@ -3,26 +3,26 @@
 testthat::skip_on_cran()
 
 testthat::skip_if_not(
-  condition = check_aif_py_modules(trace = FALSE, check = "pytorch"),
+  condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
 
 test_that("Setup Classifier Data", {
   # Config-------------------------------------------------------------------------
-  root_path_data <- testthat::test_path("test_data_tmp/Embeddings")
+  root_path_data <- testthat::test_path("test_data/Embeddings")
   create_dir(root_path_data, FALSE)
 
-  root_path_results<- testthat::test_path("test_data_tmp")
+  root_path_results <- testthat::test_path("test_data_tmp")
   create_dir(root_path_results, FALSE)
-  root_path_results<- testthat::test_path("test_data_tmp/classifier")
+  root_path_results <- testthat::test_path("test_data_tmp/classifier")
   create_dir(root_path_results, FALSE)
 
   ml_frameworks <- c("pytorch")
   trace <- FALSE
 
-  method_list <- "lstm"
+  method_list <- "LSTM"
 
-  imdb_embeddings<-load_from_disk(paste0(root_path_data,"/imdb_embeddings"))
+  imdb_embeddings <- load_from_disk(paste0(root_path_data, "/imdb_embeddings"))
 
   dataset_list <- list(
     "EmbeddedText" = imdb_embeddings,
@@ -37,14 +37,13 @@ test_that("Setup Classifier Data", {
       train_path <- paste0(root_path_data)
       extractor <- TEFeatureExtractor$new()
       extractor$configure(
-        ml_framework = framework,
         name = "Test_extractor",
         label = "Test Extractor",
         text_embeddings = dataset_list[["LargeDataSetForTextEmbeddings"]],
-        features = 128,
+        features = 32,
         method = method,
-        noise_factor = 0.002,
-        optimizer = "adam"
+        orthogonal_method = "matrix_exp",
+        noise_factor = 0.002
       )
       extractor$train(
         data_embeddings = dataset_list[["LargeDataSetForTextEmbeddings"]],
@@ -55,7 +54,7 @@ test_that("Setup Classifier Data", {
         sustain_interval = 15,
         epochs = 75,
         batch_size = 100,
-        dir_checkpoint = train_path,
+        optimizer = "Adam",
         trace = trace,
         ml_trace = as.numeric(trace)
       )
@@ -68,7 +67,7 @@ test_that("Setup Classifier Data", {
   }
 
   expect_true(
-    file.exists(paste0(root_path_results,"/","feature_extractor_",framework,"/","model_data.safetensors"))
+    file.exists(paste0(root_path_results, "/", "feature_extractor_", framework, "/", "model_data.safetensors"))
   )
-  #print("FeatureExtractor for tests generated")
+  # print("FeatureExtractor for tests generated")
 })

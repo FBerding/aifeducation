@@ -91,8 +91,6 @@ DocumentPage_UI <- function(id, type = "TextEmbeddingModel") {
 DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
   shiny::moduleServer(id, function(input, output, session) {
     # global variables-----------------------------------------------------------
-    # TODO (Yuliia): Remove? Variable is not used
-    ns <- session$ns
 
     shinyFiles::shinyDirChoose(
       input = input,
@@ -140,8 +138,10 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
               return(NULL)
             }
           } else if (type == "Classifier") {
-            if ("TEClassifierRegular" %in% class(model) |
-              "TEClassifierProtoNet" %in% class(model)) {
+            if (
+              "TEClassifierRegular" %in% class(model) |
+                "TEClassifierProtoNet" %in% class(model)
+            ) {
               shiny::removeModal()
               return(model)
             } else {

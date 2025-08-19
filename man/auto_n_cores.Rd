@@ -16,16 +16,14 @@ available cores. If the environment variable \code{CI} is set to \code{"true"} o
 process is running on cran \code{2} is returned.
 }
 \seealso{
-Other Utils: 
-\code{\link{clean_pytorch_log_transformers}()},
-\code{\link{create_config_state}()},
-\code{\link{create_dir}()},
+Other Utils Developers: 
+\code{\link{create_object}()},
+\code{\link{create_synthetic_units_from_matrix}()},
 \code{\link{generate_id}()},
-\code{\link{get_file_extension}()},
-\code{\link{get_py_package_versions}()},
-\code{\link{is.null_or_na}()},
-\code{\link{output_message}()},
-\code{\link{print_message}()},
-\code{\link{run_py_file}()}
+\code{\link{get_n_chunks}()},
+\code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{matrix_to_array_c}()},
+\code{\link{tensor_to_matrix_c}()},
+\code{\link{to_categorical_c}()}
 }
-\concept{Utils}
+\concept{Utils Developers}

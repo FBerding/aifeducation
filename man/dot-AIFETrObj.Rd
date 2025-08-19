@@ -11,20 +11,23 @@ An object of class \code{list} of length 6.
 .AIFETrObj
 }
 \description{
-This list contains transformer objects. Elements of the list are used in the public \code{make} of the
-\link{AIFETransformerMaker} \code{R6} class. This list is not designed to be used directly.
+This list contains transformer objects. Elements of the list can be used in \code{\link[=aife_transformer.make]{aife_transformer.make()}}
+function as input parameter \code{type}. This list is not designed to be used directly.
 
-It has the following elements: bert, roberta, deberta_v2, funnel, longformer, mpnet
+It has the following elements: bert, roberta, funnel, longformer, mpnet, modernbert
 }
 \seealso{
 Other Transformers for developers: 
-\code{\link{.AIFEBaseTransformer}},
-\code{\link{.AIFEBertTransformer}},
-\code{\link{.AIFEDebertaTransformer}},
-\code{\link{.AIFEFunnelTransformer}},
-\code{\link{.AIFELongformerTransformer}},
-\code{\link{.AIFEMpnetTransformer}},
-\code{\link{.AIFERobertaTransformer}}
+\code{\link{.AIFEModernBertTransformer}},
+\code{\link{.AIFETrConfig}},
+\code{\link{.AIFETrModel}},
+\code{\link{.AIFETrModelMLM}},
+\code{\link{.AIFETrTokenizer}},
+\code{\link{.aife_transformer.check_type}()},
+\code{\link{aife_transformer.load_model}()},
+\code{\link{aife_transformer.load_model_config}()},
+\code{\link{aife_transformer.load_model_mlm}()},
+\code{\link{aife_transformer.load_tokenizer}()}
 }
 \concept{Transformers for developers}
 \keyword{internal}

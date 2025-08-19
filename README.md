@@ -8,7 +8,7 @@
 **GitHub** [![Project Status: Active - The project has reached a stable,
 usable state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![](https://img.shields.io/badge/devel%20version-1.0.2-green.svg)](https://github.com/fberding/aifeducation)
+[![](https://img.shields.io/badge/devel%20version-1.1.0-green.svg)](https://github.com/fberding/aifeducation)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 [![CodeFactor](https://www.codefactor.io/repository/github/fberding/aifeducation/badge)](https://www.codefactor.io/repository/github/fberding/aifeducation)
 [![Codecov test
@@ -35,15 +35,15 @@ special conditions of the educational and social sciences.
 - Simple usage of artificial intelligence by providing routines for the
   most important tasks of educators and researchers from social and
   educational sciences.
-- Provides a graphical user interface (Aifeducation Studio), allowing
-  users to work with AI without the need for coding skills.
+- Provides a graphical user interface (AI for Education - Studio),
+  allowing users to work with AI without the need for coding skills.
 - Supports ‘PyTorch’ as the core machine learning framework which is
   widely used in research.
 - Implements the advantages of the python library ‘datasets’, increasing
-  computational speed and allowing the use of large data sets.
+  computational speed and allowing the use of very large data sets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
-- Supports MPNet, BERT, RoBERTa, DeBERTa, Longformer, and Funnel
+- Supports ModernBERT, MPNet, BERT, RoBERTa, Longformer, and Funnel
   Transformer for creating context-sensitive text embedding.
 - Makes sharing pre-trained models very easy.
 - Integrates sustainability tracking.
@@ -82,10 +82,6 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 > Started](https://fberding.github.io/aifeducation/articles/aifeducation.html)
 > for more details.
 
-How to use the package with *R* syntax is described in vignette [03
-Using R
-syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
-
 ## Graphical User Interface *AI for Education - Studio*
 
 The package ships with a shiny app that serves as a graphical user
@@ -114,19 +110,13 @@ for CPUs, GPUs and RAM during training and derives a value for CO2
 emission. This value is based on the energy mix in the country where the
 computer is located.
 
-## PyTorch and Tensorflow Compatibility
+## PyTorch as Machine Learning Framework
 
 The core machine learning framework of this package is ‘PyTorch’,
 providing a broad support of graphical devices to accelerate
 computations, access to new and unique model architectures, and a high
 compatibility of models across different versions of this machine
 learning framework.
-
-‘Tensorflow’ is also supported but only for version 2.15 and not for all
-models. Please refer to appendix [A01 Supported Machine Learning
-Frameworks](https://fberding.github.io/aifeducation/articles/Appendix_A01_Supported_Frameworks.html)
-for a detailed overview.Tensorflow support will be removed with version
-1.1.0 of this package.
 
 ## Model Life Cycle
 
@@ -140,8 +130,8 @@ already trained models work with future versions of this package.
 
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports new
-approaches such as MPNet (Song et al. 2020), BERT (Devlin et al. 2019),
-RoBERTa (Liu et al. 2019), DeBERTa version 2 (He et al. 2020),
+approaches such as modernBERT (Warner et al. 2024), MPNet (Song et
+al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019),
 Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
 Cohan 2020).
 
@@ -208,12 +198,10 @@ applying AI. These are:
 
 In order to deal with the problem of imbalanced data sets, the package
 integrates the *Synthetic Minority Oversampling Technique* into the
-learning process. Currently, the *Basic Synthetic Minority Oversampling
-Technique* (Chawla et al. 2002), *Density-Bases Synthetic Minority
-Oversampling Technique* (Bunkhumpornpat, Sinapiromsaran & Lursinsap
-2012), and *Adaptive Synthetic Sampling Approach for Imbalanced
-Learning* (Hem Garcia & Li 2008) are implemented via the *R* package
-*smotefamiliy*.
+learning process. Currently, the *K-Nearest Neighbor OveRsampling
+Approach (KNNOR)* developed by Islam et al. (2022) is available in fast
+C++. This approach reached high performance across different tasks and
+data sets compared to other techniques (Islam et al. 2022).
 
 In order to address the problem of small data sets, training loops of AI
 integrate *pseudo-labeling* (e.g., Lee 2013). Pseudo-labeling is a
@@ -237,16 +225,16 @@ well as educational and social researchers with performance measures
 they are more familiar with, every AI trained with this package is
 evaluated with the following measures and concepts:
 
-- Iota Concept of the Second Generation (Berding & Pargmann 2022)
-- Krippendorff’s Alpha (Krippendorff 2019)
-- Percentage Agreement
-- Gwet’s AC1/AC2 (Gwet 2014)
-- Kendall’s coefficient of concordance W
-- Cohen’s Kappa unweighted (Cohen 1960)
-- Cohen’s Kappa with equal weights (Cohen 1968)
-- Cohen’s Kappa with squared weights (Cohen 1968)
+- Iota Concept of the Second Generation (Berding & Pargmann 2022).
+- Krippendorff’s Alpha (Krippendorff 2019).
+- Percentage Agreement.
+- Gwet’s AC1/AC2 (Gwet 2014).
+- Kendall’s coefficient of concordance W.
+- Cohen’s Kappa unweighted (Cohen 1960).
+- Cohen’s Kappa with equal weights (Cohen 1968).
+- Cohen’s Kappa with squared weights (Cohen 1968).
 - Fleiss’ Kappa for multiple raters without exact estimation (Fleiss
-  1971)
+  1971).
 
 In addition, some traditional measures from machine learning literature
 are also available:
@@ -311,15 +299,6 @@ Bloemen, A. (2011). Lernaufgaben in Schulbüchern der Wirtschaftslehre:
 Analyse, Konstruktion und Evaluation von Lernaufgaben für die Lernfelder
 industrieller Geschäftsprozesse. Hampp.
 
-Bunkhumpornpat, C., Sinapiromsaran, K., & Lursinsap, C. (2012). DBSMOTE:
-Density-Based Synthetic Minority Over-sampling Technique. Applied
-Intelligence, 36(3), 664–684.
-<https://doi.org/10.1007/s10489-011-0287-y>
-
-Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002).
-SMOTE: Synthetic Minority Over-sampling Technique. Journal of Artificial
-Intelligence Research, 16, 321–357. <https://doi.org/10.1613/jair.953>
-
 Cohen, J (1968). Weighted kappa: Nominal scale agreement with provision
 for scaled disagreement or partial credit. Psychological Bulletin,
 70(4), 213–220. <https://doi.org/10.1037/h0026256>
@@ -360,15 +339,9 @@ G. (2017). Learning from class-imbalanced data: Review of methods and
 applications. Expert Systems with Applications, 73, 220–239.
 <https://doi.org/10.1016/j.eswa.2016.12.035>
 
-He, H., Bai, Y., Garcia, E. A., & Li, S. (2008). ADASYN: Adaptive
-synthetic sampling approach for imbalanced learning. In 2008 IEEE
-International Joint Conference on Neural Networks (IEEE World Congress
-on Computational Intelligence) (pp. 1322–1328). IEEE.
-<https://doi.org/10.1109/IJCNN.2008.4633969>
-
-He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
-BERT with Disentangled Attention.
-<https://doi.org/10.48550/arXiv.2006.03654>
+Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
+KNNOR: An oversampling technique for imbalanced datasets. Applied Soft
+Computing, 115, 108288. <https://doi.org/10.1016/j.asoc.2021.108288>
 
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th Ed.). SAGE.
@@ -396,6 +369,13 @@ Stütz, S., Berding, F., Reincke, S., & Scheper, L. (2022).
 Characteristics of learning tasks in accounting textbooks: an AI
 assisted analysis. Empirical Research in Vocational Education and
 Training, 14(1). <https://doi.org/10.1186/s40461-022-00138-2>
+
+Warner, B., Chaffin, A., Clavié, B., Weller, O., Hallström, O.,
+Taghadouini, S., Gallagher, A., Biswas, R., Ladhak, F., Aarsen, T.,
+Cooper, N., Adams, G., Howard, J. & Poli, I. (2024). Smarter, Better,
+Faster, Longer: A Modern Bidirectional Encoder for Fast, Memory
+Efficient, and Long Context Finetuning and Inference.
+<https://doi.org/10.48550/arXiv.2412.13663>
 
 Wong, J., Baars, M., Koning, B. B. de, van der Zee, T., Davis, D.,
 Khalil, M., Houben, G.‑J., & Paas, F. (2019). Educational Theories and
