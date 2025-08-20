@@ -46,8 +46,8 @@ knnor_is_same_class <- function(new_point, dataset, labels, k) {
 #'an array for use with keras.
 #'
 #'@param matrix \code{matrix} containing the sequential data.
-#'@param times \code{uword} Number of sequences.
-#'@param features \code{uword} Number of features within each sequence.
+#'@param times \code{size_t} Number of sequences.
+#'@param features \code{size_t} Number of features within each sequence.
 #'@return Returns an array. The first dimension corresponds to the cases,
 #'the second to the times, and the third to the features.
 #'

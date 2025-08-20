@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="https://fberding.github.io/aifeducation/logo.png" alt="aifeducation website" align="right" height="120"/></a>
+# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" alt="aifeducation website" align="right" height="120"/></a>
 
 <!-- badges: start -->
 
@@ -102,7 +102,7 @@ Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 The package ships with a shiny app that serves as a graphical user
 interface.
 
-![Figure 1: Aifeducation Studio](https://fberding.github.io/aifeducation/home.png){width="100%"}
+![Figure 1: Aifeducation Studio](man/figures/home.png){width="100%"}
 
 *AI for Education - Studio* allows users to easily develop, train,
 apply, document, and analyse AI models without any coding skills. See

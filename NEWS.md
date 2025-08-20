@@ -4,6 +4,10 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.1
+
+- Fixed a bug in function to_categorical_c to solve an error in UBSAN
+
 # aifeducation 1.1.0
 
 **Major Changes**

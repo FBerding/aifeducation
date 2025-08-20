@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="https://fberding.github.io/aifeducation/logo.png" alt="aifeducation website" align="right" height="120"/></a>
+# aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="man/figures/logo.png" alt="aifeducation website" align="right" height="120"/></a>
 
 <!-- badges: start -->
 
@@ -88,8 +88,8 @@ The package ships with a shiny app that serves as a graphical user
 interface.
 
 <figure>
-<img src="https://fberding.github.io/aifeducation/home.png"
-style="width:100.0%" alt="Figure 1: Aifeducation Studio" />
+<img src="man/figures/home.png" style="width:100.0%"
+alt="Figure 1: Aifeducation Studio" />
 <figcaption aria-hidden="true">Figure 1: Aifeducation
 Studio</figcaption>
 </figure>
