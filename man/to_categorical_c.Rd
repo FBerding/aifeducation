@@ -7,7 +7,7 @@
 to_categorical_c(class_vector, n_classes)
 }
 \arguments{
-\item{class_vector}{\code{vector} containing integers for every class. The
+\item{class_vector}{\code{uvec} containing integers for every class. The
 integers must range from 0 to n_classes-1.}
 
 \item{n_classes}{\code{int} Total number of classes.}

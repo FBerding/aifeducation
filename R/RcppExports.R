@@ -64,7 +64,7 @@ matrix_to_array_c <- function(matrix, times, features) {
 #'Function written in C++ transforming a vector of classes (int) into
 #'a binary class matrix.
 #'
-#'@param class_vector \code{vector} containing integers for every class. The
+#'@param class_vector \code{uvec} containing integers for every class. The
 #'integers must range from 0 to n_classes-1.
 #'@param n_classes \code{int} Total number of classes.
 #'@return Returns a \code{matrix} containing the binary representation for
