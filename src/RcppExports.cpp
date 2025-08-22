@@ -53,7 +53,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // to_categorical_c
-arma::umat to_categorical_c(arma::uvec class_vector, size_t n_classes);
+arma::mat to_categorical_c(arma::uvec class_vector, size_t n_classes);
 RcppExport SEXP _aifeducation_to_categorical_c(SEXP class_vectorSEXP, SEXP n_classesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

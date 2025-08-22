@@ -84,10 +84,10 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 //'@family Utils Developers
 //'@export
 // [[Rcpp::export]]
- arma::umat to_categorical_c(arma::uvec class_vector,
+ arma::mat to_categorical_c(arma::uvec class_vector,
                             size_t n_classes){
 
-   arma::umat binary_class_rep(class_vector.n_elem, n_classes);
+   arma::mat binary_class_rep(class_vector.n_elem, n_classes);
 
    for(size_t i=0;i<binary_class_rep.n_rows;i++){
      binary_class_rep(i,class_vector(i))=1;
