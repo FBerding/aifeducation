@@ -23,9 +23,7 @@ jobs:
           - {os: ubuntu-latest,   r: 'oldrel-1'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'devel'}
-          - {os: debain-latest,   r: 'oldrel-1'}
-          - {os: debain-latest,   r: 'release'}
-          - {os: debain-latest,   r: 'devel'}
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes

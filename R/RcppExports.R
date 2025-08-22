@@ -59,25 +59,6 @@ matrix_to_array_c <- function(matrix, times, features) {
     .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)
 }
 
-#'Transforming classes to one-hot encoding
-#'
-#'Function written in C++ transforming a vector of classes (int) into
-#'a binary class matrix.
-#'
-#'@param class_vector \code{uvec} containing integers for every class. The
-#'integers must range from 0 to n_classes-1.
-#'@param n_classes \code{int} Total number of classes.
-#'@return Returns a \code{matrix} containing the binary representation for
-#'every class.
-#'
-#'@import Rcpp
-#'@useDynLib aifeducation, .registration = TRUE
-#'@family Utils Developers
-#'@export
-to_categorical_c <- function(class_vector, n_classes) {
-    .Call(`_aifeducation_to_categorical_c`, class_vector, n_classes)
-}
-
 #' Transform tensor to matrix
 #'
 #' Function written in C++ for transformation the tensor (with size batch x times x features) to the matrix (with

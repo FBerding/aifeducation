@@ -52,18 +52,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// to_categorical_c
-arma::mat to_categorical_c(arma::uvec class_vector, size_t n_classes);
-RcppExport SEXP _aifeducation_to_categorical_c(SEXP class_vectorSEXP, SEXP n_classesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::uvec >::type class_vector(class_vectorSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_classes(n_classesSEXP);
-    rcpp_result_gen = Rcpp::wrap(to_categorical_c(class_vector, n_classes));
-    return rcpp_result_gen;
-END_RCPP
-}
 // tensor_to_matrix_c
 arma::mat tensor_to_matrix_c(arma::cube tensor, size_t times, size_t features);
 RcppExport SEXP _aifeducation_tensor_to_matrix_c(SEXP tensorSEXP, SEXP timesSEXP, SEXP featuresSEXP) {
@@ -82,7 +70,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 4},
     {"_aifeducation_knnor_is_same_class", (DL_FUNC) &_aifeducation_knnor_is_same_class, 4},
     {"_aifeducation_matrix_to_array_c", (DL_FUNC) &_aifeducation_matrix_to_array_c, 3},
-    {"_aifeducation_to_categorical_c", (DL_FUNC) &_aifeducation_to_categorical_c, 2},
     {"_aifeducation_tensor_to_matrix_c", (DL_FUNC) &_aifeducation_tensor_to_matrix_c, 3},
     {NULL, NULL, 0}
 };
