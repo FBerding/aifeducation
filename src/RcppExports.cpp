@@ -40,39 +40,27 @@ BEGIN_RCPP
 END_RCPP
 }
 // matrix_to_array_c
-arma::cube matrix_to_array_c(arma::mat matrix, arma::uword times, arma::uword features);
+arma::cube matrix_to_array_c(arma::mat matrix, size_t times, size_t features);
 RcppExport SEXP _aifeducation_matrix_to_array_c(SEXP matrixSEXP, SEXP timesSEXP, SEXP featuresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type matrix(matrixSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type times(timesSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type features(featuresSEXP);
+    Rcpp::traits::input_parameter< size_t >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< size_t >::type features(featuresSEXP);
     rcpp_result_gen = Rcpp::wrap(matrix_to_array_c(matrix, times, features));
     return rcpp_result_gen;
 END_RCPP
 }
-// to_categorical_c
-arma::mat to_categorical_c(arma::vec class_vector, arma::uword n_classes);
-RcppExport SEXP _aifeducation_to_categorical_c(SEXP class_vectorSEXP, SEXP n_classesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type class_vector(class_vectorSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type n_classes(n_classesSEXP);
-    rcpp_result_gen = Rcpp::wrap(to_categorical_c(class_vector, n_classes));
-    return rcpp_result_gen;
-END_RCPP
-}
 // tensor_to_matrix_c
-arma::mat tensor_to_matrix_c(arma::cube tensor, arma::uword times, arma::uword features);
+arma::mat tensor_to_matrix_c(arma::cube tensor, size_t times, size_t features);
 RcppExport SEXP _aifeducation_tensor_to_matrix_c(SEXP tensorSEXP, SEXP timesSEXP, SEXP featuresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::cube >::type tensor(tensorSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type times(timesSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type features(featuresSEXP);
+    Rcpp::traits::input_parameter< size_t >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< size_t >::type features(featuresSEXP);
     rcpp_result_gen = Rcpp::wrap(tensor_to_matrix_c(tensor, times, features));
     return rcpp_result_gen;
 END_RCPP
@@ -82,7 +70,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_aifeducation_knnor", (DL_FUNC) &_aifeducation_knnor, 4},
     {"_aifeducation_knnor_is_same_class", (DL_FUNC) &_aifeducation_knnor_is_same_class, 4},
     {"_aifeducation_matrix_to_array_c", (DL_FUNC) &_aifeducation_matrix_to_array_c, 3},
-    {"_aifeducation_to_categorical_c", (DL_FUNC) &_aifeducation_to_categorical_c, 2},
     {"_aifeducation_tensor_to_matrix_c", (DL_FUNC) &_aifeducation_tensor_to_matrix_c, 3},
     {NULL, NULL, 0}
 };

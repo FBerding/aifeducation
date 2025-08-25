@@ -29,8 +29,8 @@
 //'an array for use with keras.
 //'
 //'@param matrix \code{matrix} containing the sequential data.
-//'@param times \code{uword} Number of sequences.
-//'@param features \code{uword} Number of features within each sequence.
+//'@param times \code{size_t} Number of sequences.
+//'@param features \code{size_t} Number of features within each sequence.
 //'@return Returns an array. The first dimension corresponds to the cases,
 //'the second to the times, and the third to the features.
 //'
@@ -40,12 +40,12 @@
 //'@export
 // [[Rcpp::export]]
 arma::cube matrix_to_array_c(arma::mat matrix,
-                             arma::uword times,
-                             arma::uword features){
-  arma::uword i=0;
-  arma::uword j=0;
-  arma::uword f=0;
-  arma::uword index=0;
+                             size_t times,
+                             size_t features){
+  size_t i=0;
+  size_t j=0;
+  size_t f=0;
+  size_t index=0;
 
   //cube(n_rows, n_cols, n_slices)
   arma::cube output_array(matrix.n_rows,
@@ -68,33 +68,7 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 }
 
 
-//'Transforming classes to one-hot encoding
-//'
-//'Function written in C++ transforming a vector of classes (int) into
-//'a binary class matrix.
-//'
-//'@param class_vector \code{vector} containing integers for every class. The
-//'integers must range from 0 to n_classes-1.
-//'@param n_classes \code{int} Total number of classes.
-//'@return Returns a \code{matrix} containing the binary representation for
-//'every class.
-//'
-//'@import Rcpp
-//'@useDynLib aifeducation, .registration = TRUE
-//'@family Utils Developers
-//'@export
-// [[Rcpp::export]]
- arma::mat to_categorical_c(arma::vec class_vector,
-                             arma::uword n_classes){
-   arma::uword i=0;
-   arma::mat binary_class_rep(class_vector.n_elem, n_classes);
 
-   for(i=0;i<binary_class_rep.n_rows;i++){
-     binary_class_rep(i,class_vector(i))=1;
-     }
-
-   return binary_class_rep;
- }
 
 //' Transform tensor to matrix
 //'
@@ -110,19 +84,19 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 //' @export
 // [[Rcpp::export]]
 arma::mat tensor_to_matrix_c(arma::cube tensor,
-                             arma::uword times,
-                             arma::uword features)
+                             size_t times,
+                             size_t features)
 {
   arma::mat output_matrix(tensor.n_rows,
                           times * features);
 
-  for(arma::uword batch_i = 0; batch_i < tensor.n_rows; ++batch_i)
+  for(size_t batch_i = 0; batch_i < tensor.n_rows; ++batch_i)
   {
-    for(arma::uword time_i = 0; time_i < times; ++time_i)
+    for(size_t time_i = 0; time_i < times; ++time_i)
     {
-      arma::uword index = time_i * features;
+      size_t index = time_i * features;
 
-      for(arma::uword feature_i = 0; feature_i < features; ++feature_i)
+      for(size_t feature_i = 0; feature_i < features; ++feature_i)
         output_matrix(batch_i, index + feature_i) = tensor(batch_i, time_i, feature_i);
 
     }

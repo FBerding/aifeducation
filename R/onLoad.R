@@ -32,7 +32,7 @@ pyarrow <- NULL
 
 # Message on load of the package
 packageStartupMessage(
-  "This is version 1.1.0 of aifeducation. Support for 'tensorflow' is removed.
+  "This is version 1.1.1 of aifeducation. Support for 'tensorflow' is removed.
   If you need to use these models please use an older version of this package which
   is available on CRAN or GitHub. Please refer to news for more details.",
   appendLF = TRUE

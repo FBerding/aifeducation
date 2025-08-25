@@ -12,6 +12,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+#'Transforming classes to one-hot encoding
+#'
+#'Function transforming a vector of classes (int) into
+#'a binary class matrix.
+#'
+#'@param class_vector `vector` containing integers for every class. The
+#'integers must range from 0 to n_classes-1.
+#'@param n_classes `int` Total number of classes.
+#'@return Returns a `matrix` containing the binary representation for
+#'every class.
+#'
+#'@family Utils Developers
+#'@export
+to_categorical_c=function(class_vector,n_classes){
+
+   binary_class_rep=matrix(
+     data=0,
+     nrow=length(class_vector),
+     ncol=n_classes)
+
+   for(i in seq_along(class_vector)){
+     binary_class_rep[i,class_vector[i]+1]=1
+     }
+
+   return (binary_class_rep)
+ }
+
 #' @title Check if NULL or NA
 #' @description Function for checking if an object is `NULL` or .
 #'

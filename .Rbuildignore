@@ -47,3 +47,4 @@ test_preparation
 ^codecov\.yml$
 Deprecated
 .lintr
+^cran-comments\.md$

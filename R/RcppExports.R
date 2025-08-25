@@ -46,8 +46,8 @@ knnor_is_same_class <- function(new_point, dataset, labels, k) {
 #'an array for use with keras.
 #'
 #'@param matrix \code{matrix} containing the sequential data.
-#'@param times \code{uword} Number of sequences.
-#'@param features \code{uword} Number of features within each sequence.
+#'@param times \code{size_t} Number of sequences.
+#'@param features \code{size_t} Number of features within each sequence.
 #'@return Returns an array. The first dimension corresponds to the cases,
 #'the second to the times, and the third to the features.
 #'
@@ -57,25 +57,6 @@ knnor_is_same_class <- function(new_point, dataset, labels, k) {
 #'@export
 matrix_to_array_c <- function(matrix, times, features) {
     .Call(`_aifeducation_matrix_to_array_c`, matrix, times, features)
-}
-
-#'Transforming classes to one-hot encoding
-#'
-#'Function written in C++ transforming a vector of classes (int) into
-#'a binary class matrix.
-#'
-#'@param class_vector \code{vector} containing integers for every class. The
-#'integers must range from 0 to n_classes-1.
-#'@param n_classes \code{int} Total number of classes.
-#'@return Returns a \code{matrix} containing the binary representation for
-#'every class.
-#'
-#'@import Rcpp
-#'@useDynLib aifeducation, .registration = TRUE
-#'@family Utils Developers
-#'@export
-to_categorical_c <- function(class_vector, n_classes) {
-    .Call(`_aifeducation_to_categorical_c`, class_vector, n_classes)
 }
 
 #' Transform tensor to matrix
