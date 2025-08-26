@@ -30,7 +30,7 @@ for details.
 UML-diagram of Base Transformer Class:
 
 ![Figure 1.1: UML-diagram of Base Transformer
-Class](img_articles/transformer_base_class.png){width="50%"}
+Class](transformer_base_class.png){width="50%"}
 
 This class has:
 
@@ -371,7 +371,7 @@ different parameters:
 -   etc.
 
 ![Figure 1.2: Possible parameters in the params
-list](img_articles/transformer_params_list.png){width="50%"}
+list](transformer_params_list.png){width="50%"}
 
 ### `temp` list
 
@@ -387,7 +387,7 @@ tokenizer, access the variable `tok_new` in
 class.
 
 ![Figure 1.3: Possible parameters in the temp
-list](img_articles/transformer_temp_list.png){width="50%"}
+list](transformer_temp_list.png){width="50%"}
 
 # 2 Allowed Transformers
 
@@ -396,7 +396,7 @@ list](img_articles/transformer_temp_list.png){width="50%"}
 UML-diagram of Transformer Classes:
 
 ![Figure 2.1: UML-diagram of Base Transformer
-Class](img_articles/transformer_allowed_classes.png){width="75%"}
+Class](transformer_allowed_classes.png){width="75%"}
 
 The Base Transformer Class has the following child-classes:
 
@@ -538,7 +538,7 @@ object.
 UML-diagram of the Transformer Maker Class:
 
 ![Figure 3.1: UML-diagram of Transformer Maker
-Class](img_articles/transformer_maker_class.png){width="85%"}
+Class](transformer_maker_class.png){width="85%"}
 
 ## 3.2 Usage
 
