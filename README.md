@@ -8,7 +8,7 @@
 **GitHub** [![Project Status: Active - The project has reached a stable,
 usable state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![](https://img.shields.io/badge/devel%20version-1.1.0-green.svg)](https://github.com/fberding/aifeducation)
+[![](https://img.shields.io/badge/devel%20version-1.1.1-green.svg)](https://github.com/fberding/aifeducation)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 [![CodeFactor](https://www.codefactor.io/repository/github/fberding/aifeducation/badge)](https://www.codefactor.io/repository/github/fberding/aifeducation)
 [![Codecov test
