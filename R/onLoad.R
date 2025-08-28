@@ -27,6 +27,7 @@ pyarrow <- NULL
   pandas <<- reticulate::import("pandas", delay_load = TRUE)
   pyarrow <<- reticulate::import("pyarrow", delay_load = TRUE)
   codecarbon <<- reticulate::import("codecarbon", delay_load = TRUE)
+  #calflops <<- reticulate::import("calflops", delay_load = TRUE)
 }
 
 

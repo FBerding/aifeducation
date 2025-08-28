@@ -11,59 +11,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title Class names of all classifier models based on text embeddings
-#' @description `vector` containing all class names as a string.
-#' @family Parameter Dictionary
-#' @keywords internal
-#' @noRd
-TEClassifiers_class_names <- c()
-
-#' @title Get names of classifiers
-#' @description Function returns the names of all classifiers which
-#' are child classes of a specific super class.
-#' @param super_class `string` Name of the super class the classifiers should
-#' be child of. To request the names of all classifiers set this argument to `NULL`.
-#' @return Returns a vector containing the names of the classifiers.
-#' @family Parameter Dictionary
-#' @export
-get_TEClassifiers_class_names <- function(super_class = NULL) {
-  if (is.null(super_class)) {
-    return(TEClassifiers_class_names)
-  } else {
-    class_names <- NULL
-    for (class in TEClassifiers_class_names) {
-      object <- create_object(class)
-      if (super_class %in% class(object)) {
-        class_names <- append(
-          x = class_names,
-          values = class
-        )
-      }
-    }
-    return(class_names)
-  }
-}
-
-
-#' @title Names of all deprecated objects
-#'
-#' @description `vector` containing all class names as a string.
-#'
-#' @family Parameter Dictionary
-#' @keywords internal
-#' @noRd
-DeprecatedObjects <- c("TEClassifierProtoNet", "TEClassifierRegular")
-
-
-#' @title Get names of deprecated objects
-#' @description Function returns the names of all objects that are deprecated.
-#' @return Returns a `vector` containing the names.
-#' @family Parameter Dictionary
-#' @export
-get_depr_obj_names <- function() {
-  return(DeprecatedObjects)
-}
-
 #' @title Get dictionary of all parameters
 #' @description Function provides a `list` containing important characteristics
 #' of the parameter used in the models. The `list` does contain only the definition of

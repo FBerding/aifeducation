@@ -23,16 +23,9 @@
 #' @return A new object of this class.
 #' @family R6 Classes for Developers
 #' @export
-AIFEBaseModel <- R6::R6Class(
-  classname = "AIFEBaseModel",
+AIFEMaster <- R6::R6Class(
+  classname = "AIFEMaster",
   public = list(
-    #' @field model ('pytorch_model')\cr
-    #'   Field for storing a 'pytorch' model after loading.
-    model = NULL,
-
-    #' @field model_config ('list()')\cr
-    #'   List for storing information about the configuration of the model.
-    model_config = list(),
 
     #' @field last_training ('list()')\cr
     #'   List for storing the history, the configuration, and the results of the last
@@ -63,7 +56,8 @@ AIFEBaseModel <- R6::R6Class(
         model_id = private$model_info$model_id,
         model_name_root = private$model_info$model_name_root,
         model_label = private$model_info$model_label,
-        model_date = private$model_info$model_date
+        model_date = private$model_info$model_date,
+        model_language=private$model_info$model_language
       ))
     },
     #---------------------------------------------------------------------------
@@ -158,86 +152,6 @@ AIFEBaseModel <- R6::R6Class(
     get_model_description = function() {
       return(private$model_description)
     },
-    #-------------------------------------------------------------------------
-    #' @description Method for saving a model.
-    #' @param dir_path `string` Path of the directory where the model should be saved.
-    #' @param folder_name `string` Name of the folder that should be created within the directory.
-    #' @return Function does not return a value. It saves the model to disk.
-    #' @importFrom utils write.csv
-    save = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
-
-      save_format <- "safetensors"
-
-      if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
-        warning("Python library 'safetensors' is not available. Using
-                 standard save format for pytorch.")
-        save_format <- "pt"
-      }
-
-      create_dir(save_location, FALSE)
-      self$model$to("cpu", dtype = torch$float)
-      if (save_format == "safetensors") {
-        file_path <- paste0(save_location, "/", "model_data", ".safetensors")
-        safetensors$torch$save_model(model = self$model, filename = file_path)
-      } else if (save_format == "pt") {
-        file_path <- paste0(save_location, "/", "model_data", ".pt")
-        torch$save(self$model$state_dict(), file_path)
-      }
-
-
-      # Saving Sustainability Data
-      sustain_matrix <- t(as.matrix(unlist(private$sustainability)))
-      write.csv(
-        x = sustain_matrix,
-        file = paste0(save_location, "/", "sustainability.csv"),
-        row.names = FALSE
-      )
-    },
-    #--------------------------------------------------------------------------
-    #' @description Method for importing a model.
-    #' @param dir_path `string` Path of the directory where the model is saved.
-    #' @return Function does not return a value. It is used to load the weights of a model.
-    load = function(dir_path) {
-      # Load python scripts
-      private$load_reload_python_scripts()
-
-      # Load the model---------------------------------------------------------
-      path_pt <- paste0(dir_path, "/", "model_data", ".pt")
-      path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
-      private$create_reset_model()
-      if (file.exists(path_safe_tensors)) {
-        safetensors$torch$load_model(model = self$model, filename = path_safe_tensors)
-      } else {
-        if (file.exists(paths = path_pt) == TRUE) {
-          self$model$load_state_dict(torch$load(path_pt))
-        } else {
-          stop("There is no compatible model file in the choosen directory.
-                     Please check path. Please note that classifiers have to be loaded with
-                     the same framework as during creation.")
-        }
-      }
-
-
-      # Load sustainability_data
-      sustain_path <- paste0(dir_path, "/sustainability.csv")
-      if (file.exists(sustain_path)) {
-        sustain_data <- read.csv(sustain_path)
-
-        private$sustainability <- list(
-          sustainability_tracked = sustain_data$sustainability_tracked,
-          date = sustain_data$date,
-          sustainability_data = list(
-            duration_sec = sustain_data$sustainability_data.duration_sec,
-            co2eq_kg = sustain_data$sustainability_data.co2eq_kg,
-            cpu_energy_kwh = sustain_data$sustainability_data.cpu_energy_kwh,
-            gpu_energy_kwh = sustain_data$sustainability_data.gpu_energy_kwh,
-            ram_energy_kwh = sustain_data$sustainability_data.ram_energy_kwh,
-            total_energy_kwh = sustain_data$sustainability_data.total_energy_kwh
-          )
-        )
-      }
-    },
     #---------------------------------------------------------------------------
     #' @description Method for requesting a summary of the R and python packages' versions used for creating the model.
     #' @return Returns a `list` containing the versions of the relevant R and python packages.
@@ -263,25 +177,7 @@ AIFEBaseModel <- R6::R6Class(
     get_ml_framework = function() {
       return(private$ml_framework)
     },
-    #---------------------------------------------------------------------------
-    #' @description Method for counting the trainable parameters of a model.
-    #' @return Returns the number of trainable parameters of the model.
-    count_parameter = function() {
-      iterator <- reticulate::as_iterator(self$model$parameters())
-      iteration_finished <- FALSE
-      count <- 0
-      while (iteration_finished == FALSE) {
-        iter_results <- reticulate::iter_next(it = iterator)
-        if (is.null(iter_results)) {
-          iteration_finished <- TRUE
-        } else {
-          if (iter_results$requires_grad == TRUE) {
-            count <- count + iter_results$numel()
-          }
-        }
-      }
-      return(count)
-    },
+
     #-------------------------------------------------------------------------
     #' @description Method for checking if the model was successfully configured. An object can only be used if this
     #'   value is `TRUE`.
@@ -327,13 +223,29 @@ AIFEBaseModel <- R6::R6Class(
           private = private_list
         )
       )
+    },
+    #--------------------------------------------------------------------------
+    get_model_config=function(){
+      return(private$model_config)
     }
   ),
   private = list(
+
+    model = NULL,
+
+    model_config = list(),
+
     ml_framework = NA,
+
     sustainability_tracker = NA,
+
+    sustainability = list(
+      sustainability_tracked = FALSE,
+      track_log=data.frame()
+    ),
+
     dir_checkpoint = NULL,
-    # General Information-------------------------------------------------------
+
     model_info = list(
       model_license = NA,
       model_name = NA,
@@ -343,6 +255,7 @@ AIFEBaseModel <- R6::R6Class(
       model_label = NA,
       model_date = NA
     ),
+
     publication_info = list(
       developed_by = list(
         authors = NULL,
@@ -350,6 +263,7 @@ AIFEBaseModel <- R6::R6Class(
         url = NULL
       )
     ),
+
     model_description = list(
       eng = NULL,
       native = NULL,
@@ -359,46 +273,31 @@ AIFEBaseModel <- R6::R6Class(
       keywords_native = NULL,
       license = NA
     ),
+
     r_package_versions = list(
       aifeducation = NA,
       reticulate = NA
     ),
+
     py_package_versions = list(
       tensorflow = NA,
       torch = NA,
       keras = NA,
       numpy = NA
     ),
-    sustainability = list(
-      sustainability_tracked = FALSE,
-      date = NA,
-      sustainability_data = list(
-        duration_sec = NA,
-        co2eq_kg = NA,
-        cpu_energy_kwh = NA,
-        gpu_energy_kwh = NA,
-        ram_energy_kwh = NA,
-        total_energy_kwh = NA
-      ),
-      technical = list(
-        tracker = NA,
-        py_package_version = NA,
-        cpu_count = NA,
-        cpu_model = NA,
-        gpu_count = NA,
-        gpu_model = NA,
-        ram_total_size = NA
-      ),
-      region = list(
-        country_name = NA,
-        country_iso_code = NA,
-        region = NA
-      )
-    ),
+
     log_config = list(
       log_dir = NULL,
+      log_write_interval = 10,
       log_state_file = NULL,
-      log_write_intervall = 10
+      log_loss_file = NULL
+    ),
+
+    log_state = list(
+      last_log = NULL,
+      value_top = 0,
+      total_top = 1,
+      message_top = NA
     ),
 
     # Variable for checking if the object is successfully configured. Only if
@@ -436,6 +335,17 @@ AIFEBaseModel <- R6::R6Class(
       if (private$configured == TRUE) {
         stop("The object is configured. Please create a new object if you would like to change the object's
              configuration.")
+      }
+    },
+    #-------------------------------------------------------------------------
+    check_for_untrained=function(){
+      if(self$is_trained()==TRUE){
+        stop("The model has already been trained and cant't be modified. Please create a new model if you need antoher training run.")
+      }
+    },
+    check_for_trained=function(){
+      if(self$is_trained()==FALSE){
+        stop("The model has not been trained. Please train the model before you use it.")
       }
     },
     #--------------------------------------------------------------------------
@@ -497,6 +407,189 @@ AIFEBaseModel <- R6::R6Class(
       private$py_package_versions$torch <- config_private$py_package_versions$torch
       private$py_package_versions$numpy <- config_private$py_package_versions$numpy
     },
+#------------------------------------------------------------------------------
+    init_and_start_sustainability_tracking = function() {
+      # Trace
+      print_message(
+        msg = "Start Sustainability Tracking",
+        trace = self$last_training$config$trace
+      )
+
+      if (self$last_training$config$sustain_track == TRUE) {
+        if (check_versions(a = get_py_package_version("codecarbon"), operator = ">=", b = "2.8.0")) {
+          path_look_file <- codecarbon$lock$LOCKFILE
+          if (file.exists(path_look_file)) {
+            unlink(path_look_file)
+          }
+        }
+
+        private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
+          country_iso_code = self$last_training$config$sustain_iso_code,
+          region = self$last_training$config$sustain_region,
+          tracking_mode = "machine",
+          log_level = "warning",
+          measure_power_secs = self$last_training$config$sustain_interval,
+          save_to_file = FALSE,
+          save_to_api = FALSE,
+          allow_multiple_runs = FALSE
+        )
+        private$sustainability_tracker$start()
+      }
+    },
+    #---------------------------------------------------------------------------
+    stop_sustainability_tracking = function(task = NA) {
+      # Trace
+      print_message(
+        msg = "Stop Sustainability Tracking",
+        trace = self$last_training$config$trace
+      )
+
+      if (self$last_training$config$sustain_track == TRUE) {
+        private$sustainability_tracker$stop()
+        private$sustainability$sustainability_tracked <- TRUE
+        if (is.null_or_na(private$sustainability$track_log)) {
+          private$sustainability$track_log <- as.data.frame(
+            summarize_tracked_sustainability(
+              sustainability_tracker = private$sustainability_tracker,
+              task = task
+            )
+          )
+        } else {
+          private$sustainability$track_log <- rbind(
+            private$sustainability$track_log,
+            as.data.frame(
+              summarize_tracked_sustainability(
+                sustainability_tracker = private$sustainability_tracker,
+                task = task
+              )
+            )
+          )
+        }
+      }
+    },
+    #-------------------------------------------------------------------------
+    # Method for loading sustainability data
+    load_sustainability_data = function(model_dir) {
+      sustainability_datalog_path <- paste0(model_dir, "/", "sustainability.csv")
+      if (file.exists(sustainability_datalog_path)) {
+        private$sustainability$track_log <- read.csv(sustainability_datalog_path)
+        private$sustainability$sustainability_tracked <- TRUE
+      } else {
+        private$sustainability$sustainability_tracked <- FALSE
+        private$sustainability$track_log <- data.frame()
+      }
+    },
+    #-------------------------------------------------------------------------
+    # Method for saving sustainability data
+    save_sustainability_data = function(dir_path, folder_name) {
+      save_location <- paste0(dir_path, "/", folder_name)
+      create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
+      sustain_matrix <- private$sustainability$track_log
+      if(nrow(sustain_matrix)>0){
+        write.csv(
+          x = sustain_matrix,
+          file = paste0(save_location, "/", "sustainability.csv"),
+          row.names = FALSE
+        )
+      }
+    },
+    #---------------------------------------------------------------------------
+    create_checkpoint_directory = function() {
+      # Create a directory for the package
+      tmp_dir <- create_and_get_tmp_dir()
+
+      # Create a folder for the current task
+      private$dir_checkpoint <- paste0(
+        tmp_dir, "/",
+        generate_id(16)
+      )
+      create_dir(dir = private$dir_checkpoint, trace = FALSE)
+    },
+    #--------------------------------------------------------------------------
+    clean_checkpoint_directory = function() {
+      unlink(
+        x = private$dir_checkpoint,
+        recursive = TRUE,
+        force = FALSE
+      )
+    },
+    #--------------------------------------------------------------------------
+    save_all_args = function(args, group = "training") {
+      if (group %in% c("configure", "training","embedding_config")) {
+        if (group == "training") {
+          for (arg in names(args)) {
+            if (!R6::is.R6(args[[arg]]) &
+              !is.factor(args[[arg]]) &
+              !arg %in% c("log_dir", "log_write_interval")) {
+              self$last_training$config[arg] <- list(args[[arg]])
+            }
+          }
+        } else if (group == "configure") {
+          for (arg in names(args)) {
+            if (!R6::is.R6(args[[arg]]) &
+              !is.factor(args[[arg]]) &
+              !arg %in% c("log_dir", "log_write_interval")) {
+              private$model_config[arg] <- list(args[[arg]])
+            }
+          }
+        } else {
+        stop("Argument 'group' must be 'configure' or 'training'.")
+      }
+      }
+    },
+    load_config_file=function(dir_path){
+      config_file <- load_R_config_state(dir_path)
+      #Load public fields
+      params_self=names(self)
+      for(param in params_self){
+        if(!is.function(self[[param]])){
+          param_in_file=config_file$public[[param]]
+          if(!is.null_or_na(param_in_file)){
+            self[[param]]=param_in_file
+          }
+        }
+      }
+
+      #Load private fields
+      params_private=names(private)
+      for(param in params_private){
+        if(!is.function(private[[param]])){
+          param_in_file=config_file$private[[param]]
+          if(!is.null_or_na(param_in_file)){
+            private[[param]]=param_in_file
+          }
+        }
+      }
+    }
+  )
+)
+
+
+AIFEBaseModel <- R6::R6Class(
+  classname = "AIFEBaseModel",
+  inherit=AIFEMaster,
+  public = list(
+    #---------------------------------------------------------------------------
+    #' @description Method for counting the trainable parameters of a model.
+    #' @return Returns the number of trainable parameters of the model.
+    count_parameter = function() {
+      iterator <- reticulate::as_iterator(private$model$parameters())
+      iteration_finished <- FALSE
+      count <- 0
+      while (iteration_finished == FALSE) {
+        iter_results <- reticulate::iter_next(it = iterator)
+        if (is.null(iter_results)) {
+          iteration_finished <- TRUE
+        } else {
+          if (iter_results$requires_grad == TRUE) {
+            count <- count + iter_results$numel()
+          }
+        }
+      }
+      return(count)
+    }
+  ),
+  private=list(
     #-------------------------------------------------------------------------
     prepare_history_data = function(history) {
       # Provide rownames for the history
@@ -525,69 +618,6 @@ AIFEBaseModel <- R6::R6Class(
         }
       }
       return(history)
-    },
-    #--------------------------------------------------------------------------
-    init_and_start_sustainability_tracking = function() {
-      if (self$last_training$config$sustain_track == TRUE) {
-        if (check_versions(a = get_py_package_version("codecarbon"), operator = ">=", b = "2.8.0")) {
-          path_look_file <- codecarbon$lock$LOCKFILE
-          if (file.exists(path_look_file)) {
-            unlink(path_look_file)
-          }
-        }
-
-        private$sustainability_tracker <- codecarbon$OfflineEmissionsTracker(
-          country_iso_code = self$last_training$config$sustain_iso_code,
-          region = self$last_training$config$sustain_region,
-          tracking_mode = "machine",
-          log_level = "warning",
-          measure_power_secs = self$last_training$config$sustain_interval,
-          save_to_file = FALSE,
-          save_to_api = FALSE,
-          allow_multiple_runs = FALSE
-        )
-        private$sustainability_tracker$start()
-      }
-    },
-    #---------------------------------------------------------------------------
-    stop_sustainability_tracking = function() {
-      if (self$last_training$config$sustain_track == TRUE) {
-        private$sustainability_tracker$stop()
-        private$sustainability <- summarize_tracked_sustainability(private$sustainability_tracker)
-      } else {
-        private$sustainability <- list(
-          sustainability_tracked = FALSE,
-          date = NA,
-          sustainability_data = list(
-            duration_sec = NA,
-            co2eq_kg = NA,
-            cpu_energy_kwh = NA,
-            gpu_energy_kwh = NA,
-            ram_energy_kwh = NA,
-            total_energy_kwh = NA
-          )
-        )
-      }
-    },
-    #---------------------------------------------------------------------------
-    create_checkpoint_directory = function() {
-      # Create a directory for the package
-      tmp_dir <- create_and_get_tmp_dir()
-
-      # Create a folder for the current task
-      private$dir_checkpoint <- paste0(
-        tmp_dir, "/",
-        generate_id(16)
-      )
-      create_dir(dir = private$dir_checkpoint, trace = FALSE)
-    },
-    #--------------------------------------------------------------------------
-    clean_checkpoint_directory = function() {
-      unlink(
-        x = private$dir_checkpoint,
-        recursive = TRUE,
-        force = FALSE
-      )
     }
   )
 )

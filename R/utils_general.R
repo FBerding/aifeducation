@@ -181,43 +181,6 @@ auto_n_cores <- function() {
   return(n_cores = max(1, n_cores))
 }
 
-#' @title Create object
-#'
-#' @description  Support function for creating objects.
-#' @param class `string` Name of the class to be created.#'
-#' @return Returns an object of the requested class.#'
-#' @family Utils Developers
-#' @export
-create_object=function(class){
-  if(class=="TEClassifierRegular"){
-    return(suppressMessages(TEClassifierRegular$new()))
-  } else if(class=="TEClassifierProtoNet"){
-    return(suppressMessages(TEClassifierProtoNet$new()))
-  } else if(class=="TEClassifierSequential"){
-    return(TEClassifierSequential$new())
-  }else if(class=="TEClassifierSequentialPrototype"){
-    return(TEClassifierSequentialPrototype$new())
-  }else if(class=="TEClassifierParallel"){
-    return(TEClassifierParallel$new())
-  }else if(class=="TEClassifierParallelPrototype"){
-    return(TEClassifierParallelPrototype$new())
-  }else if(class=="TEFeatureExtractor"){
-    return(TEFeatureExtractor$new())
-  }  else if (class == "TextEmbeddingModel") {
-    return(TextEmbeddingModel$new())
-  } else if (class == "LargeDataSetForTextEmbeddings") {
-   return(LargeDataSetForTextEmbeddings$new())
-  } else if (class == "LargeDataSetForText") {
-    return(LargeDataSetForText$new())
-  } else if (class == "EmbeddedText") {
-    return(EmbeddedText$new())
-  } else if(class%in%unlist(AIFETrType)){
-    return(aife_transformer.make(type=class,init_trace = FALSE))
-  } else {
-    stop("Object is not implemented in this function.")
-  }
-}
-
 #' @title Detect base model's architecture
 #' @description Function for detecting the base type of a base model.
 #'

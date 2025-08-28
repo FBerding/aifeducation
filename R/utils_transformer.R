@@ -35,7 +35,7 @@
 #'
 #' @family Utils Transformers Developers
 #' @export
-calc_tokenizer_statistics <- function(dataset, step = "creation") {
+calc_tokenizer_statistics <- function(dataset, step = "creation",statistics_max_tokens_length=512) {
   # Argument Checking
   check_class(object=dataset, classes="datasets.arrow_dataset.Dataset", allow_NULL=FALSE)
 
@@ -72,6 +72,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation") {
     list(
       step = step,
       date = date(),
+      max_tokens_length=statistics_max_tokens_length,
       n_sequences = n_sequences,
       n_words = n_words,
       n_tokens = n_tokens,

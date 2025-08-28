@@ -34,7 +34,8 @@ def tokenize_raw_text(
     request_word_ids = False,
     log_file = None, write_interval = 2,
     value_top = 0, total_top = 1, message_top = "NA",
-    total_middle = 1):
+    total_middle = 1,
+    add_special_tokens=True):
       
     global current_batch
     global last_log
@@ -47,6 +48,7 @@ def tokenize_raw_text(
         return_overflowing_tokens = return_overflowing_tokens,
         return_length = return_length,
         return_special_tokens_mask = return_special_tokens_mask,
+        add_special_tokens=add_special_tokens,
         return_offsets_mapping = return_offsets_mapping,
         return_attention_mask = return_attention_mask,
         return_tensors = return_tensors)

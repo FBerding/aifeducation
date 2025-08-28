@@ -1,0 +1,506 @@
+# This file is part of the R package "aifeducation".
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
+
+#' @title
+  #' @description
+  #' @return
+  #' @family Tokenizer
+  #' @export
+  TokenizerBase <- R6::R6Class(
+    classname = "TokenizerBase",
+    inherit = AIFEMaster,
+    private = list(
+      tokenizer_statistics = data.frame(),
+      configured = FALSE,
+      #-------------------------------------------------------------------------
+      load_reload_python_scripts = function() {
+        load_py_scripts("py_log.py")
+      },
+      #------------------------------------------------------------------------
+      # Method for loading tokenizer statistics
+      load_tokenizer_statistics = function(model_dir) {
+        path <- paste0(model_dir, "/", "tokenizer_statistics.csv")
+        if (file.exists(path) == TRUE) {
+          private$tokenizer_statistics <- read.csv(file = path)
+        } else {
+          private$tokenizer_statistics <- NA
+        }
+      },
+      #------------------------------------------------------------------------
+      # Method for saving tokenizer statistics
+      save_tokenizer_statistics = function(dir_path, folder_name) {
+        if (is.null_or_na(private$tokenizer_statistics) == FALSE) {
+          save_location <- paste0(dir_path, "/", folder_name)
+          create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
+          write.csv(
+            x = private$tokenizer_statistics,
+            file = paste0(save_location, "/", "tokenizer_statistics.csv"),
+            row.names = FALSE,
+            quote = FALSE
+          )
+        }
+      }
+    ),
+    public = list(
+      #--------------------------------------------------------------------------
+      #' @description Method for saving a transformer model on disk.Relevant
+      #' only for transformer models.
+      #' @param dir_path `string` containing the path to the relevant
+      #' model directory.
+      #' @param folder_name `string` Name for the folder created within the directory.
+      #' This folder contains all model files.
+      #' @return Function does not return a value. It is used for saving a transformer model
+      #' to disk.
+      #'
+      #' @importFrom utils write.csv
+      save = function(dir_path, folder_name) {
+        check_type(object = dir_path, type = "string", FALSE)
+        check_type(object = folder_name, type = "string", FALSE)
+
+        # Create Directory and Folder
+        save_location <- paste0(dir_path, "/", folder_name)
+        create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
+        create_dir(save_location, trace = TRUE, msg_fun = FALSE)
+
+        # Save tokenizer statistics
+        private$save_tokenizer_statistics(
+          dir_path = dir_path,
+          folder_name = folder_name
+        )
+
+        # Save Sustainability Data
+        private$save_sustainability_data(dir_path = dir_path, folder_name = folder_name)
+
+        # Write vocab txt
+        special_tokens <- self$get_special_tokens()
+        special_tokens <- special_tokens[order(x = special_tokens[, "id"]), ]
+        special_tokens <- unique(special_tokens[, "token"])
+        write(
+          x = c(special_tokens, names(private$model$get_vocab())),
+          file = paste0(save_location, "/", "vocab.txt")
+        )
+
+        # Save Tokenizer
+        file_paths <- private$model$save_pretrained(save_location)
+      },
+      #--------------------------------------------------------------------------
+      #' @description loads an object from disk
+      #' and updates the object to the current version of the package.
+      #' @param dir_path Path where the object set is stored.
+      #' @return Method does not return anything. It loads an object from disk.
+      load_from_disk = function(dir_path) {
+        #Load or reload python scripts
+        private$load_reload_python_scripts()
+
+        #Load private and public config files
+        private$load_config_file(dir_path)
+
+        #Load the tokenizer model
+        private$model <- transformers$PreTrainedTokenizerFast$from_pretrained(dir_path)
+
+        #Load Tokenizer Statistics
+        private$load_tokenizer_statistics(dir_path)
+
+        # Load Sustainability Data
+        private$load_sustainability_data(model_dir = dir_path)
+
+        #Prevent modification
+        private$set_configuration_to_TRUE()
+        private$trained=TRUE
+      },
+      # ------------------------------------------------------------------------
+      get_tokenizer_statistics = function() {
+        return(private$tokenizer_statistics)
+      },
+      get_tokenizer = function() {
+        return(private$model)
+      },
+      #-------------------------------------------------------------------------
+      #' @description Method for encoding words of raw texts into integers.
+      #' @param raw_text `vector`containing the raw texts.
+      #' @param token_encodings_only `bool` If `TRUE`, only the token
+      #' encodings are returned. If `FALSE`, the complete encoding is returned
+      #' which is important for some transformer models.
+      #' @param to_int `bool` If `TRUE` the integer ids of the tokens are
+      #' returned. If `FALSE` the tokens are returned. Argument only applies
+      #' for transformer models and if `token_encodings_only=TRUE`.
+      #' @param trace `bool` If `TRUE`, information of the progress
+      #' is printed. `FALSE` if not requested.
+      #' @return `list` containing the integer or token sequences of the raw texts with
+      #' special tokens.
+      encode = function(raw_text,
+                        token_overlap = 0,
+                        max_token_sequence_length = 512,
+                        n_chunks = 1,
+                        token_encodings_only = FALSE,
+                        to_int = TRUE,
+                        return_token_type_ids=TRUE,
+                        trace = FALSE) {
+        # Checking
+        check_type(object = raw_text, type = "vector", FALSE)
+        check_type(object = token_encodings_only, type = "bool", FALSE)
+        check_type(object = to_int, type = "bool", FALSE)
+        check_type(object = trace, type = "bool", FALSE)
+
+        # Start
+        n_units <- length(raw_text)
+        #---------------------------------------------------------------------
+        if (token_encodings_only == TRUE) {
+          encodings <- NULL
+          encodings_only <- NULL
+          for (i in 1:n_units) {
+            tokens_unit <- NULL
+
+            tokens <- private$model(
+              raw_text[i],
+              stride = as.integer(token_overlap),
+              padding = "max_length",
+              truncation = TRUE,
+              return_overflowing_tokens = TRUE,
+              return_length = FALSE,
+              return_offsets_mapping = FALSE,
+              return_attention_mask = FALSE,
+              max_length = as.integer(max_token_sequence_length),
+              return_tensors = "np"
+            )
+
+            seq_len <- nrow(tokens[["input_ids"]])
+
+            chunks <- min(seq_len, n_chunks)
+
+            for (j in 1:chunks) {
+              tokens_unit[j] <- list(tokens["input_ids"][j, ])
+              if (trace == TRUE) {
+                cat(paste(date(), i, "/", n_units, "block", j, "/", chunks, "\n"))
+              }
+            }
+            encodings_only[i] <- list(tokens_unit)
+          }
+          if (to_int == TRUE) {
+            return(encodings_only)
+          } else {
+            # Convert ids to tokens
+
+            token_seq_list <- NULL
+            for (i in seq_len(length(encodings_only))) {
+              tmp_sequence <- encodings_only[[i]]
+              tmp_seqeunce_tok <- NULL
+              for (j in seq_len(length(tmp_sequence))) {
+                tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
+                  private$model$convert_ids_to_tokens(
+                    ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
+                  )
+                )
+              }
+              token_seq_list[length(token_seq_list) + 1] <- list(tmp_seqeunce_tok)
+            }
+            return(token_seq_list)
+          }
+
+          #--------------------------------------------------------------------
+        } else {
+          encodings <- NULL
+          chunk_list <- vector(length = n_units)
+          total_chunk_list <- vector(length = n_units)
+          for (i in 1:n_units) {
+
+            tokens <- private$model(
+              raw_text[i],
+              stride = as.integer(token_overlap),
+              padding = "max_length",
+              truncation = TRUE,
+              max_length = as.integer(max_token_sequence_length),
+              return_overflowing_tokens = TRUE,
+              return_length = FALSE,
+              return_offsets_mapping = FALSE,
+              return_attention_mask = TRUE,
+              return_token_type_ids = return_token_type_ids,
+              return_tensors = "pt"
+            )
+
+
+            tmp_dataset <- datasets$Dataset$from_dict(tokens)
+
+            seq_len <- tmp_dataset$num_rows
+            chunk_list[i] <- min(seq_len, n_chunks)
+            total_chunk_list[i] <- seq_len
+            if (chunk_list[i] == 1) {
+              tmp_dataset <- tmp_dataset$select(list(as.integer((1:chunk_list[[i]]) - 1)))
+            } else {
+              tmp_dataset <- tmp_dataset$select(as.integer((1:chunk_list[[i]]) - 1))
+            }
+
+            encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
+          }
+          return(encodings_list = list(
+            encodings = encodings,
+            chunks = chunk_list,
+            total_chunks = total_chunk_list
+          ))
+        }
+      },
+      #--------------------------------------------------------------------------
+      #' @description Method for decoding a sequence of integers into tokens
+      #' @param int_seqence `list` containing the integer sequences which
+      #' should be transformed to tokens or plain text.
+      #' @param to_token `bool` If `FALSE` plain text is returned.
+      #' If `TRUE` a sequence of tokens is returned. Argument only relevant
+      #' if the model is based on a transformer.
+      #'
+      #' @return `list` of token sequences
+      decode = function(int_seqence, to_token = FALSE) {
+        # Check
+        check_type(object = int_seqence, type = "list", FALSE)
+        check_type(object = to_token, type = "bool", FALSE)
+
+        # Start
+        tmp_token_list <- NULL
+        for (i in seq_len(length(int_seqence))) {
+          tmp_seq_token_list <- NULL
+          for (j in seq_len(length(int_seqence[[i]]))) {
+            tmp_vector <- int_seqence[[i]][[j]]
+            mode(tmp_vector) <- "integer"
+            if (to_token == FALSE) {
+              tmp_seq_token_list[j] <- list(private$model$decode(
+                token_ids = tmp_vector,
+                skip_special_tokens = TRUE
+              ))
+            } else {
+              tmp_seq_token_list[j] <- list(private$model$convert_ids_to_tokens(tmp_vector))
+            }
+          }
+          tmp_token_list[i] <- list(tmp_seq_token_list)
+        }
+        return(tmp_token_list)
+      },
+      #---------------------------------------------------------------------------
+      #' @description Method for receiving the special tokens of the model
+      #' @return Returns a `matrix` containing the special tokens in the rows
+      #' and their type, token, and id in the columns.
+      get_special_tokens = function() {
+        special_tokens <- c(
+          "bos_token",
+          "eos_token",
+          "unk_token",
+          "sep_token",
+          "pad_token",
+          "cls_token",
+          "mask_token"
+        )
+        tokens_map <- matrix(
+          nrow = length(special_tokens),
+          ncol = 3,
+          data = NA
+        )
+        colnames(tokens_map) <- c("type", "token", "id")
+
+        for (i in seq_len(length(special_tokens))) {
+          tokens_map[i, 1] <- special_tokens[i]
+          tokens_map[i, 2] <- replace_null_with_na(private$model[special_tokens[i]])
+          tokens_map[i, 3] <- replace_null_with_na(
+            private$model[paste0(special_tokens[i], "_id")]
+          )
+        }
+        return(tokens_map)
+      },
+      #--------------------------------------------------------------------------
+      n_special_tokens=function(){
+        special_tokens=self$get_special_tokens()
+        return(
+          length(
+            unique(
+              special_tokens[,"token"]
+            )
+          )
+        )
+      }
+    )
+  )
+
+
+
+#' @title
+#' @description
+#' @return
+#' @family Tokenizer
+#' @export
+WordPieceTokenizer <- R6::R6Class(
+  classname = "WordPieceTokenizer",
+  inherit = TokenizerBase,
+  private = list(
+  ),
+  public = list(
+    #--------------------------------------------------------------------------
+    configure = function(vocab_size = 10000,
+                         vocab_do_lower_case = FALSE) {
+      private$load_reload_python_scripts()
+      private$check_config_for_FALSE()
+
+      private$save_all_args(
+        args=get_called_args(n=1),
+        group = "configure"
+      )
+
+      # Set configured to TRUE to avoid changes in the model
+      private$set_configuration_to_TRUE()
+    },
+    #--------------------------------------------------------------------------
+    train=function(raw_text_dataset,
+                   statistics_max_tokens_length = 512,
+                   sustain_track = FALSE,
+                   sustain_iso_code = NULL,
+                   sustain_region = NULL,
+                   sustain_interval = 15,
+                   trace = FALSE){
+      private$check_config_for_TRUE()
+      private$check_for_untrained()
+
+      private$save_all_args(
+        args=get_called_args(n=1),
+        group = "training"
+      )
+
+      private$init_and_start_sustainability_tracking()
+
+      # Define tokens
+      sep_token <- "[SEP]"
+      sep_id <- 1
+      cls_token <- "[CLS]"
+      cls_id <- 0
+      unk_token <- "[UNK]"
+      pad_token <- "[PAD]"
+      mask_token <- "[MASK]"
+      bos_token <- "[CLS]"
+      eos_token <- "[SEP]"
+
+      special_tokens <- c(
+        cls_token,
+        sep_token,
+        unk_token,
+        pad_token,
+        mask_token,
+        bos_token,
+        eos_token
+      )
+
+      # Create model
+      tok_new <- tok$Tokenizer(tok$models$WordPiece(unk_token = unk_token))
+      tok_new$normalizer <- tok$normalizers$BertNormalizer(
+        lowercase = private$model_config$vocab_do_lower_case,
+        clean_text = TRUE,
+        handle_chinese_chars = TRUE,
+        strip_accents = private$model_config$vocab_do_lower_case
+      )
+      tok_new$pre_tokenizer <- tok$pre_tokenizers$BertPreTokenizer()
+      tok_new$post_processor <- tok$processors$BertProcessing(
+        sep = reticulate::tuple(list(sep_token, as.integer(sep_id))),
+        cls = reticulate::tuple(list(cls_token, as.integer(cls_id)))
+      )
+
+      tok_new$decoder <- tok$decoders$WordPiece()
+
+      # configurate training
+      trainer <- tok$trainers$WordPieceTrainer(
+        vocab_size = as.integer(private$model_config$vocab_size),
+        special_tokens = special_tokens,
+        show_progress = trace
+      )
+
+      # calculate the model
+      run_py_file("datasets_transformer_compute_vocabulary.py")
+
+      tok_new$train_from_iterator(
+        iterator = py$batch_iterator(
+          batch_size = as.integer(200),
+          dataset = raw_text_dataset$get_dataset(),
+          log_file = NULL,
+          write_interval = 2,
+          value_top = 0,
+          total_top = 1,
+          message_top = "NA"
+        ),
+        trainer = trainer,
+        length = as.integer(raw_text_dataset$n_rows())
+      )
+
+      # Create the complete and final model
+      private$model <- transformers$PreTrainedTokenizerFast(
+        tokenizer_object = tok_new,
+        unk_token = unk_token,
+        sep_token = sep_token,
+        pad_token = pad_token,
+        cls_token = cls_token,
+        mask_token = mask_token,
+        bos_token = bos_token,
+        eos_token = eos_token
+      )
+
+      # Calculate tokenizer statistics
+      tokenized_texts_raw <- tokenize_dataset(
+        dataset = raw_text_dataset$get_dataset(),
+        tokenizer = private$model,
+        max_length = statistics_max_tokens_length,
+        add_special_tokens = FALSE,
+        log_file = NULL,
+        write_interval = 2,
+        value_top = 1,
+        total_top = 1,
+        message_top = "NA"
+      )
+
+      private$tokenizer_statistics <- as.data.frame(
+        calc_tokenizer_statistics(
+          dataset = tokenized_texts_raw,
+          statistics_max_tokens_length = statistics_max_tokens_length,
+          step = "creation"
+        )
+      )
+
+      # Update
+      private$model_config$vocab_size <- length(private$model$get_vocab()) + length(special_tokens)
+
+      # Set trained field
+      private$trained=TRUE
+
+      private$stop_sustainability_tracking("Create tokenizer")
+    }
+  )
+)
+#Add the model to the user list
+TokenizerIndex$Bert=("WordPieceTokenizer")
+
+#' @title
+#' @description
+#' @return
+#' @family Tokenizer
+#' @export
+HuggingFaceTokenizer <- R6::R6Class(
+  classname = "HuggingFaceTokenizer",
+  inherit = TokenizerBase,
+  private = list(),
+  public=list(
+    create_from_hf=function(model_dir){
+      #Load the model
+      private$model=transformers$AutoTokenizer$from_pretrained(model_dir)
+
+      # Set configured to TRUE to avoid changes in the model
+      private$set_configuration_to_TRUE()
+
+      # Set trained field
+      private$trained=TRUE
+    }
+  )
+)
+#Add the model to the user list
+TokenizerIndex$HuggingFaceTokenizer=("HuggingFaceTokenizer")

@@ -352,29 +352,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       private$text_embedding_model["features"] <- features
       private$text_embedding_model["pad_value"] <- pad_value
     },
-    save_all_args = function(args, group = "training") {
-      if (group %in% c("configure", "training")) {
-        if (group == "training") {
-          for (arg in names(args)) {
-            if (!R6::is.R6(args[[arg]]) &
-              !is.factor(args[[arg]]) &
-              !arg %in% c("log_dir", "log_write_interval")) {
-              self$last_training$config[arg] <- list(args[[arg]])
-            }
-          }
-        } else if (group == "configure") {
-          for (arg in names(args)) {
-            if (!R6::is.R6(args[[arg]]) &
-              !is.factor(args[[arg]]) &
-              !arg %in% c("log_dir", "log_write_interval")) {
-              self$model_config[arg] <- list(args[[arg]])
-            }
-          }
-        }
-      } else {
-        stop("Argument 'group' must be 'configure' or 'training'.")
-      }
-    },
     set_up_logger = function(log_dir, log_write_interval) {
       private$log_config$log_dir <- log_dir
       private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")

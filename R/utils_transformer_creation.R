@@ -214,7 +214,7 @@ Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
 #' @family Utils Transformers Creation Developers
 #' @keywords internal
 #' @noRd
-tokenize_dataset <- function(dataset, tokenizer, max_length,
+tokenize_dataset <- function(dataset, tokenizer, max_length,add_special_tokens=TRUE,
                              log_file = NULL, write_interval = 2,
                              value_top = 0, total_top = 1, message_top = "NA") {
   run_py_file("datasets_transformer_prepare_data.py")
@@ -247,7 +247,8 @@ tokenize_dataset <- function(dataset, tokenizer, max_length,
         log_file = log_file,
         write_interval = write_interval,
         value_top = value_top, total_top = total_top, message_top = message_top,
-        total_middle = floor(dataset$num_rows / batch_size)
+        total_middle = floor(dataset$num_rows / batch_size),
+        add_special_tokens=add_special_tokens
       )
     ),
     remove_columns = dataset$column_names

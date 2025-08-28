@@ -37,6 +37,7 @@ def _write_history(file, history):
   
 def _write(write_fn, args_fn,
            last_log, write_interval):
+
   if args_fn["file"] == None:
     return None
   
@@ -49,7 +50,7 @@ def _write(write_fn, args_fn,
       log_time = time.time()
     except:
       log_time = last_log
-      
+
   return log_time
 
 def write_log_py(log_file, 

@@ -40,7 +40,9 @@ save_to_disk <- function(object,
       "LargeDataSetForTextEmbeddings",
       "LargeDataSetForText",
       "EmbeddedText",
-      ".AIFEBaseTransformer"
+      ".AIFEBaseTransformer",
+      "BaseModelCore",
+      "WordPieceTokenizer"
     ),
     FALSE
   )
