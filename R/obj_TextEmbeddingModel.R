@@ -168,71 +168,29 @@ TextEmbeddingModel <- R6::R6Class(
       } else {
         private$model_config$max_length <- as.integer(max_length)
       }
-    },
-    #-------------------------------------------------------------------------
-    update_model_config = function() {
-      # check if an update of values is necessary. This is the case if the model
-      # was created with an older version of aifeducation compared to 1.1.0
-      # Update values to the new values introduced in version 1.1.0
-
-      current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
-      if (is.null_or_na(current_pkg_version)) {
-        update_values <- TRUE
-      } else {
-        if (check_versions(
-          a = "1.1.0",
-          operator = ">",
-          b = self$get_package_versions()$r_package_versions$aifeducation
-        )) {
-          update_values <- TRUE
-        } else {
-          update_values <- FALSE
-        }
-      }
-
-      tmp_model_config_params <- names(private$transformer_components)
-      if (update_values) {
-        for (param in tmp_model_config_params) {
-          private$transformer_components[param] <- list(update_values_to_new_1.1.0(private$transformer_components[[param]]))
-        }
-      }
-      private$r_package_versions$aifeducation <- packageVersion("aifeducation")
     }
   ),
   public = list(
+
+    #' @field BaseModel \cr
+    #' Object of class `r paste(paste0("[",BaseModelsIndex,"]"),collapse=", ")`.
     BaseModel = NULL,
 
     #--------------------------------------------------------------------------
     #' @description Method for creating a new text embedding model
-    #' @param model_name `string` containing the name of the new model.
-    #' @param model_label `string` containing the label/title of the new model.
-    #' @param model_language `string` containing the language which the model
-    #' represents (e.g., English).
-    #' @param max_length `int` determining the maximum length of token
-    #' sequences used in transformer models. Not relevant for the other methods.
-    #' @param chunks `int` Maximum number of chunks. Must be at least 2.
-    #' @param overlap `int` determining the number of tokens which should be added
-    #' at the beginning of the next chunk. Only relevant for transformer models.
-    #' @param emb_layer_min `int` or `string` determining the first layer to be included
-    #' in the creation of embeddings. An integer correspondents to the layer number. The first
-    #' layer has the number 1. Instead of an integer the following strings are possible:
-    #' `"start"` for the first layer, `"Middle"` for the middle layer,
-    #' `"2_3_layer"` for the layer two-third layer, and `"Last"` for the last layer.
-    #' @param emb_layer_max `int` or `string` determining the last layer to be included
-    #' in the creation of embeddings. An integer correspondents to the layer number. The first
-    #' layer has the number 1. Instead of an integer the following strings are possible:
-    #' `"start"` for the first layer, `"Middle"` for the middle layer,
-    #' `"2_3_layer"` for the layer two-third layer, and `"Last"` for the last layer.
-    #' @param emb_pool_type `string` determining the method for pooling the token embeddings
-    #' within each layer. If `"CLS"` only the embedding of the CLS token is used. If
-    #' `"Average"` the token embedding of all tokens are averaged (excluding padding tokens).
-    #' `"cls` is not supported for `method="funnel"`.
+    #' @param model_name `r get_param_doc_desc("model_name")`
+    #' @param model_label `r get_param_doc_desc("model_label")`
+    #' @param model_language `r get_param_doc_desc("model_language")`
+    #' @param base_model `r get_param_doc_desc("base_model")`
+    #' @param max_length `r get_param_doc_desc("max_length")`
+    #' @param chunks `r get_param_doc_desc("chunks")`
+    #' @param overlap `r get_param_doc_desc("overlap")`
+    #' @param emb_layer_min `r get_param_doc_desc("emb_layer_min")`
+    #' @param emb_layer_max `r get_param_doc_desc("emb_layer_max")`
+    #' @param emb_pool_type `r get_param_doc_desc("emb_pool_type")`
     #' @param pad_value `r get_param_doc_desc("pad_value")`
-    #' @param model_dir `string` path to the directory where the
-    #' BERT model is stored.
-    #' @param trace `bool` `TRUE` prints information about the progress.
-    #' `FALSE` does not.
-    #' @return Returns an object of class [TextEmbeddingModel].
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @return `r get_description("return_nothing")`
     #'
     #' @import reticulate
     #' @import stats
@@ -243,8 +201,8 @@ TextEmbeddingModel <- R6::R6Class(
                          max_length = 0,
                          chunks = 2,
                          overlap = 0,
-                         emb_layer_min = "Middle",
-                         emb_layer_max = "2_3_layer",
+                         emb_layer_min = 1,
+                         emb_layer_max = 2,
                          emb_pool_type = "Average",
                          pad_value = -100,
                          base_model = NULL) {
@@ -254,7 +212,7 @@ TextEmbeddingModel <- R6::R6Class(
       # Check if the object is not configured
       private$check_config_for_FALSE()
 
-      # Load BaseModel
+       # Load BaseModel
       self$BaseModel <- base_model$clone(deep = TRUE)
 
       # Save Embedding Config
@@ -284,10 +242,10 @@ TextEmbeddingModel <- R6::R6Class(
       private$set_configuration_to_TRUE()
     },
     #--------------------------------------------------------------------------
-    #' @description loads an object from disk
+    #' @description Loads an object from disk
     #' and updates the object to the current version of the package.
-    #' @param dir_path Path where the object set is stored.
-    #' @return Method does not return anything. It loads an object from disk.
+    #' @param dir_path `r get_description("load_dir")`
+    #' @return `r get_description("return_load_on_disk")`
     load_from_disk = function(dir_path) {
       # Load private and public config files
       private$load_config_file(dir_path)
@@ -296,34 +254,40 @@ TextEmbeddingModel <- R6::R6Class(
       private$load_reload_python_scripts()
 
       # Load Base model
-      self$BaseModel <- load_from_disk(dir_path = paste0(dir_path, "/", "base_model"))
+      version_lower=check_versions(
+        a = "1.1.2",
+        operator = ">",
+        b = self$get_package_versions()$r_package_versions$aifeducation
+      )
+      if(version_lower){
+        #Old version that does not use BaseModel and Tokenizer
+        tmp_pytorch_model=transformers$AutoModelForMaskedLM$from_pretrained(model_dir=dir_path)
+        tmp_type=detect_base_model_type(tmp_pytorch_model)
+        tmp_BaseModel=create_object(tmp_type)
+        self$BaseModel<-tmp_BaseModel$create_from_hf(
+          model_dir = dir_path,
+          tokenizer_dir = dir_path
+        )
+      } else {
+        #Regular case
+        self$BaseModel <- load_from_disk(dir_path = paste0(dir_path, "/", "base_model"))
+      }
 
-      # Update config if necessary
-      private$update_model_config()
-
-      # Set model info
-      # private$set_model_info(
-      #  model_name = config_file$private$model_info$model_name,
-      #  label = config_file$private$model_info$model_label,
-      #  model_date = config_file$private$model_info$model_date,
-      #  model_language = config_file$private$model_info$model_language
-      # )
+      # Load Sustainability Data Inference
+      private$load_sustainability_data_inference(model_dir = dir_path)
 
       # Finalize config
       private$set_configuration_to_TRUE()
     },
     #--------------------------------------------------------------------------
-    #' @description Method for saving a transformer model on disk.Relevant
-    #' only for transformer models.
-    #' @param dir_path `string` containing the path to the relevant
-    #' model directory.
-    #' @param folder_name `string` Name for the folder created within the directory.
-    #' This folder contains all model files.
-    #' @return Function does not return a value. It is used for saving a transformer model
-    #' to disk.
+    #' @description Method for saving a model on disk.
+    #' @param dir_path `r get_description("save_dir")`
+    #' @param folder_name `r get_param_doc_desc("folder_name")`
+    #' @return `r get_description("return_save_on_disk")`
     #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
+
       save_location <- paste0(dir_path, "/", folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
 
@@ -333,23 +297,21 @@ TextEmbeddingModel <- R6::R6Class(
         dir_path = save_location,
         folder_name = "base_model"
       )
+
+      # Save Sustainability Data Inference
+      private$save_sustainability_data_inference(dir_path = dir_path, folder_name = folder_name)
     },
     #-------------------------------------------------------------------------
     #' @description Method for encoding words of raw texts into integers.
-    #' @param raw_text `vector`containing the raw texts.
-    #' @param token_encodings_only `bool` If `TRUE`, only the token
-    #' encodings are returned. If `FALSE`, the complete encoding is returned
-    #' which is important for some transformer models.
-    #' @param to_int `bool` If `TRUE` the integer ids of the tokens are
-    #' returned. If `FALSE` the tokens are returned. Argument only applies
-    #' for transformer models and if `token_encodings_only=TRUE`.
-    #' @param trace `bool` If `TRUE`, information of the progress
-    #' is printed. `FALSE` if not requested.
+    #' @param raw_text `r get_param_doc_desc("raw_text")`
+    #' @param token_encodings_only `r get_param_doc_desc("token_encodings_only")`
+    #' @param token_to_int `r get_param_doc_desc("token_to_int")`
+    #' @param trace `r get_param_doc_desc("trace")`
     #' @return `list` containing the integer or token sequences of the raw texts with
     #' special tokens.
     encode = function(raw_text,
                       token_encodings_only = FALSE,
-                      to_int = TRUE,
+                      token_to_int = TRUE,
                       trace = FALSE) {
       return(
         self$BaseModel$Tokenizer$encode(
@@ -358,11 +320,16 @@ TextEmbeddingModel <- R6::R6Class(
           max_token_sequence_length = private$model_config$max_length,
           n_chunks = private$model_config$chunks,
           token_encodings_only = token_encodings_only,
-          to_int = to_int,
+          token_to_int = token_to_int,
           trace = trace
         )
       )
     },
+    #--------------------------------------------------------------------------
+    #' @description Method for decoding a sequence of integers into tokens
+    #' @param int_seqence `r get_param_doc_desc("int_seqence")`
+    #' @param to_token `r get_param_doc_desc("to_token")`
+    #' @return `list` of token sequences
     decode = function(int_seqence, to_token = FALSE){
       return(
         self$BaseModel$Tokenizer$decode(
@@ -375,13 +342,11 @@ TextEmbeddingModel <- R6::R6Class(
     #' @description Method for creating text embeddings from raw texts.
     #' This method should only be used if a small number of texts should be transformed
     #' into text embeddings. For a large number of texts please use the method `embed_large`.
-    #' @param raw_text `vector` containing the raw texts.
-    #' @param doc_id `vector` containing the corresponding IDs for every text.
-    #' @param batch_size `int` determining the maximal size of every batch.
-    #' @param trace `bool` `TRUE`, if information about the progression
-    #' should be printed on console.
-    #' @param return_large_dataset 'bool' If `TRUE` the retuned object is of class
-    #' [LargeDataSetForTextEmbeddings]. If `FALSE` it is of class [EmbeddedText]
+    #' @param raw_text `r get_param_doc_desc("raw_text")`
+    #' @param doc_id `r get_param_doc_desc("doc_id")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param return_large_dataset `r get_param_doc_desc("return_large_dataset")`
     #' @return Method returns an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]. This object
     #' contains the embeddings as a [data.frame] and information about the
     #' model creating the embeddings.
@@ -437,7 +402,7 @@ TextEmbeddingModel <- R6::R6Class(
           token_overlap = private$model_config$overlap,
           max_token_sequence_length = private$model_config$max_length,
           n_chunks = private$model_config$chunks,
-          to_int = TRUE,
+          token_to_int = TRUE,
           return_token_type_ids <- (self$BaseModel$get_model_type() != AIFETrType$mpnet)
         )
 
@@ -609,30 +574,29 @@ TextEmbeddingModel <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Method for creating text embeddings from raw texts.
-    #' @param large_datas_set Object of class [LargeDataSetForText] containing the
-    #' raw texts.
-    #' @param batch_size `int` determining the maximal size of every batch.
-    #' @param trace `bool` `TRUE`, if information about the progression
-    #' should be printed on console.
-    #' @param log_file `string` Path to the file where the log should be saved.
-    #' If no logging is desired set this argument to `NULL`.
-    #' @param log_write_interval `int` Time in seconds determining the interval in which
-    #' the logger should try to update the log files. Only relevant if `log_file` is not `NULL`.
+    #'
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param log_file `r get_param_doc_desc("log_file")`
+    #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @return Method returns an object of class [LargeDataSetForTextEmbeddings].
-    embed_large = function(large_datas_set, batch_size = 32, trace = FALSE,
+    embed_large = function(text_dataset,
+                           batch_size = 32,
+                           trace = FALSE,
                            log_file = NULL,
                            log_write_interval = 2) {
       # Check arguments
-      check_class(object = large_datas_set, classes = c("LargeDataSetForText", allow_NULL = FALSE))
+      check_class(object = text_dataset, classes = c("LargeDataSetForText", allow_NULL = FALSE))
       check_type(object = batch_size, type = "int", FALSE)
       check_type(object = trace, type = "bool", FALSE)
 
       # Get total number of batches for the loop
-      total_number_of_bachtes <- ceiling(large_datas_set$n_rows() / batch_size)
+      total_number_of_bachtes <- ceiling(text_dataset$n_rows() / batch_size)
 
       # Get indices for every batch
       batches_index <- get_batches_index(
-        number_rows = large_datas_set$n_rows(),
+        number_rows = text_dataset$n_rows(),
         batch_size = batch_size,
         zero_based = TRUE
       )
@@ -641,7 +605,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Process every batch
       for (i in 1:total_number_of_bachtes) {
-        subset <- large_datas_set$select(as.integer(batches_index[[i]]))
+        subset <- text_dataset$select(as.integer(batches_index[[i]]))
         embeddings <- self$embed(
           raw_text = c(subset["text"]),
           doc_id = c(subset["id"]),
@@ -706,6 +670,7 @@ TextEmbeddingModel <- R6::R6Class(
     get_n_features = function() {
       return(self$BaseModel$get_final_size())
     },
+    #---------------------------------------------------------------------------
     #' @description Value for indicating padding.
     #' @return Returns an `int` describing the value used for padding.
     get_pad_value = function() {
@@ -732,6 +697,89 @@ TextEmbeddingModel <- R6::R6Class(
         private$publication_info$modified_by$authors <- authors
         private$publication_info$modified_by$citation <- citation
         private$publication_info$modified_by$url <- url
+      }
+    },
+    #--------------------------------------------------------------------------
+    #' @description Calculates the energy consumption for inference of the given task.
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @return Returns nothing. Method saves the statistics internally.
+    #' The statistics can be accessed with the method `get_sustainability_data("inference")`
+    estimate_sustainability_inference_embed = function(text_dataset = NULL,
+                                                       batch_size=32,
+                                                           sustain_iso_code = NULL,
+                                                           sustain_region = NULL,
+                                                           sustain_interval = 10,
+                                                           trace = TRUE) {
+      # Prepare Data
+      print_message(
+        msg = "Prepare Data",
+        trace = trace
+      )
+
+      n_cases <- text_dataset$n_rows()
+
+      # Gather information on data
+      print_message(
+        msg = "Gather information",
+        trace = trace
+      )
+
+      emp_seq_length=vector(length = n_cases)
+      arrow_dataset=text_dataset$get_dataset()
+      for(i in 1:n_cases){
+        tmp_encode=self$encode(arrow_dataset[i-1]$text,
+                    token_encodings_only = FALSE,
+                    token_to_int = TRUE,
+                    trace = FALSE)
+        emp_seq_length[i]=tmp_encode$chunks*private$model_config$max_length-(tmp_encode$chunks-1)*private$model_config$overlap
+      }
+
+
+
+
+      #Start Tracking
+      private$init_and_start_sustainability_tracker(
+        trace=trace,
+        country_iso_code=sustain_iso_code,
+        region=sustain_region,
+        measure_power_secs=sustain_interval)
+
+      #Start Task
+      result_embeddings=self$embed_large(
+        text_dataset=text_dataset,
+        batch_size = batch_size,
+        trace = FALSE,
+        log_file = NULL,
+        log_write_interval = 2
+        )
+
+      #Stop Tracking
+      results <-private$stop_sustainability_tracker(
+        trace = trace,
+        task = "Embed"
+      )
+
+      #Add additional information
+      results$data="empirical data"
+      results$n=n_cases
+      results$batch=batch_size
+      results$min_seq_len=min(emp_seq_length)
+      results$mean_seq_len=mean(emp_seq_length)
+      results$sd_seq_len=sd(emp_seq_length)
+      results$max_seq_len=max(emp_seq_length)
+
+      if (is.null_or_na(private$sustainability_inference)) {
+        private$sustainability_inference <- results
+      } else {
+        private$sustainability_inference <- rbind(
+          private$sustainability_inference,
+          results
+        )
       }
     }
   )

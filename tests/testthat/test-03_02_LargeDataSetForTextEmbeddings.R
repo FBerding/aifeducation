@@ -7,7 +7,7 @@ testthat::skip_if_not(
 load_all_py_scripts()
 
 # SetUp Test---------------------------------------------------------------------
-root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/LargeDataSetForTextEmbeddings")
 create_dir(root_path_results, FALSE)

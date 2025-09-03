@@ -12,21 +12,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title
-#' @description
-#' @return
+#' @title BERT-Transformer
+#' @description Represents models based on BERT.
+#' @references Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
+#'   Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
+#'   Conference of the North (pp. 4171--4186). Association for Computational Linguistics. \doi{10.18653/v1/N19-1423}
+#' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
 BaseModelBert <- R6::R6Class(
   classname = "BaseModelBert",
   inherit = BaseModelCore,
   private = list(
+
+    model_type="bert",
+
     create_model=function(args){
       configuration=transformers$BertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         max_position_embeddings = as.integer(args$max_position_embeddings),
         hidden_size = as.integer(args$hidden_size),
-        num_hidden_layers = as.integer(args$num_hidden_layer),
+        num_hidden_layers = as.integer(args$num_hidden_layers),
         num_attention_heads = as.integer(args$num_attention_heads),
         intermediate_size = as.integer(args$intermediate_size),
         hidden_act = tolower(args$hidden_act),
@@ -48,17 +54,28 @@ BaseModelBert <- R6::R6Class(
   ),
   public = list(
     #---------------------------------------------------------------------------
+    #' @description Configures a new object of this class.
+    #' @param tokenizer `r get_param_doc_desc("tokenizer")`
+    #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+    #' @param hidden_size `r get_param_doc_desc("hidden_size")`
+    #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
+    #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
+    #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512,
                          hidden_size = 768,
-                         num_hidden_layer = 12,
+                         num_hidden_layers = 12,
                          num_attention_heads = 12,
                          intermediate_size = 3072,
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
                          attention_probs_dropout_prob = 0.1) {
       arguments <- get_called_args(n = 1)
-      private$do_configuration(args = arguments, model_type = "bert")
+      private$do_configuration(args = arguments)
     }
   )
 )

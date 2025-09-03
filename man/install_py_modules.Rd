@@ -6,15 +6,16 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  transformer_version = "<=4.52.4",
-  tokenizers_version = "<=0.21.1",
-  pandas_version = "<=2.3.0",
+  transformer_version = "<=4.56.0",
+  tokenizers_version = "<=0.22.0",
+  pandas_version = "<=2.3.2",
   datasets_version = "<=3.6.0",
   codecarbon_version = "<=3.0.2",
-  safetensors_version = "<=0.5.3",
+  safetensors_version = "<=0.6.2",
   torcheval_version = "<=0.0.7",
-  accelerate_version = "<=1.8.1",
-  pytorch_cuda_version = "12.6",
+  accelerate_version = "<=1.10.1",
+  calflops_version = "<=0.3.2",
+  pytorch_cuda_version = "12.9",
   python_version = "3.12",
   remove_first = FALSE,
   use_conda = FALSE

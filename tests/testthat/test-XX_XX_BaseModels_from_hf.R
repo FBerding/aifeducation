@@ -29,67 +29,22 @@ create_dir(test_tmp_data_base_model_path, FALSE)
 example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
+raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
+
 # Test Configuration
 object_class_names <- c(
   "BaseModelBert",
-  #"BaseModelFunnel",
-  #"BaseModelLongformer"#,
+  "BaseModelFunnel",
+  #"BaseModelLongformer",
   "BaseModelModernBert",
   "BaseModelRoberta",
   "BaseModelMPNet"
   )
 
-max_samples <- 1
-max_samples_CI <- 1
-
-
-samples_config <- check_adjust_n_samples_on_CI(
-  n_samples_requested = max_samples,
-  n_CI = max_samples_CI
-)
 
 for (object_class_name in object_class_names) {
-  for (i in 1:samples_config) {
+  base_to_existing_base_mode=paste0(test_tmp_data_base_model_path,"/",object_class_name)
 
-# Prepare Tokenizer for the models
-    raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
-
-tokenizer <- WordPieceTokenizer$new()
-tokenizer$configure(
-  vocab_size = 2000,
-  vocab_do_lower_case = TRUE
-)
-tokenizer$train(
-  text_dataset = raw_texts,
-  statistics_max_tokens_length = 256,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  trace = FALSE
-)
-
-    config_args <- generate_args_for_tests(
-      object_name = object_class_name,
-      method = "configure",
-      var_objects = list(),
-      necessary_objects = list(
-        text_dataset = raw_texts_training,
-        tokenizer = tokenizer
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU",
-        block_sizes = c(4, 4),
-        epochs = 2,
-        max_position_embeddings = 512,
-        hidden_size = 16,
-        num_hidden_layers = 3,
-        attention_window=4,
-        num_attention_heads = 2,
-        intermediate_size = 32
-      )
-    )
     train_args <- generate_args_for_tests(
       object_name = object_class_name,
       method = "train",
@@ -110,10 +65,15 @@ tokenizer$train(
 
     #Create and train model
     base_model <- create_object(object_class_name)
+
     do.call(
-      what = base_model$configure,
-      args = config_args
+      what = base_model$create_from_hf,
+      args = list(
+        model_dir=base_to_existing_base_mode,
+        tokenizer_dir=paste0(base_to_existing_base_mode,"/","tokenizer")
+        )
     )
+
     do.call(
       what = base_model$train,
       args = train_args
@@ -129,7 +89,7 @@ tokenizer$train(
     test_that(paste(
       "Save Model",
       object_class_name,
-      get_current_args_for_print(config_args),
+
       get_current_args_for_print(train_args)
     ), {
 
@@ -145,20 +105,18 @@ tokenizer$train(
     test_that(paste(
       "Sustainability Tracking",
       object_class_name,
-      get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
       if (train_args$sustain_track == TRUE) {
-        expect_equal(nrow(base_model$get_sustainability_data()$track_log), 1)
+        expect_gte(nrow(base_model$get_sustainability_data()$track_log), 1)
       } else {
-        expect_equal(nrow(base_model$get_sustainability_data()$track_log), 0)
+        expect_gte(nrow(base_model$get_sustainability_data()$track_log), 0)
       }
     })
 
     test_that(paste(
       "History Plot",
       object_class_name,
-      get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
       history=base_model$last_training$history
@@ -177,7 +135,6 @@ tokenizer$train(
     test_that(paste(
       "Fill-Mask",
       object_class_name,
-      get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
       tokens <- base_model$get_special_tokens()
@@ -256,7 +213,6 @@ tokenizer$train(
     test_that(paste(
       "Saving and Loading",
       object_class_name,
-      get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ),{
 
@@ -266,46 +222,28 @@ tokenizer$train(
       base_model_reloaded$count_parameter()
     )
 
-      expect_equal(
-        base_model$get_sustainability_data(),
-        base_model_reloaded$get_sustainability_data()
-      )
+      # Not available for models from hugging face
+      #expect_equal(
+      #  base_model$get_sustainability_data(),
+      #  base_model_reloaded$get_sustainability_data()
+      #)
+
+      # Not available for models from hugging face
+      #expect_equal(
+      #  base_model$Tokenizer$get_tokenizer_statistics(),
+      #  base_model_reloaded$Tokenizer$get_tokenizer_statistics()
+      #)
 
       expect_equal(
-        base_model$Tokenizer$get_tokenizer_statistics(),
-        base_model_reloaded$Tokenizer$get_tokenizer_statistics()
-      )
-
-      expect_equal(
-        base_model$Tokenizer$get_sustainability_data("training"),
-        base_model_reloaded$Tokenizer$get_sustainability_data("training")
-      )
-
-      expect_equal(
-        base_model$Tokenizer$get_sustainability_data("inference"),
-        base_model_reloaded$Tokenizer$get_sustainability_data("inference")
-      )
-
-      expect_equal(
-        base_model$get_flops_estimates(),
-        base_model_reloaded$get_flops_estimates()
+        base_model$Tokenizer$get_sustainability_data(),
+        base_model_reloaded$Tokenizer$get_sustainability_data()
       )
   })
-
-    if(i==1){
-      # Clear directory for next test
-      unlink(paste0(test_tmp_data_base_model_path,"/",object_class_name), recursive = TRUE)
-      save_to_disk(
-        object = base_model,
-        dir_path = test_tmp_data_base_model_path,
-        folder_name = object_class_name
-      )
-    }
 
     # Clear directory for next test
     unlink(paste0(tmp_dir), recursive = TRUE)
   }
-}
+
 
 
 

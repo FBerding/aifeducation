@@ -24,7 +24,6 @@ prob_precision <- 1e-6
 
 # Skip Tests-------------------------------------------------------------------
 skip_creation_test <- FALSE
-skip_method_save_load <- FALSE
 skip_function_save_load <- FALSE
 skip_training_test <- FALSE
 skip_documentation <- FALSE
@@ -288,53 +287,6 @@ for (object_class_name in object_class_names) {
           )
         })
         gc()
-      }
-
-      # Save and load tests-------------------------------------------------------
-      if (!skip_method_save_load) {
-        test_that(paste("method save and load", object_class_name, get_current_args_for_print(test_combination)), {
-          classifier <- create_object(object_class_name)
-          do.call(
-            what = classifier$configure,
-            args = test_combination
-          )
-
-          # Predictions before saving and loading
-          predictions <- classifier$predict(
-            newdata = test_embeddings_reduced,
-            batch_size = 2,
-            ml_trace = 0
-          )
-
-          # Save and load
-          folder_name <- paste0("method_save_load_", generate_id())
-          dir_path <- paste0(root_path_results, "/", folder_name)
-          classifier$save(
-            dir_path = root_path_results,
-            folder_name = folder_name
-          )
-          classifier$load(dir_path = dir_path)
-
-          # Predict after loading
-          predictions_2 <- classifier$predict(
-            newdata = test_embeddings_reduced,
-            batch_size = 2,
-            ml_trace = 0
-          )
-
-          # Compare predictions
-          i <- sample(x = seq.int(from = 1, to = nrow(predictions)), size = 1)
-          expect_equal(predictions[i, , drop = FALSE],
-            predictions_2[i, , drop = FALSE],
-            tolerance = 1e-6
-          )
-
-          # Clean Directory
-          unlink(
-            x = dir_path,
-            recursive = TRUE
-          )
-        })
       }
     }
 

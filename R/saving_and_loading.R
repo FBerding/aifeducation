@@ -42,7 +42,7 @@ save_to_disk <- function(object,
       "EmbeddedText",
       ".AIFEBaseTransformer",
       "BaseModelCore",
-      "WordPieceTokenizer"
+      "TokenizerBase"
     ),
     FALSE
   )

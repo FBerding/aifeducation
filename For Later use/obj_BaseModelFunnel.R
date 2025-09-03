@@ -12,15 +12,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title
-#' @description
-#' @return
+#' @title Funnel transformer
+#' @description Represents models based on the Funnel-Transformer.
+#' @references Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer: Filtering out Sequential Redundancy
+#'   for Efficient Language Processing. \doi{10.48550/arXiv.2006.03236}
+#' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
 BaseModelFunnel <- R6::R6Class(
   classname = "BaseModelFunnel",
   inherit = BaseModelCore,
   private = list(
+
+    model_type="funnel",
+
+    adjust_max_sequence_length=1,
+
     create_model=function(args){
       configuration <- transformers$FunnelConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
@@ -29,7 +36,7 @@ BaseModelFunnel <- R6::R6Class(
         num_decoder_layers = as.integer(args$num_decoder_layers),
         d_model = as.integer(args$hidden_size),
         n_head = as.integer(args$num_attention_heads),
-        d_head = as.integer(args$target_hidden_size),
+        d_head = as.integer(args$hidden_size),
         d_inner = as.integer(args$intermediate_size),
         hidden_act = tolower(args$hidden_act),
         hidden_dropout_prob = args$hidden_dropout_prob,
@@ -37,7 +44,7 @@ BaseModelFunnel <- R6::R6Class(
         activation_dropout = as.integer(args$activation_dropout),
         initializer_range = 0.02,
         layer_norm_eps = 1e-12,
-        pooling_type = tolower(args$pooling_type),
+        pooling_type = tolower(args$funnel_pooling_type),
         attention_type = "relative_shift",
         separate_cls = TRUE,
         truncate_seq = TRUE,
@@ -52,21 +59,35 @@ BaseModelFunnel <- R6::R6Class(
   ),
   public = list(
     #---------------------------------------------------------------------------
+    #' @description Configures a new object of this class.
+    #' @param tokenizer `r get_param_doc_desc("tokenizer")`
+    #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+    #' @param hidden_size `r get_param_doc_desc("hidden_size")`
+    #' @param block_sizes `r get_param_doc_desc("block_sizes")`
+    #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
+    #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param num_decoder_layers `r get_param_doc_desc("num_decoder_layers")`
+    #' @param funnel_pooling_type `r get_param_doc_desc("funnel_pooling_type")`
+    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
+    #' @param activation_dropout `r get_param_doc_desc("activation_dropout")`
+    #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512,
                          hidden_size = 768,
-                         target_hidden_size = 64,
                          block_sizes = c(4, 4, 4),
                          num_attention_heads = 12,
                          intermediate_size = 3072,
                          num_decoder_layers = 2,
-                         pooling_type = "Mean",
+                         funnel_pooling_type = "Mean",
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
                          attention_probs_dropout_prob = 0.1,
                          activation_dropout = 0.0) {
       arguments <- get_called_args(n = 1)
-      private$do_configuration(args = arguments, model_type = "funnel")
+      private$do_configuration(args = arguments)
     }
   )
 )

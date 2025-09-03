@@ -528,4 +528,4 @@ EmbeddedText <- R6::R6Class(
 )
 
 #Add the model to the user list
-DataSetsIndex$LargeDataSetForText=("EmbeddedText")
+DataSetsIndex$EmbeddedText=("EmbeddedText")

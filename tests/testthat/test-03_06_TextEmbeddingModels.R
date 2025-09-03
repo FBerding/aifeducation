@@ -54,8 +54,8 @@ base_model_type_list <- list(
     #"BaseModelLongformer",
     #"BaseModelMPNet",
     #"deberta_v2",
-    #"BaseModelModernBert",
-    #"BaseModelRoberta"
+  #  "BaseModelModernBert",
+   # "BaseModelRoberta"
 )
 
 pooling_type_list <- list(
@@ -67,8 +67,8 @@ pooling_type_list <- list(
   "BaseModelMPNet" = c("CLS", "Average"),
   "BaseModelModernBert"=c("CLS", "Average")
 )
-
-max_layers <- 1:2
+min_layer<-1
+max_layers <- 2
 
 # Start tests--------------------------------------------------------------------
   for (base_model_type in base_model_type_list) {
@@ -84,28 +84,6 @@ max_layers <- 1:2
 
     # get a random value for padding
     random_padding_value=sample(x=seq(from=-200,to=0,by=10),size = 1)
-
-    #test_that(paste( base_model_type, "Number of parameters"), {
-    #  text_embedding_model <- TextEmbeddingModel$new()
-    #  text_embedding_model$configure(
-    #    model_name = paste0(base_model_type, "_embedding"),
-    #    model_label = paste0("Text Embedding via", base_model_type),
-    #    model_language = "english",
-    #    max_length = 20,
-    #    chunks = 2,
-    #    overlap = 10,
-    #    emb_layer_min = 1,
-    #    emb_layer_max = 1,
-    #    emb_pool_type = "CLS",
-    #    base_model = base_model,
-    #  )
-
-    #  expect_gte(
-    #    text_embedding_model$count_parameter(with_head = TRUE),
-    #             text_embedding_model$count_parameter(with_head = FALSE)
-     #            )
-
-    #})
 
     for (pooling_type in pooling_type_list[[base_model_type]]) {
       for (max_layer in max_layers) {
@@ -200,7 +178,7 @@ max_layers <- 1:2
           text_embedding_model <- TextEmbeddingModel$new()
           text_embedding_model$configure(
             model_name = paste0(base_model_type, "_embedding"),
-            model_label = paste0("Text Embedding via", base_model_type),
+            model_label = paste("Text Embedding via", base_model_type),
             model_language = "english",
             max_length = 400,
             chunks = chunks,
@@ -208,7 +186,7 @@ max_layers <- 1:2
             emb_layer_min = min_layer,
             emb_layer_max = max_layer,
             emb_pool_type = pooling_type,
-                    base_model = base_model,
+            base_model = base_model,
             pad_value = random_padding_value
           )
 
@@ -416,7 +394,7 @@ max_layers <- 1:2
             mask_token <- tokens[which(tokens[, 1] == "mask_token"), 2]
 
             first_solution <- text_embedding_model$BaseModel$fill_mask(
-              text = paste("This is a", mask_token, "."),
+              masked_text = paste("This is a", mask_token, "."),
               n_solutions = 5
             )
 
@@ -426,7 +404,7 @@ max_layers <- 1:2
             expect_equal(ncol(first_solution[[1]]), 3)
 
             second_solution <- text_embedding_model$BaseModel$fill_mask(
-              text = paste("This is a", mask_token, "."),
+              masked_text = paste("This is a", mask_token, "."),
               n_solutions = 1
             )
             expect_equal(length(second_solution), 1)
@@ -435,7 +413,7 @@ max_layers <- 1:2
             expect_equal(ncol(second_solution[[1]]), 3)
 
             third_solution <- text_embedding_model$BaseModel$fill_mask(
-              text = paste(
+              masked_text = paste(
                 "This is a", mask_token, ".",
                 "The weather is", mask_token, "."
               ),
@@ -447,6 +425,21 @@ max_layers <- 1:2
               expect_equal(nrow(third_solution[[i]]), 5)
               expect_equal(ncol(third_solution[[i]]), 3)
             }
+          })
+
+          #Estimate sustainability inference embed
+          test_that(paste( base_model_type, pooling_type, max_layer, min_layer, "decoding"),{
+
+            text_embedding_model$estimate_sustainability_inference_embed(
+            text_dataset = example_data_large,
+            batch_size = 4,
+            sustain_iso_code = "DEU",
+            sustain_interval = 2,
+            trace=TRUE
+          )
+
+            expect_equal(nrow(text_embedding_model$get_sustainability_data("inference")),1)
+
           })
 
           # Function Saving and Loading-----------------------------------------

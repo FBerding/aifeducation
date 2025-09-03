@@ -1,3 +1,5 @@
+testthat::skip()
+
 # This file does not contain any tests. It is used for creating embedded texts
 # that can be used for testing Classifiers
 testthat::skip_on_cran()

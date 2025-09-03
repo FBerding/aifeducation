@@ -227,6 +227,7 @@ get_py_package_versions <- function() {
     "tokenizers",
     "pandas",
     "datasets",
+    "calflops",
     "codecarbon",
     "safetensors",
     "torcheval",
@@ -234,11 +235,13 @@ get_py_package_versions <- function() {
     "numpy"
   )
 
+  packages_installed=reticulate::py_list_packages()
+
   versions <- vector(length = length(list_of_packages) + 1)
   names(versions) <- c("python", list_of_packages)
   versions["python"] <- as.character(reticulate::py_config()$version)
   for (package in list_of_packages) {
-    versions[package] <- get_py_package_version(package)
+    versions[package] <- packages_installed$version[which(packages_installed$package==package)]
   }
   return(versions)
 }

@@ -53,6 +53,7 @@ get_param_dict <- function() {
     is generated automatically.",
     default_value = NULL
   )
+  param$model_name=param$name
 
   param$label <- list(
     type = "string",
@@ -63,7 +64,230 @@ get_param_dict <- function() {
     desc = "Label for the new model. Here you can use free text.",
     default_value = NULL
   )
+  param$model_label=param$label
+
+
+  param$model_language <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Languages that the models can work with.",
+    default_value = NULL
+  )
+
+  param$track_mode <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("training","inference"),
+    desc = "Determines the stept to which the data refer.",
+    default_value = NULL
+  )
+
+  param$token_overlap<- list(
+    type = "int",
+    min = 0,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number of tokens from the previous chunk that should be added at the beginng of the next chunk.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 0,
+    default_historic = 0
+  )
+  param$overlap=param$token_overlap
+
+  param$max_token_sequence_length<- list(
+    type = "int",
+    min = 20,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Maximal number of tokens per chunk.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 20,
+    default_historic = 20
+  )
+
+  param$max_length<- param$max_token_sequence_length
+  param$max_length$desc="Maximal number of token per chunks. Must be equal or lower
+  as the maximal postional embeddings for the model."
+
+  param$n_chunks<- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Maximal number chunks.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 1,
+    default_historic = 1
+  )
+  param$chunks=param$n_chunks
+  param$chunks$min=2
+
+  param$emb_layer_min<- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Minimal layer from which the embeddings should be calculated.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 1,
+    default_historic = 1
+  )
+
+  param$emb_layer_max<- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Maximal layer from which the embeddings should be calculated.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 1,
+    default_historic = 1
+  )
+
+  param$emb_pool_type <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("CLS","Average"),
+    desc = "Method to summarize the embedding of single tokens into a text embedding.
+    In the case of `'CLS'` all cls-tokens between `emb_layer_min` and `emb_layer_max` are averaged.
+    In the case of `'Average'` the embeddings of all tokens are averaged.,
+    default_value = NULL"
+  )
+
+
+
+  param$statistics_max_tokens_length<- list(
+    type = "int",
+    min = 20,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Maximum sequence length for calculating the statistics.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 20,
+    default_historic = 20
+  )
+
+  param$token_encodings_only<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "
+  * `TRUE`: Returns a `list` containg only the tokens.
+  * `FALSE`: Returns a `list` containg a list for the tokens, the number of chunks, and
+    the number potential number of chunks for each document/text.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = TRUE
+  )
+
+  param$token_to_int<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "
+  * `TRUE`: Returns the tokens as `int` index.
+  * `FALSE`: Returns the tokens as `string`s.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = TRUE
+  )
+
+  param$to_token<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "
+  * `FALSE`: Transforms the integers to plain text.
+  * `TRUE`: Transforms the integers to a sequence of tokens.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = TRUE
+  )
+
+  param$return_token_type_ids<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = 0,
+    max = 1,
+    allowed_values = NULL,
+    desc = "If `TRUE` additionally returns the return_token_type_ids.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = TRUE
+  )
+
+  param$int_seqence<- list(
+    type = "list",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "`list` of integer sequence that should be converted to tokens.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = TRUE
+  )
+
+
+
   # Transformer related---------------------------------------------------------
+
+  param$tokenizer<- list(
+    type = unlist(TokenizerIndex),
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = paste(
+      "Object of class",
+      paste(paste0("[",TokenizerIndex,"]"),collapse=", "),".",
+      "This objects prepares raw text for the model."),
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL
+  )
+
+  param$base_model<- list(
+    type = unlist(BaseModelsIndex),
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = paste(
+      "Object of class",
+      paste(paste0("[",BaseModelsIndex,"]"),collapse=", "),".",
+      "This objects prepares raw text for the model."),
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL
+  )
 
   param$pad_value <- list(
     type = "int",
@@ -108,6 +332,20 @@ get_param_dict <- function() {
     default_value = NULL
   )
   param$output_dir <- param$model_dir
+  param$tokenizer_dir<- param$model_dir
+  param$tokenizer_dir$desc="Path to the directory where the tokenizer is saved."
+
+  param$folder_name <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Name of the folder where the model should be saved.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL
+  )
 
   param$model_dir_path <- list(
     type = "string",
@@ -131,6 +369,42 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = "Text Collection",
     default_value = NULL
+  )
+
+  param$raw_text<- list(
+    type = "vector",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Raw text.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL
+  )
+
+  param$doc_id<- list(
+    type = "vector",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Id for every text.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL
+  )
+
+  param$return_large_dataset <- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "If `TRUE` a [LargeDataSetForEmbedding] is returned. If `FALSE` an object if class [EmbeddedText] is returned.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = FALSE
   )
 
   param$vocab_size <- list(
@@ -243,6 +517,7 @@ get_param_dict <- function() {
     gui_label = "Hidden Size",
     default_value = 768
   )
+  param$d_model=param$hidden_size
 
   param$hidden_act <- list(
     type = "string",
@@ -255,8 +530,9 @@ get_param_dict <- function() {
     gui_label = "Hidden Activation Function",
     default_value = "gelu"
   )
+  param$hidden_activation=param$hidden_act
 
-  param$num_hidden_layer <- list(
+  param$num_hidden_layers <- list(
     type = "int",
     allow_null = FALSE,
     min = 1,
@@ -267,6 +543,7 @@ get_param_dict <- function() {
     gui_label = "Number of Hidden Layers",
     default_value = 7
   )
+  param$num_hidden_layer <- param$num_hidden_layers
 
   param$num_decoder_layers <- list(
     type = "int",
@@ -292,6 +569,7 @@ get_param_dict <- function() {
     gui_label = "Target Hidden Size",
     default_value = 768
   )
+  param$d_head=param$target_hidden_size
 
   param$hidden_dropout_prob <- list(
     type = "double",
@@ -304,6 +582,8 @@ get_param_dict <- function() {
     gui_label = "Hidden Dropout",
     default_value = 0.5
   )
+  param$embedding_dropout = param$hidden_dropout_prob
+  param$mlp_dropout=param$hidden_dropout_prob
 
   param$activation_dropout <- list(
     type = "double",
@@ -328,6 +608,7 @@ get_param_dict <- function() {
     gui_label = "Dropout for Attention Probabilities",
     default_value = 0.1
   )
+  param$attention_dropout=param$attention_probs_dropout_prob
 
   param$p_mask <- list(
     type = "(double)",
@@ -732,6 +1013,14 @@ get_param_dict <- function() {
     allow_null = TRUE,
     allowed_values = NULL,
     desc = "Path to the directory where the log files should be saved.
+      If no logging is desired set this argument to `NULL`.",
+    default_value = NULL
+  )
+  param$log_file <- list(
+    type = c("string"),
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Path to the file where the log files should be saved.
       If no logging is desired set this argument to `NULL`.",
     default_value = NULL
   )
@@ -1271,6 +1560,7 @@ get_param_dict <- function() {
     default_value = 2
   )
   param$num_attention_heads <- param$self_attention_head
+  param$n_head <- param$self_attention_head
   param$tf_num_heads <- param$self_attention_head
 
   param$intermediate_size <- list(
@@ -1285,6 +1575,7 @@ get_param_dict <- function() {
     default_value = 128
   )
   param$tf_dense_dim <- param$intermediate_size
+  param$d_inner=param$intermediate_size
 
   param$attention_type <- list(
     type = "string",

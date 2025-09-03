@@ -221,7 +221,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @description Method returns the scaling factor of the metric.
     #' @return Returns the scaling factor of the metric as `float`.
     get_metric_scale_factor=function(){
-      return(tensor_to_numpy(self$model$get_metric_scale_factor()))
+      return(tensor_to_numpy(private$model$get_metric_scale_factor()))
     },
     #---------------------------------------------------------------------------
     #' @description Method for creating a plot to visualize embeddings and their corresponding centers (prototypes).
@@ -433,7 +433,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         }
         classes_s=as.numeric(classes_s)-1
       } else {
-        class_labels <- self$model_config$target_levels
+        class_labels <- private$model_config$target_levels
         classes_s <- NULL
       }
 
@@ -466,7 +466,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         prediction_data$set_format("torch")
 
         results <- py$TeProtoNetClassifierBatchPredict(
-          model = self$model,
+          model = private$model,
           dataset = prediction_data,
           batch_size = as.integer(batch_size),
           embeddings_s = embeddings_s,
@@ -496,9 +496,9 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         if (!is.null(embeddings_s)) {
           embeddings_s <- embeddings_s$to(device, dtype = dtype)
         }
-        self$model$to(device, dtype = dtype)
-        self$model$eval()
-        results <- self$model(
+        private$model$to(device, dtype = dtype)
+        private$model$eval()
+        results <- private$model(
           input_q = prediction_data$to(device, dtype = dtype),
           input_s = embeddings_s$to(device, dtype = dtype),
           classes_s = classes_s$to(device, dtype = dtype),
@@ -579,9 +579,9 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     },
     #-------------------------------------------------------------------------
     set_random_prototypes=function(){
-      n_row <- length(self$model_config$target_levels)
-      n_col <- self$model_config$embedding_dim
-      self$model$set_trained_prototypes(
+      n_row <- length(private$model_config$target_levels)
+      n_col <- private$model_config$embedding_dim
+      private$model$set_trained_prototypes(
         prototypes = torch$from_numpy(
           reticulate::np_array(
             matrix(
@@ -594,7 +594,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         class_lables = reticulate::np_array(
           seq(
             from = 0,
-            to = (length(self$model_config$target_levels) - 1)
+            to = (length(private$model_config$target_levels) - 1)
           )
         )
       )
@@ -624,28 +624,28 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       loss_cls_fct_name <- "ProtoNetworkMargin"
 
       # Set target column
-      if (self$model_config$require_one_hot == FALSE) {
+      if (private$model_config$require_one_hot == FALSE) {
         target_column <- "labels"
       } else {
         target_column <- "one_hot_encoding"
       }
 
       dataset_train <- train_data$select_columns(c("input", target_column))
-      if (self$model_config$require_one_hot == TRUE) {
+      if (private$model_config$require_one_hot == TRUE) {
         dataset_train <- dataset_train$rename_column(target_column, "labels")
       }
 
       pytorch_train_data <- dataset_train$with_format("torch")
 
       pytorch_val_data <- val_data$select_columns(c("input", target_column))
-      if (self$model_config$require_one_hot == TRUE) {
+      if (private$model_config$require_one_hot == TRUE) {
         pytorch_val_data <- pytorch_val_data$rename_column(target_column, "labels")
       }
       pytorch_val_data <- pytorch_val_data$with_format("torch")
 
       if (!is.null(test_data)) {
         pytorch_test_data <- test_data$select_columns(c("input", target_column))
-        if (self$model_config$require_one_hot == TRUE) {
+        if (private$model_config$require_one_hot == TRUE) {
           pytorch_test_data <- pytorch_test_data$rename_column(target_column, "labels")
         }
         pytorch_test_data <- pytorch_test_data$with_format("torch")
@@ -654,7 +654,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       history <- py$TeClassifierTrainPrototype(
-        model = self$model,
+        model = private$model,
         loss_pt_fct_name = self$last_training$config$loss_pt_fct_name,
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
@@ -672,7 +672,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         sampling_separate = self$last_training$config$sampling_separate,
         sampling_shuffle = self$last_training$config$sampling_shuffle,
         filepath = paste0(private$dir_checkpoint, "/best_weights.pt"),
-        n_classes = as.integer(length(self$model_config$target_levels)),
+        n_classes = as.integer(length(private$model_config$target_levels)),
         log_dir = log_dir,
         log_write_interval = log_write_interval,
         log_top_value = log_top_value,

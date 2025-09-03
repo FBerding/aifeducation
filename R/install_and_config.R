@@ -46,7 +46,7 @@
 #' @export
 install_aifeducation <- function(install_aifeducation_studio = TRUE,
                                  python_version = "3.12",
-                                 cuda_version = "12.4",
+                                 cuda_version = "12.9",
                                  use_conda = FALSE) {
   if (install_aifeducation_studio == TRUE) {
     install_aifeducation_studio()
@@ -222,15 +222,16 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=4.52.4",
-                               tokenizers_version = "<=0.21.1",
-                               pandas_version = "<=2.3.0",
+                               transformer_version = "<=4.56.0",
+                               tokenizers_version = "<=0.22.0",
+                               pandas_version = "<=2.3.2",
                                datasets_version = "<=3.6.0",
                                codecarbon_version = "<=3.0.2",
-                               safetensors_version = "<=0.5.3",
+                               safetensors_version = "<=0.6.2",
                                torcheval_version = "<=0.0.7",
-                               accelerate_version = "<=1.8.1",
-                               pytorch_cuda_version = "12.6",
+                               accelerate_version = "<=1.10.1",
+                               calflops_version="<=0.3.2",
+                               pytorch_cuda_version = "12.9",
                                python_version = "3.12",
                                remove_first = FALSE,
                                use_conda = FALSE) {
@@ -240,7 +241,8 @@ install_py_modules <- function(envname = "aifeducation",
     paste0("tokenizers", tokenizers_version),
     paste0("pandas", pandas_version),
     paste0("datasets", datasets_version),
-    paste0("codecarbon", codecarbon_version)
+    paste0("codecarbon", codecarbon_version),
+    paste0("calflops",calflops_version)
   )
   relevant_modules_pt <- c(
     paste0("safetensors", safetensors_version),
@@ -353,7 +355,8 @@ check_aif_py_modules <- function(trace = TRUE) {
     "transformers",
     "tokenizers",
     "datasets",
-    "codecarbon"
+    "codecarbon",
+    "calflops"
   )
   pytorch_modules <- c(
     "torch",

@@ -103,28 +103,28 @@ TEClassifierRegular <- R6::R6Class(
 
       private$load_reload_python_scripts()
 
-      self$model <- py$TextEmbeddingClassifier_PT(
-        features = as.integer(self$model_config$features),
-        times = as.integer(self$model_config$times),
-        bias=self$model_config$bias,
-        dense_size = as.integer(self$model_config$dense_size),
-        dense_layers = as.integer(self$model_config$dense_layers),
-        rec_size = as.integer(self$model_config$rec_size),
-        rec_layers = as.integer(self$model_config$rec_layers),
-        rec_type = self$model_config$rec_type,
-        rec_bidirectional = self$model_config$rec_bidirectional,
-        intermediate_size = as.integer(self$model_config$intermediate_size),
-        attention_type = self$model_config$attention_type,
-        repeat_encoder = as.integer(self$model_config$repeat_encoder),
-        dense_dropout = self$model_config$dense_dropout,
-        rec_dropout = self$model_config$rec_dropout,
-        encoder_dropout = self$model_config$encoder_dropout,
+      private$model <- py$TextEmbeddingClassifier_PT(
+        features = as.integer(private$model_config$features),
+        times = as.integer(private$model_config$times),
+        bias=private$model_config$bias,
+        dense_size = as.integer(private$model_config$dense_size),
+        dense_layers = as.integer(private$model_config$dense_layers),
+        rec_size = as.integer(private$model_config$rec_size),
+        rec_layers = as.integer(private$model_config$rec_layers),
+        rec_type = private$model_config$rec_type,
+        rec_bidirectional = private$model_config$rec_bidirectional,
+        intermediate_size = as.integer(private$model_config$intermediate_size),
+        attention_type = private$model_config$attention_type,
+        repeat_encoder = as.integer(private$model_config$repeat_encoder),
+        dense_dropout = private$model_config$dense_dropout,
+        rec_dropout = private$model_config$rec_dropout,
+        encoder_dropout = private$model_config$encoder_dropout,
         pad_value=private$text_embedding_model$pad_value,
-        add_pos_embedding = self$model_config$add_pos_embedding,
-        self_attention_heads = as.integer(self$model_config$self_attention_heads),
-        target_levels = self$model_config$target_levels,
-        act_fct=self$model_config$act_fct,
-        parametrizations=self$model_config$parametrizations
+        add_pos_embedding = private$model_config$add_pos_embedding,
+        self_attention_heads = as.integer(private$model_config$self_attention_heads),
+        target_levels = private$model_config$target_levels,
+        act_fct=private$model_config$act_fct,
+        parametrizations=private$model_config$parametrizations
       )
     },
     #--------------------------------------------------------------------------
@@ -134,26 +134,26 @@ TEClassifierRegular <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration=function(){
-      if (self$model_config$dense_layers > 0) {
-        if (self$model_config$dense_size < 1) {
+      if (private$model_config$dense_layers > 0) {
+        if (private$model_config$dense_size < 1) {
           stop("Dense layers added. Size for dense layers must be at least 1.")
         }
       }
 
-      if (self$model_config$rec_layers > 0) {
-        if (self$model_config$rec_size < 1) {
+      if (private$model_config$rec_layers > 0) {
+        if (private$model_config$rec_size < 1) {
           stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
         }
       }
 
-      if (self$model_config$repeat_encoder > 0 &
-          self$model_config$attention_type == "MultiHead" &
-          self$model_config$self_attention_heads <= 0) {
+      if (private$model_config$repeat_encoder > 0 &
+          private$model_config$attention_type == "MultiHead" &
+          private$model_config$self_attention_heads <= 0) {
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
-      if (self$model_config$rec_layers != 0 & self$model_config$self_attention_heads > 0) {
-        if (self$model_config$features %% 2 != 0) {
+      if (private$model_config$rec_layers != 0 & private$model_config$self_attention_heads > 0) {
+        if (private$model_config$features %% 2 != 0) {
           stop("The number of features of the TextEmbeddingmodel is
                not a multiple of 2.")
         }
@@ -161,40 +161,40 @@ TEClassifierRegular <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     adjust_configuration = function() {
-      if (is.null(self$model_config$intermediate_size) == TRUE) {
-        if (self$model_config$attention_type == "Fourier" & self$model_config$rec_layers > 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$rec_size
-        } else if (self$model_config$attention_type == "Fourier" & self$model_config$rec_layers == 0) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
+      if (is.null(private$model_config$intermediate_size) == TRUE) {
+        if (private$model_config$attention_type == "Fourier" & private$model_config$rec_layers > 0) {
+          private$model_config$intermediate_size <- 2 * private$model_config$rec_size
+        } else if (private$model_config$attention_type == "Fourier" & private$model_config$rec_layers == 0) {
+          private$model_config$intermediate_size <- 2 * private$model_config$features
         } else if (
-          self$model_config$attention_type == "MultiHead" &
-          self$model_config$rec_layers > 0 &
-          self$model_config$self_attention_heads > 0
+          private$model_config$attention_type == "MultiHead" &
+          private$model_config$rec_layers > 0 &
+          private$model_config$self_attention_heads > 0
         ) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
+          private$model_config$intermediate_size <- 2 * private$model_config$features
         } else if (
-          self$model_config$attention_type == "MultiHead" &
-          self$model_config$rec_layers == 0 &
-          self$model_config$self_attention_heads > 0
+          private$model_config$attention_type == "MultiHead" &
+          private$model_config$rec_layers == 0 &
+          private$model_config$self_attention_heads > 0
         ) {
-          self$model_config$intermediate_size <- 2 * self$model_config$features
+          private$model_config$intermediate_size <- 2 * private$model_config$features
         } else {
-          self$model_config$intermediate_size <- NULL
+          private$model_config$intermediate_size <- NULL
         }
       }
 
-      if (self$model_config$rec_layers <= 1) {
-        self$model_config$rec_dropout <- 0.0
+      if (private$model_config$rec_layers <= 1) {
+        private$model_config$rec_dropout <- 0.0
       }
-      if (self$model_config$rec_layers <= 0) {
-        self$model_config$rec_size <- 0
+      if (private$model_config$rec_layers <= 0) {
+        private$model_config$rec_size <- 0
       }
 
-      if (self$model_config$dense_layers <= 1) {
-        self$model_config$dense_dropout <- 0.0
+      if (private$model_config$dense_layers <= 1) {
+        private$model_config$dense_dropout <- 0.0
       }
-      if (self$model_config$dense_layers <= 0) {
-        self$model_config$dense_size <- 0
+      if (private$model_config$dense_layers <= 0) {
+        private$model_config$dense_size <- 0
       }
     }
   )

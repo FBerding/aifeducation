@@ -220,7 +220,7 @@ TEFeatureExtractor <- R6::R6Class(
 
       #Start Training----------------------------------------------------------
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
-        model = self$model,
+        model = private$model,
         optimizer_method = self$last_training$config$optimizer,
         lr_rate=self$last_training$config$lr_rate,
         lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
@@ -287,7 +287,7 @@ TEFeatureExtractor <- R6::R6Class(
 
         prepared_embeddings$set_format("torch")
         reduced_tensors <- py$TeFeatureExtractorBatchExtract(
-          model = self$model,
+          model = private$model,
           dataset = prepared_embeddings,
           batch_size = as.integer(batch_size)
         )
@@ -299,20 +299,20 @@ TEFeatureExtractor <- R6::R6Class(
         if (torch$cuda$is_available()) {
           device <- "cuda"
           dtype <- torch$double
-          self$model$to(device, dtype = dtype)
-          self$model$eval()
+          private$model$to(device, dtype = dtype)
+          private$model$eval()
           input <- torch$from_numpy(prepared_embeddings)
-          reduced_tensors <- self$model(input$to(device, dtype = dtype),
+          reduced_tensors <- private$model(input$to(device, dtype = dtype),
             encoder_mode = TRUE
           )
           reduced_embeddings <- tensor_to_numpy(reduced_tensors)
         } else {
           device <- "cpu"
           dtype <- torch$float
-          self$model$to(device, dtype = dtype)
-          self$model$eval()
+          private$model$to(device, dtype = dtype)
+          private$model$eval()
           input <- torch$from_numpy(prepared_embeddings)
-          reduced_tensors <- self$model(input$to(device, dtype = dtype),
+          reduced_tensors <- private$model(input$to(device, dtype = dtype),
             encoder_mode = TRUE
           )
           reduced_embeddings <- tensor_to_numpy(reduced_tensors)
@@ -347,10 +347,10 @@ TEFeatureExtractor <- R6::R6Class(
       red_embedded_text$add_feature_extractor_info(
         model_name = private$model_info$model_name,
         model_label = private$model_info$model_label,
-        features = self$model_config$features,
-        method = self$model_config$method,
-        noise_factor = self$model_config$noise_factor,
-        optimizer = self$model_config$optimizer
+        features = private$model_config$features,
+        method = private$model_config$method,
+        noise_factor = private$model_config$noise_factor,
+        optimizer = private$model_config$optimizer
       )
 
       return(red_embedded_text)
@@ -409,10 +409,10 @@ TEFeatureExtractor <- R6::R6Class(
           embedded_texts_large$add_feature_extractor_info(
             model_name = private$model_info$model_name,
             model_label = private$model_info$model_label,
-            features = self$model_config$features,
-            method = self$model_config$method,
-            noise_factor = self$model_config$noise_factor,
-            optimizer = self$model_config$optimizer
+            features = private$model_config$features,
+            method = private$model_config$method,
+            noise_factor = private$model_config$noise_factor,
+            optimizer = private$model_config$optimizer
           )
 
           # Add new data
@@ -473,21 +473,21 @@ TEFeatureExtractor <- R6::R6Class(
     create_reset_model = function() {
       private$load_reload_python_scripts()
       private$check_config_for_TRUE()
-      if (self$model_config$method == "LSTM") {
-        self$model <- py$LSTMAutoencoder_with_Mask_PT(
+      if (private$model_config$method == "LSTM") {
+        private$model <- py$LSTMAutoencoder_with_Mask_PT(
           times = as.integer(private$text_embedding_model["times"]),
           features_in = as.integer(private$text_embedding_model["features"]),
-          features_out = as.integer(self$model_config$features),
-          noise_factor = self$model_config$noise_factor,
+          features_out = as.integer(private$model_config$features),
+          noise_factor = private$model_config$noise_factor,
           pad_value=private$text_embedding_model$pad_value
         )
-      } else if (self$model_config$method == "Dense") {
-        self$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
+      } else if (private$model_config$method == "Dense") {
+        private$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
-          features_out = as.integer(self$model_config$features),
-          noise_factor = self$model_config$noise_factor,
+          features_out = as.integer(private$model_config$features),
+          noise_factor = private$model_config$noise_factor,
           pad_value=private$text_embedding_model$pad_value,
-          orthogonal_method=self$model_config$orthogonal_method
+          orthogonal_method=private$model_config$orthogonal_method
         )
       }
     },

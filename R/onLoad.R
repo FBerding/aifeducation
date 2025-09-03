@@ -1,4 +1,4 @@
-tf <- NULL
+
 transformers <- NULL
 datasets <- NULL
 tok <- NULL
@@ -12,6 +12,7 @@ accelerate <- NULL
 safetensors <- NULL
 pandas <- NULL
 pyarrow <- NULL
+calflops<-NULL
 
 .onLoad <- function(libname, pkgname) {
   # use superassignment to update the global reference
@@ -27,7 +28,7 @@ pyarrow <- NULL
   pandas <<- reticulate::import("pandas", delay_load = TRUE)
   pyarrow <<- reticulate::import("pyarrow", delay_load = TRUE)
   codecarbon <<- reticulate::import("codecarbon", delay_load = TRUE)
-  #calflops <<- reticulate::import("calflops", delay_load = TRUE)
+  calflops <<- reticulate::import("calflops", delay_load = TRUE)
 }
 
 

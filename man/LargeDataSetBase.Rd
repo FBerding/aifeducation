@@ -13,10 +13,13 @@ of this class are not intended to be used directly.
 \seealso{
 Other R6 Classes for Developers: 
 \code{\link{AIFEBaseModel}},
+\code{\link{AIFEMaster}},
+\code{\link{BaseModelCore}},
 \code{\link{ClassifiersBasedOnTextEmbeddings}},
 \code{\link{ModelsBasedOnTextEmbeddings}},
 \code{\link{TEClassifiersBasedOnProtoNet}},
-\code{\link{TEClassifiersBasedOnRegular}}
+\code{\link{TEClassifiersBasedOnRegular}},
+\code{\link{TokenizerBase}}
 }
 \concept{R6 Classes for Developers}
 \section{Methods}{

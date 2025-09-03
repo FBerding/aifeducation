@@ -12,20 +12,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title
-#' @description
-#' @return
+#' @title MPNet
+#' @description Represents models based on MPNet.
+#' @references Song,K., Tan, X., Qin, T., Lu, J. & Liu, T.-Y. (2020). MPNet: Masked and Permuted Pre-training for
+#'   Language Understanding. \doi{10.48550/arXiv.2004.09297}
+#' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
 BaseModelMPNet <- R6::R6Class(
   classname = "BaseModelMPNet",
   inherit = BaseModelCore,
   private = list(
+    model_type = "mpnet",
+
+    adjust_max_sequence_length=2,
+
     create_model=function(args){
       configuration <- transformers$MPNetConfig(
-        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
+        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
         hidden_size = as.integer(args$hidden_size),
-        num_hidden_layers = as.integer(args$num_hidden_layer),
+        num_hidden_layers = as.integer(args$num_hidden_layers),
         num_attention_heads = as.integer(args$num_attention_heads),
         intermediate_size = as.integer(args$intermediate_size),
         hidden_act = tolower(args$hidden_act),
@@ -54,6 +60,7 @@ BaseModelMPNet <- R6::R6Class(
       )
       return(collator_maker$collator$collate_batch)
     },
+    #--------------------------------------------------------------------------
     load_BaseModel=function(dir_path){
       private$model <- py$MPNetForMPLM_PT$from_pretrained(
         dir_path,
@@ -63,19 +70,51 @@ BaseModelMPNet <- R6::R6Class(
   ),
   public = list(
     #---------------------------------------------------------------------------
+    #' @description Configures a new object of this class.
+    #' @param tokenizer `r get_param_doc_desc("tokenizer")`
+    #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+    #' @param hidden_size `r get_param_doc_desc("hidden_size")`
+    #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
+    #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
+    #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512,
                          hidden_size = 768,
-                         num_hidden_layer = 12,
+                         num_hidden_layers = 12,
                          num_attention_heads = 12,
                          intermediate_size = 3072,
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
                          attention_probs_dropout_prob = 0.1) {
       arguments <- get_called_args(n = 1)
-      private$do_configuration(args = arguments, model_type = "mpnet")
+      private$do_configuration(args = arguments)
     },
     #--------------------------------------------------------------------------
+    #' @description Traines a BaseModel
+    #' @param text_dataset `r get_description("text_dataset")`
+    #' @param p_mask `r get_description("p_mask")`
+    #' @param p_perm `r get_description("p_perm")`
+    #' @param whole_word `r get_description("whole_word")`
+    #' @param val_size `r get_description("val_size")`
+    #' @param n_epoch `r get_description("n_epoch")`
+    #' @param batch_size `r get_description("batch_size")`
+    #' @param max_sequence_length `r get_description("max_sequence_length")`
+    #' @param full_sequences_only `r get_description("full_sequences_only")`
+    #' @param min_seq_len `r get_description("min_seq_len")`
+    #' @param learning_rate `r get_description("learning_rate")`
+    #' @param sustain_track `r get_description("sustain_track")`
+    #' @param sustain_iso_code `r get_description("sustain_iso_code")`
+    #' @param sustain_region `r get_description("sustain_region")`
+    #' @param sustain_interval `r get_description("sustain_interval")`
+    #' @param trace `r get_description("trace")`
+    #' @param pytorch_trace `r get_description("pytorch_trace")`
+    #' @param log_dir `r get_description("log_dir")`
+    #' @param log_write_interval `r get_description("log_write_interval")`
+    #' @return `r get_description("return_nothing")`
     train=function(text_dataset,
                    p_mask = 0.15,
                    p_perm = 0.15,

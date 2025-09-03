@@ -12,22 +12,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title
-#' @description
-#' @return
+#' @title RoBERTa
+#' @description Represents models based on RoBERTa.
+#' @references Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &
+#'   Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \doi{10.48550/arXiv.1907.11692}
+#' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
 BaseModelRoberta <- R6::R6Class(
   classname = "BaseModelRoberta",
   inherit = BaseModelCore,
   private=list(
+    model_type = "roberta",
+
     adjust_max_sequence_length=1,
+
   create_model=function(args){
     configuration <- transformers$RobertaConfig(
       vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
       max_position_embeddings = as.integer(args$max_position_embeddings),
       hidden_size = as.integer(args$hidden_size),
-      num_hidden_layers = as.integer(args$num_hidden_layer),
+      num_hidden_layers = as.integer(args$num_hidden_layers),
       num_attention_heads = as.integer(args$num_attention_heads),
       intermediate_size = as.integer(args$intermediate_size),
       hidden_act = tolower(args$hidden_act),
@@ -48,17 +53,28 @@ BaseModelRoberta <- R6::R6Class(
 ),
   public = list(
     #---------------------------------------------------------------------------
+    #' @description Configures a new object of this class.
+    #' @param tokenizer `r get_param_doc_desc("tokenizer")`
+    #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
+    #' @param hidden_size `r get_param_doc_desc("hidden_size")`
+    #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
+    #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
+    #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512,
                          hidden_size = 768,
-                         num_hidden_layer = 12,
+                         num_hidden_layers = 12,
                          num_attention_heads = 12,
                          intermediate_size = 3072,
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
                          attention_probs_dropout_prob = 0.1) {
       arguments <- get_called_args(n = 1)
-      private$do_configuration(args = arguments, model_type = "roberta")
+      private$do_configuration(args = arguments)
     }
   )
 )

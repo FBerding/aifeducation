@@ -66,6 +66,19 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
     },
+    #-------------------------------------------------------------------------
+    #' @description Method for saving a model.
+    #' @param dir_path `string` Path of the directory where the model should be saved.
+    #' @param folder_name `string` Name of the folder that should be created within the directory.
+    #' @return Function does not return a value. It saves the model to disk.
+    #' @importFrom utils write.csv
+    save = function(dir_path, folder_name) {
+      #Save pytorch model
+      private$save_pytorch_model(dir_path=dir_path, folder_name=folder_name)
+
+      # Saving Sustainability Data
+      private$save_sustainability_data(dir_path=dir_path, folder_name=folder_name)
+    },
     #--------------------------------------------------------------------------
     #' @description loads an object from disk and updates the object to the current version of the package.
     #' @param dir_path Path where the object set is stored.
@@ -100,7 +113,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Create and load AI model
       private$create_reset_model()
-      self$load(dir_path = dir_path)
+      private$load_pytorch_model(dir_path = dir_path)
+
+      #Load sustainability data
+      private$load_sustainability_data(model_dir=dir_path)
 
       # Set training status
       private$trained <- config_file$private$trained
@@ -401,16 +417,16 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           param_names_new <- rlang::fn_fmls_names(self$configure)
           for (param in param_names_new) {
             if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
-              if (is.null(self$model_config[[param]])) {
+              if (is.null(private$model_config[[param]])) {
                 if (!is.null(param_dict[[param]]$default_historic)) {
-                  self$model_config[param] <- list(param_dict[[param]]$default_historic)
+                  private$model_config[param] <- list(param_dict[[param]]$default_historic)
                 } else {
                   warning(paste("Historic default for", param, "is missing in parameter dictionary."))
                 }
               }
             }
             if(update_values){
-              self$model_config[param]=list(update_values_to_new_1.1.0(self$model_config[[param]]))
+              private$model_config[param]=list(update_values_to_new_1.1.0(private$model_config[[param]]))
             }
           }
 
@@ -420,7 +436,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           warning("Class does not have a method `configure`.")
         }
       }
-      #print(self$model_config)
+      #print(private$model_config)
 
 
     },
@@ -594,6 +610,49 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       # Finalize data---------------------------------------------------------------
       names(result_list) <- measures
       return(result_list)
+    },
+    #---------------------------------------------------------------------------
+    save_pytorch_model=function(dir_path,folder_name){
+      save_location <- paste0(dir_path, "/", folder_name)
+
+      save_format <- "safetensors"
+
+      if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
+        warning("Python library 'safetensors' is not available. Using
+                 standard save format for pytorch.")
+        save_format <- "pt"
+      }
+
+      create_dir(save_location, FALSE)
+      private$model$to("cpu", dtype = torch$float)
+      if (save_format == "safetensors") {
+        file_path <- paste0(save_location, "/", "model_data", ".safetensors")
+        safetensors$torch$save_model(model = private$model, filename = file_path)
+      } else if (save_format == "pt") {
+        file_path <- paste0(save_location, "/", "model_data", ".pt")
+        torch$save(private$model$state_dict(), file_path)
+      }
+    },
+    #---------------------------------------------------------------------------
+    load_pytorch_model = function(dir_path) {
+      # Load python scripts
+      private$load_reload_python_scripts()
+
+      # Load the model---------------------------------------------------------
+      path_pt <- paste0(dir_path, "/", "model_data", ".pt")
+      path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
+      private$create_reset_model()
+      if (file.exists(path_safe_tensors)) {
+        safetensors$torch$load_model(model = private$model, filename = path_safe_tensors)
+      } else {
+        if (file.exists(paths = path_pt) == TRUE) {
+          private$model$load_state_dict(torch$load(path_pt))
+        } else {
+          stop("There is no compatible model file in the choosen directory.
+                     Please check path. Please note that classifiers have to be loaded with
+                     the same framework as during creation.")
+        }
+      }
     }
   )
 )

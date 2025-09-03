@@ -28,6 +28,7 @@ check_class <- function(object,object_name=NULL, classes, allow_NULL = FALSE) {
   if (!is.null(object)) {
     classes_object <- class(object)
     check_results <- sum(classes_object %in% classes)
+
     if (check_results < 1) {
       stop(
         paste(

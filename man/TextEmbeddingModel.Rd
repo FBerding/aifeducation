@@ -17,20 +17,14 @@ Other Text Embedding:
 \code{\link{TEFeatureExtractor}}
 }
 \concept{Text Embedding}
+\section{Super classes}{
+\code{\link[aifeducation:AIFEMaster]{aifeducation::AIFEMaster}} -> \code{\link[aifeducation:AIFEBaseModel]{aifeducation::AIFEBaseModel}} -> \code{TextEmbeddingModel}
+}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{last_training}}{('list()')\cr
-List for storing the history and the results of the last training. This
-information will be overwritten if a new training is started.}
-
-\item{\code{tokenizer_statistics}}{('matrix()')\cr
-Matrix containing the tokenizer statistics for the creation of the tokenizer
-and all training runs according to Kaya & Tantuğ (2024).
-
-Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity for Turkish
-large language models. Intelligent Systems with Applications, 21, 200335.
-https://doi.org/10.1016/j.iswa.2024.200335}
+\item{\code{BaseModel}}{\cr
+Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelModernBert}, \link{BaseModelRoberta}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -39,38 +33,41 @@ https://doi.org/10.1016/j.iswa.2024.200335}
 \itemize{
 \item \href{#method-TextEmbeddingModel-configure}{\code{TextEmbeddingModel$configure()}}
 \item \href{#method-TextEmbeddingModel-load_from_disk}{\code{TextEmbeddingModel$load_from_disk()}}
-\item \href{#method-TextEmbeddingModel-load}{\code{TextEmbeddingModel$load()}}
 \item \href{#method-TextEmbeddingModel-save}{\code{TextEmbeddingModel$save()}}
 \item \href{#method-TextEmbeddingModel-encode}{\code{TextEmbeddingModel$encode()}}
 \item \href{#method-TextEmbeddingModel-decode}{\code{TextEmbeddingModel$decode()}}
-\item \href{#method-TextEmbeddingModel-get_special_tokens}{\code{TextEmbeddingModel$get_special_tokens()}}
 \item \href{#method-TextEmbeddingModel-embed}{\code{TextEmbeddingModel$embed()}}
 \item \href{#method-TextEmbeddingModel-embed_large}{\code{TextEmbeddingModel$embed_large()}}
-\item \href{#method-TextEmbeddingModel-fill_mask}{\code{TextEmbeddingModel$fill_mask()}}
-\item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
-\item \href{#method-TextEmbeddingModel-get_publication_info}{\code{TextEmbeddingModel$get_publication_info()}}
-\item \href{#method-TextEmbeddingModel-set_model_license}{\code{TextEmbeddingModel$set_model_license()}}
-\item \href{#method-TextEmbeddingModel-get_model_license}{\code{TextEmbeddingModel$get_model_license()}}
-\item \href{#method-TextEmbeddingModel-set_documentation_license}{\code{TextEmbeddingModel$set_documentation_license()}}
-\item \href{#method-TextEmbeddingModel-get_documentation_license}{\code{TextEmbeddingModel$get_documentation_license()}}
-\item \href{#method-TextEmbeddingModel-set_model_description}{\code{TextEmbeddingModel$set_model_description()}}
-\item \href{#method-TextEmbeddingModel-get_model_description}{\code{TextEmbeddingModel$get_model_description()}}
-\item \href{#method-TextEmbeddingModel-get_model_info}{\code{TextEmbeddingModel$get_model_info()}}
-\item \href{#method-TextEmbeddingModel-get_package_versions}{\code{TextEmbeddingModel$get_package_versions()}}
-\item \href{#method-TextEmbeddingModel-get_basic_components}{\code{TextEmbeddingModel$get_basic_components()}}
 \item \href{#method-TextEmbeddingModel-get_n_features}{\code{TextEmbeddingModel$get_n_features()}}
-\item \href{#method-TextEmbeddingModel-get_transformer_components}{\code{TextEmbeddingModel$get_transformer_components()}}
-\item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
-\item \href{#method-TextEmbeddingModel-get_ml_framework}{\code{TextEmbeddingModel$get_ml_framework()}}
 \item \href{#method-TextEmbeddingModel-get_pad_value}{\code{TextEmbeddingModel$get_pad_value()}}
-\item \href{#method-TextEmbeddingModel-count_parameter}{\code{TextEmbeddingModel$count_parameter()}}
-\item \href{#method-TextEmbeddingModel-is_configured}{\code{TextEmbeddingModel$is_configured()}}
-\item \href{#method-TextEmbeddingModel-get_private}{\code{TextEmbeddingModel$get_private()}}
-\item \href{#method-TextEmbeddingModel-get_all_fields}{\code{TextEmbeddingModel$get_all_fields()}}
-\item \href{#method-TextEmbeddingModel-plot_training_history}{\code{TextEmbeddingModel$plot_training_history()}}
+\item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
+\item \href{#method-TextEmbeddingModel-estimate_sustainability_inference_embed}{\code{TextEmbeddingModel$estimate_sustainability_inference_embed()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
 }
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_all_fields"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_all_fields'><code>aifeducation::AIFEMaster$get_all_fields()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_documentation_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_documentation_license'><code>aifeducation::AIFEMaster$get_documentation_license()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_ml_framework"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_ml_framework'><code>aifeducation::AIFEMaster$get_ml_framework()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_model_config"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_model_config'><code>aifeducation::AIFEMaster$get_model_config()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_model_description"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_model_description'><code>aifeducation::AIFEMaster$get_model_description()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_model_info"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_model_info'><code>aifeducation::AIFEMaster$get_model_info()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_model_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_model_license'><code>aifeducation::AIFEMaster$get_model_license()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_package_versions"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_package_versions'><code>aifeducation::AIFEMaster$get_package_versions()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_private"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_private'><code>aifeducation::AIFEMaster$get_private()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_publication_info'><code>aifeducation::AIFEMaster$get_publication_info()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_sustainability_data'><code>aifeducation::AIFEMaster$get_sustainability_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="is_configured"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-is_configured'><code>aifeducation::AIFEMaster$is_configured()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="is_trained"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-is_trained'><code>aifeducation::AIFEMaster$is_trained()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_documentation_license'><code>aifeducation::AIFEMaster$set_documentation_license()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_model_description"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_model_description'><code>aifeducation::AIFEMaster$set_model_description()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_model_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_model_license'><code>aifeducation::AIFEMaster$set_model_license()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="count_parameter"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-count_parameter'><code>aifeducation::AIFEBaseModel$count_parameter()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-configure"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-configure}{}}}
@@ -84,71 +81,60 @@ Method for creating a new text embedding model
   max_length = 0,
   chunks = 2,
   overlap = 0,
-  emb_layer_min = "Middle",
-  emb_layer_max = "2_3_layer",
+  emb_layer_min = 1,
+  emb_layer_max = 2,
   emb_pool_type = "Average",
   pad_value = -100,
-  model_dir = NULL,
-  trace = FALSE
+  base_model = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model_name}}{\code{string} containing the name of the new model.}
+\item{\code{model_name}}{\code{string} Name of the new model. Please refer to common name conventions.
+Free text can be used with parameter \code{label}. If set to \code{NULL} a unique ID
+is generated automatically. Allowed values: any}
 
-\item{\code{model_label}}{\code{string} containing the label/title of the new model.}
+\item{\code{model_label}}{\code{string} Label for the new model. Here you can use free text. Allowed values: any}
 
-\item{\code{model_language}}{\code{string} containing the language which the model
-represents (e.g., English).}
+\item{\code{model_language}}{\code{string} Languages that the models can work with. Allowed values: any}
 
-\item{\code{max_length}}{\code{int} determining the maximum length of token
-sequences used in transformer models. Not relevant for the other methods.}
+\item{\code{max_length}}{\code{int} Maximal number of token per chunks. Must be equal or lower
+as the maximal postional embeddings for the model. Allowed values: \code{20 <= x }}
 
-\item{\code{chunks}}{\code{int} Maximum number of chunks. Must be at least 2.}
+\item{\code{chunks}}{\code{int} Maximal number chunks. Allowed values: \code{2 <= x }}
 
-\item{\code{overlap}}{\code{int} determining the number of tokens which should be added
-at the beginning of the next chunk. Only relevant for transformer models.}
+\item{\code{overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \code{0 <= x }}
 
-\item{\code{emb_layer_min}}{\code{int} or \code{string} determining the first layer to be included
-in the creation of embeddings. An integer correspondents to the layer number. The first
-layer has the number 1. Instead of an integer the following strings are possible:
-\code{"start"} for the first layer, \code{"Middle"} for the middle layer,
-\code{"2_3_layer"} for the layer two-third layer, and \code{"Last"} for the last layer.}
+\item{\code{emb_layer_min}}{\code{int} Minimal layer from which the embeddings should be calculated. Allowed values: \code{1 <= x }}
 
-\item{\code{emb_layer_max}}{\code{int} or \code{string} determining the last layer to be included
-in the creation of embeddings. An integer correspondents to the layer number. The first
-layer has the number 1. Instead of an integer the following strings are possible:
-\code{"start"} for the first layer, \code{"Middle"} for the middle layer,
-\code{"2_3_layer"} for the layer two-third layer, and \code{"Last"} for the last layer.}
+\item{\code{emb_layer_max}}{\code{int} Maximal layer from which the embeddings should be calculated. Allowed values: \code{1 <= x }}
 
-\item{\code{emb_pool_type}}{\code{string} determining the method for pooling the token embeddings
-within each layer. If \code{"CLS"} only the embedding of the CLS token is used. If
-\code{"Average"} the token embedding of all tokens are averaged (excluding padding tokens).
-\verb{"cls} is not supported for \code{method="funnel"}.}
+\item{\code{emb_pool_type}}{\code{string} Method to summarize the embedding of single tokens into a text embedding.
+In the case of \code{'CLS'} all cls-tokens between \code{emb_layer_min} and \code{emb_layer_max} are averaged.
+In the case of \code{'Average'} the embeddings of all tokens are averaged.,
+default_value = NULL Allowed values: 'CLS', 'Average'}
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
-\item{\code{model_dir}}{\code{string} path to the directory where the
-BERT model is stored.}
+\item{\code{base_model}}{\verb{BaseModelBert, BaseModelMPNet, BaseModelModernBert, BaseModelRoberta} Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelModernBert}, \link{BaseModelRoberta} . This objects prepares raw text for the model.}
 
-\item{\code{trace}}{\code{bool} \code{TRUE} prints information about the progress.
-\code{FALSE} does not.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Returns an object of class \link{TextEmbeddingModel}.
+Does nothing return.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-load_from_disk"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load_from_disk}{}}}
 \subsection{Method \code{load_from_disk()}}{
-loads an object from disk
+Loads an object from disk
 and updates the object to the current version of the package.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load_from_disk(dir_path)}\if{html}{\out{</div>}}
@@ -162,37 +148,14 @@ and updates the object to the current version of the package.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Method does not return anything. It loads an object from disk.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-load"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-load}{}}}
-\subsection{Method \code{load()}}{
-Method for loading a transformers model into R.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$load(dir_path)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{dir_path}}{\code{string} containing the path to the relevant
-model directory.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Function does not return a value. It is used for loading a saved
-transformer model into the R interface.
+Function does nothin return. It loads an object from disk.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextEmbeddingModel-save"></a>}}
 \if{latex}{\out{\hypertarget{method-TextEmbeddingModel-save}{}}}
 \subsection{Method \code{save()}}{
-Method for saving a transformer model on disk.Relevant
-only for transformer models.
+Method for saving a model on disk.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$save(dir_path, folder_name)}\if{html}{\out{</div>}}
 }
@@ -200,17 +163,14 @@ only for transformer models.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dir_path}}{\code{string} containing the path to the relevant
-model directory.}
+\item{\code{dir_path}}{Path to the directory where to save the object.}
 
-\item{\code{folder_name}}{\code{string} Name for the folder created within the directory.
-This folder contains all model files.}
+\item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values: any}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Function does not return a value. It is used for saving a transformer model
-to disk.
+Function does nothing return. It is used to save an object on disk.
 }
 }
 \if{html}{\out{<hr>}}
@@ -222,7 +182,7 @@ Method for encoding words of raw texts into integers.
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$encode(
   raw_text,
   token_encodings_only = FALSE,
-  to_int = TRUE,
+  token_to_int = TRUE,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -230,18 +190,22 @@ Method for encoding words of raw texts into integers.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{raw_text}}{\code{vector}containing the raw texts.}
+\item{\code{raw_text}}{\code{vector} Raw text.}
 
-\item{\code{token_encodings_only}}{\code{bool} If \code{TRUE}, only the token
-encodings are returned. If \code{FALSE}, the complete encoding is returned
-which is important for some transformer models.}
+\item{\code{token_encodings_only}}{\code{bool}
+\itemize{
+\item \code{TRUE}: Returns a \code{list} containg only the tokens.
+\item \code{FALSE}: Returns a \code{list} containg a list for the tokens, the number of chunks, and
+the number potential number of chunks for each document/text.
+}}
 
-\item{\code{to_int}}{\code{bool} If \code{TRUE} the integer ids of the tokens are
-returned. If \code{FALSE} the tokens are returned. Argument only applies
-for transformer models and if \code{token_encodings_only=TRUE}.}
+\item{\code{token_to_int}}{\code{bool}
+\itemize{
+\item \code{TRUE}: Returns the tokens as \code{int} index.
+\item \code{FALSE}: Returns the tokens as \code{string}s.
+}}
 
-\item{\code{trace}}{\code{bool} If \code{TRUE}, information of the progress
-is printed. \code{FALSE} if not requested.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }
 \if{html}{\out{</div>}}
 }
@@ -262,31 +226,18 @@ Method for decoding a sequence of integers into tokens
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{int_seqence}}{\code{list} containing the integer sequences which
-should be transformed to tokens or plain text.}
+\item{\code{int_seqence}}{\code{list} \code{list} of integer sequence that should be converted to tokens.}
 
-\item{\code{to_token}}{\code{bool} If \code{FALSE} plain text is returned.
-If \code{TRUE} a sequence of tokens is returned. Argument only relevant
-if the model is based on a transformer.}
+\item{\code{to_token}}{\code{bool}
+\itemize{
+\item \code{FALSE}: Transforms the integers to plain text.
+\item \code{TRUE}: Transforms the integers to a sequence of tokens.
+}}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 \code{list} of token sequences
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_special_tokens"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_special_tokens}{}}}
-\subsection{Method \code{get_special_tokens()}}{
-Method for receiving the special tokens of the model
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_special_tokens()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{matrix} containing the special tokens in the rows
-and their type, token, and id in the columns.
 }
 }
 \if{html}{\out{<hr>}}
@@ -309,17 +260,15 @@ into text embeddings. For a large number of texts please use the method \code{em
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{raw_text}}{\code{vector} containing the raw texts.}
+\item{\code{raw_text}}{\code{vector} Raw text.}
 
-\item{\code{doc_id}}{\code{vector} containing the corresponding IDs for every text.}
+\item{\code{doc_id}}{\code{vector} Id for every text.}
 
-\item{\code{batch_size}}{\code{int} determining the maximal size of every batch.}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{trace}}{\code{bool} \code{TRUE}, if information about the progression
-should be printed on console.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{return_large_dataset}}{'bool' If \code{TRUE} the retuned object is of class
-\link{LargeDataSetForTextEmbeddings}. If \code{FALSE} it is of class \link{EmbeddedText}}
+\item{\code{return_large_dataset}}{\code{bool} If \code{TRUE} a \link{LargeDataSetForEmbedding} is returned. If \code{FALSE} an object if class \link{EmbeddedText} is returned.}
 }
 \if{html}{\out{</div>}}
 }
@@ -336,7 +285,7 @@ model creating the embeddings.
 Method for creating text embeddings from raw texts.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed_large(
-  large_datas_set,
+  text_dataset,
   batch_size = 32,
   trace = FALSE,
   log_file = NULL,
@@ -347,19 +296,17 @@ Method for creating text embeddings from raw texts.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{large_datas_set}}{Object of class \link{LargeDataSetForText} containing the
-raw texts.}
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{batch_size}}{\code{int} determining the maximal size of every batch.}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{trace}}{\code{bool} \code{TRUE}, if information about the progression
-should be printed on console.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{log_file}}{\code{string} Path to the file where the log should be saved.
-If no logging is desired set this argument to \code{NULL}.}
+\item{\code{log_file}}{\code{string} Path to the file where the log files should be saved.
+If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
-\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which
-the logger should try to update the log files. Only relevant if \code{log_file} is not \code{NULL}.}
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
 }
 \if{html}{\out{</div>}}
 }
@@ -368,27 +315,30 @@ Method returns an object of class \link{LargeDataSetForTextEmbeddings}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-fill_mask"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-fill_mask}{}}}
-\subsection{Method \code{fill_mask()}}{
-Method for calculating tokens behind mask tokens.
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_n_features"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_n_features}{}}}
+\subsection{Method \code{get_n_features()}}{
+Method for requesting the number of features.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$fill_mask(text, n_solutions = 5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_n_features()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{text}}{\code{string} Text containing mask tokens.}
-
-\item{\code{n_solutions}}{\code{int} Number estimated tokens for every mask.}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-Returns a \code{list} containing a \code{data.frame} for every
-mask. The \code{data.frame} contains the solutions in the rows and reports
-the score, token id, and token string in the columns.
+Returns a \code{double} which represents the number of features. This number represents the
+hidden size of the embeddings for every chunk or time.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_pad_value"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_pad_value}{}}}
+\subsection{Method \code{get_pad_value()}}{
+Value for indicating padding.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_pad_value()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns an \code{int} describing the value used for padding.
 }
 }
 \if{html}{\out{<hr>}}
@@ -420,350 +370,44 @@ members for publication information of the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_publication_info"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_publication_info}{}}}
-\subsection{Method \code{get_publication_info()}}{
-Method for getting the bibliographic information of the model.
+\if{html}{\out{<a id="method-TextEmbeddingModel-estimate_sustainability_inference_embed"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-estimate_sustainability_inference_embed}{}}}
+\subsection{Method \code{estimate_sustainability_inference_embed()}}{
+Calculates the energy consumption for inference of the given task.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_publication_info()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-\code{list} of bibliographic information.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-set_model_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_model_license}{}}}
-\subsection{Method \code{set_model_license()}}{
-Method for setting the license of the model
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_model_license(license = "CC BY")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{license}}{\code{string} containing the abbreviation of the license or
-the license text.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Function does not return a value. It is used for setting the private
-member for the software license of the model.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_model_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_model_license}{}}}
-\subsection{Method \code{get_model_license()}}{
-Method for requesting the license of the model
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_model_license()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-\code{string} License of the model
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-set_documentation_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_documentation_license}{}}}
-\subsection{Method \code{set_documentation_license()}}{
-Method for setting the license of models' documentation.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_documentation_license(license = "CC BY")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{license}}{\code{string} containing the abbreviation of the license or
-the license text.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Function does not return a value. It is used to set the private member for the
-documentation license of the model.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_documentation_license"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_documentation_license}{}}}
-\subsection{Method \code{get_documentation_license()}}{
-Method for getting the license of the models' documentation.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_documentation_license()}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{license}}{\code{string} containing the abbreviation of the license or
-the license text.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-set_model_description"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-set_model_description}{}}}
-\subsection{Method \code{set_model_description()}}{
-Method for setting a description of the model
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$set_model_description(
-  eng = NULL,
-  native = NULL,
-  abstract_eng = NULL,
-  abstract_native = NULL,
-  keywords_eng = NULL,
-  keywords_native = NULL
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$estimate_sustainability_inference_embed(
+  text_dataset = NULL,
+  batch_size = 32,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 10,
+  trace = TRUE
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{eng}}{\code{string} A text describing the training of the classifier,
-its theoretical and empirical background, and the different output labels
-in English.}
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{native}}{\code{string} A text describing the training of the classifier,
-its theoretical and empirical background, and the different output labels
-in the native language of the model.}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{abstract_eng}}{\code{string} A text providing a summary of the description
-in English.}
+\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
+sustainability should be tracked. A list can be found on Wikipedia:
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
 
-\item{\code{abstract_native}}{\code{string} A text providing a summary of the description
-in the native language of the classifier.}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{keywords_eng}}{\code{vector}of keywords in English.}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
 
-\item{\code{keywords_native}}{\code{vector}of keywords in the native language of the classifier.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Function does not return a value. It is used to set the private members for the
-description of the model.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_model_description"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_model_description}{}}}
-\subsection{Method \code{get_model_description()}}{
-Method for requesting the model description.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_model_description()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-\code{list} with the description of the model in English
-and the native language.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_model_info"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_model_info}{}}}
-\subsection{Method \code{get_model_info()}}{
-Method for requesting the model information
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_model_info()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-\code{list} of all relevant model information
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_package_versions"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_package_versions}{}}}
-\subsection{Method \code{get_package_versions()}}{
-Method for requesting a summary of the R and python packages'
-versions used for creating the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_package_versions()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{list} containing the versions of the relevant
-R and python packages.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_basic_components"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_basic_components}{}}}
-\subsection{Method \code{get_basic_components()}}{
-Method for requesting the part of interface's configuration that is
-necessary for all models.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_basic_components()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{list}.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_n_features"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_n_features}{}}}
-\subsection{Method \code{get_n_features()}}{
-Method for requesting the number of features.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_n_features()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{double} which represents the number of features. This number represents the
-hidden size of the embeddings for every chunk or time.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_transformer_components"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_transformer_components}{}}}
-\subsection{Method \code{get_transformer_components()}}{
-Method for requesting the part of interface's configuration that is
-necessary for transformer models.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_transformer_components()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{list}.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_sustainability_data"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_sustainability_data}{}}}
-\subsection{Method \code{get_sustainability_data()}}{
-Method for requesting a log of tracked energy consumption
-during training and an estimate of the resulting CO2 equivalents in kg.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_sustainability_data()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{matrix} containing the tracked energy consumption,
-CO2 equivalents in kg, information on the tracker used, and technical
-information on the training infrastructure for every training run.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_ml_framework"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_ml_framework}{}}}
-\subsection{Method \code{get_ml_framework()}}{
-Method for requesting the machine learning framework used
-for the classifier.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_ml_framework()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{string} describing the machine learning framework used
-for the classifier.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_pad_value"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_pad_value}{}}}
-\subsection{Method \code{get_pad_value()}}{
-Value for indicating padding.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_pad_value()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns an \code{int} describing the value used for padding.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-count_parameter"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-count_parameter}{}}}
-\subsection{Method \code{count_parameter()}}{
-Method for counting the trainable parameters of a model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$count_parameter(with_head = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{with_head}}{\code{bool} If \code{TRUE} the number of parameters is returned including
-the language modeling head of the model. If \code{FALSE} only the number of parameters of
-the core model is returned.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns the number of trainable parameters of the model.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-is_configured"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-is_configured}{}}}
-\subsection{Method \code{is_configured()}}{
-Method for checking if the model was successfully configured.
-An object can only be used if this value is \code{TRUE}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$is_configured()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-\code{bool} \code{TRUE} if the model is fully configured. \code{FALSE} if not.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_private"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_private}{}}}
-\subsection{Method \code{get_private()}}{
-Method for requesting all private fields and methods. Used
-for loading and updating an object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_private()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Returns a \code{list} with all private fields and methods.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-get_all_fields"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_all_fields}{}}}
-\subsection{Method \code{get_all_fields()}}{
-Return all fields.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_all_fields()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Method returns a \code{list} containing all public and private fields
-of the object.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TextEmbeddingModel-plot_training_history"></a>}}
-\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-plot_training_history}{}}}
-\subsection{Method \code{plot_training_history()}}{
-Method for requesting a plot of the training history.
-This method requires the \emph{R} package 'ggplot2' to work.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$plot_training_history(y_min = NULL, y_max = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
-
-\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns a plot of class \code{ggplot} visualizing the training process.
+Returns nothing. Method saves the statistics internally.
+The statistics can be accessed with the method \code{get_sustainability_data("inference")}
 }
 }
 \if{html}{\out{<hr>}}

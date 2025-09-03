@@ -4,7 +4,7 @@
 \alias{summarize_tracked_sustainability}
 \title{Summarizing tracked sustainability data}
 \usage{
-summarize_tracked_sustainability(sustainability_tracker)
+summarize_tracked_sustainability(sustainability_tracker, task = NA)
 }
 \arguments{
 \item{sustainability_tracker}{Object of class \code{codecarbon.emissions_tracker.OfflineEmissionsTracker} of the python

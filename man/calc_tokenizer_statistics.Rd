@@ -4,7 +4,11 @@
 \alias{calc_tokenizer_statistics}
 \title{Estimate tokenizer statistics}
 \usage{
-calc_tokenizer_statistics(dataset, step = "creation")
+calc_tokenizer_statistics(
+  dataset,
+  step = "creation",
+  statistics_max_tokens_length = 512
+)
 }
 \arguments{
 \item{dataset}{Object of class datasets.arrow_dataset.Dataset. The data set must contain a column \code{"length"}

@@ -6,7 +6,7 @@ testthat::skip_if_not(
 )
 
 # SetUp-------------------------------------------------------------------------
-root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 
 # Load test data
 imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))

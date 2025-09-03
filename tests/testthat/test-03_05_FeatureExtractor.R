@@ -7,7 +7,7 @@ testthat::skip_if_not(
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
-root_path_general_data <- testthat::test_path("test_data_tmp/Embeddings")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
 create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
 create_dir(root_path_results, FALSE)
@@ -215,61 +215,6 @@ for (framework in ml_frameworks) {
         })
       }
       gc()
-
-      # Method for loading and saving models-----------------------------------
-      test_that(paste(framework, method, data_type, "method save and load"), {
-        # Predictions before saving and loading
-        if (data_type == "EmbeddedText") {
-          predictions <- extractor$extract_features(
-            data_embeddings = dataset_list[[data_type]],
-            batch_size = 50
-          )
-        } else {
-          predictions <- extractor$extract_features_large(
-            data_embeddings = dataset_list[[data_type]],
-            batch_size = 50,
-            trace = FALSE
-          )
-        }
-
-        # Save and load
-        folder_name <- paste0("method_save_load_", generate_id())
-        dir_path <- paste0(root_path_results, "/", folder_name)
-        extractor$save(
-          dir_path = root_path_results,
-          folder_name = folder_name
-        )
-        extractor$load(dir_path = dir_path)
-
-        # Predict after loading
-        if (data_type == "EmbeddedText") {
-          predictions_2 <- extractor$extract_features(
-            data_embeddings = dataset_list[[data_type]],
-            batch_size = 50
-          )
-        } else {
-          predictions_2 <- extractor$extract_features_large(
-            data_embeddings = dataset_list[[data_type]],
-            batch_size = 50,
-            trace = FALSE
-          )
-        }
-
-        # Compare predictions
-        i <- sample(x = seq.int(from = 1, to = predictions$n_rows()), size = 1)
-        expect_equal(predictions$embeddings[i, , , drop = FALSE],
-          predictions_2$embeddings[i, , , drop = FALSE],
-          tolerance = 1e-6
-        )
-
-        # Clean Directory
-        unlink(
-          x = dir_path,
-          recursive = TRUE
-        )
-      })
-      gc()
-
 
       # Function for loading and saving models-----------------------------------
       test_that(paste(framework, method, data_type, "function save and load"), {

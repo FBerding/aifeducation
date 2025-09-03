@@ -580,3 +580,23 @@ build_aife_site <- function(clear_docs=FALSE) {
 
   pkgdown::preview_site()
 }
+
+
+#==============================================================================
+
+#' @keywords internal
+get_description=function(type){
+  if(type=="return_object"){
+    return("Does return a new object of this class.")
+  } else if(type=="return_nothing"){
+    return("Does nothing return.")
+  } else if(type=="return_save_on_disk"){
+    return("Function does nothing return. It is used to save an object on disk.")
+  } else if (type=="return_load_on_disk"){
+    return("Function does nothin return. It loads an object from disk.")
+  } else if (type=="save_dir"){
+    return("Path to the directory where to save the object.")
+  } else if (type=="load_dir"){
+    return("Path where the object set is stored.")
+  }
+}

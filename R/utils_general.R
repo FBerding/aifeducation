@@ -213,6 +213,7 @@ detect_base_model_type=function(model){
   } else if(stringi::stri_detect(str=tolower(type_string),regex = "^modernbert([:alnum:]*)")){
     return("modernbert")
   } else {
-    stop("Architectue for the model could not be detected.")
+    stop("Architecture for the model could not be detected.")
   }
 }
+
