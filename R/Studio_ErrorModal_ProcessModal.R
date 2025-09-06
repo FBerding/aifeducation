@@ -76,3 +76,17 @@ display_processing <- function(
   # Give system time to display the modal
   Sys.sleep(2)
 }
+
+
+display_processing_alert<-function(text="Working"){
+  shinyWidgets::show_alert(
+    title = text,
+    text = "Please wait",
+    type = "info",
+    closeOnClickOutside = FALSE,
+    showCloseButton = FALSE,
+    btn_labels=NA
+  )
+  # Give system time to display the modal
+  Sys.sleep(2)
+}

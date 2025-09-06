@@ -551,4 +551,4 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
 )
 
 #Add the model to the user list
-DataSetsIndex$LargeDataSetForTextEmbeddings =("LargeDataSetForTextEmbeddings ")
+DataSetsIndex$LargeDataSetForTextEmbeddings =("LargeDataSetForTextEmbeddings")

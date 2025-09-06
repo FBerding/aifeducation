@@ -35,28 +35,28 @@ generate_sidebar_information <- function(model) {
       model_label <- model$get_model_info()$model_label
     }
 
-    max_tokens <- (model$get_basic_components()$max_length - model$get_transformer_components()$overlap) *
-      model$get_transformer_components()$chunks + model$get_basic_components()$max_length
+    max_tokens <- (model$get_model_config()$max_length - model$get_model_config()$overlap) *
+      model$get_model_config()$chunks + model$get_model_config()$max_length
 
-    if (!is.null(model$get_transformer_components()$aggregation)) {
-      aggegation <- shiny::tags$p("Hidden States Aggregation: ", model$get_transformer_components()$aggregation)
+    if (!is.null(model$get_model_config()$aggregation)) {
+      aggegation <- shiny::tags$p("Hidden States Aggregation: ", model$get_model_config()$aggregation)
     } else {
       aggegation <- NULL
     }
 
-    if (!is.null(model$get_transformer_components()$emb_pool_type)) {
-      pool_type <- model$get_transformer_components()$emb_pool_type
-      min_layer <- model$get_transformer_components()$emb_layer_min
-      max_layer <- model$get_transformer_components()$emb_layer_max
+    if (!is.null(model$get_model_config()$emb_pool_type)) {
+      pool_type <- model$get_model_config()$emb_pool_type
+      min_layer <- model$get_model_config()$emb_layer_min
+      max_layer <- model$get_model_config()$emb_layer_max
     } else {
       pool_type <- NULL
       min_layer <- NULL
       max_layer <- NULL
     }
 
-    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data())) {
-      if (is.na(model$get_sustainability_data()[1, 1]) == FALSE) {
-        kwh <- round(sum(model$get_sustainability_data()[, "sustainability_data.total_energy_kwh"]), 3)
+    if (methods::isClass(Class = "data.frame", where = model$BaseModel$get_sustainability_data()$track_log)) {
+      if (nrow(model$BaseModel$get_sustainability_data()$track_log)!=0) {
+        kwh <- round(sum(model$BaseModel$get_sustainability_data()$track_log[, "sustainability_data.total_energy_kwh"]), 3)
       } else {
         kwh <- "not estimated"
       }
@@ -64,9 +64,55 @@ generate_sidebar_information <- function(model) {
       kwh <- "not estimated"
     }
 
-    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data())) {
-      if (is.na(model$get_sustainability_data()[1, 1]) == FALSE) {
-        co2 <- round(sum(model$get_sustainability_data()[, "sustainability_data.co2eq_kg"]), 3)
+    if (methods::isClass(Class = "data.frame", where = model$BaseModel$get_sustainability_data()$track_log)) {
+      if (nrow(model$BaseModel$get_sustainability_data()$track_log)!=0) {
+        co2 <- round(sum(model$BaseModel$get_sustainability_data()$track_log[, "sustainability_data.co2eq_kg"]), 3)
+      } else {
+        co2 <- "not estimated"
+      }
+    } else {
+      co2 <- "not estimated"
+    }
+
+    ui <- shiny::tagList(
+      shiny::tags$p(shiny::tags$b("Model:")),
+      shiny::tags$p(model_label),
+      shiny::tags$hr(),
+      shiny::tags$p("# Parameter: ", model$BaseModel$count_parameter()),
+      shiny::tags$p("Method: ", model$BaseModel$get_model_type()),
+      aggegation,
+      shiny::tags$p("Max Tokens per Chunk: ", model$get_model_config()$max_length),
+      shiny::tags$p("Max Chunks: ", model$get_model_config()$chunks),
+      shiny::tags$p("Token Overlap: ", model$get_model_config()$overlap),
+      shiny::tags$p("Max Tokens: ", max_tokens),
+      shiny::tags$p("Pool Type: ", pool_type),
+      shiny::tags$p("Embedding Layers - Min: ", min_layer),
+      shiny::tags$p("Embedding Layers - Max: ", max_layer),
+      shiny::tags$hr(),
+      shiny::tags$p("Energy Consumption (kWh): ", kwh),
+      shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
+    )
+  } else if("BaseModelCore" %in% class(model)){
+    # Prepare output
+    if (is.null(model)) {
+      model_label <- NULL
+    } else {
+      model_label <- model$get_model_info()$model_label
+    }
+
+    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data()$track_log)) {
+      if (nrow(model$get_sustainability_data()$track_log)!=0) {
+        kwh <- round(sum(model$get_sustainability_data()$track_log[, "sustainability_data.total_energy_kwh"]), 3)
+      } else {
+        kwh <- "not estimated"
+      }
+    } else {
+      kwh <- "not estimated"
+    }
+
+    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data()$track_log)) {
+      if (nrow(model$get_sustainability_data()$track_log)!=0) {
+        co2 <- round(sum(model$get_sustainability_data()$track_log[, "sustainability_data.co2eq_kg"]), 3)
       } else {
         co2 <- "not estimated"
       }
@@ -79,15 +125,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p(model_label),
       shiny::tags$hr(),
       shiny::tags$p("# Parameter: ", model$count_parameter()),
-      shiny::tags$p("Method: ", model$get_basic_components()$method),
-      aggegation,
-      shiny::tags$p("Max Tokens per Chunk: ", model$get_basic_components()$max_length),
-      shiny::tags$p("Max Chunks: ", model$get_transformer_components()$chunks),
-      shiny::tags$p("Token Overlap: ", model$get_transformer_components()$overlap),
-      shiny::tags$p("Max Tokens: ", max_tokens),
-      shiny::tags$p("Pool Type: ", pool_type),
-      shiny::tags$p("Embedding Layers - Min: ", min_layer),
-      shiny::tags$p("Embedding Layers - Max: ", max_layer),
+      shiny::tags$p("Method: ", model$get_model_type()),
       shiny::tags$hr(),
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
@@ -806,7 +844,7 @@ create_data_raw_texts_description <- function(data_set_for_raw_texts) {
 
 create_data_base_model_description <- function(base_model) {
   ui <- bslib::value_box(
-    value = detect_base_model_type(base_model),
+    value = base_model$get_model_type(),
     title = "Base Model Type",
     showcase = shiny::icon("brain")
   )
@@ -1005,7 +1043,7 @@ create_widget_card <- function(id,
   # Get params of the corresponding method
   params <- rlang::fn_fmls_names(object[[method]])
 
-  # Get param dict
+    # Get param dict
   param_dict <- get_param_dict()[params]
 
   tmp_boxes <- list()
@@ -1223,6 +1261,14 @@ create_widget_card <- function(id,
   return(main_card)
 }
 
+extract_args_from_input=function(input,arg_names){
+  args_list=list()
+  for(param in arg_names){
+    args_list[param]=list(input[[param]])
+  }
+  return(args_list)
+}
+
 #' @title Summarize arguments from shiny input
 #' @description This function extracts the input relevant for a specific
 #' method of a specific class from shiny input.
@@ -1312,6 +1358,9 @@ summarize_args_for_long_task <- function(input,
     }
   }
 
+  #Add method to meta_args
+  meta_args$method=method
+
   # Add path arguments and further additional arguments
   return(list(
     args = param_list,
@@ -1368,6 +1417,10 @@ add_missing_args <- function(args, path_args, meta_args) {
     } else if (max(c("EmbeddedText", "LargeDataSetForText") %in% current_param$type)) {
       complete_args[param] <- list(
         load_from_disk(path_args$path_to_textual_dataset)
+      )
+    } else if(max(unlist(BaseModelsIndex) %in% current_param$type) & !is.null(path_args$path_to_base_model)){
+      complete_args[param] <- list(
+        load_from_disk(path_args$path_to_base_model)
       )
     }
   }

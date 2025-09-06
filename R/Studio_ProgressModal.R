@@ -212,10 +212,10 @@ start_and_monitor_long_task <- function(id,
     } else if (ExtendedTask_type == "embed_raw_text") {
       CurrentTask <- shiny::ExtendedTask$new(long_transform_text_to_embeddings)
     } else if (ExtendedTask_type == "classifier"|
-               ExtendedTask_type == "feature_extractor") {
-      CurrentTask <- shiny::ExtendedTask$new(long_models)
-    } else if (ExtendedTask_type == "create_transformer"|
+               ExtendedTask_type == "feature_extractor"|
                ExtendedTask_type == "train_transformer") {
+      CurrentTask <- shiny::ExtendedTask$new(long_models)
+    } else if (ExtendedTask_type == "create_transformer") {
       CurrentTask <- shiny::ExtendedTask$new(long_transformers)
     }
 
@@ -223,7 +223,6 @@ start_and_monitor_long_task <- function(id,
        ExtendedTask_type == "feature_extractor"|
        ExtendedTask_type == "create_transformer"|
        ExtendedTask_type == "train_transformer"){
-      CurrentTask$invoke(args)
     } else {
       if (!is.null(CurrentTask)) do.call(what = CurrentTask$invoke, args = ExtendedTask_arguments,quote = FALSE)
     }

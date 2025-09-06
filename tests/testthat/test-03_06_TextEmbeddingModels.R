@@ -46,7 +46,7 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 
 # config
 # Set Chunks
-chunks <- sample(x = c(4, 30), size = 1, replace = FALSE)
+chunks <- sample(x = c(4, 10), size = 1, replace = FALSE)
 
 base_model_type_list <- list(
     "BaseModelBert"#,
@@ -178,7 +178,7 @@ max_layers <- 2
           text_embedding_model <- TextEmbeddingModel$new()
           text_embedding_model$configure(
             model_name = paste0(base_model_type, "_embedding"),
-            model_label = paste("Text Embedding via", base_model_type),
+            model_label = paste0("Text Embedding via", base_model_type),
             model_language = "english",
             max_length = 400,
             chunks = chunks,
@@ -329,11 +329,11 @@ max_layers <- 2
           # encoding------------------------------------------------------------
           test_that(paste( base_model_type, pooling_type, max_layer, min_layer, "encoding"), {
             # Request for tokens only
-            for (to_int in c(TRUE, FALSE)) {
+            for (token_to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
                 token_encodings_only = TRUE,
-                to_int = to_int
+                token_to_int = token_to_int
               )
               expect_length(encodings, 10)
               expect_type(encodings, type = "list")
@@ -343,7 +343,7 @@ max_layers <- 2
               encodings_perm <- text_embedding_model$encode(
                 raw_text = example_data$text[perm],
                 token_encodings_only = TRUE,
-                to_int = to_int
+                token_to_int = token_to_int
               )
               for (i in 1:10) {
                 expect_equal(
@@ -354,7 +354,7 @@ max_layers <- 2
             }
 
             # Request for all tokens types
-            for (to_int in c(TRUE, FALSE)) {
+            for (token_to_int in c(TRUE, FALSE)) {
               encodings <- text_embedding_model$encode(
                 raw_text = example_data$text[1:10],
                 token_encodings_only = FALSE
@@ -369,7 +369,7 @@ max_layers <- 2
             encodings <- text_embedding_model$encode(
               raw_text = example_data$text[1:10],
               token_encodings_only = TRUE,
-              to_int = TRUE
+              token_to_int = TRUE
             )
             for (to_token in c(TRUE, FALSE)) {
               decodings <- text_embedding_model$decode(

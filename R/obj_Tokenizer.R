@@ -272,7 +272,7 @@ TokenizerBase <- R6::R6Class(
               skip_special_tokens = TRUE
             ))
           } else {
-            tmp_seq_token_list[j] <- list(private$model$convert_ids_to_tokens(tmp_vector))
+            tmp_seq_token_list[j] <- list(paste(private$model$convert_ids_to_tokens(tmp_vector),collapse=" "))
           }
         }
         tmp_token_list[i] <- list(tmp_seq_token_list)
@@ -322,6 +322,32 @@ TokenizerBase <- R6::R6Class(
           )
         )
       )
+    },
+    #-------------------------------------------------------------------------
+    calculate_statistics=function(text_dataset,
+                                  statistics_max_tokens_length,
+                                  step="creation"){
+      # Calculate tokenizer statistics
+      tokenized_texts_raw <- tokenize_dataset(
+        dataset = text_dataset$get_dataset(),
+        tokenizer = private$model,
+        max_length = statistics_max_tokens_length,
+        add_special_tokens = FALSE,
+        log_file = NULL,
+        write_interval = 2,
+        value_top = 1,
+        total_top = 1,
+        message_top = "NA"
+      )
+
+      statistics=as.data.frame(
+        calc_tokenizer_statistics(
+          dataset = tokenized_texts_raw,
+          statistics_max_tokens_length = statistics_max_tokens_length,
+          step = step
+        )
+      )
+      return(statistics)
     }
   )
 )
@@ -352,6 +378,9 @@ WordPieceTokenizer <- R6::R6Class(
         args = get_called_args(n = 1),
         group = "configure"
       )
+
+      #Set package versions
+      private$set_package_versions()
 
       # Set configured to TRUE to avoid changes in the model
       private$set_configuration_to_TRUE()
@@ -457,24 +486,10 @@ WordPieceTokenizer <- R6::R6Class(
       )
 
       # Calculate tokenizer statistics
-      tokenized_texts_raw <- tokenize_dataset(
-        dataset = text_dataset$get_dataset(),
-        tokenizer = private$model,
-        max_length = statistics_max_tokens_length,
-        add_special_tokens = FALSE,
-        log_file = NULL,
-        write_interval = 2,
-        value_top = 1,
-        total_top = 1,
-        message_top = "NA"
-      )
-
-      private$tokenizer_statistics <- as.data.frame(
-        calc_tokenizer_statistics(
-          dataset = tokenized_texts_raw,
-          statistics_max_tokens_length = statistics_max_tokens_length,
-          step = "creation"
-        )
+      private$tokenizer_statistics<-self$calculate_statistics(
+        text_dataset=text_dataset,
+        statistics_max_tokens_length=statistics_max_tokens_length,
+        step="creation"
       )
 
       # Update
@@ -488,7 +503,7 @@ WordPieceTokenizer <- R6::R6Class(
   )
 )
 # Add the model to the user list
-TokenizerIndex$Bert <- ("WordPieceTokenizer")
+TokenizerIndex$WordPieceTokenizer <- ("WordPieceTokenizer")
 
 #' @title HuggingFaceTokenizer
 #' @description Abstract class for all tokenizers used with the 'transformers' library.
@@ -510,6 +525,9 @@ HuggingFaceTokenizer <- R6::R6Class(
 
       # Set configured to TRUE to avoid changes in the model
       private$set_configuration_to_TRUE()
+
+      #Set package versions
+      private$set_package_versions()
 
       # Set trained field
       private$trained <- TRUE

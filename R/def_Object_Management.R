@@ -97,8 +97,9 @@ create_object=function(class){
   } else if(class%in%object_list){
     object=eval(str2expression(class))
     return(object$new())
-    } else if(class%in%names(object_list)){
-      object=eval(str2expression(object_list[[class]]))
+    } else if(class%in%tolower(names(object_list))){
+      index=which(x=(class==tolower(names(object_list))))
+      object=eval(str2expression(object_list[[index]]))
       return(object$new())
   } else {
     stop(paste0("Object ",class," is not implemented in this function."))

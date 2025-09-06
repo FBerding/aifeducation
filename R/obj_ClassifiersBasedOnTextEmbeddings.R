@@ -250,18 +250,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           stop("Object passed to feature_extractor must be an object of class
                TEFeatureExtractor or NULL.")
         } else {
-          if (feature_extractor$get_ml_framework() != self$get_ml_framework()) {
-            stop("The machine learning framework of the feature extractior and
-                 classifier do not match. Please provide a feature extractor
-                 with the same machine learning framework as the classifier.")
-          } else {
-            if (feature_extractor$is_trained() == FALSE) {
+                      if (feature_extractor$is_trained() == FALSE) {
               stop("The supplied feature extractor is not trained. Please
                 provide trained feature extractor and try again.")
             }
           }
         }
-      }
+
     },
     #--------------------------------------------------------------------------
     #' @description Method for checking if provided text embeddings must be compressed via a [TEFeatureExtractor] before
@@ -303,6 +298,27 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         } else {
           return(FALSE)
         }
+      }
+    },
+    #-------------------------------------------------------------------------
+    #' @description Method for saving a model.
+    #' @param dir_path `string` Path of the directory where the model should be saved.
+    #' @param folder_name `string` Name of the folder that should be created within the directory.
+    #' @return Function does not return a value. It saves the model to disk.
+    save = function(dir_path, folder_name) {
+      # Save the classifier
+      super$save(
+        dir_path = dir_path,
+        folder_name = folder_name
+      )
+
+      # Save the feature extractor if necessary
+      if (private$model_config$use_fe == TRUE) {
+        save_to_disk(
+          object = self$feature_extractor,
+          dir_path = paste0(dir_path, "/", folder_name),
+          folder_name = "feature_extractor"
+        )
       }
     },
     #--------------------------------------------------------------------------
@@ -1062,11 +1078,6 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Check
       check_class(object = feature_extractor, object_name = "feature_extractor", classes = "TEFeatureExtractor", allow_NULL = TRUE)
       if (!is.null(feature_extractor)) {
-        if (feature_extractor$get_ml_framework() != private$ml_framework) {
-          stop("The machine learning framework of the feature extractior and
-                 classifier do not match. Please provide a feature extractor
-                 with the same machine learning framework as the classifier.")
-        }
 
         if (feature_extractor$is_trained() == FALSE) {
           stop("The supplied feature extractor is not trained. Please
@@ -1074,7 +1085,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         }
 
         private$model_config$use_fe <- TRUE
-        private$model_config$features <- feature_extractor$model_config$features
+        private$model_config$features <- feature_extractor$get_model_config()$features
         self$feature_extractor <- feature_extractor$clone(deep = TRUE)
       } else {
         private$model_config$use_fe <- FALSE

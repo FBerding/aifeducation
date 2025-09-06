@@ -238,6 +238,9 @@ TextEmbeddingModel <- R6::R6Class(
       # Check and set pooling type
       private$check_and_set_pooling_type(emb_pool_type)
 
+      #Set package versions
+      private$set_package_versions()
+
       # Close config
       private$set_configuration_to_TRUE()
     },
@@ -261,13 +264,15 @@ TextEmbeddingModel <- R6::R6Class(
       )
       if(version_lower){
         #Old version that does not use BaseModel and Tokenizer
-        tmp_pytorch_model=transformers$AutoModelForMaskedLM$from_pretrained(model_dir=dir_path)
-        tmp_type=detect_base_model_type(tmp_pytorch_model)
+        path_to_files=paste0(dir_path,"/","model_data")
+        tmp_pytorch_model=transformers$AutoModelForMaskedLM$from_pretrained(path_to_files)
+        tmp_type=detect_base_model_type(tmp_pytorch_model$config)
         tmp_BaseModel=create_object(tmp_type)
-        self$BaseModel<-tmp_BaseModel$create_from_hf(
-          model_dir = dir_path,
-          tokenizer_dir = dir_path
+        tmp_BaseModel$create_from_hf(
+          model_dir = path_to_files,
+          tokenizer_dir = path_to_files
         )
+        self$BaseModel<-tmp_BaseModel
       } else {
         #Regular case
         self$BaseModel <- load_from_disk(dir_path = paste0(dir_path, "/", "base_model"))
@@ -725,7 +730,7 @@ TextEmbeddingModel <- R6::R6Class(
 
       # Gather information on data
       print_message(
-        msg = "Gather information",
+        msg = "Gather Information",
         trace = trace
       )
 

@@ -285,77 +285,18 @@ BaseModelCore <- R6::R6Class(
       return(tmp_trainer)
     },
     #---------------------------------------------------------------------------
-    calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
+    calc_flops_architecture_based_iternal = function(batch_size, n_batches, n_epochs) {
       # Trace
       print_message(
         msg = "Calculate Flops Based on Architecture",
         trace = self$last_training$config$trace
       )
 
-      tokenizer <- self$Tokenizer$get_tokenizer()
-      max_seq_len <- self$get_model_config()$max_position_embeddings
-      possible_tokens <- names(self$Tokenizer$get_tokenizer()$get_vocab())
-
-      generated_texts <- vector(length = batch_size)
-      for (i in 1:length(generated_texts)) {
-        generated_texts[i] <- paste(sample(
-          x = possible_tokens,
-          size = max_seq_len,
-          replace = TRUE
-        ), collapse = " ")
-      }
-
-      res_colnames <- c(
-        "date", "approach", "package", "version",
-        "n_parameter", "batch_size", "n_batches", "n_epochs",
-        "flops_bp_1", "flops_bp_2", "flops_bp_3", "flops_counted"
+      results=self$calc_flops_architecture_based(
+        batch_size=batch_size,
+        n_batches=n_batches,
+        n_epochs=n_epochs
       )
-      results <- matrix(
-        nrow = 1,
-        ncol = length(res_colnames)
-      )
-      colnames(results) <- res_colnames
-      results <- as.data.frame(results)
-
-      bp_factors <- c(1, 2, 3)
-
-      for (bp_factor in bp_factors) {
-        est_flops <- calflops$calculate_flops(
-          model = self$get_model(),
-          input_shape = NULL,
-          transformer_tokenizer = NULL,
-          # args=[],
-          kwargs = tokenizer(
-            text = generated_texts,
-            truncation = TRUE,
-            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
-            return_tensors = "pt",
-            return_token_type_ids = (private$model_type != AIFETrType$mpnet)
-          ),
-          forward_mode = "forward",
-          include_backPropagation = TRUE,
-          compute_bp_factor = bp_factor,
-          print_results = FALSE,
-          print_detailed = FALSE,
-          output_as_string = FALSE,
-          output_precision = 2L,
-          output_unit = NULL,
-          ignore_modules = NULL
-        )
-        results[1, "n_parameter"] <- est_flops[[3]]
-        results[1, "batch_size"] <- batch_size
-        results[1, paste0("flops_bp_", bp_factor)] <- est_flops[[1]] * n_batches * n_epochs
-      }
-      results[1, "approach"] <- "architecture-based"
-      results[1, "package"] <- "calflops"
-
-      results[1, "n_batches"] <- n_batches
-      results[1, "n_epochs"] <- n_epochs
-
-      package_list <- reticulate::py_list_packages()
-      results[1, "version"] <- package_list$version[which(package_list$package == "calflops")]
-
-      results[1, "date"] <- date()
 
       private$flops_estimates <- rbind(
         private$flops_estimates,
@@ -406,6 +347,9 @@ BaseModelCore <- R6::R6Class(
       # Create the tokenizer
       self$Tokenizer <- args$tokenizer$clone(deep = TRUE)
 
+      #Set package versions
+      private$set_package_versions()
+
       # Prevent the object from modification
       private$set_configuration_to_TRUE()
     },
@@ -445,13 +389,12 @@ BaseModelCore <- R6::R6Class(
 
       # Calculate Flops based on architecture-approach
       if(private$model_type!="longformer"){
-        private$calc_flops_architecture_based(
-          batch_size = self$last_training$config$batch_size,
-          n_batches = ceiling(prepared_data$train$num_rows / self$last_training$config$batch_size),
-          n_epochs = self$last_training$config$n_epoch
-        )
+        private$calc_flops_architecture_based_iternal(
+            batch_size = self$last_training$config$batch_size,
+            n_batches = ceiling(prepared_data$train$num_rows / self$last_training$config$batch_size),
+            n_epochs = self$last_training$config$n_epoch
+          )
       }
-
 
       # Create Data Collator
       data_collator <- private$create_data_collator()
@@ -524,7 +467,7 @@ BaseModelCore <- R6::R6Class(
       private$load_sustainability_data(model_dir = model_dir)
 
       # Load Sustainability Data Inference
-      private$load_sustainability_data_inference(model_dir = dir_path)
+      private$load_sustainability_data_inference(model_dir = model_dir)
 
       # Load training history
       private$load_training_history(model_dir = model_dir)
@@ -950,6 +893,76 @@ BaseModelCore <- R6::R6Class(
           results
         )
       }
+    },
+    #---------------------------------------------------------------------------
+    calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
+
+      tokenizer <- self$Tokenizer$get_tokenizer()
+      max_seq_len <- self$get_model_config()$max_position_embeddings
+      possible_tokens <- names(self$Tokenizer$get_tokenizer()$get_vocab())
+
+      generated_texts <- vector(length = batch_size)
+      for (i in 1:length(generated_texts)) {
+        generated_texts[i] <- paste(sample(
+          x = possible_tokens,
+          size = max_seq_len,
+          replace = TRUE
+        ), collapse = " ")
+      }
+
+      res_colnames <- c(
+        "date", "approach", "package", "version",
+        "n_parameter", "batch_size", "n_batches", "n_epochs",
+        "flops_bp_1", "flops_bp_2", "flops_bp_3", "flops_counted"
+      )
+      results <- matrix(
+        nrow = 1,
+        ncol = length(res_colnames)
+      )
+      colnames(results) <- res_colnames
+      results <- as.data.frame(results)
+
+      bp_factors <- c(1, 2, 3)
+
+      for (bp_factor in bp_factors) {
+        est_flops <- calflops$calculate_flops(
+          model = self$get_model(),
+          input_shape = NULL,
+          transformer_tokenizer = NULL,
+          # args=[],
+          kwargs = tokenizer(
+            text = generated_texts,
+            truncation = TRUE,
+            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
+            return_tensors = "pt",
+            return_token_type_ids = (private$model_type != AIFETrType$mpnet)
+          ),
+          forward_mode = "forward",
+          include_backPropagation = TRUE,
+          compute_bp_factor = bp_factor,
+          print_results = FALSE,
+          print_detailed = FALSE,
+          output_as_string = FALSE,
+          output_precision = 2L,
+          output_unit = NULL,
+          ignore_modules = NULL
+        )
+        results[1, "n_parameter"] <- est_flops[[3]]
+        results[1, "batch_size"] <- batch_size
+        results[1, paste0("flops_bp_", bp_factor)] <- est_flops[[1]] * n_batches * n_epochs
+      }
+      results[1, "approach"] <- "architecture-based"
+      results[1, "package"] <- "calflops"
+
+      results[1, "n_batches"] <- n_batches
+      results[1, "n_epochs"] <- n_epochs
+
+      package_list <- reticulate::py_list_packages()
+      results[1, "version"] <- package_list$version[which(package_list$package == "calflops")]
+
+      results[1, "date"] <- date()
+
+      return(results)
     }
   )
 )

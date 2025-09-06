@@ -560,6 +560,16 @@ check_error_base_model_create_or_train <- function(destination_path,
 }
 
 load_and_check_base_model=function(path){
-  model=transformers$AutoModel$from_pretrained(path)
+  if(file.exists(paste0(path,"/","r_config_state.rda"))){
+    model=load_from_disk(path)
+  } else {
+    tmp_pytorch_model=transformers$AutoModelForMaskedLM$from_pretrained(model_dir=path)
+    tmp_type=detect_base_model_type(tmp_pytorch_model)
+    model=create_object(tmp_type)
+    model$create_from_hf(
+      model_dir = path,
+      tokenizer_dir = path
+    )
+    }
   return(model)
 }

@@ -100,16 +100,28 @@ Fill_Mask_Server <- function(id, model) {
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)
-      model()$get_special_tokens()
+      if("BaseModelCore" %in% class(model())){
+        model()$get_special_tokens()
+      } else {
+        model()$BaseModel$get_special_tokens()
+      }
     })
 
     # Calculate tokens for the masks--------------------------------------------
     fill_masked_solutions <- shiny::eventReactive(input$fill_mask_start, {
       shiny::req(model)
 
+      if("BaseModelCore" %in% class(model())){
+        tmp_model=model()
+      } else {
+        tmp_model=model()$BaseModel
+      }
+
+      print(input$txt_for_fill_mask)
+
       solutions <- try(
-        model()$fill_mask(
-          text = input$txt_for_fill_mask,
+        tmp_model$fill_mask(
+          masked_text = input$txt_for_fill_mask,
           n_solutions = input$n_fillments_for_fill_mask
         ),
         silent = TRUE

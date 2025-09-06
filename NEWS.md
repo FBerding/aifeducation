@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.2
+
+**Ai for Education Studio**
+
+- Fixed bug that prevents changes in the documentation to be saved.
+
 # aifeducation 1.1.0
 
 **Major Changes**

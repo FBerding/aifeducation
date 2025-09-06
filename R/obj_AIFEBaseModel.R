@@ -603,7 +603,9 @@ AIFEMaster <- R6::R6Class(
           for (arg in names(args)) {
             if (!R6::is.R6(args[[arg]]) &
               !is.factor(args[[arg]]) &
-              !arg %in% c("log_dir", "log_write_interval")) {
+              !arg %in% c("log_dir", "log_write_interval",
+                          "base_model","model_language","model_label",
+                          "model_name","tokenizer")) {
               private$model_config[arg] <- list(args[[arg]])
             }
           }

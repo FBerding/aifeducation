@@ -176,7 +176,7 @@ get_param_dict <- function() {
   param$statistics_max_tokens_length<- list(
     type = "int",
     min = 20,
-    max = Inf,
+    max = 8192,
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "Maximum sequence length for calculating the statistics.",

@@ -98,21 +98,22 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Call the core method which loads data common for all models.
       # These are documentations, licenses, model's name and label etc.
-      private$load_base_config_and_docs_general(
-        config_public = config_file$public,
-        config_private = config_file$private
-      )
+      private$load_config_file(dir_path)
+
+      #private$load_base_config_and_docs_general(
+      #  config_public = config_file$public,
+      #  config_private = config_file$private
+      #)
 
       # Check and update model_config
       # Call this method to add parameters that where added in later version
       # which are missing in the old model
-      private$update_model_config()
+      #private$update_model_config()
 
       #Check and update pad value if necessary
       private$update_pad_value()
 
       # Create and load AI model
-      private$create_reset_model()
       private$load_pytorch_model(dir_path = dir_path)
 
       #Load sustainability data
@@ -642,8 +643,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       path_pt <- paste0(dir_path, "/", "model_data", ".pt")
       path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
       private$create_reset_model()
+      private$model$to("cpu", dtype = torch$float)
       if (file.exists(path_safe_tensors)) {
-        safetensors$torch$load_model(model = private$model, filename = path_safe_tensors)
+        safetensors$torch$load_model(
+          model = private$model,
+          filename = path_safe_tensors)
       } else {
         if (file.exists(paths = path_pt) == TRUE) {
           private$model$load_state_dict(torch$load(path_pt))

@@ -148,13 +148,23 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)
-      model()$get_special_tokens()
+      if("BaseModelCore" %in% class(model())){
+        model()$get_special_tokens()
+      } else {
+        model()$BaseModel$get_special_tokens()
+      }
     })
 
     # Render Tokenizer Statistics-----------------------------------------------
     output$tokenizer_statistics <- shiny::renderTable({
       shiny::req(model)
-      return(model()$tokenizer_statistics)
+      if("BaseModelCore" %in% class(model())){
+        tmp_model=model()
+      } else {
+        tmp_model=model()$BaseModel
+      }
+
+      return(tmp_model$Tokenizer$get_tokenizer_statistics())
     })
 
     # Encode-------------------------------------------------------------------
@@ -162,10 +172,16 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     encodings <- shiny::eventReactive(input$encode_start, {
       shiny::req(model)
 
-      integer_sequence <- model()$encode(
+      if("BaseModelCore" %in% class(model())){
+        tmp_model=model()$Tokenizer
+      } else {
+        tmp_model=model()
+      }
+
+      integer_sequence <- tmp_model$encode(
         raw_text = input$text_for_encode,
         token_encodings_only = TRUE,
-        to_int = TRUE,
+        token_to_int = TRUE,
         trace = FALSE
       )[[1]]
 
@@ -176,10 +192,10 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
         integer_output[length(integer_output) + 1] <- list(shiny::tags$p(tmp_sequence))
       }
 
-      token_sequence <- model()$encode(
+      token_sequence <- tmp_model$encode(
         raw_text = input$text_for_encode,
         token_encodings_only = TRUE,
-        to_int = FALSE,
+        token_to_int = FALSE,
         trace = FALSE
       )[[1]]
 
@@ -212,12 +228,17 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     decodings <- shiny::eventReactive(input$decode_start, {
       shiny::req(model)
 
+      if("BaseModelCore" %in% class(model())){
+        tmp_model=model()$Tokenizer
+      } else {
+        tmp_model=model()
+      }
+
       # int_sequence <- stringr::str_extract_all(input$ids_for_decode, "\\d+")
-      int_sequence <- stringi::stri_extract_all_regex(str = input$ids_for_decode, pattern = "\\d+")
+      int_sequence <- list(stringi::stri_extract_all_regex(str = input$ids_for_decode, pattern = "\\d+"))
 
-      output_list_text <- model()$decode(int_sequence, to_token = FALSE)
-
-      output_list_token <- model()$decode(int_sequence, to_token = TRUE)
+      output_list_text <- tmp_model$decode(int_sequence, to_token = FALSE)[[1]]
+      output_list_token <- tmp_model$decode(int_sequence, to_token = TRUE)[[1]]
 
       text_list <- NULL
       token_list <- NULL
@@ -227,7 +248,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
         text_list[length(text_list) + 1] <- list(shiny::tags$p(output_list_text[[i]]))
 
         token_list[length(token_list) + 1] <- list(shiny::tags$p(paste("Chunk", i)))
-        token_list[length(token_list) + 1] <- list(shiny::tags$p(output_list_token[[i]]))
+        token_list[length(token_list) + 1] <- list(shiny::tags$p(unlist(output_list_token[[i]])))
       }
 
       return(list(

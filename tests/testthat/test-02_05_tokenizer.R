@@ -39,7 +39,7 @@ for(object_class_name in object_class_names){
     method = "configure",
     var_objects = list(),
     necessary_objects = list(
-      raw_text_dataset = raw_texts
+      text_dataset = raw_texts
     ),
     var_override = list(
       sustain_interval = 30,
@@ -51,7 +51,7 @@ for(object_class_name in object_class_names){
     method = "train",
     var_objects = list(),
     necessary_objects = list(
-      raw_text_dataset = raw_texts
+      text_dataset = raw_texts
     ),
     var_override = list(
       sustain_interval = 30,

@@ -27,7 +27,7 @@ BaseModel_Train_UI <- function(id) {
       ),
       # Main Page---------------------------------------------------------------
       bslib::layout_column_wrap(
-        #Base Model
+        # Base Model
         bslib::card(
           bslib::card_header("Base Model"),
           bslib::card_body(
@@ -40,34 +40,61 @@ BaseModel_Train_UI <- function(id) {
             shiny::textInput(
               inputId = shiny::NS(id, "base_model_dir"),
               label = shiny::tags$p(shiny::icon("folder"), "Path"),
-              width="100%"
+              width = "100%"
             ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_base_model"))
           )
         ),
-        #Raw Texts
-      bslib::card(
-        bslib::card_header("Input Data"),
-        bslib::card_body(
-          shinyFiles::shinyDirButton(
-            id = shiny::NS(id, "button_select_dataset_for_raw_texts"),
-            label = "Choose Collection of Raw Texts",
-            title = "Please choose a folder",
-            icon = shiny::icon("folder-open")
-          ),
-          shiny::textInput(
-            inputId = shiny::NS(id, "raw_text_dir"),
-            label = shiny::tags$p(shiny::icon("folder"), "Path"),
-            width="100%"
-          ),
-          shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
+        # Raw Texts
+        bslib::card(
+          bslib::card_header("Input Data"),
+          bslib::card_body(
+            shinyFiles::shinyDirButton(
+              id = shiny::NS(id, "button_select_dataset_for_raw_texts"),
+              label = "Choose Collection of Raw Texts",
+              title = "Please choose a folder",
+              icon = shiny::icon("folder-open")
+            ),
+            shiny::textInput(
+              inputId = shiny::NS(id, "raw_text_dir"),
+              label = shiny::tags$p(shiny::icon("folder"), "Path"),
+              width = "100%"
+            ),
+            shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
+          )
         )
-      )
       ),
-      #Main config Cards
-      shiny::uiOutput(outputId = shiny::NS(id,"base_model_train"))
+      #------------------------------------------------------------------------
+      bslib::layout_column_wrap(
+        # Tokenizer and Text Statistics calculation
+        bslib::card(
+          bslib::card_header("Tokenizer and Data Statistics"),
+          bslib::card_body(
+            shiny::actionButton(
+              inputId = shiny::NS(id, "calc_tok_statistics"),
+              label = "Calculate Data Statistics",
+              icon = shiny::icon("paper-plane")
+            ),
+            shiny::uiOutput(outputId = shiny::NS(id, "values_toc_statistics"))
+          )
+        ),
+        # Parameter and flop calculation
+        bslib::card(
+          bslib::card_header("Parameter and FLOPS"),
+          bslib::card_body(
+            shiny::actionButton(
+              inputId = shiny::NS(id, "calc_param_flops_statistics"),
+              label = "Calculate Flops Statistics",
+              icon = shiny::icon("paper-plane")
+            ),
+            shiny::uiOutput(outputId = shiny::NS(id, "values_param_flops_statistics"))
+          )
+        )
+      ),
+      # Main config Cards
+      shiny::uiOutput(outputId = shiny::NS(id, "base_model_train"))
     )
-    #)
+    # )
   )
 }
 
@@ -90,7 +117,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # File system management----------------------------------------------------
-    #Raw Texts
+    # Raw Texts
     shinyFiles::shinyDirChoose(
       input = input,
       id = "button_select_dataset_for_raw_texts",
@@ -122,7 +149,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
           type = "info",
           closeOnClickOutside = FALSE,
           showCloseButton = FALSE,
-          btn_labels=NA
+          btn_labels = NA
         )
         shinyWidgets::closeSweetAlert()
         shinyWidgets::closeSweetAlert()
@@ -132,7 +159,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Base model
+    # Base model
     shinyFiles::shinyDirChoose(
       input = input,
       id = "button_select_base_model",
@@ -156,17 +183,17 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    base_model=shiny::reactive({
-      if(!is.null(path_to_base_model())){
+    base_model <- shiny::reactive({
+      if (!is.null(path_to_base_model())) {
         shinyWidgets::show_alert(
           title = "Loading",
           text = "Please wait",
           type = "info",
           closeOnClickOutside = FALSE,
           showCloseButton = FALSE,
-          btn_labels=NA
+          btn_labels = NA
         )
-        model=load_and_check_base_model(path_to_base_model())
+        model <- load_and_check_base_model(path_to_base_model())
         shinyWidgets::closeSweetAlert()
         shinyWidgets::closeSweetAlert()
         return(model)
@@ -176,29 +203,104 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
     })
 
     # Detect type of model
-    base_model_type=shiny::reactive({
-      model=base_model()
-      if(!is.null(model)){
-        model_type=try(detect_base_model_type(model),silent = TRUE)
-        if(inherits(x=model_type,what = "try-error")){
-          display_errors(error_messages="Type of transformer model not supported.")
-          return(NULL)
-        } else {
-          return(model_type)
-        }
+    base_model_type <- shiny::reactive({
+      model <- base_model()
+      if (!is.null(model)) {
+        type <- unlist(
+          intersect(
+            x = class(model),
+            y = BaseModelsIndex
+          )
+        )
+        return(type)
       } else {
         return(NULL)
       }
     })
 
-    #Card of Model Configuration------------------------------------------------
-    output$base_model_train<-shiny::renderUI({
-      if(!is.null(base_model_type())){
-        config_box=create_widget_card(
-          id=id,
-          object_class=base_model_type(),
+    # Tokenizer statistics--------------------------------------------------------------------------
+    tok_statistics <- shiny::eventReactive(input$calc_tok_statistics,{
+      if (!is.null(base_model()) & !is.null(data_raw_texts())) {
+        display_processing()
+
+        tokenizer <- base_model()$Tokenizer
+
+        shiny::removeModal()
+        shiny::removeModal()
+        return(tokenizer$calculate_statistics(
+          text_dataset = data_raw_texts(),
+          statistics_max_tokens_length = 512,
+          step = "creation"
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+
+    output$values_toc_statistics <- shiny::renderUI({
+      table <- tok_statistics()
+      if (!is.null(table)) {
+        return(
+          bslib::value_box(
+            title = "Tokens per Word",
+            value = table$mu_g,
+            shiny::tags$p(
+              "Total Words:", format(x = table$n_words, big.mark = ",")
+            ),
+            shiny::tags$p(
+              "Total Tokens: ", format(x = table$n_tokens, big.mark = ",")
+            )
+          )
+        )
+      } else {
+        return(NULL)
+      }
+    })
+
+    # FLOPS and Parameter statistics--------------------------------------------------------------------------
+    flop_statistics <- shiny::eventReactive(input$calc_param_flops_statistics, {
+      if (!is.null(tok_statistics()) &!is.null(base_model())) {
+        display_processing()
+
+        flops_statistics=base_model()$calc_flops_architecture_based(
+          batch_size = input$batch_size,
+          n_batches = ceiling(tok_statistics()$n_tokens / input$batch_size),
+          n_epochs = input$n_epoch
+          )
+
+        shiny::removeModal()
+        shiny::removeModal()
+        return(flops_statistics)
+      } else {
+        return(NULL)
+      }
+    })
+
+    output$values_param_flops_statistics <- shiny::renderUI({
+      table <- flop_statistics()
+      if (!is.null(table)) {
+        return(
+          bslib::value_box(
+            title = "Parameter",
+            value = table$n_parameter,
+            shiny::tags$p("N Epochs:", input$n_epoch),
+            shiny::tags$p("Total Flops (factor 2):", format(x = table$flops_bp_2, scientific=TRUE)),
+            shiny::tags$p("Total Flops (factor 3):", format(x = table$flops_bp_3, scientific=TRUE))
+          )
+        )
+      } else {
+        return(NULL)
+      }
+    })
+
+    # Card of Model Configuration------------------------------------------------
+    output$base_model_train <- shiny::renderUI({
+      if (!is.null(base_model_type())) {
+        config_box <- create_widget_card(
+          id = id,
+          object_class = base_model_type(),
           method = "train",
-          box_title="Training Settings"
+          box_title = "Training Settings"
         )
         return(config_box)
       } else {
@@ -261,16 +363,16 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Start creation-------------------------------------------------------------
+    # Start creation-------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
       # Remove Save Modal
       shiny::removeModal()
 
       # Check for errors
       errors <- check_error_base_model_create_or_train(
-        destination_path=input$save_modal_directory_path,
-        folder_name=input$save_modal_folder_name,
-        path_to_raw_texts=path_to_raw_texts()
+        destination_path = input$save_modal_directory_path,
+        folder_name = input$save_modal_folder_name,
+        path_to_raw_texts = path_to_raw_texts()
       )
 
       # If there are errors display them. If not start running task.
@@ -288,30 +390,31 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "train_transformer",
           ExtendedTask_arguments = list(
-            train=summarize_args_for_long_task(
-              input=input,
-              object_class=base_model_type(),
-              method="train",
-              path_args=list(
-                path_to_embeddings=NULL,
-                path_to_target_data=NULL,
-                path_to_textual_dataset=path_to_raw_texts(),
-                path_to_feature_extractor=NULL,
-                destination_path=input$save_modal_directory_path,
-                folder_name=input$save_modal_folder_name
+            train = summarize_args_for_long_task(
+              input = input,
+              object_class = base_model_type(),
+              method = "train",
+              path_args = list(
+                path_to_embeddings = NULL,
+                path_to_target_data = NULL,
+                path_to_textual_dataset = path_to_raw_texts(),
+                path_to_base_model=path_to_base_model(),
+                path_to_feature_extractor = NULL,
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
               ),
-              override_args=list(
-                output_dir=paste0(input$save_modal_directory_path,"/",input$save_modal_folder_name),
-                model_dir_path=path_to_base_model(),
-                sustain_track=TRUE,
+              override_args = list(
+                output_dir = paste0(input$save_modal_directory_path, "/", input$save_modal_folder_name),
+                model_dir_path = path_to_base_model(),
+                sustain_track = TRUE,
                 log_dir = log_dir,
-                trace=FALSE,
-                pytorch_safetensors=TRUE
+                trace = FALSE,
+                pytorch_safetensors = TRUE
               ),
-              meta_args=list(
-                py_environment_type=get_py_env_type(),
-                py_env_name=get_py_env_name(),
-                object_class=base_model_type()
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
+                object_class = base_model_type()
               )
             )
           ),

@@ -21,8 +21,13 @@ BaseModel_Create_UI <- function(id) {
         shiny::tags$hr(),
         shiny::selectInput(
           inputId = shiny::NS(id, "base_model_type"),
-          choices = unlist(AIFETrType),
+          choices = unname(unlist(BaseModelsIndex)),
           label = "Base Model Type"
+        ),
+        shiny::selectInput(
+          inputId = shiny::NS(id, "tokenizer_model_type"),
+          choices = setdiff(x = unname(unlist(TokenizerIndex)), y = "HuggingFaceTokenizer"),
+          label = "Tokenizer Model Type"
         ),
         shiny::tags$hr(),
         shinyFiles::shinyDirButton(
@@ -33,7 +38,7 @@ BaseModel_Create_UI <- function(id) {
         )
       ),
       # Main Page---------------------------------------------------------------
-      #bslib::layout_column_wrap(
+      # bslib::layout_column_wrap(
       bslib::card(
         bslib::card_header("Input Data"),
         bslib::card_body(
@@ -46,17 +51,39 @@ BaseModel_Create_UI <- function(id) {
           shiny::textInput(
             inputId = shiny::NS(id, "raw_text_dir"),
             label = shiny::tags$p(shiny::icon("folder"), "Path"),
-            width="100%"
+            width = "100%"
           ),
           shinycssloaders::withSpinner(
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_raw_texts"))
           )
         )
       ),
-      #Main config Cards
-      shiny::uiOutput(outputId = shiny::NS(id,"base_model_create"))
-      )
-    #)
+      # Tokenizer
+      bslib::card(
+        bslib::card_header("Tokenizer"),
+        bslib::card_body(
+          bslib::layout_column_wrap(
+            heights_equal = "row",
+            shiny::uiOutput(outputId = shiny::NS(id, "base_model_create_tokenizer")),
+            shiny::uiOutput(outputId = shiny::NS(id, "base_model_train_tokenizer")),
+            bslib::card(
+              bslib::card_header("Statistics"),
+              bslib::card_body(
+                shiny::actionButton(
+                  inputId = shiny::NS(id, "calc_tok_statistics"),
+                  label = "Calculate Statistics",
+                  icon = shiny::icon("paper-plane")
+                ),
+                shiny::uiOutput(outputId = shiny::NS(id, "values_toc_statistics"))
+              )
+            )
+          )
+        )
+      ),
+      # Base Model
+      shiny::uiOutput(outputId = shiny::NS(id, "base_model_create"))
+    )
+    # )
   )
 }
 
@@ -79,7 +106,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
     log_path <- paste0(log_dir, "/aifeducation_state.log")
 
     # File system management----------------------------------------------------
-    #Raw Texts
+    # Raw Texts
     shinyFiles::shinyDirChoose(
       input = input,
       id = "button_select_dataset_for_raw_texts",
@@ -111,13 +138,32 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Card of Model Configuration------------------------------------------------
-    output$base_model_create<-shiny::renderUI({
-      config_box=create_widget_card(
-        id=id,
-        object_class=input$base_model_type,
-        method = "create",
-        box_title="Model Configuration"
+    # Card for the tokenizer--------------------------------------------------
+    output$base_model_create_tokenizer <- shiny::renderUI({
+      config_box <- create_widget_card(
+        id = id,
+        object_class = input$tokenizer_model_type,
+        method = "configure",
+        box_title = "Configuration"
+      )
+    })
+
+    output$base_model_train_tokenizer <- shiny::renderUI({
+      config_box <- create_widget_card(
+        id = id,
+        object_class = input$tokenizer_model_type,
+        method = "train",
+        box_title = "Training Settings"
+      )
+    })
+
+    # Card of Model Configuration------------------------------------------------
+    output$base_model_create <- shiny::renderUI({
+      config_box <- create_widget_card(
+        id = id,
+        object_class = input$base_model_type,
+        method = "configure",
+        box_title = "Base Model Configuration"
       )
     })
 
@@ -153,17 +199,67 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Start creation-------------------------------------------------------------
+    # Tokenizer statistics--------------------------------------------------------------------------
+    tok_statistics <- shiny::eventReactive(input$calc_tok_statistics, {
+      if (!is.null(data_raw_texts())) {
+        display_processing()
+
+        tokenizer <- create_object(input$tokenizer_model_type)
+
+        do.call(
+          what = tokenizer$configure,
+          args = extract_args_from_input(input = input, arg_names = rlang::fn_fmls_names(tokenizer$configure))
+        )
+
+        tokenizer$train(
+          text_dataset = data_raw_texts(),
+          statistics_max_tokens_length = 512,
+          sustain_track = FALSE,
+          sustain_iso_code = NULL,
+          sustain_region = NULL,
+          sustain_interval = 15,
+          trace = FALSE
+        )
+
+        shiny::removeModal()
+        shiny::removeModal()
+        return(tokenizer$get_tokenizer_statistics())
+      } else {
+        return(NULL)
+      }
+    })
+
+    output$values_toc_statistics <- shiny::renderUI({
+      table <- tok_statistics()
+      if (!is.null(table)) {
+        return(
+          bslib::value_box(
+            title = "Tokens per Word",
+            value = table$mu_g,
+            shiny::tags$p(
+              "Total Words:", format(x = table$n_words, big.mark = ",")
+            ),
+            shiny::tags$p(
+              "Total Tokens: ", format(x = table$n_tokens, big.mark = ",")
+            )
+          )
+        )
+      } else {
+        return(NULL)
+      }
+    })
+
+    # Start creation-------------------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
       # Remove Save Modal
       shiny::removeModal()
 
       # Check for errors
       errors <- check_error_base_model_create_or_train(
-        destination_path=input$save_modal_directory_path,
-        folder_name=input$save_modal_folder_name,
-        path_to_raw_texts=path_to_raw_texts()
-        )
+        destination_path = input$save_modal_directory_path,
+        folder_name = input$save_modal_folder_name,
+        path_to_raw_texts = path_to_raw_texts()
+      )
 
       # If there are errors display them. If not start running task.
       if (!is.null(errors)) {
@@ -179,29 +275,82 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "create_transformer",
           ExtendedTask_arguments = list(
-            create=summarize_args_for_long_task(
-              input=input,
-              object_class=input$base_model_type,
-              method="create",
-              path_args=list(
-                path_to_embeddings=NULL,
-                path_to_target_data=NULL,
-                path_to_textual_dataset=path_to_raw_texts(),
-                path_to_feature_extractor=NULL,
-                destination_path=input$save_modal_directory_path,
-                folder_name=input$save_modal_folder_name
+            #Tokenizer config
+            tok_configure = summarize_args_for_long_task(
+              input = input,
+              object_class = input$tokenizer_model_type,
+              method = "configure",
+              path_args = list(
+                path_to_embeddings = NULL,
+                path_to_target_data = NULL,
+                path_to_textual_dataset = path_to_raw_texts(),
+                path_to_feature_extractor = NULL,
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
               ),
-              override_args=list(
-                model_dir=paste0(input$save_modal_directory_path,"/",input$save_modal_folder_name),
-                sustain_track=TRUE,
+              override_args = list(
+                model_dir = paste0(input$save_modal_directory_path, "/", input$save_modal_folder_name),
+                sustain_track = TRUE,
                 log_dir = log_dir,
-                trace=FALSE,
-                pytorch_safetensors=TRUE
+                trace = FALSE,
+                pytorch_safetensors = TRUE
               ),
-              meta_args=list(
-                py_environment_type=get_py_env_type(),
-                py_env_name=get_py_env_name(),
-                object_class=input$base_model_type
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
+                object_class = input$tokenizer_model_type
+              )
+            ),
+            #Tokenizer Train
+            tok_train = summarize_args_for_long_task(
+              input = input,
+              object_class = input$tokenizer_model_type,
+              method = "train",
+              path_args = list(
+                path_to_embeddings = NULL,
+                path_to_target_data = NULL,
+                path_to_textual_dataset = path_to_raw_texts(),
+                path_to_feature_extractor = NULL,
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
+              ),
+              override_args = list(
+                model_dir = paste0(input$save_modal_directory_path, "/", input$save_modal_folder_name),
+                sustain_track = TRUE,
+                log_dir = log_dir,
+                trace = FALSE,
+                pytorch_safetensors = TRUE
+              ),
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
+                object_class = input$tokenizer_model_type
+              )
+            ),
+            #Base Model config
+            bm_configure = summarize_args_for_long_task(
+              input = input,
+              object_class = input$base_model_type,
+              method = "configure",
+              path_args = list(
+                path_to_embeddings = NULL,
+                path_to_target_data = NULL,
+                path_to_textual_dataset = path_to_raw_texts(),
+                path_to_feature_extractor = NULL,
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
+              ),
+              override_args = list(
+                model_dir = paste0(input$save_modal_directory_path, "/", input$save_modal_folder_name),
+                sustain_track = TRUE,
+                log_dir = log_dir,
+                trace = FALSE,
+                pytorch_safetensors = TRUE
+              ),
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
+                object_class = input$base_model_type
               )
             )
           ),
@@ -226,6 +375,5 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
         return(NULL)
       }
     })
-
   })
 }

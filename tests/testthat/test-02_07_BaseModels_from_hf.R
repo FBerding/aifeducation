@@ -177,10 +177,10 @@ for (object_class_name in object_class_names) {
     test_that(paste(
       "Sustainaility Inference Fill-Mask",
       object_class_name,
-      get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
       n_repeat=2
+      start_values=nrow(base_model$get_sustainability_data("inference"))
       for(j in 1:n_repeat){
         base_model$estimate_sustainability_inference_fill_mask(
           text_dataset=raw_texts_training,
@@ -190,14 +190,13 @@ for (object_class_name in object_class_names) {
           sustain_interval = 15,
           trace = train_args$trace
         )
-        expect_equal(nrow(base_model$get_sustainability_data("inference")),j)
+        expect_equal(nrow(base_model$get_sustainability_data("inference")),j+start_values)
       }
     })
 
     test_that(paste(
       "Flops Estimates",
       object_class_name,
-      get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
       expect_equal(nrow(base_model$get_flops_estimates()), 1)
