@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, version_1_1_0]
+    branches: [main, master, version_1_1_2_dev]
   pull_request:
-    branches: [main, master, version_1_1_0]
+    branches: [main, master, version_1_1_2_dev]
 
 name: R-CMD-check
 
@@ -46,7 +46,7 @@ jobs:
         with:
           activate-environment: r-reticulate
           auto-update-conda: true
-          python-version: 3.11
+          python-version: 3.12
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible

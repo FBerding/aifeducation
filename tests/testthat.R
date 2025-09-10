@@ -9,4 +9,13 @@
 library(testthat)
 library(aifeducation)
 
-test_check("aifeducation")
+if(Sys.getenv("CI") == "true"){
+  testthat::set_max_fails(20)
+  test_check(package="aifeducation",
+             reporter =  testthat::MinimalReporter$new())
+} else {
+  test_check(package="aifeducation",
+             reporter =  testthat::SummaryReporter$new())
+}
+
+

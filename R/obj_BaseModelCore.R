@@ -621,6 +621,7 @@ BaseModelCore <- R6::R6Class(
 
       framework <- "pt"
       private$model$to("cpu")
+      private$model$eval()
 
       if (private$model_type != "mpnet") {
         run_py_file("FillMaskForMPLM.py")

@@ -17,8 +17,7 @@ Conference of the North (pp. 4171--4186). Association for Computational Linguist
 \seealso{
 Other Base Model: 
 \code{\link{BaseModelMPNet}},
-\code{\link{BaseModelModernBert}},
-\code{\link{BaseModelRoberta}}
+\code{\link{BaseModelModernBert}}
 }
 \concept{Base Model}
 \section{Super classes}{

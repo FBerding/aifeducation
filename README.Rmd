@@ -60,7 +60,8 @@ special conditions of the educational and social sciences.
 -   Supports ModernBERT, MPNet, BERT, RoBERTa, Longformer, and Funnel
     Transformer for creating context-sensitive text embedding.
 -   Makes sharing pre-trained models very easy.
--   Integrates sustainability tracking.
+-   Integrates sustainability tracking for training and inference.
+-   Integrates an approach to calculate FLOPS based on model's architecture.
 -   Integrates special statistical techniques for dealing with data
     structures common in the social and educational sciences.
 -   Supports the classification of long text documents.

@@ -64,6 +64,7 @@ BaseModelMPNet <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     load_BaseModel=function(dir_path){
+      run_py_file("MPNetForMPLM_PT.py")
       private$model <- py$MPNetForMPLM_PT$from_pretrained(
         dir_path,
         from_tf = FALSE,

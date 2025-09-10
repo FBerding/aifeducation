@@ -26,14 +26,15 @@ test_tmp_data_base_model_path=paste0(test_tmp_data_path,"/","TEM")
 create_dir(test_tmp_data_base_model_path, FALSE)
 
 # Test Configuration
-object_class_names <- c(
-  "BaseModelBert",
-  #"BaseModelFunnel",
-  #"BaseModelLongformer",
-  "BaseModelModernBert",
-  "BaseModelRoberta",
-  "BaseModelMPNet"
-  )
+object_class_names=BaseModelsIndex
+#object_class_names <- c(
+#  "BaseModelBert",
+#  #"BaseModelFunnel",
+#  #"BaseModelLongformer",
+#  "BaseModelModernBert",
+#  #"BaseModelRoberta",
+#  "BaseModelMPNet"
+#  )
 
 for (object_class_name in object_class_names) {
   # Data Management

@@ -68,34 +68,6 @@ arma::cube matrix_to_array_c(arma::mat matrix,
 }
 
 
-//'Transforming classes to one-hot encoding
-//'
-//'Function written in C++ transforming a vector of classes (int) into
-//'a binary class matrix.
-//'
-//'@param class_vector \code{vector} containing integers for every class. The
-//'integers must range from 0 to n_classes-1.
-//'@param n_classes \code{int} Total number of classes.
-//'@return Returns a \code{matrix} containing the binary representation for
-//'every class.
-//'
-//'@import Rcpp
-//'@useDynLib aifeducation, .registration = TRUE
-//'@family Utils Developers
-//'@export
-// [[Rcpp::export]]
- arma::mat to_categorical_c(arma::vec class_vector,
-                             arma::uword n_classes){
-   arma::uword i=0;
-   arma::mat binary_class_rep(class_vector.n_elem, n_classes);
-
-   for(i=0;i<binary_class_rep.n_rows;i++){
-     binary_class_rep(i,class_vector(i))=1;
-     }
-
-   return binary_class_rep;
- }
-
 //' Transform tensor to matrix
 //'
 //' Function written in C++ for transformation the tensor (with size batch x times x features) to the matrix (with

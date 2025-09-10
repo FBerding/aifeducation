@@ -47,9 +47,13 @@ reference:
 - contents:
   - has_concept("Data Management")
 
+- subtitle: Tokenizer
+- contents:
+  - has_concept("Tokenizer")
+
 - subtitle: Base Models and Transformers
 - contents:
-  - has_concept("Transformer")
+  - has_concept("Base Model")
 
 - subtitle: Text Embedding Models
 - contents:
@@ -80,16 +84,9 @@ reference:
 - contents:
   - has_concept("R6 classes for transformers")
 
-- subtitle: Functions for Loading
-- contents:
-  - has_concept("Transformers for developers")
-
-- subtitle: Utils for Transformers
+- subtitle: Utils for Tokenizer
 - contents:
   - has_concept("Utils Transformers Developers")
-
-#- subtitle: Utils for creating transformers
-#  - has_concept("Utils Transformers Creation Developers")
 
 - subtitle: Oversampling Approaches
 - contents:

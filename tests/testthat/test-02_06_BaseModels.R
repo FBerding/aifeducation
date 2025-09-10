@@ -30,14 +30,15 @@ example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
 # Test Configuration
-object_class_names <- c(
-  "BaseModelBert",
-  #"BaseModelFunnel",
-  #"BaseModelLongformer"#,
-  "BaseModelModernBert",
-  "BaseModelRoberta",
-  "BaseModelMPNet"
-)
+object_class_names=BaseModelsIndex
+#object_class_names <- c(
+#  "BaseModelBert",
+#  #"BaseModelFunnel",
+#  #"BaseModelLongformer"#,
+#  "BaseModelModernBert",
+#  "BaseModelRoberta",
+#  "BaseModelMPNet"
+#)
 
 max_samples <- 1
 max_samples_CI <- 1

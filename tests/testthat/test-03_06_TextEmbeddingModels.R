@@ -48,15 +48,17 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 # Set Chunks
 chunks <- sample(x = c(4, 10), size = 1, replace = FALSE)
 
-base_model_type_list <- list(
-    "BaseModelBert"#,
-    #"BaseModelFunnel",
-    #"BaseModelLongformer",
-    #"BaseModelMPNet",
-    #"deberta_v2",
-  #  "BaseModelModernBert",
-   # "BaseModelRoberta"
-)
+base_model_type_list=BaseModelsIndex
+
+#base_model_type_list <- list(
+#    "BaseModelBert"#,
+#    #"BaseModelFunnel",
+#    #"BaseModelLongformer",
+#    #"BaseModelMPNet",
+#    #"deberta_v2",
+#  #  "BaseModelModernBert",
+#   # "BaseModelRoberta"
+#)
 
 pooling_type_list <- list(
   "BaseModelFunnel" = c("CLS"),

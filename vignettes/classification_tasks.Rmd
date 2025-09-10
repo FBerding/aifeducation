@@ -956,7 +956,7 @@ is not counted directly. Instead it is estimated approximately. The column 'flop
 describes the number of FLOPS for all forwand and backward passes.
 
 Kaplan et al. (2020, p. 7) propose that as a rule of thumb the backward pass has the
-flops of the forward pass multiplied with factor 2. The resulting FLOPS for all
+FLOPS of the forward pass multiplied with factor 2. The resulting FLOPS for all
 forward and backward passes of a training run are shown in column 'flops_bp_2'. 
 
 All columns do **not** include computations for a validation or test sample.

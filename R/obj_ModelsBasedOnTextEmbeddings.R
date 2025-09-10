@@ -437,9 +437,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           warning("Class does not have a method `configure`.")
         }
       }
-      #print(private$model_config)
-
-
     },
     #-------------------------------------------------------------------------
     update_pad_value=function(){
@@ -644,7 +641,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
       private$create_reset_model()
       private$model$to("cpu", dtype = torch$float32)
-      print(private$model)
+
       if (file.exists(path_safe_tensors)) {
         safetensors$torch$load_model(
           model = private$model,
