@@ -473,6 +473,7 @@ TEFeatureExtractor <- R6::R6Class(
     create_reset_model = function() {
       private$load_reload_python_scripts()
       private$check_config_for_TRUE()
+
       if (private$model_config$method == "LSTM") {
         private$model <- py$LSTMAutoencoder_with_Mask_PT(
           times = as.integer(private$text_embedding_model["times"]),

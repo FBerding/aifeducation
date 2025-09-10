@@ -26,8 +26,11 @@ example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
 #Test Configuration
-object_class_names=c("WordPieceTokenizer")
-samples_per_object=4
+object_class_names=setdiff(x=TokenizerIndex,y="HuggingFaceTokenizer")
+samples_per_object=5
+
+#object_class_names=c("WordPieceTokenizer")
+#object_class_names=c("BPETokenizer")
 
 #Tests
 for(object_class_name in object_class_names){
@@ -91,9 +94,9 @@ for(object_class_name in object_class_names){
 
       # Sustainability
       if (training_args$sustain_track == TRUE) {
-        expect_equal(nrow(tokenizer$get_sustainability_data()$track_log), 1)
+        expect_equal(nrow(tokenizer$get_sustainability_data()), 1)
       } else {
-        expect_equal(nrow(tokenizer$get_sustainability_data()$track_log), 0)
+        expect_equal(nrow(tokenizer$get_sustainability_data()), 0)
       }
 
       # Save and Load

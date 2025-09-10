@@ -69,6 +69,7 @@ recall, and f1 for every fold.
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-check_embedding_model}{\code{ClassifiersBasedOnTextEmbeddings$check_embedding_model()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-check_feature_extractor_object_type}{\code{ClassifiersBasedOnTextEmbeddings$check_feature_extractor_object_type()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-requires_compression}{\code{ClassifiersBasedOnTextEmbeddings$requires_compression()}}
+\item \href{#method-ClassifiersBasedOnTextEmbeddings-save}{\code{ClassifiersBasedOnTextEmbeddings$save()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-load_from_disk}{\code{ClassifiersBasedOnTextEmbeddings$load_from_disk()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-adjust_target_levels}{\code{ClassifiersBasedOnTextEmbeddings$adjust_target_levels()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_training_history}{\code{ClassifiersBasedOnTextEmbeddings$plot_training_history()}}
@@ -99,7 +100,6 @@ recall, and f1 for every fold.
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="count_parameter"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-count_parameter'><code>aifeducation::AIFEBaseModel$count_parameter()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model'><code>aifeducation::ModelsBasedOnTextEmbeddings$get_text_embedding_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model_name'><code>aifeducation::ModelsBasedOnTextEmbeddings$get_text_embedding_model_name()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="save"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-save'><code>aifeducation::ModelsBasedOnTextEmbeddings$save()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -209,6 +209,28 @@ processing.
 }
 \subsection{Returns}{
 Return \code{TRUE} if a compression is necessary and \code{FALSE} if not.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ClassifiersBasedOnTextEmbeddings-save"></a>}}
+\if{latex}{\out{\hypertarget{method-ClassifiersBasedOnTextEmbeddings-save}{}}}
+\subsection{Method \code{save()}}{
+Method for saving a model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ClassifiersBasedOnTextEmbeddings$save(dir_path, folder_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir_path}}{\code{string} Path of the directory where the model should be saved.}
+
+\item{\code{folder_name}}{\code{string} Name of the folder that should be created within the directory.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Function does not return a value. It saves the model to disk.
 }
 }
 \if{html}{\out{<hr>}}

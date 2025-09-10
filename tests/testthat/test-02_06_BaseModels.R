@@ -21,7 +21,7 @@ create_dir(test_art_tmp_path, FALSE)
 
 test_tmp_data_path <- testthat::test_path("test_data_tmp")
 create_dir(test_tmp_data_path, FALSE)
-test_tmp_data_base_model_path=paste0(test_tmp_data_path,"/","TEM")
+test_tmp_data_base_model_path <- paste0(test_tmp_data_path, "/", "TEM")
 
 create_dir(test_tmp_data_base_model_path, FALSE)
 
@@ -37,7 +37,7 @@ object_class_names <- c(
   "BaseModelModernBert",
   "BaseModelRoberta",
   "BaseModelMPNet"
-  )
+)
 
 max_samples <- 1
 max_samples_CI <- 1
@@ -50,24 +50,27 @@ samples_config <- check_adjust_n_samples_on_CI(
 
 for (object_class_name in object_class_names) {
   for (i in 1:samples_config) {
-
-# Prepare Tokenizer for the models
+    # Prepare Tokenizer for the models
     raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
 
-tokenizer <- WordPieceTokenizer$new()
-tokenizer$configure(
-  vocab_size = 2000,
-  vocab_do_lower_case = TRUE
-)
-tokenizer$train(
-  text_dataset = raw_texts,
-  statistics_max_tokens_length = 256,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  trace = FALSE
-)
+    tok_type=sample(
+      x=setdiff(x=unlist(TokenizerIndex),y="HuggingFaceTokenizer"),
+      size=1
+      )
+    tokenizer <- create_object(tok_type)
+    tokenizer$configure(
+      vocab_size = 2000,
+      vocab_do_lower_case = sample(x=c(TRUE,FALSE),size=1)
+    )
+    tokenizer$train(
+      text_dataset = raw_texts,
+      statistics_max_tokens_length = 256,
+      sustain_track = TRUE,
+      sustain_iso_code = "DEU",
+      sustain_region = NULL,
+      sustain_interval = 15,
+      trace = FALSE
+    )
 
     config_args <- generate_args_for_tests(
       object_name = object_class_name,
@@ -85,7 +88,7 @@ tokenizer$train(
         max_position_embeddings = 512,
         hidden_size = 16,
         num_hidden_layers = 3,
-        attention_window=4,
+        attention_window = 4,
         num_attention_heads = 2,
         intermediate_size = 32
       )
@@ -108,7 +111,7 @@ tokenizer$train(
       )
     )
 
-    #Create and train model
+    # Create and train model
     base_model <- create_object(object_class_name)
     do.call(
       what = base_model$configure,
@@ -119,10 +122,10 @@ tokenizer$train(
       args = train_args
     )
 
-    #Prepare directory
+    # Prepare directory
     tmp_dir <- paste0(test_art_tmp_path, "/", object_class_name)
     # Clear directory for next test
-    unlink(paste0(tmp_dir,"/",object_class_name), recursive = TRUE)
+    unlink(paste0(tmp_dir, "/", object_class_name), recursive = TRUE)
     create_dir(tmp_dir, trace = FALSE)
 
     #--------------------------------------------------------------------------
@@ -132,7 +135,6 @@ tokenizer$train(
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-
       expect_no_error(
         save_to_disk(
           object = base_model,
@@ -149,9 +151,9 @@ tokenizer$train(
       get_current_args_for_print(train_args)
     ), {
       if (train_args$sustain_track == TRUE) {
-        expect_equal(nrow(base_model$get_sustainability_data()$track_log), 1)
+        expect_equal(nrow(base_model$get_sustainability_data()), 1)
       } else {
-        expect_equal(nrow(base_model$get_sustainability_data()$track_log), 0)
+        expect_equal(nrow(base_model$get_sustainability_data()), 0)
       }
     })
 
@@ -161,17 +163,17 @@ tokenizer$train(
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-      history=base_model$last_training$history
+      history <- base_model$last_training$history
       expect_equal(nrow(history), 2)
       expect_equal(ncol(history), 3)
       expect_true("epoch" %in% colnames(history))
       expect_true("loss" %in% colnames(history))
       expect_true("val_loss" %in% colnames(history))
 
-      expect_s3_class(object = base_model$plot_training_history(y_min=NULL,y_max = NULL), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min=0,y_max = NULL), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min=0,y_max = 10), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min=NULL,y_max = 10), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10), class = "ggplot")
     })
 
     test_that(paste(
@@ -223,17 +225,17 @@ tokenizer$train(
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-      n_repeat=2
-      for(j in 1:n_repeat){
+      n_repeat <- 2
+      for (j in 1:n_repeat) {
         base_model$estimate_sustainability_inference_fill_mask(
-          text_dataset=raw_texts_training,
-          n=30,
+          text_dataset = raw_texts_training,
+          n = 30,
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
           trace = train_args$trace
         )
-        expect_equal(nrow(base_model$get_sustainability_data("inference")),j)
+        expect_equal(nrow(base_model$get_sustainability_data("inference")), j)
       }
     })
 
@@ -244,11 +246,10 @@ tokenizer$train(
       get_current_args_for_print(train_args)
     ), {
       expect_equal(nrow(base_model$get_flops_estimates()), 1)
-
     })
 
     #---------------------------------------------------------------------------
-    #Re-Load Base Model and compare with the initial model
+    # Re-Load Base Model and compare with the initial model
     base_model_reloaded <- load_from_disk(
       dir_path = tmp_dir
     )
@@ -258,13 +259,11 @@ tokenizer$train(
       object_class_name,
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
-    ),{
-
-
-    expect_equal(
-      base_model$count_parameter(),
-      base_model_reloaded$count_parameter()
-    )
+    ), {
+      expect_equal(
+        base_model$count_parameter(),
+        base_model_reloaded$count_parameter()
+      )
 
       expect_equal(
         base_model$get_sustainability_data(),
@@ -290,11 +289,11 @@ tokenizer$train(
         base_model$get_flops_estimates(),
         base_model_reloaded$get_flops_estimates()
       )
-  })
+    })
 
-    if(i==1){
+    if (i == 1) {
       # Clear directory for next test
-      unlink(paste0(test_tmp_data_base_model_path,"/",object_class_name), recursive = TRUE)
+      unlink(paste0(test_tmp_data_base_model_path, "/", object_class_name), recursive = TRUE)
       save_to_disk(
         object = base_model,
         dir_path = test_tmp_data_base_model_path,
@@ -306,8 +305,3 @@ tokenizer$train(
     unlink(paste0(tmp_dir), recursive = TRUE)
   }
 }
-
-
-
-
-

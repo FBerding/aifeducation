@@ -11,6 +11,7 @@ Abstract class for all tokenizers used with the 'transformers' library.
 }
 \seealso{
 Other Tokenizer: 
+\code{\link{BPETokenizer}},
 \code{\link{WordPieceTokenizer}}
 }
 \concept{Tokenizer}
@@ -44,6 +45,7 @@ Other Tokenizer:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_model_description"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_model_description'><code>aifeducation::AIFEMaster$set_model_description()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_model_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_model_license'><code>aifeducation::AIFEMaster$set_model_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_publication_info"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_publication_info'><code>aifeducation::AIFEMaster$set_publication_info()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="calculate_statistics"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-calculate_statistics'><code>aifeducation::TokenizerBase$calculate_statistics()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="decode"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-decode'><code>aifeducation::TokenizerBase$decode()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="encode"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-encode'><code>aifeducation::TokenizerBase$encode()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="get_special_tokens"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-get_special_tokens'><code>aifeducation::TokenizerBase$get_special_tokens()</code></a></span></li>

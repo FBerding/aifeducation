@@ -25,10 +25,11 @@ BaseModelRoberta <- R6::R6Class(
   private=list(
     model_type = "roberta",
 
-    adjust_max_sequence_length=1,
+    adjust_max_sequence_length=2,
 
   create_model=function(args){
     configuration <- transformers$RobertaConfig(
+      #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
       vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
       max_position_embeddings = as.integer(args$max_position_embeddings),
       hidden_size = as.integer(args$hidden_size),

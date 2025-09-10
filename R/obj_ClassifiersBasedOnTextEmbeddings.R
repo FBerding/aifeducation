@@ -333,7 +333,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       private$load_reliability_data(dir_path = dir_path)
 
       # load FeatureExtractor if it is part of the classifier
-      private$load_FeatureExtractor(dir_path = dir_path)
+      private$load_FeatureExtractor(dir_path = paste0(dir_path))
     },
     #--------------------------------------------------------------------------
     #' @description Method transforms the levels of a factor into numbers corresponding

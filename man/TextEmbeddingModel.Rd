@@ -41,6 +41,7 @@ Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelMode
 \item \href{#method-TextEmbeddingModel-get_n_features}{\code{TextEmbeddingModel$get_n_features()}}
 \item \href{#method-TextEmbeddingModel-get_pad_value}{\code{TextEmbeddingModel$get_pad_value()}}
 \item \href{#method-TextEmbeddingModel-set_publication_info}{\code{TextEmbeddingModel$set_publication_info()}}
+\item \href{#method-TextEmbeddingModel-get_sustainability_data}{\code{TextEmbeddingModel$get_sustainability_data()}}
 \item \href{#method-TextEmbeddingModel-estimate_sustainability_inference_embed}{\code{TextEmbeddingModel$estimate_sustainability_inference_embed()}}
 \item \href{#method-TextEmbeddingModel-clone}{\code{TextEmbeddingModel$clone()}}
 }
@@ -58,7 +59,6 @@ Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelMode
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_package_versions"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_package_versions'><code>aifeducation::AIFEMaster$get_package_versions()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_private"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_private'><code>aifeducation::AIFEMaster$get_private()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_publication_info"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_publication_info'><code>aifeducation::AIFEMaster$get_publication_info()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_sustainability_data"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_sustainability_data'><code>aifeducation::AIFEMaster$get_sustainability_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="is_configured"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-is_configured'><code>aifeducation::AIFEMaster$is_configured()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="is_trained"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-is_trained'><code>aifeducation::AIFEMaster$is_trained()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_documentation_license'><code>aifeducation::AIFEMaster$set_documentation_license()</code></a></span></li>
@@ -367,6 +367,28 @@ Method for setting the bibliographic information of the model.
 \subsection{Returns}{
 Function does not return a value. It is used to set the private
 members for publication information of the model.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextEmbeddingModel-get_sustainability_data"></a>}}
+\if{latex}{\out{\hypertarget{method-TextEmbeddingModel-get_sustainability_data}{}}}
+\subsection{Method \code{get_sustainability_data()}}{
+Method for requesting a summary of tracked energy consumption during training and an estimate of the
+resulting CO2 equivalents in kg.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$get_sustainability_data(track_mode = "training")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{track_mode}}{\code{string} Determines the stept to which the data refer. Allowed values: 'training', 'inference'}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{list} containing the tracked energy consumption, CO2 equivalents in kg, information on the
+tracker used, and technical information on the training infrastructure.
 }
 }
 \if{html}{\out{<hr>}}

@@ -28,12 +28,13 @@ BaseModelModernBert <- R6::R6Class(
 
     create_model=function(args){
       configuration <- transformers$ModernBertConfig(
+        #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         hidden_size = as.integer(args$hidden_size),
         intermediate_size = as.integer(args$intermediate_size),
         num_hidden_layers = as.integer(args$num_hidden_layers),
         num_attention_heads = as.integer(args$num_attention_heads),
-        hidden_activation = tolower(args$hidden_act),
+        hidden_activation = tolower(args$hidden_activation),
         max_position_embeddings = as.integer(args$max_position_embeddings),
         initializer_range = 0.02,
         norm_eps = 1e-12,
@@ -64,7 +65,7 @@ BaseModelModernBert <- R6::R6Class(
     #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
     #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
     #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
-    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_activation `r get_param_doc_desc("hidden_activation")`
     #' @param embedding_dropout `r get_param_doc_desc("embedding_dropout")`
     #' @param mlp_dropout `r get_param_doc_desc("mlp_dropout")`
     #' @param attention_dropout `r get_param_doc_desc("attention_dropout")`
@@ -75,7 +76,7 @@ BaseModelModernBert <- R6::R6Class(
                          num_hidden_layers = 12,
                          num_attention_heads = 12,
                          intermediate_size = 3072,
-                         hidden_act = "GELU",
+                         hidden_activation = "GELU",
                          embedding_dropout = 0.1,
                          mlp_dropout=0.1,
                          attention_dropout = 0.1) {

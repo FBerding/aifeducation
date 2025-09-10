@@ -169,10 +169,10 @@ AIFEMaster <- R6::R6Class(
     #' @param track_mode `r get_param_doc_desc("track_mode")`
     #' @return Returns a `list` containing the tracked energy consumption, CO2 equivalents in kg, information on the
     #'   tracker used, and technical information on the training infrastructure.
-    get_sustainability_data = function(track_mode="training") {
-      if(track_mode=="training"){
-        return(private$sustainability)
-      } else if (track_mode=="inference"){
+    get_sustainability_data = function(track_mode = "training") {
+      if (track_mode == "training") {
+        return(private$sustainability$track_log)
+      } else if (track_mode == "inference") {
         return(private$sustainability_inference)
       }
     },
@@ -445,16 +445,17 @@ AIFEMaster <- R6::R6Class(
           task = task
         )
       )
-      return( sustain_data      )
+      return(sustain_data)
     },
     #------------------------------------------------------------------------------
     init_and_start_sustainability_tracking = function() {
       if (self$last_training$config$sustain_track == TRUE) {
         private$init_and_start_sustainability_tracker(
           trace = self$last_training$config$trace,
-          country_iso_code=self$last_training$config$sustain_iso_code,
-          region=self$last_training$config$sustain_region,
-          measure_power_secs=self$last_training$config$sustain_interval)
+          country_iso_code = self$last_training$config$sustain_iso_code,
+          region = self$last_training$config$sustain_region,
+          measure_power_secs = self$last_training$config$sustain_interval
+        )
       }
     },
     #---------------------------------------------------------------------------
@@ -495,11 +496,97 @@ AIFEMaster <- R6::R6Class(
       )
     },
     #-------------------------------------------------------------------------
+    columnes_sustainability = function() {
+      return(c(
+        "sustainability_data.duration_sec",
+        "sustainability_data.co2eq_kg",
+        "sustainability_data.cpu_energy_kwh",
+        "sustainability_data.gpu_energy_kwh",
+        "sustainability_data.ram_energy_kwh",
+        "sustainability_data.total_energy_kwh",
+        "technical.tracker",
+        "technical.py_package_version",
+        "technical.cpu_count",
+        "technical.cpu_model",
+        "technical.gpu_count",
+        "technical.gpu_model",
+        "technical.ram_total_size",
+        "region.country_name",
+        "region.country_iso_code",
+        "region.region"
+      ))
+    },
+    #-------------------------------------------------------------------------
+    columnes_sustainability_training = function() {
+      return(c(
+        "sustainability_tracked",
+        "date",
+        "task",
+        private$columnes_sustainability()
+      ))
+    },
+    #-------------------------------------------------------------------------
+    columnes_sustainability_inference = function() {
+      return(c(
+        "sustainability_tracked",
+        "date",
+        "task",
+        "data",
+        "batch",
+        "min_seq_len",
+        "mean_seq_len",
+        "sd_seq_len",
+        "max_seq_len",
+        private$columnes_sustainability()
+      ))
+    },
+    #-------------------------------------------------------------------------
+    columnes_flops_estimates = function() {
+      return(c(
+        "date",
+        "approach",
+        "package",
+        "version",
+        "n_parameter",
+        "batch_size",
+        "n_batches",
+        "n_epochs",
+        "flops_bp_1",
+        "flops_bp_2",
+        "flops_bp_3",
+        "flops_bp_4",
+        "flops_counted"
+      ))
+    },
+    #--------------------------------------------------------------------------
+    check_and_update_column_names = function(data_frame, type) {
+      if (type == "sustain_training") {
+        column_names <- private$columnes_sustainability_training()
+      } else if (type == "sustain_inference") {
+        column_names <- private$columnes_sustainability_inference()
+      } else if (type == "flops") {
+        column_names <- private$columnes_flops_estimates()
+      } else {
+        stop("Type not implemented.")
+      }
+
+      tmp_data_frame <- data_frame
+      add_vector <- vector(length = nrow(data_frame))
+      add_vector <- NA
+      for (clmn_name in setdiff(x = column_names, y = colnames(data_frame))) {
+        tmp_data_frame[clmn_name] <- add_vector
+      }
+      return(tmp_data_frame)
+    },
+    #-------------------------------------------------------------------------
     # Method for loading sustainability data
     load_sustainability_data = function(model_dir) {
       sustainability_datalog_path <- paste0(model_dir, "/", "sustainability.csv")
       if (file.exists(sustainability_datalog_path)) {
-        private$sustainability$track_log <- read.csv(sustainability_datalog_path)
+        private$sustainability$track_log <- private$check_and_update_column_names(
+          data_frame = read.csv(sustainability_datalog_path),
+          type = "sustain_training"
+        )
         private$sustainability$sustainability_tracked <- TRUE
       } else {
         private$sustainability$sustainability_tracked <- FALSE
@@ -525,9 +612,12 @@ AIFEMaster <- R6::R6Class(
     load_sustainability_data_inference = function(model_dir) {
       sustainability_datalog_path <- paste0(model_dir, "/", "sustainability_inf.csv")
       if (file.exists(sustainability_datalog_path)) {
-        private$sustainability_inference <- read.csv(sustainability_datalog_path)
+        private$sustainability_inference <- private$check_and_update_column_names(
+          data_frame = read.csv(sustainability_datalog_path),
+          type = "sustain_inference"
+        )
       } else {
-        private$sustainability_inference<- data.frame()
+        private$sustainability_inference <- data.frame()
       }
     },
     #-------------------------------------------------------------------------
@@ -545,17 +635,20 @@ AIFEMaster <- R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    # Method for loading sustainability data inference
+    # Method for loading flops estimates
     load_flops_estimates = function(model_dir) {
       datalog_path <- paste0(model_dir, "/", "flops_estimates.csv")
       if (file.exists(datalog_path)) {
-        private$flops_estimates <- read.csv(datalog_path)
+        private$flops_estimates <- private$check_and_update_column_names(
+          data_frame = read.csv(datalog_path),
+          type = "flops"
+        )
       } else {
-        private$flops_estimates<- data.frame()
+        private$flops_estimates <- data.frame()
       }
     },
     #-------------------------------------------------------------------------
-    # Method for saving sustainability data inference
+    # Method for saving flops estimates
     save_flops_estimates = function(dir_path, folder_name) {
       save_location <- paste0(dir_path, "/", folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
@@ -590,7 +683,7 @@ AIFEMaster <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     save_all_args = function(args, group = "training") {
-      if (group %in% c("configure", "training", "embedding_config")) {
+      if (group %in% c("configure", "training")) {
         if (group == "training") {
           for (arg in names(args)) {
             if (!R6::is.R6(args[[arg]]) &
@@ -603,9 +696,11 @@ AIFEMaster <- R6::R6Class(
           for (arg in names(args)) {
             if (!R6::is.R6(args[[arg]]) &
               !is.factor(args[[arg]]) &
-              !arg %in% c("log_dir", "log_write_interval",
-                          "base_model","model_language","model_label",
-                          "model_name","tokenizer")) {
+              !arg %in% c(
+                "log_dir", "log_write_interval",
+                "base_model", "model_language", "model_label",
+                "model_name", "tokenizer","text_embeddings"
+              )) {
               private$model_config[arg] <- list(args[[arg]])
             }
           }
@@ -662,27 +757,67 @@ AIFEMaster <- R6::R6Class(
         private$model_config <- config_file$public[["model_config"]]
       }
 
-      # Update values for extensions
-      # This in important for all cases that introduce new and additional parameters
-      param_dict <- get_param_dict()
-      if (is.function(self$configure)) {
-        param_names_new <- rlang::fn_fmls_names(self$configure)
-        for (param in param_names_new) {
-          if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
-            if (is.null(private$model_config[[param]])) {
-              if (!is.null(param_dict[[param]]$default_historic)) {
-                private$model_config[param] <- list(param_dict[[param]]$default_historic)
-              } else {
-                warning(paste("Historic default for", param, "is missing in parameter dictionary."))
-              }
+      # Check if the model parameter for configuration are saved on other fields
+      config_params <- setdiff(
+        x = rlang::fn_fmls_names(self$configure),
+        y = c("model_name", "model_label", "model_language","text_embeddings","features")
+      )
+
+      require_udate=check_versions(
+        a = self$get_package_versions()$r_package_versions$aifeducation,
+        operator = "<",
+        b = "1.1.2")
+      if(require_udate){
+        for (config_param in config_params) {
+          # Search in public
+          for (i in 1:length(config_file$public)) {
+            current_entry <- config_file$public[[i]]
+            if(is.list(current_entry)){
+              current_entry=config_file$public[[i]][[config_param]]
+            } else {
+              current_entry=NULL
+            }
+
+            if (!is.null_or_na(current_entry)) {
+              private$model_config[config_param] <- list(current_entry)
             }
           }
-          # Necessary for objects saved with aifeducation lower 1.1.0
-          # Values were changed to upper and lower cases
-          private$model_config[param] <- list(update_values_to_new_1.1.0(private$model_config[[param]]))
+          # Search in private
+          for (i in 1:length(config_file$private)) {
+            current_entry=config_file$private[[i]]
+            if(is.list(current_entry)){
+              current_entry=config_file$private[[i]][[config_param]]
+            } else {
+              current_entry=NULL
+            }
+            if (!is.null_or_na(current_entry)) {
+              private$model_config[config_param] <- list(current_entry)
+            }
+          }
+        }
+
+        # Update values for extensions
+        # This in important for all cases that introduce new and additional parameters
+        param_dict <- get_param_dict()
+        if (is.function(self$configure)) {
+          param_names_new <- config_params
+          for (param in param_names_new) {
+            if (is_valid_and_exportable_param(arg_name = param, param_dict = param_dict)) {
+              if (is.null(private$model_config[[param]])) {
+                if (!is.null(param_dict[[param]]$default_historic)) {
+                  private$model_config[param] <- list(param_dict[[param]]$default_historic)
+                } else {
+                  warning(paste("Historic default for", param, "is missing in parameter dictionary."))
+                }
+              }
+            }
+            # Necessary for objects saved with aifeducation lower 1.1.0
+            # Values were changed to upper and lower cases
+            private$model_config[param] <- list(update_values_to_new_1.1.0(private$model_config[[param]]))
+          }
         }
       }
-    }
+      }
   )
 )
 

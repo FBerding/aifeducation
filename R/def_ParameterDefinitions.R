@@ -524,7 +524,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("gelu", "relu", "silu", "gelu_new"),
+    allowed_values = c("GELU", "relu", "silu", "gelu_new"),
     desc = "Name of the activation function.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Activation Function",

@@ -39,9 +39,9 @@ def tokenize_raw_text(
       
     global current_batch
     global last_log
-      
+    
     outputs = tokenizer(
-        dataset["text"],
+        text=dataset["text"],
         truncation = truncation, 
         padding = padding,
         max_length = max_length,

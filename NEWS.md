@@ -6,6 +6,10 @@ editor_options:
 
 # aifeducation 1.1.2
 
+** Major Changes**
+
+- Introduction of two new classes: 'Tokenizer' and 'BaseModels'. 
+
 **Ai for Education Studio**
 
 - Fixed bug that prevents changes in the documentation to be saved.

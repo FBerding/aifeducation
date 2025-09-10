@@ -240,17 +240,21 @@ for (framework in ml_frameworks) {
           dir_path = root_path_results,
           folder_name = folder_name
         )
-        extractor <- NULL
-        extractor <- load_from_disk(dir_path = dir_path)
+        extractor2 <- NULL
+        extractor2 <- load_from_disk(dir_path = dir_path)
+
+        #Is config equal after loading
+        expect_equal(extractor$get_model_config(),
+                     extractor2$get_model_config())
 
         # Predict after loading
         if (data_type == "EmbeddedText") {
-          predictions_2 <- extractor$extract_features(
+          predictions_2 <- extractor2$extract_features(
             data_embeddings = dataset_list[[data_type]],
             batch_size = 50
           )
         } else {
-          predictions_2 <- extractor$extract_features_large(
+          predictions_2 <- extractor2$extract_features_large(
             data_embeddings = dataset_list[[data_type]],
             batch_size = 50,
             trace = FALSE

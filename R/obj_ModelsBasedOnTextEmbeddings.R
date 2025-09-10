@@ -625,7 +625,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       create_dir(save_location, FALSE)
-      private$model$to("cpu", dtype = torch$float)
+      private$model$to("cpu", dtype = torch$float32)
       if (save_format == "safetensors") {
         file_path <- paste0(save_location, "/", "model_data", ".safetensors")
         safetensors$torch$save_model(model = private$model, filename = file_path)
@@ -643,11 +643,13 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       path_pt <- paste0(dir_path, "/", "model_data", ".pt")
       path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
       private$create_reset_model()
-      private$model$to("cpu", dtype = torch$float)
+      private$model$to("cpu", dtype = torch$float32)
+      print(private$model)
       if (file.exists(path_safe_tensors)) {
         safetensors$torch$load_model(
           model = private$model,
-          filename = path_safe_tensors)
+          filename = path_safe_tensors,
+          device="cpu")
       } else {
         if (file.exists(paths = path_pt) == TRUE) {
           private$model$load_state_dict(torch$load(path_pt))

@@ -182,7 +182,7 @@ embedding. Allowed values: \code{1 <= x }}
 \item \code{"max"} for pooling with maximum values.  Allowed values: 'Mean', 'Max'
 }}
 
-\item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}
+\item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'}
 
 \item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
 

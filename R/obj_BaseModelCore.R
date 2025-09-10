@@ -23,6 +23,7 @@ BaseModelCore <- R6::R6Class(
   private = list(
     model_type = NULL,
     adjust_max_sequence_length = 0,
+    return_token_type_ids=TRUE,
     model_info = list(),
     flops_estimates = data.frame(),
     publication_info = list(
@@ -621,8 +622,6 @@ BaseModelCore <- R6::R6Class(
       framework <- "pt"
       private$model$to("cpu")
 
-      return_token_type_ids <- (private$model_type != AIFETrType$mpnet)
-
       if (private$model_type != "mpnet") {
         run_py_file("FillMaskForMPLM.py")
         fill_mask_pipeline_class <- py$FillMaskPipelineForMPLM
@@ -639,7 +638,7 @@ BaseModelCore <- R6::R6Class(
         top_k = as.integer(n_solutions),
         tokenizer_kwargs = reticulate::dict(
           list(
-            return_token_type_ids = return_token_type_ids,
+            return_token_type_ids = private$return_token_type_ids,
             max_length = as.integer(private$model$config$max_position_embeddings - private$adjust_max_sequence_length),
             truncation = "longest_first"
           )
@@ -894,7 +893,12 @@ BaseModelCore <- R6::R6Class(
         )
       }
     },
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
+    #' @description Calculates FLOPS based on model's architecture.
+    #' @param batch_size `r get_description("batch_size")`
+    #' @param n_batches `r get_description("n_batches")`
+    #' @param n_epochs `r get_description("n_epochs")`
+    #' @return Returns a `data.frame` storing the estimates.
     calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
 
       tokenizer <- self$Tokenizer$get_tokenizer()
@@ -910,11 +914,7 @@ BaseModelCore <- R6::R6Class(
         ), collapse = " ")
       }
 
-      res_colnames <- c(
-        "date", "approach", "package", "version",
-        "n_parameter", "batch_size", "n_batches", "n_epochs",
-        "flops_bp_1", "flops_bp_2", "flops_bp_3", "flops_counted"
-      )
+      res_colnames <- private$columnes_flops_estimates()
       results <- matrix(
         nrow = 1,
         ncol = length(res_colnames)
@@ -922,7 +922,7 @@ BaseModelCore <- R6::R6Class(
       colnames(results) <- res_colnames
       results <- as.data.frame(results)
 
-      bp_factors <- c(1, 2, 3)
+      bp_factors <- c(1, 2, 3,4)
 
       for (bp_factor in bp_factors) {
         est_flops <- calflops$calculate_flops(
@@ -933,9 +933,9 @@ BaseModelCore <- R6::R6Class(
           kwargs = tokenizer(
             text = generated_texts,
             truncation = TRUE,
-            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
+            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length-5),
             return_tensors = "pt",
-            return_token_type_ids = (private$model_type != AIFETrType$mpnet)
+            return_token_type_ids = private$return_token_type_ids
           ),
           forward_mode = "forward",
           include_backPropagation = TRUE,

@@ -602,7 +602,8 @@ straightforward to create a new model to fit a specific purpose.
 *aifeducation* supports the option to both create and train/fine-tune
 base models.
 
-## 3.2 Creation of Base Models
+In this chapter we concentrate on creating a new model. The usage of a pre-trained model
+from [Hugging Face](https://huggingface.co/) is described in chapter 4.
 
 Every transformer model is composed of two parts: 
 
@@ -612,6 +613,142 @@ Every transformer model is composed of two parts:
 2. the neural network that is
   used to model the capabilities for understanding natural language.
 
+## 3.2 Creation of a Tokenizer
+
+The first stept is to set up a tokenizer.
+
+In *aifeducation* you can choose between different models. In this example we use
+a WordPieceTokenizer. To create a new one we first call the method `new`.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer<-WordPieceTokenizer$new()
+```
+
+Now we have an empty tokenizer which we can configure by calling the corresponding method.
+The available parameter depend on the kind of tokenizer. In the case of a WordPieceTokenizer
+we have only two options. The first, `vocab_size` determines how many tokens the 
+tokenizer should know. The second determines if all words should be transformed to lower case 
+before tokenization. since we use only a very small data set for illustrating the usage of the
+package we set `vocab_size = 200`. In real case applications this value should be larger.
+You can find more information on this topic in vignette [04 Model configuration](model_configuration.html).
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$configure(
+  vocab_size = 200,
+  vocab_do_lower_case = FALSE
+)
+```
+
+In the next step we have to train the model by calling the method `train`. Here
+we pass a dataset for text to the parameter `text_dataset`. This raw text is used
+to train the model. 
+
+In addition, we can set up sustainability tracking of this process to estimate its 
+ecological impact with help of the python
+library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
+If you use the sustainability tracker you must provide the alpha-3 code
+for the country where your computer is located (e.g., "CAN"="Canada",
+"DEU"="Germany"). A list with the codes can be found on
+[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). The
+reason is that different countries use different sources and techniques
+for generating their energy resulting in a specific impact on CO2
+emissions. For the USA and Canada you can additionally specify a region
+by setting `sustain_region`. Please refer to the documentation of
+`codecarbon` for more information.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$train(
+  text_dataset=data_set_reviews_text,
+  statistics_max_tokens_length = 512,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE
+)
+```
+
+Training a tokenizer is a very fast process. Thus, even for a huge number of texts
+the computations should take only some minutes.
+
+Now the model is ready to use. At the beginning we can explore some tokenizer statistics.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$get_tokenizer_statistics()
+```
+
+```{r, include = FALSE, eval = TRUE}
+mu_g=tokenizer$get_tokenizer_statistics()$mu_g
+```
+
+In this table you can see an estimation of the number of words for the whole training data set,
+the total number of tokens resulting from the raw texts and the number of sequences 
+if the length of a sequence is limited to the value shown in the column 'max_token_length'.
+Furthermore, you can see the three statistics proposed by Kaya and Tantug (2024, p.5).
+$$\mu_t$$ refers to the average number of tokens per sequence, $$\mu_w$$ refers to the
+average number of words per sequence, and $$\mu_g$$ refers to the average number of tokens per word.
+$$\mu_g$$ is called the tokenizer granularity rate and describes how many tokens are
+necessary to represent a single word. This value is very important as a higher value implies
+that the same text is spitted into a longer sequence of tokens than for a tokenizer
+with a lower value. Since large language models have a maximum limit on the length
+of a token sequence this value has in impact on how many words of a text can be 
+processed by a base model. 
+
+If you would like to see how the tokenizer works you can call the method 'encode'.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$encode(raw_text = "This is a good movie.",
+                 token_encodings_only = TRUE,
+                 token_to_int = FALSE)
+```
+Here you can see that the tokenizer split the words into several tokens and adds
+some special tokens.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$encode(raw_text = "This is a good movie.",
+                 token_encodings_only = TRUE,
+                 token_to_int = TRUE)
+```
+If you change the parameter `token_to_int = TRUE` you receive the same result but
+instead of the tokens you get the index of the token in the tokenizer's vocabulary.
+For example the id 0 refers to the token [CLS] in this example.
+
+In the case you have a sequence of id and would like to know which tokens belong 
+to these numbers you can call the method `decode`.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$decode(int_seqence = list(list(c(0,  53, 109, 174, 188,  61,  67,  97,  97, 112,  73,  97, 110,  99, 101,  17,   1))),
+                 to_token=TRUE)
+```
+If you would like to analyse the ecological impact of training the tokenizer you
+can  get an estimation of energy consumption and CO2-emission.
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer$get_sustainability_data("training")$track_log
+```
+
+Since tokenizers can be trained very efficient these values will be very low in most cases.
+
+Finally, you can save and load your model. This is done for all object with
+the function pair `save_to_disk` and `load_from_disk`.
+
+```{r, include = TRUE, eval = TRUE}
+save_to_disk(
+  object = tokenizer,
+  dir_path = "examples",
+  folder_name = "example_tokenizer"
+)
+```
+
+
+```{r, include = TRUE, eval = TRUE}
+tokenizer=load_from_disk("examples/example_tokenizer")
+```
+
+Now you are ready to create a base model.
+
+## 3.3 Creating a BaseModel
+
 At the beginning you can choose between the different supported
 transformer architectures. Depending on the architecture, you have
 different options determining the shape of your neural network. For this
@@ -619,55 +756,25 @@ vignette we use a BERT (Devlin et al. 2019) model which can be created
 with the function `aife_transformer.make`. 
 
 ```{r, include = TRUE, eval = TRUE}
-base_model <- aife_transformer.make("bert")
-base_model$create(
-  model_dir = "examples/my_own_transformer",
-  text_dataset = data_set_reviews_text,
-  vocab_size = 30522,
-  vocab_do_lower_case = FALSE,
+base_model <- BaseModelBert$new()
+base_model$configure(
+  tokenizer=tokenizer,
   max_position_embeddings = 512,
-  hidden_size = 768,
-  num_hidden_layer = 12,
-  num_attention_heads = 12,
-  intermediate_size = 3072,
-  hidden_act = "gelu",
+  hidden_size = 64,
+  num_hidden_layers = 4,
+  num_attention_heads = 4,
+  intermediate_size = 2*64,
+  hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  trace = TRUE,
-  log_dir = NULL,
-  log_write_interval = 2
+  attention_probs_dropout_prob = 0.1
 )
 ```
 
-
-For this function to work, you must provide a path to a directory where
-your new transformer should be saved (`model_dir`). 
-
-Furthermore, you
-must provide raw texts to `text_dataset`. This object should be of class
-`LargeDataSetForText` as described in section 2.2.2.
-These texts are **not** used to train the transformer but for calculating the vocabulary. 
-In this example we use the text from the movie reviews. Please note, that this data set 
-is to small for creating a new transformer. We use this here only for a fast running illustration. 
-For real use cases a larger data set is necessary. 
-
-The maximum size of the vocabulary
-is determined by `vocab_size`. Modern tokenizers such as *WordPiece* (Wu
-et al. 2016) use algorithms that splits words into smaller elements,
-allowing them to build a huge number of words with a small number of
-elements. Thus, even with only small number of about 30,000 tokens, they
-are able to represent a very large number of words.
-
-The other parameters allow you to customize your BERT model. For
-example, you could increase the number of hidden layers from 12 to 24 or
-reduce the hidden size from 768 to 256, allowing you to build and to
-test larger or smaller models.
-
-> The vignette [04 Model configuration](model_configuration.html)
-> provides details on how to configure a base model.
+We first create an empty model with `new`. In the next step you can configure your model.
+The available parameter depend on the type of model. In this example we
+create a model with 4 hidden layers, a hidden size of 64, and 4 attention heads. The maximum length
+of the sequence of tokens is 512. Since the tokenizer granularity rate is `r mu_g` this
+allows the model to process a sequence of average  `r mu_g*512` words.
 
 Please note that with `max_position_embeddings` you determine how many
 tokens your transformer can process. If your text has more tokens, these
@@ -679,6 +786,64 @@ another architecture of BERT (e.g. Longformer from Beltagy, Peters &
 Cohan 2020) or split a long document into several chunks which are used
 sequentially for classification (e.g. Pappagari et al. 2019). Using
 chunks is supported by *aifedcuation* for all models.
+
+The parameter `tokenizer` requires an tokenizer object. Here we use the model
+created in section 3.2.
+
+> The vignette [04 Model configuration](model_configuration.html)
+> provides details on how to configure a base model.
+
+Now your model is ready. You can save it with the function `save_to_disk` or continue
+with training. 
+
+## 3.3 Train/Fine-Tune a Base Model
+
+If you would like to train a new base model (see section 3.2) for the
+first time or want to adapt a pre-trained model to a domain-specific
+language or task, you can call the corresponding `train`-method. 
+
+```{r, include = TRUE, eval = TRUE}
+base_model$train(
+   text_dataset=data_set_reviews_text,
+   p_mask = 0.30,
+   whole_word = TRUE,
+   val_size = 0.1,
+   n_epoch = 10,
+   batch_size = 12,
+   max_sequence_length = 250,
+   full_sequences_only = FALSE,
+   min_seq_len = 50,
+   learning_rate = 3e-3,
+   sustain_track = TRUE,
+   sustain_iso_code = "DEU",
+   sustain_region = NULL,
+   sustain_interval = 15,
+   trace = TRUE,
+   pytorch_trace = 0,
+   log_dir = NULL,
+   log_write_interval = 2
+)
+```
+
+The data for training must be passed to `text_dataset`. This object should be of class
+`LargeDataSetForText` as described in section 2.2.2.
+In this example we use the text from the movie reviews. Please note, that this data set 
+is to small for training a new transformer. We use this here only for a fast running illustration. 
+For real use cases a larger data set is necessary. 
+
+In case of a
+Bert model, the learning objective is *Masked Language Modeling*. 
+Other
+models may use other learning objectives. Please refer to the
+documentation for more details on every model.
+You set the way masking is done
+with `p_mask` and `whole_word`. In the case of `whole_word=FALSE` a number of tokens is masked.
+In the case of `whole_word=TRUE` all tokens belonging to a specific number of words are masked. 
+The number of words/tokens is chosen with `p_mask`. 
+
+You can set the length of token sequences with `max_sequence_length` leading the tokenizer
+to split long texts into several sequences with the given size. With `val_size`, 
+you set how many of the generated sequences should be used for the validation sample. 
 
 Since creating a transformer model is energy consuming, *aifeducation*
 allows you to estimate its ecological impact with help of the python
@@ -693,65 +858,132 @@ emissions. For the USA and Canada you can additionally specify a region
 by setting `sustain_region`. Please refer to the documentation of
 `codecarbon` for more information.
 
-After calling the function, you will find your new model in your model
-directory.
-
-## 3.3 Train/Fine-Tune a Base Model
-
-If you would like to train a new base model (see section 3.2) for the
-first time or want to adapt a pre-trained model to a domain-specific
-language or task, you can call the corresponding `train`-method. 
-
-```{r, include = TRUE, eval = TRUE, results='hide'}
-base_model <- aife_transformer.make("bert")
-base_model$train(
-  output_dir = "examples/my_own_transformer_trained",
-  model_dir_path = "examples/my_own_transformer",
-  text_dataset = data_set_reviews_text,
-  p_mask = 0.15,
-  whole_word = TRUE,
-  val_size = 0.1,
-  n_epoch = 1,
-  batch_size = 12,
-  chunk_size = 250,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  trace = TRUE,
-  log_dir = NULL,
-  log_write_interval = 2
-)
-```
-
-Here it is important that you provide the path to the directory where
-your new transformer is stored. Furthermore, it is important that you
-provide *another* directory where your trained transformer should be
-saved to avoid reading and writing collisions.
-
-Now, the provided raw data is used to train your model. In case of a
-Bert model, the learning objective is *Masked Language Modeling*. Other
-models may use other learning objectives. Please refer to the
-documentation for more details on every model.
-
-First, you can set the length of token sequences with `chunk_size` leading the tokenizer
-to split long texts into several chunks with the given size. With `val_size`, 
-you set how many of these chunks should be used for the validation sample. 
-With `whole_word` you can choose between masking single tokens or masking
-complete words (Please remember that modern tokenizers split words into
-several tokens. Thus, tokens and words are not forced to match each
-other directly). Finally, with `p_mask` you can determine how many tokens should
-be masked.  
-
-Please remember to set the correct alpha-3 code for tracking the
-ecological impact of training your model (`sustain_iso_code`).
-
 If you work on a machine and your graphic device only has small memory
 capacity, please reduce the batch size significantly. 
 
-After the training finishes, you can find the transformer ready to use
-in your `output_dir`. Now you are able to create a text embedding
-model.
+After training has finished you can save the entire model with `save_to_disk`.
+
+```{r, include = TRUE, eval = TRUE}
+save_to_disk(
+  object = base_model,
+  dir_path = "examples",
+  folder_name = "example_base_model"
+)
+```
+
+To use the model you can load it with
+```{r, include = TRUE, eval = TRUE}
+base_model<-load_from_disk("examples/example_base_model")
+```
+
+In order to use the model for the fill-mask task you can call `fill_mask`.
+
+```{r, include = TRUE, eval = TRUE}
+base_model$fill_mask(masked_text = "This is a [MASK] movie.",
+                     n_solutions = 5)
+```
+
+Here you can provide a text with a mask token indicating the gab the model should close.
+As a result you get the logits, the token id and the concrete token the model suggests to
+replace the mask token with.
+
+## 3.4 Analyzing a BaseModel
+
+If you would like to further investigate a base model you can use some specific methods.
+
+**Training History**
+
+A plot of the training history of the last training can be shown as follows:
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel.")}
+base_model$plot_training_history()
+```
+```{r, include = FALSE}
+running_num_figures=running_num_figures+1
+```
+
+**Sustainability of Training**
+
+To explore the ecological impact of the training and fine-tuning of a model you can
+call `get_sustainability_data("training")`.
+
+```{r, include = TRUE, eval = TRUE}
+base_model$get_sustainability_data("training")$track_log
+```
+
+The resulting table provides you detailed information on every single training run with
+active sustainability tracking.
+
+**Sustainability of Inference**
+
+Not only the ecological impact of the training is important but also the energy
+consumption and CO2-emission during inference. You can estimate the ecological impact
+by calling the method `estimate_sustainability_inference_fill_mask`.
+
+```{r, include = TRUE, eval = TRUE}
+base_model$estimate_sustainability_inference_fill_mask(
+  text_dataset = data_set_reviews_text,
+  n = 30,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE
+)
+```
+
+Here can you provide a text data set which forms the base for estimating the 
+energy conspumtion during a fill-mask task. With `n` you determine the number of
+texts to be used.
+
+The results of every run can be accessed via `get_sustainability_data("inference")`.
+
+```{r, include = TRUE, eval = TRUE}
+base_model$get_sustainability_data("inference")
+```
+
+**FLOPS Estimates**
+
+Another important value is the total number of FLOPS during training. These are
+estimated during every training run. With `get_flops_estimates` you receive a
+table. 
+
+```{r, include = TRUE, eval = TRUE}
+base_model$get_flops_estimates()
+```
+
+At the moment only an architecture-based approach is available. The number of FLOPS
+is not counted directly. Instead it is estimated approximately. The column 'flops_bp_1'
+describes the number of FLOPS for all forwand and backward passes.
+
+Kaplan et al. (2020, p. 7) propose that as a rule of thumb the backward pass has the
+flops of the forward pass multiplied with factor 2. The resulting FLOPS for all
+forward and backward passes of a training run are shown in column 'flops_bp_2'. 
+
+All columns do **not** include computations for a validation or test sample.
+
+## 3.5 Creating a BaseModel from Hugging Face
+
+In the case you would like to use a pre-trained model from hugging face you can
+create a base model as follows:
+
+- Chose a model on Hugging Face. Please ensure that the model's architecture is 
+  supported by *aifeducation*.
+- Download the relevant files (model and tokenizer) into a folder on your machine.
+- Create an empty base model for the corresponding architecture.
+- Call the method `create_from_hf` and provide the path the the folder where you stored
+  the model and the tokenizer.
+
+```{r, include = TRUE, eval = FALSE}
+base_model_bert=BaseModelBert$new()
+base_model_bert$create_from_hf(
+  model_dir = "examples/bert_uncased",
+  tokenizer_dir="examples/bert_uncased"
+)
+```
+
+Now you can use the model as all other base models in *aifedcuation*. For example, you
+can train the model as described above or you can use the model as foundation for a 
+TextEmbeddingModel.
 
 # 4 Text Embedding Models
 
@@ -785,6 +1017,18 @@ apply a pre-trained model from [Hugging Face](https://huggingface.co/) called
 [BERT base model (uncased) ](https://huggingface.co/google-bert/bert-base-uncased) published by
 Devlin et al. (2019). Download all files into a new folder. Here we store the model in  `"examples/bert_uncased"`.
 
+We first load the base model as described in section 3.
+
+```{r, include = TRUE, eval = TRUE}
+base_model_bert=BaseModelBert$new()
+base_model_bert$create_from_hf(
+  model_dir = "examples/bert_uncased",
+  tokenizer_dir="examples/bert_uncased"
+)
+```
+
+Now we can create the TextEmbeddingModel. Therefor we have to passe the base model
+to the parameter `base_model`.
 
 ```{r, include = TRUE, eval = TRUE}
 bert_modeling <- TextEmbeddingModel$new()
@@ -797,19 +1041,14 @@ bert_modeling$configure(
   emb_layer_min = "Middle",
   emb_layer_max = "2_3_layer",
   emb_pool_type = "Average",
-  model_dir = "examples/bert_uncased"
+  base_model = base_model_bert
 )
 ```
-
-Next, you have to provide the directory where your base model is stored.
-In this example this would be `model_dir="examples/bert_uncased"`.
-Of course you can use any other pre-trained model from Hugging Face
-which addresses your needs and is supported by *aifeducation*.
 
 Using a BERT model for text embedding is not a problem since your text
 does not provide more tokens than the transformer can process. This
 maximum value is set in the configuration of the transformer (see
-section 3.2). If the text produces more tokens, the last tokens are
+section 3.3). If the text produces more tokens, the last tokens are
 ignored. In some instances you might want to analyze long texts. In
 these situations, reducing the text to the first tokens (e.g. only the
 first 512 tokens) could result in a problematic loss of information. To
@@ -856,7 +1095,7 @@ After deciding about the configuration, you can use your model.
 You can see the number of learnable parameters of the underlying base model with
 
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling$count_parameter()
+bert_modeling$BaseModel$count_parameter()
 ```
 Another important value is the number of features which you can request by calling `get_n_features`.
 ```{r, include = TRUE, eval = TRUE}
@@ -945,8 +1184,8 @@ bert_modeling <- load_from_disk("examples/bert_te_model")
 In case the underlying model was trained with an active sustainability
 tracker (section 3.2 and 3.3) you can receive a table showing you the
 energy consumption, CO2 emissions, and hardware used during training by
-calling the method `get_sustainability_data()`. For our example this
-would be `bert_modeling$get_sustainability_data()`.
+calling `BaseModel$get_sustainability_data("training")`. For our example this
+would be `bert_modeling$BaseModel$get_sustainability_data("training")`.
 
 ## 4.7 Training History
 
@@ -954,7 +1193,7 @@ If you would like to see the training history of the underlying base model you
 can call a special method.
 
 ```{r, include = TRUE, eval = FALSE}
-bert_modeling$plot_training_history()
+bert_modeling$BaseModel$plot_training_history()
 ```
 
 Please note that this plot is not available for this example since the necessary
@@ -2135,6 +2374,10 @@ Learn to Implement Fast and Accurate Deep Learning Models with Fewer
 Training Samples Using Pytorch. Packt Publishing Limited.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6175328>
 
+Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
+for Turkish large language models. Intelligent Systems with
+Applications, 21, 200335. <https://doi.org/10.1016/j.iswa.2024.200335>
+
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th ed.). Los Angeles: SAGE.
 
@@ -2228,3 +2471,7 @@ International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
 ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
 Elsevier Science & Technology.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
+
+
+
+Kaplan et al. 

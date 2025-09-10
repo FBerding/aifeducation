@@ -50,6 +50,7 @@ Other Base Model:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_documentation_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_documentation_license'><code>aifeducation::AIFEMaster$set_documentation_license()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_model_description"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_model_description'><code>aifeducation::AIFEMaster$set_model_description()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="set_model_license"><a href='../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-set_model_license'><code>aifeducation::AIFEMaster$set_model_license()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="calc_flops_architecture_based"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-calc_flops_architecture_based'><code>aifeducation::BaseModelCore$calc_flops_architecture_based()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="count_parameter"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-count_parameter'><code>aifeducation::BaseModelCore$count_parameter()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="create_from_hf"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-create_from_hf'><code>aifeducation::BaseModelCore$create_from_hf()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="estimate_sustainability_inference_fill_mask"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-estimate_sustainability_inference_fill_mask'><code>aifeducation::BaseModelCore$estimate_sustainability_inference_fill_mask()</code></a></span></li>
@@ -89,7 +90,7 @@ Configures a new object of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{tokenizer}}{\verb{WordPieceTokenizer, HuggingFaceTokenizer} Object of class \link{WordPieceTokenizer}, \link{HuggingFaceTokenizer} . This objects prepares raw text for the model.}
+\item{\code{tokenizer}}{\verb{WordPieceTokenizer, BPETokenizer, HuggingFaceTokenizer} Object of class \link{WordPieceTokenizer}, \link{BPETokenizer}, \link{HuggingFaceTokenizer} . This objects prepares raw text for the model.}
 
 \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
 can be processed with the model. Allowed values: \verb{10 <= x <= 4048}}
@@ -103,7 +104,7 @@ embedding. Allowed values: \verb{1 <= x <= 2048}}
 
 \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
 
-\item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'gelu', 'relu', 'silu', 'gelu_new'}
+\item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'}
 
 \item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
 

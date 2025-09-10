@@ -5,6 +5,8 @@
 \title{Base class for tokenizers}
 \value{
 Does return a new object of this class.
+
+Returns a \code{data.frame} containg the estimates.
 }
 \description{
 Base class for tokenizers containing all methods shared by the sub-classes.
@@ -35,6 +37,7 @@ Other R6 Classes for Developers:
 \item \href{#method-TokenizerBase-decode}{\code{TokenizerBase$decode()}}
 \item \href{#method-TokenizerBase-get_special_tokens}{\code{TokenizerBase$get_special_tokens()}}
 \item \href{#method-TokenizerBase-n_special_tokens}{\code{TokenizerBase$n_special_tokens()}}
+\item \href{#method-TokenizerBase-calculate_statistics}{\code{TokenizerBase$calculate_statistics()}}
 \item \href{#method-TokenizerBase-clone}{\code{TokenizerBase$clone()}}
 }
 }
@@ -232,6 +235,39 @@ Method for receiving the special tokens of the model
 \if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$n_special_tokens()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Returns an 'int' counting the number of special tokens.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TokenizerBase-calculate_statistics"></a>}}
+\if{latex}{\out{\hypertarget{method-TokenizerBase-calculate_statistics}{}}}
+\subsection{Method \code{calculate_statistics()}}{
+Method for calculating tokenizer statistics as suggested by
+Kaya and Tantuğ (2024).
+
+Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
+for Turkish large language models. Intelligent Systems with
+Applications, 21, 200335. \url{https://doi.org/10.1016/j.iswa.2024.200335}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$calculate_statistics(
+  text_dataset,
+  statistics_max_tokens_length,
+  step = "creation"
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_dataset}}{}
+
+\item{\code{statistics_max_tokens_length}}{}
+
+\item{\code{step}}{\code{string} describing the context of the estimation.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 Returns an 'int' counting the number of special tokens.
 }

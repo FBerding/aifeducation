@@ -54,9 +54,9 @@ generate_sidebar_information <- function(model) {
       max_layer <- NULL
     }
 
-    if (methods::isClass(Class = "data.frame", where = model$BaseModel$get_sustainability_data()$track_log)) {
-      if (nrow(model$BaseModel$get_sustainability_data()$track_log)!=0) {
-        kwh <- round(sum(model$BaseModel$get_sustainability_data()$track_log[, "sustainability_data.total_energy_kwh"]), 3)
+    if (methods::isClass(Class = "data.frame", where = model$BaseModel$get_sustainability_data())) {
+      if (nrow(model$BaseModel$get_sustainability_data())!=0) {
+        kwh <- round(sum(model$BaseModel$get_sustainability_data()[, "sustainability_data.total_energy_kwh"]), 3)
       } else {
         kwh <- "not estimated"
       }
@@ -64,9 +64,9 @@ generate_sidebar_information <- function(model) {
       kwh <- "not estimated"
     }
 
-    if (methods::isClass(Class = "data.frame", where = model$BaseModel$get_sustainability_data()$track_log)) {
-      if (nrow(model$BaseModel$get_sustainability_data()$track_log)!=0) {
-        co2 <- round(sum(model$BaseModel$get_sustainability_data()$track_log[, "sustainability_data.co2eq_kg"]), 3)
+    if (methods::isClass(Class = "data.frame", where = model$BaseModel$get_sustainability_data())) {
+      if (nrow(model$BaseModel$get_sustainability_data())!=0) {
+        co2 <- round(sum(model$BaseModel$get_sustainability_data()[, "sustainability_data.co2eq_kg"]), 3)
       } else {
         co2 <- "not estimated"
       }
@@ -100,9 +100,9 @@ generate_sidebar_information <- function(model) {
       model_label <- model$get_model_info()$model_label
     }
 
-    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data()$track_log)) {
-      if (nrow(model$get_sustainability_data()$track_log)!=0) {
-        kwh <- round(sum(model$get_sustainability_data()$track_log[, "sustainability_data.total_energy_kwh"]), 3)
+    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data())) {
+      if (nrow(model$get_sustainability_data())!=0) {
+        kwh <- round(sum(model$get_sustainability_data()[, "sustainability_data.total_energy_kwh"]), 3)
       } else {
         kwh <- "not estimated"
       }
@@ -110,9 +110,9 @@ generate_sidebar_information <- function(model) {
       kwh <- "not estimated"
     }
 
-    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data()$track_log)) {
-      if (nrow(model$get_sustainability_data()$track_log)!=0) {
-        co2 <- round(sum(model$get_sustainability_data()$track_log[, "sustainability_data.co2eq_kg"]), 3)
+    if (methods::isClass(Class = "data.frame", where = model$get_sustainability_data())) {
+      if (nrow(model$get_sustainability_data())!=0) {
+        co2 <- round(sum(model$get_sustainability_data()[, "sustainability_data.co2eq_kg"]), 3)
       } else {
         co2 <- "not estimated"
       }

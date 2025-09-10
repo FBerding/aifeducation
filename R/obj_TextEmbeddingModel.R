@@ -704,6 +704,19 @@ TextEmbeddingModel <- R6::R6Class(
         private$publication_info$modified_by$url <- url
       }
     },
+    #---------------------------------------------------------------------------
+    #' @description Method for requesting a summary of tracked energy consumption during training and an estimate of the
+    #'   resulting CO2 equivalents in kg.
+    #' @param track_mode `r get_param_doc_desc("track_mode")`
+    #' @return Returns a `list` containing the tracked energy consumption, CO2 equivalents in kg, information on the
+    #'   tracker used, and technical information on the training infrastructure.
+    get_sustainability_data = function(track_mode = "training") {
+      if (track_mode == "training") {
+        return(self$BaseModel$get_sustainability_data("training"))
+      } else if (track_mode == "inference") {
+        return(private$sustainability_inference)
+      }
+    },
     #--------------------------------------------------------------------------
     #' @description Calculates the energy consumption for inference of the given task.
     #' @param text_dataset `r get_param_doc_desc("text_dataset")`

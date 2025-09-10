@@ -48,6 +48,14 @@ BaseModel_Use_UI <- function(id) {
           Training_UI(id = shiny::NS(id, "BaseModel_Training"))
         ),
         bslib::nav_panel(
+          title = "Sustainability",
+          Sustainability_UI(id = shiny::NS(id, "BaseModel_Sustainability"))
+        ),
+        bslib::nav_panel(
+          title = "FLOPS",
+          FLOPS_UI(id = shiny::NS(id, "BaseModel_FLOPS"))
+        ),
+        bslib::nav_panel(
           title = "Fill-Mask",
           Fill_Mask_UI(id = shiny::NS(id, "BaseModel_Fill_Mask"))
         ),
@@ -147,6 +155,14 @@ BaseModel_Use_Server <- function(id, log_dir, volumes) {
     Training_Server(
       id = "BaseModel_Training",
       model = model
+    )
+    Sustainability_Server(
+      id="BaseModel_Sustainability",
+      model=model
+    )
+    FLOPS_Server(
+      id="BaseModel_FLOPS",
+      model=model
     )
     Fill_Mask_Server(
       id = "BaseModel_Fill_Mask",

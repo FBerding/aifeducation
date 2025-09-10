@@ -164,7 +164,23 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
         tmp_model=model()$BaseModel
       }
 
-      return(tmp_model$Tokenizer$get_tokenizer_statistics())
+      table <- tmp_model$Tokenizer$get_tokenizer_statistics()
+      if (!is.null(table)) {
+        return(
+          bslib::value_box(
+            title = "Tokens per Word",
+            value = table$mu_g[1],
+            shiny::tags$p(
+              "Total Words:", format(x = table$n_words[1], big.mark = ",")
+            ),
+            shiny::tags$p(
+              "Total Tokens: ", format(x = table$n_tokens[1], big.mark = ",")
+            )
+          )
+        )
+      } else {
+        return(NULL)
+      }
     })
 
     # Encode-------------------------------------------------------------------

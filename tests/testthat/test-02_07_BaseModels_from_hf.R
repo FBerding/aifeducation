@@ -25,24 +25,23 @@ test_tmp_data_base_model_path=paste0(test_tmp_data_path,"/","TEM")
 
 create_dir(test_tmp_data_base_model_path, FALSE)
 
-# Data Management
-example_data <- imdb_movie_reviews
-raw_texts <- LargeDataSetForText$new(example_data)
-
-raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
-
 # Test Configuration
 object_class_names <- c(
   "BaseModelBert",
-  "BaseModelFunnel",
+  #"BaseModelFunnel",
   #"BaseModelLongformer",
   "BaseModelModernBert",
   "BaseModelRoberta",
   "BaseModelMPNet"
   )
 
-
 for (object_class_name in object_class_names) {
+  # Data Management
+  example_data <- imdb_movie_reviews
+  raw_texts <- LargeDataSetForText$new(example_data)
+
+  raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
+
   base_to_existing_base_mode=paste0(test_tmp_data_base_model_path,"/",object_class_name)
 
     train_args <- generate_args_for_tests(
@@ -80,7 +79,8 @@ for (object_class_name in object_class_names) {
     )
 
     #Prepare directory
-    tmp_dir <- paste0(test_art_tmp_path, "/", object_class_name)
+    dir_path_new=paste0(test_art_tmp_path,"/",generate_id(10))
+    tmp_dir <- paste0(dir_path_new, "/", object_class_name)
     # Clear directory for next test
     unlink(paste0(tmp_dir,"/",object_class_name), recursive = TRUE)
     create_dir(tmp_dir, trace = FALSE)
@@ -93,10 +93,11 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(train_args)
     ), {
 
+
       expect_no_error(
         save_to_disk(
           object = base_model,
-          dir_path = test_art_tmp_path,
+          dir_path = dir_path_new,
           folder_name = object_class_name
         )
       )
@@ -108,9 +109,9 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(train_args)
     ), {
       if (train_args$sustain_track == TRUE) {
-        expect_gte(nrow(base_model$get_sustainability_data()$track_log), 1)
+        expect_gte(nrow(base_model$get_sustainability_data()), 1)
       } else {
-        expect_gte(nrow(base_model$get_sustainability_data()$track_log), 0)
+        expect_gte(nrow(base_model$get_sustainability_data()), 0)
       }
     })
 

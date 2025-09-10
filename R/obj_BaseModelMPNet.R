@@ -26,10 +26,12 @@ BaseModelMPNet <- R6::R6Class(
     model_type = "mpnet",
 
     adjust_max_sequence_length=2,
+    return_token_type_ids=FALSE,
 
     create_model=function(args){
       configuration <- transformers$MPNetConfig(
-        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+        #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         hidden_size = as.integer(args$hidden_size),
         num_hidden_layers = as.integer(args$num_hidden_layers),
         num_attention_heads = as.integer(args$num_attention_heads),

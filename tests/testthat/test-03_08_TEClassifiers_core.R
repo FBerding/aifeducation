@@ -291,10 +291,9 @@ for (object_class_name in object_class_names) {
     }
 
     # Function for loading and saving models-----------------------------------
+
     if (!skip_function_save_load) {
-      test_that(paste("function save and load", object_class_name, get_current_args_for_print(test_combination)), {
-        classifier <- NULL
-        gc()
+      test_that(paste("function save and load", object_class_name), {
         # Randomly select a configuration for training
         test_combination <- generate_args_for_tests(
           object_name = object_class_name,
@@ -344,6 +343,9 @@ for (object_class_name in object_class_names) {
             merge_attention_type = "MultiHead"
           )
         )
+        classifier <- NULL
+        gc()
+
 
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
@@ -367,11 +369,15 @@ for (object_class_name in object_class_names) {
           dir_path = root_path_results,
           folder_name = folder_name
         )
-        classifier <- NULL
-        classifier <- load_from_disk(dir_path = dir_path)
+        classifier2 <- NULL
+        classifier2 <- load_from_disk(dir_path = dir_path)
+
+        #Is config equal after loading
+        expect_equal(classifier$get_model_config(),
+                     classifier2$get_model_config())
 
         # Predict after loading
-        predictions_2 <- classifier$predict(
+        predictions_2 <- classifier2$predict(
           newdata = test_embeddings_reduced,
           batch_size = 2,
           ml_trace = 0

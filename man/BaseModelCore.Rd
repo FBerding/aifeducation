@@ -28,7 +28,7 @@ Other R6 Classes for Developers:
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{Tokenizer}}{\cr
-Objects of class \link{WordPieceTokenizer}, \link{HuggingFaceTokenizer}.}
+Objects of class \link{WordPieceTokenizer}, \link{BPETokenizer}, \link{HuggingFaceTokenizer}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -50,6 +50,7 @@ Objects of class \link{WordPieceTokenizer}, \link{HuggingFaceTokenizer}.}
 \item \href{#method-BaseModelCore-get_flops_estimates}{\code{BaseModelCore$get_flops_estimates()}}
 \item \href{#method-BaseModelCore-set_publication_info}{\code{BaseModelCore$set_publication_info()}}
 \item \href{#method-BaseModelCore-estimate_sustainability_inference_fill_mask}{\code{BaseModelCore$estimate_sustainability_inference_fill_mask()}}
+\item \href{#method-BaseModelCore-calc_flops_architecture_based}{\code{BaseModelCore$calc_flops_architecture_based()}}
 \item \href{#method-BaseModelCore-clone}{\code{BaseModelCore$clone()}}
 }
 }
@@ -419,6 +420,30 @@ Calculates the energy consumption for inference of the given task.
 \subsection{Returns}{
 Returns nothing. Method saves the statistics internally.
 The statistics can be accessed with the method \code{get_sustainability_data("inference")}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelCore-calc_flops_architecture_based"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelCore-calc_flops_architecture_based}{}}}
+\subsection{Method \code{calc_flops_architecture_based()}}{
+Calculates FLOPS based on model's architecture.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$calc_flops_architecture_based(batch_size, n_batches, n_epochs)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{batch_size}}{}
+
+\item{\code{n_batches}}{}
+
+\item{\code{n_epochs}}{}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns a \code{data.frame} storing the estimates.
 }
 }
 \if{html}{\out{<hr>}}
