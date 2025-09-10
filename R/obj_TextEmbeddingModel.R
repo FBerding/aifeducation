@@ -408,7 +408,7 @@ TextEmbeddingModel <- R6::R6Class(
           max_token_sequence_length = private$model_config$max_length,
           n_chunks = private$model_config$chunks,
           token_to_int = TRUE,
-          return_token_type_ids <- (self$BaseModel$get_model_type() != AIFETrType$mpnet)
+          return_token_type_ids <- (self$BaseModel$get_model_type() != "mpnet")
         )
 
         text_embedding <- array(
@@ -435,13 +435,13 @@ TextEmbeddingModel <- R6::R6Class(
         with(
           data = torch$no_grad(),
           {
-            if (self$BaseModel$get_model_type() == AIFETrType$mpnet) {
+            if (self$BaseModel$get_model_type() == "mpnet") {
               tensor_embeddings <- self$BaseModel$get_model()(
                 input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
                 attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
                 output_hidden_states = TRUE
               )$hidden_states
-            } else if (self$BaseModel$get_model_type() == AIFETrType$modernbert) {
+            } else if (self$BaseModel$get_model_type() == "modernbert") {
               tensor_embeddings <- self$BaseModel$get_model()(
                 input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
                 attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
