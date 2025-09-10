@@ -58,13 +58,13 @@ TEFeatureExtractor <- R6::R6Class(
                          text_embeddings = NULL,
                          features = 128,
                          method = "dense",
-                         orthogonal_method="matrix_exp",
+                         orthogonal_method = "matrix_exp",
                          noise_factor = 0.2) {
-      args=get_called_args(n=1)
+      args <- get_called_args(n = 1)
       private$check_config_for_FALSE()
 
-      #Check arguments
-      check_all_args(args=args)
+      # Check arguments
+      check_all_args(args = args)
       private$check_embeddings_object_type(args$text_embeddings, strict = TRUE)
 
       # Set TextEmbeddingModel
@@ -73,20 +73,20 @@ TEFeatureExtractor <- R6::R6Class(
         feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
         times = args$text_embeddings$get_times(),
         features = args$text_embeddings$get_features(),
-        pad_value=args$text_embeddings$get_pad_value()
+        pad_value = args$text_embeddings$get_pad_value()
       )
 
-      #save arguments
-      private$save_all_args(args=args,group="configure")
+      # save arguments
+      private$save_all_args(args = args, group = "configure")
 
-      #Set target data config
-      #private$set_target_data(
+      # Set target data config
+      # private$set_target_data(
       #  target_levels=args$target_levels,
       #  one_hot_encoding=TRUE
-      #)
+      # )
 
-      #Perform additional checks and adjustments
-      #private$check_param_combinations()
+      # Perform additional checks and adjustments
+      # private$check_param_combinations()
 
       # Set ML framework
       private$ml_framework <- "pytorch"
@@ -99,11 +99,11 @@ TEFeatureExtractor <- R6::R6Class(
       )
 
       # Adjust configuration
-      #private$adjust_configuration()
+      # private$adjust_configuration()
 
       # Set FeatureExtractor and adapt config
-      #self$check_feature_extractor_object_type(args$feature_extractor)
-      #private$set_feature_extractor(args$feature_extractor)
+      # self$check_feature_extractor_object_type(args$feature_extractor)
+      # private$set_feature_extractor(args$feature_extractor)
 
       # Set package versions
       private$set_package_versions()
@@ -143,7 +143,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
-    train = function(data_embeddings=NULL,
+    train = function(data_embeddings = NULL,
                      data_val_size = 0.25,
                      sustain_track = TRUE,
                      sustain_iso_code = NULL,
@@ -155,21 +155,21 @@ TEFeatureExtractor <- R6::R6Class(
                      ml_trace = 1,
                      log_dir = NULL,
                      log_write_interval = 10,
-                     lr_rate=1e-3,
-                     lr_warm_up_ratio=0.02,
+                     lr_rate = 1e-3,
+                     lr_warm_up_ratio = 0.02,
                      optimizer = "AdamW") {
-      args=get_called_args(n=1)
-      check_all_args(args=args)
+      args <- get_called_args(n = 1)
+      check_all_args(args = args)
       self$check_embedding_model(data_embeddings)
 
-      #Save args
-      private$save_all_args(args=args,group="training")
+      # Save args
+      private$save_all_args(args = args, group = "training")
 
-      #Perform additional checks and adjustments
-      #private$check_param_combinations()
+      # Perform additional checks and adjustments
+      # private$check_param_combinations()
 
-      #set up logger
-      private$set_up_logger(log_dir=log_dir,log_write_interval=log_write_interval)
+      # set up logger
+      private$set_up_logger(log_dir = log_dir, log_write_interval = log_write_interval)
 
       # Loading PY Scripts
       private$load_reload_python_scripts()
@@ -196,12 +196,12 @@ TEFeatureExtractor <- R6::R6Class(
       # Copy input as label for training
       extractor_dataset <- data$map(
         py$map_input_to_labels,
-        load_from_cache_file=FALSE,
-        keep_in_memory=FALSE,
-        cache_file_name=paste0(create_and_get_tmp_dir(),"/",generate_id(15))
-        )
+        load_from_cache_file = FALSE,
+        keep_in_memory = FALSE,
+        cache_file_name = paste0(create_and_get_tmp_dir(), "/", generate_id(15))
+      )
 
-      #Check and create temporary directory for checkpoints
+      # Check and create temporary directory for checkpoints
       private$create_checkpoint_directory()
 
       # Set up log file
@@ -218,12 +218,12 @@ TEFeatureExtractor <- R6::R6Class(
       # Start Sustainability Tracking-------------------------------------------
       private$init_and_start_sustainability_tracking()
 
-      #Start Training----------------------------------------------------------
+      # Start Training----------------------------------------------------------
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
         model = private$model,
         optimizer_method = self$last_training$config$optimizer,
-        lr_rate=self$last_training$config$lr_rate,
-        lr_warm_up_ratio=self$last_training$config$lr_warm_up_ratio,
+        lr_rate = self$last_training$config$lr_rate,
+        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
         batch_size = as.integer(self$last_training$config$batch_size),
@@ -240,7 +240,7 @@ TEFeatureExtractor <- R6::R6Class(
       rownames(self$last_training$history$loss) <- c("train", "val")
 
       # Stop sustainability tracking if requested
-        private$stop_sustainability_tracking()
+      private$stop_sustainability_tracking()
 
       # Set training status value
       private$trained <- TRUE
@@ -264,7 +264,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @return Returns an object of class [EmbeddedText] containing the compressed embeddings.
     extract_features = function(data_embeddings, batch_size) {
       # Argument checking
-      check_type(object=batch_size, type="int", FALSE)
+      check_type(object = batch_size, type = "int", FALSE)
       # check data_embeddings object
       if ("EmbeddedText" %in% class(data_embeddings) | "LargeDataSetForTextEmbeddings" %in% class(data_embeddings)) {
         self$check_embedding_model(text_embeddings = data_embeddings)
@@ -340,7 +340,7 @@ TEFeatureExtractor <- R6::R6Class(
         param_emb_layer_max = model_info$model$param_emb_layer_max,
         param_emb_pool_type = model_info$model$param_emb_pool_type,
         param_aggregation = model_info$model$param_aggregation,
-        param_pad_value=private$text_embedding_model$pad_value,
+        param_pad_value = private$text_embedding_model$pad_value,
         embeddings = reduced_embeddings
       )
 
@@ -365,9 +365,9 @@ TEFeatureExtractor <- R6::R6Class(
     #' @return Returns an object of class [LargeDataSetForTextEmbeddings] containing the compressed embeddings.
     extract_features_large = function(data_embeddings, batch_size, trace = FALSE) {
       # Argument checking
-      check_class(object=data_embeddings,object_name="data_embeddings", classes=c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL=FALSE)
-      check_type(object=batch_size, type="int", FALSE)
-      check_type(object=trace, type="bool", FALSE)
+      check_class(object = data_embeddings, object_name = "data_embeddings", classes = c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL = FALSE)
+      check_type(object = batch_size, type = "int", FALSE)
+      check_type(object = trace, type = "bool", FALSE)
 
       # Get total number of batches for the loop
       total_number_of_bachtes <- ceiling(data_embeddings$n_rows() / batch_size)
@@ -404,7 +404,7 @@ TEFeatureExtractor <- R6::R6Class(
             param_emb_layer_max = model_info$model$param_emb_layer_max,
             param_emb_pool_type = model_info$model$param_emb_pool_type,
             param_aggregation = model_info$model$param_aggregation,
-            param_pad_value=private$text_embedding_model$pad_value
+            param_pad_value = private$text_embedding_model$pad_value
           )
           embedded_texts_large$add_feature_extractor_info(
             model_name = private$model_info$model_name,
@@ -437,15 +437,16 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
     #' @param text_size Size of the text.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history=function(y_min=NULL,y_max=NULL,text_size=10){
-      plot=super$plot_training_history(
-        final_training=FALSE,
-        pl_step=NULL,
-        measure="loss",
-        y_min=y_min,
-        y_max=y_max,
-        add_min_max=FALSE,
-        text_size=text_size)
+    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10) {
+      plot <- super$plot_training_history(
+        final_training = FALSE,
+        pl_step = NULL,
+        measure = "loss",
+        y_min = y_min,
+        y_max = y_max,
+        add_min_max = FALSE,
+        text_size = text_size
+      )
       return(plot)
     }
   ),
@@ -480,22 +481,22 @@ TEFeatureExtractor <- R6::R6Class(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
           noise_factor = private$model_config$noise_factor,
-          pad_value=private$text_embedding_model$pad_value
+          pad_value = private$text_embedding_model$pad_value
         )
       } else if (private$model_config$method == "Dense") {
         private$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
           noise_factor = private$model_config$noise_factor,
-          pad_value=private$text_embedding_model$pad_value,
-          orthogonal_method=private$model_config$orthogonal_method
+          pad_value = private$text_embedding_model$pad_value,
+          orthogonal_method = private$model_config$orthogonal_method
         )
       }
     },
     #--------------------------------------------------------------------------
-    generate_model_id=function(name){
-      if(is.null(name)){
-        return(paste0("tefe_",generate_id(16)))
+    generate_model_id = function(name) {
+      if (is.null(name)) {
+        return(paste0("tefe_", generate_id(16)))
       } else {
         return(name)
       }
@@ -503,5 +504,5 @@ TEFeatureExtractor <- R6::R6Class(
   )
 )
 
-#Add the model to the user list
-TextEmbeddingObjectsIndex$TEFeatureExtractor=("TEFeatureExtractor")
+# Add the model to the user list
+TextEmbeddingObjectsIndex$TEFeatureExtractor <- ("TEFeatureExtractor")

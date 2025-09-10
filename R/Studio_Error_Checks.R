@@ -147,7 +147,7 @@ check_errors_create_classifier <- function(classifier_type,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -232,7 +232,7 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 
   tmp_ui_error <- NULL
   if (length(error_list) > 0) {
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -323,7 +323,7 @@ check_errors_create_feature_extractor <- function(destination_path,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -377,7 +377,7 @@ check_errors_predict_classifier <- function(embeddings,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -438,7 +438,7 @@ check_errors_text_embedding_model_embed <- function(destination_path,
   # summary
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -494,7 +494,7 @@ check_errors_text_embedding_model_create <- function(destination_path,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -548,7 +548,7 @@ check_error_base_model_create_or_train <- function(destination_path,
 
   if (length(error_list) > 0) {
     tmp_ui_error <- NULL
-    for (i in seq_len(length(error_list))) {
+    for (i in seq_along(error_list)) {
       tmp_ui_error[length(tmp_ui_error) + 1] <- list(
         shiny::tags$p(error_list[i])
       )
@@ -559,17 +559,17 @@ check_error_base_model_create_or_train <- function(destination_path,
   }
 }
 
-load_and_check_base_model=function(path){
-  if(file.exists(paste0(path,"/","r_config_state.rda"))){
-    model=load_from_disk(path)
+load_and_check_base_model <- function(path) {
+  if (file.exists(paste0(path, "/", "r_config_state.rda"))) {
+    model <- load_from_disk(path)
   } else {
-    tmp_pytorch_model=transformers$AutoModelForMaskedLM$from_pretrained(model_dir=path)
-    tmp_type=detect_base_model_type(tmp_pytorch_model)
-    model=create_object(tmp_type)
+    tmp_pytorch_model <- transformers$AutoModelForMaskedLM$from_pretrained(model_dir = path)
+    tmp_type <- detect_base_model_type(tmp_pytorch_model)
+    model <- create_object(tmp_type)
     model$create_from_hf(
       model_dir = path,
       tokenizer_dir = path
     )
-    }
+  }
   return(model)
 }

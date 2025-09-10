@@ -43,12 +43,12 @@ load_py_scripts <- function(files) {
 #' @importFrom reticulate py_run_file
 #' @export
 load_all_py_scripts <- function() {
-  python_dir=system.file(
+  python_dir <- system.file(
     "python",
     package = "aifeducation"
   )
-  python_files=list.files(
-    path=python_dir,
+  python_files <- list.files(
+    path = python_dir,
     full.names = TRUE
   )
 
@@ -235,13 +235,13 @@ get_py_package_versions <- function() {
     "numpy"
   )
 
-  packages_installed=reticulate::py_list_packages()
+  packages_installed <- reticulate::py_list_packages()
 
   versions <- vector(length = length(list_of_packages) + 1)
   names(versions) <- c("python", list_of_packages)
   versions["python"] <- as.character(reticulate::py_config()$version)
   for (package in list_of_packages) {
-    versions[package] <- packages_installed$version[which(packages_installed$package==package)]
+    versions[package] <- packages_installed$version[which(packages_installed$package == package)]
   }
   return(versions)
 }
@@ -262,4 +262,3 @@ get_py_package_version <- function(package_name) {
     return(NA)
   }
 }
-

@@ -210,7 +210,11 @@ get_dict_input_types <- function(input_type) {
    be used for pseudo labeling.
    \n For predictions an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] has to be used which was
    created with the same [TextEmbeddingModel] as for training."
+  } else {
+    stop("input type not supported-")
   }
+
+  return(desc)
 }
 
 
@@ -227,8 +231,6 @@ get_dict_input_types <- function(input_type) {
 #' @family Utils Documentation
 #' @export
 get_parameter_documentation <- function(param_name, param_dict, as_list = TRUE, inc_param_name = TRUE) {
-  selected_param <- param_name
-
   # Add description
   if (as_list == TRUE) {
     prefix <- "- *"
@@ -433,10 +435,10 @@ build_documentation_for_model <- function(model_name, cls_type = NULL, core_type
   model_documentation <- NULL
 
   # CLS Type
-  desc_cls_type <- NULL
   if (!is.null(cls_type)) {
-    model_documentation <- paste0("**Classification Type**\n\n",
-      desc_cls_type = get_dict_cls_type(cls_type)
+    model_documentation <- paste0(
+      "**Classification Type**\n\n",
+      get_dict_cls_type(cls_type)
     )
   }
 
@@ -551,9 +553,9 @@ get_tr_types_list_decsription <- function() {
 #' @family Parameter Dictionary
 #' @noRd
 #' @keywords internal
-build_aife_site <- function(clear_docs=FALSE) {
+build_aife_site <- function(clear_docs = FALSE) {
   requireNamespace("pkgdown")
-  if(clear_docs==TRUE){
+  if (clear_docs == TRUE) {
     pkgdown::clean_site()
   }
   pkgdown::init_site()
@@ -582,21 +584,21 @@ build_aife_site <- function(clear_docs=FALSE) {
 }
 
 
-#==============================================================================
+# ==============================================================================
 
 #' @keywords internal
-get_description=function(type){
-  if(type=="return_object"){
+get_description <- function(type) {
+  if (type == "return_object") {
     return("Does return a new object of this class.")
-  } else if(type=="return_nothing"){
+  } else if (type == "return_nothing") {
     return("Does nothing return.")
-  } else if(type=="return_save_on_disk"){
+  } else if (type == "return_save_on_disk") {
     return("Function does nothing return. It is used to save an object on disk.")
-  } else if (type=="return_load_on_disk"){
+  } else if (type == "return_load_on_disk") {
     return("Function does nothin return. It loads an object from disk.")
-  } else if (type=="save_dir"){
+  } else if (type == "save_dir") {
     return("Path to the directory where to save the object.")
-  } else if (type=="load_dir"){
+  } else if (type == "load_dir") {
     return("Path where the object set is stored.")
   }
 }

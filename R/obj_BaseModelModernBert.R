@@ -25,10 +25,9 @@ BaseModelModernBert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "modernbert",
-
-    create_model=function(args){
+    create_model = function(args) {
       configuration <- transformers$ModernBertConfig(
-        #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+        # vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         hidden_size = as.integer(args$hidden_size),
         intermediate_size = as.integer(args$intermediate_size),
@@ -39,20 +38,19 @@ BaseModelModernBert <- R6::R6Class(
         initializer_range = 0.02,
         norm_eps = 1e-12,
         pad_token_id = args$tokenizer$get_tokenizer()$pad_token_id,
-        eos_token_id= args$tokenizer$get_tokenizer()$eos_token_id,
-        bos_token_id= args$tokenizer$get_tokenizer()$bos_token_id,
-        cls_token_id=args$tokenizer$get_tokenizer()$cls_token_id,
-        sep_token_id= args$tokenizer$get_tokenizer()$sep_token_id,
+        eos_token_id = args$tokenizer$get_tokenizer()$eos_token_id,
+        bos_token_id = args$tokenizer$get_tokenizer()$bos_token_id,
+        cls_token_id = args$tokenizer$get_tokenizer()$cls_token_id,
+        sep_token_id = args$tokenizer$get_tokenizer()$sep_token_id,
         embedding_dropout = args$embedding_dropout,
         mlp_dropout = args$mlp_dropout,
         attention_dropout = args$attention_dropout,
-        deterministic_flash_attn =TRUE
+        deterministic_flash_attn = TRUE
       )
 
       private$model <- transformers$ModernBertForMaskedLM(configuration)
-
     },
-    load_BaseModel=function(dir_path){
+    load_BaseModel = function(dir_path) {
       private$model <- transformers$ModernBertForMaskedLM$from_pretrained(dir_path)
     }
   ),
@@ -78,7 +76,7 @@ BaseModelModernBert <- R6::R6Class(
                          intermediate_size = 3072,
                          hidden_activation = "GELU",
                          embedding_dropout = 0.1,
-                         mlp_dropout=0.1,
+                         mlp_dropout = 0.1,
                          attention_dropout = 0.1) {
       arguments <- get_called_args(n = 1)
       private$do_configuration(args = arguments)
@@ -86,5 +84,5 @@ BaseModelModernBert <- R6::R6Class(
   )
 )
 
-#Add the model to the user list
-BaseModelsIndex$ModernBert=("BaseModelModernBert")
+# Add the model to the user list
+BaseModelsIndex$ModernBert <- ("BaseModelModernBert")

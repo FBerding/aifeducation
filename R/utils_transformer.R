@@ -35,9 +35,9 @@
 #'
 #' @family Utils Transformers Developers
 #' @export
-calc_tokenizer_statistics <- function(dataset, step = "creation",statistics_max_tokens_length=512) {
+calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max_tokens_length = 512) {
   # Argument Checking
-  check_class(object=dataset, classes="datasets.arrow_dataset.Dataset", allow_NULL=FALSE)
+  check_class(object = dataset, classes = "datasets.arrow_dataset.Dataset", allow_NULL = FALSE)
 
   n_sequences <- dataset$num_rows
   n_words <- NA
@@ -72,7 +72,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation",statistics_max_
     list(
       step = step,
       date = date(),
-      max_tokens_length=statistics_max_tokens_length,
+      max_tokens_length = statistics_max_tokens_length,
       n_sequences = n_sequences,
       n_words = n_words,
       n_tokens = n_tokens,
@@ -210,7 +210,8 @@ check.model_files <- function(model_dir_path) { # nolint
 #' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
-create_WordPiece_tokenizer <- function(# nolint
+create_WordPiece_tokenizer <- function(
+    # nolint
     vocab_do_lower_case,
     sep_token = "[SEP]",
     sep_id = 1,
@@ -244,7 +245,8 @@ create_WordPiece_tokenizer <- function(# nolint
 #' @family Utils Transformers Developers
 #' @keywords internal
 #' @noRd
-create_ByteLevelBPE_tokenizer <- function(# nolint
+create_ByteLevelBPE_tokenizer <- function(
+    # nolint
     max_position_embeddings,
     add_prefix_space,
     trim_offsets) {
@@ -258,4 +260,3 @@ create_ByteLevelBPE_tokenizer <- function(# nolint
   tok_new$enable_padding(pad_token = "<pad>")
   return(tok_new)
 }
-

@@ -24,7 +24,7 @@
 #' @keywords internal
 #' @noRd
 #'
-check_class <- function(object,object_name=NULL, classes, allow_NULL = FALSE) {
+check_class <- function(object, object_name = NULL, classes, allow_NULL = FALSE) {
   if (!is.null(object)) {
     classes_object <- class(object)
     check_results <- sum(classes_object %in% classes)
@@ -65,15 +65,15 @@ check_class <- function(object,object_name=NULL, classes, allow_NULL = FALSE) {
 #' @keywords internal
 #' @noRd
 #'
-check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALSE, min = NULL, max = NULL, allowed_values = NULL) {
-  if(is.null(object_name)){
-    tmp_name=dQuote(object)
+check_type <- function(object, object_name = NULL, type = "bool", allow_NULL = FALSE, min = NULL, max = NULL, allowed_values = NULL) {
+  if (is.null(object_name)) {
+    tmp_name <- dQuote(object)
   } else {
-    tmp_name=object_name
+    tmp_name <- object_name
   }
 
   if (!allow_NULL && is.null(object)) {
-    stop(paste(tmp_name,"is not allowed to be NULL"))
+    stop(paste(tmp_name, "is not allowed to be NULL"))
   }
 
   if (!is.null(object)) {
@@ -92,7 +92,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
       if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
-        if (!(min <= object & object <= max)) {
+        if (!(min <= object && object <= max)) {
           stop(paste(tmp_name, "must greater or equal", min, "and smaller or equal", max))
         }
       }
@@ -100,7 +100,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
       if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
-        if (!(min < object & object <= max)) {
+        if (!(min < object && object <= max)) {
           stop(paste(tmp_name, "must greater ", min, "and smaller or equal", max))
         }
       }
@@ -108,7 +108,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
       if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
-        if (!(min <= object & object <= max)) {
+        if (!(min <= object && object <= max)) {
           stop(paste(tmp_name, "must greater or equal", min, "and smaller", max))
         }
       }
@@ -116,7 +116,7 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
       if (!is.numeric(object)) {
         stop(paste(tmp_name, "must be double"))
       } else {
-        if (!(min <= object & object <= max)) {
+        if (!(min <= object && object <= max)) {
           stop(paste(tmp_name, "must greater", min, "and smaller", max))
         }
       }
@@ -166,8 +166,8 @@ check_type <- function(object,object_name=NULL, type = "bool", allow_NULL = FALS
 #' @noRd
 #'
 check_versions <- function(a, operator = "==", b) {
-  a=as.character(a)
-  b=as.character(b)
+  a <- as.character(a)
+  b <- as.character(b)
   res <- utils::compareVersion(a = a, b = b)
   if (operator == "==") {
     if (res == 0) {
@@ -221,11 +221,11 @@ check_versions <- function(a, operator = "==", b) {
 #' @family Utils Checks Developers
 #' @export
 #'
-check_class_and_type <- function(object,object_name=NULL, type_classes = "bool", allow_NULL = FALSE, min = NULL, max = NULL, allowed_values = NULL) {
-  if (length(type_classes)==sum(type_classes %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list"))) {
+check_class_and_type <- function(object, object_name = NULL, type_classes = "bool", allow_NULL = FALSE, min = NULL, max = NULL, allowed_values = NULL) {
+  if (length(type_classes) == sum(type_classes %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list"))) {
     check_type(
       object = object,
-      object_name=object_name,
+      object_name = object_name,
       type = type_classes,
       allow_NULL = allow_NULL,
       min = min, max = max,
@@ -250,16 +250,16 @@ check_class_and_type <- function(object,object_name=NULL, type_classes = "bool",
 #' @family Utils Checks Developers
 #' @export
 #'
-check_all_args=function(args){
-  arg_dict=get_param_dict()
-  #Select only arguments that occur in args and var group
-  shared_var_names=intersect(x=names(arg_dict),y=names(args))
-  #Check every argument
-  for(var in shared_var_names){
-    current_def=arg_dict[[var]]
+check_all_args <- function(args) {
+  arg_dict <- get_param_dict()
+  # Select only arguments that occur in args and var group
+  shared_var_names <- intersect(x = names(arg_dict), y = names(args))
+  # Check every argument
+  for (var in shared_var_names) {
+    current_def <- arg_dict[[var]]
     check_class_and_type(
-      object=args[[var]],
-      object_name=var,
+      object = args[[var]],
+      object_name = var,
       type_classes = current_def$type,
       allow_NULL = current_def$allow_null,
       min = current_def$min,
@@ -279,12 +279,12 @@ check_all_args=function(args){
 #' @keywords internal
 #' @noRd
 #'
-is_valid_and_exportable_param=function(arg_name,param_dict){
-  param_dict_entry=param_dict[[arg_name]]
+is_valid_and_exportable_param <- function(arg_name, param_dict) {
+  param_dict_entry <- param_dict[[arg_name]]
 
-  if(!is.null(param_dict_entry$type)){
-    if(max(param_dict_entry$type%in%c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")) &
-       !arg_name%in%c("log_dir","log_write_interval")){
+  if (!is.null(param_dict_entry$type)) {
+    if (max(param_dict_entry$type %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")) &&
+      !arg_name %in% c("log_dir", "log_write_interval")) {
       return(TRUE)
     } else {
       return(FALSE)
@@ -292,5 +292,4 @@ is_valid_and_exportable_param=function(arg_name,param_dict){
   } else {
     return(FALSE)
   }
-
 }

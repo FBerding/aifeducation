@@ -30,8 +30,8 @@
 #' @family performance measures
 #' @export
 cohens_kappa <- function(rater_one, rater_two) {
-  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
-  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
+  check_class(object = rater_one, classes = "factor", allow_NULL = FALSE)
+  check_class(object = rater_two, classes = "factor", allow_NULL = FALSE)
   if (sum(levels(rater_one) == levels(rater_two)) != max(length(levels(rater_one)), length(levels(rater_two)))) {
     stop("Levels for values of rater one and two are not identical.")
   }
@@ -96,9 +96,9 @@ cohens_kappa <- function(rater_one, rater_two) {
 #' @family performance measures
 #' @export
 kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
-  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
-  check_class(object=additional_raters, classes="list", allow_NULL=TRUE)
+  check_class(object = rater_one, classes = "factor", allow_NULL = FALSE)
+  check_class(object = rater_two, classes = "factor", allow_NULL = FALSE)
+  check_class(object = additional_raters, classes = "list", allow_NULL = TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -173,9 +173,9 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @family performance measures
 #' @export
 kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
-  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
-  check_class(object=additional_raters, classes="list", allow_NULL=TRUE)
+  check_class(object = rater_one, classes = "factor", allow_NULL = FALSE)
+  check_class(object = rater_two, classes = "factor", allow_NULL = FALSE)
+  check_class(object = additional_raters, classes = "list", allow_NULL = TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -299,9 +299,9 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @family performance measures
 #' @export
 fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(rater_one, classes="factor", allow_NULL=FALSE)
-  check_class(rater_two, classes="factor", allow_NULL=FALSE)
-  check_class(additional_raters, classes="list", allow_NULL=TRUE)
+  check_class(rater_one, classes = "factor", allow_NULL = FALSE)
+  check_class(rater_two, classes = "factor", allow_NULL = FALSE)
+  check_class(additional_raters, classes = "list", allow_NULL = TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -375,9 +375,9 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
 #' @family performance measures
 #' @export
 gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
-  check_class(object=rater_one, classes="factor", allow_NULL=FALSE)
-  check_class(object=rater_two, classes="factor", allow_NULL=FALSE)
-  check_class(object=additional_raters, classes="list", allow_NULL=TRUE)
+  check_class(object = rater_one, classes = "factor", allow_NULL = FALSE)
+  check_class(object = rater_two, classes = "factor", allow_NULL = FALSE)
+  check_class(object = additional_raters, classes = "list", allow_NULL = TRUE)
 
   # create list of raters
   raters <- list(rater_one, rater_two)
@@ -394,7 +394,7 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
 
   N <- length(rater_one)
   k <- length(levels(rater_one))
-  n <- length(raters)
+
 
   # Create raw matrix
   # cases in the rows and categories in the column
@@ -422,7 +422,7 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Agreement
   p_a <- 0
-  for (i in 1:nrow(reduced_raw_matrix)) {
+  for (i in seq_len(nrow(reduced_raw_matrix))) {
     for (j in 1:k) {
       p_a <- p_a + (reduced_raw_matrix[i, j] * (reduced_raw_matrix[i, j] - 1)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1))
     }
@@ -433,7 +433,7 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
   p_e <- 0
   for (j in 1:k) {
     pi <- 0
-    for (i in 1:nrow(raw_matrix)) {
+    for (i in seq_len(nrow(raw_matrix))) {
       pi <- pi + raw_matrix[i, j] / row_sums[i]
     }
     pi <- pi / N
@@ -460,7 +460,7 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
 
     # Agreement
     p_a <- 0
-    for (i in 1:nrow(reduced_raw_matrix)) {
+    for (i in seq_len(nrow(reduced_raw_matrix))) {
       for (j in 1:k) {
         weighted_count <- 0
         for (l in 1:k) {
@@ -475,7 +475,7 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
     p_e <- 0
     for (j in 1:k) {
       pi <- 0
-      for (i in 1:nrow(raw_matrix)) {
+      for (i in seq_len(nrow(raw_matrix))) {
         pi <- pi + raw_matrix[i, j] / row_sums[i]
       }
       pi <- pi / N

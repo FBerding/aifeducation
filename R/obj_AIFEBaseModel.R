@@ -699,7 +699,7 @@ AIFEMaster <- R6::R6Class(
               !arg %in% c(
                 "log_dir", "log_write_interval",
                 "base_model", "model_language", "model_label",
-                "model_name", "tokenizer","text_embeddings"
+                "model_name", "tokenizer", "text_embeddings"
               )) {
               private$model_config[arg] <- list(args[[arg]])
             }
@@ -760,22 +760,23 @@ AIFEMaster <- R6::R6Class(
       # Check if the model parameter for configuration are saved on other fields
       config_params <- setdiff(
         x = rlang::fn_fmls_names(self$configure),
-        y = c("model_name", "model_label", "model_language","text_embeddings","features")
+        y = c("model_name", "model_label", "model_language", "text_embeddings", "features")
       )
 
-      require_udate=check_versions(
+      require_udate <- check_versions(
         a = self$get_package_versions()$r_package_versions$aifeducation,
         operator = "<",
-        b = "1.1.2")
-      if(require_udate){
+        b = "1.1.2"
+      )
+      if (require_udate) {
         for (config_param in config_params) {
           # Search in public
-          for (i in 1:length(config_file$public)) {
+          for (i in 1:seq_along(config_file$public)) {
             current_entry <- config_file$public[[i]]
-            if(is.list(current_entry)){
-              current_entry=config_file$public[[i]][[config_param]]
+            if (is.list(current_entry)) {
+              current_entry <- config_file$public[[i]][[config_param]]
             } else {
-              current_entry=NULL
+              current_entry <- NULL
             }
 
             if (!is.null_or_na(current_entry)) {
@@ -783,12 +784,12 @@ AIFEMaster <- R6::R6Class(
             }
           }
           # Search in private
-          for (i in 1:length(config_file$private)) {
-            current_entry=config_file$private[[i]]
-            if(is.list(current_entry)){
-              current_entry=config_file$private[[i]][[config_param]]
+          for (i in 1:seq_along(config_file$private)) {
+            current_entry <- config_file$private[[i]]
+            if (is.list(current_entry)) {
+              current_entry <- config_file$private[[i]][[config_param]]
             } else {
-              current_entry=NULL
+              current_entry <- NULL
             }
             if (!is.null_or_na(current_entry)) {
               private$model_config[config_param] <- list(current_entry)
@@ -817,7 +818,7 @@ AIFEMaster <- R6::R6Class(
           }
         }
       }
-      }
+    }
   )
 )
 

@@ -19,9 +19,9 @@
 #' All models of this class require text embeddings as input. These are provided as
 #' objects of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
 #'
-#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+#' Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
 #'
-#'This class is **not** designed for a direct application and should only be used by developers.
+#' This class is **not** designed for a direct application and should only be used by developers.
 #'
 #' @return A new object of this class.
 #' @family R6 Classes for Developers
@@ -73,11 +73,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' @return Function does not return a value. It saves the model to disk.
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
-      #Save pytorch model
-      private$save_pytorch_model(dir_path=dir_path, folder_name=folder_name)
+      # Save pytorch model
+      private$save_pytorch_model(dir_path = dir_path, folder_name = folder_name)
 
       # Saving Sustainability Data
-      private$save_sustainability_data(dir_path=dir_path, folder_name=folder_name)
+      private$save_sustainability_data(dir_path = dir_path, folder_name = folder_name)
     },
     #--------------------------------------------------------------------------
     #' @description loads an object from disk and updates the object to the current version of the package.
@@ -100,24 +100,24 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       # These are documentations, licenses, model's name and label etc.
       private$load_config_file(dir_path)
 
-      #private$load_base_config_and_docs_general(
+      # private$load_base_config_and_docs_general(
       #  config_public = config_file$public,
       #  config_private = config_file$private
-      #)
+      # )
 
       # Check and update model_config
       # Call this method to add parameters that where added in later version
       # which are missing in the old model
-      #private$update_model_config()
+      # private$update_model_config()
 
-      #Check and update pad value if necessary
+      # Check and update pad value if necessary
       private$update_pad_value()
 
       # Create and load AI model
       private$load_pytorch_model(dir_path = dir_path)
 
-      #Load sustainability data
-      private$load_sustainability_data(model_dir=dir_path)
+      # Load sustainability data
+      private$load_sustainability_data(model_dir = dir_path)
 
       # Set training status
       private$trained <- config_file$private$trained
@@ -136,12 +136,12 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
     #' @param text_size Size of the text.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history=function(final_training=FALSE,pl_step=NULL,measure="loss",y_min=NULL,y_max=NULL,add_min_max=TRUE,text_size=10){
-        requireNamespace("ggplot2")
-        plot_data <- private$prepare_training_history(
-          final = final_training,
-          pl_step = pl_step
-        )
+    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10) {
+      requireNamespace("ggplot2")
+      plot_data <- private$prepare_training_history(
+        final = final_training,
+        pl_step = pl_step
+      )
 
       # Select the performance measure to display
       plot_data <- plot_data[[measure]]
@@ -231,10 +231,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     ),
     #------------------------------------------------------------------------------
     load_config_and_docs_textembeddingmodel = function(config_public, config_private) {
-      if(is.null(config_private$text_embedding_model$pad_value)){
-        pad_value=0
+      if (is.null(config_private$text_embedding_model$pad_value)) {
+        pad_value <- 0
       } else {
-        pad_value=config_private$text_embedding_model$pad_value
+        pad_value <- config_private$text_embedding_model$pad_value
       }
 
       private$set_text_embedding_model(
@@ -242,7 +242,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         feature_extractor_info = config_private$text_embedding_model$feature_extractor,
         times = config_private$text_embedding_model$times,
         features = config_private$text_embedding_model$features,
-        pad_value=pad_value
+        pad_value = pad_value
       )
     },
     #---------------------------------------------------------------------------
@@ -378,8 +378,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     # This Method updates the model config in the case that new parameters have been
     # introduced
     update_model_config = function() {
-
-      #Check if an update is necessary
+      # Check if an update is necessary
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
       if (is.null_or_na(current_pkg_version)) {
         update <- TRUE
@@ -395,9 +394,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
-      #check if an update of values is necessary. This is the case if the model
-      #was created with an older version of aifeducation compared to 1.1.0
-      #Update values to the new values introduced in version 1.1.0
+      # check if an update of values is necessary. This is the case if the model
+      # was created with an older version of aifeducation compared to 1.1.0
+      # Update values to the new values introduced in version 1.1.0
       if (is.null_or_na(current_pkg_version)) {
         update_values <- TRUE
       } else {
@@ -426,8 +425,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                 }
               }
             }
-            if(update_values){
-              private$model_config[param]=list(update_values_to_new_1.1.0(private$model_config[[param]]))
+            if (update_values) {
+              private$model_config[param] <- list(update_values_to_new_1.1.0(private$model_config[[param]]))
             }
           }
 
@@ -439,7 +438,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    update_pad_value=function(){
+    update_pad_value = function() {
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
       if (is.na(current_pkg_version)) {
         update <- TRUE
@@ -456,7 +455,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       if (update) {
-        if(is.null_or_na(private$text_embedding_model["pad_value"])){
+        if (is.null_or_na(private$text_embedding_model["pad_value"])) {
           private$text_embedding_model["pad_value"] <- 0
         }
       }
@@ -464,7 +463,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #--------------------------------------------------------------------------
     generate_model_id = function(name) {
       if (is.null(name)) {
-        return(paste0("mbote_",generate_id(16)))
+        return(paste0("mbote_", generate_id(16)))
       } else {
         return(name)
       }
@@ -480,27 +479,27 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #'
     #'  Utils Studio Developers
     #'  internal
-    prepare_training_history=function(final = FALSE,
-                                      pl_step = NULL) {
+    prepare_training_history = function(final = FALSE,
+                                        pl_step = NULL) {
       plot_data <- self$last_training$history
 
-      if(length(plot_data)<=1){
+      if (length(plot_data) <= 1) {
         plot_data[[1]] <- list(loss = plot_data[[1]])
       }
 
-      #if ("TEFeatureExtractor" %in% class(model)) {
+      # if ("TEFeatureExtractor" %in% class(model)) {
       #  plot_data[[1]] <- list(loss = plot_data[[1]])
-      #}
+      # }
 
       if (is.null_or_na(final)) final <- FALSE
 
-      if(is.null_or_na(self$last_training$config$use_pl)){
-        use_pl=FALSE
+      if (is.null_or_na(self$last_training$config$use_pl)) {
+        use_pl <- FALSE
       } else {
-        use_pl=self$last_training$config$use_pl
+        use_pl <- self$last_training$config$use_pl
       }
 
-      if(use_pl==TRUE & is.null_or_na(pl_step)){
+      if (use_pl == TRUE & is.null_or_na(pl_step)) {
         stop("Model was trained with pseudo labeling. Please provide a pl_step.")
       }
 
@@ -610,7 +609,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       return(result_list)
     },
     #---------------------------------------------------------------------------
-    save_pytorch_model=function(dir_path,folder_name){
+    save_pytorch_model = function(dir_path, folder_name) {
       save_location <- paste0(dir_path, "/", folder_name)
 
       save_format <- "safetensors"
@@ -646,7 +645,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         safetensors$torch$load_model(
           model = private$model,
           filename = path_safe_tensors,
-          device="cpu")
+          device = "cpu"
+        )
       } else {
         if (file.exists(paths = path_pt) == TRUE) {
           private$model$load_state_dict(torch$load(path_pt))

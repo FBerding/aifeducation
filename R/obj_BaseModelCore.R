@@ -23,7 +23,7 @@ BaseModelCore <- R6::R6Class(
   private = list(
     model_type = NULL,
     adjust_max_sequence_length = 0,
-    return_token_type_ids=TRUE,
+    return_token_type_ids = TRUE,
     model_info = list(),
     flops_estimates = data.frame(),
     publication_info = list(
@@ -293,10 +293,10 @@ BaseModelCore <- R6::R6Class(
         trace = self$last_training$config$trace
       )
 
-      results=self$calc_flops_architecture_based(
-        batch_size=batch_size,
-        n_batches=n_batches,
-        n_epochs=n_epochs
+      results <- self$calc_flops_architecture_based(
+        batch_size = batch_size,
+        n_batches = n_batches,
+        n_epochs = n_epochs
       )
 
       private$flops_estimates <- rbind(
@@ -336,7 +336,7 @@ BaseModelCore <- R6::R6Class(
       # Check if the object is not configured
       private$check_config_for_FALSE()
 
-      #Check arguments
+      # Check arguments
       check_all_args(args = args)
 
       # Save args
@@ -348,7 +348,7 @@ BaseModelCore <- R6::R6Class(
       # Create the tokenizer
       self$Tokenizer <- args$tokenizer$clone(deep = TRUE)
 
-      #Set package versions
+      # Set package versions
       private$set_package_versions()
 
       # Prevent the object from modification
@@ -389,12 +389,12 @@ BaseModelCore <- R6::R6Class(
       prepared_data <- private$prepare_data_for_training(raw_text_dataset = args$text_dataset$get_dataset())
 
       # Calculate Flops based on architecture-approach
-      if(private$model_type!="longformer"){
+      if (private$model_type != "longformer") {
         private$calc_flops_architecture_based_iternal(
-            batch_size = self$last_training$config$batch_size,
-            n_batches = ceiling(prepared_data$train$num_rows / self$last_training$config$batch_size),
-            n_epochs = self$last_training$config$n_epoch
-          )
+          batch_size = self$last_training$config$batch_size,
+          n_batches = ceiling(prepared_data$train$num_rows / self$last_training$config$batch_size),
+          n_epochs = self$last_training$config$n_epoch
+        )
       }
 
       # Create Data Collator
@@ -732,9 +732,8 @@ BaseModelCore <- R6::R6Class(
       # Save training history
       private$save_training_history(dir_path = dir_path, folder_name = folder_name)
 
-      #Save Flops Estimates
+      # Save Flops Estimates
       private$save_flops_estimates(dir_path = dir_path, folder_name = folder_name)
-
     },
     #--------------------------------------------------------------------------
     #' @description Loads an object from disk
@@ -901,13 +900,12 @@ BaseModelCore <- R6::R6Class(
     #' @param n_epochs `r get_description("n_epochs")`
     #' @return Returns a `data.frame` storing the estimates.
     calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
-
       tokenizer <- self$Tokenizer$get_tokenizer()
       max_seq_len <- self$get_model_config()$max_position_embeddings
       possible_tokens <- names(self$Tokenizer$get_tokenizer()$get_vocab())
 
       generated_texts <- vector(length = batch_size)
-      for (i in 1:length(generated_texts)) {
+      for (i in 1:seq_along(generated_texts)) {
         generated_texts[i] <- paste(sample(
           x = possible_tokens,
           size = max_seq_len,
@@ -923,7 +921,7 @@ BaseModelCore <- R6::R6Class(
       colnames(results) <- res_colnames
       results <- as.data.frame(results)
 
-      bp_factors <- c(1, 2, 3,4)
+      bp_factors <- c(1, 2, 3, 4)
 
       for (bp_factor in bp_factors) {
         est_flops <- calflops$calculate_flops(
@@ -934,7 +932,7 @@ BaseModelCore <- R6::R6Class(
           kwargs = tokenizer(
             text = generated_texts,
             truncation = TRUE,
-            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length-5),
+            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length - 5),
             return_tensors = "pt",
             return_token_type_ids = private$return_token_type_ids
           ),

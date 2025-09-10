@@ -53,7 +53,7 @@ get_param_dict <- function() {
     is generated automatically.",
     default_value = NULL
   )
-  param$model_name=param$name
+  param$model_name <- param$name
 
   param$label <- list(
     type = "string",
@@ -64,7 +64,7 @@ get_param_dict <- function() {
     desc = "Label for the new model. Here you can use free text.",
     default_value = NULL
   )
-  param$model_label=param$label
+  param$model_label <- param$label
 
 
   param$model_language <- list(
@@ -82,12 +82,12 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("training","inference"),
+    allowed_values = c("training", "inference"),
     desc = "Determines the stept to which the data refer.",
     default_value = NULL
   )
 
-  param$token_overlap<- list(
+  param$token_overlap <- list(
     type = "int",
     min = 0,
     max = Inf,
@@ -99,9 +99,9 @@ get_param_dict <- function() {
     default_value = 0,
     default_historic = 0
   )
-  param$overlap=param$token_overlap
+  param$overlap <- param$token_overlap
 
-  param$max_token_sequence_length<- list(
+  param$max_token_sequence_length <- list(
     type = "int",
     min = 20,
     max = Inf,
@@ -114,11 +114,11 @@ get_param_dict <- function() {
     default_historic = 20
   )
 
-  param$max_length<- param$max_token_sequence_length
-  param$max_length$desc="Maximal number of token per chunks. Must be equal or lower
+  param$max_length <- param$max_token_sequence_length
+  param$max_length$desc <- "Maximal number of token per chunks. Must be equal or lower
   as the maximal postional embeddings for the model."
 
-  param$n_chunks<- list(
+  param$n_chunks <- list(
     type = "int",
     min = 1,
     max = Inf,
@@ -130,10 +130,10 @@ get_param_dict <- function() {
     default_value = 1,
     default_historic = 1
   )
-  param$chunks=param$n_chunks
-  param$chunks$min=2
+  param$chunks <- param$n_chunks
+  param$chunks$min <- 2
 
-  param$emb_layer_min<- list(
+  param$emb_layer_min <- list(
     type = "int",
     min = 1,
     max = Inf,
@@ -146,7 +146,7 @@ get_param_dict <- function() {
     default_historic = 1
   )
 
-  param$emb_layer_max<- list(
+  param$emb_layer_max <- list(
     type = "int",
     min = 1,
     max = Inf,
@@ -164,7 +164,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("CLS","Average"),
+    allowed_values = c("CLS", "Average"),
     desc = "Method to summarize the embedding of single tokens into a text embedding.
     In the case of `'CLS'` all cls-tokens between `emb_layer_min` and `emb_layer_max` are averaged.
     In the case of `'Average'` the embeddings of all tokens are averaged.,
@@ -173,7 +173,7 @@ get_param_dict <- function() {
 
 
 
-  param$statistics_max_tokens_length<- list(
+  param$statistics_max_tokens_length <- list(
     type = "int",
     min = 20,
     max = 8192,
@@ -186,7 +186,7 @@ get_param_dict <- function() {
     default_historic = 20
   )
 
-  param$token_encodings_only<- list(
+  param$token_encodings_only <- list(
     type = "bool",
     allow_null = FALSE,
     min = 0,
@@ -201,7 +201,7 @@ get_param_dict <- function() {
     default_value = TRUE
   )
 
-  param$token_to_int<- list(
+  param$token_to_int <- list(
     type = "bool",
     allow_null = FALSE,
     min = 0,
@@ -215,7 +215,7 @@ get_param_dict <- function() {
     default_value = TRUE
   )
 
-  param$to_token<- list(
+  param$to_token <- list(
     type = "bool",
     allow_null = FALSE,
     min = 0,
@@ -229,7 +229,7 @@ get_param_dict <- function() {
     default_value = TRUE
   )
 
-  param$return_token_type_ids<- list(
+  param$return_token_type_ids <- list(
     type = "bool",
     allow_null = FALSE,
     min = 0,
@@ -241,7 +241,7 @@ get_param_dict <- function() {
     default_value = TRUE
   )
 
-  param$int_seqence<- list(
+  param$int_seqence <- list(
     type = "list",
     allow_null = FALSE,
     min = NULL,
@@ -257,7 +257,7 @@ get_param_dict <- function() {
 
   # Transformer related---------------------------------------------------------
 
-  param$tokenizer<- list(
+  param$tokenizer <- list(
     type = unlist(TokenizerIndex),
     min = NULL,
     max = NULL,
@@ -265,15 +265,16 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = paste(
       "Object of class",
-      paste(paste0("[",TokenizerIndex,"]"),collapse=", "),".",
-      "This objects prepares raw text for the model."),
+      paste(paste0("[", TokenizerIndex, "]"), collapse = ", "), ".",
+      "This objects prepares raw text for the model."
+    ),
     gui_box = NULL,
     gui_label = NULL,
     default_value = NULL,
     default_historic = NULL
   )
 
-  param$base_model<- list(
+  param$base_model <- list(
     type = unlist(BaseModelsIndex),
     min = NULL,
     max = NULL,
@@ -281,8 +282,9 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = paste(
       "Object of class",
-      paste(paste0("[",BaseModelsIndex,"]"),collapse=", "),".",
-      "This objects prepares raw text for the model."),
+      paste(paste0("[", BaseModelsIndex, "]"), collapse = ", "), ".",
+      "This objects prepares raw text for the model."
+    ),
     gui_box = NULL,
     gui_label = NULL,
     default_value = NULL,
@@ -332,8 +334,8 @@ get_param_dict <- function() {
     default_value = NULL
   )
   param$output_dir <- param$model_dir
-  param$tokenizer_dir<- param$model_dir
-  param$tokenizer_dir$desc="Path to the directory where the tokenizer is saved."
+  param$tokenizer_dir <- param$model_dir
+  param$tokenizer_dir$desc <- "Path to the directory where the tokenizer is saved."
 
   param$folder_name <- list(
     type = "string",
@@ -371,7 +373,7 @@ get_param_dict <- function() {
     default_value = NULL
   )
 
-  param$raw_text<- list(
+  param$raw_text <- list(
     type = "vector",
     allow_null = FALSE,
     min = NULL,
@@ -383,7 +385,7 @@ get_param_dict <- function() {
     default_value = NULL
   )
 
-  param$doc_id<- list(
+  param$doc_id <- list(
     type = "vector",
     allow_null = FALSE,
     min = NULL,
@@ -517,7 +519,7 @@ get_param_dict <- function() {
     gui_label = "Hidden Size",
     default_value = 768
   )
-  param$d_model=param$hidden_size
+  param$d_model <- param$hidden_size
 
   param$hidden_act <- list(
     type = "string",
@@ -530,7 +532,7 @@ get_param_dict <- function() {
     gui_label = "Hidden Activation Function",
     default_value = "gelu"
   )
-  param$hidden_activation=param$hidden_act
+  param$hidden_activation <- param$hidden_act
 
   param$num_hidden_layers <- list(
     type = "int",
@@ -569,7 +571,7 @@ get_param_dict <- function() {
     gui_label = "Target Hidden Size",
     default_value = 768
   )
-  param$d_head=param$target_hidden_size
+  param$d_head <- param$target_hidden_size
 
   param$hidden_dropout_prob <- list(
     type = "double",
@@ -582,8 +584,11 @@ get_param_dict <- function() {
     gui_label = "Hidden Dropout",
     default_value = 0.5
   )
-  param$embedding_dropout = param$hidden_dropout_prob
-  param$mlp_dropout=param$hidden_dropout_prob
+  param$embedding_dropout <- param$hidden_dropout_prob
+  param$embedding_dropout$desc <- "Dropout chance for the embeddings."
+
+  param$mlp_dropout <- param$hidden_dropout_prob
+  param$mlp_dropout$desc <- "Dropout rate for the mlp layer."
 
   param$activation_dropout <- list(
     type = "double",
@@ -608,7 +613,7 @@ get_param_dict <- function() {
     gui_label = "Dropout for Attention Probabilities",
     default_value = 0.1
   )
-  param$attention_dropout=param$attention_probs_dropout_prob
+  param$attention_dropout <- param$attention_probs_dropout_prob
 
   param$p_mask <- list(
     type = "(double)",
@@ -1301,8 +1306,8 @@ get_param_dict <- function() {
     gui_label = "Size",
     default_value = 32
   )
-  param$merge_pooling_features= param$cls_pooling_features
-  param$merge_pooling_features$gui_box="Merge Layer"
+  param$merge_pooling_features <- param$cls_pooling_features
+  param$merge_pooling_features$gui_box <- "Merge Layer"
 
   param$cls_pooling_type <- list(
     type = "string",
@@ -1316,8 +1321,8 @@ get_param_dict <- function() {
     default_value = "MinMax",
     default_historic = NULL
   )
-  param$merge_pooling_type=param$cls_pooling_type
-  param$merge_pooling_type$gui_box="Merge Layer"
+  param$merge_pooling_type <- param$cls_pooling_type
+  param$merge_pooling_type$gui_box <- "Merge Layer"
 
 
   # Parametrizations------------------------------------------------------------
@@ -1340,7 +1345,7 @@ get_param_dict <- function() {
     default_historic = "None"
   )
   param$rec_parametrizations <- param$parametrizations
-  param$rec_parametrizations$allowed_values = c("None")
+  param$rec_parametrizations$allowed_values <- c("None")
   param$rec_parametrizations$gui_box <- "Recurrent Layers"
 
   param$tf_parametrizations <- param$parametrizations
@@ -1399,7 +1404,7 @@ get_param_dict <- function() {
   param$dense_act_fct <- param$act_fct
   param$dense_act_fct$gui_box <- "Dense Layers"
   param$rec_act_fct <- param$act_fct
-  param$rec_act_fct$allowed_values=c("Tanh")
+  param$rec_act_fct$allowed_values <- c("Tanh")
   param$rec_act_fct$gui_box <- "Recurrent Layers"
   param$tf_act_fct <- param$act_fct
   param$tf_act_fct$gui_box <- "Transformer Encoder Layers"
@@ -1409,7 +1414,7 @@ get_param_dict <- function() {
     type = "double",
     allow_null = FALSE,
     min = 0,
-    max =0.6,
+    max = 0.6,
     allowed_values = NULL,
     desc = "determining the dropout between recurrent layers.",
     gui_box = "Recurrent Layers",
@@ -1575,7 +1580,7 @@ get_param_dict <- function() {
     default_value = 128
   )
   param$tf_dense_dim <- param$intermediate_size
-  param$d_inner=param$intermediate_size
+  param$d_inner <- param$intermediate_size
 
   param$attention_type <- list(
     type = "string",
@@ -1684,7 +1689,7 @@ get_param_dict <- function() {
 
   # Parallel specific-----------------------------------------------------------
   param$merge_attention_type <- param$attention_type
-  param$merge_attention_type$allowed_values = c("Fourier", "MultiHead")
+  param$merge_attention_type$allowed_values <- c("Fourier", "MultiHead")
   param$merge_attention_type$gui_box <- "Merge Layer"
 
   param$merge_num_heads <- param$self_attention_head
@@ -1755,7 +1760,7 @@ get_param_doc_desc <- function(param_name) {
       }
     } else if (param_def$type %in% c("double", "(double", "double)", "(double)")) {
       if (param_def$min != -Inf) {
-        if (param_def$type == "(double" | param_def$type == "(double)") {
+        if (param_def$type == "(double" || param_def$type == "(double)") {
           border_min <- paste(param_def$min, "<")
         } else {
           border_min <- paste(param_def$min, "<=")
@@ -1764,7 +1769,7 @@ get_param_doc_desc <- function(param_name) {
         border_min <- NULL
       }
       if (param_def$max != Inf) {
-        if (param_def$type == "double)" | param_def$type == "(double)") {
+        if (param_def$type == "double)" || param_def$type == "(double)") {
           border_max <- paste("<", param_def$max)
         } else {
           border_max <- paste("<=", param_def$max)

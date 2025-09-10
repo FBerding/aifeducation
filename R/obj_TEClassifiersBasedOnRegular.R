@@ -15,9 +15,9 @@
 #' @title Base class for regular classifiers relying on [EmbeddedText] or [LargeDataSetForTextEmbeddings] as input
 #' @description Abstract class for all regular classifiers that use numerical representations of texts instead of words.
 #'
-#'Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
+#' Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
 #'
-#'This class is **not** designed for a direct application and should only be used by developers.
+#' This class is **not** designed for a direct application and should only be used by developers.
 #'
 #' @return A new object of this class.
 #' @family R6 Classes for Developers
@@ -74,13 +74,13 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' * `pl_anchor`: With the help of this value, the new cases are sorted. For
     #' this aim, the distance from the anchor is calculated and all cases are arranged into an ascending order.
     #'
-    train = function(data_embeddings=NULL,
-                     data_targets=NULL,
+    train = function(data_embeddings = NULL,
+                     data_targets = NULL,
                      data_folds = 5,
                      data_val_size = 0.25,
                      loss_balance_class_weights = TRUE,
                      loss_balance_sequence_length = TRUE,
-                     loss_cls_fct_name="FocalLoss",
+                     loss_cls_fct_name = "FocalLoss",
                      use_sc = FALSE,
                      sc_method = "knnor",
                      sc_min_k = 1,
@@ -101,11 +101,11 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      log_dir = NULL,
                      log_write_interval = 10,
                      n_cores = auto_n_cores(),
-                     lr_rate=1e-3,
-                     lr_warm_up_ratio=0.02,
-                     optimizer="AdamW") {
-      private$do_training(args=get_called_args(n=1))
+                     lr_rate = 1e-3,
+                     lr_warm_up_ratio = 0.02,
+                     optimizer = "AdamW") {
+      private$do_training(args = get_called_args(n = 1))
     }
-    ),
+  ),
   private = list()
 )

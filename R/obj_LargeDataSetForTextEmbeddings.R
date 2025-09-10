@@ -81,7 +81,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     param_emb_pool_type = NA,
 
     # Value used for indicating padding.
-    param_pad_value=NA,
+    param_pad_value = NA,
 
     # Aggregation method of the hidden states. Deprecated. Included for backward compatibility.
     param_aggregation = NA,
@@ -182,7 +182,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
                          param_emb_layer_min = NULL,
                          param_emb_layer_max = NULL,
                          param_emb_pool_type = NULL,
-                         param_pad_value=-100,
+                         param_pad_value = -100,
                          param_aggregation = NULL) {
       private$model_name <- model_name
       private$model_label <- model_label
@@ -195,7 +195,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
 
       private$param_features <- param_features
       private$param_chunks <- param_chunks
-      private$param_pad_value=param_pad_value
+      private$param_pad_value <- param_pad_value
 
       private$param_emb_layer_min <- param_emb_layer_min
       private$param_emb_layer_max <- param_emb_layer_max
@@ -238,7 +238,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         param_emb_layer_max = private$param_emb_layer_max,
         param_emb_pool_type = private$param_emb_pool_type,
         param_aggregation = private$param_aggregation,
-        param_pad_value=private$param_pad_value
+        param_pad_value = private$param_pad_value
       )
       return(tmp)
     },
@@ -274,10 +274,10 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         param_emb_layer_max = config_file$private$param_emb_layer_max,
         param_emb_pool_type = config_file$private$param_emb_pool_type,
         param_aggregation = config_file$private$param_aggregation,
-        param_pad_value=config_file$private$param_pad_value
+        param_pad_value = config_file$private$param_pad_value
       )
 
-      #Update model configuration if necessary
+      # Update model configuration if necessary
       private$update_model_config()
 
       # Check for feature extractor and add information
@@ -382,7 +382,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     #-------------------------------------------------------------------------
     #' @description Value for indicating padding.
     #' @return Returns an `int` describing the value used for padding.
-    get_pad_value=function(){
+    get_pad_value = function() {
       return(private$param_pad_value)
     },
 
@@ -421,7 +421,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
           text_embeddings = embedding_array,
           features = self$get_features(),
           times = self$get_times(),
-          pad_value=self$get_pad_value()
+          pad_value = self$get_pad_value()
         )
       )
       # Create new dataset
@@ -473,7 +473,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
           text_embeddings = embedding_array,
           features = self$get_features(),
           times = self$get_times(),
-          pad_value=self$get_pad_value()
+          pad_value = self$get_pad_value()
         )
       )
       # Create new dataset
@@ -495,7 +495,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       private$check_config_for_TRUE()
 
       # Argument Checking
-      check_class(object=dataset, classes=c("LargeDataSetForTextEmbeddings", allow_NULL=FALSE))
+      check_class(object = dataset, classes = c("LargeDataSetForTextEmbeddings", allow_NULL = FALSE))
 
       # Add new data
       if (dataset$get_text_embedding_model_name() == private$model_name) {
@@ -532,7 +532,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         param_emb_pool_type = private$param_emb_pool_type,
         param_aggregation = private$param_aggregation,
         embeddings = py_dataset_to_embeddings(self$get_dataset()),
-        param_pad_value=private$param_pad_value
+        param_pad_value = private$param_pad_value
       )
 
       if (self$is_compressed() == TRUE) {
@@ -550,5 +550,5 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
   )
 )
 
-#Add the model to the user list
-DataSetsIndex$LargeDataSetForTextEmbeddings =("LargeDataSetForTextEmbeddings")
+# Add the model to the user list
+DataSetsIndex$LargeDataSetForTextEmbeddings <- ("LargeDataSetForTextEmbeddings")

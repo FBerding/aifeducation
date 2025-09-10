@@ -24,13 +24,11 @@ BaseModelMPNet <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "mpnet",
-
-    adjust_max_sequence_length=2,
-    return_token_type_ids=FALSE,
-
-    create_model=function(args){
+    adjust_max_sequence_length = 2,
+    return_token_type_ids = FALSE,
+    create_model = function(args) {
       configuration <- transformers$MPNetConfig(
-        #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+        # vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         hidden_size = as.integer(args$hidden_size),
         num_hidden_layers = as.integer(args$num_hidden_layers),
@@ -47,7 +45,6 @@ BaseModelMPNet <- R6::R6Class(
       run_py_file("MPNetForMPLM_PT.py")
       device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
       private$model <- py$MPNetForMPLM_PT(configuration)$to(device)
-
     },
     #--------------------------------------------------------------------------
     create_data_collator = function() {
@@ -57,18 +54,19 @@ BaseModelMPNet <- R6::R6Class(
         tokenizer = self$Tokenizer$get_tokenizer(),
         mlm = TRUE,
         mlm_probability = self$last_training$config$p_mask,
-        plm_probability =  self$last_training$config$p_perm,
-        mask_whole_words =  self$last_training$config$whole_word
+        plm_probability = self$last_training$config$p_perm,
+        mask_whole_words = self$last_training$config$whole_word
       )
       return(collator_maker$collator$collate_batch)
     },
     #--------------------------------------------------------------------------
-    load_BaseModel=function(dir_path){
+    load_BaseModel = function(dir_path) {
       run_py_file("MPNetForMPLM_PT.py")
       private$model <- py$MPNetForMPLM_PT$from_pretrained(
         dir_path,
         from_tf = FALSE,
-        use_safetensors = TRUE)
+        use_safetensors = TRUE
+      )
     }
   ),
   public = list(
@@ -118,29 +116,29 @@ BaseModelMPNet <- R6::R6Class(
     #' @param log_dir `r get_description("log_dir")`
     #' @param log_write_interval `r get_description("log_write_interval")`
     #' @return `r get_description("return_nothing")`
-    train=function(text_dataset,
-                   p_mask = 0.15,
-                   p_perm = 0.15,
-                   whole_word = TRUE,
-                   val_size = 0.1,
-                   n_epoch = 1,
-                   batch_size = 12,
-                   max_sequence_length = 250,
-                   full_sequences_only = FALSE,
-                   min_seq_len = 50,
-                   learning_rate = 3e-3,
-                   sustain_track = FALSE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_trace = 1,
-                   log_dir = NULL,
-                   log_write_interval = 2){
-      private$do_training(args=get_called_args(n=1))
+    train = function(text_dataset,
+                     p_mask = 0.15,
+                     p_perm = 0.15,
+                     whole_word = TRUE,
+                     val_size = 0.1,
+                     n_epoch = 1,
+                     batch_size = 12,
+                     max_sequence_length = 250,
+                     full_sequences_only = FALSE,
+                     min_seq_len = 50,
+                     learning_rate = 3e-3,
+                     sustain_track = FALSE,
+                     sustain_iso_code = NULL,
+                     sustain_region = NULL,
+                     sustain_interval = 15,
+                     trace = TRUE,
+                     pytorch_trace = 1,
+                     log_dir = NULL,
+                     log_write_interval = 2) {
+      private$do_training(args = get_called_args(n = 1))
     }
   )
 )
 
-#Add the model to the user list
-BaseModelsIndex$MPNet=("BaseModelMPNet")
+# Add the model to the user list
+BaseModelsIndex$MPNet <- ("BaseModelMPNet")

@@ -79,13 +79,13 @@ TokenizerBase <- R6::R6Class(
       private$save_sustainability_data(dir_path = dir_path, folder_name = folder_name)
 
       # Write vocab txt
-      #special_tokens <- self$get_special_tokens()
-      #special_tokens <- special_tokens[order(x = special_tokens[, "id"]), ]
-      #special_tokens <- unique(special_tokens[, "token"])
-      #write(
+      # special_tokens <- self$get_special_tokens()
+      # special_tokens <- special_tokens[order(x = special_tokens[, "id"]), ]
+      # special_tokens <- unique(special_tokens[, "token"])
+      # write(
       #  x = c(special_tokens, names(private$model$get_vocab())),
       #  file = paste0(save_location, "/", "vocab.txt")
-      #)
+      # )
 
       # Save Tokenizer
       file_paths <- private$model$save_pretrained(save_location)
@@ -368,8 +368,14 @@ TokenizerBase <- R6::R6Class(
 
 
 #' @title WordPieceTokenizer
-#' @description Tokenizer based on the WordPiece model.
+#' @description Tokenizer based on the WordPiece model (Wu et al. 2016).
 #' @return `r get_description("return_object")`
+#' @references Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W.,
+#' Krikun, M., Cao, Y., Gao, Q., Macherey, K., Klingner, J., Shah, A.,
+#' Johnson, M., Liu, X., Kaiser, Ł., Gouws, S., Kato, Y., Kudo, T., Kazawa,
+#' H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
+#' Bridging the Gap between Human and Machine Translation.
+#' <https://doi.org/10.48550/arXiv.1609.08144>
 #' @family Tokenizer
 #' @export
 WordPieceTokenizer <- R6::R6Class(
@@ -698,7 +704,7 @@ HuggingFaceTokenizer <- R6::R6Class(
   classname = "HuggingFaceTokenizer",
   inherit = TokenizerBase,
   private = list(
-    load_config_file=function(dir_path){
+    load_config_file = function(dir_path) {
 
     }
   ),

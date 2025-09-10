@@ -12,19 +12,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 
-#'@title Generate combinations of arguments
-#'@description Function generates a specific number of combinations for a method.
-#'These are used for automating tests of objects.
-#'@param object_name `string` Name of the object to generate the arguments for.
-#'@param method `string` Name of the method of the object to generate the arguments for.
-#'@param var_objects `list` of other objects which should be combined with the other arguments.
-#'@param necessary_objects `list` of other objects which are part of every combination.
-#'@param var_override Named `list` containing the arguments which should be set to a specific value
-#'for all combinations.
-#'@returns Returns a `list` with combinations of arguments.
-#'@note `var_objects`, `necessary_objects`, and `var_override` the names must exactly match
-#'the name of the parameter. Otherwise they are not applied. Names of arguments which are not part
-#'a a method are ignored. #'
+#' @title Generate combinations of arguments
+#' @description Function generates a specific number of combinations for a method.
+#' These are used for automating tests of objects.
+#' @param object_name `string` Name of the object to generate the arguments for.
+#' @param method `string` Name of the method of the object to generate the arguments for.
+#' @param var_objects `list` of other objects which should be combined with the other arguments.
+#' @param necessary_objects `list` of other objects which are part of every combination.
+#' @param var_override Named `list` containing the arguments which should be set to a specific value
+#' for all combinations.
+#' @returns Returns a `list` with combinations of arguments.
+#' @note `var_objects`, `necessary_objects`, and `var_override` the names must exactly match
+#' the name of the parameter. Otherwise they are not applied. Names of arguments which are not part
+#' a a method are ignored. #'
 #' @family Utils TestThat Developers
 #' @export
 generate_args_for_tests <- function(object_name,
@@ -58,7 +58,7 @@ generate_args_for_tests <- function(object_name,
   arg_value_list <- NULL
   for (param in arg_names) {
     current_entry <- param_dict[[param]]
-    if (is_valid_and_exportable_param(param, param_dict) & !(param %in% c(names(var_override), names(necessary_objects)))) {
+    if (is_valid_and_exportable_param(param, param_dict) && !(param %in% c(names(var_override), names(necessary_objects)))) {
       if (current_entry$type == "string") {
         if (!is.null(current_entry$allowed_values)) {
           arg_value_list[param] <- list(current_entry$allowed_values)
@@ -99,12 +99,11 @@ generate_args_for_tests <- function(object_name,
   }
 
   # create a combination
-  arg_comb=list()
-  for(i in seq_along(arg_value_list)){
-    arg_comb[names(arg_value_list)[i]]=list(sample(
-      x=arg_value_list[[i]],size = 1
-    )
-    )
+  arg_comb <- list()
+  for (i in seq_along(arg_value_list)) {
+    arg_comb[names(arg_value_list)[i]] <- list(sample(
+      x = arg_value_list[[i]], size = 1
+    ))
   }
 
   # Convert combinations to list and add override parameters and add necessary parameters
@@ -112,29 +111,29 @@ generate_args_for_tests <- function(object_name,
   override_subset <- intersect(arg_names, names(var_override))
   necessary_subset <- intersect(arg_names, names(necessary_objects))
 
-  arg_comb_list=append(x=arg_comb,values = var_override[override_subset])
-  arg_comb_list=append(x=arg_comb_list,values = necessary_objects[necessary_subset])
+  arg_comb_list <- append(x = arg_comb, values = var_override[override_subset])
+  arg_comb_list <- append(x = arg_comb_list, values = necessary_objects[necessary_subset])
 
   # add var objects
   # Replace FALSE with NULL and TRUE with the corresponding object
-  #print(arg_comb_list)
-  #print("---------")
-    for (var_object in names(var_objects)) {
-      if (arg_comb_list[[var_object]] == TRUE) {
-        arg_comb_list[var_object] <- list(var_objects[[var_object]])
-      } else {
-        arg_comb_list[var_object] <- list(NULL)
-      }
+  # print(arg_comb_list)
+  # print("---------")
+  for (var_object in names(var_objects)) {
+    if (arg_comb_list[[var_object]] == TRUE) {
+      arg_comb_list[var_object] <- list(var_objects[[var_object]])
+    } else {
+      arg_comb_list[var_object] <- list(NULL)
     }
-return(arg_comb_list)
+  }
+  return(arg_comb_list)
 }
 
-#'@title Set sample size for argument combinations
-#'@description Function adjust the number of samples depending on the test environment.
-#'On continuous integration it is limited to a random sample of combinations.
-#'@param n_samples_requested `int` Number of samples if the test do not run on continuous integration.
-#'@param n_CI `int` Number of samples if the test run on continuous integration.
-#'@return Returns an `int` depending on the test environment.
+#' @title Set sample size for argument combinations
+#' @description Function adjust the number of samples depending on the test environment.
+#' On continuous integration it is limited to a random sample of combinations.
+#' @param n_samples_requested `int` Number of samples if the test do not run on continuous integration.
+#' @param n_CI `int` Number of samples if the test run on continuous integration.
+#' @return Returns an `int` depending on the test environment.
 #' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
     n_samples_requested,
@@ -147,15 +146,15 @@ check_adjust_n_samples_on_CI <- function(
   }
 }
 
-#'@title Get test data
-#'@description Function returns example data for testing the package
-#'@param class_range `vector` containing the number of classes.
-#'@param path_test_embeddings `string` Path to the location where the test data is stored.
-#'@return Returns a `list` with test data.
+#' @title Get test data
+#' @description Function returns example data for testing the package
+#' @param class_range `vector` containing the number of classes.
+#' @param path_test_embeddings `string` Path to the location where the test data is stored.
+#' @return Returns a `list` with test data.
 #' @family Utils TestThat Developers
 #' @export
-get_test_data_for_classifiers=function(class_range=c(2,3),
-                                       path_test_embeddings){
+get_test_data_for_classifiers <- function(class_range = c(2, 3),
+                                          path_test_embeddings) {
   # Load Embeddings
   imdb_embeddings <- load_from_disk(path_test_embeddings)
 
@@ -163,7 +162,7 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
   test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
 
   test_embeddings_reduced <- test_embeddings$clone(deep = TRUE)
-  test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[c(1:5,120:125), , ]
+  test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[c(1:5, 120:125), , ]
   test_embeddings_reduced_LD <- test_embeddings_reduced$convert_to_LargeDataSetForTextEmbeddings()
 
   test_embeddings_single_case <- test_embeddings$clone(deep = TRUE)
@@ -176,10 +175,10 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
   target_data <- NULL
   target_levels <- NULL
   for (n_classes in class_range) {
-    #Load raw text and labels
-    #imdb_movie_reviews
-    obj_name=load(testthat::test_path("test_data/imdb_movie_reviews.rda"))
-    imdb_movie_reviews=get(x=obj_name)
+    # Load raw text and labels
+    # imdb_movie_reviews
+    obj_name <- load(testthat::test_path("test_data/imdb_movie_reviews.rda"))
+    imdb_movie_reviews <- get(x = obj_name)
     example_data <- imdb_movie_reviews
 
     rownames(example_data) <- rownames(test_embeddings$embeddings)
@@ -205,34 +204,34 @@ get_test_data_for_classifiers=function(class_range=c(2,3),
 
   return(
     list(
-      target_data=target_data,
-      target_levels=target_levels,
-      test_embeddings_large=test_embeddings_large,
-      test_embeddings=test_embeddings,
-      test_embeddings_reduced=test_embeddings_reduced,
-      test_embeddings_reduced_LD=test_embeddings_reduced_LD,
-      test_embeddings_single_case=test_embeddings_single_case,
-      test_embeddings_single_case_LD=test_embeddings_single_case_LD
-         )
-         )
+      target_data = target_data,
+      target_levels = target_levels,
+      test_embeddings_large = test_embeddings_large,
+      test_embeddings = test_embeddings,
+      test_embeddings_reduced = test_embeddings_reduced,
+      test_embeddings_reduced_LD = test_embeddings_reduced_LD,
+      test_embeddings_single_case = test_embeddings_single_case,
+      test_embeddings_single_case_LD = test_embeddings_single_case_LD
+    )
+  )
 }
 
-#'@title Print arguments
-#'@description Functions prints the used arguments. The aim of this function is
-#'to print the arguments to the console that resulted in a failed test.
-#'@param arg_list Named `list` of arguments. The list should be generated with [generate_args_for_tests].
-#'@return Function does nothing return.
+#' @title Print arguments
+#' @description Functions prints the used arguments. The aim of this function is
+#' to print the arguments to the console that resulted in a failed test.
+#' @param arg_list Named `list` of arguments. The list should be generated with [generate_args_for_tests].
+#' @return Function does nothing return.
 #' @family Utils TestThat Developers
 #' @export
-get_current_args_for_print=function(arg_list){
-  if(!is.list(arg_list)){
+get_current_args_for_print <- function(arg_list) {
+  if (!is.list(arg_list)) {
     stop("arg_list must be a list.")
   }
-  return(paste(names(arg_list),arg_list,collapse = ", "))
+  return(paste(names(arg_list), arg_list, collapse = ", "))
 }
 
-#'@title Generate test tensors
-#'@description Functions generates a random test tensor that can be used for
+#' @title Generate test tensors
+#' @description Functions generates a random test tensor that can be used for
 #' testing methods and functions based on 'PyTorch'. The tensors have the shape
 #' (Batch, Times,Features).
 #' @param times `int` Maximal length of a sequence.
@@ -245,32 +244,31 @@ get_current_args_for_print=function(arg_list){
 #' @note To request a *R* array please use [generate_embeddings].
 #' @family Utils TestThat Developers
 #' @export
-generate_tensors=function(times,
-                          features,
-                          seq_len,
-                          pad_value
-){
-  tensor_data=array(
+generate_tensors <- function(times,
+                             features,
+                             seq_len,
+                             pad_value) {
+  tensor_data <- array(
     data = pad_value,
-    dim = c(length(seq_len),times,features)
+    dim = c(length(seq_len), times, features)
   )
-  for(i in seq_along(seq_len)){
-    for(j in seq(from=1,to=seq_len[i])){
-      for(f in 1:features){
-        tensor_data[i,j,f]<-runif(n=1,min = -1,max = 1)
+  for (i in seq_along(seq_len)) {
+    for (j in seq(from = 1, to = seq_len[i])) {
+      for (f in 1:features) {
+        tensor_data[i, j, f] <- runif(n = 1, min = -1, max = 1)
       }
     }
   }
-  tensor_np=reticulate::np_array(tensor_data)
+  tensor_np <- reticulate::np_array(tensor_data)
   if (numpy_writeable(tensor_np) == FALSE) {
     warning("Numpy array is not writable")
   }
-  tensor=torch$from_numpy(tensor_np)
+  tensor <- torch$from_numpy(tensor_np)
   return(tensor)
 }
 
-#'@title Generate test embeddings
-#'@description Functions generates a random test embedding that can be used for
+#' @title Generate test embeddings
+#' @description Functions generates a random test embedding that can be used for
 #' testing methods and functions. The embeddings have the shape
 #' (Batch, Times,Features).
 #' @param times `int` Maximal length of a sequence.
@@ -283,58 +281,56 @@ generate_tensors=function(times,
 #' @note To generate a 'PyTorch' object please use [generate_tensors].
 #' @family Utils TestThat Developers
 #' @export
-generate_embeddings=function(times,
-                          features,
-                          seq_len,
-                          pad_value
-){
-  tensor_data=array(
+generate_embeddings <- function(times,
+                                features,
+                                seq_len,
+                                pad_value) {
+  tensor_data <- array(
     data = pad_value,
-    dim = c(length(seq_len),times,features)
+    dim = c(length(seq_len), times, features)
   )
-  for(i in seq_along(seq_len)){
-    for(j in seq(from=1,to=seq_len[i])){
-      for(f in 1:features){
-        tensor_data[i,j,f]<-runif(n=1,min = -1,max = 1)
+  for (i in seq_along(seq_len)) {
+    for (j in seq(from = 1, to = seq_len[i])) {
+      for (f in 1:features) {
+        tensor_data[i, j, f] <- runif(n = 1, min = -1, max = 1)
       }
     }
   }
   return(tensor_data)
 }
 
-#'@title Generate static test tensor
-#'@description Function generates a static test tensor which is always the same.
+#' @title Generate static test tensor
+#' @description Function generates a static test tensor which is always the same.
 #' @param pad_value `int` Value used to indicate padding.
 #' @returns Returns an object of class `Tensor` which is always the same except padding.
 #' Shape (5,3,7).
 #' @family Utils TestThat Developers
 #' @export
-get_fixed_test_tensor=function(pad_value){
-  times=3
-  features=7
-  batch=5
-  seq_len=c(1,2,1,3,2)
-  tensor_data=array(
+get_fixed_test_tensor <- function(pad_value) {
+  times <- 3
+  features <- 7
+  batch <- 5
+  seq_len <- c(1, 2, 1, 3, 2)
+  tensor_data <- array(
     data = pad_value,
-    dim = c(batch,times,features)
+    dim = c(batch, times, features)
   )
 
-  for(i in seq_along(seq_len)){
-    for(j in seq(from=1,to=seq_len[i])){
-      tensor_data[i,j,]=seq(from=-seq_len[i],to=j*batch,length.out=features)
+  for (i in seq_along(seq_len)) {
+    for (j in seq(from = 1, to = seq_len[i])) {
+      tensor_data[i, j, ] <- seq(from = -seq_len[i], to = j * batch, length.out = features)
     }
   }
-  tensor_np=reticulate::np_array(tensor_data)
+  tensor_np <- reticulate::np_array(tensor_data)
   if (numpy_writeable(tensor_np) == FALSE) {
     warning("Numpy array is not writable")
   }
-  tensor=torch$from_numpy(tensor_np)
+  tensor <- torch$from_numpy(tensor_np)
   return(tensor)
-
 }
 
-#'@title Test if running on Continuous Integration (CI)
-#'@description Function checks if it is called on CI.
+#' @title Test if running on Continuous Integration (CI)
+#' @description Function checks if it is called on CI.
 #' @returns Returns `TRUE` if the following variables are set to "true"
 #' * `"CI"`
 #' * `"NOT_CRAN"`
@@ -342,28 +338,28 @@ get_fixed_test_tensor=function(pad_value){
 #' @family Utils TestThat Developers
 #' @noRd
 #' @keywords internal
-is_on_CI=function(){
+is_on_CI <- function() {
   if (
     Sys.getenv("CI") == "true" ||
-    Sys.getenv("NOT_CRAN") == "true" ||
-    Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
+      Sys.getenv("NOT_CRAN") == "true" ||
+      Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
     return(TRUE)
   } else {
-  return(FALSE)
+    return(FALSE)
   }
 }
 
-#'@title Random bool on Continuous Integration
-#'@description Function returns randomly `TRUE` or `FALSE` if on CI. It returns `FALSE` if it is
-#'not on CI.
-#'@return Returns a `bool`.
+#' @title Random bool on Continuous Integration
+#' @description Function returns randomly `TRUE` or `FALSE` if on CI. It returns `FALSE` if it is
+#' not on CI.
+#' @return Returns a `bool`.
 #' @family Utils TestThat Developers
 #' @export
-random_bool_on_CI=function(){
-  if(is_on_CI()==TRUE){
-    rnd=sample(x=c(0,1),replace = FALSE,size = 1)
-    if(rnd==0){
+random_bool_on_CI <- function() {
+  if (is_on_CI() == TRUE) {
+    rnd <- sample(x = c(0, 1), replace = FALSE, size = 1)
+    if (rnd == 0) {
       return(FALSE)
     } else {
       return(TRUE)

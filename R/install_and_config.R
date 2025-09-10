@@ -59,11 +59,11 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
       force = FALSE
     )
   } else {
-    miniconda=try(reticulate::install_miniconda(
+    miniconda <- try(reticulate::install_miniconda(
       update = TRUE,
       force = FALSE
     ), silent = TRUE)
-    if(methods::is(object=miniconda,class2 = "try-error")){
+    if (methods::is(object = miniconda, class2 = "try-error")) {
       message("Minicond is neither installed nor updated.")
     }
   }
@@ -230,7 +230,7 @@ install_py_modules <- function(envname = "aifeducation",
                                safetensors_version = "<=0.6.2",
                                torcheval_version = "<=0.0.7",
                                accelerate_version = "<=1.10.1",
-                               calflops_version="<=0.3.2",
+                               calflops_version = "<=0.3.2",
                                pytorch_cuda_version = "12.9",
                                python_version = "3.12",
                                remove_first = FALSE,
@@ -242,7 +242,7 @@ install_py_modules <- function(envname = "aifeducation",
     paste0("pandas", pandas_version),
     paste0("datasets", datasets_version),
     paste0("codecarbon", codecarbon_version),
-    paste0("calflops",calflops_version)
+    paste0("calflops", calflops_version)
   )
   relevant_modules_pt <- c(
     paste0("safetensors", safetensors_version),
@@ -514,7 +514,7 @@ detec_os <- function() {
   sys_name <- tolower(Sys.info()["sysname"])
   if (sys_name == "windows") {
     return("windows")
-  } else if (sys_name == "unix" | sys_name == "linux") {
+  } else if (sys_name == "unix" || sys_name == "linux") {
     return("linux")
   } else if (sys_name == "Darwin") {
     return("mac")

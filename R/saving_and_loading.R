@@ -31,9 +31,9 @@ save_to_disk <- function(object,
                          folder_name) {
   # Check class of object
   check_class(
-    object=object,
-    object_name="object",
-    classes=c(
+    object = object,
+    object_name = "object",
+    classes = c(
       TEClassifiers_class_names,
       "TEFeatureExtractor",
       "TextEmbeddingModel",
@@ -46,8 +46,8 @@ save_to_disk <- function(object,
     ),
     FALSE
   )
-  check_type(object=dir_path,object_name="dir_path", type="string", FALSE)
-  check_type(object=folder_name,object_name="folder_name", type="string", FALSE)
+  check_type(object = dir_path, object_name = "dir_path", type = "string", FALSE)
+  check_type(object = folder_name, object_name = "folder_name", type = "string", FALSE)
 
   # Create path to save location
   save_location <- paste0(dir_path, "/", folder_name)
@@ -59,7 +59,7 @@ save_to_disk <- function(object,
   create_dir(dir_path, FALSE)
   create_dir(save_location, FALSE)
 
-  if(!".AIFEBaseTransformer"%in%class(object)){
+  if (!".AIFEBaseTransformer" %in% class(object)) {
     # Create config and save to disk
     config_file <- create_config_state(object)
     save(config_file, file = path_r_config_state)
@@ -86,20 +86,19 @@ save_to_disk <- function(object,
 #'
 #' @export
 load_from_disk <- function(dir_path) {
-  #Case for all native ai for education models
-  if(file.exists(paste0(dir_path, "/r_config_state.rda"))){
-    #load config
+  # Case for all native ai for education models
+  if (file.exists(paste0(dir_path, "/r_config_state.rda"))) {
+    # load config
     loaded_config <- load_R_config_state(dir_path)
 
-    #Create object
-    model<-create_object(loaded_config$class)
+    # Create object
+    model <- create_object(loaded_config$class)
 
     # load and update model
     model$load_from_disk(dir_path = dir_path)
     return(model)
   } else {
-    #Case for base models
-
+    # Case for base models
   }
 }
 

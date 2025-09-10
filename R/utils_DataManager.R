@@ -72,8 +72,8 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
         min_k_final <- min_k
       }
 
-      max_k_final=as.numeric(max_k_final)
-      min_k_final=as.numeric(min_k_final)
+      max_k_final <- as.numeric(max_k_final)
+      min_k_final <- as.numeric(min_k_final)
 
       # Check k and adjust according to the difference to the major category
       required_cases <- as.numeric(max_freq - cat_freq[cat])
@@ -83,17 +83,17 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
         min_k_final <- min_k_final + difference
       }
 
-      if (cat_freq[cat] < max_freq & min_k > 0 & cat_freq[cat] > 3 & required_cases>0) {
+      if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3 && required_cases > 0) {
         for (m in seq_len(length(method))) {
           for (k in min_k_final:max_k_final) {
-            if(length(max_k_final)>1){
+            if (length(max_k_final) > 1) {
               stop("length")
             }
-            if(max_k_final<0){
+            if (max_k_final < 0) {
               stop("max smaller 0")
             }
-            #print(as.numeric(max_k_final))
-            #print(class(max_k_final))
+            # print(as.numeric(max_k_final))
+            # print(class(max_k_final))
             input[[index]] <- list(
               cat = as.character(cat),
               required_cases = as.numeric(required_cases),
@@ -110,8 +110,8 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
       }
     }
   }
-  #print(input)
-  #return(input)
+  # print(input)
+  # return(input)
 
 
   result_list <- foreach::foreach(
@@ -485,7 +485,7 @@ get_stratified_train_test_split <- function(targets, val_size = 0.25) {
 #' @family Utils Developers
 #'
 #' @export
-get_n_chunks <- function(text_embeddings, features, times,pad_value=-100) {
+get_n_chunks <- function(text_embeddings, features, times, pad_value = -100) {
   n_chunks <- vector(length = nrow(text_embeddings))
   n_chunks[] <- 0
 
@@ -494,13 +494,13 @@ get_n_chunks <- function(text_embeddings, features, times,pad_value=-100) {
       window <- c(1:features) + (i - 1) * features
       sub_matrix <- text_embeddings[, window, drop = FALSE]
       tmp_sums <- rowSums(sub_matrix)
-      n_chunks <- n_chunks + as.numeric(!tmp_sums == times*pad_value)
+      n_chunks <- n_chunks + as.numeric(!tmp_sums == times * pad_value)
     }
   } else if (length(dim(text_embeddings)) == 3) {
     for (i in 1:times) {
       sub_matrix <- text_embeddings[, i, , drop = FALSE]
       tmp_sums <- rowSums(sub_matrix)
-      n_chunks <- n_chunks + as.numeric(!tmp_sums == features*pad_value)
+      n_chunks <- n_chunks + as.numeric(!tmp_sums == features * pad_value)
     }
   } else {
     stop("Dimensionality of text_embeddings must be 2 (matrix) or 3 (array).")

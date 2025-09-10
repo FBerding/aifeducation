@@ -39,7 +39,7 @@ TEClassifierRegular <- R6::R6Class(
   public = list(
     #' @description Creating a new instance of this class.
     #' @return Returns an object of class [TEClassifierRegular] which is ready for configuration.
-    initialize=function(){
+    initialize = function() {
       message("TEClassifierRegular is deprecated. Please use TEClassifierSequential.")
     },
     # New-----------------------------------------------------------------------
@@ -74,7 +74,7 @@ TEClassifierRegular <- R6::R6Class(
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         bias=TRUE,
+                         bias = TRUE,
                          dense_size = 4,
                          dense_layers = 0,
                          rec_size = 4,
@@ -85,20 +85,19 @@ TEClassifierRegular <- R6::R6Class(
                          intermediate_size = NULL,
                          attention_type = "Fourier",
                          add_pos_embedding = TRUE,
-                         act_fct="ELU",
-                         parametrizations="None",
+                         act_fct = "ELU",
+                         parametrizations = "None",
                          rec_dropout = 0.1,
                          repeat_encoder = 1,
                          dense_dropout = 0.4,
                          encoder_dropout = 0.1) {
-       private$do_configuration(args=get_called_args(n=1))
+      private$do_configuration(args = get_called_args(n = 1))
     }
   ),
-  #Private---------------------------------------------------------------------
+  # Private---------------------------------------------------------------------
   private = list(
     #--------------------------------------------------------------------------
     create_reset_model = function() {
-
       private$check_config_for_TRUE()
 
       private$load_reload_python_scripts()
@@ -106,7 +105,7 @@ TEClassifierRegular <- R6::R6Class(
       private$model <- py$TextEmbeddingClassifier_PT(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
-        bias=private$model_config$bias,
+        bias = private$model_config$bias,
         dense_size = as.integer(private$model_config$dense_size),
         dense_layers = as.integer(private$model_config$dense_layers),
         rec_size = as.integer(private$model_config$rec_size),
@@ -119,21 +118,21 @@ TEClassifierRegular <- R6::R6Class(
         dense_dropout = private$model_config$dense_dropout,
         rec_dropout = private$model_config$rec_dropout,
         encoder_dropout = private$model_config$encoder_dropout,
-        pad_value=private$text_embedding_model$pad_value,
+        pad_value = private$text_embedding_model$pad_value,
         add_pos_embedding = private$model_config$add_pos_embedding,
         self_attention_heads = as.integer(private$model_config$self_attention_heads),
         target_levels = private$model_config$target_levels,
-        act_fct=private$model_config$act_fct,
-        parametrizations=private$model_config$parametrizations
+        act_fct = private$model_config$act_fct,
+        parametrizations = private$model_config$parametrizations
       )
     },
     #--------------------------------------------------------------------------
-    load_reload_python_scripts=function(){
+    load_reload_python_scripts = function() {
       super$load_reload_python_scripts()
       load_py_scripts(c("pytorch_old_scripts.py"))
     },
     #--------------------------------------------------------------------------
-    check_param_combinations_configuration=function(){
+    check_param_combinations_configuration = function() {
       if (private$model_config$dense_layers > 0) {
         if (private$model_config$dense_size < 1) {
           stop("Dense layers added. Size for dense layers must be at least 1.")
@@ -147,8 +146,8 @@ TEClassifierRegular <- R6::R6Class(
       }
 
       if (private$model_config$repeat_encoder > 0 &
-          private$model_config$attention_type == "MultiHead" &
-          private$model_config$self_attention_heads <= 0) {
+        private$model_config$attention_type == "MultiHead" &
+        private$model_config$self_attention_heads <= 0) {
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
@@ -168,14 +167,14 @@ TEClassifierRegular <- R6::R6Class(
           private$model_config$intermediate_size <- 2 * private$model_config$features
         } else if (
           private$model_config$attention_type == "MultiHead" &
-          private$model_config$rec_layers > 0 &
-          private$model_config$self_attention_heads > 0
+            private$model_config$rec_layers > 0 &
+            private$model_config$self_attention_heads > 0
         ) {
           private$model_config$intermediate_size <- 2 * private$model_config$features
         } else if (
           private$model_config$attention_type == "MultiHead" &
-          private$model_config$rec_layers == 0 &
-          private$model_config$self_attention_heads > 0
+            private$model_config$rec_layers == 0 &
+            private$model_config$self_attention_heads > 0
         ) {
           private$model_config$intermediate_size <- 2 * private$model_config$features
         } else {
@@ -200,5 +199,5 @@ TEClassifierRegular <- R6::R6Class(
   )
 )
 
-#Add Classifier to central index
-TEClassifiers_class_names<-append(x=TEClassifiers_class_names,values = "TEClassifierRegular")
+# Add Classifier to central index
+TEClassifiers_class_names <- append(x = TEClassifiers_class_names, values = "TEClassifierRegular")

@@ -1,13 +1,13 @@
-#===================DataSets===================================================
-DataSetsIndex=list()
+# ===================DataSets===================================================
+DataSetsIndex <- list()
 
-#===================Tokenizer==================================================
-TokenizerIndex=list()
+# ===================Tokenizer==================================================
+TokenizerIndex <- list()
 
-#===================BaseModels=================================================
-BaseModelsIndex=list()
+# ===================BaseModels=================================================
+BaseModelsIndex <- list()
 
-#===================Classifiers================================================
+# ===================Classifiers================================================
 
 #' @title Class names of all classifier models based on text embeddings
 #' @description `vector` containing all class names as a string.
@@ -42,8 +42,8 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
   }
 }
 
-#===================TextEmbedding===============================================
-TextEmbeddingObjectsIndex=list()
+# ===================TextEmbedding===============================================
+TextEmbeddingObjectsIndex <- list()
 
 
 #' @title Names of all deprecated objects
@@ -79,10 +79,9 @@ get_depr_obj_names <- function() {
 #' @return Returns an object of the requested class.
 #' @family Utils Developers
 #' @export
-create_object=function(class){
-
-  #Create list of all objects on user level
-  object_list=c(
+create_object <- function(class) {
+  # Create list of all objects on user level
+  object_list <- c(
     DataSetsIndex,
     TokenizerIndex,
     BaseModelsIndex,
@@ -90,21 +89,18 @@ create_object=function(class){
     TEClassifiers_class_names
   )
 
-  if(class=="TEClassifierRegular"){
+  if (class == "TEClassifierRegular") {
     return(suppressMessages(TEClassifierRegular$new()))
-  } else if(class=="TEClassifierProtoNet"){
+  } else if (class == "TEClassifierProtoNet") {
     return(suppressMessages(TEClassifierProtoNet$new()))
-  } else if(class%in%object_list){
-    object=eval(str2expression(class))
+  } else if (class %in% object_list) {
+    object <- eval(str2expression(class))
     return(object$new())
-    } else if(class%in%tolower(names(object_list))){
-      index=which(x=(class==tolower(names(object_list))))
-      object=eval(str2expression(object_list[[index]]))
-      return(object$new())
+  } else if (class %in% tolower(names(object_list))) {
+    index <- which(x = (class == tolower(names(object_list))))
+    object <- eval(str2expression(object_list[[index]]))
+    return(object$new())
   } else {
-    stop(paste0("Object ",class," is not implemented in this function."))
+    stop(paste0("Object ", class, " is not implemented in this function."))
   }
 }
-
-
-

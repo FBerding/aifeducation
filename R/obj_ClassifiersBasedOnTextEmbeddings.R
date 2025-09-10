@@ -250,13 +250,12 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           stop("Object passed to feature_extractor must be an object of class
                TEFeatureExtractor or NULL.")
         } else {
-                      if (feature_extractor$is_trained() == FALSE) {
-              stop("The supplied feature extractor is not trained. Please
+          if (feature_extractor$is_trained() == FALSE) {
+            stop("The supplied feature extractor is not trained. Please
                 provide trained feature extractor and try again.")
-            }
           }
         }
-
+      }
     },
     #--------------------------------------------------------------------------
     #' @description Method for checking if provided text embeddings must be compressed via a [TEFeatureExtractor] before
@@ -369,15 +368,15 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' * `"accuracy"` = Accuracy
     #' * `"balanced_accuracy"` = Balanced Accuracy
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history=function(final_training=FALSE,pl_step=NULL,measure="loss",y_min=NULL,y_max=NULL,add_min_max=TRUE,text_size=10){
-      plot=super$plot_training_history(
-        final_training=final_training,
-        pl_step=pl_step,
-        measure=measure,
-        y_min=y_min,
-        y_max=y_max,
-        add_min_max=add_min_max,
-        text_size=text_size
+    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10) {
+      plot <- super$plot_training_history(
+        final_training = final_training,
+        pl_step = pl_step,
+        measure = measure,
+        y_min = y_min,
+        y_max = y_max,
+        add_min_max = add_min_max,
+        text_size = text_size
       )
       return(plot)
     },
@@ -389,7 +388,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' @param key_size `double` determining the size of the legend.
     #' @param text_size `double` determining the size of the text within the legend.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_coding_stream=function(label_categories_size = 3, key_size = 0.5,text_size = 10){
+    plot_coding_stream = function(label_categories_size = 3, key_size = 0.5, text_size = 10) {
       plot <- iotarelr::plot_iota2_alluvial(
         object = self$reliability$iota_object_end_free,
         label_categories_size = label_categories_size,
@@ -942,7 +941,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Correct probabilities
       number_columns <- ncol(predictions)
       col <- ncol(predictions) - 1
-      for (i in 1:nrow(predictions)) {
+      for (i in seq_len(nrow(predictions))) {
         predictions[i, 1:col] <- predictions[i, 1:col] * p_cat_true / sum(predictions[i, 1:col] * p_cat_true)
         predictions[i, number_columns] <- private$model_config$target_levels[which.max(as.numeric(predictions[i, 1:col]))]
       }
@@ -1078,7 +1077,6 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Check
       check_class(object = feature_extractor, object_name = "feature_extractor", classes = "TEFeatureExtractor", allow_NULL = TRUE)
       if (!is.null(feature_extractor)) {
-
         if (feature_extractor$is_trained() == FALSE) {
           stop("The supplied feature extractor is not trained. Please
                 provide train and try again.")

@@ -48,7 +48,7 @@ py_dataset_to_embeddings <- function(py_dataset) {
 #' @family Utils Python Data Management Developers
 #' @export
 prepare_r_array_for_dataset <- function(r_array) {
-  if(!is.null(r_array)){
+  if (!is.null(r_array)) {
     tmp_np_array <- reticulate::r_to_py(
       np$squeeze(np$split(reticulate::np_array(r_array), as.integer(nrow(r_array)), axis = 0L))
     )
@@ -145,15 +145,15 @@ class_vector_to_py_dataset <- function(vector) {
 #'
 #' @family Utils Python Data Management Developers
 #' @export
-tensor_to_numpy = function(object) {
+tensor_to_numpy <- function(object) {
   if ("torch.Tensor" %in% class(object)) {
-    if(object$requires_grad==TRUE){
-      if(object$is_cuda==TRUE){
+    if (object$requires_grad == TRUE) {
+      if (object$is_cuda == TRUE) {
         return(object$detach()$cpu()$numpy())
       } else {
         return(object$detach()$numpy())
       }
-    } else if (object$is_cuda==TRUE){
+    } else if (object$is_cuda == TRUE) {
       return(object$detach()$cpu()$numpy())
     } else {
       return(object$numpy())
@@ -173,7 +173,7 @@ tensor_to_numpy = function(object) {
 #'
 #' @family Utils Python Data Management Developers
 #' @export
-tensor_list_to_numpy = function(tensor_list) {
+tensor_list_to_numpy <- function(tensor_list) {
   for (i in seq_along(tensor_list)) {
     tensor_list[i] <- list(
       tensor_to_numpy(tensor_list[[i]])

@@ -372,13 +372,13 @@ DataManagerClassifier <- R6::R6Class(
 
       # Set up parallel processing
       requireNamespace(package = "foreach", quietly = TRUE)
-      #if(is_on_CI()==FALSE){
+      # if(is_on_CI()==FALSE){
       cl <- parallel::makeCluster(self$config$n_cores)
       doParallel::registerDoParallel(cl)
-      #} else {
+      # } else {
       #  foreach::registerDoSEQ()
       #  cl=NULL
-      #}
+      # }
 
 
       # Create Synthetic Cases
@@ -395,7 +395,7 @@ DataManagerClassifier <- R6::R6Class(
       )
 
       # Unload cluster for parallel processing
-      if(!is.null(cl)){
+      if (!is.null(cl)) {
         parallel::stopCluster(cl)
       }
 
@@ -580,7 +580,7 @@ DataManagerClassifier <- R6::R6Class(
                    6 cases are necessary. Consider to remove this category/class."))
       } else {
         if (min_freq / folds < 3) {
-          fin_k_folds <- floor(min_freq/3)
+          fin_k_folds <- floor(min_freq / 3)
           warning(paste("Frequency of the smallest category/class is not sufficent to ensure
                     at least 3 cases per fold. Adjusting number of folds from ", folds, "to", fin_k_folds, "."))
         } else {

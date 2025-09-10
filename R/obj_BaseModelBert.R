@@ -24,12 +24,10 @@ BaseModelBert <- R6::R6Class(
   classname = "BaseModelBert",
   inherit = BaseModelCore,
   private = list(
-
-    model_type="bert",
-
-    create_model=function(args){
-      configuration=transformers$BertConfig(
-        #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+    model_type = "bert",
+    create_model = function(args) {
+      configuration <- transformers$BertConfig(
+        # vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         max_position_embeddings = as.integer(args$max_position_embeddings),
         hidden_size = as.integer(args$hidden_size),
@@ -47,9 +45,9 @@ BaseModelBert <- R6::R6Class(
         is_decoder = FALSE,
         use_cache = TRUE
       )
-      private$model=transformers$BertForMaskedLM(configuration)
+      private$model <- transformers$BertForMaskedLM(configuration)
     },
-    load_BaseModel=function(dir_path){
+    load_BaseModel = function(dir_path) {
       private$model <- transformers$BertForMaskedLM$from_pretrained(dir_path)
     }
   ),
@@ -81,5 +79,5 @@ BaseModelBert <- R6::R6Class(
   )
 )
 
-#Add the model to the user list
-BaseModelsIndex$Bert=("BaseModelBert")
+# Add the model to the user list
+BaseModelsIndex$Bert <- ("BaseModelBert")

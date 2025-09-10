@@ -12,31 +12,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#'Transforming classes to one-hot encoding
+#' Transforming classes to one-hot encoding
 #'
-#'Function transforming a vector of classes (int) into
-#'a binary class matrix.
+#' Function transforming a vector of classes (int) into
+#' a binary class matrix.
 #'
-#'@param class_vector `vector` containing integers for every class. The
-#'integers must range from 0 to n_classes-1.
-#'@param n_classes `int` Total number of classes.
-#'@return Returns a `matrix` containing the binary representation for
-#'every class.
+#' @param class_vector `vector` containing integers for every class. The
+#' integers must range from 0 to n_classes-1.
+#' @param n_classes `int` Total number of classes.
+#' @return Returns a `matrix` containing the binary representation for
+#' every class.
 #'
-#'@family Utils Developers
-#'@export
-to_categorical_c=function(class_vector,n_classes){
+#' @family Utils Developers
+#' @export
+to_categorical_c <- function(class_vector, n_classes) {
+  binary_class_rep <- matrix(
+    data = 0,
+    nrow = length(class_vector),
+    ncol = n_classes
+  )
 
-  binary_class_rep=matrix(
-    data=0,
-    nrow=length(class_vector),
-    ncol=n_classes)
-
-  for(i in seq_along(class_vector)){
-    binary_class_rep[i,class_vector[i]+1]=1
+  for (i in seq_along(class_vector)) {
+    binary_class_rep[i, class_vector[i] + 1] <- 1
   }
 
-  return (binary_class_rep)
+  return(binary_class_rep)
 }
 
 #' @title Check if NULL or NA
@@ -201,7 +201,6 @@ auto_n_cores <- function() {
       Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
     n_cores <- min(2, parallel::detectCores())
-
   } else {
     n_cores <- floor(parallel::detectCores() * 0.75)
   }
@@ -218,29 +217,28 @@ auto_n_cores <- function() {
 #' @family Utils Developers
 #' @keywords internal
 #' @noRd
-detect_base_model_type=function(model){
-  if(("transformers.configuration_utils.PretrainedConfig")%in%class(model)){
-    type_string=model$architectures
+detect_base_model_type <- function(model) {
+  if (("transformers.configuration_utils.PretrainedConfig") %in% class(model)) {
+    type_string <- model$architectures
   } else {
-    type_string=model$config
+    type_string <- model$config
   }
 
-  if(stringi::stri_detect(str=tolower(type_string),regex = "^funnel([:alnum:]*)")){
+  if (stringi::stri_detect(str = tolower(type_string), regex = "^funnel([:alnum:]*)")) {
     return("funnel")
-  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^bert([:alnum:]*)")){
+  } else if (stringi::stri_detect(str = tolower(type_string), regex = "^bert([:alnum:]*)")) {
     return("bert")
-  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^debertav2([:alnum:]*)")){
+  } else if (stringi::stri_detect(str = tolower(type_string), regex = "^debertav2([:alnum:]*)")) {
     return("deberta_v2")
-  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^mpnet([:alnum:]*)")){
+  } else if (stringi::stri_detect(str = tolower(type_string), regex = "^mpnet([:alnum:]*)")) {
     return("mpnet")
-  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^longformer([:alnum:]*)")){
+  } else if (stringi::stri_detect(str = tolower(type_string), regex = "^longformer([:alnum:]*)")) {
     return("longformer")
-  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^roberta([:alnum:]*)")){
+  } else if (stringi::stri_detect(str = tolower(type_string), regex = "^roberta([:alnum:]*)")) {
     return("roberta")
-  } else if(stringi::stri_detect(str=tolower(type_string),regex = "^modernbert([:alnum:]*)")){
+  } else if (stringi::stri_detect(str = tolower(type_string), regex = "^modernbert([:alnum:]*)")) {
     return("modernbert")
   } else {
     stop("Architecture for the model could not be detected.")
   }
 }
-

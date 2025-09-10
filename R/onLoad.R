@@ -1,4 +1,3 @@
-
 transformers <- NULL
 datasets <- NULL
 tok <- NULL
@@ -12,7 +11,7 @@ accelerate <- NULL
 safetensors <- NULL
 pandas <- NULL
 pyarrow <- NULL
-calflops<-NULL
+calflops <- NULL
 
 .onLoad <- function(libname, pkgname) {
   # use superassignment to update the global reference
@@ -33,8 +32,7 @@ calflops<-NULL
 
 
 # Message on load of the package
-#packageStartupMessage(
+# packageStartupMessage(
 #  "This is version 1.1.1 of aifeducation.",
 #  appendLF = TRUE
-#)
-
+# )

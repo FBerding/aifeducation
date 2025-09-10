@@ -275,7 +275,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "create_transformer",
           ExtendedTask_arguments = list(
-            #Tokenizer config
+            # Tokenizer config
             tok_configure = summarize_args_for_long_task(
               input = input,
               object_class = input$tokenizer_model_type,
@@ -301,7 +301,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
                 object_class = input$tokenizer_model_type
               )
             ),
-            #Tokenizer Train
+            # Tokenizer Train
             tok_train = summarize_args_for_long_task(
               input = input,
               object_class = input$tokenizer_model_type,
@@ -327,7 +327,7 @@ BaseModel_Create_Server <- function(id, log_dir, volumes) {
                 object_class = input$tokenizer_model_type
               )
             ),
-            #Base Model config
+            # Base Model config
             bm_configure = summarize_args_for_long_task(
               input = input,
               object_class = input$base_model_type,

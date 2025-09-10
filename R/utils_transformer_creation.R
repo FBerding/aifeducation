@@ -19,15 +19,15 @@
 #' @family Utils Transformers Creation Developers
 #' @keywords internal
 #' @noRd
-Bert_like.SFC.create_tokenizer_draft <- function( # nolint
-  self,
-  sep_token = "[SEP]",
-  sep_id = 1,
-  cls_token = "[CLS]",
-  cls_id = 0,
-  unk_token = "[UNK]",
-  special_tokens = c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")) {
-
+Bert_like.SFC.create_tokenizer_draft <- function(
+    # nolint
+    self,
+    sep_token = "[SEP]",
+    sep_id = 1,
+    cls_token = "[CLS]",
+    cls_id = 0,
+    unk_token = "[UNK]",
+    special_tokens = c("[CLS]", "[SEP]", "[PAD]", "[UNK]", "[MASK]")) {
   self$temp$special_tokens <- special_tokens
   self$temp$tok_new <- create_WordPiece_tokenizer(
     self$params$vocab_do_lower_case,
@@ -95,7 +95,7 @@ Bert_like.SFC.calculate_vocab <- function(self) { # nolint
 #' @noRd
 Bert_like.SFC.save_tokenizer_draft <- function(self) { # nolint
   write(c(self$temp$special_tokens, names(self$temp$tok_new$get_vocab())),
-        file = paste0(self$params$model_dir, "/", "vocab.txt")
+    file = paste0(self$params$model_dir, "/", "vocab.txt")
   )
 }
 
@@ -214,23 +214,23 @@ Longformer_like.SFC.save_tokenizer_draft <- function(self) { # nolint
 #' @family Utils Transformers Creation Developers
 #' @keywords internal
 #' @noRd
-tokenize_dataset <- function(dataset, tokenizer, max_length,add_special_tokens=TRUE,
+tokenize_dataset <- function(dataset, tokenizer, max_length, add_special_tokens = TRUE,
                              log_file = NULL, write_interval = 2,
                              value_top = 0, total_top = 1, message_top = "NA") {
   run_py_file("datasets_transformer_prepare_data.py")
 
   batch_size <- 2L
 
-  id=as.character(generate_id(16))
+  id <- as.character(generate_id(16))
 
   tokenized_texts_raw <- dataset$map(
     py$tokenize_raw_text,
     batched = TRUE,
     batch_size = batch_size,
-    load_from_cache_file=FALSE,
-    keep_in_memory=FALSE,
-    cache_file_name=paste0(create_and_get_tmp_dir(),"/",id),
-    new_fingerprint=id,
+    load_from_cache_file = FALSE,
+    keep_in_memory = FALSE,
+    cache_file_name = paste0(create_and_get_tmp_dir(), "/", id),
+    new_fingerprint = id,
     fn_kwargs = reticulate::dict(
       list(
         tokenizer = tokenizer,
@@ -248,11 +248,10 @@ tokenize_dataset <- function(dataset, tokenizer, max_length,add_special_tokens=T
         write_interval = write_interval,
         value_top = value_top, total_top = total_top, message_top = message_top,
         total_middle = floor(dataset$num_rows / batch_size),
-        add_special_tokens=add_special_tokens
+        add_special_tokens = add_special_tokens
       )
     ),
     remove_columns = dataset$column_names
   )
   return(tokenized_texts_raw)
 }
-

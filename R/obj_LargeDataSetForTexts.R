@@ -73,7 +73,7 @@ LargeDataSetForText <- R6::R6Class(
                                   log_top_value = 0,
                                   log_top_total = 1,
                                   log_top_message = NA,
-                                  clean_text=TRUE,
+                                  clean_text = TRUE,
                                   trace = TRUE) {
       # Gather all text files
       file_paths <- private$get_file_paths(dir_path, ".txt")
@@ -170,7 +170,7 @@ LargeDataSetForText <- R6::R6Class(
                                   log_top_value = 0,
                                   log_top_total = 1,
                                   log_top_message = NA,
-                                  clean_text=TRUE,
+                                  clean_text = TRUE,
                                   trace = TRUE) {
       # Gather all files
       file_paths <- private$get_file_paths(dir_path, ".pdf")
@@ -266,15 +266,15 @@ LargeDataSetForText <- R6::R6Class(
                                    log_top_total = 1,
                                    log_top_message = NA) {
       # Check
-      check_type(object=id_column, type="string", FALSE)
-      check_type(object=text_column, type="string", FALSE)
-      check_type(object=bib_entry_column,type= "string", TRUE)
-      check_type(object=license_column, type="string", TRUE)
-      check_type(object=url_license_column, type="string", TRUE)
-      check_type(object=text_license_column, type="string", TRUE)
-      check_type(object=url_source_column, type="string", TRUE)
-      check_type(object=trace, type="bool", FALSE)
-      check_type(object=dir_path, type="string", FALSE)
+      check_type(object = id_column, type = "string", FALSE)
+      check_type(object = text_column, type = "string", FALSE)
+      check_type(object = bib_entry_column, type = "string", TRUE)
+      check_type(object = license_column, type = "string", TRUE)
+      check_type(object = url_license_column, type = "string", TRUE)
+      check_type(object = text_license_column, type = "string", TRUE)
+      check_type(object = url_source_column, type = "string", TRUE)
+      check_type(object = trace, type = "bool", FALSE)
+      check_type(object = dir_path, type = "string", FALSE)
 
       # Gather all files
       file_paths <- private$get_file_paths(dir_path, file_type = ".xlsx")
@@ -562,43 +562,43 @@ LargeDataSetForText <- R6::R6Class(
       return(as.data.frame(data))
     },
     clean_text = function(text) {
-      #Remove some special symbols-------------------------------------------------
+      # Remove some special symbols-------------------------------------------------
       text <- stringi::stri_replace_all(text, regex = "\\|", replacement = "")
       text <- stringi::stri_replace_all(text, regex = "([:blank:]*)-([:blank:]*)", replacement = "-")
 
-      #Normalization of blank positions and new lines---------------------------------------------
-      #Entferne alle Leerstellen zu beginn einer Zeile
+      # Normalization of blank positions and new lines---------------------------------------------
+      # Entferne alle Leerstellen zu beginn einer Zeile
       text <- stringi::stri_replace_all(text, regex = "\\n([:blank:]{1,})", replacement = "\n")
 
-      #Entferne alle Leerstellen zum Ende einer Zeile
+      # Entferne alle Leerstellen zum Ende einer Zeile
       text <- stringi::stri_replace_all(text, regex = "([:blank:]{1,})\\n", replacement = "\n")
 
-      #Entferne alle Leerzeichen, die mehrfach vorkommen
+      # Entferne alle Leerzeichen, die mehrfach vorkommen
       text <- stringi::stri_replace_all(text, regex = "[:blank:]{2,}", replacement = " ")
 
-      #Remove running heads---------------------------------------------------------
-      #Entferne alle Zeilen, die mit einer Zahl bis 999 beginnen oder mit einer Gliederungsnummer (z. B 1.2)
+      # Remove running heads---------------------------------------------------------
+      # Entferne alle Zeilen, die mit einer Zahl bis 999 beginnen oder mit einer Gliederungsnummer (z. B 1.2)
       text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:blank:])*\\n", replacement = "\n")
 
-      #Entferne alle Zeilen, die mit einer Zahl bis 999 enden
+      # Entferne alle Zeilen, die mit einer Zahl bis 999 enden
       text <- stringi::stri_replace_all(text, regex = "\\n[:alpha:]([:digit:]|[:alpha:]|[:punct:]|[:blank:])*([:digit:]{1,10})\\n", replacement = "\n")
 
-      #Remove list of contents------------------------------------------------------
+      # Remove list of contents------------------------------------------------------
       text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:digit:]|[:blank:])*(([:punct:]|[:blank:]){2,})([:digit:]{1,10})\\n", replacement = "\n")
       text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:digit:]|[:blank:])*(([:punct:]|[:blank:]){2,})([:digit:]{1,10})\\n", replacement = "\n")
       text <- stringi::stri_replace_all(text, regex = "\\n(([:digit:]|[:punct:]){1,10})([:alpha:]|[:punct:]|[:digit:]|[:blank:])*(([:punct:]|[:blank:]){2,})([:digit:]{1,10})\\n", replacement = "\n")
-      #text <- stringi::stri_replace_all(text, regex = "\\n(([:graph:]|[:blank]){1,})([:punct:]{5,})([:graph:]|[:blank:])*\\n", replacement = "\n")
+      # text <- stringi::stri_replace_all(text, regex = "\\n(([:graph:]|[:blank]){1,})([:punct:]{5,})([:graph:]|[:blank:])*\\n", replacement = "\n")
 
-      #Normalization of paragraphs-------------------------------------------------
-      #Mache Silbentrennung rückgängig
+      # Normalization of paragraphs-------------------------------------------------
+      # Mache Silbentrennung rückgängig
       text <- stringi::stri_replace_all(text, regex = "-\\n([:space:]*)", replacement = "")
 
-      #Entferne Zeilenumbrüche innerhalb von Absätzen
+      # Entferne Zeilenumbrüche innerhalb von Absätzen
       text <- stringi::stri_replace_all(text, regex = "(?<![:space:])\\n(?![:space:])", replacement = " ")
 
-      #Finale Textbereinigungen----------------------------------------------------
-      #Entferne alle Zeilenumbrüche, die mehrfach vorkommen
-      #text <- stringi::stri_replace_all(text, regex = "\\n{2,}", replacement = "")
+      # Finale Textbereinigungen----------------------------------------------------
+      # Entferne alle Zeilenumbrüche, die mehrfach vorkommen
+      # text <- stringi::stri_replace_all(text, regex = "\\n{2,}", replacement = "")
       text <- stringi::stri_replace_all(text, regex = "\\n([:space:]*)\\n", replacement = "\n")
 
       return(text)
@@ -612,5 +612,5 @@ LargeDataSetForText <- R6::R6Class(
 )
 
 
-#Add the model to the user list
-DataSetsIndex$LargeDataSetForText=("LargeDataSetForText")
+# Add the model to the user list
+DataSetsIndex$LargeDataSetForText <- ("LargeDataSetForText")

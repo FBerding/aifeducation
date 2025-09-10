@@ -24,7 +24,6 @@ TextEmbeddingModel <- R6::R6Class(
   classname = "TextEmbeddingModel",
   inherit = AIFEBaseModel,
   private = list(
-
     publication_info = list(
       developed_by = list(
         authors = NULL,
@@ -212,7 +211,7 @@ TextEmbeddingModel <- R6::R6Class(
       # Check if the object is not configured
       private$check_config_for_FALSE()
 
-       # Load BaseModel
+      # Load BaseModel
       self$BaseModel <- base_model$clone(deep = TRUE)
 
       # Save Embedding Config
@@ -232,13 +231,13 @@ TextEmbeddingModel <- R6::R6Class(
         emb_layer_max = emb_layer_max
       )
 
-      #Check and set max length
+      # Check and set max length
       private$check_and_set_max_length(max_length)
 
       # Check and set pooling type
       private$check_and_set_pooling_type(emb_pool_type)
 
-      #Set package versions
+      # Set package versions
       private$set_package_versions()
 
       # Close config
@@ -257,24 +256,24 @@ TextEmbeddingModel <- R6::R6Class(
       private$load_reload_python_scripts()
 
       # Load Base model
-      version_lower=check_versions(
+      version_lower <- check_versions(
         a = "1.1.2",
         operator = ">",
         b = self$get_package_versions()$r_package_versions$aifeducation
       )
-      if(version_lower){
-        #Old version that does not use BaseModel and Tokenizer
-        path_to_files=paste0(dir_path,"/","model_data")
-        tmp_pytorch_model=transformers$AutoModelForMaskedLM$from_pretrained(path_to_files)
-        tmp_type=detect_base_model_type(tmp_pytorch_model$config)
-        tmp_BaseModel=create_object(tmp_type)
+      if (version_lower) {
+        # Old version that does not use BaseModel and Tokenizer
+        path_to_files <- paste0(dir_path, "/", "model_data")
+        tmp_pytorch_model <- transformers$AutoModelForMaskedLM$from_pretrained(path_to_files)
+        tmp_type <- detect_base_model_type(tmp_pytorch_model$config)
+        tmp_BaseModel <- create_object(tmp_type)
         tmp_BaseModel$create_from_hf(
           model_dir = path_to_files,
           tokenizer_dir = path_to_files
         )
-        self$BaseModel<-tmp_BaseModel
+        self$BaseModel <- tmp_BaseModel
       } else {
-        #Regular case
+        # Regular case
         self$BaseModel <- load_from_disk(dir_path = paste0(dir_path, "/", "base_model"))
       }
 
@@ -292,7 +291,6 @@ TextEmbeddingModel <- R6::R6Class(
     #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
-
       save_location <- paste0(dir_path, "/", folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
 
@@ -335,10 +333,10 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param int_seqence `r get_param_doc_desc("int_seqence")`
     #' @param to_token `r get_param_doc_desc("to_token")`
     #' @return `list` of token sequences
-    decode = function(int_seqence, to_token = FALSE){
+    decode = function(int_seqence, to_token = FALSE) {
       return(
         self$BaseModel$Tokenizer$decode(
-          int_seqence=int_seqence,
+          int_seqence = int_seqence,
           to_token = to_token
         )
       )
@@ -728,11 +726,11 @@ TextEmbeddingModel <- R6::R6Class(
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`
     estimate_sustainability_inference_embed = function(text_dataset = NULL,
-                                                       batch_size=32,
-                                                           sustain_iso_code = NULL,
-                                                           sustain_region = NULL,
-                                                           sustain_interval = 10,
-                                                           trace = TRUE) {
+                                                       batch_size = 32,
+                                                       sustain_iso_code = NULL,
+                                                       sustain_region = NULL,
+                                                       sustain_interval = 10,
+                                                       trace = TRUE) {
       # Prepare Data
       print_message(
         msg = "Prepare Data",
@@ -747,49 +745,51 @@ TextEmbeddingModel <- R6::R6Class(
         trace = trace
       )
 
-      emp_seq_length=vector(length = n_cases)
-      arrow_dataset=text_dataset$get_dataset()
-      for(i in 1:n_cases){
-        tmp_encode=self$encode(arrow_dataset[i-1]$text,
-                    token_encodings_only = FALSE,
-                    token_to_int = TRUE,
-                    trace = FALSE)
-        emp_seq_length[i]=tmp_encode$chunks*private$model_config$max_length-(tmp_encode$chunks-1)*private$model_config$overlap
+      emp_seq_length <- vector(length = n_cases)
+      arrow_dataset <- text_dataset$get_dataset()
+      for (i in 1:n_cases) {
+        tmp_encode <- self$encode(arrow_dataset[i - 1]$text,
+          token_encodings_only = FALSE,
+          token_to_int = TRUE,
+          trace = FALSE
+        )
+        emp_seq_length[i] <- tmp_encode$chunks * private$model_config$max_length - (tmp_encode$chunks - 1) * private$model_config$overlap
       }
 
 
 
 
-      #Start Tracking
+      # Start Tracking
       private$init_and_start_sustainability_tracker(
-        trace=trace,
-        country_iso_code=sustain_iso_code,
-        region=sustain_region,
-        measure_power_secs=sustain_interval)
+        trace = trace,
+        country_iso_code = sustain_iso_code,
+        region = sustain_region,
+        measure_power_secs = sustain_interval
+      )
 
-      #Start Task
-      result_embeddings=self$embed_large(
-        text_dataset=text_dataset,
+      # Start Task
+      result_embeddings <- self$embed_large(
+        text_dataset = text_dataset,
         batch_size = batch_size,
         trace = FALSE,
         log_file = NULL,
         log_write_interval = 2
-        )
+      )
 
-      #Stop Tracking
-      results <-private$stop_sustainability_tracker(
+      # Stop Tracking
+      results <- private$stop_sustainability_tracker(
         trace = trace,
         task = "Embed"
       )
 
-      #Add additional information
-      results$data="empirical data"
-      results$n=n_cases
-      results$batch=batch_size
-      results$min_seq_len=min(emp_seq_length)
-      results$mean_seq_len=mean(emp_seq_length)
-      results$sd_seq_len=sd(emp_seq_length)
-      results$max_seq_len=max(emp_seq_length)
+      # Add additional information
+      results$data <- "empirical data"
+      results$n <- n_cases
+      results$batch <- batch_size
+      results$min_seq_len <- min(emp_seq_length)
+      results$mean_seq_len <- mean(emp_seq_length)
+      results$sd_seq_len <- sd(emp_seq_length)
+      results$max_seq_len <- max(emp_seq_length)
 
       if (is.null_or_na(private$sustainability_inference)) {
         private$sustainability_inference <- results
@@ -803,5 +803,5 @@ TextEmbeddingModel <- R6::R6Class(
   )
 )
 
-#Add Object to index
-TextEmbeddingObjectsIndex$TextEmbeddingModel="TextEmbeddingModel"
+# Add Object to index
+TextEmbeddingObjectsIndex$TextEmbeddingModel <- "TextEmbeddingModel"

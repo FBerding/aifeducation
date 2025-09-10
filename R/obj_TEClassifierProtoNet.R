@@ -46,7 +46,7 @@ TEClassifierProtoNet <- R6::R6Class(
   public = list(
     #' @description Creating a new instance of this class.
     #' @return Returns an object of class [TEClassifierProtoNet] which is ready for configuration.
-    initialize=function(){
+    initialize = function() {
       message("TEClassifierProtoNet is deprecated. Please use TEClassifierSequentialPrototype.")
     },
     # New-----------------------------------------------------------------------
@@ -92,13 +92,13 @@ TEClassifierProtoNet <- R6::R6Class(
                          intermediate_size = NULL,
                          attention_type = "Fourier",
                          add_pos_embedding = TRUE,
-                         act_fct="ELU",
-                         parametrizations="None",
+                         act_fct = "ELU",
+                         parametrizations = "None",
                          rec_dropout = 0.1,
                          repeat_encoder = 1,
                          dense_dropout = 0.4,
                          encoder_dropout = 0.1) {
-      private$do_configuration(args=get_called_args(n=1),one_hot_encoding=FALSE)
+      private$do_configuration(args = get_called_args(n = 1), one_hot_encoding = FALSE)
     },
     #---------------------------------------------------------------------------
     #' @description Method for embedding documents. Please do not confuse this type of embeddings with the embeddings of
@@ -114,8 +114,8 @@ TEClassifierProtoNet <- R6::R6Class(
     #' center for the different classes.
     #'
     embed = function(embeddings_q = NULL, batch_size = 32) {
-      check_class(embeddings_q,object_name="embeddings_q", c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
-      check_type(batch_size,object_name="batch_size", "int", FALSE)
+      check_class(embeddings_q, object_name = "embeddings_q", c("EmbeddedText", "LargeDataSetForTextEmbeddings"), FALSE)
+      check_type(batch_size, object_name = "batch_size", "int", FALSE)
 
       # Check input for compatible text embedding models and feature extractors
       if ("EmbeddedText" %in% class(embeddings_q)) {
@@ -221,15 +221,15 @@ TEClassifierProtoNet <- R6::R6Class(
     #'   embeddings for all cases which should be embedded into the classification space.
     #' @param classes_q Named `factor` containg the true classes for every case. Please note that the names must match
     #'   the names/ids in `embeddings_q`.
-    #'@param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
-    #'@param size_points `int` Size of the points excluding the points for prototypes.
-    #'@param size_points_prototypes `int` Size of points representing prototypes.
-    #'@param alpha `float` Value indicating how transparent the points should be (important
+    #' @param inc_unlabeled `bool` If `TRUE` plot includes unlabeled cases as data points.
+    #' @param size_points `int` Size of the points excluding the points for prototypes.
+    #' @param size_points_prototypes `int` Size of points representing prototypes.
+    #' @param alpha `float` Value indicating how transparent the points should be (important
     #'   if many points overlap). Does not apply to points representing prototypes.
     #' @param batch_size `int` batch size.
     #' @return Returns a plot of class `ggplot`visualizing embeddings.
     plot_embeddings = function(embeddings_q,
-                               classes_q=NULL,
+                               classes_q = NULL,
                                batch_size = 12,
                                alpha = 0.5,
                                size_points = 3,
@@ -249,7 +249,7 @@ TEClassifierProtoNet <- R6::R6Class(
       colnames(prototypes) <- c("x", "y", "class", "type")
 
 
-      if(!is.null(classes_q)){
+      if (!is.null(classes_q)) {
         true_values_names <- intersect(
           x = names(na.omit(classes_q)),
           y = private$get_rownames_from_embeddings(embeddings_q)
@@ -259,8 +259,8 @@ TEClassifierProtoNet <- R6::R6Class(
         true_values$type <- rep("labeled", length(true_values_names))
         colnames(true_values) <- c("x", "y", "class", "type")
       } else {
-        true_values_names=NULL
-        true_values=NULL
+        true_values_names <- NULL
+        true_values <- NULL
       }
 
 
@@ -284,12 +284,12 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
 
-      plot_data=prototypes
+      plot_data <- prototypes
       if (length(true_values) > 0) {
-        plot_data=rbind(plot_data,true_values)
+        plot_data <- rbind(plot_data, true_values)
       }
       if (length(estimated_values_names) > 0) {
-        plot_data <- rbind(plot_data,estimated_values)
+        plot_data <- rbind(plot_data, estimated_values)
       }
 
       plot <- ggplot2::ggplot(data = plot_data) +
@@ -301,8 +301,8 @@ TEClassifierProtoNet <- R6::R6Class(
             shape = type,
             size = type,
             alpha = type
-          )#,
-          #position = ggplot2::position_jitter(h = 0.1, w = 0.1)
+          ) # ,
+          # position = ggplot2::position_jitter(h = 0.1, w = 0.1)
         ) +
         ggplot2::scale_size_manual(values = c(
           "prototype" = size_points_prototypes,
@@ -321,9 +321,8 @@ TEClassifierProtoNet <- R6::R6Class(
     }
   ),
   private = list(
-    #Private--------------------------------------------------------------------------
+    # Private--------------------------------------------------------------------------
     create_reset_model = function() {
-
       private$check_config_for_TRUE()
 
       private$load_reload_python_scripts()
@@ -344,12 +343,12 @@ TEClassifierProtoNet <- R6::R6Class(
         rec_dropout = private$model_config$rec_dropout,
         encoder_dropout = private$model_config$encoder_dropout,
         add_pos_embedding = private$model_config$add_pos_embedding,
-        pad_value=as.integer(private$text_embedding_model$pad_value),
+        pad_value = as.integer(private$text_embedding_model$pad_value),
         self_attention_heads = as.integer(private$model_config$self_attention_heads),
         embedding_dim = as.integer(private$model_config$embedding_dim),
         target_levels = reticulate::np_array(seq(from = 0, to = (length(private$model_config$target_levels) - 1))),
-        act_fct=private$model_config$act_fct,
-        parametrizations=private$model_config$parametrizations
+        act_fct = private$model_config$act_fct,
+        parametrizations = private$model_config$parametrizations
       )
     },
     #--------------------------------------------------------------------------
@@ -439,12 +438,12 @@ TEClassifierProtoNet <- R6::R6Class(
       return(history)
     },
     #--------------------------------------------------------------------------
-    load_reload_python_scripts=function(){
+    load_reload_python_scripts = function() {
       super$load_reload_python_scripts()
       load_py_scripts(c("pytorch_old_scripts.py"))
     },
     #--------------------------------------------------------------------------
-    check_param_combinations_configuration=function(){
+    check_param_combinations_configuration = function() {
       if (private$model_config$dense_layers > 0) {
         if (private$model_config$dense_size < 1) {
           stop("Dense layers added. Size for dense layers must be at least 1.")
@@ -458,8 +457,8 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       if (private$model_config$repeat_encoder > 0 &
-          private$model_config$attention_type == "MultiHead" &
-          private$model_config$self_attention_heads <= 0) {
+        private$model_config$attention_type == "MultiHead" &
+        private$model_config$self_attention_heads <= 0) {
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
@@ -479,14 +478,14 @@ TEClassifierProtoNet <- R6::R6Class(
           private$model_config$intermediate_size <- 2 * private$model_config$features
         } else if (
           private$model_config$attention_type == "MultiHead" &
-          private$model_config$rec_layers > 0 &
-          private$model_config$self_attention_heads > 0
+            private$model_config$rec_layers > 0 &
+            private$model_config$self_attention_heads > 0
         ) {
           private$model_config$intermediate_size <- 2 * private$model_config$features
         } else if (
           private$model_config$attention_type == "MultiHead" &
-          private$model_config$rec_layers == 0 &
-          private$model_config$self_attention_heads > 0
+            private$model_config$rec_layers == 0 &
+            private$model_config$self_attention_heads > 0
         ) {
           private$model_config$intermediate_size <- 2 * private$model_config$features
         } else {
@@ -512,18 +511,18 @@ TEClassifierProtoNet <- R6::R6Class(
     calc_classes_on_distance = function(distance_matrix, prototypes) {
       index_vector <- vector(length = nrow(distance_matrix))
 
-      for (i in 1:length(index_vector)) {
+      for (i in seq_along(index_vector)) {
         index_vector[i] <- which.min(distance_matrix[i, ])
       }
 
       classes <- factor(index_vector,
-                        levels = 1:nrow(prototypes),
-                        labels = rownames(prototypes)
+        levels = seq_len(nrow(prototypes)),
+        labels = rownames(prototypes)
       )
       return(classes)
     }
   )
 )
 
-#Add Classifier to central index
-TEClassifiers_class_names<-append(x=TEClassifiers_class_names,values = "TEClassifierProtoNet")
+# Add Classifier to central index
+TEClassifiers_class_names <- append(x = TEClassifiers_class_names, values = "TEClassifierProtoNet")

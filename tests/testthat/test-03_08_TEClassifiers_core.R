@@ -7,12 +7,12 @@ testthat::skip_if_not(
 
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-# object_class_names=c("TEClassifierSequential")
-# object_class_names="TEClassifierParallel"
-# object_class_names="TEClassifierSequentialPrototype"
-# object_class_names="TEClassifierRegular"
+ #object_class_names=c("TEClassifierSequential")
+ #object_class_names="TEClassifierParallel"
+ #object_class_names="TEClassifierSequentialPrototype"
+ #object_class_names="TEClassifierRegular"
 
-max_samples <- 20
+max_samples <- 200
 max_samples_CI <- 10
 
 max_samples_training <- 2
