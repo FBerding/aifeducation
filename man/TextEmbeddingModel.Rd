@@ -24,7 +24,7 @@ Other Text Embedding:
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{BaseModel}}{\cr
-Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelModernBert}.}
+Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelModernBert}, \link{BaseModelRoberta}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -120,7 +120,7 @@ default_value = NULL Allowed values: 'CLS', 'Average'}
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
-\item{\code{base_model}}{\verb{BaseModelBert, BaseModelMPNet, BaseModelModernBert} Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelModernBert} . This objects prepares raw text for the model.}
+\item{\code{base_model}}{\verb{BaseModelBert, BaseModelMPNet, BaseModelModernBert, BaseModelRoberta} Object of class \link{BaseModelBert}, \link{BaseModelMPNet}, \link{BaseModelModernBert}, \link{BaseModelRoberta} . This objects prepares raw text for the model.}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }

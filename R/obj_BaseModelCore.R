@@ -902,10 +902,15 @@ BaseModelCore <- R6::R6Class(
     calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
       tokenizer <- self$Tokenizer$get_tokenizer()
       max_seq_len <- self$get_model_config()$max_position_embeddings
-      possible_tokens <- names(self$Tokenizer$get_tokenizer()$get_vocab())
+
+      #Tokens without special tokens
+      possible_tokens <- setdiff(
+        x=names(self$Tokenizer$get_tokenizer()$get_vocab()),
+        y=self$get_special_tokens()[,"token"]
+      )
 
       generated_texts <- vector(length = batch_size)
-      for (i in 1:seq_along(generated_texts)) {
+      for (i in seq_along(generated_texts)) {
         generated_texts[i] <- paste(sample(
           x = possible_tokens,
           size = max_seq_len,
@@ -923,21 +928,23 @@ BaseModelCore <- R6::R6Class(
 
       bp_factors <- c(1, 2, 3, 4)
 
+      tokenized_texts=tokenizer(
+        text = generated_texts,
+        truncation = TRUE,
+        max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
+        return_tensors = "pt",
+        return_token_type_ids = private$return_token_type_ids,
+        padding=TRUE
+      )
+
+
       for (bp_factor in bp_factors) {
         est_flops <- calflops$calculate_flops(
           model = self$get_model(),
           input_shape = NULL,
           transformer_tokenizer = NULL,
           # args=[],
-          kwargs = tokenizer(
-            text = generated_texts,
-            truncation = TRUE,
-            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
-            return_tensors = "pt",
-            return_token_type_ids = private$return_token_type_ids,
-            padding=TRUE,
-            truncation=TRUE
-          ),
+          kwargs = tokenized_texts,
           forward_mode = "forward",
           include_backPropagation = TRUE,
           compute_bp_factor = bp_factor,
@@ -948,6 +955,7 @@ BaseModelCore <- R6::R6Class(
           output_unit = NULL,
           ignore_modules = NULL
         )
+
         results[1, "n_parameter"] <- est_flops[[3]]
         results[1, "batch_size"] <- batch_size
         results[1, paste0("flops_bp_", bp_factor)] <- est_flops[[1]] * n_batches * n_epochs

@@ -771,7 +771,7 @@ AIFEMaster <- R6::R6Class(
       if (require_udate) {
         for (config_param in config_params) {
           # Search in public
-          for (i in 1:seq_along(config_file$public)) {
+          for (i in seq_along(config_file$public)) {
             current_entry <- config_file$public[[i]]
             if (is.list(current_entry)) {
               current_entry <- config_file$public[[i]][[config_param]]
@@ -784,7 +784,7 @@ AIFEMaster <- R6::R6Class(
             }
           }
           # Search in private
-          for (i in 1:seq_along(config_file$private)) {
+          for (i in seq_along(config_file$private)) {
             current_entry <- config_file$private[[i]]
             if (is.list(current_entry)) {
               current_entry <- config_file$private[[i]][[config_param]]

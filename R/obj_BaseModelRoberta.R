@@ -22,36 +22,35 @@
 BaseModelRoberta <- R6::R6Class(
   classname = "BaseModelRoberta",
   inherit = BaseModelCore,
-  private=list(
+  private = list(
     model_type = "roberta",
-
-    adjust_max_sequence_length=2,
-
-  create_model=function(args){
-    configuration <- transformers$RobertaConfig(
-      #vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
-      vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
-      max_position_embeddings = as.integer(args$max_position_embeddings),
-      hidden_size = as.integer(args$hidden_size),
-      num_hidden_layers = as.integer(args$num_hidden_layers),
-      num_attention_heads = as.integer(args$num_attention_heads),
-      intermediate_size = as.integer(args$intermediate_size),
-      hidden_act = tolower(args$hidden_act),
-      hidden_dropout_prob = args$hidden_dropout_prob,
-      attention_probs_dropout_prob = args$attention_probs_dropout_prob,
-      type_vocab_size = as.integer(2),
-      initializer_range = 0.02,
-      layer_norm_eps = 1e-12,
-      position_embedding_type = "absolute",
-      is_decoder = FALSE,
-      use_cache = TRUE
-    )
-    private$model <- transformers$RobertaForMaskedLM(configuration)
-  },
-  load_BaseModel=function(dir_path){
-    private$model <- transformers$RobertaForMaskedLM$from_pretrained(dir_path)
-  }
-),
+    adjust_max_sequence_length = 4,
+    return_token_type_ids = FALSE,
+    create_model = function(args) {
+      configuration <- transformers$RobertaConfig(
+        # vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
+        max_position_embeddings = as.integer(args$max_position_embeddings),
+        hidden_size = as.integer(args$hidden_size),
+        num_hidden_layers = as.integer(args$num_hidden_layers),
+        num_attention_heads = as.integer(args$num_attention_heads),
+        intermediate_size = as.integer(args$intermediate_size),
+        hidden_act = tolower(args$hidden_act),
+        hidden_dropout_prob = args$hidden_dropout_prob,
+        attention_probs_dropout_prob = args$attention_probs_dropout_prob,
+        type_vocab_size = as.integer(2),
+        initializer_range = 0.02,
+        layer_norm_eps = 1e-12,
+        position_embedding_type = "absolute",
+        is_decoder = FALSE,
+        use_cache = TRUE
+      )
+      private$model <- transformers$RobertaForMaskedLM(configuration)
+    },
+    load_BaseModel = function(dir_path) {
+      private$model <- transformers$RobertaForMaskedLM$from_pretrained(dir_path)
+    }
+  ),
   public = list(
     #---------------------------------------------------------------------------
     #' @description Configures a new object of this class.
@@ -80,5 +79,5 @@ BaseModelRoberta <- R6::R6Class(
   )
 )
 
-#Add the model to the user list
-BaseModelsIndex$roberta=("BaseModelRoberta")
+# Add the model to the user list
+BaseModelsIndex$roberta <- ("BaseModelRoberta")

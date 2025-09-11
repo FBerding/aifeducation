@@ -157,7 +157,7 @@ max_layers <- 2
               emb_layer_min = min_layer,
               emb_layer_max = max_layer,
               emb_pool_type = pooling_type,
-                      base_model = base_model
+              base_model = base_model
             )
             expect_error(
               text_embedding_model$configure(

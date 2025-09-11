@@ -16,7 +16,8 @@ Language Understanding. \doi{10.48550/arXiv.2004.09297}
 \seealso{
 Other Base Model: 
 \code{\link{BaseModelBert}},
-\code{\link{BaseModelModernBert}}
+\code{\link{BaseModelModernBert}},
+\code{\link{BaseModelRoberta}}
 }
 \concept{Base Model}
 \section{Super classes}{
