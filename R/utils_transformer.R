@@ -72,7 +72,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max
   return(
     list(
       step = step,
-      date = date(),
+      date = get_time_stamp(),
       max_tokens_length = statistics_max_tokens_length,
       n_sequences = n_sequences,
       n_words = n_words,

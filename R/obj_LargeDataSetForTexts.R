@@ -100,7 +100,7 @@ LargeDataSetForText <- R6::R6Class(
           list_datasets[i] <- list(chunk_dataset)
           if (trace == TRUE) {
             message(paste(
-              date(),
+              get_time_stamp(),
               "Batch", i, "from", n_batches, "processed"
             ))
           }
@@ -197,7 +197,7 @@ LargeDataSetForText <- R6::R6Class(
           list_datasets[i] <- list(chunk_dataset)
           if (trace == TRUE) {
             message(paste(
-              date(),
+              get_time_stamp(),
               "Batch", i, "from", n_batches, "processed"
             ))
           }
@@ -359,7 +359,7 @@ LargeDataSetForText <- R6::R6Class(
         list_datasets[i] <- list(chunk_dataset)
         if (trace == TRUE) {
           message(paste(
-            date(),
+            get_time_stamp(),
             "Batch", i, "from", n_batches, "processed"
           ))
         }

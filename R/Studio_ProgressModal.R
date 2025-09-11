@@ -235,7 +235,7 @@ start_and_monitor_long_task <- function(id,
         shiny::invalidateLater(millis = update_intervall * 1000)
         # TODO (Yuliia): force_update assigned but may not be used
         force_update <- input$force_update
-        # print(date())
+        # print(get_time_stamp())
 
         log <- NULL
         if (!is.null(log_path)) log <- read_log(log_path)

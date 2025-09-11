@@ -44,7 +44,7 @@ summarize_tracked_sustainability <- function(sustainability_tracker, task = NA) 
 
   results <- list(
     sustainability_tracked = TRUE,
-    date = date(),
+    date = get_time_stamp(),
     task = task,
     sustainability_data = list(
       duration_sec = sustainability_tracker$final_emissions_data$duration,

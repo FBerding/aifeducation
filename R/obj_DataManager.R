@@ -350,13 +350,13 @@ DataManagerClassifier <- R6::R6Class(
       if (trace == TRUE) {
         if (self$state$iteration <= self$config$n_folds) {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Iteration", self$state$iteration, "from", self$config$n_folds,
             "|", "Generating synthetic cases"
           ))
         } else {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Final training",
             "|", "Generating synthetic cases"
           ))
@@ -450,13 +450,13 @@ DataManagerClassifier <- R6::R6Class(
       if (trace == TRUE) {
         if (self$state$iteration <= self$config$n_folds) {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Iteration", self$state$iteration, "from", self$config$n_folds,
             "|", "Generating synthetic cases done"
           ))
         } else {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Final training",
             "|", "Generating synthetic cases done"
           ))
@@ -558,7 +558,7 @@ DataManagerClassifier <- R6::R6Class(
       # Report numbers
       if (trace == TRUE) {
         message(paste(
-          date(),
+          get_time_stamp(),
           "Total Cases:", n_init_cases,
           "Unique Cases:", n_final_cases,
           "Labeled Cases:", length(indices_labeled)

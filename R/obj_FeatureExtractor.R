@@ -95,7 +95,7 @@ TEFeatureExtractor <- R6::R6Class(
       private$set_model_info(
         model_name = private$generate_model_id(name),
         label = label,
-        model_date = date()
+        model_date = get_time_stamp()
       )
 
       # Adjust configuration
@@ -177,7 +177,7 @@ TEFeatureExtractor <- R6::R6Class(
       # Start-------------------------------------------------------------------
       if (self$last_training$config$trace == TRUE) {
         message(paste(
-          date(),
+          get_time_stamp(),
           "Start"
         ))
       }
@@ -249,7 +249,7 @@ TEFeatureExtractor <- R6::R6Class(
       private$clean_checkpoint_directory()
 
       if (self$last_training$config$trace == TRUE) {
-        message(paste(date(), "Training finished"))
+        message(paste(get_time_stamp(), "Training finished"))
       }
     },
     #---------------------------------------------------------------------------
@@ -423,7 +423,7 @@ TEFeatureExtractor <- R6::R6Class(
         }
         if (trace == TRUE) {
           cat(paste(
-            date(),
+            get_time_stamp(),
             "Batch", i, "/", total_number_of_bachtes, "done", "\n"
           ))
         }

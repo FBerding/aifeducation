@@ -221,7 +221,7 @@ TextEmbeddingModel <- R6::R6Class(
       private$set_model_info(
         model_name = private$generate_model_id(model_name),
         label = model_label,
-        model_date = date(),
+        model_date = get_time_stamp(),
         model_language = model_language
       )
 
@@ -521,7 +521,7 @@ TextEmbeddingModel <- R6::R6Class(
         batch_results[b] <- list(text_embedding)
         if (trace == TRUE) {
           cat(paste(
-            date(),
+            get_time_stamp(),
             "Batch", b, "/", n_batches, "Done", "\n"
           ))
         }
@@ -642,7 +642,7 @@ TextEmbeddingModel <- R6::R6Class(
         }
         if (trace == TRUE) {
           cat(paste(
-            date(),
+            get_time_stamp(),
             "Batch", i, "/", total_number_of_bachtes, "done", "\n"
           ))
         }

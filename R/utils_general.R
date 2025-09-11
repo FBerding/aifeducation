@@ -12,6 +12,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+#' Time stamp
+#'
+#' Function returns the time on the machine at the moment of calling.
+#'
+#' @return Returns a `string` with date and time in format "%y-%m-%d %H:%M:%S".
+#'
+#' @family Utils Developers
+#' @export
+get_time_stamp=function(){
+  return(
+    as.character(format(Sys.time()),"%y-%m-%d %H:%M:%S")
+  )
+}
+
 #' Transforming classes to one-hot encoding
 #'
 #' Function transforming a vector of classes (int) into

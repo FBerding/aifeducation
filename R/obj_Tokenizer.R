@@ -182,7 +182,7 @@ TokenizerBase <- R6::R6Class(
           for (j in 1:chunks) {
             tokens_unit[j] <- list(tokens["input_ids"][j, ])
             if (trace == TRUE) {
-              cat(paste(date(), i, "/", n_units, "block", j, "/", chunks, "\n"))
+              cat(paste(get_time_stamp(), i, "/", n_units, "block", j, "/", chunks, "\n"))
             }
           }
           encodings_only[i] <- list(tokens_unit)

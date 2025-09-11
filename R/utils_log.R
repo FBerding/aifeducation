@@ -239,7 +239,7 @@ reset_loss_log <- function(log_path, epochs) {
 #' @export
 output_message <- function(msg, trace, msg_fun) {
   fun <- ifelse(msg_fun, message, cat)
-  if (trace) fun(paste(date(), msg))
+  if (trace) fun(paste(get_time_stamp(), msg))
 }
 
 #' @title Print message (`message()`)

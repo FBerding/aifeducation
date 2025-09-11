@@ -969,7 +969,7 @@ BaseModelCore <- R6::R6Class(
       package_list <- reticulate::py_list_packages()
       results[1, "version"] <- package_list$version[which(package_list$package == "calflops")]
 
-      results[1, "date"] <- date()
+      results[1, "date"] <- get_time_stamp()
 
       return(results)
     }

@@ -527,7 +527,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #--------------------------------------------------------------------------
     finalize_train = function() {
       # Save Final Information
-      self$last_training$date <- date()
+      self$last_training$date <- get_time_stamp()
 
       # Finalize measures from content analysis
       test_metric_mean <- vector(length = ncol(self$reliability$test_metric))
@@ -603,12 +603,12 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (self$last_training$config$trace == TRUE) {
         if (iteration <= self$last_training$config$n_folds) {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Iteration", iteration, "from", self$last_training$config$n_folds
           ))
         } else {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Final training"
           ))
         }
@@ -646,13 +646,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (self$last_training$config$trace == TRUE) {
         if (iteration <= self$last_training$config$n_folds) {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
             "|", "Training"
           ))
         } else {
           message(paste(
-            date(),
+            get_time_stamp(),
             "|", "Final training",
             "|", "Training"
           ))
@@ -722,13 +722,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         if (self$last_training$config$trace == TRUE) {
           if (iteration <= self$last_training$config$n_folds) {
             message(paste(
-              date(),
+              get_time_stamp(),
               "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
               "|", "Pseudo labeling", "step", step, "from", self$last_training$config$pl_max_steps
             ))
           } else {
             message(paste(
-              date(),
+              get_time_stamp(),
               "|", "Final training",
               "|", "Pseudo labeling", "step", step, "from", self$last_training$config$pl_max_steps
             ))
@@ -777,13 +777,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         if (self$last_training$config$trace == TRUE) {
           if (iteration <= self$last_training$config$n_folds) {
             message(paste(
-              date(),
+              get_time_stamp(),
               "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
               "|", "Training"
             ))
           } else {
             message(paste(
-              date(),
+              get_time_stamp(),
               "|", "Final training",
               "|", "Training"
             ))
@@ -1149,7 +1149,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       private$set_model_info(
         model_name = private$generate_model_id(args$name),
         label = args$label,
-        model_date = date()
+        model_date = get_time_stamp()
       )
 
       # Adjust configuration
@@ -1320,7 +1320,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Start-------------------------------------------------------------------
       if (self$last_training$config$trace == TRUE) {
         message(paste(
-          date(),
+          get_time_stamp(),
           "Start"
         ))
       }
@@ -1380,7 +1380,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       if (self$last_training$config$trace == TRUE) {
         message(paste(
-          date(),
+          get_time_stamp(),
           "Training Complete"
         ))
       }
