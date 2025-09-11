@@ -32,7 +32,7 @@ TokenizerBase <- R6::R6Class(
     load_tokenizer_statistics = function(model_dir) {
       path <- paste0(model_dir, "/", "tokenizer_statistics.csv")
       if (file.exists(path) == TRUE) {
-        private$tokenizer_statistics <- read.csv(file = path)
+        private$tokenizer_statistics <- utils::read.csv(file = path)
       } else {
         private$tokenizer_statistics <- NA
       }

@@ -56,7 +56,7 @@ BaseModelCore <- R6::R6Class(
     load_training_history = function(model_dir) {
       training_datalog_path <- paste0(model_dir, "/", "history.log")
       if (file.exists(training_datalog_path) == TRUE) {
-        self$last_training$history <- read.csv2(file = training_datalog_path)
+        self$last_training$history <- utils::read.csv2(file = training_datalog_path)
       } else {
         self$last_training$history <- NA
       }
@@ -932,9 +932,11 @@ BaseModelCore <- R6::R6Class(
           kwargs = tokenizer(
             text = generated_texts,
             truncation = TRUE,
-            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length - 5),
+            max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
             return_tensors = "pt",
-            return_token_type_ids = private$return_token_type_ids
+            return_token_type_ids = private$return_token_type_ids,
+            padding=TRUE,
+            truncation=TRUE
           ),
           forward_mode = "forward",
           include_backPropagation = TRUE,

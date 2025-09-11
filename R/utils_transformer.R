@@ -22,6 +22,7 @@
 #' * `"initial_training"` for the first training of the transformer.
 #' * `"fine_tuning"` for all following trainings of the transformer.
 #' * `"training"` for a training run of the transformer.
+#' @param statistics_max_tokens_length `r get_description("statistics_max_tokens_length")`
 #' @return Returns a `list` with the following entries:
 #' * n_sequences: Number of sequences
 #' * n_words: Number for words in whole corpus

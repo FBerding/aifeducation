@@ -40,6 +40,8 @@ install_py_modules(
 
 \item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.}
 
+\item{calflops_version}{\code{string} determining the desired version of the python library 'calflops'.}
+
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for 'PyTorch'.
 To install 'PyTorch' without cuda set to \code{NULL}.}
 

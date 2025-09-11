@@ -7,7 +7,15 @@
 Does return a new object of this class.
 }
 \description{
-Tokenizer based on the WordPiece model.
+Tokenizer based on the WordPiece model (Wu et al. 2016).
+}
+\references{
+Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W.,
+Krikun, M., Cao, Y., Gao, Q., Macherey, K., Klingner, J., Shah, A.,
+Johnson, M., Liu, X., Kaiser, Ł., Gouws, S., Kato, Y., Kudo, T., Kazawa,
+H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
+Bridging the Gap between Human and Machine Translation.
+\url{https://doi.org/10.48550/arXiv.1609.08144}
 }
 \seealso{
 Other Tokenizer: 

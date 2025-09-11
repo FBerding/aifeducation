@@ -1345,6 +1345,10 @@ He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
 BERT with Disentangled Attention.
 <https://doi.org/10.48550/arXiv.2006.03654>
 
+Kaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B., Child, R., Gray, S., 
+Radford, A., Wu, J. & Amodei, D. (2020). Scaling Laws for Neural Language Models. 
+<https://doi.org/10.48550/arXiv.2001.08361>
+
 Lane, H., Howard, C., & Hapke, H. M. (2019). Natural language processing
 in action: Understanding, analyzing, and generating text with Python.
 Shelter Island: Manning.

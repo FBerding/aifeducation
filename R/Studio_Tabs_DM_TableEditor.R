@@ -130,6 +130,8 @@ DataManagement_TableEditorUI <- function(id) {
 #' @param volumes `vector` containing a named vector of available volumes.
 #' @return This function does nothing return. It is used to create the functionality of a page for a shiny app.
 #'
+#' @importFrom utils read.csv
+#'
 #' @family studio_gui_page_data_management_table_editor
 #' @keywords internal
 #' @noRd
@@ -166,7 +168,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
         if (!is.null(tmp_path)) {
           file_extension <- get_file_extension(file_path())
           if (file_extension == "csv") {
-            table <- read.csv(file = file_path())
+            table <- utils::read.csv(file = file_path())
           } else if (file_extension == "rda" | file_extension == "rdata") {
             table <- load(file = file_path())
             table <- get(table)

@@ -98,13 +98,14 @@ write_log <- function(log_file,
 #'
 #' @return Returns a matrix containing the log file.
 #'
+#' @importFrom utils read.csv
 #' @family Utils Log Developers
 #' @export
 #'
 read_log <- function(file_path) {
   res <- NULL
   if (!is.null_or_na(file_path)) {
-    log_file <- try(read.csv(file_path))
+    log_file <- try(utils::read.csv(file_path))
     if (!inherits(log_file, "try-error")) res <- log_file
   }
   return(res)

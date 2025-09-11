@@ -201,6 +201,7 @@ install_aifeducation_studio <- function() {
 #' @param safetensors_version `string` determining the desired version of the python library 'safetensors'.
 #' @param torcheval_version `string` determining the desired version of the python library 'torcheval'.
 #' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.
+#' @param calflops_version `string` determining the desired version of the python library 'calflops'.
 #' @param pytorch_cuda_version `string` determining the desired version of 'cuda' for 'PyTorch'.
 #' To install 'PyTorch' without cuda set to `NULL`.
 #' @param python_version `string` Python version to use.

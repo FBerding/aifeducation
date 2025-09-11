@@ -107,9 +107,9 @@ embedding. Allowed values: \verb{1 <= x <= 2048}}
 
 \item{\code{hidden_activation}}{\code{string} Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{embedding_dropout}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{embedding_dropout}}{\code{double} Dropout chance for the embeddings. Allowed values: \verb{0 <= x <= 0.6}}
 
-\item{\code{mlp_dropout}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{mlp_dropout}}{\code{double} Dropout rate for the mlp layer. Allowed values: \verb{0 <= x <= 0.6}}
 
 \item{\code{attention_dropout}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x <= 0.6}}
 }

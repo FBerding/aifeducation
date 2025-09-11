@@ -564,6 +564,7 @@ load_and_check_dataset_raw_texts <- function(dir_path) {
 #'
 #' @importFrom stringi stri_split_fixed
 #' @importFrom stringi stri_trans_tolower
+#' @importFrom utils read.csv
 #'
 #' @family Utils Studio Developers
 #' @keywords internal
@@ -721,7 +722,7 @@ check_numeric_input <- function(input) {
 #' categories in the columns. The ids of the cases must be stored in a column called "id".
 #'
 #' @return Returns a named factor containing the target data.
-#'
+#' @importFrom utils read.csv
 #' @family Utils Studio Developers
 #' @export
 long_load_target_data <- function(file_path, selectet_column) {

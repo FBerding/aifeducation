@@ -22,6 +22,8 @@ sequence.}
 \item \code{"fine_tuning"} for all following trainings of the transformer.
 \item \code{"training"} for a training run of the transformer.
 }}
+
+\item{statistics_max_tokens_length}{}
 }
 \value{
 Returns a \code{list} with the following entries:

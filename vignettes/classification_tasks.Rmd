@@ -2374,6 +2374,10 @@ Learn to Implement Fast and Accurate Deep Learning Models with Fewer
 Training Samples Using Pytorch. Packt Publishing Limited.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6175328>
 
+Kaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B., Child, R., Gray, S., 
+Radford, A., Wu, J. & Amodei, D. (2020). Scaling Laws for Neural Language Models. 
+<https://doi.org/10.48550/arXiv.2001.08361>
+
 Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
 for Turkish large language models. Intelligent Systems with
 Applications, 21, 200335. <https://doi.org/10.1016/j.iswa.2024.200335>
@@ -2474,4 +2478,3 @@ Elsevier Science & Technology.
 
 
 
-Kaplan et al. 
