@@ -328,6 +328,10 @@ BaseModelCore <- R6::R6Class(
         datasets$disable_progress_bars()
       }
     },
+    #--------------------------------------------------------------------------
+    check_arg_combinations=function(args){
+      #Placeholder for the child classes
+    },
     #---------------------------------------------------------------------------
     do_configuration = function(args) {
       # Load or reload python scripts
@@ -338,6 +342,9 @@ BaseModelCore <- R6::R6Class(
 
       # Check arguments
       check_all_args(args = args)
+
+      #Check argument combinations
+      private$check_arg_combinations(args=args)
 
       # Save args
       private$save_all_args(args = args, group = "configure")

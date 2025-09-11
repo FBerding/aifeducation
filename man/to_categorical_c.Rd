@@ -28,6 +28,7 @@ Other Utils Developers:
 \code{\link{generate_id}()},
 \code{\link{get_n_chunks}()},
 \code{\link{get_synthetic_cases_from_matrix}()},
+\code{\link{get_time_stamp}()},
 \code{\link{matrix_to_array_c}()},
 \code{\link{tensor_to_matrix_c}()}
 }

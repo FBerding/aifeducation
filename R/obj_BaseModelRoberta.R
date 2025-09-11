@@ -49,6 +49,12 @@ BaseModelRoberta <- R6::R6Class(
     },
     load_BaseModel = function(dir_path) {
       private$model <- transformers$RobertaForMaskedLM$from_pretrained(dir_path)
+    },
+    #---------------------------------------------------------------------------
+    check_arg_combinations = function(args) {
+      if (args$hidden_size %% args$num_attention_heads != 0) {
+        stop("hidden_size must be a multiple auf num_attention_heads.")
+      }
     }
   ),
   public = list(

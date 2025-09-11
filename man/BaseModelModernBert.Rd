@@ -81,6 +81,7 @@ Configures a new object of this class.
   hidden_size = 768,
   num_hidden_layers = 12,
   num_attention_heads = 12,
+  global_attn_every_n_layers = 3,
   intermediate_size = 3072,
   hidden_activation = "GELU",
   embedding_dropout = 0.1,
@@ -103,6 +104,8 @@ embedding. Allowed values: \verb{1 <= x <= 2048}}
 \item{\code{num_hidden_layers}}{\code{int} Number of hidden layers. Allowed values: \code{1 <= x }}
 
 \item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
+
+\item{\code{global_attn_every_n_layers}}{\code{int} Number determining to use a global attention every x-th layer. Allowed values: \verb{2 <= x <= 36}}
 
 \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
 

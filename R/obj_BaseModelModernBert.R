@@ -27,7 +27,6 @@ BaseModelModernBert <- R6::R6Class(
     model_type = "modernbert",
     create_model = function(args) {
       configuration <- transformers$ModernBertConfig(
-        # vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         hidden_size = as.integer(args$hidden_size),
         intermediate_size = as.integer(args$intermediate_size),
@@ -37,6 +36,7 @@ BaseModelModernBert <- R6::R6Class(
         max_position_embeddings = as.integer(args$max_position_embeddings),
         initializer_range = 0.02,
         norm_eps = 1e-12,
+        global_attn_every_n_layers=as.integer(args$global_attn_every_n_layers),
         pad_token_id = args$tokenizer$get_tokenizer()$pad_token_id,
         eos_token_id = args$tokenizer$get_tokenizer()$eos_token_id,
         bos_token_id = args$tokenizer$get_tokenizer()$bos_token_id,
@@ -52,6 +52,15 @@ BaseModelModernBert <- R6::R6Class(
     },
     load_BaseModel = function(dir_path) {
       private$model <- transformers$ModernBertForMaskedLM$from_pretrained(dir_path)
+    },
+    check_arg_combinations = function(args) {
+      if (args$hidden_size %% args$num_attention_heads != 0) {
+        stop("hidden_size must be a multiple auf num_attention_heads.")
+      }
+
+      if(args$global_attn_every_n_layers>args$num_hidden_layers){
+        stop("global_attn_every_n_layers must be equal or small num_hidden_layers.")
+      }
     }
   ),
   public = list(
@@ -62,6 +71,7 @@ BaseModelModernBert <- R6::R6Class(
     #' @param hidden_size `r get_param_doc_desc("hidden_size")`
     #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
     #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
+    #' @param global_attn_every_n_layers `r get_param_doc_desc("global_attn_every_n_layers")`
     #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
     #' @param hidden_activation `r get_param_doc_desc("hidden_activation")`
     #' @param embedding_dropout `r get_param_doc_desc("embedding_dropout")`
@@ -73,6 +83,7 @@ BaseModelModernBert <- R6::R6Class(
                          hidden_size = 768,
                          num_hidden_layers = 12,
                          num_attention_heads = 12,
+                         global_attn_every_n_layers=3,
                          intermediate_size = 3072,
                          hidden_activation = "GELU",
                          embedding_dropout = 0.1,

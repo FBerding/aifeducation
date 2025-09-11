@@ -156,6 +156,7 @@ AIFEMaster <- R6::R6Class(
     #' @description Method for requesting a summary of the R and python packages' versions used for creating the model.
     #' @return Returns a `list` containing the versions of the relevant R and python packages.
     get_package_versions = function() {
+      private$check_config_for_TRUE()
       return(
         list(
           r_package_versions = private$r_package_versions,
@@ -170,6 +171,7 @@ AIFEMaster <- R6::R6Class(
     #' @return Returns a `list` containing the tracked energy consumption, CO2 equivalents in kg, information on the
     #'   tracker used, and technical information on the training infrastructure.
     get_sustainability_data = function(track_mode = "training") {
+
       if (track_mode == "training") {
         return(private$sustainability$track_log)
       } else if (track_mode == "inference") {
@@ -325,6 +327,7 @@ AIFEMaster <- R6::R6Class(
         stop("The object is not configured. Please call the method configure.")
       }
     },
+    #--------------------------------------------------------------------------
     # Method for checking if the configuration is already done
     check_config_for_FALSE = function() {
       if (private$configured == TRUE) {
@@ -338,6 +341,7 @@ AIFEMaster <- R6::R6Class(
         stop("The model has already been trained and cant't be modified. Please create a new model if you need antoher training run.")
       }
     },
+    #---------------------------------------------------------------------------
     check_for_trained = function() {
       if (self$is_trained() == FALSE) {
         stop("The model has not been trained. Please train the model before you use it.")

@@ -67,6 +67,12 @@ BaseModelMPNet <- R6::R6Class(
         from_tf = FALSE,
         use_safetensors = TRUE
       )
+    },
+    #---------------------------------------------------------------------------
+    check_arg_combinations = function(args) {
+      if (args$hidden_size %% args$num_attention_heads != 0) {
+        stop("hidden_size must be a multiple auf num_attention_heads.")
+      }
     }
   ),
   public = list(

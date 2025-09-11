@@ -171,6 +171,18 @@ get_param_dict <- function() {
     default_value = NULL"
   )
 
+  param$global_attn_every_n_layers <- list(
+    type = "int",
+    min = 2,
+    max = 36,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number determining to use a global attention every x-th layer.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 3,
+    default_historic = 3
+  )
 
 
   param$statistics_max_tokens_length <- list(
@@ -362,7 +374,7 @@ get_param_dict <- function() {
   )
 
   param$text_dataset <- list(
-    type = c("LargeDataSetForText"),
+    type = "LargeDataSetForText",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
@@ -700,7 +712,7 @@ get_param_dict <- function() {
   param$text_embeddings <- param$data_embeddings
 
   param$data_targets <- list(
-    type = c("factor"),
+    type = "factor",
     allow_null = FALSE,
     desc = "containing the labels for cases stored in embeddings. Factor must be
       named and has to use the same names as used in in the embeddings."
@@ -720,7 +732,7 @@ get_param_dict <- function() {
   param$class_levels <- param$target_levels
 
   param$data_folds <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -732,7 +744,7 @@ get_param_dict <- function() {
   param$folds <- param$data_folds
 
   param$data_val_size <- list(
-    type = c("(double)"),
+    type = "(double)",
     allow_null = FALSE,
     min = 0,
     max = 1,
@@ -746,7 +758,7 @@ get_param_dict <- function() {
   param$val_size <- param$data_val_size
 
   param$loss_balance_class_weights <- list(
-    type = c("bool"),
+    type = "bool",
     allow_null = FALSE,
     desc = "If `TRUE` class weights are generated based on the frequencies of the
       training data with the method Inverse Class Frequency. If `FALSE` each class has the weight 1.",
@@ -755,7 +767,7 @@ get_param_dict <- function() {
     default_value = TRUE
   )
   param$loss_balance_sequence_length <- list(
-    type = c("bool"),
+    type = "bool",
     allow_null = FALSE,
     desc = "If `TRUE` sample weights are generated for the length of sequences based on
       the frequencies of the training data with the method Inverse Class Frequency.
@@ -786,7 +798,7 @@ get_param_dict <- function() {
 
   # Synthetic cases-------------------------------------------------------------
   param$use_sc <- list(
-    type = c("bool"),
+    type = "bool",
     allow_null = FALSE,
     desc = "`TRUE` if the estimation should integrate synthetic cases. `FALSE` if not.",
     gui_box = "Synthetic Cases",
@@ -794,9 +806,9 @@ get_param_dict <- function() {
     default_value = FALSE
   )
   param$sc_method <- list(
-    type = c("string"),
+    type = "string",
     allow_null = FALSE,
-    allowed_values = c("knnor"),
+    allowed_values = "knnor",
     desc = "containing the method for generating synthetic cases.",
     gui_box = "Synthetic Cases",
     gui_label = "Method for Creating Synthetic Cases",
@@ -805,7 +817,7 @@ get_param_dict <- function() {
   param$sc_methods <- param$sc_method
 
   param$sc_min_k <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -815,7 +827,7 @@ get_param_dict <- function() {
     default_value = 1
   )
   param$sc_max_k <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -826,7 +838,7 @@ get_param_dict <- function() {
   )
 
   param$n_cores <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -836,7 +848,7 @@ get_param_dict <- function() {
 
   # Pseudo labeling------------------------------------------------------------
   param$use_pl <- list(
-    type = c("bool"),
+    type = "bool",
     allow_null = FALSE,
     desc = "`TRUE` if the estimation should integrate pseudo-labeling. `FALSE` if not.",
     gui_box = "Pseudo Labeling",
@@ -844,7 +856,7 @@ get_param_dict <- function() {
     default_value = FALSE
   )
   param$pl_max_steps <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -865,7 +877,7 @@ get_param_dict <- function() {
     default_value = 1
   )
   param$pl_max <- list(
-    type = c("(double"),
+    type = "(double",
     allow_null = FALSE,
     min = 0,
     max = 1,
@@ -875,7 +887,7 @@ get_param_dict <- function() {
     default_value = 1
   )
   param$pl_min <- list(
-    type = c("double)"),
+    type = "double)",
     allow_null = FALSE,
     min = 0,
     max = 1,
@@ -887,14 +899,14 @@ get_param_dict <- function() {
 
   # Sustainability--------------------------------------------------------------
   param$sustain_track <- list(
-    type = c("bool"),
+    type = "bool",
     allow_null = FALSE,
     desc = "If `TRUE` energy consumption is tracked during training via the python library 'codecarbon'.",
     gui_box = NULL,
     default_value = TRUE
   )
   param$sustain_iso_code <- list(
-    type = c("string"),
+    type = "string",
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "ISO code (Alpha-3-Code) for the country. This variable must be set if
@@ -905,7 +917,7 @@ get_param_dict <- function() {
     default_value = "DEU"
   )
   param$sustain_region <- list(
-    type = c("string"),
+    type = "string",
     allow_null = TRUE,
     allowed_values = NULL,
     desc = "Region within a country. Only available for USA and Canada See the documentation of
@@ -914,7 +926,7 @@ get_param_dict <- function() {
     default_value = NULL
   )
   param$sustain_interval <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -960,7 +972,7 @@ get_param_dict <- function() {
   )
 
   param$epochs <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -972,7 +984,7 @@ get_param_dict <- function() {
   param$n_epoch <- param$epochs
 
   param$batch_size <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -982,7 +994,7 @@ get_param_dict <- function() {
     default_value = 32
   )
   param$lr_rate <- list(
-    type = c("(double"),
+    type = "(double",
     allow_null = FALSE,
     min = 0,
     max = 1,
@@ -995,7 +1007,7 @@ get_param_dict <- function() {
   param$learning_rate <- param$lr_rate
 
   param$lr_warm_up_ratio <- list(
-    type = c("(double)"),
+    type = "(double)",
     allow_null = FALSE,
     min = 0,
     max = .50,
@@ -1005,7 +1017,7 @@ get_param_dict <- function() {
     default_value = 0.01
   )
   param$dir_checkpoint <- list(
-    type = c("string"),
+    type = "string",
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "Path to the directory where the checkpoint during training should be saved.
@@ -1014,7 +1026,7 @@ get_param_dict <- function() {
 
   # Logging related-------------------------------------------------------------
   param$log_dir <- list(
-    type = c("string"),
+    type = "string",
     allow_null = TRUE,
     allowed_values = NULL,
     desc = "Path to the directory where the log files should be saved.
@@ -1022,7 +1034,7 @@ get_param_dict <- function() {
     default_value = NULL
   )
   param$log_file <- list(
-    type = c("string"),
+    type = "string",
     allow_null = TRUE,
     allowed_values = NULL,
     desc = "Path to the file where the log files should be saved.
@@ -1030,7 +1042,7 @@ get_param_dict <- function() {
     default_value = NULL
   )
   param$log_write_interval <- list(
-    type = c("int"),
+    type = "int",
     allow_null = FALSE,
     min = 1,
     max = Inf,
@@ -1039,7 +1051,7 @@ get_param_dict <- function() {
     default_value = 60
   )
   param$trace <- list(
-    type = c("bool"),
+    type = "bool",
     allow_null = FALSE,
     desc = "`TRUE` if information about the estimation phase should be printed to the console.",
     default_value = FALSE
