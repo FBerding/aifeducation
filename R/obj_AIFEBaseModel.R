@@ -156,7 +156,6 @@ AIFEMaster <- R6::R6Class(
     #' @description Method for requesting a summary of the R and python packages' versions used for creating the model.
     #' @return Returns a `list` containing the versions of the relevant R and python packages.
     get_package_versions = function() {
-      private$check_config_for_TRUE()
       return(
         list(
           r_package_versions = private$r_package_versions,

@@ -61,14 +61,20 @@ display_errors <- function(
 #'
 display_processing <- function(
     title = "Working. Please wait.",
-    size = "l",
+    size = "s",
     easy_close = FALSE,
     message = "") {
+  if(easy_close==FALSE){
+    footer=NULL
+  } else {
+    footer=shiny::modalButton("Close")
+  }
+
   processing_modal <- shiny::modalDialog(
     title = title,
     size = size,
     easyClose = easy_close,
-    footer = shiny::modalButton("Close"),
+    footer = footer,
     shiny::tagList(message)
   )
   shiny::showModal(processing_modal)
