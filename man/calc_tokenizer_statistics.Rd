@@ -23,7 +23,7 @@ sequence.}
 \item \code{"training"} for a training run of the transformer.
 }}
 
-\item{statistics_max_tokens_length}{}
+\item{statistics_max_tokens_length}{\code{int} Maximum sequence length for calculating the statistics. Allowed values: \verb{20 <= x <= 8192}}
 }
 \value{
 Returns a \code{list} with the following entries:

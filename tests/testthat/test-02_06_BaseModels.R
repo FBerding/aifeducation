@@ -89,6 +89,7 @@ for (object_class_name in object_class_names) {
         max_position_embeddings = 512,
         hidden_size = 16,
         num_hidden_layers = 3,
+        global_attn_every_n_layers=2,
         attention_window = 4,
         num_attention_heads = 2,
         intermediate_size = 32

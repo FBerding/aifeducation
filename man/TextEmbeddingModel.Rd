@@ -268,7 +268,7 @@ into text embeddings. For a large number of texts please use the method \code{em
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{return_large_dataset}}{\code{bool} If \code{TRUE} a \link{LargeDataSetForEmbeddings} is returned. If \code{FALSE} an object if class \link{EmbeddedText} is returned.}
+\item{\code{return_large_dataset}}{\code{bool} If \code{TRUE} a \link{LargeDataSetForTextEmbeddings} is returned. If \code{FALSE} an object if class \link{EmbeddedText} is returned.}
 }
 \if{html}{\out{</div>}}
 }

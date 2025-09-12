@@ -331,10 +331,10 @@ TokenizerBase <- R6::R6Class(
     #' for Turkish large language models. Intelligent Systems with
     #' Applications, 21, 200335. <https://doi.org/10.1016/j.iswa.2024.200335>
     #'
-    #' @param text_dataset `r get_description("text_dataset")`
-    #' @param statistics_max_tokens_length `r get_description("statistics_max_tokens_length")`
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param statistics_max_tokens_length `r get_param_doc_desc("statistics_max_tokens_length")`
     #' @param step `string` describing the context of the estimation.
-    #' @returns Returns a `data.frame` containg the estimates.
+    #' @returns Returns a `data.frame` containing the estimates.
 
     #' @return Returns an 'int' counting the number of special tokens.
     calculate_statistics = function(text_dataset,

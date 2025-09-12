@@ -6,7 +6,7 @@
 \value{
 Does return a new object of this class.
 
-Returns a \code{data.frame} containg the estimates.
+Returns a \code{data.frame} containing the estimates.
 }
 \description{
 Base class for tokenizers containing all methods shared by the sub-classes.
@@ -260,9 +260,9 @@ Applications, 21, 200335. \url{https://doi.org/10.1016/j.iswa.2024.200335}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text_dataset}}{}
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{statistics_max_tokens_length}}{}
+\item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values: \verb{20 <= x <= 8192}}
 
 \item{\code{step}}{\code{string} describing the context of the estimation.}
 }

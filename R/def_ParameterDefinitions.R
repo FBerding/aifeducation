@@ -415,7 +415,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = NULL,
-    desc = "If `TRUE` a [LargeDataSetForEmbeddings] is returned. If `FALSE` an object if class [EmbeddedText] is returned.",
+    desc = "If `TRUE` a [LargeDataSetForTextEmbeddings] is returned. If `FALSE` an object if class [EmbeddedText] is returned.",
     gui_box = NULL,
     gui_label = NULL,
     default_value = FALSE
