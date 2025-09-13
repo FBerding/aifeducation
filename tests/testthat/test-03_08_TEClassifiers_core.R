@@ -12,7 +12,7 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
  #object_class_names="TEClassifierSequentialPrototype"
  #object_class_names="TEClassifierRegular"
 
-max_samples <- 200
+max_samples <- 20
 max_samples_CI <- 10
 
 max_samples_training <- 2

@@ -1113,12 +1113,12 @@ for the different models.
 
 To transform raw text into a numeric representation, you only have to
 use the `embed_large` method of your model. To do this, you must provide
-a `LargeDataSetForText` to `large_datas_set`. Relying on the sample data
+a `LargeDataSetForText` to `text_dataset`. Relying on the sample data
 from section 2.3, we can use the movie reviews as raw texts.
 
 ```{r, include = TRUE, eval = TRUE}
 review_embeddings <- bert_modeling$embed_large(
-  large_datas_set = data_set_reviews_text,
+  text_dataset = data_set_reviews_text,
   trace = TRUE
 )
 ```
@@ -1672,7 +1672,7 @@ bert_modeling <- load_from_disk("examples/bert_te_model")
 
 # Create a numerical representation of the text
 review_embeddings <- bert_modeling$embed_large(
-  large_datas_set = data_set_reviews_text,
+  text_dataset = data_set_reviews_text,
   trace = TRUE
 )
 ```
@@ -2034,14 +2034,14 @@ to use the same embedding model as we used during training the classifier.
 
 ``` {r, include =TRUE, eval=TRUE }
 sample_embeddings <- bert_modeling$embed_large(
-  large_datas_set = sample_texts,
+  text_dataset = sample_texts,
   trace = TRUE
 )
 ``` 
 
 ``` {r, include =TRUE, eval=TRUE }
 query_embeddings <- bert_modeling$embed_large(
-  large_datas_set = query_texts,
+  text_dataset = query_texts,
   trace = TRUE
 )
 ```

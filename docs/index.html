@@ -18,7 +18,6 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Artificial Intelligence for Education">
 <meta name="description" content="In social and educational settings, the use of Artificial Intelligence (AI) is a challenging task. Relevant data is often only available in handwritten forms, or the use of data is restricted by privacy policies. This often leads to small data sets. Furthermore, in the educational and social sciences, data is often unbalanced in terms of frequencies. To support educators as well as educational and social researchers in using the potentials of AI for their work, this package provides a unified interface for neural nets in PyTorch to deal with natural language problems. In addition, the package ships with a shiny app, providing a graphical user interface. This allows the usage of AI for people without skills in writing python/R scripts. The tools integrate existing mathematical and statistical methods for dealing with small data sets via pseudo-labeling (e.g. Cascante-Bonilla et al. (2020) &lt;doi:10.48550/arXiv.2001.06001&gt;) and imbalanced data via the creation of synthetic cases (e.g. Islam et al. (2012) &lt;doi:10.1016/j.asoc.2021.108288&gt;). Performance evaluation of AI is connected to measures from content analysis which educational and social researchers are generally more familiar with (e.g. Berding &amp; Pargmann (2022) &lt;doi:10.30819/5581&gt;, Gwet (2014) &lt;ISBN:978-0-9708062-8-4&gt;, Krippendorff (2019) &lt;doi:10.4135/9781071878781&gt;). Estimation of energy consumption and CO2 emissions during model training is done with the python library codecarbon. Finally, all objects created with this package allow to share trained AI models with other people.">
 <meta property="og:description" content="In social and educational settings, the use of Artificial Intelligence (AI) is a challenging task. Relevant data is often only available in handwritten forms, or the use of data is restricted by privacy policies. This often leads to small data sets. Furthermore, in the educational and social sciences, data is often unbalanced in terms of frequencies. To support educators as well as educational and social researchers in using the potentials of AI for their work, this package provides a unified interface for neural nets in PyTorch to deal with natural language problems. In addition, the package ships with a shiny app, providing a graphical user interface. This allows the usage of AI for people without skills in writing python/R scripts. The tools integrate existing mathematical and statistical methods for dealing with small data sets via pseudo-labeling (e.g. Cascante-Bonilla et al. (2020) &lt;doi:10.48550/arXiv.2001.06001&gt;) and imbalanced data via the creation of synthetic cases (e.g. Islam et al. (2012) &lt;doi:10.1016/j.asoc.2021.108288&gt;). Performance evaluation of AI is connected to measures from content analysis which educational and social researchers are generally more familiar with (e.g. Berding &amp; Pargmann (2022) &lt;doi:10.30819/5581&gt;, Gwet (2014) &lt;ISBN:978-0-9708062-8-4&gt;, Krippendorff (2019) &lt;doi:10.4135/9781071878781&gt;). Estimation of energy consumption and CO2 emissions during model training is done with the python library codecarbon. Finally, all objects created with this package allow to share trained AI models with other people.">
-<meta property="og:image" content="https://fberding.github.io/aifeducation/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -28,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,11 +68,9 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="aifeducation-">aifeducation 
+<div class="page-header"><h1 id="aifeducation-">aifeducation <a href="https://fberding.github.io/aifeducation/"><img src="https://fberding.github.io/aifeducation/logo.png" alt="aifeducation website" align="right" height="120"></a>
 <a class="anchor" aria-label="anchor" href="#aifeducation-"></a>
-</h1>
-</div>
+</h1></div>
 <!-- badges: start -->
 
 
@@ -91,7 +88,8 @@
 <li>Supports pre-trained language models from Hugging Face.</li>
 <li>Supports ModernBERT, MPNet, BERT, RoBERTa, Longformer, and Funnel Transformer for creating context-sensitive text embedding.</li>
 <li>Makes sharing pre-trained models very easy.</li>
-<li>Integrates sustainability tracking.</li>
+<li>Integrates sustainability tracking for training and inference.</li>
+<li>Integrates an approach to calculate FLOPS based on model’s architecture.</li>
 <li>Integrates special statistical techniques for dealing with data structures common in the social and educational sciences.</li>
 <li>Supports the classification of long text documents.</li>
 </ul>
@@ -119,7 +117,7 @@
 <a class="anchor" aria-label="anchor" href="#graphical-user-interface-ai-for-education---studio"></a>
 </h2>
 <p>The package ships with a shiny app that serves as a graphical user interface.</p>
-<figure><img src="reference/figures/home.png" style="width:100.0%" alt="Figure 1: Aifeducation Studio"><figcaption aria-hidden="true">
+<figure><img src="https://fberding.github.io/aifeducation/home.png" style="width:100.0%" alt="Figure 1: Aifeducation Studio"><figcaption aria-hidden="true">
 Figure 1: Aifeducation Studio
 </figcaption></figure><p><em>AI for Education - Studio</em> allows users to easily develop, train, apply, document, and analyse AI models without any coding skills. See the corresponding vignette for more details: <a href="https://fberding.github.io/aifeducation/articles/gui_aife_studio.html">02 Using the graphical user interface Aifeducation - Studio</a>.</p>
 </div>

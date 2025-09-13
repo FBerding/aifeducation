@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,8 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>02 Using the graphical user interface Aifeducation - Studio</h1>
+
+      <h1>02 Using the graphical user interface Aifeducation - Studio</h1>
                         <h4 data-toc-skip class="author">Florian
 Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
 Rebmann</h4>
@@ -563,22 +564,20 @@ large number of words with a limited, small number of tokens and</li>
 <li>the neural network that is used to model the capabilities for
 understanding natural language.</li>
 </ol>
-<p>At the beginning you can choose between the different supported
-transformer architectures (<em>Base Model Type</em> combo box in
-<em>Control Panel</em>, left side).</p>
-<p>Depending on the architecture, you have different options determining
-the shape of your neural network.</p>
-<p>You find a box named <em>Input Data</em> at the top. Here you must
-provide the path to a folder which contains a LargeDataSetForTexts. This
-data set is used to calculate the vocabulary of the transformer. This
-file should be created with **AI for Education - Studio* (tab <em>Data
-Management</em>) to ensure compatibility. See section 3.1.1 for more
-details.</p>
-<p>In addition you find a box <em>Vocabulary</em>. Here you can
-configure the vocabulary that the transformer should use. It is very
-important that you provide a number of how many tokens the vocabulary
-should include. Depending on the transformer method, you can set
-additional options, affecting a transformer’s vocabulary.</p>
+<p>At the beginning you find a box named <em>Input Data</em> at the top.
+Here you must provide the path to a folder which contains a
+LargeDataSetForTexts. This data set is used to calculate the vocabulary
+of the transformer. This file should be created with **AI for Education
+- Studio* (tab <em>Data Management</em>) to ensure compatibility. See
+section 3.1.1 for more details.</p>
+<p>In the next step you can choose between the different types of
+tokenizer (<em>Tokenizer Model Type</em> combo box in <em>Control
+Panel</em>, left side). Depending on the model type you have different
+options for configuration. On very important parameter is the size of
+the vocabulary. With this value you determine how many tokens should be
+used to split words and sentences into smaller pieces.</p>
+<p>Depending on the tokenizer method, you can set additional options,
+affecting raw text processing.</p>
 <ul>
 <li><p><strong>Transform to Lower:</strong> If this option is enabled,
 all words in a raw text are transformed to lower cases. For instance,
@@ -594,6 +593,18 @@ achievement.” and 2) “A high motivation is necessary for
 <li><p><strong>Trim Offsets:</strong> If this option is enabled, the
 white spaces of the produced offsets are trimmed.</p></li>
 </ul>
+<p>If you have set all parameters to the desired values you can click on
+the button <em>Calculate Statistics</em> to receive the tokenizer
+granularity rate This value describes how many tokens are in average
+necessary to represent a single word. This value is important as it has
+an impact on the necessary length of a sequence of tokens for modeling a
+text. A tokenizer with a higher value needs a longer sequence of tokens
+for representing the same text as a tokenizer with a smaller value.
+since most transformer have a maximum limit for the length of a token
+sequence this values has directly an impact on the base model.</p>
+<p>The final step is to configure the transformer model. You can choose
+the between different architectures (<em>Base Model Type</em> combo box
+in <em>Control Panel</em>, left side).</p>
 <p>Finally, you can start the creation of your model by clicking on the
 button “Create Model”. Here you have to select a directory and folder to
 save the resulting model. The creation of the model may take some time.
@@ -622,6 +633,24 @@ modernBERT, etc.</p>
 raw texts which should be used for training/tuning (box <em>Input
 Data</em>). We recommend that you create this collection of texts as
 described in section 3.1.1.</p>
+<p>After selecting a base model and a data set you can calculate some
+statistics. You can click on the button <em>Calculate Data
+Statistics</em>. This will provide you an estimate on the total number
+of words, tokens, and the tokenizer granularity rate for the specific
+data set and model.</p>
+<p>In addition you can click on the button <em>Calculate FLOPS
+Statistics</em>. This will give you an estimate on the total number of
+FLOPS for the planned training run. That is, this value depends on the
+size for the training data, model’s architecture and configuration, and
+the number of training epochs.</p>
+<p>At the moment only an architecture-based approach is available. The
+number of FLOPS is not counted directly. Instead it is estimated
+approximately. The column ‘flops_bp_1’ describes the number of FLOPS for
+all forwand and backward passes.</p>
+<p>Kaplan et al. (2020, p. 7) propose that as a rule of thumb the
+backward pass has the FLOPS of the forward pass multiplied with factor
+2. The resulting FLOPS for all forward and backward passes of a training
+run are shown in column ‘flops_bp_2’.</p>
 <p>After choosing a base model, new boxes appear as shown in Figure
 17.<br>
 Possible options depend on the kind of model.</p>
@@ -704,14 +733,10 @@ foundation of your new text embedding model. Please select the folder
 that contains the entire model and not single files (button <em>Choose a
 Base Model</em> on the <em>Control Panel</em>).</p>
 <p>After choosing a model, new boxes appear which allow you to customize
-your interface. Here it is very important that you give your model a
-unique name and label (<em>Control Panel</em>). The difference between
-<em>Name</em> and <em>Label</em> is that <em>Name</em> is used for the
-computer and <em>Label</em> for users. Thus, <em>Name</em> should not
-contain any spaces or special characters. <em>Label</em> does not have
-any restrictions. Think of <em>Label</em> as the title of a book or
-paper. With <em>Label</em> you can also provide a version number if you
-create a newer version of your model. In case you create a new model, we
+your interface. Here you can give your model a label (<em>Control
+Panel</em>). Think of <em>Label</em> as the title of a book or paper.
+With <em>Label</em> you can also provide a version number if you create
+a newer version of your model. In case you create a new model, we
 recommend to use “0.0.1”. It is also important that you choose which
 language your model is created for, such as English, French, German,
 etc.</p>
@@ -1239,6 +1264,9 @@ Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/
 in Python (2., aktualisierte Auflage). Hanser.</p>
 <p>He, P., Liu, X., Gao, J. &amp; Chen, W. (2020). DeBERTa:
 Decoding-enhanced BERT with Disentangled Attention. <a href="https://doi.org/10.48550/arXiv.2006.03654" class="external-link uri">https://doi.org/10.48550/arXiv.2006.03654</a></p>
+<p>Kaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B.,
+Child, R., Gray, S., Radford, A., Wu, J. &amp; Amodei, D. (2020).
+Scaling Laws for Neural Language Models. <a href="https://doi.org/10.48550/arXiv.2001.08361" class="external-link uri">https://doi.org/10.48550/arXiv.2001.08361</a></p>
 <p>Lane, H., Howard, C., &amp; Hapke, H. M. (2019). Natural language
 processing in action: Understanding, analyzing, and generating text with
 Python. Shelter Island: Manning.</p>
