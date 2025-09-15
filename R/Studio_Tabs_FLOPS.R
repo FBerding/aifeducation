@@ -47,13 +47,13 @@ FLOPS_Server <- function(id, model) {
     ns <- session$ns
 
     output$ui_flops<-DT::renderDataTable({
-      if("BaseModelCore"%in%class(model())){
-        data=model()$get_flops_estimates()
+      if(inherits(model(), "BaseModelCore")){
+        data <- model()$get_flops_estimates()
 
-      } else if("TextEmbeddingModel"%in%class(model())){
-        data=model()$BaseModel$get_flops_estimates()
+      } else if(inherits(model(), "TextEmbeddingModel")){
+        data <- model()$BaseModel$get_flops_estimates()
       } else {
-        data=NULL
+        data <- NULL
       }
       return(data)
   })

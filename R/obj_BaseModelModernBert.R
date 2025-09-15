@@ -54,7 +54,7 @@ BaseModelModernBert <- R6::R6Class(
       private$model <- transformers$ModernBertForMaskedLM$from_pretrained(dir_path)
     },
     check_arg_combinations = function(args) {
-      if (args$hidden_size %% args$num_attention_heads != 0) {
+      if (args$hidden_size %% args$num_attention_heads != 0L) {
         stop("hidden_size must be a multiple auf num_attention_heads.")
       }
 
@@ -79,17 +79,17 @@ BaseModelModernBert <- R6::R6Class(
     #' @param attention_dropout `r get_param_doc_desc("attention_dropout")`
     #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
-                         max_position_embeddings = 512,
-                         hidden_size = 768,
-                         num_hidden_layers = 12,
-                         num_attention_heads = 12,
-                         global_attn_every_n_layers=3,
-                         intermediate_size = 3072,
+                         max_position_embeddings = 512L,
+                         hidden_size = 768L,
+                         num_hidden_layers = 12L,
+                         num_attention_heads = 12L,
+                         global_attn_every_n_layers=3L,
+                         intermediate_size = 3072L,
                          hidden_activation = "GELU",
                          embedding_dropout = 0.1,
                          mlp_dropout = 0.1,
                          attention_dropout = 0.1) {
-      arguments <- get_called_args(n = 1)
+      arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
     }
   )

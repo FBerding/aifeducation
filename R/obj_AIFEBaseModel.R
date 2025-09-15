@@ -170,7 +170,6 @@ AIFEMaster <- R6::R6Class(
     #' @return Returns a `list` containing the tracked energy consumption, CO2 equivalents in kg, information on the
     #'   tracker used, and technical information on the training infrastructure.
     get_sustainability_data = function(track_mode = "training") {
-
       if (track_mode == "training") {
         return(private$sustainability$track_log)
       } else if (track_mode == "inference") {
@@ -212,13 +211,13 @@ AIFEMaster <- R6::R6Class(
       private_list <- NULL
 
       for (entry in names(self)) {
-        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+        if (!is.function(self[[entry]]) & !is.environment(self[[entry]])) {
           public_list[entry] <- list(self[[entry]])
         }
       }
 
       for (entry in names(private)) {
-        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+        if (!is.function(private[[entry]]) & !is.environment(private[[entry]])) {
           private_list[entry] <- list(private[[entry]])
         }
       }
@@ -285,14 +284,14 @@ AIFEMaster <- R6::R6Class(
     ),
     log_config = list(
       log_dir = NULL,
-      log_write_interval = 10,
+      log_write_interval = 10L,
       log_state_file = NULL,
       log_loss_file = NULL
     ),
     log_state = list(
       last_log = NULL,
-      value_top = 0,
-      total_top = 1,
+      value_top = 0L,
+      total_top = 1L,
       message_top = NA
     ),
 
@@ -322,27 +321,27 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for checking if the configuration is done successfully
     check_config_for_TRUE = function() {
-      if (private$configured == FALSE) {
+      if (!private$configured) {
         stop("The object is not configured. Please call the method configure.")
       }
     },
     #--------------------------------------------------------------------------
     # Method for checking if the configuration is already done
     check_config_for_FALSE = function() {
-      if (private$configured == TRUE) {
+      if (private$configured) {
         stop("The object is configured. Please create a new object if you would like to change the object's
              configuration.")
       }
     },
     #-------------------------------------------------------------------------
     check_for_untrained = function() {
-      if (self$is_trained() == TRUE) {
+      if (self$is_trained()) {
         stop("The model has already been trained and cant't be modified. Please create a new model if you need antoher training run.")
       }
     },
     #---------------------------------------------------------------------------
     check_for_trained = function() {
-      if (self$is_trained() == FALSE) {
+      if (!self$is_trained()) {
         stop("The model has not been trained. Please train the model before you use it.")
       }
     },
@@ -452,7 +451,7 @@ AIFEMaster <- R6::R6Class(
     },
     #------------------------------------------------------------------------------
     init_and_start_sustainability_tracking = function() {
-      if (self$last_training$config$sustain_track == TRUE) {
+      if (self$last_training$config$sustain_track) {
         private$init_and_start_sustainability_tracker(
           trace = self$last_training$config$trace,
           country_iso_code = self$last_training$config$sustain_iso_code,
@@ -463,7 +462,7 @@ AIFEMaster <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     stop_sustainability_tracking = function(task = NA) {
-      if (self$last_training$config$sustain_track == TRUE) {
+      if (self$last_training$config$sustain_track) {
         sustain_data <- private$stop_sustainability_tracker(
           trace = self$last_training$config$trace,
           task = task
@@ -584,7 +583,7 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for loading sustainability data
     load_sustainability_data = function(model_dir) {
-      sustainability_datalog_path <- paste0(model_dir, "/", "sustainability.csv")
+      sustainability_datalog_path <- file.path(model_dir, "sustainability.csv")
       if (file.exists(sustainability_datalog_path)) {
         private$sustainability$track_log <- private$check_and_update_column_names(
           data_frame = read.csv(sustainability_datalog_path),
@@ -599,13 +598,13 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for saving sustainability data
     save_sustainability_data = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       sustain_matrix <- private$sustainability$track_log
-      if (nrow(sustain_matrix) > 0) {
+      if (nrow(sustain_matrix) > 0L) {
         write.csv(
           x = sustain_matrix,
-          file = paste0(save_location, "/", "sustainability.csv"),
+          file = file.path(save_location, "sustainability.csv"),
           row.names = FALSE
         )
       }
@@ -613,7 +612,7 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for loading sustainability data inference
     load_sustainability_data_inference = function(model_dir) {
-      sustainability_datalog_path <- paste0(model_dir, "/", "sustainability_inf.csv")
+      sustainability_datalog_path <- file.path(model_dir, "sustainability_inf.csv")
       if (file.exists(sustainability_datalog_path)) {
         private$sustainability_inference <- private$check_and_update_column_names(
           data_frame = read.csv(sustainability_datalog_path),
@@ -626,13 +625,13 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for saving sustainability data inference
     save_sustainability_data_inference = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       sustain_matrix <- private$sustainability_inference
-      if (nrow(sustain_matrix) > 0) {
+      if (nrow(sustain_matrix) > 0L) {
         write.csv(
           x = sustain_matrix,
-          file = paste0(save_location, "/", "sustainability_inf.csv"),
+          file = file.path(save_location, "sustainability_inf.csv"),
           row.names = FALSE
         )
       }
@@ -640,7 +639,7 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for loading flops estimates
     load_flops_estimates = function(model_dir) {
-      datalog_path <- paste0(model_dir, "/", "flops_estimates.csv")
+      datalog_path <- file.path(model_dir, "flops_estimates.csv")
       if (file.exists(datalog_path)) {
         private$flops_estimates <- private$check_and_update_column_names(
           data_frame = read.csv(datalog_path),
@@ -653,13 +652,13 @@ AIFEMaster <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for saving flops estimates
     save_flops_estimates = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       sustain_matrix <- private$flops_estimates
-      if (nrow(sustain_matrix) > 0) {
+      if (nrow(sustain_matrix) > 0L) {
         write.csv(
           x = sustain_matrix,
-          file = paste0(save_location, "/", "flops_estimates.csv"),
+          file = file.path(save_location, "flops_estimates.csv"),
           row.names = FALSE
         )
       }
@@ -670,10 +669,7 @@ AIFEMaster <- R6::R6Class(
       tmp_dir <- create_and_get_tmp_dir()
 
       # Create a folder for the current task
-      private$dir_checkpoint <- paste0(
-        tmp_dir, "/",
-        generate_id(16)
-      )
+      private$dir_checkpoint <- file.path(tmp_dir, generate_id(16L))
       create_dir(dir = private$dir_checkpoint, trace = FALSE)
     },
     #--------------------------------------------------------------------------
@@ -811,7 +807,7 @@ AIFEMaster <- R6::R6Class(
                 if (!is.null(param_dict[[param]]$default_historic)) {
                   private$model_config[param] <- list(param_dict[[param]]$default_historic)
                 } else {
-                  warning(paste("Historic default for", param, "is missing in parameter dictionary."))
+                  warning("Historic default for ", param, " is missing in parameter dictionary.")
                 }
               }
             }
@@ -844,13 +840,13 @@ AIFEBaseModel <- R6::R6Class(
     count_parameter = function() {
       iterator <- reticulate::as_iterator(private$model$parameters())
       iteration_finished <- FALSE
-      count <- 0
-      while (iteration_finished == FALSE) {
+      count <- 0L
+      while (!iteration_finished) {
         iter_results <- reticulate::iter_next(it = iterator)
         if (is.null(iter_results)) {
           iteration_finished <- TRUE
         } else {
-          if (iter_results$requires_grad == TRUE) {
+          if (iter_results$requires_grad) {
             count <- count + iter_results$numel()
           }
         }
@@ -864,7 +860,7 @@ AIFEBaseModel <- R6::R6Class(
       # Provide rownames for the history
       for (i in seq_len(length(history))) {
         if (!is.null(history[[i]])) {
-          if (nrow(history[[i]]) == 2) {
+          if (nrow(history[[i]]) == 2L) {
             rownames(history[[i]]) <- c("train", "val")
           } else {
             rownames(history[[i]]) <- c("train", "val", "test")
@@ -875,13 +871,13 @@ AIFEBaseModel <- R6::R6Class(
           index_max <- ncol(history[[i]])
           for (j in seq_len(nrow(history[[i]]))) {
             # Check if -100 occurs in the row
-            includes_m_100 <- (history[[i]][j, ] == -100)
+            includes_m_100 <- (history[[i]][j, ] == -100L)
             # if at least one -100 occurs
-            if (sum(includes_m_100) > 0) {
+            if (sum(includes_m_100) > 0L) {
               # min index for replacements
               index_min <- min(which(includes_m_100))
               # replace
-              history[[i]][j, index_min:index_max] <- history[[i]][j, (index_min - 1)]
+              history[[i]][j, index_min:index_max] <- history[[i]][j, (index_min - 1L)]
             }
           }
         }

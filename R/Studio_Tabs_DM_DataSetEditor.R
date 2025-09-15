@@ -97,7 +97,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
     })
     output$card_body_data_set_editor <- shiny::renderUI({
       if (!is.null(loaded_object())) {
-        if ("LargeDataSetForText" %in% class(loaded_object())) {
+        if (inherits(loaded_object(), "LargeDataSetForText")) {
           ui <- shiny::tagList(
             shiny::uiOutput(
               outputId = ns("editor_content_meta_data")
@@ -161,7 +161,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
     loaded_object <- shiny::reactive({
       if (!is.null(folder_path())) {
         object <- load_from_disk(dir_path = folder_path())
-        if ("LargeDataSetForText" %in% class(object)) {
+        if (inherits(object, "LargeDataSetForText")) {
           return(object)
         } else {
           display_errors(
@@ -213,7 +213,7 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
     # Ui Elements editor--------------------------------------------------------
     output$raw_text_control <- shiny::renderUI({
       if (!is.null(loaded_object())) {
-        if ("LargeDataSetForText" %in% class(loaded_object())) {
+        if (inherits(loaded_object(), "LargeDataSetForText")) {
           ui <- shiny::tagList(
             bslib::card(
               bslib::card_header("Documents"),

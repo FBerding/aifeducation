@@ -507,7 +507,7 @@ DataManagerClassifier <- R6::R6Class(
   ),
   private = list(
     prepare_datasets = function(data_embeddings, data_targets, trace) {
-      if ("EmbeddedText" %in% class(data_embeddings)) {
+      if (inherits(data_embeddings, "EmbeddedText")) {
         data_set_embeddings <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
         data_set_embeddings <- data_set_embeddings$get_dataset()
       } else {

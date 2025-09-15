@@ -148,7 +148,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)
-      if("BaseModelCore" %in% class(model())){
+      if(inherits(model(), "BaseModelCore")){
         model()$get_special_tokens()
       } else {
         model()$BaseModel$get_special_tokens()
@@ -158,10 +158,10 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     # Render Tokenizer Statistics-----------------------------------------------
     output$tokenizer_statistics <- shiny::renderTable({
       shiny::req(model)
-      if("BaseModelCore" %in% class(model())){
-        tmp_model=model()
+      if(inherits(model(), "BaseModelCore")){
+        tmp_model <- model()
       } else {
-        tmp_model=model()$BaseModel
+        tmp_model <- model()$BaseModel
       }
 
       table <- tmp_model$Tokenizer$get_tokenizer_statistics()
@@ -188,10 +188,10 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     encodings <- shiny::eventReactive(input$encode_start, {
       shiny::req(model)
 
-      if("BaseModelCore" %in% class(model())){
-        tmp_model=model()$Tokenizer
+      if(inherits(model(), "BaseModelCore")){
+        tmp_model <- model()$Tokenizer
       } else {
-        tmp_model=model()
+        tmp_model <- model()
       }
 
       integer_sequence <- tmp_model$encode(
@@ -244,10 +244,10 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     decodings <- shiny::eventReactive(input$decode_start, {
       shiny::req(model)
 
-      if("BaseModelCore" %in% class(model())){
-        tmp_model=model()$Tokenizer
+      if(inherits(model(), "BaseModelCore")){
+        tmp_model <- model()$Tokenizer
       } else {
-        tmp_model=model()
+        tmp_model <- model()
       }
 
       # int_sequence <- stringr::str_extract_all(input$ids_for_decode, "\\d+")

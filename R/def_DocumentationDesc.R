@@ -232,7 +232,7 @@ get_dict_input_types <- function(input_type) {
 #' @export
 get_parameter_documentation <- function(param_name, param_dict, as_list = TRUE, inc_param_name = TRUE) {
   # Add description
-  if (as_list == TRUE) {
+  if (as_list) {
     prefix <- "- *"
     suffix <- "*: "
     list_level <- "\t"
@@ -242,7 +242,7 @@ get_parameter_documentation <- function(param_name, param_dict, as_list = TRUE, 
     list_level <- ""
   }
 
-  if (inc_param_name == TRUE) {
+  if (inc_param_name) {
     param_desc <- paste0(prefix, param_name, suffix)
   } else {
     param_desc <- NULL
@@ -301,7 +301,7 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
     title_format_2 <- ""
   }
 
-  title <- paste0(title_format_1, current_doc$title, title_format_2, "\n\n")
+  title_string <- paste0(title_format_1, current_doc$title, title_format_2, "\n\n")
 
 
   if (subtitle_format == "italic") {
@@ -320,7 +320,7 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
   )
 
   # Image of the layer
-  if (inc_img == TRUE) {
+  if (inc_img) {
     img_block <- paste0(subtitle_format1, "Visualization", subtitle_format1, "\n\n")
     img_block <- paste0(
       img_block,
@@ -333,7 +333,7 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
   # Description of all parameters
   param_desc <- NULL
   # Parameter Documentation---------------------------------------------------
-  if (inc_params == TRUE) {
+  if (inc_params) {
     param_desc <- paste0(subtitle_format1, "Parameters", subtitle_format1, "\n\n")
     for (i in seq_along(relevant_params)) {
       selected_param <- relevant_params[[i]]
@@ -349,7 +349,7 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
   # Gather documentation elements---------------------------------------------
   markdown_doc <- paste0(
     "\n",
-    title,
+    title_string,
     img_block,
     desc,
     param_desc
@@ -371,7 +371,7 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
 get_desc_for_core_model_architecture <- function(name, title_format = "bold", inc_img = FALSE) {
   documentation <- get_dict_core_models(name)
 
-  if (inc_img == TRUE) {
+  if (inc_img) {
     img_block <- "**Visualization**\n\n"
     img_block <- paste0(
       img_block,
@@ -425,7 +425,7 @@ build_documentation_for_model <- function(model_name, cls_type = NULL, core_type
 
   for (i in seq_along(layer_included)) {
     check_inlucded <- stringi::stri_detect(str = params, regex = paste0("^", prefixes[i]))
-    if (sum(check_inlucded) > 0) {
+    if (sum(check_inlucded) > 0L) {
       layer_included[i] <- TRUE
     } else {
       layer_included[i] <- FALSE
@@ -452,7 +452,7 @@ build_documentation_for_model <- function(model_name, cls_type = NULL, core_type
 
   # Layer Description
   for (i in seq_along(layer_included)) {
-    if (layer_included[i] == TRUE) {
+    if (layer_included[i]) {
       model_documentation <- paste0(
         model_documentation, "\n",
         get_layer_documentation(names(layer_included)[i], subtitle_format = "italic")
@@ -529,7 +529,7 @@ build_layer_stack_documentation_for_vignette <- function() {
 #' @keywords internal
 build_aife_site <- function(clear_docs = FALSE) {
   requireNamespace("pkgdown")
-  if (clear_docs == TRUE) {
+  if (clear_docs) {
     pkgdown::clean_site()
   }
   pkgdown::init_site()

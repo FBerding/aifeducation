@@ -123,17 +123,11 @@ TextEmbeddingModel <- R6::R6Class(
       }
       if (self$BaseModel$get_model_type() == "funnel") {
         if (emb_layer_max > self$BaseModel$get_model()$config$num_hidden_layers) {
-          stop(paste0(
-            "emb_layer_max can not exceed the number of layers. The transformer has",
-            max_layers_funnel, "layers."
-          ))
+          stop("emb_layer_max can not exceed the number of layers. The transformer has", max_layers_funnel, "layers.")
         }
       } else {
         if (emb_layer_max > self$BaseModel$get_model()$config$num_hidden_layers) {
-          stop(paste0(
-            "emb_layer_max can not exceed the number of layers. The transformer has",
-            self$BaseModel$get_model()$config$num_hidden_layers, "layers."
-          ))
+          stop("emb_layer_max can not exceed the number of layers. The transformer has", self$BaseModel$get_model()$config$num_hidden_layers, "layers.")
         }
       }
 
@@ -487,7 +481,7 @@ TextEmbeddingModel <- R6::R6Class(
                 if (private$model_config$emb_pool_type == "CLS") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$numpy()
+                    tensor_embeddings[[layer_int]][[index_int]][[0L]]$detach()$numpy()
                   )
                 } else if (private$model_config$emb_pool_type == "Average") {
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
@@ -498,7 +492,7 @@ TextEmbeddingModel <- R6::R6Class(
                 if (private$model_config$emb_pool_type == "CLS") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]][[as.integer(0)]]$detach()$cpu()$numpy()
+                    tensor_embeddings[[layer_int]][[index_int]][[0L]]$detach()$cpu()$numpy()
                   )
                 } else if (private$model_config$emb_pool_type == "Average") {
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(

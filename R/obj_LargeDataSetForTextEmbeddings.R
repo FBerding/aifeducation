@@ -428,7 +428,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       new_dataset <- datasets$Dataset$from_dict(new_dataset_dict)
       # Check the number of rows and remove duplicate if necessary
       if (n_cases == 1) {
-        new_dataset <- new_dataset$select(indices = list(as.integer(0)))
+        new_dataset <- new_dataset$select(indices = list(0L))
       }
       # add dataset
       private$add(new_dataset)
@@ -443,7 +443,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     add_embeddings_from_EmbeddedText = function(EmbeddedText) {
       private$check_config_for_TRUE()
 
-      if ("EmbeddedText" %in% class(EmbeddedText) == FALSE) {
+      if (inherits(EmbeddedText, "EmbeddedText") == FALSE) {
         stop("Input must be an object of class EmbeddedText.")
       }
 
@@ -480,7 +480,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
       new_dataset <- datasets$Dataset$from_dict(new_dataset_dict)
       # Check the number of rows and remove duplicate if necessary
       if (n_cases == 1) {
-        new_dataset <- new_dataset$select(indices = list(as.integer(0)))
+        new_dataset <- new_dataset$select(indices = list(0L))
       }
       # add dataset
       private$add(new_dataset)

@@ -236,7 +236,7 @@ get_py_package_versions <- function() {
   )
 
   versions <- vector(length = length(list_of_packages) + 1)
-
+names(versions)=c("python",list_of_packages)
   versions["python"] <- as.character(reticulate::py_config()$version)
 
   for (package in list_of_packages) {
@@ -258,18 +258,19 @@ get_py_package_version <- function(package_name) {
 
   if (reticulate::py_module_available(package_name) == TRUE) {
     tmp_package <- reticulate::import(module = package_name, delay_load = FALSE)
-    tmp_version=try(as.character(tmp_package["__version__"]),silent=TRUE)
+    tmp_version <- try(as.character(tmp_package["__version__"]),silent=TRUE)
 
     if(is(tmp_version,"try-error")){
-      packages_installed <- reticulate::py_list_packages()
-      if(package_name%in%packages_installed$package){
-        tmp_version=packages_installed$version[which(packages_installed$package == package_name)]
+      packages_installed <- try(reticulate::py_list_packages(),silent=TRUE)
+
+      if(package_name%in%packages_installed$package && !inherits(packages_installed,"try-error")){
+        tmp_version <- packages_installed$version[which(packages_installed$package == package_name)]
       }else{
-        tmp_version=NA
+        tmp_version <- NA
       }
     }
   } else {
-    tmp_version=NA
+    tmp_version <- NA
   }
   return(tmp_version)
 }

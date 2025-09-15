@@ -249,17 +249,17 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     check_embeddings_object_type = function(embeddings, strict = TRUE) {
       if (strict == TRUE) {
         if (
-          !("EmbeddedText" %in% class(embeddings)) &
-            !("LargeDataSetForTextEmbeddings" %in% class(embeddings))
+          !(inherits(embeddings, "EmbeddedText")) &
+            !(inherits(embeddings, "LargeDataSetForTextEmbeddings"))
         ) {
           stop("text_embeddings must be of class EmbeddedText or LargeDataSetForTextEmbeddings.")
         }
       } else {
         if (
-          !("EmbeddedText" %in% class(embeddings)) &
-            !("LargeDataSetForTextEmbeddings" %in% class(embeddings)) &
-            !("array" %in% class(embeddings)) &
-            !("datasets.arrow_dataset.Dataset" %in% class(embeddings))
+          !(inherits(embeddings, "EmbeddedText")) &
+            !(inherits(embeddings, "LargeDataSetForTextEmbeddings")) &
+            !(inherits(embeddings, "array")) &
+            !(inherits(embeddings, "datasets.arrow_dataset.Dataset"))
         ) {
           stop("text_embeddings must be of class EmbeddedText, LargeDataSetForTextEmbeddings,
                datasets.arrow_dataset.Dataset or array.")
@@ -269,30 +269,30 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #-------------------------------------------------------------------------
     check_single_prediction = function(embeddings) {
       if (
-        "EmbeddedText" %in% class(embeddings) |
-          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+        inherits(embeddings, "EmbeddedText") |
+          inherits(embeddings, "LargeDataSetForTextEmbeddings")
       ) {
         if (embeddings$n_rows() > 1) {
           single_prediction <- FALSE
         } else {
           single_prediction <- TRUE
         }
-      } else if ("array" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "array")) {
         if (nrow(embeddings) > 1) {
           single_prediction <- FALSE
         } else {
           single_prediction <- TRUE
         }
-      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "datasets.arrow_dataset.Dataset")) {
         single_prediction <- FALSE
       }
       return(single_prediction)
     },
     #--------------------------------------------------------------------------
     prepare_embeddings_as_dataset = function(embeddings) {
-      if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+      if (inherits(embeddings, "datasets.arrow_dataset.Dataset")) {
         prepared_dataset <- embeddings
-      } else if ("EmbeddedText" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "EmbeddedText")) {
         prepared_dataset <- datasets$Dataset$from_dict(
           reticulate::dict(
             list(
@@ -308,7 +308,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             convert = FALSE
           )
         )
-      } else if ("array" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "array")) {
         prepared_dataset <- datasets$Dataset$from_dict(
           reticulate::dict(
             list(
@@ -318,23 +318,23 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             convert = FALSE
           )
         )
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "LargeDataSetForTextEmbeddings")) {
         prepared_dataset <- embeddings$get_dataset()
       }
       return(prepared_dataset)
     },
     #-------------------------------------------------------------------------
     prepare_embeddings_as_np_array = function(embeddings) {
-      if ("EmbeddedText" %in% class(embeddings)) {
+      if (inherits(embeddings, "EmbeddedText")) {
         prepared_dataset <- embeddings$embeddings
         tmp_np_array <- np$array(prepared_dataset)
-      } else if ("array" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "array")) {
         prepared_dataset <- embeddings
         tmp_np_array <- np$array(prepared_dataset)
-      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "datasets.arrow_dataset.Dataset")) {
         prepared_dataset <- embeddings$set_format("np")
         tmp_np_array <- prepared_dataset["input"]
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "LargeDataSetForTextEmbeddings")) {
         prepared_dataset <- embeddings$get_dataset()
         prepared_dataset$set_format("np")
         tmp_np_array <- prepared_dataset["input"]
@@ -347,13 +347,13 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     get_rownames_from_embeddings = function(embeddings) {
-      if ("EmbeddedText" %in% class(embeddings)) {
+      if (inherits(embeddings, "EmbeddedText")) {
         return(rownames(embeddings$embeddings))
-      } else if ("array" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "array")) {
         return(rownames(embeddings))
-      } else if ("datasets.arrow_dataset.Dataset" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "datasets.arrow_dataset.Dataset")) {
         return(embeddings["id"])
-      } else if ("LargeDataSetForTextEmbeddings" %in% class(embeddings)) {
+      } else if (inherits(embeddings, "LargeDataSetForTextEmbeddings")) {
         embeddings$get_ids()
       }
     },

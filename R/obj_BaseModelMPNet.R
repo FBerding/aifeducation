@@ -24,7 +24,7 @@ BaseModelMPNet <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "mpnet",
-    adjust_max_sequence_length = 2,
+    adjust_max_sequence_length = 2L,
     return_token_type_ids = FALSE,
     create_model = function(args) {
       configuration <- transformers$MPNetConfig(
@@ -70,7 +70,7 @@ BaseModelMPNet <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     check_arg_combinations = function(args) {
-      if (args$hidden_size %% args$num_attention_heads != 0) {
+      if (args$hidden_size %% args$num_attention_heads != 0L) {
         stop("hidden_size must be a multiple auf num_attention_heads.")
       }
     }
@@ -89,15 +89,15 @@ BaseModelMPNet <- R6::R6Class(
     #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
     #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
-                         max_position_embeddings = 512,
-                         hidden_size = 768,
-                         num_hidden_layers = 12,
-                         num_attention_heads = 12,
-                         intermediate_size = 3072,
+                         max_position_embeddings = 512L,
+                         hidden_size = 768L,
+                         num_hidden_layers = 12L,
+                         num_attention_heads = 12L,
+                         intermediate_size = 3072L,
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
                          attention_probs_dropout_prob = 0.1) {
-      arguments <- get_called_args(n = 1)
+      arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
     },
     #--------------------------------------------------------------------------
@@ -127,21 +127,21 @@ BaseModelMPNet <- R6::R6Class(
                      p_perm = 0.15,
                      whole_word = TRUE,
                      val_size = 0.1,
-                     n_epoch = 1,
-                     batch_size = 12,
-                     max_sequence_length = 250,
+                     n_epoch = 1L,
+                     batch_size = 12L,
+                     max_sequence_length = 250L,
                      full_sequences_only = FALSE,
-                     min_seq_len = 50,
+                     min_seq_len = 50L,
                      learning_rate = 3e-3,
                      sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
-                     sustain_interval = 15,
+                     sustain_interval = 15L,
                      trace = TRUE,
-                     pytorch_trace = 1,
+                     pytorch_trace = 1L,
                      log_dir = NULL,
-                     log_write_interval = 2) {
-      private$do_training(args = get_called_args(n = 1))
+                     log_write_interval = 2L) {
+      private$do_training(args = get_called_args(n = 1L))
     }
   )
 )

@@ -32,7 +32,7 @@
 cohens_kappa <- function(rater_one, rater_two) {
   check_class(object = rater_one, classes = "factor", allow_NULL = FALSE)
   check_class(object = rater_two, classes = "factor", allow_NULL = FALSE)
-  if (sum(levels(rater_one) == levels(rater_two)) != max(length(levels(rater_one)), length(levels(rater_two)))) {
+  if (sum(levels(rater_one) == levels(rater_two)) != max(nlevels(rater_one), nlevels(rater_two))) {
     stop("Levels for values of rater one and two are not identical.")
   }
 
@@ -58,14 +58,14 @@ cohens_kappa <- function(rater_one, rater_two) {
   # Weight matrices and expected_freq table
   weight_matrix_linear <- matrix(
     data = 0,
-    nrow = length(levels(rater_one)),
-    ncol = length(levels(rater_one)),
+    nrow = nlevels(rater_one),
+    ncol = nlevels(rater_one),
     dimnames = list(levels(rater_one), levels(rater_one))
   )
   weight_matrix_squared <- weight_matrix_linear
   expected_freq <- weight_matrix_squared
-  for (i in seq_len(length(levels(rater_one)))) {
-    for (j in seq_len(length(levels(rater_one)))) {
+  for (i in seq_len(nlevels(rater_one))) {
+    for (j in seq_len(nlevels(rater_one))) {
       weight_matrix_linear[i, j] <- abs(i - j)
       weight_matrix_squared[i, j] <- abs(i - j)^2
       expected_freq[i, j] <- freq_rater_one[i] * freq_rater_two[j] / N^2
@@ -107,7 +107,7 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -184,7 +184,7 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -201,18 +201,18 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   canonical_form <- replace(x = canonical_form, list = is.na(canonical_form), values = 0)
 
   # create value unit matrix
-  value_unit_matrix <- matrix(data = 0, nrow = length(levels(rater_one)), ncol = N)
+  value_unit_matrix <- matrix(data = 0, nrow = nlevels(rater_one), ncol = N)
   for (i in seq_len(ncol(canonical_form))) {
     value_unit_matrix[, i] <- as.vector(table(factor(
       canonical_form[, i],
-      levels = seq(from = 1, to = length(levels(rater_one)))
+      levels = seq(from = 1, to = nlevels(rater_one))
     )))
   }
 
   # Create matrix of observed coincidences
   obs_coincidence_matrix <- matrix(
-    data = 0, nrow = length(levels(rater_one)),
-    ncol = length(levels(rater_one))
+    data = 0, nrow = nlevels(rater_one),
+    ncol = nlevels(rater_one)
   )
 
   for (i_1 in seq_len(nrow(value_unit_matrix))) {
@@ -236,8 +236,8 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Create matrix of expected coincidences
   exp_coincidence_matrix <- matrix(
-    data = 0, nrow = length(levels(rater_one)),
-    ncol = length(levels(rater_one))
+    data = 0, nrow = nlevels(rater_one),
+    ncol = nlevels(rater_one)
   )
   row_sums <- rowSums(obs_coincidence_matrix)
   for (i_1 in seq_len(nrow(obs_coincidence_matrix))) {
@@ -253,15 +253,15 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Create matrix for differences for nominal data
   nominal_metric_matrix <- matrix(
-    data = 1, nrow = length(levels(rater_one)),
-    ncol = length(levels(rater_one))
+    data = 1, nrow = nlevels(rater_one),
+    ncol = nlevels(rater_one)
   )
   diag(nominal_metric_matrix) <- 0
 
   # Create matrix for differences for ordinal data
   ordinal_metric_matrix <- matrix(
-    data = 0, nrow = length(levels(rater_one)),
-    ncol = length(levels(rater_one))
+    data = 0, nrow = nlevels(rater_one),
+    ncol = nlevels(rater_one)
   )
   n_ranks <- rowSums(obs_coincidence_matrix)
   for (i in seq_len(nrow(ordinal_metric_matrix))) {
@@ -310,14 +310,14 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
   }
 
   N <- length(rater_one)
-  k <- length(levels(rater_one))
+  k <- nlevels(rater_one)
   n <- length(raters)
 
   # Create raw matrix
@@ -386,14 +386,14 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
   # Check levels
   for (i in 2:length(raters)) {
     if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(length(levels(raters[[1]])), length(levels(raters[[i]])))
+      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
   }
 
   N <- length(rater_one)
-  k <- length(levels(rater_one))
+  k <- nlevels(rater_one)
 
 
   # Create raw matrix

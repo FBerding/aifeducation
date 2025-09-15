@@ -59,7 +59,7 @@ save_to_disk <- function(object,
   create_dir(dir_path, FALSE)
   create_dir(save_location, FALSE)
 
-  if (!".AIFEBaseTransformer" %in% class(object)) {
+  if (!inherits(object, ".AIFEBaseTransformer")) {
     # Create config and save to disk
     config_file <- create_config_state(object)
     save(config_file, file = path_r_config_state)

@@ -183,7 +183,7 @@ TEFeatureExtractor <- R6::R6Class(
       }
 
       # Set up dataset
-      if ("EmbeddedText" %in% class(data_embeddings)) {
+      if (inherits(data_embeddings, "EmbeddedText")) {
         data <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
         data <- data$get_dataset()
       } else {
@@ -266,7 +266,7 @@ TEFeatureExtractor <- R6::R6Class(
       # Argument checking
       check_type(object = batch_size, type = "int", FALSE)
       # check data_embeddings object
-      if ("EmbeddedText" %in% class(data_embeddings) | "LargeDataSetForTextEmbeddings" %in% class(data_embeddings)) {
+      if (inherits(data_embeddings, "EmbeddedText") | inherits(data_embeddings, "LargeDataSetForTextEmbeddings")) {
         self$check_embedding_model(text_embeddings = data_embeddings)
       } else {
         private$check_embeddings_object_type(data_embeddings, strict = FALSE)

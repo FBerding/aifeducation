@@ -4,7 +4,7 @@
 \alias{get_magnitude_values}
 \title{Magnitudes of an argument}
 \usage{
-get_magnitude_values(magnitude, n_elements = 9, max, min)
+get_magnitude_values(magnitude, n_elements = 9L, max = NULL, min = NULL)
 }
 \arguments{
 \item{magnitude}{\code{double} Factor using for creating the magnitude.}

@@ -20,7 +20,7 @@
 #'
 #' @family Utils Developers
 #' @export
-get_time_stamp=function(){
+get_time_stamp <- function(){
   return(
     as.character(format(Sys.time()),"%y-%m-%d %H:%M:%S")
   )

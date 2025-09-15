@@ -52,8 +52,8 @@ Sustainability_Server <- function(id, model) {
     )
 
     output$ui_inference<-DT::renderDataTable({
-      if("BaseModelCore"%in%class(model())||
-         "TextEmbeddingModel"%in%class(model())){
+      if(inherits(model(), "BaseModelCore")||
+         inherits(model(), "TextEmbeddingModel")){
         return(model()$get_sustainability_data("inference"))
       }
     })

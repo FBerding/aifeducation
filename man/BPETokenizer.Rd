@@ -75,13 +75,13 @@ Configures a new object of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{vocab_size}}{\code{int} Size of the vocabulary. Allowed values: \verb{1000 <= x <= 5e+05}}
+\item{\code{vocab_size}}{\code{int} Size of the vocabulary. Allowed values: \verb{1000 <= x <= 500000}}
 
 \item{\code{add_prefix_space}}{\code{bool} \code{TRUE} if an additional space should be inserted to the leading words.}
 
 \item{\code{trim_offsets}}{\code{bool} \code{TRUE} trims the whitespaces from the produced offsets.}
 
-\item{\code{vocab_do_lower_case}}{\code{bool} \code{TRUE} if all words/tokens should be lower case.}
+\item{\code{vocab_do_lower_case}}{\code{bool} \code{TRUE} if all tokens should be lower case.}
 }
 \if{html}{\out{</div>}}
 }

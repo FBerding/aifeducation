@@ -140,7 +140,7 @@ check_type <- function(object, object_name = NULL, type = "bool", allow_NULL = F
         stop(paste(tmp_name, "must be a list"))
       }
     } else {
-      warning(paste0("There is no implemented check for type", dQuote(type), "."))
+      warning("There is no implemented check for type", dQuote(type), ".")
     }
   }
 }

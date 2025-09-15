@@ -22,7 +22,7 @@ BaseModelCore <- R6::R6Class(
   inherit = AIFEBaseModel,
   private = list(
     model_type = NULL,
-    adjust_max_sequence_length = 0,
+    adjust_max_sequence_length = 0L,
     return_token_type_ids = TRUE,
     model_info = list(),
     flops_estimates = data.frame(),
@@ -54,8 +54,8 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     # Method for loading training history
     load_training_history = function(model_dir) {
-      training_datalog_path <- paste0(model_dir, "/", "history.log")
-      if (file.exists(training_datalog_path) == TRUE) {
+      training_datalog_path <- file.path(model_dir,  "history.log")
+      if (file.exists(training_datalog_path)) {
         self$last_training$history <- utils::read.csv2(file = training_datalog_path)
       } else {
         self$last_training$history <- NA
@@ -64,12 +64,12 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     # Method for saving training history
     save_training_history = function(dir_path, folder_name) {
-      if (is.null_or_na(self$last_training$history) == FALSE) {
-        save_location <- paste0(dir_path, "/", folder_name)
+      if (!is.null_or_na(self$last_training$history)) {
+        save_location <- file.path(dir_path,  folder_name)
         create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
         write.csv2(
           x = self$last_training$history,
-          file = paste0(save_location, "/", "history.log"),
+          file = file.path(save_location,  "history.log"),
           row.names = FALSE,
           quote = FALSE
         )
@@ -77,7 +77,7 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     save_tokenizer = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path,  folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
       save_to_disk(
         object = self$Tokenizer,
@@ -87,7 +87,7 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     load_tokenizer = function(dir_path) {
-      load_location <- paste0(dir_path, "/", "tokenizer")
+      load_location <- file.path(dir_path,  "tokenizer")
       self$Tokenizer <- load_from_disk(load_location)
     },
     #--------------------------------------------------------------------------
@@ -99,12 +99,12 @@ BaseModelCore <- R6::R6Class(
       private$log_config$log_dir <- log_dir
       private$log_config$log_write_interval <- log_write_interval
 
-      private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
-      private$log_config$log_loss_file <- paste0(private$log_config$log_dir, "/aifeducation_loss.log")
+      private$log_config$log_state_file <- file.path(private$log_config$log_dir, "aifeducation_state.log")
+      private$log_config$log_loss_file <- file.path(private$log_config$log_dir, "aifeducation_loss.log")
     },
     #--------------------------------------------------------------------------
     update_logger = function(message) {
-      private$log_state$value_top <- private$log_state$value_top + 1
+      private$log_state$value_top <- private$log_state$value_top + 1L
 
       private$log_state$last_log <- py$write_log_py(
         log_file = private$log_config$log_state_file,
@@ -147,8 +147,8 @@ BaseModelCore <- R6::R6Class(
         )
       }
 
-      if (length(relevant_indices) > 0) {
-        tokenized_texts_raw <- tokenized_texts_raw$select(as.integer(relevant_indices - 1))
+      if (length(relevant_indices) > 0L) {
+        tokenized_texts_raw <- tokenized_texts_raw$select(as.integer(relevant_indices - 1L))
       }
 
       tokenized_texts_raw$set_format(type = "torch")
@@ -207,7 +207,7 @@ BaseModelCore <- R6::R6Class(
         value_top = private$log_state$value_top,
         total_top = private$log_state$total_top,
         message_top = "Training...",
-        min_step = 1
+        min_step = 1L
       )
       logger <- do.call(create_logger, logger_args)
 
@@ -219,7 +219,7 @@ BaseModelCore <- R6::R6Class(
           num_train_epochs = as.integer(self$last_training$config$n_epoch),
           logging_strategy = "epoch",
           save_strategy = "epoch",
-          save_total_limit = as.integer(1),
+          save_total_limit = 1L,
           load_best_model_at_end = TRUE,
           optim = "adamw_torch",
           learning_rate = self$last_training$config$learning_rate,
@@ -240,7 +240,7 @@ BaseModelCore <- R6::R6Class(
           num_train_epochs = as.integer(self$last_training$config$n_epoch),
           logging_strategy = "epoch",
           save_strategy = "epoch",
-          save_total_limit = as.integer(1),
+          save_total_limit = 1L,
           load_best_model_at_end = TRUE,
           optim = "adamw_torch",
           learning_rate = self$last_training$config$learning_rate,
@@ -322,7 +322,7 @@ BaseModelCore <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     config_dataset_prograss_bar = function() {
-      if (self$last_training$config$pytorch_trace == TRUE) {
+      if (self$last_training$config$pytorch_trace) {
         datasets$enable_progress_bars()
       } else {
         datasets$disable_progress_bars()
@@ -377,8 +377,8 @@ BaseModelCore <- R6::R6Class(
 
       # set up logger
       private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
-      private$log_state$value_top <- 0
-      private$log_state$total_top <- 6
+      private$log_state$value_top <- 0L
+      private$log_state$total_top <- 6L
 
       # Update logger
       private$update_logger("Prepare Process")
@@ -459,15 +459,15 @@ BaseModelCore <- R6::R6Class(
       # Check if the model is the correct model type
       detected_model_type <- detect_base_model_type(tmp_model)
       if (detected_model_type != private$model_type) {
-        stop(paste0("Detected ", detected_model_type, " but expected ", private$model_type, "."))
+        stop("Detected ", detected_model_type, " but expected ", private$model_type, ".")
       }
 
       # Add model to the R6 class
       private$model <- tmp_model
 
       # Set Model Config
-      args <- rlang::fn_fmls_names(self$configure)
-      for (arg in intersect(x = args, y = names(private$model$config))) {
+      tmp_args <- rlang::fn_fmls_names(self$configure)
+      for (arg in intersect(x = tmp_args, y = names(private$model$config))) {
         private$model_config[arg] <- list(private$model$config[arg])
       }
 
@@ -513,21 +513,21 @@ BaseModelCore <- R6::R6Class(
                      p_mask = 0.15,
                      whole_word = TRUE,
                      val_size = 0.1,
-                     n_epoch = 1,
-                     batch_size = 12,
-                     max_sequence_length = 250,
+                     n_epoch = 1L,
+                     batch_size = 12L,
+                     max_sequence_length = 250L,
                      full_sequences_only = FALSE,
-                     min_seq_len = 50,
+                     min_seq_len = 50L,
                      learning_rate = 3e-3,
                      sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
-                     sustain_interval = 15,
+                     sustain_interval = 15L,
                      trace = TRUE,
-                     pytorch_trace = 1,
+                     pytorch_trace = 1L,
                      log_dir = NULL,
-                     log_write_interval = 2) {
-      private$do_training(args = get_called_args(n = 1))
+                     log_write_interval = 2L) {
+      private$do_training(args = get_called_args(n = 1L))
     },
     #---------------------------------------------------------------------------
     #' @description Method for counting the trainable parameters of a model.
@@ -535,13 +535,13 @@ BaseModelCore <- R6::R6Class(
     count_parameter = function() {
       iterator <- reticulate::as_iterator(private$model$parameters())
       iteration_finished <- FALSE
-      count <- 0
-      while (iteration_finished == FALSE) {
+      count <- 0L
+      while (!iteration_finished) {
         iter_results <- reticulate::iter_next(it = iterator)
         if (is.null(iter_results)) {
           iteration_finished <- TRUE
         } else {
-          if (iter_results$requires_grad == TRUE) {
+          if (iter_results$requires_grad) {
             count <- count + iter_results$numel()
           }
         }
@@ -555,7 +555,7 @@ BaseModelCore <- R6::R6Class(
     #' @param y_max `r get_description("y_max")`
     #' @param text_size `r get_description("y_max")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10) {
+    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10L) {
       requireNamespace("ggplot2")
       plot_data <- self$last_training$history
 
@@ -567,14 +567,14 @@ BaseModelCore <- R6::R6Class(
         y_max <- max(self$last_training$history[, c("loss", "val_loss")])
       }
 
-      colnames <- c("epoch", "val_loss", "loss")
-      cols_exist <- sum(colnames %in% colnames(plot_data)) == length(colnames)
+      tmp_colnames <- c("epoch", "val_loss", "loss")
+      cols_exist <- sum(tmp_colnames %in% colnames(plot_data)) == length(tmp_colnames)
 
       if (cols_exist) {
         val_loss_min <- min(plot_data$val_loss)
         best_model_epoch <- which(x = (plot_data$val_loss) == val_loss_min)
 
-        plot <- ggplot2::ggplot(data = plot_data) +
+        tmp_plot <- ggplot2::ggplot(data = plot_data) +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$loss, color = "train")) +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation")) +
           ggplot2::geom_vline(
@@ -582,20 +582,20 @@ BaseModelCore <- R6::R6Class(
             linetype = "dashed"
           )
 
-        plot <- plot + ggplot2::theme_classic() +
+        tmp_plot <- tmp_plot + ggplot2::theme_classic() +
           ggplot2::ylab("value") +
           ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
           ggplot2::xlab("epoch") +
           ggplot2::scale_color_manual(values = c(
-            "train" = "red",
-            "validation" = "blue",
-            "test" = "darkgreen"
+            train = "red",
+            validation = "blue",
+            test = "darkgreen"
           )) +
           ggplot2::theme(
             text = ggplot2::element_text(size = text_size),
             legend.position = "bottom"
           )
-        return(plot)
+        return(tmp_plot)
       } else {
         warning("Data for the training history is not available.")
         return(NULL)
@@ -621,7 +621,7 @@ BaseModelCore <- R6::R6Class(
     #' @return Returns a `list` containing a `data.frame` for every
     #' mask. The `data.frame` contains the solutions in the rows and reports
     #' the score, token id, and token string in the columns.
-    fill_mask = function(masked_text, n_solutions = 5) {
+    fill_mask = function(masked_text, n_solutions = 5L) {
       # Arugment checking
       check_type(object = masked_text, type = "string", FALSE)
       check_type(object = n_solutions, type = "int", FALSE)
@@ -641,7 +641,7 @@ BaseModelCore <- R6::R6Class(
         model = private$model,
         tokenizer = self$Tokenizer$get_tokenizer(),
         framework = "pt",
-        num_workers = 1,
+        num_workers = 1L,
         binary_output = FALSE,
         top_k = as.integer(n_solutions),
         tokenizer_kwargs = reticulate::dict(
@@ -662,7 +662,7 @@ BaseModelCore <- R6::R6Class(
         simplify = TRUE
       ))
 
-      if (n_mask_tokens == 0) {
+      if (n_mask_tokens == 0L) {
         stop("There is no masking token. Please check your input.")
       }
 
@@ -670,10 +670,10 @@ BaseModelCore <- R6::R6Class(
 
       solutions_list <- NULL
 
-      if (n_mask_tokens == 1) {
+      if (n_mask_tokens == 1L) {
         solution_data_frame <- matrix(
           nrow = length(solutions),
-          ncol = 3
+          ncol = 3L
         )
         colnames(solution_data_frame) <- c(
           "score",
@@ -687,12 +687,12 @@ BaseModelCore <- R6::R6Class(
         }
         solution_data_frame <- as.data.frame(solution_data_frame)
         solution_data_frame$score <- as.numeric(solution_data_frame$score)
-        solutions_list[length(solutions_list) + 1] <- list(solution_data_frame)
+        solutions_list[length(solutions_list) + 1L] <- list(solution_data_frame)
       } else {
         for (j in seq_len(length(solutions))) {
           solution_data_frame <- matrix(
             nrow = length(solutions[[j]]),
-            ncol = 3
+            ncol = 3L
           )
           colnames(solution_data_frame) <- c(
             "score",
@@ -706,7 +706,7 @@ BaseModelCore <- R6::R6Class(
           }
           solution_data_frame <- as.data.frame(solution_data_frame)
           solution_data_frame$score <- as.numeric(solution_data_frame$score)
-          solutions_list[length(solutions_list) + 1] <- list(solution_data_frame)
+          solutions_list[length(solutions_list) + 1L] <- list(solution_data_frame)
         }
       }
 
@@ -718,7 +718,7 @@ BaseModelCore <- R6::R6Class(
     #' @param folder_name `r get_param_doc_desc("folder_name")`
     #' @return `r get_description("return_save_on_disk")`
     save = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path,  folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
 
       # Save BaseModel
@@ -837,7 +837,7 @@ BaseModelCore <- R6::R6Class(
                                                            n = NULL,
                                                            sustain_iso_code = NULL,
                                                            sustain_region = NULL,
-                                                           sustain_interval = 15,
+                                                           sustain_interval = 15L,
                                                            trace = TRUE) {
       # Prepare Data
       print_message(
@@ -848,10 +848,10 @@ BaseModelCore <- R6::R6Class(
       n_cases <- text_dataset$n_rows()
       sample_size <- min(n_cases, n)
       random_sample <- sample(
-        x = seq.int(from = 1, to = n_cases),
+        x = seq.int(from = 1L, to = n_cases),
         size = sample_size,
         replace = FALSE
-      ) - 1
+      ) - 1L
 
       # Prepare Data
       print_message(
@@ -872,8 +872,8 @@ BaseModelCore <- R6::R6Class(
         measure_power_secs = sustain_interval
       )
 
-      for (i in 1:sample_size) {
-        self$fill_mask(masked_text = selected_texts_with_mask[i], n_solutions = 1)
+      for (i in 1L:sample_size) {
+        self$fill_mask(masked_text = selected_texts_with_mask[i], n_solutions = 1L)
       }
 
       # Stop Tracking
@@ -885,7 +885,7 @@ BaseModelCore <- R6::R6Class(
       # Add additional information
       results$data <- "empirical data"
       results$n <- sample_size
-      results$batch <- 1
+      results$batch <- 1L
       results$min_seq_len <- NA
       results$mean_seq_len <- NA
       results$sd_seq_len <- NA
@@ -927,15 +927,15 @@ BaseModelCore <- R6::R6Class(
 
       res_colnames <- private$columnes_flops_estimates()
       results <- matrix(
-        nrow = 1,
+        nrow = 1L,
         ncol = length(res_colnames)
       )
       colnames(results) <- res_colnames
       results <- as.data.frame(results)
 
-      bp_factors <- c(1, 2, 3, 4)
+      bp_factors <- c(1L, L2, 3L, 4L)
 
-      tokenized_texts=tokenizer(
+      tokenized_texts <- tokenizer(
         text = generated_texts,
         truncation = TRUE,
         max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
@@ -963,19 +963,19 @@ BaseModelCore <- R6::R6Class(
           ignore_modules = NULL
         )
 
-        results[1, "n_parameter"] <- est_flops[[3]]
-        results[1, "batch_size"] <- batch_size
-        results[1, paste0("flops_bp_", bp_factor)] <- est_flops[[1]] * n_batches * n_epochs
+        results[1L, "n_parameter"] <- est_flops[[L3]]
+        results[1L, "batch_size"] <- batch_size
+        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[L1]] * n_batches * n_epochs
       }
-      results[1, "approach"] <- "architecture-based"
+      results[1L, "approach"] <- "architecture-based"
 
-      results[1, "n_batches"] <- n_batches
-      results[1, "n_epochs"] <- n_epochs
+      results[1L, "n_batches"] <- n_batches
+      results[1L, "n_epochs"] <- n_epochs
 
-      results[1, "package"] <- "calflops"
-      results[1, "version"] <- get_py_package_version("calflops")
+      results[1L, "package"] <- "calflops"
+      results[1L, "version"] <- get_py_package_version("calflops")
 
-      results[1, "date"] <- get_time_stamp()
+      results[1L, "date"] <- get_time_stamp()
 
       return(results)
     }

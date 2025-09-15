@@ -262,7 +262,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
       if (!is.null(tok_statistics()) &!is.null(base_model())) {
         display_processing()
 
-        flops_statistics=base_model()$calc_flops_architecture_based(
+        flops_statistics <- base_model()$calc_flops_architecture_based(
           batch_size = input$batch_size,
           n_batches = ceiling(tok_statistics()$n_tokens / input$batch_size),
           n_epochs = input$n_epoch

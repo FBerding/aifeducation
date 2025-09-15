@@ -118,10 +118,10 @@ TEClassifierProtoNet <- R6::R6Class(
       check_type(batch_size, object_name = "batch_size", "int", FALSE)
 
       # Check input for compatible text embedding models and feature extractors
-      if ("EmbeddedText" %in% class(embeddings_q)) {
+      if (inherits(embeddings_q, "EmbeddedText")) {
         self$check_embedding_model(text_embeddings = embeddings_q)
         requires_compression <- self$requires_compression(embeddings_q)
-      } else if ("array" %in% class(embeddings_q)) {
+      } else if (inherits(embeddings_q, "array")) {
         requires_compression <- self$requires_compression(embeddings_q)
       } else {
         requires_compression <- FALSE

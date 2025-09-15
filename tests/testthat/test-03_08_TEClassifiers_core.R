@@ -13,7 +13,7 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
  #object_class_names="TEClassifierRegular"
 
 max_samples <- 20
-max_samples_CI <- 10
+max_samples_CI <- 5
 
 max_samples_training <- 2
 max_samples_training_CI<-1

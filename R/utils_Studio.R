@@ -27,7 +27,7 @@
 generate_sidebar_information <- function(model) {
   ui <- shiny::tagList()
 
-  if ("TextEmbeddingModel" %in% class(model)) {
+  if (inherits(model, "TextEmbeddingModel")) {
     # Prepare output
     if (is.null(model)) {
       model_label <- NULL
@@ -92,7 +92,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
     )
-  } else if ("BaseModelCore" %in% class(model)) {
+  } else if (inherits(model, "BaseModelCore")) {
     # Prepare output
     if (is.null(model)) {
       model_label <- NULL
@@ -130,7 +130,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Energy Consumption (kWh): ", kwh),
       shiny::tags$p("Carbon Footprint (CO2eq. kg): ", co2)
     )
-  } else if ("ClassifiersBasedOnTextEmbeddings" %in% class(model)) {
+  } else if (inherits(model, "ClassifiersBasedOnTextEmbeddings")) {
     if (is.null(model)) {
       model_label <- NULL
     } else {
@@ -158,7 +158,7 @@ generate_sidebar_information <- function(model) {
       shiny::tags$p("Carbon Footprint (CO2eq. kg): "),
       shiny::tags$p(co2)
     )
-  } else if ("TEFeatureExtractor" %in% class(model)) {
+  } else if (inherits(model, "TEFeatureExtractor")) {
     if (!is.null(model)) {
       if (nrow(model$get_sustainability_data()) > 0) {
         kwh <- round(model$get_sustainability_data()$sustainability_data$total_energy_kwh, 3)
@@ -471,8 +471,8 @@ load_and_check_embeddings <- function(dir_path) {
       Sys.sleep(1)
       embeddings <- load_from_disk(dir_path)
       if (
-        "EmbeddedText" %in% class(embeddings) ||
-          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+        inherits(embeddings, "EmbeddedText") ||
+          inherits(embeddings, "LargeDataSetForTextEmbeddings")
       ) {
         shiny::removeModal()
         return(embeddings)
@@ -519,7 +519,7 @@ load_and_check_dataset_raw_texts <- function(dir_path) {
       # Wait for modal
       Sys.sleep(1)
       data_set_raw_text <- load_from_disk(dir_path)
-      if ("LargeDataSetForText" %in% class(data_set_raw_text)) {
+      if (inherits(data_set_raw_text, "LargeDataSetForText")) {
         shiny::removeModal()
         return(data_set_raw_text)
       } else {
@@ -1181,10 +1181,10 @@ create_widget_card <- function(id,
     reduced_names <- setdiff(x = box_names, "General Settings")
     ordered_names <- c(
       "General Settings",
-      reduced_names[order(reduced_names)]
+      sort(reduced_names, na.last = TRUE)
     )
   } else {
-    ordered_names <- box_names[order(box_names)]
+    ordered_names <- sort(box_names, na.last = TRUE)
   }
   tmp_boxes <- tmp_boxes[ordered_names]
 
@@ -1199,10 +1199,10 @@ create_widget_card <- function(id,
       reduced_names <- setdiff(x = tmp_names, y = use_string)
       ordered_names <- c(
         use_string,
-        reduced_names[order(reduced_names)]
+        sort(reduced_names, na.last = TRUE)
       )
     } else {
-      ordered_names <- tmp_names[order(tmp_names)]
+      ordered_names <- sort(tmp_names, na.last = TRUE)
     }
     current_box <- current_box[ordered_names]
     tmp_boxes[i] <- list(current_box)

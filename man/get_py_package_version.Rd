@@ -10,7 +10,8 @@ get_py_package_version(package_name)
 \item{package_name}{\code{string} Name of the package.}
 }
 \value{
-Returns the version as \code{string} or \code{NA} if the package does not exist.
+Returns the version as \code{string} or \code{NA} if the package does not exist
+or no version is available.
 }
 \description{
 Function for requesting the version of a specific python package.

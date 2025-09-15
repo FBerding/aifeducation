@@ -162,7 +162,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
         )
 
         # Generate embedding plot for TEProtoNetClassifier
-        if ("TEClassifierProtoNet" %in% class(model())) {
+        if (inherits(model(), "TEClassifierProtoNet")) {
           if (model()$model_config$embedding_dim == 2) {
             plot <- model()$plot_embeddings(
               embeddings_q = data_embeddings(),
@@ -262,7 +262,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
     # Display Protonet embeddings
     output$proto_net_embeddings <- shiny::renderUI({
       model <- model()
-      if ("TEClassifierProtoNet" %in% class(model)) {
+      if (inherits(model, "TEClassifierProtoNet")) {
         if (model$model_config$embedding_dim == 2) {
           ui <- shiny::tagList(
             bslib::card(

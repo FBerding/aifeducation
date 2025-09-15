@@ -238,7 +238,7 @@ long_transformers <- function(args) {
       # Request the method to apply
       method <- current_task$meta_args$method
 
-      if ("BaseModelCore" %in% class(tmp_object)) {
+      if (inherits(tmp_object, "BaseModelCore")) {
         current_task$args$tokenizer <- object_list[[1]]
       }
 

@@ -124,7 +124,7 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
 
     #Box for model configuration------------------------------------------------
     output$model_configuration<-shiny::renderUI({
-      config_box=create_widget_card(
+      config_box <- create_widget_card(
         id=id,
         object_class="TEFeatureExtractor",
         method = "configure",
@@ -133,7 +133,7 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
     })
     #Box for training set up---------------------------------------------------
     output$training_setup<-shiny::renderUI({
-      config_box=create_widget_card(
+      config_box <- create_widget_card(
         id=id,
         object_class="TEFeatureExtractor",
         method = "train",

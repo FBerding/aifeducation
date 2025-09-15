@@ -480,7 +480,7 @@ WordPieceTokenizer <- R6::R6Class(
 
       tok_new$train_from_iterator(
         iterator = py$batch_iterator(
-          batch_size = as.integer(200),
+          batch_size = 200L,
           dataset = text_dataset$get_dataset(),
           log_file = NULL,
           write_interval = 2,
@@ -633,7 +633,7 @@ BPETokenizer <- R6::R6Class(
 
       tok_new$decoder <- tok$decoders$ByteLevel()
 
-      tok_new$enable_truncation(max_length = as.integer(512))
+      tok_new$enable_truncation(max_length = 512L)
       tok_new$enable_padding(pad_token = pad_token)
 
       # configurate training
@@ -648,7 +648,7 @@ BPETokenizer <- R6::R6Class(
 
       tok_new$train_from_iterator(
         iterator = py$batch_iterator(
-          batch_size = as.integer(200),
+          batch_size = 200L,
           dataset = text_dataset$get_dataset(),
           log_file = NULL,
           write_interval = 2,

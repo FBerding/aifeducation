@@ -123,12 +123,12 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         # Try to load the model
         model <- try(load_from_disk(model_path), silent = TRUE)
 
-        if ("try-error" %in% class(model) == FALSE) {
+        if (inherits(model, "try-error") == FALSE) {
           if (type == "TextEmbeddingModel") {
-            if ("TextEmbeddingModel" %in% class(model)) {
+            if (inherits(model, "TextEmbeddingModel")) {
               shiny::removeModal()
               return(model)
-            } else if ("BaseModelCore" %in% class(model)) {
+            } else if (inherits(model, "BaseModelCore")) {
                 shiny::removeModal()
                 return(model)
               } else {
@@ -142,8 +142,8 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
               }
           } else if (type == "Classifier") {
             if (
-              "TEClassifierRegular" %in% class(model) |
-                "TEClassifierProtoNet" %in% class(model)
+              inherits(model, "TEClassifierRegular") |
+                inherits(model, "TEClassifierProtoNet")
             ) {
               shiny::removeModal()
               return(model)
@@ -158,7 +158,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
               return(NULL)
             }
           } else if (type == "FeatureExtractors") {
-            if ("TEFeatureExtractor" %in% class(model)) {
+            if (inherits(model, "TEFeatureExtractor")) {
               shiny::removeModal()
               return(model)
             } else {
@@ -232,7 +232,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         url = input[[paste0("doc_", "developed_by", "_url")]]
       )
       r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-             tmp_config=create_config_state(tmp_model)
+             tmp_config <- create_config_state(tmp_model)
              save(tmp_config, file = r_interface_path)
       model <- shiny::reactive({
         tmp_model
@@ -274,7 +274,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
           url = input[[paste0("doc_", "modified_by", "_url")]]
         )
        r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-               tmp_config=create_config_state(tmp_model)
+               tmp_config <- create_config_state(tmp_model)
                save(tmp_config, file = r_interface_path)
         model <- shiny::reactive({
           tmp_model
@@ -299,7 +299,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         keywords_eng = input$doc_editor_abstract_eng_keywords
       )
       r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-      tmp_config=create_config_state(tmp_model)
+      tmp_config <- create_config_state(tmp_model)
       save(tmp_config, file = r_interface_path)
       model <- shiny::reactive({
         tmp_model
@@ -326,7 +326,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         eng = input$doc_editor_description_eng
       )
      r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-             tmp_config=create_config_state(tmp_model)
+             tmp_config <- create_config_state(tmp_model)
              save(tmp_config, file = r_interface_path)
       model <- shiny::reactive({
         tmp_model
@@ -354,7 +354,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         keywords_native = input$doc_editor_abstract_native_keywords
       )
      r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-             tmp_config=create_config_state(tmp_model)
+             tmp_config <- create_config_state(tmp_model)
              save(tmp_config, file = r_interface_path)
       model <- shiny::reactive({
         tmp_model
@@ -382,7 +382,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
         native = input$doc_editor_description_native
       )
      r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-             tmp_config=create_config_state(tmp_model)
+             tmp_config <- create_config_state(tmp_model)
              save(tmp_config, file = r_interface_path)
       model <- shiny::reactive({
         tmp_model
@@ -410,7 +410,7 @@ DocumentPage_Server <- function(id, volumes, type = "TextEmbeddingModel") {
       tmp_model$set_model_license(input$doc_editor_software_license)
 
      r_interface_path <- paste0(model_path(), "/r_config_state.rda")
-            tmp_config=create_config_state(tmp_model)
+            tmp_config <- create_config_state(tmp_model)
             save(tmp_config, file = r_interface_path)
       model <- shiny::reactive({
         tmp_model

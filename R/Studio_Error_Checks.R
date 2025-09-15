@@ -76,12 +76,12 @@ check_errors_create_classifier <- function(classifier_type,
     ))
   } else {
     embeddings <- try(load_from_disk(path_to_embeddings), silent = TRUE)
-    if ("try-error" %in% class(embeddings)) {
+    if (inherits(embeddings, "try-error")) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
     } else if (
-      !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+      !(inherits(embeddings, "LargeDataSetForTextEmbeddings") || inherits(embeddings, "EmbeddedText"))
     ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
@@ -100,11 +100,11 @@ check_errors_create_classifier <- function(classifier_type,
       ))
     } else {
       feature_extractor <- try(load_from_disk(path_to_feature_extractor), silent = TRUE)
-      if ("try-error" %in% class(feature_extractor)) {
+      if (inherits(feature_extractor, "try-error")) {
         error_list[length(error_list) + 1] <- list(shiny::tags$p(
           feature_extractor
         ))
-      } else if (!("TEFeatureExtractor" %in% class(feature_extractor))) {
+      } else if (!(inherits(feature_extractor, "TEFeatureExtractor"))) {
         error_list[length(error_list) + 1] <- list(shiny::tags$p(
           "Directory which should contain a feature extractor does not contain an object of class
           TEFeatureExtractor."
@@ -291,12 +291,12 @@ check_errors_create_feature_extractor <- function(destination_path,
     ))
   } else {
     embeddings <- try(load_from_disk(path_to_embeddings), silent = TRUE)
-    if ("try-error" %in% class(embeddings)) {
+    if (inherits(embeddings, "try-error")) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         embeddings
       ))
     } else if (
-      !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+      !(inherits(embeddings, "LargeDataSetForTextEmbeddings") || inherits(embeddings, "EmbeddedText"))
     ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
@@ -357,7 +357,7 @@ check_errors_predict_classifier <- function(embeddings,
 
   # Embeddings
   if (
-    !("LargeDataSetForTextEmbeddings" %in% class(embeddings) || "EmbeddedText" %in% class(embeddings))
+    !(inherits(embeddings, "LargeDataSetForTextEmbeddings") || inherits(embeddings, "EmbeddedText"))
   ) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
       "Directory which should store embeddings does not contain an object of class 'LargeDataSetForTextEmbeddings'
@@ -425,10 +425,10 @@ check_errors_text_embedding_model_embed <- function(destination_path,
     error_list[length(error_list) + 1] <- list(shiny::tags$p("There is no file at the current path."))
   } else {
     raw_texts <- try(load_from_disk(dir_path = path_to_raw_texts), silent = TRUE)
-    if ("try-error" %in% class(raw_texts)) {
+    if (inherits(raw_texts, "try-error")) {
       error_list[length(error_list) + 1] <- raw_texts
     } else {
-      if (!"LargeDataSetForText" %in% class(raw_texts)) {
+      if (!inherits(raw_texts, "LargeDataSetForText")) {
         error_list[length(error_list) + 1] <- paste("The object is not of class LargeDataSetForText")
       }
     }
@@ -533,12 +533,12 @@ check_error_base_model_create_or_train <- function(destination_path,
     ))
   } else {
     raw_texts <- try(load_from_disk(path_to_raw_texts), silent = TRUE)
-    if ("try-error" %in% class(raw_texts)) {
+    if (inherits(raw_texts, "try-error")) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         raw_texts
       ))
     } else if (
-      !("LargeDataSetForText" %in% class(raw_texts))
+      !(inherits(raw_texts, "LargeDataSetForText"))
     ) {
       error_list[length(error_list) + 1] <- list(shiny::tags$p(
         "Directory which should store the raw texts does not contain an object of class 'LargeDataSetForText'."

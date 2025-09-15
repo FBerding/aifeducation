@@ -65,9 +65,9 @@ display_processing <- function(
     easy_close = FALSE,
     message = "") {
   if(easy_close==FALSE){
-    footer=NULL
+    footer <- NULL
   } else {
-    footer=shiny::modalButton("Close")
+    footer <- shiny::modalButton("Close")
   }
 
   processing_modal <- shiny::modalDialog(

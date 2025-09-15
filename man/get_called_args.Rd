@@ -4,7 +4,7 @@
 \alias{get_called_args}
 \title{Called arguments}
 \usage{
-get_called_args(n = 1)
+get_called_args(n = 1L)
 }
 \arguments{
 \item{n}{\code{int} level of the nested environments where to extract the arguments.}

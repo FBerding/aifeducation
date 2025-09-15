@@ -146,15 +146,15 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     interface_architecture <- shiny::eventReactive(path_to_base_model(), {
       model_path <- path_to_base_model()
 
-      path_bin=paste0(model_path,"/","pytorch_model.bin")
-      path_safetensor=paste0(model_path,"/","model.safetensors")
+      path_bin <- paste0(model_path,"/","pytorch_model.bin")
+      path_safetensor <- paste0(model_path,"/","model.safetensors")
 
       if (file.exists(path_safetensor)) {
-       valid_path= path_safetensor
+       valid_path <- path_safetensor
       } else if(file.exists(path_bin)) {
-        valid_path=path_bin
+        valid_path <- path_bin
       } else {
-        valid_path=NA
+        valid_path <- NA
       }
 
       if(!is.na(valid_path)){

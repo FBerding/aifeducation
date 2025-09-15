@@ -12,7 +12,7 @@ data.frame_to_py_dataset <- function(data_frame) {
     data_list <- as.list(data_frame)
     data_dict <- reticulate::dict(data_list)
     dataset <- datasets$Dataset$from_dict(data_dict)
-    dataset <- dataset$select(indices = list(as.integer(0)))
+    dataset <- dataset$select(indices = list(0L))
   } else {
     data_list <- as.list(data_frame)
     data_dict <- reticulate::dict(data_list)
@@ -125,7 +125,7 @@ class_vector_to_py_dataset <- function(vector) {
     data_list <- as.list(data_frame)
     data_dict <- reticulate::dict(data_list)
     dataset <- datasets$Dataset$from_dict(data_dict)
-    dataset <- dataset$select(indices = list(as.integer(0)))
+    dataset <- dataset$select(indices = list(0L))
   } else {
     data_list <- as.list(data_frame)
     data_dict <- reticulate::dict(data_list)
@@ -146,7 +146,7 @@ class_vector_to_py_dataset <- function(vector) {
 #' @family Utils Python Data Management Developers
 #' @export
 tensor_to_numpy <- function(object) {
-  if ("torch.Tensor" %in% class(object)) {
+  if (inherits(object, "torch.Tensor")) {
     if (object$requires_grad == TRUE) {
       if (object$is_cuda == TRUE) {
         return(object$detach()$cpu()$numpy())

@@ -38,7 +38,7 @@ BaseModelBert <- R6::R6Class(
         hidden_dropout_prob = args$hidden_dropout_prob,
         attention_probs_dropout_prob = args$attention_probs_dropout_prob,
         pad_token_id = args$tokenizer$get_tokenizer()$pad_token_id,
-        type_vocab_size = as.integer(2),
+        type_vocab_size = 2L,
         initializer_range = 0.02,
         layer_norm_eps = 1e-12,
         position_embedding_type = "absolute",
@@ -51,7 +51,7 @@ BaseModelBert <- R6::R6Class(
       private$model <- transformers$BertForMaskedLM$from_pretrained(dir_path)
     },
     check_arg_combinations = function(args) {
-      if (args$hidden_size %% args$num_attention_heads != 0) {
+      if (args$hidden_size %% args$num_attention_heads != 0L) {
         stop("hidden_size must be a multiple auf num_attention_heads.")
       }
     }
@@ -70,15 +70,15 @@ BaseModelBert <- R6::R6Class(
     #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
     #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
-                         max_position_embeddings = 512,
-                         hidden_size = 768,
-                         num_hidden_layers = 12,
-                         num_attention_heads = 12,
-                         intermediate_size = 3072,
+                         max_position_embeddings = 512L,
+                         hidden_size = 768L,
+                         num_hidden_layers = 12L,
+                         num_attention_heads = 12L,
+                         intermediate_size = 3072L,
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
                          attention_probs_dropout_prob = 0.1) {
-      arguments <- get_called_args(n = 1)
+      arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
     }
   )

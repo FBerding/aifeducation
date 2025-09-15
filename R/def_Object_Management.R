@@ -14,7 +14,7 @@ BaseModelsIndex <- list()
 #' @family Parameter Dictionary
 #' @keywords internal
 #' @noRd
-TEClassifiers_class_names <- c()
+TEClassifiers_class_names <- vector()
 
 #' @title Get names of classifiers
 #' @description Function returns the names of all classifiers which
@@ -31,7 +31,7 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
     class_names <- NULL
     for (class in TEClassifiers_class_names) {
       object <- create_object(class)
-      if (super_class %in% class(object)) {
+      if (inherits(object,super_class)) {
         class_names <- append(
           x = class_names,
           values = class
@@ -101,6 +101,6 @@ create_object <- function(class) {
     object <- eval(str2expression(object_list[[index]]))
     return(object$new())
   } else {
-    stop(paste0("Object ", class, " is not implemented in this function."))
+    stop("Object ", class, " is not implemented in this function.")
   }
 }

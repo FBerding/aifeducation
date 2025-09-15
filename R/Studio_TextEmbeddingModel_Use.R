@@ -118,8 +118,8 @@ TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
         # Try to load the model
         model <- try(load_from_disk(model_path), silent = TRUE)
 
-        if ("try-error" %in% class(model) == FALSE) {
-          if ("TextEmbeddingModel" %in% class(model)) {
+        if (inherits(model, "try-error") == FALSE) {
+          if (inherits(model, "TextEmbeddingModel")) {
             shiny::removeModal()
             return(model)
           } else {

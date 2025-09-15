@@ -548,8 +548,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
 
       # Check input for compatible text embedding models and feature extractors
       if (
-        "EmbeddedText" %in% class(embeddings) |
-          "LargeDataSetForTextEmbeddings" %in% class(embeddings)
+        inherits(embeddings, "EmbeddedText") |
+          inherits(embeddings, "LargeDataSetForTextEmbeddings")
       ) {
         self$check_embedding_model(text_embeddings = embeddings, require_compressed = FALSE)
       } else {
@@ -561,7 +561,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       # Convert to a LargeDataSetForTextEmbeddings
-      if ("EmbeddedText" %in% class(embeddings)) {
+      if (inherits(embeddings, "EmbeddedText")) {
         embeddings <- embeddings$convert_to_LargeDataSetForTextEmbeddings()
       } else {
         embeddings <- embeddings
