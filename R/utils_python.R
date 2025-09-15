@@ -235,13 +235,12 @@ get_py_package_versions <- function() {
     "numpy"
   )
 
-  packages_installed <- reticulate::py_list_packages()
-
   versions <- vector(length = length(list_of_packages) + 1)
-  names(versions) <- c("python", list_of_packages)
+
   versions["python"] <- as.character(reticulate::py_config()$version)
+
   for (package in list_of_packages) {
-    versions[package] <- packages_installed$version[which(packages_installed$package == package)]
+    versions[package] <- get_py_package_version(package)
   }
   return(versions)
 }
@@ -249,16 +248,28 @@ get_py_package_versions <- function() {
 #' @title Get versions of a specific python package
 #' @description Function for requesting the version of a specific python package.
 #' @param package_name `string` Name of the package.
-#' @return Returns the version as `string` or `NA` if the package does not exist.
+#' @return Returns the version as `string` or `NA` if the package does not exist
+#' or no version is available.
 #'
 #' @family Utils Python Developers
 #' @importFrom reticulate import
 #' @export
 get_py_package_version <- function(package_name) {
+
   if (reticulate::py_module_available(package_name) == TRUE) {
     tmp_package <- reticulate::import(module = package_name, delay_load = FALSE)
-    return(as.character(tmp_package["__version__"]))
+    tmp_version=try(as.character(tmp_package["__version__"]),silent=TRUE)
+
+    if(is(tmp_version,"try-error")){
+      packages_installed <- reticulate::py_list_packages()
+      if(package_name%in%packages_installed$package){
+        tmp_version=packages_installed$version[which(packages_installed$package == package_name)]
+      }else{
+        tmp_version=NA
+      }
+    }
   } else {
-    return(NA)
+    tmp_version=NA
   }
+  return(tmp_version)
 }

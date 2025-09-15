@@ -968,13 +968,12 @@ BaseModelCore <- R6::R6Class(
         results[1, paste0("flops_bp_", bp_factor)] <- est_flops[[1]] * n_batches * n_epochs
       }
       results[1, "approach"] <- "architecture-based"
-      results[1, "package"] <- "calflops"
 
       results[1, "n_batches"] <- n_batches
       results[1, "n_epochs"] <- n_epochs
 
-      package_list <- reticulate::py_list_packages()
-      results[1, "version"] <- package_list$version[which(package_list$package == "calflops")]
+      results[1, "package"] <- "calflops"
+      results[1, "version"] <- get_py_package_version("calflops")
 
       results[1, "date"] <- get_time_stamp()
 
