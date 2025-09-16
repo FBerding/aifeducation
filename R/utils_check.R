@@ -29,7 +29,7 @@ check_class <- function(object, object_name = NULL, classes, allow_NULL = FALSE)
     classes_object <- class(object)
     check_results <- sum(classes_object %in% classes)
 
-    if (check_results < 1) {
+    if (check_results < 1L) {
       stop(
         paste(
           "Class of", object_name, "must be:",
@@ -73,71 +73,71 @@ check_type <- function(object, object_name = NULL, type = "bool", allow_NULL = F
   }
 
   if (!allow_NULL && is.null(object)) {
-    stop(paste(tmp_name, "is not allowed to be NULL"))
+    stop(tmp_name, " is not allowed to be NULL")
   }
 
   if (!is.null(object)) {
     #--------------------
     if (type == "bool") {
       if (!isTRUE(object) && !isFALSE(object)) {
-        stop(paste(tmp_name, "must be TRUE or FALSE"))
+        stop(tmp_name, " must be TRUE or FALSE")
       }
       #------------------------
     } else if (type == "int") {
-      if (!is.numeric(object) || (object %% 1) != 0) {
-        stop(paste(tmp_name, "must be an integer"))
+      if (!is.numeric(object) || (object %% 1L) != 0L) {
+        stop(tmp_name, " must be an integer")
       }
       #---------------------------
     } else if (type == "double") {
       if (!is.numeric(object)) {
-        stop(paste(tmp_name, "must be double"))
+        stop(tmp_name, " must be double")
       } else {
         if (!(min <= object && object <= max)) {
-          stop(paste(tmp_name, "must greater or equal", min, "and smaller or equal", max))
+          stop(tmp_name, " must greater or equal ", min, " and smaller or equal ", max)
         }
       }
     } else if (type == "(double") {
       if (!is.numeric(object)) {
-        stop(paste(tmp_name, "must be double"))
+        stop(tmp_name, " must be double")
       } else {
         if (!(min < object && object <= max)) {
-          stop(paste(tmp_name, "must greater ", min, "and smaller or equal", max))
+          stop(tmp_name, " must greater ", min, " and smaller or equal ", max)
         }
       }
     } else if (type == "double)") {
       if (!is.numeric(object)) {
-        stop(paste(tmp_name, "must be double"))
+        stop(tmp_name, " must be double")
       } else {
         if (!(min <= object && object <= max)) {
-          stop(paste(tmp_name, "must greater or equal", min, "and smaller", max))
+          stop(tmp_name, " must greater or equal ", min, " and smaller ", max)
         }
       }
     } else if (type == "(double)") {
       if (!is.numeric(object)) {
-        stop(paste(tmp_name, "must be double"))
+        stop(tmp_name, " must be double")
       } else {
         if (!(min <= object && object <= max)) {
-          stop(paste(tmp_name, "must greater", min, "and smaller", max))
+          stop(tmp_name, " must greater ", min, " and smaller ", max)
         }
       }
     } else if (type == "string") {
       #------------------------------
       if (!is.character(object)) {
-        stop(paste(tmp_name, "must be a string"))
+        stop(tmp_name, " must be a string")
       } else {
         if (!is.null(allowed_values)) {
-          if (object %in% allowed_values == FALSE) {
-            stop(paste(tmp_name, "must be one of the following:", allowed_values, collapse = ", "))
+          if (!object %in% allowed_values) {
+            stop(tmp_name, " must be one of the following: ", allowed_values, collapse = ", ")
           }
         }
       }
     } else if (type == "vector") {
       if (!is.vector(object)) {
-        stop(paste(tmp_name, "must be a vector"))
+        stop(tmp_name, " must be a vector")
       }
     } else if (type == "list") {
       if (!is.list(object)) {
-        stop(paste(tmp_name, "must be a list"))
+        stop(tmp_name, " must be a list")
       }
     } else {
       warning("There is no implemented check for type", dQuote(type), ".")
@@ -170,31 +170,31 @@ check_versions <- function(a, operator = "==", b) {
   b <- as.character(b)
   res <- utils::compareVersion(a = a, b = b)
   if (operator == "==") {
-    if (res == 0) {
+    if (res == 0L) {
       return(TRUE)
     } else {
       return(FALSE)
     }
   } else if (operator == ">=") {
-    if (res >= 0) {
+    if (res >= 0L) {
       return(TRUE)
     } else {
       return(FALSE)
     }
   } else if (operator == ">") {
-    if (res > 0) {
+    if (res > 0L) {
       return(TRUE)
     } else {
       return(FALSE)
     }
   } else if (operator == "<=") {
-    if (res <= 0) {
+    if (res <= 0L) {
       return(TRUE)
     } else {
       return(FALSE)
     }
   } else if (operator == "<") {
-    if (res < 0) {
+    if (res < 0L) {
       return(TRUE)
     } else {
       return(FALSE)

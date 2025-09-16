@@ -41,13 +41,13 @@ get_time_stamp <- function(){
 #' @export
 to_categorical_c <- function(class_vector, n_classes) {
   binary_class_rep <- matrix(
-    data = 0,
+    data = 0L,
     nrow = length(class_vector),
     ncol = n_classes
   )
 
   for (i in seq_along(class_vector)) {
-    binary_class_rep[i, class_vector[i] + 1] <- 1
+    binary_class_rep[i, class_vector[i] + 1L] <- 1L
   }
 
   return(binary_class_rep)
@@ -92,42 +92,42 @@ array_form_bind <- function(...) {
   for (object in objects) {
     if (is.list(object)) {
       for (j in seq_len(length(object))) {
-        arrays[length(arrays) + 1] <- list(object[[j]])
+        arrays[length(arrays) + 1L] <- list(object[[j]])
       }
     } else {
-      arrays[length(arrays) + 1] <- list(object)
+      arrays[length(arrays) + 1L] <- list(object)
     }
   }
 
   # arrays <- list(...)
-  if (length(arrays) > 1) {
-    total_rows <- 0
+  if (length(arrays) > 1L) {
+    total_rows <- 0L
 
-    dimension <- dim(arrays[[1]])
+    dimension <- dim(arrays[[1L]])
 
     for (i in seq_len(length(arrays))) {
-      total_rows <- total_rows + dim(arrays[[i]])[1]
+      total_rows <- total_rows + dim(arrays[[i]])[1L]
 
       # Check number of dimensions
-      if (sum(dim(arrays[[i]])[-1] != dimension[-1])) {
+      if (sum(dim(arrays[[i]])[-1L] != dimension[-1L])) {
         stop("The dimensions of the array differ.")
       }
     }
 
     combined_array <- array(
       data = NA,
-      dim = c(total_rows, dimension[2], dimension[3])
+      dim = c(total_rows, dimension[2L], dimension[3L])
     )
 
-    intercept <- 0
+    intercept <- 0L
     row_names <- NULL
 
 
     for (i in seq_len(length(arrays))) {
       index <- seq.int(
-        from = 1,
+        from = 1L,
         to = nrow(arrays[[i]]),
-        by = 1
+        by = 1L
       ) + intercept
 
       combined_array[index, , ] <- arrays[[i]]
@@ -140,7 +140,7 @@ array_form_bind <- function(...) {
     rownames(combined_array) <- row_names
     return(combined_array)
   } else {
-    return(arrays[[1]])
+    return(arrays[[1L]])
   }
 }
 
@@ -154,7 +154,7 @@ array_form_bind <- function(...) {
 #' @return Returns a `string` of the requested length.
 #' @family Utils Developers
 #' @export
-generate_id <- function(length = 16) {
+generate_id <- function(length = 16L) {
   id_suffix <- NULL
   sample_values <- c(
     "a", "A",
@@ -183,7 +183,7 @@ generate_id <- function(length = 16) {
     "x", "X",
     "y", "Y",
     "z", "Z",
-    seq(from = 0, to = 9, by = 1)
+    seq(from = 0L, to = 9L, by = 1L)
   )
 
 
@@ -214,11 +214,11 @@ auto_n_cores <- function() {
       Sys.getenv("NOT_CRAN") == "true" ||
       Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
-    n_cores <- min(2, parallel::detectCores())
+    n_cores <- min(2L, parallel::detectCores())
   } else {
     n_cores <- floor(parallel::detectCores() * 0.75)
   }
-  return(n_cores = max(1, n_cores))
+  return(n_cores = max(1L, n_cores))
 }
 
 #' @title Detect base model's architecture
@@ -232,7 +232,7 @@ auto_n_cores <- function() {
 #' @keywords internal
 #' @noRd
 detect_base_model_type <- function(model) {
-  if (("transformers.configuration_utils.PretrainedConfig") %in% class(model)) {
+  if (inherits(model,"transformers.configuration_utils.PretrainedConfig")) {
     type_string <- model$architectures
   } else {
     type_string <- model$config

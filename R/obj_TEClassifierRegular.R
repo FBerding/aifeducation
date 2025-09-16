@@ -75,23 +75,23 @@ TEClassifierRegular <- R6::R6Class(
                          feature_extractor = NULL,
                          target_levels = NULL,
                          bias = TRUE,
-                         dense_size = 4,
-                         dense_layers = 0,
-                         rec_size = 4,
-                         rec_layers = 2,
+                         dense_size = 4L,
+                         dense_layers = 0L,
+                         rec_size = 4L,
+                         rec_layers = 2L,
                          rec_type = "GRU",
                          rec_bidirectional = FALSE,
-                         self_attention_heads = 0,
+                         self_attention_heads = 0L,
                          intermediate_size = NULL,
                          attention_type = "Fourier",
                          add_pos_embedding = TRUE,
                          act_fct = "ELU",
                          parametrizations = "None",
                          rec_dropout = 0.1,
-                         repeat_encoder = 1,
+                         repeat_encoder = 1L,
                          dense_dropout = 0.4,
                          encoder_dropout = 0.1) {
-      private$do_configuration(args = get_called_args(n = 1))
+      private$do_configuration(args = get_called_args(n = 1L))
     }
   ),
   # Private---------------------------------------------------------------------
@@ -129,30 +129,30 @@ TEClassifierRegular <- R6::R6Class(
     #--------------------------------------------------------------------------
     load_reload_python_scripts = function() {
       super$load_reload_python_scripts()
-      load_py_scripts(c("pytorch_old_scripts.py"))
+      load_py_scripts("pytorch_old_scripts.py")
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {
-      if (private$model_config$dense_layers > 0) {
-        if (private$model_config$dense_size < 1) {
+      if (private$model_config$dense_layers > 0L) {
+        if (private$model_config$dense_size < 1L) {
           stop("Dense layers added. Size for dense layers must be at least 1.")
         }
       }
 
-      if (private$model_config$rec_layers > 0) {
-        if (private$model_config$rec_size < 1) {
+      if (private$model_config$rec_layers > 0L) {
+        if (private$model_config$rec_size < 1L) {
           stop("Recurrent  layers added. Size for recurrent layers must be at least 1.")
         }
       }
 
-      if (private$model_config$repeat_encoder > 0 &
+      if (private$model_config$repeat_encoder > 0L &
         private$model_config$attention_type == "MultiHead" &
-        private$model_config$self_attention_heads <= 0) {
+        private$model_config$self_attention_heads <= 0L) {
         stop("Encoder layer is set to 'multihead'. This requires self_attention_heads>=1.")
       }
 
-      if (private$model_config$rec_layers != 0 & private$model_config$self_attention_heads > 0) {
-        if (private$model_config$features %% 2 != 0) {
+      if (private$model_config$rec_layers != 0L & private$model_config$self_attention_heads > 0L) {
+        if (private$model_config$features %% 2L != 0L) {
           stop("The number of features of the TextEmbeddingmodel is
                not a multiple of 2.")
         }
@@ -160,40 +160,40 @@ TEClassifierRegular <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     adjust_configuration = function() {
-      if (is.null(private$model_config$intermediate_size) == TRUE) {
-        if (private$model_config$attention_type == "Fourier" & private$model_config$rec_layers > 0) {
-          private$model_config$intermediate_size <- 2 * private$model_config$rec_size
-        } else if (private$model_config$attention_type == "Fourier" & private$model_config$rec_layers == 0) {
-          private$model_config$intermediate_size <- 2 * private$model_config$features
+      if (is.null(private$model_config$intermediate_size)) {
+        if (private$model_config$attention_type == "Fourier" & private$model_config$rec_layers > 0L) {
+          private$model_config$intermediate_size <- 2L * private$model_config$rec_size
+        } else if (private$model_config$attention_type == "Fourier" & private$model_config$rec_layers == 0L) {
+          private$model_config$intermediate_size <- 2L * private$model_config$features
         } else if (
           private$model_config$attention_type == "MultiHead" &
-            private$model_config$rec_layers > 0 &
-            private$model_config$self_attention_heads > 0
+            private$model_config$rec_layers > 0L &
+            private$model_config$self_attention_heads > 0L
         ) {
-          private$model_config$intermediate_size <- 2 * private$model_config$features
+          private$model_config$intermediate_size <- 2L * private$model_config$features
         } else if (
           private$model_config$attention_type == "MultiHead" &
-            private$model_config$rec_layers == 0 &
-            private$model_config$self_attention_heads > 0
+            private$model_config$rec_layers == 0L &
+            private$model_config$self_attention_heads > 0L
         ) {
-          private$model_config$intermediate_size <- 2 * private$model_config$features
+          private$model_config$intermediate_size <- 2L * private$model_config$features
         } else {
           private$model_config$intermediate_size <- NULL
         }
       }
 
-      if (private$model_config$rec_layers <= 1) {
+      if (private$model_config$rec_layers <= 1L) {
         private$model_config$rec_dropout <- 0.0
       }
-      if (private$model_config$rec_layers <= 0) {
-        private$model_config$rec_size <- 0
+      if (private$model_config$rec_layers <= 0L) {
+        private$model_config$rec_size <- 0L
       }
 
-      if (private$model_config$dense_layers <= 1) {
+      if (private$model_config$dense_layers <= 1L) {
         private$model_config$dense_dropout <- 0.0
       }
-      if (private$model_config$dense_layers <= 0) {
-        private$model_config$dense_size <- 0
+      if (private$model_config$dense_layers <= 0L) {
+        private$model_config$dense_size <- 0L
       }
     }
   )

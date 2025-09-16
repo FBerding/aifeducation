@@ -68,7 +68,7 @@ LargeDataSetBase <- R6::R6Class(
     #' @return Returns a data set of class `datasets.arrow_dataset.Dataset` with the selected rows.
     select = function(indicies) {
       private$data$set_format("np")
-      if (length(indicies) > 1) {
+      if (length(indicies) > 1L) {
         return(private$data$select(as.integer(indicies)))
       } else {
         return(private$data$select(list(as.integer(indicies))))
@@ -90,8 +90,8 @@ LargeDataSetBase <- R6::R6Class(
     #' @return Method does not return anything. It write the data set to disk.
     save = function(dir_path, folder_name, create_dir = TRUE) {
       # Create directory
-      if (dir.exists(dir_path) == FALSE) {
-        if (create_dir == TRUE) {
+      if (!dir.exists(dir_path)) {
+        if (create_dir) {
           dir.create(dir_path)
         } else {
           stop("Directory does not exist.")
@@ -99,7 +99,7 @@ LargeDataSetBase <- R6::R6Class(
       }
 
       # Create folder
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path,  folder_name)
       create_dir(save_location, FALSE)
 
       # Save
@@ -154,13 +154,13 @@ LargeDataSetBase <- R6::R6Class(
       private_list <- NULL
 
       for (entry in names(self)) {
-        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+        if (!is.function(self[[entry]])  & !is.environment(self[[entry]])) {
           public_list[entry] <- list(self[[entry]])
         }
       }
 
       for (entry in names(private)) {
-        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+        if (!is.function(private[[entry]])  & !is.environment(private[[entry]])) {
           private_list[entry] <- list(private[[entry]])
         }
       }

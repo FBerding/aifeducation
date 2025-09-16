@@ -36,7 +36,7 @@
 #'
 #' @family Utils Transformers Developers
 #' @export
-calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max_tokens_length = 512) {
+calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max_tokens_length = 512L) {
   # Argument Checking
   check_class(object = dataset, classes = "datasets.arrow_dataset.Dataset", allow_NULL = FALSE)
 
@@ -48,25 +48,25 @@ calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max
   mu_g <- NA
 
   if (step == "training" || step == "creation") {
-    if ("word_ids" %in% dataset$column_names == FALSE) {
+    if (!"word_ids" %in% dataset$column_names ) {
       stop("dataset must contain a column 'word_ids'.")
     }
-    if ("length" %in% dataset$column_names == FALSE) {
+    if (!"length" %in% dataset$column_names ) {
       stop("dataset must contain a column 'length'.")
     }
 
-    n_words <- 0
-    n_tokens <- 0
-    for (i in 1:n_sequences) {
-      n_words <- n_words + length(unique(unlist(dataset[i - 1]$word_ids)))
-      n_tokens <- n_tokens + dataset[i - 1]$length
+    n_words <- 0L
+    n_tokens <- 0L
+    for (i in 1L:n_sequences) {
+      n_words <- n_words + length(unique(unlist(dataset[i - 1L]$word_ids)))
+      n_tokens <- n_tokens + dataset[i - 1L]$length
     }
 
     mu_t <- n_tokens / n_sequences
     mu_w <- n_words / n_sequences
     mu_g <- n_tokens / n_words
   } else {
-    stop(paste("Step", step, "is invalid. Allowed steps: creation or training"))
+    stop("Step ", step, " is invalid. Allowed steps: creation or training")
   }
 
   return(
@@ -95,7 +95,7 @@ calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max
 #' @keywords internal
 #' @noRd
 check.max_position_embeddings <- function(max_position_embeddings) { # nolint
-  if (max_position_embeddings > 512) {
+  if (max_position_embeddings > 512L) {
     warning("Due to a quadratic increase in memory requirments it is not
             recommended to set max_position_embeddings above 512.
             If you want to analyse long documents please split your document
@@ -114,7 +114,7 @@ check.max_position_embeddings <- function(max_position_embeddings) { # nolint
 #' @keywords internal
 #' @noRd
 check.hidden_act <- function(hidden_act) { # nolint
-  if ((hidden_act %in% c("gelu", "relu", "silu", "gelu_new")) == FALSE) {
+  if (!(hidden_act %in% c("gelu", "relu", "silu", "gelu_new")) ) {
     stop("hidden_act must be gelu, relu, silu or gelu_new")
   }
 }
@@ -170,9 +170,9 @@ check.possible_save_formats <- function(pytorch_safetensors) { # nolint
 #' @keywords internal
 #' @noRd
 check.model_files <- function(model_dir_path) { # nolint
-  bin_exists <- file.exists(paste0(model_dir_path, "/pytorch_model.bin"))
-  safetensors_exists <- file.exists(paste0(model_dir_path, "/model.safetensors"))
-  h5_exists <- file.exists(paste0(model_dir_path, "/tf_model.h5"))
+  bin_exists <- file.exists(file.path(model_dir_path, "pytorch_model.bin"))
+  safetensors_exists <- file.exists(file.path(model_dir_path, "model.safetensors"))
+  h5_exists <- file.exists(file.path(model_dir_path, "tf_model.h5"))
 
   if (!bin_exists && !safetensors_exists && !h5_exists) {
     stop("Directory does not contain a tf_model.h5, pytorch_model.bin or
@@ -215,9 +215,9 @@ create_WordPiece_tokenizer <- function(
     # nolint
     vocab_do_lower_case,
     sep_token = "[SEP]",
-    sep_id = 1,
+    sep_id = 1L,
     cls_token = "[CLS]",
-    cls_id = 0,
+    cls_id = 0L,
     unk_token = "[UNK]") {
   tok_new <- tok$Tokenizer(tok$models$WordPiece(unk_token = unk_token))
   tok_new$normalizer <- tok$normalizers$BertNormalizer(

@@ -7,7 +7,7 @@
 #' @family Utils Python Data Management Developers
 #' @export
 data.frame_to_py_dataset <- function(data_frame) {
-  if (nrow(data_frame) == 1) {
+  if (nrow(data_frame) == 1L) {
     data_frame <- rbind(data_frame, data_frame)
     data_list <- as.list(data_frame)
     data_dict <- reticulate::dict(data_list)
@@ -52,7 +52,7 @@ prepare_r_array_for_dataset <- function(r_array) {
     tmp_np_array <- reticulate::r_to_py(
       np$squeeze(np$split(reticulate::np_array(r_array), as.integer(nrow(r_array)), axis = 0L))
     )
-    if (length(tmp_np_array$shape) == 2) {
+    if (length(tmp_np_array$shape) == 2L) {
       tmp_np_array <- np$expand_dims(
         tmp_np_array,
         1L
@@ -78,13 +78,13 @@ prepare_r_array_for_dataset <- function(r_array) {
 get_batches_index <- function(number_rows, batch_size, zero_based = FALSE) {
   n_batches <- ceiling(number_rows / batch_size)
   index_list <- NULL
-  for (i in 1:n_batches) {
-    min <- 1 + (i - 1) * batch_size
-    max <- min(batch_size + (i - 1) * batch_size, number_rows)
-    if (zero_based == FALSE) {
-      index_list[i] <- list(seq.int(from = min, to = max, by = 1))
+  for (i in 1L:n_batches) {
+    min <- 1L + (i - 1L) * batch_size
+    max <- min(batch_size + (i - 1L) * batch_size, number_rows)
+    if (!zero_based) {
+      index_list[i] <- list(seq.int(from = min, to = max, by = 1L))
     } else {
-      index_list[i] <- list(seq.int(from = min, to = max, by = 1) - 1)
+      index_list[i] <- list(seq.int(from = min, to = max, by = 1L) - 1L)
     }
   }
   return(index_list)
@@ -120,7 +120,7 @@ class_vector_to_py_dataset <- function(vector) {
   data_frame <- as.data.frame(vector)
   data_frame$id <- names(vector)
   colnames(data_frame) <- c("labels", "id")
-  if (length(data_frame) == 1) {
+  if (length(data_frame) == 1L) {
     data_frame <- rbind(data_frame, data_frame)
     data_list <- as.list(data_frame)
     data_dict <- reticulate::dict(data_list)
@@ -147,13 +147,13 @@ class_vector_to_py_dataset <- function(vector) {
 #' @export
 tensor_to_numpy <- function(object) {
   if (inherits(object, "torch.Tensor")) {
-    if (object$requires_grad == TRUE) {
-      if (object$is_cuda == TRUE) {
+    if (object$requires_grad) {
+      if (object$is_cuda) {
         return(object$detach()$cpu()$numpy())
       } else {
         return(object$detach()$numpy())
       }
-    } else if (object$is_cuda == TRUE) {
+    } else if (object$is_cuda) {
       return(object$detach()$cpu()$numpy())
     } else {
       return(object$numpy())

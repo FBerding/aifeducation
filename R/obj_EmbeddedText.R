@@ -109,7 +109,7 @@ EmbeddedText <- R6::R6Class(
 
     # Method for checking if the configuration is done successfully
     check_config_for_TRUE = function() {
-      if (private$configured == FALSE) {
+      if (!private$configured) {
         stop("The object is not configured. Please call the method configure.")
       }
     },
@@ -120,20 +120,20 @@ EmbeddedText <- R6::R6Class(
     update_model_config = function() {
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
       if (is.null_or_na(current_pkg_version)) {
-        update <- TRUE
+        need_update <- TRUE
       } else {
         if (check_versions(
           a = packageVersion("aifeducation"),
           operator = ">",
           b = self$get_package_versions()$r_package_versions$aifeducation
         )) {
-          update <- TRUE
+          need_update <- TRUE
         } else {
-          update <- FALSE
+          need_update <- FALSE
         }
       }
 
-      if (update) {
+      if (need_update) {
         param_dict <- get_param_dict()
         if (is.function(self$configure)) {
           param_names_new <- rlang::fn_fmls_names(self$configure)
@@ -144,7 +144,7 @@ EmbeddedText <- R6::R6Class(
                 if (!is.null(param_dict[[param]]$default_historic)) {
                   private[param] <- list(param_dict[[param]]$default_historic)
                 } else {
-                  warning(paste("Historic default for", param, "is missing in parameter dictionary."))
+                  warning("Historic default for ", param, " is missing in parameter dictionary.")
                 }
               }
             }
@@ -186,7 +186,8 @@ EmbeddedText <- R6::R6Class(
     #' @param embeddings `data.frame` containing the text embeddings.
     #' @return Returns an object of class [EmbeddedText] which stores the text embeddings produced by an objects of
     #'   class [TextEmbeddingModel].
-    configure = function(model_name = NA,
+    configure = function(embeddings,
+                         model_name = NA,
                          model_label = NA,
                          model_date = NA,
                          model_method = NA,
@@ -200,8 +201,7 @@ EmbeddedText <- R6::R6Class(
                          param_emb_layer_max = NULL,
                          param_emb_pool_type = NULL,
                          param_aggregation = NULL,
-                         param_pad_value = -100,
-                         embeddings) {
+                         param_pad_value = -100L) {
       private$model_name <- model_name
       private$model_label <- model_label
       private$model_date <- model_date
@@ -231,8 +231,8 @@ EmbeddedText <- R6::R6Class(
     #' @return Method does not return anything. It write the data set to disk.
     save = function(dir_path, folder_name, create_dir = TRUE) {
       # Create directory
-      if (dir.exists(dir_path) == FALSE) {
-        if (create_dir == TRUE) {
+      if (!dir.exists(dir_path)) {
+        if (create_dir) {
           dir.create(dir_path)
         } else {
           stop("Directory does not exist.")
@@ -244,7 +244,7 @@ EmbeddedText <- R6::R6Class(
 
       save(
         data_embeddings,
-        file = paste0(dir_path, "/", folder_name, "/data.rda")
+        file = file.path(dir_path, folder_name, "data.rda")
       )
     },
     #-------------------------------------------------------------------------
@@ -260,7 +260,7 @@ EmbeddedText <- R6::R6Class(
     #' @param dir_path Path where the data set set is stored.
     #' @return Method does not return anything. It loads an object from disk.
     load_from_disk = function(dir_path) {
-      if (self$is_configured() == TRUE) {
+      if (self$is_configured()) {
         stop("The object has already been configured.")
       }
 
@@ -291,7 +291,7 @@ EmbeddedText <- R6::R6Class(
       private$update_model_config()
 
       # Check for feature extractor and add information
-      if (is.null_or_na(config_file$private$feature_extractor$model_name) == FALSE) {
+      if (!is.null_or_na(config_file$private$feature_extractor$model_name)) {
         self$add_feature_extractor_info(
           model_name = config_file$private$feature_extractor$model_name,
           model_label = config_file$private$feature_extractor$model_label,
@@ -303,9 +303,9 @@ EmbeddedText <- R6::R6Class(
       }
 
       # Load data
-      data <- load(paste0(dir_path, "/", "data.rda"))
-      data <- get(data)
-      self$embeddings <- data
+      tmp_data <- load(file.path(dir_path, "data.rda"))
+      tmp_data <- get(tmp_data)
+      self$embeddings <- tmp_data
     },
     #--------------------------------------------------------------------------
     #' @description Method for retrieving information about the model that generated this embedding.
@@ -352,7 +352,7 @@ EmbeddedText <- R6::R6Class(
     #'   [feature extractor][TEFeatureExtractor]) you can use the method `get_original_features` of this class.
     #' @return Returns an `int` describing the number of features/dimensions of the text embeddings.
     get_features = function() {
-      if (self$is_compressed() == TRUE) {
+      if (self$is_compressed()) {
         return(private$feature_extractor$features)
       } else {
         return(private$param_features)
@@ -451,7 +451,7 @@ EmbeddedText <- R6::R6Class(
         param_pad_value = private$param_pad_value
       )
 
-      if (self$is_compressed() == TRUE) {
+      if (self$is_compressed()) {
         new_data_set$add_feature_extractor_info(
           model_name = private$feature_extractor$model_name,
           model_label = private$feature_extractor$model_label,
@@ -469,7 +469,7 @@ EmbeddedText <- R6::R6Class(
     #' @description Number of rows.
     #' @return Returns the number of rows of the text embeddings which represent the number of cases.
     n_rows = function() {
-      return(dim(self$embeddings)[1])
+      return(dim(self$embeddings)[1L])
     },
     #--------------------------------------------------------------------------
     #' @description Return all fields.
@@ -480,13 +480,13 @@ EmbeddedText <- R6::R6Class(
       private_list <- NULL
 
       for (entry in names(self)) {
-        if (is.function(self[[entry]]) == FALSE & is.environment(self[[entry]]) == FALSE) {
+        if (!is.function(self[[entry]]) & !is.environment(self[[entry]])) {
           public_list[entry] <- list(self[[entry]])
         }
       }
 
       for (entry in names(private)) {
-        if (is.function(private[[entry]]) == FALSE & is.environment(private[[entry]]) == FALSE) {
+        if (!is.function(private[[entry]]) & !is.environment(private[[entry]])) {
           private_list[entry] <- list(private[[entry]])
         }
       }

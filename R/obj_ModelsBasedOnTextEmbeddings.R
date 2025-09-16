@@ -54,7 +54,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Check original text embedding model
       embedding_model_config <- text_embeddings$get_model_info()
-      check <- c("model_name")
+      check <- "model_name"
 
       if (
         !is.null_or_na(embedding_model_config[[check]]) &
@@ -136,7 +136,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
     #' @param text_size Size of the text.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10) {
+    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10L) {
       requireNamespace("ggplot2")
       plot_data <- private$prepare_training_history(
         final = final_training,
@@ -157,12 +157,12 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         y_label <- "Average Iota"
       }
 
-      plot <- ggplot2::ggplot(data = plot_data) +
+      tmp_plot <- ggplot2::ggplot(data = plot_data) +
         ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_mean, color = "train")) +
         ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation_mean, color = "validation"))
 
-      if (add_min_max == TRUE) {
-        plot <- plot +
+      if (add_min_max) {
+        tmp_plot <- tmp_plot +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_min, color = "train")) +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train_max, color = "train")) +
           ggplot2::geom_ribbon(
@@ -188,10 +188,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       if ("test_mean" %in% colnames(plot_data)) {
-        plot <- plot +
+        tmp_plot <- tmp_plot +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_mean, color = "test"))
-        if (add_min_max == TRUE) {
-          plot <- plot +
+        if (add_min_max ) {
+          tmp_plot <- tmp_plot +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_min, color = "test")) +
 
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_max, color = "test")) +
@@ -207,20 +207,20 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
-      plot <- plot + ggplot2::theme_classic() +
+      tmp_plot <- tmp_plot + ggplot2::theme_classic() +
         ggplot2::ylab(y_label) +
         ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
         ggplot2::xlab("epoch") +
         ggplot2::scale_color_manual(values = c(
-          "train" = "red",
-          "validation" = "blue",
-          "test" = "darkgreen"
+          train = "red",
+          validation = "blue",
+          test = "darkgreen"
         )) +
         ggplot2::theme(
           text = ggplot2::element_text(size = text_size),
           legend.position = "bottom"
         )
-      return(plot)
+      return(tmp_plot)
     }
   ),
   private = list(
@@ -232,7 +232,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #------------------------------------------------------------------------------
     load_config_and_docs_textembeddingmodel = function(config_public, config_private) {
       if (is.null(config_private$text_embedding_model$pad_value)) {
-        pad_value <- 0
+        pad_value <- 0L
       } else {
         pad_value <- config_private$text_embedding_model$pad_value
       }
@@ -247,7 +247,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     check_embeddings_object_type = function(embeddings, strict = TRUE) {
-      if (strict == TRUE) {
+      if (strict) {
         if (
           !(inherits(embeddings, "EmbeddedText")) &
             !(inherits(embeddings, "LargeDataSetForTextEmbeddings"))
@@ -272,13 +272,13 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         inherits(embeddings, "EmbeddedText") |
           inherits(embeddings, "LargeDataSetForTextEmbeddings")
       ) {
-        if (embeddings$n_rows() > 1) {
+        if (embeddings$n_rows() > 1L) {
           single_prediction <- FALSE
         } else {
           single_prediction <- TRUE
         }
       } else if (inherits(embeddings, "array")) {
-        if (nrow(embeddings) > 1) {
+        if (nrow(embeddings) > 1L) {
           single_prediction <- FALSE
         } else {
           single_prediction <- TRUE
@@ -340,7 +340,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         tmp_np_array <- prepared_dataset["input"]
       }
       tmp_np_array <- reticulate::np_array(tmp_np_array)
-      if (numpy_writeable(tmp_np_array) == FALSE) {
+      if (!numpy_writeable(tmp_np_array)) {
         warning("Numpy array is not writable")
       }
       return(tmp_np_array)
@@ -371,7 +371,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     set_up_logger = function(log_dir, log_write_interval) {
       private$log_config$log_dir <- log_dir
-      private$log_config$log_state_file <- paste0(private$log_config$log_dir, "/aifeducation_state.log")
+      private$log_config$log_state_file <- file.path(private$log_config$log_dir, "aifeducation_state.log")
       private$log_config$log_write_interval <- log_write_interval
     },
     #-------------------------------------------------------------------------
@@ -381,16 +381,16 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       # Check if an update is necessary
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
       if (is.null_or_na(current_pkg_version)) {
-        update <- TRUE
+        need_update <- TRUE
       } else {
         if (check_versions(
           a = packageVersion("aifeducation"),
           operator = ">",
           b = self$get_package_versions()$r_package_versions$aifeducation
         )) {
-          update <- TRUE
+          need_update <- TRUE
         } else {
-          update <- FALSE
+          need_update <- FALSE
         }
       }
 
@@ -411,7 +411,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
-      if (update) {
+      if (need_update) {
         param_dict <- get_param_dict()
         if (is.function(self$configure)) {
           param_names_new <- rlang::fn_fmls_names(self$configure)
@@ -421,7 +421,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                 if (!is.null(param_dict[[param]]$default_historic)) {
                   private$model_config[param] <- list(param_dict[[param]]$default_historic)
                 } else {
-                  warning(paste("Historic default for", param, "is missing in parameter dictionary."))
+                  warning("Historic default for ", param, " is missing in parameter dictionary.")
                 }
               }
             }
@@ -441,29 +441,29 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     update_pad_value = function() {
       current_pkg_version <- self$get_package_versions()$r_package_versions$aifeducation
       if (is.na(current_pkg_version)) {
-        update <- TRUE
+        need_update <- TRUE
       } else {
         if (check_versions(
           a = packageVersion("aifeducation"),
           operator = ">",
           b = self$get_package_versions()$r_package_versions$aifeducation
         )) {
-          update <- TRUE
+          need_update <- TRUE
         } else {
-          update <- FALSE
+          need_update <- FALSE
         }
       }
 
-      if (update) {
+      if (need_update) {
         if (is.null_or_na(private$text_embedding_model["pad_value"])) {
-          private$text_embedding_model["pad_value"] <- 0
+          private$text_embedding_model["pad_value"] <- 0L
         }
       }
     },
     #--------------------------------------------------------------------------
     generate_model_id = function(name) {
       if (is.null(name)) {
-        return(paste0("mbote_", generate_id(16)))
+        return(paste0("mbote_", generate_id(16L)))
       } else {
         return(name)
       }
@@ -483,8 +483,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                                         pl_step = NULL) {
       plot_data <- self$last_training$history
 
-      if (length(plot_data) <= 1) {
-        plot_data[[1]] <- list(loss = plot_data[[1]])
+      if (length(plot_data) <= 1L) {
+        plot_data[[1L]] <- list(loss = plot_data[[1L]])
       }
 
       # if ("TEFeatureExtractor" %in% class(model)) {
@@ -499,7 +499,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         use_pl <- self$last_training$config$use_pl
       }
 
-      if (use_pl == TRUE & is.null_or_na(pl_step)) {
+      if (use_pl  & is.null_or_na(pl_step)) {
         stop("Model was trained with pseudo labeling. Please provide a pl_step.")
       }
 
@@ -509,31 +509,31 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Get information about the existence of a training, validation, and test data set
       # Get Number of folds for the request
-      if (final == FALSE) {
+      if (!final ) {
         n_folds <- length(self$last_training$history)
-        if (n_folds > 1) {
-          n_folds <- n_folds - 1
+        if (n_folds > 1L) {
+          n_folds <- n_folds - 1L
         }
 
         if (!use_pl) {
-          measures <- names(plot_data[[1]])
-          n_sample_type <- nrow(plot_data[[1]][[measures[1]]])
+          measures <- names(plot_data[[1L]])
+          n_sample_type <- nrow(plot_data[[1L]][[measures[1L]]])
         } else {
-          measures <- names(plot_data[[1]][[1]])
-          n_sample_type <- nrow(plot_data[[1]][[as.numeric(pl_step)]][[measures[1]]])
+          measures <- names(plot_data[[1L]][[1L]])
+          n_sample_type <- nrow(plot_data[[1L]][[as.numeric(pl_step)]][[measures[1L]]])
         }
       } else {
-        n_folds <- 1
-        if (use_pl == FALSE) {
+        n_folds <- 1L
+        if (!use_pl) {
           measures <- names(plot_data[[index_final]])
-          n_sample_type <- nrow(plot_data[[index_final]][[measures[1]]])
+          n_sample_type <- nrow(plot_data[[index_final]][[measures[1L]]])
         } else {
-          measures <- names(plot_data[[index_final]][[1]])
-          n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1]]])
+          measures <- names(plot_data[[index_final]][[1L]])
+          n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1L]]])
         }
       }
 
-      if (n_sample_type == 3) {
+      if (n_sample_type == 3L) {
         sample_type_name <- c("train", "validation", "test")
       } else {
         sample_type_name <- c("train", "validation")
@@ -555,7 +555,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         final_data_measure <- matrix(
           data = NA,
           nrow = n_epochs,
-          ncol = 3 * n_sample_type + 1
+          ncol = 3L * n_sample_type + 1L
         )
         colnames(final_data_measure) <- c(
           "epoch",
@@ -568,11 +568,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             )
           )
         )
-        final_data_measure[, "epoch"] <- seq.int(from = 1, to = n_epochs)
+        final_data_measure[, "epoch"] <- seq.int(from = 1L, to = n_epochs)
 
-        if (final == FALSE) {
-          for (i in 1:n_folds) {
-            if (use_pl == FALSE) {
+        if (!final) {
+          for (i in 1L:n_folds) {
+            if (!use_pl) {
               measure_array[i, , ] <- plot_data[[i]][[measure]]
             } else {
               measure_array[i, , ] <- plot_data[[i]][[as.numeric(pl_step)]][[measure]]
@@ -580,13 +580,13 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           }
         } else {
           if (!use_pl) {
-            measure_array[1, , ] <- plot_data[[index_final]][[measure]]
+            measure_array[1L, , ] <- plot_data[[index_final]][[measure]]
           } else {
-            measure_array[1, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
+            measure_array[1L, , ] <- plot_data[[index_final]][[as.numeric(pl_step)]][[measure]]
           }
         }
 
-        for (i in 1:n_epochs) {
+        for (i in 1L:n_epochs) {
           final_data_measure[i, "train_min"] <- min(measure_array[, "train", i])
           final_data_measure[i, "train_mean"] <- mean(measure_array[, "train", i])
           final_data_measure[i, "train_max"] <- max(measure_array[, "train", i])
@@ -595,7 +595,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           final_data_measure[i, "validation_mean"] <- mean(measure_array[, "validation", i])
           final_data_measure[i, "validation_max"] <- max(measure_array[, "validation", i])
 
-          if (n_sample_type == 3) {
+          if (n_sample_type == 3L) {
             final_data_measure[i, "test_min"] <- min(measure_array[, "test", i])
             final_data_measure[i, "test_mean"] <- mean(measure_array[, "test", i])
             final_data_measure[i, "test_max"] <- max(measure_array[, "test", i])
@@ -610,11 +610,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     save_pytorch_model = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path,  folder_name)
 
       save_format <- "safetensors"
 
-      if (save_format == "safetensors" & reticulate::py_module_available("safetensors") == FALSE) {
+      if (save_format == "safetensors" & !reticulate::py_module_available("safetensors")) {
         warning("Python library 'safetensors' is not available. Using
                  standard save format for pytorch.")
         save_format <- "pt"
@@ -648,7 +648,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           device = "cpu"
         )
       } else {
-        if (file.exists(paths = path_pt) == TRUE) {
+        if (file.exists(paths = path_pt)) {
           private$model$load_state_dict(torch$load(path_pt))
         } else {
           stop("There is no compatible model file in the choosen directory.

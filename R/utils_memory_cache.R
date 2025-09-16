@@ -14,10 +14,10 @@
 create_and_get_tmp_dir <- function() {
   if (Sys.getenv("CI") == "true") {
     requireNamespace("testthat")
-    temp_dir <- paste0(testthat::test_path(), "/r_aifeducation")
+    temp_dir <- file.path(testthat::test_path(), "r_aifeducation")
     create_dir(dir_path = temp_dir, trace = FALSE)
   } else {
-    temp_dir <- paste0(tempdir(), "/r_aifeducation")
+    temp_dir <- file.path(tempdir(), "r_aifeducation")
   }
   create_dir(dir_path = temp_dir, trace = FALSE)
   return(temp_dir)
@@ -37,6 +37,6 @@ clean_tmp_dir <- function() {
   if (dir.exists(temp_dir)) {
     unlink(x = temp_dir)
   } else {
-    message(paste(tempdir, "does not exist."))
+    message(tempdir, " does not exist.")
   }
 }

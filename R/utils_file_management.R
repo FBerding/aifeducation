@@ -28,7 +28,7 @@ create_dir <- function(dir_path, trace, msg = "Creating Directory", msg_fun = TR
 #' @export
 #'
 get_file_extension <- function(file_path) {
-  extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1]]
+  extension <- stringi::stri_split_fixed(file_path, pattern = ".")[[1L]]
   extension <- stringi::stri_trans_tolower(extension[[length(extension)]])
   return(extension)
 }

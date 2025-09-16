@@ -32,17 +32,17 @@ generate_args_for_tests <- function(object_name,
                                     var_objects = list(),
                                     necessary_objects = list(),
                                     var_override = list(
-                                      sustain_interval = 30,
+                                      sustain_interval = 30L,
                                       trace = FALSE,
-                                      epochs = 50,
-                                      batch_size = 20,
-                                      ml_trace = 0,
-                                      n_cores = 2,
-                                      data_folds = 2,
-                                      pl_max_steps = 2,
-                                      pl_max = 1,
-                                      pl_anchor = 1,
-                                      pl_min = 0,
+                                      epochs = 50L,
+                                      batch_size = 20L,
+                                      ml_trace = 0L,
+                                      n_cores = 2L,
+                                      data_folds = 2L,
+                                      pl_max_steps = 2L,
+                                      pl_max = 1L,
+                                      pl_anchor = 1L,
+                                      pl_min = 0L,
                                       sustain_track = TRUE,
                                       sustain_iso_code = "DEU",
                                       data_val_size = 0.25,
@@ -67,20 +67,20 @@ generate_args_for_tests <- function(object_name,
         arg_value_list[param] <- list(c(FALSE, TRUE))
       } else {
         if (current_entry$min == -Inf) {
-          tmp_min <- -1
+          tmp_min <- -1L
         } else {
           tmp_min <- current_entry$min
         }
 
         if (current_entry$max == Inf) {
-          tmp_max <- 3
+          tmp_max <- 3L
         } else {
           tmp_max <- current_entry$max
         }
       }
 
       if (current_entry$type == "int") {
-        arg_value_list[param] <- list(seq(from = tmp_min, to = tmp_max, by = 1))
+        arg_value_list[param] <- list(seq(from = tmp_min, to = tmp_max, by = 1L))
       } else if (current_entry$type == "double") {
         arg_value_list[param] <- list(c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
       } else if (current_entry$type == "(double") {
@@ -102,7 +102,7 @@ generate_args_for_tests <- function(object_name,
   arg_comb <- list()
   for (i in seq_along(arg_value_list)) {
     arg_comb[names(arg_value_list)[i]] <- list(sample(
-      x = arg_value_list[[i]], size = 1
+      x = arg_value_list[[i]], size = 1L
     ))
   }
 
@@ -119,7 +119,7 @@ generate_args_for_tests <- function(object_name,
   # print(arg_comb_list)
   # print("---------")
   for (var_object in names(var_objects)) {
-    if (arg_comb_list[[var_object]] == TRUE) {
+    if (arg_comb_list[[var_object]]) {
       arg_comb_list[var_object] <- list(var_objects[[var_object]])
     } else {
       arg_comb_list[var_object] <- list(NULL)
@@ -137,7 +137,7 @@ generate_args_for_tests <- function(object_name,
 #' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
     n_samples_requested,
-    n_CI = 50) {
+    n_CI = 50L) {
   # If on github use only a small random sample
   if (Sys.getenv("CI") != "true") {
     return(min(n_samples_requested, n_CI))
@@ -153,7 +153,7 @@ check_adjust_n_samples_on_CI <- function(
 #' @return Returns a `list` with test data.
 #' @family Utils TestThat Developers
 #' @export
-get_test_data_for_classifiers <- function(class_range = c(2, 3),
+get_test_data_for_classifiers <- function(class_range = c(2L, 3L),
                                           path_test_embeddings) {
   # Load Embeddings
   imdb_embeddings <- load_from_disk(path_test_embeddings)
@@ -162,11 +162,11 @@ get_test_data_for_classifiers <- function(class_range = c(2, 3),
   test_embeddings <- test_embeddings_large$convert_to_EmbeddedText()
 
   test_embeddings_reduced <- test_embeddings$clone(deep = TRUE)
-  test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[c(1:5, 120:125), , ]
+  test_embeddings_reduced$embeddings <- test_embeddings_reduced$embeddings[c(1L:5L, 120L:125L), , ]
   test_embeddings_reduced_LD <- test_embeddings_reduced$convert_to_LargeDataSetForTextEmbeddings()
 
   test_embeddings_single_case <- test_embeddings$clone(deep = TRUE)
-  test_embeddings_single_case$embeddings <- test_embeddings_single_case$embeddings[1, , , drop = FALSE]
+  test_embeddings_single_case$embeddings <- test_embeddings_single_case$embeddings[1L, , , drop = FALSE]
   test_embeddings_single_case_LD <- test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
 
 
@@ -188,9 +188,9 @@ get_test_data_for_classifiers <- function(class_range = c(2, 3),
     ), ]
 
     example_data$label <- as.character(example_data$label)
-    example_data$label[c(201:300)] <- NA
-    if (n_classes > 2) {
-      example_data$label[c(201:250)] <- "medium"
+    example_data$label[c(201L:300L)] <- NA
+    if (n_classes > 2L) {
+      example_data$label[c(201L:250L)] <- "medium"
       tmp_target_levels <- c("neg", "medium", "pos")
     } else {
       tmp_target_levels <- c("neg", "pos")
@@ -253,14 +253,14 @@ generate_tensors <- function(times,
     dim = c(length(seq_len), times, features)
   )
   for (i in seq_along(seq_len)) {
-    for (j in seq(from = 1, to = seq_len[i])) {
-      for (f in 1:features) {
-        tensor_data[i, j, f] <- runif(n = 1, min = -1, max = 1)
+    for (j in seq(from = 1L, to = seq_len[i])) {
+      for (f in 1L:features) {
+        tensor_data[i, j, f] <- runif(n = 1L, min = -1L, max = 1L)
       }
     }
   }
   tensor_np <- reticulate::np_array(tensor_data)
-  if (numpy_writeable(tensor_np) == FALSE) {
+  if (!numpy_writeable(tensor_np)) {
     warning("Numpy array is not writable")
   }
   tensor <- torch$from_numpy(tensor_np)
@@ -290,9 +290,9 @@ generate_embeddings <- function(times,
     dim = c(length(seq_len), times, features)
   )
   for (i in seq_along(seq_len)) {
-    for (j in seq(from = 1, to = seq_len[i])) {
-      for (f in 1:features) {
-        tensor_data[i, j, f] <- runif(n = 1, min = -1, max = 1)
+    for (j in seq(from = 1L, to = seq_len[i])) {
+      for (f in 1L:features) {
+        tensor_data[i, j, f] <- runif(n = 1L, min = -1L, max = 1L)
       }
     }
   }
@@ -307,22 +307,22 @@ generate_embeddings <- function(times,
 #' @family Utils TestThat Developers
 #' @export
 get_fixed_test_tensor <- function(pad_value) {
-  times <- 3
-  features <- 7
-  batch <- 5
-  seq_len <- c(1, 2, 1, 3, 2)
+  times <- 3L
+  features <- 7L
+  batch <- 5L
+  seq_len <- c(1L, 2L, 1L, 3L, 2L)
   tensor_data <- array(
     data = pad_value,
     dim = c(batch, times, features)
   )
 
   for (i in seq_along(seq_len)) {
-    for (j in seq(from = 1, to = seq_len[i])) {
+    for (j in seq(from = 1L, to = seq_len[i])) {
       tensor_data[i, j, ] <- seq(from = -seq_len[i], to = j * batch, length.out = features)
     }
   }
   tensor_np <- reticulate::np_array(tensor_data)
-  if (numpy_writeable(tensor_np) == FALSE) {
+  if (!numpy_writeable(tensor_np)) {
     warning("Numpy array is not writable")
   }
   tensor <- torch$from_numpy(tensor_np)
@@ -357,9 +357,9 @@ is_on_CI <- function() {
 #' @family Utils TestThat Developers
 #' @export
 random_bool_on_CI <- function() {
-  if (is_on_CI() == TRUE) {
-    rnd <- sample(x = c(0, 1), replace = FALSE, size = 1)
-    if (rnd == 0) {
+  if (is_on_CI()) {
+    rnd <- sample(x = c(0L, 1L), replace = FALSE, size = 1L)
+    if (rnd == 0L) {
       return(FALSE)
     } else {
       return(TRUE)

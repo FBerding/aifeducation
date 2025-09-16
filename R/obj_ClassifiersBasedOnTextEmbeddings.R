@@ -99,13 +99,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         self$check_embedding_model(text_embeddings = newdata, require_compressed = FALSE)
       } else {
         private$check_embeddings_object_type(newdata, strict = FALSE)
-        if (requires_compression == TRUE) {
+        if (requires_compression) {
           stop("Objects of class datasets.arrow_dataset.Dataset must be provided in
                compressed form.")
         }
       }
       # Apply feature extractor if it is part of the model
-      if (requires_compression == TRUE) {
+      if (requires_compression) {
         if (inherits(newdata, "EmbeddedText")) {
           newdata <- newdata$convert_to_LargeDataSetForTextEmbeddings()
         } else {
@@ -129,7 +129,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       current_row_names <- private$get_rownames_from_embeddings(newdata)
 
       # If at least two cases are part of the data set---------------------------
-      if (single_prediction == FALSE) {
+      if (!single_prediction) {
         # Returns a data set object
         prediction_data <- private$prepare_embeddings_as_dataset(newdata)
 
@@ -173,7 +173,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Transforming predictions to target levels------------------------------
       predictions <- as.character(as.vector(predictions))
-      for (i in 0L:(length(private$model_config$target_levels) - L1)) {
+      for (i in 0L:(length(private$model_config$target_levels) - 1L)) {
         predictions <- replace(
           x = predictions,
           predictions == as.character(i),
@@ -219,11 +219,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Check if a compressed version is necessary and if true if the feature extractor is
       # compatible
       feature_extractor_info <- text_embeddings$get_feature_extractor_info()
-      if (require_compressed == TRUE) {
-        if (!is.null(feature_extractor_info$model_name) & private$model_config$use_fe == FALSE) {
+      if (require_compressed) {
+        if (!is.null(feature_extractor_info$model_name) & !private$model_config$use_fe) {
           stop("Compressed embeddings provided but the classifier does not support
              compressed embeddings.")
-        } else if (!is.null(feature_extractor_info$model_name) & private$model_config$use_fe == TRUE) {
+        } else if (!is.null(feature_extractor_info$model_name) & private$model_config$use_fe) {
           if (private$text_embedding_model$feature_extractor$model_name != feature_extractor_info$model_name) {
             stop("The feature extractor of the compressed embeddings is not the same as
                the feature extractor during the creation of the classifier.")
@@ -246,11 +246,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #'
     check_feature_extractor_object_type = function(feature_extractor) {
       if (!is.null(feature_extractor)) {
-        if (inherits(feature_extractor, "TEFeatureExtractor") == FALSE) {
+        if (!inherits(feature_extractor, "TEFeatureExtractor")) {
           stop("Object passed to feature_extractor must be an object of class
                TEFeatureExtractor or NULL.")
         } else {
-          if (feature_extractor$is_trained() == FALSE) {
+          if (!feature_extractor$is_trained()) {
             stop("The supplied feature extractor is not trained. Please
                 provide trained feature extractor and try again.")
           }
@@ -278,7 +278,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         inherits(text_embeddings, "EmbeddedText") |
           inherits(text_embeddings, "LargeDataSetForTextEmbeddings")
       ) {
-        if (private$model_config$use_fe == TRUE & text_embeddings$is_compressed() == FALSE) {
+        if (private$model_config$use_fe & !text_embeddings$is_compressed()) {
           return(TRUE)
         } else {
           return(FALSE)
@@ -312,10 +312,10 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
 
       # Save the feature extractor if necessary
-      if (private$model_config$use_fe == TRUE) {
+      if (private$model_config$use_fe) {
         save_to_disk(
           object = self$feature_extractor,
-          dir_path = paste0(dir_path, "/", folder_name),
+          dir_path = file.path(dir_path,  folder_name),
           folder_name = "feature_extractor"
         )
       }
@@ -369,7 +369,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' * `"balanced_accuracy"` = Balanced Accuracy
     #' @return Returns a plot of class `ggplot` visualizing the training process.
     plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10L) {
-      plot <- super$plot_training_history(
+      tmp_plot <- super$plot_training_history(
         final_training = final_training,
         pl_step = pl_step,
         measure = measure,
@@ -378,7 +378,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         add_min_max = add_min_max,
         text_size = text_size
       )
-      return(plot)
+      return(tmp_plot)
     },
     #' @description Method for requesting a plot the coding stream.
     #' The plot shows how the cases of different categories/classes are
@@ -389,13 +389,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' @param text_size `double` determining the size of the text within the legend.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
     plot_coding_stream = function(label_categories_size = 3L, key_size = 0.5, text_size = 10L) {
-      plot <- iotarelr::plot_iota2_alluvial(
+      tmp_plot <- iotarelr::plot_iota2_alluvial(
         object = self$reliability$iota_object_end_free,
         label_categories_size = label_categories_size,
         key_size = key_size,
         text_size = text_size
       )
-      return(plot)
+      return(tmp_plot)
     }
   ),
   private = list(
@@ -454,7 +454,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       test_data$set_format("np")
       true_values <- factor(
         x = test_data["labels"],
-        levels = 0L:(length(private$model_config$target_levels) - L1),
+        levels = 0L:(length(private$model_config$target_levels) - 1L),
         labels = private$model_config$target_levels
       )
       names(true_values) <- test_data["id"]
@@ -475,7 +475,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
       test_data <- data_manager$get_test_dataset()
 
-      if (!is.null(test_data) == TRUE) {
+      if (!is.null(test_data)) {
         # Predict labels
         test_predictions <- self$predict(
           newdata = test_data,
@@ -490,7 +490,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         test_data$set_format("np")
         true_values <- factor(
           x = test_data["labels"],
-          levels = 0L:(length(private$model_config$target_levels) - L1),
+          levels = 0L:(length(private$model_config$target_levels) - 1L),
           labels = private$model_config$target_levels
         )
         names(true_values) <- test_data["id"]
@@ -505,7 +505,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         self$reliability$iota_objects_end[iteration] <- list(iotarelr::check_new_rater(
           true_values = factor(
             x = test_data["labels"],
-            levels = 0L:(length(private$model_config$target_levels) - L1),
+            levels = 0L:(length(private$model_config$target_levels) - 1L),
             labels = private$model_config$target_levels
           ),
           assigned_values = test_pred_cat,
@@ -514,7 +514,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         self$reliability$iota_objects_end_free[iteration] <- list(iotarelr::check_new_rater(
           true_values = factor(
             x = test_data["labels"],
-            levels = 0L:(length(private$model_config$target_levels) - L1),
+            levels = 0L:(length(private$model_config$target_levels) - 1L),
             labels = private$model_config$target_levels
           ),
           assigned_values = test_pred_cat,
@@ -539,7 +539,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       for (i in 1L:self$last_training$config$n_folds) {
         for (j in seq_len(ncol(self$reliability$test_metric))) {
-          if (is.na(self$reliability$test_metric[i, j]) == FALSE) {
+          if (!is.na(self$reliability$test_metric[i, j])) {
             test_metric_mean[j] <- test_metric_mean[j] + self$reliability$test_metric[i, j]
           } else {
             n_mean[j] <- n_mean[j] - 1L
@@ -559,7 +559,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
 
       # Finalize iota objects
-      if (is.null(self$reliability$iota_objects_end) == FALSE) {
+      if (!is.null(self$reliability$iota_objects_end)) {
         self$reliability$iota_object_end <- create_iota2_mean_object(
           iota2_list = self$reliability$iota_objects_end,
           original_cat_labels = private$model_config$target_levels,
@@ -570,7 +570,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         self$reliability$iota_objects_end <- NULL
       }
 
-      if (is.null(self$reliability$iota_objects_end_free) == FALSE) {
+      if (!is.null(self$reliability$iota_objects_end_free)) {
         self$reliability$iota_object_end_free <- create_iota2_mean_object(
           iota2_list = self$reliability$iota_objects_end_free,
           original_cat_labels = private$model_config$target_levels,
@@ -600,17 +600,16 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
                               data_manager = NULL,
                               inc_synthetic = FALSE) {
       # Print status message to console
-      if (self$last_training$config$trace == TRUE) {
+      if (self$last_training$config$trace) {
         if (iteration <= self$last_training$config$n_folds) {
-          message(paste(
-            get_time_stamp(),
+          message(get_time_stamp(),
             "|", "Iteration", iteration, "from", self$last_training$config$n_folds
-          ))
+          )
         } else {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Final training"
-          ))
+          )
         }
       }
 
@@ -621,7 +620,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
 
       # Generate syntetic cases if requested
-      if (inc_synthetic == TRUE) {
+      if (inc_synthetic) {
         data_manager$create_synthetic(
           trace = self$last_training$config$trace,
           inc_pseudo_data = FALSE
@@ -643,19 +642,19 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # Print status to console
-      if (self$last_training$config$trace == TRUE) {
+      if (self$last_training$config$trace) {
         if (iteration <= self$last_training$config$n_folds) {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
             "|", "Training"
-          ))
+          )
         } else {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Final training",
             "|", "Training"
-          ))
+          )
         }
       }
 
@@ -677,7 +676,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       self$last_training$history[iteration] <- list(train_history)
 
       # Calculate test metric
-      if (!is.null(test_data) == TRUE) {
+      if (!is.null(test_data)) {
         private$calculate_test_metric(
           test_data = test_data,
           iteration = iteration,
@@ -692,7 +691,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
                                         inc_synthetic = FALSE) {
       # If model is not trained than train for the first time
       # Necessary for estimating pseudo labels
-      if (init_train == TRUE) {
+      if (init_train) {
         private$train_standard(
           iteration = iteration,
           data_manager = data_manager,
@@ -719,19 +718,19 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       for (step in 1L:self$last_training$config$pl_max_steps) {
         # Print status message to console
-        if (self$last_training$config$trace == TRUE) {
+        if (self$last_training$config$trace) {
           if (iteration <= self$last_training$config$n_folds) {
-            message(paste(
+            message(
               get_time_stamp(),
               "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
               "|", "Pseudo labeling", "step", step, "from", self$last_training$config$pl_max_steps
-            ))
+            )
           } else {
-            message(paste(
+            message(
               get_time_stamp(),
               "|", "Final training",
               "|", "Pseudo labeling", "step", step, "from", self$last_training$config$pl_max_steps
-            ))
+            )
           }
         }
 
@@ -758,7 +757,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         rm(pseudo_data)
 
         # Generate synthetic data if requested
-        if (inc_synthetic == TRUE) {
+        if (inc_synthetic) {
           data_manager$create_synthetic(
             trace = self$last_training$config$trace,
             inc_pseudo_data = TRUE
@@ -774,19 +773,19 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         )
 
         # Print status to console
-        if (self$last_training$config$trace == TRUE) {
+        if (self$last_training$config$trace) {
           if (iteration <= self$last_training$config$n_folds) {
-            message(paste(
+            message(
               get_time_stamp(),
               "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
               "|", "Training"
-            ))
+            )
           } else {
-            message(paste(
+            message(
               get_time_stamp(),
               "|", "Final training",
               "|", "Training"
-            ))
+            )
           }
         }
 
@@ -812,7 +811,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       self$last_training$history[iteration] <- list(step_histories)
 
       # Calculate test metric
-      if (!is.null(test_data) == TRUE) {
+      if (!is.null(test_data)) {
         private$calculate_test_metric(
           test_data = test_data,
           iteration = iteration,
@@ -848,8 +847,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Gather information for every case. That is the category with the
       # highest probability and save both
       for (i in seq_len(nrow(predicted_labels))) {
-        tmp_est_prob <- predicted_labels[i, 1L:(ncol(predicted_labels) - L1)]
-        new_categories[i, 1L] <- which.max(tmp_est_prob) - L1
+        tmp_est_prob <- predicted_labels[i, 1L:(ncol(predicted_labels) - 1L)]
+        new_categories[i, 1L] <- which.max(tmp_est_prob) - 1L
         new_categories[i, 2L] <- max(tmp_est_prob)
       }
       new_categories <- as.data.frame(new_categories)
@@ -940,10 +939,10 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Correct probabilities
       number_columns <- ncol(predictions)
-      col <- ncol(predictions) - 1L
+      n_col <- ncol(predictions) - 1L
       for (i in seq_len(nrow(predictions))) {
-        predictions[i, 1L:col] <- predictions[i, 1L:col] * p_cat_true / sum(predictions[i, 1L:col] * p_cat_true)
-        predictions[i, number_columns] <- private$model_config$target_levels[which.max(as.numeric(predictions[i, 1L:col]))]
+        predictions[i, 1L:n_col] <- predictions[i, 1L:n_col] * p_cat_true / sum(predictions[i, 1L:n_col] * p_cat_true)
+        predictions[i, number_columns] <- private$model_config$target_levels[which.max(as.numeric(predictions[i, 1L:n_col]))]
       }
       return(predictions)
     },
@@ -965,7 +964,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
 
       # Generating class weights
-      if (self$last_training$config$loss_balance_class_weights == TRUE) {
+      if (self$last_training$config$loss_balance_class_weights) {
         abs_freq_classes <- table(train_data["labels"])
         class_weights <- as.vector(sum(abs_freq_classes) / (length(abs_freq_classes) * abs_freq_classes))
       } else {
@@ -973,7 +972,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # Generating weights for sequence length
-      if (self$last_training$config$loss_balance_sequence_length == TRUE) {
+      if (self$last_training$config$loss_balance_sequence_length) {
         sequence_length <- train_data["length"]
         abs_freq_length <- table(sequence_length)
 
@@ -993,7 +992,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # Reset model if requested
-      if (reset_model == TRUE) {
+      if (reset_model) {
         private$create_reset_model()
       }
 
@@ -1008,7 +1007,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
 
       # Set target column
-      if (private$model_config$require_one_hot == FALSE) {
+      if (!private$model_config$require_one_hot) {
         target_column <- "labels"
       } else {
         target_column <- "one_hot_encoding"
@@ -1022,21 +1021,22 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       dataset_train <- train_data$add_column("sample_weights", data_set_weights["sample_weights"])
       dataset_train <- dataset_train$select_columns(c("input", target_column, "sample_weights"))
-      if (private$model_config$require_one_hot == TRUE) {
+
+      if (private$model_config$require_one_hot) {
         dataset_train <- dataset_train$rename_column(target_column, "labels")
       }
 
       pytorch_train_data <- dataset_train$with_format("torch")
 
       pytorch_val_data <- val_data$select_columns(c("input", target_column))
-      if (private$model_config$require_one_hot == TRUE) {
+      if (private$model_config$require_one_hot) {
         pytorch_val_data <- pytorch_val_data$rename_column(target_column, "labels")
       }
       pytorch_val_data <- pytorch_val_data$with_format("torch")
 
       if (!is.null(test_data)) {
         pytorch_test_data <- test_data$select_columns(c("input", target_column))
-        if (private$model_config$require_one_hot == TRUE) {
+        if (private$model_config$require_one_hot) {
           pytorch_test_data <- pytorch_test_data$rename_column(target_column, "labels")
         }
         pytorch_test_data <- pytorch_test_data$with_format("torch")
@@ -1044,7 +1044,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      history <- py$TeClassifierTrain(
+      tmp_history <- py$TeClassifierTrain(
         model = private$model,
         loss_cls_fct_name = self$last_training$config$loss_cls_fct_name,
         optimizer_method = self$last_training$config$optimizer,
@@ -1057,7 +1057,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         train_data = pytorch_train_data,
         val_data = pytorch_val_data,
         test_data = pytorch_test_data,
-        filepath = paste0(private$dir_checkpoint, "/best_weights.pt"),
+        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
         n_classes = as.integer(length(private$model_config$target_levels)),
         class_weights = torch$tensor(np$array(class_weights)),
         log_dir = log_dir,
@@ -1069,15 +1069,15 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
 
       # provide rownames and replace -100
-      history <- private$prepare_history_data(history)
-      return(history)
+      tmp_history <- private$prepare_history_data(tmp_history)
+      return(tmp_history)
     },
     #--------------------------------------------------------------------------
     set_feature_extractor = function(feature_extractor) {
       # Check
       check_class(object = feature_extractor, object_name = "feature_extractor", classes = "TEFeatureExtractor", allow_NULL = TRUE)
       if (!is.null(feature_extractor)) {
-        if (feature_extractor$is_trained() == FALSE) {
+        if (!feature_extractor$is_trained()) {
           stop("The supplied feature extractor is not trained. Please
                 provide train and try again.")
         }
@@ -1094,12 +1094,12 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     check_target_levels = function(data_targets) {
       if (sum(levels(data_targets) %in% private$model_config$target_levels) != private$model_config$n_categories) {
         warning(
-          paste(
+
             "data_targets contains levels that are not defined for the classifier",
             "Defined levels are", private$model_config$target_levels, ".",
             "Please check your data or create a new classifier and pass
                 all levels to the classifier's configuration."
-          )
+
         )
       }
     },
@@ -1172,7 +1172,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     check_param_combinations_training = function() {
-      if (self$last_training$config$use_pl == TRUE) {
+      if (self$last_training$config$use_pl) {
         if (self$last_training$config$pl_max < self$last_training$config$pl_min) {
           stop("pl_max must be at least pl_min.")
         }
@@ -1184,7 +1184,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
-      if (self$last_training$config$use_sc == TRUE) {
+      if (self$last_training$config$use_sc) {
         if (self$last_training$config$sc_max_k < self$last_training$config$sc_min_k) {
           stop("sc_max_k must be at least sc_min_k")
         }
@@ -1197,15 +1197,15 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Set up data
       if (inherits(data_embeddings, "EmbeddedText")) {
-        data <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+        tmp_data <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
       } else {
-        data <- data_embeddings
+        tmp_data <- data_embeddings
       }
 
       # Create DataManager------------------------------------------------------
-      if (private$model_config$use_fe == TRUE) {
+      if (private$model_config$use_fe) {
         compressed_embeddings <- self$feature_extractor$extract_features_large(
-          data_embeddings = data,
+          data_embeddings = tmp_data,
           as.integer(self$last_training$config$batch_size),
           trace = self$last_training$config$trace
         )
@@ -1226,7 +1226,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         )
       } else {
         data_manager <- DataManagerClassifier$new(
-          data_embeddings = data,
+          data_embeddings = tmp_data,
           data_targets = data_targets,
           folds = self$last_training$config$data_folds,
           val_size = self$last_training$config$data_val_size,
@@ -1252,7 +1252,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     check_data_for_pseudo_labeling = function(data_manager) {
-      if (self$last_training$config$use_pl == TRUE) {
+      if (self$last_training$config$use_pl) {
         if (!data_manager$contains_unlabeled_data()) {
           warning("There are no cases without labels. Setting 'use_pl' to 'FALSE'.")
           self$last_training$config$use_pl <- FALSE
@@ -1318,11 +1318,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       private$create_checkpoint_directory()
 
       # Start-------------------------------------------------------------------
-      if (self$last_training$config$trace == TRUE) {
-        message(paste(
+      if (self$last_training$config$trace) {
+        message(
           get_time_stamp(),
           "Start"
-        ))
+        )
       }
 
       # Init Training------------------------------------------------------------
@@ -1343,13 +1343,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       for (iter in 1L:(self$last_training$config$n_folds + 1L)) {
         base::gc(verbose = FALSE, full = TRUE)
 
-        if (self$last_training$config$use_pl == FALSE) {
+        if (!self$last_training$config$use_pl) {
           private$train_standard(
             iteration = iter,
             data_manager = data_manager,
             inc_synthetic = self$last_training$config$use_sc
           )
-        } else if (self$last_training$config$use_pl == TRUE) {
+        } else if (self$last_training$config$use_pl) {
           private$train_with_pseudo_labels(
             init_train = TRUE,
             iteration = iter,
@@ -1378,11 +1378,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Set trained field
       private$trained <- TRUE
 
-      if (self$last_training$config$trace == TRUE) {
-        message(paste(
+      if (self$last_training$config$trace) {
+        message(
           get_time_stamp(),
           "Training Complete"
-        ))
+        )
       }
     },
     #-------------------------------------------------------------------------
@@ -1405,9 +1405,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     load_FeatureExtractor = function(dir_path = dir_path) {
-      if (private$model_config$use_fe == TRUE) {
+      if (private$model_config$use_fe) {
         feature_extractor <- TEFeatureExtractor$new()
-        feature_extractor$load_from_disk(paste0(dir_path, "/feature_extractor"))
+        feature_extractor$load_from_disk(file.path(dir_path, "feature_extractor"))
         self$feature_extractor <- feature_extractor
       }
     },

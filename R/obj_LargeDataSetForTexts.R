@@ -67,18 +67,18 @@ LargeDataSetForText <- R6::R6Class(
     #'  * Multiple line breaks are reduced to a single line break.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_txt = function(dir_path,
-                                  batch_size = 500,
+                                  batch_size = 500L,
                                   log_file = NULL,
-                                  log_write_interval = 2,
-                                  log_top_value = 0,
-                                  log_top_total = 1,
+                                  log_write_interval = 2L,
+                                  log_top_value = 0L,
+                                  log_top_total = 1L,
                                   log_top_message = NA,
                                   clean_text = TRUE,
                                   trace = TRUE) {
       # Gather all text files
       file_paths <- private$get_file_paths(dir_path, ".txt")
 
-      if (length(file_paths) > 0) {
+      if (length(file_paths) > 0L) {
         # calculate number of batches
         n_batches <- ceiling(length(file_paths) / batch_size)
 
@@ -91,18 +91,18 @@ LargeDataSetForText <- R6::R6Class(
         # Process every batch
         list_datasets <- list()
         last_log <- NULL
-        for (i in 1:n_batches) {
+        for (i in 1L:n_batches) {
           chunk <- private$get_batch(batches[[i]],
             file_paths = file_paths,
             clean_text = clean_text
           )
           chunk_dataset <- data.frame_to_py_dataset(chunk)
           list_datasets[i] <- list(chunk_dataset)
-          if (trace == TRUE) {
-            message(paste(
+          if (trace) {
+            message(
               get_time_stamp(),
-              "Batch", i, "from", n_batches, "processed"
-            ))
+              " Batch ", i, " from ", n_batches, " processed"
+            )
           }
           last_log <- write_log(
             log_file = log_file,
@@ -110,10 +110,10 @@ LargeDataSetForText <- R6::R6Class(
             write_interval = log_write_interval,
             value_top = log_top_value,
             value_middle = i,
-            value_bottom = 0,
+            value_bottom = 0L,
             total_top = log_top_total,
             total_middle = n_batches,
-            total_bottom = 1,
+            total_bottom = 1L,
             message_top = log_top_message,
             message_middle = ".txt files",
             message_bottom = NA
@@ -164,17 +164,17 @@ LargeDataSetForText <- R6::R6Class(
     #'   the log files. Only relevant if `log_file` is not `NULL`.
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_files_pdf = function(dir_path,
-                                  batch_size = 500,
+                                  batch_size = 500L,
                                   log_file = NULL,
-                                  log_write_interval = 2,
-                                  log_top_value = 0,
-                                  log_top_total = 1,
+                                  log_write_interval = 2L,
+                                  log_top_value = 0L,
+                                  log_top_total = 1L,
                                   log_top_message = NA,
                                   clean_text = TRUE,
                                   trace = TRUE) {
       # Gather all files
       file_paths <- private$get_file_paths(dir_path, ".pdf")
-      if (length(file_paths) > 0) {
+      if (length(file_paths) > 0L) {
         # calculate number of batches
         n_batches <- ceiling(length(file_paths) / batch_size)
 
@@ -188,18 +188,18 @@ LargeDataSetForText <- R6::R6Class(
         list_datasets <- list()
         last_log <- NULL
 
-        for (i in 1:n_batches) {
+        for (i in 1L:n_batches) {
           chunk <- private$get_batch(batches[[i]],
             file_paths = file_paths,
             clean_text = clean_text
           )
           chunk_dataset <- data.frame_to_py_dataset(chunk)
           list_datasets[i] <- list(chunk_dataset)
-          if (trace == TRUE) {
-            message(paste(
+          if (trace ) {
+            message(
               get_time_stamp(),
-              "Batch", i, "from", n_batches, "processed"
-            ))
+              " Batch ", i, " from ", n_batches, " processed"
+            )
           }
           last_log <- write_log(
             log_file = log_file,
@@ -207,10 +207,10 @@ LargeDataSetForText <- R6::R6Class(
             write_interval = log_write_interval,
             value_top = log_top_value,
             value_middle = i,
-            value_bottom = 0,
+            value_bottom = 0L,
             total_top = log_top_total,
             total_middle = n_batches,
-            total_bottom = 1,
+            total_bottom = 1L,
             message_top = log_top_message,
             message_middle = ".pdf files",
             message_bottom = NA
@@ -261,9 +261,9 @@ LargeDataSetForText <- R6::R6Class(
                                    text_license_column = "text_license",
                                    url_source_column = "url_source",
                                    log_file = NULL,
-                                   log_write_interval = 2,
-                                   log_top_value = 0,
-                                   log_top_total = 1,
+                                   log_write_interval = 2L,
+                                   log_top_value = 0L,
+                                   log_top_total = 1L,
                                    log_top_message = NA) {
       # Check
       check_type(object = id_column, type = "string", FALSE)
@@ -283,14 +283,14 @@ LargeDataSetForText <- R6::R6Class(
       # Process every batch
       list_datasets <- list()
       last_log <- NULL
-      for (i in 1:n_batches) {
+      for (i in 1L:n_batches) {
         chunk <- readtext::readtext(
           file = file_paths[i],
           docid_field = id_column,
           text_field = text_column,
           docvarsfrom = "metadata"
         )
-        if (nrow(chunk) < 2) {
+        if (nrow(chunk) < 2L) {
           chunk <- readtext::readtext(
             file = file_paths[i],
             docid_field = NULL,
@@ -305,7 +305,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # Bib_entry column
         index <- which(colnames(chunk) %in% bib_entry_column)
-        if (length(index) == 0) {
+        if (length(index) == 0L) {
           chunk$bib_entry <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "bib_entry"
@@ -313,7 +313,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # License column
         index <- which(colnames(chunk) %in% license_column)
-        if (length(index) == 0) {
+        if (length(index) == 0L) {
           chunk$license <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "license"
@@ -321,7 +321,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # URL License column
         index <- which(colnames(chunk) %in% url_license_column)
-        if (length(index) == 0) {
+        if (length(index) == 0L) {
           chunk$url_license <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "url_license"
@@ -329,7 +329,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # Text License column
         index <- which(colnames(chunk) %in% text_license_column)
-        if (length(index) == 0) {
+        if (length(index) == 0L) {
           chunk$text_license <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "text_license"
@@ -337,7 +337,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # URL source column
         index <- which(colnames(chunk) %in% url_source_column)
-        if (length(index) == 0) {
+        if (length(index) == 0L) {
           chunk$url_source <- rep(NA_character_, nrow(chunk))
         } else {
           colnames(chunk)[index] <- "url_source"
@@ -357,11 +357,11 @@ LargeDataSetForText <- R6::R6Class(
         chunk_dataset <- data.frame_to_py_dataset(chunk)
 
         list_datasets[i] <- list(chunk_dataset)
-        if (trace == TRUE) {
-          message(paste(
+        if (trace ) {
+          message(
             get_time_stamp(),
-            "Batch", i, "from", n_batches, "processed"
-          ))
+            " Batch ", i, " from ", n_batches, " processed"
+          )
         }
         last_log <- write_log(
           log_file = log_file,
@@ -369,10 +369,10 @@ LargeDataSetForText <- R6::R6Class(
           write_interval = log_write_interval,
           value_top = log_top_value,
           value_middle = i,
-          value_bottom = 0,
+          value_bottom = 0L,
           total_top = log_top_total,
           total_middle = n_batches,
-          total_bottom = 1,
+          total_bottom = 1L,
           message_top = log_top_message,
           message_middle = ".xlsx files",
           message_bottom = NA
@@ -395,32 +395,32 @@ LargeDataSetForText <- R6::R6Class(
     #' @return The method does not return anything. It adds new raw texts to the data set.
     add_from_data.frame = function(data_frame) {
       # Necessary columns
-      if (is.data.frame(data_frame) == FALSE) {
+      if (!is.data.frame(data_frame)) {
         stop("Input must be of type data.frame")
       }
-      if ("id" %in% colnames(data_frame) == FALSE) {
+      if (!"id" %in% colnames(data_frame)) {
         stop("data.frame must contain a column id.")
       }
-      if ("text" %in% colnames(data_frame) == FALSE) {
+      if (!"text" %in% colnames(data_frame) ) {
         stop("data.frame must contain a column text.")
       }
 
       data_to_add <- data_frame
 
       # optional columns
-      if ("bib_entry" %in% colnames(data_to_add) == FALSE) {
+      if (!"bib_entry" %in% colnames(data_to_add) ) {
         data_to_add["bib_entry"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if ("license" %in% colnames(data_to_add) == FALSE) {
+      if (!"license" %in% colnames(data_to_add)) {
         data_to_add["license"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if ("url_license" %in% colnames(data_to_add) == FALSE) {
+      if (!"url_license" %in% colnames(data_to_add) ) {
         data_to_add["url_license"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if ("text_license" %in% colnames(data_to_add) == FALSE) {
+      if (!"text_license" %in% colnames(data_to_add) ) {
         data_to_add["text_license"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if ("url_source" %in% colnames(data_to_add) == FALSE) {
+      if (!"url_source" %in% colnames(data_to_add) ) {
         data_to_add["url_source"] <- rep(x = NA, times = nrow(data_to_add))
       }
 
@@ -455,7 +455,7 @@ LargeDataSetForText <- R6::R6Class(
         recursive = TRUE,
         pattern = paste0("*", file_type)
       )
-      if (length(file_paths) > 0) {
+      if (length(file_paths) > 0L) {
         file_paths <- private$clean_path(file_paths)
       }
       return(file_paths)
@@ -465,23 +465,23 @@ LargeDataSetForText <- R6::R6Class(
       new_paths[] <- NA
       for (i in seq_len(length(paths))) {
         path <- paths[i]
-        bib_entry_path <- paste0(
-          dirname(path), "/bib_entry.txt"
+        bib_entry_path <- file.path(
+          dirname(path), "bib_entry.txt"
         )
-        licence_path <- paste0(
-          dirname(path), "/license.txt"
+        licence_path <- file.path(
+          dirname(path), "license.txt"
         )
-        license_text_path <- paste0(
-          dirname(path), "/text_license.txt"
+        license_text_path <- file.path(
+          dirname(path), "text_license.txt"
         )
-        url_licence_path <- paste0(
-          dirname(path), "/url_license.txt"
+        url_licence_path <- file.path(
+          dirname(path), "url_license.txt"
         )
-        url_source_path <- paste0(
-          dirname(path), "/url_source.txt"
+        url_source_path <- file.path(
+          dirname(path), "url_source.txt"
         )
         path_list <- c(bib_entry_path, licence_path, license_text_path, url_licence_path, url_source_path)
-        if (path %in% path_list == FALSE) {
+        if (!path %in% path_list) {
           new_paths[i] <- path
         }
       }
@@ -497,69 +497,69 @@ LargeDataSetForText <- R6::R6Class(
         "text_license",
         "url_source"
       )
-      data <- matrix(
+      tmp_data <- matrix(
         data = NA,
         nrow = length(batch),
         ncol = length(col_names)
       )
-      colnames(data) <- col_names
+      colnames(tmp_data) <- col_names
 
       for (i in seq_len(length(batch))) {
         index <- batch[i]
         document <- readtext::readtext(file = file_paths[index])
 
         # ID
-        data[i, 1] <- private$remove_file_extenstion(document$doc_id)
+        tmp_data[i, 1L] <- private$remove_file_extenstion(document$doc_id)
 
         # Text
-        if (clean_text == TRUE) {
-          text <- private$clean_text(document$text)
+        if (clean_text ) {
+          tmp_text <- private$clean_text(document$text)
         } else {
-          text <- document$text
+          tmp_text <- document$text
         }
-        data[i, 2] <- text
+        tmp_data[i, 2L] <- tmp_text
 
         # Bib_entry
-        file_path <- paste0(dirname(file_paths[index]), "/bib_entry.txt")
-        if (file.exists(file_path) == TRUE) {
-          data[i, 3] <- readLines(con = file_path, warn = FALSE)
+        file_path <- file.path(dirname(file_paths[index]), "bib_entry.txt")
+        if (file.exists(file_path) ) {
+          tmp_data[i, 3L] <- readLines(con = file_path, warn = FALSE)
         } else {
-          data[i, 3] <- NA
+          tmp_data[i, 3L] <- NA
         }
 
         # License
-        file_path <- paste0(dirname(file_paths[index]), "/license.txt")
-        if (file.exists(file_path) == TRUE) {
-          data[i, 4] <- readLines(con = file_path, warn = FALSE)
+        file_path <- file.path(dirname(file_paths[index]), "license.txt")
+        if (file.exists(file_path) ) {
+          tmp_data[i, 4L] <- readLines(con = file_path, warn = FALSE)
         } else {
-          data[i, 4] <- NA
+          tmp_data[i, 4L] <- NA
         }
 
         # URL License
-        file_path <- paste0(dirname(file_paths[index]), "/url_license.txt")
-        if (file.exists(file_path) == TRUE) {
-          data[i, 5] <- readLines(con = file_path, warn = FALSE)
+        file_path <- file.path(dirname(file_paths[index]), "url_license.txt")
+        if (file.exists(file_path) ) {
+          tmp_data[i, 5L] <- readLines(con = file_path, warn = FALSE)
         } else {
-          data[i, 5] <- NA
+          tmp_data[i, 5L] <- NA
         }
 
         # Text License
-        file_path <- paste0(dirname(file_paths[index]), "/text_license.txt")
-        if (file.exists(file_path) == TRUE) {
-          data[i, 6] <- readLines(con = file_path, warn = FALSE)
+        file_path <- file.path(dirname(file_paths[index]), "text_license.txt")
+        if (file.exists(file_path) ) {
+          tmp_data[i, 6L] <- readLines(con = file_path, warn = FALSE)
         } else {
-          data[i, 6] <- NA
+          tmp_data[i, 6L] <- NA
         }
 
         # URL Source
-        file_path <- paste0(dirname(file_paths[index]), "/url_source.txt")
-        if (file.exists(file_path) == TRUE) {
-          data[i, 7] <- readLines(con = file_path, warn = FALSE)
+        file_path <- file.path(dirname(file_paths[index]), "url_source.txt")
+        if (file.exists(file_path) ) {
+          tmp_data[i, 7L] <- readLines(con = file_path, warn = FALSE)
         } else {
-          data[i, 7] <- NA
+          tmp_data[i, 7L] <- NA
         }
       }
-      return(as.data.frame(data))
+      return(as.data.frame(tmp_data))
     },
     clean_text = function(text) {
       # Remove some special symbols-------------------------------------------------
@@ -605,8 +605,8 @@ LargeDataSetForText <- R6::R6Class(
     },
     remove_file_extenstion = function(file) {
       # tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
-      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1, simplify = TRUE)
-      return(paste0(tmp_string[1, 1:(ncol(tmp_string) - 1)], collapse = "."))
+      tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1L, simplify = TRUE)
+      return(paste0(tmp_string[1L, 1L:(ncol(tmp_string)-1L)], collapse = "."))
     }
   )
 )

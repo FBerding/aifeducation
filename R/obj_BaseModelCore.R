@@ -965,7 +965,7 @@ BaseModelCore <- R6::R6Class(
 
         results[1L, "n_parameter"] <- est_flops[[L3]]
         results[1L, "batch_size"] <- batch_size
-        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[L1]] * n_batches * n_epochs
+        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[1L]] * n_batches * n_epochs
       }
       results[1L, "approach"] <- "architecture-based"
 

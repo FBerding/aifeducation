@@ -41,7 +41,7 @@ TextEmbeddingModel <- R6::R6Class(
     # Method for generating a model id
     generate_model_id = function(name) {
       if (is.null(name)) {
-        return(paste0("tem_", generate_id(16)))
+        return(paste0("tem_", generate_id(16L)))
       } else {
         return(name)
       }
@@ -74,41 +74,41 @@ TextEmbeddingModel <- R6::R6Class(
         )
 
         if (emb_layer_min == "First") {
-          emb_layer_min <- 1
+          emb_layer_min <- 1L
         } else if (emb_layer_min == "Middle") {
           emb_layer_min <- floor(0.5 * max_layers_funnel)
         } else if (emb_layer_min == "2_3_layer") {
-          emb_layer_min <- floor(2 / 3 * max_layers_funnel)
+          emb_layer_min <- floor(2L / L3 * max_layers_funnel)
         } else if (emb_layer_min == "Last") {
           emb_layer_min <- max_layers_funnel
         }
 
         if (emb_layer_max == "First") {
-          emb_layer_max <- 1
+          emb_layer_max <- 1L
         } else if (emb_layer_max == "Middle") {
           emb_layer_max <- floor(0.5 * max_layers_funnel)
         } else if (emb_layer_max == "2_3_layer") {
-          emb_layer_max <- floor(2 / 3 * max_layers_funnel)
+          emb_layer_max <- floor(2L / 3L * max_layers_funnel)
         } else if (emb_layer_max == "Last") {
           emb_layer_max <- max_layers_funnel
         }
       } else {
         if (emb_layer_min == "First") {
-          emb_layer_min <- 1
+          emb_layer_min <- 1L
         } else if (emb_layer_min == "Middle") {
           emb_layer_min <- floor(0.5 * self$BaseModel$get_model()$config$num_hidden_layers)
         } else if (emb_layer_min == "2_3_layer") {
-          emb_layer_min <- floor(2 / 3 * self$BaseModel$get_model()$config$num_hidden_layers)
+          emb_layer_min <- floor(2L / 3L * self$BaseModel$get_model()$config$num_hidden_layers)
         } else if (emb_layer_min == "Last") {
           emb_layer_min <- self$BaseModel$get_model()$config$num_hidden_layers
         }
 
         if (emb_layer_max == "First") {
-          emb_layer_max <- 1
+          emb_layer_max <- 1L
         } else if (emb_layer_max == "Middle") {
           emb_layer_max <- floor(0.5 * self$BaseModel$get_model()$config$num_hidden_layers)
         } else if (emb_layer_max == "2_3_layer") {
-          emb_layer_max <- floor(2 / 3 * self$BaseModel$get_model()$config$num_hidden_layers)
+          emb_layer_max <- floor(2L / 3L * self$BaseModel$get_model()$config$num_hidden_layers)
         } else if (emb_layer_max == "Last") {
           emb_layer_max <- self$BaseModel$get_model()$config$num_hidden_layers
         }
@@ -118,7 +118,7 @@ TextEmbeddingModel <- R6::R6Class(
       if (emb_layer_min > emb_layer_max) {
         stop("emb_layer_min layer must be smaller or equal emb_layer_max.")
       }
-      if (emb_layer_min < 1) {
+      if (emb_layer_min < 1L) {
         stop("emb_laser_min must be at least 1.")
       }
       if (self$BaseModel$get_model_type() == "funnel") {
@@ -131,7 +131,7 @@ TextEmbeddingModel <- R6::R6Class(
         }
       }
 
-      if (is.integer(as.integer(emb_layer_min)) == FALSE | is.integer(as.integer(emb_layer_max)) == FALSE) {
+      if (!is.integer(as.integer(emb_layer_min))  | !is.integer(as.integer(emb_layer_max))) {
         stop("emb_layer_min and emb_layer_max must be integers or the following string:
                'first','last','middle','2_3_layer'")
       }
@@ -142,7 +142,7 @@ TextEmbeddingModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for checking and setting pooling type
     check_and_set_pooling_type = function(emb_pool_type) {
-      if (emb_pool_type %in% c("CLS", "Average") == FALSE) {
+      if (!emb_pool_type %in% c("CLS", "Average") ) {
         stop("emb_pool_type must be 'cls' or 'average'.")
       }
       if (self$BaseModel$get_model_type() == "funnel" & emb_pool_type != "CLS") {
@@ -154,10 +154,10 @@ TextEmbeddingModel <- R6::R6Class(
     # Method for checking and setting max_length
     check_and_set_max_length = function(max_length) {
       if (max_length > (self$BaseModel$get_model()$config$max_position_embeddings)) {
-        stop(paste(
-          "max_length is", max_length, ". This value is not allowed to exceed",
+        stop(
+          "max_length is ", max_length, ". This value is not allowed to exceed ",
           self$BaseModel$get_model()$config$max_position_embeddings
-        ))
+        )
       } else {
         private$model_config$max_length <- as.integer(max_length)
       }
@@ -191,13 +191,13 @@ TextEmbeddingModel <- R6::R6Class(
     configure = function(model_name = NULL,
                          model_label = NULL,
                          model_language = NULL,
-                         max_length = 0,
-                         chunks = 2,
-                         overlap = 0,
-                         emb_layer_min = 1,
-                         emb_layer_max = 2,
+                         max_length = 0L,
+                         chunks = 2L,
+                         overlap = 0L,
+                         emb_layer_min = 1L,
+                         emb_layer_max = 2L,
                          emb_pool_type = "Average",
-                         pad_value = -100,
+                         pad_value = -100L,
                          base_model = NULL) {
       # Load or reload python scripts
       private$load_reload_python_scripts()
@@ -209,7 +209,7 @@ TextEmbeddingModel <- R6::R6Class(
       self$BaseModel <- base_model$clone(deep = TRUE)
 
       # Save Embedding Config
-      private$save_all_args(args = get_called_args(n = 1), group = "configure")
+      private$save_all_args(args = get_called_args(n = 1L), group = "configure")
 
       # Set Model info
       private$set_model_info(
@@ -257,7 +257,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
       if (version_lower) {
         # Old version that does not use BaseModel and Tokenizer
-        path_to_files <- paste0(dir_path, "/", "model_data")
+        path_to_files <- file.path(dir_path,  "model_data")
         tmp_pytorch_model <- transformers$AutoModelForMaskedLM$from_pretrained(path_to_files)
         tmp_type <- detect_base_model_type(tmp_pytorch_model$config)
         tmp_BaseModel <- create_object(tmp_type)
@@ -268,7 +268,7 @@ TextEmbeddingModel <- R6::R6Class(
         self$BaseModel <- tmp_BaseModel
       } else {
         # Regular case
-        self$BaseModel <- load_from_disk(dir_path = paste0(dir_path, "/", "base_model"))
+        self$BaseModel <- load_from_disk(dir_path = file.path(dir_path, "base_model"))
       }
 
       # Load Sustainability Data Inference
@@ -285,7 +285,7 @@ TextEmbeddingModel <- R6::R6Class(
     #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path,  folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
 
       # Save BaseModel
@@ -347,7 +347,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' @return Method returns an object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]. This object
     #' contains the embeddings as a [data.frame] and information about the
     #' model creating the embeddings.
-    embed = function(raw_text = NULL, doc_id = NULL, batch_size = 8, trace = FALSE, return_large_dataset = FALSE) {
+    embed = function(raw_text = NULL, doc_id = NULL, batch_size = 8L, trace = FALSE, return_large_dataset = FALSE) {
       # check arguments
       check_type(object = raw_text, type = "vector", FALSE)
       check_type(object = doc_id, type = "vector", FALSE)
@@ -372,7 +372,7 @@ TextEmbeddingModel <- R6::R6Class(
         pooling$eval()
       }
 
-      for (b in 1:n_batches) {
+      for (b in 1L:n_batches) {
         # Set model to evaluation mode
         self$BaseModel$get_model()$eval()
         if (torch$cuda$is_available()) {
@@ -388,7 +388,7 @@ TextEmbeddingModel <- R6::R6Class(
         }
 
 
-        index_min <- 1 + (b - 1) * batch_size
+        index_min <- 1L + (b - 1L) * batch_size
         index_max <- min(b * batch_size, n_units)
         batch <- index_min:index_max
 
@@ -414,7 +414,7 @@ TextEmbeddingModel <- R6::R6Class(
 
         # Selecting the relevant layers
         selected_layer <- private$model_config$emb_layer_min:private$model_config$emb_layer_max
-        tmp_selected_layer <- 1 + selected_layer
+        tmp_selected_layer <- 1L + selected_layer
 
         # Clear memory
         if (torch$cuda$is_available()) {
@@ -467,17 +467,17 @@ TextEmbeddingModel <- R6::R6Class(
 
         # Sorting the hidden states to the corresponding cases and times
         # If more than one layer is selected the mean is calculated
-        index <- 0
+        index <- 0L
         for (i in seq_len(length(batch))) {
-          for (j in 1:tokens$chunks[i]) {
+          for (j in 1L:tokens$chunks[i]) {
             for (layer in tmp_selected_layer) {
               layer_int <- as.integer(layer)
               index_int <- as.integer(index)
 
               # Set values to zero to remove padding value
-              text_embedding[i, j, ] <- 0
+              text_embedding[i, j, ] <- 0L
 
-              if (torch$cuda$is_available() == FALSE) {
+              if (!torch$cuda$is_available() ) {
                 if (private$model_config$emb_pool_type == "CLS") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
@@ -502,18 +502,18 @@ TextEmbeddingModel <- R6::R6Class(
               }
             }
             text_embedding[i, j, ] <- text_embedding[i, j, ] / length(tmp_selected_layer)
-            index <- index + 1
+            index <- index + 1L
           }
         }
-        dimnames(text_embedding)[[3]] <- paste0(
+        dimnames(text_embedding)[[3L]] <- paste0(
           self$BaseModel$get_model_type(), "_",
-          seq(from = 1, to = n_layer_size, by = 1)
+          seq(from = 1L, to = n_layer_size, by = 1L)
         )
 
         # Add ID of every case
-        dimnames(text_embedding)[[1]] <- doc_id[batch]
+        dimnames(text_embedding)[[1L]] <- doc_id[batch]
         batch_results[b] <- list(text_embedding)
-        if (trace == TRUE) {
+        if (trace) {
           cat(paste(
             get_time_stamp(),
             "Batch", b, "/", n_batches, "Done", "\n"
@@ -533,7 +533,7 @@ TextEmbeddingModel <- R6::R6Class(
         model_method = self$BaseModel$get_model_type(),
         model_language = private$model_info$model_language,
         param_seq_length = private$model_config$max_length,
-        param_features = dim(text_embedding)[3],
+        param_features = dim(text_embedding)[3L],
         param_chunks = private$model_config$chunks,
         param_overlap = private$model_config$overlap,
         param_emb_layer_min = private$model_config$emb_layer_min,
@@ -544,7 +544,7 @@ TextEmbeddingModel <- R6::R6Class(
         embeddings = text_embedding
       )
 
-      if (return_large_dataset == FALSE) {
+      if (!return_large_dataset ) {
         return(embeddings)
       } else {
         embedded_texts_large <- LargeDataSetForTextEmbeddings$new()
@@ -579,10 +579,10 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @return Method returns an object of class [LargeDataSetForTextEmbeddings].
     embed_large = function(text_dataset,
-                           batch_size = 32,
+                           batch_size = 32L,
                            trace = FALSE,
                            log_file = NULL,
-                           log_write_interval = 2) {
+                           log_write_interval = 2L) {
       # Check arguments
       check_class(object = text_dataset, classes = c("LargeDataSetForText", allow_NULL = FALSE))
       check_type(object = batch_size, type = "int", FALSE)
@@ -601,15 +601,15 @@ TextEmbeddingModel <- R6::R6Class(
       last_log <- NULL
 
       # Process every batch
-      for (i in 1:total_number_of_bachtes) {
-        subset <- text_dataset$select(as.integer(batches_index[[i]]))
+      for (i in 1L:total_number_of_bachtes) {
+        tmp_subset <- text_dataset$select(as.integer(batches_index[[i]]))
         embeddings <- self$embed(
-          raw_text = c(subset["text"]),
-          doc_id = c(subset["id"]),
+          raw_text = c(tmp_subset["text"]),
+          doc_id = c(tmp_subset["id"]),
           batch_size = batch_size,
           trace = FALSE
         )
-        if (i == 1) {
+        if (i == 1L) {
           # Create Large Dataset
           embedded_texts_large <- LargeDataSetForTextEmbeddings$new()
           embedded_texts_large$configure(
@@ -619,7 +619,7 @@ TextEmbeddingModel <- R6::R6Class(
             model_method = self$BaseModel$get_model_type(),
             model_language = private$model_info$model_language,
             param_seq_length = private$model_config$max_length,
-            param_features = dim(embeddings$embeddings)[3],
+            param_features = dim(embeddings$embeddings)[3L],
             param_chunks = private$model_config$chunks,
             param_overlap = private$model_config$overlap,
             param_emb_layer_min = private$model_config$emb_layer_min,
@@ -634,7 +634,7 @@ TextEmbeddingModel <- R6::R6Class(
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
-        if (trace == TRUE) {
+        if (trace ) {
           cat(paste(
             get_time_stamp(),
             "Batch", i, "/", total_number_of_bachtes, "done", "\n"
@@ -647,11 +647,11 @@ TextEmbeddingModel <- R6::R6Class(
           last_log = last_log,
           write_interval = log_write_interval,
           value_top = i,
-          value_middle = 0,
-          value_bottom = 0,
+          value_middle = 0L,
+          value_bottom = 0L,
           total_top = total_number_of_bachtes,
-          total_middle = 1,
-          total_bottom = 1,
+          total_middle = 1L,
+          total_bottom = 1L,
           message_top = "Batches",
           message_middle = NA,
           message_bottom = NA
@@ -720,10 +720,10 @@ TextEmbeddingModel <- R6::R6Class(
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`
     estimate_sustainability_inference_embed = function(text_dataset = NULL,
-                                                       batch_size = 32,
+                                                       batch_size = 32L,
                                                        sustain_iso_code = NULL,
                                                        sustain_region = NULL,
-                                                       sustain_interval = 10,
+                                                       sustain_interval = 10L,
                                                        trace = TRUE) {
       # Prepare Data
       print_message(
@@ -741,13 +741,13 @@ TextEmbeddingModel <- R6::R6Class(
 
       emp_seq_length <- vector(length = n_cases)
       arrow_dataset <- text_dataset$get_dataset()
-      for (i in 1:n_cases) {
-        tmp_encode <- self$encode(arrow_dataset[i - 1]$text,
+      for (i in 1L:n_cases) {
+        tmp_encode <- self$encode(arrow_dataset[i - 1L]$text,
           token_encodings_only = FALSE,
           token_to_int = TRUE,
           trace = FALSE
         )
-        emp_seq_length[i] <- tmp_encode$chunks * private$model_config$max_length - (tmp_encode$chunks - 1) * private$model_config$overlap
+        emp_seq_length[i] <- tmp_encode$chunks * private$model_config$max_length - (tmp_encode$chunks - 1L) * private$model_config$overlap
       }
 
 
@@ -767,7 +767,7 @@ TextEmbeddingModel <- R6::R6Class(
         batch_size = batch_size,
         trace = FALSE,
         log_file = NULL,
-        log_write_interval = 2
+        log_write_interval = 2L
       )
 
       # Stop Tracking

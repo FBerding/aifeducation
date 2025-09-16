@@ -45,10 +45,10 @@
 #' @export
 #'
 write_log <- function(log_file,
-                      value_top = 0, total_top = 1, message_top = NA,
-                      value_middle = 0, total_middle = 1, message_middle = NA,
-                      value_bottom = 0, total_bottom = 1, message_bottom = NA,
-                      last_log = NULL, write_interval = 2) {
+                      value_top = 0L, total_top = 1L, message_top = NA,
+                      value_middle = 0L, total_middle = 1L, message_middle = NA,
+                      value_bottom = 0L, total_bottom = 1L, message_bottom = NA,
+                      last_log = NULL, write_interval = 2L) {
   if (is.null(log_file)) {
     return(NULL)
   }
@@ -71,15 +71,15 @@ write_log <- function(log_file,
   }
 
   if (
-    value_top %in% c(1, total_top) ||
-      value_middle %in% c(1, total_middle) ||
-      value_bottom %in% c(1, total_bottom)
+    value_top %in% c(1L, total_top) ||
+      value_middle %in% c(1L, total_middle) ||
+      value_bottom %in% c(1L, total_bottom)
   ) {
     # if this is the first or last iteration
     return(try_write_log_data())
   } else {
     if (!is.null(last_log)) {
-      diff <- difftime(Sys.time(), last_log, units = "secs")[[1]]
+      diff <- difftime(Sys.time(), last_log, units = "secs")[[1L]]
       if (diff > write_interval) {
         return(try_write_log_data())
       }
@@ -129,9 +129,9 @@ reset_log <- function(log_path) {
   }
 
   log_data <- rbind(
-    c(0, 1, NA),
-    c(0, 1, NA),
-    c(0, 1, NA)
+    c(0L, 1L, NA),
+    c(0L, 1L, NA),
+    c(0L, 1L, NA)
   )
   colnames(log_data) <- c("value", "total", "message")
 
@@ -168,7 +168,7 @@ read_loss_log <- function(path_loss) {
 
   if (!(inherits(loss_data, "try-error"))) {
     loss_data <- t(loss_data)
-    if (ncol(loss_data) > 2) {
+    if (ncol(loss_data) > 2L) {
       colnames(loss_data) <- c("train", "validation", "test")
     } else {
       colnames(loss_data) <- c("train", "validation")
@@ -179,9 +179,9 @@ read_loss_log <- function(path_loss) {
       loss_data[, i] <- as.numeric(loss_data[, i])
     }
     loss_data$epoch <- seq.int(
-      from = 1,
+      from = 1L,
       to = nrow(loss_data),
-      by = 1
+      by = 1L
     )
   }
 
@@ -209,9 +209,9 @@ reset_loss_log <- function(log_path, epochs) {
   }
 
   log_data <- rbind(
-    rep(-100, times = epochs),
-    rep(-100, times = epochs),
-    rep(-100, times = epochs)
+    rep(-100L, times = epochs),
+    rep(-100L, times = epochs),
+    rep(-100L, times = epochs)
   )
 
   try(
@@ -288,15 +288,15 @@ clean_pytorch_log_transformers <- function(log) {
     ncol = length(cols)
   )
   colnames(cleaned_log) <- cols
-  for (i in 1:max_epochs) {
+  for (i in 1L:max_epochs) {
     cleaned_log[i, "epoch"] <- i
 
-    tmp_loss <- subset(log, log$epoch == i & is.na(log$loss) == FALSE)
-    tmp_loss <- tmp_loss[1, "loss"]
+    tmp_loss <- subset(log, log$epoch == i & !is.na(log$loss) )
+    tmp_loss <- tmp_loss[1L, "loss"]
     cleaned_log[i, "loss"] <- tmp_loss
 
-    tmp_val_loss <- subset(log, log$epoch == i & is.na(log$eval_loss) == FALSE)
-    tmp_val_loss <- tmp_val_loss[1, "eval_loss"]
+    tmp_val_loss <- subset(log, log$epoch == i & !is.na(log$eval_loss))
+    tmp_val_loss <- tmp_val_loss[1L, "eval_loss"]
     cleaned_log[i, "val_loss"] <- tmp_val_loss
   }
   return(as.data.frame(cleaned_log))

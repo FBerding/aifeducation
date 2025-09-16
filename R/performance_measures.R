@@ -57,7 +57,7 @@ cohens_kappa <- function(rater_one, rater_two) {
 
   # Weight matrices and expected_freq table
   weight_matrix_linear <- matrix(
-    data = 0,
+    data = 0L,
     nrow = nlevels(rater_one),
     ncol = nlevels(rater_one),
     dimnames = list(levels(rater_one), levels(rater_one))
@@ -67,15 +67,15 @@ cohens_kappa <- function(rater_one, rater_two) {
   for (i in seq_len(nlevels(rater_one))) {
     for (j in seq_len(nlevels(rater_one))) {
       weight_matrix_linear[i, j] <- abs(i - j)
-      weight_matrix_squared[i, j] <- abs(i - j)^2
-      expected_freq[i, j] <- freq_rater_one[i] * freq_rater_two[j] / N^2
+      weight_matrix_squared[i, j] <- abs(i - j)^2L
+      expected_freq[i, j] <- freq_rater_one[i] * freq_rater_two[j] / N^2L
     }
   }
 
   # Calculate Kappa
-  kappa_unweighted <- (probability_observed - probability_expected) / (1 - probability_expected)
-  kappa_linear <- 1 - sum(rel_table * weight_matrix_linear) / sum(expected_freq * weight_matrix_linear)
-  kappa_squared <- 1 - sum(rel_table * weight_matrix_squared) / sum(expected_freq * weight_matrix_squared)
+  kappa_unweighted <- (probability_observed - probability_expected) / (1L - probability_expected)
+  kappa_linear <- 1L - sum(rel_table * weight_matrix_linear) / sum(expected_freq * weight_matrix_linear)
+  kappa_squared <- 1L - sum(rel_table * weight_matrix_squared) / sum(expected_freq * weight_matrix_squared)
 
   return(list(
     kappa_unweighted = kappa_unweighted,
@@ -105,9 +105,9 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   raters <- append(raters, additional_raters)
 
   # Check levels
-  for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
+  for (i in 2L:length(raters)) {
+    if (sum(levels(raters[[1L]]) == levels(raters[[i]])) !=
+      max(nlevels(raters[[1L]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -119,7 +119,7 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   # Number of raters
   M <- length(raters)
 
-  raw_table <- matrix(data = 0, nrow = N, ncol = length(raters))
+  raw_table <- matrix(data = 0L, nrow = N, ncol = length(raters))
   for (i in seq_len(length(raters))) {
     raw_table[, i] <- as.numeric(raters[[i]])
   }
@@ -132,13 +132,13 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
 
   ranking_sums <- rowSums(ranking_table)
   mean_ranking <- sum(ranking_sums) / N
-  deviation <- sum((ranking_sums - mean_ranking)^2)
+  deviation <- sum((ranking_sums - mean_ranking)^2L)
 
   # Calculate ties for every rater
   ties_value_per_rater <- vector(length = M)
-  for (i in 1:M) {
+  for (i in 1L:M) {
     ties_raw <- table(ranking_table[, i])
-    ties <- ties_raw^3 - ties_raw
+    ties <- ties_raw^3L - ties_raw
     ties_value_per_rater[i] <- sum(ties)
   }
 
@@ -146,8 +146,8 @@ kendalls_w <- function(rater_one, rater_two, additional_raters = NULL) {
   ties <- sum(ties_value_per_rater)
 
   # final measures
-  kendall_w <- 12 * deviation / (M^2 * (N^3 - N))
-  kendall_w_corrected <- 12 * deviation / (M^2 * (N^3 - N) - M * ties)
+  kendall_w <- 12L * deviation / (M^2L * (N^3L - N))
+  kendall_w_corrected <- 12L * deviation / (M^2L * (N^3L - N) - M * ties)
   return(
     list(
       kendall_w = kendall_w,
@@ -182,9 +182,9 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
   raters <- append(raters, additional_raters)
 
   # Check levels
-  for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
+  for (i in 2L:length(raters)) {
+    if (sum(levels(raters[[1L]]) == levels(raters[[i]])) !=
+      max(nlevels(raters[[1L]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -194,39 +194,39 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # create canonical form
   # raters in rows, cases in columns
-  canonical_form <- matrix(data = 0, nrow = length(raters), ncol = N)
+  canonical_form <- matrix(data = 0L, nrow = length(raters), ncol = N)
   for (i in seq_len(length(raters))) {
     canonical_form[i, ] <- as.numeric(raters[[i]])
   }
-  canonical_form <- replace(x = canonical_form, list = is.na(canonical_form), values = 0)
+  canonical_form <- replace(x = canonical_form, list = is.na(canonical_form), values = 0L)
 
   # create value unit matrix
-  value_unit_matrix <- matrix(data = 0, nrow = nlevels(rater_one), ncol = N)
+  value_unit_matrix <- matrix(data = 0L, nrow = nlevels(rater_one), ncol = N)
   for (i in seq_len(ncol(canonical_form))) {
     value_unit_matrix[, i] <- as.vector(table(factor(
       canonical_form[, i],
-      levels = seq(from = 1, to = nlevels(rater_one))
+      levels = seq(from = 1L, to = nlevels(rater_one))
     )))
   }
 
   # Create matrix of observed coincidences
   obs_coincidence_matrix <- matrix(
-    data = 0, nrow = nlevels(rater_one),
+    data = 0L, nrow = nlevels(rater_one),
     ncol = nlevels(rater_one)
   )
 
   for (i_1 in seq_len(nrow(value_unit_matrix))) {
     for (i_2 in seq_len(nrow(value_unit_matrix))) {
-      tmp_sum <- 0
+      tmp_sum <- 0L
       for (j in seq_len(ncol(value_unit_matrix))) {
         value_1 <- value_unit_matrix[i_1, j]
         value_2 <- value_unit_matrix[i_2, j]
         m_u <- sum(value_unit_matrix[, j])
-        if (m_u > 1) {
+        if (m_u > 1L) {
           if (i_1 == i_2) {
-            tmp_sum <- tmp_sum + value_1 * (value_2 - 1) / (m_u - 1)
+            tmp_sum <- tmp_sum + value_1 * (value_2 - 1L) / (m_u - 1L)
           } else {
-            tmp_sum <- tmp_sum + value_1 * value_2 / (m_u - 1)
+            tmp_sum <- tmp_sum + value_1 * value_2 / (m_u - 1L)
           }
         }
       }
@@ -236,45 +236,45 @@ kripp_alpha <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Create matrix of expected coincidences
   exp_coincidence_matrix <- matrix(
-    data = 0, nrow = nlevels(rater_one),
+    data = 0L, nrow = nlevels(rater_one),
     ncol = nlevels(rater_one)
   )
   row_sums <- rowSums(obs_coincidence_matrix)
   for (i_1 in seq_len(nrow(obs_coincidence_matrix))) {
     for (i_2 in seq_len(nrow(obs_coincidence_matrix))) {
       if (i_1 == i_2) {
-        exp_coincidence_matrix[i_1, i_2] <- row_sums[i_1] * (row_sums[i_2] - 1)
+        exp_coincidence_matrix[i_1, i_2] <- row_sums[i_1] * (row_sums[i_2] - 1L)
       } else {
         exp_coincidence_matrix[i_1, i_2] <- row_sums[i_1] * row_sums[i_2]
       }
     }
   }
-  exp_coincidence_matrix <- exp_coincidence_matrix / (sum(obs_coincidence_matrix) - 1)
+  exp_coincidence_matrix <- exp_coincidence_matrix / (sum(obs_coincidence_matrix) - 1L)
 
   # Create matrix for differences for nominal data
   nominal_metric_matrix <- matrix(
-    data = 1, nrow = nlevels(rater_one),
+    data = 1L, nrow = nlevels(rater_one),
     ncol = nlevels(rater_one)
   )
-  diag(nominal_metric_matrix) <- 0
+  diag(nominal_metric_matrix) <- 0L
 
   # Create matrix for differences for ordinal data
   ordinal_metric_matrix <- matrix(
-    data = 0, nrow = nlevels(rater_one),
+    data = 0L, nrow = nlevels(rater_one),
     ncol = nlevels(rater_one)
   )
   n_ranks <- rowSums(obs_coincidence_matrix)
   for (i in seq_len(nrow(ordinal_metric_matrix))) {
     for (j in seq_len(nrow(ordinal_metric_matrix))) {
-      categories_between <- seq(from = min(i, j), to = max(i, j), by = 1)
-      ordinal_metric_matrix[i, j] <- (sum(n_ranks[categories_between]) - (n_ranks[i] + n_ranks[j]) / 2)^2
+      categories_between <- seq(from = min(i, j), to = max(i, j), by = 1L)
+      ordinal_metric_matrix[i, j] <- (sum(n_ranks[categories_between]) - (n_ranks[i] + n_ranks[j]) / 2L)^2L
     }
   }
 
   # final values
-  alpha_nominal <- 1 - sum(obs_coincidence_matrix * nominal_metric_matrix) /
+  alpha_nominal <- 1L - sum(obs_coincidence_matrix * nominal_metric_matrix) /
     sum(exp_coincidence_matrix * nominal_metric_matrix)
-  alpha_ordinal <- 1 - sum(obs_coincidence_matrix * ordinal_metric_matrix) /
+  alpha_ordinal <- 1L - sum(obs_coincidence_matrix * ordinal_metric_matrix) /
     sum(exp_coincidence_matrix * ordinal_metric_matrix)
 
   return(
@@ -308,9 +308,9 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
   raters <- append(raters, additional_raters)
 
   # Check levels
-  for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
+  for (i in 2L:length(raters)) {
+    if (sum(levels(raters[[1L]]) == levels(raters[[i]])) !=
+      max(nlevels(raters[[1L]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -322,10 +322,10 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Create raw matrix
   # cases in the rows and categories in the column
-  raw_matrix <- matrix(data = 0, nrow = N, ncol = k)
+  raw_matrix <- matrix(data = 0L, nrow = N, ncol = k)
   for (i in seq_len(length(raters))) {
     raw_matrix <- raw_matrix + to_categorical_c(
-      class_vector = (as.numeric(raters[[i]]) - 1),
+      class_vector = (as.numeric(raters[[i]]) - 1L),
       n_classes = k
     )
   }
@@ -335,12 +335,12 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Agreement
   p_agree <- vector(length = N)
-  for (i in 1:N) {
-    for (j in 1:k) {
-      p_agree[i] <- p_agree[i] + raw_matrix[i, j] * (raw_matrix[i, j] - 1)
+  for (i in 1L:N) {
+    for (j in 1L:k) {
+      p_agree[i] <- p_agree[i] + raw_matrix[i, j] * (raw_matrix[i, j] - 1L)
     }
   }
-  p_agree <- p_agree / (n * (n - 1))
+  p_agree <- p_agree / (n * (n - 1L))
 
   # Observed Overall Agreement
   p_agree_mean <- mean(p_agree)
@@ -349,7 +349,7 @@ fleiss_kappa <- function(rater_one, rater_two, additional_raters = NULL) {
   p_agree_mean_expected <- sum(p_obs * p_obs)
 
   # Final Kappa
-  kappa <- (p_agree_mean - p_agree_mean_expected) / (1 - p_agree_mean_expected)
+  kappa <- (p_agree_mean - p_agree_mean_expected) / (1L - p_agree_mean_expected)
 
   return(kappa)
 }
@@ -384,9 +384,9 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
   raters <- append(raters, additional_raters)
 
   # Check levels
-  for (i in 2:length(raters)) {
-    if (sum(levels(raters[[1]]) == levels(raters[[i]])) !=
-      max(nlevels(raters[[1]]), nlevels(raters[[i]]))
+  for (i in 2L:length(raters)) {
+    if (sum(levels(raters[[1L]]) == levels(raters[[i]])) !=
+      max(nlevels(raters[[1L]]), nlevels(raters[[i]]))
     ) {
       stop("Levels for values are not identical.")
     }
@@ -398,16 +398,16 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
 
   # Create raw matrix
   # cases in the rows and categories in the column
-  raw_matrix <- matrix(data = 0, nrow = N, ncol = k)
+  raw_matrix <- matrix(data = 0L, nrow = N, ncol = k)
   for (i in seq_len(length(raters))) {
     tmp <- to_categorical_c(
-      class_vector = (as.numeric(raters[[i]]) - 1),
+      class_vector = (as.numeric(raters[[i]]) - 1L),
       n_classes = k
     )
     tmp <- replace(
       x = tmp,
       is.na(raters[[i]]),
-      values = 0
+      values = 0L
     )
     raw_matrix <- raw_matrix + tmp
   }
@@ -416,40 +416,40 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
   # Exclude subjects with only one rating
   reduced_raw_matrix <- subset(
     x = raw_matrix,
-    subset = (rowSums(raw_matrix) >= 2)
+    subset = (rowSums(raw_matrix) >= 2L)
   )
   row_sums_reduced <- rowSums(reduced_raw_matrix)
 
   # Agreement
-  p_a <- 0
+  p_a <- 0L
   for (i in seq_len(nrow(reduced_raw_matrix))) {
-    for (j in 1:k) {
-      p_a <- p_a + (reduced_raw_matrix[i, j] * (reduced_raw_matrix[i, j] - 1)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1))
+    for (j in 1L:k) {
+      p_a <- p_a + (reduced_raw_matrix[i, j] * (reduced_raw_matrix[i, j] - 1L)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1L))
     }
   }
   p_a <- p_a / nrow(reduced_raw_matrix)
 
   # Expected
-  p_e <- 0
-  for (j in 1:k) {
-    pi <- 0
+  p_e <- 0L
+  for (j in 1L:k) {
+    pi <- 0L
     for (i in seq_len(nrow(raw_matrix))) {
       pi <- pi + raw_matrix[i, j] / row_sums[i]
     }
     pi <- pi / N
-    p_e <- p_e + pi * (1 - pi)
+    p_e <- p_e + pi * (1L - pi)
   }
-  p_e <- p_e / (k - 1)
+  p_e <- p_e / (k - 1L)
 
-  ac1 <- (p_a - p_e) / (1 - p_e)
+  ac1 <- (p_a - p_e) / (1L - p_e)
 
   # Calculation of ac2
   weights_quadratic <- matrix(data = NA, nrow = k, ncol = k)
   weights_linear <- weights_quadratic
-  for (i in 1:k) {
-    for (j in 1:k) {
-      weights_quadratic[i, j] <- 1 - (i - j)^2 / (k - 1)^2
-      weights_linear[i, j] <- 1 - abs((i - j)) / (k - 1)
+  for (i in 1L:k) {
+    for (j in 1L:k) {
+      weights_quadratic[i, j] <- 1L - (i - j)^2L / (k - 1L)^2L
+      weights_linear[i, j] <- 1L - abs((i - j)) / (k - 1L)
     }
   }
 
@@ -459,40 +459,40 @@ gwet_ac <- function(rater_one, rater_two, additional_raters = NULL) {
     weights <- weights_list[[w]]
 
     # Agreement
-    p_a <- 0
+    p_a <- 0L
     for (i in seq_len(nrow(reduced_raw_matrix))) {
-      for (j in 1:k) {
-        weighted_count <- 0
-        for (l in 1:k) {
+      for (j in 1L:k) {
+        weighted_count <- 0L
+        for (l in 1L:k) {
           weighted_count <- weighted_count + weights[j, l] * reduced_raw_matrix[i, l]
         }
-        p_a <- p_a + (reduced_raw_matrix[i, j] * (weighted_count - 1)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1))
+        p_a <- p_a + (reduced_raw_matrix[i, j] * (weighted_count - 1L)) / (row_sums_reduced[i] * (row_sums_reduced[i] - 1L))
       }
     }
     p_a <- p_a / nrow(reduced_raw_matrix)
 
     # Expected
-    p_e <- 0
-    for (j in 1:k) {
-      pi <- 0
+    p_e <- 0L
+    for (j in 1L:k) {
+      pi <- 0L
       for (i in seq_len(nrow(raw_matrix))) {
         pi <- pi + raw_matrix[i, j] / row_sums[i]
       }
       pi <- pi / N
-      p_e <- p_e + pi * (1 - pi)
+      p_e <- p_e + pi * (1L - pi)
     }
     T_w <- sum(weights)
-    p_e <- p_e * (T_w / (k * (k - 1)))
+    p_e <- p_e * (T_w / (k * (k - 1L)))
 
     ac2_list[w] <- list(
-      (p_a - p_e) / (1 - p_e)
+      (p_a - p_e) / (1L - p_e)
     )
   }
   return(
     list(
       ac1 = ac1,
-      ac2_linear = ac2_list[[1]],
-      ac2_quadratic = ac2_list[[2]]
+      ac2_linear = ac2_list[[1L]],
+      ac2_quadratic = ac2_list[[2L]]
     )
   )
 }
@@ -566,7 +566,7 @@ get_coder_metrics <- function(true_values = NULL,
   metric_values <- vector(length = length(metric_names))
   names(metric_values) <- metric_names
 
-  if (return_names_only == TRUE) {
+  if (return_names_only) {
     return(metric_names)
   } else {
     val_res <- iotarelr::check_new_rater(
@@ -654,10 +654,11 @@ get_coder_metrics <- function(true_values = NULL,
 #' @keywords internal
 #' @noRd
 create_iota2_mean_object <- function(iota2_list,
+                                     original_cat_labels,
                                      free_aem = FALSE,
-                                     call = "aifeducation::te_classifier_neuralnet",
-                                     original_cat_labels) {
-  if (free_aem == TRUE) {
+                                     call = "aifeducation::te_classifier_neuralnet"
+                                     ) {
+  if (free_aem) {
     call <- paste0(call, "_free_aem")
   }
 
@@ -666,7 +667,7 @@ create_iota2_mean_object <- function(iota2_list,
   n_performance_estimation <- length(iota2_list)
 
   for (i in seq_len(length(iota2_list))) {
-    if (i == 1) {
+    if (i == 1L) {
       mean_aem <- iota2_list[[i]]$categorical_level$raw_estimates$assignment_error_matrix
     } else {
       mean_aem <- mean_aem + iota2_list[[i]]$categorical_level$raw_estimates$assignment_error_matrix
@@ -695,7 +696,7 @@ create_iota2_mean_object <- function(iota2_list,
   Esimtates_Information["conformity"] <- list(iotarelr::check_conformity_c(aem = mean_aem))
   Esimtates_Information["boundaries"] <- list(NA)
   Esimtates_Information["p_boundaries"] <- list(NA)
-  Esimtates_Information["n_rater"] <- list(1)
+  Esimtates_Information["n_rater"] <- list(1L)
   Esimtates_Information["n_cunits"] <- list(iota2_list[[i]]$information$n_cunits)
   Esimtates_Information["call"] <- list(call)
   Esimtates_Information["random_starts"] <- list(NA)
@@ -724,7 +725,7 @@ calc_standard_classification_measures <- function(true_values, predicted_values)
   categories <- levels(true_values)
   results <- matrix(
     nrow = length(categories),
-    ncol = 3
+    ncol = 3L
   )
   colnames(results) <- c("precision", "recall", "f1")
   rownames(results) <- categories
@@ -739,29 +740,29 @@ calc_standard_classification_measures <- function(true_values, predicted_values)
     conf_matrix <- table(bin_true_values, bin_pred_values)
     conf_matrix <- conf_matrix[c("TRUE", "FALSE"), c("TRUE", "FALSE")]
 
-    TP_FN <- (sum(conf_matrix[1, ]))
-    if (TP_FN == 0) {
+    TP_FN <- (sum(conf_matrix[1L, ]))
+    if (TP_FN == 0L) {
       recall <- NA
     } else {
-      recall <- conf_matrix[1, 1] / TP_FN
+      recall <- conf_matrix[1L, 1L] / TP_FN
     }
 
-    TP_FP <- sum(conf_matrix[, 1])
-    if (TP_FP == 0) {
+    TP_FP <- sum(conf_matrix[, 1L])
+    if (TP_FP == 0L) {
       precision <- NA
     } else {
-      precision <- conf_matrix[1, 1] / TP_FP
+      precision <- conf_matrix[1L, 1L] / TP_FP
     }
 
     if (is.na(recall) || is.na(precision)) {
       f1 <- NA
     } else {
-      f1 <- 2 * precision * recall / (precision + recall)
+      f1 <- 2L * precision * recall / (precision + recall)
     }
 
-    results[categories[i], 1] <- precision
-    results[categories[i], 2] <- recall
-    results[categories[i], 3] <- f1
+    results[categories[i], 1L] <- precision
+    results[categories[i], 2L] <- recall
+    results[categories[i], 3L] <- f1
   }
   return(results)
 }

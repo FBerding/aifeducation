@@ -87,15 +87,15 @@ TEClassifierSequential <- R6::R6Class(
                          cls_pooling_features = NULL,
                          cls_pooling_type = "MinMax",
                          feat_act_fct = "ELU",
-                         feat_size = 50,
+                         feat_size = 50L,
                          feat_bias = TRUE,
                          feat_dropout = 0.0,
                          feat_parametrizations = "None",
                          feat_normalization_type = "LayerNorm",
                          ng_conv_act_fct = "ELU",
-                         ng_conv_n_layers = 1,
-                         ng_conv_ks_min = 2,
-                         ng_conv_ks_max = 4,
+                         ng_conv_n_layers = 1L,
+                         ng_conv_ks_min = 2L,
+                         ng_conv_ks_max = 4L,
                          ng_conv_bias = FALSE,
                          ng_conv_dropout = 0.1,
                          ng_conv_parametrizations = "None",
@@ -109,7 +109,7 @@ TEClassifierSequential <- R6::R6Class(
                          dense_normalization_type = "LayerNorm",
                          dense_residual_type = "ResidualGate",
                          rec_act_fct = "Tanh",
-                         rec_n_layers = 1,
+                         rec_n_layers = 1L,
                          rec_type = "GRU",
                          rec_bidirectional = FALSE,
                          rec_dropout = 0.2,
@@ -118,8 +118,8 @@ TEClassifierSequential <- R6::R6Class(
                          rec_normalization_type = "LayerNorm",
                          rec_residual_type = "ResidualGate",
                          tf_act_fct = "ELU",
-                         tf_dense_dim = 50,
-                         tf_n_layers = 1,
+                         tf_dense_dim = 50L,
+                         tf_n_layers = 1L,
                          tf_dropout_rate_1 = 0.1,
                          tf_dropout_rate_2 = 0.5,
                          tf_attention_type = "MultiHead",
@@ -129,7 +129,7 @@ TEClassifierSequential <- R6::R6Class(
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
                          tf_residual_type = "ResidualGate") {
-      private$do_configuration(args = get_called_args(n = 1))
+      private$do_configuration(args = get_called_args(n = 1L))
     }
   ),
   # Private---------------------------------------------------------------------

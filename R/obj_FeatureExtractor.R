@@ -56,34 +56,28 @@ TEFeatureExtractor <- R6::R6Class(
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
-                         features = 128,
+                         features = 128L,
                          method = "dense",
                          orthogonal_method = "matrix_exp",
                          noise_factor = 0.2) {
-      args <- get_called_args(n = 1)
+      tmp_args <- get_called_args(n = 1L)
       private$check_config_for_FALSE()
 
       # Check arguments
-      check_all_args(args = args)
-      private$check_embeddings_object_type(args$text_embeddings, strict = TRUE)
+      check_all_args(args = tmp_args)
+      private$check_embeddings_object_type(tmp_args$text_embeddings, strict = TRUE)
 
       # Set TextEmbeddingModel
       private$set_text_embedding_model(
-        model_info = args$text_embeddings$get_model_info(),
-        feature_extractor_info = args$text_embeddings$get_feature_extractor_info(),
-        times = args$text_embeddings$get_times(),
-        features = args$text_embeddings$get_features(),
-        pad_value = args$text_embeddings$get_pad_value()
+        model_info = tmp_args$text_embeddings$get_model_info(),
+        feature_extractor_info = tmp_args$text_embeddings$get_feature_extractor_info(),
+        times = tmp_args$text_embeddings$get_times(),
+        features = tmp_args$text_embeddings$get_features(),
+        pad_value = tmp_args$text_embeddings$get_pad_value()
       )
 
       # save arguments
-      private$save_all_args(args = args, group = "configure")
-
-      # Set target data config
-      # private$set_target_data(
-      #  target_levels=args$target_levels,
-      #  one_hot_encoding=TRUE
-      # )
+      private$save_all_args(args = tmp_args, group = "configure")
 
       # Perform additional checks and adjustments
       # private$check_param_combinations()
@@ -97,13 +91,6 @@ TEFeatureExtractor <- R6::R6Class(
         label = label,
         model_date = get_time_stamp()
       )
-
-      # Adjust configuration
-      # private$adjust_configuration()
-
-      # Set FeatureExtractor and adapt config
-      # self$check_feature_extractor_object_type(args$feature_extractor)
-      # private$set_feature_extractor(args$feature_extractor)
 
       # Set package versions
       private$set_package_versions()
@@ -148,22 +135,22 @@ TEFeatureExtractor <- R6::R6Class(
                      sustain_track = TRUE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
-                     sustain_interval = 15,
-                     epochs = 40,
-                     batch_size = 32,
+                     sustain_interval = 15L,
+                     epochs = 40L,
+                     batch_size = 32L,
                      trace = TRUE,
-                     ml_trace = 1,
+                     ml_trace = 1L,
                      log_dir = NULL,
-                     log_write_interval = 10,
+                     log_write_interval = 10L,
                      lr_rate = 1e-3,
                      lr_warm_up_ratio = 0.02,
                      optimizer = "AdamW") {
-      args <- get_called_args(n = 1)
-      check_all_args(args = args)
+      tmp_args <- get_called_args(n = 1L)
+      check_all_args(args = tmp_args)
       self$check_embedding_model(data_embeddings)
 
       # Save args
-      private$save_all_args(args = args, group = "training")
+      private$save_all_args(args = tmp_args, group = "training")
 
       # Perform additional checks and adjustments
       # private$check_param_combinations()
@@ -175,38 +162,38 @@ TEFeatureExtractor <- R6::R6Class(
       private$load_reload_python_scripts()
 
       # Start-------------------------------------------------------------------
-      if (self$last_training$config$trace == TRUE) {
-        message(paste(
+      if (self$last_training$config$trace) {
+        message(
           get_time_stamp(),
-          "Start"
-        ))
+          " Start"
+        )
       }
 
       # Set up dataset
       if (inherits(data_embeddings, "EmbeddedText")) {
-        data <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
-        data <- data$get_dataset()
+        tmp_data <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+        tmp_data <- tmp_data$get_dataset()
       } else {
-        data <- data_embeddings$get_dataset()
+        tmp_data <- data_embeddings$get_dataset()
       }
 
       # Reduce to unique cases for training
-      data <- reduce_to_unique(data, "id")
+      tmp_data <- reduce_to_unique(tmp_data, "id")
 
       # Copy input as label for training
-      extractor_dataset <- data$map(
+      extractor_dataset <- tmp_data$map(
         py$map_input_to_labels,
         load_from_cache_file = FALSE,
         keep_in_memory = FALSE,
-        cache_file_name = paste0(create_and_get_tmp_dir(), "/", generate_id(15))
+        cache_file_name = file.path(create_and_get_tmp_dir(),  generate_id(15L))
       )
 
       # Check and create temporary directory for checkpoints
       private$create_checkpoint_directory()
 
       # Set up log file
-      log_top_value <- 0
-      log_top_total <- 1
+      log_top_value <- 0L
+      log_top_total <- 1L
       log_top_message <- "Overall"
 
       # Set format
@@ -229,7 +216,7 @@ TEFeatureExtractor <- R6::R6Class(
         batch_size = as.integer(self$last_training$config$batch_size),
         train_data = extractor_dataset$train,
         val_data = extractor_dataset$test,
-        filepath = paste0(private$dir_checkpoint, "/best_weights.pt"),
+        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
         use_callback = TRUE,
         log_dir = private$log_config$log_dir,
         log_write_interval = private$log_config$log_write_interval,
@@ -248,8 +235,8 @@ TEFeatureExtractor <- R6::R6Class(
       # Clean temporary directory
       private$clean_checkpoint_directory()
 
-      if (self$last_training$config$trace == TRUE) {
-        message(paste(get_time_stamp(), "Training finished"))
+      if (self$last_training$config$trace) {
+        message(get_time_stamp(), " Training finished")
       }
     },
     #---------------------------------------------------------------------------
@@ -282,7 +269,7 @@ TEFeatureExtractor <- R6::R6Class(
       current_row_names <- private$get_rownames_from_embeddings(data_embeddings)
 
       # If at least two cases are part of the data set---------------------------
-      if (single_prediction == FALSE) {
+      if (!single_prediction) {
         prepared_embeddings <- private$prepare_embeddings_as_dataset(data_embeddings)
 
         prepared_embeddings$set_format("torch")
@@ -333,7 +320,7 @@ TEFeatureExtractor <- R6::R6Class(
         model_version = model_info$model$model_version,
         model_language = model_info$model$model_language,
         param_seq_length = model_info$model$param_seq_length,
-        param_features = dim(reduced_embeddings)[3],
+        param_features = dim(reduced_embeddings)[3L],
         param_chunks = model_info$model$param_chunks,
         param_overlap = model_info$model$param_overlap,
         param_emb_layer_min = model_info$model$param_emb_layer_min,
@@ -379,13 +366,13 @@ TEFeatureExtractor <- R6::R6Class(
         zero_based = TRUE
       )
       # Process every batch
-      for (i in 1:total_number_of_bachtes) {
-        subset <- data_embeddings$select(as.integer(batches_index[[i]]))
+      for (i in 1L:total_number_of_bachtes) {
+        tmp_subset <- data_embeddings$select(as.integer(batches_index[[i]]))
         embeddings <- self$extract_features(
-          data_embeddings = subset,
+          data_embeddings = tmp_subset,
           batch_size = batch_size
         )
-        if (i == 1) {
+        if (i == 1L) {
           # Create Large Dataset
           model_info <- self$get_text_embedding_model()
 
@@ -397,7 +384,7 @@ TEFeatureExtractor <- R6::R6Class(
             model_version = model_info$model_version,
             model_language = model_info$model_language,
             param_seq_length = model_info$param_seq_length,
-            param_features = dim(embeddings)[3],
+            param_features = dim(embeddings)[3L],
             param_chunks = model_info$model$param_chunks,
             param_overlap = model_info$model$param_overlap,
             param_emb_layer_min = model_info$model$param_emb_layer_min,
@@ -421,7 +408,7 @@ TEFeatureExtractor <- R6::R6Class(
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
-        if (trace == TRUE) {
+        if (trace) {
           cat(paste(
             get_time_stamp(),
             "Batch", i, "/", total_number_of_bachtes, "done", "\n"
@@ -437,8 +424,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
     #' @param text_size Size of the text.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10) {
-      plot <- super$plot_training_history(
+    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10L) {
+      tmp_plot <- super$plot_training_history(
         final_training = FALSE,
         pl_step = NULL,
         measure = "loss",
@@ -447,7 +434,7 @@ TEFeatureExtractor <- R6::R6Class(
         add_min_max = FALSE,
         text_size = text_size
       )
-      return(plot)
+      return(tmp_plot)
     }
   ),
   private = list(
@@ -496,7 +483,7 @@ TEFeatureExtractor <- R6::R6Class(
     #--------------------------------------------------------------------------
     generate_model_id = function(name) {
       if (is.null(name)) {
-        return(paste0("tefe_", generate_id(16)))
+        return(paste0("tefe_", generate_id(16L)))
       } else {
         return(name)
       }

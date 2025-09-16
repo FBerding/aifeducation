@@ -76,19 +76,19 @@ DataManagerClassifier <- R6::R6Class(
     #' @return Method returns an initialized object of class [DataManagerClassifier].
     initialize = function(data_embeddings,
                           data_targets,
-                          folds = 5,
-                          val_size = 0.25,
-                          pad_value = -100,
                           class_levels,
+                          folds = 5L,
+                          val_size = 0.25,
+                          pad_value = -100L,
                           one_hot_encoding = TRUE,
                           add_matrix_map = TRUE,
                           sc_methods = "knnor",
-                          sc_min_k = 1,
-                          sc_max_k = 10,
+                          sc_min_k = 1L,
+                          sc_max_k = 10L,
                           trace = TRUE,
                           n_cores = auto_n_cores()) {
       # Checking Prerequisites---------------------------------------------------
-      check_all_args(get_called_args(n = 1))
+      check_all_args(get_called_args(n = 1L))
 
       # Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -119,12 +119,12 @@ DataManagerClassifier <- R6::R6Class(
       self$config$pad_value <- pad_value
 
       # Add one hot encoding if necessary
-      if (self$config$one_hot_encoding == TRUE) {
+      if (self$config$one_hot_encoding) {
         self$datasets$data_labeled <- private$add_one_hot_encoding(self$datasets$data_labeled)
       }
 
       # Add matrix map if necessary
-      if (self$config$add_matrix_map == TRUE) {
+      if (self$config$add_matrix_map) {
         self$datasets$data_labeled <- private$add_matrix_form(self$datasets$data_labeled)
         self$datasets$data_unlabeled <- private$add_matrix_form(self$datasets$data_unlabeled)
       }
@@ -170,17 +170,17 @@ DataManagerClassifier <- R6::R6Class(
     #'   training is requested with pseudo labels.
     #' @return Method does not return anything. It is used for setting the internal state of the DataManager.
     set_state = function(iteration, step = NULL) {
-      check_type(object = step, object_name = "step", type = "int", min = 1, max = Inf, allow_NULL = TRUE, allowed_values = NULL)
+      check_type(object = step, object_name = "step", type = "int", min = 1L, max = Inf, allow_NULL = TRUE, allowed_values = NULL)
 
-      if (is.numeric(iteration) == FALSE) {
+      if (!is.numeric(iteration)) {
         if (iteration == "final") {
-          iteration <- self$config$n_folds + 1
+          iteration <- self$config$n_folds + 1L
         } else {
           stop(
-            paste(
+
               iteration,
-              "is not a valid input for iteration"
-            )
+              " is not a valid input for iteration"
+
           )
         }
       }
@@ -240,7 +240,7 @@ DataManagerClassifier <- R6::R6Class(
       if (is.null(self$datasets$data_unlabeled)) {
         return(FALSE)
       } else {
-        if (self$datasets$data_unlabeled$num_rows > 0) {
+        if (self$datasets$data_unlabeled$num_rows > 0L) {
           return(TRUE)
         } else {
           return(FALSE)
@@ -268,46 +268,46 @@ DataManagerClassifier <- R6::R6Class(
       check_type(object = inc_synthetic, type = "bool", FALSE)
       check_type(object = inc_pseudo_data, type = "bool", FALSE)
 
-      data <- NULL
+      tmp_data <- NULL
 
       requested_datasets <- list()
 
-      if (inc_labeled == TRUE) {
+      if (inc_labeled) {
         self$datasets$data_labeled$set_format("np")
-        requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled$select(
+        requested_datasets[length(requested_datasets) + 1L] <- list(self$datasets$data_labeled$select(
           as.integer(self$samples[[self$state$iteration]]$train)
         ))
       }
 
-      if (inc_synthetic == TRUE) {
+      if (inc_synthetic) {
         if (!is.null(self$datasets$data_labeled_synthetic)) {
           self$datasets$data_labeled_synthetic$set_format("np")
-          requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled_synthetic)
+          requested_datasets[length(requested_datasets) + 1L] <- list(self$datasets$data_labeled_synthetic)
         }
       }
 
-      if (inc_pseudo_data == TRUE) {
+      if (inc_pseudo_data) {
         if (!is.null(self$datasets$data_labeled_pseudo)) {
           self$datasets$data_labeled_pseudo$set_format("np")
-          requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_labeled_pseudo)
+          requested_datasets[length(requested_datasets) + 1L] <- list(self$datasets$data_labeled_pseudo)
         }
       }
-      if (inc_unlabeled == TRUE) {
+      if (inc_unlabeled) {
         if (!is.null(self$datasets$data_unlabeled)) {
           self$datasets$data_unlabeled$set_format("np")
-          requested_datasets[length(requested_datasets) + 1] <- list(self$datasets$data_unlabeled)
+          requested_datasets[length(requested_datasets) + 1L] <- list(self$datasets$data_unlabeled)
         }
       }
 
 
-      if (length(requested_datasets) < 1) {
-        data <- NULL
-      } else if (length(requested_datasets) == 1) {
-        data <- requested_datasets[[1]]
+      if (length(requested_datasets) < 1L) {
+        tmp_data <- NULL
+      } else if (length(requested_datasets) == 1L) {
+        tmp_data <- requested_datasets[[1L]]
       } else {
-        data <- datasets$concatenate_datasets(dsets = requested_datasets, axis = 0L)
+        tmp_data <- datasets$concatenate_datasets(dsets = requested_datasets, axis = 0L)
       }
-      return(data)
+      return(tmp_data)
     },
 
     #' @description Method for requesting a data set for validation depending in the current state of the
@@ -347,23 +347,23 @@ DataManagerClassifier <- R6::R6Class(
       check_type(object = inc_pseudo_data, type = "bool", FALSE)
 
       # Print status message to console
-      if (trace == TRUE) {
+      if (trace) {
         if (self$state$iteration <= self$config$n_folds) {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Iteration", self$state$iteration, "from", self$config$n_folds,
             "|", "Generating synthetic cases"
-          ))
+          )
         } else {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Final training",
             "|", "Generating synthetic cases"
-          ))
+          )
         }
       }
 
-      data <- self$get_dataset(
+      tmp_data <- self$get_dataset(
         inc_labeled = TRUE,
         inc_unlabeled = FALSE,
         inc_synthetic = FALSE,
@@ -382,11 +382,11 @@ DataManagerClassifier <- R6::R6Class(
 
 
       # Create Synthetic Cases
-      data$set_format("np")
+      tmp_data$set_format("np")
       syn_cases <- get_synthetic_cases_from_matrix(
-        matrix_form = data["matrix_form"],
-        target = data["labels"],
-        sequence_length = data["length"],
+        matrix_form = tmp_data["matrix_form"],
+        target = tmp_data["labels"],
+        sequence_length = tmp_data["length"],
         method = self$config$sc$methods,
         min_k = self$config$sc$min_k,
         max_k = self$config$sc$max_k,
@@ -404,19 +404,19 @@ DataManagerClassifier <- R6::R6Class(
       targets_synthetic <- as.numeric(as.character(syn_cases$syntetic_targets))
 
       # Check if cases with zero length are included
-      length <- get_n_chunks(
+      seq_length <- get_n_chunks(
         text_embeddings = embeddings_syntehtic,
         features = self$config$features,
         times = self$config$times,
         pad_value = self$config$pad_value
       )
-      idx_non_zero_length <- which(x = (length > 0))
+      idx_non_zero_length <- which(x = (seq_length > 0L))
 
       # exclude cases with zero length
       embeddings_syntehtic <- embeddings_syntehtic[idx_non_zero_length, , , drop = FALSE]
       targets_synthetic <- targets_synthetic[idx_non_zero_length]
 
-      if (dim(embeddings_syntehtic)[1] > 1) {
+      if (dim(embeddings_syntehtic)[1L] > 1L) {
         # Add or replace current dataset for synthetic cases
         self$datasets$data_labeled_synthetic <- datasets$Dataset$from_dict(
           reticulate::dict(
@@ -436,30 +436,30 @@ DataManagerClassifier <- R6::R6Class(
         )
 
 
-        if (self$config$one_hot_encoding == TRUE) {
+        if (self$config$one_hot_encoding) {
           self$datasets$data_labeled_synthetic <- private$add_one_hot_encoding(self$datasets$data_labeled_synthetic)
         }
 
-        if (self$config$add_matrix_map == TRUE) {
+        if (self$config$add_matrix_map) {
           self$datasets$data_labeled_synthetic <- private$add_matrix_form(self$datasets$data_labeled_synthetic)
         }
       } else {
         self$datasets$data_labeled_synthetic <- NULL
       }
 
-      if (trace == TRUE) {
+      if (trace) {
         if (self$state$iteration <= self$config$n_folds) {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Iteration", self$state$iteration, "from", self$config$n_folds,
             "|", "Generating synthetic cases done"
-          ))
+          )
         } else {
-          message(paste(
+          message(
             get_time_stamp(),
             "|", "Final training",
             "|", "Generating synthetic cases done"
-          ))
+          )
         }
       }
     },
@@ -474,7 +474,7 @@ DataManagerClassifier <- R6::R6Class(
                                        labels) {
       # checks
       check_class(object = inputs, classes = c("array", "matrix"), allow_NULL = FALSE)
-      check_class(object = labels, classes = c("factor"), allow_NULL = FALSE)
+      check_class(object = labels, classes = "factor", allow_NULL = FALSE)
 
       private$check_labels(labels)
       # Add or replace current dataset for pseudo data
@@ -483,7 +483,7 @@ DataManagerClassifier <- R6::R6Class(
           list(
             id = rownames(inputs),
             input = prepare_r_array_for_dataset(inputs),
-            labels = as.numeric(labels) - 1,
+            labels = as.numeric(labels) - 1L,
             length = get_n_chunks(
               text_embeddings = inputs,
               features = self$config$features,
@@ -495,11 +495,11 @@ DataManagerClassifier <- R6::R6Class(
         )
       )
 
-      if (self$config$one_hot_encoding == TRUE) {
+      if (self$config$one_hot_encoding) {
         self$datasets$data_labeled_pseudo <- private$add_one_hot_encoding(self$datasets$data_labeled_pseudo)
       }
 
-      if (self$config$add_matrix_map == TRUE) {
+      if (self$config$add_matrix_map) {
         self$datasets$data_labeled_pseudo <- private$add_matrix_form(self$datasets$data_labeled_pseudo)
       }
     }
@@ -527,7 +527,7 @@ DataManagerClassifier <- R6::R6Class(
       # Convert labels
       data_targets <- na.omit(data_targets)
       data_targets_names <- names(data_targets)
-      data_targets <- as.numeric(data_targets) - 1
+      data_targets <- as.numeric(data_targets) - 1L
       names(data_targets) <- data_targets_names
 
       # Estimate all targets which have an embedding input
@@ -540,15 +540,15 @@ DataManagerClassifier <- R6::R6Class(
       class_vector <- class_vector[data_set_embeddings["id"]]
 
       # Get indices for labeled-unlabeled split
-      indices_unlabeled <- which(is.na(class_vector)) - 1
-      indices_labeled <- which(!is.na(class_vector)) - 1
+      indices_unlabeled <- which(is.na(class_vector)) - 1L
+      indices_labeled <- which(!is.na(class_vector)) - 1L
 
       # Add labels to data set
       data_set_embeddings <- data_set_embeddings$add_column("labels", np$array(class_vector))
 
       # Split data
       self$datasets$data_labeled <- data_set_embeddings$select(as.integer(indices_labeled))
-      if (length(indices_unlabeled) != 0) {
+      if (length(indices_unlabeled) != 0L) {
         self$datasets$data_unlabeled <- data_set_embeddings$select(as.integer(indices_unlabeled))
       } else {
         self$datasets$data_unlabeled <- NULL
@@ -556,13 +556,13 @@ DataManagerClassifier <- R6::R6Class(
 
 
       # Report numbers
-      if (trace == TRUE) {
-        message(paste(
+      if (trace) {
+        message(
           get_time_stamp(),
           "Total Cases:", n_init_cases,
           "Unique Cases:", n_final_cases,
           "Labeled Cases:", length(indices_labeled)
-        ))
+        )
       }
     },
     #--------------------------------------------------------------------------
@@ -575,14 +575,14 @@ DataManagerClassifier <- R6::R6Class(
       sample_target <- private$get_all_labels()
       freq_cat <- table(sample_target)
       min_freq <- min(freq_cat)
-      if (min_freq < 6) {
-        stop(paste("Frequency of the smallest category/class is", min_freq, ". At least
-                   6 cases are necessary. Consider to remove this category/class."))
+      if (min_freq < 6L) {
+        stop("Frequency of the smallest category respective class is", min_freq, ". At least
+                   6 cases are necessary. Consider to remove this category/class.")
       } else {
-        if (min_freq / folds < 3) {
-          fin_k_folds <- floor(min_freq / 3)
-          warning(paste("Frequency of the smallest category/class is not sufficent to ensure
-                    at least 3 cases per fold. Adjusting number of folds from ", folds, "to", fin_k_folds, "."))
+        if (min_freq / folds < 3L) {
+          fin_k_folds <- floor(min_freq / 3L)
+          warning("Frequency of the smallest category respective class is not sufficent to ensure
+                    at least 3 cases per fold. Adjusting number of folds from ", folds, "to", fin_k_folds, ".")
         } else {
           fin_k_folds <- folds
         }
@@ -599,7 +599,7 @@ DataManagerClassifier <- R6::R6Class(
           ),
           load_from_cache_file = FALSE,
           keep_in_memory = FALSE,
-          cache_file_name = paste0(create_and_get_tmp_dir(), "/", generate_id(15))
+          cache_file_name = file.path(create_and_get_tmp_dir(), generate_id(15L))
         )
         return(dataset)
       } else {
@@ -613,7 +613,7 @@ DataManagerClassifier <- R6::R6Class(
           fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes))),
           load_from_cache_file = FALSE,
           keep_in_memory = FALSE,
-          cache_file_name = paste0(create_and_get_tmp_dir(), "/", generate_id(15))
+          cache_file_name = file.path(create_and_get_tmp_dir(),  generate_id(15L))
         )
         return(dataset)
       } else {
@@ -626,11 +626,11 @@ DataManagerClassifier <- R6::R6Class(
       ))
     },
     create_indices_name_map = function() {
-      self$name_idx$labeled_data <- seq.int(from = 0, to = (length(self$datasets$data_labeled["id"])) - 1)
+      self$name_idx$labeled_data <- seq.int(from = 0L, to = (length(self$datasets$data_labeled["id"])) - 1L)
       names(self$name_idx$labeled_data) <- self$datasets$data_labeled["id"]
 
       if (!is.null(self$datasets$data_unlabeled)) {
-        self$name_idx$unlabeled_data <- seq.int(from = 0, to = (length(self$datasets$data_unlabeled["id"])) - 1)
+        self$name_idx$unlabeled_data <- seq.int(from = 0L, to = (length(self$datasets$data_unlabeled["id"])) - 1L)
         names(self$name_idx$unlabeled_data) <- self$datasets$data_unlabeled["id"]
       } else {
         self$name_idx$unlabeled_data <- NULL
@@ -648,7 +648,7 @@ DataManagerClassifier <- R6::R6Class(
       )
 
       self$samples <- NULL
-      for (i in 1:self$config$n_folds) {
+      for (i in 1L:self$config$n_folds) {
         train_val_split <- get_train_test_split(
           embedding = NULL,
           target = data_targets[folds$train_sample[[i]]],
@@ -677,19 +677,19 @@ DataManagerClassifier <- R6::R6Class(
         val = self$name_idx$labeled_data[names_final_split$test_sample],
         test = NULL
       )
-      self$samples[length(self$samples) + 1] <- list(final_split)
+      self$samples[length(self$samples) + 1L] <- list(final_split)
     },
     check_labels = function(labels) {
-      if (is.factor(labels) == FALSE) {
+      if (!is.factor(labels)) {
         stop("labels must be an object of class factor.")
       } else {
         levels_identical <- sum(levels(labels) == self$config$class_levels)
         if (levels_identical != self$config$n_classes) {
-          stop(paste(
+          stop(
             "Levels of the labels are not identical with the levels of the classifier.",
             "Necessary levels:", self$config$class_levels,
             "Provided levels":levels(labels)
-          ))
+          )
         }
       }
     }

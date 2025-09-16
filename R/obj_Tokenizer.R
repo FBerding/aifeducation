@@ -30,8 +30,8 @@ TokenizerBase <- R6::R6Class(
     #------------------------------------------------------------------------
     # Method for loading tokenizer statistics
     load_tokenizer_statistics = function(model_dir) {
-      path <- paste0(model_dir, "/", "tokenizer_statistics.csv")
-      if (file.exists(path) == TRUE) {
+      path <- file.path(model_dir,  "tokenizer_statistics.csv")
+      if (file.exists(path) ) {
         private$tokenizer_statistics <- utils::read.csv(file = path)
       } else {
         private$tokenizer_statistics <- NA
@@ -40,12 +40,12 @@ TokenizerBase <- R6::R6Class(
     #------------------------------------------------------------------------
     # Method for saving tokenizer statistics
     save_tokenizer_statistics = function(dir_path, folder_name) {
-      if (is.null_or_na(private$tokenizer_statistics) == FALSE) {
-        save_location <- paste0(dir_path, "/", folder_name)
+      if (!is.null_or_na(private$tokenizer_statistics) ) {
+        save_location <- file.path(dir_path,  folder_name)
         create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
         write.csv(
           x = private$tokenizer_statistics,
-          file = paste0(save_location, "/", "tokenizer_statistics.csv"),
+          file = file.path(save_location,  "tokenizer_statistics.csv"),
           row.names = FALSE,
           quote = FALSE
         )
@@ -65,7 +65,7 @@ TokenizerBase <- R6::R6Class(
       check_type(object = folder_name, type = "string", FALSE)
 
       # Create Directory and Folder
-      save_location <- paste0(dir_path, "/", folder_name)
+      save_location <- file.path(dir_path,  folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       create_dir(save_location, trace = TRUE, msg_fun = FALSE)
 
@@ -140,9 +140,9 @@ TokenizerBase <- R6::R6Class(
     #' @return `list` containing the integer or token sequences of the raw texts with
     #' special tokens.
     encode = function(raw_text,
-                      token_overlap = 0,
-                      max_token_sequence_length = 512,
-                      n_chunks = 1,
+                      token_overlap = 0L,
+                      max_token_sequence_length = 512L,
+                      n_chunks = 1L,
                       token_encodings_only = FALSE,
                       token_to_int = TRUE,
                       return_token_type_ids = TRUE,
@@ -156,10 +156,10 @@ TokenizerBase <- R6::R6Class(
       # Start
       n_units <- length(raw_text)
       #---------------------------------------------------------------------
-      if (token_encodings_only == TRUE) {
+      if (token_encodings_only) {
         encodings <- NULL
         encodings_only <- NULL
-        for (i in 1:n_units) {
+        for (i in 1L:n_units) {
           tokens_unit <- NULL
 
           tokens <- private$model(
@@ -175,19 +175,19 @@ TokenizerBase <- R6::R6Class(
             return_tensors = "np"
           )
 
-          seq_len <- nrow(tokens[["input_ids"]])
+          tmp_seq_len <- nrow(tokens[["input_ids"]])
 
-          chunks <- min(seq_len, n_chunks)
+          chunks <- min(tmp_seq_len, n_chunks)
 
-          for (j in 1:chunks) {
+          for (j in 1L:chunks) {
             tokens_unit[j] <- list(tokens["input_ids"][j, ])
-            if (trace == TRUE) {
+            if (trace ) {
               cat(paste(get_time_stamp(), i, "/", n_units, "block", j, "/", chunks, "\n"))
             }
           }
           encodings_only[i] <- list(tokens_unit)
         }
-        if (token_to_int == TRUE) {
+        if (token_to_int ) {
           return(encodings_only)
         } else {
           # Convert ids to tokens
@@ -197,13 +197,13 @@ TokenizerBase <- R6::R6Class(
             tmp_sequence <- encodings_only[[i]]
             tmp_seqeunce_tok <- NULL
             for (j in seq_len(length(tmp_sequence))) {
-              tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1] <- list(
+              tmp_seqeunce_tok[length(tmp_seqeunce_tok) + 1L] <- list(
                 private$model$convert_ids_to_tokens(
                   ids = as.integer(tmp_sequence[[j]]), skip_special_tokens = FALSE
                 )
               )
             }
-            token_seq_list[length(token_seq_list) + 1] <- list(tmp_seqeunce_tok)
+            token_seq_list[length(token_seq_list) + 1L] <- list(tmp_seqeunce_tok)
           }
           return(token_seq_list)
         }
@@ -213,7 +213,7 @@ TokenizerBase <- R6::R6Class(
         encodings <- NULL
         chunk_list <- vector(length = n_units)
         total_chunk_list <- vector(length = n_units)
-        for (i in 1:n_units) {
+        for (i in 1L:n_units) {
           tokens <- private$model(
             raw_text[i],
             stride = as.integer(token_overlap),
@@ -231,13 +231,13 @@ TokenizerBase <- R6::R6Class(
 
           tmp_dataset <- datasets$Dataset$from_dict(tokens)
 
-          seq_len <- tmp_dataset$num_rows
-          chunk_list[i] <- min(seq_len, n_chunks)
-          total_chunk_list[i] <- seq_len
-          if (chunk_list[i] == 1) {
-            tmp_dataset <- tmp_dataset$select(list(as.integer((1:chunk_list[[i]]) - 1)))
+          tmp_seq_len <- tmp_dataset$num_rows
+          chunk_list[i] <- min(tmp_seq_len, n_chunks)
+          total_chunk_list[i] <- tmp_seq_len
+          if (chunk_list[i] == 1L) {
+            tmp_dataset <- tmp_dataset$select(list(as.integer((1L:chunk_list[[i]]) - 1L)))
           } else {
-            tmp_dataset <- tmp_dataset$select(as.integer((1:chunk_list[[i]]) - 1))
+            tmp_dataset <- tmp_dataset$select(as.integer((1L:chunk_list[[i]]) - 1L))
           }
 
           encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
@@ -266,7 +266,7 @@ TokenizerBase <- R6::R6Class(
         for (j in seq_len(length(int_seqence[[i]]))) {
           tmp_vector <- int_seqence[[i]][[j]]
           mode(tmp_vector) <- "integer"
-          if (to_token == FALSE) {
+          if (!to_token ) {
             tmp_seq_token_list[j] <- list(private$model$decode(
               token_ids = tmp_vector,
               skip_special_tokens = TRUE
@@ -295,16 +295,16 @@ TokenizerBase <- R6::R6Class(
       )
       tokens_map <- matrix(
         nrow = length(special_tokens),
-        ncol = 3,
+        ncol = 3L,
         data = NA
       )
       colnames(tokens_map) <- c("type", "token", "id")
       rownames(tokens_map) <- special_tokens
 
       for (i in seq_len(length(special_tokens))) {
-        tokens_map[i, 1] <- special_tokens[i]
-        tokens_map[i, 2] <- replace_null_with_na(private$model[special_tokens[i]])
-        tokens_map[i, 3] <- replace_null_with_na(
+        tokens_map[i, 1L] <- special_tokens[i]
+        tokens_map[i, 2L] <- replace_null_with_na(private$model[special_tokens[i]])
+        tokens_map[i, 3L] <- replace_null_with_na(
           private$model[paste0(special_tokens[i], "_id")]
         )
       }
@@ -347,9 +347,9 @@ TokenizerBase <- R6::R6Class(
         max_length = statistics_max_tokens_length,
         add_special_tokens = FALSE,
         log_file = NULL,
-        write_interval = 2,
-        value_top = 1,
-        total_top = 1,
+        write_interval = 2L,
+        value_top = 1L,
+        total_top = 1L,
         message_top = "NA"
       )
 
@@ -388,13 +388,13 @@ WordPieceTokenizer <- R6::R6Class(
     #' @param vocab_size `r get_param_doc_desc("vocab_size")`
     #' @param vocab_do_lower_case `r get_param_doc_desc("vocab_do_lower_case")`
     #' @return `r get_description("return_nothing")`
-    configure = function(vocab_size = 10000,
+    configure = function(vocab_size = 10000L,
                          vocab_do_lower_case = FALSE) {
       private$load_reload_python_scripts()
       private$check_config_for_FALSE()
 
       private$save_all_args(
-        args = get_called_args(n = 1),
+        args = get_called_args(n = 1L),
         group = "configure"
       )
 
@@ -415,17 +415,17 @@ WordPieceTokenizer <- R6::R6Class(
     #' @param trace `r get_param_doc_desc("trace")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
-                     statistics_max_tokens_length = 512,
+                     statistics_max_tokens_length = 512L,
                      sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
-                     sustain_interval = 15,
+                     sustain_interval = 15L,
                      trace = FALSE) {
       private$check_config_for_TRUE()
       private$check_for_untrained()
 
       private$save_all_args(
-        args = get_called_args(n = 1),
+        args = get_called_args(n = 1L),
         group = "training"
       )
 
@@ -433,9 +433,9 @@ WordPieceTokenizer <- R6::R6Class(
 
       # Define tokens
       sep_token <- "[SEP]"
-      sep_id <- 1
+      sep_id <- 1L
       cls_token <- "[CLS]"
-      cls_id <- 0
+      cls_id <- 0L
       unk_token <- "[UNK]"
       pad_token <- "[PAD]"
       mask_token <- "[MASK]"
@@ -483,9 +483,9 @@ WordPieceTokenizer <- R6::R6Class(
           batch_size = 200L,
           dataset = text_dataset$get_dataset(),
           log_file = NULL,
-          write_interval = 2,
-          value_top = 0,
-          total_top = 1,
+          write_interval = 2L,
+          value_top = 0L,
+          total_top = 1L,
           message_top = "NA"
         ),
         trainer = trainer,
@@ -544,7 +544,7 @@ BPETokenizer <- R6::R6Class(
     #' @param trim_offsets `r get_param_doc_desc("trim_offsets")`
     #' @param vocab_do_lower_case `r get_param_doc_desc("vocab_do_lower_case")`
     #' @return `r get_description("return_nothing")`
-    configure = function(vocab_size = 2000,
+    configure = function(vocab_size = 2000L,
                          add_prefix_space = TRUE,
                          trim_offsets = FALSE,
                          vocab_do_lower_case = FALSE) {
@@ -552,7 +552,7 @@ BPETokenizer <- R6::R6Class(
       private$check_config_for_FALSE()
 
       private$save_all_args(
-        args = get_called_args(n = 1),
+        args = get_called_args(n = 1L),
         group = "configure"
       )
 
@@ -573,17 +573,17 @@ BPETokenizer <- R6::R6Class(
     #' @param trace `r get_param_doc_desc("trace")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
-                     statistics_max_tokens_length = 512,
+                     statistics_max_tokens_length = 512L,
                      sustain_track = FALSE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
-                     sustain_interval = 15,
+                     sustain_interval = 15L,
                      trace = FALSE) {
       private$check_config_for_TRUE()
       private$check_for_untrained()
 
       private$save_all_args(
-        args = get_called_args(n = 1),
+        args = get_called_args(n = 1L),
         group = "training"
       )
 
@@ -591,9 +591,9 @@ BPETokenizer <- R6::R6Class(
 
       # Define tokens
       sep_token <- "[SEP]"
-      sep_id <- 1
+      sep_id <- 1L
       cls_token <- "[CLS]"
-      cls_id <- 0
+      cls_id <- 0L
       unk_token <- "[UNK]"
       pad_token <- "[PAD]"
       mask_token <- "[MASK]"
@@ -616,7 +616,7 @@ BPETokenizer <- R6::R6Class(
         )
       )
 
-      if (private$model_config$vocab_do_lower_case == TRUE) {
+      if (private$model_config$vocab_do_lower_case) {
         tok_new$normalizer <- tok$normalizers$Sequence(
           c(tok$normalizers$Lowercase(), tok$normalizers$NFC())
         )
@@ -628,7 +628,7 @@ BPETokenizer <- R6::R6Class(
         trim_offsets = private$model_config$trim_offsets,
         add_prefix_space = private$model_config$add_prefix_space,
         sep = reticulate::tuple(sep_token, as.integer(sep_id)),
-        cls = reticulate::tuple(cls_token, as.integer(cls_id)),
+        cls = reticulate::tuple(cls_token, as.integer(cls_id))
       )
 
       tok_new$decoder <- tok$decoders$ByteLevel()
@@ -651,9 +651,9 @@ BPETokenizer <- R6::R6Class(
           batch_size = 200L,
           dataset = text_dataset$get_dataset(),
           log_file = NULL,
-          write_interval = 2,
-          value_top = 0,
-          total_top = 1,
+          write_interval = 2L,
+          value_top = 0L,
+          total_top = 1L,
           message_top = "NA"
         ),
         trainer = trainer,

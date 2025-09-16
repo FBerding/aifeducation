@@ -23,10 +23,10 @@
 update_values_to_new_1.1.0 <- function(value) {
   if (is.null_or_na(value)) {
     return(value)
-  } else if (is.character(value) && length(value) == 1) {
+  } else if (is.character(value) && length(value) == 1L) {
     # column 1 represent the old values
     # column 2 represent the new values
-    data <- c(
+    tmp_data <- c(
       "last", "Last",
       "middle", "Middle",
       "first", "First",
@@ -52,14 +52,14 @@ update_values_to_new_1.1.0 <- function(value) {
     )
 
     value_table <- matrix(
-      data = data,
-      ncol = 2,
+      data = tmp_data,
+      ncol = 2L,
       byrow = TRUE
     )
 
-    ind <- which(value_table[, 1] == value)
-    if (length(ind) == 1) {
-      new_value <- value_table[ind, 2]
+    ind <- which(value_table[, 1L] == value)
+    if (length(ind) == 1L) {
+      new_value <- value_table[ind, 2L]
       return(new_value)
     } else {
       return(value)

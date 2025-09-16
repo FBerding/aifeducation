@@ -39,13 +39,13 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
                                             features,
                                             target,
                                             sequence_length,
-                                            method = c("knnor"),
-                                            min_k = 1,
-                                            max_k = 6) {
+                                            method = "knnor",
+                                            min_k = 1L,
+                                            max_k = 6L) {
   # get possible seq lengthes in order to group the cases by sequence length
   seq_length_categories <- as.numeric(names(table(sequence_length)))
 
-  index <- 1
+  index <- 1L
   input <- NULL
 
   # Create tasks for every group of sequence lengths
@@ -58,7 +58,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 
     for (cat in categories) {
       # Check k and adjust if necessary
-      n_neighbors <- cat_freq[cat] - 1
+      n_neighbors <- cat_freq[cat] - 1L
 
       if (n_neighbors <= max_k) {
         max_k_final <- n_neighbors
@@ -83,13 +83,13 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
         min_k_final <- min_k_final + difference
       }
 
-      if (cat_freq[cat] < max_freq && min_k > 0 && cat_freq[cat] > 3 && required_cases > 0) {
+      if (cat_freq[cat] < max_freq && min_k > 0L && cat_freq[cat] > 3L && required_cases > 0L) {
         for (m in seq_len(length(method))) {
           for (k in min_k_final:max_k_final) {
-            if (length(max_k_final) > 1) {
+            if (length(max_k_final) > 1L) {
               stop("length")
             }
-            if (max_k_final < 0) {
+            if (max_k_final < 0L) {
               stop("max smaller 0")
             }
             # print(as.numeric(max_k_final))
@@ -104,7 +104,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
               k_s = length(min_k_final:max_k_final),
               max_k = as.numeric(max_k_final)
             )
-            index <- index + 1
+            index <- index + 1L
           }
         }
       }
@@ -123,7 +123,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
         input[[index]]$selected_cases,
-        c(1:(input[[index]]$chunks * features))
+        c(1L:(input[[index]]$chunks * features))
       ],
       target = target[input[[index]]$selected_cases],
       required_cases = input[[index]]$required_cases,
@@ -136,15 +136,15 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
   }
 
   # get number of synthetic cases
-  n_syn_cases <- 0
+  n_syn_cases <- 0L
   for (i in seq_len(length(result_list))) {
-    if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
+    if (!is.null(result_list[[i]]$syntetic_embeddings)) {
       n_syn_cases <- n_syn_cases + nrow(result_list[[i]]$syntetic_embeddings)
     }
   }
 
   syntetic_embeddings <- matrix(
-    data = 0,
+    data = 0L,
     nrow = n_syn_cases,
     ncol = times * features
   )
@@ -152,12 +152,12 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
   syntetic_embeddings <- as.data.frame(syntetic_embeddings)
   syntetic_targets <- NULL
 
-  n_row <- 0
+  n_row <- 0L
   names_vector <- NULL
   for (i in seq_len(length(result_list))) {
-    if (is.null(result_list[[i]]$syntetic_embeddings) == FALSE) {
+    if (!is.null(result_list[[i]]$syntetic_embeddings) ) {
       syntetic_embeddings[
-        (n_row + 1):(n_row + nrow(result_list[[i]]$syntetic_embeddings)),
+        (n_row + 1L):(n_row + nrow(result_list[[i]]$syntetic_embeddings)),
         c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))
       ] <- result_list[[i]]$syntetic_embeddings[, c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))]
       syntetic_targets <- append(syntetic_targets, values = result_list[[i]]$syntetic_targets)
@@ -239,14 +239,14 @@ create_synthetic_units_from_matrix <- function(matrix_form,
   }
 
   if (
-    inherits(x = syn_data, what = "try-error") == FALSE &&
-      (is.null(syn_data) == FALSE || nrow(syn_data$syn_data) > 0)
+    !inherits(x = syn_data, what = "try-error") &&
+      (!is.null(syn_data)  || nrow(syn_data$syn_data) > 0L)
   ) {
     n_cols_embedding <- ncol(matrix_form)
-    tmp_data <- syn_data$syn_data[1:required_cases, -ncol(syn_data$syn_data)]
+    tmp_data <- syn_data$syn_data[1L:required_cases, -ncol(syn_data$syn_data)]
     rownames(tmp_data) <- paste0(
       method, "_", cat, "_", k, "_", n_cols_embedding, "_",
-      seq(from = 1, to = nrow(tmp_data), by = 1)
+      seq(from = 1L, to = nrow(tmp_data), by = 1L)
     )
     tmp_data <- as.data.frame(tmp_data)
     tmp_target <- rep(cat, times = nrow(tmp_data))
@@ -293,13 +293,13 @@ get_train_test_split <- function(embedding = NULL,
   for (cat in categories) {
     tmp <- subset(target, target == cat)
     val_sampe[cat] <- list(
-      sample(names(tmp), size = max(1, length(tmp) * val_size))
+      sample(names(tmp), size = max(1L, length(tmp) * val_size))
     )
   }
   val_data <- target[unlist(val_sampe)]
   train_data <- target[setdiff(names(target), names(val_data))]
 
-  if (is.null(embedding) == FALSE) {
+  if (!is.null(embedding)) {
     val_embeddings <- embedding$clone(deep = TRUE)
     val_embeddings$embeddings <- val_embeddings$embeddings[names(val_data), ]
     val_embeddings$embeddings <- na.omit(val_embeddings$embeddings)
@@ -356,11 +356,11 @@ get_folds <- function(target,
   categories <- names(freq_cat)
   min_freq <- min(freq_cat)
 
-  if (min_freq / k_folds < 1) {
+  if (min_freq / k_folds < 1L) {
     fin_k_folds <- min_freq
-    warning(paste("Frequency of the smallest category/label is not sufficent to ensure
-                  at least 1 cases per fold. Adjusting number of folds from ", k_folds, "to", fin_k_folds, "."))
-    if (fin_k_folds == 0) {
+    warning("Frequency of the smallest category/label is not sufficent to ensure
+                  at least 1 cases per fold. Adjusting number of folds from ", k_folds, " to ", fin_k_folds, ".")
+    if (fin_k_folds == 0L) {
       stop("Frequency of the smallest category/label is to low. Please check your data.
            Consider to remove all categories/labels with a very low absolute frequency.")
     }
@@ -381,9 +381,9 @@ get_folds <- function(target,
     cases_per_fold[] <- ceiling(n_cases / fin_k_folds)
 
     delta <- sum(cases_per_fold) - n_cases
-    if (delta > 0) {
-      for (i in 1:delta) {
-        cases_per_fold[1 + (i - 1) %% fin_k_folds] <- cases_per_fold[1 + (i - 1) %% fin_k_folds] - 1
+    if (delta > 0L) {
+      for (i in 1L:delta) {
+        cases_per_fold[1L + (i - 1L) %% fin_k_folds] <- cases_per_fold[1L + (i - 1L) %% fin_k_folds] - 1L
       }
     }
 
@@ -411,7 +411,7 @@ get_folds <- function(target,
   }
 
   val_sample <- NULL
-  for (i in 1:fin_k_folds) {
+  for (i in 1L:fin_k_folds) {
     condition <- (final_assignments == i)
     val_sample[i] <- list(names(subset(
       x = final_assignments,
@@ -420,11 +420,11 @@ get_folds <- function(target,
   }
 
   train_sample <- NULL
-  for (i in 1:fin_k_folds) {
+  for (i in 1L:fin_k_folds) {
     train_sample[i] <- list(setdiff(x = names(sample_target), y = val_sample[[i]]))
   }
 
-  unlabeled_cases <- setdiff(x = names(target), y = c(val_sample[[1]], train_sample[[1]]))
+  unlabeled_cases <- setdiff(x = names(target), y = c(val_sample[[1L]], train_sample[[1L]]))
 
   results <- list(
     val_sample = val_sample,
@@ -459,7 +459,7 @@ get_stratified_train_test_split <- function(targets, val_size = 0.25) {
       subset = condition
     ))
     test_sample[cat] <- list(
-      sample(tmp, size = max(1, length(tmp) * val_size))
+      sample(tmp, size = max(1L, length(tmp) * val_size))
     )
   }
   test_sample <- unlist(test_sample, use.names = FALSE)
@@ -485,19 +485,19 @@ get_stratified_train_test_split <- function(targets, val_size = 0.25) {
 #' @family Utils Developers
 #'
 #' @export
-get_n_chunks <- function(text_embeddings, features, times, pad_value = -100) {
+get_n_chunks <- function(text_embeddings, features, times, pad_value = -100L) {
   n_chunks <- vector(length = nrow(text_embeddings))
-  n_chunks[] <- 0
+  n_chunks[] <- 0L
 
-  if (length(dim(text_embeddings)) == 2) {
-    for (i in 1:times) {
-      window <- c(1:features) + (i - 1) * features
+  if (length(dim(text_embeddings)) == 2L) {
+    for (i in 1L:times) {
+      window <- c(1L:features) + (i - 1L) * features
       sub_matrix <- text_embeddings[, window, drop = FALSE]
       tmp_sums <- rowSums(sub_matrix)
       n_chunks <- n_chunks + as.numeric(!tmp_sums == times * pad_value)
     }
-  } else if (length(dim(text_embeddings)) == 3) {
-    for (i in 1:times) {
+  } else if (length(dim(text_embeddings)) == 3L) {
+    for (i in 1L:times) {
       sub_matrix <- text_embeddings[, i, , drop = FALSE]
       tmp_sums <- rowSums(sub_matrix)
       n_chunks <- n_chunks + as.numeric(!tmp_sums == features * pad_value)
