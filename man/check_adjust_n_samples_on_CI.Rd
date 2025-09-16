@@ -4,7 +4,7 @@
 \alias{check_adjust_n_samples_on_CI}
 \title{Set sample size for argument combinations}
 \usage{
-check_adjust_n_samples_on_CI(n_samples_requested, n_CI = 50)
+check_adjust_n_samples_on_CI(n_samples_requested, n_CI = 50L)
 }
 \arguments{
 \item{n_samples_requested}{\code{int} Number of samples if the test do not run on continuous integration.}

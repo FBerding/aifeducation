@@ -6,17 +6,17 @@
 \usage{
 write_log(
   log_file,
-  value_top = 0,
-  total_top = 1,
+  value_top = 0L,
+  total_top = 1L,
   message_top = NA,
-  value_middle = 0,
-  total_middle = 1,
+  value_middle = 0L,
+  total_middle = 1L,
   message_middle = NA,
-  value_bottom = 0,
-  total_bottom = 1,
+  value_bottom = 0L,
+  total_bottom = 1L,
   message_bottom = NA,
   last_log = NULL,
-  write_interval = 2
+  write_interval = 2L
 )
 }
 \arguments{

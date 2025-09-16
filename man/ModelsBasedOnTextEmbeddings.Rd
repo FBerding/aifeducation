@@ -169,7 +169,7 @@ This method requires the \emph{R} package 'ggplot2' to work.
   y_min = NULL,
   y_max = NULL,
   add_min_max = TRUE,
-  text_size = 10
+  text_size = 10L
 )}\if{html}{\out{</div>}}
 }
 

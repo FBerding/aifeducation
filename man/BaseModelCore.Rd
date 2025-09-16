@@ -109,20 +109,20 @@ Traines a BaseModel
   p_mask = 0.15,
   whole_word = TRUE,
   val_size = 0.1,
-  n_epoch = 1,
-  batch_size = 12,
-  max_sequence_length = 250,
+  n_epoch = 1L,
+  batch_size = 12L,
+  max_sequence_length = 250L,
   full_sequences_only = FALSE,
-  min_seq_len = 50,
+  min_seq_len = 50L,
   learning_rate = 0.003,
   sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 15,
+  sustain_interval = 15L,
   trace = TRUE,
-  pytorch_trace = 1,
+  pytorch_trace = 1L,
   log_dir = NULL,
-  log_write_interval = 2
+  log_write_interval = 2L
 )}\if{html}{\out{</div>}}
 }
 
@@ -191,7 +191,11 @@ Returns the number of trainable parameters of the model.
 Method for requesting a plot of the training history.
 This method requires the \emph{R} package 'ggplot2' to work.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$plot_training_history(y_min = NULL, y_max = NULL, text_size = 10)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$plot_training_history(
+  y_min = NULL,
+  y_max = NULL,
+  text_size = 10L
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -242,7 +246,7 @@ Returns a \code{data.frame} containing the tokenizer's statistics.
 \subsection{Method \code{fill_mask()}}{
 Method for calculating tokens behind mask tokens.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$fill_mask(masked_text, n_solutions = 5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$fill_mask(masked_text, n_solutions = 5L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -395,7 +399,7 @@ Calculates the energy consumption for inference of the given task.
   n = NULL,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 15,
+  sustain_interval = 15L,
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }

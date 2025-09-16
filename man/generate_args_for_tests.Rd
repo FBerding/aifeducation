@@ -9,10 +9,10 @@ generate_args_for_tests(
   method,
   var_objects = list(),
   necessary_objects = list(),
-  var_override = list(sustain_interval = 30, trace = FALSE, epochs = 50, batch_size = 20,
-    ml_trace = 0, n_cores = 2, data_folds = 2, pl_max_steps = 2, pl_max = 1, pl_anchor =
-    1, pl_min = 0, sustain_track = TRUE, sustain_iso_code = "DEU", data_val_size = 0.25,
-    lr_rate = 0.001, lr_warm_up_ratio = 0.01)
+  var_override = list(sustain_interval = 30L, trace = FALSE, epochs = 50L, batch_size =
+    20L, ml_trace = 0L, n_cores = 2L, data_folds = 2L, pl_max_steps = 2L, pl_max = 1L,
+    pl_anchor = 1L, pl_min = 0L, sustain_track = TRUE, sustain_iso_code = "DEU",
+    data_val_size = 0.25, lr_rate = 0.001, lr_warm_up_ratio = 0.01)
 )
 }
 \arguments{

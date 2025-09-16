@@ -10,9 +10,9 @@ get_synthetic_cases_from_matrix(
   features,
   target,
   sequence_length,
-  method = c("knnor"),
-  min_k = 1,
-  max_k = 6
+  method = "knnor",
+  min_k = 1L,
+  max_k = 6L
 )
 }
 \arguments{

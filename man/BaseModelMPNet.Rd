@@ -76,11 +76,11 @@ Configures a new object of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseModelMPNet$configure(
   tokenizer,
-  max_position_embeddings = 512,
-  hidden_size = 768,
-  num_hidden_layers = 12,
-  num_attention_heads = 12,
-  intermediate_size = 3072,
+  max_position_embeddings = 512L,
+  hidden_size = 768L,
+  num_hidden_layers = 12L,
+  num_attention_heads = 12L,
+  intermediate_size = 3072L,
   hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1
@@ -128,20 +128,20 @@ Traines a BaseModel
   p_perm = 0.15,
   whole_word = TRUE,
   val_size = 0.1,
-  n_epoch = 1,
-  batch_size = 12,
-  max_sequence_length = 250,
+  n_epoch = 1L,
+  batch_size = 12L,
+  max_sequence_length = 250L,
   full_sequences_only = FALSE,
-  min_seq_len = 50,
+  min_seq_len = 50L,
   learning_rate = 0.003,
   sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 15,
+  sustain_interval = 15L,
   trace = TRUE,
-  pytorch_trace = 1,
+  pytorch_trace = 1L,
   log_dir = NULL,
-  log_write_interval = 2
+  log_write_interval = 2L
 )}\if{html}{\out{</div>}}
 }
 

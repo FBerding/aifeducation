@@ -77,11 +77,11 @@ Configures a new object of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseModelBert$configure(
   tokenizer,
-  max_position_embeddings = 512,
-  hidden_size = 768,
-  num_hidden_layers = 12,
-  num_attention_heads = 12,
-  intermediate_size = 3072,
+  max_position_embeddings = 512L,
+  hidden_size = 768L,
+  num_hidden_layers = 12L,
+  num_attention_heads = 12L,
+  intermediate_size = 3072L,
   hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1

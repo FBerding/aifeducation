@@ -92,7 +92,7 @@ Creating a new instance of this class.
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
-  features = 128,
+  features = 128L,
   method = "dense",
   orthogonal_method = "matrix_exp",
   noise_factor = 0.2
@@ -137,13 +137,13 @@ Method for training a neural net.
   sustain_track = TRUE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 15,
-  epochs = 40,
-  batch_size = 32,
+  sustain_interval = 15L,
+  epochs = 40L,
+  batch_size = 32L,
   trace = TRUE,
-  ml_trace = 1,
+  ml_trace = 1L,
   log_dir = NULL,
-  log_write_interval = 10,
+  log_write_interval = 10L,
   lr_rate = 0.001,
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW"
@@ -264,7 +264,7 @@ This method requires the \emph{R} package 'ggplot2' to work.
 \if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$plot_training_history(
   y_min = NULL,
   y_max = NULL,
-  text_size = 10
+  text_size = 10L
 )}\if{html}{\out{</div>}}
 }
 

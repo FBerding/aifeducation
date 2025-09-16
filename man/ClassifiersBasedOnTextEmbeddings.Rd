@@ -111,8 +111,8 @@ Method for predicting new data with a trained neural net.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ClassifiersBasedOnTextEmbeddings$predict(
   newdata,
-  batch_size = 32,
-  ml_trace = 1
+  batch_size = 32L,
+  ml_trace = 1L
 )}\if{html}{\out{</div>}}
 }
 
@@ -290,7 +290,7 @@ This method requires the \emph{R} package 'ggplot2' to work.
   y_min = NULL,
   y_max = NULL,
   add_min_max = TRUE,
-  text_size = 10
+  text_size = 10L
 )}\if{html}{\out{</div>}}
 }
 
@@ -336,9 +336,9 @@ assigned to a the available classes/categories. The visualization
 is helpful for analyzing the consequences of coding errors.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ClassifiersBasedOnTextEmbeddings$plot_coding_stream(
-  label_categories_size = 3,
+  label_categories_size = 3L,
   key_size = 0.5,
-  text_size = 10
+  text_size = 10L
 )}\if{html}{\out{</div>}}
 }
 

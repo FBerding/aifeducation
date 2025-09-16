@@ -91,11 +91,11 @@ names. Id and raw texts are mandatory, bibliographic and license information are
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_txt(
   dir_path,
-  batch_size = 500,
+  batch_size = 500L,
   log_file = NULL,
-  log_write_interval = 2,
-  log_top_value = 0,
-  log_top_total = 1,
+  log_write_interval = 2L,
+  log_top_value = 0L,
+  log_top_total = 1L,
   log_top_message = NA,
   clean_text = TRUE,
   trace = TRUE
@@ -163,11 +163,11 @@ names. Id and raw texts are mandatory, bibliographic and license information are
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForText$add_from_files_pdf(
   dir_path,
-  batch_size = 500,
+  batch_size = 500L,
   log_file = NULL,
-  log_write_interval = 2,
-  log_top_value = 0,
-  log_top_total = 1,
+  log_write_interval = 2L,
+  log_top_value = 0L,
+  log_top_total = 1L,
   log_top_message = NA,
   clean_text = TRUE,
   trace = TRUE
@@ -235,9 +235,9 @@ optional. Additional columns are dropped.
   text_license_column = "text_license",
   url_source_column = "url_source",
   log_file = NULL,
-  log_write_interval = 2,
-  log_top_value = 0,
-  log_top_total = 1,
+  log_write_interval = 2L,
+  log_top_value = 0L,
+  log_top_total = 1L,
   log_top_message = NA
 )}\if{html}{\out{</div>}}
 }

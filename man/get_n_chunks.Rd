@@ -4,7 +4,7 @@
 \alias{get_n_chunks}
 \title{Get the number of chunks/sequences for each case}
 \usage{
-get_n_chunks(text_embeddings, features, times, pad_value = -100)
+get_n_chunks(text_embeddings, features, times, pad_value = -100L)
 }
 \arguments{
 \item{text_embeddings}{\code{data.frame} or \code{array} containing the text embeddings.}

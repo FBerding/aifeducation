@@ -4,7 +4,7 @@
 \alias{get_test_data_for_classifiers}
 \title{Get test data}
 \usage{
-get_test_data_for_classifiers(class_range = c(2, 3), path_test_embeddings)
+get_test_data_for_classifiers(class_range = c(2L, 3L), path_test_embeddings)
 }
 \arguments{
 \item{class_range}{\code{vector} containing the number of classes.}

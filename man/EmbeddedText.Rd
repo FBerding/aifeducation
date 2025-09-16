@@ -64,6 +64,7 @@ in the columns.}
 Creates a new object representing text embeddings.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EmbeddedText$configure(
+  embeddings,
   model_name = NA,
   model_label = NA,
   model_date = NA,
@@ -78,14 +79,15 @@ Creates a new object representing text embeddings.
   param_emb_layer_max = NULL,
   param_emb_pool_type = NULL,
   param_aggregation = NULL,
-  param_pad_value = -100,
-  embeddings
+  param_pad_value = -100L
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{embeddings}}{\code{data.frame} containing the text embeddings.}
+
 \item{\code{model_name}}{\code{string} Name of the model that generates this embedding.}
 
 \item{\code{model_label}}{\code{string} Label of the model that generates this embedding.}
@@ -121,8 +123,6 @@ compatibility.}
 \item{\code{param_pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
-
-\item{\code{embeddings}}{\code{data.frame} containing the text embeddings.}
 }
 \if{html}{\out{</div>}}
 }

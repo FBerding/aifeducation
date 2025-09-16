@@ -72,7 +72,7 @@ Other Tokenizer:
 \subsection{Method \code{configure()}}{
 Configures a new object of this class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{WordPieceTokenizer$configure(vocab_size = 10000, vocab_do_lower_case = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{WordPieceTokenizer$configure(vocab_size = 10000L, vocab_do_lower_case = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -96,11 +96,11 @@ Trains a new object of this class
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{WordPieceTokenizer$train(
   text_dataset,
-  statistics_max_tokens_length = 512,
+  statistics_max_tokens_length = 512L,
   sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 15,
+  sustain_interval = 15L,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }

@@ -141,9 +141,9 @@ Method for encoding words of raw texts into integers.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$encode(
   raw_text,
-  token_overlap = 0,
-  max_token_sequence_length = 512,
-  n_chunks = 1,
+  token_overlap = 0L,
+  max_token_sequence_length = 512L,
+  n_chunks = 1L,
   token_encodings_only = FALSE,
   token_to_int = TRUE,
   return_token_type_ids = TRUE,

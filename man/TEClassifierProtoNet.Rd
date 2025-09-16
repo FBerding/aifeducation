@@ -122,21 +122,21 @@ Creating a new instance of this class.
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
-  dense_size = 4,
-  dense_layers = 0,
-  rec_size = 4,
-  rec_layers = 2,
+  dense_size = 4L,
+  dense_layers = 0L,
+  rec_size = 4L,
+  rec_layers = 2L,
   rec_type = "GRU",
   rec_bidirectional = FALSE,
-  embedding_dim = 2,
-  self_attention_heads = 0,
+  embedding_dim = 2L,
+  self_attention_heads = 0L,
   intermediate_size = NULL,
   attention_type = "Fourier",
   add_pos_embedding = TRUE,
   act_fct = "ELU",
   parametrizations = "None",
   rec_dropout = 0.1,
-  repeat_encoder = 1,
+  repeat_encoder = 1L,
   dense_dropout = 0.4,
   encoder_dropout = 0.1
 )}\if{html}{\out{</div>}}
@@ -207,7 +207,7 @@ Method for embedding documents. Please do not confuse this type of embeddings wi
 texts created by an object of class \link{TextEmbeddingModel}. These embeddings embed documents according to their
 similarity to specific classes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$embed(embeddings_q = NULL, batch_size = 32)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$embed(embeddings_q = NULL, batch_size = 32L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -238,10 +238,10 @@ Method for creating a plot to visualize embeddings and their corresponding cente
 \if{html}{\out{<div class="r">}}\preformatted{TEClassifierProtoNet$plot_embeddings(
   embeddings_q,
   classes_q = NULL,
-  batch_size = 12,
+  batch_size = 12L,
   alpha = 0.5,
-  size_points = 3,
-  size_points_prototypes = 8,
+  size_points = 3L,
+  size_points_prototypes = 8L,
   inc_unlabeled = TRUE
 )}\if{html}{\out{</div>}}
 }

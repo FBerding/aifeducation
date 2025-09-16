@@ -4,7 +4,7 @@
 \alias{generate_id}
 \title{Generate ID suffix for objects}
 \usage{
-generate_id(length = 16)
+generate_id(length = 16L)
 }
 \arguments{
 \item{length}{\code{int} determining the length of the id suffix.}

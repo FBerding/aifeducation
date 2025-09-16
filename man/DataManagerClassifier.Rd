@@ -74,15 +74,15 @@ Creating a new instance of this class.
 \if{html}{\out{<div class="r">}}\preformatted{DataManagerClassifier$new(
   data_embeddings,
   data_targets,
-  folds = 5,
-  val_size = 0.25,
-  pad_value = -100,
   class_levels,
+  folds = 5L,
+  val_size = 0.25,
+  pad_value = -100L,
   one_hot_encoding = TRUE,
   add_matrix_map = TRUE,
   sc_methods = "knnor",
-  sc_min_k = 1,
-  sc_max_k = 10,
+  sc_min_k = 1L,
+  sc_max_k = 10L,
   trace = TRUE,
   n_cores = auto_n_cores()
 )}\if{html}{\out{</div>}}
@@ -96,6 +96,10 @@ Creating a new instance of this class.
 \item{\code{data_targets}}{\code{factor} containing the labels for cases stored in embeddings. Factor must be
 named and has to use the same names as used in in the embeddings.}
 
+\item{\code{class_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
+note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
+indicating a higher category/class. For nominal data the order does not matter.}
+
 \item{\code{folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \code{1 <= x }}
 
 \item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
@@ -105,10 +109,6 @@ The remaining cases are part of the training data. Allowed values: \verb{0 < x <
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
-
-\item{\code{class_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
-note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
-indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{one_hot_encoding}}{\code{bool} If \code{TRUE} all labels are converted to one hot encoding.}
 

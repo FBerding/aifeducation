@@ -65,7 +65,7 @@ Other Tokenizer:
 Configures a new object of this class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BPETokenizer$configure(
-  vocab_size = 2000,
+  vocab_size = 2000L,
   add_prefix_space = TRUE,
   trim_offsets = FALSE,
   vocab_do_lower_case = FALSE
@@ -97,11 +97,11 @@ Trains a new object of this class
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BPETokenizer$train(
   text_dataset,
-  statistics_max_tokens_length = 512,
+  statistics_max_tokens_length = 512L,
   sustain_track = FALSE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 15,
+  sustain_interval = 15L,
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }

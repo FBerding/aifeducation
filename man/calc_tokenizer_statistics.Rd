@@ -7,7 +7,7 @@
 calc_tokenizer_statistics(
   dataset,
   step = "creation",
-  statistics_max_tokens_length = 512
+  statistics_max_tokens_length = 512L
 )
 }
 \arguments{

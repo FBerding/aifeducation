@@ -91,7 +91,7 @@ Creates a new object representing text embeddings.
   param_emb_layer_min = NULL,
   param_emb_layer_max = NULL,
   param_emb_pool_type = NULL,
-  param_pad_value = -100,
+  param_pad_value = -100L,
   param_aggregation = NULL
 )}\if{html}{\out{</div>}}
 }

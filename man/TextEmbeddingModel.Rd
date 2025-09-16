@@ -78,13 +78,13 @@ Method for creating a new text embedding model
   model_name = NULL,
   model_label = NULL,
   model_language = NULL,
-  max_length = 0,
-  chunks = 2,
-  overlap = 0,
-  emb_layer_min = 1,
-  emb_layer_max = 2,
+  max_length = 0L,
+  chunks = 2L,
+  overlap = 0L,
+  emb_layer_min = 1L,
+  emb_layer_max = 2L,
   emb_pool_type = "Average",
-  pad_value = -100,
+  pad_value = -100L,
   base_model = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -251,7 +251,7 @@ into text embeddings. For a large number of texts please use the method \code{em
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed(
   raw_text = NULL,
   doc_id = NULL,
-  batch_size = 8,
+  batch_size = 8L,
   trace = FALSE,
   return_large_dataset = FALSE
 )}\if{html}{\out{</div>}}
@@ -286,10 +286,10 @@ Method for creating text embeddings from raw texts.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$embed_large(
   text_dataset,
-  batch_size = 32,
+  batch_size = 32L,
   trace = FALSE,
   log_file = NULL,
-  log_write_interval = 2
+  log_write_interval = 2L
 )}\if{html}{\out{</div>}}
 }
 
@@ -399,10 +399,10 @@ Calculates the energy consumption for inference of the given task.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TextEmbeddingModel$estimate_sustainability_inference_embed(
   text_dataset = NULL,
-  batch_size = 32,
+  batch_size = 32L,
   sustain_iso_code = NULL,
   sustain_region = NULL,
-  sustain_interval = 10,
+  sustain_interval = 10L,
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }
