@@ -78,7 +78,7 @@ TextEmbeddingModel <- R6::R6Class(
         } else if (emb_layer_min == "Middle") {
           emb_layer_min <- floor(0.5 * max_layers_funnel)
         } else if (emb_layer_min == "2_3_layer") {
-          emb_layer_min <- floor(2L / L3 * max_layers_funnel)
+          emb_layer_min <- floor(2L / 3L * max_layers_funnel)
         } else if (emb_layer_min == "Last") {
           emb_layer_min <- max_layers_funnel
         }

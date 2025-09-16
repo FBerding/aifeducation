@@ -368,7 +368,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
             current_proto <- prototypes[i, ]
             tmp_plot <- tmp_plot + ggplot2::annotate(
               geom = "point",
-              x = current_proto$x + margin * cos(seq(from = 0L, to = L2 * base::pi, length.out = 1000L)),
+              x = current_proto$x + margin * cos(seq(from = 0L, to = 2L * base::pi, length.out = 1000L)),
               y = current_proto$y + margin * sin(seq(from = 0L, to = 2L * base::pi, length.out = 1000L))
             )
           }

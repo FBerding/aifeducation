@@ -933,7 +933,7 @@ BaseModelCore <- R6::R6Class(
       colnames(results) <- res_colnames
       results <- as.data.frame(results)
 
-      bp_factors <- c(1L, L2, 3L, 4L)
+      bp_factors <- c(1L, 2L, 3L, 4L)
 
       tokenized_texts <- tokenizer(
         text = generated_texts,
@@ -963,7 +963,7 @@ BaseModelCore <- R6::R6Class(
           ignore_modules = NULL
         )
 
-        results[1L, "n_parameter"] <- est_flops[[L3]]
+        results[1L, "n_parameter"] <- est_flops[[3L]]
         results[1L, "batch_size"] <- batch_size
         results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[1L]] * n_batches * n_epochs
       }
