@@ -61,7 +61,7 @@ base_model_type_list=BaseModelsIndex
 #)
 
 pooling_type_list <- list(
-  "BaseModelFunnel" = c("CLS"),
+  "BaseModelFunnel" = "CLS",
   "BaseModelBert" = c("CLS", "Average"),
   "BaseModelRoberta" = c("CLS", "Average"),
   "BaseModelLongformer" = c("CLS", "Average"),
@@ -556,7 +556,7 @@ max_layers <- 2
               text_embedding_model$set_model_license("test_license")
               expect_equal(
                 object = text_embedding_model$get_model_license(),
-                expected = c("test_license")
+                expected = "test_license"
               )
             })
 
@@ -565,7 +565,7 @@ max_layers <- 2
               text_embedding_model$set_documentation_license("test_license")
               expect_equal(
                 object = text_embedding_model$get_documentation_license(),
-                expected = c("test_license")
+                expected = "test_license"
               )
             })
 

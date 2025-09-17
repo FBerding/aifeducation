@@ -96,7 +96,6 @@ arma::mat tensor_to_matrix_c(arma::cube tensor,
 
       for(arma::uword feature_i = 0; feature_i < features; ++feature_i)
         output_matrix(batch_i, index + feature_i) = tensor(batch_i, time_i, feature_i);
-
     }
   }
   return output_matrix;

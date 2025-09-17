@@ -886,7 +886,7 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
   )
 
   missing_r_packages <- NULL
-  for (i in seq_len(length(r_packages))) {
+  for (i in seq_along(r_packages)) {
     if (!requireNamespace(names(r_packages)[i], quietly = TRUE, )) {
       missing_r_packages <- append(
         x = missing_r_packages,

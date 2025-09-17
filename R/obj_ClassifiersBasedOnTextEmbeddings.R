@@ -982,7 +982,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         sequence_order <- names(abs_freq_length)
 
         sample_weights <- vector(length = length(sequence_length))
-        for (i in seq_len(length(sample_weights))) {
+        for (i in seq_along(sample_weights)) {
           idx <- which(sequence_length[i] == sequence_order)
           sample_weights[i] <- sample_weight_per_sequence_length[idx]
         }

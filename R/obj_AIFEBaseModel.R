@@ -858,7 +858,7 @@ AIFEBaseModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     prepare_history_data = function(history) {
       # Provide rownames for the history
-      for (i in seq_len(length(history))) {
+      for (i in seq_along(history)) {
         if (!is.null(history[[i]])) {
           if (nrow(history[[i]]) == 2L) {
             rownames(history[[i]]) <- c("train", "val")

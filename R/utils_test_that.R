@@ -188,9 +188,9 @@ get_test_data_for_classifiers <- function(class_range = c(2L, 3L),
     ), ]
 
     example_data$label <- as.character(example_data$label)
-    example_data$label[c(201L:300L)] <- NA
+    example_data$label[201L:300L] <- NA
     if (n_classes > 2L) {
-      example_data$label[c(201L:250L)] <- "medium"
+      example_data$label[201L:250L] <- "medium"
       tmp_target_levels <- c("neg", "medium", "pos")
     } else {
       tmp_target_levels <- c("neg", "pos")

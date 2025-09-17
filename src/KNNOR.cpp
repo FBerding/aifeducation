@@ -368,7 +368,6 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
                              const arma::uvec &labels,
                              size_t cycles_number_limit)
 {
-
   arma::mat embeddings_augmented;
 
   double upper_alpha = alpha_coefficient(embeddings_min, embeddings_maj);
@@ -430,7 +429,6 @@ arma::mat knnor_augmentation(const arma::mat &embeddings_min,
 double alpha_coefficient(const arma::mat &embeddings_min,
                          const arma::mat &embeddings_maj)
 {
-
   arma::vec all_dist(embeddings_maj.n_rows * embeddings_min.n_rows);
 
   size_t k = 0;

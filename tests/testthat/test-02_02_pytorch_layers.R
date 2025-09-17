@@ -477,7 +477,7 @@ test_that("layer_adaptive_extreme_pooling_1d", {
     # Check if the correct values are selected
     result_matrix <- tensor_to_numpy(result)
     tensor_matrix <- tensor_to_numpy(tensor)
-    for (i in 1:nrow(result_matrix)) {
+    for (i in seq_len(nrow(result_matrix))) {
       if (pooling_type == "Max") {
         ordered_values <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = TRUE)]
         relevant_values <- ordered_values[seq(from = 1, to = output_size)]

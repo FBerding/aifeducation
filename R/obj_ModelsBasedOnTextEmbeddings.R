@@ -541,7 +541,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Create array for saving the data-------------------------------------------
       result_list <- NULL
-      for (j in seq_len(length(measures))) {
+      for (j in seq_along(measures)) {
         measure <- measures[j]
         measure_array <- array(
           dim = c(

@@ -378,7 +378,7 @@ check_aif_py_modules <- function(trace = TRUE) {
   )
   colnames(matrix_overview) <- c("module", "available")
   matrix_overview <- as.data.frame(matrix_overview)
-  for (i in seq_len(length(relevant_modules))) {
+  for (i in seq_along(relevant_modules)) {
     matrix_overview[i, 1L] <- relevant_modules[i]
     matrix_overview[i, 2L] <- reticulate::py_module_available(relevant_modules[i])
   }

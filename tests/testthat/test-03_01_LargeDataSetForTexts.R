@@ -545,7 +545,7 @@ test_that("LargeDataSetForTexts - Add single txt", {
   )
 
   id <- new_dataset$get_ids()
-  true_ids <- c("text_a")
+  true_ids <- "text_a"
   ids_complete <- sum(true_ids %in% id)
   expect_equal(ids_complete, length(true_ids))
 })
@@ -574,7 +574,7 @@ test_that("LargeDataSetForTexts - Add single pdf", {
   )
 
   id <- new_dataset$get_ids()
-  true_ids <- c("pdf_a")
+  true_ids <- "pdf_a"
   ids_complete <- sum(true_ids %in% id)
   expect_equal(ids_complete, length(true_ids))
 })
@@ -603,7 +603,7 @@ test_that("LargeDataSetForTexts - Add single excel", {
   )
 
   id <- new_dataset$get_ids()
-  true_ids <- c("excel_a")
+  true_ids <- "excel_a"
   ids_complete <- sum(true_ids %in% id)
   expect_equal(ids_complete, length(true_ids))
 })

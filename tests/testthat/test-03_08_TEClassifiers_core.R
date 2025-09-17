@@ -500,7 +500,7 @@ for (object_class_name in object_class_names) {
         classifier$set_model_license("test_license")
         expect_equal(
           object = classifier$get_model_license(),
-          expected = c("test_license")
+          expected = "test_license"
         )
 
 
@@ -508,7 +508,7 @@ for (object_class_name in object_class_names) {
         classifier$set_documentation_license("test_license")
         expect_equal(
           object = classifier$get_documentation_license(),
-          expected = c("test_license")
+          expected = "test_license"
         )
 
 

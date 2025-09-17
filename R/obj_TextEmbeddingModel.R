@@ -468,7 +468,7 @@ TextEmbeddingModel <- R6::R6Class(
         # Sorting the hidden states to the corresponding cases and times
         # If more than one layer is selected the mean is calculated
         index <- 0L
-        for (i in seq_len(length(batch))) {
+        for (i in seq_along(batch)) {
           for (j in 1L:tokens$chunks[i]) {
             for (layer in tmp_selected_layer) {
               layer_int <- as.integer(layer)

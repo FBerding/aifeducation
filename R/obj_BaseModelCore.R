@@ -680,7 +680,7 @@ BaseModelCore <- R6::R6Class(
           "token",
           "token_str"
         )
-        for (i in seq_len(length(solutions))) {
+        for (i in seq_along(solutions)) {
           solution_data_frame[i, "score"] <- solutions[[i]]$score
           solution_data_frame[i, "token"] <- solutions[[i]]$token
           solution_data_frame[i, "token_str"] <- solutions[[i]]$token_str
@@ -689,7 +689,7 @@ BaseModelCore <- R6::R6Class(
         solution_data_frame$score <- as.numeric(solution_data_frame$score)
         solutions_list[length(solutions_list) + 1L] <- list(solution_data_frame)
       } else {
-        for (j in seq_len(length(solutions))) {
+        for (j in seq_along(solutions)) {
           solution_data_frame <- matrix(
             nrow = length(solutions[[j]]),
             ncol = 3L
@@ -699,7 +699,7 @@ BaseModelCore <- R6::R6Class(
             "token",
             "token_str"
           )
-          for (i in seq_len(length(solutions[[j]]))) {
+          for (i in seq_along(solutions[[j]])) {
             solution_data_frame[i, "score"] <- solutions[[j]][[i]]$score
             solution_data_frame[i, "token"] <- solutions[[j]][[i]]$token
             solution_data_frame[i, "token_str"] <- solutions[[j]][[i]]$token_str
