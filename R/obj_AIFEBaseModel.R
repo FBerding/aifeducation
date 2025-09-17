@@ -872,8 +872,9 @@ AIFEBaseModel <- R6::R6Class(
           for (j in seq_len(nrow(history[[i]]))) {
             # Check if -100 occurs in the row
             includes_m_100 <- (history[[i]][j, ] == -100L)
+
             # if at least one -100 occurs
-            if (sum(includes_m_100) > 0L) {
+            if (sum(includes_m_100) > 0L && !anyNA(includes_m_100)) {
               # min index for replacements
               index_min <- min(which(includes_m_100))
               # replace
