@@ -32,7 +32,7 @@ Tokenize_Encode_Decode_UI <- function(id) {
       bslib::card_body(
         bslib::layout_column_wrap(
           shiny::uiOutput(outputId = shiny::NS(id, "token_table")),
-          shiny::tableOutput(outputId = shiny::NS(id, "tokenizer_statistics"))
+          shiny::uiOutput(outputId = shiny::NS(id, "tokenizer_statistics"))
         ),
         bslib::layout_column_wrap(
           bslib::card(
@@ -156,7 +156,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     })
 
     # Render Tokenizer Statistics-----------------------------------------------
-    output$tokenizer_statistics <- shiny::renderTable({
+    output$tokenizer_statistics <- shiny::renderUI({
       shiny::req(model)
       if(inherits(model(), "BaseModelCore")){
         tmp_model <- model()

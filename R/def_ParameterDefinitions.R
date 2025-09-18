@@ -171,6 +171,19 @@ get_param_dict <- function() {
     default_value = NULL"
   )
 
+  param$funnel_pooling_type<- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("Mean", "Max"),
+    desc = "Method for pooling over the seqence length.",
+    default_value = "Mean",
+    default_historic = "Mean",
+    gui_box = "Transformer Encoder Layers",
+    gui_label = "Sequence Pooling"
+  )
+
   param$global_attn_every_n_layers <- list(
     type = "int",
     min = 2L,
@@ -577,13 +590,16 @@ get_param_dict <- function() {
     min = 1L,
     max = Inf,
     allowed_values = NULL,
-    desc = "Number of neurons in the final layer. This parameter determines the dimensionality of the resulting text
+    desc = "Number of neurons of the final layer. This parameter determines the dimensionality of the resulting text
   embedding.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Target Hidden Size",
     default_value = 768L
   )
+
   param$d_head <- param$target_hidden_size
+  param$d_head$desc="Number of neurons of the final layer."
+  param$d_head$default_value = 64L
 
   param$hidden_dropout_prob <- list(
     type = "double",
@@ -1370,7 +1386,7 @@ get_param_dict <- function() {
   param$ng_conv_parametrizations$gui_box <- "Multiple N-Gram Layers"
 
   param$feat_parametrizations <- param$parametrizations
-  param$feat_parametrizations$gui_box <- "Classifiction Pooling Layer"
+  param$feat_parametrizations$gui_box <- "Feature Layer"
 
   # Bias------------------------------------------------------------------------
   param$bias <- list(
@@ -1394,7 +1410,7 @@ get_param_dict <- function() {
   param$ng_conv_bias <- param$bias
   param$ng_conv_bias$gui_box <- "Multiple N-Gram Layers"
   param$feat_bias <- param$bias
-  param$feat_bias$gui_box <- "Classifiction Pooling Layer"
+  param$feat_bias$gui_box <- "Feature Layer"
 
   # Activation functions---------------------------------------------------------
   param$act_fct <- list(
@@ -1410,7 +1426,7 @@ get_param_dict <- function() {
     default_historic = "GELU"
   )
   param$feat_act_fct <- param$act_fct
-  param$feat_act_fct$gui_box <- "Classifiction Pooling Layer"
+  param$feat_act_fct$gui_box <-  "Feature Layer"
   param$ng_conv_act_fct <- param$act_fct
   param$ng_conv_act_fct$gui_box <- "Multiple N-Gram Layers"
   param$dense_act_fct <- param$act_fct
@@ -1546,6 +1562,7 @@ get_param_dict <- function() {
   )
 
   param$feat_size <- param$dense_size
+  param$feat_size$gui_box= "Feature Layer"
   param$feat_size$min <- 2L
 
   # Transformer Layer------------------------------------------------------------

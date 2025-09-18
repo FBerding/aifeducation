@@ -12,6 +12,37 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+#' @title Recommended version of python packages
+#' @description Returns the minimum and maximum versions of the core
+#' python packages used in *aifeducation*. It is recommended to use packages of
+#' these version. Packages of other versions can result in errors or unexpected results.
+#'
+#'@return Returns a `data.frame` with the packages in the columns and the minimum and
+#'maximum version in the rows.
+#'
+#' @family Installation and Configuration
+#'
+#' @export
+get_recommended_py_versions=function(){
+
+  py_versions=list(
+    transformers=c("4.56.0","4.56.1"),
+    tokenizers=c("0.22.0","0.22.0"),
+    pandas=c("2.3.2","2.3.2"),
+    datasets=c("3.6.0","3.6.0"),
+    codecarbon=c("3.0.0","3.0.4"),
+    safetensors=c("0.6.2","0.6.2"),
+    torcheval=c("0.0.7","0.0.7"),
+    accelerate=c("1.10.1","1.10.1"),
+    calflops=c("0.3.2","0.3.2")
+  )
+
+  py_versions=as.data.frame(py_versions)
+  rownames(py_versions)=c("min","max")
+  return(py_versions)
+
+}
+
 #' @title Install aifeducation on a machine
 #' @description Function for installing 'aifeducation' on a machine.
 #'
@@ -223,11 +254,11 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=4.56.0",
+                               transformer_version = "<=4.56.1",
                                tokenizers_version = "<=0.22.0",
                                pandas_version = "<=2.3.2",
                                datasets_version = "<=3.6.0",
-                               codecarbon_version = "<=3.0.2",
+                               codecarbon_version = "<=3.0.4",
                                safetensors_version = "<=0.6.2",
                                torcheval_version = "<=0.0.7",
                                accelerate_version = "<=1.10.1",

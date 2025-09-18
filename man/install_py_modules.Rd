@@ -6,11 +6,11 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  transformer_version = "<=4.56.0",
+  transformer_version = "<=4.56.1",
   tokenizers_version = "<=0.22.0",
   pandas_version = "<=2.3.2",
   datasets_version = "<=3.6.0",
-  codecarbon_version = "<=3.0.2",
+  codecarbon_version = "<=3.0.4",
   safetensors_version = "<=0.6.2",
   torcheval_version = "<=0.0.7",
   accelerate_version = "<=1.10.1",
@@ -68,6 +68,7 @@ MAC OS is detected 'PyTorch' is installed without support for cuda.
 \seealso{
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
+\code{\link{get_recommended_py_versions}()},
 \code{\link{install_aifeducation}()},
 \code{\link{install_aifeducation_studio}()},
 \code{\link{prepare_session}()},

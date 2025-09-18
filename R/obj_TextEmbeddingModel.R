@@ -145,9 +145,6 @@ TextEmbeddingModel <- R6::R6Class(
       if (!emb_pool_type %in% c("CLS", "Average") ) {
         stop("emb_pool_type must be 'cls' or 'average'.")
       }
-      if (self$BaseModel$get_model_type() == "funnel" & emb_pool_type != "CLS") {
-        stop("Funnel currently supports only cls as pooling type.")
-      }
       private$model_config$emb_pool_type <- emb_pool_type
     },
     #-------------------------------------------------------------------------

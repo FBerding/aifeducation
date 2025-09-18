@@ -168,10 +168,16 @@ Training_Server <- function(id, model) {
           # Necessary input
           shiny::req(input$measure)
 
+          if(input$training_phase=="TRUE"){
+            bool_training_phase=TRUE
+          } else {
+            bool_training_phase=FALSE
+          }
+
           plot <- model()$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
-            final_training = input$training_phase,
+            final_training = bool_training_phase,
             pl_step = input$classifier_pl_step,
             measure = input$measure,
             add_min_max = input$training_min_max,

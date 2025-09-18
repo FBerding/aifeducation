@@ -138,8 +138,8 @@ generate_sidebar_information <- function(model) {
     }
 
     if (nrow(model$get_sustainability_data()) > 0) {
-      kwh <- round(model$get_sustainability_data()$sustainability_data$total_energy_kwh, 3)
-      co2 <- round(model$get_sustainability_data()$sustainability_data$co2eq_kg, 3)
+      kwh <- round(sum(model$get_sustainability_data()$sustainability_data$total_energy_kwh), 3)
+      co2 <- round(sum(model$get_sustainability_data()$sustainability_data$co2eq_kg), 3)
     } else {
       kwh <- "not estimated"
       co2 <- "not estimated"

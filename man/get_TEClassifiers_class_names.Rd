@@ -8,7 +8,7 @@ get_TEClassifiers_class_names(super_class = NULL)
 }
 \arguments{
 \item{super_class}{\code{string} Name of the super class the classifiers should
-be child of. To request the names of all classifiers set this argument to \code{NULL}.}
+be a child of. To request the names of all classifiers set this argument to \code{NULL}.}
 }
 \value{
 Returns a vector containing the names of the classifiers.
@@ -19,6 +19,9 @@ are child classes of a specific super class.
 }
 \seealso{
 Other Parameter Dictionary: 
+\code{\link{BaseModelsIndex}},
+\code{\link{DataSetsIndex}},
+\code{\link{TokenizerIndex}},
 \code{\link{get_called_args}()},
 \code{\link{get_depr_obj_names}()},
 \code{\link{get_magnitude_values}()},

@@ -19,6 +19,9 @@ Its aim is to be used for documenting the parameter of functions.
 }
 \seealso{
 Other Parameter Dictionary: 
+\code{\link{BaseModelsIndex}},
+\code{\link{DataSetsIndex}},
+\code{\link{TokenizerIndex}},
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
 \code{\link{get_depr_obj_names}()},

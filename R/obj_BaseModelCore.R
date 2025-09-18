@@ -95,6 +95,13 @@ BaseModelCore <- R6::R6Class(
 
     },
     #--------------------------------------------------------------------------
+    set_model_config_from_hf=function(){
+    tmp_args <- rlang::fn_fmls_names(self$configure)
+    for (arg in intersect(x = tmp_args, y = names(private$model$config))) {
+      private$model_config[arg] <- list(private$model$config[arg])
+    }
+    },
+    #--------------------------------------------------------------------------
     set_up_logger = function(log_dir, log_write_interval) {
       private$log_config$log_dir <- log_dir
       private$log_config$log_write_interval <- log_write_interval
@@ -466,10 +473,7 @@ BaseModelCore <- R6::R6Class(
       private$model <- tmp_model
 
       # Set Model Config
-      tmp_args <- rlang::fn_fmls_names(self$configure)
-      for (arg in intersect(x = tmp_args, y = names(private$model$config))) {
-        private$model_config[arg] <- list(private$model$config[arg])
-      }
+      private$set_model_config_from_hf()
 
       # Load Sustainability Data
       private$load_sustainability_data(model_dir = model_dir)
@@ -933,7 +937,7 @@ BaseModelCore <- R6::R6Class(
       colnames(results) <- res_colnames
       results <- as.data.frame(results)
 
-      bp_factors <- c(1L, 2L, 3L, 4L)
+      bp_factors <- c(1.0, 2.0, 3.0, 4.0)
 
       tokenized_texts <- tokenizer(
         text = generated_texts,
@@ -958,7 +962,7 @@ BaseModelCore <- R6::R6Class(
           print_results = FALSE,
           print_detailed = FALSE,
           output_as_string = FALSE,
-          output_precision = 2L,
+          output_precision = 2.0,
           output_unit = NULL,
           ignore_modules = NULL
         )

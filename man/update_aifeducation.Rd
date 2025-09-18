@@ -44,6 +44,7 @@ On MAC OS torch will be installed without support for cuda.
 \seealso{
 Other Installation and Configuration: 
 \code{\link{check_aif_py_modules}()},
+\code{\link{get_recommended_py_versions}()},
 \code{\link{install_aifeducation}()},
 \code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},

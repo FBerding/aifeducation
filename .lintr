@@ -1,9 +1,13 @@
 linters: linters_with_tags(
   tags=c("common_mistakes","consistency","correctness","efficiency","robustness"),
   object_name_linter=NULL,
-  return_linter=NULL,
-  line_length_linter=NULL,
-  object_length_linter=NULL,
+  return_linter=return_linter(
+    return_style = "explicit",
+    allow_implicit_else = TRUE,
+    return_functions = NULL,
+    except = NULL,
+    except_regex = NULL
+    ),
   if_not_else_linter=NULL,
   if_switch_linter=NULL,
   unnecessary_nesting_linter=NULL

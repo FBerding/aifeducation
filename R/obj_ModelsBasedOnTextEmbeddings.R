@@ -491,7 +491,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       #  plot_data[[1]] <- list(loss = plot_data[[1]])
       # }
 
-      if (is.null_or_na(final)) final <- FALSE
+      if (is.null_or_na(final)){
+        final <- FALSE
+      }
 
       if (is.null_or_na(self$last_training$config$use_pl)) {
         use_pl <- FALSE
@@ -509,7 +511,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Get information about the existence of a training, validation, and test data set
       # Get Number of folds for the request
-      if (!final ) {
+      if (!final) {
         n_folds <- length(self$last_training$history)
         if (n_folds > 1L) {
           n_folds <- n_folds - 1L

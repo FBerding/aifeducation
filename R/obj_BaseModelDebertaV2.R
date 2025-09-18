@@ -12,24 +12,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title Longformer
-#' @description Represents models based on Longformer
-#' @references Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The Long-Document Transformer.
-#'   \doi{10.48550/arXiv.2004.05150}
+#' @title RoBERTa
+#' @description Represents models based on RoBERTa.
+#' @references Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &
+#'   Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \doi{10.48550/arXiv.1907.11692}
 #' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
-BaseModelLongformer <- R6::R6Class(
-  classname = "BaseModelLongformer",
+BaseModelDebertaV2 <- R6::R6Class(
+  classname = "BaseModelDebertaV2",
   inherit = BaseModelCore,
   private = list(
-    model_type = "longformer",
+    model_type = "deberta_v2",
+    adjust_max_sequence_length = 4L,
     return_token_type_ids = FALSE,
-    adjust_max_sequence_length=2L,
-
-    create_model=function(args){
-      configuration <- transformers$LongformerConfig(
-        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())+length(unique(args$tokenizer$get_tokenizer()$special_tokens_map))),
+    create_model = function(args) {
+      configuration <- transformers$DebertaV2Config(
+        vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         max_position_embeddings = as.integer(args$max_position_embeddings),
         hidden_size = as.integer(args$hidden_size),
         num_hidden_layers = as.integer(args$num_hidden_layers),
@@ -38,16 +37,19 @@ BaseModelLongformer <- R6::R6Class(
         hidden_act = tolower(args$hidden_act),
         hidden_dropout_prob = args$hidden_dropout_prob,
         attention_probs_dropout_prob = args$attention_probs_dropout_prob,
-        attention_window = as.integer(args$attention_window),
-        type_vocab_size = as.integer(2L),
+        type_vocab_size = 2L,
         initializer_range = 0.02,
-        layer_norm_eps = 1e-12
+        layer_norm_eps = 1e-12,
+        relative_attention=TRUE,
+        max_relative_positions=-1L,
+        pad_token_id=args$tokenizer$get_tokenizer()$pad_token_id,
+        position_biased_input=TRUE,
+        legacy=TRUE
       )
-
-      private$model <- transformers$LongformerForMaskedLM(configuration)
+      private$model <- transformers$DebertaV2ForMaskedLM(configuration)
     },
-    load_BaseModel=function(dir_path){
-      private$model <- transformers$LongformerForMaskedLM$from_pretrained(dir_path)
+    load_BaseModel = function(dir_path) {
+      private$model <- transformers$DebertaV2ForMaskedLM$from_pretrained(dir_path)
     },
     #---------------------------------------------------------------------------
     check_arg_combinations = function(args) {
@@ -68,7 +70,6 @@ BaseModelLongformer <- R6::R6Class(
     #' @param hidden_act `r get_param_doc_desc("hidden_act")`
     #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
     #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
-    #' @param attention_window `r get_param_doc_desc("attention_window")`
     #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512L,
@@ -78,13 +79,12 @@ BaseModelLongformer <- R6::R6Class(
                          intermediate_size = 3072L,
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
-                         attention_probs_dropout_prob = 0.1,
-                         attention_window = 512L) {
+                         attention_probs_dropout_prob = 0.1) {
       arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
     }
   )
 )
 
-#Add the model to the user list
-BaseModelsIndex$Longformer=("BaseModelLongformer")
+# Add the model to the user list
+BaseModelsIndex$deberta_v2 <- ("BaseModelDebertaV2")

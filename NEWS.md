@@ -8,11 +8,38 @@ editor_options:
 
 ** Major Changes**
 
-- Introduction of two new classes: 'Tokenizer' and 'BaseModels'. 
+- Introduction of two new classes: one for tokenizers and one for base models. 
+  This allows us a more specialized implementation of new methods (e.g. for estimation FLOPS) and a unified 
+  handling for all classes in this packages (e.g. saving and loading). 
+- Re-implementation of DeBERTa V2.
+- Temporally removed support for Longformer since it causes some cuda errors.
+- Intensive re-factoring of all remaining classes. Now the R6 classes uses the 
+  capabilities of R6 more stringent. The structure of all classes was unified and is now
+  more in line with object orientated programming styles.
+  Old models are updated during loading automatically to the new structure. The position
+  of some method changed. Please refer to the documentation or vignettes for more details. 
+- Added analyses for lints and started to apply more rigorous lint analyzers to
+  improve code quality. This process is not finished yet. 
+- Added dependency to a new python library 'calflops'. Please install this package to your
+  python environment. 
+
+**TextEmbeddingModels**
+
+- TextEmbeddingModels based on a funnel transformer allow now to apply average pooling. 
 
 **Ai for Education Studio**
 
 - Fixed bug that prevents changes in the documentation to be saved.
+- Updated Studio to the new classes and methods.
+
+**Classifiers**
+
+- Fixed a bug in TEClassifierRegular and TEClassifierParallelPrototype that could occur
+  during the preparation of the training history. Error caused the training to abort.
+
+**Documentation**
+
+- The documentation was updated to the new structure and objects. 
 
 # aifeducation 1.1.0
 

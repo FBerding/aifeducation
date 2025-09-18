@@ -1,10 +1,22 @@
 # ===================DataSets===================================================
+#' @title List of all available types of data sets
+#' @description Named `list` containing all available types of data sets as a string.
+#' @family Parameter Dictionary
+#' @export
 DataSetsIndex <- list()
 
 # ===================Tokenizer==================================================
+#' @title List of all available Tokenizers
+#' @description Named `list` containing all tokenizers as a string.
+#' @family Parameter Dictionary
+#' @export
 TokenizerIndex <- list()
 
 # ===================BaseModels=================================================
+#' @title List of all available BaseModels
+#' @description Named `list` containing all BaseModels as a string.
+#' @family Parameter Dictionary
+#' @export
 BaseModelsIndex <- list()
 
 # ===================Classifiers================================================
@@ -20,7 +32,7 @@ TEClassifiers_class_names <- vector()
 #' @description Function returns the names of all classifiers which
 #' are child classes of a specific super class.
 #' @param super_class `string` Name of the super class the classifiers should
-#' be child of. To request the names of all classifiers set this argument to `NULL`.
+#' be a child of. To request the names of all classifiers set this argument to `NULL`.
 #' @return Returns a vector containing the names of the classifiers.
 #' @family Parameter Dictionary
 #' @export

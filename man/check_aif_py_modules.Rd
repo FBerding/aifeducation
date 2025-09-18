@@ -20,6 +20,7 @@ available.
 }
 \seealso{
 Other Installation and Configuration: 
+\code{\link{get_recommended_py_versions}()},
 \code{\link{install_aifeducation}()},
 \code{\link{install_aifeducation_studio}()},
 \code{\link{install_py_modules}()},

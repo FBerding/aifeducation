@@ -23,3 +23,7 @@ test_that("set_transformers_logger", {
 test_that("prepare_session", {
 expect_no_error(prepare_session())
 })
+
+test_that("get_recommended_py_versions", {
+  expect_s3_class(get_recommended_py_versions(),"data.frame")
+})

@@ -32,7 +32,8 @@ raw_texts <- LargeDataSetForText$new(example_data)
 # Test Configuration
 object_class_names=BaseModelsIndex
 #object_class_names <- c(
-#  "BaseModelBert",
+#  "BaseModelDebertaV2")
+  #  "BaseModelBert",
 #  #"BaseModelFunnel",
 #  #"BaseModelLongformer"#,
 #  "BaseModelModernBert",
@@ -248,6 +249,11 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(train_args)
     ), {
       expect_equal(nrow(base_model$get_flops_estimates()), 1)
+      expect_gt(base_model$get_flops_estimates()$flops_bp_1, 0)
+      expect_gt(base_model$get_flops_estimates()$flops_bp_2, 0)
+      expect_gt(base_model$get_flops_estimates()$flops_bp_3, 0)
+      expect_gt(base_model$get_flops_estimates()$flops_bp_4, 0)
+
     })
 
     #---------------------------------------------------------------------------
