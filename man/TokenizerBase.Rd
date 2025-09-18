@@ -248,7 +248,8 @@ Kaya and Tantuğ (2024).
 
 Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
 for Turkish large language models. Intelligent Systems with
-Applications, 21, 200335. \url{https://doi.org/10.1016/j.iswa.2024.200335}
+Applications, 21, 200335.
+\ifelse{text}{\doi{doi:10.1016/j.iswa.2024.200335}}{<https://doi.org/10.1016/j.iswa.2024.200335>}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$calculate_statistics(
   text_dataset,

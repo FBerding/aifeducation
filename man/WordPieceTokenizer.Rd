@@ -15,7 +15,7 @@ Krikun, M., Cao, Y., Gao, Q., Macherey, K., Klingner, J., Shah, A.,
 Johnson, M., Liu, X., Kaiser, Ł., Gouws, S., Kato, Y., Kudo, T., Kazawa,
 H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
 Bridging the Gap between Human and Machine Translation.
-\url{https://doi.org/10.48550/arXiv.1609.08144}
+\ifelse{text}{\doi{doi:10.48550/arXiv.1609.08144}}{<https://doi.org/10.48550/arXiv.1609.08144>}
 }
 \seealso{
 Other Tokenizer: 

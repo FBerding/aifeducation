@@ -589,9 +589,8 @@ and functions in *aifeducation*.
 
 Base models are the foundation of all further models in *aifeducation*.
 At the moment, these are transformer models such modernBERT (Warner et al. 2024), 
-MPNet (Song et al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), 
-Funnel-Transformer (Dai et al. 2020), and Longformer
-(Beltagy, Peters & Cohan 2020). In general, these models are trained on
+MPNet (Song et al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), and
+Funnel-Transformer (Dai et al. 2020). In general, these models are trained on
 a large corpus of general texts in the first step. In the next step, the
 models are fine-tuned to domain-specific texts and/or fine-tuned for
 specific tasks. Since the creation of base models requires a huge number

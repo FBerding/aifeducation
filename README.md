@@ -43,7 +43,7 @@ special conditions of the educational and social sciences.
   computational speed and allowing the use of very large data sets.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
-- Supports ModernBERT, MPNet, BERT, RoBERTa, Longformer, and Funnel
+- Supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, and Funnel
   Transformer for creating context-sensitive text embedding.
 - Makes sharing pre-trained models very easy.
 - Integrates sustainability tracking for training and inference.
@@ -133,9 +133,8 @@ already trained models work with future versions of this package.
 Classification tasks require the transformation of raw texts into a
 representation with numbers. For this step, *aifeducation* supports new
 approaches such as modernBERT (Warner et al. 2024), MPNet (Song et
-al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019),
-Funnel-Transformer (Dai et al. 2020), and Longformer (Beltagy, Peters &
-Cohan 2020).
+al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), and
+Funnel-Transformer (Dai et al. 2020).
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
@@ -285,9 +284,6 @@ you can find a detailed guide on how to document and share your models.
 
 ## References
 
-Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
-Long-Document Transformer. <https://doi.org/10.48550/arXiv.2004.05150>
-
 Berding, F., & Pargmann, J. (2022). Iota Reliability Concept of the
 Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
 
@@ -340,6 +336,10 @@ Haixiang, G., Yijing, L., Shang, J., Mingyun, G., Yuanyue, H., & Bing,
 G. (2017). Learning from class-imbalanced data: Review of methods and
 applications. Expert Systems with Applications, 73, 220–239.
 <https://doi.org/10.1016/j.eswa.2016.12.035>
+
+He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
+BERT with Disentangled Attention.
+<https://doi.org/10.48550/arXiv.2006.03654>
 
 Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
 KNNOR: An oversampling technique for imbalanced datasets. Applied Soft

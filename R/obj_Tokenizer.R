@@ -235,9 +235,9 @@ TokenizerBase <- R6::R6Class(
           chunk_list[i] <- min(tmp_seq_len, n_chunks)
           total_chunk_list[i] <- tmp_seq_len
           if (chunk_list[i] == 1L) {
-            tmp_dataset <- tmp_dataset$select(list(as.integer((1L:chunk_list[[i]]) - 1L)))
+            tmp_dataset <- tmp_dataset$select(list(as.integer((1L:chunk_list[[i]]) - L1)))
           } else {
-            tmp_dataset <- tmp_dataset$select(as.integer((1L:chunk_list[[i]]) - 1L))
+            tmp_dataset <- tmp_dataset$select(as.integer((1L:chunk_list[[i]]) - L1))
           }
 
           encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
@@ -329,7 +329,8 @@ TokenizerBase <- R6::R6Class(
     #'
     #' Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
     #' for Turkish large language models. Intelligent Systems with
-    #' Applications, 21, 200335. <https://doi.org/10.1016/j.iswa.2024.200335>
+    #' Applications, 21, 200335.
+    #' \ifelse{text}{\doi{doi:10.1016/j.iswa.2024.200335}}{<https://doi.org/10.1016/j.iswa.2024.200335>}
     #'
     #' @param text_dataset `r get_param_doc_desc("text_dataset")`
     #' @param statistics_max_tokens_length `r get_param_doc_desc("statistics_max_tokens_length")`
@@ -375,7 +376,8 @@ TokenizerBase <- R6::R6Class(
 #' Johnson, M., Liu, X., Kaiser, Ł., Gouws, S., Kato, Y., Kudo, T., Kazawa,
 #' H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
 #' Bridging the Gap between Human and Machine Translation.
-#' <https://doi.org/10.48550/arXiv.1609.08144>
+#' \ifelse{text}{\doi{doi:10.48550/arXiv.1609.08144}}{<https://doi.org/10.48550/arXiv.1609.08144>}
+#'
 #' @family Tokenizer
 #' @export
 WordPieceTokenizer <- R6::R6Class(
