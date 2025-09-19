@@ -120,7 +120,7 @@ default_value = NULL Allowed values: 'CLS', 'Average'}
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
-\item{\code{base_model}}{\verb{BaseModelBert, BaseModelFunnel, BaseModelMPNet, BaseModelModernBert, BaseModelRoberta} Object of class \link{BaseModelBert}, \link{BaseModelFunnel}, \link{BaseModelMPNet}, \link{BaseModelModernBert}, \link{BaseModelRoberta} . This objects prepares raw text for the model.}
+\item{\code{base_model}}{\verb{BaseModelBert, BaseModelFunnel, BaseModelMPNet, BaseModelModernBert, BaseModelRoberta} BaseModels for processing raw texts.}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }

@@ -289,9 +289,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     allowed_values = NULL,
     desc = paste(
-      "Object of class",
-      paste(paste0("[", TokenizerIndex, "]"), collapse = ", "), ".",
-      "This objects prepares raw text for the model."
+      "Tokenizer for the model."
     ),
     gui_box = NULL,
     gui_label = NULL,
@@ -306,9 +304,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     allowed_values = NULL,
     desc = paste(
-      "Object of class",
-      paste(paste0("[", BaseModelsIndex, "]"), collapse = ", "), ".",
-      "This objects prepares raw text for the model."
+      "BaseModels for processing raw texts."
     ),
     gui_box = NULL,
     gui_label = NULL,

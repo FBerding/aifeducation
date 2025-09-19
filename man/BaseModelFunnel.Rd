@@ -95,7 +95,7 @@ Configures a new object of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{tokenizer}}{\verb{WordPieceTokenizer, BPETokenizer, HuggingFaceTokenizer} Object of class \link{WordPieceTokenizer}, \link{BPETokenizer}, \link{HuggingFaceTokenizer} . This objects prepares raw text for the model.}
+\item{\code{tokenizer}}{\verb{WordPieceTokenizer, BPETokenizer, HuggingFaceTokenizer} Tokenizer for the model.}
 
 \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
 can be processed with the model. Allowed values: \verb{10 <= x <= 4048}}
