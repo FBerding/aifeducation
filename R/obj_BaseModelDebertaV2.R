@@ -44,7 +44,7 @@ BaseModelDebertaV2 <- R6::R6Class(
         max_relative_positions=-1L,
         pad_token_id=args$tokenizer$get_tokenizer()$pad_token_id,
         position_biased_input=TRUE,
-        legacy=FALSE
+        legacy=TRUE
       )
       private$model <- transformers$DebertaV2ForMaskedLM(configuration)
     },
