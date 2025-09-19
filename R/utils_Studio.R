@@ -450,7 +450,7 @@ generate_doc_input_text_editor <- function(ns, model, language = "eng", type = "
 #'
 #' @param dir_path `string` path to the directory containing the embeddings.
 #'
-#' @return If there are any errors an error modal is displayed by calling the function [display_errors]. If there are no
+#' @return If there are any errors an error modal is displayed by calling the function `display_errors`. If there are no
 #'   errors the function returns embeddings as an object of class [LargeDataSetForTextEmbeddings] or [EmbeddedText]. In
 #'   the case of erros the function returns `NULL`.
 #'
@@ -558,7 +558,7 @@ load_and_check_dataset_raw_texts <- function(dir_path) {
 #'
 #' @param file_path `string` path to the file containing the target data.
 #'
-#' @return If there are any errors an error modal is displayed by calling the function [display_errors]. If there are no
+#' @return If there are any errors an error modal is displayed by calling the function `display_errors`. If there are no
 #'   errors the function returns a `data.frame` containing the target data. In the case of erros the function returns
 #'   `NULL`.
 #'

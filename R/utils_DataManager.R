@@ -437,7 +437,7 @@ get_folds <- function(target,
 
 #-------------------------------------------------------------------------------
 #' @title Create a stratified random sample
-#' @description This function creates a stratified random sample.The difference to [get_train_test_split] is that this
+#' @description This function creates a stratified random sample.The difference to `get_train_test_split` is that this
 #'   function does not require text embeddings and does not split the text embeddings into a train and validation
 #'   sample.
 #'

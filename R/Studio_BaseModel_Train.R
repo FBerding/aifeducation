@@ -1,5 +1,5 @@
 #' @title Graphical user interface for base models - train
-#' @description Functions generates the page for using the [.AIFE*Transformer]s.
+#' @description Functions generates the page for using the BaseModels.
 #'
 #' @param id `string` determining the id for the namespace.
 #' @return This function does nothing return. It is used to build a page for a shiny app.
