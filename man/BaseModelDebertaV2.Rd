@@ -2,16 +2,16 @@
 % Please edit documentation in R/obj_BaseModelDebertaV2.R
 \name{BaseModelDebertaV2}
 \alias{BaseModelDebertaV2}
-\title{RoBERTa}
+\title{DeBERTa V2}
 \value{
 Does return a new object of this class.
 }
 \description{
-Represents models based on RoBERTa.
+Represents models based on DeBERTa version 2.
 }
 \references{
-Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &
-Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \doi{10.48550/arXiv.1907.11692}
+He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa:
+Decoding-enhanced BERT with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
 }
 \seealso{
 Other Base Model: 

@@ -49,9 +49,21 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.2" id="aifeducation-112">aifeducation 1.1.2<a class="anchor" aria-label="anchor" href="#aifeducation-112"></a></h2>
 <p>** Major Changes**</p>
-<ul><li>Introduction of two new classes: ‘Tokenizer’ and ‘BaseModels’.</li>
+<ul><li>Introduction of two new classes: one for tokenizers and one for base models. This allows us a more specialized implementation of new methods (e.g. for estimation FLOPS) and a unified handling for all classes in this packages (e.g. saving and loading).</li>
+<li>Re-implementation of DeBERTa V2.</li>
+<li>Temporally removed support for Longformer since it causes some cuda errors.</li>
+<li>Intensive re-factoring of all remaining classes. Now the R6 classes uses the capabilities of R6 more stringent. The structure of all classes was unified and is now more in line with object orientated programming styles. Old models are updated during loading automatically to the new structure. The position of some method changed. Please refer to the documentation or vignettes for more details.</li>
+<li>Added analyses for lints and started to apply more rigorous lint analyzers to improve code quality. This process is not finished yet.</li>
+<li>Added dependency to a new python library ‘calflops’. Please install this package to your python environment.</li>
+</ul><p><strong>TextEmbeddingModels</strong></p>
+<ul><li>TextEmbeddingModels based on a funnel transformer allow now to apply average pooling.</li>
 </ul><p><strong>Ai for Education Studio</strong></p>
 <ul><li>Fixed bug that prevents changes in the documentation to be saved.</li>
+<li>Updated Studio to the new classes and methods.</li>
+</ul><p><strong>Classifiers</strong></p>
+<ul><li>Fixed a bug in TEClassifierRegular and TEClassifierParallelPrototype that could occur during the preparation of the training history. Error caused the training to abort.</li>
+</ul><p><strong>Documentation</strong></p>
+<ul><li>The documentation was updated to the new structure and objects.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="aifeducation-110">aifeducation 1.1.0<a class="anchor" aria-label="anchor" href="#aifeducation-110"></a></h2><p class="text-muted">CRAN release: 2025-08-19</p>

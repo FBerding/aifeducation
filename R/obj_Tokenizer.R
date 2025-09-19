@@ -235,9 +235,9 @@ TokenizerBase <- R6::R6Class(
           chunk_list[i] <- min(tmp_seq_len, n_chunks)
           total_chunk_list[i] <- tmp_seq_len
           if (chunk_list[i] == 1L) {
-            tmp_dataset <- tmp_dataset$select(list(as.integer((1L:chunk_list[[i]]) - L1)))
+            tmp_dataset <- tmp_dataset$select(list(as.integer((1L:chunk_list[[i]]) - 1L)))
           } else {
-            tmp_dataset <- tmp_dataset$select(as.integer((1L:chunk_list[[i]]) - L1))
+            tmp_dataset <- tmp_dataset$select(as.integer((1L:chunk_list[[i]]) - 1L))
           }
 
           encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))

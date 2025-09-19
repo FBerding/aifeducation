@@ -12,10 +12,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title RoBERTa
-#' @description Represents models based on RoBERTa.
-#' @references Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &
-#'   Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \doi{10.48550/arXiv.1907.11692}
+#' @title DeBERTa V2
+#' @description Represents models based on DeBERTa version 2.
+#' @references He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa:
+#' Decoding-enhanced BERT with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
 #' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
@@ -44,7 +44,7 @@ BaseModelDebertaV2 <- R6::R6Class(
         max_relative_positions=-1L,
         pad_token_id=args$tokenizer$get_tokenizer()$pad_token_id,
         position_biased_input=TRUE,
-        legacy=TRUE
+        legacy=FALSE
       )
       private$model <- transformers$DebertaV2ForMaskedLM(configuration)
     },
