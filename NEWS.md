@@ -11,7 +11,6 @@ editor_options:
 - Introduction of two new classes: one for tokenizers and one for base models. 
   This allows us a more specialized implementation of new methods (e.g. for estimation FLOPS) and a unified 
   handling for all classes in this packages (e.g. saving and loading). 
-- Re-implementation of DeBERTa V2.
 - Temporally removed support for Longformer since it causes some cuda errors.
 - Intensive re-factoring of all remaining classes. Now the R6 classes uses the 
   capabilities of R6 more stringent. The structure of all classes was unified and is now

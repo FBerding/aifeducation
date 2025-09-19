@@ -37,14 +37,14 @@ BaseModelDebertaV2 <- R6::R6Class(
         hidden_act = tolower(args$hidden_act),
         hidden_dropout_prob = args$hidden_dropout_prob,
         attention_probs_dropout_prob = args$attention_probs_dropout_prob,
-        type_vocab_size = 2L,
+        type_vocab_size = 0L,
         initializer_range = 0.02,
         layer_norm_eps = 1e-12,
         relative_attention=TRUE,
         max_relative_positions=-1L,
         pad_token_id=args$tokenizer$get_tokenizer()$pad_token_id,
         position_biased_input=TRUE,
-        legacy=TRUE
+        legacy=FALSE
       )
       private$model <- transformers$DebertaV2ForMaskedLM(configuration)
     },

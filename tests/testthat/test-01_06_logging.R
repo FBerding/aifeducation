@@ -1,5 +1,7 @@
 test_that("logging in R", {
   dir <- testthat::test_path("test_artefacts")
+  create_dir(dir, FALSE)
+
   log_file <- file.path(dir, "state.log")
   reset_log(log_file)
   log <- read_log(log_file)

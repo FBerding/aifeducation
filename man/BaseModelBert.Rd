@@ -16,7 +16,6 @@ Conference of the North (pp. 4171--4186). Association for Computational Linguist
 }
 \seealso{
 Other Base Model: 
-\code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},

@@ -16,7 +16,6 @@ for Efficient Language Processing. \doi{10.48550/arXiv.2006.03236}
 \seealso{
 Other Base Model: 
 \code{\link{BaseModelBert}},
-\code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},
 \code{\link{BaseModelRoberta}}
