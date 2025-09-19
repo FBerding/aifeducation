@@ -46,7 +46,7 @@ jobs:
         with:
           activate-environment: r-reticulate
           auto-update-conda: true
-          python-version: 3.10
+          python-version: 3.11
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
