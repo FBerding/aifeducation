@@ -39,7 +39,7 @@ test_that("LargeDataSetForTextEmbeddings - Create", {
     param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
     param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
     param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
-    param_pad_value=-100
+    param_pad_value = -100
   ))
 })
 
@@ -61,7 +61,7 @@ test_that("LargeDataSetForTextEmbeddings - No FeatureExtractor", {
     param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
     param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
     param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
-    param_pad_value=-100
+    param_pad_value = -100
   )
 
   # Correct Features
@@ -82,7 +82,7 @@ test_that("LargeDataSetForTextEmbeddings - No FeatureExtractor", {
   }
 
   # Correct padding value
-  expect_equal(new_dataset$get_pad_value(),-100)
+  expect_equal(new_dataset$get_pad_value(), -100)
 
   # Add embeddings from array
   expect_no_error(
@@ -111,7 +111,7 @@ test_that("LargeDataSetForTextEmbeddings - No FeatureExtractor", {
   }
 
   # Correct padding value
-  expect_equal(new_data_set_converted$get_pad_value(),-100)
+  expect_equal(new_data_set_converted$get_pad_value(), -100)
 
   # Selection test
   one_case <- new_dataset$select(3)
@@ -142,7 +142,7 @@ test_that("LargeDataSetForTextEmbeddings - Method Save and Load", {
     param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
     param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
     param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
-    param_pad_value=-100
+    param_pad_value = -100
   )
 
   new_dataset$add_embeddings_from_array(imdb_embeddings$embeddings)
@@ -175,7 +175,7 @@ test_that("LargeDataSetForTextEmbeddings - Function Save and Load", {
     param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
     param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
     param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
-    param_pad_value=-100
+    param_pad_value = -100
   )
 
   new_dataset$add_embeddings_from_array(imdb_embeddings$embeddings)

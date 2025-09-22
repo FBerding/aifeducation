@@ -6,15 +6,38 @@ testthat::skip_if_not(
 )
 
 test_that("class_vector_to_py_dataset", {
-  vec=c(0,0,1,1,2,0)
-  name_vector=c("A","B","C","d","e","f")
-  names(vec)=name_vector
-  dataset=class_vector_to_py_dataset(vec)
+  vec <- c(0, 0, 1, 1, 2, 0)
+  name_vector <- c("A", "B", "C", "d", "e", "f")
+  names(vec) <- name_vector
+  dataset <- class_vector_to_py_dataset(vec)
 
-  expect_s3_class(object=dataset,class="datasets.arrow_dataset.Dataset")
-  expect_equal(dataset[["id"]],name_vector)
-  expect_equal(dataset[["labels"]],unname(vec))
+  expect_s3_class(object = dataset, class = "datasets.arrow_dataset.Dataset")
+  expect_equal(dataset[["id"]], name_vector)
+  expect_equal(dataset[["labels"]], unname(vec))
+})
 
+test_that("is_venv ", {
+  if (Sys.getenv("CI") == "true") {
+    expect_false(is_venv())
+  } else {
+    expect_true(is_venv())
+  }
+})
+
+test_that("get_py_env_type ", {
+  if (Sys.getenv("CI") == "true") {
+    expect_equal(get_py_env_type(),"conda")
+  } else {
+    expect_equal(get_py_env_type(),"venv")
+  }
+})
+
+test_that("get_py_env_type ", {
+  if (Sys.getenv("CI") == "true") {
+    expect_equal(get_py_env_name(),"r-reticulate")
+  } else {
+    expect_equal(get_py_env_name(),"aifeducation")
+  }
 })
 
 

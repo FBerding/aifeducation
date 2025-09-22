@@ -155,7 +155,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
   n_row <- 0L
   names_vector <- NULL
   for (i in seq_len(length(result_list))) {
-    if (!is.null(result_list[[i]]$syntetic_embeddings) ) {
+    if (!is.null(result_list[[i]]$syntetic_embeddings)) {
       syntetic_embeddings[
         (n_row + 1L):(n_row + nrow(result_list[[i]]$syntetic_embeddings)),
         c(seq_len(ncol(result_list[[i]]$syntetic_embeddings)))
@@ -240,7 +240,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
 
   if (
     !inherits(x = syn_data, what = "try-error") &&
-      (!is.null(syn_data)  || nrow(syn_data$syn_data) > 0L)
+      (!is.null(syn_data) || nrow(syn_data$syn_data) > 0L)
   ) {
     n_cols_embedding <- ncol(matrix_form)
     tmp_data <- syn_data$syn_data[1L:required_cases, -ncol(syn_data$syn_data)]

@@ -23,12 +23,9 @@ BaseModelFunnel <- R6::R6Class(
   classname = "BaseModelFunnel",
   inherit = BaseModelCore,
   private = list(
-
-    model_type="funnel",
-
-    adjust_max_sequence_length=1,
-
-    create_model=function(args){
+    model_type = "funnel",
+    adjust_max_sequence_length = 1,
+    create_model = function(args) {
       configuration <- transformers$FunnelConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         block_sizes = as.integer(args$block_sizes),
@@ -52,22 +49,22 @@ BaseModelFunnel <- R6::R6Class(
         max_position_embeddings = as.integer(args$max_position_embeddings),
       )
       private$model <- transformers$FunnelForMaskedLM(configuration)
-  },
-  load_BaseModel=function(dir_path){
-    private$model <- transformers$FunnelForMaskedLM$from_pretrained(dir_path)
-  },
-  set_model_config_from_hf=function(){
-    super$set_model_config_from_hf()
-    private$model_config["num_attention_heads"] <- list(private$model$config["n_head"])
-    private$model_config["hidden_size"] <- list(private$model$config["d_model"])
-    private$model_config["intermediate_size"] <- list(private$model$config["d_inner"])
-    private$model_config["funnel_pooling_type"] <- list(private$model$config["pooling_type"])
-  },
-  check_arg_combinations = function(args) {
-    if (args$hidden_size %% args$num_attention_heads != 0L) {
-      stop("hidden_size must be a multiple auf num_attention_heads.")
+    },
+    load_BaseModel = function(dir_path) {
+      private$model <- transformers$FunnelForMaskedLM$from_pretrained(dir_path)
+    },
+    set_model_config_from_hf = function() {
+      super$set_model_config_from_hf()
+      private$model_config["num_attention_heads"] <- list(private$model$config["n_head"])
+      private$model_config["hidden_size"] <- list(private$model$config["d_model"])
+      private$model_config["intermediate_size"] <- list(private$model$config["d_inner"])
+      private$model_config["funnel_pooling_type"] <- list(private$model$config["pooling_type"])
+    },
+    check_arg_combinations = function(args) {
+      if (args$hidden_size %% args$num_attention_heads != 0L) {
+        stop("hidden_size must be a multiple auf num_attention_heads.")
+      }
     }
-  }
   ),
   public = list(
     #---------------------------------------------------------------------------
@@ -94,7 +91,7 @@ BaseModelFunnel <- R6::R6Class(
                          num_attention_heads = 12L,
                          intermediate_size = 3072L,
                          num_decoder_layers = 2L,
-                         d_head=64L,
+                         d_head = 64L,
                          funnel_pooling_type = "Mean",
                          hidden_act = "GELU",
                          hidden_dropout_prob = 0.1,
@@ -106,5 +103,5 @@ BaseModelFunnel <- R6::R6Class(
   )
 )
 
-#Add the model to the user list
-BaseModelsIndex$Funnel=("BaseModelFunnel")
+# Add the model to the user list
+BaseModelsIndex$Funnel <- ("BaseModelFunnel")

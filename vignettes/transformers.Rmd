@@ -426,8 +426,8 @@ bert_transformer <- .AIFEBertTransformer$new() # (1)
 
 # See .AIFEBertTransformer documentation to get input parameters
 # for create and train methods instead of ...
-bert_transformer$create(...)                   # (2)
-bert_transformer$train(...)                    # (3)
+bert_transformer$create(...) # (2)
+bert_transformer$train(...) # (3)
 ```
 
 ## 2.2 Transformer Parameters
@@ -557,55 +557,59 @@ transformer <- aife_transformer_maker$make(AIFETrType$bert)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(model_dir = model_dir,
-                   text_dataset = text_dataset,
-                   vocab_size = 30522,
-                   vocab_do_lower_case = FALSE,
-                   max_position_embeddings = 512,
-                   hidden_size = 768,
-                   num_hidden_layer = 12,
-                   num_attention_heads = 12,
-                   intermediate_size = 3072,
-                   hidden_act = "gelu",
-                   hidden_dropout_prob = 0.1,
-                   attention_probs_dropout_prob = 0.1,
-                   sustain_track = TRUE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_safetensors = TRUE,
-                   log_dir = NULL,
-                   log_write_interval = 2)
+transformer$create(
+  model_dir = model_dir,
+  text_dataset = text_dataset,
+  vocab_size = 30522,
+  vocab_do_lower_case = FALSE,
+  max_position_embeddings = 512,
+  hidden_size = 768,
+  num_hidden_layer = 12,
+  num_attention_heads = 12,
+  intermediate_size = 3072,
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(output_dir = output_dir,
-                  model_dir_path = model_dir_path,
-                  text_dataset = text_dataset,
-                  p_mask = 0.15,
-                  whole_word = TRUE,
-                  val_size = 0.1,
-                  n_epoch = 1,
-                  batch_size = 12,
-                  chunk_size = 250,
-                  full_sequences_only = FALSE,
-                  min_seq_len = 50,
-                  learning_rate = 3e-3,
-                  n_workers = 1,
-                  multi_process = FALSE,
-                  sustain_track = TRUE,
-                  sustain_iso_code = NULL,
-                  sustain_region = NULL,
-                  sustain_interval = 15,
-                  trace = TRUE,
-                  keras_trace = 1,
-                  pytorch_trace = 1,
-                  pytorch_safetensors = TRUE,
-                  log_dir = NULL,
-                  log_write_interval = 2)
+transformer$train(
+  output_dir = output_dir,
+  model_dir_path = model_dir_path,
+  text_dataset = text_dataset,
+  p_mask = 0.15,
+  whole_word = TRUE,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
+  learning_rate = 3e-3,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1,
+  pytorch_trace = 1,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 ### `DeBERTa-v2`
@@ -623,55 +627,59 @@ transformer <- aife_transformer_maker$make(AIFETrType$deberta_v2)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(model_dir = model_dir,
-                   text_dataset = text_dataset,
-                   vocab_size = 128100,
-                   vocab_do_lower_case = FALSE,
-                   max_position_embeddings = 512,
-                   hidden_size = 1536,
-                   num_hidden_layer = 24,
-                   num_attention_heads = 24,
-                   intermediate_size = 6144,
-                   hidden_act = "gelu",
-                   hidden_dropout_prob = 0.1,
-                   attention_probs_dropout_prob = 0.1,
-                   sustain_track = TRUE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_safetensors = TRUE,
-                   log_dir = NULL,
-                   log_write_interval = 2)
+transformer$create(
+  model_dir = model_dir,
+  text_dataset = text_dataset,
+  vocab_size = 128100,
+  vocab_do_lower_case = FALSE,
+  max_position_embeddings = 512,
+  hidden_size = 1536,
+  num_hidden_layer = 24,
+  num_attention_heads = 24,
+  intermediate_size = 6144,
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(output_dir = output_dir,
-                  model_dir_path = model_dir_path,
-                  text_dataset = text_dataset,
-                  p_mask = 0.15,
-                  whole_word = TRUE,
-                  val_size = 0.1,
-                  n_epoch = 1,
-                  batch_size = 12,
-                  chunk_size = 250,
-                  full_sequences_only = FALSE,
-                  min_seq_len = 50,
-                  learning_rate = 3e-2,
-                  n_workers = 1,
-                  multi_process = FALSE,
-                  sustain_track = TRUE,
-                  sustain_iso_code = NULL,
-                  sustain_region = NULL,
-                  sustain_interval = 15,
-                  trace = TRUE,
-                  keras_trace = 1,
-                  pytorch_trace = 1,
-                  pytorch_safetensors = TRUE,
-                  log_dir = NULL,
-                  log_write_interval = 2)
+transformer$train(
+  output_dir = output_dir,
+  model_dir_path = model_dir_path,
+  text_dataset = text_dataset,
+  p_mask = 0.15,
+  whole_word = TRUE,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
+  learning_rate = 3e-2,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1,
+  pytorch_trace = 1,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 ### `RoBERTa`
@@ -689,55 +697,59 @@ transformer <- aife_transformer_maker$make(AIFETrType$roberta)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(model_dir = model_dir,
-                   text_dataset = text_dataset,
-                   vocab_size = 30522,
-                   add_prefix_space = FALSE,
-                   trim_offsets = TRUE,
-                   max_position_embeddings = 512,
-                   hidden_size = 768,
-                   num_hidden_layer = 12,
-                   num_attention_heads = 12,
-                   intermediate_size = 3072,
-                   hidden_act = "gelu",
-                   hidden_dropout_prob = 0.1,
-                   attention_probs_dropout_prob = 0.1,
-                   sustain_track = TRUE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_safetensors = TRUE,
-                   log_dir = NULL,
-                   log_write_interval = 2)
+transformer$create(
+  model_dir = model_dir,
+  text_dataset = text_dataset,
+  vocab_size = 30522,
+  add_prefix_space = FALSE,
+  trim_offsets = TRUE,
+  max_position_embeddings = 512,
+  hidden_size = 768,
+  num_hidden_layer = 12,
+  num_attention_heads = 12,
+  intermediate_size = 3072,
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(output_dir = output_dir,
-                  model_dir_path = model_dir_path,
-                  text_dataset = text_dataset,
-                  p_mask = 0.15,
-                  val_size = 0.1,
-                  n_epoch = 1,
-                  batch_size = 12,
-                  chunk_size = 250,
-                  full_sequences_only = FALSE,
-                  min_seq_len = 50,
-                  learning_rate = 3e-2,
-                  n_workers = 1,
-                  multi_process = FALSE,
-                  sustain_track = TRUE,
-                  sustain_iso_code = NULL,
-                  sustain_region = NULL,
-                  sustain_interval = 15,
-                  trace = TRUE,
-                  keras_trace = 1,
-                  pytorch_trace = 1,
-                  pytorch_safetensors = TRUE,
-                  log_dir = NULL,
-                  log_write_interval = 2)
+transformer$train(
+  output_dir = output_dir,
+  model_dir_path = model_dir_path,
+  text_dataset = text_dataset,
+  p_mask = 0.15,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
+  learning_rate = 3e-2,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1,
+  pytorch_trace = 1,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 ### `Funnel`
@@ -755,59 +767,63 @@ transformer <- aife_transformer_maker$make(AIFETrType$funnel)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(model_dir = model_dir,
-                   text_dataset = text_dataset,
-                   vocab_size = 30522,
-                   vocab_do_lower_case = FALSE,
-                   max_position_embeddings = 512,
-                   hidden_size = 768,
-                   target_hidden_size = 64,
-                   block_sizes = c(4, 4, 4),
-                   num_attention_heads = 12,
-                   intermediate_size = 3072,
-                   num_decoder_layers = 2,
-                   pooling_type = "Mean",
-                   hidden_act = "gelu",
-                   hidden_dropout_prob = 0.1,
-                   attention_probs_dropout_prob = 0.1,
-                   activation_dropout = 0.0,
-                   sustain_track = TRUE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_safetensors = TRUE,
-                   log_dir = NULL,
-                   log_write_interval = 2)
+transformer$create(
+  model_dir = model_dir,
+  text_dataset = text_dataset,
+  vocab_size = 30522,
+  vocab_do_lower_case = FALSE,
+  max_position_embeddings = 512,
+  hidden_size = 768,
+  target_hidden_size = 64,
+  block_sizes = c(4, 4, 4),
+  num_attention_heads = 12,
+  intermediate_size = 3072,
+  num_decoder_layers = 2,
+  pooling_type = "Mean",
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
+  activation_dropout = 0.0,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(output_dir = output_dir,
-                  model_dir_path = model_dir_path,
-                  text_dataset = text_dataset,
-                  p_mask = 0.15,
-                  whole_word = TRUE,
-                  val_size = 0.1,
-                  n_epoch = 1,
-                  batch_size = 12,
-                  chunk_size = 250,
-                  full_sequences_only = FALSE,
-                  min_seq_len = 50,
-                  learning_rate = 3e-3,
-                  n_workers = 1,
-                  multi_process = FALSE,
-                  sustain_track = TRUE,
-                  sustain_iso_code = NULL,
-                  sustain_region = NULL,
-                  sustain_interval = 15,
-                  trace = TRUE,
-                  keras_trace = 1,
-                  pytorch_trace = 1,
-                  pytorch_safetensors = TRUE,
-                  log_dir = NULL,
-                  log_write_interval = 2)
+transformer$train(
+  output_dir = output_dir,
+  model_dir_path = model_dir_path,
+  text_dataset = text_dataset,
+  p_mask = 0.15,
+  whole_word = TRUE,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
+  learning_rate = 3e-3,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1,
+  pytorch_trace = 1,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 ### `Longformer`
@@ -825,56 +841,60 @@ transformer <- aife_transformer_maker$make(AIFETrType$longformer)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(model_dir = model_dir,
-                   text_dataset = text_dataset,
-                   vocab_size = 30522,
-                   add_prefix_space = FALSE,
-                   trim_offsets = TRUE,
-                   max_position_embeddings = 512,
-                   hidden_size = 768,
-                   num_hidden_layer = 12,
-                   num_attention_heads = 12,
-                   intermediate_size = 3072,
-                   hidden_act = "gelu",
-                   hidden_dropout_prob = 0.1,
-                   attention_probs_dropout_prob = 0.1,
-                   attention_window = 512,
-                   sustain_track = TRUE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_safetensors = TRUE,
-                   log_dir = NULL,
-                   log_write_interval = 2)
+transformer$create(
+  model_dir = model_dir,
+  text_dataset = text_dataset,
+  vocab_size = 30522,
+  add_prefix_space = FALSE,
+  trim_offsets = TRUE,
+  max_position_embeddings = 512,
+  hidden_size = 768,
+  num_hidden_layer = 12,
+  num_attention_heads = 12,
+  intermediate_size = 3072,
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
+  attention_window = 512,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(output_dir = output_dir,
-                  model_dir_path = model_dir_path,
-                  text_dataset = text_dataset,
-                  p_mask = 0.15,
-                  val_size = 0.1,
-                  n_epoch = 1,
-                  batch_size = 12,
-                  chunk_size = 250,
-                  full_sequences_only = FALSE,
-                  min_seq_len = 50,
-                  learning_rate = 3e-2,
-                  n_workers = 1,
-                  multi_process = FALSE,
-                  sustain_track = TRUE,
-                  sustain_iso_code = NULL,
-                  sustain_region = NULL,
-                  sustain_interval = 15,
-                  trace = TRUE,
-                  keras_trace = 1,
-                  pytorch_trace = 1,
-                  pytorch_safetensors = TRUE,
-                  log_dir = NULL,
-                  log_write_interval = 2)
+transformer$train(
+  output_dir = output_dir,
+  model_dir_path = model_dir_path,
+  text_dataset = text_dataset,
+  p_mask = 0.15,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
+  learning_rate = 3e-2,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1,
+  pytorch_trace = 1,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 ### `MPNet`
@@ -892,56 +912,60 @@ transformer <- aife_transformer_maker$make(AIFETrType$mpnet)
 #### Create
 
 ```{r, eval = FALSE}
-transformer$create(model_dir = model_dir,
-                   text_dataset = text_dataset,
-                   vocab_size = 30522,
-                   vocab_do_lower_case = FALSE,
-                   max_position_embeddings = 512,
-                   hidden_size = 768,
-                   num_hidden_layer = 12,
-                   num_attention_heads = 12,
-                   intermediate_size = 3072,
-                   hidden_act = "gelu",
-                   hidden_dropout_prob = 0.1,
-                   attention_probs_dropout_prob = 0.1,
-                   sustain_track = TRUE,
-                   sustain_iso_code = NULL,
-                   sustain_region = NULL,
-                   sustain_interval = 15,
-                   trace = TRUE,
-                   pytorch_safetensors = TRUE,
-                   log_dir = NULL,
-                   log_write_interval = 2)
+transformer$create(
+  model_dir = model_dir,
+  text_dataset = text_dataset,
+  vocab_size = 30522,
+  vocab_do_lower_case = FALSE,
+  max_position_embeddings = 512,
+  hidden_size = 768,
+  num_hidden_layer = 12,
+  num_attention_heads = 12,
+  intermediate_size = 3072,
+  hidden_act = "gelu",
+  hidden_dropout_prob = 0.1,
+  attention_probs_dropout_prob = 0.1,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 #### Train
 
 ```{r, eval = FALSE}
-transformer$train(output_dir = output_dir,
-                  model_dir_path = model_dir_path,
-                  text_dataset = text_dataset,
-                  p_mask = 0.15,
-                  p_perm = 0.15,
-                  whole_word = TRUE,
-                  val_size = 0.1,
-                  n_epoch = 1,
-                  batch_size = 12,
-                  chunk_size = 250,
-                  full_sequences_only = FALSE,
-                  min_seq_len = 50,
-                  learning_rate = 3e-3,
-                  n_workers = 1,
-                  multi_process = FALSE,
-                  sustain_track = TRUE,
-                  sustain_iso_code = NULL,
-                  sustain_region = NULL,
-                  sustain_interval = 15,
-                  trace = TRUE,
-                  keras_trace = 1,
-                  pytorch_trace = 1,
-                  pytorch_safetensors = TRUE,
-                  log_dir = NULL,
-                  log_write_interval = 2)
+transformer$train(
+  output_dir = output_dir,
+  model_dir_path = model_dir_path,
+  text_dataset = text_dataset,
+  p_mask = 0.15,
+  p_perm = 0.15,
+  whole_word = TRUE,
+  val_size = 0.1,
+  n_epoch = 1,
+  batch_size = 12,
+  chunk_size = 250,
+  full_sequences_only = FALSE,
+  min_seq_len = 50,
+  learning_rate = 3e-3,
+  n_workers = 1,
+  multi_process = FALSE,
+  sustain_track = TRUE,
+  sustain_iso_code = NULL,
+  sustain_region = NULL,
+  sustain_interval = 15,
+  trace = TRUE,
+  keras_trace = 1,
+  pytorch_trace = 1,
+  pytorch_safetensors = TRUE,
+  log_dir = NULL,
+  log_write_interval = 2
+)
 ```
 
 # 4 Implement A Custom Transformer
@@ -966,12 +990,12 @@ To implement a new transformer, do the following steps:
     `train` methods.
 
     ```{r}
-    .AIFECustomTransformer <- R6::R6Class(
-      classname = ".AIFECustomTransformer", # (1)
-      inherit = .AIFEBaseTransformer, # (2)
-      private = list(), # (3)
-      public = list() # (4)
-    )
+.AIFECustomTransformer <- R6::R6Class(
+  classname = ".AIFECustomTransformer", # (1)
+  inherit = .AIFEBaseTransformer, # (2)
+  private = list(), # (3)
+  public = list() # (4)
+)
     ```
 
 3.  Define the private `title` attribute **(1)** and set it in the
@@ -979,18 +1003,18 @@ To implement a new transformer, do the following steps:
     base method **(3)** in the base class.
 
     ```{r}
-    .AIFECustomTransformer <- R6::R6Class(
-      classname = ".AIFECustomTransformer",
-      inherit = .AIFEBaseTransformer,
-      private = list(
-        title = "Custom Model" # (1)
-      ),
-      public = list(
-        initialize = function() { # (2)
-          super$set_title(private$title) # (3)
-        }
-      )
-    )
+.AIFECustomTransformer <- R6::R6Class(
+  classname = ".AIFECustomTransformer",
+  inherit = .AIFEBaseTransformer,
+  private = list(
+    title = "Custom Model" # (1)
+  ),
+  public = list(
+    initialize = function() { # (2)
+      super$set_title(private$title) # (3)
+    }
+  )
+)
     ```
 
 4.  Define the private `steps_for_creation` list **(1)** to implement
@@ -1216,20 +1240,20 @@ To implement a new transformer, do the following steps:
     `AIFETrType` list and add a new element to the end of it **(1)**:
 
     ```{r, eval = FALSE}
-    AIFETrType <- list(
-      bert = "bert",
-      roberta = "roberta",
-      # ...
-      mpnet = "mpnet",
-      custom = "custom"   # (1)
-    )
+AIFETrType <- list(
+  bert = "bert",
+  roberta = "roberta",
+  # ...
+  mpnet = "mpnet",
+  custom = "custom" # (1)
+)
     ```
 
     In the end of the file "R/dotAIFECustomTransformer.R" put the
     following line to use this transformer with Transformer Maker:
 
     ```{r, eval = FALSE}
-    .AIFETrObj[[AIFETrType$custom]] <- .AIFECustomTransformer$new
+.AIFETrObj[[AIFETrType$custom]] <- .AIFECustomTransformer$new
     ```
 
     > Now use the Transformer Maker class to create a custom transformer

@@ -23,8 +23,8 @@ Other Text Embedding:
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{BaseModel}}{\cr
-Object of class \link{BaseModelBert}, \link{BaseModelFunnel}, \link{BaseModelMPNet}, \link{BaseModelModernBert}, \link{BaseModelRoberta}.}
+\item{\code{BaseModel}}{('BaseModelCore')\cr
+Object of class \code{BaseModelCore}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -120,7 +120,7 @@ default_value = NULL Allowed values: 'CLS', 'Average'}
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is \code{-100}. Allowed values: \code{ x <= -100}}
 
-\item{\code{base_model}}{\verb{BaseModelBert, BaseModelFunnel, BaseModelMPNet, BaseModelModernBert, BaseModelRoberta} BaseModels for processing raw texts.}
+\item{\code{base_model}}{\code{BaseModelCore} BaseModels for processing raw texts.}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }

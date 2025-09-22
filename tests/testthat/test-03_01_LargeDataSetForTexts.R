@@ -97,7 +97,7 @@ test_that("LargeDataSetForTexts - Add txt - with log", {
       log_top_value = 0,
       log_top_total = 1,
       log_top_message = NA,
-      clean_text=TRUE
+      clean_text = TRUE
     )
   )
 
@@ -227,7 +227,7 @@ test_that("LargeDataSetForTexts - Add pdf with log", {
   expect_no_error(
     new_dataset$add_from_files_pdf(
       dir_path = root_path_data_multiple_texts,
-      clean_text=TRUE,
+      clean_text = TRUE,
       trace = FALSE
     )
   )

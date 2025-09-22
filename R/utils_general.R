@@ -20,9 +20,9 @@
 #'
 #' @family Utils Developers
 #' @export
-get_time_stamp <- function(){
+get_time_stamp <- function() {
   return(
-    as.character(format(Sys.time()),"%y-%m-%d %H:%M:%S")
+    as.character(format(Sys.time()), "%y-%m-%d %H:%M:%S")
   )
 }
 
@@ -232,7 +232,7 @@ auto_n_cores <- function() {
 #' @keywords internal
 #' @noRd
 detect_base_model_type <- function(model) {
-  if (inherits(model,"transformers.configuration_utils.PretrainedConfig")) {
+  if (inherits(model, "transformers.configuration_utils.PretrainedConfig")) {
     type_string <- model$architectures
   } else {
     type_string <- model$config

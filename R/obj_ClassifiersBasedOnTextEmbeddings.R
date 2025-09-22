@@ -315,7 +315,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (private$model_config$use_fe) {
         save_to_disk(
           object = self$feature_extractor,
-          dir_path = file.path(dir_path,  folder_name),
+          dir_path = file.path(dir_path, folder_name),
           folder_name = "feature_extractor"
         )
       }
@@ -602,7 +602,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       # Print status message to console
       if (self$last_training$config$trace) {
         if (iteration <= self$last_training$config$n_folds) {
-          message(get_time_stamp(),
+          message(
+            get_time_stamp(),
             "|", "Iteration", iteration, "from", self$last_training$config$n_folds
           )
         } else {
@@ -1094,12 +1095,10 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     check_target_levels = function(data_targets) {
       if (sum(levels(data_targets) %in% private$model_config$target_levels) != private$model_config$n_categories) {
         warning(
-
-            "data_targets contains levels that are not defined for the classifier",
-            "Defined levels are", private$model_config$target_levels, ".",
-            "Please check your data or create a new classifier and pass
+          "data_targets contains levels that are not defined for the classifier",
+          "Defined levels are", private$model_config$target_levels, ".",
+          "Please check your data or create a new classifier and pass
                 all levels to the classifier's configuration."
-
         )
       }
     },

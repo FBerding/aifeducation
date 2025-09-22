@@ -171,7 +171,7 @@ get_param_dict <- function() {
     default_value = NULL"
   )
 
-  param$funnel_pooling_type<- list(
+  param$funnel_pooling_type <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
@@ -283,7 +283,7 @@ get_param_dict <- function() {
   # Transformer related---------------------------------------------------------
 
   param$tokenizer <- list(
-    type = unlist(TokenizerIndex),
+    type = "TokenizerBase",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
@@ -298,7 +298,7 @@ get_param_dict <- function() {
   )
 
   param$base_model <- list(
-    type = unlist(BaseModelsIndex),
+    type = "BaseModelCore",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
@@ -594,8 +594,8 @@ get_param_dict <- function() {
   )
 
   param$d_head <- param$target_hidden_size
-  param$d_head$desc="Number of neurons of the final layer."
-  param$d_head$default_value = 64L
+  param$d_head$desc <- "Number of neurons of the final layer."
+  param$d_head$default_value <- 64L
 
   param$hidden_dropout_prob <- list(
     type = "double",
@@ -1422,7 +1422,7 @@ get_param_dict <- function() {
     default_historic = "GELU"
   )
   param$feat_act_fct <- param$act_fct
-  param$feat_act_fct$gui_box <-  "Feature Layer"
+  param$feat_act_fct$gui_box <- "Feature Layer"
   param$ng_conv_act_fct <- param$act_fct
   param$ng_conv_act_fct$gui_box <- "Multiple N-Gram Layers"
   param$dense_act_fct <- param$act_fct
@@ -1558,7 +1558,7 @@ get_param_dict <- function() {
   )
 
   param$feat_size <- param$dense_size
-  param$feat_size$gui_box= "Feature Layer"
+  param$feat_size$gui_box <- "Feature Layer"
   param$feat_size$min <- 2L
 
   # Transformer Layer------------------------------------------------------------
@@ -1870,7 +1870,7 @@ get_called_args <- function(n = 1L) {
 #' max * magnitude^i for i=1,...,n_elements.
 #' Only values equal or greater `min` are returned.
 #' @family Parameter Dictionary
-get_magnitude_values <- function(magnitude, n_elements = 9L, max=NULL, min=NULL) {
+get_magnitude_values <- function(magnitude, n_elements = 9L, max = NULL, min = NULL) {
   value_vector <- vector(length = n_elements)
   for (i in seq_along(value_vector)) {
     value_vector[i] <- max(min, max * magnitude^i)

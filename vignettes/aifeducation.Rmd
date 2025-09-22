@@ -76,7 +76,8 @@ aifeducation::install_aifeducation(
   install_aifeducation_studio = TRUE,
   python_version = "3.12",
   cuda_version = "12.4",
-  use_conda = FALSE)
+  use_conda = FALSE
+)
 ```
 
 This function will install python, and all relevant python
@@ -156,7 +157,8 @@ aifeducation::update_aifeducation(
   update_aifeducation_studio = TRUE,
   env_type = "auto",
   cuda_version = "12.4",
-  envname = "aifeducation")
+  envname = "aifeducation"
+)
 ```
 
 > Starting with version 1.1.2 the python package 'calflops' is necessary. If you

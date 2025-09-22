@@ -2,18 +2,12 @@
 % Please edit documentation in R/def_Object_Management.R
 \name{create_object}
 \alias{create_object}
-\title{Create object}
+\title{Create object#'}
 \usage{
 create_object(class)
 }
 \arguments{
-\item{class}{\code{string} Name of the class to be created. The following
-strings are possible:
-\code{unique(DataSetsIndex,names(DataSetsIndex))}
-\code{unique(TokenizerIndex,names(TokenizerIndex))}
-\code{unique(BaseModelsIndex,names(BaseModelsIndex))}
-\code{unique(TextEmbeddingObjectsIndex,names(TextEmbeddingObjectsIndex))}
-\code{unique(TEClassifiers_class_names,names(TEClassifiers_class_names))}}
+\item{class}{\code{string} Name of the class to be created.}
 }
 \value{
 Returns an object of the requested class.

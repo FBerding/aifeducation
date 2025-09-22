@@ -131,7 +131,7 @@ TextEmbeddingModel <- R6::R6Class(
         }
       }
 
-      if (!is.integer(as.integer(emb_layer_min))  | !is.integer(as.integer(emb_layer_max))) {
+      if (!is.integer(as.integer(emb_layer_min)) | !is.integer(as.integer(emb_layer_max))) {
         stop("emb_layer_min and emb_layer_max must be integers or the following string:
                'first','last','middle','2_3_layer'")
       }
@@ -142,7 +142,7 @@ TextEmbeddingModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for checking and setting pooling type
     check_and_set_pooling_type = function(emb_pool_type) {
-      if (!emb_pool_type %in% c("CLS", "Average") ) {
+      if (!emb_pool_type %in% c("CLS", "Average")) {
         stop("emb_pool_type must be 'cls' or 'average'.")
       }
       private$model_config$emb_pool_type <- emb_pool_type
@@ -162,8 +162,8 @@ TextEmbeddingModel <- R6::R6Class(
   ),
   public = list(
 
-    #' @field BaseModel \cr
-    #' Object of class `r paste(paste0("[",BaseModelsIndex,"]"),collapse=", ")`.
+    #' @field BaseModel ('BaseModelCore')\cr
+    #' Object of class `BaseModelCore`.
     BaseModel = NULL,
 
     #--------------------------------------------------------------------------
@@ -254,7 +254,7 @@ TextEmbeddingModel <- R6::R6Class(
       )
       if (version_lower) {
         # Old version that does not use BaseModel and Tokenizer
-        path_to_files <- file.path(dir_path,  "model_data")
+        path_to_files <- file.path(dir_path, "model_data")
         tmp_pytorch_model <- transformers$AutoModelForMaskedLM$from_pretrained(path_to_files)
         tmp_type <- detect_base_model_type(tmp_pytorch_model$config)
         tmp_BaseModel <- create_object(tmp_type)
@@ -282,7 +282,7 @@ TextEmbeddingModel <- R6::R6Class(
     #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
-      save_location <- file.path(dir_path,  folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
 
       # Save BaseModel
@@ -384,7 +384,6 @@ TextEmbeddingModel <- R6::R6Class(
           pooling$to(pytorch_device)
         }
 
-
         index_min <- 1L + (b - 1L) * batch_size
         index_max <- min(b * batch_size, n_units)
         batch <- index_min:index_max
@@ -474,7 +473,7 @@ TextEmbeddingModel <- R6::R6Class(
               # Set values to zero to remove padding value
               text_embedding[i, j, ] <- 0L
 
-              if (!torch$cuda$is_available() ) {
+              if (!torch$cuda$is_available()) {
                 if (private$model_config$emb_pool_type == "CLS") {
                   # CLS Token is always the first token
                   text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
@@ -541,7 +540,7 @@ TextEmbeddingModel <- R6::R6Class(
         embeddings = text_embedding
       )
 
-      if (!return_large_dataset ) {
+      if (!return_large_dataset) {
         return(embeddings)
       } else {
         embedded_texts_large <- LargeDataSetForTextEmbeddings$new()
@@ -631,7 +630,7 @@ TextEmbeddingModel <- R6::R6Class(
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
-        if (trace ) {
+        if (trace) {
           cat(paste(
             get_time_stamp(),
             "Batch", i, "/", total_number_of_bachtes, "done", "\n"

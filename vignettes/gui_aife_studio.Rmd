@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(aifeducation)
-running_num_figures=1
+running_num_figures <- 1
 ```
 
 # 1 Introduction and Overview
@@ -92,7 +92,7 @@ this package's understanding.
 ![Figure `r running_num_figures`: Understanding of Central Concepts](classif_fig_01.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 Since *aifeducation* looks at the application of AI for classification
@@ -117,7 +117,7 @@ supervised machine learning principles.
 ![Figure `r running_num_figures`: Basic Structure of Supervised Machine Learning](classif_fig_02.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 By providing AI with both the textual data as input data and the
@@ -155,7 +155,7 @@ models, as shown in Figure `r running_num_figures`.
 ![Figure `r running_num_figures`: Modells Types in aifeducation](classif_model_hierachy.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 -   **Base Models:** The base models are the models which contain the
@@ -199,7 +199,7 @@ At the beginning you will see the home page (Figure `r running_num_figures`).
 ![Figure `r running_num_figures`: Home Page](home.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 
@@ -227,7 +227,7 @@ Management* page on the top panel as shown in Figure `r running_num_figures`.
 ![Figure `r running_num_figures`: Data Management Page](DM_Create.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 On the resulting page (see Figure `r running_num_figures`), you first have to choose the
@@ -337,14 +337,14 @@ Figure `r running_num_figures` shows an example.
 ![Figure `r running_num_figures`: Structure of Raw Texts within an Excel Sheet](DM_Create_Excel_file.png){width="75%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 
 ![Figure `r running_num_figures`: Data Preparation Page](DM_Create_Fill_fields.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 In the next step, you can decide which file formats should be included
@@ -379,7 +379,7 @@ saved.
 ![Figure `r running_num_figures`: Selecting a path for a data set](DM_Create_Start_creation.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 Finally, you can start creating the collection (*Continue* button in
@@ -389,7 +389,7 @@ creation progress in the progress bars (Figure 9).
 ![Figure `r running_num_figures`: Progress of Dataset creation process](DM_Create_Progress.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 When the process finishes you can see a message like in Figure `r running_num_figures` (if
@@ -398,7 +398,7 @@ the process has completed without any errors).
 ![Figure `r running_num_figures`: Progress of Dataset creation process](DM_Create_Success.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 You now have a folder with the files that can be used for further tasks
@@ -418,7 +418,7 @@ extension).
 ![Figure `r running_num_figures`: Filnames as IDs](DM_Create_Text_sources.png){width="75%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 The IDs are very important since they are used to match the
@@ -432,7 +432,7 @@ the *DataSetExplorer*. The *DataSetExplorer* can be found on the tab *Data Manag
 ![Figure `r running_num_figures`: DataExplorer](DM_DataExplorer.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 On the rights side (*Control Panel*) you can choose a folder where the dataset is stored. After
@@ -455,7 +455,7 @@ categories/classes. Supported file formats are .xlsx, .csv, and
 ![Figure `r running_num_figures`: Target Data in Excel Files](CF_Create_Targets.png){width="50%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 > In any case, the table must contain a column with the name "id" which
@@ -468,7 +468,7 @@ the *TableEditor*. The *TableEditor* is located in the tab *Data Management*.
 ![Figure `r running_num_figures`: TableEditor](DM_TableEditor.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 On the right side you can either create a new empty table or load and edit an existing table.
@@ -517,7 +517,7 @@ shows the corresponding page.
 Figure `r running_num_figures`: Base Models - Create Transformer (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 Every transformer model is composed of two parts: 
@@ -586,7 +586,7 @@ Models* tab.
 Figure `r running_num_figures`: Base Models - Train/Tune Transformer (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 In the first step, you have to choose the base model you would like to
@@ -677,7 +677,7 @@ progress bars and a plot (Figure `r running_num_figures`).
 ![Figure `r running_num_figures`: Progress of training the transformer](BM_Train_Progress.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 ## 3.3 Text Embedding Models
@@ -707,7 +707,7 @@ section "Text Embedding Models". Figure `r running_num_figures` shows the corres
 Figure `r running_num_figures`: Text Embedding Model - Create (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 First you have to choose the base model that should form the foundation
@@ -787,7 +787,7 @@ the model.
 Figure `r running_num_figures`: Text Embedding Model - Description (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 The tab *Training* shows the development of the loss and the validation
@@ -812,7 +812,7 @@ Embeddings" the transformation of texts begins.
 Figure `r running_num_figures`: Text Embedding Model - Embeddings (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 The tab *Tokenize/Encode/Decode* (Figure `r running_num_figures`) offers you insights into
@@ -830,7 +830,7 @@ Figure `r running_num_figures`: Text Embedding Model - Tokenize/Encode/Decode (c
 enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 Finally, the tab *Fill Mask* (Figure `r running_num_figures`) allows you to request the
@@ -851,7 +851,7 @@ the bottom.
 Figure `r running_num_figures`: Text Embedding Model - Fill Mask (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 ### 3.3.3 Documenting a Text Embedding Model
@@ -880,7 +880,7 @@ or task.
 Figure `r running_num_figures`: Text Embedding Model - Documentation (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 In the tabs *Abstract* and *Description*, you can provide an abstract
@@ -909,8 +909,8 @@ the corresponding page.
 Figure `r running_num_figures`: Classifier - Creation Part 1 (click image to enlarge)
 
 ```{r, include = FALSE}
-first_classifier_image=running_num_figures
-running_num_figures=running_num_figures+1
+first_classifier_image <- running_num_figures
+running_num_figures <- running_num_figures + 1
 ```
 
 First, you choose a core model within the *Control Panel* on the left side. It determines
@@ -922,7 +922,7 @@ of layers step by step. All layers are grouped by their kind into stacks.
 
 ![Figure `r running_num_figures`: Basic Architecture of a Sequential Classifier](core_arch_sequential.png){width="100%"}
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 In contrast, the parallel architecture (see Figure `r running_num_figures`) offers a model where 
@@ -931,7 +931,7 @@ are combined to create the final output of the whole model.
 
 ![Figure `r running_num_figures`: Basic Architecture of a Parallel Classifier](core_arch_parallel.png){width="100%"}
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 You can find the name of the used core model in the name of the classifier. For
@@ -998,7 +998,7 @@ neural network (Figure `r running_num_figures`).
 Figure `r running_num_figures`: Classifier - Creation Part 2 (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 Since a detailed explanation of every option is beyond the scope of this
@@ -1095,7 +1095,7 @@ al. (2020). Therefore, the following parameters have to be set:
 Figure `r running_num_figures`: Classifier - Creation Part 3 (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 Before you start training, you can check how many cases can be matched
@@ -1129,7 +1129,7 @@ documentation of the model.
 Figure `r running_num_figures`: Classifier - Description (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 In the second tab, *Training* (Figure `r running_num_figures`), you receive a summary of the
@@ -1142,7 +1142,7 @@ you can request additional images.
 Figure `r running_num_figures`: Classifier - Training (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 The third tab, *Reliability* (Figure `r running_num_figures`), provides you with the
@@ -1156,7 +1156,7 @@ performance.
 Figure `r running_num_figures`: Classifier - Reliability (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 The last tab, *Prediction* (Figure `r running_num_figures`), allows you to apply a trained
@@ -1171,7 +1171,7 @@ The necessary steps are described in section 3.3.2.
 Figure `r running_num_figures`: Classifier - Prediction (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 > These embeddings must be created with the same text embedding model
@@ -1186,7 +1186,7 @@ shown in Figure `r running_num_figures`.
 ![Figure `r running_num_figures`: Classifier - Prediction Results](CF_Use_Prediction_Result.png){width="50%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 ### 3.4.3 Documenting a Classifier
@@ -1236,7 +1236,7 @@ basic architecture of all extractors is shown in the following figure.
 ![Figure `r running_num_figures`: Basic architecture of feature extractors](classif_feature_extractor.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 The learning objective of the feature extractors is first to compress
@@ -1256,7 +1256,7 @@ in the tab *Feature Extractors*).
 ![Figure `r running_num_figures`: Feature Extractors - Create](FE_Create_Fill_fields.png){width="100%"}
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 First, you need to choose embeddings by using the box *Input Data*.
@@ -1301,7 +1301,7 @@ shows an example for exploring the training and validation loss.
 Figure `r running_num_figures`: Feature Extractor - Training (click image to enlarge)
 
 ```{r, include = FALSE}
-running_num_figures=running_num_figures+1
+running_num_figures <- running_num_figures + 1
 ```
 
 # References

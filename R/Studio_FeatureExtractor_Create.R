@@ -45,28 +45,28 @@ FeatureExtractors_Create_UI <- function(id) {
       # Main Page---------------------------------------------------------------
       # Content depends in the TextEmbeddingModel of the embeddings
       # Embeddings
-      #bslib::layout_column_wrap(
-        bslib::card(
-          bslib::card_header("Input Data"),
-          bslib::card_body(
-            shinyFiles::shinyDirButton(
-              id = shiny::NS(id, "button_select_dataset_for_embeddings"),
-              label = "Choose Embeddings",
-              title = "Please choose a folder",
-              icon = shiny::icon("folder-open")
-            ),
-            shiny::textInput(
-              inputId = shiny::NS(id, "embeddings_dir"),
-              label = shiny::tags$p(shiny::icon("folder"), "Path"),
-              width="100%"
-            ),
-            shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
-          )
-        ),
-        #Main config Cards
-        shiny::uiOutput(outputId = shiny::NS(id,"model_configuration")),
-        shiny::uiOutput(outputId = shiny::NS(id,"training_setup"))
-      #)
+      # bslib::layout_column_wrap(
+      bslib::card(
+        bslib::card_header("Input Data"),
+        bslib::card_body(
+          shinyFiles::shinyDirButton(
+            id = shiny::NS(id, "button_select_dataset_for_embeddings"),
+            label = "Choose Embeddings",
+            title = "Please choose a folder",
+            icon = shiny::icon("folder-open")
+          ),
+          shiny::textInput(
+            inputId = shiny::NS(id, "embeddings_dir"),
+            label = shiny::tags$p(shiny::icon("folder"), "Path"),
+            width = "100%"
+          ),
+          shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
+        )
+      ),
+      # Main config Cards
+      shiny::uiOutput(outputId = shiny::NS(id, "model_configuration")),
+      shiny::uiOutput(outputId = shiny::NS(id, "training_setup"))
+      # )
     )
   )
 }
@@ -122,22 +122,22 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Box for model configuration------------------------------------------------
-    output$model_configuration<-shiny::renderUI({
+    # Box for model configuration------------------------------------------------
+    output$model_configuration <- shiny::renderUI({
       config_box <- create_widget_card(
-        id=id,
-        object_class="TEFeatureExtractor",
+        id = id,
+        object_class = "TEFeatureExtractor",
         method = "configure",
-        box_title="Model Configuration"
+        box_title = "Model Configuration"
       )
     })
-    #Box for training set up---------------------------------------------------
-    output$training_setup<-shiny::renderUI({
+    # Box for training set up---------------------------------------------------
+    output$training_setup <- shiny::renderUI({
       config_box <- create_widget_card(
-        id=id,
-        object_class="TEFeatureExtractor",
+        id = id,
+        object_class = "TEFeatureExtractor",
         method = "train",
-        box_title="Training SetUp"
+        box_title = "Training SetUp"
       )
     })
 
@@ -201,50 +201,50 @@ FeatureExtractor_Create_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "feature_extractor",
           ExtendedTask_arguments = list(
-            configure=summarize_args_for_long_task(
-              input=input,
-              object_class="TEFeatureExtractor",
-              method="configure",
-              path_args=list(
-                path_to_embeddings=path_to_embeddings(),
-                path_to_target_data=NULL,
-                path_to_feature_extractor=NULL,
-                destination_path=input$save_modal_directory_path,
-                folder_name=input$save_modal_folder_name
+            configure = summarize_args_for_long_task(
+              input = input,
+              object_class = "TEFeatureExtractor",
+              method = "configure",
+              path_args = list(
+                path_to_embeddings = path_to_embeddings(),
+                path_to_target_data = NULL,
+                path_to_feature_extractor = NULL,
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
               ),
-              override_args=list(
-                sustain_track=TRUE
+              override_args = list(
+                sustain_track = TRUE
               ),
-              meta_args=list(
-                py_environment_type=get_py_env_type(),
-                py_env_name=get_py_env_name(),
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
                 target_data_column = NULL,
-                object_class="TEFeatureExtractor"
+                object_class = "TEFeatureExtractor"
               )
             ),
-            train=summarize_args_for_long_task(
-              input=input,
-              object_class="TEFeatureExtractor",
-              method="train",
-              path_args=list(
-                path_to_embeddings=path_to_embeddings(),
-                path_to_target_data=NULL,
-                path_to_feature_extractor=NULL,
-                destination_path=input$save_modal_directory_path,
-                folder_name=input$save_modal_folder_name
+            train = summarize_args_for_long_task(
+              input = input,
+              object_class = "TEFeatureExtractor",
+              method = "train",
+              path_args = list(
+                path_to_embeddings = path_to_embeddings(),
+                path_to_target_data = NULL,
+                path_to_feature_extractor = NULL,
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
               ),
-              override_args=list(
-                sustain_track=TRUE,
+              override_args = list(
+                sustain_track = TRUE,
                 log_dir = log_dir,
-                trace=FALSE,
-                ml_trace=0,
-                n_cores=auto_n_cores()
+                trace = FALSE,
+                ml_trace = 0,
+                n_cores = auto_n_cores()
               ),
-              meta_args=list(
-                py_environment_type=get_py_env_type(),
-                py_env_name=get_py_env_name(),
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
                 target_data_column = NULL,
-                object_class="TEFeatureExtractor"
+                object_class = "TEFeatureExtractor"
               )
             )
           ),

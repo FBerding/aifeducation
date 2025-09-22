@@ -100,7 +100,7 @@ Fill_Mask_Server <- function(id, model) {
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)
-      if(inherits(model(), "BaseModelCore")){
+      if (inherits(model(), "BaseModelCore")) {
         model()$get_special_tokens()
       } else {
         model()$BaseModel$get_special_tokens()
@@ -111,7 +111,7 @@ Fill_Mask_Server <- function(id, model) {
     fill_masked_solutions <- shiny::eventReactive(input$fill_mask_start, {
       shiny::req(model)
 
-      if(inherits(model(), "BaseModelCore")){
+      if (inherits(model(), "BaseModelCore")) {
         tmp_model <- model()
       } else {
         tmp_model <- model()$BaseModel

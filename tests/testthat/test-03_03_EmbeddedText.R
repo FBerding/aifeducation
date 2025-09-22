@@ -43,7 +43,7 @@ test_that("EmbeddedText - Create", {
     param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
     param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
     param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
-    param_pad_value=-100,
+    param_pad_value = -100,
     embeddings = imdb_embeddings$embeddings
   ))
 })
@@ -66,7 +66,7 @@ test_that("EmbeddedText - No FeatureExtractor", {
     param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
     param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
     param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
-    param_pad_value=-100,
+    param_pad_value = -100,
     embeddings = imdb_embeddings$embeddings
   )
 
@@ -88,7 +88,7 @@ test_that("EmbeddedText - No FeatureExtractor", {
   }
 
   # Correct padding value
-  expect_equal(new_embedded_text$get_pad_value(),-100)
+  expect_equal(new_embedded_text$get_pad_value(), -100)
 
   # Compression test
   expect_false(new_embedded_text$is_compressed())
@@ -104,6 +104,5 @@ test_that("EmbeddedText - No FeatureExtractor", {
   }
 
   # Correct padding value
-  expect_equal(new_data_set_converted$get_pad_value(),-100)
-
+  expect_equal(new_data_set_converted$get_pad_value(), -100)
 })

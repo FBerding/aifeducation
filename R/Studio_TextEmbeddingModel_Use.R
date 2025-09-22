@@ -161,12 +161,12 @@ TextEmbeddingModel_Use_Server <- function(id, log_dir, volumes) {
       model = model
     )
     Sustainability_Server(
-      id="TextEmbeddingModel_Sustainability",
-      model=model
+      id = "TextEmbeddingModel_Sustainability",
+      model = model
     )
     FLOPS_Server(
-      id="TextEmbeddingModel_FLOPS",
-      model=model
+      id = "TextEmbeddingModel_FLOPS",
+      model = model
     )
     Fill_Mask_Server(
       id = "TextEmbeddingModel_Fill_Mask",

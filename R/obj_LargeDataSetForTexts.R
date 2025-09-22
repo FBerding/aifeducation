@@ -195,7 +195,7 @@ LargeDataSetForText <- R6::R6Class(
           )
           chunk_dataset <- data.frame_to_py_dataset(chunk)
           list_datasets[i] <- list(chunk_dataset)
-          if (trace ) {
+          if (trace) {
             message(
               get_time_stamp(),
               " Batch ", i, " from ", n_batches, " processed"
@@ -357,7 +357,7 @@ LargeDataSetForText <- R6::R6Class(
         chunk_dataset <- data.frame_to_py_dataset(chunk)
 
         list_datasets[i] <- list(chunk_dataset)
-        if (trace ) {
+        if (trace) {
           message(
             get_time_stamp(),
             " Batch ", i, " from ", n_batches, " processed"
@@ -401,26 +401,26 @@ LargeDataSetForText <- R6::R6Class(
       if (!"id" %in% colnames(data_frame)) {
         stop("data.frame must contain a column id.")
       }
-      if (!"text" %in% colnames(data_frame) ) {
+      if (!"text" %in% colnames(data_frame)) {
         stop("data.frame must contain a column text.")
       }
 
       data_to_add <- data_frame
 
       # optional columns
-      if (!"bib_entry" %in% colnames(data_to_add) ) {
+      if (!"bib_entry" %in% colnames(data_to_add)) {
         data_to_add["bib_entry"] <- rep(x = NA, times = nrow(data_to_add))
       }
       if (!"license" %in% colnames(data_to_add)) {
         data_to_add["license"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if (!"url_license" %in% colnames(data_to_add) ) {
+      if (!"url_license" %in% colnames(data_to_add)) {
         data_to_add["url_license"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if (!"text_license" %in% colnames(data_to_add) ) {
+      if (!"text_license" %in% colnames(data_to_add)) {
         data_to_add["text_license"] <- rep(x = NA, times = nrow(data_to_add))
       }
-      if (!"url_source" %in% colnames(data_to_add) ) {
+      if (!"url_source" %in% colnames(data_to_add)) {
         data_to_add["url_source"] <- rep(x = NA, times = nrow(data_to_add))
       }
 
@@ -512,7 +512,7 @@ LargeDataSetForText <- R6::R6Class(
         tmp_data[i, 1L] <- private$remove_file_extenstion(document$doc_id)
 
         # Text
-        if (clean_text ) {
+        if (clean_text) {
           tmp_text <- private$clean_text(document$text)
         } else {
           tmp_text <- document$text
@@ -521,7 +521,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # Bib_entry
         file_path <- file.path(dirname(file_paths[index]), "bib_entry.txt")
-        if (file.exists(file_path) ) {
+        if (file.exists(file_path)) {
           tmp_data[i, 3L] <- readLines(con = file_path, warn = FALSE)
         } else {
           tmp_data[i, 3L] <- NA
@@ -529,7 +529,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # License
         file_path <- file.path(dirname(file_paths[index]), "license.txt")
-        if (file.exists(file_path) ) {
+        if (file.exists(file_path)) {
           tmp_data[i, 4L] <- readLines(con = file_path, warn = FALSE)
         } else {
           tmp_data[i, 4L] <- NA
@@ -537,7 +537,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # URL License
         file_path <- file.path(dirname(file_paths[index]), "url_license.txt")
-        if (file.exists(file_path) ) {
+        if (file.exists(file_path)) {
           tmp_data[i, 5L] <- readLines(con = file_path, warn = FALSE)
         } else {
           tmp_data[i, 5L] <- NA
@@ -545,7 +545,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # Text License
         file_path <- file.path(dirname(file_paths[index]), "text_license.txt")
-        if (file.exists(file_path) ) {
+        if (file.exists(file_path)) {
           tmp_data[i, 6L] <- readLines(con = file_path, warn = FALSE)
         } else {
           tmp_data[i, 6L] <- NA
@@ -553,7 +553,7 @@ LargeDataSetForText <- R6::R6Class(
 
         # URL Source
         file_path <- file.path(dirname(file_paths[index]), "url_source.txt")
-        if (file.exists(file_path) ) {
+        if (file.exists(file_path)) {
           tmp_data[i, 7L] <- readLines(con = file_path, warn = FALSE)
         } else {
           tmp_data[i, 7L] <- NA
@@ -606,7 +606,7 @@ LargeDataSetForText <- R6::R6Class(
     remove_file_extenstion = function(file) {
       # tmp_string <- stringr::str_split_fixed(file, pattern = "\\.", n = Inf)
       tmp_string <- stringi::stri_split_fixed(file, pattern = ".", n = -1L, simplify = TRUE)
-      return(paste0(tmp_string[1L, 1L:(ncol(tmp_string)-1L)], collapse = "."))
+      return(paste0(tmp_string[1L, 1L:(ncol(tmp_string) - 1L)], collapse = "."))
     }
   )
 )

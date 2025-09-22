@@ -4,7 +4,7 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Load python scripts
+# Load python scripts
 load_all_py_scripts()
 
 # stack_dense_layer----------------------------------------------------
@@ -38,11 +38,11 @@ test_that("stack_dense_layer", {
     act_fct = "ELU",
     bias = TRUE,
     normalization_type = "LayerNorm",
-    pad_value=as.integer(pad_value),
+    pad_value = as.integer(pad_value),
     parametrizations = "None",
-    dtype=values[[1]]$dtype,
+    dtype = values[[1]]$dtype,
     device = device,
-    residual_type="ResidualGate"
+    residual_type = "ResidualGate"
   )$to(device)
   layer$eval()
 
@@ -77,14 +77,13 @@ test_that("stack_dense_layer", {
     mask_features = values[[4]]
   )
   expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
-
 })
 
-#Stack Reccurent layers----------------------------------------------------
+# Stack Reccurent layers----------------------------------------------------
 test_that("stack_rec_layers", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  rec_types=c("GRU","LSTM")
-  bidirectional_types=c(TRUE,FALSE)
+  rec_types <- c("GRU", "LSTM")
+  bidirectional_types <- c(TRUE, FALSE)
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -105,22 +104,22 @@ test_that("stack_rec_layers", {
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
 
-  for (rec_type in rec_types){
-    for(bidirectional in bidirectional_types){
+  for (rec_type in rec_types) {
+    for (bidirectional in bidirectional_types) {
       layer <- py$stack_recurrent_layers(
         times = as.integer(times),
         hidden_size = as.integer(features),
         n_layers = 3L,
         dropout = 0.3,
-        rec_type=rec_type,
-        rec_bidirectional=bidirectional,
-        pad_value=as.integer(pad_value),
+        rec_type = rec_type,
+        rec_bidirectional = bidirectional,
+        pad_value = as.integer(pad_value),
         bias = TRUE,
         parametrizations = "None",
-        dtype=values[[1]]$dtype,
+        dtype = values[[1]]$dtype,
         device = device,
-        residual_type="ResidualGate",
-        return_sequence=TRUE
+        residual_type = "ResidualGate",
+        return_sequence = TRUE
       )$to(device)
       layer$eval()
 
@@ -161,10 +160,10 @@ test_that("stack_rec_layers", {
 })
 
 
-#stack_tf_encoder_layer----------------------------------------------------
+# stack_tf_encoder_layer----------------------------------------------------
 test_that("stack_tf_encoder_layer", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  attention_types=c("MultiHead","Fourier")
+  attention_types <- c("MultiHead", "Fourier")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
@@ -185,23 +184,23 @@ test_that("stack_tf_encoder_layer", {
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
 
-  for (attention_type in attention_types){
+  for (attention_type in attention_types) {
     layer <- py$stack_tf_encoder_layer(
-      dense_dim=as.integer(4*features),
-      attention_type=attention_type,
-      num_heads=2L,
+      dense_dim = as.integer(4 * features),
+      attention_type = attention_type,
+      num_heads = 2L,
       times = as.integer(times),
       features = as.integer(features),
       n_layers = 3L,
       dropout_rate_1 = 0.1,
-      dropout_rate_2=0.2,
-      pad_value=as.integer(pad_value),
-      positional_embedding="absolute",
+      dropout_rate_2 = 0.2,
+      pad_value = as.integer(pad_value),
+      positional_embedding = "absolute",
       bias = TRUE,
       parametrizations = "None",
-      dtype=values[[1]]$dtype,
+      dtype = values[[1]]$dtype,
       device = device,
-      residual_type="ResidualGate"
+      residual_type = "ResidualGate"
     )$to(device)
     layer$eval()
 
@@ -237,10 +236,9 @@ test_that("stack_tf_encoder_layer", {
     )
     expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
   }
-
 })
 
-#stack_n_gram_convolution----------------------------------------------------
+# stack_n_gram_convolution----------------------------------------------------
 test_that("stack_n_gram_convolution", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
@@ -263,20 +261,20 @@ test_that("stack_n_gram_convolution", {
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
 
-  for(max_n_gram in 3:times){
-    layer=py$stack_n_gram_convolution(
-      ks_min=2L,
-      ks_max=as.integer(max_n_gram),
-      times=as.integer(times),
-      features=as.integer(features),
-      n_layers=3L,
-      pad_value=as.integer(pad_value),
-      bias=TRUE,
-      parametrizations="None",
-      dtype=values[[1]]$dtype,
+  for (max_n_gram in 3:times) {
+    layer <- py$stack_n_gram_convolution(
+      ks_min = 2L,
+      ks_max = as.integer(max_n_gram),
+      times = as.integer(times),
+      features = as.integer(features),
+      n_layers = 3L,
+      pad_value = as.integer(pad_value),
+      bias = TRUE,
+      parametrizations = "None",
+      dtype = values[[1]]$dtype,
       device = device,
-      act_fct="ELU",
-      residual_type="ResidualGate"
+      act_fct = "ELU",
+      residual_type = "ResidualGate"
     )$to(device)
     layer$eval()
 
@@ -315,7 +313,7 @@ test_that("stack_n_gram_convolution", {
     )
     expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
 
-    #Test method return shape
-    expect_equal(dim(tensor_to_numpy(y_1[[1]])),c(length(sequence_length),times,features))
+    # Test method return shape
+    expect_equal(dim(tensor_to_numpy(y_1[[1]])), c(length(sequence_length), times, features))
   }
 })

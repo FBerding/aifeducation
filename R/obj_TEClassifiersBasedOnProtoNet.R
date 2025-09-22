@@ -506,7 +506,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         )
       }
 
-      if (prediction_mode ) {
+      if (prediction_mode) {
         results <- tensor_to_numpy(results)
         rownames(results) <- current_row_names
         colnames(results) <- as.character(class_labels)
@@ -554,7 +554,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         self$check_embedding_model(text_embeddings = embeddings, require_compressed = FALSE)
       } else {
         private$check_embeddings_object_type(embeddings, strict = FALSE)
-        if (requires_compression ) {
+        if (requires_compression) {
           stop("Objects of class datasets.arrow_dataset.Dataset must be provided in
                compressed form.")
         }
@@ -567,7 +567,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         embeddings <- embeddings
       }
 
-      if (requires_compression ) {
+      if (requires_compression) {
         # Returns a data set
         embeddings <- self$feature_extractor$extract_features_large(
           data_embeddings = embeddings,
@@ -616,7 +616,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       # Reset model if requested
-      if (reset_model ) {
+      if (reset_model) {
         private$create_reset_model()
       }
 
@@ -624,28 +624,28 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       loss_cls_fct_name <- "ProtoNetworkMargin"
 
       # Set target column
-      if (!private$model_config$require_one_hot ) {
+      if (!private$model_config$require_one_hot) {
         target_column <- "labels"
       } else {
         target_column <- "one_hot_encoding"
       }
 
       dataset_train <- train_data$select_columns(c("input", target_column))
-      if (private$model_config$require_one_hot ) {
+      if (private$model_config$require_one_hot) {
         dataset_train <- dataset_train$rename_column(target_column, "labels")
       }
 
       pytorch_train_data <- dataset_train$with_format("torch")
 
       pytorch_val_data <- val_data$select_columns(c("input", target_column))
-      if (private$model_config$require_one_hot ) {
+      if (private$model_config$require_one_hot) {
         pytorch_val_data <- pytorch_val_data$rename_column(target_column, "labels")
       }
       pytorch_val_data <- pytorch_val_data$with_format("torch")
 
       if (!is.null(test_data)) {
         pytorch_test_data <- test_data$select_columns(c("input", target_column))
-        if (private$model_config$require_one_hot ) {
+        if (private$model_config$require_one_hot) {
           pytorch_test_data <- pytorch_test_data$rename_column(target_column, "labels")
         }
         pytorch_test_data <- pytorch_test_data$with_format("torch")

@@ -148,7 +148,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     # Render Token table--------------------------------------------------------
     output$token_table <- shiny::renderTable({
       shiny::req(model)
-      if(inherits(model(), "BaseModelCore")){
+      if (inherits(model(), "BaseModelCore")) {
         model()$get_special_tokens()
       } else {
         model()$BaseModel$get_special_tokens()
@@ -158,7 +158,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     # Render Tokenizer Statistics-----------------------------------------------
     output$tokenizer_statistics <- shiny::renderUI({
       shiny::req(model)
-      if(inherits(model(), "BaseModelCore")){
+      if (inherits(model(), "BaseModelCore")) {
         tmp_model <- model()
       } else {
         tmp_model <- model()$BaseModel
@@ -188,7 +188,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     encodings <- shiny::eventReactive(input$encode_start, {
       shiny::req(model)
 
-      if(inherits(model(), "BaseModelCore")){
+      if (inherits(model(), "BaseModelCore")) {
         tmp_model <- model()$Tokenizer
       } else {
         tmp_model <- model()
@@ -244,7 +244,7 @@ Tokenize_Encode_Decode_Server <- function(id, model) {
     decodings <- shiny::eventReactive(input$decode_start, {
       shiny::req(model)
 
-      if(inherits(model(), "BaseModelCore")){
+      if (inherits(model(), "BaseModelCore")) {
         tmp_model <- model()$Tokenizer
       } else {
         tmp_model <- model()

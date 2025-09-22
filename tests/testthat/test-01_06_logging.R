@@ -1,4 +1,4 @@
-test_that("logging in R", {
+test_that("logging in R - state log", {
   dir <- testthat::test_path("test_artefacts")
   create_dir(dir, FALSE)
 
@@ -29,4 +29,17 @@ test_that("logging in R", {
   colnames(write_log) <- c("value", "total", "message")
   log <- read_log(log_file)
   expect_equal(as.matrix(log), write_log)
+})
+
+test_that("logging in R - loss log", {
+  dir <- testthat::test_path("test_artefacts")
+  create_dir(dir, FALSE)
+
+  log_file <- file.path(dir, "loss.log")
+
+  expect_no_error(reset_loss_log(log_file))
+
+  res=read_loss_log(log_file)
+  expect_equal(colnames(res),c("train","validation","test","epoch"))
+  expect_equal(unname(as.matrix(res)[1,1:3]),c(-100,-100,-100))
 })

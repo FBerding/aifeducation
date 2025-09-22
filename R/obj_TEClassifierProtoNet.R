@@ -137,7 +137,7 @@ TEClassifierProtoNet <- R6::R6Class(
       current_row_names <- private$get_rownames_from_embeddings(embeddings_q)
 
       # Apply feature extractor if it is part of the model
-      if (requires_compression ) {
+      if (requires_compression) {
         # Returns a data set
         embeddings_q <- self$feature_extractor$extract_features(
           data_embeddings = embeddings_q,
@@ -147,7 +147,7 @@ TEClassifierProtoNet <- R6::R6Class(
 
 
       # If at least two cases are part of the data set---------------------------
-      if (!single_prediction ) {
+      if (!single_prediction) {
         # Returns a data set object
         prediction_data_q_embeddings <- private$prepare_embeddings_as_dataset(embeddings_q)
 
@@ -165,7 +165,7 @@ TEClassifierProtoNet <- R6::R6Class(
         prediction_data_q_embeddings <- private$prepare_embeddings_as_np_array(embeddings_q)
 
         # Apply feature extractor if it is part of the model
-        if (requires_compression ) {
+        if (requires_compression) {
           # Returns a data set
           prediction_data_q <- np$array(self$feature_extractor$extract_features(
             data_embeddings = prediction_data_q_embeddings,
@@ -264,7 +264,7 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
 
-      if (inc_unlabeled ) {
+      if (inc_unlabeled) {
         estimated_values_names <- setdiff(
           x = private$get_rownames_from_embeddings(embeddings_q),
           y = true_values_names
@@ -368,7 +368,7 @@ TEClassifierProtoNet <- R6::R6Class(
       }
 
       # Reset model if requested
-      if (reset_model ) {
+      if (reset_model) {
         private$create_reset_model()
       }
 
@@ -376,28 +376,28 @@ TEClassifierProtoNet <- R6::R6Class(
       loss_cls_fct_name <- "ProtoNetworkMargin"
 
       # Set target column
-      if (!private$model_config$require_one_hot ) {
+      if (!private$model_config$require_one_hot) {
         target_column <- "labels"
       } else {
         target_column <- "one_hot_encoding"
       }
 
       dataset_train <- train_data$select_columns(c("input", target_column))
-      if (private$model_config$require_one_hot ) {
+      if (private$model_config$require_one_hot) {
         dataset_train <- dataset_train$rename_column(target_column, "labels")
       }
 
       pytorch_train_data <- dataset_train$with_format("torch")
 
       pytorch_val_data <- val_data$select_columns(c("input", target_column))
-      if (private$model_config$require_one_hot ) {
+      if (private$model_config$require_one_hot) {
         pytorch_val_data <- pytorch_val_data$rename_column(target_column, "labels")
       }
       pytorch_val_data <- pytorch_val_data$with_format("torch")
 
       if (!is.null(test_data)) {
         pytorch_test_data <- test_data$select_columns(c("input", target_column))
-        if (private$model_config$require_one_hot ) {
+        if (private$model_config$require_one_hot) {
           pytorch_test_data <- pytorch_test_data$rename_column(target_column, "labels")
         }
         pytorch_test_data <- pytorch_test_data$with_format("torch")

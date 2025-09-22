@@ -17,6 +17,7 @@ Conference of the North (pp. 4171--4186). Association for Computational Linguist
 \seealso{
 Other Base Model: 
 \code{\link{BaseModelBert}},
+\code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelRoberta}}
@@ -94,7 +95,7 @@ Configures a new object of this class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{tokenizer}}{\verb{WordPieceTokenizer, BPETokenizer, HuggingFaceTokenizer} Tokenizer for the model.}
+\item{\code{tokenizer}}{\code{TokenizerBase} Tokenizer for the model.}
 
 \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
 can be processed with the model. Allowed values: \verb{10 <= x <= 4048}}

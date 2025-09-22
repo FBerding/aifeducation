@@ -67,9 +67,8 @@ for (framework in ml_frameworks) {
           )
         )
 
-        #Check if sustainability data has been tracked
+        # Check if sustainability data has been tracked
         expect_true(extractor$get_sustainability_data()$sustainability_tracked)
-
       })
       gc()
 
@@ -243,9 +242,11 @@ for (framework in ml_frameworks) {
         extractor2 <- NULL
         extractor2 <- load_from_disk(dir_path = dir_path)
 
-        #Is config equal after loading
-        expect_equal(extractor$get_model_config(),
-                     extractor2$get_model_config())
+        # Is config equal after loading
+        expect_equal(
+          extractor$get_model_config(),
+          extractor2$get_model_config()
+        )
 
         # Predict after loading
         if (data_type == "EmbeddedText") {

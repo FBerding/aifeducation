@@ -64,7 +64,7 @@ display_processing <- function(
     size = "s",
     easy_close = FALSE,
     message = "") {
-  if(easy_close==FALSE){
+  if (easy_close == FALSE) {
     footer <- NULL
   } else {
     footer <- shiny::modalButton("Close")
@@ -84,14 +84,14 @@ display_processing <- function(
 }
 
 
-display_processing_alert<-function(text="Working"){
+display_processing_alert <- function(text = "Working") {
   shinyWidgets::show_alert(
     title = text,
     text = "Please wait",
     type = "info",
     closeOnClickOutside = FALSE,
     showCloseButton = FALSE,
-    btn_labels=NA
+    btn_labels = NA
   )
   # Give system time to display the modal
   Sys.sleep(2)

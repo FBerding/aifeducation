@@ -262,7 +262,7 @@ get_py_package_version <- function(package_name) {
     if (is(tmp_version, "try-error")) {
       packages_installed <- try(reticulate::py_list_packages(), silent = TRUE)
 
-      if(!inherits(packages_installed, "try-error") && is.data.frame(packages_installed)){
+      if (!inherits(packages_installed, "try-error") && is.data.frame(packages_installed)) {
         if (package_name %in% packages_installed$package) {
           tmp_version <- packages_installed$version[which(packages_installed$package == package_name)]
         } else {

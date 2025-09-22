@@ -177,10 +177,8 @@ DataManagerClassifier <- R6::R6Class(
           iteration <- self$config$n_folds + 1L
         } else {
           stop(
-
-              iteration,
-              " is not a valid input for iteration"
-
+            iteration,
+            " is not a valid input for iteration"
           )
         }
       }
@@ -613,7 +611,7 @@ DataManagerClassifier <- R6::R6Class(
           fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes))),
           load_from_cache_file = FALSE,
           keep_in_memory = FALSE,
-          cache_file_name = file.path(create_and_get_tmp_dir(),  generate_id(15L))
+          cache_file_name = file.path(create_and_get_tmp_dir(), generate_id(15L))
         )
         return(dataset)
       } else {

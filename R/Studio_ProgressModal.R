@@ -198,7 +198,7 @@ start_and_monitor_long_task <- function(id,
       file = paste0(getwd(), "/arguments.rda")
     )
     future::plan(future::multisession)
-    #future::plan(future::sequential)
+    # future::plan(future::sequential)
 
     # Start ExtendedTask
     CurrentTask <- NULL
@@ -271,7 +271,7 @@ start_and_monitor_long_task <- function(id,
             data_columns <- c("train", "validation")
           }
           y_max <- max(plot_data[data_columns])
-          y_min <- max(min(plot_data[data_columns]),0)
+          y_min <- max(min(plot_data[data_columns]), 0)
           # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +

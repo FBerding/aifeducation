@@ -190,7 +190,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       if ("test_mean" %in% colnames(plot_data)) {
         tmp_plot <- tmp_plot +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_mean, color = "test"))
-        if (add_min_max ) {
+        if (add_min_max) {
           tmp_plot <- tmp_plot +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test_min, color = "test")) +
 
@@ -491,7 +491,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       #  plot_data[[1]] <- list(loss = plot_data[[1]])
       # }
 
-      if (is.null_or_na(final)){
+      if (is.null_or_na(final)) {
         final <- FALSE
       }
 
@@ -501,7 +501,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         use_pl <- self$last_training$config$use_pl
       }
 
-      if (use_pl  & is.null_or_na(pl_step)) {
+      if (use_pl & is.null_or_na(pl_step)) {
         stop("Model was trained with pseudo labeling. Please provide a pl_step.")
       }
 
@@ -612,7 +612,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     save_pytorch_model = function(dir_path, folder_name) {
-      save_location <- file.path(dir_path,  folder_name)
+      save_location <- file.path(dir_path, folder_name)
 
       save_format <- "safetensors"
 

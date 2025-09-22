@@ -47,13 +47,13 @@ Sustainability_Server <- function(id, model) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 
-    output$ui_training<-DT::renderDataTable(
+    output$ui_training <- DT::renderDataTable(
       return(model()$get_sustainability_data("training"))
     )
 
-    output$ui_inference<-DT::renderDataTable({
-      if(inherits(model(), "BaseModelCore")||
-         inherits(model(), "TextEmbeddingModel")){
+    output$ui_inference <- DT::renderDataTable({
+      if (inherits(model(), "BaseModelCore") ||
+        inherits(model(), "TextEmbeddingModel")) {
         return(model()$get_sustainability_data("inference"))
       }
     })

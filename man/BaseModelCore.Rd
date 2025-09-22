@@ -27,8 +27,8 @@ Other R6 Classes for Developers:
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{Tokenizer}}{\cr
-Objects of class \link{WordPieceTokenizer}, \link{BPETokenizer}, \link{HuggingFaceTokenizer}.}
+\item{\code{Tokenizer}}{('TokenizerBase')\cr
+Objects of class \code{TokenizerBase}.}
 }
 \if{html}{\out{</div>}}
 }

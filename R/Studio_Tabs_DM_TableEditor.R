@@ -334,7 +334,7 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
     })
 
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       write.csv(

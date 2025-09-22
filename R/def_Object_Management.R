@@ -43,7 +43,7 @@ get_TEClassifiers_class_names <- function(super_class = NULL) {
     class_names <- NULL
     for (class in TEClassifiers_class_names) {
       object <- create_object(class)
-      if (inherits(object,super_class)) {
+      if (inherits(object, super_class)) {
         class_names <- append(
           x = class_names,
           values = class
@@ -78,16 +78,9 @@ get_depr_obj_names <- function() {
 }
 
 
-#' @title Create object
-#'
+#' @title Create object#'
 #' @description  Support function for creating objects.
-#' @param class `string` Name of the class to be created. The following
-#' strings are possible:
-#' `unique(DataSetsIndex,names(DataSetsIndex))`
-#' `unique(TokenizerIndex,names(TokenizerIndex))`
-#' `unique(BaseModelsIndex,names(BaseModelsIndex))`
-#' `unique(TextEmbeddingObjectsIndex,names(TextEmbeddingObjectsIndex))`
-#' `unique(TEClassifiers_class_names,names(TEClassifiers_class_names))`
+#' @param class `string` Name of the class to be created.
 #' @return Returns an object of the requested class.
 #' @family Utils Developers
 #' @export

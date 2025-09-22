@@ -59,9 +59,10 @@ DataManagement_RawTextsUI <- function(id) {
               bslib::card_header("Text Processing"),
               bslib::card_body(
                 shinyWidgets::materialSwitch(
-                  inputId = shiny::NS(id,"clean_text"),
+                  inputId = shiny::NS(id, "clean_text"),
                   label = "Clean text from .txt and .pdf files",
-                  value = TRUE)
+                  value = TRUE
+                )
               )
             )
           ),
@@ -217,7 +218,7 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
     # Implement Algorithm--------------------------------------------------------
     # button_continue comes from the SaveModal
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       # Check for errors
@@ -266,8 +267,8 @@ DataManagement_RawTextsServer <- function(id, log_dir, volumes) {
             excel_url_license_column = input$excel_url_license_column,
             excel_text_license_column = input$excel_text_license_column,
             excel_url_source_column = input$excel_url_source_column,
-              py_environment_type=get_py_env_type(),
-              py_env_name=get_py_env_name(),
+            py_environment_type = get_py_env_type(),
+            py_env_name = get_py_env_name(),
             log_write_interval = 2
           ),
           log_path = log_path,

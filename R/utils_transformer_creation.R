@@ -1,5 +1,3 @@
-
-
 #' @title Dataset tokenization
 #' @description A given dataset must contain a column 'text' storing raw texts.
 #'

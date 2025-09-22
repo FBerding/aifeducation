@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-running_num_figures=1
+running_num_figures <- 1
 ```
 
 ```{r setup, include = FALSE}

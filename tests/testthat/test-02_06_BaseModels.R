@@ -30,16 +30,16 @@ example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
 # Test Configuration
-object_class_names=BaseModelsIndex
-#object_class_names <- c(
+object_class_names <- BaseModelsIndex
+# object_class_names <- c(
 #  "BaseModelDebertaV2")
-  #  "BaseModelBert",
+#  "BaseModelBert",
 #  #"BaseModelFunnel",
 #  #"BaseModelLongformer"#,
 #  "BaseModelModernBert",
 #  "BaseModelRoberta",
 #  "BaseModelMPNet"
-#)
+# )
 
 max_samples <- 1
 max_samples_CI <- 1
@@ -55,14 +55,14 @@ for (object_class_name in object_class_names) {
     # Prepare Tokenizer for the models
     raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
 
-    tok_type=sample(
-      x=setdiff(x=unlist(TokenizerIndex),y="HuggingFaceTokenizer"),
-      size=1
-      )
+    tok_type <- sample(
+      x = setdiff(x = unlist(TokenizerIndex), y = "HuggingFaceTokenizer"),
+      size = 1
+    )
     tokenizer <- create_object(tok_type)
     tokenizer$configure(
       vocab_size = 2000,
-      vocab_do_lower_case = sample(x=c(TRUE,FALSE),size=1)
+      vocab_do_lower_case = sample(x = c(TRUE, FALSE), size = 1)
     )
     tokenizer$train(
       text_dataset = raw_texts,
@@ -90,7 +90,7 @@ for (object_class_name in object_class_names) {
         max_position_embeddings = 512,
         hidden_size = 16,
         num_hidden_layers = 3,
-        global_attn_every_n_layers=2,
+        global_attn_every_n_layers = 2,
         attention_window = 4,
         num_attention_heads = 2,
         intermediate_size = 32
@@ -253,7 +253,6 @@ for (object_class_name in object_class_names) {
       expect_gt(base_model$get_flops_estimates()$flops_bp_2, 0)
       expect_gt(base_model$get_flops_estimates()$flops_bp_3, 0)
       expect_gt(base_model$get_flops_estimates()$flops_bp_4, 0)
-
     })
 
     #---------------------------------------------------------------------------

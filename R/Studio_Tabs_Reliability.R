@@ -47,9 +47,9 @@ Reliability_Server <- function(id, model) {
       percentage_agreement = "Percentage Agreement",
       balanced_accuracy = "Average Accuracy within each Class",
       gwet_ac = "Gwet's AC1/AC2 Agreement Coefficient",
-      gwet_ac1_nominal="Gwet's AC1 (Nominal)",
-      gwet_ac2_linear="Gwet's AC2 (Linear Weights, Ordinal)",
-      gwet_ac2_quadratic="Gwet's AC2 (Quadratic Weights, Ordinal)"
+      gwet_ac1_nominal = "Gwet's AC1 (Nominal)",
+      gwet_ac2_linear = "Gwet's AC2 (Linear Weights, Ordinal)",
+      gwet_ac2_quadratic = "Gwet's AC2 (Quadratic Weights, Ordinal)"
     )
     measures_scale_level <- c(
       "dynamic_iota_index",

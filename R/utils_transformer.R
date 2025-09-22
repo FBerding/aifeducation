@@ -48,10 +48,10 @@ calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max
   mu_g <- NA
 
   if (step == "training" || step == "creation") {
-    if (!"word_ids" %in% dataset$column_names ) {
+    if (!"word_ids" %in% dataset$column_names) {
       stop("dataset must contain a column 'word_ids'.")
     }
-    if (!"length" %in% dataset$column_names ) {
+    if (!"length" %in% dataset$column_names) {
       stop("dataset must contain a column 'length'.")
     }
 
@@ -83,5 +83,3 @@ calc_tokenizer_statistics <- function(dataset, step = "creation", statistics_max
     )
   )
 }
-
-

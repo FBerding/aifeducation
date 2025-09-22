@@ -12,54 +12,49 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title ModernBert
-#' @description Represents models based on Modern Bert.
-#' @references Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
-#'   Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
-#'   Conference of the North (pp. 4171--4186). Association for Computational Linguistics. \doi{10.18653/v1/N19-1423}
+#' @title DeBERTa V2
+#' @description Represents models based on DeBERTa version 2.
+#' @references He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa:
+#' Decoding-enhanced BERT with Disentangled Attention. \doi{10.48550/arXiv.2006.03654}
 #' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
-BaseModelModernBert <- R6::R6Class(
-  classname = "BaseModelModernBert",
+BaseModelDebertaV2 <- R6::R6Class(
+  classname = "BaseModelDebertaV2",
   inherit = BaseModelCore,
   private = list(
-    model_type = "modernbert",
+    model_type = "deberta_v2",
+    adjust_max_sequence_length = 4L,
+    return_token_type_ids = FALSE,
     create_model = function(args) {
-      configuration <- transformers$ModernBertConfig(
+      configuration <- transformers$DebertaV2Config(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
+        max_position_embeddings = as.integer(args$max_position_embeddings),
         hidden_size = as.integer(args$hidden_size),
-        intermediate_size = as.integer(args$intermediate_size),
         num_hidden_layers = as.integer(args$num_hidden_layers),
         num_attention_heads = as.integer(args$num_attention_heads),
-        hidden_activation = tolower(args$hidden_activation),
-        max_position_embeddings = as.integer(args$max_position_embeddings),
+        intermediate_size = as.integer(args$intermediate_size),
+        hidden_act = tolower(args$hidden_act),
+        hidden_dropout_prob = args$hidden_dropout_prob,
+        attention_probs_dropout_prob = args$attention_probs_dropout_prob,
+        type_vocab_size = 0L,
         initializer_range = 0.02,
-        norm_eps = 1e-12,
-        global_attn_every_n_layers = as.integer(args$global_attn_every_n_layers),
-        pad_token_id = args$tokenizer$get_tokenizer()$pad_token_id,
-        eos_token_id = args$tokenizer$get_tokenizer()$eos_token_id,
-        bos_token_id = args$tokenizer$get_tokenizer()$bos_token_id,
-        cls_token_id = args$tokenizer$get_tokenizer()$cls_token_id,
-        sep_token_id = args$tokenizer$get_tokenizer()$sep_token_id,
-        embedding_dropout = args$embedding_dropout,
-        mlp_dropout = args$mlp_dropout,
-        attention_dropout = args$attention_dropout,
-        deterministic_flash_attn = TRUE
+        layer_norm_eps = 1e-12,
+        relative_attention=TRUE,
+        max_relative_positions=-1L,
+        pad_token_id=args$tokenizer$get_tokenizer()$pad_token_id,
+        position_biased_input=TRUE,
+        legacy=TRUE
       )
-
-      private$model <- transformers$ModernBertForMaskedLM(configuration)
+      private$model <- transformers$DebertaV2ForMaskedLM(configuration)
     },
     load_BaseModel = function(dir_path) {
-      private$model <- transformers$ModernBertForMaskedLM$from_pretrained(dir_path)
+      private$model <- transformers$DebertaV2ForMaskedLM$from_pretrained(dir_path)
     },
+    #---------------------------------------------------------------------------
     check_arg_combinations = function(args) {
       if (args$hidden_size %% args$num_attention_heads != 0L) {
         stop("hidden_size must be a multiple auf num_attention_heads.")
-      }
-
-      if (args$global_attn_every_n_layers > args$num_hidden_layers) {
-        stop("global_attn_every_n_layers must be equal or small num_hidden_layers.")
       }
     }
   ),
@@ -71,24 +66,20 @@ BaseModelModernBert <- R6::R6Class(
     #' @param hidden_size `r get_param_doc_desc("hidden_size")`
     #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
     #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`
-    #' @param global_attn_every_n_layers `r get_param_doc_desc("global_attn_every_n_layers")`
     #' @param intermediate_size `r get_param_doc_desc("intermediate_size")`
-    #' @param hidden_activation `r get_param_doc_desc("hidden_activation")`
-    #' @param embedding_dropout `r get_param_doc_desc("embedding_dropout")`
-    #' @param mlp_dropout `r get_param_doc_desc("mlp_dropout")`
-    #' @param attention_dropout `r get_param_doc_desc("attention_dropout")`
+    #' @param hidden_act `r get_param_doc_desc("hidden_act")`
+    #' @param hidden_dropout_prob `r get_param_doc_desc("hidden_dropout_prob")`
+    #' @param attention_probs_dropout_prob `r get_param_doc_desc("attention_probs_dropout_prob")`
     #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512L,
                          hidden_size = 768L,
                          num_hidden_layers = 12L,
                          num_attention_heads = 12L,
-                         global_attn_every_n_layers = 3L,
                          intermediate_size = 3072L,
-                         hidden_activation = "GELU",
-                         embedding_dropout = 0.1,
-                         mlp_dropout = 0.1,
-                         attention_dropout = 0.1) {
+                         hidden_act = "GELU",
+                         hidden_dropout_prob = 0.1,
+                         attention_probs_dropout_prob = 0.1) {
       arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
     }
@@ -96,4 +87,4 @@ BaseModelModernBert <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$ModernBert <- ("BaseModelModernBert")
+BaseModelsIndex$deberta_v2 <- ("BaseModelDebertaV2")

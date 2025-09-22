@@ -7,16 +7,16 @@ testthat::skip_if_not(
 
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
- #object_class_names=c("TEClassifierSequential")
- #object_class_names="TEClassifierParallel"
- #object_class_names="TEClassifierSequentialPrototype"
- object_class_names="TEClassifierRegular"
+# object_class_names=c("TEClassifierSequential")
+# object_class_names="TEClassifierParallel"
+# object_class_names="TEClassifierSequentialPrototype"
+#object_class_names <- "TEClassifierRegular"
 
 max_samples <- 20
 max_samples_CI <- 5
 
 max_samples_training <- 2
-max_samples_training_CI<-1
+max_samples_training_CI <- 1
 
 class_range <- c(2, 3)
 
@@ -107,7 +107,7 @@ for (object_class_name in object_class_names) {
             tf_num_heads = 2,
             ng_conv_ks_min = 2,
             ng_conv_ks_max = 3,
-            trace=random_bool_on_CI(),
+            trace = random_bool_on_CI(),
             epochs = 10,
             batch_size = 20,
             ml_trace = 0,
@@ -218,7 +218,7 @@ for (object_class_name in object_class_names) {
         })
 
         if (!is.null(test_combination$attention)) {
-          if (!(test_combination$attention == "Fourier" & (object_class_name%in%c("TEClassifierRegular","TEClassifierProtoNet")))) {
+          if (!(test_combination$attention == "Fourier" & (object_class_name %in% c("TEClassifierRegular", "TEClassifierProtoNet")))) {
             test_that(paste("predict - order invariance", object_class_name, get_current_args_for_print(test_combination)), {
               embeddings_ET_perm <- test_embeddings_reduced$clone(deep = TRUE)
               perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
@@ -320,7 +320,7 @@ for (object_class_name in object_class_names) {
             tf_num_heads = 2,
             ng_conv_ks_min = 2,
             ng_conv_ks_max = 3,
-            trace=random_bool_on_CI(),
+            trace = random_bool_on_CI(),
             epochs = 10,
             batch_size = 20,
             ml_trace = 0,
@@ -372,9 +372,11 @@ for (object_class_name in object_class_names) {
         classifier2 <- NULL
         classifier2 <- load_from_disk(dir_path = dir_path)
 
-        #Is config equal after loading
-        expect_equal(classifier$get_model_config(),
-                     classifier2$get_model_config())
+        # Is config equal after loading
+        expect_equal(
+          classifier$get_model_config(),
+          classifier2$get_model_config()
+        )
 
         # Predict after loading
         predictions_2 <- classifier2$predict(
@@ -428,7 +430,7 @@ for (object_class_name in object_class_names) {
             tf_num_heads = 2,
             ng_conv_ks_min = 2,
             ng_conv_ks_max = 3,
-            trace=random_bool_on_CI(),
+            trace = random_bool_on_CI(),
             epochs = 10,
             batch_size = 20,
             ml_trace = 0,
@@ -546,7 +548,7 @@ for (object_class_name in object_class_names) {
       log_dir <- paste0(root_path_results, "/", generate_id(5))
       create_dir(log_dir, trace = FALSE)
 
-      for (j in 1:check_adjust_n_samples_on_CI(n_samples_requested = max_samples_training,n_CI=max_samples_training_CI) ) {
+      for (j in 1:check_adjust_n_samples_on_CI(n_samples_requested = max_samples_training, n_CI = max_samples_training_CI)) {
         # Config sample
         test_combination <- generate_args_for_tests(
           object_name = object_class_name,
@@ -573,7 +575,7 @@ for (object_class_name in object_class_names) {
             tf_num_heads = 2,
             ng_conv_ks_min = 2,
             ng_conv_ks_max = 3,
-            trace=random_bool_on_CI(),
+            trace = random_bool_on_CI(),
             epochs = 10,
             batch_size = 20,
             ml_trace = 0,
@@ -632,7 +634,7 @@ for (object_class_name in object_class_names) {
             rec_dropout = 0.1,
             dense_dropout = 0.1,
             encoder_dropout = 0.1,
-            trace=random_bool_on_CI(),
+            trace = random_bool_on_CI(),
             epochs = 5,
             batch_size = 20,
             ml_trace = 0,
@@ -714,25 +716,25 @@ for (object_class_name in object_class_names) {
           } else {
             pl_step <- NULL
           }
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=FALSE,add_min_max=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
 
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 2), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 1), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 1), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=FALSE,add_min_max=TRUE,y_min = 0,y_max = 1), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 2), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1), class = "ggplot")
 
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=FALSE,add_min_max=FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
 
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss",final_training=TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota",final_training=TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy",final_training=TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy",final_training=TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = TRUE), class = "ggplot")
         })
 
         test_that(paste(

@@ -156,22 +156,22 @@ Training_Server <- function(id, model) {
           plot <- model()$BaseModel$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
-            text_size=input$text_size
+            text_size = input$text_size
           )
-        } else if((inherits(model(), "BaseModelCore"))){
+        } else if ((inherits(model(), "BaseModelCore"))) {
           plot <- model()$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
-            text_size=input$text_size
+            text_size = input$text_size
           )
-        }  else if (inherits(model(), "ClassifiersBasedOnTextEmbeddings")) {
+        } else if (inherits(model(), "ClassifiersBasedOnTextEmbeddings")) {
           # Necessary input
           shiny::req(input$measure)
 
-          if(input$training_phase=="TRUE"){
-            bool_training_phase=TRUE
+          if (input$training_phase == "TRUE") {
+            bool_training_phase <- TRUE
           } else {
-            bool_training_phase=FALSE
+            bool_training_phase <- FALSE
           }
 
           plot <- model()$plot_training_history(

@@ -262,7 +262,7 @@ like this:</p>
 <span><span class="co">#&gt; accelerate: 1.10.1</span></span>
 <span><span class="co">#&gt; numpy: 2.2.6</span></span>
 <span><span class="co">#&gt; GPU Acceleration: TRUE</span></span>
-<span><span class="co">#&gt; Location for Temporary Files:C:\Users\User\AppData\Local\Temp\RtmpoFyd7n/r_aifeducation</span></span></code></pre></div>
+<span><span class="co">#&gt; Location for Temporary Files:C:\Users\User\AppData\Local\Temp\Rtmpa0atH4/r_aifeducation</span></span></code></pre></div>
 <blockquote>
 <p>Please remember: Every time you start a new session in <em>R,</em>
 you have to load the library <code>aifeducation</code> and to configure
@@ -370,7 +370,7 @@ passing the path to the directory of the main folder to
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_texts</span><span class="op">$</span><span class="fu">add_from_files_txt</span><span class="op">(</span></span>
 <span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span>,</span>
-<span>  clean_text<span class="op">=</span><span class="cn">TRUE</span></span>
+<span>  clean_text <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The data set will now read all the raw texts in the main folder and
 will assign every text the corresponding bib entry, license, etc. Please
@@ -456,7 +456,7 @@ passing the path to the directory of the main folder to
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_texts</span><span class="op">$</span><span class="fu">add_from_files_pdf</span><span class="op">(</span></span>
 <span>  dir_path <span class="op">=</span> <span class="st">"main folder"</span>,</span>
-<span>  clean_text<span class="op">=</span><span class="cn">TRUE</span></span>
+<span>  clean_text <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>As stated above, <code>bib_entry.txt</code>,
 <code>license.txt</code>, <code>url_license.txt</code>,
@@ -736,7 +736,7 @@ understanding natural language.</li>
 this example we use a WordPieceTokenizer. To create a new one we first
 call the method <code>new</code>.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">&lt;-</span><span class="va"><a href="../reference/WordPieceTokenizer.html">WordPieceTokenizer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">tokenizer</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/WordPieceTokenizer.html">WordPieceTokenizer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Now we have an empty tokenizer which we can configure by calling the
 corresponding method. The available parameter depend on the kind of
 tokenizer. In the case of a WordPieceTokenizer we have only two options.
@@ -770,7 +770,7 @@ region by setting <code>sustain_region</code>. Please refer to the
 documentation of <code>codecarbon</code> for more information.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
-<span>  text_dataset<span class="op">=</span><span class="va">data_set_reviews_text</span>,</span>
+<span>  text_dataset <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  statistics_max_tokens_length <span class="op">=</span> <span class="fl">512</span>,</span>
 <span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="st">"DEU"</span>,</span>
@@ -778,8 +778,8 @@ documentation of <code>codecarbon</code> for more information.</p>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:42 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:45 Stop Sustainability Tracking</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:52:02 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:05 Stop Sustainability Tracking</span></span></code></pre></div>
 <p>Training a tokenizer is a very fast process. Thus, even for a huge
 number of texts the computations should take only some minutes.</p>
 <p>Now the model is ready to use. At the beginning we can explore some
@@ -787,7 +787,7 @@ tokenizer statistics.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">get_tokenizer_statistics</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       step                date max_tokens_length n_sequences n_words n_tokens</span></span>
-<span><span class="co">#&gt; 1 creation 2025-09-18 19:54:45               512         653   90195   257269</span></span>
+<span><span class="co">#&gt; 1 creation 2025-09-20 11:52:05               512         653   90195   257269</span></span>
 <span><span class="co">#&gt;       mu_t    mu_w     mu_g</span></span>
 <span><span class="co">#&gt; 1 393.9801 138.124 2.852364</span></span></code></pre></div>
 <p>In this table you can see an estimation of the number of words for
@@ -813,9 +813,11 @@ a base model.</p>
 <p>If you would like to see how the tokenizer works you can call the
 method ‘encode’.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span>raw_text <span class="op">=</span> <span class="st">"This is a good movie."</span>,</span>
-<span>                 token_encodings_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                 token_to_int <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span></span>
+<span>  raw_text <span class="op">=</span> <span class="st">"This is a good movie."</span>,</span>
+<span>  token_encodings_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  token_to_int <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; [[1]][[1]]</span></span>
 <span><span class="co">#&gt;   [1] "[CLS]" "T"     "##h"   "##is"  "is"    "a"     "g"     "##o"   "##o"  </span></span>
@@ -878,12 +880,14 @@ method ‘encode’.</p>
 <p>Here you can see that the tokenizer split the words into several
 tokens and adds some special tokens.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span>raw_text <span class="op">=</span> <span class="st">"This is a good movie."</span>,</span>
-<span>                 token_encodings_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                 token_to_int <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span></span>
+<span>  raw_text <span class="op">=</span> <span class="st">"This is a good movie."</span>,</span>
+<span>  token_encodings_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  token_to_int <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; [[1]][[1]]</span></span>
-<span><span class="co">#&gt;   [1]   0  53  97 174 188  61  67 114 114 100  73 114 108  98  96  17   1   3</span></span>
+<span><span class="co">#&gt;   [1]   0  53 102 174 188  61  67  96  96 117  73  96 108 107  99  17   1   3</span></span>
 <span><span class="co">#&gt;  [19]   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3</span></span>
 <span><span class="co">#&gt;  [37]   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3</span></span>
 <span><span class="co">#&gt;  [55]   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3</span></span>
@@ -920,11 +924,13 @@ the token [CLS] in this example.</p>
 tokens belong to these numbers you can call the method
 <code>decode</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">decode</span><span class="op">(</span>int_seqence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,  <span class="fl">53</span>, <span class="fl">109</span>, <span class="fl">174</span>, <span class="fl">188</span>,  <span class="fl">61</span>,  <span class="fl">67</span>,  <span class="fl">97</span>,  <span class="fl">97</span>, <span class="fl">112</span>,  <span class="fl">73</span>,  <span class="fl">97</span>, <span class="fl">110</span>,  <span class="fl">99</span>, <span class="fl">101</span>,  <span class="fl">17</span>,   <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                 to_token<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">decode</span><span class="op">(</span></span>
+<span>  int_seqence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">53</span>, <span class="fl">109</span>, <span class="fl">174</span>, <span class="fl">188</span>, <span class="fl">61</span>, <span class="fl">67</span>, <span class="fl">97</span>, <span class="fl">97</span>, <span class="fl">112</span>, <span class="fl">73</span>, <span class="fl">97</span>, <span class="fl">110</span>, <span class="fl">99</span>, <span class="fl">101</span>, <span class="fl">17</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  to_token <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; [[1]][[1]]</span></span>
-<span><span class="co">#&gt; [1] "[CLS] T ##u ##is is a g ##h ##h ##N m ##h ##l ##n ##r . [SEP]"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "[CLS] T ##n ##is is a g ##c ##c ##s m ##c ##g ##e ##a . [SEP]"</span></span></code></pre></div>
 <p>If you would like to analyse the ecological impact of training the
 tokenizer you can get an estimation of energy consumption and
 CO2-emission.</p>
@@ -943,7 +949,7 @@ object with the function pair <code>save_to_disk</code> and
 <span>  folder_name <span class="op">=</span> <span class="st">"example_tokenizer"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tokenizer</span><span class="op">=</span><span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/example_tokenizer"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">tokenizer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/example_tokenizer"</span><span class="op">)</span></span></code></pre></div>
 <p>Now you are ready to create a base model.</p>
 </div>
 <div class="section level3">
@@ -957,12 +963,12 @@ with the function <code>aife_transformer.make</code>.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/BaseModelBert.html">BaseModelBert</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">base_model</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
-<span>  tokenizer<span class="op">=</span><span class="va">tokenizer</span>,</span>
+<span>  tokenizer <span class="op">=</span> <span class="va">tokenizer</span>,</span>
 <span>  max_position_embeddings <span class="op">=</span> <span class="fl">512</span>,</span>
 <span>  hidden_size <span class="op">=</span> <span class="fl">64</span>,</span>
 <span>  num_hidden_layers <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  num_attention_heads <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  intermediate_size <span class="op">=</span> <span class="fl">2</span><span class="op">*</span><span class="fl">64</span>,</span>
+<span>  intermediate_size <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">64</span>,</span>
 <span>  hidden_act <span class="op">=</span> <span class="st">"GELU"</span>,</span>
 <span>  hidden_dropout_prob <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  attention_probs_dropout_prob <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -1003,34 +1009,34 @@ language or task, you can call the corresponding
 <code>train</code>-method.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_model</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
-<span>   text_dataset<span class="op">=</span><span class="va">data_set_reviews_text</span>,</span>
-<span>   p_mask <span class="op">=</span> <span class="fl">0.30</span>,</span>
-<span>   whole_word <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>   val_size <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>   n_epoch <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>   batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>   max_sequence_length <span class="op">=</span> <span class="fl">250</span>,</span>
-<span>   full_sequences_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>   min_seq_len <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>   learning_rate <span class="op">=</span> <span class="fl">3e-3</span>,</span>
-<span>   sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>   sustain_iso_code <span class="op">=</span> <span class="st">"DEU"</span>,</span>
-<span>   sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>   sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>   trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>   pytorch_trace <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>   log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>   log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
+<span>  text_dataset <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
+<span>  p_mask <span class="op">=</span> <span class="fl">0.30</span>,</span>
+<span>  whole_word <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  val_size <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  n_epoch <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  max_sequence_length <span class="op">=</span> <span class="fl">250</span>,</span>
+<span>  full_sequences_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  min_seq_len <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  learning_rate <span class="op">=</span> <span class="fl">3e-3</span>,</span>
+<span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sustain_iso_code <span class="op">=</span> <span class="st">"DEU"</span>,</span>
+<span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  pytorch_trace <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:46 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:48 Prepare Data for Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:48 Calculate Flops Based on Architecture</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:49 Create Data Collator</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:49 Create Trainer</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:49 Using Whole Word Masking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:54:49 Start Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:06 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:06 Finish</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:52:06 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:08 Prepare Data for Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:08 Calculate Flops Based on Architecture</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:09 Create Data Collator</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:09 Create Trainer</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:09 Using Whole Word Masking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:09 Start Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:25 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:25 Finish</span></span></code></pre></div>
 <p>The data for training must be passed to <code>text_dataset</code>.
 This object should be of class <code>LargeDataSetForText</code> as
 described in section 2.2.2. In this example we use the text from the
@@ -1074,19 +1080,21 @@ memory capacity, please reduce the batch size significantly.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>To use the model you can load it with</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_model</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/example_base_model"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/example_base_model"</span><span class="op">)</span></span></code></pre></div>
 <p>In order to use the model for the fill-mask task you can call
 <code>fill_mask</code>.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_model</span><span class="op">$</span><span class="fu">fill_mask</span><span class="op">(</span>masked_text <span class="op">=</span> <span class="st">"This is a [MASK] movie."</span>,</span>
-<span>                     n_solutions <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">base_model</span><span class="op">$</span><span class="fu">fill_mask</span><span class="op">(</span></span>
+<span>  masked_text <span class="op">=</span> <span class="st">"This is a [MASK] movie."</span>,</span>
+<span>  n_solutions <span class="op">=</span> <span class="fl">5</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt;        score token token_str</span></span>
-<span><span class="co">#&gt; 1 0.06615704    96       ##e</span></span>
-<span><span class="co">#&gt; 2 0.03776980   104       ##t</span></span>
-<span><span class="co">#&gt; 3 0.03654816   111       ##s</span></span>
-<span><span class="co">#&gt; 4 0.03511496   114       ##o</span></span>
-<span><span class="co">#&gt; 5 0.03007550    97       ##h</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 0.05507819    99       ##e</span></span>
+<span><span class="co">#&gt; 2 0.03389458   100       ##t</span></span>
+<span><span class="co">#&gt; 3 0.03048431   102       ##h</span></span>
+<span><span class="co">#&gt; 4 0.02767239    96       ##o</span></span>
+<span><span class="co">#&gt; 5 0.02747143   112       ##s</span></span></code></pre></div>
 <p>Here you can provide a text with a mask token indicating the gab the
 model should close. As a result you get the logits, the token id and the
 concrete token the model suggests to replace the mask token with.</p>
@@ -1128,10 +1136,10 @@ estimate the ecological impact by calling the method
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:07 Prepare Data</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:07 Add Masking Token</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:07 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:09 Stop Sustainability Tracking</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:52:26 Prepare Data</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:26 Add Masking Token</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:26 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:28 Stop Sustainability Tracking</span></span></code></pre></div>
 <p>Here can you provide a text data set which forms the base for
 estimating the energy conspumtion during a fill-mask task. With
 <code>n</code> you determine the number of texts to be used.</p>
@@ -1140,13 +1148,13 @@ estimating the energy conspumtion during a fill-mask task. With
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_model</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="st">"inference"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   sustainability_tracked                date     task</span></span>
-<span><span class="co">#&gt; 1                   TRUE 2025-09-18 19:55:09 FillMask</span></span>
+<span><span class="co">#&gt; 1                   TRUE 2025-09-20 11:52:28 FillMask</span></span>
 <span><span class="co">#&gt;   sustainability_data.duration_sec sustainability_data.co2eq_kg</span></span>
-<span><span class="co">#&gt; 1                        0.5644269                 4.114665e-06</span></span>
+<span><span class="co">#&gt; 1                        0.5182372                 4.068816e-06</span></span>
 <span><span class="co">#&gt;   sustainability_data.cpu_energy_kwh sustainability_data.gpu_energy_kwh</span></span>
-<span><span class="co">#&gt; 1                       6.580988e-06                       2.671947e-06</span></span>
+<span><span class="co">#&gt; 1                        6.10137e-06                       3.144169e-06</span></span>
 <span><span class="co">#&gt;   sustainability_data.ram_energy_kwh sustainability_data.total_energy_kwh</span></span>
-<span><span class="co">#&gt; 1                       1.548127e-06                         1.080106e-05</span></span>
+<span><span class="co">#&gt; 1                        1.43517e-06                         1.068071e-05</span></span>
 <span><span class="co">#&gt;   technical.tracker technical.py_package_version technical.cpu_count</span></span>
 <span><span class="co">#&gt; 1        codecarbon                        3.0.4                  12</span></span>
 <span><span class="co">#&gt;                    technical.cpu_model technical.gpu_count</span></span>
@@ -1164,7 +1172,7 @@ These are estimated during every training run. With
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_model</span><span class="op">$</span><span class="fu">get_flops_estimates</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  date           approach  package version n_parameter</span></span>
-<span><span class="co">#&gt; 1 2025-09-18 19:54:49 architecture-based calflops   0.3.2      184200</span></span>
+<span><span class="co">#&gt; 1 2025-09-20 11:52:09 architecture-based calflops   0.3.2      184200</span></span>
 <span><span class="co">#&gt;   batch_size n_batches n_epochs   flops_bp_1   flops_bp_2   flops_bp_3</span></span>
 <span><span class="co">#&gt; 1         12        85       10 3.124416e+12 4.686624e+12 6.248831e+12</span></span>
 <span><span class="co">#&gt;     flops_bp_4 flops_counted</span></span>
@@ -1195,10 +1203,10 @@ your machine.</li>
 the folder where you stored the model and the tokenizer.</li>
 </ul>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_model_bert</span><span class="op">=</span><span class="va"><a href="../reference/BaseModelBert.html">BaseModelBert</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">base_model_bert</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/BaseModelBert.html">BaseModelBert</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">base_model_bert</span><span class="op">$</span><span class="fu">create_from_hf</span><span class="op">(</span></span>
 <span>  model_dir <span class="op">=</span> <span class="st">"examples/bert_uncased"</span>,</span>
-<span>  tokenizer_dir<span class="op">=</span><span class="st">"examples/bert_uncased"</span></span>
+<span>  tokenizer_dir <span class="op">=</span> <span class="st">"examples/bert_uncased"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Now you can use the model as all other base models in
 <em>aifedcuation</em>. For example, you can train the model as described
@@ -1244,10 +1252,10 @@ files into a new folder. Here we store the model in
 <code>"examples/bert_uncased"</code>.</p>
 <p>We first load the base model as described in section 3.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_model_bert</span><span class="op">=</span><span class="va"><a href="../reference/BaseModelBert.html">BaseModelBert</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">base_model_bert</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/BaseModelBert.html">BaseModelBert</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">base_model_bert</span><span class="op">$</span><span class="fu">create_from_hf</span><span class="op">(</span></span>
 <span>  model_dir <span class="op">=</span> <span class="st">"examples/bert_uncased"</span>,</span>
-<span>  tokenizer_dir<span class="op">=</span><span class="st">"examples/bert_uncased"</span></span>
+<span>  tokenizer_dir <span class="op">=</span> <span class="st">"examples/bert_uncased"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Now we can create the TextEmbeddingModel. Therefor we have to passe
 the base model to the parameter <code>base_model</code>.</p>
@@ -1342,16 +1350,16 @@ we can use the movie reviews as raw texts.</p>
 <span>  text_dataset <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:10 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:12 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:13 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:14 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:15 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:16 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:17 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:18 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:20 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:20 Batch 10 / 10 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:52:30 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:31 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:32 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:33 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:34 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:35 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:36 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:37 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:38 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:39 Batch 10 / 10 done</span></span></code></pre></div>
 <p>The method <code>embed_large</code>creates an object of class
 <code>LargeDataSetForTextEmbeddings</code>. This is just a data set
 consisting of the embeddings of every text. The embeddings are an array,
@@ -1381,7 +1389,7 @@ shown below.</p>
 <p>To load the embeddings you can call the function
 <code>load_from_disk</code>.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">review_embeddings</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/imdb_movie_reviews"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">review_embeddings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_from_disk.html">load_from_disk</a></span><span class="op">(</span><span class="st">"examples/imdb_movie_reviews"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="saving-and-loading-text-embedding-models">4.5 Saving and Loading Text Embedding Models<a class="anchor" aria-label="anchor" href="#saving-and-loading-text-embedding-models"></a>
@@ -1506,52 +1514,52 @@ of a new classifier may look like:</p>
 <span>  text_embeddings <span class="op">=</span> <span class="va">review_embeddings</span>,</span>
 <span>  feature_extractor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"neg"</span>, <span class="st">"pos"</span><span class="op">)</span>,</span>
-<span>  skip_connection_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  cls_pooling_features<span class="op">=</span><span class="fl">50</span>,</span>
-<span>  cls_pooling_type<span class="op">=</span><span class="st">"MinMax"</span>,</span>
-<span>  feat_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  feat_size<span class="op">=</span><span class="fl">256</span>,</span>
-<span>  feat_bias<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>  feat_dropout<span class="op">=</span><span class="fl">0.0</span>,</span>
-<span>  feat_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  feat_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  ng_conv_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  ng_conv_n_layers<span class="op">=</span><span class="fl">0</span>,</span>
-<span>  ng_conv_ks_min<span class="op">=</span><span class="fl">2</span>,</span>
-<span>  ng_conv_ks_max<span class="op">=</span><span class="fl">4</span>,</span>
-<span>  ng_conv_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  ng_conv_dropout<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span>  ng_conv_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  ng_conv_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  ng_conv_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  dense_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  dense_n_layers<span class="op">=</span><span class="fl">1</span>,</span>
-<span>  dense_dropout<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span>  dense_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  dense_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  dense_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  dense_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  rec_act_fct<span class="op">=</span><span class="st">"Tanh"</span>,</span>
-<span>  rec_n_layers<span class="op">=</span><span class="fl">2</span>,</span>
-<span>  rec_type<span class="op">=</span><span class="st">"GRU"</span>,</span>
-<span>  rec_bidirectional<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  rec_dropout<span class="op">=</span><span class="fl">0.2</span>,</span>
-<span>  rec_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  rec_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  rec_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  rec_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  tf_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  tf_dense_dim<span class="op">=</span><span class="fl">512</span>,</span>
-<span>  tf_n_layers<span class="op">=</span><span class="fl">0</span>,</span>
-<span>  tf_dropout_rate_1<span class="op">=</span><span class="fl">0.2</span>,</span>
-<span>  tf_dropout_rate_2<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span>  tf_attention_type<span class="op">=</span><span class="st">"MultiHead"</span>,</span>
-<span>  tf_positional_type <span class="op">=</span><span class="st">"absolute"</span>,</span>
-<span>  tf_num_heads<span class="op">=</span><span class="fl">1</span>,</span>
-<span>  tf_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  tf_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  tf_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  tf_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span></span>
+<span>  skip_connection_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  cls_pooling_features <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  cls_pooling_type <span class="op">=</span> <span class="st">"MinMax"</span>,</span>
+<span>  feat_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  feat_size <span class="op">=</span> <span class="fl">256</span>,</span>
+<span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  feat_dropout <span class="op">=</span> <span class="fl">0.0</span>,</span>
+<span>  feat_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  feat_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  ng_conv_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  ng_conv_n_layers <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  ng_conv_ks_min <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  ng_conv_ks_max <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  ng_conv_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ng_conv_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  ng_conv_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  ng_conv_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  ng_conv_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  dense_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  dense_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  dense_dropout <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  dense_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  dense_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  dense_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  rec_act_fct <span class="op">=</span> <span class="st">"Tanh"</span>,</span>
+<span>  rec_n_layers <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  rec_type <span class="op">=</span> <span class="st">"GRU"</span>,</span>
+<span>  rec_bidirectional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rec_dropout <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  rec_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rec_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  rec_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  rec_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  tf_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  tf_dense_dim <span class="op">=</span> <span class="fl">512</span>,</span>
+<span>  tf_n_layers <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  tf_dropout_rate_1 <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  tf_dropout_rate_2 <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  tf_attention_type <span class="op">=</span> <span class="st">"MultiHead"</span>,</span>
+<span>  tf_positional_type <span class="op">=</span> <span class="st">"absolute"</span>,</span>
+<span>  tf_num_heads <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  tf_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tf_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  tf_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  tf_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Similarly to the text embedding model, you should provide a label
 (<code>label</code>) for your new classifier. With
@@ -1648,7 +1656,7 @@ estimation of a classifier’s performance.</p>
 <span>  data_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  loss_balance_class_weights <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  loss_balance_sequence_length <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  loss_cls_fct_name<span class="op">=</span><span class="st">"FocalLoss"</span>,</span>
+<span>  loss_cls_fct_name <span class="op">=</span> <span class="st">"FocalLoss"</span>,</span>
 <span>  use_sc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sc_method <span class="op">=</span> <span class="st">"knnor"</span>,</span>
 <span>  sc_min_k <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -1669,37 +1677,37 @@ estimation of a classifier’s performance.</p>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_write_interval <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fu"><a href="../reference/auto_n_cores.html">auto_n_cores</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  lr_rate<span class="op">=</span><span class="fl">1e-3</span>,</span>
-<span>  lr_warm_up_ratio<span class="op">=</span><span class="fl">0.02</span>,</span>
-<span>  optimizer<span class="op">=</span><span class="st">"AdamW"</span></span>
+<span>  lr_rate <span class="op">=</span> <span class="fl">1e-3</span>,</span>
+<span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:22Total Cases:300Unique Cases:300Labeled Cases:225</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:22Start</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:22 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:24|Iteration1from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:24|Iteration1from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:41|Iteration2from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:41|Iteration2from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:58|Iteration3from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:55:58|Iteration3from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:56:15|Iteration4from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:56:15|Iteration4from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:56:32|Iteration5from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:56:32|Iteration5from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:56:49|Iteration6from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:56:49|Iteration6from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:06|Iteration7from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:06|Iteration7from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:23|Iteration8from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:23|Iteration8from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:41|Iteration9from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:41|Iteration9from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:57|Iteration10from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:57:58|Iteration10from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:15|Final training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:15|Final training|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:32 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:32Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:52:41Total Cases:300Unique Cases:300Labeled Cases:225</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:41Start</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:41 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:43|Iteration1from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:52:43|Iteration1from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:00|Iteration2from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:00|Iteration2from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:18|Iteration3from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:18|Iteration3from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:35|Iteration4from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:35|Iteration4from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:53|Iteration5from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:53:53|Iteration5from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:54:11|Iteration6from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:54:11|Iteration6from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:54:28|Iteration7from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:54:28|Iteration7from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:54:46|Iteration8from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:54:46|Iteration8from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:03|Iteration9from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:03|Iteration9from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:21|Iteration10from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:21|Iteration10from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:39|Final training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:39|Final training|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:57 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:55:57Training Complete</span></span></code></pre></div>
 <p>You can further modify the training process with different arguments.
 With <code>loss_balance_class_weights=TRUE</code> the absolute
 frequencies of the classes/categories are adjusted according to the
@@ -1808,13 +1816,14 @@ is left empty.</p>
 which shows how important performance measures develop over epochs.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="fu">plot_training_history</span><span class="op">(</span></span>
-<span>  final_training<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  pl_step<span class="op">=</span><span class="cn">NULL</span>,</span>
-<span>  measure<span class="op">=</span><span class="st">"loss"</span>,</span>
-<span>  y_min<span class="op">=</span><span class="cn">NULL</span>,</span>
-<span>  y_max<span class="op">=</span><span class="cn">NULL</span>,</span>
-<span>  add_min_max<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>  text_size<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<span>  final_training <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  pl_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  measure <span class="op">=</span> <span class="st">"loss"</span>,</span>
+<span>  y_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add_min_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="classification_tasks_files/figure-html/unnamed-chunk-59-1.png" alt="Figure 8: Training History of a Classifier" width="700"><p class="caption">
 Figure 8: Training History of a Classifier
@@ -1910,13 +1919,13 @@ tracker, you can receive information on sustainability by calling
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   sustainability_tracked                date task</span></span>
-<span><span class="co">#&gt; 1                   TRUE 2025-09-18 19:58:32   NA</span></span>
+<span><span class="co">#&gt; 1                   TRUE 2025-09-20 11:55:57   NA</span></span>
 <span><span class="co">#&gt;   sustainability_data.duration_sec sustainability_data.co2eq_kg</span></span>
-<span><span class="co">#&gt; 1                         189.0374                  0.001587508</span></span>
+<span><span class="co">#&gt; 1                          194.657                  0.001650853</span></span>
 <span><span class="co">#&gt;   sustainability_data.cpu_energy_kwh sustainability_data.gpu_energy_kwh</span></span>
-<span><span class="co">#&gt; 1                        0.002231197                        0.001411056</span></span>
+<span><span class="co">#&gt; 1                        0.002297602                        0.001495306</span></span>
 <span><span class="co">#&gt;   sustainability_data.ram_energy_kwh sustainability_data.total_energy_kwh</span></span>
-<span><span class="co">#&gt; 1                       0.0005249825                          0.004167235</span></span>
+<span><span class="co">#&gt; 1                       0.0005406065                          0.004333515</span></span>
 <span><span class="co">#&gt;   technical.tracker technical.py_package_version technical.cpu_count</span></span>
 <span><span class="co">#&gt; 1        codecarbon                        3.0.4                  12</span></span>
 <span><span class="co">#&gt;                    technical.cpu_model technical.gpu_count</span></span>
@@ -1961,16 +1970,16 @@ our example classifier, we use our BERT model.</p>
 <span>  text_dataset <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:35 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:37 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:38 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:39 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:40 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:41 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:42 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:43 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:44 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:45 Batch 10 / 10 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:56:00 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:01 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:02 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:03 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:04 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:05 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:07 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:08 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:09 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:09 Batch 10 / 10 done</span></span></code></pre></div>
 <p>To transform raw texts into a numeric representation just pass the
 raw texts to the method <code>embed_large</code> of the loaded model.
 The raw texts should be an object of class
@@ -2123,7 +2132,7 @@ classifier.</p>
 <span>  tf_dropout_rate_1 <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  tf_dropout_rate_2 <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  tf_attention_type <span class="op">=</span> <span class="st">"MultiHead"</span>,</span>
-<span>  tf_positional_type  <span class="op">=</span> <span class="st">"absolute"</span>,</span>
+<span>  tf_positional_type <span class="op">=</span> <span class="st">"absolute"</span>,</span>
 <span>  tf_num_heads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  tf_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tf_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
@@ -2194,33 +2203,33 @@ structure. Let us see how this changes when we train the model.</p>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:46Total Cases:300Unique Cases:300Labeled Cases:225</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:46Start</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:46 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:48|Iteration1from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:58:48|Iteration1from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:59:13|Iteration2from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:59:13|Iteration2from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:59:34|Iteration3from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:59:34|Iteration3from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:59:49|Iteration4from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 19:59:49|Iteration4from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:00:13|Iteration5from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:00:13|Iteration5from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:00:35|Iteration6from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:00:35|Iteration6from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:00:56|Iteration7from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:00:56|Iteration7from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:01:24|Iteration8from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:01:24|Iteration8from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:01:41|Iteration9from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:01:41|Iteration9from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:01:55|Iteration10from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:01:55|Iteration10from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:17|Final training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:17|Final training|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:31 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:31Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:56:11Total Cases:300Unique Cases:300Labeled Cases:225</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:11Start</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:11 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:12|Iteration1from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:12|Iteration1from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:36|Iteration2from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:36|Iteration2from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:57|Iteration3from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:56:57|Iteration3from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:57:13|Iteration4from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:57:13|Iteration4from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:57:36|Iteration5from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:57:36|Iteration5from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:57:58|Iteration6from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:57:58|Iteration6from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:58:19|Iteration7from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:58:19|Iteration7from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:58:46|Iteration8from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:58:46|Iteration8from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:02|Iteration9from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:02|Iteration9from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:17|Iteration10from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:17|Iteration10from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:39|Final training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:39|Final training|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:52 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:52Training Complete</span></span></code></pre></div>
 <p>While there are no arguments for requesting a balance of the class
 weights (<code>loss_balance_class_weights</code>) or balancing the
 sequence length (<code>loss_balance_sequence_length</code>), four new
@@ -2349,8 +2358,8 @@ classes/categories from 2 to 4.</p>
 <span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">76</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
 <span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">201</span><span class="op">:</span><span class="fl">250</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
 <span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">251</span><span class="op">:</span><span class="fl">260</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"very positive"</span></span>
-<span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span>,useNA<span class="op">=</span><span class="st">"ifany"</span><span class="op">)</span></span>
+<span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span>, useNA <span class="op">=</span> <span class="st">"ifany"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           neg           pos very negative very positive          &lt;NA&gt; </span></span>
 <span><span class="co">#&gt;            60           140            15            10            75</span></span></code></pre></div>
@@ -2360,23 +2369,23 @@ different classes. Thus, we first have to split the data. The cases with
 classes/categories form the <em>sample set</em> and the cases without
 any classes/categories form the <em>query set</em>.</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sample_set_raw</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">example_data</span>,<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sample_classes</span><span class="op">=</span><span class="va">sample_set_raw</span><span class="op">$</span><span class="va">label</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">sample_classes</span>,useNA<span class="op">=</span><span class="st">"ifany"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sample_set_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">example_data</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sample_classes</span> <span class="op">&lt;-</span> <span class="va">sample_set_raw</span><span class="op">$</span><span class="va">label</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">sample_classes</span>, useNA <span class="op">=</span> <span class="st">"ifany"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; sample_classes</span></span>
 <span><span class="co">#&gt;           neg           pos very negative very positive </span></span>
 <span><span class="co">#&gt;            60           140            15            10</span></span>
 <span></span>
-<span><span class="va">sample_texts</span><span class="op">=</span><span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">sample_texts</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">sample_texts</span><span class="op">$</span><span class="fu">add_from_data.frame</span><span class="op">(</span><span class="va">sample_set_raw</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">query_set_raw</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">example_data</span>,<span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">query_set_raw</span><span class="op">$</span><span class="va">label</span>,useNA<span class="op">=</span><span class="st">"ifany"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">query_set_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">example_data</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">query_set_raw</span><span class="op">$</span><span class="va">label</span>, useNA <span class="op">=</span> <span class="st">"ifany"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           neg           pos very negative very positive          &lt;NA&gt; </span></span>
 <span><span class="co">#&gt;             0             0             0             0            75</span></span>
 <span></span>
-<span><span class="va">query_texts</span><span class="op">=</span><span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">query_texts</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LargeDataSetForText.html">LargeDataSetForText</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">query_texts</span><span class="op">$</span><span class="fu">add_from_data.frame</span><span class="op">(</span><span class="va">query_set_raw</span><span class="op">)</span></span></code></pre></div>
 <p>Now we must create text embeddings for the query and the sample data
 set. We have to use the same embedding model as we used during training
@@ -2386,26 +2395,26 @@ the classifier.</p>
 <span>  text_dataset <span class="op">=</span> <span class="va">sample_texts</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:34 Batch 1 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:35 Batch 2 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:36 Batch 3 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:37 Batch 4 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:38 Batch 5 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:39 Batch 6 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:41 Batch 7 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:41 Batch 8 / 8 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 11:59:55 Batch 1 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:56 Batch 2 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:57 Batch 3 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:58 Batch 4 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 11:59:59 Batch 5 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:00:00 Batch 6 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:00:01 Batch 7 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:00:02 Batch 8 / 8 done</span></span></code></pre></div>
 <div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">query_embeddings</span> <span class="op">&lt;-</span> <span class="va">bert_modeling</span><span class="op">$</span><span class="fu">embed_large</span><span class="op">(</span></span>
 <span>  text_dataset <span class="op">=</span> <span class="va">query_texts</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:42 Batch 1 / 3 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:43 Batch 2 / 3 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:44 Batch 3 / 3 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 12:00:03 Batch 1 / 3 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:00:04 Batch 2 / 3 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:00:05 Batch 3 / 3 done</span></span></code></pre></div>
 <p>Now we are ready to use our classifier. First, we predict the classes
 of the query sample.</p>
 <div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">new_predictions</span><span class="op">=</span><span class="va">classifier_prototype</span><span class="op">$</span><span class="fu">predict_with_samples</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">new_predictions</span> <span class="op">&lt;-</span> <span class="va">classifier_prototype</span><span class="op">$</span><span class="fu">predict_with_samples</span><span class="op">(</span></span>
 <span>  newdata <span class="op">=</span> <span class="va">query_embeddings</span>,</span>
 <span>  embeddings_s <span class="op">=</span> <span class="va">sample_embeddings</span>,</span>
 <span>  classes_s <span class="op">=</span> <span class="va">sample_classes</span></span>
@@ -2425,7 +2434,7 @@ of the query sample.</p>
 <p>Although we trained our classifier for two classes we can now use it
 to predict other classes. Next, we plot the results.</p>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot_with_samples</span><span class="op">&lt;-</span><span class="va">classifier_prototype</span><span class="op">$</span><span class="fu">plot_embeddings</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">plot_with_samples</span> <span class="op">&lt;-</span> <span class="va">classifier_prototype</span><span class="op">$</span><span class="fu">plot_embeddings</span><span class="op">(</span></span>
 <span>  embeddings_q <span class="op">=</span> <span class="va">query_embeddings</span>,</span>
 <span>  embeddings_s <span class="op">=</span> <span class="va">sample_embeddings</span>,</span>
 <span>  classes_s <span class="op">=</span> <span class="va">sample_classes</span>,</span>
@@ -2531,10 +2540,10 @@ configuration of your model.</p>
 <span>  ml_trace <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:45 Start</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:02:45 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:24 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:24 Training finished</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 12:00:06 Start</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:00:06 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:49 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:49 Training finished</span></span></code></pre></div>
 <blockquote>
 <p>In this example we use the same text embeddings as we use to traing
 the classifier. It can be beneficial if you use a larger sample of texts
@@ -2568,52 +2577,52 @@ described in section 5 this would look like:</p>
 <span>  text_embeddings <span class="op">=</span> <span class="va">review_embeddings</span>,</span>
 <span>  feature_extractor <span class="op">=</span> <span class="va">feature_extractor</span>,</span>
 <span>  target_levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"neg"</span>, <span class="st">"pos"</span><span class="op">)</span>,</span>
-<span>  skip_connection_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  cls_pooling_features<span class="op">=</span><span class="fl">50</span>,</span>
-<span>  cls_pooling_type<span class="op">=</span><span class="st">"MinMax"</span>,</span>
-<span>  feat_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  feat_size<span class="op">=</span><span class="fl">256</span>,</span>
-<span>  feat_bias<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>  feat_dropout<span class="op">=</span><span class="fl">0.0</span>,</span>
-<span>  feat_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  feat_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  ng_conv_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  ng_conv_n_layers<span class="op">=</span><span class="fl">0</span>,</span>
-<span>  ng_conv_ks_min<span class="op">=</span><span class="fl">2</span>,</span>
-<span>  ng_conv_ks_max<span class="op">=</span><span class="fl">4</span>,</span>
-<span>  ng_conv_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  ng_conv_dropout<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span>  ng_conv_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  ng_conv_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  ng_conv_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  dense_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  dense_n_layers<span class="op">=</span><span class="fl">1</span>,</span>
-<span>  dense_dropout<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span>  dense_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  dense_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  dense_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  dense_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  rec_act_fct<span class="op">=</span><span class="st">"Tanh"</span>,</span>
-<span>  rec_n_layers<span class="op">=</span><span class="fl">2</span>,</span>
-<span>  rec_type<span class="op">=</span><span class="st">"GRU"</span>,</span>
-<span>  rec_bidirectional<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  rec_dropout<span class="op">=</span><span class="fl">0.2</span>,</span>
-<span>  rec_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  rec_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  rec_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  rec_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span>,</span>
-<span>  tf_act_fct<span class="op">=</span><span class="st">"ELU"</span>,</span>
-<span>  tf_dense_dim<span class="op">=</span><span class="fl">512</span>,</span>
-<span>  tf_n_layers<span class="op">=</span><span class="fl">0</span>,</span>
-<span>  tf_dropout_rate_1<span class="op">=</span><span class="fl">0.2</span>,</span>
-<span>  tf_dropout_rate_2<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span>  tf_attention_type<span class="op">=</span><span class="st">"MultiHead"</span>,</span>
-<span>  tf_positional_type <span class="op">=</span><span class="st">"absolute"</span>,</span>
-<span>  tf_num_heads<span class="op">=</span><span class="fl">1</span>,</span>
-<span>  tf_bias<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>  tf_parametrizations<span class="op">=</span><span class="st">"None"</span>,</span>
-<span>  tf_normalization_type<span class="op">=</span><span class="st">"LayerNorm"</span>,</span>
-<span>  tf_residual_type<span class="op">=</span><span class="st">"ResidualGate"</span></span>
+<span>  skip_connection_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  cls_pooling_features <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  cls_pooling_type <span class="op">=</span> <span class="st">"MinMax"</span>,</span>
+<span>  feat_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  feat_size <span class="op">=</span> <span class="fl">256</span>,</span>
+<span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  feat_dropout <span class="op">=</span> <span class="fl">0.0</span>,</span>
+<span>  feat_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  feat_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  ng_conv_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  ng_conv_n_layers <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  ng_conv_ks_min <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  ng_conv_ks_max <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  ng_conv_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ng_conv_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  ng_conv_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  ng_conv_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  ng_conv_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  dense_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  dense_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  dense_dropout <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  dense_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  dense_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  dense_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  rec_act_fct <span class="op">=</span> <span class="st">"Tanh"</span>,</span>
+<span>  rec_n_layers <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  rec_type <span class="op">=</span> <span class="st">"GRU"</span>,</span>
+<span>  rec_bidirectional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rec_dropout <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  rec_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rec_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  rec_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  rec_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  tf_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  tf_dense_dim <span class="op">=</span> <span class="fl">512</span>,</span>
+<span>  tf_n_layers <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  tf_dropout_rate_1 <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  tf_dropout_rate_2 <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  tf_attention_type <span class="op">=</span> <span class="st">"MultiHead"</span>,</span>
+<span>  tf_positional_type <span class="op">=</span> <span class="st">"absolute"</span>,</span>
+<span>  tf_num_heads <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  tf_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tf_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
+<span>  tf_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  tf_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_with_fe</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
@@ -2623,7 +2632,7 @@ described in section 5 this would look like:</p>
 <span>  data_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  loss_balance_class_weights <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  loss_balance_sequence_length <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  loss_cls_fct_name<span class="op">=</span><span class="st">"FocalLoss"</span>,</span>
+<span>  loss_cls_fct_name <span class="op">=</span> <span class="st">"FocalLoss"</span>,</span>
 <span>  use_sc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sc_method <span class="op">=</span> <span class="st">"knnor"</span>,</span>
 <span>  sc_min_k <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -2644,47 +2653,47 @@ described in section 5 this would look like:</p>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_write_interval <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fu"><a href="../reference/auto_n_cores.html">auto_n_cores</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  lr_rate<span class="op">=</span><span class="fl">1e-3</span>,</span>
-<span>  lr_warm_up_ratio<span class="op">=</span><span class="fl">0.02</span>,</span>
-<span>  optimizer<span class="op">=</span><span class="st">"AdamW"</span></span>
+<span>  lr_rate <span class="op">=</span> <span class="fl">1e-3</span>,</span>
+<span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:24 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:25 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:25 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:25 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:26 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:26 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:27 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:27 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:28 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:28 Batch 10 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:28Total Cases:300Unique Cases:300Labeled Cases:225</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:29Start</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:29 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:30|Iteration1from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:30|Iteration1from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:46|Iteration2from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:29:46|Iteration2from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:03|Iteration3from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:03|Iteration3from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:20|Iteration4from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:20|Iteration4from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:36|Iteration5from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:36|Iteration5from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:53|Iteration6from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:30:53|Iteration6from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:10|Iteration7from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:10|Iteration7from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:26|Iteration8from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:26|Iteration8from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:43|Iteration9from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:43|Iteration9from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:59|Iteration10from10</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:31:59|Iteration10from10|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:32:16|Final training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:32:16|Final training|Training</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:32:33 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-09-18 20:32:33Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-09-20 12:26:50 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:50 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:51 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:51 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:51 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:52 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:52 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:53 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:53 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:54 Batch 10 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:54Total Cases:300Unique Cases:300Labeled Cases:225</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:54Start</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:54 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:55|Iteration1from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:26:56|Iteration1from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:27:13|Iteration2from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:27:13|Iteration2from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:27:30|Iteration3from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:27:30|Iteration3from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:27:47|Iteration4from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:27:47|Iteration4from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:04|Iteration5from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:04|Iteration5from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:21|Iteration6from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:21|Iteration6from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:38|Iteration7from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:38|Iteration7from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:56|Iteration8from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:28:56|Iteration8from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:29:13|Iteration9from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:29:13|Iteration9from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:29:30|Iteration10from10</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:29:30|Iteration10from10|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:29:47|Final training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:29:47|Final training|Training</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:30:05 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-09-20 12:30:05Training Complete</span></span></code></pre></div>
 <p>That is all. Now you can use and train the classifier in the same way
 as you did without a feature extractor. You even do not need to save and
 load the feature extractor manually. This is done automatically for all

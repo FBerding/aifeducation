@@ -50,10 +50,10 @@ save_to_disk <- function(object,
   check_type(object = folder_name, object_name = "folder_name", type = "string", FALSE)
 
   # Create path to save location
-  save_location <- file.path(dir_path,  folder_name)
+  save_location <- file.path(dir_path, folder_name)
 
   # Create path to r_interface
-  path_r_config_state <- file.path(save_location,  "r_config_state.rda")
+  path_r_config_state <- file.path(save_location, "r_config_state.rda")
 
   # Check directory
   create_dir(dir_path, FALSE)
@@ -108,7 +108,7 @@ load_R_config_state <- function(dir_path) {
   interface_path <- file.path(dir_path, "r_config_state.rda")
 
   # Check for r_config_state.rda
-  if (!file.exists(interface_path) ) {
+  if (!file.exists(interface_path)) {
     stop(
       "There is no file r_config_state.rda in the selected directory ",
       "The directory is: ", dir_path

@@ -157,12 +157,12 @@ BaseModel_Use_Server <- function(id, log_dir, volumes) {
       model = model
     )
     Sustainability_Server(
-      id="BaseModel_Sustainability",
-      model=model
+      id = "BaseModel_Sustainability",
+      model = model
     )
     FLOPS_Server(
-      id="BaseModel_FLOPS",
-      model=model
+      id = "BaseModel_FLOPS",
+      model = model
     )
     Fill_Mask_Server(
       id = "BaseModel_Fill_Mask",

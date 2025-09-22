@@ -233,72 +233,71 @@ test_that("Kendall's w", {
 })
 
 test_that("Gwet's AC1 and AC2", {
-  #Example taken from Gwet (2021, p.160)
-  data<-matrix(data = c(
-    0,0,NA,0,
-    1,1,2,1,
-    2,2,2,2,
-    2,2,2,2,
-    1,1,1,1,
-    0,1,2,3,
-    3,3,3,3,
-    0,0,1,0,
-    1,1,1,1,
-    NA,4,4,4,
-    NA,NA,0,0,
-    NA,NA,2,NA),ncol=4,nrow=12,byrow=TRUE)
+  # Example taken from Gwet (2021, p.160)
+  data <- matrix(data = c(
+    0, 0, NA, 0,
+    1, 1, 2, 1,
+    2, 2, 2, 2,
+    2, 2, 2, 2,
+    1, 1, 1, 1,
+    0, 1, 2, 3,
+    3, 3, 3, 3,
+    0, 0, 1, 0,
+    1, 1, 1, 1,
+    NA, 4, 4, 4,
+    NA, NA, 0, 0,
+    NA, NA, 2, NA
+  ), ncol = 4, nrow = 12, byrow = TRUE)
 
-  r_1=factor(data[,1],levels = c(0,1,2,3,4))
-  r_2=factor(data[,2],levels = c(0,1,2,3,4))
-  r_3=factor(data[,3],levels = c(0,1,2,3,4))
-  r_4=factor(data[,4],levels = c(0,1,2,3,4))
+  r_1 <- factor(data[, 1], levels = c(0, 1, 2, 3, 4))
+  r_2 <- factor(data[, 2], levels = c(0, 1, 2, 3, 4))
+  r_3 <- factor(data[, 3], levels = c(0, 1, 2, 3, 4))
+  r_4 <- factor(data[, 4], levels = c(0, 1, 2, 3, 4))
 
-  results<-gwet_ac(rater_one = r_1,rater_two = r_2,additional_raters = list(r_3,r_4))
-  expect_equal(results$ac1,0.7754,tolerance = 1e-4)
+  results <- gwet_ac(rater_one = r_1, rater_two = r_2, additional_raters = list(r_3, r_4))
+  expect_equal(results$ac1, 0.7754, tolerance = 1e-4)
 
-  #example taken from Gwet (2021, p.165)
-  data<-matrix(data = c(
-    1,1,2,NA,2,
-    1,1,0,1,NA,
-    2,3,3,3,NA,
-    NA,0,0,NA,0,
-    0,0,0,NA,0,
-    0,0,0,NA,0,
-    1,0,2,NA,1,
-    1,NA,2,0,NA,
-    2,2,2,NA,2,
-    2,1,1,1,NA,
-    NA,1,0,0,NA,
-    0,0,0,0,NA,
-    1,2,2,2,NA,
-    3,3,2,2,3,
-    1,1,1,NA,1,
-    1,1,1,NA,1,
-    2,1,2,NA,2,
-    1,2,3,3,NA,
-    1,1,0,1,NA,
-    0,0,0,NA,0
+  # example taken from Gwet (2021, p.165)
+  data <- matrix(
+    data = c(
+      1, 1, 2, NA, 2,
+      1, 1, 0, 1, NA,
+      2, 3, 3, 3, NA,
+      NA, 0, 0, NA, 0,
+      0, 0, 0, NA, 0,
+      0, 0, 0, NA, 0,
+      1, 0, 2, NA, 1,
+      1, NA, 2, 0, NA,
+      2, 2, 2, NA, 2,
+      2, 1, 1, 1, NA,
+      NA, 1, 0, 0, NA,
+      0, 0, 0, 0, NA,
+      1, 2, 2, 2, NA,
+      3, 3, 2, 2, 3,
+      1, 1, 1, NA, 1,
+      1, 1, 1, NA, 1,
+      2, 1, 2, NA, 2,
+      1, 2, 3, 3, NA,
+      1, 1, 0, 1, NA,
+      0, 0, 0, NA, 0
     ),
-    ncol=5,
-    nrow=20,
-    byrow=TRUE)
+    ncol = 5,
+    nrow = 20,
+    byrow = TRUE
+  )
 
-  r_1=factor(data[,1],levels = c(0,1,2,3))
-  r_2=factor(data[,2],levels = c(0,1,2,3))
-  r_3=factor(data[,3],levels = c(0,1,2,3))
-  r_4=factor(data[,4],levels = c(0,1,2,3))
-  r_5=factor(data[,5],levels = c(0,1,2,3))
+  r_1 <- factor(data[, 1], levels = c(0, 1, 2, 3))
+  r_2 <- factor(data[, 2], levels = c(0, 1, 2, 3))
+  r_3 <- factor(data[, 3], levels = c(0, 1, 2, 3))
+  r_4 <- factor(data[, 4], levels = c(0, 1, 2, 3))
+  r_5 <- factor(data[, 5], levels = c(0, 1, 2, 3))
 
-  results<-gwet_ac(rater_one = r_1,rater_two = r_2,additional_raters = list(r_3,r_4,r_5))
-  expect_equal(results$ac1,0.5021,tolerance = 1e-4)
-  expect_equal(results$ac2_quadratic,0.8224,tolerance = 1e-4)
+  results <- gwet_ac(rater_one = r_1, rater_two = r_2, additional_raters = list(r_3, r_4, r_5))
+  expect_equal(results$ac1, 0.5021, tolerance = 1e-4)
+  expect_equal(results$ac2_quadratic, 0.8224, tolerance = 1e-4)
 
-  results<-gwet_ac(rater_one = na.omit(r_1),rater_two = na.omit(r_1))
-  expect_equal(results$ac1,1,tolerance = 1e-4)
-  expect_equal(results$ac2_linear,1,tolerance = 1e-4)
-  expect_equal(results$ac2_quadratic,1,tolerance = 1e-4)
+  results <- gwet_ac(rater_one = na.omit(r_1), rater_two = na.omit(r_1))
+  expect_equal(results$ac1, 1, tolerance = 1e-4)
+  expect_equal(results$ac2_linear, 1, tolerance = 1e-4)
+  expect_equal(results$ac2_quadratic, 1, tolerance = 1e-4)
 })
-
-
-
-

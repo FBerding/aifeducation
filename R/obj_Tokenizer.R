@@ -30,8 +30,8 @@ TokenizerBase <- R6::R6Class(
     #------------------------------------------------------------------------
     # Method for loading tokenizer statistics
     load_tokenizer_statistics = function(model_dir) {
-      path <- file.path(model_dir,  "tokenizer_statistics.csv")
-      if (file.exists(path) ) {
+      path <- file.path(model_dir, "tokenizer_statistics.csv")
+      if (file.exists(path)) {
         private$tokenizer_statistics <- utils::read.csv(file = path)
       } else {
         private$tokenizer_statistics <- NA
@@ -40,12 +40,12 @@ TokenizerBase <- R6::R6Class(
     #------------------------------------------------------------------------
     # Method for saving tokenizer statistics
     save_tokenizer_statistics = function(dir_path, folder_name) {
-      if (!is.null_or_na(private$tokenizer_statistics) ) {
-        save_location <- file.path(dir_path,  folder_name)
+      if (!is.null_or_na(private$tokenizer_statistics)) {
+        save_location <- file.path(dir_path, folder_name)
         create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
         write.csv(
           x = private$tokenizer_statistics,
-          file = file.path(save_location,  "tokenizer_statistics.csv"),
+          file = file.path(save_location, "tokenizer_statistics.csv"),
           row.names = FALSE,
           quote = FALSE
         )
@@ -65,7 +65,7 @@ TokenizerBase <- R6::R6Class(
       check_type(object = folder_name, type = "string", FALSE)
 
       # Create Directory and Folder
-      save_location <- file.path(dir_path,  folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
       create_dir(save_location, trace = TRUE, msg_fun = FALSE)
 
@@ -181,13 +181,13 @@ TokenizerBase <- R6::R6Class(
 
           for (j in 1L:chunks) {
             tokens_unit[j] <- list(tokens["input_ids"][j, ])
-            if (trace ) {
+            if (trace) {
               cat(paste(get_time_stamp(), i, "/", n_units, "block", j, "/", chunks, "\n"))
             }
           }
           encodings_only[i] <- list(tokens_unit)
         }
-        if (token_to_int ) {
+        if (token_to_int) {
           return(encodings_only)
         } else {
           # Convert ids to tokens
@@ -266,7 +266,7 @@ TokenizerBase <- R6::R6Class(
         for (j in seq_len(length(int_seqence[[i]]))) {
           tmp_vector <- int_seqence[[i]][[j]]
           mode(tmp_vector) <- "integer"
-          if (!to_token ) {
+          if (!to_token) {
             tmp_seq_token_list[j] <- list(private$model$decode(
               token_ids = tmp_vector,
               skip_special_tokens = TRUE

@@ -4,10 +4,10 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Load python scripts
+# Load python scripts
 load_all_py_scripts()
 
-#Prototyp Metric---------------------------------------------------------------
+# Prototyp Metric---------------------------------------------------------------
 test_that("Prototype Metric", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   layer <- py$layer_protonet_metric()$to(device)
@@ -47,20 +47,22 @@ test_that("Prototype Metric", {
   prototypes <- torch$from_numpy(
     prototypes
   )
-  result_matrix <- matrix(data = c(
-    1.214546097,        1.049661321,    1.167033276,
-    1.004301858,        1.192821119,    1.921787363,
-    0.620796979,        0.745244181,    1.615827961,
-    0.933124977,        1.017212968,    1.587566272,
-    0.640668054,        0.530963485,    1.201041215,
-    0.926942405,        0.782872205,    1.01721843,
-    1.196350933,        0.95989004,     0.597355282,
-    1.938080379,        1.678478147,    0.686294397,
-    1.012614877,        0.863243239,    0.766789845
-  ),
-  nrow = 9,
-  ncol = 3,
-  byrow = TRUE)
+  result_matrix <- matrix(
+    data = c(
+      1.214546097,        1.049661321,    1.167033276,
+      1.004301858,        1.192821119,    1.921787363,
+      0.620796979,        0.745244181,    1.615827961,
+      0.933124977,        1.017212968,    1.587566272,
+      0.640668054,        0.530963485,    1.201041215,
+      0.926942405,        0.782872205,    1.01721843,
+      1.196350933,        0.95989004,     0.597355282,
+      1.938080379,        1.678478147,    0.686294397,
+      1.012614877,        0.863243239,    0.766789845
+    ),
+    nrow = 9,
+    ncol = 3,
+    byrow = TRUE
+  )
 
   scaling_factor <- layer$get_scaling_factor()
 
@@ -115,7 +117,7 @@ test_that("identity layer", {
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$identity_layer(apply_masking=FALSE)$to(device)
+  layer <- py$identity_layer(apply_masking = FALSE)$to(device)
   y <- layer(
     x = values[[1]],
     seq_len = values[[2]],
@@ -266,7 +268,7 @@ test_that("LayerNorm with Mask", {
 test_that("DenseLayer with Mask", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   normalization_types <- c("None", "LayerNorm")
-  residual_types=c("None", "Addition", "ResidualGate")
+  residual_types <- c("None", "Addition", "ResidualGate")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -287,61 +289,59 @@ test_that("DenseLayer with Mask", {
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
   for (norm_types in normalization_types) {
-    for (res_types in residual_types){
+    for (res_types in residual_types) {
+      for (target_features in features_output) {
+        # Create layer
+        layer <- py$dense_layer_with_mask(
+          input_size = as.integer(features),
+          output_size = as.integer(target_features),
+          times = as.integer(times),
+          pad_value = as.integer(pad_value),
+          act_fct = "ELU",
+          dropout = 0.3,
+          bias = TRUE,
+          parametrizations = "None",
+          dtype = values[[1]]$dtype,
+          residual_type = "None",
+          normalization_type = norm_types
+        )$to(device)
+        layer$eval()
 
+        y <- layer(
+          x = values[[1]],
+          seq_len = values[[2]],
+          mask_times = values[[3]],
+          mask_features = values[[4]]
+        )
 
-    for (target_features in features_output) {
-      # Create layer
-      layer <- py$dense_layer_with_mask(
-        input_size = as.integer(features),
-        output_size = as.integer(target_features),
-        times = as.integer(times),
-        pad_value = as.integer(pad_value),
-        act_fct = "ELU",
-        dropout = 0.3,
-        bias = TRUE,
-        parametrizations = "None",
-        dtype = values[[1]]$dtype,
-        residual_type = "None",
-        normalization_type = norm_types
-      )$to(device)
-      layer$eval()
+        # Test that masking values are the same
+        expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+        expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
 
-      y <- layer(
-        x = values[[1]],
-        seq_len = values[[2]],
-        mask_times = values[[3]],
-        mask_features = values[[4]]
-      )
+        # Test the correct size of the new masking on feature level
+        expect_equal(dim(tensor_to_numpy(y[[4]]))[3], target_features)
 
-      # Test that masking values are the same
-      expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
-      expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+        # Test that padding is not destroyed
+        y_2 <- masking_layer(y[[1]])
+        expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+        expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+        expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
 
-      # Test the correct size of the new masking on feature level
-      expect_equal(dim(tensor_to_numpy(y[[4]]))[3], target_features)
-
-      # Test that padding is not destroyed
-      y_2 <- masking_layer(y[[1]])
-      expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
-      expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
-      expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
-
-      # Test that values do not change at random for same input
-      y_1 <- layer(
-        x = values[[1]],
-        seq_len = values[[2]],
-        mask_times = values[[3]],
-        mask_features = values[[4]]
-      )
-      y_2 <- layer(
-        x = values[[1]],
-        seq_len = values[[2]],
-        mask_times = values[[3]],
-        mask_features = values[[4]]
-      )
-      expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
-    }
+        # Test that values do not change at random for same input
+        y_1 <- layer(
+          x = values[[1]],
+          seq_len = values[[2]],
+          mask_times = values[[3]],
+          mask_features = values[[4]]
+        )
+        y_2 <- layer(
+          x = values[[1]],
+          seq_len = values[[2]],
+          mask_times = values[[3]],
+          mask_features = values[[4]]
+        )
+        expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
+      }
     }
   }
 })
@@ -481,25 +481,24 @@ test_that("layer_adaptive_extreme_pooling_1d", {
       if (pooling_type == "Max") {
         ordered_values <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = TRUE)]
         relevant_values <- ordered_values[seq(from = 1, to = output_size)]
-        expect_equal(sum(round(result_matrix[i,],digits=5) %in% round(relevant_values,digits=5)), output_size)
+        expect_equal(sum(round(result_matrix[i, ], digits = 5) %in% round(relevant_values, digits = 5)), output_size)
       } else if (pooling_type == "Min") {
         ordered_values <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = FALSE)]
         relevant_values <- ordered_values[seq(from = 1, to = output_size)]
-        expect_equal(sum(round(result_matrix[i,],digits=5) %in% round(relevant_values,digits=5)), output_size)
+        expect_equal(sum(round(result_matrix[i, ], digits = 5) %in% round(relevant_values, digits = 5)), output_size)
       } else {
-        n_max=ceiling(output_size/2)
-        n_min=output_size-n_max
+        n_max <- ceiling(output_size / 2)
+        n_min <- output_size - n_max
 
-        #Max
+        # Max
         ordered_values_max <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = TRUE)]
         relevant_values_max <- ordered_values_max[seq(from = 1, to = n_max)]
-        expect_equal(sum(round(result_matrix[i,],digits=5) %in% round(relevant_values_max,digits=5)), n_max)
+        expect_equal(sum(round(result_matrix[i, ], digits = 5) %in% round(relevant_values_max, digits = 5)), n_max)
 
-        #Min
+        # Min
         ordered_values_min <- tensor_matrix[i, order(tensor_matrix[i, ], decreasing = FALSE)]
         relevant_values_min <- ordered_values_min[seq(from = 1, to = n_min)]
-        expect_equal(sum(round(result_matrix[i,],digits=5) %in% round(relevant_values_min,digits=5)), n_min)
-
+        expect_equal(sum(round(result_matrix[i, ], digits = 5) %in% round(relevant_values_min, digits = 5)), n_min)
       }
     }
   }
@@ -663,7 +662,7 @@ test_that("merge_layer", {
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  for(attention_type in c("MultiHead","Fourier")){
+  for (attention_type in c("MultiHead", "Fourier")) {
     for (pooling_type in c("Max", "Min", "MinMax")) {
       layer <- py$merge_layer(
         times = as.integer(times),
@@ -681,8 +680,8 @@ test_that("merge_layer", {
 
       y <- layer(
         tensor_list = rep(values[1], times = n_input_streams),
-        seq_len=values[[2]],
-        mask_times=values[[3]],
+        seq_len = values[[2]],
+        mask_times = values[[3]],
         mask_features = values[[4]]
       )
 
@@ -747,79 +746,85 @@ test_that("rnn_preparation", {
 
 test_that("layer_class_mean", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  layer=py$layer_class_mean()$to(device)
+  layer <- py$layer_class_mean()$to(device)
 
 
-  test_tensor=matrix(
-    data=c(0.59,	0.71,	0.51,
-    0.45,	-1,	-0.77,
-    0.27,	0.11,	-0.99,
-    -0.15,	-0.61,	-0.89,
-    0.39,	0.57,	-0.31,
-    0.57,	0.21,	0.46,
-    -0.59,	0.44,	-0.06,
-    -0.85,	0.45,	0.94,
-    0.1,	-0.36,	0.49
-  ),nrow=9,ncol=3,byrow=TRUE)
-  test_tensor=reticulate::np_array(test_tensor)
-  test_tensor=torch$from_numpy(
+  test_tensor <- matrix(
+    data = c(
+      0.59, 0.71, 0.51,
+      0.45, -1, -0.77,
+      0.27, 0.11, -0.99,
+      -0.15, -0.61, -0.89,
+      0.39, 0.57, -0.31,
+      0.57, 0.21, 0.46,
+      -0.59, 0.44, -0.06,
+      -0.85, 0.45, 0.94,
+      0.1, -0.36, 0.49
+    ), nrow = 9, ncol = 3, byrow = TRUE
+  )
+  test_tensor <- reticulate::np_array(test_tensor)
+  test_tensor <- torch$from_numpy(
     test_tensor
   )
-  test_classes=torch$from_numpy(reticulate::np_array(c(0,0,0,1,1,1,2,2,2))$copy())
-  num_classes=3
+  test_classes <- torch$from_numpy(reticulate::np_array(c(0, 0, 0, 1, 1, 1, 2, 2, 2))$copy())
+  num_classes <- 3
 
-  result_matrix=matrix(data=c(
-    0.436667,	-0.060000,	-0.416667,
-    0.270000,	0.056667,	-0.246667,
-    -0.446667,	0.176667,	0.456667
-  ),
-  nrow=3,ncol=3,byrow=TRUE)
+  result_matrix <- matrix(
+    data = c(
+      0.436667,   -0.060000,      -0.416667,
+      0.270000,   0.056667,       -0.246667,
+      -0.446667,  0.176667,       0.456667
+    ),
+    nrow = 3, ncol = 3, byrow = TRUE
+  )
 
-  cls_means=layer(x=test_tensor$to(device),
-                  classes=test_classes$to(device),
-                  total_classes=3L)
+  cls_means <- layer(
+    x = test_tensor$to(device),
+    classes = test_classes$to(device),
+    total_classes = 3L
+  )
   expect_equal(
     object = tensor_to_numpy(cls_means),
     expected = result_matrix,
     tolerance = 1e-5
-    )
+  )
 })
 
-#layer_global_average_pooling_1d------------------------------------------------
+# layer_global_average_pooling_1d------------------------------------------------
 test_that("layer_global_average_pooling_1d", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
-times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
-features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
-sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
-example_tensor <- generate_tensors(
-  times = times,
-  features = features,
-  seq_len = sequence_length,
-  pad_value = pad_value
-)$to(device)
-masking_layer <- py$masking_layer(pad_value)$to(device)
-values <- masking_layer(example_tensor)
+  times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
+  features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
+  sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
+  example_tensor <- generate_tensors(
+    times = times,
+    features = features,
+    seq_len = sequence_length,
+    pad_value = pad_value
+  )$to(device)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
+  values <- masking_layer(example_tensor)
 
-layer=py$layer_global_average_pooling_1d(mask_type="mask")$to(device)
+  layer <- py$layer_global_average_pooling_1d(mask_type = "mask")$to(device)
 
-results=layer(x=values[[1]],mask=values[[3]])
+  results <- layer(x = values[[1]], mask = values[[3]])
 
-true_mean_source=tensor_to_numpy(example_tensor)
-true_mean_source=replace(x=true_mean_source,true_mean_source==pad_value,values=0)
-true_mean=matrix(data=0,nrow = 30,ncol = features)
-for(b in seq(30)){
-  for (t in 1:times){
-    for(f in 1:features){
-      true_mean[b,f]=true_mean_source[b,t,f]+true_mean[b,f]
+  true_mean_source <- tensor_to_numpy(example_tensor)
+  true_mean_source <- replace(x = true_mean_source, true_mean_source == pad_value, values = 0)
+  true_mean <- matrix(data = 0, nrow = 30, ncol = features)
+  for (b in seq(30)) {
+    for (t in 1:times) {
+      for (f in 1:features) {
+        true_mean[b, f] <- true_mean_source[b, t, f] + true_mean[b, f]
+      }
     }
   }
-}
-true_mean=true_mean/sequence_length
+  true_mean <- true_mean / sequence_length
 
-expect_equal(
-  object =tensor_to_numpy(results),
-  expected = true_mean,
-  tolerance = 1e-7)
+  expect_equal(
+    object = tensor_to_numpy(results),
+    expected = true_mean,
+    tolerance = 1e-7
+  )
 })
-

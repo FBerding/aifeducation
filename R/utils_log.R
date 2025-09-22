@@ -169,6 +169,7 @@ read_loss_log <- function(path_loss) {
   if (!(inherits(loss_data, "try-error"))) {
     loss_data <- t(loss_data)
     if (ncol(loss_data) > 2L) {
+      print(loss_data)
       colnames(loss_data) <- c("train", "validation", "test")
     } else {
       colnames(loss_data) <- c("train", "validation")
@@ -291,7 +292,7 @@ clean_pytorch_log_transformers <- function(log) {
   for (i in 1L:max_epochs) {
     cleaned_log[i, "epoch"] <- i
 
-    tmp_loss <- subset(log, log$epoch == i & !is.na(log$loss) )
+    tmp_loss <- subset(log, log$epoch == i & !is.na(log$loss))
     tmp_loss <- tmp_loss[1L, "loss"]
     cleaned_log[i, "loss"] <- tmp_loss
 

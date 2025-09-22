@@ -54,7 +54,7 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     # Method for loading training history
     load_training_history = function(model_dir) {
-      training_datalog_path <- file.path(model_dir,  "history.log")
+      training_datalog_path <- file.path(model_dir, "history.log")
       if (file.exists(training_datalog_path)) {
         self$last_training$history <- utils::read.csv2(file = training_datalog_path)
       } else {
@@ -65,11 +65,11 @@ BaseModelCore <- R6::R6Class(
     # Method for saving training history
     save_training_history = function(dir_path, folder_name) {
       if (!is.null_or_na(self$last_training$history)) {
-        save_location <- file.path(dir_path,  folder_name)
+        save_location <- file.path(dir_path, folder_name)
         create_dir(dir_path, trace = TRUE, msg_fun = FALSE)
         write.csv2(
           x = self$last_training$history,
-          file = file.path(save_location,  "history.log"),
+          file = file.path(save_location, "history.log"),
           row.names = FALSE,
           quote = FALSE
         )
@@ -77,7 +77,7 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     save_tokenizer = function(dir_path, folder_name) {
-      save_location <- file.path(dir_path,  folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
       save_to_disk(
         object = self$Tokenizer,
@@ -87,7 +87,7 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     load_tokenizer = function(dir_path) {
-      load_location <- file.path(dir_path,  "tokenizer")
+      load_location <- file.path(dir_path, "tokenizer")
       self$Tokenizer <- load_from_disk(load_location)
     },
     #--------------------------------------------------------------------------
@@ -95,11 +95,11 @@ BaseModelCore <- R6::R6Class(
 
     },
     #--------------------------------------------------------------------------
-    set_model_config_from_hf=function(){
-    tmp_args <- rlang::fn_fmls_names(self$configure)
-    for (arg in intersect(x = tmp_args, y = names(private$model$config))) {
-      private$model_config[arg] <- list(private$model$config[arg])
-    }
+    set_model_config_from_hf = function() {
+      tmp_args <- rlang::fn_fmls_names(self$configure)
+      for (arg in intersect(x = tmp_args, y = names(private$model$config))) {
+        private$model_config[arg] <- list(private$model$config[arg])
+      }
     },
     #--------------------------------------------------------------------------
     set_up_logger = function(log_dir, log_write_interval) {
@@ -336,8 +336,8 @@ BaseModelCore <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    check_arg_combinations=function(args){
-      #Placeholder for the child classes
+    check_arg_combinations = function(args) {
+      # Placeholder for the child classes
     },
     #---------------------------------------------------------------------------
     do_configuration = function(args) {
@@ -350,8 +350,8 @@ BaseModelCore <- R6::R6Class(
       # Check arguments
       check_all_args(args = args)
 
-      #Check argument combinations
-      private$check_arg_combinations(args=args)
+      # Check argument combinations
+      private$check_arg_combinations(args = args)
 
       # Save args
       private$save_all_args(args = args, group = "configure")
@@ -445,8 +445,8 @@ BaseModelCore <- R6::R6Class(
   ),
   public = list(
 
-    #' @field Tokenizer \cr
-    #' Objects of class `r paste(paste0("[",TokenizerIndex,"]"),collapse=", ")`.
+    #' @field Tokenizer ('TokenizerBase')\cr
+    #' Objects of class `TokenizerBase`.
     Tokenizer = NULL,
 
     #--------------------------------------------------------------------------
@@ -722,7 +722,7 @@ BaseModelCore <- R6::R6Class(
     #' @param folder_name `r get_param_doc_desc("folder_name")`
     #' @return `r get_description("return_save_on_disk")`
     save = function(dir_path, folder_name) {
-      save_location <- file.path(dir_path,  folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(dir_path = save_location, trace = FALSE)
 
       # Save BaseModel
@@ -914,10 +914,10 @@ BaseModelCore <- R6::R6Class(
       tokenizer <- self$Tokenizer$get_tokenizer()
       max_seq_len <- self$get_model_config()$max_position_embeddings
 
-      #Tokens without special tokens
+      # Tokens without special tokens
       possible_tokens <- setdiff(
-        x=names(self$Tokenizer$get_tokenizer()$get_vocab()),
-        y=self$get_special_tokens()[,"token"]
+        x = names(self$Tokenizer$get_tokenizer()$get_vocab()),
+        y = self$get_special_tokens()[, "token"]
       )
 
       generated_texts <- vector(length = batch_size)
@@ -945,7 +945,7 @@ BaseModelCore <- R6::R6Class(
         max_length = as.integer(max_seq_len - private$adjust_max_sequence_length),
         return_tensors = "pt",
         return_token_type_ids = private$return_token_type_ids,
-        padding=TRUE
+        padding = TRUE
       )
 
 

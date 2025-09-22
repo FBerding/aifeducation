@@ -99,7 +99,7 @@ LargeDataSetBase <- R6::R6Class(
       }
 
       # Create folder
-      save_location <- file.path(dir_path,  folder_name)
+      save_location <- file.path(dir_path, folder_name)
       create_dir(save_location, FALSE)
 
       # Save
@@ -154,13 +154,13 @@ LargeDataSetBase <- R6::R6Class(
       private_list <- NULL
 
       for (entry in names(self)) {
-        if (!is.function(self[[entry]])  & !is.environment(self[[entry]])) {
+        if (!is.function(self[[entry]]) & !is.environment(self[[entry]])) {
           public_list[entry] <- list(self[[entry]])
         }
       }
 
       for (entry in names(private)) {
-        if (!is.function(private[[entry]])  & !is.environment(private[[entry]])) {
+        if (!is.function(private[[entry]]) & !is.environment(private[[entry]])) {
           private_list[entry] <- list(private[[entry]])
         }
       }

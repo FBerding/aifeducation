@@ -219,7 +219,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
     })
 
     # Tokenizer statistics--------------------------------------------------------------------------
-    tok_statistics <- shiny::eventReactive(input$calc_tok_statistics,{
+    tok_statistics <- shiny::eventReactive(input$calc_tok_statistics, {
       if (!is.null(base_model()) & !is.null(data_raw_texts())) {
         display_processing()
 
@@ -259,14 +259,14 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
 
     # FLOPS and Parameter statistics--------------------------------------------------------------------------
     flop_statistics <- shiny::eventReactive(input$calc_param_flops_statistics, {
-      if (!is.null(tok_statistics()) &!is.null(base_model())) {
+      if (!is.null(tok_statistics()) & !is.null(base_model())) {
         display_processing()
 
         flops_statistics <- base_model()$calc_flops_architecture_based(
           batch_size = input$batch_size,
           n_batches = ceiling(tok_statistics()$n_tokens / input$batch_size),
           n_epochs = input$n_epoch
-          )
+        )
 
         shiny::removeModal()
         shiny::removeModal()
@@ -284,8 +284,8 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
             title = "Parameter",
             value = table$n_parameter,
             shiny::tags$p("N Epochs:", input$n_epoch),
-            shiny::tags$p("Total Flops (factor 2):", format(x = table$flops_bp_2, scientific=TRUE)),
-            shiny::tags$p("Total Flops (factor 3):", format(x = table$flops_bp_3, scientific=TRUE))
+            shiny::tags$p("Total Flops (factor 2):", format(x = table$flops_bp_2, scientific = TRUE)),
+            shiny::tags$p("Total Flops (factor 3):", format(x = table$flops_bp_3, scientific = TRUE))
           )
         )
       } else {
@@ -398,7 +398,7 @@ BaseModel_Train_Server <- function(id, log_dir, volumes) {
                 path_to_embeddings = NULL,
                 path_to_target_data = NULL,
                 path_to_textual_dataset = path_to_raw_texts(),
-                path_to_base_model=path_to_base_model(),
+                path_to_base_model = path_to_base_model(),
                 path_to_feature_extractor = NULL,
                 destination_path = input$save_modal_directory_path,
                 folder_name = input$save_modal_folder_name

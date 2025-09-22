@@ -21,61 +21,58 @@ create_dir(test_art_path, FALSE)
 create_dir(test_art_tmp_path, FALSE)
 create_dir(tmp_full_models_pt_path, FALSE)
 
-#Data Mangement
+# Data Mangement
 example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
-#Test Configuration
-object_class_names=setdiff(x=TokenizerIndex,y="HuggingFaceTokenizer")
-samples_per_object=5
+# Test Configuration
+object_class_names <- setdiff(x = TokenizerIndex, y = "HuggingFaceTokenizer")
+samples_per_object <- 5
 
-#object_class_names=c("WordPieceTokenizer")
-#object_class_names=c("BPETokenizer")
+# object_class_names=c("WordPieceTokenizer")
+# object_class_names=c("BPETokenizer")
 
-#Tests
-for(object_class_name in object_class_names){
+# Tests
+for (object_class_name in object_class_names) {
   for (i in 1:samples_per_object) {
-
-
-  config_args=generate_args_for_tests(
-    object_name = object_class_name,
-    method = "configure",
-    var_objects = list(),
-    necessary_objects = list(
-      text_dataset = raw_texts
-    ),
-    var_override = list(
-      sustain_interval = 30,
-      sustain_iso_code = "DEU"
+    config_args <- generate_args_for_tests(
+      object_name = object_class_name,
+      method = "configure",
+      var_objects = list(),
+      necessary_objects = list(
+        text_dataset = raw_texts
+      ),
+      var_override = list(
+        sustain_interval = 30,
+        sustain_iso_code = "DEU"
+      )
     )
-  )
-  training_args=generate_args_for_tests(
-    object_name = object_class_name,
-    method = "train",
-    var_objects = list(),
-    necessary_objects = list(
-      text_dataset = raw_texts
-    ),
-    var_override = list(
-      sustain_interval = 30,
-      sustain_iso_code = "DEU"
-    )
-  )
-
-
-  test_that(paste(object_class_name, get_current_args_for_print(config_args),get_current_args_for_print(training_args)), {
-
-    tokenizer <- create_object(object_class_name)
-
-    do.call(
-      what = tokenizer$configure,
-      args = config_args
+    training_args <- generate_args_for_tests(
+      object_name = object_class_name,
+      method = "train",
+      var_objects = list(),
+      necessary_objects = list(
+        text_dataset = raw_texts
+      ),
+      var_override = list(
+        sustain_interval = 30,
+        sustain_iso_code = "DEU"
+      )
     )
 
-    do.call(
-      what = tokenizer$train,
-      args = training_args
-    )
+
+    test_that(paste(object_class_name, get_current_args_for_print(config_args), get_current_args_for_print(training_args)), {
+      tokenizer <- create_object(object_class_name)
+
+      do.call(
+        what = tokenizer$configure,
+        args = config_args
+      )
+
+      do.call(
+        what = tokenizer$train,
+        args = training_args
+      )
 
       # tokenizer statistics
       expect_equal(

@@ -245,7 +245,7 @@ Classifier_Prediction_Server <- function(id, model, volumes) {
 
     # Save
     shiny::observeEvent(input$save_modal_button_continue, {
-      #Remove Save Modal
+      # Remove Save Modal
       shiny::removeModal()
 
       write.csv(

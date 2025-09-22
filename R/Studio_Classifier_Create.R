@@ -33,8 +33,9 @@ Classifiers_Create_UI <- function(id) {
         shiny::selectInput(
           inputId = shiny::NS(id, "classifier_type"),
           choices = setdiff(
-            x=get_TEClassifiers_class_names("ClassifiersBasedOnTextEmbeddings"),
-            y=get_depr_obj_names()),
+            x = get_TEClassifiers_class_names("ClassifiersBasedOnTextEmbeddings"),
+            y = get_depr_obj_names()
+          ),
           label = "Classifier Type"
         ),
         shiny::textInput(
@@ -75,7 +76,7 @@ Classifiers_Create_UI <- function(id) {
             shiny::textInput(
               inputId = shiny::NS(id, "embeddings_dir"),
               label = shiny::tags$p(shiny::icon("folder"), "Path"),
-              width="100%"
+              width = "100%"
             ),
             shiny::uiOutput(outputId = shiny::NS(id, "summary_data_embeddings"))
           )
@@ -93,7 +94,7 @@ Classifiers_Create_UI <- function(id) {
             shiny::textInput(
               inputId = shiny::NS(id, "target_dir"),
               label = shiny::tags$p(shiny::icon("folder"), "Path"),
-              width="100%"
+              width = "100%"
             ),
             bslib::layout_column_wrap(
               shiny::uiOutput(outputId = shiny::NS(id, "summary_data_targets")),
@@ -102,7 +103,7 @@ Classifiers_Create_UI <- function(id) {
           )
         )
       ),
-      #FeatureExtractor
+      # FeatureExtractor
       bslib::card(
         bslib::card_header(
           "Feature Extractor"
@@ -120,12 +121,12 @@ Classifiers_Create_UI <- function(id) {
           )
         )
       ),
-      #Main config Cards
+      # Main config Cards
       shinycssloaders::withSpinner(
-      shiny::uiOutput(outputId = shiny::NS(id,"model_configuration"))
+        shiny::uiOutput(outputId = shiny::NS(id, "model_configuration"))
       ),
       shinycssloaders::withSpinner(
-      shiny::uiOutput(outputId = shiny::NS(id,"training_setup"))
+        shiny::uiOutput(outputId = shiny::NS(id, "training_setup"))
       )
     )
   )
@@ -224,22 +225,22 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
-    #Box for model configuration------------------------------------------------
-    output$model_configuration<-shiny::renderUI({
+    # Box for model configuration------------------------------------------------
+    output$model_configuration <- shiny::renderUI({
       config_box <- create_widget_card(
-        id=id,
-        object_class=input$classifier_type,
+        id = id,
+        object_class = input$classifier_type,
         method = "configure",
-        box_title="Model Configuration"
+        box_title = "Model Configuration"
       )
     })
-    #Box for training set up---------------------------------------------------
-    output$training_setup<-shiny::renderUI({
+    # Box for training set up---------------------------------------------------
+    output$training_setup <- shiny::renderUI({
       config_box <- create_widget_card(
-        id=id,
-        object_class=input$classifier_type,
+        id = id,
+        object_class = input$classifier_type,
         method = "train",
-        box_title="Training SetUp"
+        box_title = "Training SetUp"
       )
     })
 
@@ -326,13 +327,13 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
         path_to_feature_extractor = path_to_feature_extractor(),
         model_name = input$name,
         model_label = input$label,
-        use_sc=input$use_sc,
-        sc_min_k=input$sc_min_k,
-        sc_max_k=input$sc_max_k,
-        use_pl=input$use_pl,
-        pl_min=input$pl_min,
-        pl_max=input$pl_max,
-        pl_anchor=input$pl_anchor
+        use_sc = input$use_sc,
+        sc_min_k = input$sc_min_k,
+        sc_max_k = input$sc_max_k,
+        use_pl = input$use_pl,
+        pl_min = input$pl_min,
+        pl_max = input$pl_max,
+        pl_anchor = input$pl_anchor
       )
 
       # If there are errors display them. If not start running task.
@@ -349,50 +350,50 @@ Classifiers_Create_Server <- function(id, log_dir, volumes) {
           id = id,
           ExtendedTask_type = "classifier",
           ExtendedTask_arguments = list(
-            configure=summarize_args_for_long_task(
-              input=input,
-              object_class=input$classifier_type,
-              method="configure",
-              path_args=list(
-                path_to_embeddings=path_to_embeddings(),
-                path_to_target_data=NULL,
-                path_to_feature_extractor=path_to_feature_extractor(),
-                destination_path=input$save_modal_directory_path,
-                folder_name=input$save_modal_folder_name
+            configure = summarize_args_for_long_task(
+              input = input,
+              object_class = input$classifier_type,
+              method = "configure",
+              path_args = list(
+                path_to_embeddings = path_to_embeddings(),
+                path_to_target_data = NULL,
+                path_to_feature_extractor = path_to_feature_extractor(),
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
               ),
-              override_args=list(
-                sustain_track=TRUE
+              override_args = list(
+                sustain_track = TRUE
               ),
-              meta_args=list(
-                py_environment_type=get_py_env_type(),
-                py_env_name=get_py_env_name(),
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
                 target_data_column = input$data_target_column,
-                object_class=input$classifier_type
+                object_class = input$classifier_type
               )
             ),
-            train=summarize_args_for_long_task(
-              input=input,
-              object_class=input$classifier_type,
-              method="train",
-              path_args=list(
-                path_to_embeddings=path_to_embeddings(),
-                path_to_target_data=path_to_target_data(),
-                path_to_feature_extractor=path_to_feature_extractor(),
-                destination_path=input$save_modal_directory_path,
-                folder_name=input$save_modal_folder_name
+            train = summarize_args_for_long_task(
+              input = input,
+              object_class = input$classifier_type,
+              method = "train",
+              path_args = list(
+                path_to_embeddings = path_to_embeddings(),
+                path_to_target_data = path_to_target_data(),
+                path_to_feature_extractor = path_to_feature_extractor(),
+                destination_path = input$save_modal_directory_path,
+                folder_name = input$save_modal_folder_name
               ),
-              override_args=list(
-                sustain_track=TRUE,
+              override_args = list(
+                sustain_track = TRUE,
                 log_dir = log_dir,
-                trace=FALSE,
-                ml_trace=0,
-                n_cores=auto_n_cores()
+                trace = FALSE,
+                ml_trace = 0,
+                n_cores = auto_n_cores()
               ),
-              meta_args=list(
-                py_environment_type=get_py_env_type(),
-                py_env_name=get_py_env_name(),
+              meta_args = list(
+                py_environment_type = get_py_env_type(),
+                py_env_name = get_py_env_name(),
                 target_data_column = input$data_target_column,
-                object_class=input$classifier_type
+                object_class = input$classifier_type
               )
             )
           ),

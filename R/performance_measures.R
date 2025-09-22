@@ -656,8 +656,7 @@ get_coder_metrics <- function(true_values = NULL,
 create_iota2_mean_object <- function(iota2_list,
                                      original_cat_labels,
                                      free_aem = FALSE,
-                                     call = "aifeducation::te_classifier_neuralnet"
-                                     ) {
+                                     call = "aifeducation::te_classifier_neuralnet") {
   if (free_aem) {
     call <- paste0(call, "_free_aem")
   }

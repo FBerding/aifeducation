@@ -13,17 +13,16 @@ test_that("check_python_modules", {
 })
 
 test_that("set_transformers_logger", {
-  for(state in c("ERROR","WARNING","INFO","DEBUG")){
-    expect_no_error(set_transformers_logger(level=state))
+  for (state in c("ERROR", "WARNING", "INFO", "DEBUG")) {
+    expect_no_error(set_transformers_logger(level = state))
   }
   set_transformers_logger("WARNING")
-
 })
 
 test_that("prepare_session", {
-expect_no_error(prepare_session())
+  expect_no_error(prepare_session())
 })
 
 test_that("get_recommended_py_versions", {
-  expect_s3_class(get_recommended_py_versions(),"data.frame")
+  expect_s3_class(get_recommended_py_versions(), "data.frame")
 })
