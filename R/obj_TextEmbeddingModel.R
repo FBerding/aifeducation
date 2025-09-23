@@ -59,7 +59,8 @@ TextEmbeddingModel <- R6::R6Class(
       load_py_scripts(
         files = c(
           "pytorch_layers.py",
-          "MPNetForMPLM_PT.py"
+          "MPNetForMPLM_PT.py",
+          "pytorch_text_embedding_model.py"
         )
       )
     },
@@ -352,173 +353,83 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(object = trace, type = "bool", FALSE)
       check_type(object = return_large_dataset, type = "bool", FALSE)
 
-      # transformer---------------------------------------------------------------------
-      n_units <- length(raw_text)
-      n_layer <- self$BaseModel$get_model()$config$num_hidden_layers
-      n_layer_size <- self$BaseModel$get_model()$config$hidden_size
+      #Load python scripts
+      private$load_reload_python_scripts()
 
-      # Batch refers to the number of cases
-      n_batches <- ceiling(n_units / batch_size)
-      batch_results <- NULL
+      #Object for storing embeddings
+      batch_results=list()
 
-      if (private$model_config$emb_pool_type == "Average") {
-        reticulate::py_run_file(system.file("python/pytorch_old_scripts.py",
-          package = "aifeducation"
-        ))
-        pooling <- py$layer_global_average_pooling_1d(mask_type = "attention")
-        pooling$eval()
+      #Get tokenizer
+      tokenizer=self$BaseModel$Tokenizer$get_tokenizer()
+
+      #get device and data type
+      if (torch$cuda$is_available()) {
+        pytorch_device <- "cuda"
+        pytorch_dtype <- torch$float
+      } else {
+        pytorch_device <- "cpu"
+        pytorch_dtype <- torch$double
       }
 
-      for (b in 1L:n_batches) {
-        # Set model to evaluation mode
-        self$BaseModel$get_model()$eval()
-        if (torch$cuda$is_available()) {
-          pytorch_device <- "cuda"
-          pytorch_dtype <- torch$float
-        } else {
-          pytorch_device <- "cpu"
-          pytorch_dtype <- torch$double
-        }
-        self$BaseModel$get_model()$to(pytorch_device, dtype = pytorch_dtype)
-        if (private$model_config$emb_pool_type == "Average") {
-          pooling$to(pytorch_device)
-        }
+      require_token_type_ids=self$BaseModel$get_private()$return_token_type_ids
 
-        index_min <- 1L + (b - 1L) * batch_size
-        index_max <- min(b * batch_size, n_units)
-        batch <- index_min:index_max
+      #Create a model for embedding
+      pytorch_embedding_model=py$TextEmbeddingModel(
+        base_model=self$BaseModel$get_model(),
+        chunks=as.integer(private$model_config$chunks),
+        emb_layer_min=as.integer(private$model_config$emb_layer_min),
+        emb_layer_max=as.integer(private$model_config$emb_layer_max),
+        pad_value=private$model_config$pad_value,
+        emb_pool_type=private$model_config$emb_pool_type
+      )
 
-        tokens <- self$BaseModel$Tokenizer$encode(
-          raw_text = raw_text[batch],
-          trace = trace,
-          token_encodings_only = FALSE,
-          token_overlap = private$model_config$overlap,
-          max_token_sequence_length = private$model_config$max_length,
-          n_chunks = private$model_config$chunks,
-          token_to_int = TRUE,
-          return_token_type_ids <- (self$BaseModel$get_model_type() != "mpnet")
+      pytorch_embedding_model$to(device=pytorch_device,dtype=pytorch_dtype)
+      pytorch_embedding_model$eval()
+
+      n_documents=length(raw_text)
+      for(i in seq_along(raw_text)){
+        tokens <- tokenizer(
+          raw_text[i],
+          stride = as.integer(private$model_config$overlap),
+          padding = "max_length",
+          truncation = TRUE,
+          max_length = as.integer(private$model_config$max_length),
+          return_overflowing_tokens = TRUE,
+          return_length = FALSE,
+          return_offsets_mapping = FALSE,
+          return_attention_mask = TRUE,
+          return_token_type_ids = require_token_type_ids,
+          return_tensors = "pt"
         )
 
-        text_embedding <- array(
-          data = private$model_config$pad_value,
-          dim = c(
-            length(batch),
-            private$model_config$chunks,
-            n_layer_size
+        if(require_token_type_ids){
+          tmp_embeddings=pytorch_embedding_model(
+            input_ids=tokens["input_ids"]$to(device=pytorch_device),
+            attention_mask=tokens["attention_mask"]$to(device=pytorch_device),
+            token_type_ids=token_type_ids=tokens["token_type_ids"]$to(device=pytorch_device)
           )
-        )
-
-        # Selecting the relevant layers
-        selected_layer <- private$model_config$emb_layer_min:private$model_config$emb_layer_max
-        tmp_selected_layer <- 1L + selected_layer
-
-        # Clear memory
-        if (torch$cuda$is_available()) {
-          torch$cuda$empty_cache()
+        } else {
+          tmp_embeddings=pytorch_embedding_model(
+            input_ids=tokens["input_ids"]$to(device=pytorch_device),
+            attention_mask=tokens["attention_mask"]$to(device=pytorch_device)
+          )
         }
 
-        # Calculate tensors
-        tokens$encodings$set_format(type = "torch")
 
-        with(
-          data = torch$no_grad(),
-          {
-            if (self$BaseModel$get_model_type() == "mpnet") {
-              tensor_embeddings <- self$BaseModel$get_model()(
-                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                output_hidden_states = TRUE
-              )$hidden_states
-            } else if (self$BaseModel$get_model_type() == "modernbert") {
-              tensor_embeddings <- self$BaseModel$get_model()(
-                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                output_hidden_states = TRUE
-              )$hidden_states
-            } else {
-              tensor_embeddings <- self$BaseModel$get_model()(
-                input_ids = tokens$encodings["input_ids"]$to(pytorch_device),
-                attention_mask = tokens$encodings["attention_mask"]$to(pytorch_device),
-                token_type_ids = tokens$encodings["token_type_ids"]$to(pytorch_device),
-                output_hidden_states = TRUE
-              )$hidden_states
-            }
-          }
-        )
+        tmp_embeddings=tensor_to_numpy(tmp_embeddings)
+        rownames(tmp_embeddings)=doc_id[i]
 
-        if (private$model_config$emb_pool_type == "Average") {
-          # Average Pooling over all tokens of a layer
-          for (i in tmp_selected_layer) {
-            # abc=pooling(
-            #  x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
-            #  mask = tokens$encodings["attention_mask"]$to(pytorch_device)
-            # )
-            # print(abc)
-            tensor_embeddings[i] <- list(pooling(
-              x = tensor_embeddings[[as.integer(i)]]$to(pytorch_device),
-              mask = tokens$encodings["attention_mask"]$to(pytorch_device)
-            ))
-          }
-        }
+        batch_results[length(batch_results)+1]=list(tmp_embeddings)
 
-        # Sorting the hidden states to the corresponding cases and times
-        # If more than one layer is selected the mean is calculated
-        index <- 0L
-        for (i in seq_along(batch)) {
-          for (j in 1L:tokens$chunks[i]) {
-            for (layer in tmp_selected_layer) {
-              layer_int <- as.integer(layer)
-              index_int <- as.integer(index)
-
-              # Set values to zero to remove padding value
-              text_embedding[i, j, ] <- 0L
-
-              if (!torch$cuda$is_available()) {
-                if (private$model_config$emb_pool_type == "CLS") {
-                  # CLS Token is always the first token
-                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]][[0L]]$detach()$numpy()
-                  )
-                } else if (private$model_config$emb_pool_type == "Average") {
-                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]]$detach()$numpy()
-                  )
-                }
-              } else {
-                if (private$model_config$emb_pool_type == "CLS") {
-                  # CLS Token is always the first token
-                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]][[0L]]$detach()$cpu()$numpy()
-                  )
-                } else if (private$model_config$emb_pool_type == "Average") {
-                  text_embedding[i, j, ] <- text_embedding[i, j, ] + as.vector(
-                    tensor_embeddings[[layer_int]][[index_int]]$detach()$cpu()$numpy()
-                  )
-                }
-              }
-            }
-            text_embedding[i, j, ] <- text_embedding[i, j, ] / length(tmp_selected_layer)
-            index <- index + 1L
-          }
-        }
-        dimnames(text_embedding)[[3L]] <- paste0(
-          self$BaseModel$get_model_type(), "_",
-          seq(from = 1L, to = n_layer_size, by = 1L)
-        )
-
-        # Add ID of every case
-        dimnames(text_embedding)[[1L]] <- doc_id[batch]
-        batch_results[b] <- list(text_embedding)
-        if (trace) {
+        if (trace == TRUE) {
           cat(paste(
-            get_time_stamp(),
-            "Batch", b, "/", n_batches, "Done", "\n"
+            date(),
+            "Document", i, "/", n_documents, "Done", "\n"
           ))
         }
-        base::gc(verbose = FALSE, full = TRUE)
       }
 
-      # Summarizing the results over all batches
+      # Summarizing the results
       text_embedding <- array_form_bind(batch_results)
 
       embeddings <- EmbeddedText$new()
@@ -579,6 +490,7 @@ TextEmbeddingModel <- R6::R6Class(
                            trace = FALSE,
                            log_file = NULL,
                            log_write_interval = 2L) {
+
       # Check arguments
       check_class(object = text_dataset, classes = c("LargeDataSetForText", allow_NULL = FALSE))
       check_type(object = batch_size, type = "int", FALSE)

@@ -20,7 +20,7 @@
 #' @return Objects of this class are used for ensuring the correct data management for training different types of
 #'   classifiers. They are also used for data augmentation by creating synthetic cases with different
 #'   techniques.
-#' @family Data Management Developers
+#' @family R6 Classes for Developers
 #' @export
 DataManagerClassifier <- R6::R6Class(
   classname = "DataManagerClassifier",

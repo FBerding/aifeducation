@@ -6,7 +6,7 @@ editor_options:
 
 # aifeducation 1.1.2
 
-** Major Changes**
+**Major Changes**
 
 - Introduction of two new classes: one for tokenizers and one for base models. 
   This allows us a more specialized implementation of new methods (e.g. for estimation FLOPS) and a unified 

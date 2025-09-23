@@ -49,6 +49,7 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 chunks <- sample(x = c(4, 10), size = 1, replace = FALSE)
 
 base_model_type_list <- BaseModelsIndex
+#base_model_type_list=base_model_type_list[1]
 
 pooling_type_list <- list(
   "CLS", "Average"
@@ -230,7 +231,7 @@ for (base_model_type in base_model_type_list) {
           for (i in 1:10) {
             expect_equal(embeddings$embeddings[i, , , drop = FALSE],
               embeddings_perm$embeddings[rownames(embeddings$embeddings)[i], , , drop = FALSE],
-              tolerance = 1e-2
+              tolerance = 1e-6
             )
           }
 
@@ -248,7 +249,7 @@ for (base_model_type in base_model_type_list) {
           )
           expect_equal(embeddings_large$get_pad_value(), random_padding_value)
 
-          # Check absence of randrom variation
+          # Check absence of random variation
           embeddings_2 <- text_embedding_model$embed(
             raw_text = example_data$text[1:10],
             doc_id = example_data$id[1:10],

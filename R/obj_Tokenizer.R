@@ -228,7 +228,6 @@ TokenizerBase <- R6::R6Class(
             return_tensors = "pt"
           )
 
-
           tmp_dataset <- datasets$Dataset$from_dict(tokens)
 
           tmp_seq_len <- tmp_dataset$num_rows
@@ -239,7 +238,6 @@ TokenizerBase <- R6::R6Class(
           } else {
             tmp_dataset <- tmp_dataset$select(as.integer((1L:chunk_list[[i]]) - 1L))
           }
-
           encodings <- datasets$concatenate_datasets(c(encodings, tmp_dataset))
         }
         return(encodings_list = list(

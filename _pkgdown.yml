@@ -72,17 +72,9 @@ reference:
   - has_concept("performance measures")
 
 - title: For Developers
-- subtitle: R6 Classes (except transformers)
+- subtitle: R6 Classes
 - contents:
   - has_concept("R6 Classes for Developers")
-
-- subtitle: R6 Classes for Data Management
-- contents:
-  - has_concept("Data Management Developers")
-
-- subtitle: R6 Classes for Language Models/Transformers
-- contents:
-  - has_concept("R6 classes for transformers")
 
 - subtitle: Utils for Tokenizer
 - contents:

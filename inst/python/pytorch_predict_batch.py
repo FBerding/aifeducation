@@ -102,3 +102,5 @@ def TeProtoNetClassifierBatchPredict(model,dataset,batch_size,embeddings_s,class
     return predictions_list,distances_list,query_classes_list,query_embeddings_list,prototypes    
   else:
     return predictions_list
+
+
