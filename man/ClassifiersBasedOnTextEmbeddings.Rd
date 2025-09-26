@@ -18,6 +18,7 @@ Other R6 Classes for Developers:
 \code{\link{AIFEBaseModel}},
 \code{\link{AIFEMaster}},
 \code{\link{BaseModelCore}},
+\code{\link{DataManagerClassifier}},
 \code{\link{LargeDataSetBase}},
 \code{\link{ModelsBasedOnTextEmbeddings}},
 \code{\link{TEClassifiersBasedOnProtoNet}},

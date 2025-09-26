@@ -40,5 +40,14 @@ test_that("get_py_env_type ", {
   }
 })
 
+test_that("get_current_conda_env and get_current_venv", {
+  if (Sys.getenv("CI") == "true") {
+    expect_equal(get_current_conda_env (),"r-reticulate")
+    expect_error(get_current_venv ())
+  } else {
+    expect_equal(get_current_venv (),"aifeducation")
+    expect_error(get_current_conda_env ())
+  }
+})
 
 

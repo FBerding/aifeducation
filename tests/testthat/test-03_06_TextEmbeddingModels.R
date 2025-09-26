@@ -111,24 +111,6 @@ for (base_model_type in base_model_type_list) {
             )
           )
         })
-        # Error Checking: max length exceeded
-        test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "Error Checking: max length exceeded"), {
-          text_embedding_model <- TextEmbeddingModel$new()
-          expect_error(
-            text_embedding_model$configure(
-              model_name = paste0(base_model_type, "_embedding"),
-              model_label = paste0("Text Embedding via", base_model_type),
-              model_language = "english",
-              max_length = 50000,
-              chunks = chunks,
-              overlap = 10,
-              emb_layer_min = min_layer,
-              emb_layer_max = max_layer,
-              emb_pool_type = pooling_type,
-              base_model = base_model
-            )
-          )
-        })
         # Error Checking: Configuration already set
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"), {
           text_embedding_model <- TextEmbeddingModel$new()

@@ -24,6 +24,7 @@ BaseModelCore <- R6::R6Class(
     model_type = NULL,
     adjust_max_sequence_length = 0L,
     return_token_type_ids = TRUE,
+    sequence_mode="equal",
     model_info = list(),
     flops_estimates = data.frame(),
     publication_info = list(
@@ -47,7 +48,8 @@ BaseModelCore <- R6::R6Class(
           "datasets_transformer_compute_vocabulary.py",
           "datasets_transformer_prepare_data.py",
           "pytorch_transformer_callbacks.py",
-          "pytorch_base_models_training_loops.py"
+          "pytorch_base_models_training_loops.py",
+          "data_collator.py"
         )
       )
     },
@@ -176,11 +178,9 @@ BaseModelCore <- R6::R6Class(
       )
 
       if (self$last_training$config$whole_word) {
-        tmp_data_collator <- transformers$DataCollatorForWholeWordMask(
+        tmp_data_collator <- py$DataCollatorForWholeWordMask(
           tokenizer = self$Tokenizer$get_tokenizer(),
-          mlm = TRUE,
-          mlm_probability = self$last_training$config$p_mask,
-          return_tensors = "pt"
+          mlm_probability = self$last_training$config$p_mask
         )
       } else {
         tmp_data_collator <- transformers$DataCollatorForLanguageModeling(

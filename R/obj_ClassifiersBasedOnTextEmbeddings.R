@@ -604,12 +604,12 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         if (iteration <= self$last_training$config$n_folds) {
           message(
             get_time_stamp(),
-            "|", "Iteration", iteration, "from", self$last_training$config$n_folds
+            " | ", "Iteration ", iteration, " from ", self$last_training$config$n_folds
           )
         } else {
           message(
             get_time_stamp(),
-            "|", "Final training"
+            " | ", "Final training"
           )
         }
       }
@@ -647,14 +647,14 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         if (iteration <= self$last_training$config$n_folds) {
           message(
             get_time_stamp(),
-            "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
-            "|", "Training"
+            " | ", "Iteration ", iteration, " from ", self$last_training$config$n_folds,
+            " | ", "Training"
           )
         } else {
           message(
             get_time_stamp(),
-            "|", "Final training",
-            "|", "Training"
+            " | ", "Final training",
+            " | ", "Training"
           )
         }
       }
@@ -723,14 +723,14 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           if (iteration <= self$last_training$config$n_folds) {
             message(
               get_time_stamp(),
-              "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
-              "|", "Pseudo labeling", "step", step, "from", self$last_training$config$pl_max_steps
+              " | ", "Iteration ", iteration, " from ", self$last_training$config$n_folds,
+              " | ", "Pseudo labeling ", "step ", step, " from ", self$last_training$config$pl_max_steps
             )
           } else {
             message(
               get_time_stamp(),
-              "|", "Final training",
-              "|", "Pseudo labeling", "step", step, "from", self$last_training$config$pl_max_steps
+              " | ", "Final training",
+              " | ", "Pseudo labeling ", "step ", step, " from ", self$last_training$config$pl_max_steps
             )
           }
         }
@@ -778,14 +778,14 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           if (iteration <= self$last_training$config$n_folds) {
             message(
               get_time_stamp(),
-              "|", "Iteration", iteration, "from", self$last_training$config$n_folds,
-              "|", "Training"
+              " | ", "Iteration ", iteration, " from ", self$last_training$config$n_folds,
+              " | ", "Training"
             )
           } else {
             message(
               get_time_stamp(),
-              "|", "Final training",
-              "|", "Training"
+              " | ", "Final training",
+              " | ", "Training"
             )
           }
         }
@@ -1320,7 +1320,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (self$last_training$config$trace) {
         message(
           get_time_stamp(),
-          "Start"
+          " Start"
         )
       }
 
@@ -1380,7 +1380,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (self$last_training$config$trace) {
         message(
           get_time_stamp(),
-          "Training Complete"
+          " Training Complete"
         )
       }
     },

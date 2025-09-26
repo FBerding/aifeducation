@@ -25,12 +25,19 @@ editor_options:
 
 **TextEmbeddingModels**
 
-- TextEmbeddingModels based on a funnel transformer allow now to apply average pooling. 
+- Re-implemented algorithm to embed texts. The new version has a better numerical stability and is
+  faster.
 
 **Ai for Education Studio**
 
 - Fixed bug that prevents changes in the documentation to be saved.
 - Updated Studio to the new classes and methods.
+
+**BaseModels**
+
+- Added an own implementation of the DataCollatorForWholeWordMask that uses the 
+  word_ids of PreTrainedTokenizerFast. This collator can be used with any
+  type of PreTrainedTokenizerFast.
 
 **Classifiers**
 

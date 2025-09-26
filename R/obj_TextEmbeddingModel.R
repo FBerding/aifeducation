@@ -143,8 +143,10 @@ TextEmbeddingModel <- R6::R6Class(
     #-------------------------------------------------------------------------
     # Method for checking and setting pooling type
     check_and_set_pooling_type = function(emb_pool_type) {
-      if (!emb_pool_type %in% c("CLS", "Average")) {
-        stop("emb_pool_type must be 'cls' or 'average'.")
+      if (self$BaseModel$get_model_type() == "funnel" & emb_pool_type != "CLS") {
+        message("Text embedding based on a funnel transformer allows only 'CLS' as pooling type and not ",
+                emb_pool_type,". Chaneging method to 'CLS'")
+        emb_pool_type="CLS"
       }
       private$model_config$emb_pool_type <- emb_pool_type
     },
@@ -152,10 +154,12 @@ TextEmbeddingModel <- R6::R6Class(
     # Method for checking and setting max_length
     check_and_set_max_length = function(max_length) {
       if (max_length > (self$BaseModel$get_model()$config$max_position_embeddings)) {
-        stop(
+        message(
           "max_length is ", max_length, ". This value is not allowed to exceed ",
-          self$BaseModel$get_model()$config$max_position_embeddings
+          self$BaseModel$get_model()$config$max_position_embeddings,
+          "Set value to ",self$BaseModel$get_model()$config$max_position_embeddings,"."
         )
+        private$model_config$max_length<- as.integer(self$BaseModel$get_model()$config$max_position_embeddings)
       } else {
         private$model_config$max_length <- as.integer(max_length)
       }
@@ -353,16 +357,16 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(object = trace, type = "bool", FALSE)
       check_type(object = return_large_dataset, type = "bool", FALSE)
 
-      #Load python scripts
+      # Load python scripts
       private$load_reload_python_scripts()
 
-      #Object for storing embeddings
-      batch_results=list()
+      # Object for storing embeddings
+      batch_results <- list()
 
-      #Get tokenizer
-      tokenizer=self$BaseModel$Tokenizer$get_tokenizer()
+      # Get tokenizer
+      tokenizer <- self$BaseModel$Tokenizer$get_tokenizer()
 
-      #get device and data type
+      # get device and data type
       if (torch$cuda$is_available()) {
         pytorch_device <- "cuda"
         pytorch_dtype <- torch$float
@@ -371,23 +375,25 @@ TextEmbeddingModel <- R6::R6Class(
         pytorch_dtype <- torch$double
       }
 
-      require_token_type_ids=self$BaseModel$get_private()$return_token_type_ids
+      require_token_type_ids <- self$BaseModel$get_private()$return_token_type_ids
+      sequence_mode <- self$BaseModel$get_private()$sequence_mode
 
-      #Create a model for embedding
-      pytorch_embedding_model=py$TextEmbeddingModel(
-        base_model=self$BaseModel$get_model(),
-        chunks=as.integer(private$model_config$chunks),
-        emb_layer_min=as.integer(private$model_config$emb_layer_min),
-        emb_layer_max=as.integer(private$model_config$emb_layer_max),
-        pad_value=private$model_config$pad_value,
-        emb_pool_type=private$model_config$emb_pool_type
+      # Create a model for embedding
+      pytorch_embedding_model <- py$TextEmbeddingModel(
+        base_model = self$BaseModel$get_model(),
+        chunks = as.integer(private$model_config$chunks),
+        emb_layer_min = as.integer(private$model_config$emb_layer_min),
+        emb_layer_max = as.integer(private$model_config$emb_layer_max),
+        pad_value = private$model_config$pad_value,
+        emb_pool_type = private$model_config$emb_pool_type,
+        sequence_mode = sequence_mode
       )
 
-      pytorch_embedding_model$to(device=pytorch_device,dtype=pytorch_dtype)
+      pytorch_embedding_model$to(device = pytorch_device, dtype = pytorch_dtype)
       pytorch_embedding_model$eval()
 
-      n_documents=length(raw_text)
-      for(i in seq_along(raw_text)){
+      n_documents <- length(raw_text)
+      for (i in seq_along(raw_text)) {
         tokens <- tokenizer(
           raw_text[i],
           stride = as.integer(private$model_config$overlap),
@@ -402,24 +408,24 @@ TextEmbeddingModel <- R6::R6Class(
           return_tensors = "pt"
         )
 
-        if(require_token_type_ids){
-          tmp_embeddings=pytorch_embedding_model(
-            input_ids=tokens["input_ids"]$to(device=pytorch_device),
-            attention_mask=tokens["attention_mask"]$to(device=pytorch_device),
-            token_type_ids=token_type_ids=tokens["token_type_ids"]$to(device=pytorch_device)
+        if (require_token_type_ids) {
+          tmp_embeddings <- pytorch_embedding_model(
+            input_ids = tokens["input_ids"]$to(device = pytorch_device),
+            attention_mask = tokens["attention_mask"]$to(device = pytorch_device),
+            token_type_ids = tokens["token_type_ids"]$to(device = pytorch_device)
           )
         } else {
-          tmp_embeddings=pytorch_embedding_model(
-            input_ids=tokens["input_ids"]$to(device=pytorch_device),
-            attention_mask=tokens["attention_mask"]$to(device=pytorch_device)
+          tmp_embeddings <- pytorch_embedding_model(
+            input_ids = tokens["input_ids"]$to(device = pytorch_device),
+            attention_mask = tokens["attention_mask"]$to(device = pytorch_device)
           )
         }
 
 
-        tmp_embeddings=tensor_to_numpy(tmp_embeddings)
-        rownames(tmp_embeddings)=doc_id[i]
+        tmp_embeddings <- tensor_to_numpy(tmp_embeddings)
+        rownames(tmp_embeddings) <- doc_id[i]
 
-        batch_results[length(batch_results)+1]=list(tmp_embeddings)
+        batch_results[length(batch_results) + 1] <- list(tmp_embeddings)
 
         if (trace == TRUE) {
           cat(paste(
@@ -490,7 +496,6 @@ TextEmbeddingModel <- R6::R6Class(
                            trace = FALSE,
                            log_file = NULL,
                            log_write_interval = 2L) {
-
       # Check arguments
       check_class(object = text_dataset, classes = c("LargeDataSetForText", allow_NULL = FALSE))
       check_type(object = batch_size, type = "int", FALSE)

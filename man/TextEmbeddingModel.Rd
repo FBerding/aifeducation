@@ -113,8 +113,8 @@ as the maximal postional embeddings for the model. Allowed values: \code{20 <= x
 
 \item{\code{emb_pool_type}}{\code{string} Method to summarize the embedding of single tokens into a text embedding.
 In the case of \code{'CLS'} all cls-tokens between \code{emb_layer_min} and \code{emb_layer_max} are averaged.
-In the case of \code{'Average'} the embeddings of all tokens are averaged.,
-default_value = NULL Allowed values: 'CLS', 'Average'}
+In the case of \code{'Average'} the embeddings of all tokens are averaged.
+Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Average'}
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.

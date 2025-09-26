@@ -25,6 +25,7 @@ BaseModelFunnel <- R6::R6Class(
   private = list(
     model_type = "funnel",
     adjust_max_sequence_length = 1,
+    sequence_mode="vary",
     create_model = function(args) {
       configuration <- transformers$FunnelConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),

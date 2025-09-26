@@ -349,14 +349,14 @@ DataManagerClassifier <- R6::R6Class(
         if (self$state$iteration <= self$config$n_folds) {
           message(
             get_time_stamp(),
-            "|", "Iteration", self$state$iteration, "from", self$config$n_folds,
-            "|", "Generating synthetic cases"
+            " | ", "Iteration ", self$state$iteration, " from ", self$config$n_folds,
+            " | ", "Generating synthetic cases"
           )
         } else {
           message(
             get_time_stamp(),
-            "|", "Final training",
-            "|", "Generating synthetic cases"
+            " | ", "Final training",
+            " | ", "Generating synthetic cases"
           )
         }
       }
@@ -449,14 +449,14 @@ DataManagerClassifier <- R6::R6Class(
         if (self$state$iteration <= self$config$n_folds) {
           message(
             get_time_stamp(),
-            "|", "Iteration", self$state$iteration, "from", self$config$n_folds,
-            "|", "Generating synthetic cases done"
+            " | ", "Iteration ", self$state$iteration, " from ", self$config$n_folds,
+            " | ", "Generating synthetic cases done"
           )
         } else {
           message(
             get_time_stamp(),
-            "|", "Final training",
-            "|", "Generating synthetic cases done"
+            " | ", "Final training",
+            " | ", "Generating synthetic cases done"
           )
         }
       }
@@ -557,9 +557,9 @@ DataManagerClassifier <- R6::R6Class(
       if (trace) {
         message(
           get_time_stamp(),
-          "Total Cases:", n_init_cases,
-          "Unique Cases:", n_final_cases,
-          "Labeled Cases:", length(indices_labeled)
+          " Total Cases: ", n_init_cases,
+          " Unique Cases: ", n_final_cases,
+          " Labeled Cases: ", length(indices_labeled)
         )
       }
     },

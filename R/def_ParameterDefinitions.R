@@ -167,8 +167,9 @@ get_param_dict <- function() {
     allowed_values = c("CLS", "Average"),
     desc = "Method to summarize the embedding of single tokens into a text embedding.
     In the case of `'CLS'` all cls-tokens between `emb_layer_min` and `emb_layer_max` are averaged.
-    In the case of `'Average'` the embeddings of all tokens are averaged.,
-    default_value = NULL"
+    In the case of `'Average'` the embeddings of all tokens are averaged.
+    Please note that BaseModelFunnel allows only 'CLS'.",
+    default_value = NULL
   )
 
   param$funnel_pooling_type <- list(

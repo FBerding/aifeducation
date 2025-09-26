@@ -12,7 +12,19 @@ techniques.
 Abstract class for managing the data and samples during training a classifier. DataManagerClassifier is
 used with all classifiers based on text embeddings.
 }
-\concept{Data Management Developers}
+\seealso{
+Other R6 Classes for Developers: 
+\code{\link{AIFEBaseModel}},
+\code{\link{AIFEMaster}},
+\code{\link{BaseModelCore}},
+\code{\link{ClassifiersBasedOnTextEmbeddings}},
+\code{\link{LargeDataSetBase}},
+\code{\link{ModelsBasedOnTextEmbeddings}},
+\code{\link{TEClassifiersBasedOnProtoNet}},
+\code{\link{TEClassifiersBasedOnRegular}},
+\code{\link{TokenizerBase}}
+}
+\concept{R6 Classes for Developers}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
